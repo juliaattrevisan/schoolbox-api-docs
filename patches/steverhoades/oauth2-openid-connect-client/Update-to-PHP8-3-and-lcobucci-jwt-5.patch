@@ -1,0 +1,525 @@
+From f049491ad13d975495782ebed3ccf32a5fa411f5 Mon Sep 17 00:00:00 2001
+From: Andreas Heigl <andreas@heigl.org>
+Date: Thu, 21 Dec 2023 10:49:13 +0100
+Subject: [PATCH 1/2] Move to PHPUnit 10
+
+Note that changes to composer.json and composer.lock have been removed from this patch to reduce its size.  Those files
+have no effect on the Schoolbox project.
+
+THis prepares the whole testsuite to be usable with PHP8.3
+---
+ phpunit.xml                                   |   47 +-
+ src/Validator/ValidatorChain.php              |    5 +-
+ tests/Runner/BypassFinalExtension.php         |   16 -
+ .../ConvertWarningToExceptionExtension.php    |   16 -
+ tests/Unit/OpenIDConnectProviderTest.php      |   17 +-
+ .../Validator/AbstractValidatorTester.php     |   11 +-
+ .../Unit/Validator/EqualsToOrContainsTest.php |    4 +-
+ tests/Unit/Validator/EqualsToTest.php         |    4 +-
+ .../Unit/Validator/GreaterOrEqualsToTest.php  |    4 +-
+ tests/Unit/Validator/LesserOrEqualsToTest.php |    4 +-
+ tests/Unit/Validator/NotEmptyTest.php         |    6 +-
+ tests/Unit/Validator/ValidatorChainTest.php   |   62 +-
+ 14 files changed, 1936 insertions(+), 2345 deletions(-)
+ delete mode 100644 tests/Runner/BypassFinalExtension.php
+ delete mode 100644 tests/Runner/ConvertWarningToExceptionExtension.php
+
+diff --git a/phpunit.xml b/phpunit.xml
+index 665688d..8228a78 100644
+--- a/phpunit.xml
++++ b/phpunit.xml
+@@ -1,31 +1,24 @@
+ <?xml version="1.0" encoding="UTF-8"?>
+ <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+-    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.4/phpunit.xsd"
+-    backupGlobals="false"
+-    backupStaticAttributes="false"
+-    beStrictAboutOutputDuringTests="true"
+-    beStrictAboutTestsThatDoNotTestAnything="true"
+-    colors="true"
+-    convertErrorsToExceptions="true"
+-    convertNoticesToExceptions="true"
+-    convertWarningsToExceptions="true"
+-    processIsolation="false"
+-    stopOnFailure="false"
++         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
++         backupGlobals="false"
++         beStrictAboutOutputDuringTests="true"
++         beStrictAboutTestsThatDoNotTestAnything="true"
++         colors="true"
++         processIsolation="false"
++         stopOnFailure="false"
++         cacheDirectory=".phpunit.cache"
++         backupStaticProperties="false"
+ >
+-    <testsuites>
+-        <testsuite name="Unit Test Suite">
+-            <directory suffix="Test.php">./tests/Unit</directory>
+-        </testsuite>
+-    </testsuites>
+-
+-    <coverage processUncoveredFiles="true">
+-        <include>
+-            <directory suffix=".php">./src</directory>
+-        </include>
+-    </coverage>
+-
+-    <extensions>
+-        <extension class="OpenIDConnectClient\Tests\Runner\ConvertWarningToExceptionExtension"/>
+-        <extension class="OpenIDConnectClient\Tests\Runner\BypassFinalExtension"/>
+-    </extensions>
++  <testsuites>
++    <testsuite name="Unit Test Suite">
++      <directory suffix="Test.php">./tests/Unit</directory>
++    </testsuite>
++  </testsuites>
++  <coverage/>
++  <source>
++    <include>
++      <directory suffix=".php">./src</directory>
++    </include>
++  </source>
+ </phpunit>
+diff --git a/src/Validator/ValidatorChain.php b/src/Validator/ValidatorChain.php
+index dc35fd4..862eca9 100644
+--- a/src/Validator/ValidatorChain.php
++++ b/src/Validator/ValidatorChain.php
+@@ -5,10 +5,11 @@
+ namespace OpenIDConnectClient\Validator;
+
+ use Lcobucci\JWT\Token\Plain;
++use Lcobucci\JWT\UnencryptedToken;
+ use OpenIDConnectClient\Exception\UnknownValidatorRequestedException;
+ use Webmozart\Assert\Assert;
+
+-final class ValidatorChain
++class ValidatorChain
+ {
+     /** @var ValidatorInterface[] */
+     private array $validators = [];
+@@ -39,7 +40,7 @@ public function addValidator(ValidatorInterface $validator): self
+         return $this;
+     }
+
+-    public function validate(array $data, Plain $token): bool
++    public function validate(array $data, UnencryptedToken $token): bool
+     {
+         $valid = true;
+         $claims = $token->claims();
+diff --git a/tests/Runner/BypassFinalExtension.php b/tests/Runner/BypassFinalExtension.php
+deleted file mode 100644
+index f225bc8..0000000
+--- a/tests/Runner/BypassFinalExtension.php
++++ /dev/null
+@@ -1,16 +0,0 @@
+-<?php
+-
+-declare(strict_types=1);
+-
+-namespace OpenIDConnectClient\Tests\Runner;
+-
+-use DG\BypassFinals;
+-use PHPUnit\Runner\BeforeFirstTestHook;
+-
+-final class BypassFinalExtension implements BeforeFirstTestHook
+-{
+-    public function executeBeforeFirstTest(): void
+-    {
+-        BypassFinals::enable();
+-    }
+-}
+diff --git a/tests/Runner/ConvertWarningToExceptionExtension.php b/tests/Runner/ConvertWarningToExceptionExtension.php
+deleted file mode 100644
+index 25e42f0..0000000
+--- a/tests/Runner/ConvertWarningToExceptionExtension.php
++++ /dev/null
+@@ -1,16 +0,0 @@
+-<?php
+-
+-declare(strict_types=1);
+-
+-namespace OpenIDConnectClient\Tests\Runner;
+-
+-use PHPUnit\Runner\AfterTestWarningHook;
+-
+-final class ConvertWarningToExceptionExtension implements AfterTestWarningHook
+-{
+-    public function executeAfterTestWarning(string $test, string $message, float $time): void
+-    {
+-        echo PHP_EOL . $message . ' in ' . $test . PHP_EOL;
+-        exit(1);
+-    }
+-}
+diff --git a/tests/Unit/OpenIDConnectProviderTest.php b/tests/Unit/OpenIDConnectProviderTest.php
+index 8829198..d493098 100644
+--- a/tests/Unit/OpenIDConnectProviderTest.php
++++ b/tests/Unit/OpenIDConnectProviderTest.php
+@@ -103,6 +103,10 @@ protected function setUp(): void
+      */
+     public function testConstructorWithoutSignerThrowsException(array $options, array $collaborators): void
+     {
++        if (isset($collaborators['signers']) && $collaborators['signers'] === 'create') {
++            $collaborators['signers'] = $this->createMock(Signer::class);
++        }
++
+         $this->expectException(InvalidArgumentException::class);
+
+         $this->provider = new OpenIDConnectProvider($options, $collaborators);
+@@ -308,9 +312,8 @@ public function testDefaultValidatorChain(): void
+         self::assertTrue($chain->hasValidator(RegisteredClaims::SUBJECT));
+     }
+
+-    public function invalidConstructorArgumentsProvider(): iterable
++    public static function invalidConstructorArgumentsProvider(): iterable
+     {
+-        $signer = $this->createMock(Signer::class);
+
+         yield 'signer is missing' => [
+             [
+@@ -347,7 +350,7 @@ public function invalidConstructorArgumentsProvider(): iterable
+                 'idTokenIssuer' => 'some idTokenIssuer',
+             ],
+             [
+-                'signer' => $signer,
++                'signer' => 'create',
+             ],
+         ];
+
+@@ -360,7 +363,7 @@ public function invalidConstructorArgumentsProvider(): iterable
+                 'idTokenIssuer' => 'some idTokenIssuer',
+             ],
+             [
+-                'signer' => $signer,
++                'signer' => 'create',
+             ],
+         ];
+
+@@ -373,7 +376,7 @@ public function invalidConstructorArgumentsProvider(): iterable
+                 'idTokenIssuer' => 'some idTokenIssuer',
+             ],
+             [
+-                'signer' => $signer,
++                'signer' => 'create',
+             ],
+         ];
+
+@@ -386,7 +389,7 @@ public function invalidConstructorArgumentsProvider(): iterable
+                 'idTokenIssuer' => 'some idTokenIssuer',
+             ],
+             [
+-                'signer' => $signer,
++                'signer' => 'create',
+             ],
+         ];
+
+@@ -399,7 +402,7 @@ public function invalidConstructorArgumentsProvider(): iterable
+                 //'idTokenIssuer' => 'some idTokenIssuer',
+             ],
+             [
+-                'signer' => $signer,
++                'signer' => 'create',
+             ],
+         ];
+     }
+diff --git a/tests/Unit/Validator/AbstractValidatorTester.php b/tests/Unit/Validator/AbstractValidatorTester.php
+index b7006d5..7823f67 100644
+--- a/tests/Unit/Validator/AbstractValidatorTester.php
++++ b/tests/Unit/Validator/AbstractValidatorTester.php
+@@ -12,9 +12,9 @@ abstract class AbstractValidatorTester extends TestCase
+ {
+     protected static string $classUnderTest = 'please provide your the FQN of the class to test';
+
+-    abstract public function isValidArgumentExpectationsProvider(): iterable;
++    abstract public static function isValidArgumentExpectationsProvider(): iterable;
+
+-    abstract public function isValidInvalidArgumentProvider(): iterable;
++    abstract public static function isValidInvalidArgumentProvider(): iterable;
+
+     protected function setUp(): void
+     {
+@@ -69,6 +69,9 @@ public function testIsValidExpectations($originalExpectedValue, $receivedValue,
+      */
+     public function testIsValidWithInvalidParameters($originalExpectedValue, $receivedValue): void
+     {
++        if (static::class === NotEmptyTest::class)  {
++            $this->markTestSkipped('We can not test validity for NotEmpty');
++        }
+         $classUnderTest = static::$classUnderTest;
+
+         /** @var ValidatorInterface $validator */
+@@ -79,14 +82,14 @@ public function testIsValidWithInvalidParameters($originalExpectedValue, $receiv
+         $validator->isValid($originalExpectedValue, $receivedValue);
+     }
+
+-    public function validConstructorParametersProvider(): iterable
++    public static function validConstructorParametersProvider(): iterable
+     {
+         yield ['a', true];
+         yield ['name 1', true];
+         yield ['name-2', false];
+     }
+
+-    public function invalidConstructorParametersProvider(): iterable
++    public static function invalidConstructorParametersProvider(): iterable
+     {
+         yield ['', true];
+         yield [' ', true];
+diff --git a/tests/Unit/Validator/EqualsToOrContainsTest.php b/tests/Unit/Validator/EqualsToOrContainsTest.php
+index 1600d67..47ca465 100644
+--- a/tests/Unit/Validator/EqualsToOrContainsTest.php
++++ b/tests/Unit/Validator/EqualsToOrContainsTest.php
+@@ -10,7 +10,7 @@ final class EqualsToOrContainsTest extends AbstractValidatorTester
+ {
+     protected static string $classUnderTest = EqualsToOrContains::class;
+
+-    public function isValidArgumentExpectationsProvider(): iterable
++    public static function isValidArgumentExpectationsProvider(): iterable
+     {
+         yield ["\n", "\n", true];
+         yield ["\n\t", "\n\t", true];
+@@ -50,7 +50,7 @@ public function isValidArgumentExpectationsProvider(): iterable
+         yield [0, [456, false], false];
+     }
+
+-    public function isValidInvalidArgumentProvider(): iterable
++    public static function isValidInvalidArgumentProvider(): iterable
+     {
+         yield [(object)['field' => 1], ''];
+         yield [['array' => 1], ['array' => 1]];
+diff --git a/tests/Unit/Validator/EqualsToTest.php b/tests/Unit/Validator/EqualsToTest.php
+index de68249..f2b06a8 100644
+--- a/tests/Unit/Validator/EqualsToTest.php
++++ b/tests/Unit/Validator/EqualsToTest.php
+@@ -10,7 +10,7 @@ final class EqualsToTest extends AbstractValidatorTester
+ {
+     protected static string $classUnderTest = EqualsTo::class;
+
+-    public function isValidArgumentExpectationsProvider(): iterable
++    public static function isValidArgumentExpectationsProvider(): iterable
+     {
+         yield ["\n", "\n", true];
+         yield ["\n\t", "\n\t", true];
+@@ -37,7 +37,7 @@ public function isValidArgumentExpectationsProvider(): iterable
+         yield [null, true, false];
+     }
+
+-    public function isValidInvalidArgumentProvider(): iterable
++    public static function isValidInvalidArgumentProvider(): iterable
+     {
+         yield [(object)['field' => 1], (object)['field' => 1], true];
+         yield [['array' => 1], ['array' => 1], true];
+diff --git a/tests/Unit/Validator/GreaterOrEqualsToTest.php b/tests/Unit/Validator/GreaterOrEqualsToTest.php
+index e46c690..7748323 100644
+--- a/tests/Unit/Validator/GreaterOrEqualsToTest.php
++++ b/tests/Unit/Validator/GreaterOrEqualsToTest.php
+@@ -10,7 +10,7 @@ final class GreaterOrEqualsToTest extends AbstractValidatorTester
+ {
+     protected static string $classUnderTest = GreaterOrEqualsTo::class;
+
+-    public function isValidArgumentExpectationsProvider(): iterable
++    public static function isValidArgumentExpectationsProvider(): iterable
+     {
+         yield ['123', '122', false];
+         yield [123, '122', false];
+@@ -27,7 +27,7 @@ public function isValidArgumentExpectationsProvider(): iterable
+         yield [null, 123, true];
+     }
+
+-    public function isValidInvalidArgumentProvider(): iterable
++    public static function isValidInvalidArgumentProvider(): iterable
+     {
+         yield [123, -2.3];
+         yield [123, 'some string'];
+diff --git a/tests/Unit/Validator/LesserOrEqualsToTest.php b/tests/Unit/Validator/LesserOrEqualsToTest.php
+index 0455614..a6be2a7 100644
+--- a/tests/Unit/Validator/LesserOrEqualsToTest.php
++++ b/tests/Unit/Validator/LesserOrEqualsToTest.php
+@@ -10,7 +10,7 @@ final class LesserOrEqualsToTest extends AbstractValidatorTester
+ {
+     protected static string $classUnderTest = LesserOrEqualsTo::class;
+
+-    public function isValidArgumentExpectationsProvider(): iterable
++    public static function isValidArgumentExpectationsProvider(): iterable
+     {
+         yield ['123', '122', true];
+         yield [123, '122', true];
+@@ -27,7 +27,7 @@ public function isValidArgumentExpectationsProvider(): iterable
+         yield [null, 123, false];
+     }
+
+-    public function isValidInvalidArgumentProvider(): iterable
++    public static function isValidInvalidArgumentProvider(): iterable
+     {
+         yield [123, -2.3];
+         yield [123, 'some string'];
+diff --git a/tests/Unit/Validator/NotEmptyTest.php b/tests/Unit/Validator/NotEmptyTest.php
+index e16322e..066a89f 100644
+--- a/tests/Unit/Validator/NotEmptyTest.php
++++ b/tests/Unit/Validator/NotEmptyTest.php
+@@ -10,7 +10,7 @@ final class NotEmptyTest extends AbstractValidatorTester
+ {
+     protected static string $classUnderTest = NotEmpty::class;
+
+-    public function isValidArgumentExpectationsProvider(): iterable
++    public static function isValidArgumentExpectationsProvider(): iterable
+     {
+         yield [null, 'not empty', true];
+         yield [null, ' ', true];
+@@ -30,9 +30,9 @@ public function isValidArgumentExpectationsProvider(): iterable
+         yield [null, false, false];
+     }
+
+-    public function isValidInvalidArgumentProvider(): iterable
++    public static function isValidInvalidArgumentProvider(): iterable
+     {
+         // NotEmpty can process any type
+-        return [];
++        return [['', '']];
+     }
+ }
+diff --git a/tests/Unit/Validator/ValidatorChainTest.php b/tests/Unit/Validator/ValidatorChainTest.php
+index fc6937e..8241c8c 100644
+--- a/tests/Unit/Validator/ValidatorChainTest.php
++++ b/tests/Unit/Validator/ValidatorChainTest.php
+@@ -8,6 +8,7 @@
+ use Lcobucci\JWT\Token;
+ use Lcobucci\JWT\Token\DataSet;
+ use Lcobucci\JWT\Token\Plain;
++use Lcobucci\JWT\UnencryptedToken;
+ use OpenIDConnectClient\Validator\ValidatorChain;
+ use OpenIDConnectClient\Validator\ValidatorInterface;
+ use PHPUnit\Framework\TestCase;
+@@ -129,40 +130,23 @@ public function testExecuteValidValidators(): void
+         $this->chain->addValidator($firstValidator);
+         $this->chain->addValidator($secondValidator);
+
+-        $token = $this->createMock(Plain::class);
+-        $claims = $this->createMock(DataSet::class);
++        $token = $this->createMock(UnencryptedToken::class);
++        $claims = new DataSet([
++            'v1' => 'some value 1',
++            'v2' => 'some value 2'
++        ], 'encodedstring');
+         $token
+             ->expects(self::once())
+             ->method('claims')
+             ->willReturn($claims);
+
+-        $claims
+-            ->expects(self::exactly(3))
+-            ->method('has')
+-            ->willReturnMap(
+-                [
+-                    ['v1', true],
+-                    ['v2', true],
+-                ],
+-            );
+-
+-        $claims
+-            ->expects(self::exactly(2))
+-            ->method('get')
+-            ->willReturnMap(
+-                [
+-                    ['v1', null, 'some value 1'],
+-                    ['v2', null, 'some value 2'],
+-                ],
+-            );
+-
+-        $claims = [
++        $checkedClaims = [
+             'v1' => 'value 1',
+             'v2' => 'value 2',
+             'unused' => 'something unused',
+         ];
+
+-        self::assertTrue($this->chain->validate($claims, $token));
++        self::assertTrue($this->chain->validate($checkedClaims, $token));
+         self::assertCount(0, $this->chain->getMessages());
+     }
+
+@@ -231,40 +215,22 @@ public function testExecuteInValidValidators(): void
+         $this->chain->addValidator($thirdValidator);
+         $this->chain->addValidator($fourthValidator);
+
+-        $token = $this->createMock(Plain::class);
+-        $claims = $this->createMock(DataSet::class);
++        $token = $this->createMock(UnencryptedToken::class);
++        $claims = new DataSet([
++            'v2' => 'some value 2',
++        ], 'encrypted string');
+         $token
+             ->expects(self::once())
+             ->method('claims')
+             ->willReturn($claims);
+
+-        $claims
+-            ->expects(self::exactly(3))
+-            ->method('has')
+-            ->willReturnMap(
+-                [
+-                    ['v1', false],
+-                    ['v2', true],
+-                    ['v4', false],
+-                ],
+-            );
+-
+-        $claims
+-            ->expects(self::once())
+-            ->method('get')
+-            ->willReturnMap(
+-                [
+-                    ['v2', null, 'some value 2'],
+-                ],
+-            );
+-
+-        $claims = [
++        $checkedClaims = [
+             'v1' => 'value 1',
+             'v2' => 'value 2',
+             'v4' => 'value 4',
+         ];
+
+-        self::assertFalse($this->chain->validate($claims, $token));
++        self::assertFalse($this->chain->validate($checkedClaims, $token));
+
+         $messages = $this->chain->getMessages();
+         self::assertCount(2, $messages);
+
+From 88ea9f5bc00fbf342a49817d2623a148bdbcff03 Mon Sep 17 00:00:00 2001
+From: Andreas Heigl <andreas@heigl.org>
+Date: Thu, 21 Dec 2023 11:05:45 +0100
+Subject: [PATCH 2/2] Update JWT-lib to v5
+
+THis allows to use the latest version of the JWT-lib. Some changes where
+necessary due to the previous way not being supported anymore but as
+that was anyhow only used to parse the token we can also use the default
+way of parsing the token without needing a whole configuration object in
+the first place
+---
+ src/AccessToken.php |    6 +-
+ 3 files changed, 1925 insertions(+), 1986 deletions(-)
+
+diff --git a/src/AccessToken.php b/src/AccessToken.php
+index 8770b14..2a98b07 100644
+--- a/src/AccessToken.php
++++ b/src/AccessToken.php
+@@ -5,6 +5,8 @@
+ namespace OpenIDConnectClient;
+
+ use Lcobucci\JWT\Configuration;
++use Lcobucci\JWT\Encoding\JoseEncoder;
++use Lcobucci\JWT\Token\Parser;
+ use Lcobucci\JWT\Token\Plain;
+ use League\OAuth2\Client\Token\AccessToken as LeagueAccessToken;
+ use OpenIDConnectClient\Exception\InvalidTokenException;
+@@ -20,9 +22,7 @@ public function __construct(array $options = [])
+
+         if (isset($this->values['id_token'])) {
+             // Signature is validated outside, this just parses the token
+-            $token = Configuration::forUnsecuredSigner()
+-                ->parser()
+-                ->parse($this->values['id_token']);
++            $token = (new Parser(new JoseEncoder()))->parse($this->values['id_token']);
+
+             if (!$token instanceof Plain) {
+                 throw new InvalidTokenException('Received wrong token type (expected Plain)');
