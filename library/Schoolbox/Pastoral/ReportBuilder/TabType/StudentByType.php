@@ -37,6 +37,33 @@ class StudentByType extends Cursor implements TabTypeInterface
     }
 
     /**
+     * validate and return the relevant order query to sort the results
+     *
+     * @return string
+     */
+    private function getOrderBy(): string
+    {
+        $orderByName = "u.lastname {$this->order}, COALESCE(u.preferred_name, u.firstname) {$this->order}";
+
+        if (strcasecmp($this->sortBy, 'total') === 0) {
+            return "total {$this->order}";
+        }
+
+        if (!str_starts_with($this->sortBy, 'count_')) {
+            return $orderByName;
+        }
+
+        if (
+            !in_array($this->sortBy, $this->helper->getType()->map(fn(Type $type) => "count_type_" . $type->getId())->getAll()) &&
+            !in_array($this->sortBy, $this->helper->getSubTypes()->map(fn(SubType $subtype) => "count_subtype_" . $subtype->getId())->getAll())
+        ) {
+            return "{$this->sortBy} {$this->order}";
+        }
+
+        return $orderByName;
+    }
+
+    /**
      * @inheritdoc
      */
     public function retrieveResults(?string $encodedCursor): Collection
@@ -123,20 +150,18 @@ class StudentByType extends Cursor implements TabTypeInterface
         $whereParts = "";
         $this->params['limit'] = $this->limit;
         $groupBy = "u.lastname, COALESCE(u.preferred_name, u.firstname)";
-        $orderBy = "u.lastname {$this->order}, COALESCE(u.preferred_name, u.firstname) {$this->order}";
+
+        $orderBy = $this->getOrderBy();
 
         if (isset($cursor)) {
-            /* TODO default to ordering by name in ascending order, will update in SA-20574 when implementing sorting
-             */
-            $sortingOperator = $this->order == Cursor::ORDER_DIRECTION_DEFAULT ? ' >= ' : ' <= ';
+            $sortingOperator = $this->order == Cursor::ORDER_DIRECTION_DEFAULT ? ' > ' : ' < ';
             $whereParts = "
                 CROSS JOIN (SELECT id, lastname, COALESCE(preferred_name, firstname) as preferred_name
                 FROM user
                 WHERE id = :cursor) u2
                 WHERE (
                     u.lastname {$sortingOperator} u2.lastname OR
-                    (u.lastname {$sortingOperator} u2.lastname AND COALESCE(u.preferred_name, u.firstname) {$sortingOperator} u2.preferred_name) AND
-                    u.id <> u2.id)
+                    (u.lastname {$sortingOperator} u2.lastname AND COALESCE(u.preferred_name, u.firstname) {$sortingOperator} u2.preferred_name))
             ";
             $this->params['cursor'] = $cursor['id'];
         }
@@ -209,7 +234,6 @@ class StudentByType extends Cursor implements TabTypeInterface
         $last = $collection->last();
         return $this->codec->encode([
             'id' => $last['student_id'],
-            'orderBy' => 'name' //TODO SA-20574 for sorting in different types
         ]);
     }
 
