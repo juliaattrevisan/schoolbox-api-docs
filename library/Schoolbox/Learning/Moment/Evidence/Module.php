@@ -173,6 +173,17 @@ class Module extends BaseModule
             Closure::fromCallable([$this, 'preloadEvidence']),
         );
 
+        /* Put an evidence into the Submitted state as-is;
+         * Used from the Activity Feed
+         */
+        $this->register(
+            self::METHOD_PUT,
+            '/{evidenceId}/submit',
+            'putSubmit',
+            $modifyEvidenceRule,
+            Closure::fromCallable([$this, 'preloadEvidence']),
+        );
+
         // Evidence modify form
         $this->register(
             self::METHOD_PUT,
@@ -189,17 +200,6 @@ class Module extends BaseModule
             '/{evidenceId}',
             'deleteEvidence',
             $deleteEvidenceRule,
-            Closure::fromCallable([$this, 'preloadEvidence']),
-        );
-
-        /* Put an evidence into the Submitted state as-is;
-         * Used from the Activity Feed
-         */
-        $this->register(
-            self::METHOD_PUT,
-            '/{evidenceId}',
-            'putSubmit',
-            $modifyEvidenceRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
         );
 

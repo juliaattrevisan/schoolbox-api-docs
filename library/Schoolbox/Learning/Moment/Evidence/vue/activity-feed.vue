@@ -462,8 +462,20 @@ export default {
         *
         * @param evidence
         */
-        submit(evidence) {
-            console.log(evidence._links.submit);
+        submitEvidence(evidence) {
+            const submitLink = evidence?._links?.submit;
+
+            if (submitLink) {
+                this.$refs.toast.activate("Submitting...");
+
+                fetch(submitLink, {
+                    method: "PUT",
+                })
+                .then(() => {
+                    this.$refs.toast.timeout("Submitted.", true, 2000);
+                })
+                .catch(() => this.$refs.toast.timeout("Submit failed", false, 5000));
+            }
         }
     },
 };
@@ -775,7 +787,7 @@ export default {
                                     <template v-if="'draft' == evidence.object.currentState || 'rejected' == evidence.object.currentState">
                                         <a class="button">Modify</a>
 
-                                        <a class="button" @click="submit(evidence.object)">Submit</a>
+                                        <a class="button" @click="submitEvidence(evidence.object)">Submit</a>
                                     </template>
                                 </template>
                                 <template v-if="evidence.discriminator === 'badgeAward'">
