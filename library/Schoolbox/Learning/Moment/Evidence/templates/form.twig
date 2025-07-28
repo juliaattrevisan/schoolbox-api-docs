@@ -138,7 +138,7 @@
 
             {% if USER.role.isStudent %}
                 {% if moderationRequired %}
-                    <input type="submit" id="evidence-submit" data-test="learning-moment-evidence-form-submit" value="Submit" />
+                    <input type="submit" id="evidence-submit" data-test="learning-moment-evidence-form-submit" value="Submit for approval" />
                 {% endif %}
             {% elseif USER.role.isStaff and USER.role.accessEvidence %}
                 {% if evidence.isSubmitted %}
