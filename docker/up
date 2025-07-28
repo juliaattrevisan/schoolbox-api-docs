@@ -5,7 +5,9 @@ cd "$(dirname "$0")/.." || exit 1
 
 declare taskd_compose_file
 
-# For now this is hardcoded
+# For now this is hardcoded:
+# eventually, this may allow loading the deployable variant of the FrankenPHP
+# container
 declare frankenphp_compose_file="docker/schoolbox-frankenphp-local.docker-compose.yaml"
 
 # Load config to figure out which taskd compose file to use

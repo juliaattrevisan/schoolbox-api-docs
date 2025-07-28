@@ -3,7 +3,9 @@
 # Always run within root folder
 cd "$(dirname "$0")/.." || exit 1
 
-# stop containers for all docker-compose configurations
+# Stop containers for all docker-compose configurations:
+# don't need to stop all possible permutations, just need to ensure each
+# taskd and frankenphp variant is stopped at least once.
 docker compose --progress plain \
     -f "docker/base.docker-compose.yaml" \
     -f "docker/schoolbox-taskd-local.docker-compose.yaml" \
