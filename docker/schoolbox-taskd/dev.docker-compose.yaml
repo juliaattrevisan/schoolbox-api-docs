@@ -15,3 +15,5 @@ services:
     env_file:
       - path: ./default.env
         required: true
+      - path: ./../taskd.env
+        required: false

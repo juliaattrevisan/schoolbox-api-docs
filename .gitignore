@@ -22,6 +22,7 @@ vagrantcache/
 tools/xdebug.ini
 vagrant.yaml
 docker.ini
+taskd.env
 .sass-cache/
 post-provision.sh
 .idea/
