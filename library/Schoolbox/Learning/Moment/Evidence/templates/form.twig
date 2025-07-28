@@ -117,22 +117,38 @@
              # Staff and students share this area, but their buttons are differently described
              #}
             <button id="draft">Save for later</button>
-            <script>
-                $(function() {
-                    $('#draft').on('click', function(event) {
-                        event.preventDefault();
+            {% if isCreate %}
+                <script>
+                    $(function() {
+                        $('#draft').on('click', function(event) {
+                            event.preventDefault();
 
-                        let route = '{{ routeLookupIfAuthorized('learningMomentEvidence.putDraft', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) }}';
+                            let route = '{{ routeLookup('learningMomentEvidence.postMomentForUsers', {userIds: userIds|join(',')}) }}';
 
-                        $('#evidence-form').attr('action', route);
+                            $('#evidence-form').attr('action', route);
 
-                        $('#evidence-persist').trigger('click');
+                            $('#evidence-persist').trigger('click');
+                        });
                     });
-                });
-            </script>
+                </script>
+            {% else %}
+                <script>
+                    $(function() {
+                        $('#draft').on('click', function(event) {
+                            event.preventDefault();
+
+                            let route = '{{ routeLookupIfAuthorized('learningMomentEvidence.putDraft', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) }}';
+
+                            $('#evidence-form').attr('action', route);
+
+                            $('#evidence-persist').trigger('click');
+                        });
+                    });
+                </script>
+            {% endif %}
 
             {% if USER.role.isStudent %}
-                {% if moderationRequired and evidence.isDraft %}
+                {% if moderationRequired and evidence.id and evidence.isDraft %}
                     <button id="submit">Submit for approval</button>
                     <script>
                         $(function() {
