@@ -648,7 +648,9 @@ export default {
                                                 >
                                                 <!-- Only show status that isn't published, since that is the default state -->
                                                 <template v-if="'published' != evidence.object.currentState">
-                                                    <p class="pipe meta">{{ evidence.object.currentState }}</p>
+                                                    <p class="pipe meta">
+                                                        <span :class="`moment-${evidence.object.currentState}`">{{ evidence.object.currentState }}</span>
+                                                    </p>
                                                 </template>
                                             </component>
                                         </div>
@@ -1070,5 +1072,24 @@ export default {
 .fade-enter-to,
 .fade-leave-from {
     opacity: 1;
+}
+
+/* Learning Moment Moderation
+ * Apparently we copypasta this everywhere we need it?
+ */
+.moment-published {
+    /* green */
+}
+
+.moment-submitted {
+    /* oj */
+}
+
+.moment-rejected {
+    /* red */
+}
+
+.moment-draft {
+    /* grey */
 }
 </style>
