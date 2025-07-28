@@ -472,6 +472,7 @@ export default {
                 })
                 .then(() => {
                     this.$refs.toast.timeout("Submitted.", true, 2000);
+                    window.location.reload();
                 })
                 .catch(() => this.$refs.toast.timeout("Submit failed", false, 5000));
             }
@@ -493,6 +494,7 @@ export default {
                 })
                 .then(() => {
                     this.$refs.toast.timeout("Published.", true, 2000);
+                    window.location.reload();
                 })
                 .catch(() => this.$refs.toast.timeout("Publish failed", false, 5000));
             }
