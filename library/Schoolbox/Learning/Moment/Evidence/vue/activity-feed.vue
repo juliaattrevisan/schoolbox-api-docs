@@ -646,6 +646,7 @@ export default {
                                                         )
                                                     }}</time
                                                 >
+                                                <!-- Only show status that isn't published, since that is the default state -->
                                                 <template v-if="'published' != evidence.object.currentState">
                                                     <p class="pipe meta">{{ evidence.object.currentState }}</p>
                                                 </template>
@@ -751,7 +752,7 @@ export default {
                                         />
                                     </div>
 
-                                    <p>TODO Action buttons go here</p>
+                                    <p>TODO Action buttons go here SA-20434</p>
 
                                 </template>
                                 <template v-if="evidence.discriminator === 'badgeAward'">
