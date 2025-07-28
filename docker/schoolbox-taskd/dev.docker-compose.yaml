@@ -11,7 +11,7 @@ services:
       redis-storage:
         condition: service_healthy
     build:
-      context: ../../../taskd
+      context: ../../taskd
     env_file:
       - path: ./default.env
         required: true
