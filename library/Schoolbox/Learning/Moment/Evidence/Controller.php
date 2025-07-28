@@ -22,6 +22,7 @@ use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
+use Schoolbox\Resource\Exception;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\TokenReplacer;
@@ -254,7 +255,7 @@ class Controller extends Base
      * @param Collection|User[] $users
      * @throws MapperException
      */
-    public function postMomentForUsers(Collection $users): void
+    public function postMomentForUsers(Collection $users, string $defaultState = null): void
     {
         /* Since this is a collection of users, each of whom might have a unique
          * configuration (e.g. some year levels require moderation, some don't)
@@ -280,9 +281,21 @@ class Controller extends Base
                 ->setRecipient($user)
                 ->setBody($tokenReplacer->replace($evidenceModel->getBody(), $user));
 
-            /* Accelerate into the next state based on configs and year level settings
+            /* Spawn a learning moment in a particular state
              */
-            if ($moderationRequired) {
+            if (null !== $defaultState) {
+                if (Model::STATUS_DRAFT === $defaultState) {
+                    $evidenceModel->draft();
+                } elseif (Model::STATUS_SUBMITTED === $defaultState) {
+                    $evidenceModel->submit($this->getUser());
+                } elseif (Model::STATUS_PUBLISHED === $defaultState) {
+                    $evidenceModel->publish($this->getUser());
+                } elseif (MOdel::STATUS_REJECTED === $defaultState) {
+                    $evidenceModel->reject($this->getUser());
+                }
+            } elseif ($moderationRequired) {
+                /* Accelerate into the next state based on configs and year level settings
+                 */
                 $evidenceModel->draft();
             } else {
                 /* Does not require moderation; just send it into the world
@@ -385,83 +398,6 @@ class Controller extends Base
         );
         $this->response     = $this->responseAsJson($responseTranslator($evidence));
     }
-
-
-    /**
-     * A special endpoint used as a shortcut from the Activity Feed. Its express purpose is to
-     * put the current $evidence into Draft state without changing anything else about it
-     *
-     * @api   PUT /learning/evidence/{id}/submit
-     * @param Model $evidence
-     * @return void
-     * @throws MapperException
-     */
-    public function putDraft(Model $evidence): void
-    {
-        $evidence->draft();
-
-        $this->mapper->save($evidence);
-
-        $responseTranslator = new Translator\ModelToArray\Base(
-            new User\Translator\Author\ModelToArray(),
-            new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
-            new ScrubAdapter(),
-        );
-        $this->response = $this->responseAsJson($responseTranslator($evidence));
-    }
-
-
-    /**
-     * A special endpoint used as a shortcut from the Activity Feed. Its express purpose is to
-     * put the current $evidence into Submitted state without changing anything else about it;
-     * ostensibly used from the activity feed after you got redirected there, after making your
-     * changes to the learning moment.
-     *
-     * @api   PUT /learning/evidence/{id}/submit
-     * @param Model $evidence
-     * @return void
-     * @throws MapperException
-     */
-    public function putSubmit(Model $evidence): void
-    {
-        $evidence->submit($this->getUser());
-
-        $this->mapper->save($evidence);
-
-        $responseTranslator = new Translator\ModelToArray\Base(
-            new User\Translator\Author\ModelToArray(),
-            new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
-            new ScrubAdapter(),
-        );
-        $this->response = $this->responseAsJson($responseTranslator($evidence));
-    }
-
-
-    /**
-     * A special endpoint used as a shortcut from the Activity Feed. Its express purpose is to
-     * put the current $evidence into Published state without changing anything else about it;
-     * ostensibly used from the activity feed after you got redirected there, after making your
-     * changes to the learning moment.
-     *
-     * @api   PUT /learning/evidence/{id}/publish
-     * @param Model $evidence
-     * @return void
-     * @throws MapperException
-     */
-    public function putPublish(Model $evidence): void
-    {
-        $evidence->publish($this->getUser());
-
-        $this->mapper->save($evidence);
-
-        $responseTranslator = new Translator\ModelToArray\Base(
-            new User\Translator\Author\ModelToArray(),
-            new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
-            new ScrubAdapter(),
-        );
-        $this->response = $this->responseAsJson($responseTranslator($evidence));
-    }
-
 
     /**
      * Delete a single moment.
@@ -611,5 +547,101 @@ class Controller extends Base
     private function curriculumTaggingEnabled(): bool
     {
         return $this->getUser()->getRole()->isStaff() && $this->getConfigLoader()->get('curriculum_tagging_enabled');
+    }
+
+
+    /* State changes that bypass, or precede, the moderation workflow
+     * such as drafting, submitting for moderation and publishing immediately to the world
+     */
+
+    /**
+     * A special endpoint used as a shortcut from the Activity Feed. Its express purpose is to
+     * put the current $evidence into Draft state without changing anything else about it
+     *
+     * @api   PUT /learning/evidence/{id}/submit
+     * @param Model $evidence
+     * @return void
+     * @throws MapperException
+     */
+    public function putDraft(Model $evidence): void
+    {
+        $evidence->draft();
+
+        $this->mapper->save($evidence);
+
+        $responseTranslator = new Translator\ModelToArray\Base(
+            new User\Translator\Author\ModelToArray(),
+            new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
+            new ScrubAdapter(),
+        );
+        $this->response = $this->responseAsJson($responseTranslator($evidence));
+    }
+
+
+    /**
+     * Craft a new learning moment directly into the Submitted state, skipping the Drafting state.
+     * This is almost a direct replica of postMomentForUsers() - it just sets a state on the new
+     * instance rather than assume a Draft state.
+     *
+     * @api   POST /learning/evidence/{id}/submit
+     * @param Collection $users
+     * @return void
+     * @throws MapperException
+     */
+    public function postSubmit(Collection $users): void
+    {
+        $this->postMomentForUsers($users, Model::STATUS_SUBMITTED);
+    }
+
+
+    /**
+     * A special endpoint used as a shortcut from the Activity Feed. Its express purpose is to
+     * put the current $evidence into Submitted state without changing anything else about it;
+     * ostensibly used from the activity feed after you got redirected there, after making your
+     * changes to the learning moment.
+     *
+     * @api   PUT /learning/evidence/{id}/submit
+     * @param Model $evidence
+     * @return void
+     * @throws MapperException
+     */
+    public function putSubmit(Model $evidence): void
+    {
+        $evidence->submit($this->getUser());
+
+        $this->mapper->save($evidence);
+
+        $responseTranslator = new Translator\ModelToArray\Base(
+            new User\Translator\Author\ModelToArray(),
+            new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
+            new ScrubAdapter(),
+        );
+        $this->response = $this->responseAsJson($responseTranslator($evidence));
+    }
+
+
+    /**
+     * A special endpoint used as a shortcut from the Activity Feed. Its express purpose is to
+     * put the current $evidence into Published state without changing anything else about it;
+     * ostensibly used from the activity feed after you got redirected there, after making your
+     * changes to the learning moment.
+     *
+     * @api   PUT /learning/evidence/{id}/publish
+     * @param Model $evidence
+     * @return void
+     * @throws MapperException
+     */
+    public function putPublish(Model $evidence): void
+    {
+        $evidence->publish($this->getUser());
+
+        $this->mapper->save($evidence);
+
+        $responseTranslator = new Translator\ModelToArray\Base(
+            new User\Translator\Author\ModelToArray(),
+            new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
+            new ScrubAdapter(),
+        );
+        $this->response = $this->responseAsJson($responseTranslator($evidence));
     }
 }

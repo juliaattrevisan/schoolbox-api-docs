@@ -148,21 +148,37 @@
             {% endif %}
 
             {% if USER.role.isStudent %}
-                {% if moderationRequired and evidence.id and evidence.isDraft %}
+                {% if moderationRequired and evidence.isDraft %}
                     <button id="submit">Submit for approval</button>
-                    <script>
-                        $(function() {
-                            $('#submit').on('click', function(event) {
-                                event.preventDefault();
+                    {% if isCreate %}
+                        <script>
+                            $(function() {
+                                $('#submit').on('click', function(event) {
+                                    event.preventDefault();
 
-                                let route = '{{ routeLookupIfAuthorized('learningMomentEvidence.putSubmit', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) }}';
+                                    let route = '{{ routeLookupIfAuthorized('learningMomentEvidence.postSubmit', {userIds: userIds|join(',')}) }}';
 
-                                $('#evidence-form').attr('action', route);
+                                    $('#evidence-form').attr('action', route);
 
-                                $('#evidence-persist').trigger('click');
+                                    $('#evidence-persist').trigger('click');
+                                });
                             });
-                        });
-                    </script>
+                        </script>
+                    {% else %}
+                        <script>
+                            $(function() {
+                                $('#submit').on('click', function(event) {
+                                    event.preventDefault();
+
+                                    let route = '{{ routeLookupIfAuthorized('learningMomentEvidence.putSubmit', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) }}';
+
+                                    $('#evidence-form').attr('action', route);
+
+                                    $('#evidence-persist').trigger('click');
+                                });
+                            });
+                        </script>
+                    {% endif %}
                 {% endif %}
             {% elseif USER.role.isStaff and USER.role.accessEvidence %}
                 {% if evidence.isSubmitted %}

@@ -185,8 +185,17 @@ class Module extends BaseModule
             Closure::fromCallable([$this, 'preloadEvidence']),
         );
 
+        /* Create a whole new evidence instance in the Submitted state, from nothing previously
+         */
+        $this->register(
+            self::METHOD_POST,
+            '/user/{userIds}/submit',
+            'postSubmit',
+            $viewCreateFormRule,
+            $viewCreateFormPreloader,
+        );
 
-        /* Put an evidence into the Submitted state as-is;
+        /* Put an existing evidence into the Submitted state as-is;
          * Used from the Activity Feed
          */
         $this->register(
