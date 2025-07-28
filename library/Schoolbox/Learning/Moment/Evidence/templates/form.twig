@@ -201,6 +201,10 @@
                                 $('#publish').on('click', function(event) {
                                     event.preventDefault();
 
+                                    let route = '{{ routeLookup('learningMomentModeration.putPublish', {evidenceId: evidence.id}) }}';
+
+                                    $('#evidence-form').attr('action', route);
+
                                     {# Show the modal with an option to delete comments #}
                                     $('#deleteCommentsModal').foundation('reveal', 'open');
 
