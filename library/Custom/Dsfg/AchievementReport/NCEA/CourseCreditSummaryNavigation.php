@@ -14,7 +14,6 @@ namespace Custom\Dsfg\AchievementReport\NCEA;
  */
 class CourseCreditSummaryNavigation extends Base
 {
-
     /**
      * Heading
      *

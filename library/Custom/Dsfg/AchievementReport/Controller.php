@@ -839,8 +839,7 @@ class Controller extends Base
         ?int $year,
         string $navigationKey,
         string $dbTableName
-    ): array
-    {
+    ): array {
         $footer = new NCEA\Footer($user, $externalUser, $db, null, $dbTableName);
 
         $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($user, $externalUser, $db, $year, $dbTableName);

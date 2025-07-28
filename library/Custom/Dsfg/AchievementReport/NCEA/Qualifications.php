@@ -13,7 +13,6 @@ namespace Custom\Dsfg\AchievementReport\NCEA;
  */
 class Qualifications extends Base
 {
-
     /**
      * Returns data for twig rendering
      *
