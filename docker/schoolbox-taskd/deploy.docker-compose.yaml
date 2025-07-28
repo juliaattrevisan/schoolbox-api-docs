@@ -11,8 +11,6 @@ services:
     depends_on:
       redis-storage:
         condition: service_healthy
-    build:
-      context: ./schoolbox-taskd
     env_file:
-      - path: ./schoolbox-taskd/default.env
+      - path: ./default.env
         required: true

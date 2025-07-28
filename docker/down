@@ -8,12 +8,12 @@ cd "$(dirname "$0")/.." || exit 1
 # taskd and frankenphp variant is stopped at least once.
 docker compose --progress plain \
     -f "docker/base.docker-compose.yaml" \
-    -f "docker/schoolbox-taskd-local.docker-compose.yaml" \
-    -f "docker/schoolbox-frankenphp-local.docker-compose.yaml" \
+    -f "docker/schoolbox-taskd/dev.docker-compose.yaml" \
+    -f "docker/schoolbox-frankenphp/dev.docker-compose.yaml" \
     down
 
 docker compose --progress plain \
     -f "docker/base.docker-compose.yaml" \
-    -f "docker/schoolbox-taskd-prebuilt.docker-compose.yaml" \
-    -f "docker/schoolbox-frankenphp-deploy.docker-compose.yaml" \
+    -f "docker/schoolbox-taskd/deploy.docker-compose.yaml" \
+    -f "docker/schoolbox-frankenphp/deploy.docker-compose.yaml" \
     down

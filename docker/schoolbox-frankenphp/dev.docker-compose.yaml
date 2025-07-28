@@ -1,16 +1,14 @@
-# This FrankenPHP container contains Schoolbox's code within its image, thus
-# changes made to the local file system will not propagate to the FrankenPHP
-# container.
-# This container is intended for testing of deployments.
+# This FrankenPHP container mounts Schoolbox's code folder as a local mount,
+# so that changes made locally are made available immediately.
+# This container is intended for local development.
 
 services:
   schoolbox-frankenphp:
+    environment:
+      DEBUG: "1"
     restart: always
     build:
-      context: ./schoolbox-frankenphp
-      dockerfile: deploy-image.Dockerfile
-      additional_contexts:
-        - code=../
+      dockerfile: dev-image.Dockerfile
     scale: 2
     deploy:
       mode: replicated
@@ -21,6 +19,7 @@ services:
         timeout: 10s
         retries: 5
     volumes:
+      - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
     # After building: create data dirs, and make mount writable by www-data
