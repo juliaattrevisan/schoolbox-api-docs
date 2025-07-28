@@ -8,15 +8,6 @@ import { isNewUrl } from "@js/util/queryUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import type { TablePayload } from "../../js/types/pastoralReportTypes";
 
-const MAX_ROWS = 20; // Maximum number of rows to display in the table
-
-export type LoadStatus = {
-    maxRows: number; // Maximum number of rows to display in the table
-    loadIndex: number; // Current load index
-    maxLoads: number; // Maximum load index
-    hasMoreRows: boolean; // Indicates if there are more rows to load
-};
-
 /**
  * load the pastoral report table data from the given endpoint.
  * @param endpoint - the endpoint to load the table data
@@ -26,19 +17,12 @@ export function useLoadPrTable(endpoint: Ref<string>): {
     isNewLoading: Ref<boolean>;
     isSameLoading: Ref<boolean>;
     payload: Ref<TablePayload | null>;
-    loadStatus: Ref<LoadStatus>;
     isEmpty: Ref<boolean>;
     loadError: Ref<string | null>;
 } {
     const isNewLoad = window.Vue.ref(false); // to distinguish between loading a new table and loading data for the same table
     const isNewLoading = window.Vue.ref(false); // to notify when a new table is being loaded
     const isSameLoading = window.Vue.ref(false); // to notify when the data linked to the same table is being loaded
-    const loadStatus = window.Vue.ref({
-        maxRows: MAX_ROWS,
-        loadIndex: 0,
-        maxLoads: 0,
-        hasMoreRows: false,
-    });
     const payload = window.Vue.ref<TablePayload | null>(null); // to store the payload that matches the current query
     const isEmpty = window.Vue.computed(() => payload.value === null && !isNewLoading.value); // To show that no payload match the current report table
     const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the load
@@ -78,10 +62,10 @@ export function useLoadPrTable(endpoint: Ref<string>): {
             if (newPayload === null || newPayload.data === undefined || !Array.isArray(newPayload.data.tableHeaders)) {
                 throw new Error("Unexpected response format");
             }
-            loadStatus.value.loadIndex += 1;
-            loadStatus.value.hasMoreRows = newPayload.metadata.count >= MAX_ROWS;
-            loadStatus.value.maxLoads = Math.ceil(newPayload.metadata.count / MAX_ROWS);
-            console.warn(`Max load index: ${loadStatus.value.maxLoads}`);
+            // loadStatus.value.loadIndex += 1;
+            // loadStatus.value.hasMoreRows = newPayload.metadata.count >= MAX_ROWS;
+            // loadStatus.value.maxLoads = Math.ceil(newPayload.metadata.count / MAX_ROWS);
+            // console.warn(`Max load index: ${loadStatus.value.maxLoads}`);
             payload.value = newPayload;
         } catch (error) {
             // ignore abort errors, as the previous request was cancelled
@@ -116,7 +100,6 @@ export function useLoadPrTable(endpoint: Ref<string>): {
         isNewLoading,
         isSameLoading,
         payload,
-        loadStatus,
         isEmpty,
         loadError,
     };

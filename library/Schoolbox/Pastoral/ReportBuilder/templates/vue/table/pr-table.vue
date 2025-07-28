@@ -25,7 +25,7 @@ const recordsOrPoints = defineModel<"records" | "points">("records-or-points", {
 const sortBy = window.Vue.ref<string>("user"); // the current sort by field - this should update when payload is loaded
 const sortOrder = window.Vue.ref<"asc" | "desc">("asc"); // the current sort order
 const currentEndpoint = window.Vue.ref("");
-const { isNewLoading, isSameLoading, payload, loadStatus, isEmpty, loadError } = useLoadPrTable(currentEndpoint);
+const { isNewLoading, isSameLoading, payload, isEmpty, loadError } = useLoadPrTable(currentEndpoint);
 
 // #region scrollable height
 
@@ -93,15 +93,12 @@ function onSortSelected(headerKey: string): void {
     // or sort the existing data in payloadData
 }
 
-const cursorList = window.Vue.ref<string[]>([""]); // Array to store cursors for pagination
-const cursorIndex = window.Vue.ref<number>(0); // Current index in the cursor list
-
 /**
  * Handle previous page button click
+ * @param cursor - the cursor to use for the previous page
  */
-function onPrevious(): void {
-    cursorIndex.value -= 1;
-    currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}&cursor=${cursorList.value[cursorIndex.value]}`;
+function onPrevious(cursor: string): void {
+    currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}&cursor=${cursor}`;
     // need an array to store the cursor
     // when the first item (the start of the payload) the cursor should be empty
     // items after the previous will be the stored .next cursor
@@ -111,11 +108,10 @@ function onPrevious(): void {
 
 /**
  * Handle next page button click
+ * @param cursor - the cursor to use for the next page
  */
-function onNext(): void {
-    cursorIndex.value += 1;
-    cursorList.value.push(payload.value?.metadata.cursor.next || "");
-    currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}&cursor=${cursorList.value[cursorIndex.value]}`;
+function onNext(cursor: string): void {
+    currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}&cursor=${cursor}`;
     // need an array to store the cursor
     // if there's no cursor in the array, can use metadata.cursor.next to load, otherwise use the stored cursor
 }
@@ -182,12 +178,7 @@ function onNext(): void {
                     />
                 </tbody>
             </table>
-            <pr-table-footer
-                :metadata="(payload as TablePayload).metadata"
-                :load-status="loadStatus"
-                @previous="onPrevious"
-                @next="onNext"
-            />
+            <pr-table-footer :metadata="(payload as TablePayload).metadata" @previous="onPrevious" @next="onNext" />
         </div>
     </template>
 </template>
