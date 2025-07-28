@@ -785,9 +785,14 @@ export default {
                                     </div>
 
                                     <!-- Learning Moment Moderation: Action Buttons -->
-                                    <template v-if="'draft' == evidence.object.currentState || 'rejected' == evidence.object.currentState">
+                                    <!-- These are based on role types -->
+                                    <template v-if="'draft' === evidence.object.currentState || 'submitted' === evidence.object.currentState || 'rejected' === evidence.object.currentState">
+                                        <!-- Modify button available when a learning moment is: draft/submitted/rejected -->
                                         <a class="button">Modify</a>
+                                    </template>
 
+                                    <template v-if="'draft' === evidence.object.currentState || 'submitted' === evidence.object.currentState || 'rejected' === evidence.object.currentState">
+                                        <!-- Submit button available when a learning moment is: draft/submitted/rejected -->
                                         <a class="button" @click="submitEvidence(evidence.object)">Submit</a>
                                     </template>
                                 </template>
