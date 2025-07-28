@@ -116,14 +116,15 @@
             {# Moderation Workflow
              # Staff and students share this area, but their buttons are differently described
              #}
-            <button id="draft">Save for later</button>
+
             {% if isCreate %}
+                <button id="draft">Save for later</button>
                 <script>
                     $(function() {
                         $('#draft').on('click', function(event) {
                             event.preventDefault();
 
-                            let route = '{{ routeLookup('learningMomentEvidence.postMomentForUsers', {userIds: userIds|join(',')}) }}';
+                            let route = '{{ routeLookup('learningMomentEvidence.postDraft', {userIds: userIds|join(',')}) }}';
 
                             $('#evidence-form').attr('action', route);
 
@@ -132,6 +133,7 @@
                     });
                 </script>
             {% else %}
+                <button id="draft">Save for later</button>
                 <script>
                     $(function() {
                         $('#draft').on('click', function(event) {

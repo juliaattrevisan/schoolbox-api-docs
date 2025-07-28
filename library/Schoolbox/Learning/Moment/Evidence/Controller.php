@@ -546,6 +546,22 @@ class Controller extends Base
      * such as drafting, submitting for moderation and publishing immediately to the world
      */
 
+
+    /**
+     * Craft a new learning moment directly into the Draft state via the Class List "Share a Learning Moment"
+     *
+     * This is almost a direct replica of postMomentForUsers()
+     *
+     * @param Collection $users
+     * @return void
+     * @throws MapperException
+     */
+    public function postDraft(Collection $users): void
+    {
+        $this->postMomentForUsers($users, Model::STATUS_DRAFT);
+    }
+
+
     /**
      * Its express purpose is to put the existing $evidence into Draft along with any alterations
      * to its content such as body, tags, curric nodes, etc.

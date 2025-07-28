@@ -174,6 +174,17 @@ class Module extends BaseModule
             Closure::fromCallable([$this, 'preloadEvidence']),
         );
 
+        /* Create a whole new evidence instance in the Draft state, from nothing previously
+         * This seems unique to the Class List "Share a Learning Moment"
+         */
+        $this->register(
+            self::METHOD_POST,
+            '/user/{userIds}/draft',
+            'postDraft',
+            $viewCreateFormRule,
+            $viewCreateFormPreloader
+        );
+
         /* Put an evidence into the Draft state as-is;
          * Used from the Activity Feed
          */
