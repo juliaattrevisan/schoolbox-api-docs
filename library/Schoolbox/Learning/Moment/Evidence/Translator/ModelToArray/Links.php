@@ -77,6 +77,14 @@ class Links extends AbstractLinks
             ]
         );
 
+        $translation['_links']['publish'] = $this->getRouteIfAuthorized(
+            'learningMomentEvidence.putPublish',
+            [
+                'evidenceId' => $evidence->getId(),
+                'creatorId'  => $evidence->getCreator()->getId(),
+            ]
+        );
+
         $translation['_links']['delete'] = $this->getRouteIfAuthorized(
             'learningMomentEvidence.deleteEvidence',
             [

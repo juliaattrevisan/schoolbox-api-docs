@@ -416,7 +416,33 @@ class Controller extends Base
             new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
             new ScrubAdapter(),
         );
-        $this->response     = $this->responseAsJson($responseTranslator($evidence));
+        $this->response = $this->responseAsJson($responseTranslator($evidence));
+    }
+
+
+    /**
+     * A special endpoint used as a shortcut from the Activity Feed. Its express purpose is to
+     * put the current $evidence into Published state without changing anything else about it;
+     * ostensibly used from the activity feed after you got redirected there, after making your
+     * changes to the learning moment.
+     *
+     * @api   PUT /learning/evidence/{id}/publish
+     * @param Model $evidence
+     * @return void
+     * @throws MapperException
+     */
+    public function putPublish(Model $evidence): void
+    {
+        $evidence->publish($this->getUser());
+
+        $this->mapper->save($evidence);
+
+        $responseTranslator = new Translator\ModelToArray\Base(
+            new User\Translator\Author\ModelToArray(),
+            new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
+            new ScrubAdapter(),
+        );
+        $this->response = $this->responseAsJson($responseTranslator($evidence));
     }
 
 
