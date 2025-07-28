@@ -1,7 +1,6 @@
-# docker-compose.yaml override, for when using a local taskd build.
-
-include:
-  - dev.docker-compose.yaml
+# This taskd container references a code base somewhere on the file system,
+# thus changes made to that container are made available immediately.
+# This container is intended for development of taskd.
 
 services:
   # Local taskd definition:

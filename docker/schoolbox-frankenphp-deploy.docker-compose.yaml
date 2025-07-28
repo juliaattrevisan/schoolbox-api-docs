@@ -1,6 +1,7 @@
 # This FrankenPHP container contains Schoolbox's code within its image, thus
 # changes made to the local file system will not propagate to the FrankenPHP
 # container.
+# This container is intended for testing of deployments.
 
 services:
   schoolbox-frankenphp:
