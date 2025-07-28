@@ -131,11 +131,10 @@ function onSortSelected(headerKey: string): void {
                     :sort-order="sortOrder"
                     @sort="onSortSelected"
                 />
-                <tbody v-if="isSameLoading" class="pr-table__loading">
-                    <tr>
-                        <td colspan="100%">
-                            <div class="loader"></div>
-                        </td>
+                <!-- Skeleton loading state when switching between records/rows and sorting -->
+                <tbody v-if="isSameLoading" class="skeleton">
+                    <tr v-for="(row, index) in 5" :key="index">
+                        <td colspan="100%"></td>
                     </tr>
                 </tbody>
                 <tbody v-else>
@@ -173,18 +172,12 @@ function onSortSelected(headerKey: string): void {
 
 .pr-table {
     width: 100%;
-    thead,
-    &__loading {
-        background: #ffffff; /* Ensure the header has a background to prevent transparency */
-        position: sticky;
-        z-index: var(--sbx-depth-ui-sticky);
-    }
     /* fix the head to stay at the top when scrolling */
     thead {
+        background: #ffffff; /* Ensure the header has a background to prevent transparency */
+        position: sticky;
         top: 0;
-    }
-    &__loading {
-        left: 0;
+        z-index: var(--sbx-depth-ui-sticky);
     }
 }
 
