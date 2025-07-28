@@ -237,7 +237,6 @@ $container-bg: white;
     &.moment-draft {
         @include label($bg: $neutral-color);
         color: darken($neutral-color, 50%);
-        text-transform: none;
         margin-top: 0.4rem;
         margin-left: 0.5rem;
     }
@@ -245,7 +244,6 @@ $container-bg: white;
     &.moment-submitted {
         @include label($bg: tint($warning-color, 74%));
         color: $warning-color;
-        text-transform: none;
         margin-top: 0.4rem;
         margin-left: 0.5rem;
     }
@@ -253,7 +251,6 @@ $container-bg: white;
     &.moment-rejected {
         @include label($bg: tint($alert-color, 74%));
         color: $alert-color;
-        text-transform: none;
         margin-top: 0.4rem;
         margin-left: 0.5rem;
     }
