@@ -138,14 +138,10 @@
 
             {% if USER.role.isStudent %}
                 {% if moderationRequired %}
-                    {% set submitText = 'Submit for approval' %}
                     <input type="submit" id="evidence-submit" data-test="learning-moment-evidence-form-submit" value="Submit" />
                 {% endif %}
             {% elseif USER.role.isStaff and USER.role.accessEvidence %}
                 {% if evidence.isSubmitted %}
-                    {# If the moment is in Submitted state, this acts as the transition to Published #}
-                    {% set submitText = 'Approve' %}
-
                     {# This triggers an async request to Reject+reason #}
                     <button id="request-update">Request update</button>
 
