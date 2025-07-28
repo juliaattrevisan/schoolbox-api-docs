@@ -283,9 +283,15 @@ class Controller extends Base
             /* Accelerate into the next state based on configs and year level settings
              */
             if ($moderationRequired) {
-                /* Requires moderation and; needs a human to progress to Published state
-                 */
-                $evidenceModel->submit($this->getUser());
+                if ($requestBody['draftState']) {
+                    /* Save a draft
+                     */
+                    $evidenceModel->draft();
+                } else {
+                    /* Requires moderation and needs a human to progress to Published state
+                     */
+                    $evidenceModel->submit($this->getUser());
+                }
             } else {
                 /* Does not require moderation; just send it into the world
                  */

@@ -83,40 +83,58 @@
 <div class="row">
     <div class="small-12 island">
         <form action="{{ formAction }}" method="post" id="evidence-form">
-                <section>
-                    <fieldset class="content">
-                        <div class="small-12 columns">
-                            {% block formInputFile %}
-                            {% endblock formInputFile %}
-                            {% block formInputBody %}
-                                {% block formInputBodyMeta %}
-                                    {% if USER.role.staff %}
-                                        <p class="meta">
-                                            Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details on creation.
-                                        </p>
-                                    {% endif %}
-                                {% endblock formInputBodyMeta %}
-                            {% endblock formInputBody %}
-                            <label for="evidence-tags">Tags</label>
-                            <select data-tags name="tags[]" id="evidence-tags" multiple></select>
-                            {% if curriculumTaggingEnabled %}
-                                <label for="curriculum-code-select">
-                                    Curriculum Codes
-                                </label>
-                                    {% include 'sub/curriculumCodeSelector.twig' with
-                                        {
-                                            codeList: curriculumCodes ?? [],
-                                            renderButton: true
-                                        } %}
-                            {% endif %}
-                        </div>
-                    </fieldset>
-                </section>
+            <input type="hidden" name="draftState" value="0" />
+
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        {% block formInputFile %}
+                        {% endblock formInputFile %}
+                        {% block formInputBody %}
+                            {% block formInputBodyMeta %}
+                                {% if USER.role.staff %}
+                                    <p class="meta">
+                                        Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details on creation.
+                                    </p>
+                                {% endif %}
+                            {% endblock formInputBodyMeta %}
+                        {% endblock formInputBody %}
+                        <label for="evidence-tags">Tags</label>
+                        <select data-tags name="tags[]" id="evidence-tags" multiple></select>
+                        {% if curriculumTaggingEnabled %}
+                            <label for="curriculum-code-select">
+                                Curriculum Codes
+                            </label>
+                                {% include 'sub/curriculumCodeSelector.twig' with
+                                    {
+                                        codeList: curriculumCodes ?? [],
+                                        renderButton: true
+                                    } %}
+                        {% endif %}
+                    </div>
+                </fieldset>
+            </section>
 
             {# Moderation Workflow
              # Staff and students share this area, but their buttons are differently described
              #}
-            <input type="submit" id="evidence-save" data-test="learning-moment-evidence-form-submit" value="Save" />
+            <button id="evidence-save">Save for later</button>
+            <script>
+                $(function() {
+                    $('#evidence-save').on('click', function(event) {
+                        event.preventDefault();
+
+                        {# FIXME maybe possible for Save to cancel and return you to the original form,
+                         # but this val will have changed: maybe find a way to revert it, in that circumstance
+                         # e.g. when network connectivity drops out and the request fails maybe, but atm
+                         # we are processing synchronously
+                         #}
+                        $('#evidence-form').find('input[name="draftState"]').val(1);
+
+                        $('#evidence-submit').trigger('click');
+                    });
+                });
+            </script>
 
             {% if USER.role.isStudent %}
                 {% if moderationRequired %}
@@ -292,6 +310,10 @@
                      # For when someone chose "Delete and continue"
                      #}
                     deleteComments: formData.get('delete-comments'),
+                    {# Moderation Workflow
+                     # When an author saves a draft
+                     #}
+                    draftState: formData.get('draftState')
                 };
 
         let tags = form.querySelector('#evidence-tags').selectize.items;

@@ -329,6 +329,30 @@ class Model implements ISoftDeletable, IThreadLocation
 
 
     /**
+     * Set a learning moment to Draft status,
+     * ready for the next state transition to Submitted
+     *
+     * @return $this
+     */
+    public function draft(): self
+    {
+        // Treat as never being submitted
+        $this->submittedAt = null;
+        $this->submittedBy = null;
+
+        // Treat as never being published
+        $this->publishedAt = null;
+        $this->publishedBy = null;
+
+        // Treat as never being rejected
+        $this->rejectedAt = null;
+        $this->rejectedBy = null;
+
+        return $this;
+    }
+
+
+    /**
      * Set a learning moment to Submitted status, along with its effector,
      * ready for the next state transition to Published or Rejected
      *
