@@ -456,7 +456,6 @@ export default {
             }
         },
 
-
        /**
         * Put the $evidence into the Submitted state as-is
         *
@@ -475,6 +474,27 @@ export default {
                     this.$refs.toast.timeout("Submitted.", true, 2000);
                 })
                 .catch(() => this.$refs.toast.timeout("Submit failed", false, 5000));
+            }
+        },
+
+        /**
+         * Put the $evidence into the Published state as-is
+         *
+         * @param evidence
+         */
+        publishEvidence(evidence) {
+            const publishLink = evidence?._links?.publish;
+
+            if (publishLink) {
+                this.$refs.toast.activate("Publishing...");
+
+                fetch(publishLink, {
+                  method: "PUT",
+                })
+                .then(() => {
+                    this.$refs.toast.timeout("Published.", true, 2000);
+                })
+                .catch(() => this.$refs.toast.timeout("Publish failed", false, 5000));
             }
         }
     },
@@ -809,7 +829,7 @@ export default {
 
                                         <template v-if="'draft' === evidence.object.currentState || 'submitted' === evidence.object.currentState || 'rejected' === evidence.object.currentState">
                                             <!-- Publish button available when a learning moment is: draft/submitted/rejected -->
-                                            <a class="button">Publish</a>
+                                            <a class="button" @click="publishEvidence(evidence.object)">Publish</a>
                                         </template>
                                     </template>
 
