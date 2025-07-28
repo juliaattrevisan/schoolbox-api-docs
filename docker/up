@@ -3,19 +3,21 @@
 # Always run within root folder
 cd "$(dirname "$0")/.." || exit 1
 
-declare taskd_compose_file
+taskd_compose_file=''
 
 # For now this is hardcoded:
 # eventually, this may allow loading the deployable variant of the FrankenPHP
 # container
-declare frankenphp_compose_file="docker/schoolbox-frankenphp/dev.docker-compose.yaml"
+frankenphp_compose_file="docker/schoolbox-frankenphp/dev.docker-compose.yaml"
 
 # Load config to figure out which taskd compose file to use
 declare TASKD_BUILD_FROM_LOCAL
 source ./docker.default.env
-source ./docker.env
+if [ -f ./docker.env ]; then
+    source ./docker.env
+fi
 case "${TASKD_BUILD_FROM_LOCAL}" in
-    1 | true | on)
+    1 | true | yes | on)
         taskd_compose_file="docker/schoolbox-taskd/dev.docker-compose.yaml"
         ;;
     *)
