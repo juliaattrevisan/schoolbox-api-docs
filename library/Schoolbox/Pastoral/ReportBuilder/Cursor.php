@@ -33,7 +33,7 @@ class Cursor implements ICursor
 
     public const RESULT_TYPE_POINTS = 'points';
     public const RESULT_TYPE_RECORDS = 'records';
-    public const SORT_BY_DEFAULT = 'name';
+    public const SORT_BY_DEFAULT = 'user';
     public const ORDER_DIRECTION_DEFAULT = self::ORDER_DIRECTION_ASC;
     public const ORDER_DIRECTION_ASC = 'ASC';
     public const ORDER_DIRECTION_DESC = 'DESC';
