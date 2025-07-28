@@ -10,7 +10,7 @@ services:
       context: ./schoolbox-frankenphp
       dockerfile: deploy-image.Dockerfile
       additional_contexts:
-        - code=../../
+        - code=../
     scale: 2
     deploy:
       mode: replicated
