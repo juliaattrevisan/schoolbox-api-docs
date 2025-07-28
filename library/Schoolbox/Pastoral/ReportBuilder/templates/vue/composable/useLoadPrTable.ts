@@ -4,23 +4,27 @@
 
 import type { Ref } from "vue";
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
+import { isNewUrl } from "@js/util/queryUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import type { TablePayload } from "../../js/types/pastoralReportTypes";
 
 /**
- * search for payload that match the current query
+ * load the pastoral report table data from the given endpoint.
  * @param endpoint - the endpoint to load the table data
- * @returns isLoading, payload, isEmpty, loadError
+ * @returns isNewLoading, payload, isEmpty, loadError
  */
 export function useLoadPrTable(endpoint: Ref<string>): {
-    isLoading: Ref<boolean>;
+    isNewLoading: Ref<boolean>;
+    isSameLoading: Ref<boolean>;
     payload: Ref<TablePayload | null>;
     isEmpty: Ref<boolean>;
     loadError: Ref<string | null>;
 } {
-    const isLoading = window.Vue.ref(false); // to notify that an action is taking place,
+    const isNewLoad = window.Vue.ref(false); // to distinguish between loading a new table and loading data for the same table
+    const isNewLoading = window.Vue.ref(false); // to notify when a new table is being loaded
+    const isSameLoading = window.Vue.ref(false); // to notify when the data linked to the same table is being loaded
     const payload = window.Vue.ref<TablePayload | null>(null); // to store the payload that matches the current query
-    const isEmpty = window.Vue.computed(() => payload.value === null && !isLoading.value); // To show that no payload match the current report table
+    const isEmpty = window.Vue.computed(() => payload.value === null && !isNewLoading.value); // To show that no payload match the current report table
     const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the load
     let controller: AbortController; // to allow aborting the previous search if a new one is started
 
@@ -29,11 +33,17 @@ export function useLoadPrTable(endpoint: Ref<string>): {
      */
     async function load(): Promise<void> {
         // abort the previous search if it's still running
-        if (isLoading.value) {
+        if (isNewLoading.value || isSameLoading.value) {
             controller.abort();
         }
         try {
-            isLoading.value = true;
+            // to distinguish between loading a new table and loading data for the same table
+            // so the entire table doesn't need to be re-rendered to just load new rows
+            if (isNewLoad.value) {
+                isNewLoading.value = true;
+            } else {
+                isSameLoading.value = true;
+            }
             loadError.value = null;
             controller = new AbortController();
             const response = await fetch(endpoint.value, {
@@ -67,21 +77,28 @@ export function useLoadPrTable(endpoint: Ref<string>): {
             }
             console.error(error);
         } finally {
-            isLoading.value = false;
+            if (isNewLoad.value) {
+                isNewLoading.value = false;
+            } else {
+                isSameLoading.value = false;
+            }
         }
     }
 
     /**
-     * when the endpoint changes trigger a new load
+     * when the endpoint to trigger load changes provided the endpoint is not empty
+     * and the new endpoint is different from the old one, load the data
      */
-    window.Vue.watch(endpoint, () => {
-        if (endpoint.value !== "") {
+    window.Vue.watch(endpoint, (newEndpoint, oldEndpoint) => {
+        if (endpoint.value !== "" && newEndpoint !== oldEndpoint) {
+            isNewLoad.value = isNewUrl(oldEndpoint, newEndpoint);
             void load();
         }
     });
 
     return {
-        isLoading,
+        isNewLoading,
+        isSameLoading,
         payload,
         isEmpty,
         loadError,

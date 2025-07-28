@@ -4,16 +4,18 @@
  * Renders headers with optional sorting functionality.
  */
 
-import type { TableHeader } from "../js/types/pastoralReportTypes";
+import { capitalizeFirstLetter } from "@js/util/stringUtils";
+import type { TableHeader, Config } from "../js/types/pastoralReportTypes";
 
 const props = defineProps<{
     headers: TableHeader[];
+    config: Config;
     recordsAndPoints: string[];
     sortBy: string;
     sortOrder: "asc" | "desc";
 }>();
 
-const recordsOrPoints = defineModel<string>("records-or-points", { default: "Records" });
+const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
 
 // const emit = defineEmits<{
 //     sort: [key: string];
@@ -86,11 +88,11 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
     <thead class="pr-table-header">
         <tr>
             <th :colspan="hasSubTitles ? 1 : props.headers.length" class="u-border-right u-sticky-left">
-                <div class="checklist">
+                <div v-if="props.config.pastoralPointEnabled" class="checklist">
                     <ul class="option-list l-flex l-gap-m f-no-margins">
                         <li v-for="(option, index) in props.recordsAndPoints" :key="`option-${index}`">
                             <input :id="option" v-model="recordsOrPoints" type="radio" :value="option" />
-                            <label :for="option" class="f-no-margins">{{ option }}</label>
+                            <label :for="option" class="f-no-margins">{{ capitalizeFirstLetter(option) }}</label>
                         </li>
                     </ul>
                 </div>
@@ -122,6 +124,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
                     <span v-else-if="header.isSortable" class="sort-indicator sort-indicator--inactive"> ↕ </span>
                 </button> -->
                 {{ header.subTitle ? header.subTitle : header.title }}
+                {{ header.key === "total" ? capitalizeFirstLetter(recordsOrPoints) : "" }}
             </th>
         </tr>
     </thead>
@@ -144,7 +147,9 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
 }
 
 .total-cell {
-    background: lightgray;
+    background: var(--sbx-pr-table-total-cell-colour);
+    min-width: 80px;
+    width: 80px;
 }
 
 .title-button {

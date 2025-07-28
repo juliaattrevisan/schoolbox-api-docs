@@ -23,8 +23,8 @@ const props = defineProps<{
 }>();
 
 const selectedTab = window.Vue.ref(props.tabs[0]); // the currently selected tab, defaulting to the first tab type
-const recordsAndPoints = window.Vue.ref(["Records", "Points"]); // to toggle the tables between records and points
-const recordsOrPoints = window.Vue.ref("Records"); // the current records/points selection
+const recordsAndPoints = window.Vue.ref(["records", "points"]); // to toggle the tables between records and points
+const recordsOrPoints = window.Vue.ref<"records" | "points">("records"); // the current records/points selection
 const tabParamName = "tab"; // URL parameter name for the selected tab
 
 /**
@@ -108,6 +108,7 @@ window.Vue.onMounted((): void => {
                 v-model:records-or-points="recordsOrPoints"
                 :records-and-points="recordsAndPoints"
                 :selected-tab="selectedTab"
+                :config="props.config"
                 :routes="props.routes"
                 :locale-pastoral="props.localePastoral"
             />
@@ -115,4 +116,8 @@ window.Vue.onMounted((): void => {
     </div>
 </template>
 
-<style scoped></style>
+<style>
+:root {
+    --sbx-pr-table-total-cell-colour: #eee;
+}
+</style>

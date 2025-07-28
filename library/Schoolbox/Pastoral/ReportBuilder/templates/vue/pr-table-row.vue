@@ -12,7 +12,7 @@ import type { TableHeader, RowOptions, RecordsAndPoints } from "../js/types/past
 type Props = {
     headers: TableHeader[];
     rowData: { [key: string]: RowOptions };
-    recordsOrPoints: string;
+    recordsOrPoints: "records" | "points";
 };
 const props = defineProps<Props>();
 
@@ -66,11 +66,16 @@ function isUser(data: RowOptions): data is User {
                 <!-- Change data based on current radio button selection -->
                 <Transition name="fade" mode="out-in">
                     <span :key="`${props.recordsOrPoints}-${header.key}`">
-                        <template v-if="props.recordsOrPoints === 'Records'">
-                            {{ (props.rowData[header.key] as RecordsAndPoints).records }}
+                        <template v-if="props.recordsOrPoints === 'records'">
+                            <!-- Only show records if they're above 0 -->
+                            <template v-if="(props.rowData[header.key] as RecordsAndPoints)?.records! > 0">
+                                {{ (props.rowData[header.key] as RecordsAndPoints).records }}
+                            </template>
                         </template>
                         <template v-else>
-                            {{ (props.rowData[header.key] as RecordsAndPoints).points }}
+                            <template v-if="(props.rowData[header.key] as RecordsAndPoints)?.points! !== null">
+                                {{ (props.rowData[header.key] as RecordsAndPoints).points }}
+                            </template>
                         </template>
                     </span>
                 </Transition>
@@ -84,6 +89,6 @@ function isUser(data: RowOptions): data is User {
 
 <style scoped lang="scss">
 .total-cell {
-    background: lightgray;
+    background: var(--sbx-pr-table-total-cell-colour);
 }
 </style>

@@ -186,7 +186,8 @@ tr.sub-row {
 }
 
 // Table Skeleton
-table.skeleton {
+table.skeleton,
+tbody.skeleton {
     tr {
         height: 2rem;
     }
