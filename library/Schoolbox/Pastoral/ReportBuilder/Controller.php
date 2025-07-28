@@ -441,13 +441,13 @@ class Controller extends Base
      */
     public function getReportByTabType(string $tabType, PastoralReport $report): void
     {
-        $limit = $this->requestQuery->getInt('limit', Cursor::LIMIT_DEFAULT);
-        $encodedCursor = $this->requestQuery->get('cursor');
-        $resultType = $this->requestQuery->get('selected');
-        $sortBy = $this->requestQuery->get('sortBy', Cursor::SORT_BY_DEFAULT);
-        $order = $this->requestQuery->get('order', Cursor::ORDER_DIRECTION_DEFAULT);
-
         try {
+            $limit = $this->requestQuery->getInt('limit', Cursor::LIMIT_DEFAULT);
+            $encodedCursor = $this->requestQuery->get('cursor');
+            $resultType = $this->requestQuery->get('selected');
+            $sortBy = $this->requestQuery->get('sortBy', Cursor::SORT_BY_DEFAULT);
+            $order = $this->requestQuery->get('order', Cursor::ORDER_DIRECTION_DEFAULT);
+
             $factory = (new Factory(
                 $this->userTranslator,
                 $this->userMapper,
@@ -469,10 +469,14 @@ class Controller extends Base
                 throw new MapperException("Invalid type: $tabType has been given.");
             }
 
-            $records = $factory->retrieveResults($encodedCursor);
-            $records = $factory->process($records, $encodedCursor);
+            $records        = $factory->retrieveResults($encodedCursor);
+            $records        = $factory->process($records, $encodedCursor);
             $this->response = $this->responseAsJson($records);
-        } catch (\Exception $e) {
+        } catch (\PDOException $e) {
+            $problem = (new ApiProblem('Something has gone wrong, please contact your support if the problem persists'))
+                ->setStatus(500);
+            $this->response = $this->responseAsJson($problem->asArray());
+        } catch (\Exception | \ValueError $e) {
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($e->getCode());
             $this->response = $this->responseAsJson($problem->asArray());
