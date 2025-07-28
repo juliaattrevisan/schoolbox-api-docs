@@ -201,7 +201,6 @@ services:
         condition: service_started
     build:
       context: ./schoolbox-socketd
-    env_file: ./default.env
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
