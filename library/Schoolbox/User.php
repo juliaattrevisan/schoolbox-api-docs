@@ -1299,6 +1299,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
             'givenName',
             'lastname',
             'fullName',
+            'role'
         ];
     }
 
