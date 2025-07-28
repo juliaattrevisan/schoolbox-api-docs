@@ -43,6 +43,17 @@ Some fields have also changed name:
 Not all Vagrant configuration fields are relevant in Docker: if it's not in
 `docker.default.ini`, it won't be relevant to Docker.
 
+### Task daemon
+
+The task daemon can be configured to run from either an already built image,
+or from an image built from local code, depending on the
+`TASKD_BUILD_FROM_LOCAL` environment variable.
+
+> TODO finalise how to pull already built image: Dockerhub? ECR?
+
+However it's run: the config file [taskd.env](../taskd.env) can be used to
+configure it, as per https://github.com/alaress/taskd/blob/master/CONFIGURATION.md.
+
 ## Scripts
 
 The name of these scripts is intended to mirror the Vagrant commands for setting
