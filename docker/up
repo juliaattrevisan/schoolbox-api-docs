@@ -1,16 +1,30 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 # Always run within root folder
 cd "$(dirname "$0")/.." || exit 1
+
+# Load config to figure out which compose file to use
+declare taskd_build_from_local
+declare compose_file
+source ./docker.default.ini
+source ./docker.ini
+case "${taskd_build_from_local}" in
+    1 | true | on)
+        compose_file="docker/dev-taskd-local.docker-compose.yaml"
+        ;;
+    *)
+        compose_file="docker-compose.yaml"
+        ;;
+esac
 
 # ensure that the storage folder exists
 mkdir -p ./data/docker/storage
 
 # currently, the `php82-bookworm` image must be built locally before everything
 # else
-docker compose --progress plain build php82-bookworm
+docker compose --progress plain -f "${compose_file}" build php82-bookworm
 
 # start default environment:
 # this has Schoolbox's code folder mounted as a local mount, thus changes made
 # locally are available immediately within the container.
-docker compose --progress plain up -d
+docker compose --progress plain -f "${compose_file}" up -d --remove-orphans
