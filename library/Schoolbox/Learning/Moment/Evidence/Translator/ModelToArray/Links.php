@@ -69,6 +69,14 @@ class Links extends AbstractLinks
             ]
         );
 
+        $translation['_links']['submit'] = $this->getRouteIfAuthorized(
+            'learningMomentEvidence.putSubmit',
+            [
+                'evidenceId' => $evidence->getId(),
+                'creatorId'  => $evidence->getCreator()->getId(),
+            ]
+        );
+
         $translation['_links']['delete'] = $this->getRouteIfAuthorized(
             'learningMomentEvidence.deleteEvidence',
             [
@@ -76,7 +84,6 @@ class Links extends AbstractLinks
                 'creatorId'  => $evidence->getCreator()->getId(),
             ]
         );
-
 
         return $translation;
     }

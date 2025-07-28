@@ -54,6 +54,10 @@ export default {
             type: Boolean,
             required: true,
         },
+        submitRoute: {
+            type: String,
+            required: true
+        }
     },
     data() {
         return {
@@ -451,6 +455,16 @@ export default {
                 }
             }
         },
+
+
+       /**
+        * Put the $evidence into the Submitted state as-is
+        *
+        * @param evidence
+        */
+        submit(evidence) {
+            console.log(evidence._links.submit);
+        }
     },
 };
 </script>
@@ -760,7 +774,8 @@ export default {
 
                                     <template v-if="'draft' == evidence.object.currentState || 'rejected' == evidence.object.currentState">
                                         <a class="button">Modify</a>
-                                        <a class="button">Submit</a>
+
+                                        <a class="button" @click="submit(evidence.object)">Submit</a>
                                     </template>
                                 </template>
                                 <template v-if="evidence.discriminator === 'badgeAward'">
