@@ -44,19 +44,11 @@ function onNextSelected(): void {
 
 <template>
     <div class="pr-table-footer l-flex-row l-flex--align-center l-flex--justify-end l-gap-m l-pad-m">
-        <!-- <p class="f-no-margins">
-            <b
-                >{{ (props.loadStatus.loadIndex - 1) * props.loadStatus.maxRows + 1 }}-{{
-                    Math.min(props.loadStatus.loadIndex * props.loadStatus.maxRows, props.metadata.count)
-                }}
-                of {{ props.metadata.count }}</b
-            >
-        </p> -->
         <p class="f-no-margins">
             <b
-                >{{ cursorIndex * PER_PAGE + 1 }}-{{ Math.min((cursorIndex - 1) * PER_PAGE, props.metadata.count) }} of
-                {{ props.metadata.count }}</b
-            >
+                >{{ cursorIndex * PER_PAGE + 1 }}-{{ Math.min((cursorIndex + 1) * PER_PAGE, props.metadata.count) }} of
+                {{ props.metadata.count }}
+            </b>
         </p>
         <nav v-if="hasPaginate" class="l-flex-row l-gap-s">
             <button v-if="hasPrevious" type="button" title="Previous" @click="onPreviousSelected">&lt;</button>
