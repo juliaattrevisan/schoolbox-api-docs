@@ -967,7 +967,7 @@ class Controller extends Base
      */
     public function getDbViewTests(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
-        if (!in_array($_SESSION['username'], ['alaress', 'psingh'])) {
+        if (!in_array($_SESSION['username'], ['alaress', 'psingh', 'swalker'])) {
             echo "Not authorised";
             die;
         }
@@ -988,7 +988,7 @@ class Controller extends Base
         $queryTimeSecondsByViewName = [];
 
         foreach ($viewNames as $viewName) {
-            $query = "SELECT TOP 1 * FROM $viewName";
+            $query = "SELECT TOP 100 * FROM $viewName WHERE " . (($viewName === 'dbo.uvSchoolBoxSchoolGradeResults') ? 'ID': 'id') . ' = ' . $externalUser['StudentID'];
 
             $t0 = microtime(true);
             try {
@@ -1027,6 +1027,7 @@ class Controller extends Base
             echo "    padding: 2px;\n";
             echo "}\n";
             echo "</style>\n";
+            echo "<p>Found " . count($rows) . " rows</p>\n";
             echo "<table class='dbview-table'>\n";
             echo " <thead>\n";
             echo "  <tr>\n";
