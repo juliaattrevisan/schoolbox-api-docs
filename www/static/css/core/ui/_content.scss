@@ -226,6 +226,24 @@ $container-bg: white;
         @include label($bg: $neutral-color);
         color: darken($neutral-color, 50%);
     }
+
+    /* Learning Moment Moderation
+     * These are based on the existing submission workflow colours.
+     */
+    &.moment-draft {
+        @include label($bg: $neutral-color);
+        color: darken($neutral-color, 50%);
+    }
+
+    &.moment-submitted {
+        @include label($bg: tint($warning-color, 74%));
+        color: $warning-color;
+    }
+
+    &.moment-rejected {
+        @include label($bg: tint($alert-color, 74%));
+        color: $alert-color;
+    }
 }
 
 // For individual student learning plan notes
