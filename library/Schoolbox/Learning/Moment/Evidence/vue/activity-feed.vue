@@ -758,8 +758,10 @@ export default {
                                         />
                                     </div>
 
-                                    <p>TODO Action buttons go here SA-20434</p>
-
+                                    <template v-if="'draft' == evidence.object.currentState || 'rejected' == evidence.object.currentState">
+                                        <a class="button">Modify</a>
+                                        <a class="button">Submit</a>
+                                    </template>
                                 </template>
                                 <template v-if="evidence.discriminator === 'badgeAward'">
                                     <div class="card badge-card small-12">
