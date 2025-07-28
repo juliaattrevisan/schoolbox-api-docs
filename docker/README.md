@@ -14,6 +14,21 @@ The settings in this file override the defaults in
 
 ### Migration from Vagrant
 
+#### Automatic
+
+The script [tools/vagrant-yaml-translate.php](../tools/vagrant-yaml-translate.php)
+can automatically convert `vagrant.yaml` to a format understandable by Docker's
+provision process.
+
+This tool must be run in Vagrant after provision:
+```shell
+vagrant ssh
+cd /usr/share/schoolbox
+tools/vagrant-yaml-translate.php > docker.env
+```
+
+#### Manual
+
 `vagrant.yaml` can be copied to `docker.env` in Schoolbox's root folder,
 however its format will need to be changed from YAML:
 - replace the `:` between key and value with a `=`
