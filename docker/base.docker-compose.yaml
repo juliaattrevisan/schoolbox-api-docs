@@ -1,7 +1,22 @@
 # Base docker-compose.yaml for local running of a containerised Schoolbox
 # environment.
+#
+# This definition isn't itself enough to run the Schoolbox environment:
+# it must be combined with a docker-compose which defines:
+# * schoolbox-frankenphp
+# * schoolbox-taskd
 
 services:
+  # Base image: only needs to be built, not started
+  # By default, build with ENV=dev
+  php82-bookworm:
+    image: php82-bookworm
+    build:
+      context: ./base-images/php82-bookworm
+      args:
+        ENV: ${ENV:-dev}
+    restart: no
+
   # Frontend web server, mimicking a load balancer and SSL termination endpoint.
   # In the dev environment, forwards requests to one of these containers:
   # * schoolbox-frankenphp-1
