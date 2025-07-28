@@ -189,6 +189,8 @@
 
                     <input type="submit" id="evidence-moderate" data-test="learning-moment-evidence-form-submit" value="Approve" style="display:none" />
                 {% endif %}
+            {% elseif USER.role.isParent %}
+                <input type="submit" id="evidence-submit" data-test="learning-moment-evidence-form-submit" value="Submit" style="display:none" />
             {% endif %}
         </form>
     </div>
