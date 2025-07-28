@@ -140,7 +140,7 @@ function handleDrop(event: DragEvent): void {
         v-else
         :for="props.id"
         class="attachzone s64"
-        :class="{ 'dz-drag-hover': isOverDropZone && !props.disabled }"
+        :class="{ 'dz-drag-hover': isOverDropZone && !props.disabled, [props.class]: true }"
         :style="{ pointerEvents: props.disabled ? 'none' : undefined }"
         @click.prevent="handleClick"
         @drop.prevent="handleDrop"
