@@ -987,7 +987,7 @@ class Controller extends Base
         $queryTimeSecondsByViewName = [];
 
         foreach ($viewNames as $viewName) {
-            $query = "SELECT TOP 100 * FROM $viewName WHERE " . (($viewName === 'dbo.uvSchoolBoxSchoolGradeResults') ? 'ID': 'id') . ' = ' . $externalUser['StudentID'];
+            $query = "SELECT TOP 100 * FROM $viewName WHERE " . (($viewName === 'dbo.uvSchoolBoxSchoolGradeResults') ? 'ID' : 'id') . ' = ' . $externalUser['StudentID'];
 
             $t0 = microtime(true);
             try {
