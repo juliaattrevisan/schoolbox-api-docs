@@ -281,18 +281,10 @@ class Controller extends Base
                 ->setRecipient($user)
                 ->setBody($tokenReplacer->replace($evidenceModel->getBody(), $user));
 
-            /* Spawn a learning moment in a particular state
-             */
             if (null !== $defaultState) {
-                if (Model::STATUS_DRAFT === $defaultState) {
-                    $evidenceModel->draft();
-                } elseif (Model::STATUS_SUBMITTED === $defaultState) {
-                    $evidenceModel->submit($this->getUser());
-                } elseif (Model::STATUS_PUBLISHED === $defaultState) {
-                    $evidenceModel->publish($this->getUser());
-                } elseif (MOdel::STATUS_REJECTED === $defaultState) {
-                    $evidenceModel->reject($this->getUser());
-                }
+                /* Spawn a learning moment in a particular state
+                 */
+                $this->updateState($evidenceModel, $defaultState);
             } elseif ($moderationRequired) {
                 /* Accelerate into the next state based on configs and year level settings
                  */
@@ -555,44 +547,18 @@ class Controller extends Base
      */
 
     /**
-     * A special endpoint used as a shortcut from the Activity Feed. Its express purpose is to
-     * put the current $evidence into Draft state without changing anything else about it
+     * Its express purpose is to put the existing $evidence into Draft along with any alterations
+     * to its content such as body, tags, curric nodes, etc.
      *
-     * @api   PUT /learning/evidence/{id}/submit
      * @param Model $evidence
      * @return void
      * @throws Exception
      * @throws MapperException
+     *@api   PUT /learning/evidence/{id}/submit
      */
     public function putDraft(Model $evidence): void
     {
-        $requestBody = $this->request->getParsedBody();
-
-        /* This might be empty if drafting directly from the activity feed;
-         *
-         * It'll be an array of stuff from the Modify form though, at which point we take what was
-         * written there and update our model here.
-         */
-        if (!empty($requestBody)) {
-            $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
-            $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
-            $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
-            $evidence = $requestTranslator($requestBody, $evidence)->setBody($tokenReplacer->replace($evidence->getBody(), $evidence->getRecipient()));
-        }
-
-        /* Draft this thing
-         */
-        $evidence->draft();
-
-        $this->mapper->save($evidence);
-
-        $responseTranslator = new Translator\ModelToArray\Base(
-            new User\Translator\Author\ModelToArray(),
-            new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
-            new ScrubAdapter(),
-        );
-
-        $this->response = $this->responseAsJson($responseTranslator($evidence));
+        $this->putWithState($evidence, Model::STATUS_DRAFT);
     }
 
 
@@ -613,18 +579,49 @@ class Controller extends Base
 
 
     /**
-     * A special endpoint used as a shortcut from the Activity Feed. Its express purpose is to
-     * put the current $evidence into Submitted state without changing anything else about it;
-     * ostensibly used from the activity feed after you got redirected there, after making your
-     * changes to the learning moment.
+     * Its express purpose is to put the existing $evidence into Submitted along with any alterations
+     * to its content such as body, tags, curric nodes, etc.
      *
-     * @api   PUT /learning/evidence/{id}/submit
      * @param Model $evidence
      * @return void
      * @throws Exception
      * @throws MapperException
+     *@api   PUT /learning/evidence/{id}/submit
      */
     public function putSubmit(Model $evidence): void
+    {
+        $this->putWithState($evidence, Model::STATUS_SUBMITTED);
+    }
+
+
+    /**
+     * Its express purpose is to put the existing $evidence into Published along with any alterations
+     * to its content such as body, tags, curric nodes, etc.
+     *
+     * @param Model $evidence
+     * @return void
+     * @throws Exception
+     * @throws MapperException
+     *@api   PUT /learning/evidence/{id}/publish
+     */
+    public function putPublish(Model $evidence): void
+    {
+        $this->putWithState($evidence, Model::STATUS_PUBLISHED);
+    }
+
+
+    /**
+     * Place $evidence into the new state $state, along with any modifications made to its
+     * body, tags, curric nodes, etc. via the Modify form. This might not always be how we
+     * putWithState() since you can do this directly from the CTAs on the Activity Feed.
+     *
+     * @param Model $evidence
+     * @param string $state
+     * @return void
+     * @throws Exception
+     * @throws MapperException
+     */
+    private function putWithState(Model $evidence, string $state): void
     {
         $requestBody = $this->request->getParsedBody();
 
@@ -640,10 +637,12 @@ class Controller extends Base
             $evidence = $requestTranslator($requestBody, $evidence)->setBody($tokenReplacer->replace($evidence->getBody(), $evidence->getRecipient()));
         }
 
-        /* Submit this thing
+        /* Shove it into the new state, $state
          */
-        $evidence->submit($this->getUser());
+        $this->updateState($evidence, $state);
 
+        /* Save it
+         */
         $this->mapper->save($evidence);
 
         $responseTranslator = new Translator\ModelToArray\Base(
@@ -657,45 +656,22 @@ class Controller extends Base
 
 
     /**
-     * A special endpoint used as a shortcut from the Activity Feed. Its express purpose is to
-     * put the current $evidence into Published state without changing anything else about it;
-     * ostensibly used from the activity feed after you got redirected there, after making your
-     * changes to the learning moment.
+     * Place $evidence into the new state $state
      *
-     * @api   PUT /learning/evidence/{id}/publish
      * @param Model $evidence
+     * @param string $state
      * @return void
-     * @throws Exception
-     * @throws MapperException
      */
-    public function putPublish(Model $evidence): void
+    private function updateState(Model $evidence, string $state): void
     {
-        $requestBody = $this->request->getParsedBody();
-
-        /* This might be empty if submitting directly from the activity feed;
-         *
-         * It'll be an array of stuff from the Modify form though, at which point we take what was
-         * written there and update our model here.
-         */
-        if (!empty($requestBody)) {
-            $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
-            $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
-            $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
-            $evidence = $requestTranslator($requestBody, $evidence)->setBody($tokenReplacer->replace($evidence->getBody(), $evidence->getRecipient()));
+        if (Model::STATUS_DRAFT === $state) {
+            $evidence->draft();
+        } elseif (Model::STATUS_SUBMITTED === $state) {
+            $evidence->submit($this->getUser());
+        } elseif (Model::STATUS_PUBLISHED === $state) {
+            $evidence->publish($this->getUser());
+        } elseif (MOdel::STATUS_REJECTED === $state) {
+            $evidence->reject($this->getUser());
         }
-
-        /* Publish this thing
-         */
-        $evidence->publish($this->getUser());
-
-        $this->mapper->save($evidence);
-
-        $responseTranslator = new Translator\ModelToArray\Base(
-            new User\Translator\Author\ModelToArray(),
-            new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
-            new ScrubAdapter(),
-        );
-
-        $this->response = $this->responseAsJson($responseTranslator($evidence));
     }
 }
