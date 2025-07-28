@@ -2,8 +2,9 @@
 .news-list {
     .card {
         padding: 1rem;
-        img {
-            margin: 0 1rem 0 1rem !important;
+        article img {
+            margin: 0px;
+            width: auto;
         }
         p > img,
         p > a > img {
