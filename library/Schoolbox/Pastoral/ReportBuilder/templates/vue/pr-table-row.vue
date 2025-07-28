@@ -73,7 +73,7 @@ function isUser(data: RowOptions): data is User {
                             </template>
                         </template>
                         <template v-else>
-                            <template v-if="props.rowData[header.key]">
+                            <template v-if="(props.rowData[header.key] as RecordsAndPoints)?.points! !== null">
                                 {{ (props.rowData[header.key] as RecordsAndPoints).points }}
                             </template>
                         </template>

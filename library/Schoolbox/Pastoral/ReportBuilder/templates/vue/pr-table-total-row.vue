@@ -30,13 +30,22 @@ const props = defineProps<Props>();
                 <!-- Change data based on current radio button selection -->
                 <Transition name="fade" mode="out-in">
                     <span :key="`${props.recordsOrPoints}-${header.key}`">
-                        <template v-if="props.recordsOrPoints === 'records'">
-                            <!-- Only show records if they're above 0 -->
-                            <template v-if="(props.rowData[header.key] as RecordsAndPoints)?.records! > 0">
-                                {{ (props.rowData[header.key] as RecordsAndPoints).records }}
-                            </template>
+                        <!-- Only show records if they're above 0 -->
+                        <template
+                            v-if="
+                                props.recordsOrPoints === 'records' &&
+                                (props.rowData[header.key] as RecordsAndPoints)?.records! > 0
+                            "
+                        >
+                            {{ (props.rowData[header.key] as RecordsAndPoints).records }}
                         </template>
-                        <template v-else>
+                        <!-- Only show if points exist -->
+                        <template
+                            v-else-if="
+                                props.recordsOrPoints === 'points' &&
+                                (props.rowData[header.key] as RecordsAndPoints)?.points! !== null
+                            "
+                        >
                             {{ (props.rowData[header.key] as RecordsAndPoints).points }}
                         </template>
                     </span>
