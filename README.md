@@ -61,7 +61,7 @@ Ideally, only the Docker development environment will need to be set up.
   ```
   127.0.0.1 docker.dev.schoolbox.cloud
   ```
-* create `docker.ini`, and override any configuration in `docker.default.ini`
+* create `docker.env`, and override any configuration in `docker.default.env`
   if needed:
   * the default settings should work for most development requirements, but
     `cdn_bucket_prefix` will need to be set if testing S3 static file hosting

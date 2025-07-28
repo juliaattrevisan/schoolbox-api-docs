@@ -6,15 +6,15 @@ within a self-contained development environment.
 
 ## Configuration
 
-The Docker environment is configured with [docker.ini](../docker.ini) in the
+The Docker environment is configured with [docker.env](../docker.env) in the
 root of the Schoolbox folder.
 
 The settings in this file override the defaults in
-[docker.default.ini](../docker.default.ini).
+[docker.default.env](../docker.default.env).
 
 ### Migration from Vagrant
 
-`vagrant.yaml` can be copied to `docker.ini` in Schoolbox's root folder,
+`vagrant.yaml` can be copied to `docker.env` in Schoolbox's root folder,
 however its format will need to be changed from YAML:
 - replace the `:` between key and value with a `=`
 - remove all space between the `=` and the value

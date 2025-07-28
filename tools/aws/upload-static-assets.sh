@@ -66,22 +66,22 @@ function derive_site_root() {
 
 function load_config() {
   # Is the DOCKER env var there?
-  # If so, load from docker.ini: otherwise, from vagrant.yaml
+  # If so, load from docker.env: otherwise, from vagrant.yaml
   case "$HOST_TYPE" in
     docker)
-      log "HOST_TYPE=docker: loading config from docker.default.ini + docker.ini"
-      source "${site_root}/docker.default.ini"
-      source "${site_root}/docker.ini"
+      log "HOST_TYPE=docker: loading config from docker.default.env + docker.env"
+      source "${site_root}/docker.default.env"
+      source "${site_root}/docker.env"
       if [ ! -v cdn_host ]; then
-        error "cdn_host not defined in docker.default.ini or docker.ini"
+        error "cdn_host not defined in docker.default.env or docker.env"
         exit 1
       fi
       if [ ! -v cdn_bucket ]; then
-        error "cdn_bucket not defined in docker.default.ini or docker.ini"
+        error "cdn_bucket not defined in docker.default.env or docker.env"
         exit 1
       fi
       if [ ! -v cdn_bucket_prefix ]; then
-        error "cdn_bucket_prefix not defined in docker.default.ini or docker.ini"
+        error "cdn_bucket_prefix not defined in docker.default.env or docker.env"
         exit 1
       fi
       bucket_host="${cdn_host}"
