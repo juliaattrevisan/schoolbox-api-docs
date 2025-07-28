@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\ReportBuilder;
 
+use Alaress\Database\Exception as DatabaseException;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
@@ -472,7 +473,7 @@ class Controller extends Base
             $records        = $factory->retrieveResults($encodedCursor);
             $records        = $factory->process($records, $encodedCursor);
             $this->response = $this->responseAsJson($records);
-        } catch (\PDOException $e) {
+        } catch (\PDOException | DatabaseException $e) {
             $problem = (new ApiProblem('Something has gone wrong, please contact your support if the problem persists'))
                 ->setStatus(500);
             $this->response = $this->responseAsJson($problem->asArray());
