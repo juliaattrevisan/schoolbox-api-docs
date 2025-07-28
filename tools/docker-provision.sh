@@ -2,8 +2,8 @@
 # Provisions the Docker environment: port of `vagrant-provision.sh`
 
 declare SITE_ROOT
-declare cachedir
-declare REQUIRED_CONSTS=(SITE_ROOT cachedir)
+declare CACHE_DIR
+declare REQUIRED_CONSTS=(SITE_ROOT CACHE_DIR)
 
 declare aws_account_id
 declare aws_role_name
@@ -126,17 +126,17 @@ function setup_aws_sso() {
 
 function cleanup_cache_dir() {
   log "Cleaning up zero byte files";
-  find "${cachedir}" -type f -empty -delete;
+  find "${CACHE_DIR}" -type f -empty -delete;
 }
 
 function download_secrets() {
   log "Retrieving latest secrets";
   # Download some files from S3: note these still use the Vagrant names
-  if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source"  --file-name "vagrant-secrets.sql" --cache-dir "$cachedir"; then
+  if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source"  --file-name "vagrant-secrets.sql" --cache-dir "$CACHE_DIR"; then
     error "Unable to download s3 file: 'vagrant-secrets.sql': exiting";
     exit 1;
   fi
-  if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source" --file-name "vagrant-cleanup-secrets.sql" --cache-dir "$cachedir"; then
+  if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source" --file-name "vagrant-cleanup-secrets.sql" --cache-dir "$CACHE_DIR"; then
     error "Unable to download s3 file: 'vagrant-cleanup-secrets.sql': exiting";
     exit 1;
   fi
@@ -213,8 +213,8 @@ function download_artifact() {
 
   local cache_file;
   local etag_file;
-  cache_file="${cachedir}/${cache_name}.cache"
-  etag_file="${cachedir}/${cache_name}.etag.cache"
+  cache_file="${CACHE_DIR}/${cache_name}.cache"
+  etag_file="${CACHE_DIR}/${cache_name}.etag.cache"
 
   if [ "$artifact_file" != 'ignore' ]; then
       log "Artifact $artifact_name not up to date: checking for newer version";
@@ -245,7 +245,7 @@ function download_artifact() {
                           local version_artifact_name;
                           version_artifact_name="${branch}-${artifact_name}"
                           log "Downloading latest artifact: ${version_artifact_name}";
-                          wget --no-verbose "${artifact_source}/${version_artifact_name}" -O "${cachedir}/${version_artifact_name}" 2>&1;
+                          wget --no-verbose "${artifact_source}/${version_artifact_name}" -O "${CACHE_DIR}/${version_artifact_name}" 2>&1;
                           if [ $? -eq 0 ]; then
                               # This is a new file, so remove old references
                               sed -i "/${version_artifact_name}/d" "$etag_file" 2>/dev/null;
@@ -254,15 +254,15 @@ function download_artifact() {
                               echo "$etag ${version_artifact_name}" >> "$etag_file";
 
                               # Cleanup for purity?
-                              rm -fR "${cachedir}/${extract_dir:?}" 2> /dev/null;
+                              rm -fR "${CACHE_DIR}/${extract_dir:?}" 2> /dev/null;
 
                               # Extract checksum
-                              tar xzf "${cachedir}/${version_artifact_name}" "${checksum_file}";
+                              tar xzf "${CACHE_DIR}/${version_artifact_name}" "${checksum_file}";
                               local version_artifact_checksum
                               version_artifact_checksum=`awk '{print $1}' "${extract_dir}/${checksum_file}"`;
 
                               # Cleanup again
-                              rm -fR "${cachedir}/${extract_dir:?}" 2> /dev/null;
+                              rm -fR "${CACHE_DIR}/${extract_dir:?}" 2> /dev/null;
 
                               # Add new file to vendor cache
                               echo "$version_artifact_checksum ${version_artifact_name}" >> "$cache_file";
@@ -296,11 +296,11 @@ function init_composer_dependencies() {
       log "Vendor artifact up to date: updating autoload and patches";
       composer install -o --no-interaction
   else
-      if [ -f "${cachedir}/${artifact_file}" ]; then
+      if [ -f "${CACHE_DIR}/${artifact_file}" ]; then
           # Extract content
           log "Extracting vendor cache file '${artifact_file}'";
           rm -fR "${vendor_dir}" 2> /dev/null;
-          tar xzf "${cachedir}/${artifact_file}";
+          tar xzf "${CACHE_DIR}/${artifact_file}";
           log "Updating autoload and patches";
           composer install -o --no-interaction
       else
@@ -329,16 +329,16 @@ function init_npm_dependencies() {
   if [ "$artifact_file" = "ignore" ]; then
       log "NPM artifact up to date";
   else
-      if [ -f "${cachedir}/${artifact_file}" ]; then
+      if [ -f "${CACHE_DIR}/${artifact_file}" ]; then
           # Extract content
           log "Found matching NPM cache file: now extracting";
           rm -fR "$SITE_ROOT"/node_modules 2>/dev/null;
           rm -fR "${npm_dir}" 2> /dev/null;
-          tar xzf "${cachedir}/${artifact_file}";
+          tar xzf "${CACHE_DIR}/${artifact_file}";
       else
           # Still no luck, build from scratch
           log "Cache content:";
-          cat "${cachedir}"/npm.cache;
+          cat "${CACHE_DIR}"/npm.cache;
           log "No matching NPM cache found. Building with npm";
           "$SITE_ROOT"/tools/pkg-build-npm.sh 2>&1;
       fi
@@ -364,7 +364,7 @@ function install_instance() {
   --sql-schema 'schoolbox' \
   --sql-user 'schoolboxdocker' \
   --sql-pass 'abc123' \
-  --cache-dir "${cachedir}" \
+  --cache-dir "${CACHE_DIR}" \
   --config amqp_host "'rabbitmq'" \
   --config amqp_user "'guest'" \
   --config amqp_pass "'guest'" \
@@ -411,7 +411,7 @@ function install_instance() {
 
   log "Applying development environment SQL fixes";
   mariadb -h mariadb -u root -D schoolbox < "${SITE_ROOT}/sql/vagrant.sql"
-  mariadb -h mariadb -u root -D schoolbox < "${cachedir}/vagrant-secrets.sql"
+  mariadb -h mariadb -u root -D schoolbox < "${CACHE_DIR}/vagrant-secrets.sql"
 
   log "Loading all demo data complete";
 }
