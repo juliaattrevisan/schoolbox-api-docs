@@ -229,20 +229,33 @@ $container-bg: white;
 
     /* Learning Moment Moderation
      * These are based on the existing submission workflow colours.
+     *
+     * Anyway, the margin-top aligns a baseline with everything else in an
+     * adjacent .meta element; also, we are apparently deviating from .label's
+     * text-transform convention in favour of the default.
      */
     &.moment-draft {
         @include label($bg: $neutral-color);
         color: darken($neutral-color, 50%);
+        text-transform: none;
+        margin-top: 0.4rem;
+        margin-left: 0.5rem;
     }
 
     &.moment-submitted {
         @include label($bg: tint($warning-color, 74%));
         color: $warning-color;
+        text-transform: none;
+        margin-top: 0.4rem;
+        margin-left: 0.5rem;
     }
 
     &.moment-rejected {
         @include label($bg: tint($alert-color, 74%));
         color: $alert-color;
+        text-transform: none;
+        margin-top: 0.4rem;
+        margin-left: 0.5rem;
     }
 }
 

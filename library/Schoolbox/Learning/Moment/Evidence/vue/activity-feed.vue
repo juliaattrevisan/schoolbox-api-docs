@@ -648,13 +648,13 @@ export default {
                                                 >
                                                 <!-- Only show status that isn't published, since that is the default state -->
                                                 <template v-if="'draft' == evidence.object.currentState">
-                                                  <p class="pipe meta"><span :class="`moment-${evidence.object.currentState} label`">Draft</span></p>
+                                                    <span :class="`moment-${evidence.object.currentState} label`">Draft</span>
                                                 </template>
                                                 <template v-else-if="'submitted' == evidence.object.currentState">
-                                                    <p class="pipe meta"><span :class="`moment-${evidence.object.currentState} label`">Requiring approval</span></p>
+                                                    <span :class="`moment-${evidence.object.currentState} label`">Requiring approval</span>
                                                 </template>
                                                 <template v-else-if="'rejected' == evidence.object.currentState">
-                                                    <p class="pipe meta"><span :class="`moment-${evidence.object.currentState} label`">Requiring update</span></p>
+                                                    <span :class="`moment-${evidence.object.currentState} label`">Requiring update</span>
                                                 </template>
                                             </component>
                                         </div>
