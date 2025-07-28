@@ -131,7 +131,7 @@ function onSortSelected(headerKey: string): void {
                     :sort-order="sortOrder"
                     @sort="onSortSelected"
                 />
-                <tbody v-if="isSameLoading">
+                <tbody v-if="isSameLoading" class="pr-table__loading">
                     <tr>
                         <td colspan="100%">
                             <div class="loader"></div>
@@ -173,23 +173,29 @@ function onSortSelected(headerKey: string): void {
 
 .pr-table {
     width: 100%;
-    thead {
-        /* fix the head to stay at the top when scrolling */
-        position: sticky;
-        top: 0;
-        z-index: var(--sbx-depth-ui-sticky);
+    thead,
+    &__loading {
         background: #ffffff; /* Ensure the header has a background to prevent transparency */
+        position: sticky;
+        z-index: var(--sbx-depth-ui-sticky);
+    }
+    /* fix the head to stay at the top when scrolling */
+    thead {
+        top: 0;
+    }
+    &__loading {
+        left: 0;
     }
 }
 
 .pr-table-metadata {
+    background-color: #f9f9f9;
+    border-top: 1px solid #e0e0e0;
     margin-top: 1rem;
     padding: 0.5rem;
-    border-top: 1px solid #e0e0e0;
-    background-color: #f9f9f9;
     &__count {
-        font-size: 0.9rem;
         color: #666;
+        font-size: 0.9rem;
     }
 }
 </style>
