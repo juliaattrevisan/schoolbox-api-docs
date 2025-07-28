@@ -49,17 +49,23 @@ class StudentByType extends Cursor implements TabTypeInterface
             return "total {$this->order}";
         }
 
+        /* Early return if the key is not what we are expecting
+         */
         if (!str_starts_with($this->sortBy, 'count_')) {
             return $orderByName;
         }
 
+        /* Double-checking that the key is valid column for sorting
+         */
         if (
-            !in_array($this->sortBy, $this->helper->getType()->map(fn(Type $type) => "count_type_" . $type->getId())->getAll()) &&
-            !in_array($this->sortBy, $this->helper->getSubTypes()->map(fn(SubType $subtype) => "count_subtype_" . $subtype->getId())->getAll())
+            in_array($this->sortBy, $this->helper->getType()->map(fn(Type $type) => "count_type_" . $type->getId())->getAll()) ||
+            in_array($this->sortBy, $this->helper->getSubTypes()->map(fn(SubType $subtype) => "count_subtype_" . $subtype->getId())->getAll())
         ) {
             return "{$this->sortBy} {$this->order}";
         }
 
+        /* Otherwise default to sorting by name
+         */
         return $orderByName;
     }
 
