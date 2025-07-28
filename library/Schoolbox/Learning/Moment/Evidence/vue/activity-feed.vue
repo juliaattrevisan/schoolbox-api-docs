@@ -784,6 +784,7 @@ export default {
                                         />
                                     </div>
 
+                                    <!-- Learning Moment Moderation: Action Buttons -->
                                     <template v-if="'draft' == evidence.object.currentState || 'rejected' == evidence.object.currentState">
                                         <a class="button">Modify</a>
 
