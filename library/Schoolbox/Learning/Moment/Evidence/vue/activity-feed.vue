@@ -791,7 +791,7 @@ export default {
                                     <template v-if="'student' === config.currentUser.role.type">
                                         <template v-if="'draft' === evidence.object.currentState || 'submitted' === evidence.object.currentState || 'rejected' === evidence.object.currentState">
                                             <!-- Modify button available when a learning moment is: draft/submitted/rejected -->
-                                            <a class="button">Modify</a>
+                                            <a class="button" :href="evidence.object._links.modifyForm">Modify</a>
                                         </template>
 
                                         <template v-if="'draft' === evidence.object.currentState">
@@ -804,7 +804,7 @@ export default {
                                     <template v-else-if="'staff' === config.currentUser.role.type">
                                         <template v-if="'draft' === evidence.object.currentState || 'submitted' === evidence.object.currentState || 'rejected' === evidence.object.currentState">
                                             <!-- Modify button available when a learning moment is: draft/submitted/rejected -->
-                                            <a class="button">Modify</a>
+                                          <a class="button" :href="evidence.object._links.modifyForm">Modify</a>
                                         </template>
 
                                         <template v-if="'draft' === evidence.object.currentState || 'submitted' === evidence.object.currentState || 'rejected' === evidence.object.currentState">
@@ -817,7 +817,7 @@ export default {
                                     <template v-else-if="'parent' === config.currentUser.role.type">
                                         <template v-if="'draft' === evidence.object.currentState">
                                             <!-- Modify button available when a learning moment is: draft -->
-                                            <a class="button">Modify</a>
+                                          <a class="button" :href="evidence.object._links.modifyForm">Modify</a>
                                         </template>
                                     </template>
                                 </template>
