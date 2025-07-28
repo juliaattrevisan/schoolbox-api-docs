@@ -3,5 +3,15 @@
 # Always run within root folder
 cd "$(dirname "$0")/.." || exit 1
 
-# stop containers for the docker compose configuration
-docker compose --progress plain down
+# stop containers for all docker-compose configurations
+docker compose --progress plain \
+    -f "docker/base.docker-compose.yaml" \
+    -f "docker/schoolbox-taskd-local.docker-compose.yaml" \
+    -f "docker/schoolbox-frankenphp-local.docker-compose.yaml" \
+    down
+
+docker compose --progress plain \
+    -f "docker/base.docker-compose.yaml" \
+    -f "docker/schoolbox-taskd-prebuilt.docker-compose.yaml" \
+    -f "docker/schoolbox-frankenphp-deploy.docker-compose.yaml" \
+    down
