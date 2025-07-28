@@ -52,6 +52,7 @@ class BaseTest extends TestCase
                 '_links'           => [],
                 'curriculumNodes'  => null,
                 'tags'             => null,
+                'currentState'     => Model::STATUS_DRAFT,
             ],
         ];
 
@@ -72,7 +73,8 @@ class BaseTest extends TestCase
                 ->setCurriculumNodes(
                     (new GenericCollection(new CurriculumNode()))->add((new CurriculumNode())->setId(500)->setName('Test Curriculum')->setCode(trim('TEST500 ')))
                 )
-                ->setTags((new GenericCollection(new EvidenceTag()))->add((new EvidenceTag())->setId(1)->setName('Class Work'))),
+                ->setTags((new GenericCollection(new EvidenceTag()))->add((new EvidenceTag())->setId(1)->setName('Class Work')))
+                ->publish((new User())->setId(12345)),
             [
                 'id'               => 3,
                 'body'             => 'something',
@@ -86,6 +88,7 @@ class BaseTest extends TestCase
                 '_links'           => [],
                 'curriculumNodes'  => new Collection([['id' => 500, 'name' => 'Test Curriculum', 'code' => 'TEST500']]),
                 'tags'             => new Collection([['id' => 1, 'name' => 'Class Work']]),
+                'currentState'     => Model::STATUS_PUBLISHED
             ],
         ];
     }
