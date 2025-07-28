@@ -7,7 +7,10 @@ import { toRef } from "vue";
 import type { Metadata } from "@js/util/sbx/apiUtils";
 import { usePagination } from "../composable/usePagination";
 
+const PER_PAGE = 20;
+
 const props = defineProps<{
+    endpoint: string;
     metadata: Metadata;
 }>();
 
@@ -16,9 +19,10 @@ const emit = defineEmits<{
     next: [cursor: string];
 }>();
 
-const { hasNext, toNext, hasPrevious, toPrevious, currentCursor, hasPaginate, reset } = usePagination(
-    20,
-    toRef(props.metadata),
+const { cursorIndex, hasNext, toNext, hasPrevious, toPrevious, currentCursor, hasPaginate, reset } = usePagination(
+    toRef(() => props.endpoint),
+    PER_PAGE,
+    toRef(() => props.metadata),
 );
 
 /**
@@ -36,17 +40,6 @@ function onNextSelected(): void {
     toNext();
     emit("next", currentCursor.value);
 }
-
-/**
- *
- *
- */
-window.Vue.watch(
-    () => props.metadata,
-    () => {
-        console.warn("Metadata changed:", props.metadata);
-    },
-);
 </script>
 
 <template>
@@ -59,6 +52,12 @@ window.Vue.watch(
                 of {{ props.metadata.count }}</b
             >
         </p> -->
+        <p class="f-no-margins">
+            <b
+                >{{ cursorIndex * PER_PAGE + 1 }}-{{ Math.min((cursorIndex - 1) * PER_PAGE, props.metadata.count) }} of
+                {{ props.metadata.count }}</b
+            >
+        </p>
         <nav v-if="hasPaginate" class="l-flex-row l-gap-s">
             <button v-if="hasPrevious" type="button" title="Previous" @click="onPreviousSelected">&lt;</button>
             <button v-if="hasNext" type="button" title="Next" @click="onNextSelected">&gt;</button>

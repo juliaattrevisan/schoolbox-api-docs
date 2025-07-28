@@ -7,11 +7,13 @@ import type { Metadata } from "@js/util/sbx/apiUtils";
 
 /**
  *
+ * @param endpoint -
  * @param perPage - number of items per page
  * @param metadata - metadata containing pagination information
- * @returns
+ * @returns -
  */
 export function usePagination(
+    endpoint: Ref<string>,
     perPage: number,
     metadata: Ref<Metadata>,
 ): {
@@ -20,6 +22,7 @@ export function usePagination(
     toPrevious: () => void;
     toNext: () => void;
     reset: () => void;
+    cursorIndex: Ref<number>;
     currentCursor: Ref<string>;
     hasPaginate: Ref<boolean>;
 } {
@@ -29,6 +32,38 @@ export function usePagination(
     const hasPaginate = window.Vue.ref<boolean>(false);
     const hasPrevious = window.Vue.computed(() => cursorIndex.value > 0);
     const hasNext = window.Vue.computed(() => cursorIndex.value < cursorList.value.length - 1);
+
+    /**
+     * Determines if pagination should be reset based on URL changes
+     * @param oldUrl - the previous endpoint URL
+     * @param newUrl - the new endpoint URL
+     * @returns - true if pagination should be reset
+     */
+    function shouldResetPagination(oldUrl: string, newUrl: string): boolean {
+        try {
+            const oldUrlObj = new URL(oldUrl, window.location.origin);
+            const newUrlObj = new URL(newUrl, window.location.origin);
+
+            // If pathname or hash changed, definitely reset
+            if (oldUrlObj.pathname !== newUrlObj.pathname || oldUrlObj.hash !== newUrlObj.hash) {
+                return true;
+            }
+
+            // Compare query parameters excluding cursor
+            const oldParams = new URLSearchParams(oldUrlObj.search);
+            const newParams = new URLSearchParams(newUrlObj.search);
+
+            // Remove cursor parameter from both for comparison
+            oldParams.delete("cursor");
+            newParams.delete("cursor");
+
+            // If the remaining parameters are different, reset pagination
+            return oldParams.toString() !== newParams.toString();
+        } catch (error) {
+            // If URL parsing fails, be safe and reset
+            return true;
+        }
+    }
 
     /**
      * Move to the previous page
@@ -50,6 +85,24 @@ export function usePagination(
     function reset(): void {
         cursorList.value = [""];
         cursorIndex.value = 0;
+    }
+
+    /**
+     * watch endpoint and if anything other than cursor changes, it means the pagination needs to reset
+     */
+    window.Vue.watch(endpoint, (newEndpoint, oldEndpoint) => {
+        if (endpoint.value !== "" && newEndpoint !== oldEndpoint) {
+            // Check if this is a URL change that should trigger a reset
+            if (shouldResetPagination(oldEndpoint, newEndpoint)) {
+                reset();
+            }
+        }
+    });
+
+    /**
+     *
+     */
+    function checkMetadata(): void {
         hasPaginate.value = metadata.value.count >= perPage;
         if (hasPaginate.value) {
             cursorList.value.push(metadata.value.cursor.next || "");
@@ -61,7 +114,7 @@ export function usePagination(
      *
      */
     window.Vue.watch(metadata, () => {
-        console.warn("Metadata changed ya:", metadata);
+        checkMetadata();
     });
 
     /**
@@ -69,6 +122,7 @@ export function usePagination(
      */
     window.Vue.onMounted(() => {
         reset();
+        checkMetadata();
     });
 
     return {
@@ -77,6 +131,7 @@ export function usePagination(
         toPrevious,
         toNext,
         reset,
+        cursorIndex,
         currentCursor,
         hasPaginate,
     };

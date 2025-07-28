@@ -178,7 +178,12 @@ function onNext(cursor: string): void {
                     />
                 </tbody>
             </table>
-            <pr-table-footer :metadata="(payload as TablePayload).metadata" @previous="onPrevious" @next="onNext" />
+            <pr-table-footer
+                :endpoint="currentEndpoint"
+                :metadata="(payload as TablePayload).metadata"
+                @previous="onPrevious"
+                @next="onNext"
+            />
         </div>
     </template>
 </template>
