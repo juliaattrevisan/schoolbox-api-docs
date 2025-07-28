@@ -472,7 +472,7 @@ export default {
                 })
                 .then(() => {
                     this.$refs.toast.timeout("Submitted.", true, 2000);
-                    // window.location.reload();
+                    window.location.reload();
                 })
                 .catch(() => this.$refs.toast.timeout("Submit failed", false, 5000));
             }
