@@ -786,14 +786,39 @@ export default {
 
                                     <!-- Learning Moment Moderation: Action Buttons -->
                                     <!-- These are based on role types -->
-                                    <template v-if="'draft' === evidence.object.currentState || 'submitted' === evidence.object.currentState || 'rejected' === evidence.object.currentState">
-                                        <!-- Modify button available when a learning moment is: draft/submitted/rejected -->
-                                        <a class="button">Modify</a>
+
+                                    <!-- Student buttons -->
+                                    <template v-if="'student' === config.currentUser.role.type">
+                                        <template v-if="'draft' === evidence.object.currentState || 'submitted' === evidence.object.currentState || 'rejected' === evidence.object.currentState">
+                                            <!-- Modify button available when a learning moment is: draft/submitted/rejected -->
+                                            <a class="button">Modify</a>
+                                        </template>
+
+                                        <template v-if="'draft' === evidence.object.currentState">
+                                            <!-- Submit button available when a learning moment is: draft -->
+                                            <a class="button" @click="submitEvidence(evidence.object)">Submit</a>
+                                        </template>
                                     </template>
 
-                                    <template v-if="'draft' === evidence.object.currentState || 'submitted' === evidence.object.currentState || 'rejected' === evidence.object.currentState">
-                                        <!-- Submit button available when a learning moment is: draft/submitted/rejected -->
-                                        <a class="button" @click="submitEvidence(evidence.object)">Submit</a>
+                                    <!-- Staff buttons -->
+                                    <template v-else-if="'staff' === config.currentUser.role.type">
+                                        <template v-if="'draft' === evidence.object.currentState || 'submitted' === evidence.object.currentState || 'rejected' === evidence.object.currentState">
+                                            <!-- Modify button available when a learning moment is: draft/submitted/rejected -->
+                                            <a class="button">Modify</a>
+                                        </template>
+
+                                        <template v-if="'draft' === evidence.object.currentState || 'submitted' === evidence.object.currentState || 'rejected' === evidence.object.currentState">
+                                            <!-- Publish button available when a learning moment is: draft/submitted/rejected -->
+                                            <a class="button">Publish</a>
+                                        </template>
+                                    </template>
+
+                                    <!-- Parent buttons -->
+                                    <template v-else-if="'parent' === config.currentUser.role.type">
+                                        <template v-if="'draft' === evidence.object.currentState">
+                                            <!-- Modify button available when a learning moment is: draft -->
+                                            <a class="button">Modify</a>
+                                        </template>
                                     </template>
                                 </template>
                                 <template v-if="evidence.discriminator === 'badgeAward'">
