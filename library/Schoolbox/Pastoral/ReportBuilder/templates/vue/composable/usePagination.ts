@@ -32,6 +32,7 @@ export function usePagination(
     const hasPaginate = window.Vue.ref<boolean>(false);
     const hasPrevious = window.Vue.computed(() => cursorIndex.value > 0);
     const hasNext = window.Vue.computed(() => cursorIndex.value < cursorList.value.length - 1);
+    const pageCount = window.Vue.ref(0);
 
     /**
      * Determines if pagination should be reset based on URL changes
@@ -106,7 +107,9 @@ export function usePagination(
         hasPaginate.value = metadata.value.count >= perPage;
         if (hasPaginate.value) {
             cursorList.value.push(metadata.value.cursor.next || "");
+            pageCount.value = Math.ceil(metadata.value.count / perPage);
             console.warn("Pagination enabled:", cursorList.value);
+            console.warn("Page count:", pageCount.value);
         }
     }
 
@@ -114,7 +117,10 @@ export function usePagination(
      *
      */
     window.Vue.watch(metadata, () => {
-        checkMetadata();
+        // only add a new cursor if the metadata has a next cursor
+        if (cursorList.value.length !== pageCount.value) {
+            checkMetadata();
+        }
     });
 
     /**
