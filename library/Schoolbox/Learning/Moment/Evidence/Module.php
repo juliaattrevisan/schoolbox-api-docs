@@ -88,7 +88,8 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
-                new Rule\IsUser('creatorId')
+                new Rule\IsUser('creatorId'),
+                $isParentOrUserRule
             )
         );
         $deleteEvidenceRule = $modifyEvidenceRule;
