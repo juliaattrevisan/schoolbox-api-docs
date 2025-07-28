@@ -124,7 +124,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
                     <span v-else-if="header.isSortable" class="sort-indicator sort-indicator--inactive"> ↕ </span>
                 </button> -->
                 {{ header.subTitle ? header.subTitle : header.title }}
-                {{ header.key === "total" ? recordsOrPoints : "" }}
+                {{ header.key === "total" ? capitalizeFirstLetter(recordsOrPoints) : "" }}
             </th>
         </tr>
     </thead>
