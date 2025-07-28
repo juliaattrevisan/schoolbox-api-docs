@@ -138,7 +138,7 @@ services:
         condition: service_started
     build:
       context: ./schoolbox-digestd
-    env_file: ./default.env
+    env_file: ./schoolbox/default-instance.env
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
@@ -159,7 +159,7 @@ services:
         condition: service_started
     build:
       context: ./schoolbox-scheduled
-    env_file: ./default.env
+    env_file: ./schoolbox/default-instance.env
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
@@ -180,7 +180,7 @@ services:
         condition: service_started
     build:
       context: ./schoolbox-mobiled
-    env_file: ./default.env
+    env_file: ./schoolbox/default-instance.env
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
@@ -201,6 +201,7 @@ services:
         condition: service_started
     build:
       context: ./schoolbox-socketd
+    env_file: ./schoolbox/default-instance.env
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage

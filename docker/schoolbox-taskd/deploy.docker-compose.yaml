@@ -14,7 +14,7 @@ services:
     build:
       context: ./schoolbox-taskd
     env_file:
-      - path: ./default.env
+      - path: ./schoolbox-taskd/default.env
         required: true
       - path: ./../taskd.env
         required: false
