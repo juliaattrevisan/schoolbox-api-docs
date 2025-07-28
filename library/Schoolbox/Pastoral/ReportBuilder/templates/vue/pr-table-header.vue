@@ -15,7 +15,7 @@ const props = defineProps<{
     sortOrder: "asc" | "desc";
 }>();
 
-const recordsOrPoints = defineModel<string>("records-or-points", { default: "records" });
+const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
 
 // const emit = defineEmits<{
 //     sort: [key: string];

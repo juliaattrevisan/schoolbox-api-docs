@@ -10,7 +10,7 @@ import type { TableHeader, RowOptions, RecordsAndPoints } from "../js/types/past
 type Props = {
     headers: TableHeader[];
     rowData: { [key: string]: RowOptions };
-    recordsOrPoints: string;
+    recordsOrPoints: "records" | "points";
 };
 const props = defineProps<Props>();
 </script>

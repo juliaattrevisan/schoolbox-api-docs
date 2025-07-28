@@ -4,7 +4,6 @@
  */
 
 import { useTemplateRef } from "vue";
-// import { payload as tempPayload } from "./tempData";
 import type { Tab, TablePayload, Config, Routes } from "../js/types/pastoralReportTypes";
 import { TabType } from "../js/types/pastoralReportTypes";
 import { useLoadPrTable } from "./composable/useLoadPrTable";
@@ -20,7 +19,7 @@ const props = defineProps<{
     localePastoral: string;
 }>();
 
-const recordsOrPoints = defineModel<string>("records-or-points", { default: "records" });
+const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
 
 const sortBy = window.Vue.ref<string>("user"); // the current sort by field - this should update when payload is loaded
 const sortOrder = window.Vue.ref<"asc" | "desc">("asc"); // the current sort order
