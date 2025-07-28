@@ -450,6 +450,22 @@ class Model implements ISoftDeletable, IThreadLocation
      */
 
     /**
+     * This moment is draft
+     *
+     * @return bool
+     */
+    public function isDraft(): bool
+    {
+        return $this->getSubmittedAt() === null &&
+            $this->getSubmittedBy() === null &&
+            $this->getPublishedAt() === null &&
+            $this->getPublishedBy() === null &&
+            $this->getRejectedAt() === null &&
+            $this->getRejectedBy() === null;
+    }
+
+
+    /**
      * This moment is submitted;
      * it isn't published, nor rejected
      *

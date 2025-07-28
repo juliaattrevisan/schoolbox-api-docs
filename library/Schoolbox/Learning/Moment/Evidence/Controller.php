@@ -283,6 +283,8 @@ class Controller extends Base
             /* Accelerate into the next state based on configs and year level settings
              */
             if ($moderationRequired) {
+                /* TODO deconflict
+                 */
                 if ($requestBody['draftState']) {
                     /* Save a draft
                      */
@@ -377,6 +379,7 @@ class Controller extends Base
     public function putEvidence(Model $evidence): void
     {
         $requestBody       = $this->request->getParsedBody();
+
         $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
         $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
         $tokenReplacer     = new TokenReplacer\Student(new TokenReplacer\Simple());
@@ -391,6 +394,30 @@ class Controller extends Base
             new ScrubAdapter(),
         );
         $this->response     = $this->responseAsJson($responseTranslator($evidence));
+    }
+
+
+    /**
+     * A special endpoint used as a shortcut from the Activity Feed. Its express purpose is to
+     * put the current $evidence into Draft state without changing anything else about it
+     *
+     * @api   PUT /learning/evidence/{id}/submit
+     * @param Model $evidence
+     * @return void
+     * @throws MapperException
+     */
+    public function putDraft(Model $evidence): void
+    {
+        $evidence->draft();
+
+        $this->mapper->save($evidence);
+
+        $responseTranslator = new Translator\ModelToArray\Base(
+            new User\Translator\Author\ModelToArray(),
+            new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
+            new ScrubAdapter(),
+        );
+        $this->response = $this->responseAsJson($responseTranslator($evidence));
     }
 
 

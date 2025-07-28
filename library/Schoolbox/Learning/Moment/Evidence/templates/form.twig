@@ -83,8 +83,6 @@
 <div class="row">
     <div class="small-12 island">
         <form action="{{ formAction }}" method="post" id="evidence-form">
-            <input type="hidden" name="draftState" value="0" />
-
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -118,31 +116,43 @@
             {# Moderation Workflow
              # Staff and students share this area, but their buttons are differently described
              #}
-            <button id="evidence-save">Save for later</button>
+            <button id="draft">Save for later</button>
             <script>
                 $(function() {
-                    $('#evidence-save').on('click', function(event) {
+                    $('#draft').on('click', function(event) {
                         event.preventDefault();
 
-                        {# FIXME maybe possible for Save to cancel and return you to the original form,
-                         # but this val will have changed: maybe find a way to revert it, in that circumstance
-                         # e.g. when network connectivity drops out and the request fails maybe, but atm
-                         # we are processing synchronously
-                         #}
-                        $('#evidence-form').find('input[name="draftState"]').val(1);
+                        let route = '{{ routeLookupIfAuthorized('learningMomentEvidence.putDraft', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) }}';
 
-                        $('#evidence-submit').trigger('click');
+                        $('#evidence-form').attr('action', route);
+
+                        $('#evidence-persist').trigger('click');
                     });
                 });
             </script>
 
             {% if USER.role.isStudent %}
-                {% if moderationRequired %}
-                    <input type="submit" id="evidence-submit" data-test="learning-moment-evidence-form-submit" value="Submit for approval" />
+                {% if moderationRequired and evidence.isDraft %}
+                    <button id="submit">Submit for approval</button>
+                    <script>
+                        $(function() {
+                            $('#submit').on('click', function(event) {
+                                event.preventDefault();
+
+                                let route = '{{ routeLookupIfAuthorized('learningMomentEvidence.putSubmit', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) }}';
+
+                                $('#evidence-form').attr('action', route);
+
+                                $('#evidence-persist').trigger('click');
+                            });
+                        });
+                    </script>
                 {% endif %}
             {% elseif USER.role.isStaff and USER.role.accessEvidence %}
                 {% if evidence.isSubmitted %}
-                    {# This triggers an async request to Reject+reason #}
+                    {# This triggers an async request to Reject+reason
+                     # For the implementation, scroll down to the modal
+                     #}
                     <button id="request-update">Request update</button>
 
                     {# Publish with optional comment deletion
@@ -171,23 +181,23 @@
 
                                         $('#delete-comments').val(1);
 
-                                        $('#evidence-moderate').trigger('click');
+                                        $('#evidence-persist').trigger('click');
                                     });
 
                                     {# Continue with no further alterations #}
                                     $('#preserveComments').on('click', function () {
-                                        $('#evidence-moderate').trigger('click');
+                                        $('#evidence-persist').trigger('click');
                                     });
                                 })
                             });
                         </script>
                     {% endif %}
-
-                    <input type="submit" id="evidence-moderate" data-test="learning-moment-evidence-form-submit" value="Approve" style="display:none" />
                 {% endif %}
             {% elseif USER.role.isParent %}
-                <input type="submit" id="evidence-submit" data-test="learning-moment-evidence-form-submit" value="Submit" style="display:none" />
+
             {% endif %}
+
+            <input type="submit" id="evidence-persist" data-test="learning-moment-evidence-form-submit" value="Secret Submit" style="display:none" />
         </form>
     </div>
 </div>
@@ -211,7 +221,7 @@
     <script>
         $(function() {
             $(document).on('closed.fndtn.reveal', '#deleteCommentsModal', function () {
-                $('#evidence-submit').prop('disabled', false);
+                $('#evidence-persist').prop('disabled', false);
             });
         });
     </script>
@@ -263,7 +273,7 @@
                  # prior to payload being constructed, sending you the original text rather than
                  # the updated text. To dodge this ckeditor hankypanky we just simulate a user click
                  #}
-                $('#evidence-moderate').trigger('click');
+                $('#evidence-persist').trigger('click');
             });
         });
     </script>
@@ -308,10 +318,6 @@
                      # For when someone chose "Delete and continue"
                      #}
                     deleteComments: formData.get('delete-comments'),
-                    {# Moderation Workflow
-                     # When an author saves a draft
-                     #}
-                    draftState: formData.get('draftState')
                 };
 
         let tags = form.querySelector('#evidence-tags').selectize.items;
@@ -382,6 +388,7 @@
                     formMethod = 'put';
                 }
 
+                console.log(form.action, formMethod);
                 // Redirect to the return URL provided
                 fetch(form.action, {
                     method: formMethod,
@@ -395,7 +402,7 @@
                         throw new Error("Save failed!");
                     }
                     toast.toastTimeout({text: 'Saved'});
-                    window.location.href = '{{ RETURN_URL.previous.decoded ?? '/' }}';
+                    {#window.location.href = '{{ RETURN_URL.previous.decoded ?? '/' }}';#}
                     isSubmittingForm = false;
                 })
                 .catch(() => {

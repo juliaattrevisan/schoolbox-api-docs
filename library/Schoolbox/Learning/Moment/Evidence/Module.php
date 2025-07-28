@@ -174,6 +174,18 @@ class Module extends BaseModule
             Closure::fromCallable([$this, 'preloadEvidence']),
         );
 
+        /* Put an evidence into the Draft state as-is;
+         * Used from the Activity Feed
+         */
+        $this->register(
+            self::METHOD_PUT,
+            '/{evidenceId}/draft',
+            'putDraft',
+            $modifyEvidenceRule,
+            Closure::fromCallable([$this, 'preloadEvidence']),
+        );
+
+
         /* Put an evidence into the Submitted state as-is;
          * Used from the Activity Feed
          */
