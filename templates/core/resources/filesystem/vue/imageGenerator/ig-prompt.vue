@@ -84,7 +84,7 @@ async function sendRequest(): Promise<void> {
         id="ig-prompt-file-drop"
         v-model:current-file="currentFile"
         placeholder="Click or drag here to add an image prompt"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/gif,image/webp"
     />
 
     <label>
