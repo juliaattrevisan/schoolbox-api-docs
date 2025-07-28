@@ -13,34 +13,22 @@ import type { Metadata } from "@js/util/sbx/apiUtils";
  */
 export function usePagination(
     perPage: number,
-    metadata: Metadata,
+    metadata: Ref<Metadata>,
 ): {
-    hasPrevious: () => boolean;
-    hasNext: () => boolean;
+    hasPrevious: Ref<boolean>;
+    hasNext: Ref<boolean>;
     toPrevious: () => void;
     toNext: () => void;
     reset: () => void;
     currentCursor: Ref<string>;
+    hasPaginate: Ref<boolean>;
 } {
     const cursorList = window.Vue.ref<string[]>([""]); // to distinguish between loading a new table and loading data for the same table
     const cursorIndex = window.Vue.ref(0); // to track the current cursor index
     const currentCursor = window.Vue.computed(() => cursorList.value[cursorIndex.value] || "");
-
-    /**
-     * Check if there is a previous page
-     * @returns - true if there is a previous page, false otherwise
-     */
-    function hasPrevious(): boolean {
-        return cursorIndex.value > 0;
-    }
-
-    /**
-     * Check if there is a next page
-     * @returns - true if there is a next page, false otherwise
-     */
-    function hasNext(): boolean {
-        return cursorIndex.value < cursorList.value.length - 1;
-    }
+    const hasPaginate = window.Vue.ref<boolean>(false);
+    const hasPrevious = window.Vue.computed(() => cursorIndex.value > 0);
+    const hasNext = window.Vue.computed(() => cursorIndex.value < cursorList.value.length - 1);
 
     /**
      * Move to the previous page
@@ -62,14 +50,25 @@ export function usePagination(
     function reset(): void {
         cursorList.value = [""];
         cursorIndex.value = 0;
+        hasPaginate.value = metadata.value.count >= perPage;
+        if (hasPaginate.value) {
+            cursorList.value.push(metadata.value.cursor.next || "");
+            console.warn("Pagination enabled:", cursorList.value);
+        }
     }
 
     /**
      *
-     *
      */
     window.Vue.watch(metadata, () => {
         console.warn("Metadata changed ya:", metadata);
+    });
+
+    /**
+     * Start setting the scrollable height on any window resize change
+     */
+    window.Vue.onMounted(() => {
+        reset();
     });
 
     return {
@@ -79,5 +78,6 @@ export function usePagination(
         toNext,
         reset,
         currentCursor,
+        hasPaginate,
     };
 }

@@ -16,7 +16,10 @@ const emit = defineEmits<{
     next: [cursor: string];
 }>();
 
-const { hasNext, toNext, hasPrevious, toPrevious, currentCursor } = usePagination(20, toRef(props.metadata));
+const { hasNext, toNext, hasPrevious, toPrevious, currentCursor, hasPaginate, reset } = usePagination(
+    20,
+    toRef(props.metadata),
+);
 
 /**
  * Handles the previous button click
@@ -55,11 +58,11 @@ window.Vue.watch(
                 }}
                 of {{ props.metadata.count }}</b
             >
-        </p>
-        <nav v-if="props.loadStatus.hasMoreRows" class="l-flex-row l-gap-s">
-            <button v-if="hasPrevious()" type="button" title="Previous" @click="onPreviousSelected">&lt;</button>
-            <button v-if="hasNext()" type="button" title="Next" @click="onNextSelected">&gt;</button>
-        </nav> -->
+        </p> -->
+        <nav v-if="hasPaginate" class="l-flex-row l-gap-s">
+            <button v-if="hasPrevious" type="button" title="Previous" @click="onPreviousSelected">&lt;</button>
+            <button v-if="hasNext" type="button" title="Next" @click="onNextSelected">&gt;</button>
+        </nav>
     </div>
 </template>
 
