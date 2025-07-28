@@ -1,0 +1,29 @@
+# This FrankenPHP container mounts Schoolbox's code folder as a local mount,
+# so that changes made locally are made available immediately.
+# This container is intended for local development.
+
+services:
+  schoolbox-frankenphp:
+    environment:
+      DEBUG: "1"
+    restart: always
+    build:
+      context: ./schoolbox-frankenphp
+      dockerfile: dev-image.Dockerfile
+    scale: 2
+    deploy:
+      mode: replicated
+      replicas: 2
+    healthcheck:
+        test: [ "CMD", "curl", "http://localhost/health" ]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+    volumes:
+      - code:/usr/share/schoolbox
+      - storage:/var/lib/schoolbox/docker/storage
+      - schoolbox-config:/etc/schoolbox
+    # After building: create data dirs, and make mount writable by www-data
+    post_start:
+      - command: /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox/docker/
+      - command: /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox/docker/ www-data
