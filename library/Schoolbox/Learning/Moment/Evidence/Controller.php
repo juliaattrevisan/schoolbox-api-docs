@@ -686,7 +686,7 @@ class Controller extends Base
             $evidence->submit($this->getUser());
         } elseif (Model::STATUS_PUBLISHED === $state) {
             $evidence->publish($this->getUser());
-        } elseif (MOdel::STATUS_REJECTED === $state) {
+        } elseif (Model::STATUS_REJECTED === $state) {
             $evidence->reject($this->getUser());
         }
     }
