@@ -75,6 +75,23 @@ async function sendRequest(): Promise<void> {
         prompt.value = "";
     }
 }
+
+/**
+ * The form is disabled if:
+ * - there is an active generation in progress
+ * - an invalid image was uploaded (the user must remove it first)
+ */
+const isFormDisabled = window.Vue.computed(() => {
+    if (igStore.activeGeneration !== null) {
+        return true;
+    }
+
+    if ((currentFile.value?.error ?? false) !== false) {
+        return true;
+    }
+
+    return false;
+});
 </script>
 
 <template>
@@ -95,7 +112,7 @@ async function sendRequest(): Promise<void> {
             rows="1"
             placeholder="Describe or refine the image you want to generate"
             style="resize: vertical; margin-bottom: 0"
-            :disabled="igStore.activeGeneration !== null || undefined"
+            :disabled="isFormDisabled || undefined"
             required
             @keydown.enter.exact.prevent="sendRequest"
         ></textarea>
@@ -108,7 +125,7 @@ async function sendRequest(): Promise<void> {
                 :ref="attributeEls.set"
                 v-model="attributes[attr.id]"
                 :name="attr.id"
-                :disabled="igStore.activeGeneration !== null || undefined"
+                :disabled="isFormDisabled || undefined"
                 :required="attr.required || undefined"
             >
                 <option
@@ -129,7 +146,7 @@ async function sendRequest(): Promise<void> {
                 class="icon-send"
                 href="#"
                 title="Generate Image"
-                :disabled="igStore.activeGeneration !== null || undefined"
+                :disabled="isFormDisabled || undefined"
                 @click.prevent="sendRequest"
             ></a>
         </nav>
