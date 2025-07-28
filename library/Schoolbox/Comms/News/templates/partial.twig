@@ -27,17 +27,17 @@
                         {% set thumbnail = compactMode ? "thumbnail" : "" %}
                         {% if article.featureImage %}
                             <a href="{{ articleURL }}">
-                                <img class="{{ thumbnail }}" src="/storage/image.php?hash={{ article.featureImage.hash }}&size=constrain200">
+                                <img class="homepage-news-feature-image {{ thumbnail }}" src="/storage/image.php?hash={{ article.featureImage.hash }}&size=constrain200">
                             </a>
                         {% elseif fallbackImage.type == 'school-logo' %}
                             <a href="{{ articleURL }}">
-                                <img class="{{ thumbnail }}" src="/images/logo.php?logo=skin_logo_large&size=normal">
+                                <img class="homepage-news-feature-image {{ thumbnail }}" src="/images/logo.php?logo=skin_logo_large&size=normal">
                             </a>
                         {% elseif fallbackImage.type == 'author' %}
                             {% if article.author.portrait and article.author.portrait.hash %}
 
                                 <a href="{{ articleURL }}">
-                                    <img class="{{ thumbnail }}" src="/storage/image.php?hash={{ article.author.portrait.hash }}&size=constrain200">
+                                    <img class="homepage-news-feature-image{{ thumbnail }}" src="/storage/image.php?hash={{ article.author.portrait.hash }}&size=constrain200">
                                 </a>
                             {% endif %}
                         {% endif %}
