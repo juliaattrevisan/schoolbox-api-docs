@@ -11,10 +11,10 @@ declare taskd_compose_file
 declare frankenphp_compose_file="docker/schoolbox-frankenphp/dev.docker-compose.yaml"
 
 # Load config to figure out which taskd compose file to use
-declare taskd_build_from_local
-source ./docker.default.ini
-source ./docker.ini
-case "${taskd_build_from_local}" in
+declare TASKD_BUILD_FROM_LOCAL
+source ./docker.default.env
+source ./docker.env
+case "${TASKD_BUILD_FROM_LOCAL}" in
     1 | true | on)
         taskd_compose_file="docker/schoolbox-taskd/dev.docker-compose.yaml"
         ;;
