@@ -561,10 +561,27 @@ class Controller extends Base
      * @api   PUT /learning/evidence/{id}/submit
      * @param Model $evidence
      * @return void
+     * @throws Exception
      * @throws MapperException
      */
     public function putDraft(Model $evidence): void
     {
+        $requestBody = $this->request->getParsedBody();
+
+        /* This might be empty if drafting directly from the activity feed;
+         *
+         * It'll be an array of stuff from the Modify form though, at which point we take what was
+         * written there and update our model here.
+         */
+        if (!empty($requestBody)) {
+            $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
+            $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
+            $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
+            $evidence = $requestTranslator($requestBody, $evidence)->setBody($tokenReplacer->replace($evidence->getBody(), $evidence->getRecipient()));
+        }
+
+        /* Draft this thing
+         */
         $evidence->draft();
 
         $this->mapper->save($evidence);
@@ -574,6 +591,7 @@ class Controller extends Base
             new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
             new ScrubAdapter(),
         );
+
         $this->response = $this->responseAsJson($responseTranslator($evidence));
     }
 
@@ -603,10 +621,27 @@ class Controller extends Base
      * @api   PUT /learning/evidence/{id}/submit
      * @param Model $evidence
      * @return void
+     * @throws Exception
      * @throws MapperException
      */
     public function putSubmit(Model $evidence): void
     {
+        $requestBody = $this->request->getParsedBody();
+
+        /* This might be empty if submitting directly from the activity feed;
+         *
+         * It'll be an array of stuff from the Modify form though, at which point we take what was
+         * written there and update our model here.
+         */
+        if (!empty($requestBody)) {
+            $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
+            $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
+            $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
+            $evidence = $requestTranslator($requestBody, $evidence)->setBody($tokenReplacer->replace($evidence->getBody(), $evidence->getRecipient()));
+        }
+
+        /* Submit this thing
+         */
         $evidence->submit($this->getUser());
 
         $this->mapper->save($evidence);
@@ -616,6 +651,7 @@ class Controller extends Base
             new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
             new ScrubAdapter(),
         );
+
         $this->response = $this->responseAsJson($responseTranslator($evidence));
     }
 
@@ -629,10 +665,27 @@ class Controller extends Base
      * @api   PUT /learning/evidence/{id}/publish
      * @param Model $evidence
      * @return void
+     * @throws Exception
      * @throws MapperException
      */
     public function putPublish(Model $evidence): void
     {
+        $requestBody = $this->request->getParsedBody();
+
+        /* This might be empty if submitting directly from the activity feed;
+         *
+         * It'll be an array of stuff from the Modify form though, at which point we take what was
+         * written there and update our model here.
+         */
+        if (!empty($requestBody)) {
+            $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
+            $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
+            $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
+            $evidence = $requestTranslator($requestBody, $evidence)->setBody($tokenReplacer->replace($evidence->getBody(), $evidence->getRecipient()));
+        }
+
+        /* Publish this thing
+         */
         $evidence->publish($this->getUser());
 
         $this->mapper->save($evidence);
@@ -642,6 +695,7 @@ class Controller extends Base
             new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
             new ScrubAdapter(),
         );
+
         $this->response = $this->responseAsJson($responseTranslator($evidence));
     }
 }
