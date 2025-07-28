@@ -39,4 +39,4 @@ docker compose --progress plain \
     -f "docker/base.docker-compose.yaml" \
     -f "${frankenphp_compose_file}" \
     -f "${taskd_compose_file}" \
-    up -d --remove-orphans
+    up -d
