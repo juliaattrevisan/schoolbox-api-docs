@@ -11,29 +11,42 @@ class StudentByType extends Cursor implements TabTypeInterface
 {
     private array $params = [];
 
+    private ?Collection $typeSubTypeKeys = null;
     /**
      * Get the select string for the counts
      *
-     * @param string $resultType
-     * @param int    $value
-     * @param bool   $isSubtype
+     * @param string       $resultType
+     * @param Type|SubType $type
      * @return string
      * @throws \Exception
      */
-    private function getSelectCountString(string $resultType, int $value, bool $isSubtype = false): string
+    private function getSelectCountString(string $resultType, Type|SubType $type): string
     {
-        $type = $isSubtype ? 'subtype' : 'type';
+        $typeKey = ($type instanceof Type) ? 'type' : 'subtype';
+        $value = $type->getId();
 
-        $label = "count_{$type}_{$value}";
+        $label = "count_{$typeKey}_{$value}";
         $this->params[$label] = $label;
 
         return match (strtolower($resultType)) {
             Cursor::RESULT_TYPE_RECORDS =>
-            "ROUND(COUNT(CASE WHEN p.{$type}_id = {$value} THEN 1 END), 2) AS :{$label}",
+            "ROUND(COUNT(CASE WHEN p.{$typeKey}_id = {$value} THEN 1 END), 2) AS :{$label}",
             Cursor::RESULT_TYPE_POINTS =>
-            "ROUND(SUM(CASE WHEN p.{$type}_id = {$value} THEN p.points END), 2) AS :{$label}",
+            "ROUND(SUM(CASE WHEN p.{$typeKey}_id = {$value} THEN p.points END), 2) AS :{$label}",
             default => throw new \Exception("Unknown result type: '{$resultType}'"),
         };
+    }
+
+    private function getTypeSubtypeKey(): Collection
+    {
+        if (null === $this->typeSubTypeKeys) {
+            $this->typeSubTypeKeys = new Collection(array_filter(array_merge(
+                $this->helper->getType()->map(fn(Type $type) => "count_type_{$type->getId()}")->getAll(),
+                $this->helper->getSubTypes()->map(fn(SubType $subtype) => "count_subtype_{$subtype->getId()}")->getAll()
+            )));
+        }
+
+        return $this->typeSubTypeKeys;
     }
 
     /**
@@ -63,17 +76,31 @@ class StudentByType extends Cursor implements TabTypeInterface
         return "u.lastname {$this->order}, COALESCE(u.preferred_name, u.firstname) {$this->order}";
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function retrieveResults(?string $encodedCursor): Collection
+    private function getTotalCount(): Collection
     {
-        if (null !== $encodedCursor) {
-            $cursor = $this->codec->decode($encodedCursor);
-        }
-
         $db = $this->pastoralMapper->getDatabase();
 
+        $selectSUM = implode(',', $this->getTypeSubtypeKey()->map(fn(string $key) => "SUM({$key}) as {$key}")->getAll());
+
+        $query = "
+         SELECT SUM(total) as total, {$selectSUM}
+         FROM ({$this->getResultQuery()}) as count
+        ";
+
+        $result =  $db->executeQuery(
+            $query,
+            array_merge(
+                $this->helper->getParams(),
+                $this->params
+            )
+        );
+
+        $data = $result->fetch(\PDO::FETCH_ASSOC);
+        return new Collection($data);
+    }
+
+    private function getResultQuery(): string
+    {
         $whereInTypeSubTypeQuery = [];
 
         $whereTypes = $this->helper->getType();
@@ -83,7 +110,7 @@ class StudentByType extends Cursor implements TabTypeInterface
             $countTypeQuery = implode(
                 ', ',
                 $whereTypes->map(
-                    fn(Type $type) => $this->getSelectCountString($this->resultType, $type->getId())
+                    fn(Type $type) => $this->getSelectCountString($this->resultType, $type)
                 )->getAll()
             );
             $whereInTypeSubTypeQuery[] = "p.type_id IN ({$whereTypeIds})";
@@ -95,7 +122,7 @@ class StudentByType extends Cursor implements TabTypeInterface
             $countSubTypeQuery = implode(
                 ', ',
                 $this->helper->getSubTypes()->map(
-                    fn(SubType $subType) => $this->getSelectCountString($this->resultType, $subType->getId(), true)
+                    fn(SubType $subType) => $this->getSelectCountString($this->resultType, $subType)
                 )->getAll()
             );
             $whereInTypeSubTypeQuery[] = "p.subtype_id IN ({$whereSubTypeIds})";
@@ -144,11 +171,30 @@ class StudentByType extends Cursor implements TabTypeInterface
         $totalCount .= " THEN NULL ELSE ";
         $totalCount .= "(" . implode(' + ', array_filter([$typeKeys, $subTypeKeys])) . ") END as total";
 
+        $query = "SELECT countData.*, {$totalCount}
+            FROM ($countQuery) countData
+            INNER JOIN user u ON countData.student_id = u.id";
+
+        return $query;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function retrieveResults(?string $encodedCursor): Collection
+    {
+        $params = [];
+        if (null !== $encodedCursor) {
+            $cursor = $this->codec->decode($encodedCursor);
+        }
+
+        $db = $this->pastoralMapper->getDatabase();
+
         /**
          * Finding out where to locate the position where the cursor is pointing
          */
         $whereParts = "";
-        $this->params['limit'] = $this->limit;
+        $params['limit'] = $this->limit;
         $groupBy = "u.lastname, COALESCE(u.preferred_name, u.firstname)";
 
         $orderBy = $this->getOrderBy();
@@ -165,13 +211,11 @@ class StudentByType extends Cursor implements TabTypeInterface
                     (u.lastname = u2.lastname AND COALESCE(u.preferred_name, u.firstname) = u2.preferred_name AND u.id {$sortingOperator} :cursor)
                 )
             ";
-            $this->params['cursor'] = $cursor['id'];
+            $params['cursor'] = $cursor['id'];
         }
 
         $totalQuery = "
-            SELECT countData.*, {$totalCount}
-            FROM ($countQuery) countData
-            INNER JOIN user u ON countData.student_id = u.id
+            {$this->getResultQuery()}
             {$whereParts}
             GROUP BY countData.student_id, {$groupBy}
             ORDER BY {$orderBy}, countData.student_id {$this->order}
@@ -182,6 +226,7 @@ class StudentByType extends Cursor implements TabTypeInterface
             $totalQuery,
             array_merge(
                 $this->params,
+                $params,
                 $this->helper->getParams()
             )
         );
@@ -252,8 +297,6 @@ class StudentByType extends Cursor implements TabTypeInterface
      */
     private function getTableHeaders(): array
     {
-        $types = $this->helper->getType();
-
         $tableHeaders = [
             [
                 'key' => 'user',
@@ -269,7 +312,7 @@ class StudentByType extends Cursor implements TabTypeInterface
             ]
         ];
 
-        foreach ($types as $type) {
+        foreach ($this->helper->getType() as $type) {
             $tableHeaders[] = [
                 'key' => "count_type_{$type->getId()}",
                 'title' => $type->getName(),
@@ -316,18 +359,11 @@ class StudentByType extends Cursor implements TabTypeInterface
 
             /* Return null if all the values are null otherwise return the total count
              */
-            foreach ($keys as $key) {
-                $totalRow[$key] = [
-                    $this->resultType => array_reduce(
-                        array_column($records->getAll(), $key),
-                        function (?float $carry, ?float $value) {
-                            if (!is_null($value)) {
-                                return $carry += $value;
-                            }
-                            return $carry;
-                        }
-                    )];
-            }
+            $totalRow = array_merge(
+                $totalRow,
+                $this->getTotalCount()
+                     ->map(fn($count) => [ $this->resultType => is_numeric($count) ? $count / 1 : null ])->getAll()
+            );
 
             $rows = $records->map(
                 function (array $record) use ($students) {
