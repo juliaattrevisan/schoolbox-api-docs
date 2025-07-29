@@ -80,6 +80,7 @@ function onSort(headerKey: string): void {
     }
     queryParams.set("sortBy", sortBy.value);
     queryParams.set("order", order.value);
+    queryParams.set("cursor", ""); // Reset cursor on sort change
     currentEndpoint.value = `${props.selectedTab.endpoint}?${queryParams.toString()}`;
 }
 
