@@ -1475,6 +1475,15 @@ function alertInvalidIconName(): false {
                 <path d="M0 24h32l-16-16z"></path>
             </svg>
             <svg
+                v-else-if="props.name === 'sortable'"
+                class="sbx-icon__svg"
+                viewBox="0 0 32 32"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path d="M0 12h32L16 0z" />
+                <path d="M32 18.25H0l16 12z" />
+            </svg>
+            <svg
                 v-else-if="props.name === 'sport'"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
