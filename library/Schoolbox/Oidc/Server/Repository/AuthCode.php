@@ -113,7 +113,7 @@ class AuthCode implements AuthCodeRepositoryInterface
      * @param string $codeId
      * @return void
      */
-    public function revokeAuthCode($codeId): void
+    public function revokeAuthCode(string $codeId): void
     {
         $this->cache->delete($this->authCodeKeyGenerator->generateKey($codeId));
     }
@@ -124,7 +124,7 @@ class AuthCode implements AuthCodeRepositoryInterface
      * @param string $codeId
      * @return bool
      */
-    public function isAuthCodeRevoked($codeId): bool
+    public function isAuthCodeRevoked(string $codeId): bool
     {
         return !$this->cache->has($this->authCodeKeyGenerator->generateKey($codeId));
     }

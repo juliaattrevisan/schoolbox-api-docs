@@ -56,7 +56,7 @@ class Scope implements ScopeRepositoryInterface
      * @param string $identifier The requested scope, as a string.
      * @return ScopeEntityInterface|null
      */
-    public function getScopeEntityByIdentifier($identifier): ?ScopeEntityInterface
+    public function getScopeEntityByIdentifier(string $identifier): ?ScopeEntityInterface
     {
         if (!in_array($identifier, self::AVAILABLE_SCOPES)) {
             return null;
@@ -76,10 +76,10 @@ class Scope implements ScopeRepositoryInterface
      */
     public function finalizeScopes(
         array $scopes,
-        $grantType,
+        string $grantType,
         ClientEntityInterface $clientEntity,
-        $userIdentifier = null,
-        ?string $authCodeId = null
+        string|null $userIdentifier = null,
+        ?string $authCodeId = null,
     ): array {
         // For now: assume all scopes are acceptable for all users.
         return $scopes;
