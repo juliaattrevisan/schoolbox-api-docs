@@ -53,8 +53,10 @@ function onNextSelected(): void {
             </b>
         </p>
         <nav v-if="hasPaginate" class="l-flex-row l-gap-s">
-            <button v-if="hasPrevious" type="button" title="Previous" @click="onPreviousSelected">&lt;</button>
-            <button v-if="hasNext" type="button" title="Next" @click="onNextSelected">&gt;</button>
+            <button v-if="hasPrevious" type="button" title="Previous" aria-label="Previous" @click="onPreviousSelected">
+                &lt;
+            </button>
+            <button v-if="hasNext" type="button" title="Next" aria-label="Next" @click="onNextSelected">&gt;</button>
         </nav>
     </div>
 </template>
