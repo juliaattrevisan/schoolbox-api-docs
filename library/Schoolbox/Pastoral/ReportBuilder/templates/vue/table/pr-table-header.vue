@@ -119,9 +119,11 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
                         {{ header.subTitle ? header.subTitle : header.title }}
                         {{ header.key === "total" ? capitalizeFirstLetter(recordsOrPoints) : "" }}
                     </span>
-                    <span v-if="header.isSortable && props.sortBy === header.key" class="sort-indicator">
-                        {{ props.order === "asc" ? "↑" : "↓" }}
-                    </span>
+                    <sbx-icon
+                        v-if="header.isSortable && props.sortBy === header.key"
+                        :name="`${props.order === 'asc' ? 'sort-up' : 'sort-down'}`"
+                        size="0.725rem"
+                    />
                     <span v-else-if="header.isSortable" class="sort-indicator sort-indicator--inactive"> ↕ </span>
                 </button>
                 <template v-else>
