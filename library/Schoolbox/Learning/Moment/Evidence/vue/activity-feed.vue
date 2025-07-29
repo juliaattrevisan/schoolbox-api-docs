@@ -695,13 +695,13 @@ export default {
                                                     }}</time
                                                 >
                                                 <!-- Only show status that isn't published, since that is the default state -->
-                                                <template v-if="'draft' == evidence.object.currentState">
+                                                <template v-if="'draft' === evidence.object.currentState">
                                                     <span :class="`moment-${evidence.object.currentState} label`">Draft</span>
                                                 </template>
-                                                <template v-else-if="'submitted' == evidence.object.currentState">
+                                                <template v-else-if="'submitted' === evidence.object.currentState">
                                                     <span :class="`moment-${evidence.object.currentState} label`">Requiring approval</span>
                                                 </template>
-                                                <template v-else-if="'rejected' == evidence.object.currentState">
+                                                <template v-else-if="'rejected' === evidence.object.currentState">
                                                     <span :class="`moment-${evidence.object.currentState} label`">Requiring update</span>
                                                 </template>
                                             </component>
@@ -721,9 +721,7 @@ export default {
                                             <li>
                                                 <a
                                                     v-if="evidence.object._links.modifyForm"
-                                                    :href="
-                                                        evidence.object._links.modifyForm + '?returnUrl=' + returnUrl
-                                                    "
+                                                    :href="evidence.object._links.modifyForm + '?returnUrl=' + returnUrl"
                                                     class="icon-modify"
                                                     title="Modify"
                                                     :data-test="`learning-moment-evidence-popout-option-modify-${evidence.object.id}`"
