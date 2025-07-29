@@ -12,6 +12,7 @@
 ) }}
     {% set heading = 'Share a' %}
     {% set formAction = routeLookup('learningMomentEvidence.postMomentForUsers', {userIds: userIds|join(',')}) %}
+    {% set formMethod = 'post' %}
 {% else %}
     {{ bread.crumbs(
         [evidence.recipient.fullName, '/search/user/' ~ evidence.recipient.id],
@@ -29,9 +30,11 @@
     {% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted %}
         {% set heading = 'Publish a' %}
         {% set formAction = routeLookup('learningMomentModeration.putPublish', {evidenceId: evidence.id}) %}
+        {% set formMethod = 'put' %}
     {% else %}
         {% set heading = 'Modify' %}
         {% set formAction = routeLookup('learningMomentEvidence.putEvidence', {evidenceId: evidence.id}) %}
+        {% set formMethod = 'put' %}
     {% endif %}
 {% endif %}
 
@@ -113,21 +116,62 @@
             {# Moderation Workflow
              # Staff and students share this area, but their buttons are differently described
              #}
-            {% set submitText = 'Submit' %}
+            <input type="submit" id="evidence-save" data-test="learning-moment-evidence-form-submit" value="Save" />
 
             {% if USER.role.isStudent %}
                 {% if moderationRequired %}
                     {% set submitText = 'Submit for approval' %}
+                    <input type="submit" id="evidence-submit" data-test="learning-moment-evidence-form-submit" value="Submit" />
                 {% endif %}
             {% elseif USER.role.isStaff and USER.role.accessEvidence %}
                 {% if evidence.isSubmitted %}
                     {# If the moment is in Submitted state, this acts as the transition to Published #}
                     {% set submitText = 'Approve' %}
-                    {% set deleteCommentsAttr = 'data-delete-comments=0' %}
+
+                    {# This triggers an async request to Reject+reason #}
+                    <button id="request-update">Request update</button>
+
+                    {# Publish with optional comment deletion
+                     # This spawns a modal, which allows for the setting of a flag,
+                     # prior to the usual form submission. Sorry about all these cloak-and-dagger input fields
+                     # that I need to deconflict at least four workflows in via form + ckeditor bug
+                     #}
+                    <button id="publish">Approve</button>
+
+                    {% if hasComments %}
+                        <input type="hidden" name="delete-comments" id="delete-comments" value="0" />
+
+                        <script>
+                            $(function() {
+                                $('#publish').on('click', function(event) {
+                                    event.preventDefault();
+
+                                    {# Show the modal with an option to delete comments #}
+                                    $('#deleteCommentsModal').foundation('reveal', 'open');
+
+                                    {# Set a special flag for the payload to capture
+                                     # then proceed to submit the form
+                                     #}
+                                    $('#deleteComments').on('click', function (event) {
+                                        event.preventDefault();
+
+                                        $('#delete-comments').val(1);
+
+                                        $('#evidence-moderate').trigger('click');
+                                    });
+
+                                    {# Continue with no further alterations #}
+                                    $('#preserveComments').on('click', function () {
+                                        $('#evidence-moderate').trigger('click');
+                                    });
+                                })
+                            });
+                        </script>
+                    {% endif %}
+
+                    <input type="submit" id="evidence-moderate" data-test="learning-moment-evidence-form-submit" value="Approve" style="display:none" />
                 {% endif %}
             {% endif %}
-
-            <input type="submit" id="evidence-submit" {{ deleteCommentsAttr ?? '' }} data-test="learning-moment-evidence-form-submit" value="{{ submitText }}" />
         </form>
     </div>
 </div>
@@ -152,6 +196,58 @@
         $(function() {
             $(document).on('closed.fndtn.reveal', '#deleteCommentsModal', function () {
                 $('#evidence-submit').prop('disabled', false);
+            });
+        });
+    </script>
+{% endif %}
+
+{# Moderation Workflow
+ # A secret form that submits a secret payload to the rejection endpoint when the Request Update
+ # button is clicked; this exists inside some other form.
+ #}
+{% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted %}
+    {% set rejectAction = routeLookup('learningMomentModeration.putReject', {evidenceId: evidence.id}) %}
+
+    <div id="rejectModal" class="reveal-modal" data-reveal aria-labelledby="rejectModalTitle" aria-hidden="true" role="dialog">
+        <h2 id="rejectModalTitle">Request update</h2>
+        <p>You have requested the student updates their learning moment before it is published.</p>
+        <p>Provide feedback to the student. This will appear as a comment that can be deleted later.</p>
+
+        <form id="rejectionForm" method="post" action="{{ rejectAction }}">
+            <textarea id="rejectionReason" name="rejectionReason"></textarea>
+
+            <input type="submit" value="Request update" />
+        </form>
+
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+
+    <script>
+        $(function() {
+            $('#request-update').on('click', function(event) {
+                event.preventDefault();
+
+                $('#rejectModal').foundation('reveal', 'open');
+            });
+
+            {# Hijack the existing modify form to send it to the rejection endpoint,
+             # injecting the rejection data into the modify form.
+             #}
+            $('#rejectionForm').on('submit', function(event) {
+                event.preventDefault();
+
+                $('#evidence-form')
+                    .attr('action', '{{ rejectAction }}')
+                    .append($('#rejectionReason'));
+
+                {# Hide it lol #}
+                $('#rejectionReason').css('opacity', 0);
+
+                {# If you just use $('#evidence-form').submit() the ckeditor contents won't update
+                 # prior to payload being constructed, sending you the original text rather than
+                 # the updated text. To dodge this ckeditor hankypanky we just simulate a user click
+                 #}
+                $('#evidence-moderate').trigger('click');
             });
         });
     </script>
@@ -185,6 +281,17 @@
                     curriculumNodes: [],
                     tags: [],
                     type: '{{ momentType }}',
+                    {# Moderation Workflow
+                     # Append a rejection reason; this payload can go to putEvidence()
+                     # or putReject() depending on what the staff did. Rejection changes
+                     # the form url to go to putReject() where it essentially does the
+                     # same thing as putEvidence().
+                    #}
+                    rejectionReason: formData.get('rejectionReason'),
+                    {# Moderation Workflow
+                     # For when someone chose "Delete and continue"
+                     #}
+                    deleteComments: formData.get('delete-comments'),
                 };
 
         let tags = form.querySelector('#evidence-tags').selectize.items;
@@ -230,30 +337,34 @@
          * @params { <form> element }
          */
         const submitForm = (form) => {
-
             if (!isSubmittingForm) {
-
                 isSubmittingForm = true;
+
+                {# This is either POST or PUT
+                 # ...it depends on whether you're creating a new thing, or modifying an existing thing
+                 # html forms don't support PUT, only the classical POST and GET methods.
+                 #}
+                let formMethod = '{{ formMethod }}';
 
                 // Build a request to post the form
                 let payload = buildPayload(form),
                     toast   = $('#toast'),
-                    submit  = $('#evidence-submit');
+                    submit  = $('#evidence-form').find('input[type="submit"], button');
 
                 // Toast then post
                 toast.toastActivate('Saving...')
                 submit.prop('disabled', true);
 
                 {# Moderation Workflow
-                 # Augment payload with the comment deletion flag, if set
+                 # Rejection is based on the presence of the rejectionReason node in the payload
                  #}
-                if (0 != $('#evidence-submit').attr('data-delete-comments')) {
-                    payload.deleteComments = 1;
+                if (null !== payload.rejectionReason) {
+                    formMethod = 'put';
                 }
 
                 // Redirect to the return URL provided
                 fetch(form.action, {
-                    method: '{{ isCreate ? 'POST' : 'PUT' }}',
+                    method: formMethod,
                     headers: {
                         'Content-Type': 'application/json',
                     },
@@ -279,10 +390,13 @@
             rules: buildValidationRules(),
             messages: buildValidationMessages(),
             submitHandler(form, event) {
-
                 event.preventDefault();
 
-                document.getElementById('evidence-submit').disabled = true; //disable on select to prevent multiple submits
+                //disable on select to prevent multiple submits
+                /* it already does this during the submitForm() method, not sure why we do it twice
+                 * but whatever
+                 */
+                $('#evidence-form').find('input[type="submit"], button').prop('disabled', true);
 
                 if (isMediaUploadRequired()) {
                     document.getElementById('evidence-media-recording').scrollIntoView({behavior: 'smooth'}); //uploading can take a while, so scroll up to know that it's processing
@@ -290,35 +404,13 @@
                     document.addEventListener('evidence-media-recording__onUploadComplete', (event) => submitForm(form)); //once the media is uploaded, #evidence-media-recording.vue will dispatch
                     document.dispatchEvent(new CustomEvent('evidence-media-recording__onFormSubmit')); //dispatch to allow the media recording to start uploading
                 } else {
-
                     event.preventDefault();
 
-                    {# Moderation Workflow
-                     # Show a special modal about optionally deleting comments
-                     #}
-                    {% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted and hasComments %}
-                        {# Initial condition: preserve comments #}
-                        $('#evidence-submit').attr('data-delete-comments', 0);
-
-                        {# Show the modal with an option to delete comments #}
-                        $('#deleteCommentsModal').foundation('reveal', 'open');
-
-                        $('#deleteComments').on('click', function() {
-                            $('#evidence-submit').attr('data-delete-comments', 1);
-
-                            submitForm(form);
-                        });
-
-                        {# ...or keep them intact #}
-                        $('#preserveComments').on('click', function() {
-                            submitForm(form);
-                        });
-                    {% else %}
-                        submitForm(form);
-                    {% endif %}
+                    submitForm(form);
                 }
             }
         });
+
         $('[data-tags]').selectizeSelector({
             ajax: {
                 url: '{{ routeLookup('learningMomentEvidence.getTags') }}',

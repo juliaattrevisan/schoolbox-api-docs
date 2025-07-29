@@ -351,6 +351,7 @@ class Controller extends Base
             'curriculumCodes'          => $evidence->getViewableCurriculumNodes()?->reindex(),
             'zone'                     => $zone->getTwigContext(),
             'hasComments'              => $this->hasComments($evidence),
+            'returnUrl'                => $this->requestQuery->get('returnUrl')
         ];
 
         $this->response = $this->responseFromTemplate(
@@ -500,10 +501,10 @@ class Controller extends Base
      * Find out if there any comments related to this learning moment
      * Finding at least one comment means there's stuff to delete here
      *
-     * @param $evidence
+     * @param Model $evidence
      * @return bool
      */
-    private function hasComments($evidence): bool
+    private function hasComments(Model $evidence): bool
     {
         $translator = $this->buildTranslatorWithComments(1);
         $item = $translator($evidence);

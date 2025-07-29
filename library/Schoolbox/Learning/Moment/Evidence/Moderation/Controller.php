@@ -11,7 +11,9 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Moment\Evidence\Moderation;
 
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Discussion\Comment;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Moment\Evidence\Model;
 use Schoolbox\Learning\Moment\Evidence\Translator;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -82,7 +84,87 @@ class Controller extends Base
         $evidence->publish($this->getUser());
 
         $this->mapper->save($evidence);
+
+        /* TODO Post a notification
+         */
     }
+
+
+    /**
+     * Reject a Moment, along with a reason which goes int the Moment's comment thread.
+     *
+     * @param Model $evidence
+     * @return void
+     * @throws MapperException
+     * @throws RouteNotFound
+     */
+    public function putReject(Model $evidence): void
+    {
+        $requestBody       = $this->request->getParsedBody();
+        $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
+        $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
+        $tokenReplacer     = new TokenReplacer\Student(new TokenReplacer\Simple());
+
+        /* This is a pretty convoluted way of doing things just to decide on a subset of nodes
+         * Anyway, this $baseModel contains any curriculum nodes and tags you might have altered
+         */
+        $baseModel = (new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory()))($requestBody)
+            ->setCreator($this->getUser());
+
+        /* Update anything that might have changed
+         */
+        $evidence = $requestTranslator($requestBody, $evidence)
+            ->setBody($tokenReplacer->replace($baseModel->getBody(), $evidence->getRecipient()))
+            ->setTags($baseModel->getTags())
+            ->setCurriculumNodes($baseModel->getCurriculumNodes());
+
+        /* Update the status of $evidence to Rejected
+         */
+        $evidence->reject($this->getUser());
+
+        /* If a discussion thread never existed, spawn one
+         */
+        $discussionThread = $evidence->getDiscussionThread();
+
+        if (null === $discussionThread) {
+            $discussionThreadMapper = \Schoolbox\Discussion\Thread\Mapper::getInstance();
+
+            $discussionThread = $discussionThreadMapper->createModel()
+                ->setOpen(true);
+
+            $discussionThreadMapper->save($discussionThread);
+
+            $evidence->setDiscussionThread($discussionThread);
+        }
+
+        $this->mapper->save($evidence);
+
+        /* Spawn a comment
+         * Save it to $evidence's discussion thread somehow
+         */
+        $comment = $this->commentMapper->createModel()
+            ->setContent($requestBody['rejectionReason'])
+            ->setAuthor($this->getUser())
+            ->setThread($discussionThread);
+
+        $this->commentMapper->save($comment);
+
+        /* Redirect back to a place
+         */
+        $encodedReturnUrl = $this->requestPost->get(Redirect::RETURN_URL);
+
+        if (!empty($encodedReturnUrl)) {
+            $returnUrl = Redirect::decode($encodedReturnUrl);
+        } else {
+            $returnUrl = $this->routeGenerator->generate('searchUser.getProfile', ['userId' => $evidence->getRecipient()->getId()]);
+        }
+
+        /* TODO Post a notification
+         */
+
+        $this->response = $this->redirectAfterPost($returnUrl);
+    }
+
 
     /**
      * Checks whether curriculum tagging is enabled

@@ -51,6 +51,16 @@ class Module extends BaseModule
             $staffOnlyRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
         );
+
+        /* Reject a Learning Moment
+         */
+        $this->register(
+            self::METHOD_PUT,
+            '/{evidenceId}/reject',
+            'putReject',
+            $staffOnlyRule,
+            Closure::fromCallable([$this, 'preloadEvidence']),
+        );
     }
 
 
