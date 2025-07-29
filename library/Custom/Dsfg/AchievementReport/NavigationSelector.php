@@ -258,7 +258,7 @@ class NavigationSelector
             ];
         }
 
-        if ($_SESSION['username'] === 'alaress') {
+        if (in_array($_SESSION['username'], ['alaress', 'psingh', 'swalker'])) {
             $availableNavigation[self::COCURRICULAR_KEY] = [
                 'url' => $this->routeGenerator->generate('achievementreport.getDbViewTests', [
                     'externalUserId' => $this->externalUser['StudentID'],
