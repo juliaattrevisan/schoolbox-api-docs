@@ -62,10 +62,6 @@ export function useLoadPrTable(endpoint: Ref<string>): {
             if (newPayload === null || newPayload.data === undefined || !Array.isArray(newPayload.data.tableHeaders)) {
                 throw new Error("Unexpected response format");
             }
-            // loadStatus.value.loadIndex += 1;
-            // loadStatus.value.hasMoreRows = newPayload.metadata.count >= MAX_ROWS;
-            // loadStatus.value.maxLoads = Math.ceil(newPayload.metadata.count / MAX_ROWS);
-            // console.warn(`Max load index: ${loadStatus.value.maxLoads}`);
             payload.value = newPayload;
         } catch (error) {
             // ignore abort errors, as the previous request was cancelled
