@@ -22,7 +22,8 @@ const props = defineProps<{
 
 const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
 
-const queryParams = new URLSearchParams();
+const queryParams = new URLSearchParams(); // to store the query parameters for the endpoint to update
+const LIMIT = 20; // the current set limit for the number of records to fetch at once
 const sortBy = window.Vue.ref<string>("user"); // the current sort by field - this should update when payload is loaded
 const sortOrder = window.Vue.ref<"asc" | "desc">("asc"); // the current sort order
 const currentEndpoint = window.Vue.ref("");
@@ -52,6 +53,7 @@ window.Vue.onMounted(() => {
     // Set initial endpoint based on selected tab, which will trigger the load in useLoadPrTable
     queryParams.append("selected", recordsOrPoints.value);
     queryParams.append("cursor", "");
+    queryParams.append("limit", LIMIT.toString());
     currentEndpoint.value = `${props.selectedTab.endpoint}?${queryParams.toString()}`;
 });
 
@@ -171,6 +173,7 @@ function onPaginate(cursor: string): void {
             <pr-table-footer
                 :endpoint="currentEndpoint"
                 :metadata="(payload as TablePayload).metadata"
+                :limit="LIMIT"
                 @previous="onPaginate"
                 @next="onPaginate"
             />

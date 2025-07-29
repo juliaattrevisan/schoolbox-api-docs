@@ -8,13 +8,13 @@ import type { Metadata } from "@js/util/sbx/apiUtils";
 /**
  *
  * @param endpoint -
- * @param perPage - number of items per page
+ * @param limit - number of items per page
  * @param metadata - metadata containing pagination information
  * @returns -
  */
 export function usePagination(
     endpoint: Ref<string>,
-    perPage: number,
+    limit: number,
     metadata: Ref<Metadata>,
 ): {
     hasPrevious: Ref<boolean>;
@@ -109,10 +109,10 @@ export function usePagination(
      *
      */
     function checkMetadata(): void {
-        hasPaginate.value = metadata.value.count >= perPage;
+        hasPaginate.value = metadata.value.count >= limit;
         if (hasPaginate.value) {
             cursorList.value.push(metadata.value.cursor.next || "");
-            pageCount.value = Math.ceil(metadata.value.count / perPage);
+            pageCount.value = Math.ceil(metadata.value.count / limit);
             console.warn("Pagination enabled:", cursorList.value);
             console.warn("Page count:", pageCount.value);
         }

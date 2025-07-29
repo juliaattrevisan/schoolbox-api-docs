@@ -7,11 +7,10 @@ import { toRef } from "vue";
 import type { Metadata } from "@js/util/sbx/apiUtils";
 import { usePagination } from "../composable/usePagination";
 
-const PER_PAGE = 20;
-
 const props = defineProps<{
     endpoint: string;
     metadata: Metadata;
+    limit: number;
 }>();
 
 const emit = defineEmits<{
@@ -21,7 +20,7 @@ const emit = defineEmits<{
 
 const { cursorIndex, hasNext, toNext, hasPrevious, toPrevious, currentCursor, hasPaginate } = usePagination(
     toRef(() => props.endpoint),
-    PER_PAGE,
+    props.limit,
     toRef(() => props.metadata),
 );
 
@@ -46,7 +45,10 @@ function onNextSelected(): void {
     <div class="pr-table-footer l-flex-row l-flex--align-center l-flex--justify-end l-gap-m l-pad-m">
         <p class="f-no-margins">
             <b
-                >{{ cursorIndex * PER_PAGE + 1 }}-{{ Math.min((cursorIndex + 1) * PER_PAGE, props.metadata.count) }} of
+                >{{ cursorIndex * props.limit + 1 }}-{{
+                    Math.min((cursorIndex + 1) * props.limit, props.metadata.count)
+                }}
+                of
                 {{ props.metadata.count }}
             </b>
         </p>
