@@ -167,7 +167,7 @@
                 {# Used to decide if comments should be deleted upon publish #}
                 <input type="hidden" name="delete-comments" id="delete-comments" value="0" />
 
-                {% if evidence.isSubmitted or evidence.isDraft %}
+                {% if evidence.isDraft or evidence.isSubmitted or evidence.isRejected %}
                     {# This triggers an async request to Reject+reason
                      # For the implementation, scroll down to the modal
                      #}
@@ -255,8 +255,12 @@
 {# Moderation Workflow
  # A secret form that submits a secret payload to the rejection endpoint when the Request Update
  # button is clicked; this exists inside some other form.
+ #
+ # Rejection is available when:
+ #    - evidence.id exists (it's been saved before)
+ #    - evidence is in one of draft, submitted, rejected states
  #}
-{% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted %}
+{% if USER.role.isStaff and USER.role.accessEvidence and evidence.id and (evidence.isDraft or evidence.isSubmitted or evidence.isRejected) %}
     {% set rejectAction = routeLookup('learningMomentModeration.putReject', {evidenceId: evidence.id}) %}
 
     <div id="rejectModal" class="reveal-modal" data-reveal aria-labelledby="rejectModalTitle" aria-hidden="true" role="dialog">
