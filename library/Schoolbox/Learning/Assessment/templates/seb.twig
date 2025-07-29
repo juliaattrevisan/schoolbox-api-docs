@@ -1,15 +1,16 @@
 <script type="text/javascript">
-    (async () => {
-        /**
-         * Callback for when SEB's security information has been updated
-         */
-        function onSEBLoaded() {
-            const pageConfigKey = SafeExamBrowser.security.configKey;
-            // const pageBrowserExamKey = SafeExamBrowser.security.browserExamKey;
-            // const sebClientVersion = SafeExamBrowser.version;
-            window.location.href = `{{ url }}${pageConfigKey}`;
-        }
+    /**
+     * Callback for when SEB's security information has been updated
+     * For some reason this MUST be global scope, otherwise SEB on iOS won't call it???
+     */
+    function onSEBLoaded() {
+        const pageConfigKey = SafeExamBrowser.security.configKey;
+        // const pageBrowserExamKey = SafeExamBrowser.security.browserExamKey;
+        // const sebClientVersion = SafeExamBrowser.version;
+        window.location.href = `{{ url }}${pageConfigKey}`;
+    }
 
+    (async () => {
         /**
          * @returns {boolean} Whether SEB is available or not
          */
