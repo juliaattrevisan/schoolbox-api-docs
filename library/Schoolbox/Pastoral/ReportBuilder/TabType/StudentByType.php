@@ -233,6 +233,12 @@ class StudentByType extends Cursor implements TabTypeInterface
             return null;
         }
 
+        /* If result size is smaller than limit, assumed that it is at the end of pointer and terminate early
+         */
+        if ($collection->count() < $this->limit) {
+            return null;
+        }
+
         $last = $collection->last();
         return $this->codec->encode([
             'id' => $last['student_id'],
