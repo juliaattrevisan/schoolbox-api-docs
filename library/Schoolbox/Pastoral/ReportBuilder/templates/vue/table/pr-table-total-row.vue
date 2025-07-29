@@ -13,6 +13,18 @@ const props = defineProps<{
     rowData: { [key: string]: RowOptions };
     recordsOrPoints: "records" | "points";
 }>();
+
+const emit = defineEmits<{
+    cellSelect: [key: string];
+}>();
+
+/**
+ * Handles the cell click
+ * @param key - the key of the cell that was clicked
+ */
+function onCellSelected(key: string): void {
+    emit("cellSelect", key);
+}
 </script>
 
 <template>
@@ -57,6 +69,7 @@ const props = defineProps<{
                         (props.rowData[header.key] as RecordsAndPoints)?.records! > 0
                     "
                     class="f-always-show u-td-button"
+                    @click.prevent="onCellSelected(header.key)"
                 >
                     {{ (props.rowData[header.key] as RecordsAndPoints).records }}
                 </button>
@@ -67,6 +80,7 @@ const props = defineProps<{
                         (props.rowData[header.key] as RecordsAndPoints)?.points! !== null
                     "
                     class="f-always-show u-td-button"
+                    @click.prevent="onCellSelected(header.key)"
                 >
                     {{ (props.rowData[header.key] as RecordsAndPoints).points }}
                 </button>

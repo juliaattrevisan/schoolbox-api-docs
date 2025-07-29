@@ -107,6 +107,19 @@ window.Vue.watch(
 
 // #endregion
 
+// #region table cell selected
+
+/**
+ * Handle cell selection
+ * @param key - the key of the cell that was selected
+ */
+function onCellSelect(key: string): void {
+    // Handle cell selection logic here
+    console.warn("Cell selected:", key);
+}
+
+// #endregion
+
 /**
  * Start setting the scrollable height on any window resize change
  * and reset the table load to ensure the correct endpoint is set
@@ -168,6 +181,7 @@ window.Vue.onMounted(() => {
                         :headers="(payload as TablePayload).data.tableHeaders"
                         :row-data="(payload as TablePayload).data.totalRow"
                         :records-or-points="recordsOrPoints"
+                        @cell-select="onCellSelect"
                     />
                     <!-- All other rows -->
                     <pr-table-row
