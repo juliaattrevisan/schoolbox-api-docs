@@ -57,16 +57,12 @@ export function useLoadPrTable(endpoint: Ref<string>): {
                 const errorMessage = await extractErrorMessage(response);
                 throw new Error(errorMessage);
             }
-            const responseJson = (await response.json()) as TablePayload;
+            const newPayload = (await response.json()) as TablePayload;
             // check if the response does not have the expected structure
-            if (
-                responseJson === null ||
-                responseJson.data === undefined ||
-                !Array.isArray(responseJson.data.tableHeaders)
-            ) {
+            if (newPayload === null || newPayload.data === undefined || !Array.isArray(newPayload.data.tableHeaders)) {
                 throw new Error("Unexpected response format");
             }
-            payload.value = responseJson;
+            payload.value = newPayload;
         } catch (error) {
             // ignore abort errors, as the previous request was cancelled
             if (isAbortError(error)) {

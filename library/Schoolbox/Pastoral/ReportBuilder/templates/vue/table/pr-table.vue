@@ -4,12 +4,13 @@
  */
 
 import { useTemplateRef } from "vue";
-import type { Tab, TablePayload, Config, Routes } from "../js/types/pastoralReportTypes";
-import { TabType } from "../js/types/pastoralReportTypes";
-import { useLoadPrTable } from "./composable/useLoadPrTable";
+import type { Tab, TablePayload, Config, Routes } from "../../js/types/pastoralReportTypes";
+import { TabType } from "../../js/types/pastoralReportTypes";
+import { useLoadPrTable } from "../composable/useLoadPrTable";
 import PrTableHeader from "./pr-table-header.vue";
 import PrTableTotalRow from "./pr-table-total-row.vue";
 import PrTableRow from "./pr-table-row.vue";
+import PrTableFooter from "./pr-table-footer.vue";
 
 const props = defineProps<{
     selectedTab: Tab;
@@ -18,13 +19,6 @@ const props = defineProps<{
     recordsAndPoints: string[];
     localePastoral: string;
 }>();
-
-const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
-
-const sortBy = window.Vue.ref<string>("user"); // the current sort by field - this should update when payload is loaded
-const sortOrder = window.Vue.ref<"asc" | "desc">("asc"); // the current sort order
-const currentEndpoint = window.Vue.ref("");
-const { isNewLoading, isSameLoading, payload, isEmpty, loadError } = useLoadPrTable(currentEndpoint);
 
 // #region scrollable height
 
@@ -39,39 +33,34 @@ function setScrollableHeight(): void {
     maxScrollableHeight.value = `${window.innerHeight - 300}px`;
 }
 
-/**
- * Start setting the scrollable height on any window resize change
- */
-window.Vue.onMounted(() => {
-    setScrollableHeight();
-    window.addEventListener("resize", () => {
-        setScrollableHeight();
-    });
-    // Set initial endpoint based on selected tab, which will trigger the load in useLoadPrTable
-    currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}`;
-});
-
 // #endregion
 
-/**
- * when the endpoint changes trigger a new load
- */
-window.Vue.watch(
-    () => props.selectedTab,
-    (newTab) => {
-        if (newTab.type === TabType.TABLE) {
-            // endpoint change
-        }
-    },
-);
+// #region table load
 
-// #region reload data
+const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
+const queryParams = new URLSearchParams(); // to store the query parameters for the endpoint to update
+const LIMIT = 20; // the current set limit for the number of records to fetch at once
+const sortBy = window.Vue.ref<string>("user"); // the current sort by field - this should update when payload is loaded
+const sortOrder = window.Vue.ref<"asc" | "desc">("asc"); // the current sort order
+const currentEndpoint = window.Vue.ref("");
+const { isNewLoading, isSameLoading, payload, isEmpty, loadError } = useLoadPrTable(currentEndpoint);
+
+/**
+ * Reset the table load by clearing the cursor and reloading the data
+ */
+function resetTableLoad(): void {
+    queryParams.set("selected", recordsOrPoints.value);
+    queryParams.set("cursor", "");
+    queryParams.set("limit", LIMIT.toString());
+    currentEndpoint.value = `${props.selectedTab.endpoint}?${queryParams.toString()}`;
+}
 
 /**
  * Load the row data again when the recordsOrPoints changes
  */
 window.Vue.watch(recordsOrPoints, () => {
-    currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}`;
+    queryParams.set("selected", recordsOrPoints.value);
+    currentEndpoint.value = `${props.selectedTab.endpoint}?${queryParams.toString()}`;
 });
 
 /**
@@ -92,7 +81,40 @@ function onSortSelected(headerKey: string): void {
     // or sort the existing data in payloadData
 }
 
+/**
+ * Handle previous/next page button clicks
+ * @param cursor - the cursor to use for the previous/next page
+ */
+function onPaginate(cursor: string): void {
+    queryParams.set("cursor", cursor);
+    currentEndpoint.value = `${props.selectedTab.endpoint}?${queryParams.toString()}`;
+}
+
+/**
+ * when the endpoint changes trigger a new load
+ */
+window.Vue.watch(
+    () => props.selectedTab,
+    (newTab) => {
+        if (newTab.type === TabType.TABLE) {
+            // endpoint change
+        }
+    },
+);
+
 // #endregion
+
+/**
+ * Start setting the scrollable height on any window resize change
+ * and reset the table load to ensure the correct endpoint is set
+ */
+window.Vue.onMounted(() => {
+    setScrollableHeight();
+    window.addEventListener("resize", () => {
+        setScrollableHeight();
+    });
+    resetTableLoad();
+});
 </script>
 
 <template>
@@ -154,14 +176,14 @@ function onSortSelected(headerKey: string): void {
                     />
                 </tbody>
             </table>
+            <pr-table-footer
+                :endpoint="currentEndpoint"
+                :metadata="(payload as TablePayload).metadata"
+                :limit="LIMIT"
+                @previous="onPaginate"
+                @next="onPaginate"
+            />
         </div>
-        <!-- Table metadata -->
-        <!-- <div class="pr-table-metadata">
-            <div class="pr-table-metadata__count">
-                Showing {{ (payload as TablePayload).data.rows.length }} of
-                {{ (payload as TablePayload).metadata.count }} records
-            </div>
-        </div> -->
     </template>
 </template>
 

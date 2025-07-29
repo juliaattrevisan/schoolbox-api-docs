@@ -1,12 +1,26 @@
 /**
- * Utilities for accessing API endpoints and recieving fully typed responses
+ * Utilities for accessing API endpoints and receiving fully typed responses
  */
 
 import { parseSseEvent } from "./fetchUtils";
 
+/**
+ * Metadata typically for paginated API responses
+ * Includes the total count of items and cursor for pagination
+ */
+export type Metadata = {
+    count: number;
+    cursor: {
+        current: string | null;
+        next: string | null;
+    };
+    url?: string;
+};
+
 type ApiBaseResponseSuccess<TRespData> = {
     success: true;
     data: TRespData;
+    metadata?: Metadata;
 };
 
 type ApiBaseResponseFailure = {

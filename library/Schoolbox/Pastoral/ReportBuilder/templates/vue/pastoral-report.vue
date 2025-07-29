@@ -7,7 +7,7 @@ import type { PastoralRecord } from "@schoolboxLibrary/Pastoral/types/PastoralRe
 import { TabType } from "../js/types/pastoralReportTypes";
 import type { Tab, Config, Routes, SeverityColors } from "../js/types/pastoralReportTypes";
 import PrList from "./pr-list.vue";
-import PrTable from "./pr-table.vue";
+import PrTable from "./table/pr-table.vue";
 
 const props = defineProps<{
     title: string;
