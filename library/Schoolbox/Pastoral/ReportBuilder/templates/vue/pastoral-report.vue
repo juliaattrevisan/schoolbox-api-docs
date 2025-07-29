@@ -111,6 +111,8 @@ window.Vue.onMounted((): void => {
                 :config="props.config"
                 :routes="props.routes"
                 :locale-pastoral="props.localePastoral"
+                :show-severity="props.showSeverity"
+                :severity-colors="props.severityColors"
             />
         </div>
     </div>

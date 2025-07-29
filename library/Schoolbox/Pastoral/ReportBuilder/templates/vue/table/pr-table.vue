@@ -5,7 +5,7 @@
 
 import { useTemplateRef } from "vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
-import type { Tab, TablePayload, Config, Routes } from "../../js/types/pastoralReportTypes";
+import type { Tab, TablePayload, Config, Routes, SeverityColors } from "../../js/types/pastoralReportTypes";
 import { TabType } from "../../js/types/pastoralReportTypes";
 import { useLoadPrTable } from "../composable/useLoadPrTable";
 import { useLoadRecords } from "../composable/useLoadRecords";
@@ -13,6 +13,7 @@ import PrTableHeader from "./pr-table-header.vue";
 import PrTableTotalRow from "./pr-table-total-row.vue";
 import PrTableRow from "./pr-table-row.vue";
 import PrTableFooter from "./pr-table-footer.vue";
+import PrRecord from "../pr-record.vue";
 
 const props = defineProps<{
     selectedTab: Tab;
@@ -20,6 +21,8 @@ const props = defineProps<{
     routes: Routes;
     recordsAndPoints: string[];
     localePastoral: string;
+    showSeverity: boolean;
+    severityColors: SeverityColors;
 }>();
 
 // #region scrollable height
@@ -126,6 +129,7 @@ const {
 function onCellSelect(key: string): void {
     console.warn("Cell selected:", key);
     isCellExpanded.value = true; // Open the modal to show related records
+    recordsEndpoint.value = "yep";
 }
 
 // #endregion
@@ -213,7 +217,29 @@ window.Vue.onMounted(() => {
         </div>
     </template>
     <basic-modal v-model:is-open="isCellExpanded">
-        <p>Related cell records will be shown here.</p>
+        <div v-if="isLoadingRecords" class="loader"></div>
+        <div v-else-if="recordsLoadError" class="alert-box alert f-no-margins">
+            Sorry, there was an error during record retrieval. Please
+            <a href="" title="refresh the page"> refresh the page </a>
+            to try again and contact your support if the problem persists.
+            <template v-if="recordsLoadError && recordsLoadError.length > 0"
+                ><em>Further support info: {{ recordsLoadError }}</em></template
+            >
+        </div>
+        <template v-else>
+            <section v-for="record in recordsPayload?.data.records" :key="record.id">
+                <ul class="information-list threaded">
+                    <pr-record
+                        :record="record"
+                        :config="props.config"
+                        :routes="props.routes"
+                        :locale-pastoral="props.localePastoral"
+                        :show-severity="props.showSeverity"
+                        :severity-colors="props.severityColors"
+                    />
+                </ul>
+            </section>
+        </template>
     </basic-modal>
 </template>
 
