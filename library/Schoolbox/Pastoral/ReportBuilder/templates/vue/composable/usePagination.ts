@@ -35,7 +35,8 @@ export function usePagination(
     const pageCount = window.Vue.ref(0);
 
     /**
-     * Determines if pagination should be reset based on URL changes
+     * Pagination should currently be reset if sorting on the endpoint changes,
+     * or if the endpoint URL changes in a way that does not include the cursor.
      * @param oldUrl - the previous endpoint URL
      * @param newUrl - the new endpoint URL
      * @returns - true if pagination should be reset
@@ -57,6 +58,10 @@ export function usePagination(
             // Remove cursor parameter from both for comparison
             oldParams.delete("cursor");
             newParams.delete("cursor");
+
+            // Remove selected parameter from both for comparison
+            oldParams.delete("selected");
+            newParams.delete("selected");
 
             // If the remaining parameters are different, reset pagination
             return oldParams.toString() !== newParams.toString();

@@ -22,6 +22,7 @@ const props = defineProps<{
 
 const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
 
+const cursor = window.Vue.ref<string>("");
 const sortBy = window.Vue.ref<string>("user"); // the current sort by field - this should update when payload is loaded
 const sortOrder = window.Vue.ref<"asc" | "desc">("asc"); // the current sort order
 const currentEndpoint = window.Vue.ref("");
@@ -49,7 +50,7 @@ window.Vue.onMounted(() => {
         setScrollableHeight();
     });
     // Set initial endpoint based on selected tab, which will trigger the load in useLoadPrTable
-    currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}`;
+    currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}&cursor=${cursor.value}`;
 });
 
 // #endregion
@@ -72,7 +73,7 @@ window.Vue.watch(
  * Load the row data again when the recordsOrPoints changes
  */
 window.Vue.watch(recordsOrPoints, () => {
-    currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}`;
+    currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}&cursor=${cursor.value}`;
 });
 
 /**
@@ -95,25 +96,20 @@ function onSortSelected(headerKey: string): void {
 
 /**
  * Handle previous page button click
- * @param cursor - the cursor to use for the previous page
+ * @param $cursor - the cursor to use for the previous page
  */
-function onPrevious(cursor: string): void {
-    currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}&cursor=${cursor}`;
-    // need an array to store the cursor
-    // when the first item (the start of the payload) the cursor should be empty
-    // items after the previous will be the stored .next cursor
-
-    // this cursor array needs to reset on a new table load, points/records change, or sort change
+function onPrevious($cursor: string): void {
+    cursor.value = $cursor;
+    currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}&cursor=${cursor.value}`;
 }
 
 /**
  * Handle next page button click
- * @param cursor - the cursor to use for the next page
+ * @param $cursor - the cursor to use for the next page
  */
-function onNext(cursor: string): void {
-    currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}&cursor=${cursor}`;
-    // need an array to store the cursor
-    // if there's no cursor in the array, can use metadata.cursor.next to load, otherwise use the stored cursor
+function onNext($cursor: string): void {
+    cursor.value = $cursor;
+    currentEndpoint.value = `${props.selectedTab.endpoint}?selected=${recordsOrPoints.value}&cursor=${cursor.value}`;
 }
 
 // #endregion
