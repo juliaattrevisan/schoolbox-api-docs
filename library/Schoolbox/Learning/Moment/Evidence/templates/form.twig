@@ -188,7 +188,14 @@
                                 $('#publish').on('click', function(event) {
                                     event.preventDefault();
 
-                                    $('#evidence-form').attr('action', '{{ routeLookup('learningMomentModeration.putPublish', {evidenceId: evidence.id}) }}');
+                                    {% if evidence.id %}
+                                        {% set route = routeLookup('learningMomentModeration.putPublish', {evidenceId: evidence.id}) %}
+                                    {% else %}
+                                        {# Share a Learning Moment from the Class List #}
+                                        {% set route = routeLookupIfAuthorized('learningMomentEvidence.postPublish', {userIds: userIds|join(',')}) %}
+                                    {% endif %}
+
+                                    $('#evidence-form').attr('action', '{{ route }}');
 
                                     {% if hasComments ?? false %}
                                         {# Show the modal with an option to delete comments #}
