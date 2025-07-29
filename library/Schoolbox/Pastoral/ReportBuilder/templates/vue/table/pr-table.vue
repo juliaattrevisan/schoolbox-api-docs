@@ -4,6 +4,7 @@
  */
 
 import { useTemplateRef } from "vue";
+import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import type { Tab, TablePayload, Config, Routes } from "../../js/types/pastoralReportTypes";
 import { TabType } from "../../js/types/pastoralReportTypes";
 import { useLoadPrTable } from "../composable/useLoadPrTable";
@@ -109,13 +110,15 @@ window.Vue.watch(
 
 // #region table cell selected
 
+const isCellExpanded = window.Vue.ref(false);
+
 /**
  * Handle cell selection
  * @param key - the key of the cell that was selected
  */
 function onCellSelect(key: string): void {
-    // Handle cell selection logic here
     console.warn("Cell selected:", key);
+    isCellExpanded.value = true; // Open the modal to show related records
 }
 
 // #endregion
@@ -202,6 +205,9 @@ window.Vue.onMounted(() => {
             />
         </div>
     </template>
+    <basic-modal v-model:is-open="isCellExpanded">
+        <p>Related cell records will be shown here.</p>
+    </basic-modal>
 </template>
 
 <style scoped lang="scss">
