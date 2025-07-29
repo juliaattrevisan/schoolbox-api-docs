@@ -110,7 +110,7 @@
         "ramsey/uuid": "^4.7",
         "steverhoades/oauth2-openid-connect-client": "^2.0",
         "kreait/firebase-php": "^7.9",
-        "league/oauth2-server": "^8.5",
+        "league/oauth2-server": "^9.2",
         "steverhoades/oauth2-openid-connect-server": "^v3.0.1",
         "google/common-protos": "^4.8",
         "ext-xmlreader": "*",
