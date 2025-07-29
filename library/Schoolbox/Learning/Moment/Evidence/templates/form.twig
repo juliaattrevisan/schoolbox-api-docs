@@ -187,9 +187,7 @@
                             $('#publish').on('click', function(event) {
                                 event.preventDefault();
 
-                                let route = '{{ routeLookup('learningMomentModeration.putPublish', {evidenceId: evidence.id}) }}';
-
-                                $('#evidence-form').attr('action', route);
+                                $('#evidence-form').attr('action', '{{ routeLookup('learningMomentModeration.putPublish', {evidenceId: evidence.id}) }}');
 
                                 {% if hasComments ?? false %}
                                     {# Show the modal with an option to delete comments #}
@@ -211,7 +209,6 @@
                                         $('#evidence-persist').trigger('click');
                                     });
                                 {% else %}
-
                                     $('#evidence-persist').trigger('click');
                                 {% endif %}
                             })
