@@ -55,9 +55,10 @@ export default {
             required: true,
         },
         moderationRequired: {
+            // learning moment moderation requirement
             type: Boolean,
-            required: true
-        }
+            required: true,
+        },
     },
     data() {
         return {
@@ -456,11 +457,11 @@ export default {
             }
         },
 
-       /**
-        * Put the $evidence into the Submitted state as-is
-        *
-        * @param evidence
-        */
+        /**
+         * Put the $evidence into the Submitted state as-is
+         *
+         * @param evidence
+         */
         submitEvidence(evidence) {
             const submitLink = evidence?._links?.submit;
 
@@ -470,11 +471,11 @@ export default {
                 fetch(submitLink, {
                     method: "PUT",
                 })
-                .then(() => {
-                    this.$refs.toast.timeout("Submitted.", true, 2000);
-                    window.location.reload();
-                })
-                .catch(() => this.$refs.toast.timeout("Submit failed", false, 5000));
+                    .then(() => {
+                        this.$refs.toast.timeout("Submitted.", true, 2000);
+                        window.location.reload();
+                    })
+                    .catch(() => this.$refs.toast.timeout("Submit failed", false, 5000));
             }
         },
 
@@ -490,15 +491,15 @@ export default {
                 this.$refs.toast.activate("Publishing...");
 
                 fetch(publishLink, {
-                  method: "PUT",
+                    method: "PUT",
                 })
-                .then(() => {
-                    this.$refs.toast.timeout("Published.", true, 2000);
-                    window.location.reload();
-                })
-                .catch(() => this.$refs.toast.timeout("Publish failed", false, 5000));
+                    .then(() => {
+                        this.$refs.toast.timeout("Published.", true, 2000);
+                        window.location.reload();
+                    })
+                    .catch(() => this.$refs.toast.timeout("Publish failed", false, 5000));
             }
-        }
+        },
     },
 };
 </script>
@@ -696,13 +697,19 @@ export default {
                                                 >
                                                 <!-- Only show status that isn't published, since that is the default state -->
                                                 <template v-if="'draft' === evidence.object.currentState">
-                                                    <span :class="`moment-${evidence.object.currentState} label`">Draft</span>
+                                                    <span :class="`moment-${evidence.object.currentState} label`"
+                                                        >Draft</span
+                                                    >
                                                 </template>
                                                 <template v-else-if="'submitted' === evidence.object.currentState">
-                                                    <span :class="`moment-${evidence.object.currentState} label`">Requiring approval</span>
+                                                    <span :class="`moment-${evidence.object.currentState} label`"
+                                                        >Requiring approval</span
+                                                    >
                                                 </template>
                                                 <template v-else-if="'rejected' === evidence.object.currentState">
-                                                    <span :class="`moment-${evidence.object.currentState} label`">Requiring update</span>
+                                                    <span :class="`moment-${evidence.object.currentState} label`"
+                                                        >Requiring update</span
+                                                    >
                                                 </template>
                                             </component>
                                         </div>
@@ -721,7 +728,9 @@ export default {
                                             <li>
                                                 <a
                                                     v-if="evidence.object._links.modifyForm"
-                                                    :href="evidence.object._links.modifyForm + '?returnUrl=' + returnUrl"
+                                                    :href="
+                                                        evidence.object._links.modifyForm + '?returnUrl=' + returnUrl
+                                                    "
                                                     class="icon-modify"
                                                     title="Modify"
                                                     :data-test="`learning-moment-evidence-popout-option-modify-${evidence.object.id}`"
@@ -811,7 +820,13 @@ export default {
                                     <template v-if="'student' === config.currentUser.role.type">
                                         <!-- student must be the author of the learning moment to have these actions -->
                                         <template v-if="config.currentUser.id === evidence.object.creator.id">
-                                            <template v-if="'draft' === evidence.object.currentState || 'submitted' === evidence.object.currentState || 'rejected' === evidence.object.currentState">
+                                            <template
+                                                v-if="
+                                                    'draft' === evidence.object.currentState ||
+                                                    'submitted' === evidence.object.currentState ||
+                                                    'rejected' === evidence.object.currentState
+                                                "
+                                            >
                                                 <!-- Modify button available when a learning moment is: draft/submitted/rejected -->
                                                 <a class="button" :href="evidence.object._links.modifyForm">Modify</a>
                                             </template>
@@ -819,10 +834,14 @@ export default {
                                             <template v-if="'draft' === evidence.object.currentState">
                                                 <!-- Submit button available when a learning moment is: draft -->
                                                 <template v-if="moderationRequired">
-                                                    <a class="button" @click="submitEvidence(evidence.object)">Submit for approval</a>
+                                                    <a class="button" @click="submitEvidence(evidence.object)"
+                                                        >Submit for approval</a
+                                                    >
                                                 </template>
                                                 <template v-else>
-                                                    <a class="button" @click="submitEvidence(evidence.object)">Submit</a>
+                                                    <a class="button" @click="submitEvidence(evidence.object)"
+                                                        >Submit</a
+                                                    >
                                                 </template>
                                             </template>
                                         </template>
@@ -830,12 +849,24 @@ export default {
 
                                     <!-- Staff buttons -->
                                     <template v-else-if="'staff' === config.currentUser.role.type">
-                                        <template v-if="'draft' === evidence.object.currentState || 'submitted' === evidence.object.currentState || 'rejected' === evidence.object.currentState">
+                                        <template
+                                            v-if="
+                                                'draft' === evidence.object.currentState ||
+                                                'submitted' === evidence.object.currentState ||
+                                                'rejected' === evidence.object.currentState
+                                            "
+                                        >
                                             <!-- Modify button available when a learning moment is: draft/submitted/rejected -->
-                                          <a class="button" :href="evidence.object._links.modifyForm">Modify</a>
+                                            <a class="button" :href="evidence.object._links.modifyForm">Modify</a>
                                         </template>
 
-                                        <template v-if="'draft' === evidence.object.currentState || 'submitted' === evidence.object.currentState || 'rejected' === evidence.object.currentState">
+                                        <template
+                                            v-if="
+                                                'draft' === evidence.object.currentState ||
+                                                'submitted' === evidence.object.currentState ||
+                                                'rejected' === evidence.object.currentState
+                                            "
+                                        >
                                             <!-- Publish button available when a learning moment is: draft/submitted/rejected -->
                                             <a class="button" @click="publishEvidence(evidence.object)">Publish</a>
                                         </template>
@@ -845,7 +876,7 @@ export default {
                                     <template v-else-if="'parent' === config.currentUser.role.type">
                                         <template v-if="'draft' === evidence.object.currentState">
                                             <!-- Modify button available when a learning moment is: draft -->
-                                          <a class="button" :href="evidence.object._links.modifyForm">Modify</a>
+                                            <a class="button" :href="evidence.object._links.modifyForm">Modify</a>
                                         </template>
                                     </template>
                                 </template>
