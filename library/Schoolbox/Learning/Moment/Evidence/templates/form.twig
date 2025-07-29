@@ -211,6 +211,7 @@
                                         $('#evidence-persist').trigger('click');
                                     });
                                 {% else %}
+
                                     $('#evidence-persist').trigger('click');
                                 {% endif %}
                             })
@@ -232,7 +233,7 @@
  # Agreeing to that sets a hidden input field which is then interpreted by the
  # buildPayload method, injecting this for controllers to use.
  #}
-{% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted and hasComments %}
+{% if USER.role.isStaff and USER.role.accessEvidence and evidence.id and (evidence.isDraft or evidence.isSubmitted or evidence.isRejected) and hasComments %}
     <div id="deleteCommentsModal" class="reveal-modal" data-reveal aria-labelledby="deleteCommentsModalTitle" aria-hidden="true" role="dialog">
         <h2 id="deleteCommentsModalTitle">Please confirm</h2>
         <p>There are comments on this learning moment that have already been made and will become visible to parents.</p>
