@@ -43,30 +43,24 @@ class StudentByType extends Cursor implements TabTypeInterface
      */
     private function getOrderBy(): string
     {
-        $orderByName = "u.lastname {$this->order}, COALESCE(u.preferred_name, u.firstname) {$this->order}";
-
         if (strcasecmp($this->sortBy, 'total') === 0) {
             return "total {$this->order}";
         }
 
-        /* Early return if the key is not what we are expecting
-         */
-        if (!str_starts_with($this->sortBy, 'count_')) {
-            return $orderByName;
-        }
-
-        /* Double-checking that the key is valid column for sorting
-         */
-        if (
-            in_array($this->sortBy, $this->helper->getType()->map(fn(Type $type) => "count_type_" . $type->getId())->getAll()) ||
-            in_array($this->sortBy, $this->helper->getSubTypes()->map(fn(SubType $subtype) => "count_subtype_" . $subtype->getId())->getAll())
-        ) {
-            return "{$this->sortBy} {$this->order}";
+        if (str_starts_with($this->sortBy, 'count_')) {
+            /* Double-checking that the key is valid column for sorting
+             */
+            if (
+                in_array($this->sortBy, $this->helper->getType()->map(fn(Type $type) => "count_type_" . $type->getId())->getAll()) ||
+                in_array($this->sortBy, $this->helper->getSubTypes()->map(fn(SubType $subtype) => "count_subtype_" . $subtype->getId())->getAll())
+            ) {
+                return "{$this->sortBy} {$this->order}";
+            }
         }
 
         /* Otherwise default to sorting by name
          */
-        return $orderByName;
+        return "u.lastname {$this->order}, COALESCE(u.preferred_name, u.firstname) {$this->order}";
     }
 
     /**
@@ -167,7 +161,9 @@ class StudentByType extends Cursor implements TabTypeInterface
                 WHERE id = :cursor) u2
                 WHERE (
                     u.lastname {$sortingOperator} u2.lastname OR
-                    (u.lastname {$sortingOperator} u2.lastname AND COALESCE(u.preferred_name, u.firstname) {$sortingOperator} u2.preferred_name))
+                    (u.lastname = u2.lastname AND COALESCE(u.preferred_name, u.firstname) {$sortingOperator} u2.preferred_name) OR
+                    (u.lastname = u2.lastname AND COALESCE(u.preferred_name, u.firstname) = u2.preferred_name AND u.id {$sortingOperator} :cursor)
+                )
             ";
             $this->params['cursor'] = $cursor['id'];
         }
@@ -178,7 +174,7 @@ class StudentByType extends Cursor implements TabTypeInterface
             INNER JOIN user u ON countData.student_id = u.id
             {$whereParts}
             GROUP BY countData.student_id, {$groupBy}
-            ORDER BY {$orderBy}
+            ORDER BY {$orderBy}, countData.student_id {$this->order}
             LIMIT :limit
         ";
 
