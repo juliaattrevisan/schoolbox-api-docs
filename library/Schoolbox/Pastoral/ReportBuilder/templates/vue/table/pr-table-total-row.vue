@@ -8,12 +8,11 @@ import { capitalizeFirstLetter } from "@js/util/stringUtils";
 import { TableHeaderType } from "../../js/types/pastoralReportTypes";
 import type { TableHeader, RowOptions, RecordsAndPoints } from "../../js/types/pastoralReportTypes";
 
-type Props = {
+const props = defineProps<{
     headers: TableHeader[];
     rowData: { [key: string]: RowOptions };
     recordsOrPoints: "records" | "points";
-};
-const props = defineProps<Props>();
+}>();
 </script>
 
 <template>
