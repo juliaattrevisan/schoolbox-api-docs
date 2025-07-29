@@ -41,7 +41,7 @@ const recordsOrPoints = defineModel<"records" | "points">("records-or-points", {
 const queryParams = new URLSearchParams(); // to store the query parameters for the endpoint to update
 const LIMIT = 20; // the current set limit for the number of records to fetch at once
 const sortBy = window.Vue.ref<string>("user"); // the current sort by field - this should update when payload is loaded
-const order = window.Vue.ref<"asc" | "desc">("asc"); // the current sort order
+const order = window.Vue.ref<"ASC" | "DESC">("ASC"); // the current sort order
 const currentEndpoint = window.Vue.ref("");
 const { isNewLoading, isSameLoading, payload, isEmpty, loadError } = useLoadPrTable(currentEndpoint);
 
@@ -72,11 +72,11 @@ window.Vue.watch(recordsOrPoints, () => {
 function onSort(headerKey: string): void {
     // If clicking the same header, toggle sort order
     if (sortBy.value === headerKey) {
-        order.value = order.value === "asc" ? "desc" : "asc";
+        order.value = order.value === "ASC" ? "DESC" : "ASC";
     } else {
         // New header selected, set to ascending and update sortBy
         sortBy.value = headerKey;
-        order.value = "asc";
+        order.value = "ASC";
     }
     queryParams.set("sortBy", sortBy.value);
     queryParams.set("order", order.value);

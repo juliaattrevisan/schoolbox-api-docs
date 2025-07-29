@@ -12,7 +12,7 @@ const props = defineProps<{
     config: Config;
     recordsAndPoints: string[];
     sortBy: string;
-    order: "asc" | "desc";
+    order: "ASC" | "DESC";
 }>();
 
 const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
@@ -121,7 +121,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
                     </span>
                     <sbx-icon
                         v-if="header.isSortable && props.sortBy === header.key"
-                        :name="`${props.order === 'asc' ? 'sort-up' : 'sort-down'}`"
+                        :name="`${props.order === 'ASC' ? 'sort-up' : 'sort-down'}`"
                         size="0.825rem"
                     />
                     <sbx-icon v-else-if="header.isSortable" name="sortable" size="0.825rem" />
