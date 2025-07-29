@@ -505,11 +505,10 @@ table.attempts-table {
     z-index: calc(var(--sbx-depth-ui-sticky) - 1);
 }
 
-.u-has-td-button {
+/* to accommodate an absolute positioned child */
+td:has(.u-td-button) {
+    padding: 0; // padding is handled by the button instead
     position: relative;
-    &:has(.u-td-button) {
-        padding: 0; // padding is handled by the button instead
-    }
 }
 
 /* a <button> inside a <td>, to be able to select the entire cell */
