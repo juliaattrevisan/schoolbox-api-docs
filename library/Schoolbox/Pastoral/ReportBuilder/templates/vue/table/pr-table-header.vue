@@ -122,9 +122,9 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
                     <sbx-icon
                         v-if="header.isSortable && props.sortBy === header.key"
                         :name="`${props.order === 'asc' ? 'sort-up' : 'sort-down'}`"
-                        size="0.725rem"
+                        size="0.825rem"
                     />
-                    <span v-else-if="header.isSortable" class="sort-indicator sort-indicator--inactive"> ↕ </span>
+                    <sbx-icon v-else-if="header.isSortable" name="sortable" size="0.825rem" />
                 </button>
                 <template v-else>
                     {{ header.subTitle ? header.subTitle : header.title }}
@@ -137,7 +137,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
 
 <style scoped lang="scss">
 .title-cell {
-    min-width: 100px;
+    min-width: 120px;
     &:has(.title-button) {
         padding: 0; // padding is handled by the button instead
     }
@@ -157,17 +157,18 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
 }
 
 .title-button {
+    align-items: center;
     background: none;
     display: flex; // to align the text to the top left
+    gap: var(--spacing-s);
     justify-content: space-between;
-    align-items: center;
     height: 100%;
     margin: 0;
     padding: 0.625rem;
     text-align: left;
     width: 100%;
     &:hover {
-        background: var(--accent-background);
+        background: none;
     }
 }
 
