@@ -841,7 +841,7 @@ export default {
                                                         <template v-if="moderationRequired">
                                                             <li>
                                                                 <a
-                                                                    class="button"
+                                                                    class="button submit"
                                                                     @click="submitEvidence(evidence.object)"
                                                                     >Submit for approval</a
                                                                 >
@@ -850,7 +850,7 @@ export default {
                                                         <template v-else>
                                                             <li>
                                                                 <a
-                                                                    class="button"
+                                                                    class="button submit"
                                                                     @click="submitEvidence(evidence.object)"
                                                                     >Submit</a
                                                                 >
@@ -886,7 +886,7 @@ export default {
                                                 >
                                                     <!-- Publish button available when a learning moment is: draft/submitted/rejected -->
                                                     <li>
-                                                        <a class="button" @click="publishEvidence(evidence.object)"
+                                                        <a class="button submit" @click="publishEvidence(evidence.object)"
                                                             >Publish</a
                                                         >
                                                     </li>
