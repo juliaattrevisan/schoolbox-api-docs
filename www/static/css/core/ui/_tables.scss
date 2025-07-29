@@ -504,3 +504,25 @@ table.attempts-table {
 .u-sticky-left--row {
     z-index: calc(var(--sbx-depth-ui-sticky) - 1);
 }
+
+.u-has-td-button {
+    position: relative;
+    &:has(.u-td-button) {
+        padding: 0; // padding is handled by the button instead
+    }
+}
+
+/* a <button> inside a <td>, to be able to select the entire cell */
+.u-td-button {
+    background: none;
+    display: flex; // to align the text to the top left
+    height: 100%;
+    margin: 0;
+    padding: 0.625rem;
+    position: absolute; // make the button fill the entire td cell
+    text-align: left;
+    width: 100%;
+    &:hover {
+        background: var(--accent-background);
+    }
+}

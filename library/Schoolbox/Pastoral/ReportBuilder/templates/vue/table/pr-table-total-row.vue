@@ -21,7 +21,7 @@ const props = defineProps<Props>();
         <td
             v-for="header in props.headers"
             :key="header.key"
-            :class="`u-border-right ${header.key === 'user' ? 'u-sticky-left u-sticky-left--row' : ''}`"
+            :class="`u-border-right u-has-td-button ${header.key === 'user' ? 'u-sticky-left u-sticky-left--row' : ''}`"
         >
             <!-- The first cell is always just 'Total' text -->
             <template v-if="header.key === props.headers[0].key">
@@ -30,23 +30,25 @@ const props = defineProps<Props>();
             <template v-else-if="header.type == TableHeaderType.RECORDS_AND_POINTS">
                 <!-- Change data based on current radio button selection -->
                 <!-- Only show records if they're above 0 -->
-                <template
+                <button
                     v-if="
                         props.recordsOrPoints === 'records' &&
                         (props.rowData[header.key] as RecordsAndPoints)?.records! > 0
                     "
+                    class="f-always-show u-td-button"
                 >
                     {{ (props.rowData[header.key] as RecordsAndPoints).records }}
-                </template>
+                </button>
                 <!-- Only show if points exist -->
-                <template
+                <button
                     v-else-if="
                         props.recordsOrPoints === 'points' &&
                         (props.rowData[header.key] as RecordsAndPoints)?.points! !== null
                     "
+                    class="f-always-show u-td-button"
                 >
                     {{ (props.rowData[header.key] as RecordsAndPoints).points }}
-                </template>
+                </button>
             </template>
             <template v-else>
                 {{ props.rowData[header.key] }}
