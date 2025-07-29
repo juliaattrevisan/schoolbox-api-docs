@@ -113,48 +113,18 @@
             {# Moderation Workflow
              # Staff and students share this area, but their buttons are differently described
              #}
-            <button id="draft">Save for later</button>
+            <ul class="flex-list buttons">
+                <li><button id="draft">Save for later</button></li>
 
-            {% if isCreate %}
-                {% set route = routeLookup('learningMomentEvidence.postDraft', {userIds: userIds|join(',')}) %}
-            {% else %}
-                {% set route = routeLookupIfAuthorized('learningMomentEvidence.putDraft', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
-            {% endif %}
-
-            <script>
-                $(function() {
-                    $('#draft').on('click', function(event) {
-                        event.preventDefault();
-
-                        $('#evidence-form').attr('action', '{{ route }}');
-
-                        $('#evidence-persist').trigger('click');
-                    });
-                });
-            </script>
-
-            {% if USER.role.isStudent %}
-                {% if moderationRequired and (evidence.isDraft or evidence.isRejected) %}
-                    <button id="submit">Submit for approval</button>
-
-                    {% if isCreate %}
-                        {% set route = routeLookupIfAuthorized('learningMomentEvidence.postSubmit', {userIds: userIds|join(',')}) %}
-                    {% else %}
-                        {% set route = routeLookupIfAuthorized('learningMomentEvidence.putSubmit', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
-                    {% endif %}
+                {% if isCreate %}
+                    {% set route = routeLookup('learningMomentEvidence.postDraft', {userIds: userIds|join(',')}) %}
                 {% else %}
-                    <button id="submit">Publish</button>
-
-                    {% if isCreate %}
-                        {% set route = routeLookupIfAuthorized('learningMomentEvidence.postPublish', {userIds: userIds|join(',')}) %}
-                    {% else %}
-                        {% set route = routeLookupIfAuthorized('learningMomentEvidence.putPublish', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
-                    {% endif %}
+                    {% set route = routeLookupIfAuthorized('learningMomentEvidence.putDraft', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
                 {% endif %}
 
                 <script>
                     $(function() {
-                        $('#submit').on('click', function(event) {
+                        $('#draft').on('click', function(event) {
                             event.preventDefault();
 
                             $('#evidence-form').attr('action', '{{ route }}');
@@ -163,63 +133,94 @@
                         });
                     });
                 </script>
-            {% elseif USER.role.isStaff and USER.role.accessEvidence %}
-                {# Used to decide if comments should be deleted upon publish #}
-                <input type="hidden" name="delete-comments" id="delete-comments" value="0" />
 
-                {% if evidence.isDraft or evidence.isSubmitted or evidence.isRejected %}
-                    {# This triggers an async request to Reject+reason
-                     # For the implementation, scroll down to the modal
-                     #}
-                    {% if evidence.id %}
-                        <button id="request-update">Request update</button>
+                {% if USER.role.isStudent %}
+                    {% if moderationRequired and (evidence.isDraft or evidence.isRejected) %}
+                        <li><button id="submit">Submit for approval</button></li>
+
+                        {% if isCreate %}
+                            {% set route = routeLookupIfAuthorized('learningMomentEvidence.postSubmit', {userIds: userIds|join(',')}) %}
+                        {% else %}
+                            {% set route = routeLookupIfAuthorized('learningMomentEvidence.putSubmit', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
+                        {% endif %}
+                    {% else %}
+                        <li><button id="submit">Publish</button></li>
+
+                        {% if isCreate %}
+                            {% set route = routeLookupIfAuthorized('learningMomentEvidence.postPublish', {userIds: userIds|join(',')}) %}
+                        {% else %}
+                            {% set route = routeLookupIfAuthorized('learningMomentEvidence.putPublish', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
+                        {% endif %}
                     {% endif %}
-
-                    {# Publish with optional comment deletion
-                     # This spawns a modal, which allows for the setting of a flag,
-                     # prior to the usual form submission. Sorry about all these cloak-and-dagger input fields
-                     # that I need to deconflict at least four workflows in via form + ckeditor bug
-                     #}
-                    <button id="publish">Approve</button>
 
                     <script>
                         $(function() {
-                            $('#publish').on('click', function(event) {
+                            $('#submit').on('click', function(event) {
                                 event.preventDefault();
 
-                                $('#evidence-form').attr('action', '{{ routeLookup('learningMomentModeration.putPublish', {evidenceId: evidence.id}) }}');
+                                $('#evidence-form').attr('action', '{{ route }}');
 
-                                {% if hasComments ?? false %}
-                                    {# Show the modal with an option to delete comments #}
-                                    $('#deleteCommentsModal').foundation('reveal', 'open');
-
-                                    {# Set a special flag for the payload to capture
-                                     # then proceed to submit the form
-                                     #}
-                                    $('#deleteComments').on('click', function (event) {
-                                        event.preventDefault();
-
-                                        $('#delete-comments').val(1);
-
-                                        $('#evidence-persist').trigger('click');
-                                    });
-
-                                    {# Continue with no further alterations #}
-                                    $('#preserveComments').on('click', function () {
-                                        $('#evidence-persist').trigger('click');
-                                    });
-                                {% else %}
-                                    $('#evidence-persist').trigger('click');
-                                {% endif %}
-                            })
+                                $('#evidence-persist').trigger('click');
+                            });
                         });
                     </script>
-                {% elseif isCreate %}
-                    {# "Share a Learning Moment" via the Class List #}
-                    <button id="publish">Publish</button>
-                {% endif %}
-            {% endif %}
+                {% elseif USER.role.isStaff and USER.role.accessEvidence %}
+                    {# Used to decide if comments should be deleted upon publish #}
+                    <input type="hidden" name="delete-comments" id="delete-comments" value="0" />
 
+                    {% if evidence.isDraft or evidence.isSubmitted or evidence.isRejected %}
+                        {# This triggers an async request to Reject+reason
+                         # For the implementation, scroll down to the modal
+                         #}
+                        {% if evidence.id %}
+                            <li><button id="request-update">Request update</button></li>
+                        {% endif %}
+
+                        {# Publish with optional comment deletion
+                         # This spawns a modal, which allows for the setting of a flag,
+                         # prior to the usual form submission. Sorry about all these cloak-and-dagger input fields
+                         # that I need to deconflict at least four workflows in via form + ckeditor bug
+                         #}
+                        <li><button id="publish">Approve</button></li>
+
+                        <script>
+                            $(function() {
+                                $('#publish').on('click', function(event) {
+                                    event.preventDefault();
+
+                                    $('#evidence-form').attr('action', '{{ routeLookup('learningMomentModeration.putPublish', {evidenceId: evidence.id}) }}');
+
+                                    {% if hasComments ?? false %}
+                                        {# Show the modal with an option to delete comments #}
+                                        $('#deleteCommentsModal').foundation('reveal', 'open');
+
+                                        {# Set a special flag for the payload to capture
+                                         # then proceed to submit the form
+                                         #}
+                                        $('#deleteComments').on('click', function (event) {
+                                            event.preventDefault();
+
+                                            $('#delete-comments').val(1);
+
+                                            $('#evidence-persist').trigger('click');
+                                        });
+
+                                        {# Continue with no further alterations #}
+                                        $('#preserveComments').on('click', function () {
+                                            $('#evidence-persist').trigger('click');
+                                        });
+                                    {% else %}
+                                        $('#evidence-persist').trigger('click');
+                                    {% endif %}
+                                })
+                            });
+                        </script>
+                    {% elseif isCreate %}
+                        {# "Share a Learning Moment" via the Class List #}
+                        <li><button id="publish">Publish</button></li>
+                    {% endif %}
+                {% endif %}
+            </ul>
             <input type="submit" id="evidence-persist" data-test="learning-moment-evidence-form-submit" value="Secret Submit" style="display:none" />
         </form>
     </div>
