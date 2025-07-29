@@ -113,108 +113,56 @@
             {# Moderation Workflow
              # Staff and students share this area, but their buttons are differently described
              #}
+            <button id="draft">Save for later</button>
 
             {% if isCreate %}
-                <button id="draft">Save for later</button>
-                <script>
-                    $(function() {
-                        $('#draft').on('click', function(event) {
-                            event.preventDefault();
-
-                            let route = '{{ routeLookup('learningMomentEvidence.postDraft', {userIds: userIds|join(',')}) }}';
-
-                            $('#evidence-form').attr('action', route);
-
-                            $('#evidence-persist').trigger('click');
-                        });
-                    });
-                </script>
+                {% set route = routeLookup('learningMomentEvidence.postDraft', {userIds: userIds|join(',')}) %}
             {% else %}
-                <button id="draft">Save for later</button>
-                <script>
-                    $(function() {
-                        $('#draft').on('click', function(event) {
-                            event.preventDefault();
-
-                            let route = '{{ routeLookupIfAuthorized('learningMomentEvidence.putDraft', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) }}';
-
-                            $('#evidence-form').attr('action', route);
-
-                            $('#evidence-persist').trigger('click');
-                        });
-                    });
-                </script>
+                {% set route = routeLookupIfAuthorized('learningMomentEvidence.putDraft', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
             {% endif %}
+
+            <script>
+                $(function() {
+                    $('#draft').on('click', function(event) {
+                        event.preventDefault();
+
+                        $('#evidence-form').attr('action', '{{ route }}');
+
+                        $('#evidence-persist').trigger('click');
+                    });
+                });
+            </script>
 
             {% if USER.role.isStudent %}
                 {% if moderationRequired and (evidence.isDraft or evidence.isRejected) %}
                     <button id="submit">Submit for approval</button>
 
                     {% if isCreate %}
-                        <script>
-                            $(function() {
-                                $('#submit').on('click', function(event) {
-                                    event.preventDefault();
-
-                                    let route = '{{ routeLookupIfAuthorized('learningMomentEvidence.postSubmit', {userIds: userIds|join(',')}) }}';
-
-                                    $('#evidence-form').attr('action', route);
-
-                                    $('#evidence-persist').trigger('click');
-                                });
-                            });
-                        </script>
+                        {% set route = routeLookupIfAuthorized('learningMomentEvidence.postSubmit', {userIds: userIds|join(',')}) %}
                     {% else %}
-                        <script>
-                            $(function() {
-                                $('#submit').on('click', function(event) {
-                                    event.preventDefault();
-
-                                    let route = '{{ routeLookupIfAuthorized('learningMomentEvidence.putSubmit', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) }}';
-
-                                    $('#evidence-form').attr('action', route);
-
-                                    $('#evidence-persist').trigger('click');
-                                });
-                            });
-                        </script>
+                        {% set route = routeLookupIfAuthorized('learningMomentEvidence.putSubmit', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
                     {% endif %}
                 {% else %}
                     <button id="submit">Publish</button>
 
                     {% if isCreate %}
-                        <script>
-                            $(function() {
-                                $('#submit').on('click', function(event) {
-                                    event.preventDefault();
-
-                                    let route = '{{ routeLookupIfAuthorized('learningMomentEvidence.postPublish', {userIds: userIds|join(',')}) }}';
-
-                                    $('#evidence-form').attr('action', route);
-
-                                    $('#evidence-persist').trigger('click');
-                                });
-                            });
-                        </script>
+                        {% set route = routeLookupIfAuthorized('learningMomentEvidence.postPublish', {userIds: userIds|join(',')}) %}
                     {% else %}
-                        <script>
-                            $(function() {
-                                $('#submit').on('click', function(event) {
-                                    event.preventDefault();
-
-                                    let route = '{{ routeLookupIfAuthorized('learningMomentEvidence.putPublish', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) }}';
-
-                                    $('#evidence-form').attr('action', route);
-
-                                    $('#evidence-persist').trigger('click');
-                                });
-                            });
-                        </script>
+                        {% set route = routeLookupIfAuthorized('learningMomentEvidence.putPublish', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
                     {% endif %}
                 {% endif %}
 
+                <script>
+                    $(function() {
+                        $('#submit').on('click', function(event) {
+                            event.preventDefault();
 
+                            $('#evidence-form').attr('action', '{{ route }}');
 
+                            $('#evidence-persist').trigger('click');
+                        });
+                    });
+                </script>
             {% elseif USER.role.isStaff and USER.role.accessEvidence %}
                 {# Used to decide if comments should be deleted upon publish #}
                 <input type="hidden" name="delete-comments" id="delete-comments" value="0" />
