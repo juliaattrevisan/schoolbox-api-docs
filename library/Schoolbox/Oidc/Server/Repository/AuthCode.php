@@ -65,7 +65,7 @@ class AuthCode implements AuthCodeRepositoryInterface
      *                                                           the request have been reused: this suggests the auth
      *                                                           code request has been replayed.
      */
-    public function persistNewAuthCode(AuthCodeEntityInterface $authCodeEntity)
+    public function persistNewAuthCode(AuthCodeEntityInterface $authCodeEntity): void
     {
         $identifier  = $authCodeEntity->getIdentifier();
         $authCodeKey = $this->authCodeKeyGenerator->generateKey($identifier);

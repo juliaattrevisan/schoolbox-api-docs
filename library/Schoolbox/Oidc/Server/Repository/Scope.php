@@ -78,7 +78,8 @@ class Scope implements ScopeRepositoryInterface
         array $scopes,
         $grantType,
         ClientEntityInterface $clientEntity,
-        $userIdentifier = null
+        $userIdentifier = null,
+        ?string $authCodeId = null
     ): array {
         // For now: assume all scopes are acceptable for all users.
         return $scopes;
