@@ -54,8 +54,8 @@ export default {
             type: Boolean,
             required: true,
         },
-        submitRoute: {
-            type: String,
+        moderationRequired: {
+            type: Boolean,
             required: true
         }
     },
@@ -820,7 +820,12 @@ export default {
 
                                             <template v-if="'draft' === evidence.object.currentState">
                                                 <!-- Submit button available when a learning moment is: draft -->
-                                                <a class="button" @click="submitEvidence(evidence.object)">Submit</a>
+                                                <template v-if="moderationRequired">
+                                                    <a class="button" @click="submitEvidence(evidence.object)">Submit for approval</a>
+                                                </template>
+                                                <template v-else>
+                                                    <a class="button" @click="submitEvidence(evidence.object)">Submit</a>
+                                                </template>
                                             </template>
                                         </template>
                                     </template>
