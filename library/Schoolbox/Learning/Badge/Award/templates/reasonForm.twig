@@ -1,3 +1,6 @@
+{##
+    editorTemplates       array           Retrieve any pre-existing editor templates to insert into the 'Body' rich text editor
+ #}
 <div class="row">
     <div class="small-12 island">
         <div class="actions-small-2 row">
@@ -44,6 +47,9 @@
             detail: {
                 targetElements: ['#reason'],
                 {% if USER.role.staff %}hasTokens: true,{% endif %}
+                {% if editorTemplates %}
+                    templates: {{ editorTemplates|json_encode|raw }},
+                {% endif %}
             }
         }));
     });

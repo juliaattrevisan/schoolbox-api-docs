@@ -23,6 +23,9 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
+use Schoolbox\Editor\Templates\Mapper as EditorTemplateMapper;
+use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
 
 class Module extends BaseModule
 {
@@ -298,8 +301,8 @@ class Module extends BaseModule
     {
         return [
             'user' => $this->getMapperFactory()
-                           ->get(UserMapper::class)
-                           ->findById($params['userId']),
+                ->get(UserMapper::class)
+                ->findById($params['userId']),
         ];
     }
 
@@ -316,8 +319,8 @@ class Module extends BaseModule
     {
         return [
             'badge' => $this->getMapperFactory()
-                            ->get(BadgeMapper::class)
-                            ->findById($params['badgeId']),
+                ->get(BadgeMapper::class)
+                ->findById($params['badgeId']),
         ];
     }
 
@@ -335,8 +338,8 @@ class Module extends BaseModule
     {
         $userIds = array_unique(explode(',', $params['userIds']));
         $users   = $this->getMapperFactory()
-                        ->get(UserMapper::class)
-                        ->findByColumn('id', $userIds);
+            ->get(UserMapper::class)
+            ->findByColumn('id', $userIds);
 
         // It's acceptable for some users in userIds to not be found.
         // However, at least one user must be found for this form to have
@@ -362,8 +365,8 @@ class Module extends BaseModule
         } else {
             try {
                 $award = $this->getMapperFactory()
-                              ->get(Mapper::class)
-                              ->findById($params['awardId']);
+                    ->get(Mapper::class)
+                    ->findById($params['awardId']);
             } catch (MapperException $e) {
                 throw new \Schoolbox\Application\Exception\NotFound("No award found for id: {$params['awardId']}");
             }
@@ -393,7 +396,7 @@ class Module extends BaseModule
             throw new \UnexpectedValueException("No 'folderId' found in route params");
         } else {
             $preload[$folder] = $this->getMapperFactory()
-                                     ->get(\Schoolbox\Resource\Folder\Mapper::class)->findById($params[$folderId]);
+                ->get(\Schoolbox\Resource\Folder\Mapper::class)->findById($params[$folderId]);
         }
 
         return $preload;
@@ -421,7 +424,12 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(FilterMapper::class),
             $this->getMapperFactory()->get(FilterSelectionMapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
-            $this->injector->get('l10n'),
+            new EditorTemplateHelper(
+                $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                EditorTemplatesCategoryModel::BADGE_EVIDENCE,
+                $this->injector->get('user')
+            ),
+            $this->injector->get('l10n')
         );
     }
 }

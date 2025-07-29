@@ -38,6 +38,7 @@ use UnexpectedValueException;
 use Schoolbox\Learning\Badge\Translator as BadgeTranslator;
 use Schoolbox\Resource\Storage;
 use Schoolbox\TokenReplacer;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 use function count;
 use function in_array;
@@ -79,6 +80,10 @@ class Controller extends Base
      */
     private UserMapper $userMapper;
 
+    /**
+     * Helper for editor templates.
+     */
+    private EditorTemplateHelper $editorTemplateHelper;
 
     /**
      * Constructor
@@ -89,6 +94,7 @@ class Controller extends Base
      * @param Filter\Mapper           $filterMapper
      * @param Filter\Selection\Mapper $filterSelectionMapper
      * @param UserMapper              $userMapper
+     * @param EditorTemplateHelper    $editorTemplateHelper
      */
     public function __construct(
         Mapper $mapper,
@@ -97,6 +103,7 @@ class Controller extends Base
         Filter\Mapper $filterMapper,
         Filter\Selection\Mapper $filterSelectionMapper,
         UserMapper $userMapper,
+        EditorTemplateHelper $editorTemplateHelper,
         private RosettaStone $l10n,
     ) {
         $this->badgeMapper           = $badgeMapper;
@@ -105,6 +112,7 @@ class Controller extends Base
         $this->filterMapper          = $filterMapper;
         $this->filterSelectionMapper = $filterSelectionMapper;
         $this->userMapper            = $userMapper;
+        $this->editorTemplateHelper  = $editorTemplateHelper;
     }
 
 
@@ -316,6 +324,7 @@ class Controller extends Base
                 'targetUserIds' => implode(',', $users->getPropertyValues('id')),
                 'returnUrl'     => $returnUrl,
                 'cancelUrl'     => $cancelUrl,
+                'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
             ],
             'Award Achievement'
         );
@@ -798,6 +807,7 @@ class Controller extends Base
                 'award'     => $award,
                 'returnUrl' => $returnUrl,
                 'cancelUrl' => Redirect::decode($returnUrl),
+                'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
             ],
             'Edit award'
         );
@@ -822,8 +832,8 @@ class Controller extends Base
         $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
         $reason        = trim($this->requestPost->get('reason') ?? '');
         $award->setReason($tokenReplacer->replace($reason, $student))
-              ->setReasonedBy($this->getUser())
-              ->setReasonedAt(Alaress_Date_Format::now());
+            ->setReasonedBy($this->getUser())
+            ->setReasonedAt(Alaress_Date_Format::now());
 
         $this->mapper->save($award);
 
@@ -862,14 +872,14 @@ class Controller extends Base
 
         // create new achievement award from award
         $achievement = $this->mapper->createModel()
-                                    ->setRecipient($award->getRecipient())
-                                    ->setBadge($award->getBadge())
-                                    ->setReason($award->getReason())
-                                    ->setReasonedBy($award->getReasonedBy())
-                                    ->setReasonedAt($award->getReasonedAt())
-                                    ->setStatus(AwardModel::AWARD_STATUS_ACHIEVEMENT)
-                                    ->setAwardedBy($this->getUser())
-                                    ->setAwardedAt(Alaress_Date_Format::now());
+            ->setRecipient($award->getRecipient())
+            ->setBadge($award->getBadge())
+            ->setReason($award->getReason())
+            ->setReasonedBy($award->getReasonedBy())
+            ->setReasonedAt($award->getReasonedAt())
+            ->setStatus(AwardModel::AWARD_STATUS_ACHIEVEMENT)
+            ->setAwardedBy($this->getUser())
+            ->setAwardedAt(Alaress_Date_Format::now());
         $achievement = $achievement->setExpiresAt((new ExpiryHelper())->determineExpiry($achievement));
         $this->mapper->save($achievement);
 
