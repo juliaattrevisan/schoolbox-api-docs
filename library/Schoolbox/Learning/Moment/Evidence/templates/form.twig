@@ -187,7 +187,9 @@
                     {# This triggers an async request to Reject+reason
                      # For the implementation, scroll down to the modal
                      #}
-                    <button id="request-update">Request update</button>
+                    {% if evidence.id %}
+                        <button id="request-update">Request update</button>
+                    {% endif %}
 
                     {# Publish with optional comment deletion
                      # This spawns a modal, which allows for the setting of a flag,
@@ -205,7 +207,7 @@
 
                                 $('#evidence-form').attr('action', route);
 
-                                {% if hasComments %}
+                                {% if hasComments ?? false %}
                                     {# Show the modal with an option to delete comments #}
                                     $('#deleteCommentsModal').foundation('reveal', 'open');
 
