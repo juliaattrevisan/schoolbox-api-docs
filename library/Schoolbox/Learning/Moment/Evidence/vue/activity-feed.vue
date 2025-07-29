@@ -811,14 +811,17 @@ export default {
 
                                     <!-- Student buttons -->
                                     <template v-if="'student' === config.currentUser.role.type">
-                                        <template v-if="'draft' === evidence.object.currentState || 'submitted' === evidence.object.currentState || 'rejected' === evidence.object.currentState">
-                                            <!-- Modify button available when a learning moment is: draft/submitted/rejected -->
-                                            <a class="button" :href="evidence.object._links.modifyForm">Modify</a>
-                                        </template>
+                                        <!-- student must be the author of the learning moment to have these actions -->
+                                        <template v-if="config.currentUser.id === evidence.object.creator.id">
+                                            <template v-if="'draft' === evidence.object.currentState || 'submitted' === evidence.object.currentState || 'rejected' === evidence.object.currentState">
+                                                <!-- Modify button available when a learning moment is: draft/submitted/rejected -->
+                                                <a class="button" :href="evidence.object._links.modifyForm">Modify</a>
+                                            </template>
 
-                                        <template v-if="'draft' === evidence.object.currentState">
-                                            <!-- Submit button available when a learning moment is: draft -->
-                                            <a class="button" @click="submitEvidence(evidence.object)">Submit</a>
+                                            <template v-if="'draft' === evidence.object.currentState">
+                                                <!-- Submit button available when a learning moment is: draft -->
+                                                <a class="button" @click="submitEvidence(evidence.object)">Submit</a>
+                                            </template>
                                         </template>
                                     </template>
 
