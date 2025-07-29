@@ -410,7 +410,7 @@
                 // Build a request to post the form
                 let payload = buildPayload(form),
                     toast   = $('#toast'),
-                    submit  = $('#evidence-form, #rejectionForm').find('input[type="submit"], button');
+                    submit  = $('#evidence-form, #rejectionForm, #deleteCommentsModal').find('input[type="submit"], button');
 
                 // Toast then post
                 toast.toastActivate('Saving...')
