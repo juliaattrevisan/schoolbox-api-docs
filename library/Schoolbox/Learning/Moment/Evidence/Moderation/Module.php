@@ -94,6 +94,7 @@ class Module extends BaseModule
         return new Controller(
             $this->getMapperFactory()->get(\Schoolbox\Learning\Moment\Evidence\Mapper::class),
             $this->getMapperFactory()->get(CommentMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Discussion\Thread\Mapper::class),
         );
     }
 

@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Moment\Evidence\Mapper;
 use Schoolbox\Learning\Moment\Evidence\Model;
 use Schoolbox\Learning\Moment\Evidence\Translator;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -26,12 +27,14 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param \Schoolbox\Learning\Moment\Evidence\Mapper $mapper
+     * @param Mapper $mapper
      * @param Comment\Mapper $commentMapper
+     * @param \Schoolbox\Discussion\Thread\Mapper $discussionThreadMapper
      */
     public function __construct(
         private \Schoolbox\Learning\Moment\Evidence\Mapper $mapper,
-        private Comment\Mapper $commentMapper
+        private Comment\Mapper $commentMapper,
+        private \Schoolbox\Discussion\Thread\Mapper $discussionThreadMapper,
     ) {
     }
 
@@ -83,6 +86,8 @@ class Controller extends Base
          */
         $evidence->publish($this->getUser());
 
+        /* Save it
+         */
         $this->mapper->save($evidence);
 
         /* TODO Post a notification
@@ -118,25 +123,25 @@ class Controller extends Base
             ->setTags($baseModel->getTags())
             ->setCurriculumNodes($baseModel->getCurriculumNodes());
 
-        /* Update the status of $evidence to Rejected
-         */
-        $evidence->reject($this->getUser());
-
         /* If a discussion thread never existed, spawn one
          */
         $discussionThread = $evidence->getDiscussionThread();
 
         if (null === $discussionThread) {
-            $discussionThreadMapper = \Schoolbox\Discussion\Thread\Mapper::getInstance();
-
-            $discussionThread = $discussionThreadMapper->createModel()
+            $discussionThread = $this->discussionThreadMapper->createModel()
                 ->setOpen(true);
 
-            $discussionThreadMapper->save($discussionThread);
+            $this->discussionThreadMapper->save($discussionThread);
 
             $evidence->setDiscussionThread($discussionThread);
         }
 
+        /* Update the status of $evidence to Rejected
+         */
+        $evidence->reject($this->getUser());
+
+        /* Save it
+         */
         $this->mapper->save($evidence);
 
         /* Spawn a comment
