@@ -20,15 +20,6 @@ const props = defineProps<{
     localePastoral: string;
 }>();
 
-const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
-
-const queryParams = new URLSearchParams(); // to store the query parameters for the endpoint to update
-const LIMIT = 20; // the current set limit for the number of records to fetch at once
-const sortBy = window.Vue.ref<string>("user"); // the current sort by field - this should update when payload is loaded
-const sortOrder = window.Vue.ref<"asc" | "desc">("asc"); // the current sort order
-const currentEndpoint = window.Vue.ref("");
-const { isNewLoading, isSameLoading, payload, isEmpty, loadError } = useLoadPrTable(currentEndpoint);
-
 // #region scrollable height
 
 const scrollableEl = useTemplateRef<HTMLDivElement>("scrollableEl");
@@ -42,36 +33,27 @@ function setScrollableHeight(): void {
     maxScrollableHeight.value = `${window.innerHeight - 300}px`;
 }
 
-/**
- * Start setting the scrollable height on any window resize change
- */
-window.Vue.onMounted(() => {
-    setScrollableHeight();
-    window.addEventListener("resize", () => {
-        setScrollableHeight();
-    });
-    // Set initial endpoint based on selected tab, which will trigger the load in useLoadPrTable
-    queryParams.append("selected", recordsOrPoints.value);
-    queryParams.append("cursor", "");
-    queryParams.append("limit", LIMIT.toString());
-    currentEndpoint.value = `${props.selectedTab.endpoint}?${queryParams.toString()}`;
-});
-
 // #endregion
 
-/**
- * when the endpoint changes trigger a new load
- */
-window.Vue.watch(
-    () => props.selectedTab,
-    (newTab) => {
-        if (newTab.type === TabType.TABLE) {
-            // endpoint change
-        }
-    },
-);
+// #region table load
 
-// #region reload data
+const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
+const queryParams = new URLSearchParams(); // to store the query parameters for the endpoint to update
+const LIMIT = 20; // the current set limit for the number of records to fetch at once
+const sortBy = window.Vue.ref<string>("user"); // the current sort by field - this should update when payload is loaded
+const sortOrder = window.Vue.ref<"asc" | "desc">("asc"); // the current sort order
+const currentEndpoint = window.Vue.ref("");
+const { isNewLoading, isSameLoading, payload, isEmpty, loadError } = useLoadPrTable(currentEndpoint);
+
+/**
+ * Reset the table load by clearing the cursor and reloading the data
+ */
+function resetTableLoad(): void {
+    queryParams.set("selected", recordsOrPoints.value);
+    queryParams.set("cursor", "");
+    queryParams.set("limit", LIMIT.toString());
+    currentEndpoint.value = `${props.selectedTab.endpoint}?${queryParams.toString()}`;
+}
 
 /**
  * Load the row data again when the recordsOrPoints changes
@@ -108,7 +90,31 @@ function onPaginate(cursor: string): void {
     currentEndpoint.value = `${props.selectedTab.endpoint}?${queryParams.toString()}`;
 }
 
+/**
+ * when the endpoint changes trigger a new load
+ */
+window.Vue.watch(
+    () => props.selectedTab,
+    (newTab) => {
+        if (newTab.type === TabType.TABLE) {
+            // endpoint change
+        }
+    },
+);
+
 // #endregion
+
+/**
+ * Start setting the scrollable height on any window resize change
+ * and reset the table load to ensure the correct endpoint is set
+ */
+window.Vue.onMounted(() => {
+    setScrollableHeight();
+    window.addEventListener("resize", () => {
+        setScrollableHeight();
+    });
+    resetTableLoad();
+});
 </script>
 
 <template>
