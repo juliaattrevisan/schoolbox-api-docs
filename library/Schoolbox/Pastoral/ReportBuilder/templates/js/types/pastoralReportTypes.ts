@@ -1,5 +1,6 @@
 import type { User } from "@schoolboxLibrary/types/User";
 import type { Metadata } from "@js/util/sbx/apiUtils";
+import type { PastoralRecord } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
 
 /**
  * Pastoral report tab types
@@ -85,6 +86,16 @@ export type TablePayload = {
         tableHeaders: TableHeader[];
         totalRow: { [key: string]: RowOptions };
         rows: { [key: string]: RowOptions }[];
+    };
+    metadata: Metadata;
+};
+
+/**
+ * The expected payload for a Pastoral records load.
+ */
+export type RecordsPayload = {
+    data: {
+        records: PastoralRecord[];
     };
     metadata: Metadata;
 };
