@@ -4957,12 +4957,6 @@ parameters:
 			path: library/Schoolbox/Learning/InlineGrader/Kami/Connector.php
 
 		-
-			message: '#^Method Schoolbox\\Learning\\InlineGrader\\Kami\\ReQueueErrors\:\:getErrorKamiIds\(\) should return array\<string\> but returns array\<int\>\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Learning/InlineGrader/Kami/ReQueueErrors.php
-
-		-
 			message: '#^Method Schoolbox\\Learning\\InlineGrader\\Kami\\Test\\ConnectorTest\:\:providerInvalidSiteSchoolCode\(\) should return array\<string\|null\> but returns array\<int, list\<string\|null\>\>\.$#'
 			identifier: return.type
 			count: 1

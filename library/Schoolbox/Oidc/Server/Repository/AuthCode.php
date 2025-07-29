@@ -65,15 +65,19 @@ class AuthCode implements AuthCodeRepositoryInterface
      *                                                           the request have been reused: this suggests the auth
      *                                                           code request has been replayed.
      */
-    public function persistNewAuthCode(AuthCodeEntityInterface $authCodeEntity)
+    public function persistNewAuthCode(AuthCodeEntityInterface $authCodeEntity): void
     {
         $identifier  = $authCodeEntity->getIdentifier();
         $authCodeKey = $this->authCodeKeyGenerator->generateKey($identifier);
         if ($this->cache->has($authCodeKey)) {
+            // `UniqueTokenIdentifierConstraintViolationException::create`
+            // raises a 500 HTTP status code.
+            // That doesn't seem right, because reuse of an auth code seems like
+            // a client rather than a server error.
             throw new UniqueTokenIdentifierConstraintViolationException(
                 'Auth code has already been used, and may not be reused',
                 0,
-                null,
+                'access_token_duplicate',
                 400,
             );
         }
@@ -95,7 +99,7 @@ class AuthCode implements AuthCodeRepositoryInterface
                 throw new UniqueTokenIdentifierConstraintViolationException(
                     'Nonce value has already been used, and may not be reused',
                     0,
-                    null,
+                    'access_token_duplicate',
                     400,
                 );
             }
@@ -109,7 +113,7 @@ class AuthCode implements AuthCodeRepositoryInterface
      * @param string $codeId
      * @return void
      */
-    public function revokeAuthCode($codeId): void
+    public function revokeAuthCode(string $codeId): void
     {
         $this->cache->delete($this->authCodeKeyGenerator->generateKey($codeId));
     }
@@ -120,7 +124,7 @@ class AuthCode implements AuthCodeRepositoryInterface
      * @param string $codeId
      * @return bool
      */
-    public function isAuthCodeRevoked($codeId): bool
+    public function isAuthCodeRevoked(string $codeId): bool
     {
         return !$this->cache->has($this->authCodeKeyGenerator->generateKey($codeId));
     }
