@@ -70,10 +70,14 @@ class AuthCode implements AuthCodeRepositoryInterface
         $identifier  = $authCodeEntity->getIdentifier();
         $authCodeKey = $this->authCodeKeyGenerator->generateKey($identifier);
         if ($this->cache->has($authCodeKey)) {
+            // `UniqueTokenIdentifierConstraintViolationException::create`
+            // raises a 500 HTTP status code.
+            // That doesn't seem right, because reuse of an auth code seems like
+            // a client rather than a server error.
             throw new UniqueTokenIdentifierConstraintViolationException(
                 'Auth code has already been used, and may not be reused',
                 0,
-                null,
+                'access_token_duplicate',
                 400,
             );
         }
@@ -95,7 +99,7 @@ class AuthCode implements AuthCodeRepositoryInterface
                 throw new UniqueTokenIdentifierConstraintViolationException(
                     'Nonce value has already been used, and may not be reused',
                     0,
-                    null,
+                    'access_token_duplicate',
                     400,
                 );
             }
