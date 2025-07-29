@@ -1,16 +1,13 @@
 <script type="text/javascript">
     (async () => {
-        let url = "{{ url }}";
-
-        function displaySEBSecurityInfo () {
-            SafeExamBrowser.security.updateKeys(didUpdateSEBSecurityInfo);
-        }
-
-        function didUpdateSEBSecurityInfo () {
-            var pageConfigKey = SafeExamBrowser.security.configKey;
-            // var pageBrowserExamKey = SafeExamBrowser.security.browserExamKey;
-            // var sebClientVersion = SafeExamBrowser.version;
-            window.location.href = url + pageConfigKey;
+        /**
+         * Callback for when SEB's security information has been updated
+         */
+        function onSEBLoaded() {
+            const pageConfigKey = SafeExamBrowser.security.configKey;
+            // const pageBrowserExamKey = SafeExamBrowser.security.browserExamKey;
+            // const sebClientVersion = SafeExamBrowser.version;
+            window.location.href = `{{ url }}${pageConfigKey}`;
         }
 
         /**
@@ -46,11 +43,11 @@
             });
         }
 
-        const isSebAvailable = await waitForSEB(2000, 10);
-        if (isSebAvailable) {
-            displaySEBSecurityInfo();
+        const hasSEB = await waitForSEB(2000, 10);
+        if (hasSEB) {
+            SafeExamBrowser.security.updateKeys(onSEBLoaded);
         } else {
-            window.location.href = url;
+            window.location.href = "{{ url }}";
         }
     })();
 </script>
