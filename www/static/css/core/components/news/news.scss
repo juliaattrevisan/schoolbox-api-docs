@@ -21,6 +21,9 @@
                 }
             }
         }
+        > a:not([data-plugin]) > img.homepage-news-feature-image {
+            width: 4rem;
+        }
         .thumbnail {
             width: 4rem;
         }
