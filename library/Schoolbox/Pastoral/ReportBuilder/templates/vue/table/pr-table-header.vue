@@ -113,7 +113,6 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
                 :key="header.key"
                 :class="`u-border-right title-cell ${header.key === 'user' ? 'u-sticky-left user-cell' : ''} ${header.key === 'total' ? 'total-cell' : ''}`"
             >
-                <!-- active sort class - ${props.sortBy === header.key ? 'sorted' : ''} -->
                 <button v-if="header.isSortable" class="title-button f-always-show" @click="onSortSelected(header.key)">
                     <span>
                         {{ header.subTitle ? header.subTitle : header.title }}
