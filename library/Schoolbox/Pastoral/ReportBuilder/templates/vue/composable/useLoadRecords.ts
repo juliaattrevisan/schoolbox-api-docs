@@ -12,7 +12,7 @@ import type { RecordsPayload } from "../../js/types/pastoralReportTypes";
  * @param endpoint - the endpoint to load the records from
  * @returns isLoading, payload, isEmpty, loadError
  */
-export function useLoadPrTable(endpoint: Ref<string>): {
+export function useLoadRecords(endpoint: Ref<string>): {
     isLoading: Ref<boolean>;
     payload: Ref<RecordsPayload | null>;
     isEmpty: Ref<boolean>;

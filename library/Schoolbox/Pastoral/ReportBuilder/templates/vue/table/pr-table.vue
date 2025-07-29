@@ -8,6 +8,7 @@ import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import type { Tab, TablePayload, Config, Routes } from "../../js/types/pastoralReportTypes";
 import { TabType } from "../../js/types/pastoralReportTypes";
 import { useLoadPrTable } from "../composable/useLoadPrTable";
+import { useLoadRecords } from "../composable/useLoadRecords";
 import PrTableHeader from "./pr-table-header.vue";
 import PrTableTotalRow from "./pr-table-total-row.vue";
 import PrTableRow from "./pr-table-row.vue";
@@ -111,6 +112,12 @@ window.Vue.watch(
 // #region table cell selected
 
 const isCellExpanded = window.Vue.ref(false);
+const recordsEndpoint = window.Vue.ref("");
+const {
+    isLoading: isLoadingRecords,
+    payload: recordsPayload,
+    loadError: recordsLoadError,
+} = useLoadRecords(recordsEndpoint);
 
 /**
  * Handle cell selection
