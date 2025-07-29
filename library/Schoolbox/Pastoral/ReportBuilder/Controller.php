@@ -484,6 +484,11 @@ class Controller extends Base
         }
     }
 
+    public function getReportByTabTypeScope(string $tabType, PastoralReport $report): void
+    {
+        $this->response = $this->responseAsJson([]);
+    }
+
     /**
      * Exports report data
      * @param PastoralReport $report
