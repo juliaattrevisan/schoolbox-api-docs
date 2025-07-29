@@ -23,9 +23,31 @@ const props = defineProps<Props>();
             :key="header.key"
             :class="`u-border-right u-has-td-button ${header.key === 'user' ? 'u-sticky-left u-sticky-left--row' : ''}`"
         >
-            <!-- The first cell is always just 'Total' text -->
+            <!-- The first cell is always just 'Total Records/Points' text -->
             <template v-if="header.key === props.headers[0].key">
                 <b>{{ props.rowData[header.key] }} {{ capitalizeFirstLetter(props.recordsOrPoints) }}</b>
+            </template>
+            <!-- We don't need to make the total cell selectable, as it would just be a duplicate result list of the List tab -->
+            <template v-else-if="header.key === 'total'">
+                <!-- Change data based on current radio button selection -->
+                <!-- Only show records if they're above 0 -->
+                <template
+                    v-if="
+                        props.recordsOrPoints === 'records' &&
+                        (props.rowData[header.key] as RecordsAndPoints)?.records! > 0
+                    "
+                >
+                    {{ (props.rowData[header.key] as RecordsAndPoints).records }}
+                </template>
+                <!-- Only show if points exist -->
+                <template
+                    v-else-if="
+                        props.recordsOrPoints === 'points' &&
+                        (props.rowData[header.key] as RecordsAndPoints)?.points! !== null
+                    "
+                >
+                    {{ (props.rowData[header.key] as RecordsAndPoints).points }}
+                </template>
             </template>
             <template v-else-if="header.type == TableHeaderType.RECORDS_AND_POINTS">
                 <!-- Change data based on current radio button selection -->
