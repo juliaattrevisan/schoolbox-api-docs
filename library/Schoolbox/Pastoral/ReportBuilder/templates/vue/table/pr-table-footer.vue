@@ -19,7 +19,7 @@ const emit = defineEmits<{
     next: [cursor: string];
 }>();
 
-const { cursorIndex, hasNext, toNext, hasPrevious, toPrevious, currentCursor, hasPaginate, reset } = usePagination(
+const { cursorIndex, hasNext, toNext, hasPrevious, toPrevious, currentCursor, hasPaginate } = usePagination(
     toRef(() => props.endpoint),
     PER_PAGE,
     toRef(() => props.metadata),

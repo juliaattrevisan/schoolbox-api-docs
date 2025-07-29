@@ -5,7 +5,7 @@
  */
 
 import { capitalizeFirstLetter } from "@js/util/stringUtils";
-import type { TableHeader, Config } from "../js/types/pastoralReportTypes";
+import type { TableHeader, Config } from "../../js/types/pastoralReportTypes";
 
 const props = defineProps<{
     headers: TableHeader[];
