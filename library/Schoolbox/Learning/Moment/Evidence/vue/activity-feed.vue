@@ -840,20 +840,22 @@ export default {
                                                         <!-- Submit button available when a learning moment is: draft -->
                                                         <template v-if="moderationRequired">
                                                             <li>
-                                                                <a
-                                                                    class="button submit"
+                                                                <button
+                                                                    class="submit"
                                                                     @click="submitEvidence(evidence.object)"
-                                                                    >Submit for approval</a
                                                                 >
+                                                                    Submit for approval
+                                                                </button>
                                                             </li>
                                                         </template>
                                                         <template v-else>
                                                             <li>
-                                                                <a
-                                                                    class="button submit"
+                                                                <button
+                                                                    class="submit"
                                                                     @click="submitEvidence(evidence.object)"
-                                                                    >Submit</a
                                                                 >
+                                                                    Submit
+                                                                </button>
                                                             </li>
                                                         </template>
                                                     </template>
@@ -886,9 +888,12 @@ export default {
                                                 >
                                                     <!-- Publish button available when a learning moment is: draft/submitted/rejected -->
                                                     <li>
-                                                        <a class="button submit" @click="publishEvidence(evidence.object)"
-                                                            >Publish</a
+                                                        <button
+                                                            class="submit"
+                                                            @click="publishEvidence(evidence.object)"
                                                         >
+                                                            Publish
+                                                        </button>
                                                     </li>
                                                 </template>
                                             </template>
