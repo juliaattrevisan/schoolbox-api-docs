@@ -12,24 +12,22 @@ const props = defineProps<{
     config: Config;
     recordsAndPoints: string[];
     sortBy: string;
-    sortOrder: "asc" | "desc";
+    order: "asc" | "desc";
 }>();
 
 const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
 
-// const emit = defineEmits<{
-//     sort: [key: string];
-// }>();
+const emit = defineEmits<{
+    sort: [key: string];
+}>();
 
 /**
  * Handles the sort action when a sortable header is clicked
- * @param header - the header object that was clicked
+ * @param key - the key of the header that was clicked
  */
-// function onSortSelected(header: TableHeader): void {
-//     if (header.isSortable) {
-//         emit("sort", header.key);
-//     }
-// }
+function onSortSelected(key: string): void {
+    emit("sort", key);
+}
 
 /**
  * If we have sub titles, it means the titles need to be displayed on the same row as the records/points radio buttons,
@@ -116,15 +114,15 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
                 :class="`u-border-right title-cell ${header.key === 'user' ? 'u-sticky-left user-cell' : ''} ${header.key === 'total' ? 'total-cell' : ''}`"
             >
                 <!-- active sort class - ${props.sortBy === header.key ? 'sorted' : ''} -->
-                <!-- <button class="title-button f-always-show" @click="onSortSelected(header)">
+                <button v-if="header.isSortable" class="title-button f-always-show" @click="onSortSelected(header.key)">
                     <span>{{ header.subTitle ? header.subTitle : header.title }}</span>
                     <span v-if="header.isSortable && props.sortBy === header.key" class="sort-indicator">
-                        {{ props.sortOrder === "asc" ? "↑" : "↓" }}
+                        {{ props.order === "asc" ? "↑" : "↓" }}
                     </span>
                     <span v-else-if="header.isSortable" class="sort-indicator sort-indicator--inactive"> ↕ </span>
-                </button> -->
-                {{ header.subTitle ? header.subTitle : header.title }}
-                {{ header.key === "total" ? capitalizeFirstLetter(recordsOrPoints) : "" }}
+                </button>
+                <!-- {{ header.subTitle ? header.subTitle : header.title }} -->
+                <!-- {{ header.key === "total" ? capitalizeFirstLetter(recordsOrPoints) : "" }} -->
             </th>
         </tr>
     </thead>
@@ -133,7 +131,6 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
 <style scoped lang="scss">
 .title-cell {
     min-width: 100px;
-    // position: relative;
     &:has(.title-button) {
         padding: 0; // padding is handled by the button instead
     }

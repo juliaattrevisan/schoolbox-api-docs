@@ -41,7 +41,7 @@ const recordsOrPoints = defineModel<"records" | "points">("records-or-points", {
 const queryParams = new URLSearchParams(); // to store the query parameters for the endpoint to update
 const LIMIT = 20; // the current set limit for the number of records to fetch at once
 const sortBy = window.Vue.ref<string>("user"); // the current sort by field - this should update when payload is loaded
-const sortOrder = window.Vue.ref<"asc" | "desc">("asc"); // the current sort order
+const order = window.Vue.ref<"asc" | "desc">("asc"); // the current sort order
 const currentEndpoint = window.Vue.ref("");
 const { isNewLoading, isSameLoading, payload, isEmpty, loadError } = useLoadPrTable(currentEndpoint);
 
@@ -52,6 +52,8 @@ function resetTableLoad(): void {
     queryParams.set("selected", recordsOrPoints.value);
     queryParams.set("cursor", "");
     queryParams.set("limit", LIMIT.toString());
+    queryParams.set("sortBy", sortBy.value);
+    queryParams.set("order", order.value);
     currentEndpoint.value = `${props.selectedTab.endpoint}?${queryParams.toString()}`;
 }
 
@@ -67,18 +69,18 @@ window.Vue.watch(recordsOrPoints, () => {
  * Handle sort button click
  * @param headerKey - the key of the header that was clicked for sorting
  */
-function onSortSelected(headerKey: string): void {
+function onSort(headerKey: string): void {
     // If clicking the same header, toggle sort order
     if (sortBy.value === headerKey) {
-        sortOrder.value = sortOrder.value === "asc" ? "desc" : "asc";
+        order.value = order.value === "asc" ? "desc" : "asc";
     } else {
         // New header selected, set to ascending and update sortBy
         sortBy.value = headerKey;
-        sortOrder.value = "asc";
+        order.value = "asc";
     }
-    // TODO: Implement actual sorting logic here
-    // This could trigger a new data load with sorting parameters
-    // or sort the existing data in payloadData
+    queryParams.set("sortBy", sortBy.value);
+    queryParams.set("order", order.value);
+    currentEndpoint.value = `${props.selectedTab.endpoint}?${queryParams.toString()}`;
 }
 
 /**
@@ -150,8 +152,8 @@ window.Vue.onMounted(() => {
                     :config="props.config"
                     :records-and-points="props.recordsAndPoints"
                     :sort-by="sortBy"
-                    :sort-order="sortOrder"
-                    @sort="onSortSelected"
+                    :order="order"
+                    @sort="onSort"
                 />
                 <!-- Skeleton loading state when switching between records/rows and sorting -->
                 <tbody v-if="isSameLoading" class="skeleton">
