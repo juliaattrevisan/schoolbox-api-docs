@@ -180,7 +180,10 @@
                     {% endif %}
                 {% endif %}
             {% elseif USER.role.isStaff and USER.role.accessEvidence %}
-                {% if evidence.isSubmitted %}
+                {# Used to decide if comments should be deleted upon publish #}
+                <input type="hidden" name="delete-comments" id="delete-comments" value="0" />
+
+                {% if evidence.isSubmitted or evidence.isDraft %}
                     {# This triggers an async request to Reject+reason
                      # For the implementation, scroll down to the modal
                      #}
@@ -193,18 +196,16 @@
                      #}
                     <button id="publish">Approve</button>
 
-                    {% if hasComments %}
-                        <input type="hidden" name="delete-comments" id="delete-comments" value="0" />
+                    <script>
+                        $(function() {
+                            $('#publish').on('click', function(event) {
+                                event.preventDefault();
 
-                        <script>
-                            $(function() {
-                                $('#publish').on('click', function(event) {
-                                    event.preventDefault();
+                                let route = '{{ routeLookup('learningMomentModeration.putPublish', {evidenceId: evidence.id}) }}';
 
-                                    let route = '{{ routeLookup('learningMomentModeration.putPublish', {evidenceId: evidence.id}) }}';
+                                $('#evidence-form').attr('action', route);
 
-                                    $('#evidence-form').attr('action', route);
-
+                                {% if hasComments %}
                                     {# Show the modal with an option to delete comments #}
                                     $('#deleteCommentsModal').foundation('reveal', 'open');
 
@@ -223,10 +224,12 @@
                                     $('#preserveComments').on('click', function () {
                                         $('#evidence-persist').trigger('click');
                                     });
-                                })
-                            });
-                        </script>
-                    {% endif %}
+                                {% else %}
+                                    $('#evidence-persist').trigger('click');
+                                {% endif %}
+                            })
+                        });
+                    </script>
                 {% elseif isCreate %}
                     {# "Share a Learning Moment" via the Class List #}
                     <button id="publish">Publish</button>
