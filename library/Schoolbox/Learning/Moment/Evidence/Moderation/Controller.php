@@ -40,7 +40,8 @@ class Controller extends Base
 
 
     /**
-     * Persists any staff-made changes to a Moment and sets it in the published state
+     * Persists any staff-made changes to a Moment and sets it in the published state;
+     * also provides the option to delete the comment thread if one existed.
      *
      * @api   PUT /learning/evidence/{id}/publish
      * @param Model $evidence
@@ -100,6 +101,7 @@ class Controller extends Base
      *
      * @param Model $evidence
      * @return void
+     * @throws Exception
      * @throws MapperException
      * @throws RouteNotFound
      */
