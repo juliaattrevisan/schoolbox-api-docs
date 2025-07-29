@@ -611,6 +611,22 @@ class Controller extends Base
 
 
     /**
+     * Craft a new learning moment directly into the Published state, skipping the Submitted state.
+     * This is almost a direct replica of postMomentForUsers() - it just sets a state on the new
+     * instance rather than assume a Submitted state.
+     *
+     * @api   POST /learning/evidence/{id}/publish
+     * @param Collection $users
+     * @return void
+     * @throws MapperException
+     */
+    public function postPublish(Collection $users): void
+    {
+        $this->postMomentForUsers($users, Model::STATUS_PUBLISHED);
+    }
+
+
+    /**
      * Its express purpose is to put the existing $evidence into Published along with any alterations
      * to its content such as body, tags, curric nodes, etc.
      *

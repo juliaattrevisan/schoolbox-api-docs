@@ -149,6 +149,7 @@
             {% if USER.role.isStudent %}
                 {% if moderationRequired and (evidence.isDraft or evidence.isRejected) %}
                     <button id="submit">Submit for approval</button>
+
                     {% if isCreate %}
                         <script>
                             $(function() {
@@ -178,7 +179,42 @@
                             });
                         </script>
                     {% endif %}
+                {% else %}
+                    <button id="submit">Publish</button>
+
+                    {% if isCreate %}
+                        <script>
+                            $(function() {
+                                $('#submit').on('click', function(event) {
+                                    event.preventDefault();
+
+                                    let route = '{{ routeLookupIfAuthorized('learningMomentEvidence.postPublish', {userIds: userIds|join(',')}) }}';
+
+                                    $('#evidence-form').attr('action', route);
+
+                                    $('#evidence-persist').trigger('click');
+                                });
+                            });
+                        </script>
+                    {% else %}
+                        <script>
+                            $(function() {
+                                $('#submit').on('click', function(event) {
+                                    event.preventDefault();
+
+                                    let route = '{{ routeLookupIfAuthorized('learningMomentEvidence.putPublish', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) }}';
+
+                                    $('#evidence-form').attr('action', route);
+
+                                    $('#evidence-persist').trigger('click');
+                                });
+                            });
+                        </script>
+                    {% endif %}
                 {% endif %}
+
+
+
             {% elseif USER.role.isStaff and USER.role.accessEvidence %}
                 {# Used to decide if comments should be deleted upon publish #}
                 <input type="hidden" name="delete-comments" id="delete-comments" value="0" />

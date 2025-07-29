@@ -174,6 +174,18 @@ class Module extends BaseModule
             Closure::fromCallable([$this, 'preloadEvidence']),
         );
 
+        /* Create a whole new evidence instance in the Published state, from nothing previously
+         * This is when students are not moderated and spawn a new learning moment directly into
+         * the world, skipping the whole moderation workflow.
+         */
+        $this->register(
+            self::METHOD_POST,
+            '/user/{userIds}/publish',
+            'postPublish',
+            $viewCreateFormRule,
+            $viewCreateFormPreloader
+        );
+
         /* Create a whole new evidence instance in the Draft state, from nothing previously
          * This seems unique to the Class List "Share a Learning Moment"
          */
