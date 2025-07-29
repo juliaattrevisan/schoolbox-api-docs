@@ -29,28 +29,24 @@ const props = defineProps<Props>();
             </template>
             <template v-else-if="header.type == TableHeaderType.RECORDS_AND_POINTS">
                 <!-- Change data based on current radio button selection -->
-                <Transition name="fade" mode="out-in">
-                    <span :key="`${props.recordsOrPoints}-${header.key}`">
-                        <!-- Only show records if they're above 0 -->
-                        <template
-                            v-if="
-                                props.recordsOrPoints === 'records' &&
-                                (props.rowData[header.key] as RecordsAndPoints)?.records! > 0
-                            "
-                        >
-                            {{ (props.rowData[header.key] as RecordsAndPoints).records }}
-                        </template>
-                        <!-- Only show if points exist -->
-                        <template
-                            v-else-if="
-                                props.recordsOrPoints === 'points' &&
-                                (props.rowData[header.key] as RecordsAndPoints)?.points! !== null
-                            "
-                        >
-                            {{ (props.rowData[header.key] as RecordsAndPoints).points }}
-                        </template>
-                    </span>
-                </Transition>
+                <!-- Only show records if they're above 0 -->
+                <template
+                    v-if="
+                        props.recordsOrPoints === 'records' &&
+                        (props.rowData[header.key] as RecordsAndPoints)?.records! > 0
+                    "
+                >
+                    {{ (props.rowData[header.key] as RecordsAndPoints).records }}
+                </template>
+                <!-- Only show if points exist -->
+                <template
+                    v-else-if="
+                        props.recordsOrPoints === 'points' &&
+                        (props.rowData[header.key] as RecordsAndPoints)?.points! !== null
+                    "
+                >
+                    {{ (props.rowData[header.key] as RecordsAndPoints).points }}
+                </template>
             </template>
             <template v-else>
                 {{ props.rowData[header.key] }}
