@@ -9,6 +9,9 @@ use Schoolbox\Pastoral\Type\Model as Type;
 
 class StudentByType extends Cursor implements TabTypeInterface
 {
+    public const COLUMN_KEY_FORMAT = "count_%s_%d";
+    public const COLUMN_KEY_REGEX = "/count_(?<type>\w+)_(?<id>\d+)/";
+
     private array $params = [];
 
     private ?Collection $typeSubTypeKeys = null;
@@ -25,7 +28,7 @@ class StudentByType extends Cursor implements TabTypeInterface
         $typeKey = ($type instanceof Type) ? 'type' : 'subtype';
         $value = $type->getId();
 
-        $label = "count_{$typeKey}_{$value}";
+        $label = sprintf(self::COLUMN_KEY_FORMAT, $typeKey, $value);
         $this->params[$label] = $label;
 
         return match (strtolower($resultType)) {
@@ -41,8 +44,8 @@ class StudentByType extends Cursor implements TabTypeInterface
     {
         if (null === $this->typeSubTypeKeys) {
             $this->typeSubTypeKeys = new Collection(array_filter(array_merge(
-                $this->helper->getType()->map(fn(Type $type) => "count_type_{$type->getId()}")->getAll(),
-                $this->helper->getSubTypes()->map(fn(SubType $subtype) => "count_subtype_{$subtype->getId()}")->getAll()
+                $this->helper->getType()->map(fn(Type $type) => sprintf(self::COLUMN_KEY_FORMAT, 'type', $type->getId()))->getAll(),
+                $this->helper->getSubTypes()->map(fn(SubType $subtype) => sprintf(self::COLUMN_KEY_FORMAT, 'subtype', $subtype->getId()))->getAll()
             )));
         }
 
@@ -64,8 +67,8 @@ class StudentByType extends Cursor implements TabTypeInterface
             /* Double-checking that the key is valid column for sorting
              */
             if (
-                in_array($this->sortBy, $this->helper->getType()->map(fn(Type $type) => "count_type_" . $type->getId())->getAll()) ||
-                in_array($this->sortBy, $this->helper->getSubTypes()->map(fn(SubType $subtype) => "count_subtype_" . $subtype->getId())->getAll())
+                in_array($this->sortBy, $this->helper->getType()->map(fn(Type $type) => sprintf(self::COLUMN_KEY_FORMAT, 'type', $type->getId()))->getAll()) ||
+                in_array($this->sortBy, $this->helper->getSubTypes()->map(fn(SubType $subtype) => sprintf(self::COLUMN_KEY_FORMAT, 'subtype', $subtype->getId()))->getAll())
             ) {
                 return "{$this->sortBy} {$this->order}";
             }
@@ -147,23 +150,23 @@ class StudentByType extends Cursor implements TabTypeInterface
         $typeKeys = implode(
             ' + ',
             $whereTypes->map(
-                fn(Type $type) => "COALESCE(count_type_{$type->getId()}, 0)"
+                fn(Type $type) => sprintf("COALESCE(" . self::COLUMN_KEY_FORMAT . ", 0)", 'type', $type->getId())
             )->getAll()
         );
 
         $subTypeKeys = implode(
             ' + ',
             $this->helper->getSubTypes()->map(
-                fn(SubType $subType) => "COALESCE(count_subtype_{$subType->getId()}, 0)"
+                fn(SubType $subType) => sprintf("COALESCE(" . self::COLUMN_KEY_FORMAT . ", 0)", 'subtype', $subType->getId())
             )->getAll()
         );
 
         $typeNullValueCheck = $this->helper->getType()->map(
-            fn(Type $type) => "count_type_{$type->getId()} IS NULL"
+            fn(Type $type) => sprintf(self::COLUMN_KEY_FORMAT . " IS NULL", 'type', $type->getId())
         )->getAll();
 
         $subTypeNullValueCheck = $this->helper->getSubTypes()->map(
-            fn(SubType $subType) => "count_subtype_{$subType->getId()} IS NULL"
+            fn(SubType $subType) => sprintf(self::COLUMN_KEY_FORMAT . " IS NULL", 'subtype', $subType->getId())
         )->getAll();
 
         $totalCount = "CASE WHEN ";
@@ -314,7 +317,7 @@ class StudentByType extends Cursor implements TabTypeInterface
 
         foreach ($this->helper->getType() as $type) {
             $tableHeaders[] = [
-                'key' => "count_type_{$type->getId()}",
+                'key' => sprintf(self::COLUMN_KEY_FORMAT, 'type', $type->getId()),
                 'title' => $type->getName(),
                 'type' => 'RecordsAndPoints',
                 'isSortable' => true,
@@ -324,7 +327,7 @@ class StudentByType extends Cursor implements TabTypeInterface
         foreach ($this->helper->getSubTypes() as $subType) {
             if ($subType instanceof SubType) {
                 $tableHeaders[] = [
-                    'key'   => "count_subtype_{$subType->getId()}",
+                    'key'   => sprintf(self::COLUMN_KEY_FORMAT, 'subtype', $subType->getId()),
                     'title' => $subType->getPastoralType()->getName(),
                     'subTitle' => $subType->getName(),
                     'type' => 'RecordsAndPoints',

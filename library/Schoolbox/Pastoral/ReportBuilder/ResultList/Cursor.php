@@ -8,7 +8,9 @@ use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as PastoralModel;
+use Schoolbox\Pastoral\ReportBuilder\Factory;
 use Schoolbox\Pastoral\ReportBuilder\Helper;
+use Schoolbox\Pastoral\ReportBuilder\TabType\StudentByType;
 use ValueError;
 
 class Cursor implements ICursor
@@ -102,8 +104,9 @@ class Cursor implements ICursor
         }
 
         if (null !== $this->columnKey) {
-            $where[] = "p.subtype_id = :column_id";
-            $param['column_id'] = $this->columnKey;
+            $match = $this->getColumnKeyByTabType();
+            $where[] = "p.{$match['type']}_id = :column_id";
+            $param['column_id'] = $match['id'];
         }
 
         return [
@@ -185,5 +188,19 @@ class Cursor implements ICursor
         $results = $this->pastoralMapper->findByColumn('id', $pastoralIds)->reindex();
 
         return $results;
+    }
+
+    /**
+     * @return array
+     */
+    private function getColumnKeyByTabType(): array
+    {
+        switch ($this->tabType) {
+            case Factory::STUDENT_BY_TYPE:
+                preg_match(StudentByType::COLUMN_KEY_REGEX, $this->columnKey, $matches);
+                return $matches;
+            default:
+                throw new ValueError(sprintf('Unknown tab type: %s', $this->tabType));
+        }
     }
 }
