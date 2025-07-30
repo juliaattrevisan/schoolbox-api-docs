@@ -46,7 +46,7 @@ export function useLoadPrTable(endpoint: Ref<string>): {
             }
             loadError.value = null;
             controller = new AbortController();
-            const response = await apiRequest<TablePayload, FormData>({
+            const response = await apiRequest<TablePayload>({
                 url: endpoint.value,
                 method: "GET",
                 signal: controller.signal,
@@ -67,7 +67,9 @@ export function useLoadPrTable(endpoint: Ref<string>): {
             }
             if (error instanceof Error && hasErrorMessage(error)) {
                 loadError.value = error.message;
+                return;
             }
+            loadError.value = "An unexpected error occurred while loading the data.";
             console.error(error);
         } finally {
             if (isNewLoad.value) {
