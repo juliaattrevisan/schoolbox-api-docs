@@ -5,7 +5,7 @@
 import type { Ref } from "vue";
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
 import { isNewUrl } from "@js/util/queryUtils";
-import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
+import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { TablePayload } from "../../js/types/pastoralReportTypes";
 
 /**
@@ -46,20 +46,17 @@ export function useLoadPrTable(endpoint: Ref<string>): {
             }
             loadError.value = null;
             controller = new AbortController();
-            const response = await fetch(endpoint.value, {
+            const response = await apiRequest<TablePayload, FormData>({
+                url: endpoint.value,
                 method: "GET",
                 signal: controller.signal,
-                headers: {
-                    "Content-Type": "application/json",
-                },
             });
-            if (!response.ok) {
-                const errorMessage = await extractErrorMessage(response);
-                throw new Error(errorMessage);
+            if (!response.success) {
+                throw new Error(response.message || "Failed to load data");
             }
-            const newPayload = (await response.json()) as TablePayload;
+            const newPayload = response.data;
             // check if the response does not have the expected structure
-            if (newPayload === null || newPayload.data === undefined || !Array.isArray(newPayload.data.tableHeaders)) {
+            if (!Array.isArray(newPayload.data.tableHeaders)) {
                 throw new Error("Unexpected response format");
             }
             payload.value = newPayload;
