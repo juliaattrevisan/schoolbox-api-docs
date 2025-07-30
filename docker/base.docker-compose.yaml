@@ -281,7 +281,6 @@ volumes:
       o: bind
       device: ./caddy/config
 
-
   caddy-ssl:
     driver: local
     driver_opts:
