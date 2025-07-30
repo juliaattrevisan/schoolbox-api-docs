@@ -79,7 +79,7 @@ test.describe("Due Work - Mark type tests", () => {
         await assessmentForm.toggleRubricIndicator(0, 420);
         await assessmentForm.fillRubricCriterionPoints(0, 420, 0, "1");
         await assessmentForm.fillRubricCriterionPoints(0, 420, 1, "2");
-        await assessmentForm.create(true);
+        await assessmentForm.create();
 
         // Now back on the course modify page, import the unit into the homepage
         tester.isGoingTo("import the new unit into 9A English");
@@ -132,7 +132,7 @@ test.describe("Due Work - Mark type tests", () => {
         await assessmentForm.toggleRubricIndicator(0, 446);
         await assessmentForm.fillRubricCriterionPoints(0, 446, 0, "1");
         await assessmentForm.fillRubricCriterionPoints(0, 446, 1, "2");
-        await assessmentForm.create();
+        await assessmentForm.create(true);
     });
 
     /**
