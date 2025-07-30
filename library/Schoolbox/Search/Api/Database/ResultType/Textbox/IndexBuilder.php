@@ -343,7 +343,7 @@ class IndexBuilder extends BaseBuilder
                     ]);
                     $componentExistsCache[$textboxId] = $componentExistsQuery->fetchColumnArray('component_instance_id');
                 }
-                if ($componentId === '') {
+                if ($componentId === null) {
                     // This index has no component:
                     // remove it if any components exist for this textbox
                     if (!empty($componentExistsCache[$textboxId])) {

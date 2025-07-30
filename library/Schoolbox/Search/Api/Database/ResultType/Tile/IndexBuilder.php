@@ -263,7 +263,7 @@ class IndexBuilder extends BaseBuilder
                         $componentExistsQuery->fetchColumnArray('component_instance_id')
                     );
                 }
-                if ($componentId === '') {
+                if ($componentId === null) {
                     // This index has no component.  Remove it if any components exist for this tile.
                     if (!empty($componentExistsCache[$tileId])) {
                         $this->logger->debug(
