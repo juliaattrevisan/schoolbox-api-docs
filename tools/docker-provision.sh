@@ -10,6 +10,7 @@ declare AWS_ROLE_NAME
 declare AWS_START_URL
 declare DATA_SOURCE
 declare DATA_FILENAME
+declare CERTIFICATE_SOURCE
 declare EXTERNAL_DB
 declare EXTERNAL_DB_HOST
 declare EXTERNAL_DB_DB
@@ -19,6 +20,7 @@ declare ARTIFACT_SOURCE
 declare REQUIRED_CONFIGS=(\
   AWS_ACCOUNT_ID AWS_ROLE_NAME AWS_START_URL \
   DATA_SOURCE DATA_FILENAME \
+  CERTIFICATE_SOURCE \
   EXTERNAL_DB EXTERNAL_DB_HOST EXTERNAL_DB_DB \
   INSTANCE_REGISTRY_URL \
   DEFAULT_INSTANCE_ID \
@@ -143,20 +145,19 @@ function download_secrets() {
 }
 
 function download_certs() {
-# Download wildcard cert
-    filename='tls-wildcard.dev.schoolbox.cloud.tar.gz'
+    log "Retrieving latest wildcard certificate";
+    local filename='tls-wildcard.dev.schoolbox.cloud.tar.gz'
 
-    if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "https://s3-ap-southeast-2.amazonaws.com/schoolbox-cloud-tls" \
+    if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "${CERTIFICATE_SOURCE}" \
       --file-name "certs/$filename" \
       --cache-dir "$CACHE_DIR"; then
-      echo "Unable to download wildcard certificate" >&2
+      error "Unable to download wildcard certificate: exiting"
       exit 1
     fi
-    tar xzfO "$CACHE_DIR/$filename" dev.schoolbox.cloud/fullchain.pem >/etc/nginx/certs/schoolbox-docker-fullchain.crt
-    tar xzfO "$CACHE_DIR/$filename" dev.schoolbox.cloud/privkey.pem >/etc/nginx/certs/schoolbox-docker-private.key
-    tar xzfO "$CACHE_DIR/$filename" dev.schoolbox.cloud/chain.pem >/etc/nginx/certs/schoolbox-docker-intermediate.crt
+    tar xzfO "$CACHE_DIR/$filename" dev.schoolbox.cloud/fullchain.pem > /etc/nginx/certs/schoolbox-docker-fullchain.crt
+    tar xzfO "$CACHE_DIR/$filename" dev.schoolbox.cloud/privkey.pem > /etc/nginx/certs/schoolbox-docker-private.key
+    tar xzfO "$CACHE_DIR/$filename" dev.schoolbox.cloud/chain.pem > /etc/nginx/certs/schoolbox-docker-intermediate.crt
 }
-
 
 function mark_safe_for_git() {
   log "Adding Schoolbox dir ${SITE_ROOT} as safe for Git";
