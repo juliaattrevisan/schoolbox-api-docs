@@ -26,6 +26,7 @@ use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\TokenReplacer;
 use Schoolbox\User;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 /**
  * Controller for learning moments.
@@ -45,15 +46,23 @@ class Controller extends Base
 
 
     /**
+     * Helper for editor templates.
+     */
+    private EditorTemplateHelper $editorTemplateHelper;
+
+
+    /**
      * Constructor
      *
      * @param Mapper         $mapper
      * @param Comment\Mapper $commentMapper
+     * @param EditorTemplateHelper    $editorTemplateHelper
      */
-    public function __construct(Mapper $mapper, Comment\Mapper $commentMapper)
+    public function __construct(Mapper $mapper, Comment\Mapper $commentMapper, EditorTemplateHelper $editorTemplateHelper)
     {
         $this->mapper        = $mapper;
         $this->commentMapper = $commentMapper;
+        $this->editorTemplateHelper = $editorTemplateHelper;
     }
 
 
@@ -126,7 +135,8 @@ class Controller extends Base
             'moderationRequired'       => $moderationRequired,
             'isCreate'                 => true,
             'momentType'               => $momentType,
-            'zone'                     => $this->buildAttachzone($momentType)->getTwigContext()
+            'zone'                     => $this->buildAttachzone($momentType)->getTwigContext(),
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ];
 
         $this->response = $this->responseFromTemplate($template, $params);
@@ -168,15 +178,15 @@ class Controller extends Base
     }
 
 
-//    /**
-//     * Retrieve a JSON representation of a single learning moment.
-//     *
-//     * @api   GET /learning/evidence/{id}
-//     * @since 20.2
-//     */
-//    public function getMoment(): void
-//    {
-//    }
+    //    /**
+    //     * Retrieve a JSON representation of a single learning moment.
+    //     *
+    //     * @api   GET /learning/evidence/{id}
+    //     * @since 20.2
+    //     */
+    //    public function getMoment(): void
+    //    {
+    //    }
 
 
     /**
@@ -215,34 +225,32 @@ class Controller extends Base
      * @api   POST /learning/evidence/
      * @since 20.2
      */
-    public function postMoments(): void
-    {
-    }
+    public function postMoments(): void {}
 
 
-//    /**
-//     * Post a JSON representation of a learning moment for a user.
-//     *
-//     * @api   POST /learning/evidence/user/{userId}
-//     * @since 20.2
-//     *
-//     * @param User $user
-//     */
-//    public function postMomentForUser(User $user): void
-//    {
-//        $model = $this->mapper->createModel();
-//        /** @var \stdClass $requestBody */
-//        $requestBody = $this->request->content->get();
-//        $model
-//            ->setBody($requestBody->body)
-//            ->setRecipient($user)
-//            ->setCreator($this->getUser());
-//        $this->mapper->save($model);
-//        $requestBody->id = $model->getId();
-//        $this->response->content->set(
-//            $this->buildJsonOutput($requestBody)
-//        );
-//    }
+    //    /**
+    //     * Post a JSON representation of a learning moment for a user.
+    //     *
+    //     * @api   POST /learning/evidence/user/{userId}
+    //     * @since 20.2
+    //     *
+    //     * @param User $user
+    //     */
+    //    public function postMomentForUser(User $user): void
+    //    {
+    //        $model = $this->mapper->createModel();
+    //        /** @var \stdClass $requestBody */
+    //        $requestBody = $this->request->content->get();
+    //        $model
+    //            ->setBody($requestBody->body)
+    //            ->setRecipient($user)
+    //            ->setCreator($this->getUser());
+    //        $this->mapper->save($model);
+    //        $requestBody->id = $model->getId();
+    //        $this->response->content->set(
+    //            $this->buildJsonOutput($requestBody)
+    //        );
+    //    }
 
 
     /**
@@ -437,33 +445,33 @@ class Controller extends Base
     {
         $zone = new GenericZone('storage', StorageMapper::getInstance());
         $zone->setAttachmentsLabel('')
-             ->setAttachPrompt('upload files to this location')
-             ->setMimeFilter('*/*')
-             ->setFileVar('file')
-             ->setMulti(false)
-             ->setThumbnailSize(64)
-             ->setModalTitle('Select file');
+            ->setAttachPrompt('upload files to this location')
+            ->setMimeFilter('*/*')
+            ->setFileVar('file')
+            ->setMulti(false)
+            ->setThumbnailSize(64)
+            ->setModalTitle('Select file');
         switch ($momentType) {
             case Model::MOMENT_TYPE_PHOTO:
                 $zone->setAttachPrompt('take a picture')
-                     ->setIconClass('icon-camera')
-                     ->setUseModal(false)
-                     ->setCapture(true)
-                     ->setMimeFilter('image/*');
+                    ->setIconClass('icon-camera')
+                    ->setUseModal(false)
+                    ->setCapture(true)
+                    ->setMimeFilter('image/*');
                 break;
             case Model::MOMENT_TYPE_AUDIO:
                 $zone->setAttachPrompt('record audio')
-                     ->setIconClass('icon-audio')
-                     ->setUseModal(false)
-                     ->setCapture(true)
-                     ->setMimeFilter('audio/*');
+                    ->setIconClass('icon-audio')
+                    ->setUseModal(false)
+                    ->setCapture(true)
+                    ->setMimeFilter('audio/*');
                 break;
             case Model::MOMENT_TYPE_VIDEO:
                 $zone->setAttachPrompt('record video')
-                     ->setIconClass('icon-video')
-                     ->setUseModal(false)
-                     ->setCapture(true)
-                     ->setMimeFilter('video/*');
+                    ->setIconClass('icon-video')
+                    ->setUseModal(false)
+                    ->setCapture(true)
+                    ->setMimeFilter('video/*');
                 break;
             case Model::MOMENT_TYPE_UPLOAD:
             case Model::MOMENT_TYPE_TEXT:
