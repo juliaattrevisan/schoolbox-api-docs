@@ -24,6 +24,8 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App {
      *
      * Null values are not used in Docker's provision process, and are thus not
      * mapped.
+     *
+     * @var array<string, ?string>
      */
     private const KEY_MAPPING = [
         'vagrant_box'                    => null,
@@ -85,13 +87,13 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App {
         foreach ($yaml as $oldKey => $value) {
             $log->debug(sprintf('Key "%s" found in vagrant.yaml', $oldKey));
 
-            if (!isset(self::KEY_MAPPING[$oldKey])) {
+            if (!array_key_exists($oldKey, self::KEY_MAPPING)) {
                 $log->debug('.. not found in key mapping: skipping');
                 continue;
             }
 
             $newKey = self::KEY_MAPPING[$oldKey];
-            if (!$newKey !== null) {
+            if (!isset($newKey)) {
                 $log->debug('.. does not map to any key in Docker env: skipping');
                 continue;
             }
