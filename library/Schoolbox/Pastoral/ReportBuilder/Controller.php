@@ -486,7 +486,32 @@ class Controller extends Base
 
     public function getReportByTabTypeScope(string $tabType, PastoralReport $report): void
     {
-        $this->response = $this->responseAsJson([]);
+        $cursor = new \Schoolbox\Pastoral\ReportBuilder\ResultList\Cursor(
+            new Helper(
+                $this->prepareReportData($report),
+                $this->pastoralMapper,
+                $this->getConfigLoader(),
+            ),
+            $this->pastoralMapper
+        );
+
+        $result = $cursor->retrieveResults(null);
+
+        $this->response = $this->responseAsJson(
+            [
+                'data' => [
+                    'results' => $result->map($this->pastoralTranslator),
+                ],
+                'metadata' => [
+                    'count' => $cursor->retrieveResultCount(),
+                    'cursor' => [
+                        'current' => $cursor->current($result),
+                        'next' => $cursor->next($result) ?? null
+                    ]
+                ]
+
+            ]
+        );
     }
 
     /**
