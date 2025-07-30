@@ -31,6 +31,9 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\RoleMapper;
 use Schoolbox\UserMapper;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
+use Schoolbox\Editor\Templates\Mapper as EditorTemplateMapper;
+use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
 
 /**
  * Class Module
@@ -120,7 +123,12 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(Attendance\Mapper::class),
             $this->getMapperFactory()->get(Access::class), // Not a mapper, but has getInstance, so does work.
-            new Validator(new \Alaress_Date_Locale_Config())
+            new Validator(new \Alaress_Date_Locale_Config()),
+            new EditorTemplateHelper(
+                $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                EditorTemplatesCategoryModel::CALENDAR_EVENTS,
+                $this->injector->get('user')
+            ),
         );
     }
 
