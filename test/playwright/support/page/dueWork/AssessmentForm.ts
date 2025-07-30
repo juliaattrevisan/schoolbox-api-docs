@@ -144,7 +144,7 @@ export default class AssessmentForm {
     /**
      * Submits this form to create a duework
      * Verifies that the homepage is visible after submission
-     * @param hasParticipationPrompt - Whether the participation prompt is expected to be shown
+     * @param hasParticipationPrompt - Whether the participation prompt is expected to be shown (should be when creating a new class/project duework/task)
      * @param toParticipation - Whether to navigate to the participation page
      */
     async create(hasParticipationPrompt: boolean = false, toParticipation: boolean = false): Promise<void> {
