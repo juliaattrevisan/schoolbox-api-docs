@@ -58,6 +58,10 @@ interface ApiRequestOptions<TBody extends ApiRequestBodyBase | undefined = undef
      * For a GET request, this is transformed into query parameters where possible
      */
     body?: TBody;
+    /**
+     * Optional signal to abort the request
+     */
+    signal?: AbortSignal;
 }
 
 export type SseMessageCallback<TMessageData> = (data: ApiBaseResponse<TMessageData>) => void;
@@ -101,6 +105,7 @@ async function buildRequest(
             "Content-Type": "application/json",
             Accept: acceptHeader,
         },
+        signal: options.signal,
     };
 
     if (options.body instanceof FormData) {
