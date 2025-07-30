@@ -214,7 +214,7 @@ export default class AssessmentForm {
     async enableDualMarkTypes(): Promise<void> {
         const dualMarkTypesSwitch = this.page.getByTestId(AssessmentForm.DATA_TEST_DUAL_MARK_TYPES);
         await expect(dualMarkTypesSwitch).not.toBeChecked();
-        await dualMarkTypesSwitch.click();
+        await dualMarkTypesSwitch.check();
     }
 
     /**
@@ -223,7 +223,7 @@ export default class AssessmentForm {
     async disableDualMarkTypes(): Promise<void> {
         const dualMarkTypesSwitch = this.page.getByTestId(AssessmentForm.DATA_TEST_DUAL_MARK_TYPES);
         await expect(dualMarkTypesSwitch).toBeChecked();
-        await dualMarkTypesSwitch.click();
+        await dualMarkTypesSwitch.uncheck();
     }
 
     /**
