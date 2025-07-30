@@ -148,13 +148,13 @@ function download_certs() {
 
     if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "https://s3-ap-southeast-2.amazonaws.com/schoolbox-cloud-tls" \
       --file-name "certs/$filename" \
-      --cache-dir "$cachedir"; then
+      --cache-dir "$CACHE_DIR"; then
       echo "Unable to download wildcard certificate" >&2
       exit 1
     fi
-    tar xzfO $cachedir/$filename dev.schoolbox.cloud/fullchain.pem >/etc/nginx/certs/schoolbox-docker-fullchain.crt
-    tar xzfO $cachedir/$filename dev.schoolbox.cloud/privkey.pem >/etc/nginx/certs/schoolbox-docker-private.key
-    tar xzfO $cachedir/$filename dev.schoolbox.cloud/chain.pem >/etc/nginx/certs/schoolbox-docker-intermediate.crt
+    tar xzfO "$CACHE_DIR/$filename" dev.schoolbox.cloud/fullchain.pem >/etc/nginx/certs/schoolbox-docker-fullchain.crt
+    tar xzfO "$CACHE_DIR/$filename" dev.schoolbox.cloud/privkey.pem >/etc/nginx/certs/schoolbox-docker-private.key
+    tar xzfO "$CACHE_DIR/$filename" dev.schoolbox.cloud/chain.pem >/etc/nginx/certs/schoolbox-docker-intermediate.crt
 }
 
 
