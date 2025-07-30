@@ -484,6 +484,13 @@ class Controller extends Base
         }
     }
 
+    /**
+     * Get the report list and able to filter down to specific cells
+     *
+     * @param string         $tabType
+     * @param PastoralReport $report
+     * @return void
+     */
     public function getReportByTabTypeScope(string $tabType, PastoralReport $report): void
     {
         try {
