@@ -486,32 +486,51 @@ class Controller extends Base
 
     public function getReportByTabTypeScope(string $tabType, PastoralReport $report): void
     {
-        $cursor = new \Schoolbox\Pastoral\ReportBuilder\ResultList\Cursor(
-            new Helper(
-                $this->prepareReportData($report),
+        try {
+            $encodedCursor = $this->requestQuery->get('cursor');
+            $columnKey     = $this->requestQuery->get('column');
+            $rowKey        = $this->requestQuery->get('row');
+            $limit         = $this->requestQuery->getInt('limit', Cursor::LIMIT_DEFAULT);
+
+            $cursor = new \Schoolbox\Pastoral\ReportBuilder\ResultList\Cursor(
+                new Helper(
+                    $this->prepareReportData($report),
+                    $this->pastoralMapper,
+                    $this->getConfigLoader(),
+                ),
                 $this->pastoralMapper,
-                $this->getConfigLoader(),
-            ),
-            $this->pastoralMapper
-        );
+                $tabType,
+                $columnKey,
+                $rowKey,
+                $limit,
+            );
 
-        $result = $cursor->retrieveResults(null);
+            $result = $cursor->retrieveResults($encodedCursor);
 
-        $this->response = $this->responseAsJson(
-            [
-                'data' => [
-                    'results' => $result->map($this->pastoralTranslator),
-                ],
-                'metadata' => [
-                    'count' => $cursor->retrieveResultCount(),
-                    'cursor' => [
-                        'current' => $cursor->current($result),
-                        'next' => $cursor->next($result) ?? null
+            $this->response = $this->responseAsJson(
+                [
+                    'data'     => [
+                        'results' => $result->map($this->pastoralTranslator),
+                    ],
+                    'metadata' => [
+                        'count'  => $cursor->retrieveResultCount(),
+                        'cursor' => [
+                            'current' => $cursor->current($result),
+                            'next'    => $cursor->next($result) ?? null
+                        ]
                     ]
-                ]
 
-            ]
-        );
+                ]
+            );
+        } catch (\PDOException | DatabaseException $e) {
+            $problem = (new ApiProblem('Something has gone wrong, please contact your support if the problem persists'))
+                ->setStatus(500);
+            $this->response = $this->responseAsJson($problem->asArray());
+        } catch (\Exception | \ValueError $e) {
+            $problem = new ApiProblem($e->getMessage());
+            $problem->setStatus($e->getCode());
+            $this->response = $this->responseAsJson($problem->asArray());
+        }
     }
 
     /**
