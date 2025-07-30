@@ -91,7 +91,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App {
             }
 
             $newKey = self::KEY_MAPPING[$oldKey];
-            if (!isset($newKey)) {
+            if (!$newKey !== null) {
                 $log->debug('.. does not map to any key in Docker env: skipping');
                 continue;
             }
@@ -113,7 +113,6 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App {
                 $newKey,
                 is_string($value) ? escapeshellarg($value) : (string)$value,
             );
-
         }
         echo implode(PHP_EOL, $output) . PHP_EOL;
         exit(CliKernelAbstract::EXIT_STATUS_OK);
