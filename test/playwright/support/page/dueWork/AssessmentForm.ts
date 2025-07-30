@@ -70,6 +70,8 @@ export default class AssessmentForm {
 
     static readonly SELECTOR_CONFIRM_DIALOG_BUTTON_CONFIRM = "confirm-dialog-confirm-button";
 
+    static readonly SELECTOR_CONFIRM_DIALOG_BUTTON_CANCEL = "confirm-dialog-cancel-button";
+
     static readonly SELECTOR_HOMEPAGE_TABS = "homepage-tabs";
 
     static readonly DATA_TEST_MODIFY_PLANS = "sbx-pop-out-plan-options-button";
@@ -142,9 +144,21 @@ export default class AssessmentForm {
     /**
      * Submits this form to create a duework
      * Verifies that the homepage is visible after submission
+     * @param hasParticipationPrompt - Whether the participation prompt is expected to be shown
+     * @param toParticipation - Whether to navigate to the participation page
      */
-    async create(): Promise<void> {
+    async create(hasParticipationPrompt: boolean = false, toParticipation: boolean = false): Promise<void> {
         await this.page.getByTestId(AssessmentForm.SELECTOR_BUTTON_CREATE).click();
+
+        if (hasParticipationPrompt && toParticipation) {
+            // If the participation prompt is shown, and we wish to navigate to the participation page
+            const confirmDialogConfirm = this.page.getByTestId(AssessmentForm.SELECTOR_CONFIRM_DIALOG_BUTTON_CONFIRM);
+            await confirmDialogConfirm.click();
+        } else if (hasParticipationPrompt && !toParticipation) {
+            // Otherwise, if the participation prompt is shown but we wish to skip participation editing
+            const confirmDialogCancel = this.page.getByTestId(AssessmentForm.SELECTOR_CONFIRM_DIALOG_BUTTON_CANCEL);
+            await confirmDialogCancel.click();
+        }
 
         const homepageTabs = this.page.getByTestId(AssessmentForm.SELECTOR_HOMEPAGE_TABS);
         const courseModifyPage = this.page.locator("h1").filter({ hasText: "Modify Course" });
