@@ -1,31 +1,60 @@
+<div class="small-12 island">
+    <section class="content">
+        <div class="loader"></div>
+    </section>
+</div>
+
 <script type="text/javascript">
-    let url = "{{ url }}";
-
-    function displaySEBSecurityInfo () {
-        SafeExamBrowser.security.updateKeys(didUpdateSEBSecurityInfo);
+    /**
+     * Callback for when SEB's security information has been updated
+     * For some reason this MUST be global scope, otherwise SEB on iOS won't call it???
+     */
+    function onSEBLoaded() {
+        const pageConfigKey = SafeExamBrowser.security.configKey;
+        // const pageBrowserExamKey = SafeExamBrowser.security.browserExamKey;
+        // const sebClientVersion = SafeExamBrowser.version;
+        window.location.href = `{{ url }}${pageConfigKey}`;
     }
 
-    function didUpdateSEBSecurityInfo () {
-        var pageConfigKey = SafeExamBrowser.security.configKey;
-        // var pageBrowserExamKey = SafeExamBrowser.security.browserExamKey;
-        // var sebClientVersion = SafeExamBrowser.version;
-        window.location.href = url + pageConfigKey;
-    }
+    (async () => {
+        /**
+         * @returns {boolean} Whether SEB is available or not
+         */
+        function isSEBAvailable() {
+            return typeof SafeExamBrowser !== 'undefined';
+        }
 
-    window.addEventListener(
-        'load',
-        function () {
-            window.setTimeout(
-                function () {
-                    if (typeof SafeExamBrowser !== 'undefined') {
-                        displaySEBSecurityInfo();
-                    } else {
-                        window.location.href = url;
+        /**
+         * SEB doesn't always immediately load on some devices (only seen on Windows so far)
+         * but it may become available after a short delay, so wait a bit before giving up
+         * @param {number} maxWait - Maximum time to wait for SEB to load
+         * @param {number} interval - Interval to check for SEB availability
+         * @returns {Promise<boolean>} whether SEB was found or not
+         */
+        async function waitForSEB(maxWait, interval) {
+            if (isSEBAvailable()) {
+                return true;
+            }
+
+            let remainingTime = maxWait;
+            return new Promise((resolve) => {
+                const checkInterval = setInterval(() => {
+                    if (!isSEBAvailable() && remainingTime > 0) {
+                        remainingTime -= interval;
+                        return;
                     }
-                },
-                1,
-            )
-        },
-    )
 
+                    clearInterval(checkInterval);
+                    resolve(isSEBAvailable());
+                }, interval);
+            });
+        }
+
+        const hasSEB = await waitForSEB(2000, 10);
+        if (hasSEB) {
+            SafeExamBrowser.security.updateKeys(onSEBLoaded);
+        } else {
+            window.location.href = "{{ url }}";
+        }
+    })();
 </script>
