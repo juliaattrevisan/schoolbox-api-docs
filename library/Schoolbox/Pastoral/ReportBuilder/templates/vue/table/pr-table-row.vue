@@ -9,12 +9,23 @@ import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { TableHeaderType } from "../../js/types/pastoralReportTypes";
 import type { TableHeader, RowOptions, RecordsAndPoints } from "../../js/types/pastoralReportTypes";
 
-type Props = {
+const props = defineProps<{
     headers: TableHeader[];
     rowData: { [key: string]: RowOptions };
     recordsOrPoints: "records" | "points";
-};
-const props = defineProps<Props>();
+}>();
+
+const emit = defineEmits<{
+    cellSelect: [key: TableHeader];
+}>();
+
+/**
+ * Handles the cell click
+ * @param header - the header of the cell that was clicked
+ */
+function onCellSelected(header: TableHeader): void {
+    emit("cellSelect", header);
+}
 
 /**
  * To cast the row data to a User type
@@ -65,23 +76,27 @@ function isUser(data: RowOptions): data is User {
             <template v-else-if="header.type == TableHeaderType.RECORDS_AND_POINTS">
                 <!-- Change data based on current radio button selection -->
                 <!-- Only show records if they're above 0 -->
-                <template
+                <button
                     v-if="
                         props.recordsOrPoints === 'records' &&
                         (props.rowData[header.key] as RecordsAndPoints)?.records! > 0
                     "
+                    class="f-always-show u-td-button"
+                    @click.prevent="onCellSelected(header)"
                 >
                     {{ (props.rowData[header.key] as RecordsAndPoints).records }}
-                </template>
+                </button>
                 <!-- Only show if points exist -->
-                <template
+                <button
                     v-else-if="
                         props.recordsOrPoints === 'points' &&
                         (props.rowData[header.key] as RecordsAndPoints)?.points! !== null
                     "
+                    class="f-always-show u-td-button"
+                    @click.prevent="onCellSelected(header)"
                 >
                     {{ (props.rowData[header.key] as RecordsAndPoints).points }}
-                </template>
+                </button>
             </template>
             <template v-else>
                 {{ props.rowData[header.key] }}
