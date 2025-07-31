@@ -23,6 +23,7 @@ import PrTableFooter from "./pr-table-footer.vue";
 import PrRecord from "../pr-record.vue";
 
 const props = defineProps<{
+    title: string;
     selectedTab: Tab;
     config: Config;
     routes: Routes;
@@ -232,19 +233,30 @@ window.Vue.onMounted(() => {
                 ><em>Further support info: {{ recordsLoadError }}</em></template
             >
         </div>
-        <template v-else>
-            <section v-for="record in recordsPayload?.data.results" :key="record.id">
-                <ul class="information-list threaded">
-                    <pr-record
-                        :record="record"
-                        :config="props.config"
-                        :routes="props.routes"
-                        :locale-pastoral="props.localePastoral"
-                        :show-severity="props.showSeverity"
-                        :severity-colors="props.severityColors"
-                    />
-                </ul>
-            </section>
+        <template v-else-if="selectedHeader !== null">
+            <div class="l-flex-col l-gap-m">
+                <div class="l-flex-col l-gap-s f-no-margins">
+                    <h2>{{ props.title }}</h2>
+                    <p class="meta">
+                        Type: {{ selectedHeader.title }}
+                        <template v-if="selectedHeader.subTitle"
+                            ><br />Sub-Type: {{ selectedHeader.subTitle }}</template
+                        >
+                    </p>
+                </div>
+                <section v-for="record in recordsPayload?.data.results" :key="record.id">
+                    <ul class="information-list threaded">
+                        <pr-record
+                            :record="record"
+                            :config="props.config"
+                            :routes="props.routes"
+                            :locale-pastoral="props.localePastoral"
+                            :show-severity="props.showSeverity"
+                            :severity-colors="props.severityColors"
+                        />
+                    </ul>
+                </section>
+            </div>
         </template>
     </basic-modal>
 </template>
