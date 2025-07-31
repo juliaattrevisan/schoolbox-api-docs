@@ -14,13 +14,14 @@ import type { RecordsPayload } from "../../js/types/pastoralReportTypes";
  */
 export function useLoadRecords(endpoint: Ref<string>): {
     isNewLoading: Ref<boolean>;
+    isMoreLoading: Ref<boolean>;
     payload: Ref<RecordsPayload | null>;
     isEmpty: Ref<boolean>;
     loadError: Ref<string | null>;
 } {
     const isNewLoad = window.Vue.ref(false); // to distinguish between loading a new results and loading more results of the same set
     const isNewLoading = window.Vue.ref(false); // to notify when a new results is being loaded
-    const isSameLoading = window.Vue.ref(false); // to notify when more of the same results is being loaded
+    const isMoreLoading = window.Vue.ref(false); // to notify when more of the same results is being loaded
     const payload = window.Vue.ref<RecordsPayload | null>(null); // to store the payload that matches the current query
     const isEmpty = window.Vue.computed(() => payload.value === null && !isNewLoading.value); // To show that no payload match the current report table
     const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the load
@@ -39,7 +40,7 @@ export function useLoadRecords(endpoint: Ref<string>): {
             if (isNewLoad.value) {
                 isNewLoading.value = true;
             } else {
-                isSameLoading.value = true;
+                isMoreLoading.value = true;
             }
             loadError.value = null;
             controller = new AbortController();
@@ -77,7 +78,7 @@ export function useLoadRecords(endpoint: Ref<string>): {
             if (isNewLoad.value) {
                 isNewLoading.value = false;
             } else {
-                isSameLoading.value = false;
+                isMoreLoading.value = false;
             }
         }
     }
@@ -121,7 +122,6 @@ export function useLoadRecords(endpoint: Ref<string>): {
      */
     window.Vue.watch(endpoint, (newEndpoint, oldEndpoint) => {
         if (endpoint.value !== "" && newEndpoint !== oldEndpoint) {
-            // Update isNewLoad based on whether parameters other than cursor changed
             isNewLoad.value = shouldLoadNew(oldEndpoint, newEndpoint);
             void load();
         }
@@ -129,6 +129,7 @@ export function useLoadRecords(endpoint: Ref<string>): {
 
     return {
         isNewLoading,
+        isMoreLoading,
         payload,
         isEmpty,
         loadError,

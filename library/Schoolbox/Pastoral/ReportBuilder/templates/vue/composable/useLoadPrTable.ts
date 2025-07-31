@@ -15,14 +15,14 @@ import type { TablePayload } from "../../js/types/pastoralReportTypes";
  */
 export function useLoadPrTable(endpoint: Ref<string>): {
     isNewLoading: Ref<boolean>;
-    isSameLoading: Ref<boolean>;
+    isMoreLoading: Ref<boolean>;
     payload: Ref<TablePayload | null>;
     isEmpty: Ref<boolean>;
     loadError: Ref<string | null>;
 } {
     const isNewLoad = window.Vue.ref(false); // to distinguish between loading a new table and loading data for the same table
     const isNewLoading = window.Vue.ref(false); // to notify when a new table is being loaded
-    const isSameLoading = window.Vue.ref(false); // to notify when the data linked to the same table is being loaded
+    const isMoreLoading = window.Vue.ref(false); // to notify when the data linked to the same table is being loaded
     const payload = window.Vue.ref<TablePayload | null>(null); // to store the payload that matches the current query
     const isEmpty = window.Vue.computed(() => payload.value === null && !isNewLoading.value); // To show that no payload match the current report table
     const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the load
@@ -33,7 +33,7 @@ export function useLoadPrTable(endpoint: Ref<string>): {
      */
     async function load(): Promise<void> {
         // abort the previous search if it's still running
-        if (isNewLoading.value || isSameLoading.value) {
+        if (isNewLoading.value || isMoreLoading.value) {
             controller.abort();
         }
         try {
@@ -42,7 +42,7 @@ export function useLoadPrTable(endpoint: Ref<string>): {
             if (isNewLoad.value) {
                 isNewLoading.value = true;
             } else {
-                isSameLoading.value = true;
+                isMoreLoading.value = true;
             }
             loadError.value = null;
             controller = new AbortController();
@@ -75,7 +75,7 @@ export function useLoadPrTable(endpoint: Ref<string>): {
             if (isNewLoad.value) {
                 isNewLoading.value = false;
             } else {
-                isSameLoading.value = false;
+                isMoreLoading.value = false;
             }
         }
     }
@@ -93,7 +93,7 @@ export function useLoadPrTable(endpoint: Ref<string>): {
 
     return {
         isNewLoading,
-        isSameLoading,
+        isMoreLoading,
         payload,
         isEmpty,
         loadError,

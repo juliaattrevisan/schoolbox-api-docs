@@ -36,7 +36,6 @@ const props = defineProps<{
 
 // #region scrollable height
 
-const scrollableEl = useTemplateRef<HTMLDivElement>("scrollableRef");
 const maxScrollableHeight = window.Vue.ref<string>(`${window.innerHeight - 200}px`); // 200px chosen to give breathing room for header and metadata
 
 /**
@@ -57,7 +56,7 @@ const viewLinkParams = new URLSearchParams();
 const LIMIT = 20; // the current set limit for the number of records to fetch at once
 const sortBy = window.Vue.ref<string>("user"); // the current sort by field - this should update when payload is loaded
 const order = window.Vue.ref<"ASC" | "DESC">("ASC"); // the current sort order
-const { isNewLoading, isSameLoading, payload, isEmpty, loadError } = useLoadPrTable(viewLink);
+const { isNewLoading, isMoreLoading, payload, isEmpty, loadError } = useLoadPrTable(viewLink);
 
 /**
  * Reset the table load by clearing the cursor and reloading the data
@@ -128,7 +127,8 @@ const selectedHeader = window.Vue.ref<TableHeader | null>(null);
 const scopeLink = window.Vue.ref("");
 const scopeLinkParams = new URLSearchParams();
 const {
-    isNewLoading: isLoadingRecords,
+    isNewLoading: isLoadingNewRecords,
+    isMoreLoading: isLoadingMoreRecords,
     payload: recordsPayload,
     loadError: recordsLoadError,
 } = useLoadRecords(scopeLink);
@@ -148,7 +148,9 @@ function onCellSelect(header: TableHeader): void {
  * To display more results when there's lots to display and the user has scrolled to the bottom
  */
 const modalResultsEl = useTemplateRef<HTMLDivElement>("modalResultsRef");
-const { arrivedState } = useScroll(modalResultsEl);
+const { arrivedState } = useScroll(modalResultsEl, {
+    offset: { bottom: 30 },
+});
 const { bottom } = toRefs(arrivedState);
 window.Vue.watch(bottom, (isAtBottom) => {
     if (isAtBottom && recordsPayload.value && recordsPayload.value.metadata.cursor.next !== null) {
@@ -209,7 +211,7 @@ window.Vue.onMounted(() => {
                     @sort="onSort"
                 />
                 <!-- Skeleton loading state when switching between records/rows and sorting -->
-                <tbody v-if="isSameLoading" class="skeleton">
+                <tbody v-if="isMoreLoading" class="skeleton">
                     <tr v-for="(row, index) in 5" :key="index">
                         <td colspan="100%"></td>
                     </tr>
@@ -242,7 +244,7 @@ window.Vue.onMounted(() => {
         </div>
     </template>
     <basic-modal v-model:is-open="isCellExpanded">
-        <div v-if="isLoadingRecords" class="loader"></div>
+        <div v-if="isLoadingNewRecords" class="loader"></div>
         <div v-else-if="recordsLoadError" class="alert-box alert f-no-margins">
             Sorry, there was an error during record retrieval. Please
             <a href="" title="refresh the page"> refresh the page </a>
@@ -275,6 +277,9 @@ window.Vue.onMounted(() => {
                             />
                         </ul>
                     </section>
+                    <div v-if="isLoadingMoreRecords" class="c-island l-pad-m">
+                        <div class="loader"></div>
+                    </div>
                 </div>
             </div>
         </template>
