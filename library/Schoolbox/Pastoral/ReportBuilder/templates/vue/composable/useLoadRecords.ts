@@ -83,11 +83,46 @@ export function useLoadRecords(endpoint: Ref<string>): {
     }
 
     /**
+     * Determines if this is a new load based on URL changes
+     * Returns true if anything other than the cursor parameter has changed
+     * @param oldUrl - the previous endpoint URL
+     * @param newUrl - the new endpoint URL
+     * @returns - true if this should be treated as a new load
+     */
+    function shouldLoadNew(oldUrl: string, newUrl: string): boolean {
+        try {
+            const oldUrlObj = new URL(oldUrl, window.location.origin);
+            const newUrlObj = new URL(newUrl, window.location.origin);
+
+            // If pathname or hash changed, definitely a new load
+            if (oldUrlObj.pathname !== newUrlObj.pathname || oldUrlObj.hash !== newUrlObj.hash) {
+                return true;
+            }
+
+            // Compare query parameters excluding cursor
+            const oldParams = new URLSearchParams(oldUrlObj.search);
+            const newParams = new URLSearchParams(newUrlObj.search);
+
+            // Remove cursor parameter from both for comparison
+            oldParams.delete("cursor");
+            newParams.delete("cursor");
+
+            // If the remaining parameters are different, it's a new load
+            return oldParams.toString() !== newParams.toString();
+        } catch (error) {
+            // If URL parsing fails, be safe and treat as new load
+            return true;
+        }
+    }
+
+    /**
      * when the endpoint to trigger load changes provided the endpoint is not empty
      * and the new endpoint is different from the old one, load the data
      */
     window.Vue.watch(endpoint, (newEndpoint, oldEndpoint) => {
         if (endpoint.value !== "" && newEndpoint !== oldEndpoint) {
+            // Update isNewLoad based on whether parameters other than cursor changed
+            isNewLoad.value = shouldLoadNew(oldEndpoint, newEndpoint);
             void load();
         }
     });
