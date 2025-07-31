@@ -40,6 +40,7 @@ use Schoolbox\User;
 use Schoolbox\User\Translator\ModelToArray as UserTranslator;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 /**
  * Class Controller
@@ -109,6 +110,12 @@ class Controller extends Base
 
 
     /**
+     * Helper for editor templates.
+     */
+    private EditorTemplateHelper $editorTemplateHelper;
+
+
+    /**
      * Controller constructor.
      *
      * @param Error\Mapper      $errorMapper
@@ -121,6 +128,7 @@ class Controller extends Base
      * @param Attendance\Mapper $attendanceMapper
      * @param FolderAccess      $folderAccess
      * @param Validator         $validator
+     * @param EditorTemplateHelper    $editorTemplateHelper
      */
     public function __construct(
         Error\Mapper $errorMapper,
@@ -133,6 +141,7 @@ class Controller extends Base
         Attendance\Mapper $attendanceMapper,
         FolderAccess $folderAccess,
         Validator $validator,
+        EditorTemplateHelper $editorTemplateHelper,
     ) {
         $this->errorMapper = $errorMapper;
         $this->roleMapper = $roleMapper;
@@ -144,6 +153,7 @@ class Controller extends Base
         $this->attendanceMapper = $attendanceMapper;
         $this->folderAccess = $folderAccess;
         $this->validator = $validator;
+        $this->editorTemplateHelper = $editorTemplateHelper;
     }
 
 
@@ -303,6 +313,7 @@ class Controller extends Base
 
             'guests' => [],
             'returnUrl' => Redirect::queryStringEncodedParam($this->requestQuery->get('returnUrl') ?? Redirect::encode('/')),
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ], 'Create event');
     }
 
@@ -395,6 +406,7 @@ class Controller extends Base
 
             'guests' => $this->attendanceMapper->findAttendances($event),
             'returnUrl' => Redirect::queryStringEncodedParam($this->requestQuery->get('returnUrl') ?? Redirect::encode('/')),
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ], "Modify {$event->getTitle()}");
     }
 
