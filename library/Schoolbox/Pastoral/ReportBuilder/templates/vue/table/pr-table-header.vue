@@ -136,7 +136,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
 
 <style scoped lang="scss">
 .title-cell {
-    min-width: 120px;
+    min-width: 120px; // given the titles can be long, this ensures they don't wrap too much
     &:has(.title-button) {
         padding: 0; // padding is handled by the button instead
     }
@@ -151,15 +151,14 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
 
 .total-cell {
     background: var(--sbx-pr-table-total-cell-colour);
-    min-width: 80px;
-    width: 80px;
+    min-width: 100px; // so points/records change doesn't trigger a reflow
 }
 
 .title-button {
     align-items: center;
     background: none;
-    display: flex; // to align the text to the top left
-    gap: var(--spacing-s);
+    display: flex;
+    gap: var(--spacing-m);
     justify-content: space-between;
     height: 100%;
     margin: 0;
