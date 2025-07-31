@@ -850,6 +850,12 @@ export const Default: Story = {
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
+                    <sbx-icon name="sortable"></sbx-icon>
+                </div>
+                <p>sortable</p>
+            </div>
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
                     <sbx-icon name="sport"></sbx-icon>
                 </div>
                 <p>sport</p>

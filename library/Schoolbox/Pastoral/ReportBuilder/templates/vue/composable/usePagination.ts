@@ -1,5 +1,10 @@
 /**
- *
+ * To handle pagination logic for the pastoral report table
+ * We currently have to do a bit of wrangling for pagination,
+ * as we just rely on metadata.cursor.next to determine if there is a next page,
+ * and there's no metadata.cursor.previous.
+ * So we have to keep track of the cursor list and the current index.
+ * This allows us to navigate through pages without relying on the backend to provide previous cursors.
  */
 
 import type { Ref } from "vue";
@@ -106,7 +111,7 @@ export function usePagination(
     });
 
     /**
-     *
+     * Check if the metadata has enough items to paginate
      */
     function checkMetadata(): void {
         hasPaginate.value = metadata.value.count >= limit;
@@ -119,7 +124,7 @@ export function usePagination(
     }
 
     /**
-     *
+     * Watch for changes in the metadata and see if we can add a new cursor
      */
     window.Vue.watch(metadata, () => {
         // only add a new cursor if the metadata has a next cursor
@@ -129,7 +134,7 @@ export function usePagination(
     });
 
     /**
-     * Start setting the scrollable height on any window resize change
+     * Initialize the pagination state on component mount
      */
     window.Vue.onMounted(() => {
         reset();
