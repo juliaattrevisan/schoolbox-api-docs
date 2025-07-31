@@ -301,8 +301,8 @@ class Module extends BaseModule
     {
         return [
             'user' => $this->getMapperFactory()
-                ->get(UserMapper::class)
-                ->findById($params['userId']),
+                           ->get(UserMapper::class)
+                           ->findById($params['userId']),
         ];
     }
 
