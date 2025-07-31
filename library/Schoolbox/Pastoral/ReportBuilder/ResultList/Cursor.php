@@ -195,12 +195,19 @@ class Cursor implements ICursor
      */
     private function getColumnKeyByTabType(): array
     {
+        $matches = [];
         switch ($this->tabType) {
             case Factory::STUDENT_BY_TYPE:
                 preg_match(StudentByType::COLUMN_KEY_REGEX, $this->columnKey, $matches);
-                return $matches;
+                break;
             default:
                 throw new ValueError(sprintf('Unknown tab type: %s', $this->tabType));
         }
+
+        if (empty($matches)) {
+            throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey));
+        }
+
+        return $matches;
     }
 }
