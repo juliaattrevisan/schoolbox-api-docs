@@ -20,6 +20,9 @@ use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
+use Schoolbox\Editor\Templates\Mapper as EditorTemplateMapper;
+use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
 
 /**
  * Module for the learning moment evidence API and forms.
@@ -211,6 +214,11 @@ class Module extends BaseModule
         return new Controller(
             $this->getMapperFactory()->get(Mapper::class),
             $this->getMapperFactory()->get(CommentMapper::class),
+            new EditorTemplateHelper(
+                $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                EditorTemplatesCategoryModel::LEARNING_MOMENTS,
+                $this->injector->get('user')
+            ),
         );
     }
 

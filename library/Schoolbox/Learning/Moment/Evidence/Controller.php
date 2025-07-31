@@ -26,6 +26,7 @@ use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\TokenReplacer;
 use Schoolbox\User;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 /**
  * Controller for learning moments.
@@ -45,15 +46,23 @@ class Controller extends Base
 
 
     /**
+     * Helper for editor templates.
+     */
+    private EditorTemplateHelper $editorTemplateHelper;
+
+
+    /**
      * Constructor
      *
      * @param Mapper         $mapper
      * @param Comment\Mapper $commentMapper
+     * @param EditorTemplateHelper    $editorTemplateHelper
      */
-    public function __construct(Mapper $mapper, Comment\Mapper $commentMapper)
+    public function __construct(Mapper $mapper, Comment\Mapper $commentMapper, EditorTemplateHelper $editorTemplateHelper)
     {
         $this->mapper        = $mapper;
         $this->commentMapper = $commentMapper;
+        $this->editorTemplateHelper = $editorTemplateHelper;
     }
 
 
@@ -126,7 +135,8 @@ class Controller extends Base
             'moderationRequired'       => $moderationRequired,
             'isCreate'                 => true,
             'momentType'               => $momentType,
-            'zone'                     => $this->buildAttachzone($momentType)->getTwigContext()
+            'zone'                     => $this->buildAttachzone($momentType)->getTwigContext(),
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ];
 
         $this->response = $this->responseFromTemplate($template, $params);

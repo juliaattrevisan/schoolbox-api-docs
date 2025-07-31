@@ -3,6 +3,7 @@
  #
  # @param bool $moderationRequired  Decide if the current user's post requires moderation
  # @param bool $hasComments         Indicates whether there is at least one comment associated with this learning moment
+   editorTemplates array Retrieve any pre-existing editor templates to insert into the 'Body' rich text editor
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 
@@ -315,6 +316,9 @@
             detail: {
                 targetElements: ['#evidence-body'],
                 {% if USER.role.staff %}hasTokens: true,{% endif %}
+                {% if editorTemplates %}
+                    templates: {{ editorTemplates|json_encode|raw }},
+                {% endif %}
             }
         }));
 
