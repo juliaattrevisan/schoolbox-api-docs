@@ -136,7 +136,7 @@ class Controller extends Base
             'isCreate'                 => true,
             'momentType'               => $momentType,
             'zone'                     => $this->buildAttachzone($momentType)->getTwigContext(),
-            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
+            'editorTemplates'          => $this->editorTemplateHelper->getTemplatesForCategory(),
         ];
 
         $this->response = $this->responseFromTemplate($template, $params);
@@ -361,7 +361,8 @@ class Controller extends Base
             'curriculumCodes'          => $evidence->getViewableCurriculumNodes()?->reindex(),
             'zone'                     => $zone->getTwigContext(),
             'hasComments'              => $this->hasComments($evidence),
-            'returnUrl'                => $this->requestQuery->get('returnUrl')
+            'returnUrl'                => $this->requestQuery->get('returnUrl'),
+            'editorTemplates'          => $this->editorTemplateHelper->getTemplatesForCategory(),
         ];
 
         $this->response = $this->responseFromTemplate(

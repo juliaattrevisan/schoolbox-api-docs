@@ -316,7 +316,7 @@
             detail: {
                 targetElements: ['#evidence-body'],
                 {% if USER.role.staff %}hasTokens: true,{% endif %}
-                {% if editorTemplates %}
+                {% if editorTemplates is defined %}
                     templates: {{ editorTemplates|json_encode|raw }},
                 {% endif %}
             }
