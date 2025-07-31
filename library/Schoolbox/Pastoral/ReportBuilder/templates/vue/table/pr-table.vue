@@ -127,6 +127,7 @@ const selectedHeader = window.Vue.ref<TableHeader | null>(null);
 const scopeLink = window.Vue.ref("");
 const scopeLinkParams = new URLSearchParams();
 const {
+    isNewLoad: isNewRecordLoad,
     isNewLoading: isLoadingNewRecords,
     isMoreLoading: isLoadingMoreRecords,
     payload: recordsPayload,
@@ -244,9 +245,9 @@ window.Vue.onMounted(() => {
         </div>
     </template>
     <basic-modal v-model:is-open="isCellExpanded">
-        <div v-if="isLoadingNewRecords" class="loader"></div>
-        <div v-else-if="recordsLoadError" class="alert-box alert f-no-margins">
-            Sorry, there was an error during record retrieval. Please
+        <div v-if="isNewRecordLoad && isLoadingNewRecords" class="loader"></div>
+        <div v-else-if="isNewRecordLoad && recordsLoadError" class="alert-box alert f-no-margins">
+            Sorry, there was an error during further record retrieval. Please
             <a href="" title="refresh the page"> refresh the page </a>
             to try again and contact your support if the problem persists.
             <template v-if="recordsLoadError && recordsLoadError.length > 0"
@@ -279,6 +280,14 @@ window.Vue.onMounted(() => {
                     </section>
                     <div v-if="isLoadingMoreRecords" class="c-island l-pad-m">
                         <div class="loader"></div>
+                    </div>
+                    <div v-else-if="!isNewRecordLoad && recordsLoadError" class="alert-box alert f-no-margins">
+                        Sorry, there was an error during record retrieval. Please
+                        <a href="" title="refresh the page"> refresh the page </a>
+                        to try again and contact your support if the problem persists.
+                        <template v-if="recordsLoadError && recordsLoadError.length > 0"
+                            ><em>Further support info: {{ recordsLoadError }}</em></template
+                        >
                     </div>
                 </div>
             </div>

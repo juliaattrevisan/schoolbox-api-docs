@@ -13,6 +13,7 @@ import type { RecordsPayload } from "../../js/types/pastoralReportTypes";
  * @returns isNewLoading, payload, isEmpty, loadError
  */
 export function useLoadRecords(endpoint: Ref<string>): {
+    isNewLoad: Ref<boolean>;
     isNewLoading: Ref<boolean>;
     isMoreLoading: Ref<boolean>;
     payload: Ref<RecordsPayload | null>;
@@ -128,6 +129,7 @@ export function useLoadRecords(endpoint: Ref<string>): {
     });
 
     return {
+        isNewLoad,
         isNewLoading,
         isMoreLoading,
         payload,
