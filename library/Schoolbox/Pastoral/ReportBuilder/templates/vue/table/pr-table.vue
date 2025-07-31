@@ -127,7 +127,11 @@ const isCellExpanded = window.Vue.ref(false);
 const selectedHeader = window.Vue.ref<TableHeader | null>(null);
 const scopeLink = window.Vue.ref("");
 const scopeLinkParams = new URLSearchParams();
-const { isLoading: isLoadingRecords, payload: recordsPayload, loadError: recordsLoadError } = useLoadRecords(scopeLink);
+const {
+    isNewLoading: isLoadingRecords,
+    payload: recordsPayload,
+    loadError: recordsLoadError,
+} = useLoadRecords(scopeLink);
 
 /**
  * Handle cell selection
@@ -141,15 +145,15 @@ function onCellSelect(header: TableHeader): void {
 }
 
 /**
- * To display more nodes when there's lots to display and the user has scrolled to the bottom
- * This avoids a heavy computation for the DOM when there's lots of nodes to display
+ * To display more results when there's lots to display and the user has scrolled to the bottom
  */
 const modalResultsEl = useTemplateRef<HTMLDivElement>("modalResultsRef");
 const { arrivedState } = useScroll(modalResultsEl);
 const { bottom } = toRefs(arrivedState);
 window.Vue.watch(bottom, (isAtBottom) => {
-    if (isAtBottom && recordsPayload.value?.metadata.cursor.next !== null) {
-        console.warn("load more");
+    if (isAtBottom && recordsPayload.value && recordsPayload.value.metadata.cursor.next !== null) {
+        scopeLinkParams.set("cursor", recordsPayload.value.metadata.cursor.next);
+        scopeLink.value = `${props.selectedTab._links.scope}?${scopeLinkParams.toString()}`;
     }
 });
 
