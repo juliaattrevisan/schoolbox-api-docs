@@ -196,13 +196,13 @@ class Module extends BaseModule
         );
 
 
-        //        $this->register(
-        //            self::METHOD_POST,
-        //            '/user/{userId}/create',
-        //            'postMomentForUser',
-        //            $isParentOrUserRule,
-        //            Closure::fromCallable([$this, 'preloadUser']),
-        //        );
+//        $this->register(
+//            self::METHOD_POST,
+//            '/user/{userId}/create',
+//            'postMomentForUser',
+//            $isParentOrUserRule,
+//            Closure::fromCallable([$this, 'preloadUser']),
+//        );
     }
 
 
@@ -243,8 +243,8 @@ class Module extends BaseModule
     {
         return [
             'user' => $this->getMapperFactory()
-                ->get(UserMapper::class)
-                ->findById($params['userId']),
+                           ->get(UserMapper::class)
+                           ->findById($params['userId']),
         ];
     }
 
@@ -260,8 +260,8 @@ class Module extends BaseModule
     private function preloadEvidence(array $params): array
     {
         $evidence = $this->getMapperFactory()
-            ->get(Mapper::class)
-            ->findById($params['evidenceId']);
+             ->get(Mapper::class)
+             ->findById($params['evidenceId']);
 
         return [
             'userId' => $evidence->getRecipient()->getId(),
@@ -282,8 +282,8 @@ class Module extends BaseModule
     {
         $userIds = array_unique(explode(',', $params['userIds']));
         $users   = $this->getMapperFactory()
-            ->get(UserMapper::class)
-            ->findByColumn('id', $userIds);
+                        ->get(UserMapper::class)
+                        ->findByColumn('id', $userIds);
 
         // It's acceptable for some users in userIds to not be found.
         // However, at least one user must be found for this form to have

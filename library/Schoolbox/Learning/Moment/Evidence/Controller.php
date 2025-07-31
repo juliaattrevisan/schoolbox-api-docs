@@ -178,15 +178,15 @@ class Controller extends Base
     }
 
 
-    //    /**
-    //     * Retrieve a JSON representation of a single learning moment.
-    //     *
-    //     * @api   GET /learning/evidence/{id}
-    //     * @since 20.2
-    //     */
-    //    public function getMoment(): void
-    //    {
-    //    }
+//    /**
+//     * Retrieve a JSON representation of a single learning moment.
+//     *
+//     * @api   GET /learning/evidence/{id}
+//     * @since 20.2
+//     */
+//    public function getMoment(): void
+//    {
+//    }
 
 
     /**
@@ -225,7 +225,9 @@ class Controller extends Base
      * @api   POST /learning/evidence/
      * @since 20.2
      */
-    public function postMoments(): void {}
+    public function postMoments(): void
+    {
+    }
 
 
     //    /**
@@ -445,33 +447,33 @@ class Controller extends Base
     {
         $zone = new GenericZone('storage', StorageMapper::getInstance());
         $zone->setAttachmentsLabel('')
-            ->setAttachPrompt('upload files to this location')
-            ->setMimeFilter('*/*')
-            ->setFileVar('file')
-            ->setMulti(false)
-            ->setThumbnailSize(64)
-            ->setModalTitle('Select file');
+             ->setAttachPrompt('upload files to this location')
+             ->setMimeFilter('*/*')
+             ->setFileVar('file')
+             ->setMulti(false)
+             ->setThumbnailSize(64)
+             ->setModalTitle('Select file');
         switch ($momentType) {
             case Model::MOMENT_TYPE_PHOTO:
                 $zone->setAttachPrompt('take a picture')
-                    ->setIconClass('icon-camera')
-                    ->setUseModal(false)
-                    ->setCapture(true)
-                    ->setMimeFilter('image/*');
+                     ->setIconClass('icon-camera')
+                     ->setUseModal(false)
+                     ->setCapture(true)
+                     ->setMimeFilter('image/*');
                 break;
             case Model::MOMENT_TYPE_AUDIO:
                 $zone->setAttachPrompt('record audio')
-                    ->setIconClass('icon-audio')
-                    ->setUseModal(false)
-                    ->setCapture(true)
-                    ->setMimeFilter('audio/*');
+                     ->setIconClass('icon-audio')
+                     ->setUseModal(false)
+                     ->setCapture(true)
+                     ->setMimeFilter('audio/*');
                 break;
             case Model::MOMENT_TYPE_VIDEO:
                 $zone->setAttachPrompt('record video')
-                    ->setIconClass('icon-video')
-                    ->setUseModal(false)
-                    ->setCapture(true)
-                    ->setMimeFilter('video/*');
+                     ->setIconClass('icon-video')
+                     ->setUseModal(false)
+                     ->setCapture(true)
+                     ->setMimeFilter('video/*');
                 break;
             case Model::MOMENT_TYPE_UPLOAD:
             case Model::MOMENT_TYPE_TEXT:
