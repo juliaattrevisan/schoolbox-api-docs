@@ -244,18 +244,20 @@ window.Vue.onMounted(() => {
                         >
                     </p>
                 </div>
-                <section v-for="record in recordsPayload?.data.results" :key="record.id">
-                    <ul class="information-list threaded">
-                        <pr-record
-                            :record="record"
-                            :config="props.config"
-                            :routes="props.routes"
-                            :locale-pastoral="props.localePastoral"
-                            :show-severity="props.showSeverity"
-                            :severity-colors="props.severityColors"
-                        />
-                    </ul>
-                </section>
+                <div class="pr-table__records">
+                    <section v-for="record in recordsPayload?.data.results" :key="record.id">
+                        <ul class="information-list threaded">
+                            <pr-record
+                                :record="record"
+                                :config="props.config"
+                                :routes="props.routes"
+                                :locale-pastoral="props.localePastoral"
+                                :show-severity="props.showSeverity"
+                                :severity-colors="props.severityColors"
+                            />
+                        </ul>
+                    </section>
+                </div>
             </div>
         </template>
     </basic-modal>
@@ -275,5 +277,10 @@ window.Vue.onMounted(() => {
         top: 0;
         z-index: var(--sbx-depth-ui-sticky);
     }
+}
+
+.pr-table__records {
+    max-height: 650px;
+    overflow-y: auto;
 }
 </style>
