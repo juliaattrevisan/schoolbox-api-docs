@@ -15,7 +15,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    cellSelect: [key: TableHeader];
+    cellSelect: [header: TableHeader];
 }>();
 
 /**

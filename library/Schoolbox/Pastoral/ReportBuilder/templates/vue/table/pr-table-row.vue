@@ -16,7 +16,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    cellSelect: [key: TableHeader];
+    cellSelect: [header: TableHeader, rowData: { [key: string]: RowOptions }];
 }>();
 
 /**
@@ -24,7 +24,7 @@ const emit = defineEmits<{
  * @param header - the header of the cell that was clicked
  */
 function onCellSelected(header: TableHeader): void {
-    emit("cellSelect", header);
+    emit("cellSelect", header, props.rowData);
 }
 
 /**

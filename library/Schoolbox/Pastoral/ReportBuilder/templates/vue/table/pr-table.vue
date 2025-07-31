@@ -160,12 +160,24 @@ const {
 } = useLoadRecords(scopeLink);
 
 /**
- * Handle cell selection
+ * Handle total cell selection
  * @param header - the header of the cell that was selected
  */
-function onCellSelect(header: TableHeader): void {
+function onTotalCellSelect(header: TableHeader): void {
     selectedHeader.value = header;
     scopeLinkParams.set("column", selectedHeader.value.key);
+    scopeLink.value = `${props.selectedTab._links.scope}?${scopeLinkParams.toString()}`;
+    isCellExpanded.value = true; // Open the modal to show related records
+}
+
+/**
+ * Handle row cell selection
+ * @param header - the header of the cell that was selected
+ */
+function onRowCellSelect(header: TableHeader, rowData: { [key: string]: RowOptions }): void {
+    selectedHeader.value = header;
+    scopeLinkParams.set("column", selectedHeader.value.key);
+    scopeLinkParams.set("row", rowData["user"].id.toString()); // Assuming rowData["user"] contains the user object with an id
     scopeLink.value = `${props.selectedTab._links.scope}?${scopeLinkParams.toString()}`;
     isCellExpanded.value = true; // Open the modal to show related records
 }
@@ -255,7 +267,7 @@ window.Vue.onUnmounted(() => {
                         :headers="(payload as TablePayload).data.tableHeaders"
                         :row-data="(payload as TablePayload).data.totalRow"
                         :records-or-points="recordsOrPoints"
-                        @cell-select="onCellSelect"
+                        @cell-select="onTotalCellSelect"
                     />
                     <!-- All other rows -->
                     <pr-table-row
@@ -264,6 +276,7 @@ window.Vue.onUnmounted(() => {
                         :headers="(payload as TablePayload).data.tableHeaders"
                         :row-data="row"
                         :records-or-points="recordsOrPoints"
+                        @cell-select="onRowCellSelect"
                     />
                 </tbody>
             </table>
