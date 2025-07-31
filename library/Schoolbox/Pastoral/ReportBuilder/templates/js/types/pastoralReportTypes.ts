@@ -98,7 +98,7 @@ export type TablePayload = {
  */
 export type RecordsPayload = {
     data: {
-        records: PastoralRecord[];
+        results: PastoralRecord[];
     };
     metadata: Metadata;
 };

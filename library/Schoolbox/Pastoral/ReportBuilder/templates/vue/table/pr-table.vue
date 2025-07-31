@@ -127,9 +127,8 @@ const {
  * @param key - the key of the cell that was selected
  */
 function onCellSelect(key: string): void {
-    console.warn("Cell selected:", key);
     isCellExpanded.value = true; // Open the modal to show related records
-    recordsEndpoint.value = "yep";
+    recordsEndpoint.value = `${props.selectedTab._links.scope}?column=${key}`;
 }
 
 // #endregion
@@ -227,7 +226,7 @@ window.Vue.onMounted(() => {
             >
         </div>
         <template v-else>
-            <section v-for="record in recordsPayload?.data.records" :key="record.id">
+            <section v-for="record in recordsPayload?.data.results" :key="record.id">
                 <ul class="information-list threaded">
                     <pr-record
                         :record="record"

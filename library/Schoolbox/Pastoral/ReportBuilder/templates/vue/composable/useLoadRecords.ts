@@ -4,7 +4,7 @@
 
 import type { Ref } from "vue";
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
-import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
+import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { RecordsPayload } from "../../js/types/pastoralReportTypes";
 
 /**
@@ -36,20 +36,17 @@ export function useLoadRecords(endpoint: Ref<string>): {
             isLoading.value = true;
             loadError.value = null;
             controller = new AbortController();
-            const response = await fetch(endpoint.value, {
+            const response = await apiRequest<RecordsPayload>({
+                url: endpoint.value,
                 method: "GET",
                 signal: controller.signal,
-                headers: {
-                    "Content-Type": "application/json",
-                },
             });
-            if (!response.ok) {
-                const errorMessage = await extractErrorMessage(response);
-                throw new Error(errorMessage);
+            if (!response.success) {
+                throw new Error(response.message || "Failed to load data");
             }
-            const newPayload = (await response.json()) as RecordsPayload;
+            const newPayload = response.data;
             // check if the response does not have the expected structure
-            if (newPayload === null || newPayload.data === undefined || !Array.isArray(newPayload.data.records)) {
+            if (!Array.isArray(newPayload.data.results)) {
                 throw new Error("Unexpected response format");
             }
             payload.value = newPayload;
@@ -60,7 +57,9 @@ export function useLoadRecords(endpoint: Ref<string>): {
             }
             if (error instanceof Error && hasErrorMessage(error)) {
                 loadError.value = error.message;
+                return;
             }
+            loadError.value = "An unexpected error occurred while loading the data.";
             console.error(error);
         } finally {
             isLoading.value = false;
