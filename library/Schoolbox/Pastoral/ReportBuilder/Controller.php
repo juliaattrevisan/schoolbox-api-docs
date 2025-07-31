@@ -558,12 +558,14 @@ class Controller extends Base
     }
 
     /**
-     * Exports report data
+     * Export results to csv
+     *
      * @param PastoralReport $report
+     * @param Collection     $records
+     * @return void
      */
-    public function getReportResultsExport(PastoralReport $report): void
+    private function exportResultsToCSV(PastoralReport $report, Collection $records): void
     {
-        $records  = $this->getReportData($report);
         $exporter = new \Report_Exporter($report->getName());
         $headings = [
             'Pastoral ID'  => 'Pastoral ID',
@@ -597,6 +599,54 @@ class Controller extends Base
         // we need to modify the dataset to substitute resourceIDs with their actual names / descriptions
         $exporter->setData($records, [$this, 'dataManipulator']);
         $exporter->exportCSV();
+    }
+
+    /**
+     * Exporting results that's filtered to the column and row to CSV
+     *
+     * @param string         $tabType
+     * @param PastoralReport $report
+     * @return void
+     */
+    public function getReportResultsInScopeExport(string $tabType, PastoralReport $report): void
+    {
+        try {
+            $columnKey     = $this->requestQuery->get('column');
+            $rowKey        = $this->requestQuery->get('row');
+
+            $cursor = new \Schoolbox\Pastoral\ReportBuilder\ResultList\Cursor(
+                new Helper(
+                    $this->prepareReportData($report),
+                    $this->pastoralMapper,
+                    $this->getConfigLoader(),
+                ),
+                $this->pastoralMapper,
+                $tabType,
+                $columnKey,
+                $rowKey,
+            );
+
+            $result = $cursor->retrieveResults(null);
+            $this->exportResultsToCSV($report, $result);
+        } catch (\PDOException | DatabaseException $e) {
+            $problem = (new ApiProblem('Something has gone wrong, please contact your support if the problem persists'))
+                ->setStatus(500);
+            $this->response = $this->responseAsJson($problem->asArray());
+        } catch (\Exception | \ValueError $e) {
+            $problem = new ApiProblem($e->getMessage());
+            $problem->setStatus($e->getCode());
+            $this->response = $this->responseAsJson($problem->asArray());
+        }
+    }
+
+    /**
+     * Exports report data
+     * @param PastoralReport $report
+     */
+    public function getReportResultsExport(PastoralReport $report): void
+    {
+        $records  = $this->getReportData($report);
+        $this->exportResultsToCSV($report, $records);
     }
 
     /**
