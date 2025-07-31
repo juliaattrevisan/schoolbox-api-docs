@@ -382,7 +382,14 @@ class Controller extends Base
         $severityColors = $showSeverity ? $this->getSeverityColors() : [];
 
         $defaultSummaryOptions = [
-            ['title' => 'List', 'type' => 'list', 'key' => 'list', 'endpoint' => 'list']
+            [
+                'title' => 'List',
+                'type' => 'list',
+                'key' => 'list',
+                '_links' => [
+                    'view' => 'list'
+                ]
+            ]
         ];
 
         /* Find the selected list of options
@@ -402,14 +409,24 @@ class Controller extends Base
                 'title' => $option['label'],
                 'type' => $option['type'],
                 'key' => $key,
-                'endpoint' => $this->getRouteIfAuthorized(
-                    'pastoralReportBuilder.getReportByTabType',
-                    [
-                        'reportId' => $report->getId(),
-                        'report' => $report,
-                        'tabType' => $key,
-                    ]
-                )
+                '_links' => [
+                    'view' => $this->getRouteIfAuthorized(
+                        'pastoralReportBuilder.getReportByTabType',
+                        [
+                            'reportId' => $report->getId(),
+                            'report' => $report,
+                            'tabType' => $key,
+                        ]
+                    ),
+                    'scope' => $this->getRouteIfAuthorized(
+                        'pastoralReportBuilder.getReportByTabTypeScope',
+                        [
+                            'reportId' => $report->getId(),
+                            'report' => $report,
+                            'tabType' => $key,
+                        ]
+                    )
+                ]
             ];
         }
 
@@ -445,7 +462,7 @@ class Controller extends Base
         try {
             $limit = $this->requestQuery->getInt('limit', Cursor::LIMIT_DEFAULT);
             $encodedCursor = $this->requestQuery->get('cursor');
-            $resultType = $this->requestQuery->get('selected');
+            $resultType = $this->requestQuery->get('selected', Cursor::RESULT_TYPE_RECORDS);
             $sortBy = $this->requestQuery->get('sortBy', Cursor::SORT_BY_DEFAULT);
             $order = $this->requestQuery->get('order', Cursor::ORDER_DIRECTION_DEFAULT);
 
@@ -473,6 +490,62 @@ class Controller extends Base
             $records        = $factory->retrieveResults($encodedCursor);
             $records        = $factory->process($records, $encodedCursor);
             $this->response = $this->responseAsJson($records);
+        } catch (\PDOException | DatabaseException $e) {
+            $problem = (new ApiProblem('Something has gone wrong, please contact your support if the problem persists'))
+                ->setStatus(500);
+            $this->response = $this->responseAsJson($problem->asArray());
+        } catch (\Exception | \ValueError $e) {
+            $problem = new ApiProblem($e->getMessage());
+            $problem->setStatus($e->getCode());
+            $this->response = $this->responseAsJson($problem->asArray());
+        }
+    }
+
+    /**
+     * Get the report list and able to filter down to specific cells
+     *
+     * @param string         $tabType
+     * @param PastoralReport $report
+     * @return void
+     */
+    public function getReportByTabTypeScope(string $tabType, PastoralReport $report): void
+    {
+        try {
+            $encodedCursor = $this->requestQuery->get('cursor');
+            $columnKey     = $this->requestQuery->get('column');
+            $rowKey        = $this->requestQuery->get('row');
+            $limit         = $this->requestQuery->getInt('limit', Cursor::LIMIT_DEFAULT);
+
+            $cursor = new \Schoolbox\Pastoral\ReportBuilder\ResultList\Cursor(
+                new Helper(
+                    $this->prepareReportData($report),
+                    $this->pastoralMapper,
+                    $this->getConfigLoader(),
+                ),
+                $this->pastoralMapper,
+                $tabType,
+                $columnKey,
+                $rowKey,
+                $limit,
+            );
+
+            $result = $cursor->retrieveResults($encodedCursor);
+
+            $this->response = $this->responseAsJson(
+                [
+                    'data'     => [
+                        'results' => $result->map($this->pastoralTranslator),
+                    ],
+                    'metadata' => [
+                        'count'  => $cursor->retrieveResultCount(),
+                        'cursor' => [
+                            'current' => $cursor->current($result),
+                            'next'    => $cursor->next($result) ?? null
+                        ]
+                    ]
+
+                ]
+            );
         } catch (\PDOException | DatabaseException $e) {
             $problem = (new ApiProblem('Something has gone wrong, please contact your support if the problem persists'))
                 ->setStatus(500);
