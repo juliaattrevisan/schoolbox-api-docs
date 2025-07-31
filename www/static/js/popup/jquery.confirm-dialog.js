@@ -121,9 +121,9 @@
          * then shank it into the flexlist
          */
         if (settings.hasCancelButton) {
-            cancelButton = $('<a href="#" class="button" id="confirm-dialog-cancel-button" />').text(
-                settings.cancelLabel,
-            );
+            cancelButton = $(
+                '<a href="#" class="button" id="confirm-dialog-cancel-button" data-test="confirm-dialog-cancel-button" />',
+            ).text(settings.cancelLabel);
 
             buttons = buttons.add(cancelButton);
 
