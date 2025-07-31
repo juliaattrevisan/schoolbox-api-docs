@@ -90,7 +90,7 @@ class ForwardToBrokeredQueue implements QueueInterface
      */
     public function push(Instance $instance): void
     {
-        $this->broker->publish($instance, [$this->instanceId, $this->userId]);
+        $this->broker->publish($instance, [$this->instanceId, $this->userId], $instance->getTTL());
     }
 
     /**
