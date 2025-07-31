@@ -16,6 +16,7 @@ interface Props {
     getLearningPlanNewUrl: string;
     getAssessmentParticipation: string;
     getAssessmentParticipationNewActivity: string;
+    getAssessmentParticipationCopyActivity: string;
     assessmentId: number;
     customisations: (Plan | CustomisedPlan)[];
     includeInExistingCustomisation: string;
@@ -422,7 +423,12 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                                     </li>
                                     <li class="separator">Create</li>
                                     <li>
-                                        <a class="icon-copy"> Copy Activity </a>
+                                        <a
+                                            class="icon-copy"
+                                            :href="`${getAssessmentParticipationCopyActivity}?student=${participant.user.id}&original=${assessmentId}&${getReturnUrl()}`"
+                                        >
+                                            Copy Activity
+                                        </a>
                                     </li>
                                     <li>
                                         <a
@@ -474,7 +480,13 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                         </button>
                     </div>
                     <div class="l-flex__item--1-auto">
-                        <a class="icon-copy submit" data-test="custom-participation-copy-activity">Copy Activity</a>
+                        <a
+                            class="icon-copy submit"
+                            data-test="custom-participation-copy-activity"
+                            :href="`${getAssessmentParticipationCopyActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${assessmentId}&${getReturnUrl()}`"
+                        >
+                            Copy Activity
+                        </a>
                     </div>
                     <div class="l-flex__item--1-auto">
                         <a

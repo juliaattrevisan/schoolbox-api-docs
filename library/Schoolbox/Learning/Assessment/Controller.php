@@ -467,6 +467,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $this->response = $content;
     }
 
+    public function getCloneAssessmentForm(IAssessable $assessment): void
+    {
+
+        $this->response = $this->responseAsJson([]);
+    }
 
     /**
      * Get the form to update an existing Assessment's details

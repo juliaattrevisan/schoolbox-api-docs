@@ -35,6 +35,10 @@
         assessmentId: assessment.id,
         assessment: assessment,
     }) }}"
+    get-assessment-participation-copy-activity="{{ routeLookupIfAuthorized('learningAssessment.getCloneAssessmentForm', {
+        assessmentId: assessment.id,
+        assessment: assessment,
+    }) }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/customParticipation.js?v={{ config.site_version }}"></script>
