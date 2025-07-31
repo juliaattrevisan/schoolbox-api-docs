@@ -24,6 +24,8 @@ class Factory
         private UserMapper $userMapper,
         private PastoralMapper $pastoralMapper,
         private string $resultType,
+        private ?string $orderBy,
+        private ?string $order,
         private ?int $limit = null,
     ) {
     }
@@ -39,6 +41,8 @@ class Factory
                 $this->userMapper,
                 $this->pastoralMapper,
                 $this->resultType,
+                $this->orderBy,
+                $this->order,
                 $this->limit,
             ),
             default => null

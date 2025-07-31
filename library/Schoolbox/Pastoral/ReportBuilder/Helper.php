@@ -116,7 +116,7 @@ class Helper
         $query = implode(' OR ', array_filter($filters ?? []));
 
         if ($query) {
-            $this->filters[] = $query;
+            $this->filters[] = "({$query})";
         }
     }
 
