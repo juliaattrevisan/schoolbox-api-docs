@@ -50,11 +50,11 @@ function setScrollableHeight(): void {
 // #region table load
 
 const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
-const viewLinkParams = new URLSearchParams(); // to store the query parameters for the endpoint to update
+const viewLink = window.Vue.ref("");
+const viewLinkParams = new URLSearchParams();
 const LIMIT = 20; // the current set limit for the number of records to fetch at once
 const sortBy = window.Vue.ref<string>("user"); // the current sort by field - this should update when payload is loaded
 const order = window.Vue.ref<"ASC" | "DESC">("ASC"); // the current sort order
-const viewLink = window.Vue.ref("");
 const { isNewLoading, isSameLoading, payload, isEmpty, loadError } = useLoadPrTable(viewLink);
 
 /**
@@ -122,7 +122,9 @@ window.Vue.watch(
 // #region table cell selected
 
 const isCellExpanded = window.Vue.ref(false);
+const selectedHeader = window.Vue.ref<TableHeader | null>(null);
 const scopeLink = window.Vue.ref("");
+const scopeLinkParams = new URLSearchParams();
 const { isLoading: isLoadingRecords, payload: recordsPayload, loadError: recordsLoadError } = useLoadRecords(scopeLink);
 
 /**
@@ -130,8 +132,10 @@ const { isLoading: isLoadingRecords, payload: recordsPayload, loadError: records
  * @param header - the header of the cell that was selected
  */
 function onCellSelect(header: TableHeader): void {
+    selectedHeader.value = header;
+    scopeLinkParams.set("column", selectedHeader.value.key);
+    scopeLink.value = `${props.selectedTab._links.scope}?${scopeLinkParams.toString()}`;
     isCellExpanded.value = true; // Open the modal to show related records
-    scopeLink.value = `${props.selectedTab._links.scope}?column=${header.key}`;
 }
 
 // #endregion
