@@ -276,15 +276,4 @@ window.Vue.onMounted(() => {
         z-index: var(--sbx-depth-ui-sticky);
     }
 }
-
-.pr-table-metadata {
-    background-color: #f9f9f9;
-    border-top: 1px solid #e0e0e0;
-    margin-top: 1rem;
-    padding: 0.5rem;
-    &__count {
-        color: #666;
-        font-size: 0.9rem;
-    }
-}
 </style>
