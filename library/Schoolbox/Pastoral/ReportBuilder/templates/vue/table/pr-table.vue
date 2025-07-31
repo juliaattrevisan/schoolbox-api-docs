@@ -43,31 +43,31 @@ function setScrollableHeight(): void {
 // #region table load
 
 const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
-const queryParams = new URLSearchParams(); // to store the query parameters for the endpoint to update
+const viewLinkParams = new URLSearchParams(); // to store the query parameters for the endpoint to update
 const LIMIT = 20; // the current set limit for the number of records to fetch at once
 const sortBy = window.Vue.ref<string>("user"); // the current sort by field - this should update when payload is loaded
 const order = window.Vue.ref<"ASC" | "DESC">("ASC"); // the current sort order
-const currentEndpoint = window.Vue.ref("");
-const { isNewLoading, isSameLoading, payload, isEmpty, loadError } = useLoadPrTable(currentEndpoint);
+const viewLink = window.Vue.ref("");
+const { isNewLoading, isSameLoading, payload, isEmpty, loadError } = useLoadPrTable(viewLink);
 
 /**
  * Reset the table load by clearing the cursor and reloading the data
  */
 function resetTableLoad(): void {
-    queryParams.set("selected", recordsOrPoints.value);
-    queryParams.set("cursor", "");
-    queryParams.set("limit", LIMIT.toString());
-    queryParams.set("sortBy", sortBy.value);
-    queryParams.set("order", order.value);
-    currentEndpoint.value = `${props.selectedTab._links.view}?${queryParams.toString()}`;
+    viewLinkParams.set("selected", recordsOrPoints.value);
+    viewLinkParams.set("cursor", "");
+    viewLinkParams.set("limit", LIMIT.toString());
+    viewLinkParams.set("sortBy", sortBy.value);
+    viewLinkParams.set("order", order.value);
+    viewLink.value = `${props.selectedTab._links.view}?${viewLinkParams.toString()}`;
 }
 
 /**
  * Load the row data again when the recordsOrPoints changes
  */
 window.Vue.watch(recordsOrPoints, () => {
-    queryParams.set("selected", recordsOrPoints.value);
-    currentEndpoint.value = `${props.selectedTab._links.view}?${queryParams.toString()}`;
+    viewLinkParams.set("selected", recordsOrPoints.value);
+    viewLink.value = `${props.selectedTab._links.view}?${viewLinkParams.toString()}`;
 });
 
 /**
@@ -83,10 +83,10 @@ function onSort(headerKey: string): void {
         sortBy.value = headerKey;
         order.value = "ASC";
     }
-    queryParams.set("sortBy", sortBy.value);
-    queryParams.set("order", order.value);
-    queryParams.set("cursor", ""); // Reset cursor on sort change
-    currentEndpoint.value = `${props.selectedTab._links.view}?${queryParams.toString()}`;
+    viewLinkParams.set("sortBy", sortBy.value);
+    viewLinkParams.set("order", order.value);
+    viewLinkParams.set("cursor", ""); // Reset cursor on sort change
+    viewLink.value = `${props.selectedTab._links.view}?${viewLinkParams.toString()}`;
 }
 
 /**
@@ -94,8 +94,8 @@ function onSort(headerKey: string): void {
  * @param cursor - the cursor to use for the previous/next page
  */
 function onPaginate(cursor: string): void {
-    queryParams.set("cursor", cursor);
-    currentEndpoint.value = `${props.selectedTab._links.view}?${queryParams.toString()}`;
+    viewLinkParams.set("cursor", cursor);
+    viewLink.value = `${props.selectedTab._links.view}?${viewLinkParams.toString()}`;
 }
 
 /**
@@ -115,12 +115,8 @@ window.Vue.watch(
 // #region table cell selected
 
 const isCellExpanded = window.Vue.ref(false);
-const recordsEndpoint = window.Vue.ref("");
-const {
-    isLoading: isLoadingRecords,
-    payload: recordsPayload,
-    loadError: recordsLoadError,
-} = useLoadRecords(recordsEndpoint);
+const scopeLink = window.Vue.ref("");
+const { isLoading: isLoadingRecords, payload: recordsPayload, loadError: recordsLoadError } = useLoadRecords(scopeLink);
 
 /**
  * Handle cell selection
@@ -128,7 +124,7 @@ const {
  */
 function onCellSelect(key: string): void {
     isCellExpanded.value = true; // Open the modal to show related records
-    recordsEndpoint.value = `${props.selectedTab._links.scope}?column=${key}`;
+    scopeLink.value = `${props.selectedTab._links.scope}?column=${key}`;
 }
 
 // #endregion
@@ -207,7 +203,7 @@ window.Vue.onMounted(() => {
                 </tbody>
             </table>
             <pr-table-footer
-                :endpoint="currentEndpoint"
+                :endpoint="viewLink"
                 :metadata="(payload as TablePayload).metadata"
                 :limit="LIMIT"
                 @previous="onPaginate"
