@@ -15,15 +15,15 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    cellSelect: [key: string];
+    cellSelect: [key: TableHeader];
 }>();
 
 /**
  * Handles the cell click
- * @param key - the key of the cell that was clicked
+ * @param header - the header of the cell that was clicked
  */
-function onCellSelected(key: string): void {
-    emit("cellSelect", key);
+function onCellSelected(header: TableHeader): void {
+    emit("cellSelect", header);
 }
 </script>
 
@@ -69,7 +69,7 @@ function onCellSelected(key: string): void {
                         (props.rowData[header.key] as RecordsAndPoints)?.records! > 0
                     "
                     class="f-always-show u-td-button"
-                    @click.prevent="onCellSelected(header.key)"
+                    @click.prevent="onCellSelected(header)"
                 >
                     {{ (props.rowData[header.key] as RecordsAndPoints).records }}
                 </button>
@@ -80,7 +80,7 @@ function onCellSelected(key: string): void {
                         (props.rowData[header.key] as RecordsAndPoints)?.points! !== null
                     "
                     class="f-always-show u-td-button"
-                    @click.prevent="onCellSelected(header.key)"
+                    @click.prevent="onCellSelected(header)"
                 >
                     {{ (props.rowData[header.key] as RecordsAndPoints).points }}
                 </button>

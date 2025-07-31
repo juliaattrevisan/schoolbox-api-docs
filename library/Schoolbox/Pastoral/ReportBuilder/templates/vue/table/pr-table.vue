@@ -5,7 +5,14 @@
 
 import { useTemplateRef } from "vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
-import type { Tab, TablePayload, Config, Routes, SeverityColors } from "../../js/types/pastoralReportTypes";
+import type {
+    Tab,
+    TablePayload,
+    Config,
+    Routes,
+    SeverityColors,
+    TableHeader,
+} from "../../js/types/pastoralReportTypes";
 import { TabType } from "../../js/types/pastoralReportTypes";
 import { useLoadPrTable } from "../composable/useLoadPrTable";
 import { useLoadRecords } from "../composable/useLoadRecords";
@@ -120,11 +127,11 @@ const { isLoading: isLoadingRecords, payload: recordsPayload, loadError: records
 
 /**
  * Handle cell selection
- * @param key - the key of the cell that was selected
+ * @param header - the header of the cell that was selected
  */
-function onCellSelect(key: string): void {
+function onCellSelect(header: TableHeader): void {
     isCellExpanded.value = true; // Open the modal to show related records
-    scopeLink.value = `${props.selectedTab._links.scope}?column=${key}`;
+    scopeLink.value = `${props.selectedTab._links.scope}?column=${header.key}`;
 }
 
 // #endregion
