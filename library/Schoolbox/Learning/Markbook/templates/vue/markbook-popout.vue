@@ -612,6 +612,7 @@ function onToggleSelected(): void {
                         !cellInfo.participant.isExcluded &&
                         cellInfo.activity.assessmentType !== ACTIVITY_TYPE_PROJECT
                     "
+                    :class="{ 'is-disabled': !routes.excludeRoute && !cellInfo.participant.isExcluded }"
                     @selected="excludeCheck()"
                 >
                     Exclude Student
