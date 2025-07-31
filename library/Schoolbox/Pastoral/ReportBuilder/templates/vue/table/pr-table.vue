@@ -59,7 +59,7 @@ function resetTableLoad(): void {
     queryParams.set("limit", LIMIT.toString());
     queryParams.set("sortBy", sortBy.value);
     queryParams.set("order", order.value);
-    currentEndpoint.value = `${props.selectedTab.endpoint}?${queryParams.toString()}`;
+    currentEndpoint.value = `${props.selectedTab._links.view}?${queryParams.toString()}`;
 }
 
 /**
@@ -67,7 +67,7 @@ function resetTableLoad(): void {
  */
 window.Vue.watch(recordsOrPoints, () => {
     queryParams.set("selected", recordsOrPoints.value);
-    currentEndpoint.value = `${props.selectedTab.endpoint}?${queryParams.toString()}`;
+    currentEndpoint.value = `${props.selectedTab._links.view}?${queryParams.toString()}`;
 });
 
 /**
@@ -86,7 +86,7 @@ function onSort(headerKey: string): void {
     queryParams.set("sortBy", sortBy.value);
     queryParams.set("order", order.value);
     queryParams.set("cursor", ""); // Reset cursor on sort change
-    currentEndpoint.value = `${props.selectedTab.endpoint}?${queryParams.toString()}`;
+    currentEndpoint.value = `${props.selectedTab._links.view}?${queryParams.toString()}`;
 }
 
 /**
@@ -95,7 +95,7 @@ function onSort(headerKey: string): void {
  */
 function onPaginate(cursor: string): void {
     queryParams.set("cursor", cursor);
-    currentEndpoint.value = `${props.selectedTab.endpoint}?${queryParams.toString()}`;
+    currentEndpoint.value = `${props.selectedTab._links.view}?${queryParams.toString()}`;
 }
 
 /**

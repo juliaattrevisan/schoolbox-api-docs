@@ -17,7 +17,10 @@ export type Tab = {
     type: TabType;
     title: string;
     key: string; // Unique key for the tab, used for routing
-    endpoint: string;
+    _links: {
+        view: string; // URL to view the tab
+        scope?: string; // to view a specific result set within the tab
+    };
 };
 
 /**
