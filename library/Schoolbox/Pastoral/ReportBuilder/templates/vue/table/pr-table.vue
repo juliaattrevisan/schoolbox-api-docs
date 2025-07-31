@@ -278,7 +278,7 @@ window.Vue.onMounted(() => {
                             />
                         </ul>
                     </section>
-                    <div v-if="isLoadingMoreRecords" class="c-island l-pad-m">
+                    <div v-if="isLoadingMoreRecords" class="c-island l-pad-s">
                         <div class="loader"></div>
                     </div>
                     <div v-else-if="!isNewRecordLoad && recordsLoadError" class="alert-box alert f-no-margins">

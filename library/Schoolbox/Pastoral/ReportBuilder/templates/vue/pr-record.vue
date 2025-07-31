@@ -72,18 +72,20 @@ const props = defineProps<{
             </p>
         </div>
         <article>
-            <media-article v-if="props.record.bodyPublic" :content="props.record.bodyPublic" />
-            <p v-if="props.record.tags.length > 0" class="spaced">
-                <template v-for="tag in props.record.tags" :key="tag.id">
-                    <a
-                        class="neutral label hide-on-print"
-                        :href="props.routes.getReportTags.replace('{tagId}', tag.id.toString())"
-                    >
-                        {{ tag.name }}
-                    </a>
-                    <b class="show-for-print"> {{ tag.name }}</b>
-                </template>
-            </p>
+            <div class="l-flex-col l-gap-s">
+                <media-article v-if="props.record.bodyPublic" :content="props.record.bodyPublic" />
+                <p v-if="props.record.tags.length > 0" class="spaced">
+                    <template v-for="tag in props.record.tags" :key="tag.id">
+                        <a
+                            class="neutral label hide-on-print"
+                            :href="props.routes.getReportTags.replace('{tagId}', tag.id.toString())"
+                        >
+                            {{ tag.name }}
+                        </a>
+                        <b class="show-for-print"> {{ tag.name }}</b>
+                    </template>
+                </p>
+            </div>
         </article>
         <ul v-if="props.record.comments.length" class="information-list reply">
             <li v-for="comment in props.record.comments.filter((c) => !c.private)" :key="comment.owner.id">
