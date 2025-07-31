@@ -175,8 +175,10 @@ class Module extends BaseModule
 
         $canModifyCustomParticipation = new Rule\All(
             /* Should only be accessible if the custom participation config is enabled
-            */
+             */
             new Rule\IsConfigOn(ConfigMapper::NAME_CUSTOM_ASSESSMENT_PARTICIPATION, $this->getConfig()),
+            /* Check if the custom participation is available
+             */
             new IsCustomParticipationEnabled(),
             new Rule\Any(
                 $isSuper,
