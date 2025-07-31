@@ -188,7 +188,6 @@ class Controller extends Base
             'folderCollection' => $helper->getFolderCollection($event),
             'user' => $this->getUser(),
 
-
             /* Modify perms are calculated in the attendance list fragment
              * This is synonymous with calling (new Event\Access())->checkExisting() again
              */
