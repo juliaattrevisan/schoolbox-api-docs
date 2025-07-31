@@ -3,7 +3,8 @@
  * Displays a pastoral report in a table format.
  */
 
-import { useTemplateRef } from "vue";
+import { useTemplateRef, toRefs } from "vue";
+import { useScroll } from "@vueuse/core";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import type {
     Tab,
@@ -35,7 +36,7 @@ const props = defineProps<{
 
 // #region scrollable height
 
-const scrollableEl = useTemplateRef<HTMLDivElement>("scrollableEl");
+const scrollableEl = useTemplateRef<HTMLDivElement>("scrollableRef");
 const maxScrollableHeight = window.Vue.ref<string>(`${window.innerHeight - 200}px`); // 200px chosen to give breathing room for header and metadata
 
 /**
@@ -139,6 +140,19 @@ function onCellSelect(header: TableHeader): void {
     isCellExpanded.value = true; // Open the modal to show related records
 }
 
+/**
+ * To display more nodes when there's lots to display and the user has scrolled to the bottom
+ * This avoids a heavy computation for the DOM when there's lots of nodes to display
+ */
+const modalResultsEl = useTemplateRef<HTMLDivElement>("modalResultsRef");
+const { arrivedState } = useScroll(modalResultsEl);
+const { bottom } = toRefs(arrivedState);
+window.Vue.watch(bottom, (isAtBottom) => {
+    if (isAtBottom && recordsPayload.value?.metadata.cursor.next !== null) {
+        console.warn("load more");
+    }
+});
+
 // #endregion
 
 /**
@@ -175,7 +189,7 @@ window.Vue.onMounted(() => {
     </div>
     <template v-else>
         <div
-            ref="scrollableEl"
+            ref="scrollableRef"
             class="table-container scrollable"
             :style="{ maxHeight: maxScrollableHeight }"
             data-test="pr-table"
@@ -244,7 +258,7 @@ window.Vue.onMounted(() => {
                         >
                     </p>
                 </div>
-                <div class="pr-table__records">
+                <div ref="modalResultsRef" class="pr-table__records">
                     <section v-for="record in recordsPayload?.data.results" :key="record.id">
                         <ul class="information-list threaded">
                             <pr-record
