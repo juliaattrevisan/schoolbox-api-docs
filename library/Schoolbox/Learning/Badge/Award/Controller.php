@@ -872,14 +872,14 @@ class Controller extends Base
 
         // create new achievement award from award
         $achievement = $this->mapper->createModel()
-                 ->setRecipient($award->getRecipient())
-                 ->setBadge($award->getBadge())
-                 ->setReason($award->getReason())
-                 ->setReasonedBy($award->getReasonedBy())
-                 ->setReasonedAt($award->getReasonedAt())
-                 ->setStatus(AwardModel::AWARD_STATUS_ACHIEVEMENT)
-                 ->setAwardedBy($this->getUser())
-                 ->setAwardedAt(Alaress_Date_Format::now());
+                                    ->setRecipient($award->getRecipient())
+                                    ->setBadge($award->getBadge())
+                                    ->setReason($award->getReason())
+                                    ->setReasonedBy($award->getReasonedBy())
+                                    ->setReasonedAt($award->getReasonedAt())
+                                    ->setStatus(AwardModel::AWARD_STATUS_ACHIEVEMENT)
+                                    ->setAwardedBy($this->getUser())
+                                    ->setAwardedAt(Alaress_Date_Format::now());
         $achievement = $achievement->setExpiresAt((new ExpiryHelper())->determineExpiry($achievement));
         $this->mapper->save($achievement);
 
