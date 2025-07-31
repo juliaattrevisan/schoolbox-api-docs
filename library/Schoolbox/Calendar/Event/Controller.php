@@ -650,18 +650,18 @@ class Controller extends Base
 
         $folderIds = (
             array_key_exists('folders', (array)$validRequestPost)
-            ? array_map(fn($folder) => $folder['id'], $validRequestPost['folders'])
-            : $event->getFolderCollection()->map(fn($folder) => $folder->getId())->getAll()
+            ? array_map(fn ($folder) => $folder['id'], $validRequestPost['folders'])
+            : $event->getFolderCollection()->map(fn ($folder) => $folder->getId())->getAll()
         );
         $campusIds = (
             array_key_exists('campuses', (array)$validRequestPost)
-            ? array_map(fn($campus) => $campus['id'], $validRequestPost['campuses'])
-            : $event->getCampusCollection()->map(fn($campus) => $campus->getId())->getAll()
+            ? array_map(fn ($campus) => $campus['id'], $validRequestPost['campuses'])
+            : $event->getCampusCollection()->map(fn ($campus) => $campus->getId())->getAll()
         );
         $roleIds = (
             array_key_exists('roles', (array)$validRequestPost)
-            ? array_map(fn($role) => $role['id'], $validRequestPost['roles'])
-            : $event->getRoleCollection()->map(fn($role) => $role->getRoleId())->getAll() // Note $role is Calendar\Relation\Role, so getRoleId().
+            ? array_map(fn ($role) => $role['id'], $validRequestPost['roles'])
+            : $event->getRoleCollection()->map(fn ($role) => $role->getRoleId())->getAll() // Note $role is Calendar\Relation\Role, so getRoleId().
         );
 
         /* Recurrence settings
@@ -777,7 +777,7 @@ class Controller extends Base
         $guestIds = [];
         if ((new Event\Attendance\ValidCanInvite())->isSatisfiedBy($this->getUser(), $this->getConfigLoader()->get('calendar_student_can_invite'))) {
             if (array_key_exists('guests', (array)$validRequestPost)) {
-                $guestIds = array_map(fn($guest) => $guest['id'], $validRequestPost['guests']);
+                $guestIds = array_map(fn ($guest) => $guest['id'], $validRequestPost['guests']);
             } else {
                 $this->eventMapper->populateGuests($event); // Hydrate guests in $event.
                 $guestIds = $event->getGuests()->getAll(); // Note getGuests() returns a Collection of ints.
