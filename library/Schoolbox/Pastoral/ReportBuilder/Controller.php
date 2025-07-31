@@ -382,7 +382,14 @@ class Controller extends Base
         $severityColors = $showSeverity ? $this->getSeverityColors() : [];
 
         $defaultSummaryOptions = [
-            ['title' => 'List', 'type' => 'list', 'key' => 'list', 'endpoint' => 'list']
+            [
+                'title' => 'List',
+                'type' => 'list',
+                'key' => 'list',
+                '_links' => [
+                    'view' => 'list'
+                ]
+            ]
         ];
 
         /* Find the selected list of options
@@ -402,14 +409,24 @@ class Controller extends Base
                 'title' => $option['label'],
                 'type' => $option['type'],
                 'key' => $key,
-                'endpoint' => $this->getRouteIfAuthorized(
-                    'pastoralReportBuilder.getReportByTabType',
-                    [
-                        'reportId' => $report->getId(),
-                        'report' => $report,
-                        'tabType' => $key,
-                    ]
-                )
+                '_links' => [
+                    'view' => $this->getRouteIfAuthorized(
+                        'pastoralReportBuilder.getReportByTabType',
+                        [
+                            'reportId' => $report->getId(),
+                            'report' => $report,
+                            'tabType' => $key,
+                        ]
+                    ),
+                    'scope' => $this->getRouteIfAuthorized(
+                        'pastoralReportBuilder.getReportByTabTypeScope',
+                        [
+                            'reportId' => $report->getId(),
+                            'report' => $report,
+                            'tabType' => $key,
+                        ]
+                    )
+                ]
             ];
         }
 
