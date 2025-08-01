@@ -70,14 +70,18 @@ class Client
     public function subscribe($channel, EventListener $listener)
     {
         $pubSubLoop = $this->redisClient->pubSubLoop();
-        $pubSubLoop->subscribe($channel);
-        $this->loop->addTimer(0.1, function () use ($pubSubLoop, $listener) {
-            foreach ($pubSubLoop as $event) {
-                if ($e = $this->castEvent($event)) {
-                    $listener->handle($e);
-                }
+        $pubSubLoop->subscribe($channel, function ($event) use ($listener) {
+            if ($e = $this->castEvent($event)) {
+                $listener->handle($e);
             }
         });
+//        $this->loop->addTimer(0.1, function () use ($pubSubLoop, $listener) {
+//            foreach ($pubSubLoop as $event) {
+//                if ($e = $this->castEvent($event)) {
+//                    $listener->handle($e);
+//                }
+//            }
+//        });
 //        $this->subscriptions[$channel][] = [
 //            'loop'     => $pubSubLoop,
 //            'listener' => $listener
@@ -94,14 +98,19 @@ class Client
     public function psubscribe($pattern, EventListener $listener)
     {
         $pubSubLoop = $this->redisClient->pubSubLoop();
-        $pubSubLoop->psubscribe($pattern);
-        $this->loop->addTimer(0.1, function () use ($pubSubLoop, $listener) {
-            foreach ($pubSubLoop as $event) {
-                if ($e = $this->castEvent($event)) {
-                    $listener->handle($e);
-                }
+        $pubSubLoop->psubscribe($pattern, function ($event) use ($listener) {
+            if ($e = $this->castEvent($event)) {
+                $listener->handle($e);
             }
         });
+//        $pubSubLoop->psubscribe($pattern);
+//        $this->loop->addTimer(0.1, function () use ($pubSubLoop, $listener) {
+//            foreach ($pubSubLoop as $event) {
+//                if ($e = $this->castEvent($event)) {
+//                    $listener->handle($e);
+//                }
+//            }
+//        });
 
 //        $this->patternSubscriptions[$pattern][] = [
 //            'loop'     => $pubSubLoop,
