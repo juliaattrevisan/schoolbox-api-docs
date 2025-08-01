@@ -306,7 +306,7 @@ window.Vue.onUnmounted(() => {
                 <div class="l-flex-col l-gap-s f-no-margins">
                     <h2>{{ props.title }}</h2>
                     <p class="meta">
-                        Type: {{ selectedHeader.title }}
+                        <template v-if="selectedHeader.title !== 'Total'">Type: {{ selectedHeader.title }}</template>
                         <template v-if="selectedHeader.subTitle"
                             ><br />Sub-Type: {{ selectedHeader.subTitle }}</template
                         >
@@ -361,5 +361,8 @@ window.Vue.onUnmounted(() => {
 .pr-table__records {
     max-height: 650px;
     overflow-y: auto;
+    section {
+        margin-bottom: 1rem;
+    }
 }
 </style>
