@@ -1,5 +1,5 @@
 /**
- * Retrieve a set of table payload data based on the provided endpoint.
+ * Retrieve a set of table payload data based on the provided url.
  */
 
 import type { Ref } from "vue";
@@ -9,11 +9,11 @@ import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { TablePayload } from "../../js/types/pastoralReportTypes";
 
 /**
- * load the pastoral report table data from the given endpoint.
- * @param endpoint - the endpoint to load the table data
+ * load the pastoral report table data from the given url.
+ * @param url - the url to load the table data
  * @returns isNewLoading, payload, isEmpty, loadError
  */
-export function useLoadPrTable(endpoint: Ref<string>): {
+export function useLoadPrTable(url: Ref<string>): {
     isNewLoading: Ref<boolean>;
     isMoreLoading: Ref<boolean>;
     payload: Ref<TablePayload | null>;
@@ -47,7 +47,7 @@ export function useLoadPrTable(endpoint: Ref<string>): {
             loadError.value = null;
             controller = new AbortController();
             const response = await apiRequest<TablePayload>({
-                url: endpoint.value,
+                url: url.value,
                 method: "GET",
                 signal: controller.signal,
             });
@@ -81,12 +81,12 @@ export function useLoadPrTable(endpoint: Ref<string>): {
     }
 
     /**
-     * when the endpoint to trigger load changes provided the endpoint is not empty
-     * and the new endpoint is different from the old one, load the data
+     * when the url to trigger load changes provided the url is not empty
+     * and the new url is different from the old one, load the data
      */
-    window.Vue.watch(endpoint, (newEndpoint, oldEndpoint) => {
-        if (endpoint.value !== "" && newEndpoint !== oldEndpoint) {
-            isNewLoad.value = isNewUrl(oldEndpoint, newEndpoint);
+    window.Vue.watch(url, (newUrl, oldUrl) => {
+        if (url.value !== "" && newUrl !== oldUrl) {
+            isNewLoad.value = isNewUrl(oldUrl, newUrl);
             void load();
         }
     });
