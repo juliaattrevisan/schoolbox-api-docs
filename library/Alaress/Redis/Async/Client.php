@@ -218,26 +218,26 @@ class Client
 //            $this->client->$type($argument);
 //        }
 //    }
-
-
-    /**
-     * Cast a primitive object into an actual class
-     *
-     * @param stdClass $event
-     * @return IEvent
-     */
-    private function castEvent(stdClass $event)
-    {
-        switch ($event->kind) {
-            case 'pong':
-                return new Pong($event->payload);
-            case 'message':
-                return new Message($event->payload, $event->channel);
-            case 'pmessage':
-                return new PMessage($event->payload, $event->channel, $event->pattern);
-            default:
-                // given its async nature, throwing an exception in here would be pointless
-                return null;
-        }
-    }
+//
+//
+//    /**
+//     * Cast a primitive object into an actual class
+//     *
+//     * @param stdClass $event
+//     * @return IEvent
+//     */
+//    private function castEvent(stdClass $event)
+//    {
+//        switch ($event->kind) {
+//            case 'pong':
+//                return new Pong($event->payload);
+//            case 'message':
+//                return new Message($event->payload, $event->channel);
+//            case 'pmessage':
+//                return new PMessage($event->payload, $event->channel, $event->pattern);
+//            default:
+//                // given its async nature, throwing an exception in here would be pointless
+//                return null;
+//        }
+//    }
 }
