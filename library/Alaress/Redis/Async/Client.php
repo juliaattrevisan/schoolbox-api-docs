@@ -20,10 +20,10 @@ use stdClass;
 
 class Client
 {
-    /** @var Predis\Async\Client */
-    private $client;
-
-    private Predis\PubSub\Consumer $pubSubConsumer;
+//    /** @var Predis\Async\Client */
+//    private $client;
+//
+//    private Predis\PubSub\Consumer $pubSubConsumer;
 
     /**
      * Subscriptions to a single channel.
@@ -59,7 +59,6 @@ class Client
         $dsn,
         private LoopInterface $loop
     ) {
-        $this->client = new Predis\Async\Client($dsn, $loop);
     }
 
     /**
@@ -70,23 +69,14 @@ class Client
     public function subscribe($channel, EventListener $listener)
     {
         $pubSubLoop = $this->redisClient->pubSubLoop();
-        $pubSubLoop->subscribe($channel, function ($event) use ($listener) {
-            if ($e = $this->castEvent($event)) {
-                $listener->handle($e);
+        $pubSubLoop->subscribe($channel);
+        $this->loop->addTimer(0.1, function () use ($pubSubLoop, $listener) {
+            foreach ($pubSubLoop as $event) {
+                if ($e = $this->castEvent($event)) {
+                    $listener->handle($e);
+                }
             }
         });
-//        $this->loop->addTimer(0.1, function () use ($pubSubLoop, $listener) {
-//            foreach ($pubSubLoop as $event) {
-//                if ($e = $this->castEvent($event)) {
-//                    $listener->handle($e);
-//                }
-//            }
-//        });
-//        $this->subscriptions[$channel][] = [
-//            'loop'     => $pubSubLoop,
-//            'listener' => $listener
-//        ];
-//        $this->timer ??= $this->addTimer();
     }
 
 
@@ -98,26 +88,14 @@ class Client
     public function psubscribe($pattern, EventListener $listener)
     {
         $pubSubLoop = $this->redisClient->pubSubLoop();
-        $pubSubLoop->psubscribe($pattern, function ($event) use ($listener) {
-            if ($e = $this->castEvent($event)) {
-                $listener->handle($e);
+        $pubSubLoop->psubscribe($pattern);
+        $this->loop->addTimer(0.1, function () use ($pubSubLoop, $listener) {
+            foreach ($pubSubLoop as $event) {
+                if ($e = $this->castEvent($event)) {
+                    $listener->handle($e);
+                }
             }
         });
-//        $pubSubLoop->psubscribe($pattern);
-//        $this->loop->addTimer(0.1, function () use ($pubSubLoop, $listener) {
-//            foreach ($pubSubLoop as $event) {
-//                if ($e = $this->castEvent($event)) {
-//                    $listener->handle($e);
-//                }
-//            }
-//        });
-
-//        $this->patternSubscriptions[$pattern][] = [
-//            'loop'     => $pubSubLoop,
-//            'listener' => $listener
-//        ];
-//        $this->timer ??= $this->addTimer();
-//        $this->addSubscription(Predis\Async\PubSub\Consumer::PSUBSCRIBE, $pattern, $listener);
     }
 
 
@@ -130,7 +108,6 @@ class Client
         $pubSubLoop = $this->redisClient->pubSubLoop();
         $pubSubLoop->unsubscribe($channel);
         unset($this->subscriptions[$channel]);
-//        $this->removeSubscription(Predis\Async\PubSub\Consumer::UNSUBSCRIBE, $channel);
     }
 
 
@@ -177,45 +154,45 @@ class Client
 //    private function processSubscription(array $subscription)
 
 
-    /**
-     * @param string          $type
-     * @param string|string[] $arguments
-     * @param EventListener   $listener
-     * @throws Predis\ClientException if the subscribe fails
-     */
-    private function addSubscription($type, $arguments, EventListener $listener)
-    {
-        if (empty($arguments)) {
-            return;
-        }
-
-        $arguments = (array)$arguments;
-        $channels  = [ $type => $arguments ];
-
-        $this->client->pubSubLoop($channels, function (stdClass $event) use ($listener): void {
-            // cast this stdClass event object to a named class and push to the listener
-            if ($e = $this->castEvent($event)) {
-                $listener->handle($e);
-            }
-        });
-    }
-
-
-    /**
-     * @param string          $type
-     * @param string|string[] $arguments
-     * @throws Predis\ClientException if the unsubscribe fails
-     */
-    private function removeSubscription($type, $arguments)
-    {
-        if (empty($arguments)) {
-            return;
-        }
-
-        foreach ((array)$arguments as $argument) {
-            $this->client->$type($argument);
-        }
-    }
+//    /**
+//     * @param string          $type
+//     * @param string|string[] $arguments
+//     * @param EventListener   $listener
+//     * @throws Predis\ClientException if the subscribe fails
+//     */
+//    private function addSubscription($type, $arguments, EventListener $listener)
+//    {
+//        if (empty($arguments)) {
+//            return;
+//        }
+//
+//        $arguments = (array)$arguments;
+//        $channels  = [ $type => $arguments ];
+//
+//        $this->client->pubSubLoop($channels, function (stdClass $event) use ($listener): void {
+//            // cast this stdClass event object to a named class and push to the listener
+//            if ($e = $this->castEvent($event)) {
+//                $listener->handle($e);
+//            }
+//        });
+//    }
+//
+//
+//    /**
+//     * @param string          $type
+//     * @param string|string[] $arguments
+//     * @throws Predis\ClientException if the unsubscribe fails
+//     */
+//    private function removeSubscription($type, $arguments)
+//    {
+//        if (empty($arguments)) {
+//            return;
+//        }
+//
+//        foreach ((array)$arguments as $argument) {
+//            $this->client->$type($argument);
+//        }
+//    }
 
 
     /**
