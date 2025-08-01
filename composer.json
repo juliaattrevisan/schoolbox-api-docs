@@ -38,7 +38,6 @@
         "sabre/vobject" : "^4.4.0",
         "ezyang/htmlpurifier": "^4.14.0",
         "twig/twig": "^v3.20.0",
-        "maximebf/debugbar": "^v2.1.0",
         "predis/predis": "^1.0",
         "monolog/monolog": "^3.7",
         "league/flysystem": "^3.5.2",
@@ -148,7 +147,8 @@
         "codeception/module-cli": "^2.0",
         "codeception/module-rest": "^3.4",
         "codeception/module-phpbrowser": "^3.0",
-        "rector/rector": "^2.0.7"
+        "rector/rector": "^2.0.7",
+        "php-debugbar/php-debugbar": "^2.2"
     },
     "config": {
         "allow-plugins": {
