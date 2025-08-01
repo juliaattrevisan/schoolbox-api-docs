@@ -24,30 +24,30 @@ class Client
 //    private $client;
 //
 //    private Predis\PubSub\Consumer $pubSubConsumer;
-
-    /**
-     * Subscriptions to a single channel.
-     *
-     * @var array<string, array<array{loop: Predis\PubSub\Consumer, listener: EventListener}>>
-     */
-    private array $subscriptions = [];
-
-    /**
-     * Subscriptions to a channel pattern.
-     *
-     * @var array<string, array<array{loop: Predis\PubSub\Consumer, listener: EventListener}>>
-     */
-    private array $patternSubscriptions = [];
-
-    /**
-     * The timer function used for fetching subscriptions.
-     */
-    private ?TimerInterface $timer = null;
-
-    /**
-     * @var array<EventListener>
-     */
-    private array $eventListeners = [];
+//
+//    /**
+//     * Subscriptions to a single channel.
+//     *
+//     * @var array<string, array<array{loop: Predis\PubSub\Consumer, listener: EventListener}>>
+//     */
+//    private array $subscriptions = [];
+//
+//    /**
+//     * Subscriptions to a channel pattern.
+//     *
+//     * @var array<string, array<array{loop: Predis\PubSub\Consumer, listener: EventListener}>>
+//     */
+//    private array $patternSubscriptions = [];
+//
+//    /**
+//     * The timer function used for fetching subscriptions.
+//     */
+//    private ?TimerInterface $timer = null;
+//
+//    /**
+//     * @var array<EventListener>
+//     */
+//    private array $eventListeners = [];
 
     /**
      * @param Predis\ClientInterface $redisClient
@@ -107,7 +107,6 @@ class Client
     {
         $pubSubLoop = $this->redisClient->pubSubLoop();
         $pubSubLoop->unsubscribe($channel);
-        unset($this->subscriptions[$channel]);
     }
 
 
@@ -119,37 +118,35 @@ class Client
     {
         $pubSubLoop = $this->redisClient->pubSubLoop();
         $pubSubLoop->punsubscribe($pattern);
-        unset($this->patternSubscriptions[$pattern]);
-//        $this->removeSubscription(Predis\Async\PubSub\Consumer::PUNSUBSCRIBE, $pattern);
     }
-
-
-    private function addTimer(): TimerInterface
-    {
-        return $this->loop->addPeriodicTimer(
-            0.1,
-            function () {
-                foreach ($this->subscriptions as $subscriptions) {
-                    foreach ($subscriptions as $subscription) {
-                        foreach ($subscription['loop'] as $event) {
-                            if ($e = $this->castEvent($event)) {
-                                $subscription['listener']->handle($e);
-                            }
-                        }
-                    }
-                }
-                foreach ($this->patternSubscriptions as $subscriptions) {
-                    foreach ($subscriptions as $subscription) {
-                        foreach ($subscription['loop'] as $event) {
-                            if ($e = $this->castEvent($event)) {
-                                $subscription['listener']->handle($e);
-                            }
-                        }
-                    }
-                }
-            }
-        );
-    }
+//
+//
+//    private function addTimer(): TimerInterface
+//    {
+//        return $this->loop->addPeriodicTimer(
+//            0.1,
+//            function () {
+//                foreach ($this->subscriptions as $subscriptions) {
+//                    foreach ($subscriptions as $subscription) {
+//                        foreach ($subscription['loop'] as $event) {
+//                            if ($e = $this->castEvent($event)) {
+//                                $subscription['listener']->handle($e);
+//                            }
+//                        }
+//                    }
+//                }
+//                foreach ($this->patternSubscriptions as $subscriptions) {
+//                    foreach ($subscriptions as $subscription) {
+//                        foreach ($subscription['loop'] as $event) {
+//                            if ($e = $this->castEvent($event)) {
+//                                $subscription['listener']->handle($e);
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        );
+//    }
 
 //    private function processSubscription(array $subscription)
 
