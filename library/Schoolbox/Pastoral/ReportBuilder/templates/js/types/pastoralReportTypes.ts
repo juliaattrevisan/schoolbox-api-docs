@@ -20,6 +20,7 @@ export type Tab = {
     _links: {
         view: string; // URL to view the tab
         scope?: string; // to view a specific result set within the tab
+        scopeExport?: string; // to export the specific result set within the tab
     };
 };
 

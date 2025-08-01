@@ -160,6 +160,16 @@ const {
 } = useLoadRecords(scopeUrl);
 
 /**
+ * Get the current scope export url to download the related records as CSV
+ * @returns - the current scope export URL
+ */
+function scopeExportUrl(): string {
+    return props.selectedTab._links.scopeExport
+        ? `${props.selectedTab._links.scopeExport}?${scopeUrlParams.toString()}`
+        : "";
+}
+
+/**
  * Handle total cell selection
  * @param header - the header of the cell that was selected
  */
@@ -316,7 +326,8 @@ window.Vue.onUnmounted(() => {
                         </p>
                     </div>
                     <a
-                        :href="props.routes.getReportResultsExport"
+                        v-if="props.selectedTab._links.scopeExport"
+                        :href="scopeExportUrl()"
                         aria-label="Download related records as CSV"
                         title="Download related records as CSV"
                         ><sbx-icon name="download"
