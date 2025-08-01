@@ -103,7 +103,7 @@ class Cursor implements ICursor
             $param['student_id'] = $this->rowKey;
         }
 
-        if (null !== $this->columnKey) {
+        if (null !== $this->columnKey && 'total' !== $this->columnKey) {
             $match = $this->getColumnKeyByTabType();
             $where[] = "p.{$match['type']}_id = :column_id";
             $param['column_id'] = $match['id'];
