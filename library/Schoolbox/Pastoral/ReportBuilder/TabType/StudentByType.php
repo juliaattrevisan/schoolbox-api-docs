@@ -33,9 +33,9 @@ class StudentByType extends Cursor implements TabTypeInterface
 
         return match (strtolower($resultType)) {
             Cursor::RESULT_TYPE_RECORDS =>
-            "ROUND(COUNT(CASE WHEN p.{$typeKey}_id = {$value} THEN 1 END), 2) AS :{$label}",
+            "ROUND(COUNT(CASE WHEN distinctRecords.{$typeKey}_id = {$value} THEN 1 END), 2) AS :{$label}",
             Cursor::RESULT_TYPE_POINTS =>
-            "ROUND(SUM(CASE WHEN p.{$typeKey}_id = {$value} THEN p.points END), 2) AS :{$label}",
+            "ROUND(SUM(CASE WHEN distinctRecords.{$typeKey}_id = {$value} THEN distinctRecords.points END), 2) AS :{$label}",
             default => throw new \Exception("Unknown result type: '{$resultType}'"),
         };
     }
@@ -138,13 +138,16 @@ class StudentByType extends Cursor implements TabTypeInterface
         $whereQuery = implode(" AND ", $this->helper->getFilters());
 
         $countQuery =
-            "SELECT p.student_id, {$countQuery}
+            "
+            SELECT distinctRecords.student_id, {$countQuery}
+            FROM (SELECT DISTINCT p.*
             {$this->helper->getFromString()}
             WHERE
                 ({$whereTypeSubTypeQuery}) AND
                 {$whereQuery} AND
                 p.deleted_at IS NULL
-            GROUP BY p.student_id
+            ) distinctRecords
+            GROUP BY distinctRecords.student_id
            ";
 
         $typeKeys = implode(
