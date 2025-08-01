@@ -387,7 +387,14 @@ class Controller extends Base
                 'type' => 'list',
                 'key' => 'list',
                 '_links' => [
-                    'view' => 'list'
+                    'view' => 'list',
+                    'export' => $this->getRouteIfAuthorized(
+                        'pastoralReportBuilder.getReportResultsExport',
+                        [
+                            'reportId' => $report->getId(),
+                            'report' => $report,
+                        ]
+                    )
                 ]
             ]
         ];
