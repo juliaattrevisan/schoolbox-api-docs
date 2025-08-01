@@ -227,11 +227,11 @@ class Client
     private function castEvent(stdClass $event)
     {
         switch ($event->kind) {
-            case Predis\Async\PubSub\Consumer::PONG:
+            case 'pong':
                 return new Pong($event->payload);
-            case Predis\Async\PubSub\Consumer::MESSAGE:
+            case 'message':
                 return new Message($event->payload, $event->channel);
-            case Predis\Async\PubSub\Consumer::PMESSAGE:
+            case 'pmessage':
                 return new PMessage($event->payload, $event->channel, $event->pattern);
             default:
                 // given its async nature, throwing an exception in here would be pointless
