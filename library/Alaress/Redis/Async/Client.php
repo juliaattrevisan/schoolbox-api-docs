@@ -20,8 +20,7 @@ use stdClass;
 
 class Client
 {
-//    /** @var Predis\Async\Client */
-//    private $client;
+    private \Clue\React\Redis\Client $client;
 //
 //    private Predis\PubSub\Consumer $pubSubConsumer;
 //
@@ -59,6 +58,10 @@ class Client
         $dsn,
         private LoopInterface $loop
     ) {
+        $clientFactory = new \Clue\React\Redis\Factory($this->loop);
+        $this->client  = $clientFactory->createLazyClient(
+            sprintf('%s:%s', parse_url($dsn, PHP_URL_HOST), parse_url($dsn, PHP_URL_PORT)),
+        );
     }
 
     /**
@@ -68,15 +71,24 @@ class Client
      */
     public function subscribe($channel, EventListener $listener)
     {
-        $pubSubLoop = $this->redisClient->pubSubLoop();
-        $pubSubLoop->subscribe($channel);
-        $this->loop->addTimer(0.1, function () use ($pubSubLoop, $listener) {
-            foreach ($pubSubLoop as $event) {
+        $this->client->subscribe($channel);
+        $this->client->on('message', function (string $chan, string $payload) use ($channel, $listener) {
+            if ($chan === $channel) {
+                $event = json_decode($payload);
                 if ($e = $this->castEvent($event)) {
                     $listener->handle($e);
                 }
             }
         });
+//        $pubSubLoop = $this->redisClient->pubSubLoop();
+//        $pubSubLoop->subscribe($channel);
+//        $this->loop->addTimer(0.1, function () use ($pubSubLoop, $listener) {
+//            foreach ($pubSubLoop as $event) {
+//                if ($e = $this->castEvent($event)) {
+//                    $listener->handle($e);
+//                }
+//            }
+//        });
     }
 
 
@@ -87,15 +99,29 @@ class Client
      */
     public function psubscribe($pattern, EventListener $listener)
     {
-        $pubSubLoop = $this->redisClient->pubSubLoop();
-        $pubSubLoop->psubscribe($pattern);
-        $this->loop->addTimer(0.1, function () use ($pubSubLoop, $listener) {
-            foreach ($pubSubLoop as $event) {
-                if ($e = $this->castEvent($event)) {
-                    $listener->handle($e);
-                }
+        $this->client->psubscribe($pattern);
+        $this->client->on('pmessage', function (string $patt, string $chan, string $payload) use ($listener) {
+            var_dump(func_get_args());
+            $event = json_decode($payload);
+            if ($e = $this->castEvent($event)) {
+                $listener->handle($e);
             }
+//            if ($chan === $channel) {
+//                $event = json_decode($payload);
+//                if ($e = $this->castEvent($event)) {
+//                    $listener->handle($e);
+//                }
+//            }
         });
+//        $pubSubLoop = $this->redisClient->pubSubLoop();
+//        $pubSubLoop->psubscribe($pattern);
+//        $this->loop->addTimer(0.1, function () use ($pubSubLoop, $listener) {
+//            foreach ($pubSubLoop as $event) {
+//                if ($e = $this->castEvent($event)) {
+//                    $listener->handle($e);
+//                }
+//            }
+//        });
     }
 
 
