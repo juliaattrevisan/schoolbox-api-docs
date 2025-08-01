@@ -123,7 +123,7 @@ class CleanupQueue extends CliTool\App
                 $instanceKeyTtlSetCount++;
                 $logger->info(sprintf('Key "%s" TTL >= 0: setting TTL', $key));
                 if ($this->perform()) {
-                    $redis->expire($key, $newExpiryTime);
+                    $redis->expire($key, $newKeyTtl);
                 }
             }
         }
