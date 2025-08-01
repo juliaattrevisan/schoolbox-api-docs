@@ -192,6 +192,16 @@ window.Vue.onMounted(() => {
     initSetScrollableHeight();
     resetTableLoad();
 });
+
+/**
+ * Clean up the ResizeObserver when the component is unmounted
+ */
+window.Vue.onUnmounted(() => {
+    if (resizeObserver.value) {
+        resizeObserver.value.disconnect();
+        resizeObserver.value = null;
+    }
+});
 </script>
 
 <template>
