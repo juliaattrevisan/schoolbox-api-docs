@@ -273,7 +273,7 @@ window.Vue.onUnmounted(() => {
             />
         </div>
     </template>
-    <basic-modal v-model:is-open="isCellExpanded">
+    <basic-modal v-model:is-open="isCellExpanded" has-background-click>
         <div v-if="isNewRecordLoad && isLoadingNewRecords" class="loader"></div>
         <div v-else-if="isNewRecordLoad && recordsLoadError" class="alert-box alert f-no-margins">
             Sorry, there was an error during further record retrieval. Please
