@@ -210,7 +210,8 @@ class Redis
             $parameters = parse_url($parameters);
             $parameters['persistent'] = true;
         }
-        $this->setClient(new AutoRefreshClient($parameters, $options));
+        $options ??= [];
+        $this->setClient(new AutoRefreshClient($parameters, $options + ['connections' => 'relay']));
         $this->instanceId = $instanceId;
         return $this;
     }
