@@ -166,6 +166,7 @@ const {
 function onTotalCellSelect(header: TableHeader): void {
     selectedHeader.value = header;
     scopeLinkParams.set("column", selectedHeader.value.key);
+    scopeLinkParams.delete("row");
     scopeLink.value = `${props.selectedTab._links.scope}?${scopeLinkParams.toString()}`;
     isCellExpanded.value = true; // Open the modal to show related records
 }
