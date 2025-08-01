@@ -166,6 +166,12 @@ class EntriesAndResults extends Base
             'year' => $this->year
         ];
 
+        if ($this->getDbTableName() === self::MAIN_DB_TABLE_NCEA) {
+            $dbTableName = 'uvSchoolBoxNCEAResultsV2';
+        } else {
+            $dbTableName = $this->getDbTableName();
+        }
+
         $query = '
             SELECT
                 CourseDescription,
@@ -187,7 +193,7 @@ class EntriesAndResults extends Base
                 ResultCredits,
                 StudentYear
             FROM
-                dbo.uvSchoolBoxNCEAResultsV2
+                ' . $dbTableName . '
             WHERE
                 id = :externalId AND
                 WithdrawnFlag = 0
