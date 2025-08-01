@@ -89,7 +89,13 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
                 <div v-if="props.config.pastoralPointEnabled" class="checklist">
                     <ul class="option-list l-flex l-gap-m f-no-margins">
                         <li v-for="(option, index) in props.recordsAndPoints" :key="`option-${index}`">
-                            <input :id="option" v-model="recordsOrPoints" type="radio" :value="option" />
+                            <input
+                                :id="option"
+                                v-model="recordsOrPoints"
+                                type="radio"
+                                :value="option"
+                                autocomplete="off"
+                            />
                             <label :for="option" class="f-no-margins">{{ capitalizeFirstLetter(option) }}</label>
                         </li>
                     </ul>
