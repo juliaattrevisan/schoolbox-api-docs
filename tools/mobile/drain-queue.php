@@ -76,12 +76,12 @@ $kernel = new CliTool\Kernel(
                         $messageTtl    = $decodedValue->getTTL();
                         $newExpiryTime = $messageTime + $messageTtl;
                         $currentTime   = time();
-                        $newKeyTtl     = $currentTime - $newExpiryTime;
+                        $newKeyTtl     = $newExpiryTime - $currentTime;
                         $logger->debug(sprintf('.. message time:    %s', date(DATE_ATOM, $messageTime)));
                         $logger->debug(sprintf('.. message TTL:     %d', $messageTtl));
                         $logger->debug(sprintf('.. new expiry time: %s (message time + TTL)', date(DATE_ATOM, $newExpiryTime)));
                         $logger->debug(sprintf('.. current time:    %s', date(DATE_ATOM, $currentTime)));
-                        $logger->debug(sprintf('.. new key TTL:     %d (time - new expiry time)', $newKeyTtl));
+                        $logger->debug(sprintf('.. new key TTL:     %d (new expiry time - current time)', $newKeyTtl));
                         if ($newKeyTtl < 0) {
                             $logger->info(sprintf('Key "%s" TTL < 0: deleting immediately', $key));
                             if ($this->perform()) {
@@ -98,12 +98,13 @@ $kernel = new CliTool\Kernel(
             }
         }
 
+        /**
+         * @inheritdoc
+         */
         public function runAsRoot(): ?bool
         {
             return null;
         }
     },
-    [CliKernelAbstract::OPTION_LEVEL => Monolog\Logger::INFO],
-    true,
 );
 $kernel->runApp();
