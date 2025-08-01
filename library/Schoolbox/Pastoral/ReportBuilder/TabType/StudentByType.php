@@ -176,7 +176,7 @@ class StudentByType extends Cursor implements TabTypeInterface
 
         $query = "SELECT countData.*, {$totalCount}
             FROM ($countQuery) countData
-            INNER JOIN user u ON countData.student_id = u.id";
+        ";
 
         return $query;
     }
@@ -204,24 +204,38 @@ class StudentByType extends Cursor implements TabTypeInterface
 
         if (isset($cursor)) {
             $sortingOperator = $this->order == Cursor::ORDER_DIRECTION_DEFAULT ? ' > ' : ' < ';
-            $whereParts = "
+            if (key_exists('count', $cursor) && ($this->getTypeSubtypeKey()->contains($this->sortBy) | strcasecmp('total', $this->sortBy) === 0)) {
+                $whereParts = "
+                WHERE (
+                          (withTotal.student_id {$sortingOperator} :studentId AND {$this->sortBy} = :countDiscriminator) OR
+                          ({$this->sortBy} {$sortingOperator} :countDiscriminator)
+                      )
+                ";
+                $params['countDiscriminator'] = $cursor['count'];
+            } else {
+                $whereParts = "
                 CROSS JOIN (SELECT id, lastname, COALESCE(preferred_name, firstname) as preferred_name
                 FROM user
-                WHERE id = :cursor) u2
+                WHERE id = :studentId) u2
                 WHERE (
                     u.lastname {$sortingOperator} u2.lastname OR
                     (u.lastname = u2.lastname AND COALESCE(u.preferred_name, u.firstname) {$sortingOperator} u2.preferred_name) OR
-                    (u.lastname = u2.lastname AND COALESCE(u.preferred_name, u.firstname) = u2.preferred_name AND u.id {$sortingOperator} :cursor)
+                    (u.lastname = u2.lastname AND COALESCE(u.preferred_name, u.firstname) = u2.preferred_name AND u.id {$sortingOperator} :studentId)
                 )
             ";
-            $params['cursor'] = $cursor['id'];
+            }
+            $params['studentId'] = $cursor['id'];
         }
 
         $totalQuery = "
-            {$this->getResultQuery()}
+            SELECT *
+            FROM (
+                    {$this->getResultQuery()}
+                ) withTotal
+            INNER JOIN user u ON withTotal.student_id = u.id
             {$whereParts}
-            GROUP BY countData.student_id, {$groupBy}
-            ORDER BY {$orderBy}, countData.student_id {$this->order}
+            GROUP BY withTotal.student_id, {$groupBy}
+            ORDER BY {$orderBy}, withTotal.student_id {$this->order}
             LIMIT :limit
         ";
 
@@ -288,9 +302,14 @@ class StudentByType extends Cursor implements TabTypeInterface
         }
 
         $last = $collection->last();
-        return $this->codec->encode([
-            'id' => $last['student_id'],
-        ]);
+
+        $discriminator = [ 'id' => $last['student_id']];
+
+        if ($this->getTypeSubtypeKey()->contains($this->sortBy) | strcasecmp('total', $this->sortBy) == 0) {
+            $discriminator['count'] = $last[$this->sortBy];
+        }
+
+        return $this->codec->encode($discriminator);
     }
 
     /**
