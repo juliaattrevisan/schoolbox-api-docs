@@ -71,11 +71,18 @@ class Client
     {
         $pubSubLoop = $this->redisClient->pubSubLoop();
         $pubSubLoop->subscribe($channel);
-        $this->subscriptions[$channel][] = [
-            'loop'     => $pubSubLoop,
-            'listener' => $listener
-        ];
-        $this->timer ??= $this->addTimer();
+        $this->loop->addTimer(0.1, function () use ($pubSubLoop, $listener) {
+            foreach ($pubSubLoop as $event) {
+                if ($e = $this->castEvent($event)) {
+                    $listener->handle($e);
+                }
+            }
+        });
+//        $this->subscriptions[$channel][] = [
+//            'loop'     => $pubSubLoop,
+//            'listener' => $listener
+//        ];
+//        $this->timer ??= $this->addTimer();
     }
 
 
@@ -88,11 +95,19 @@ class Client
     {
         $pubSubLoop = $this->redisClient->pubSubLoop();
         $pubSubLoop->psubscribe($pattern);
-        $this->patternSubscriptions[$pattern][] = [
-            'loop'     => $pubSubLoop,
-            'listener' => $listener
-        ];
-        $this->timer ??= $this->addTimer();
+        $this->loop->addTimer(0.1, function () use ($pubSubLoop, $listener) {
+            foreach ($pubSubLoop as $event) {
+                if ($e = $this->castEvent($event)) {
+                    $listener->handle($e);
+                }
+            }
+        });
+
+//        $this->patternSubscriptions[$pattern][] = [
+//            'loop'     => $pubSubLoop,
+//            'listener' => $listener
+//        ];
+//        $this->timer ??= $this->addTimer();
 //        $this->addSubscription(Predis\Async\PubSub\Consumer::PSUBSCRIBE, $pattern, $listener);
     }
 
