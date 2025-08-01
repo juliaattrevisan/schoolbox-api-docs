@@ -73,7 +73,12 @@ window.Vue.onMounted((): void => {
         </div>
         <nav>
             <template v-if="props.results.length">
-                <a v-if="props.export" :href="props.routes.getReportResultsExport" class="icon-download"></a>
+                <a
+                    v-if="props.export"
+                    :href="props.routes.getReportResultsExport"
+                    class="icon-download"
+                    aria-label="Download Report as CSV"
+                ></a>
                 <!-- <a href="#" class="icon-print" title="Print Report Results" @click.prevent="onPrintSelected"></a> -->
             </template>
         </nav>
