@@ -74,10 +74,7 @@ class Client
         $this->client->subscribe($channel);
         $this->client->on('message', function (string $chan, string $payload) use ($channel, $listener) {
             if ($chan === $channel) {
-                $event = json_decode($payload);
-                if ($e = $this->castEvent($event)) {
-                    $listener->handle($e);
-                }
+                $listener->handle(new Message($payload, $chan));
             }
         });
 //        $pubSubLoop = $this->redisClient->pubSubLoop();
@@ -100,12 +97,15 @@ class Client
     public function psubscribe($pattern, EventListener $listener)
     {
         $this->client->psubscribe($pattern);
-        $this->client->on('pmessage', function (string $patt, string $chan, string $payload) use ($listener) {
-            var_dump(func_get_args());
-            $event = json_decode($payload);
-            if ($e = $this->castEvent($event)) {
-                $listener->handle($e);
+        $this->client->on('pmessage', function (string $patt, string $chan, string $payload) use ($pattern, $listener) {
+            if (fnmatch($pattern, $patt)) {
+                $event = new PMessage($payload, $chan, $patt);
+                $listener->handle($event);
             }
+//            $event = json_decode($payload);
+//            if ($e = $this->castEvent($event)) {
+//                $listener->handle($e);
+//            }
 //            if ($chan === $channel) {
 //                $event = json_decode($payload);
 //                if ($e = $this->castEvent($event)) {
@@ -131,8 +131,9 @@ class Client
      */
     public function unsubscribe($channel)
     {
-        $pubSubLoop = $this->redisClient->pubSubLoop();
-        $pubSubLoop->unsubscribe($channel);
+        $this->client->unsubscribe($channel);
+//        $pubSubLoop = $this->redisClient->pubSubLoop();
+//        $pubSubLoop->unsubscribe($channel);
     }
 
 
@@ -142,8 +143,9 @@ class Client
      */
     public function punsubscribe($pattern)
     {
-        $pubSubLoop = $this->redisClient->pubSubLoop();
-        $pubSubLoop->punsubscribe($pattern);
+        $this->client->punsubscribe($pattern);
+//        $pubSubLoop = $this->redisClient->pubSubLoop();
+//        $pubSubLoop->punsubscribe($pattern);
     }
 //
 //
