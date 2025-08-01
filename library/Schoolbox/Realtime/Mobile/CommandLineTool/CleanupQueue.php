@@ -200,10 +200,10 @@ class CleanupQueue extends CliTool\App
             SYNOPSIS:
                 $green{$file} {$yellow}[OPTION]...$white
 
-            DESCRIPTION
+            DESCRIPTION:
                 Tool for cleaning up the mobile daemon's queue data.
 
-                Until recently, this tool stored messages in Redis with no expiry time: thus
+                Until recently, the queue stored messages in Redis with no expiry time: thus
                 keeping the message in Redis long after it had been processed and thus was
                 of no further use.
 
@@ -217,6 +217,7 @@ class CleanupQueue extends CliTool\App
                  to exist until its internal TTL expires: in practice, that internal TTL is
                  always 14 days.)
 
+            OPTIONS:
                 $yellow-h, --help$white
                     Print this help and exit.
 
