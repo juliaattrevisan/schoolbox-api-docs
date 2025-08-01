@@ -34,16 +34,38 @@ const props = defineProps<{
     severityColors: SeverityColors;
 }>();
 
-// #region scrollable height
+// #region scrollable table height
 
-const maxScrollableHeight = window.Vue.ref<string>(`${window.innerHeight - 200}px`); // 200px chosen to give breathing room for header and metadata
+const resizeObserver = window.Vue.ref<ResizeObserver | null>(null);
+const maxScrollableHeight = window.Vue.ref<string>(`${window.innerHeight}px`);
 
 /**
- * Set the max height to allow the thead to use sticky position
- * and to incrementally display large row lists on scroll
+ * Set the max height to allow the table to sit within the browser window
  */
 function setScrollableHeight(): void {
-    maxScrollableHeight.value = `${window.innerHeight - 300}px`;
+    const tabsBottomY = document.querySelector("dl")?.getBoundingClientRect().bottom || 0;
+    const footerHeight = document.getElementById("footer")?.getBoundingClientRect().height || 0;
+
+    const mainSBContainerEl = document.getElementById("container");
+    const mainSBContainerPaddingBtm = mainSBContainerEl
+        ? parseInt(window.getComputedStyle(mainSBContainerEl).paddingBottom, 10)
+        : 0;
+
+    const newHeight = window.innerHeight - tabsBottomY - footerHeight - mainSBContainerPaddingBtm - 1;
+
+    maxScrollableHeight.value = `${newHeight}px`;
+}
+
+/**
+ * Initialize the ResizeObserver to adjust the scrollable height
+ * when the container changes size
+ */
+function initSetScrollableHeight(): void {
+    resizeObserver.value = new ResizeObserver(setScrollableHeight);
+    resizeObserver.value.observe(document.querySelector("#container")!);
+    // Set the initial height, and update it again when the DOM is fully loaded to ensure the footer is included
+    setScrollableHeight();
+    window.addEventListener("DOMContentLoaded", setScrollableHeight, { once: true });
 }
 
 // #endregion
@@ -167,10 +189,7 @@ window.Vue.watch(bottom, (isAtBottom) => {
  * and reset the table load to ensure the correct endpoint is set
  */
 window.Vue.onMounted(() => {
-    setScrollableHeight();
-    window.addEventListener("resize", () => {
-        setScrollableHeight();
-    });
+    initSetScrollableHeight();
     resetTableLoad();
 });
 </script>
