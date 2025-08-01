@@ -16,15 +16,26 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    cellSelect: [header: TableHeader, rowData: { [key: string]: RowOptions }];
+    cellSelect: [header: TableHeader, rowId: number];
 }>();
+
+/**
+ * Returns the row id, currently if there's a 'user' key in rowData,
+ * it'll return the user's id, otherwise it defaults to 0.
+ * @returns - The id of the row, or 0 if not defined.
+ */
+const rowId = (): number => {
+    // check if there's a 'user' key in rowData and return its id if it exists
+    const user = props.rowData.user as User;
+    return user?.id || 0; // Default to 0 if user is not defined
+};
 
 /**
  * Handles the cell click
  * @param header - the header of the cell that was clicked
  */
 function onCellSelected(header: TableHeader): void {
-    emit("cellSelect", header, props.rowData);
+    emit("cellSelect", header, rowId());
 }
 
 /**

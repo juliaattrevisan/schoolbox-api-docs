@@ -173,11 +173,12 @@ function onTotalCellSelect(header: TableHeader): void {
 /**
  * Handle row cell selection
  * @param header - the header of the cell that was selected
+ * @param rowId - the id of the row that was selected
  */
-function onRowCellSelect(header: TableHeader, rowData: { [key: string]: RowOptions }): void {
+function onRowCellSelect(header: TableHeader, rowId: number): void {
     selectedHeader.value = header;
     scopeLinkParams.set("column", selectedHeader.value.key);
-    scopeLinkParams.set("row", rowData["user"].id.toString()); // Assuming rowData["user"] contains the user object with an id
+    scopeLinkParams.set("row", rowId.toString());
     scopeLink.value = `${props.selectedTab._links.scope}?${scopeLinkParams.toString()}`;
     isCellExpanded.value = true; // Open the modal to show related records
 }
