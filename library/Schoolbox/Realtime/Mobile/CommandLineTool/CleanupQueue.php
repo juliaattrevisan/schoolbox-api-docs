@@ -39,6 +39,14 @@ class CleanupQueue extends CliTool\App
     private const KEYSPACE_PATTERN = 'msg:%s:s:*';
 
     /**
+     * How many keys should be fetched at once from Redis?
+     *
+     * This affects how many keys the Redis keyspace scan should fetch at most,
+     * and also after how many keys a progress notice is output.
+     */
+    private const CHUNK_SIZE = 10_000;
+
+    /**
      * @inheritdoc
      */
     public function run(): void
@@ -55,10 +63,14 @@ class CleanupQueue extends CliTool\App
         $instanceKeyNoTtlCount   = 0;
         $instanceKeyTtlSetCount  = 0;
         $instanceKeyDeletedCount = 0;
-        $keyspace = new Keyspace($redis, $pattern, 10_000);
+        $keyspace = new Keyspace($redis, $pattern, self::CHUNK_SIZE);
         foreach ($keyspace as $key) {
             // Decode the value, only processing Instance objects
             $keyCount++;
+            if ($keyCount % self::CHUNK_SIZE === 0) {
+                $logger->notice(sprintf('Searched keys: %d', $keyCount));
+            }
+
             $value             = $redis->get($key);
             $uncompressedValue = gzuncompress($value);
             if ($uncompressedValue === false) {
