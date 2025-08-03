@@ -491,10 +491,9 @@ EOL;
             $di->lazyNew(
                 MultiInstance\RedisAsyncClientRepository::class,
                 [
-                    'redisClientRepository' => $di->lazyGet('multiInstance.redisCacheClientRepository'),
-                    'configRepository'      => $di->lazyGet('multiInstance.configRepository'),
-                    'configKey'             => ConfigMapper::NAME_REDIS_EPHEMERAL_URL,
-                    'loop'                  => $di->lazyGet('react.loop'),
+                    'configRepository' => $di->lazyGet('multiInstance.configRepository'),
+                    'configKey'        => ConfigMapper::NAME_REDIS_EPHEMERAL_URL,
+                    'loop'             => $di->lazyGet('react.loop'),
                 ],
             )
         );

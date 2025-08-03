@@ -32,17 +32,13 @@ class RedisAsyncClientRepository
     /**
      * Constructor
      *
-     * @param RedisClientRepository $redisClientRepository Redis client repository: required for fetching Redis clients
-     *                                                     for instances.
-     * @param ConfigRepository      $configRepository      Config repository: required for fetching Redis URLs for
-     *                                                     instances.
-     * @param string                $configKey             The config key which stores the Redis URL.
-     *                                                     Should be one of the `Schoolbox\Config\ConfigMapper`
-     *                                                     constants `NAME_REDIS_URL` or `NAME_REDIS_EPHEMERAL_URL`.
-     * @param LoopInterface         $loop                  Event loop: required for async clients.
+     * @param ConfigRepository $configRepository Config repository: required for fetching Redis URLs for instances.
+     * @param string           $configKey        The config key which stores the Redis URL.
+     *                                           Should be one of the `Schoolbox\Config\ConfigMapper` constants
+     *                                           `NAME_REDIS_URL` or `NAME_REDIS_EPHEMERAL_URL`.
+     * @param LoopInterface    $loop             Event loop: required for async clients.
      */
     public function __construct(
-        private RedisClientRepository $redisClientRepository,
         private ConfigRepository $configRepository,
         private string $configKey,
         private LoopInterface $loop,
