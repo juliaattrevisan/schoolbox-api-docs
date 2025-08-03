@@ -429,11 +429,13 @@ EOL;
         $di->set('redis.signalQueue.sub', $di->lazy(function () use ($di) {
             /** @var IConfigLoader $conf */
             $conf = $di->get('config');
-            return new AsyncRedisClient(
-                $di->get('redis.signalQueue.pub'),
-                $conf->get(ConfigMapper::NAME_REDIS_EPHEMERAL_URL),
-                $di->get('react.loop'),
+            $dsn  = $conf->get(ConfigMapper::NAME_REDIS_EPHEMERAL_URL);
+            $asyncRedisClientFactory = new \Clue\React\Redis\Factory($di->get('react.loop'));
+            $asyncRedisClient        = $asyncRedisClientFactory->createLazyClient(
+                sprintf('%s:%s', parse_url($dsn, PHP_URL_HOST), parse_url($dsn, PHP_URL_PORT)),
             );
+
+            return new AsyncRedisClient($asyncRedisClient);
         }));
 
         // Multi-instance repositories

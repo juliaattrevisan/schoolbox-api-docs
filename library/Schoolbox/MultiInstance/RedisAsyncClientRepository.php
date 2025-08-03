@@ -59,10 +59,11 @@ class RedisAsyncClientRepository
         $dsn = $this->configRepository
             ->fetchConfigForInstance($instanceId)
             ->get($this->configKey);
-        return $this->clients[$dsn] ??= new Client(
-            $this->redisClientRepository->fetchForInstance($instanceId),
-            $dsn,
-            $this->loop,
+
+        $asyncRedisClientFactory = new \Clue\React\Redis\Factory($this->loop);
+        $asyncRedisClient        = $asyncRedisClientFactory->createLazyClient(
+            sprintf('%s:%s', parse_url($dsn, PHP_URL_HOST), parse_url($dsn, PHP_URL_PORT)),
         );
+        return $this->clients[$dsn] ??= new Client($asyncRedisClient);
     }
 }

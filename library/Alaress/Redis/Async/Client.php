@@ -13,7 +13,6 @@ namespace Alaress\Redis\Async;
 
 use Alaress\Redis\Async\Event\Message;
 use Alaress\Redis\Async\Event\PMessage;
-use React\EventLoop\LoopInterface;
 use Predis;
 
 /**
@@ -23,25 +22,13 @@ use Predis;
 class Client
 {
     /**
-     * The internal asynchronous Redis client, used only for subscriptions to
-     * pub/sub queues.
+     * Constructor
+     *
+     * @param \Clue\React\Redis\Client $client The internal asynchronous Redis client: used only for subscriptions to
+     *                                         pub/sub queues.
      */
-    private \Clue\React\Redis\Client $client;
-
-    /**
-     * @param Predis\ClientInterface $redisClient
-     * @param string                 $dsn
-     * @param LoopInterface          $loop
-     */
-    public function __construct(
-        private Predis\ClientInterface $redisClient,
-        $dsn,
-        private LoopInterface $loop
-    ) {
-        $clientFactory = new \Clue\React\Redis\Factory($this->loop);
-        $this->client  = $clientFactory->createLazyClient(
-            sprintf('%s:%s', parse_url($dsn, PHP_URL_HOST), parse_url($dsn, PHP_URL_PORT)),
-        );
+    public function __construct(private \Clue\React\Redis\Client $client)
+    {
     }
 
     /**
