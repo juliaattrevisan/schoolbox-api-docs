@@ -41,7 +41,7 @@ class Client
     public function subscribe(array|string $channel, EventListener $listener)
     {
         $channels = is_array($channel) ? $channel : [$channel];
-        $this->client->subscribe($channels);
+        array_map($this->client->subscribe(...), $channels);
         $this->client->on('message', function (string $messageChannel, string $payload) use ($channels, $listener) {
             if (in_array($messageChannel, $channels)) {
                 $listener->handle(new Message($payload, $messageChannel));
@@ -60,7 +60,7 @@ class Client
     public function psubscribe(string|array $pattern, EventListener $listener)
     {
         $patterns = is_array($pattern) ? $pattern : [$pattern];
-        $this->client->psubscribe($patterns);
+        array_map($this->client->psubscribe(...), $patterns);
         $this->client->on('pmessage', function (string $messagePattern, string $messageChannel, string $payload) use ($patterns, $listener) {
             foreach ($patterns as $pattern) {
                 if (fnmatch($pattern, $messagePattern)) {
@@ -80,7 +80,8 @@ class Client
      */
     public function unsubscribe(array|string $channel)
     {
-        $this->client->unsubscribe($channel);
+        $channels = is_array($channel) ? $channel : [$channel];
+        array_map($this->client->unsubscribe(...), $channels);
     }
 
 
@@ -92,6 +93,7 @@ class Client
      */
     public function punsubscribe(array|string $pattern)
     {
-        $this->client->punsubscribe($pattern);
+        $patterns = is_array($pattern) ? $pattern : [$pattern];
+        array_map($this->client->punsubscribe(...), $patterns);
     }
 }
