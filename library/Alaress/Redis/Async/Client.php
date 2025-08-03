@@ -7,6 +7,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Alaress\Redis\Async;
 
 use Alaress\Redis\Async\Event\Message;
@@ -14,8 +16,16 @@ use Alaress\Redis\Async\Event\PMessage;
 use React\EventLoop\LoopInterface;
 use Predis;
 
+/**
+ * Redis asynchronous client wrapper: provides a more convenient interface for
+ * subscribing to pub/sub queues.
+ */
 class Client
 {
+    /**
+     * The internal asynchronous Redis client, used only for subscriptions to
+     * pub/sub queues.
+     */
     private \Clue\React\Redis\Client $client;
 
     /**
@@ -91,7 +101,7 @@ class Client
      * Unsubscribe from one or more message patterns.
      *
      * @param string|array<string> $pattern One or more patterns from which to unsubscribe.
-     * @throws Predis\ClientException if the subscribe fails
+     * @throws Predis\ClientException if the unsubscribe fails
      */
     public function punsubscribe(array|string $pattern)
     {
