@@ -35,53 +35,65 @@ class Client
     }
 
     /**
-     * @param string|string[] $channel  one or more channels to which to subscribe
-     * @param EventListener   $listener
+     * Subscribe to one or more channels.
+     *
+     * @param string|array<string> $channel  One or more channels to which to subscribe.
+     * @param EventListener        $listener The event listener which handles messages on `$channel`.
      * @throws Predis\ClientException if the subscribe fails
      */
-    public function subscribe($channel, EventListener $listener)
+    public function subscribe(array|string $channel, EventListener $listener)
     {
-        $this->client->subscribe($channel);
-        $this->client->on('message', function (string $chan, string $payload) use ($channel, $listener) {
-            if ($chan === $channel) {
-                $listener->handle(new Message($payload, $chan));
+        $channels = is_array($channel) ? $channel : [$channel];
+        $this->client->subscribe($channels);
+        $this->client->on('message', function (string $messageChannel, string $payload) use ($channels, $listener) {
+            if (in_array($messageChannel, $channels)) {
+                $listener->handle(new Message($payload, $messageChannel));
             }
         });
     }
 
 
     /**
-     * @param string|string[] $pattern  one or more patterns to which to subscribe
-     * @param EventListener   $listener
+     * Subscribe to one or more message patterns.
+     *
+     * @param string|array<string> $pattern  One or more patterns to which to subscribe.
+     * @param EventListener        $listener The event listener which handles messages on channels matching `$pattern`.
      * @throws Predis\ClientException if the subscribe fails
      */
-    public function psubscribe($pattern, EventListener $listener)
+    public function psubscribe(string|array $pattern, EventListener $listener)
     {
-        $this->client->psubscribe($pattern);
-        $this->client->on('pmessage', function (string $patt, string $chan, string $payload) use ($pattern, $listener) {
-            if (fnmatch($pattern, $patt)) {
-                $event = new PMessage($payload, $chan, $patt);
-                $listener->handle($event);
+        $patterns = is_array($pattern) ? $pattern : [$pattern];
+        $this->client->psubscribe($patterns);
+        $this->client->on('pmessage', function (string $messagePattern, string $messageChannel, string $payload) use ($patterns, $listener) {
+            foreach ($patterns as $pattern) {
+                if (fnmatch($pattern, $messagePattern)) {
+                    $event = new PMessage($payload, $messageChannel, $messagePattern);
+                    $listener->handle($event);
+                }
             }
         });
     }
 
 
     /**
-     * @param string|string[] $channel  one or more channels from which to unsubscribe
-     * @throws Predis\ClientException if the subscribe fails
+     * Unsubscribe from one or more channels.
+     *
+     * @param string|array<string> $channel One or more channels from which to unsubscribe.
+     * @throws Predis\ClientException if the unsubscribe fails
      */
-    public function unsubscribe($channel)
+    public function unsubscribe(array|string $channel)
     {
         $this->client->unsubscribe($channel);
     }
 
 
     /**
-     * @param string|string[] $pattern  one or more patterns from which to unsubscribe
+     * Unsubscribe from one or more message patterns.
+     *
+     * @param string|array<string> $pattern One or more patterns from which to unsubscribe.
      * @throws Predis\ClientException if the subscribe fails
      */
-    public function punsubscribe($pattern)
+    public function punsubscribe(array|string $pattern)
     {
         $this->client->punsubscribe($pattern);
     }
