@@ -15,6 +15,7 @@ use Alaress\Exception\IO\IOException;
 use Alaress\Lumberjack\Logger;
 use Alaress\Redis\Async\Client as AsyncRedisClient;
 use Aura\Di\Container;
+use Clue\React\Redis\Factory as ReactRedisClientFactory;
 use ErrorException;
 use Exception;
 use PDOException;
@@ -428,14 +429,14 @@ EOL;
         // Redis queue subscription (not persistent)
         $di->set('redis.signalQueue.sub', $di->lazy(function () use ($di) {
             /** @var IConfigLoader $conf */
-            $conf = $di->get('config');
-            $dsn  = $conf->get(ConfigMapper::NAME_REDIS_EPHEMERAL_URL);
-            $asyncRedisClientFactory = new \Clue\React\Redis\Factory($di->get('react.loop'));
-            $asyncRedisClient        = $asyncRedisClientFactory->createLazyClient(
+            $conf                    = $di->get('config');
+            $dsn                     = $conf->get(ConfigMapper::NAME_REDIS_EPHEMERAL_URL);
+            $reactRedisClientFactory = new ReactRedisClientFactory($di->get('react.loop'));
+            $reactRedisClient        = $reactRedisClientFactory->createLazyClient(
                 sprintf('%s:%s', parse_url($dsn, PHP_URL_HOST), parse_url($dsn, PHP_URL_PORT)),
             );
 
-            return new AsyncRedisClient($asyncRedisClient);
+            return new AsyncRedisClient($reactRedisClient);
         }));
 
         // Multi-instance repositories

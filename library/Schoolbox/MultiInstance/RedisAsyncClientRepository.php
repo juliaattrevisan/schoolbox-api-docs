@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\MultiInstance;
 
 use Alaress\Redis\Async\Client;
+use Clue\React\Redis\Factory as ReactRedisClientFactory;
 use React\EventLoop\LoopInterface;
 
 /**
@@ -60,10 +61,10 @@ class RedisAsyncClientRepository
             ->fetchConfigForInstance($instanceId)
             ->get($this->configKey);
 
-        $asyncRedisClientFactory = new \Clue\React\Redis\Factory($this->loop);
-        $asyncRedisClient        = $asyncRedisClientFactory->createLazyClient(
+        $reactRedisClientFactory = new ReactRedisClientFactory($this->loop);
+        $reactRedisClient        = $reactRedisClientFactory->createLazyClient(
             sprintf('%s:%s', parse_url($dsn, PHP_URL_HOST), parse_url($dsn, PHP_URL_PORT)),
         );
-        return $this->clients[$dsn] ??= new Client($asyncRedisClient);
+        return $this->clients[$dsn] ??= new Client($reactRedisClient);
     }
 }
