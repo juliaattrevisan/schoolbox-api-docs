@@ -227,7 +227,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         }
 
         try {
-            $this->redis->executeCommand(new RawCommand(['UNLINK', $key]));
+            $this->redis->executeCommand(new RawCommand('UNLINK', [$key]));
         } catch (ServerException $e) {
             $this->useUnlink = false;
             $this->redis->del([$key]);
