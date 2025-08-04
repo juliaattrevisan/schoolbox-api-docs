@@ -796,6 +796,12 @@ class Controller extends Base
          */
         $users = array_fill_keys(\Schoolbox\UserMapper::getInstance()->findByExternalIds($students, \Schoolbox\Role::STUDENT)->indexBy('id')->keys(), true);
 
+        /* TODO combine with guys in a group, not just a class list from the externals, then dedupe
+         */
+
+        /* TODO cleanup w/ dependency injections
+         */
+
         /* Find all the learning moments in the specified date range
          */
         $pb = $this->mapper->getPredicateBuilder()
