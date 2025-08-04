@@ -787,29 +787,41 @@ class Controller extends Base
         $pb = $this->mapper->getPredicateBuilder()
             ->between('updated_at', $from, $to);
 
-        $result = $this->mapper->findByPredicates($pb)->sortBy('updatedAt', 'DESC');
+        $moments = $this->mapper->findByPredicates($pb)->sortBy('updatedAt', 'DESC');
 
-        new \Alaress_Probe($result);
+        foreach ($moments as $moment) {
+            $index = $moment->getUpdatedAt()->getLocalShort();
 
-        $payload = [
-            'date' => [
-                'moment 1' => [
-                    'id' => null,
-                    'body' => null,
-                    'recipient' => null,
-                    'createdBy' => null,
-                    'hasComments' => null,
-                    'currentStatus' => null,
-                    'date' => [
-                        'index' => null,
-                        'updatedAt' => null,
-                        'submittedAt' => null,
-                        'publishAt' => null,
-                        'rejectedAt' => null,
-                    ]
+            $payload[$index][] = [
+                'id' => $moment->getId(),
+                'body' => $moment->getBody(),
+                'recipient' => [
+                    'id' => $moment->getRecipient()->getId(),
+                    'fullname' => $moment->getRecipient()->getFullname(),
+                    'firstname' => $moment->getRecipient()->getFirstname(),
+                    'lastname' => $moment->getRecipient()->getLastname(),
+                    'portrait' => $moment->getRecipient()->getPortrait()->getHash(),
+                    /* Maybe needed later, since we're looking at a cohort report and you perhaps
+                     * get multiple guys with the same name; it wasn't in the wireframes tho
+                     *
+                     * TODO Anyway, recipients need their role hydrated before you can use this
+                     */
+                    // 'role' => $moment->getRecipient()->getPreferredTitle()
+                ],
+                'creator' => $moment->getCreator()->getFullname(),
+                'hasComments' => $this->hasComments($moment),
+                'currentState' => $moment->getCurrentState(),
+                'date' => [
+                    'index' => $moment->getUpdatedAt()->getLocalShort(),
+                    'updatedAt' => $moment->getUpdatedAt()->getDatabase(),
+                    'submittedAt' => $moment->getSubmittedAt()?->getDatabase(),
+                    'publishAt' => $moment->getPublishedAt()?->getDatabase(),
+                    'rejectedAt' => $moment->getRejectedAt()?->getDatabase(),
                 ]
-            ]
-        ];
+            ];
+        }
+
+        new \Alaress_Probe($payload);
 
     }
 }
