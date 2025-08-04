@@ -796,7 +796,23 @@ class Controller extends Base
         /* Get a list of student ids that are in $folder and use a hash lookup
          * to cross reference everything we find later
          */
-        if ('' !== $folder->getCodeString()) {
+        if ($folder->isGroup()) {
+            /* Students in a Group
+             */
+            $userAccessList = $this->userAccessMapper->findForFolder($folder)
+                ->indexByCallback(static function (UserAccess $userAccess) {
+                    return $userAccess->getUser()->getId();
+                });
+
+            if ($userAccessList->count()) {
+                $ids = $this->userMapper->findByColumn('id', $userAccessList->keys())
+                    ->filter(function (\Schoolbox\User $user) {
+                        return ($user->getRole()->isStudent());
+                    })
+                    ->indexBy('id')
+                    ->keys();
+            }
+        } else {
             /* Students of a class-coded folder
              */
             $students = array_column($this->externalClass->getStudents($folder->getCodeString()), 'synergy_id');
@@ -806,22 +822,6 @@ class Controller extends Base
              */
             if (\count($students)) {
                 $ids = $this->userMapper->findByExternalIds($students, \Schoolbox\Role::STUDENT)
-                    ->indexBy('id')
-                    ->keys();
-            }
-        } else {
-            /* Students in a Group
-             */
-            $userAccessList = $this->userAccessMapper->findForFolder($folder)
-                ->indexByCallback(static function (UserAccess $userAccess) {
-                    return $userAccess->getUser()->getId();
-                });
-
-            if (\count($userAccessList)) {
-                $ids = $this->userMapper->findByColumn('id', $userAccessList->keys())
-                    ->filter(function (\Schoolbox\User $user) {
-                        return ($user->getRole()->isStudent());
-                    })
                     ->indexBy('id')
                     ->keys();
             }
@@ -859,7 +859,7 @@ class Controller extends Base
                         'fullname' => $moment->getRecipient()->getFullname(),
                         'firstname' => $moment->getRecipient()->getFirstname(),
                         'lastname' => $moment->getRecipient()->getLastname(),
-                        'portrait' => $moment->getRecipient()->getPortrait()->getHash(),
+                        'portrait' => $moment->getRecipient()->getPortrait()?->getHash(),
                         'role' => $moment->getRecipient()->getPreferredTitle()
                     ],
                     'creator' => [
@@ -867,7 +867,7 @@ class Controller extends Base
                         'fullname' => $moment->getCreator()->getFullname(),
                         'firstname' => $moment->getCreator()->getFirstname(),
                         'lastname' => $moment->getCreator()->getLastname(),
-                        'portrait' => $moment->getCreator()->getPortrait()->getHash(),
+                        'portrait' => $moment->getCreator()->getPortrait()?->getHash(),
                     ],
                     /* This is always set
                      */
@@ -877,7 +877,7 @@ class Controller extends Base
                         'fullname' => $moment->getCreator()->getFullname(),
                         'firstname' => $moment->getCreator()->getFirstname(),
                         'lastname' => $moment->getCreator()->getLastname(),
-                        'portrait' => $moment->getCreator()->getPortrait()->getHash(),
+                        'portrait' => $moment->getCreator()->getPortrait()?->getHash(),
                     ] : null,
                     /* We don't store updatedBy, for whatever reason: I suppose it was presumed
                      * to always be the same as its author...
@@ -903,7 +903,7 @@ class Controller extends Base
                             'fullname' => $moment->getSubmittedBy()->getFullname(),
                             'firstname' => $moment->getSubmittedBy()->getFirstname(),
                             'lastname' => $moment->getSubmittedBy()->getLastname(),
-                            'portrait' => $moment->getSubmittedBy()->getPortrait()->getHash(),
+                            'portrait' => $moment->getSubmittedBy()->getPortrait()?->getHash(),
                         ] : null,
                         'publishAt' => $moment->getPublishedAt()?->getDatabase(),
                         'publishedBy' => $moment->getPublishedBy() ? [
@@ -911,7 +911,7 @@ class Controller extends Base
                             'fullname' => $moment->getPublishedBy()->getFullname(),
                             'firstname' => $moment->getPublishedBy()->getFirstname(),
                             'lastname' => $moment->getPublishedBy()->getLastname(),
-                            'portrait' => $moment->getPublishedBy()->getPortrait()->getHash(),
+                            'portrait' => $moment->getPublishedBy()->getPortrait()?->getHash(),
                         ] : null,
                         'rejectedAt' => $moment->getRejectedAt()?->getDatabase(),
                         'rejectedBy' => $moment->getRejectedBy() ? [
@@ -919,7 +919,7 @@ class Controller extends Base
                             'fullname' => $moment->getRejectedBy()->getFullname(),
                             'firstname' => $moment->getRejectedBy()->getFirstname(),
                             'lastname' => $moment->getRejectedBy()->getLastname(),
-                            'portrait' => $moment->getRejectedBy()->getPortrait()->getHash(),
+                            'portrait' => $moment->getRejectedBy()->getPortrait()?->getHash(),
                         ] : null
                     ],
                     /* A shortcut to urls for changing states in this learning moment
