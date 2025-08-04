@@ -178,7 +178,8 @@ const viewAllText = window.Vue.computed(() => {
         return "The student is no longer a participant in the class.";
     }
 
-    const getAssessmentParticipationRoute = cellInfo.value?.aImpl._routes.student[cellInfo.value.studentId].getAssessmentParticipationForm ?? null
+    const getAssessmentParticipationRoute =
+        cellInfo.value?.aImpl._routes.student[cellInfo.value.studentId].getAssessmentParticipationForm ?? null;
     if (cellInfo.value.participant.isExcluded) {
         if (getAssessmentParticipationRoute === null) {
             return "The student has been excluded. You may include this student in this activity";
@@ -187,7 +188,7 @@ const viewAllText = window.Vue.computed(() => {
         }
     }
     if (isActivityEmpty.value) {
-        if(getAssessmentParticipationRoute === null) {
+        if (getAssessmentParticipationRoute === null) {
             return "There has been no activity yet, you may create feedback or exclude this student from this activity";
         } else {
             return "There has been no activity yet, you may create feedback or visit the participation page of the original learning activity to customise their status";
@@ -612,7 +613,11 @@ function onToggleSelected(): void {
                 </template>
                 <!-- Only show the 'Include Student' button if it's the original assessment and not a customisation -->
                 <pop-out-menu-item
-                    v-if="cellInfo.participant && cellInfo.participant.isExcluded && routes.getAssessmentParticipationForm === null"
+                    v-if="
+                        cellInfo.participant &&
+                        cellInfo.participant.isExcluded &&
+                        routes.getAssessmentParticipationForm === null
+                    "
                     :class="{ 'is-disabled': !cellInfo.participant.isExcluded }"
                     @selected="onMenuItemSelected(routes.includeRoute, 'exclude')"
                 >
