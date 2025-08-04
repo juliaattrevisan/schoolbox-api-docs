@@ -833,7 +833,6 @@ class Controller extends Base
                     'lastname' => $moment->getCreator()->getLastname(),
                     'portrait' => $moment->getCreator()->getPortrait()->getHash(),
                 ],
-                'hasComments' => $this->hasComments($moment),
                 /* This is always set
                  */
                 'createdAt' => $moment->getCreatedAt()->getDatabase(),
@@ -848,6 +847,10 @@ class Controller extends Base
                  * to always be the same as its author...
                  */
                 'updatedAt' => $moment->getUpdatedAt()->getDatabase(),
+                /* Whether this moment had comments or not, which affects a user interaction
+                 * where they have an opportunity to delete comments upon approval
+                 */
+                'hasComments' => $this->hasComments($moment),
                 /* Metadata about the current state of a learning moment and any other details
                  * regarding the current state, such as who actioned a state change etc.
                  */
@@ -883,7 +886,9 @@ class Controller extends Base
             ];
         }
 
-        new \Alaress_Probe($payload);
-
+        $this->response = $this->responseAsJson([
+            'status'  => 200,
+            'content' => $payload,
+        ]);
     }
 }
