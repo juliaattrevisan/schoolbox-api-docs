@@ -824,12 +824,7 @@ class Controller extends Base
                     'firstname' => $moment->getRecipient()->getFirstname(),
                     'lastname' => $moment->getRecipient()->getLastname(),
                     'portrait' => $moment->getRecipient()->getPortrait()->getHash(),
-                    /* Maybe needed later, since we're looking at a cohort report and you perhaps
-                     * get multiple guys with the same name; it wasn't in the wireframes tho
-                     *
-                     * TODO Anyway, recipients need their role hydrated before you can use this
-                     */
-                    // 'role' => $moment->getRecipient()->getPreferredTitle()
+                    'role' => $moment->getRecipient()->getPreferredTitle()
                 ],
                 'creator' => [
                     'id' => $moment->getCreator()->getId(),

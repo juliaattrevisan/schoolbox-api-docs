@@ -103,6 +103,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('recipient.year', 'recipientYear')},
                 {$this->getJoinColumnString('recipient.schoolHouse', 'recipientSchoolHouse')},
                 {$this->getJoinColumnString('recipient.pronoun', 'recipientPronoun')},
+                {$this->getJoinColumnString('recipient.role', 'recipientRole')},
                 {$this->getJoinColumnString('creator', 'creator')},
                 {$this->getJoinColumnString('creator.pronoun', 'creatorPronoun')},
                 {$this->getJoinColumnString('submittedBy', 'submittedBy')},
@@ -127,6 +128,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('recipient.year', 'recipient', 'recipientYear', true)}
             LEFT JOIN {$this->getJoinSql('recipient.schoolHouse', 'recipient', 'recipientSchoolHouse', true)}
             LEFT JOIN {$this->getJoinSql('recipient.pronoun', 'recipient', 'recipientPronoun')}
+            LEFT JOIN {$this->getJoinSql('recipient.role', 'recipient', 'recipientRole')}
             LEFT JOIN {$this->getJoinSql('creator', '', 'creator', true)}
             LEFT JOIN {$this->getJoinSql('creator.pronoun', 'creator', 'creatorPronoun')}
             LEFT JOIN {$this->getJoinSql('submittedBy', '', 'submittedBy', true)}
