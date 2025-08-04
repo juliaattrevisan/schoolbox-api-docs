@@ -834,11 +834,25 @@ class Controller extends Base
                     'portrait' => $moment->getCreator()->getPortrait()->getHash(),
                 ],
                 'hasComments' => $this->hasComments($moment),
-                'currentState' => $moment->getCurrentState(),
+                /* This is always set
+                 */
+                'createdAt' => $moment->getCreatedAt()->getLocalShort(),
+                'createdBy' => $moment->getCreator() ? [
+                    'id' => $moment->getCreator()->getId(),
+                    'fullname' => $moment->getCreator()->getFullname(),
+                    'firstname' => $moment->getCreator()->getFirstname(),
+                    'lastname' => $moment->getCreator()->getLastname(),
+                    'portrait' => $moment->getCreator()->getPortrait()->getHash(),
+                ] : null,
+                /* We don't store updatedBy, for whatever reason: I suppose it was presumed
+                 * to always be the same as its author...
+                 */
+                'updatedAt' => $moment->getUpdatedAt()->getDatabase(),
+                /* Metadata about the current state of a learning moment and any other details
+                 * regarding the current state, such as who actioned a state change etc.
+                 */
                 'states' => [
-                    /* This is always set
-                     */
-                    'updatedAt' => $moment->getUpdatedAt()->getDatabase(),
+                    'current' => $moment->getCurrentState(),
                     /* You'll be in one of three alternative states here: submitted/published/rejected
                      */
                     'submittedAt' => $moment->getSubmittedAt()?->getDatabase(),
