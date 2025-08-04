@@ -811,6 +811,8 @@ class Controller extends Base
                 continue;
             }
 
+            /* Index by a date in a format you can directly shank into the frontend
+             */
             $index = $moment->getUpdatedAt()->getLocalShort();
 
             $payload[$index][] = [
@@ -839,7 +841,11 @@ class Controller extends Base
                 'hasComments' => $this->hasComments($moment),
                 'currentState' => $moment->getCurrentState(),
                 'date' => [
+                    /* This is always set
+                     */
                     'updatedAt' => $moment->getUpdatedAt()->getDatabase(),
+                    /* You'll be in one of three alternative states here: submitted/published/rejected
+                     */
                     'submittedAt' => $moment->getSubmittedAt()?->getDatabase(),
                     'publishAt' => $moment->getPublishedAt()?->getDatabase(),
                     'rejectedAt' => $moment->getRejectedAt()?->getDatabase(),
