@@ -71,7 +71,7 @@ function initSetScrollableHeight(): void {
     window.addEventListener("DOMContentLoaded", setScrollableHeight, { once: true });
 }
 
-// #endregions
+// #endregion
 
 // #region table load
 
