@@ -11,7 +11,7 @@ use Alaress_Date_Format;
 
 class Helper
 {
-    private array $filters = [];
+    private array $filters = ['p.deleted_at IS NULL'];
     private array $params = [];
 
     public function __construct(
