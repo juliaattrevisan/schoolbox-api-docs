@@ -835,15 +835,36 @@ class Controller extends Base
                 ],
                 'hasComments' => $this->hasComments($moment),
                 'currentState' => $moment->getCurrentState(),
-                'date' => [
+                'states' => [
                     /* This is always set
                      */
                     'updatedAt' => $moment->getUpdatedAt()->getDatabase(),
                     /* You'll be in one of three alternative states here: submitted/published/rejected
                      */
                     'submittedAt' => $moment->getSubmittedAt()?->getDatabase(),
+                    'submittedBy' => $moment->getSubmittedBy() ? [
+                        'id' => $moment->getSubmittedBy()->getId(),
+                        'fullname' => $moment->getSubmittedBy()->getFullname(),
+                        'firstname' => $moment->getSubmittedBy()->getFirstname(),
+                        'lastname' => $moment->getSubmittedBy()->getLastname(),
+                        'portrait' => $moment->getSubmittedBy()->getPortrait()->getHash(),
+                    ] : null,
                     'publishAt' => $moment->getPublishedAt()?->getDatabase(),
+                    'publishedBy' => $moment->getPublishedBy() ? [
+                        'id' => $moment->getPublishedBy()->getId(),
+                        'fullname' => $moment->getPublishedBy()->getFullname(),
+                        'firstname' => $moment->getPublishedBy()->getFirstname(),
+                        'lastname' => $moment->getPublishedBy()->getLastname(),
+                        'portrait' => $moment->getPublishedBy()->getPortrait()->getHash(),
+                    ] : null,
                     'rejectedAt' => $moment->getRejectedAt()?->getDatabase(),
+                    'rejectedBy' => $moment->getRejectedBy() ? [
+                        'id' => $moment->getRejectedBy()->getId(),
+                        'fullname' => $moment->getRejectedBy()->getFullname(),
+                        'firstname' => $moment->getRejectedBy()->getFirstname(),
+                        'lastname' => $moment->getRejectedBy()->getLastname(),
+                        'portrait' => $moment->getRejectedBy()->getPortrait()->getHash(),
+                    ] : null
                 ]
             ];
         }
