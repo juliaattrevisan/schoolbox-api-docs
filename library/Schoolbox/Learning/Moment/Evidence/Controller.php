@@ -836,7 +836,7 @@ class Controller extends Base
                 'hasComments' => $this->hasComments($moment),
                 /* This is always set
                  */
-                'createdAt' => $moment->getCreatedAt()->getLocalShort(),
+                'createdAt' => $moment->getCreatedAt()->getDatabase(),
                 'createdBy' => $moment->getCreator() ? [
                     'id' => $moment->getCreator()->getId(),
                     'fullname' => $moment->getCreator()->getFullname(),
