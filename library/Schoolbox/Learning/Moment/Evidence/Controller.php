@@ -890,6 +890,22 @@ class Controller extends Base
                         'lastname' => $moment->getRejectedBy()->getLastname(),
                         'portrait' => $moment->getRejectedBy()->getPortrait()->getHash(),
                     ] : null
+                ],
+                /* A shortcut to urls for changing states in this learning moment
+                 */
+                '_links' => [
+                    'submit' => $this->routeGenerator->generate('learningMomentEvidence.putSubmit', [
+                        'evidenceId' => $moment->getId(),
+                        'creatorId'  => $moment->getCreator()->getId(),
+                        'userId'     => $moment->getRecipient()->getId(),
+                    ]),
+                    'publish' => $this->routeGenerator->generate('learningMomentEvidence.putPublish', [
+                        'evidenceId' => $moment->getId(),
+                        'creatorId'  => $moment->getCreator()->getId(),
+                    ]),
+                    'reject' => $this->routeGenerator->generate('learningMomentModeration.putReject', [
+                        'evidenceId' => $moment->getId(),
+                    ]),
                 ]
             ];
         }
