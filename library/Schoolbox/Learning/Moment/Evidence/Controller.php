@@ -797,7 +797,7 @@ class Controller extends Base
          * to cross reference everything we find later
          */
         if ('' !== $folder->getCodeString()) {
-            /* Students of a class coded folder
+            /* Students of a class-coded folder
              */
             $students = array_column($this->externalClass->getStudents($folder->getCodeString()), 'synergy_id');
 
@@ -805,24 +805,28 @@ class Controller extends Base
              * We'll use this to interset with learning moments $recipients
              */
             if (\count($students)) {
-                $users = array_fill_keys($this->userMapper->findByExternalIds($students, \Schoolbox\Role::STUDENT)->indexBy('id')->keys(), true);
+                $ids = $this->userMapper->findByExternalIds($students, \Schoolbox\Role::STUDENT)
+                    ->indexBy('id')
+                    ->keys();
+
+                $users = array_fill_keys($ids, true);
             }
         } else {
-            /* Folks in a Group
+            /* Students in a Group
              */
-            $this->userAccessMapper = \Schoolbox\Permission\Access\UserAccessMapper::getInstance();
-
             $userAccessList = $this->userAccessMapper->findForFolder($folder)
                 ->indexByCallback(static function (UserAccess $userAccess) {
                     return $userAccess->getUser()->getId();
                 });
 
-            $users = array_fill_keys($this->userMapper->findByColumn('id', $userAccessList->keys())
+            $ids = $this->userMapper->findByColumn('id', $userAccessList->keys())
                 ->filter(function (\Schoolbox\User $user) {
                     return ($user->getRole()->isStudent());
                 })
                 ->indexBy('id')
-                ->keys(), true);
+                ->keys();
+
+            $users = array_fill_keys($ids, true);
         }
 
         /* Find all the learning moments in the specified date range
