@@ -136,8 +136,11 @@ window.Vue.onMounted(() => {
         <i class="icon-link"></i>
         <p>
             There are currently no {{ locale.activity.plural() }} linked to this {{ locale.lessonPlan.singular() }}. You
-            may <a @click.prevent="store.isOpen = true">link existing {{ locale.activity.plural() }}</a> to this
-            {{ locale.lessonPlan.singular() }} for students to complete as part of this
+            may
+            <a data-test="lesson-plan-link-activities-link" @click.prevent="store.isOpen = true"
+                >link existing {{ locale.activity.plural() }}</a
+            >
+            to this {{ locale.lessonPlan.singular() }} for students to complete as part of this
             {{ locale.lessonPlan.singular() }}.
         </p>
     </div>

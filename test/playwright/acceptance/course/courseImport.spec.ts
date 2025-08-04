@@ -6,6 +6,10 @@ import CreateFolder from "@schoolboxTest/playwright/support/page/folder/CreateFo
 import CourseModify from "@schoolboxTest/playwright/support/page/courses/CourseModify";
 import CourseList from "@schoolboxTest/playwright/support/page/courses/CourseList";
 import ImportCourseIntoClass from "@schoolboxTest/playwright/support/page/courses/ImportCourseIntoClass";
+import CreateLessonPlan from "@schoolboxTest/playwright/support/page/lessonPlan/CreateLessonPlan";
+import TemplateList from "@schoolboxTest/playwright/support/page/lessonPlan/TemplateList";
+import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 test.describe("Course import tests", () => {
     test.beforeEach(async ({ tester }) => {
@@ -26,33 +30,66 @@ test.describe("Course import tests", () => {
         const createFolder = new CreateFolder(tester, page);
         const courseList = new CourseList(page);
         const importCourseIntoClass = new ImportCourseIntoClass(page);
+        const courseModify = new CourseModify(page, tester);
+        const createLessonPlan = new CreateLessonPlan(tester, page);
+        const templateList = new TemplateList(tester, page);
+        const assessmentForm = new AssessmentForm(tester, page);
+        const common = new Common(page);
 
         const folderName = `Automation Course Import Folder1`;
         const homepageTemplateOption = "Course";
         const schoolCode = "test1";
 
         // sets write access permission for Administration and Teacher, read access permission for senior student, parent, junior student and middle student
-        await createFolder.createFolder(
-            folderName,
-            homepageTemplateOption,
-            db,
-            [
-                [1, "write"],
-                [2, "write"],
-                [3, "read"],
-                [4, "read"],
-                [5, "read"],
-                [6, "read"],
-            ],
-            schoolCode,
-        );
+        // await createFolder.createFolder(
+        //     folderName,
+        //     homepageTemplateOption,
+        //     db,
+        //     [
+        //         [1, "write"],
+        //         [2, "write"],
+        //         [3, "read"],
+        //         [4, "read"],
+        //         [5, "read"],
+        //         [6, "read"],
+        //     ],
+        //     schoolCode,
+        // );
 
-        tester.isGoingTo("navigate to the course list page");
+        tester.isGoingTo("modify the course, add add a lesson plan and project with a task under it");
+        await courseModify.goto(6); // Navigate to Year 9 English course modify page
+        await courseModify.clickUnitArrow(15); // Click the 3-dot menu for Romeo and Juliet unit
+        await courseModify.clickNewActivityButton("lesson-plan");
+        await templateList.clickTemplateLink(3);
+        await tester.common.clickSubmitButton();
+        await createLessonPlan.typeName("Lesson Plan for Romeo and Juliet");
+        await createLessonPlan.clickCreateButton();
+        tester.isGoingTo("check if the lesson plan is presented");
+        await expect(page.locator("#linked-activities-container")).toBeVisible();
+        await expect(page.locator("ul.breadcrumb")).toContainText("Lesson Plan for Romeo and Juliet");
+        await createLessonPlan.clickLinkActivity();
+        await createLessonPlan.clickUnitMenu(15); // Click the unit Romeo and JUliet expand arrow
+        await page.waitForTimeout(1000); // Wait for the unit to expand
+        await createLessonPlan.tickAssessmentCheckbox("Romeo and Juliet Key Quote Activity", 52); // Tick the assessment checkbox Romeo and Juliet Key Quote Activity
+        await createLessonPlan.tickAssessmentCheckbox("Present a scene of Romeo and Juliet", 146); // Tick the assessment checkbox Present a scene of Romeo and Juliet
+        await page.locator("a.button.expand.icon-link").click(); // Click Link Activity button
+
+        // tester.isGoingTo("add a project with a due work under it");
+        // await courseModify.goto(6); // Navigate to Year 9 English course modify page
+        // await courseModify.clickUnitArrow(15); // Click the 3-dot menu for Romeo and Juliet unit
+        // await courseModify.clickNewActivityButton("project");
+        // await page.locator("input#title").fill("Project for Romeo and Juliet");
+        // await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
+        // await assessmentForm.clickCreate();
+        // await page.getByTestId("project-create-activity-link").click();
+        // await page.locator(`label[for="due-work"]`).click();
+        // await assessmentForm.setTitle("Test Due Work Project");
+        // await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
+        // await assessmentForm.clickCreate();
+
+        tester.isGoingTo("navigate to the course list and click the option Import into classes from the dropdown menu");
         await courseList.goto();
-
-        tester.isGoingTo("click the 3-dot menu for Year 9 English course in the course list page");
-        await courseList.clickCourseDotMenu(6);
-        tester.isGoingTo("click the option Import into classes from the dropdown menu");
+        await courseList.clickCourseDotMenu(6); // Click the 3-dot menu for Year 9 English course
         await courseList.clickImportIntoClass(6);
 
         tester.isGoingTo("type a class name, select it from the results and click the Next button");
