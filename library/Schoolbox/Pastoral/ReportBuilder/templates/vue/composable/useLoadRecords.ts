@@ -1,5 +1,5 @@
 /**
- * Retrieve a set of pastoral records based on the provided endpoint.
+ * Retrieve a set of pastoral records based on the provided url.
  */
 
 import type { Ref } from "vue";
@@ -9,11 +9,11 @@ import { isSignificantUrlChange } from "@js/util/sbx/urlUtils";
 import type { RecordsPayload } from "../../js/types/pastoralReportTypes";
 
 /**
- * load the pastoral records from the given endpoint.
- * @param endpoint - the endpoint to load the records from
+ * load the pastoral records from the given url.
+ * @param url - the url to load the records from
  * @returns isNewLoading, payload, isEmpty, loadError
  */
-export function useLoadRecords(endpoint: Ref<string>): {
+export function useLoadRecords(url: Ref<string>): {
     isNewLoad: Ref<boolean>;
     isNewLoading: Ref<boolean>;
     isMoreLoading: Ref<boolean>;
@@ -47,7 +47,7 @@ export function useLoadRecords(endpoint: Ref<string>): {
             loadError.value = null;
             controller = new AbortController();
             const response = await apiRequest<RecordsPayload>({
-                url: endpoint.value,
+                url: url.value,
                 method: "GET",
                 signal: controller.signal,
             });
@@ -86,12 +86,12 @@ export function useLoadRecords(endpoint: Ref<string>): {
     }
 
     /**
-     * when the endpoint to trigger load changes provided the endpoint is not empty
-     * and the new endpoint is different from the old one, load the data
+     * when the url to trigger load changes provided the url is not empty
+     * and the new url is different from the old one, load the data
      */
-    window.Vue.watch(endpoint, (newEndpoint, oldEndpoint) => {
-        if (endpoint.value !== "" && newEndpoint !== oldEndpoint) {
-            isNewLoad.value = isSignificantUrlChange(oldEndpoint, newEndpoint, ["cursor"]);
+    window.Vue.watch(url, (newUrl, oldUrl) => {
+        if (url.value !== "" && newUrl !== oldUrl) {
+            isNewLoad.value = isSignificantUrlChange(oldUrl, newUrl, ["cursor"]);
             void load();
         }
     });

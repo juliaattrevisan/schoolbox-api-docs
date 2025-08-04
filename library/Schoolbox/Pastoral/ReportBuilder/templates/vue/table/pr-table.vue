@@ -76,31 +76,31 @@ function initSetScrollableHeight(): void {
 // #region table load
 
 const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
-const viewLink = window.Vue.ref("");
-const viewLinkParams = new URLSearchParams();
+const viewUrl = window.Vue.ref("");
+const viewUrlParams = new URLSearchParams();
 const LIMIT = 20; // the current set limit for the number of records to fetch at once
 const sortBy = window.Vue.ref<string>("user"); // the current sort by field - this should update when payload is loaded
 const order = window.Vue.ref<"ASC" | "DESC">("ASC"); // the current sort order
-const { isNewLoading, isMoreLoading, payload, isEmpty, loadError } = useLoadPrTable(viewLink);
+const { isNewLoading, isMoreLoading, payload, isEmpty, loadError } = useLoadPrTable(viewUrl);
 
 /**
  * Reset the table load by clearing the cursor and reloading the data
  */
 function resetTableLoad(): void {
-    viewLinkParams.set("selected", recordsOrPoints.value);
-    viewLinkParams.set("cursor", "");
-    viewLinkParams.set("limit", LIMIT.toString());
-    viewLinkParams.set("sortBy", sortBy.value);
-    viewLinkParams.set("order", order.value);
-    viewLink.value = `${props.selectedTab._links.view}?${viewLinkParams.toString()}`;
+    viewUrlParams.set("selected", recordsOrPoints.value);
+    viewUrlParams.set("cursor", "");
+    viewUrlParams.set("limit", LIMIT.toString());
+    viewUrlParams.set("sortBy", sortBy.value);
+    viewUrlParams.set("order", order.value);
+    viewUrl.value = `${props.selectedTab._links.view}?${viewUrlParams.toString()}`;
 }
 
 /**
  * Load the row data again when the recordsOrPoints changes
  */
 window.Vue.watch(recordsOrPoints, () => {
-    viewLinkParams.set("selected", recordsOrPoints.value);
-    viewLink.value = `${props.selectedTab._links.view}?${viewLinkParams.toString()}`;
+    viewUrlParams.set("selected", recordsOrPoints.value);
+    viewUrl.value = `${props.selectedTab._links.view}?${viewUrlParams.toString()}`;
 });
 
 /**
@@ -116,10 +116,10 @@ function onSort(headerKey: string): void {
         sortBy.value = headerKey;
         order.value = "ASC";
     }
-    viewLinkParams.set("sortBy", sortBy.value);
-    viewLinkParams.set("order", order.value);
-    viewLinkParams.set("cursor", ""); // Reset cursor on sort change
-    viewLink.value = `${props.selectedTab._links.view}?${viewLinkParams.toString()}`;
+    viewUrlParams.set("sortBy", sortBy.value);
+    viewUrlParams.set("order", order.value);
+    viewUrlParams.set("cursor", ""); // Reset cursor on sort change
+    viewUrl.value = `${props.selectedTab._links.view}?${viewUrlParams.toString()}`;
 }
 
 /**
@@ -127,8 +127,8 @@ function onSort(headerKey: string): void {
  * @param cursor - the cursor to use for the previous/next page
  */
 function onPaginate(cursor: string): void {
-    viewLinkParams.set("cursor", cursor);
-    viewLink.value = `${props.selectedTab._links.view}?${viewLinkParams.toString()}`;
+    viewUrlParams.set("cursor", cursor);
+    viewUrl.value = `${props.selectedTab._links.view}?${viewUrlParams.toString()}`;
 }
 
 /**
@@ -149,24 +149,38 @@ window.Vue.watch(
 
 const isCellExpanded = window.Vue.ref(false);
 const selectedHeader = window.Vue.ref<TableHeader | null>(null);
-const scopeLink = window.Vue.ref("");
-const scopeLinkParams = new URLSearchParams();
+const scopeUrl = window.Vue.ref("");
+const scopeUrlParams = new URLSearchParams();
 const {
     isNewLoad: isNewRecordLoad,
     isNewLoading: isLoadingNewRecords,
     isMoreLoading: isLoadingMoreRecords,
     payload: recordsPayload,
     loadError: recordsLoadError,
-} = useLoadRecords(scopeLink);
+} = useLoadRecords(scopeUrl);
 
 /**
- * Handle cell selection
+ * Handle total cell selection
  * @param header - the header of the cell that was selected
  */
-function onCellSelect(header: TableHeader): void {
+function onTotalCellSelect(header: TableHeader): void {
     selectedHeader.value = header;
-    scopeLinkParams.set("column", selectedHeader.value.key);
-    scopeLink.value = `${props.selectedTab._links.scope}?${scopeLinkParams.toString()}`;
+    scopeUrlParams.set("column", selectedHeader.value.key);
+    scopeUrlParams.delete("row");
+    scopeUrl.value = `${props.selectedTab._links.scope}?${scopeUrlParams.toString()}`;
+    isCellExpanded.value = true; // Open the modal to show related records
+}
+
+/**
+ * Handle row cell selection
+ * @param header - the header of the cell that was selected
+ * @param rowId - the id of the row that was selected
+ */
+function onRowCellSelect(header: TableHeader, rowId: number): void {
+    selectedHeader.value = header;
+    scopeUrlParams.set("column", selectedHeader.value.key);
+    scopeUrlParams.set("row", rowId.toString());
+    scopeUrl.value = `${props.selectedTab._links.scope}?${scopeUrlParams.toString()}`;
     isCellExpanded.value = true; // Open the modal to show related records
 }
 
@@ -180,8 +194,8 @@ const { arrivedState } = useScroll(modalResultsEl, {
 const { bottom } = toRefs(arrivedState);
 window.Vue.watch(bottom, (isAtBottom) => {
     if (isAtBottom && recordsPayload.value && recordsPayload.value.metadata.cursor.next !== null) {
-        scopeLinkParams.set("cursor", recordsPayload.value.metadata.cursor.next);
-        scopeLink.value = `${props.selectedTab._links.scope}?${scopeLinkParams.toString()}`;
+        scopeUrlParams.set("cursor", recordsPayload.value.metadata.cursor.next);
+        scopeUrl.value = `${props.selectedTab._links.scope}?${scopeUrlParams.toString()}`;
     }
 });
 
@@ -255,7 +269,7 @@ window.Vue.onUnmounted(() => {
                         :headers="(payload as TablePayload).data.tableHeaders"
                         :row-data="(payload as TablePayload).data.totalRow"
                         :records-or-points="recordsOrPoints"
-                        @cell-select="onCellSelect"
+                        @cell-select="onTotalCellSelect"
                     />
                     <!-- All other rows -->
                     <pr-table-row
@@ -264,11 +278,12 @@ window.Vue.onUnmounted(() => {
                         :headers="(payload as TablePayload).data.tableHeaders"
                         :row-data="row"
                         :records-or-points="recordsOrPoints"
+                        @cell-select="onRowCellSelect"
                     />
                 </tbody>
             </table>
             <pr-table-footer
-                :endpoint="viewLink"
+                :endpoint="viewUrl"
                 :metadata="(payload as TablePayload).metadata"
                 :limit="LIMIT"
                 @previous="onPaginate"
@@ -291,7 +306,7 @@ window.Vue.onUnmounted(() => {
                 <div class="l-flex-col l-gap-s f-no-margins">
                     <h2>{{ props.title }}</h2>
                     <p class="meta">
-                        Type: {{ selectedHeader.title }}
+                        <template v-if="selectedHeader.title !== 'Total'">Type: {{ selectedHeader.title }}</template>
                         <template v-if="selectedHeader.subTitle"
                             ><br />Sub-Type: {{ selectedHeader.subTitle }}</template
                         >
@@ -346,5 +361,8 @@ window.Vue.onUnmounted(() => {
 .pr-table__records {
     max-height: 650px;
     overflow-y: auto;
+    section {
+        margin-bottom: 1rem;
+    }
 }
 </style>

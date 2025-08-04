@@ -9,12 +9,34 @@ import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { TableHeaderType } from "../../js/types/pastoralReportTypes";
 import type { TableHeader, RowOptions, RecordsAndPoints } from "../../js/types/pastoralReportTypes";
 
-type Props = {
+const props = defineProps<{
     headers: TableHeader[];
     rowData: { [key: string]: RowOptions };
     recordsOrPoints: "records" | "points";
+}>();
+
+const emit = defineEmits<{
+    cellSelect: [header: TableHeader, rowId: number];
+}>();
+
+/**
+ * Returns the row id, currently if there's a 'user' key in rowData,
+ * it'll return the user's id, otherwise it defaults to 0.
+ * @returns - The id of the row, or 0 if not defined.
+ */
+const rowId = (): number => {
+    // check if there's a 'user' key in rowData and return its id if it exists
+    const user = props.rowData.user as User;
+    return user?.id || 0; // Default to 0 if user is not defined
 };
-const props = defineProps<Props>();
+
+/**
+ * Handles the cell click
+ * @param header - the header of the cell that was clicked
+ */
+function onCellSelected(header: TableHeader): void {
+    emit("cellSelect", header, rowId());
+}
 
 /**
  * To cast the row data to a User type
@@ -64,21 +86,28 @@ function isUser(data: RowOptions): data is User {
             </template>
             <template v-else-if="header.type == TableHeaderType.RECORDS_AND_POINTS">
                 <!-- Change data based on current radio button selection -->
-                <Transition name="fade" mode="out-in">
-                    <span :key="`${props.recordsOrPoints}-${header.key}`">
-                        <template v-if="props.recordsOrPoints === 'records'">
-                            <!-- Only show records if they're above 0 -->
-                            <template v-if="(props.rowData[header.key] as RecordsAndPoints)?.records! > 0">
-                                {{ (props.rowData[header.key] as RecordsAndPoints).records }}
-                            </template>
-                        </template>
-                        <template v-else>
-                            <template v-if="(props.rowData[header.key] as RecordsAndPoints)?.points! !== null">
-                                {{ (props.rowData[header.key] as RecordsAndPoints).points }}
-                            </template>
-                        </template>
-                    </span>
-                </Transition>
+                <!-- Only show records if they're above 0 -->
+                <button
+                    v-if="
+                        props.recordsOrPoints === 'records' &&
+                        (props.rowData[header.key] as RecordsAndPoints)?.records! > 0
+                    "
+                    class="f-always-show u-td-button"
+                    @click.prevent="onCellSelected(header)"
+                >
+                    {{ (props.rowData[header.key] as RecordsAndPoints).records }}
+                </button>
+                <!-- Only show if points exist -->
+                <button
+                    v-else-if="
+                        props.recordsOrPoints === 'points' &&
+                        (props.rowData[header.key] as RecordsAndPoints)?.points! !== null
+                    "
+                    class="f-always-show u-td-button"
+                    @click.prevent="onCellSelected(header)"
+                >
+                    {{ (props.rowData[header.key] as RecordsAndPoints).points }}
+                </button>
             </template>
             <template v-else>
                 {{ props.rowData[header.key] }}
