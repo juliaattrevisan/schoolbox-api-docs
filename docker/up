@@ -20,6 +20,8 @@ declare PRIVATE_CONTAINER_REGISTRY_TYPE
 declare PRIVATE_CONTAINER_REGISTRY_DOCKERHUB_USERNAME
 declare PRIVATE_CONTAINER_REGISTRY_ECR_ACCOUNT_ID
 declare PRIVATE_CONTAINER_REGISTRY_ECR_REGION
+declare AWS_REGION
+declare AWS_START_URL
 source ./docker.default.env
 if [ -f ./docker.env ]; then
     source ./docker.env
@@ -32,6 +34,24 @@ case "${TASKD_BUILD_FROM_LOCAL}" in
         taskd_compose_file="docker/schoolbox-taskd/deploy.docker-compose.yaml"
         ;;
 esac
+
+# Preconfigure an AWS profile and SSO session, just for this script.
+# it's not possible to pass `aws configure sso` a region or start URL, so that
+# needs to be in the pre-configured AWS config.
+aws_profile='schoolbox-docker'
+mkdir -p .aws
+echo "[default]
+sso_session = ${aws_profile}
+sso_account_id = ${AWS_ACCOUNT_ID}
+sso_role_name = ${AWS_ROLE_NAME}
+region = ${AWS_REGION}
+
+[sso-session ${aws_profile}]
+sso_region = ${AWS_REGION}
+sso_start_url = ${AWS_START_URL}" > .aws/config
+
+# Then log in to AWS
+AWS_CONFIG_FILE=.aws/config aws sso login --no-browser --use-device-code
 
 # Log into whatever repository, as long as not already logged in to that repo
 private_container_registry=''
@@ -58,7 +78,8 @@ case "${PRIVATE_CONTAINER_REGISTRY_TYPE}" in
         docker manifest inspect "${private_container_registry}/${test_image}" > /dev/null
         if [ ! $? -eq 0 ]; then
             echo "Not logged in to private container registry: logging in"
-            aws ecr get-login-password --region "${PRIVATE_CONTAINER_REGISTRY_ECR_REGION}" | docker login -u AWS --password-stdin "${private_container_registry}"
+            AWS_CONFIG_FILE=.aws/config aws ecr get-login-password --region "${PRIVATE_CONTAINER_REGISTRY_ECR_REGION}" \
+                | docker login -u AWS --password-stdin "${private_container_registry}"
         else
             echo "Logged in to private container registry: continuing"
         fi
