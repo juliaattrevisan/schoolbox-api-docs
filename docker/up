@@ -10,7 +10,9 @@ taskd_compose_file=''
 # container
 frankenphp_compose_file="docker/schoolbox-frankenphp/dev.docker-compose.yaml"
 
-# Load config to figure out which taskd compose file to use
+# Load config to figure out which of the following to use:
+# * taskd compose file
+# * private repository
 declare TASKD_BUILD_FROM_LOCAL
 source ./docker.default.env
 if [ -f ./docker.env ]; then
@@ -25,6 +27,11 @@ case "${TASKD_BUILD_FROM_LOCAL}" in
         ;;
 esac
 
+# Output the private repository into an env file for docker compose
+echo "
+PRIVATE_CONTAINER_REGISTRY=\"${PRIVATE_CONTAINER_REGISTRY}\"
+" > .docker-compose.env
+
 # ensure that the storage folder exists
 mkdir -p ./data/docker/storage
 
@@ -38,6 +45,7 @@ docker compose --progress plain \
     -f "docker/base.docker-compose.yaml" \
     -f "${frankenphp_compose_file}" \
     -f "${taskd_compose_file}" \
+    --env-file .docker-compose.env \
     build php82-bookworm
 
 # start default environment:
@@ -47,4 +55,5 @@ docker compose --progress plain \
     -f "docker/base.docker-compose.yaml" \
     -f "${frankenphp_compose_file}" \
     -f "${taskd_compose_file}" \
+    --env-file .docker-compose.env \
     up -d
