@@ -820,7 +820,7 @@ class Controller extends Base
 
             /* Index by a date in a format you can directly shank into the frontend
              */
-            $index = $moment->getUpdatedAt()->getLocalShort();
+            $index = $moment->getUpdatedAt()->getDatabaseDate();
 
             $payload[$index][] = [
                 'id' => $moment->getId(),
@@ -852,8 +852,11 @@ class Controller extends Base
                 ] : null,
                 /* We don't store updatedBy, for whatever reason: I suppose it was presumed
                  * to always be the same as its author...
+                 *
+                 * Anyway, this is the localised version of config's date_short which you can use
+                 * to group moments per day.
                  */
-                'updatedAt' => $moment->getUpdatedAt()->getDatabase(),
+                'updatedAt' => $moment->getUpdatedAt()->getLocalShort(),
                 /* Whether this moment had comments or not, which affects a user interaction
                  * where they have an opportunity to delete comments upon approval
                  */
