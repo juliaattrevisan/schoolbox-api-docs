@@ -803,6 +803,8 @@ class Controller extends Base
 
         $moments = $this->mapper->findByPredicates($pb)->sortBy('updatedAt', 'DESC');
 
+        $payload = [];
+
         foreach ($moments as $moment) {
             /* Only care about moments whose recipients are in the set of users associated
              * with $folder: otherwise ignore the learning moment
