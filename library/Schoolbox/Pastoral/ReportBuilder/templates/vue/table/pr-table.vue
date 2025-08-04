@@ -62,7 +62,10 @@ function setScrollableHeight(): void {
  */
 function initSetScrollableHeight(): void {
     resizeObserver.value = new ResizeObserver(setScrollableHeight);
-    resizeObserver.value.observe(document.querySelector("#container")!);
+    const containerEl = document.querySelector("#container");
+    if (containerEl) {
+        resizeObserver.value.observe(containerEl);
+    }
     // Set the initial height, and update it again when the DOM is fully loaded to ensure the footer is included
     setScrollableHeight();
     window.addEventListener("DOMContentLoaded", setScrollableHeight, { once: true });
