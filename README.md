@@ -57,9 +57,11 @@ Ideally, only the Docker development environment will need to be set up.
 * install the required dependencies:
   * the most recent [Docker Engine](https://docs.docker.com/engine/install/)
     for your operating system
+    > TODO test Docker Desktop
   * the most recent [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
     for your operating system
-  * Linux or MacOS only: `jq` for parsing JSON files
+  * recommended: a [Docker Credentials Store](https://docs.docker.com/reference/cli/docker/login/#credential-stores)
+    for secure storage of credentials
 * add this line to `/etc/hosts` or its Windows equivalent
   (usually `C:\Windows\System32\drivers\etc\hosts`)
   ```

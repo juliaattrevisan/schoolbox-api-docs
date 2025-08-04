@@ -3,6 +3,8 @@
 # Always run within root folder
 cd "$(dirname "$0")/.." || exit 1
 
+# Log functions
+
 taskd_compose_file=''
 
 # For now this is hardcoded:
@@ -33,14 +35,33 @@ esac
 
 # Log into whatever repository, as long as not already logged in to that repo
 private_container_registry=''
+test_image='taskd'
 case "${PRIVATE_CONTAINER_REGISTRY_TYPE}" in
     dockerhub )
         private_container_registry="docker.io/${PRIVATE_CONTAINER_REGISTRY_DOCKERHUB_USERNAME}"
-        docker login -u "${PRIVATE_CONTAINER_REGISTRY_DOCKERHUB_USERNAME}"
+        # Test if logged into repo by fetching the test image manifest:
+        # if not, then login
+        echo "Testing if logged in to private container registry ${private_container_registry}..."
+        docker manifest inspect "${private_container_registry}/${test_image}" > /dev/null
+        if [ ! $? -eq 0 ]; then
+            echo "Not logged in to private container registry: logging in"
+            docker login -u "${PRIVATE_CONTAINER_REGISTRY_DOCKERHUB_USERNAME}"
+        else
+            echo "Logged in to private container registry: continuing"
+        fi
         ;;
     ecr )
         private_container_registry="${PRIVATE_CONTAINER_REGISTRY_ECR_ACCOUNT_ID}.dkr.ecr.${PRIVATE_CONTAINER_REGISTRY_ECR_REGION}.amazonaws.com"
-        aws ecr get-login-password --region "${PRIVATE_CONTAINER_REGISTRY_ECR_REGION}" | docker login -u AWS --password-stdin "${private_container_registry}"
+        # As with the Dockerhub variant:
+        # test if logged in by fetching test image manifest, if not then login
+        echo "Testing if logged in to private container registry ${private_container_registry}..."
+        docker manifest inspect "${private_container_registry}/${test_image}" > /dev/null
+        if [ ! $? -eq 0 ]; then
+            echo "Not logged in to private container registry: logging in"
+            aws ecr get-login-password --region "${PRIVATE_CONTAINER_REGISTRY_ECR_REGION}" | docker login -u AWS --password-stdin "${private_container_registry}"
+        else
+            echo "Logged in to private container registry: continuing"
+        fi
         ;;
     * )
         echo "Invalid PRIVATE_CONTAINER_REGISTRY_TYPE value ${PRIVATE_CONTAINER_REGISTRY_TYPE}: must be dockerhub or ecr" >&2
