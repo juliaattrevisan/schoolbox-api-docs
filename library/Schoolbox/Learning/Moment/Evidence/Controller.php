@@ -833,113 +833,115 @@ class Controller extends Base
 
         /* Find all the learning moments in the specified date range
          */
-        $pb = $this->mapper->getPredicateBuilder()
-            ->between('updated_at', $from, $to);
-
-        $moments = $this->mapper->findByPredicates($pb)->sortBy('updatedAt', 'DESC');
-
         $payload = [];
 
-        foreach ($moments as $moment) {
-            /* Only care about moments whose recipients are in the set of users associated
-             * with $folder: otherwise ignore the learning moment
-             */
-            if (!array_key_exists($moment->getRecipient()->getId(), $users)) {
-                continue;
-            }
+        if (\count($users)) {
+            $pb = $this->mapper->getPredicateBuilder()
+                ->between('updated_at', $from, $to);
 
-            /* Index by a date in a format you can directly shank into the frontend
-             */
-            $index = $moment->getUpdatedAt()->getDatabaseDate();
+            $moments = $this->mapper->findByPredicates($pb)->sortBy('updatedAt', 'DESC');
 
-            $payload[$index][] = [
-                'id' => $moment->getId(),
-                'body' => $moment->getBody(),
-                'recipient' => [
-                    'id' => $moment->getRecipient()->getId(),
-                    'fullname' => $moment->getRecipient()->getFullname(),
-                    'firstname' => $moment->getRecipient()->getFirstname(),
-                    'lastname' => $moment->getRecipient()->getLastname(),
-                    'portrait' => $moment->getRecipient()->getPortrait()->getHash(),
-                    'role' => $moment->getRecipient()->getPreferredTitle()
-                ],
-                'creator' => [
-                    'id' => $moment->getCreator()->getId(),
-                    'fullname' => $moment->getCreator()->getFullname(),
-                    'firstname' => $moment->getCreator()->getFirstname(),
-                    'lastname' => $moment->getCreator()->getLastname(),
-                    'portrait' => $moment->getCreator()->getPortrait()->getHash(),
-                ],
-                /* This is always set
+            foreach ($moments as $moment) {
+                /* Only care about moments whose recipients are in the set of users associated
+                 * with $folder: otherwise ignore the learning moment
                  */
-                'createdAt' => $moment->getCreatedAt()->getDatabase(),
-                'createdBy' => $moment->getCreator() ? [
-                    'id' => $moment->getCreator()->getId(),
-                    'fullname' => $moment->getCreator()->getFullname(),
-                    'firstname' => $moment->getCreator()->getFirstname(),
-                    'lastname' => $moment->getCreator()->getLastname(),
-                    'portrait' => $moment->getCreator()->getPortrait()->getHash(),
-                ] : null,
-                /* We don't store updatedBy, for whatever reason: I suppose it was presumed
-                 * to always be the same as its author...
-                 *
-                 * Anyway, this is the localised version of config's date_short which you can use
-                 * to group moments per day.
+                if (!array_key_exists($moment->getRecipient()->getId(), $users)) {
+                    continue;
+                }
+
+                /* Index by a date in a format you can directly shank into the frontend
                  */
-                'updatedAt' => $moment->getUpdatedAt()->getLocalShort(),
-                /* Whether this moment had comments or not, which affects a user interaction
-                 * where they have an opportunity to delete comments upon approval
-                 */
-                'hasComments' => $this->hasComments($moment),
-                /* Metadata about the current state of a learning moment and any other details
-                 * regarding the current state, such as who actioned a state change etc.
-                 */
-                'states' => [
-                    'current' => $moment->getCurrentState(),
-                    /* You'll be in one of three alternative states here: submitted/published/rejected
+                $index = $moment->getUpdatedAt()->getDatabaseDate();
+
+                $payload[$index][] = [
+                    'id' => $moment->getId(),
+                    'body' => $moment->getBody(),
+                    'recipient' => [
+                        'id' => $moment->getRecipient()->getId(),
+                        'fullname' => $moment->getRecipient()->getFullname(),
+                        'firstname' => $moment->getRecipient()->getFirstname(),
+                        'lastname' => $moment->getRecipient()->getLastname(),
+                        'portrait' => $moment->getRecipient()->getPortrait()->getHash(),
+                        'role' => $moment->getRecipient()->getPreferredTitle()
+                    ],
+                    'creator' => [
+                        'id' => $moment->getCreator()->getId(),
+                        'fullname' => $moment->getCreator()->getFullname(),
+                        'firstname' => $moment->getCreator()->getFirstname(),
+                        'lastname' => $moment->getCreator()->getLastname(),
+                        'portrait' => $moment->getCreator()->getPortrait()->getHash(),
+                    ],
+                    /* This is always set
                      */
-                    'submittedAt' => $moment->getSubmittedAt()?->getDatabase(),
-                    'submittedBy' => $moment->getSubmittedBy() ? [
-                        'id' => $moment->getSubmittedBy()->getId(),
-                        'fullname' => $moment->getSubmittedBy()->getFullname(),
-                        'firstname' => $moment->getSubmittedBy()->getFirstname(),
-                        'lastname' => $moment->getSubmittedBy()->getLastname(),
-                        'portrait' => $moment->getSubmittedBy()->getPortrait()->getHash(),
+                    'createdAt' => $moment->getCreatedAt()->getDatabase(),
+                    'createdBy' => $moment->getCreator() ? [
+                        'id' => $moment->getCreator()->getId(),
+                        'fullname' => $moment->getCreator()->getFullname(),
+                        'firstname' => $moment->getCreator()->getFirstname(),
+                        'lastname' => $moment->getCreator()->getLastname(),
+                        'portrait' => $moment->getCreator()->getPortrait()->getHash(),
                     ] : null,
-                    'publishAt' => $moment->getPublishedAt()?->getDatabase(),
-                    'publishedBy' => $moment->getPublishedBy() ? [
-                        'id' => $moment->getPublishedBy()->getId(),
-                        'fullname' => $moment->getPublishedBy()->getFullname(),
-                        'firstname' => $moment->getPublishedBy()->getFirstname(),
-                        'lastname' => $moment->getPublishedBy()->getLastname(),
-                        'portrait' => $moment->getPublishedBy()->getPortrait()->getHash(),
-                    ] : null,
-                    'rejectedAt' => $moment->getRejectedAt()?->getDatabase(),
-                    'rejectedBy' => $moment->getRejectedBy() ? [
-                        'id' => $moment->getRejectedBy()->getId(),
-                        'fullname' => $moment->getRejectedBy()->getFullname(),
-                        'firstname' => $moment->getRejectedBy()->getFirstname(),
-                        'lastname' => $moment->getRejectedBy()->getLastname(),
-                        'portrait' => $moment->getRejectedBy()->getPortrait()->getHash(),
-                    ] : null
-                ],
-                /* A shortcut to urls for changing states in this learning moment
-                 */
-                '_links' => [
-                    'submit' => $this->routeGenerator->generate('learningMomentEvidence.putSubmit', [
-                        'evidenceId' => $moment->getId(),
-                        'creatorId' => $moment->getCreator()->getId(),
-                        'userId' => $moment->getRecipient()->getId(),
-                    ]),
-                    'publish' => $this->routeGenerator->generate('learningMomentEvidence.putPublish', [
-                        'evidenceId' => $moment->getId(),
-                        'creatorId' => $moment->getCreator()->getId(),
-                    ]),
-                    'reject' => $this->routeGenerator->generate('learningMomentModeration.putReject', [
-                        'evidenceId' => $moment->getId(),
-                    ]),
-                ]
-            ];
+                    /* We don't store updatedBy, for whatever reason: I suppose it was presumed
+                     * to always be the same as its author...
+                     *
+                     * Anyway, this is the localised version of config's date_short which you can use
+                     * to group moments per day.
+                     */
+                    'updatedAt' => $moment->getUpdatedAt()->getLocalShort(),
+                    /* Whether this moment had comments or not, which affects a user interaction
+                     * where they have an opportunity to delete comments upon approval
+                     */
+                    'hasComments' => $this->hasComments($moment),
+                    /* Metadata about the current state of a learning moment and any other details
+                     * regarding the current state, such as who actioned a state change etc.
+                     */
+                    'states' => [
+                        'current' => $moment->getCurrentState(),
+                        /* You'll be in one of three alternative states here: submitted/published/rejected
+                         */
+                        'submittedAt' => $moment->getSubmittedAt()?->getDatabase(),
+                        'submittedBy' => $moment->getSubmittedBy() ? [
+                            'id' => $moment->getSubmittedBy()->getId(),
+                            'fullname' => $moment->getSubmittedBy()->getFullname(),
+                            'firstname' => $moment->getSubmittedBy()->getFirstname(),
+                            'lastname' => $moment->getSubmittedBy()->getLastname(),
+                            'portrait' => $moment->getSubmittedBy()->getPortrait()->getHash(),
+                        ] : null,
+                        'publishAt' => $moment->getPublishedAt()?->getDatabase(),
+                        'publishedBy' => $moment->getPublishedBy() ? [
+                            'id' => $moment->getPublishedBy()->getId(),
+                            'fullname' => $moment->getPublishedBy()->getFullname(),
+                            'firstname' => $moment->getPublishedBy()->getFirstname(),
+                            'lastname' => $moment->getPublishedBy()->getLastname(),
+                            'portrait' => $moment->getPublishedBy()->getPortrait()->getHash(),
+                        ] : null,
+                        'rejectedAt' => $moment->getRejectedAt()?->getDatabase(),
+                        'rejectedBy' => $moment->getRejectedBy() ? [
+                            'id' => $moment->getRejectedBy()->getId(),
+                            'fullname' => $moment->getRejectedBy()->getFullname(),
+                            'firstname' => $moment->getRejectedBy()->getFirstname(),
+                            'lastname' => $moment->getRejectedBy()->getLastname(),
+                            'portrait' => $moment->getRejectedBy()->getPortrait()->getHash(),
+                        ] : null
+                    ],
+                    /* A shortcut to urls for changing states in this learning moment
+                     */
+                    '_links' => [
+                        'submit' => $this->routeGenerator->generate('learningMomentEvidence.putSubmit', [
+                            'evidenceId' => $moment->getId(),
+                            'creatorId' => $moment->getCreator()->getId(),
+                            'userId' => $moment->getRecipient()->getId(),
+                        ]),
+                        'publish' => $this->routeGenerator->generate('learningMomentEvidence.putPublish', [
+                            'evidenceId' => $moment->getId(),
+                            'creatorId' => $moment->getCreator()->getId(),
+                        ]),
+                        'reject' => $this->routeGenerator->generate('learningMomentModeration.putReject', [
+                            'evidenceId' => $moment->getId(),
+                        ]),
+                    ]
+                ];
+            }
         }
 
         $this->response = $this->responseAsJson([
