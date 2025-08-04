@@ -36,11 +36,12 @@ class Client
      *
      * @param string|array<string> $channel  One or more channels to which to subscribe.
      * @param EventListener        $listener The event listener which handles messages on `$channel`.
-     * @throws Predis\ClientException if the subscribe fails
      */
     public function subscribe(array|string $channel, EventListener $listener)
     {
         $channels = is_array($channel) ? $channel : [$channel];
+
+        /** @phpstan-ignore-next-line method.notFound - this method does exist */
         array_map($this->client->subscribe(...), $channels);
         $this->client->on('message', function (string $messageChannel, string $payload) use ($channels, $listener) {
             if (in_array($messageChannel, $channels)) {
@@ -55,11 +56,12 @@ class Client
      *
      * @param string|array<string> $pattern  One or more patterns to which to subscribe.
      * @param EventListener        $listener The event listener which handles messages on channels matching `$pattern`.
-     * @throws Predis\ClientException if the subscribe fails
      */
     public function psubscribe(string|array $pattern, EventListener $listener)
     {
         $patterns = is_array($pattern) ? $pattern : [$pattern];
+
+        /** @phpstan-ignore-next-line method.notFound - this method does exist */
         array_map($this->client->psubscribe(...), $patterns);
         $this->client->on('pmessage', function (string $messagePattern, string $messageChannel, string $payload) use ($patterns, $listener) {
             foreach ($patterns as $pattern) {
@@ -76,10 +78,10 @@ class Client
      * Unsubscribe from one or more channels.
      *
      * @param string|array<string> $channel One or more channels from which to unsubscribe.
-     * @throws Predis\ClientException if the unsubscribe fails
      */
     public function unsubscribe(array|string $channel)
     {
+        /** @phpstan-ignore-next-line method.notFound - this method does exist */
         $channels = is_array($channel) ? $channel : [$channel];
         array_map($this->client->unsubscribe(...), $channels);
     }
@@ -89,10 +91,10 @@ class Client
      * Unsubscribe from one or more message patterns.
      *
      * @param string|array<string> $pattern One or more patterns from which to unsubscribe.
-     * @throws Predis\ClientException if the unsubscribe fails
      */
     public function punsubscribe(array|string $pattern)
     {
+        /** @phpstan-ignore-next-line method.notFound - this method does exist */
         $patterns = is_array($pattern) ? $pattern : [$pattern];
         array_map($this->client->punsubscribe(...), $patterns);
     }
