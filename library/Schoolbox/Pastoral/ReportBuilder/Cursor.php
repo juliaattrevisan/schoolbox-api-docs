@@ -46,7 +46,7 @@ class Cursor implements ICursor
         protected string $resultType,
         protected ?string $sortBy = self::SORT_BY_DEFAULT,
         protected ?string $order = self::ORDER_DIRECTION_DEFAULT,
-        protected ?int $limit = self::LIMIT_DEFAULT,
+        protected int $limit = self::LIMIT_DEFAULT,
         protected ?ICodec $codec = null,
     ) {
         $this->codec ??= new Base64();
