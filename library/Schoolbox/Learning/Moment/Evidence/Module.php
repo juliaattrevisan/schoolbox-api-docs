@@ -326,7 +326,8 @@ class Module extends BaseModule
                 $this->injector->get('user')
             ),
             $this->getMapperFactory()->get(\Schoolbox\UserMapper::class),
-            new \External_Class()
+            new \External_Class(),
+            $this->getMapperFactory()->get(\Schoolbox\Permission\Access\UserAccessMapper::class),
         );
     }
 

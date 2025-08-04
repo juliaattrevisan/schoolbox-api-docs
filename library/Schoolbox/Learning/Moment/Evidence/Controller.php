@@ -22,6 +22,7 @@ use Schoolbox\Learning\Moment\Evidence\Moderation\ModerationRequired;
 use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Exception;
@@ -51,6 +52,7 @@ class Controller extends Base
      * @param EditorTemplateHelper    $editorTemplateHelper
      * @param \Schoolbox\UserMapper $userMapper
      * @param \External_Class $externalClass
+     * @param \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper
      */
     public function __construct(
         private Mapper $mapper,
@@ -58,6 +60,7 @@ class Controller extends Base
         private EditorTemplateHelper $editorTemplateHelper,
         private \Schoolbox\UserMapper $userMapper,
         private \External_Class $externalClass,
+        private \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper,
     ) {
     }
 
@@ -788,18 +791,39 @@ class Controller extends Base
      */
     public function getCohortReportPayload(Folder\Model $folder, \Alaress_Date_Format $from, \Alaress_Date_Format $to): void
     {
+        $users = [];
+
         /* Get a list of student ids that are in $folder and use a hash lookup
          * to cross reference everything we find later
          */
-        $students = array_column($this->externalClass->getStudents($folder->getCodeString()), 'synergy_id');
+        if ('' !== $folder->getCodeString()) {
+            /* Students of a class coded folder
+             */
+            $students = array_column($this->externalClass->getStudents($folder->getCodeString()), 'synergy_id');
 
-        /* These are the user instances associated with $folder's class list of students
-         * We'll use this to interset with learning moments $recipients
-         */
-        $users = array_fill_keys($this->userMapper->findByExternalIds($students, \Schoolbox\Role::STUDENT)->indexBy('id')->keys(), true);
+            /* These are the user instances associated with $folder's class list of students
+             * We'll use this to interset with learning moments $recipients
+             */
+            if (\count($students)) {
+                $users = array_fill_keys($this->userMapper->findByExternalIds($students, \Schoolbox\Role::STUDENT)->indexBy('id')->keys(), true);
+            }
+        } else {
+            /* Folks in a Group
+             */
+            $this->userAccessMapper = \Schoolbox\Permission\Access\UserAccessMapper::getInstance();
 
-        /* TODO combine with guys in a group, not just a class list from the externals, then dedupe
-         */
+            $userAccessList = $this->userAccessMapper->findForFolder($folder)
+                ->indexByCallback(static function (UserAccess $userAccess) {
+                    return $userAccess->getUser()->getId();
+                });
+
+            $users = array_fill_keys($this->userMapper->findByColumn('id', $userAccessList->keys())
+                ->filter(function (\Schoolbox\User $user) {
+                    return ($user->getRole()->isStudent());
+                })
+                ->indexBy('id')
+                ->keys(), true);
+        }
 
         /* Find all the learning moments in the specified date range
          */
@@ -898,12 +922,12 @@ class Controller extends Base
                 '_links' => [
                     'submit' => $this->routeGenerator->generate('learningMomentEvidence.putSubmit', [
                         'evidenceId' => $moment->getId(),
-                        'creatorId'  => $moment->getCreator()->getId(),
-                        'userId'     => $moment->getRecipient()->getId(),
+                        'creatorId' => $moment->getCreator()->getId(),
+                        'userId' => $moment->getRecipient()->getId(),
                     ]),
                     'publish' => $this->routeGenerator->generate('learningMomentEvidence.putPublish', [
                         'evidenceId' => $moment->getId(),
-                        'creatorId'  => $moment->getCreator()->getId(),
+                        'creatorId' => $moment->getCreator()->getId(),
                     ]),
                     'reject' => $this->routeGenerator->generate('learningMomentModeration.putReject', [
                         'evidenceId' => $moment->getId(),
