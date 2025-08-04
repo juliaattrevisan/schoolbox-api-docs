@@ -819,14 +819,16 @@ class Controller extends Base
                     return $userAccess->getUser()->getId();
                 });
 
-            $ids = $this->userMapper->findByColumn('id', $userAccessList->keys())
-                ->filter(function (\Schoolbox\User $user) {
-                    return ($user->getRole()->isStudent());
-                })
-                ->indexBy('id')
-                ->keys();
+            if (\count($userAccessList)) {
+                $ids = $this->userMapper->findByColumn('id', $userAccessList->keys())
+                    ->filter(function (\Schoolbox\User $user) {
+                        return ($user->getRole()->isStudent());
+                    })
+                    ->indexBy('id')
+                    ->keys();
 
-            $users = array_fill_keys($ids, true);
+                $users = array_fill_keys($ids, true);
+            }
         }
 
         /* Find all the learning moments in the specified date range
