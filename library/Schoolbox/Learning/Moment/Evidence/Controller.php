@@ -829,7 +829,13 @@ class Controller extends Base
                      */
                     // 'role' => $moment->getRecipient()->getPreferredTitle()
                 ],
-                'creator' => $moment->getCreator()->getFullname(),
+                'creator' => [
+                    'id' => $moment->getCreator()->getId(),
+                    'fullname' => $moment->getCreator()->getFullname(),
+                    'firstname' => $moment->getCreator()->getFirstname(),
+                    'lastname' => $moment->getCreator()->getLastname(),
+                    'portrait' => $moment->getCreator()->getPortrait()->getHash(),
+                ],
                 'hasComments' => $this->hasComments($moment),
                 'currentState' => $moment->getCurrentState(),
                 'date' => [
