@@ -13,6 +13,7 @@ namespace Alaress\Redis\Async;
 
 use Alaress\Redis\Async\Event\Message;
 use Alaress\Redis\Async\Event\PMessage;
+use Clue\React\Redis\Client as ReactRedisClient;
 use React\Promise;
 use React\Promise\PromiseInterface;
 
@@ -25,10 +26,12 @@ class Client
     /**
      * Constructor
      *
-     * @param \Clue\React\Redis\Client $client The internal asynchronous Redis client: used only for subscriptions to
-     *                                         pub/sub queues.
+     * @param ReactRedisClient $client The internal asynchronous Redis client.
+     *                                 This instance of the client may only be used for subscriptions to pub/sub queues:
+     *                                 once a client has started subscribing to a queue, it cannot be used for other
+     *                                 commands as per https://github.com/clue/reactphp-redis?tab=readme-ov-file#pubsub.
      */
-    public function __construct(private \Clue\React\Redis\Client $client)
+    public function __construct(private ReactRedisClient $client)
     {
     }
 
