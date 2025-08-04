@@ -166,7 +166,7 @@ Copies an instance's redis data to the specified server
         /**
          * Prepare the migrate command
          */
-        $migrate = (new \Predis\Command\KeyMigrate());
+        $migrate = new \Predis\Command\RawCommand('MIGRATE');
         $args    = [
             $targetRedisUrl->getHost(),
             $targetRedisUrl->getPort(),
