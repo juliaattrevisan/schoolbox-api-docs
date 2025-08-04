@@ -31,7 +31,7 @@ case "${TASKD_BUILD_FROM_LOCAL}" in
         ;;
 esac
 
-# Log into whatever repository, as long as not already logged in
+# Log into whatever repository, as long as not already logged in to that repo
 private_container_registry=''
 case "${PRIVATE_CONTAINER_REGISTRY_TYPE}" in
     dockerhub )
@@ -40,7 +40,7 @@ case "${PRIVATE_CONTAINER_REGISTRY_TYPE}" in
         ;;
     ecr )
         private_container_registry="${PRIVATE_CONTAINER_REGISTRY_ECR_ACCOUNT_ID}.dkr.ecr.${PRIVATE_CONTAINER_REGISTRY_ECR_REGION}.amazonaws.com"
-        aws ecr get-login-password --region "${PRIVATE_CONTAINER_REGISTRY_ECR_REGION}" | docker login --username AWS --password-stdin "${private_container_registry}"
+        aws ecr get-login-password --region "${PRIVATE_CONTAINER_REGISTRY_ECR_REGION}" | docker login -u AWS --password-stdin "${private_container_registry}"
         ;;
     * )
         echo "Invalid PRIVATE_CONTAINER_REGISTRY_TYPE value ${PRIVATE_CONTAINER_REGISTRY_TYPE}: must be dockerhub or ecr" >&2
