@@ -791,7 +791,7 @@ class Controller extends Base
      */
     public function getCohortReportPayload(Folder\Model $folder, \Alaress_Date_Format $from, \Alaress_Date_Format $to): void
     {
-        $users = [];
+        $ids = [];
 
         /* Get a list of student ids that are in $folder and use a hash lookup
          * to cross reference everything we find later
@@ -808,8 +808,6 @@ class Controller extends Base
                 $ids = $this->userMapper->findByExternalIds($students, \Schoolbox\Role::STUDENT)
                     ->indexBy('id')
                     ->keys();
-
-                $users = array_fill_keys($ids, true);
             }
         } else {
             /* Students in a Group
@@ -826,8 +824,6 @@ class Controller extends Base
                     })
                     ->indexBy('id')
                     ->keys();
-
-                $users = array_fill_keys($ids, true);
             }
         }
 
@@ -835,7 +831,9 @@ class Controller extends Base
          */
         $payload = [];
 
-        if (\count($users)) {
+        if (\count($ids)) {
+            $users = array_fill_keys($ids, true);
+
             $pb = $this->mapper->getPredicateBuilder()
                 ->between('updated_at', $from, $to);
 
