@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Moment\Evidence;
 
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
+use DebugBar\DebugBarException;
 use Schoolbox\API\Translator\ModelToArray\Composite;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
@@ -737,22 +738,52 @@ class Controller extends Base
      *   - end of today
      *
      * @param Folder\Model $folder
-     * @param string|null $fromDate
-     * @param string|null $toDate
      * @return void
      */
-    public function getCohortReportPayload(Folder\Model $folder, string $fromDate = null, string $toDate = null): void
+    public function getCohortReportPayloadDefault(Folder\Model $folder): void
     {
-        /* Assume the seven-day default range in the absence of any specific dates
-         */
-        if (null === $fromDate || null === $toDate) {
-            $from = \Alaress_Date_Format::now()->addDays(self::COHORT_REPORT_PAST_THRESHOLD)->startOfDay();
-            $to = \Alaress_Date_Format::now()->endOfDay();
-        } else {
-            $from = (new \Alaress_Date_Format($fromDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT))->startOfDay();
-            $to = (new \Alaress_Date_Format($toDate, \ALaress_Date_Format::DATABASE_DATE_FORMAT))->endOfDay();
-        }
+        $this->getCohortReportPayload(
+            $folder,
+            \Alaress_Date_Format::now()->addDays(self::COHORT_REPORT_PAST_THRESHOLD)->startOfDay(),
+            \Alaress_Date_Format::now()->endOfDay()
+        );
+    }
 
+
+    /**
+     * Generates a json payload that tells you about learning moments for any of $folder's students
+     * that were created between the $from and $to dates, grouped by date, sorted reverse-chronologically.
+     *
+     * @param Folder\Model $folder
+     * @param string $fromDate
+     * @param string $toDate
+     * @return void
+     */
+    public function getCohortReportPayloadRange(Folder\Model $folder, string $fromDate, string $toDate): void
+    {
+        $this->getCohortReportPayload(
+            $folder,
+            (new \Alaress_Date_Format($fromDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT))->startOfDay(),
+            (new \Alaress_Date_Format($toDate, \ALaress_Date_Format::DATABASE_DATE_FORMAT))->endOfDay()
+        );
+    }
+
+
+    /**
+     * Generates a json payload that tells you about learning moments for any of $folder's students
+     * that were created between the $from and $to dates, grouped by date, sorted reverse-chronologically.
+     *
+     * By default, it'll assume $from and $to to be a 7-day range:
+     *   - start of the day 7 days ago
+     *   - end of today
+     *
+     * @param Folder\Model $folder
+     * @param \Alaress_Date_Format $from
+     * @param \Alaress_Date_Format $to
+     * @return void
+     */
+    public function getCohortReportPayload(Folder\Model $folder, \Alaress_Date_Format $from, \Alaress_Date_Format $to): void
+    {
         $pb = $this->mapper->getPredicateBuilder()
             ->between('updated_at', $from, $to);
 

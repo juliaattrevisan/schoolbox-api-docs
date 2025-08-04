@@ -286,8 +286,16 @@ class Module extends BaseModule
          */
         $this->register(
             self::METHOD_GET,
-            '/cohort/{folderId}/payload/{from}/{to}',
-            'getCohortReportPayload',
+            '/cohort/{folderId}/payload/{fromDate}/{toDate}',
+            'getCohortReportPayloadRange',
+            $viewCohortReportRule,
+            Closure::fromCallable([$this, 'preloadFolder']),
+        );
+
+        $this->register(
+            self::METHOD_GET,
+            '/cohort/{folderId}/payload',
+            'getCohortReportPayloadDefault',
             $viewCohortReportRule,
             Closure::fromCallable([$this, 'preloadFolder']),
         );
