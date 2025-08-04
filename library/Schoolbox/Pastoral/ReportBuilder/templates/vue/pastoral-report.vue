@@ -28,13 +28,6 @@ const recordsOrPoints = window.Vue.ref<"records" | "points">("records"); // the 
 const tabParamName = "tab"; // URL parameter name for the selected tab
 
 /**
- * Handle print button click
- */
-function onPrintSelected(): void {
-    window.print();
-}
-
-/**
  * Handle tab selection and update URL without adding to browser history
  * @param tab - the tab that has been selected
  */
