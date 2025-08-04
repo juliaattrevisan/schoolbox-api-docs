@@ -778,7 +778,7 @@ class Controller extends Base
      *   - start of the day 7 days ago
      *   - end of today
      *
-     * @param Model $folder
+     * @param Folder\Model $folder
      * @param \Alaress_Date_Format $from
      * @param \Alaress_Date_Format $to
      * @return void
