@@ -66,7 +66,7 @@
     }
 
     handle_path /debugbar* {
-        root * /usr/share/schoolbox/vendor/maximebf/debugbar/src/DebugBar/Resources
+        root * /usr/share/schoolbox/vendor/php-debugbar/php-debugbar/src/DebugBar/Resources
     }
     handle /static* {
         file_server
