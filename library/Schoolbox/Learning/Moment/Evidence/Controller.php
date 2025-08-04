@@ -753,7 +753,12 @@ class Controller extends Base
             $to = (new \Alaress_Date_Format($toDate, \ALaress_Date_Format::DATABASE_DATE_FORMAT))->endOfDay();
         }
 
-        $this->
+        $pb = $this->mapper->getPredicateBuilder()
+            ->between('updated_at', $from, $to);
+
+        $result = $this->mapper->findByPredicates($pb)->sortBy('updatedAt', 'DESC');
+
+        new \Alaress_Probe($result);
 
         $payload = [
             'date' => [
@@ -765,7 +770,7 @@ class Controller extends Base
                     'hasComments' => null,
                     'currentStatus' => null,
                     'date' => [
-                        'createdAt' => null,
+                        'index' => null,
                         'updatedAt' => null,
                         'submittedAt' => null,
                         'publishAt' => null,
