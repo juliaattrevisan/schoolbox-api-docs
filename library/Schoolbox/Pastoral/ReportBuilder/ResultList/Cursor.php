@@ -47,17 +47,18 @@ class Cursor implements ICursor
         $this->codec ??= new Base64();
 
         /* Set a maximum number of results should be returned otherwise reject
- */
-        if ($this->limit > self::LIMIT_MAX) {
-            throw new ValueError(sprintf('Limit must be at most %d: %d provided', self::LIMIT_MAX, $this->limit));
-        }
-
-        /* Set a minimum number of results should be returned otherwise reject
          */
-        if ($this->limit < self::LIMIT_MIN) {
-            throw new ValueError(sprintf('Limit must be at least %d: %d provided', self::LIMIT_MIN, $this->limit));
-        }
+        if (null !== $this->limit) {
+            if ($this->limit > self::LIMIT_MAX) {
+                throw new ValueError(sprintf('Limit must be at most %d: %d provided', self::LIMIT_MAX, $this->limit));
+            }
 
+            /* Set a minimum number of results should be returned otherwise reject
+             */
+            if ($this->limit < self::LIMIT_MIN) {
+                throw new ValueError(sprintf('Limit must be at least %d: %d provided', self::LIMIT_MIN, $this->limit));
+            }
+        }
         $this->init();
     }
 
@@ -193,6 +194,9 @@ class Cursor implements ICursor
         $filter = $this->filterByCell();
         $whereFilter = $filter['where'];
 
+        $limit = (null === $this->limit) ? "" : " LIMIT {$this->limit}";
+
+
         $statement = $db->executeQuery(
             "
             SELECT p.id
@@ -201,7 +205,7 @@ class Cursor implements ICursor
             AND {$whereFilter}
             AND ({$this->inTypeSubType})
             ORDER BY p.id ASC
-            LIMIT {$this->limit}
+            {$limit}
         ",
             array_merge(
                 $this->helper->getParams(),

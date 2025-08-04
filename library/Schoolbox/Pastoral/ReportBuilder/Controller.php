@@ -639,6 +639,7 @@ class Controller extends Base
                 $tabType,
                 $columnKey,
                 $rowKey,
+                null,
             );
 
             $result = $cursor->retrieveResults(null);
