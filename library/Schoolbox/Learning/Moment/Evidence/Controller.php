@@ -812,7 +812,6 @@ class Controller extends Base
                 'hasComments' => $this->hasComments($moment),
                 'currentState' => $moment->getCurrentState(),
                 'date' => [
-                    'index' => $moment->getUpdatedAt()->getLocalShort(),
                     'updatedAt' => $moment->getUpdatedAt()->getDatabase(),
                     'submittedAt' => $moment->getSubmittedAt()?->getDatabase(),
                     'publishAt' => $moment->getPublishedAt()?->getDatabase(),
