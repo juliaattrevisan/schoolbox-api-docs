@@ -16,6 +16,8 @@ frankenphp_compose_file="docker/schoolbox-frankenphp/dev.docker-compose.yaml"
 declare TASKD_BUILD_FROM_LOCAL
 declare PRIVATE_CONTAINER_REGISTRY_TYPE
 declare PRIVATE_CONTAINER_REGISTRY_DOCKERHUB_USERNAME
+declare PRIVATE_CONTAINER_REGISTRY_ECR_ACCOUNT_ID
+declare PRIVATE_CONTAINER_REGISTRY_ECR_REGION
 source ./docker.default.env
 if [ -f ./docker.env ]; then
     source ./docker.env
@@ -37,8 +39,8 @@ case "${PRIVATE_CONTAINER_REGISTRY_TYPE}" in
         docker login -u "${PRIVATE_CONTAINER_REGISTRY_DOCKERHUB_USERNAME}"
         ;;
     ecr )
-        private_container_registry="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
-        aws ecr get-login-password --region "${AWS_REGION}" | docker login --username AWS --password-stdin "${private_container_registry}"
+        private_container_registry="${PRIVATE_CONTAINER_REGISTRY_ECR_ACCOUNT_ID}.dkr.ecr.${PRIVATE_CONTAINER_REGISTRY_ECR_REGION}.amazonaws.com"
+        aws ecr get-login-password --region "${PRIVATE_CONTAINER_REGISTRY_ECR_REGION}" | docker login --username AWS --password-stdin "${private_container_registry}"
         ;;
     * )
         echo "Invalid PRIVATE_CONTAINER_REGISTRY_TYPE value ${PRIVATE_CONTAINER_REGISTRY_TYPE}: must be dockerhub or ecr" >&2
