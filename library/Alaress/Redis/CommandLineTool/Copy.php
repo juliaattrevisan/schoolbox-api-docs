@@ -255,9 +255,8 @@ Copies an instance's redis data to the specified server
      */
     private function logKey(string $key)
     {
-        /** @var Predis\Response\Status $type */
         $type = $this->sourceRedis->type($key);
-        switch ($type->getPayload()) {
+        switch ($type) {
             case 'string':
                 $length = $this->sourceRedis->strlen($key);
                 break;
@@ -271,12 +270,12 @@ Copies an instance's redis data to the specified server
                 $length = array_sum(array_map('strlen', $this->sourceRedis->zrange($key, 0, -1)));
                 break;
             default:
-                $this->getLogger()->warning("Unrecognised payload: '{$type->getPayload()}'");
+                $this->getLogger()->warning("Unrecognised payload: '{$type}'");
                 $length = 0;
         }
         $ttl = $this->sourceRedis->ttl($key);
         $this->getLogger()->debug(sprintf('%s %s', $this->isDelete ? 'Deleting' : 'Migrating', $key));
-        $this->getLogger()->debug("payload: {$type->getPayload()}, ttl: $ttl, length: $length");
+        $this->getLogger()->debug("payload: {$type}, ttl: $ttl, length: $length");
         $this->count++;
         $this->totalLength += $length;
     }

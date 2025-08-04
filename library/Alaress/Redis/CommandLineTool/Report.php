@@ -313,9 +313,8 @@ class Report extends CliTool\App
         string $redisInstanceName,
         bool $groupResults,
     ): ?array {
-        /** @var Predis\Response\Status $type */
         $type = $redis->type($key);
-        switch ($type->getPayload()) {
+        switch ($type) {
             case 'string':
                 $length = $redis->strlen($key);
                 break;
@@ -329,11 +328,11 @@ class Report extends CliTool\App
                 $length = array_sum(array_map('strlen', $redis->zrange($key, 0, -1)));
                 break;
             default:
-                $this->getLogger()->warning("Unrecognised payload: '{$type->getPayload()}'");
+                $this->getLogger()->warning("Unrecognised payload: '{$type}'");
                 $length = 0;
         }
         $ttl = $redis->ttl($key);
-        $this->getLogger()->info("payload: {$type->getPayload()}, ttl: $ttl, length: $length");
+        $this->getLogger()->info("payload: {$type}, ttl: $ttl, length: $length");
 
         // Search this instance's key patterns
         $keyPattern = null;
@@ -407,7 +406,7 @@ class Report extends CliTool\App
             }
             $keyPattern = str_replace(Registry::INSTANCE_ID_MATCH, $instanceId, $keyPattern);
         }
-        return [$keyPattern, $instanceId, $type->getPayload(), $ttl, $length, $status];
+        return [$keyPattern, $instanceId, $type, $ttl, $length, $status];
     }
 
 

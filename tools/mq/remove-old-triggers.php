@@ -83,7 +83,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             $keyType = $this->redis->type($key);
 
             // clean up set
-            if ($keyType->getPayload() === 'set') {
+            if ($keyType === 'set') {
                 $members = $this->redis->smembers($key);
                 $memberCount = count($members);
                 foreach ($members as $member) {
@@ -105,8 +105,8 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             }
 
             // if the key is not string (unexpectedly), skip
-            if ($keyType->getPayload() !== 'string') {
-                $this->getLogger()->debug("Skipping {$key} type: {$keyType->getPayload()} ");
+            if ($keyType !== 'string') {
+                $this->getLogger()->debug("Skipping {$key} type: {$keyType} ");
                 continue;
             }
 

@@ -74,7 +74,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
                 $uncompressed = gzuncompress($rawRedisData);
                 $instance = unserialize($uncompressed);
             } catch (Exception $e) {
-                if ($keyType->getPayload() === 'set') {
+                if ($keyType === 'set') {
                     $setCount = \count($this->redis->smembers($key));
                     $this->getLogger()->info("{$setCount} messages exist.");
 
