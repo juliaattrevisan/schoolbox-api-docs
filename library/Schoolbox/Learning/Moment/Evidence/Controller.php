@@ -784,12 +784,33 @@ class Controller extends Base
      */
     public function getCohortReportPayload(Folder\Model $folder, \Alaress_Date_Format $from, \Alaress_Date_Format $to): void
     {
+        $externalClass = new \External_Class();
+
+        /* Get a list of student ids that are in $folder and use a hash lookup
+         * to cross reference everything we find later
+         */
+        $students = array_column($externalClass->getStudents($folder->getCodeString()), 'synergy_id');
+
+        /* These are the user instances associated with $folder's class list of students
+         * We'll use this to interset with learning moments $recipients
+         */
+        $users = array_fill_keys(\Schoolbox\UserMapper::getInstance()->findByExternalIds($students, \Schoolbox\Role::STUDENT)->indexBy('id')->keys(), true);
+
+        /* Find all the learning moments in the specified date range
+         */
         $pb = $this->mapper->getPredicateBuilder()
             ->between('updated_at', $from, $to);
 
         $moments = $this->mapper->findByPredicates($pb)->sortBy('updatedAt', 'DESC');
 
         foreach ($moments as $moment) {
+            /* Only care about moments whose recipients are in the set of users associated
+             * with $folder: otherwise ignore the learning moment
+             */
+            if (!array_key_exists($moment->getRecipient()->getId(), $users)) {
+                continue;
+            }
+
             $index = $moment->getUpdatedAt()->getLocalShort();
 
             $payload[$index][] = [
