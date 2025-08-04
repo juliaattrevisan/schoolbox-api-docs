@@ -155,11 +155,11 @@ Copies an instance's redis data to the specified server
         // See library/Alaress/Redis/CommandLineTool/Report.php for patterns
         $keyPatterns = Registry::KEY_PATTERNS[Redis::INSTANCE_STORAGE];
 
-        // Skipping keys which doesn't have INSTANCE_ID
+        // Skipping keys which aren't for a particular instance
         $keyPatterns = array_filter(
             $keyPatterns,
             static function (string $pattern) {
-                return str_contains($pattern, INSTANCE_ID);
+                return str_contains($pattern, Registry::INSTANCE_ID_MATCH);
             }
         );
 
