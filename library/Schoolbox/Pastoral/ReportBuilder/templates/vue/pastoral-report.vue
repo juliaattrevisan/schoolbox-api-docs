@@ -74,8 +74,8 @@ window.Vue.onMounted((): void => {
         <nav>
             <template v-if="props.results.length">
                 <a
-                    v-if="props.export"
-                    :href="props.routes.getReportResultsExport"
+                    v-if="selectedTab._links.export"
+                    :href="selectedTab._links.export"
                     class="icon-download"
                     aria-label="Download Report as CSV"
                 ></a>
