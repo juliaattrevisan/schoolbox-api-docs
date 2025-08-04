@@ -3,34 +3,72 @@
  * Displays a pastoral report in a table format.
  */
 
-import { useTemplateRef } from "vue";
-import type { Tab, TablePayload, Config, Routes } from "../../js/types/pastoralReportTypes";
+import { useTemplateRef, toRefs } from "vue";
+import { useScroll } from "@vueuse/core";
+import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
+import type {
+    Tab,
+    TablePayload,
+    Config,
+    Routes,
+    SeverityColors,
+    TableHeader,
+} from "../../js/types/pastoralReportTypes";
 import { TabType } from "../../js/types/pastoralReportTypes";
 import { useLoadPrTable } from "../composable/useLoadPrTable";
+import { useLoadRecords } from "../composable/useLoadRecords";
 import PrTableHeader from "./pr-table-header.vue";
 import PrTableTotalRow from "./pr-table-total-row.vue";
 import PrTableRow from "./pr-table-row.vue";
 import PrTableFooter from "./pr-table-footer.vue";
+import PrRecord from "../pr-record.vue";
 
 const props = defineProps<{
+    title: string;
     selectedTab: Tab;
     config: Config;
     routes: Routes;
     recordsAndPoints: string[];
     localePastoral: string;
+    showSeverity: boolean;
+    severityColors: SeverityColors;
 }>();
 
-// #region scrollable height
+// #region scrollable table height
 
-const scrollableEl = useTemplateRef<HTMLDivElement>("scrollableEl");
-const maxScrollableHeight = window.Vue.ref<string>(`${window.innerHeight - 200}px`); // 200px chosen to give breathing room for header and metadata
+const resizeObserver = window.Vue.ref<ResizeObserver | null>(null);
+const maxScrollableHeight = window.Vue.ref<string>(`${window.innerHeight}px`);
 
 /**
- * Set the max height to allow the thead to use sticky position
- * and to incrementally display large row lists on scroll
+ * Set the max height to allow the table to sit within the browser window
  */
 function setScrollableHeight(): void {
-    maxScrollableHeight.value = `${window.innerHeight - 300}px`;
+    const tabsBottomY = document.querySelector("dl")?.getBoundingClientRect().bottom || 0;
+    const footerHeight = document.getElementById("footer")?.getBoundingClientRect().height || 0;
+
+    const mainSBContainerEl = document.getElementById("container");
+    const mainSBContainerPaddingBtm = mainSBContainerEl
+        ? parseInt(window.getComputedStyle(mainSBContainerEl).paddingBottom, 10)
+        : 0;
+
+    const newHeight = window.innerHeight - tabsBottomY - footerHeight - mainSBContainerPaddingBtm - 1;
+
+    maxScrollableHeight.value = `${newHeight}px`;
+}
+
+/**
+ * Initialize the ResizeObserver to adjust the scrollable height
+ * when the container changes size
+ */
+function initSetScrollableHeight(): void {
+    resizeObserver.value = new ResizeObserver(setScrollableHeight);
+    const containerEl = document.querySelector("#container");
+    if (containerEl) {
+        resizeObserver.value.observe(containerEl);
+    }
+    // Set the initial height, and update it again when the DOM is fully loaded to ensure the footer is included
+    setScrollableHeight();
+    window.addEventListener("DOMContentLoaded", setScrollableHeight, { once: true });
 }
 
 // #endregion
@@ -38,31 +76,31 @@ function setScrollableHeight(): void {
 // #region table load
 
 const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
-const queryParams = new URLSearchParams(); // to store the query parameters for the endpoint to update
+const viewLink = window.Vue.ref("");
+const viewLinkParams = new URLSearchParams();
 const LIMIT = 20; // the current set limit for the number of records to fetch at once
 const sortBy = window.Vue.ref<string>("user"); // the current sort by field - this should update when payload is loaded
 const order = window.Vue.ref<"ASC" | "DESC">("ASC"); // the current sort order
-const currentEndpoint = window.Vue.ref("");
-const { isNewLoading, isSameLoading, payload, isEmpty, loadError } = useLoadPrTable(currentEndpoint);
+const { isNewLoading, isMoreLoading, payload, isEmpty, loadError } = useLoadPrTable(viewLink);
 
 /**
  * Reset the table load by clearing the cursor and reloading the data
  */
 function resetTableLoad(): void {
-    queryParams.set("selected", recordsOrPoints.value);
-    queryParams.set("cursor", "");
-    queryParams.set("limit", LIMIT.toString());
-    queryParams.set("sortBy", sortBy.value);
-    queryParams.set("order", order.value);
-    currentEndpoint.value = `${props.selectedTab.endpoint}?${queryParams.toString()}`;
+    viewLinkParams.set("selected", recordsOrPoints.value);
+    viewLinkParams.set("cursor", "");
+    viewLinkParams.set("limit", LIMIT.toString());
+    viewLinkParams.set("sortBy", sortBy.value);
+    viewLinkParams.set("order", order.value);
+    viewLink.value = `${props.selectedTab._links.view}?${viewLinkParams.toString()}`;
 }
 
 /**
  * Load the row data again when the recordsOrPoints changes
  */
 window.Vue.watch(recordsOrPoints, () => {
-    queryParams.set("selected", recordsOrPoints.value);
-    currentEndpoint.value = `${props.selectedTab.endpoint}?${queryParams.toString()}`;
+    viewLinkParams.set("selected", recordsOrPoints.value);
+    viewLink.value = `${props.selectedTab._links.view}?${viewLinkParams.toString()}`;
 });
 
 /**
@@ -78,10 +116,10 @@ function onSort(headerKey: string): void {
         sortBy.value = headerKey;
         order.value = "ASC";
     }
-    queryParams.set("sortBy", sortBy.value);
-    queryParams.set("order", order.value);
-    queryParams.set("cursor", ""); // Reset cursor on sort change
-    currentEndpoint.value = `${props.selectedTab.endpoint}?${queryParams.toString()}`;
+    viewLinkParams.set("sortBy", sortBy.value);
+    viewLinkParams.set("order", order.value);
+    viewLinkParams.set("cursor", ""); // Reset cursor on sort change
+    viewLink.value = `${props.selectedTab._links.view}?${viewLinkParams.toString()}`;
 }
 
 /**
@@ -89,8 +127,8 @@ function onSort(headerKey: string): void {
  * @param cursor - the cursor to use for the previous/next page
  */
 function onPaginate(cursor: string): void {
-    queryParams.set("cursor", cursor);
-    currentEndpoint.value = `${props.selectedTab.endpoint}?${queryParams.toString()}`;
+    viewLinkParams.set("cursor", cursor);
+    viewLink.value = `${props.selectedTab._links.view}?${viewLinkParams.toString()}`;
 }
 
 /**
@@ -107,16 +145,65 @@ window.Vue.watch(
 
 // #endregion
 
+// #region table cell selected
+
+const isCellExpanded = window.Vue.ref(false);
+const selectedHeader = window.Vue.ref<TableHeader | null>(null);
+const scopeLink = window.Vue.ref("");
+const scopeLinkParams = new URLSearchParams();
+const {
+    isNewLoad: isNewRecordLoad,
+    isNewLoading: isLoadingNewRecords,
+    isMoreLoading: isLoadingMoreRecords,
+    payload: recordsPayload,
+    loadError: recordsLoadError,
+} = useLoadRecords(scopeLink);
+
+/**
+ * Handle cell selection
+ * @param header - the header of the cell that was selected
+ */
+function onCellSelect(header: TableHeader): void {
+    selectedHeader.value = header;
+    scopeLinkParams.set("column", selectedHeader.value.key);
+    scopeLink.value = `${props.selectedTab._links.scope}?${scopeLinkParams.toString()}`;
+    isCellExpanded.value = true; // Open the modal to show related records
+}
+
+/**
+ * To display more results when there's lots to display and the user has scrolled to the bottom
+ */
+const modalResultsEl = useTemplateRef<HTMLDivElement>("modalResultsRef");
+const { arrivedState } = useScroll(modalResultsEl, {
+    offset: { bottom: 30 },
+});
+const { bottom } = toRefs(arrivedState);
+window.Vue.watch(bottom, (isAtBottom) => {
+    if (isAtBottom && recordsPayload.value && recordsPayload.value.metadata.cursor.next !== null) {
+        scopeLinkParams.set("cursor", recordsPayload.value.metadata.cursor.next);
+        scopeLink.value = `${props.selectedTab._links.scope}?${scopeLinkParams.toString()}`;
+    }
+});
+
+// #endregion
+
 /**
  * Start setting the scrollable height on any window resize change
  * and reset the table load to ensure the correct endpoint is set
  */
 window.Vue.onMounted(() => {
-    setScrollableHeight();
-    window.addEventListener("resize", () => {
-        setScrollableHeight();
-    });
+    initSetScrollableHeight();
     resetTableLoad();
+});
+
+/**
+ * Clean up the ResizeObserver when the component is unmounted
+ */
+window.Vue.onUnmounted(() => {
+    if (resizeObserver.value) {
+        resizeObserver.value.disconnect();
+        resizeObserver.value = null;
+    }
 });
 </script>
 
@@ -141,7 +228,7 @@ window.Vue.onMounted(() => {
     </div>
     <template v-else>
         <div
-            ref="scrollableEl"
+            ref="scrollableRef"
             class="table-container scrollable"
             :style="{ maxHeight: maxScrollableHeight }"
             data-test="pr-table"
@@ -157,7 +244,7 @@ window.Vue.onMounted(() => {
                     @sort="onSort"
                 />
                 <!-- Skeleton loading state when switching between records/rows and sorting -->
-                <tbody v-if="isSameLoading" class="skeleton">
+                <tbody v-if="isMoreLoading" class="skeleton">
                     <tr v-for="(row, index) in 5" :key="index">
                         <td colspan="100%"></td>
                     </tr>
@@ -168,6 +255,7 @@ window.Vue.onMounted(() => {
                         :headers="(payload as TablePayload).data.tableHeaders"
                         :row-data="(payload as TablePayload).data.totalRow"
                         :records-or-points="recordsOrPoints"
+                        @cell-select="onCellSelect"
                     />
                     <!-- All other rows -->
                     <pr-table-row
@@ -180,7 +268,7 @@ window.Vue.onMounted(() => {
                 </tbody>
             </table>
             <pr-table-footer
-                :endpoint="currentEndpoint"
+                :endpoint="viewLink"
                 :metadata="(payload as TablePayload).metadata"
                 :limit="LIMIT"
                 @previous="onPaginate"
@@ -188,6 +276,55 @@ window.Vue.onMounted(() => {
             />
         </div>
     </template>
+    <basic-modal v-model:is-open="isCellExpanded" has-background-click>
+        <div v-if="isNewRecordLoad && isLoadingNewRecords" class="loader"></div>
+        <div v-else-if="isNewRecordLoad && recordsLoadError" class="alert-box alert f-no-margins">
+            Sorry, there was an error during further record retrieval. Please
+            <a href="" title="refresh the page"> refresh the page </a>
+            to try again and contact your support if the problem persists.
+            <template v-if="recordsLoadError && recordsLoadError.length > 0"
+                ><em>Further support info: {{ recordsLoadError }}</em></template
+            >
+        </div>
+        <template v-else-if="selectedHeader !== null">
+            <div class="l-flex-col l-gap-m">
+                <div class="l-flex-col l-gap-s f-no-margins">
+                    <h2>{{ props.title }}</h2>
+                    <p class="meta">
+                        Type: {{ selectedHeader.title }}
+                        <template v-if="selectedHeader.subTitle"
+                            ><br />Sub-Type: {{ selectedHeader.subTitle }}</template
+                        >
+                    </p>
+                </div>
+                <div ref="modalResultsRef" class="pr-table__records">
+                    <section v-for="record in recordsPayload?.data.results" :key="record.id">
+                        <ul class="information-list threaded">
+                            <pr-record
+                                :record="record"
+                                :config="props.config"
+                                :routes="props.routes"
+                                :locale-pastoral="props.localePastoral"
+                                :show-severity="props.showSeverity"
+                                :severity-colors="props.severityColors"
+                            />
+                        </ul>
+                    </section>
+                    <div v-if="isLoadingMoreRecords" class="c-island l-pad-s">
+                        <div class="loader"></div>
+                    </div>
+                    <div v-else-if="!isNewRecordLoad && recordsLoadError" class="alert-box alert f-no-margins">
+                        Sorry, there was an error during record retrieval. Please
+                        <a href="" title="refresh the page"> refresh the page </a>
+                        to try again and contact your support if the problem persists.
+                        <template v-if="recordsLoadError && recordsLoadError.length > 0"
+                            ><em>Further support info: {{ recordsLoadError }}</em></template
+                        >
+                    </div>
+                </div>
+            </div>
+        </template>
+    </basic-modal>
 </template>
 
 <style scoped lang="scss">
@@ -206,14 +343,8 @@ window.Vue.onMounted(() => {
     }
 }
 
-.pr-table-metadata {
-    background-color: #f9f9f9;
-    border-top: 1px solid #e0e0e0;
-    margin-top: 1rem;
-    padding: 0.5rem;
-    &__count {
-        color: #666;
-        font-size: 0.9rem;
-    }
+.pr-table__records {
+    max-height: 650px;
+    overflow-y: auto;
 }
 </style>

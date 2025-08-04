@@ -106,11 +106,14 @@ window.Vue.onMounted((): void => {
             <pr-table
                 v-else
                 v-model:records-or-points="recordsOrPoints"
+                :title="props.title"
                 :records-and-points="recordsAndPoints"
                 :selected-tab="selectedTab"
                 :config="props.config"
                 :routes="props.routes"
                 :locale-pastoral="props.localePastoral"
+                :show-severity="props.showSeverity"
+                :severity-colors="props.severityColors"
             />
         </div>
     </div>
