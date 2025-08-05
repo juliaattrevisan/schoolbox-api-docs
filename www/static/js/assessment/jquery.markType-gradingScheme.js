@@ -1,4 +1,9 @@
 (function () {
+    /** already a thing? don't make another instance */
+    if (typeof jQuery.fn.markTypeGradingScheme !== "undefined") {
+        return;
+    }
+
     const configEntries = {};
 
     /**
