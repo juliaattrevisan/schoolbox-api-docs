@@ -127,4 +127,26 @@ export default class ApiHelper {
 
         return folderIds;
     }
+
+    /**
+     * Delete a homepage component
+     * @param homepageId - ID of the homepage containing the component
+     * @param componentInstanceId - ID of the component instance to delete
+     */
+    async deleteHomepageComponent(homepageId: string | number, componentInstanceId: string | number): Promise<void> {
+        this.baseTester.isGoingTo(`delete the component with ID ${componentInstanceId} from homepage ${homepageId}`);
+
+        const formData = new FormData();
+        formData.append("cid", String(homepageId));
+        formData.append("delete", String(componentInstanceId));
+
+        const resp = await this.request.post(`/homepage/configForm`, {
+            ...(await this.getAuthHeader()),
+            multipart: formData,
+        });
+
+        if (!resp.ok()) {
+            throw new Error(`Failed to delete homepage component: ${resp.status()} ${resp.statusText()}`);
+        }
+    }
 }

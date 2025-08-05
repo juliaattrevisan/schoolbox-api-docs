@@ -31,7 +31,7 @@ export default class Homepage {
 
     static readonly ELEMENT_COMPONENT_SECTION_MULTIMEDIA = 'a[href="#tabs-sub-4"]';
 
-    static readonly ELEMENT_COMPONENT_SECTION_RESOURCES = 'a[href="#tabs-sub-5"]';
+    static readonly ELEMENT_COMPONENT_SECTION_RESOURCES = "#tabs-sub-5";
 
     static readonly ELEMENT_COMPONENT_SECTION_FEEDS = 'a[href="#tabs-sub-6"]';
 
