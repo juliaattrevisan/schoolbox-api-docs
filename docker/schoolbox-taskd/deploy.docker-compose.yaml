@@ -18,5 +18,5 @@ services:
     env_file:
       - path: ./schoolbox-taskd/default.env
         required: true
-      - path: ./../taskd.env
+      - path: ./../docker-taskd.env
         required: false

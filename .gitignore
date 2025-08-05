@@ -42,6 +42,6 @@ www/javascript
 
 # Docker environment configuration
 docker.env
-taskd.env
+docker-taskd.env
 .aws/
 .docker-compose.env
