@@ -11,10 +11,13 @@ use Schoolbox\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\ReportBuilder\Factory;
 use Schoolbox\Pastoral\ReportBuilder\Helper;
 use Schoolbox\Pastoral\ReportBuilder\TabType\StudentByType;
+use Schoolbox\Pastoral\SubType\Model as SubType;
+use Schoolbox\Pastoral\Type\Model as Type;
 use ValueError;
 
 class Cursor implements ICursor
 {
+    private string $inTypeSubType;
     /**
      * Maximum number of results returnable from the cursor at once:
      * IMO 20 results is a sensible maximum.
@@ -44,16 +47,39 @@ class Cursor implements ICursor
         $this->codec ??= new Base64();
 
         /* Set a maximum number of results should be returned otherwise reject
- */
-        if ($this->limit > self::LIMIT_MAX) {
-            throw new ValueError(sprintf('Limit must be at most %d: %d provided', self::LIMIT_MAX, $this->limit));
+         */
+        if (null !== $this->limit) {
+            if ($this->limit > self::LIMIT_MAX) {
+                throw new ValueError(sprintf('Limit must be at most %d: %d provided', self::LIMIT_MAX, $this->limit));
+            }
+
+            /* Set a minimum number of results should be returned otherwise reject
+             */
+            if ($this->limit < self::LIMIT_MIN) {
+                throw new ValueError(sprintf('Limit must be at least %d: %d provided', self::LIMIT_MIN, $this->limit));
+            }
+        }
+        $this->init();
+    }
+
+    /**
+     * Initialise the cursor with some common values
+     *
+     * @return void
+     */
+    private function init(): void
+    {
+        $whereInTypeSubTypeQuery = [];
+        if ($this->helper->getType()->count() > 0) {
+            $whereTypeIds = implode(',', $this->helper->getType()->getPropertyValues('id'));
+            $whereInTypeSubTypeQuery[] = "p.type_id IN ({$whereTypeIds})";
+        }
+        if ($this->helper->getSubTypes()->count() > 0) {
+            $whereSubTypeIds = implode(',', $this->helper->getSubTypes()->getPropertyValues('id'));
+            $whereInTypeSubTypeQuery[] = "p.subtype_id IN ({$whereSubTypeIds})";
         }
 
-        /* Set a minimum number of results should be returned otherwise reject
-         */
-        if ($this->limit < self::LIMIT_MIN) {
-            throw new ValueError(sprintf('Limit must be at least %d: %d provided', self::LIMIT_MIN, $this->limit));
-        }
+        $this->inTypeSubType = implode(' OR ', array_filter($whereInTypeSubTypeQuery));
     }
 
     /**
@@ -135,6 +161,7 @@ class Cursor implements ICursor
             {$this->helper->getFromString()}
             WHERE {$where}
             AND {$whereFilter}
+            AND ({$this->inTypeSubType})
         ",
             array_merge(
                 $this->helper->getParams(),
@@ -167,14 +194,18 @@ class Cursor implements ICursor
         $filter = $this->filterByCell();
         $whereFilter = $filter['where'];
 
+        $limit = (null === $this->limit) ? "" : " LIMIT {$this->limit}";
+
+
         $statement = $db->executeQuery(
             "
             SELECT p.id
             {$this->helper->getFromString()}
             WHERE {$where}
             AND {$whereFilter}
+            AND ({$this->inTypeSubType})
             ORDER BY p.id ASC
-            LIMIT {$this->limit}
+            {$limit}
         ",
             array_merge(
                 $this->helper->getParams(),

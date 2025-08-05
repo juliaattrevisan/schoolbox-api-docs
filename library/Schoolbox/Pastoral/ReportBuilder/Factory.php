@@ -26,7 +26,7 @@ class Factory
         private string $resultType,
         private ?string $orderBy,
         private ?string $order,
-        private ?int $limit = null,
+        private int $limit = Cursor::LIMIT_DEFAULT,
     ) {
     }
 

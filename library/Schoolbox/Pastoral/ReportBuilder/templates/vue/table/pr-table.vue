@@ -160,6 +160,16 @@ const {
 } = useLoadRecords(scopeUrl);
 
 /**
+ * Get the current scope export url to download the related records as CSV
+ * @returns - the current scope export URL
+ */
+function scopeExportUrl(): string {
+    return props.selectedTab._links.scopeExport
+        ? `${props.selectedTab._links.scopeExport}?${scopeUrlParams.toString()}`
+        : "";
+}
+
+/**
  * Handle total cell selection
  * @param header - the header of the cell that was selected
  */
@@ -303,14 +313,25 @@ window.Vue.onUnmounted(() => {
         </div>
         <template v-else-if="selectedHeader !== null">
             <div class="l-flex-col l-gap-m">
-                <div class="l-flex-col l-gap-s f-no-margins">
-                    <h2>{{ props.title }}</h2>
-                    <p class="meta">
-                        <template v-if="selectedHeader.title !== 'Total'">Type: {{ selectedHeader.title }}</template>
-                        <template v-if="selectedHeader.subTitle"
-                            ><br />Sub-Type: {{ selectedHeader.subTitle }}</template
-                        >
-                    </p>
+                <div class="l-flex-row l-flex--justify-space l-gap-s">
+                    <div class="l-flex-col l-gap-s f-no-margins">
+                        <h2>{{ props.title }}</h2>
+                        <p class="meta">
+                            <template v-if="selectedHeader.title !== 'Total'"
+                                >Type: {{ selectedHeader.title }}</template
+                            >
+                            <template v-if="selectedHeader.subTitle"
+                                ><br />Sub-Type: {{ selectedHeader.subTitle }}</template
+                            >
+                        </p>
+                    </div>
+                    <a
+                        v-if="props.selectedTab._links.scopeExport"
+                        :href="scopeExportUrl()"
+                        aria-label="Download related records as CSV"
+                        title="Download related records as CSV"
+                        ><sbx-icon name="download"
+                    /></a>
                 </div>
                 <div ref="modalResultsRef" class="pr-table__records">
                     <section v-for="record in recordsPayload?.data.results" :key="record.id">

@@ -144,8 +144,7 @@ class StudentByType extends Cursor implements TabTypeInterface
             {$this->helper->getFromString()}
             WHERE
                 ({$whereTypeSubTypeQuery}) AND
-                {$whereQuery} AND
-                p.deleted_at IS NULL
+                {$whereQuery}
             ) distinctRecords
             GROUP BY distinctRecords.student_id
            ";
@@ -279,7 +278,6 @@ class StudentByType extends Cursor implements TabTypeInterface
             WHERE
                 {$whereQuery}
                 AND {$whereFilterQuery}
-                AND p.deleted_at IS NULL
             GROUP BY p.student_id
         ;";
 

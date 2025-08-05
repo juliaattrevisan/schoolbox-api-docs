@@ -19,7 +19,9 @@ export type Tab = {
     key: string; // Unique key for the tab, used for routing
     _links: {
         view: string; // URL to view the tab
+        export?: string; // URL to export the results of the tab
         scope?: string; // to view a specific result set within the tab
+        scopeExport?: string; // to export the specific result set within the tab
     };
 };
 
@@ -44,10 +46,9 @@ export type Config = {
  * Routes for the Pastoral Report Builder
  */
 export type Routes = {
-    getStudentRecord: string;
-    getReportTags: string;
-    getIndex: string;
-    getReportResultsExport: string;
+    getStudentRecord: string; // to get a specific pastoral record for a student
+    getReportTags: string; // to only display the selected tag within the report
+    getIndex: string; // to the pastoral report builder
 };
 
 /**

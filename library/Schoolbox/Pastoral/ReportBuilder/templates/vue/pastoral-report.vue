@@ -28,19 +28,11 @@ const recordsOrPoints = window.Vue.ref<"records" | "points">("records"); // the 
 const tabParamName = "tab"; // URL parameter name for the selected tab
 
 /**
- * Handle print button click
- */
-function onPrintSelected(): void {
-    window.print();
-}
-
-/**
  * Handle tab selection and update URL without adding to browser history
  * @param tab - the tab that has been selected
  */
 function onTabSelected(tab: Tab): void {
     selectedTab.value = tab;
-    // Update URL without adding to browser history
     const url = new URL(window.location.href);
     url.searchParams.set(tabParamName, tab.key);
     window.history.replaceState(null, "", url.toString());
@@ -74,11 +66,12 @@ window.Vue.onMounted((): void => {
         <nav>
             <template v-if="props.results.length">
                 <a
-                    v-if="props.export"
-                    :href="props.routes.getReportResultsExport.replace('{reportId}', props.reportId.toString())"
+                    v-if="selectedTab._links.export"
+                    :href="selectedTab._links.export"
                     class="icon-download"
+                    aria-label="Download Report as CSV"
                 ></a>
-                <a href="#" class="icon-print" title="Print Report Results" @click.prevent="onPrintSelected"></a>
+                <!-- <a href="#" class="icon-print" title="Print Report Results" @click.prevent="onPrintSelected"></a> -->
             </template>
         </nav>
     </div>

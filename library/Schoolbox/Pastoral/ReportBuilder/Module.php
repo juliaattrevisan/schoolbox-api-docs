@@ -102,6 +102,7 @@ class Module extends BaseModule
                     '/results/tag/{tagId:\d+}'                                  => ['getReportTags' => $permissionStaff],
                     "$resultsRoute/tab/{tabType}"                               => ['getReportByTabType' => $permissionStaff],
                     "$resultsRoute/tab/{tabType}/scope"                         => ['getReportByTabTypeScope' => $permissionStaff],
+                    "$resultsRoute/tab/{tabType}/scope/export"                  => ['getReportResultsInScopeExport' => $permissionStaff],
                     "$resultsRoute/print"                                       => ['getReportResultsPrint' => $permissionReadReport],
                     "$resultsRoute/export"                                      => ['getReportResultsExport' => $permissionReadReport],
                 ],
