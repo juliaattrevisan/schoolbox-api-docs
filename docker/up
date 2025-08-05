@@ -60,6 +60,13 @@ else
 fi
 
 # TODO pass AWS config and SSO credentials into CLI container
+aws_config=$(AWS_CONFIG_FILE=.aws/config aws configure export-credentials --format=env-no-export)
+
+echo "${AWS_SECRET_ACCESS_KEY}"
+
+# should this be by:
+# * copying AWS config and SSO into container?
+# * extracting access and secret keys, and copying into container?
 
 # Log into whatever repository, as long as not already logged in to that repo
 private_container_registry=''
@@ -101,6 +108,7 @@ esac
 # Output the private repository into an env file for docker compose
 echo "
 PRIVATE_CONTAINER_REGISTRY=\"${private_container_registry}\"
+${aws_config}
 " > .docker-compose.env
 
 # ensure that the storage folder exists
