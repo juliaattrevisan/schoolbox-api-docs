@@ -3,8 +3,14 @@
 # Always run within root folder
 cd "$(dirname "$0")/.." || exit 1
 
-# TODO create log functions
+# Log to stderr
+function log() {
+    echo "$@" >&2
+}
 
+# Which task daemon compose file is used?
+# A different one is used when using a locally built container, vs. using one
+# pulled from the private container registry.
 taskd_compose_file=''
 
 # For now this is hardcoded:
@@ -51,12 +57,12 @@ sso_region = ${AWS_REGION}
 sso_start_url = ${AWS_START_URL}" > .aws/config
 
 # Then log in to AWS, if not already logged in
-echo "Testing if logged in to AWS (region: ${AWS_REGION})..."
+log "Testing if logged in to AWS (region: ${AWS_REGION})..."
 if ! AWS_CONFIG_FILE=.aws/config aws configure list > /dev/null; then
-    echo "Not logged in to AWS: logging in"
+    log "Not logged in to AWS: logging in"
     AWS_CONFIG_FILE=.aws/config aws sso login --no-browser --use-device-code
 else
-    echo "Logged in to AWS: continuing"
+    log "Logged in to AWS: continuing"
 fi
 
 # Log into whatever repository, as long as not already logged in to that repo
@@ -67,31 +73,31 @@ case "${PRIVATE_CONTAINER_REGISTRY_TYPE}" in
         private_container_registry="docker.io/${PRIVATE_CONTAINER_REGISTRY_DOCKERHUB_USERNAME}"
         # Test if logged into repo by fetching the test image manifest:
         # if not, then login
-        echo "Testing if logged in to private container registry ${private_container_registry}..."
+        log "Testing if logged in to private container registry ${private_container_registry}..."
         docker manifest inspect "${private_container_registry}/${test_image}" > /dev/null
         if [ ! $? -eq 0 ]; then
-            echo "Not logged in to private container registry: logging in"
+            log "Not logged in to private container registry: logging in"
             docker login -u "${PRIVATE_CONTAINER_REGISTRY_DOCKERHUB_USERNAME}"
         else
-            echo "Logged in to private container registry: continuing"
+            log "Logged in to private container registry: continuing"
         fi
         ;;
     ecr )
         private_container_registry="${PRIVATE_CONTAINER_REGISTRY_ECR_ACCOUNT_ID}.dkr.ecr.${PRIVATE_CONTAINER_REGISTRY_ECR_REGION}.amazonaws.com"
         # As with the Dockerhub variant:
         # test if logged in by fetching test image manifest, if not then login
-        echo "Testing if logged in to private container registry ${private_container_registry}..."
+        log "Testing if logged in to private container registry ${private_container_registry}..."
         docker manifest inspect "${private_container_registry}/${test_image}" > /dev/null
         if [ ! $? -eq 0 ]; then
-            echo "Not logged in to private container registry: logging in"
+            log "Not logged in to private container registry: logging in"
             AWS_CONFIG_FILE=.aws/config aws ecr get-login-password --region "${PRIVATE_CONTAINER_REGISTRY_ECR_REGION}" \
                 | docker login -u AWS --password-stdin "${private_container_registry}"
         else
-            echo "Logged in to private container registry: continuing"
+            log "Logged in to private container registry: continuing"
         fi
         ;;
     * )
-        echo "Invalid PRIVATE_CONTAINER_REGISTRY_TYPE value ${PRIVATE_CONTAINER_REGISTRY_TYPE}: must be dockerhub or ecr" >&2
+        log "Invalid PRIVATE_CONTAINER_REGISTRY_TYPE value ${PRIVATE_CONTAINER_REGISTRY_TYPE}: must be dockerhub or ecr" >&2
         exit 1
         ;;
 esac
