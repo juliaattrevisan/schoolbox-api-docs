@@ -33,7 +33,6 @@ const tabParamName = "tab"; // URL parameter name for the selected tab
  */
 function onTabSelected(tab: Tab): void {
     selectedTab.value = tab;
-    // Update URL without adding to browser history
     const url = new URL(window.location.href);
     url.searchParams.set(tabParamName, tab.key);
     window.history.replaceState(null, "", url.toString());
