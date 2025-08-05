@@ -473,7 +473,7 @@ export default {
                 })
                     .then(() => {
                         this.$refs.toast.timeout("Submitted.", true, 2000);
-                        this.loadFilteredContent('', true);
+                        this.loadFilteredContent("", true);
                     })
                     .catch(() => this.$refs.toast.timeout("Submit failed", false, 5000));
             }
@@ -495,7 +495,7 @@ export default {
                 })
                     .then(() => {
                         this.$refs.toast.timeout("Published.", true, 2000);
-                        this.loadFilteredContent('', true);
+                        this.loadFilteredContent("", true);
                     })
                     .catch(() => this.$refs.toast.timeout("Publish failed", false, 5000));
             }
@@ -818,7 +818,12 @@ export default {
                                     <div class="learning-moment-cta small-12 columns">
                                         <ul class="flex-list buttons">
                                             <!-- Student buttons -->
-                                            <template v-if="'student' === config.currentUser.role.type || 'parent' === config.currentUser.role.type">
+                                            <template
+                                                v-if="
+                                                    'student' === config.currentUser.role.type ||
+                                                    'parent' === config.currentUser.role.type
+                                                "
+                                            >
                                                 <!-- student must be the author of the learning moment to have these actions -->
                                                 <template v-if="config.currentUser.id === evidence.object.creator.id">
                                                     <template
@@ -830,7 +835,13 @@ export default {
                                                     >
                                                         <!-- Modify button available when a learning moment is: draft/submitted/rejected -->
                                                         <li>
-                                                            <a class="button" :href="evidence.object._links.modifyForm + '?returnUrl=' + returnUrl"
+                                                            <a
+                                                                class="button"
+                                                                :href="
+                                                                    evidence.object._links.modifyForm +
+                                                                    '?returnUrl=' +
+                                                                    returnUrl
+                                                                "
                                                                 >Modify</a
                                                             >
                                                         </li>
@@ -873,7 +884,13 @@ export default {
                                                 >
                                                     <!-- Modify button available when a learning moment is: draft/submitted/rejected -->
                                                     <li>
-                                                        <a class="button" :href="evidence.object._links.modifyForm + '?returnUrl=' + returnUrl"
+                                                        <a
+                                                            class="button"
+                                                            :href="
+                                                                evidence.object._links.modifyForm +
+                                                                '?returnUrl=' +
+                                                                returnUrl
+                                                            "
                                                             >Modify</a
                                                         >
                                                     </li>
@@ -903,7 +920,13 @@ export default {
                                                 <template v-if="'draft' === evidence.object.currentState">
                                                     <!-- Modify button available when a learning moment is: draft -->
                                                     <li>
-                                                        <a class="button" :href="evidence.object._links.modifyForm + '?returnUrl=' + returnUrl"
+                                                        <a
+                                                            class="button"
+                                                            :href="
+                                                                evidence.object._links.modifyForm +
+                                                                '?returnUrl=' +
+                                                                returnUrl
+                                                            "
                                                             >Modify</a
                                                         >
                                                     </li>
