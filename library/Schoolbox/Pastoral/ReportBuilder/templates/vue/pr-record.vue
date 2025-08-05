@@ -32,7 +32,7 @@ const props = defineProps<{
                         .replace('{recordId}', props.record.id.toString())
                 "
             >
-                <h4 class="l-flex l-flex--align-center l-gap-s">
+                <h3 class="l-flex l-flex--align-center l-gap-s">
                     {{ props.record.student.fullName }}: {{ props.record.heading }}
                     <span
                         v-if="
@@ -54,8 +54,9 @@ const props = defineProps<{
                         v-if="props.config.pastoralPointEnabled && props.record.points"
                         :points="props.record.points"
                         :title="`${props.record.points} Points`"
+                        class="l-flex__item--none"
                     ></sbx-label-pastoral-points>
-                </h4>
+                </h3>
             </a>
             <p class="meta">
                 {{ props.record.type.name }}
