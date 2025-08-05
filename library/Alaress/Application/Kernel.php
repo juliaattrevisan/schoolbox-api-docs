@@ -953,7 +953,7 @@ abstract class Kernel
                     if ($config->get('debug_mode')) {
                         $dataGenerators['debugBar'] = new Output\DataGenerator\DebugBar(
                             \Alaress\DebugBar\Instance::getInstance(),
-                            '/debugbar/',
+                            '/php-debugbar/',
                         );
                     }
 
