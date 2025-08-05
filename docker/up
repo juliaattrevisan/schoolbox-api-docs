@@ -50,8 +50,16 @@ region = ${AWS_REGION}
 sso_region = ${AWS_REGION}
 sso_start_url = ${AWS_START_URL}" > .aws/config
 
-# Then log in to AWS
-AWS_CONFIG_FILE=.aws/config aws sso login --no-browser --use-device-code
+# Then log in to AWS, if not already logged in
+echo "Testing if logged in to AWS (region: ${AWS_REGION})..."
+if ! AWS_CONFIG_FILE=.aws/config aws configure list > /dev/null; then
+    echo "Not logged in to AWS: logging in"
+    AWS_CONFIG_FILE=.aws/config aws sso login --no-browser --use-device-code
+else
+    echo "Logged in to AWS: continuing"
+fi
+
+# TODO pass AWS config and SSO credentials into CLI container
 
 # Log into whatever repository, as long as not already logged in to that repo
 private_container_registry=''
