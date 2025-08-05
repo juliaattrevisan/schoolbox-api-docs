@@ -352,6 +352,8 @@ class Controller extends Base
 
         if ($this->getUser()->getRole()->isStudent()) {
             $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $this->getUser()->getYear());
+        } elseif ($this->getUser()->getRole()->isParent()) {
+            $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $evidence->getRecipient()->getYear());
         }
 
         $params = [
