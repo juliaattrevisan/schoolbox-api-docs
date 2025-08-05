@@ -284,14 +284,7 @@ class Controller extends Base
 
 
     /**
-     * Return a _links array which contains urls for things you could potentially do
-     * next, for a given $moment, for the Cohort Overview.
-     *
-     * You could expand this to provide _links based on the current user's roletype,
-     * check for additional perms and moderation steps etc. if you wanted this to
-     * also surface for students (so far that hasn't been needed) because this _links
-     * node is always in the response of a PUT endpoint. It'll just be all nulls for
-     * students, for now.
+     * For a particular learning moment, decide what actions could happen next.
      *
      * @param Model $moment
      * @return array

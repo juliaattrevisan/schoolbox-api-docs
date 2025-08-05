@@ -1,10 +1,28 @@
 <?php
+/**
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2025, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
 
 namespace Schoolbox\Learning\Moment;
 
 class NextRoutes
 {
     /**
+     * Return a _links array which contains urls for things you could potentially do
+     * next, for a given $moment, for the Cohort Overview.
+     *
+     * You could expand this to provide _links based on the current user's roletype,
+     * check for additional perms and moderation steps etc. if you wanted this to
+     * also surface for students (so far that hasn't been needed) because this _links
+     * node is always in the response of a PUT endpoint. It'll just be all nulls for
+     * students, for now.
+     *
+     * You have to actually obtain the links via the route generator in controllers
+     * because it depends on a pre-existing logic that we shouldn't replicate here.
+     * There doesn't seem to be a convenient way to compartmentalise getRouteIfAuthorized()
+     *
      * @param Evidence\Model $moment
      * @return array
      */
