@@ -552,6 +552,7 @@ class Controller extends Base
      *
      * This is almost a direct replica of postMomentForUsers()
      *
+     * @api   POST /learning/evidence/user/{userIds}/draft
      * @param Collection $users
      * @return void
      * @throws MapperException
