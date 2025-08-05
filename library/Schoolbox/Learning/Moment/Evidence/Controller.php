@@ -676,23 +676,22 @@ class Controller extends Base
      */
     public function putBulkPublish(): void
     {
-        die('mog');
         $stack = [];
 
-//        /* Find all the learning moments to bulk modify
-//         */
-//        $requestBody = $this->request->getParsedBody();
-//
-//        $momentIds = explode(',', $requestBody['momentIds']);
-//
-//        $moments = $this->mapper->findByColumn('id', $momentIds);
-//
-//        /* Process each moment into the next state individually, collecting a $stack
-//         * of translated moments in their new state
-//         */
-//        foreach ($moments as $moment) {
-//             $stack[$moment->getId()] = $this->putWithState($moment, Model::STATUS_PUBLISHED);
-//        }
+        /* Find all the learning moments to bulk modify
+         */
+        $requestBody = $this->request->getParsedBody();
+
+        $momentIds = explode(',', $requestBody['momentIds']);
+
+        $moments = $this->mapper->findByColumn('id', $momentIds);
+
+        /* Process each moment into the next state individually, collecting a $stack
+         * of translated moments in their new state
+         */
+        foreach ($moments as $moment) {
+             $stack[$moment->getId()] = $this->putWithState($moment, Model::STATUS_PUBLISHED);
+        }
 
         $this->response = $this->responseAsJson($stack);
     }
