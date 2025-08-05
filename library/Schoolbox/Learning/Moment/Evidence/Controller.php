@@ -847,9 +847,11 @@ class Controller extends Base
                     continue;
                 }
 
-                /* Index by a date in a format you can directly shank into the frontend
+                /* Index by moment identifier for vue representation
                  */
-                $payload[] = [
+                $index = $moment->getId();
+
+                $payload[$index] = [
                     'id' => $moment->getId(),
                     'body' => $moment->getBody(),
                     'recipient' => [
