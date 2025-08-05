@@ -80,8 +80,10 @@ class Module extends BaseModule
             )
         );
 
-        /* Superusers, Staff and Evidence Creators can modify or delete an
-         * Evidence instance
+        /* Superusers, Staff can modify or delete an Evidence instance
+         *
+         * Students and parents can only modify/delete moments that they themselves created
+         * (they can't modify/delete moments spawned by staffs)
          */
         $modifyEvidenceRule = new Rule\All(
             new Rule\IsLoggedIn(),
@@ -89,9 +91,9 @@ class Module extends BaseModule
                 new Rule\IsSuperuser(),
                 new Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
                 new Rule\IsUser('creatorId'),
-                $isParentOrUserRule
             )
         );
+
         $deleteEvidenceRule = $modifyEvidenceRule;
 
 
