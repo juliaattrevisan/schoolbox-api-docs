@@ -708,7 +708,13 @@ class Controller extends Base
             new ScrubAdapter(),
         );
 
-        $this->response = $this->responseAsJson($responseTranslator($evidence));
+        $translated = $responseTranslator($evidence);
+
+        /* A shortcut to urls for changing states in this learning moment
+         */
+        $translated['_links'] = $this->getNextRoutes($evidence);
+
+        $this->response = $this->responseAsJson($translated);
     }
 
 
@@ -924,20 +930,7 @@ class Controller extends Base
                     ],
                     /* A shortcut to urls for changing states in this learning moment
                      */
-                    '_links' => [
-                        'submit' => $this->routeGenerator->generate('learningMomentEvidence.putSubmit', [
-                            'evidenceId' => $moment->getId(),
-                            'creatorId' => $moment->getCreator()->getId(),
-                            'userId' => $moment->getRecipient()->getId(),
-                        ]),
-                        'publish' => $this->routeGenerator->generate('learningMomentEvidence.putPublish', [
-                            'evidenceId' => $moment->getId(),
-                            'creatorId' => $moment->getCreator()->getId(),
-                        ]),
-                        'reject' => $this->routeGenerator->generate('learningMomentModeration.putReject', [
-                            'evidenceId' => $moment->getId(),
-                        ]),
-                    ]
+                    '_links' => $this->getNextRoutes($moment),
                 ];
             }
         }
@@ -946,5 +939,79 @@ class Controller extends Base
             'status'  => 200,
             'content' => $payload,
         ]);
+    }
+
+
+    /**
+     * Return a _links array which contains urls for things you could potentially do
+     * next, for a given $moment, for the Cohort Overview.
+     *
+     * You could expand this to provide _links based on the current user's roletype,
+     * check for additional perms and moderation steps etc. if you wanted this to
+     * also surface for students (so far that hasn't been needed) because this _links
+     * node is always in the response of a PUT endpoint. It'll just be all nulls for
+     * students, for now.
+     *
+     * @param Model $moment
+     * @return array
+     * @throws RouteNotFound
+     */
+    private function getNextRoutes(Model $moment): array
+    {
+        /* You can't SOBO a learning moment, so this is always null for now:
+         * That might change later
+         */
+        $submitLink = null;
+
+        if ($moment->isSubmitted()) {
+            /* Next mutable states: published, rejected
+             */
+            $publishLink = true;
+            $rejectLink = true;
+        } elseif ($moment->isPublished()) {
+            /* Next mutable states: rejected
+             */
+            $publishLink = null;
+            $rejectLink = true;
+        } elseif ($moment->isRejected()) {
+            /* Next mutable states: published
+             */
+            $publishLink = true;
+            $rejectLink = null;
+        } else {
+            /* Next mutable states: published, rejected
+             */
+            $publishLink = true;
+            $rejectLink = true;
+        }
+
+        /* Only get the routes you need
+         */
+        //        if ($submitLink) {
+        //            $submitLink = $this->getRouteIfAuthorized('learningMomentEvidence.putSubmit', [
+        //                'evidenceId' => $moment->getId(),
+        //                'creatorId' => $moment->getCreator()->getId(),
+        //                'userId' => $moment->getRecipient()->getId(),
+        //            ]);
+        //        }
+
+        if ($publishLink) {
+            $publishLink = $this->getRouteIfAuthorized('learningMomentEvidence.putPublish', [
+                'evidenceId' => $moment->getId(),
+                'creatorId' => $moment->getCreator()->getId(),
+            ]);
+        }
+
+        if ($rejectLink) {
+            $rejectLink = $this->getRouteIfAuthorized('learningMomentModeration.putReject', [
+                'evidenceId' => $moment->getId(),
+            ]);
+        }
+
+        return [
+            'submit' => $submitLink,
+            'publish' => $publishLink,
+            'reject' => $rejectLink,
+        ];
     }
 }
