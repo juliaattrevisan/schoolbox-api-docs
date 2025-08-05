@@ -183,16 +183,14 @@ const viewAllText = window.Vue.computed(() => {
     if (cellInfo.value.participant.isExcluded) {
         if (getAssessmentParticipationRoute === null) {
             return "The student has been excluded. You may include this student in this activity";
-        } else {
-            return "The student has been excluded. Visit the participation page of the original learning activity to customise their status";
         }
+        return "The student has been excluded. Visit the participation page of the original learning activity to customise their status";
     }
     if (isActivityEmpty.value) {
         if (getAssessmentParticipationRoute === null) {
             return "There has been no activity yet, you may create feedback or exclude this student from this activity";
-        } else {
-            return "There has been no activity yet, you may create feedback or visit the participation page of the original learning activity to customise their status";
         }
+        return "There has been no activity yet, you may create feedback or visit the participation page of the original learning activity to customise their status";
     }
     if (isExpansionDisabled.value) {
         return "No additional recent activity";
