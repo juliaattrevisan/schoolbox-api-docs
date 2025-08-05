@@ -849,35 +849,33 @@ class Controller extends Base
 
                 /* Index by a date in a format you can directly shank into the frontend
                  */
-                $index = $moment->getUpdatedAt()->getDatabaseDate();
-
-                $payload[$index][] = [
+                $payload[] = [
                     'id' => $moment->getId(),
                     'body' => $moment->getBody(),
                     'recipient' => [
                         'id' => $moment->getRecipient()->getId(),
+                        'externalId' => $moment->getRecipient()->getExternalId(),
                         'fullname' => $moment->getRecipient()->getFullname(),
                         'firstname' => $moment->getRecipient()->getFirstname(),
                         'lastname' => $moment->getRecipient()->getLastname(),
-                        'portrait' => $moment->getRecipient()->getPortrait()?->getHash(),
                         'role' => $moment->getRecipient()->getPreferredTitle()
                     ],
                     'creator' => [
                         'id' => $moment->getCreator()->getId(),
+                        'externalId' => $moment->getCreator()->getExternalId(),
                         'fullname' => $moment->getCreator()->getFullname(),
                         'firstname' => $moment->getCreator()->getFirstname(),
                         'lastname' => $moment->getCreator()->getLastname(),
-                        'portrait' => $moment->getCreator()->getPortrait()?->getHash(),
                     ],
                     /* This is always set
                      */
                     'createdAt' => $moment->getCreatedAt()->getDatabase(),
                     'createdBy' => $moment->getCreator() ? [
                         'id' => $moment->getCreator()->getId(),
+                        'externalId' => $moment->getCreator()->getExternalId(),
                         'fullname' => $moment->getCreator()->getFullname(),
                         'firstname' => $moment->getCreator()->getFirstname(),
                         'lastname' => $moment->getCreator()->getLastname(),
-                        'portrait' => $moment->getCreator()->getPortrait()?->getHash(),
                     ] : null,
                     /* We don't store updatedBy, for whatever reason: I suppose it was presumed
                      * to always be the same as its author...
@@ -900,26 +898,26 @@ class Controller extends Base
                         'submittedAt' => $moment->getSubmittedAt()?->getDatabase(),
                         'submittedBy' => $moment->getSubmittedBy() ? [
                             'id' => $moment->getSubmittedBy()->getId(),
+                            'externalId' => $moment->getSubmittedBy()->getExternalId(),
                             'fullname' => $moment->getSubmittedBy()->getFullname(),
                             'firstname' => $moment->getSubmittedBy()->getFirstname(),
                             'lastname' => $moment->getSubmittedBy()->getLastname(),
-                            'portrait' => $moment->getSubmittedBy()->getPortrait()?->getHash(),
                         ] : null,
                         'publishAt' => $moment->getPublishedAt()?->getDatabase(),
                         'publishedBy' => $moment->getPublishedBy() ? [
                             'id' => $moment->getPublishedBy()->getId(),
+                            'externalId' => $moment->getPublishedBy()->getExternalId(),
                             'fullname' => $moment->getPublishedBy()->getFullname(),
                             'firstname' => $moment->getPublishedBy()->getFirstname(),
                             'lastname' => $moment->getPublishedBy()->getLastname(),
-                            'portrait' => $moment->getPublishedBy()->getPortrait()?->getHash(),
                         ] : null,
                         'rejectedAt' => $moment->getRejectedAt()?->getDatabase(),
                         'rejectedBy' => $moment->getRejectedBy() ? [
                             'id' => $moment->getRejectedBy()->getId(),
+                            'externalId' => $moment->getRejectedBy()->getExternalId(),
                             'fullname' => $moment->getRejectedBy()->getFullname(),
                             'firstname' => $moment->getRejectedBy()->getFirstname(),
                             'lastname' => $moment->getRejectedBy()->getLastname(),
-                            'portrait' => $moment->getRejectedBy()->getPortrait()?->getHash(),
                         ] : null
                     ],
                     /* A shortcut to urls for changing states in this learning moment
