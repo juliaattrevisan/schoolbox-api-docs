@@ -21,8 +21,6 @@ test/behavior/screenshots/*.html
 vagrantcache/
 tools/xdebug.ini
 vagrant.yaml
-docker.env
-taskd.env
 .sass-cache/
 post-provision.sh
 .idea/
@@ -42,3 +40,9 @@ v8-compile-cache-0/
 www/css/core/*.css
 www/javascript
 db-data/
+
+# Docker environment configuration
+docker.env
+taskd.env
+.aws/
+.docker-compose.env
