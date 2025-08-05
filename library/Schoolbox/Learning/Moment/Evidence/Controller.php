@@ -570,7 +570,6 @@ class Controller extends Base
      * such as drafting, submitting for moderation and publishing immediately to the world
      */
 
-
     /**
      * Craft a new learning moment directly into the Draft state via the Class List "Share a Learning Moment"
      *
@@ -591,15 +590,15 @@ class Controller extends Base
      * Its express purpose is to put the existing $evidence into Draft along with any alterations
      * to its content such as body, tags, curric nodes, etc.
      *
+     * @api   PUT /learning/evidence/{id}/submit
      * @param Model $evidence
      * @return void
      * @throws Exception
-     * @throws MapperException
-     *@api   PUT /learning/evidence/{id}/submit
+     * @throws MapperException|RouteNotFound
      */
     public function putDraft(Model $evidence): void
     {
-        $this->putWithState($evidence, Model::STATUS_DRAFT);
+        $this->response = $this->responseAsJson($this->putWithState($evidence, Model::STATUS_DRAFT));
     }
 
 
@@ -623,15 +622,15 @@ class Controller extends Base
      * Its express purpose is to put the existing $evidence into Submitted along with any alterations
      * to its content such as body, tags, curric nodes, etc.
      *
+     * @api   PUT /learning/evidence/{id}/submit
      * @param Model $evidence
      * @return void
      * @throws Exception
-     * @throws MapperException
-     *@api   PUT /learning/evidence/{id}/submit
+     * @throws MapperException|RouteNotFound
      */
     public function putSubmit(Model $evidence): void
     {
-        $this->putWithState($evidence, Model::STATUS_SUBMITTED);
+        $this->response = $this->responseAsJson($this->putWithState($evidence, Model::STATUS_SUBMITTED));
     }
 
 
@@ -655,15 +654,15 @@ class Controller extends Base
      * Its express purpose is to put the existing $evidence into Published along with any alterations
      * to its content such as body, tags, curric nodes, etc.
      *
+     * @api   PUT /learning/evidence/{id}/publish
      * @param Model $evidence
      * @return void
      * @throws Exception
-     * @throws MapperException
-     *@api   PUT /learning/evidence/{id}/publish
+     * @throws MapperException|RouteNotFound
      */
     public function putPublish(Model $evidence): void
     {
-        $this->putWithState($evidence, Model::STATUS_PUBLISHED);
+        $this->response = $this->responseAsJson($this->putWithState($evidence, Model::STATUS_PUBLISHED));
     }
 
 
@@ -674,11 +673,11 @@ class Controller extends Base
      *
      * @param Model $evidence
      * @param string $state
-     * @return void
+     * @return array
      * @throws Exception
-     * @throws MapperException
+     * @throws MapperException|RouteNotFound
      */
-    private function putWithState(Model $evidence, string $state): void
+    private function putWithState(Model $evidence, string $state): array
     {
         $requestBody = $this->request->getParsedBody();
 
@@ -714,7 +713,7 @@ class Controller extends Base
          */
         $translated['_links'] = $this->getNextRoutes($evidence);
 
-        $this->response = $this->responseAsJson($translated);
+        return $translated;
     }
 
 
