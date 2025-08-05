@@ -17,6 +17,7 @@ import type {
 import { TabType } from "../../js/types/pastoralReportTypes";
 import { useLoadPrTable } from "../composable/useLoadPrTable";
 import { useLoadRecords } from "../composable/useLoadRecords";
+import PrEmpty from "../pr-empty.vue";
 import PrTableHeader from "./pr-table-header.vue";
 import PrTableTotalRow from "./pr-table-total-row.vue";
 import PrTableRow from "./pr-table-row.vue";
@@ -247,11 +248,7 @@ window.Vue.onUnmounted(() => {
             >
         </div>
     </div>
-    <div v-else-if="isEmpty" class="empty-state-flex-centered f-no-margins">
-        <i class="icon-pastoral"></i>
-        <p>No {{ props.localePastoral }} records matched your report criteria.</p>
-        <a :href="props.routes.getIndex"> Select Another Report </a>
-    </div>
+    <pr-empty v-else-if="isEmpty" :routes="props.routes" :locale-pastoral="props.localePastoral" />
     <template v-else-if="hasRows">
         <div
             ref="scrollableRef"
