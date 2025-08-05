@@ -101,6 +101,15 @@ function setup_aws_sso() {
   fi
 }
 
+function create_ir_conf_file() {
+  log "Creating instance registry configuration";
+  echo -e \
+    "{\n" \
+    "  \"instance_registry_url_override\": \"${INSTANCE_REGISTRY_URL}\",\n" \
+    "  \"instance_registry_api_token\": \"${INSTANCE_REGISTRY_API_KEY}\"\n" \
+    "}" > /etc/schoolbox/instance-registry.json
+}
+
 function cleanup_cache_dir() {
   log "Cleaning up zero byte files";
   find "${CACHE_DIR}" -type f -empty -delete;
@@ -434,6 +443,7 @@ function main() {
   load_consts
   load_config
   setup_aws_sso
+  create_ir_conf_file
 
   cleanup_cache_dir
   download_secrets
