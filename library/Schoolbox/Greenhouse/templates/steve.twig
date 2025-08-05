@@ -1,7 +1,7 @@
 <script>
     window.onload = function() {
-        fetch('/learning/evidence/moderation/bulk/reject', {
-        // fetch('/learning/evidence/moderation/bulk/publish', {
+        // fetch('/learning/evidence/moderation/bulk/reject', {
+        fetch('/learning/evidence/moderation/bulk/publish', {
             method: "PUT",
             body: JSON.stringify({
                 momentIds: [14,15,16,17],

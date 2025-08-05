@@ -20,6 +20,7 @@ use Schoolbox\Discussion\Comment;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Moment\Evidence\Moderation\ModerationRequired;
 use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Factory;
+use Schoolbox\Learning\Moment\NextRoutes;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccess;
@@ -959,60 +960,31 @@ class Controller extends Base
      */
     private function getNextRoutes(Model $moment): array
     {
-        /* You can't SOBO a learning moment, so this is always null for now:
-         * That might change later
-         */
-        $submitLink = null;
-
-        if ($moment->isSubmitted()) {
-            /* Next mutable states: published, rejected
-             */
-            $publishLink = true;
-            $rejectLink = true;
-        } elseif ($moment->isPublished()) {
-            /* Next mutable states: rejected
-             */
-            $publishLink = null;
-            $rejectLink = true;
-        } elseif ($moment->isRejected()) {
-            /* Next mutable states: published
-             */
-            $publishLink = true;
-            $rejectLink = null;
-        } else {
-            /* Next mutable states: published, rejected
-             */
-            $publishLink = true;
-            $rejectLink = true;
-        }
+        $links = (new NextRoutes())->generate($moment);
 
         /* Only get the routes you need
          */
-        //        if ($submitLink) {
-        //            $submitLink = $this->getRouteIfAuthorized('learningMomentEvidence.putSubmit', [
+        //        if ($links['submit']) {
+        //            $links['submit'] = $this->getRouteIfAuthorized('learningMomentEvidence.putSubmit', [
         //                'evidenceId' => $moment->getId(),
         //                'creatorId' => $moment->getCreator()->getId(),
         //                'userId' => $moment->getRecipient()->getId(),
         //            ]);
         //        }
 
-        if ($publishLink) {
-            $publishLink = $this->getRouteIfAuthorized('learningMomentEvidence.putPublish', [
+        if ($links['publish']) {
+            $links['publish'] = $this->getRouteIfAuthorized('learningMomentEvidence.putPublish', [
                 'evidenceId' => $moment->getId(),
                 'creatorId' => $moment->getCreator()->getId(),
             ]);
         }
 
-        if ($rejectLink) {
-            $rejectLink = $this->getRouteIfAuthorized('learningMomentModeration.putReject', [
+        if ($links['reject']) {
+            $links['reject'] = $this->getRouteIfAuthorized('learningMomentModeration.putReject', [
                 'evidenceId' => $moment->getId(),
             ]);
         }
 
-        return [
-            'submit' => $submitLink,
-            'publish' => $publishLink,
-            'reject' => $rejectLink,
-        ];
+        return $links;
     }
 }

@@ -19,6 +19,7 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Moment\Evidence\Mapper;
 use Schoolbox\Learning\Moment\Evidence\Model;
 use Schoolbox\Learning\Moment\Evidence\Translator;
+use Schoolbox\Learning\Moment\NextRoutes;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Exception;
@@ -52,6 +53,7 @@ class Controller extends Base
      * @return array
      * @throws MapperException
      * @throws Exception
+     * @throws RouteNotFound
      */
     public function putPublish(Model $evidence): array
     {
@@ -104,7 +106,13 @@ class Controller extends Base
             new ScrubAdapter(),
         );
 
-        return $responseTranslator($evidence);
+        $translated = $responseTranslator($evidence);
+
+        /* A shortcut to urls for changing states in this learning moment
+         */
+        $translated['_links'] = $this->getNextRoutes($evidence);
+
+        return $translated;
     }
 
 
@@ -114,6 +122,7 @@ class Controller extends Base
      * @return void
      * @throws Exception
      * @throws MapperException
+     * @throws RouteNotFound
      */
     public function putBulkPublish(): void
     {
@@ -174,6 +183,7 @@ class Controller extends Base
      * @return void
      * @throws Exception
      * @throws MapperException
+     * @throws RouteNotFound
      */
     public function putBulkReject(): void
     {
@@ -204,6 +214,7 @@ class Controller extends Base
      * @return array
      * @throws Exception
      * @throws MapperException
+     * @throws RouteNotFound
      */
     private function reject(Model $evidence): array
     {
@@ -253,7 +264,13 @@ class Controller extends Base
             new ScrubAdapter(),
         );
 
-        return $responseTranslator($evidence);
+        $translated = $responseTranslator($evidence);
+
+        /* A shortcut to urls for changing states in this learning moment
+         */
+        $translated['_links'] = $this->getNextRoutes($evidence);
+
+        return $translated;
     }
 
 
@@ -263,5 +280,50 @@ class Controller extends Base
     private function curriculumTaggingEnabled(): bool
     {
         return $this->getUser()->getRole()->isStaff() && $this->getConfigLoader()->get('curriculum_tagging_enabled');
+    }
+
+
+    /**
+     * Return a _links array which contains urls for things you could potentially do
+     * next, for a given $moment, for the Cohort Overview.
+     *
+     * You could expand this to provide _links based on the current user's roletype,
+     * check for additional perms and moderation steps etc. if you wanted this to
+     * also surface for students (so far that hasn't been needed) because this _links
+     * node is always in the response of a PUT endpoint. It'll just be all nulls for
+     * students, for now.
+     *
+     * @param Model $moment
+     * @return array
+     * @throws RouteNotFound
+     */
+    private function getNextRoutes(Model $moment): array
+    {
+        $links = (new NextRoutes())->generate($moment);
+
+        /* Only get the routes you need
+         */
+        //        if ($links['submit']) {
+        //            $links['submit'] = $this->getRouteIfAuthorized('learningMomentEvidence.putSubmit', [
+        //                'evidenceId' => $moment->getId(),
+        //                'creatorId' => $moment->getCreator()->getId(),
+        //                'userId' => $moment->getRecipient()->getId(),
+        //            ]);
+        //        }
+
+        if ($links['publish']) {
+            $links['publish'] = $this->getRouteIfAuthorized('learningMomentEvidence.putPublish', [
+                'evidenceId' => $moment->getId(),
+                'creatorId' => $moment->getCreator()->getId(),
+            ]);
+        }
+
+        if ($links['reject']) {
+            $links['reject'] = $this->getRouteIfAuthorized('learningMomentModeration.putReject', [
+                'evidenceId' => $moment->getId(),
+            ]);
+        }
+
+        return $links;
     }
 }
