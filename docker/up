@@ -25,6 +25,14 @@ function verify_executables() {
         exit 1
     fi
 
+    log "Verifying current user has permission to run Docker..."
+    if ! docker info > /dev/null 2>&1; then
+        log "Current user does not have permission to run Docker. Either:"
+        log "* run as \`sudo\`"
+        log "* add the current user to the \`docker\` group: https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user"
+        exit 1
+    fi
+
     log "Verifying AWS CLI installed..."
     if ! which aws > /dev/null; then
         log "AWS CLI not installed."
