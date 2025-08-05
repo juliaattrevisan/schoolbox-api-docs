@@ -4,61 +4,44 @@ This set of configuration files, as well as
 [docker-compose.yaml](../docker-compose.yaml), define how Schoolbox may run
 within a self-contained development environment.
 
-## Manual setup
+## Configuration
 
-- first, ensure you're running the most recent Docker Engine, installing if
-  required: https://docs.docker.com/engine/install/
-- add this line to `/etc/hosts` or its Windows equivalent:
-  ```
-  127.0.0.1 docker.dev.schoolbox.cloud
-  ```
-- `vagrant provision` as per normal: we'll need the database
-- extract the files from the provisioned dataset to the mount folder:
-  ```shell
-  # with data_filename from vagrant.yaml:
-  # may need to use sudo due to Docker user assuming ownership
-  mkdir -p data/docker/storage
-  sudo tar -C data/docker/storage -xf vagrantcache/$data_filename --strip-components=2 data/storage
-  ```
-- once provisioned, backup the database content:
-  ```shell
-  vagrant ssh
-  sudo /usr/share/schoolbox/tools/backup-database.sh
-  # this will create a file somewhere in /var/lib/schoolbox: note that path
-  cp $backupLocation /usr/share/schoolbox/vagrantcache/schoolbox.sql
-  ```
-- from the base folder, stop and start Docker containers:
-  ```shell
-  # stop containers for all docker-compose configurations
-  sudo docker compose down
-  sudo docker compose -f docker/deploy.docker-compose.yaml down
-  sudo docker compose -f docker/prod.docker-compose.yaml down
+The Docker environment is configured with [docker.ini](../docker.ini) in the
+root of the Schoolbox folder.
 
-  # start default environment:
-  # this has Schoolbox's code folder mounted as a local mount, thus changes made
-  # locally are available immediately within the container.
-  sudo docker compose up -d
+The settings in this file override the defaults in
+[docker.default.ini](../docker.default.ini).
 
-  # Alternately, start the deployment environment:
-  sudo docker compose -f docker/deploy.docker-compose.yaml up -d
+### Migration from Vagrant
 
-  # Also alternately, start the prod environment:
-  sudo docker compose -f docker/prod.docker-compose.yaml up -d
-  ```
-- from the CLI container, setup database copied from Vagrant and reload
-  notification bindings:
-  ```shell
-  sudo docker exec -it schoolbox-cli /bin/bash
-  cd /usr/share/schoolbox
-  mariadb -h mariadb -u root < docker/schoolbox/sql/setup.sql
-  mariadb -h mariadb -u root -D schoolbox < vagrantcache/schoolbox.sql
-  mariadb -h mariadb -u root -D schoolbox < docker/schoolbox/sql/post-setup.sql
-  tools/notif/route/refresh-binding-cache.php
-  ```
-- finally, visit https://docker.dev.schoolbox.cloud
-  - you may be asked to accept an unsigned certificate or similar: accept it
-  - if the right-side notification panel is stuck in "Connecting...": bring up
-    the Docker containers again:
-    ```shell
-    sudo docker compose up -d
-    ```
+`vagrant.yaml` can be copied to `docker.ini` in Schoolbox's root folder,
+however its format will need to be changed from YAML:
+- replace the `:` between key and value with a `=`
+- remove all space between the `=` and the value
+- you may wish to wrap the value in `""`, as the INI files are parsed by
+  `source`
+
+Some fields have also changed name:
+- `aws_bucket` is now `cdn_bucket`
+- `aws_bucket_prefix` is now `cdn_bucket_prefix`
+
+Not all Vagrant configuration fields are relevant in Docker: if it's not in
+`docker.default.ini`, it won't be relevant to Docker.
+
+## Scripts
+
+The name of these scripts is intended to mirror the Vagrant commands for setting
+up the Vagrant development environment.
+
+- `up`: builds and starts containers for development environment
+- `down`: stops containers
+- `provision`: sets up the Schoolbox instance in the started containers
+  (`up` must be run first)
+- `ssh`: create a shell session in the `schoolbox-cli` container, for running
+  commands
+- `clean`: cleans up the temporary and cache files which the Docker development
+  environment may create
+
+These scripts should all be run with `sudo`, unless your current user has been
+added to the Docker group: see
+https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user.

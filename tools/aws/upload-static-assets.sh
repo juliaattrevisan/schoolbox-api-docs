@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Global constants
 readonly LOG=/usr/bin/alaress-logger
@@ -11,6 +11,9 @@ readonly VAGRANT_YAML_KEY_AWS_BUCKET_PREFIX="aws_bucket_prefix"
 
 # Global vars
 declare site_root
+declare bucket_name
+declare bucket_name
+declare bucket_prefix
 
 function log() {
   $LOG $L_INFO "$1"
@@ -20,14 +23,6 @@ function error() {
   $LOG $L_ERROR "$1"
 }
 
-function check_run_as_root() {
-  if [[ $EUID -ne 0 ]]; then
-    error "This script must be run as root to enable install of awscli package"
-    exit 1
-  fi
-}
-
-# Install awscli v2, removing v1 if present
 function help_msg() {
   echo "Uploads static assets to S3"
   echo "Does not build/publish assets. You need to do that prior to invoking this tool with npm"
@@ -69,6 +64,47 @@ function derive_site_root() {
   site_root=$(readlink -f "$dir_path"/../../)
 }
 
+function load_config() {
+  # Is the DOCKER env var there?
+  # If so, load from docker.ini: otherwise, from vagrant.yaml
+  case "$HOST_TYPE" in
+    docker)
+      log "HOST_TYPE=docker: loading config from docker.default.ini + docker.ini"
+      source "${site_root}/docker.default.ini"
+      source "${site_root}/docker.ini"
+      if [ ! -v cdn_host ]; then
+        error "cdn_host not defined in docker.default.ini or docker.ini"
+        exit 1
+      fi
+      if [ ! -v cdn_bucket ]; then
+        error "cdn_bucket not defined in docker.default.ini or docker.ini"
+        exit 1
+      fi
+      if [ ! -v cdn_bucket_prefix ]; then
+        error "cdn_bucket_prefix not defined in docker.default.ini or docker.ini"
+        exit 1
+      fi
+      bucket_host="${cdn_host}"
+      bucket_name="${cdn_bucket}"
+      bucket_prefix="${cdn_bucket_prefix}"
+      ;;
+    vagrant)
+      log "HOST_TYPE=vagrant: loading config from vagrant.default.yaml + vagrant.yaml"
+      bucket_host="https://s3-ap-southeast-2.amazonaws.com"
+      bucket_name=$(read_var_from_vagrant_yaml "$VAGRANT_YAML_KEY_AWS_BUCKET")
+      bucket_prefix=$(read_var_from_vagrant_yaml "$VAGRANT_YAML_KEY_AWS_BUCKET_PREFIX")
+      if [[ -z $bucket_prefix ]]; then
+        error "Bucket prefix not found in vagrant.yaml please add value for $VAGRANT_YAML_KEY_AWS_BUCKET_PREFIX with your firstname.lastname"
+        exit 1
+      fi
+      ;;
+    *)
+      error "HOST_TYPE=${HOST_TYPE}: must be either vagrant or docker"
+      exit 1
+      ;;
+    esac
+}
+
 # Function to fetch value from vagrant.yaml file by key
 function read_var_from_yaml() {
   VAR=$(grep -E "^\s*$1" "$2" | xargs)
@@ -90,34 +126,30 @@ function read_var_from_vagrant_yaml() {
 
 function upload_assets() {
   log "Checking AWS credentials..."
-  if ! aws configure list >/dev/null; then
-    aws sso login --no-browser
+  # TODO this doesn't properly check if the current profile has keys
+  if ! aws configure list > /dev/null; then
+    aws sso login --no-browser --use-device-code
   fi
   log "Uploading assets..."
   site_version=$(find "$site_root"/updates/ -mindepth 1 -maxdepth 1 -type d -printf %f\\n | sort -V | tail -n 1)
   site_package=${site_version}-0
-  aws_bucket=$(read_var_from_vagrant_yaml "$VAGRANT_YAML_KEY_AWS_BUCKET")
-  bucket_prefix=$(read_var_from_vagrant_yaml "$VAGRANT_YAML_KEY_AWS_BUCKET_PREFIX")
-  if [[ -z $bucket_prefix ]]; then
-    error "Bucket prefix not found in vagrant.yaml please add value for $VAGRANT_YAML_KEY_AWS_BUCKET_PREFIX with your firstname.lastname"
-    exit 1
-  fi
-  aws s3 sync "$site_root"/www/static/ s3://"$aws_bucket"/"$bucket_prefix"/"$site_package"
+  aws s3 sync "$site_root"/www/static/ s3://"$bucket_name"/"$bucket_prefix"/"$site_package"
 
+  # TODO update config by connecting to correct database
   log "Updating config..."
   log "Setting 'site_package' to '$site_package'"
-  mysql schoolbox -e "UPDATE config SET value = '$site_package' WHERE name = 'site_package'"
-  site_static_asset_prefix="https://s3-ap-southeast-2.amazonaws.com/$aws_bucket/$bucket_prefix/{site_package}"
+  "${site_root}/tools/instance-mariadb.sh" -e "UPDATE config SET value = '$site_package' WHERE name = 'site_package'"
+  site_static_asset_prefix="$bucket_host/$bucket_name/$bucket_prefix/{site_package}"
   log "Setting 'site_static_asset_prefix' to '$site_static_asset_prefix'"
-  mysql schoolbox -e "UPDATE config SET value = '$site_static_asset_prefix' WHERE name = 'site_static_asset_prefix'"
+  "${site_root}/tools/instance-mariadb.sh" -e "UPDATE config SET value = '$site_static_asset_prefix' WHERE name = 'site_static_asset_prefix'"
   log "Setting 'site_static_asset_serve_from_cdn' to 1'"
-  mysql schoolbox -e "UPDATE config SET value = '1' WHERE name = 'site_static_asset_serve_from_cdn'"
+  "${site_root}/tools/instance-mariadb.sh" -e "UPDATE config SET value = '1' WHERE name = 'site_static_asset_serve_from_cdn'"
 }
 
 function main() {
-  check_run_as_root
   derive_site_root "$@"
   parse_args "$@"
+  load_config
   upload_assets
 }
 

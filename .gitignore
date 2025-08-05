@@ -21,6 +21,7 @@ test/behavior/screenshots/*.html
 vagrantcache/
 tools/xdebug.ini
 vagrant.yaml
+docker.ini
 .sass-cache/
 post-provision.sh
 .idea/

@@ -147,11 +147,11 @@ then
                             # Add new file to etag cache
                             echo "$etag $branch-vendor-php-dev.tar.gz" >> vendor.etag.cache;
                             # Cleanup for purity
-                            rm -fR "$SITE_ROOT"/vagrantcache/vendor 2>/dev/null;
+                            rm -fR "${cachedir}"/vendor 2>/dev/null;
                             # Extract checksum
                             tar xzf $branch-vendor-php-dev.tar.gz vendor/composer.lock.checksum;
                             vendorchecksum=`awk '{print $1}' vendor/composer.lock.checksum`;
-                            rm -fR "$SITE_ROOT"/vagrantcache/vendor 2>/dev/null;
+                            rm -fR "${cachedir}"/vendor 2>/dev/null;
                             # Add new file to vendor cache
                             echo "$vendorchecksum $branch-vendor-php-dev.tar.gz" >> vendor.cache;
                             # Check if this is file we need
@@ -168,12 +168,12 @@ then
     cd "$SITE_ROOT" || exit;
     if [ "$vendorfile" != '' ];
     then
-        if [ -f "$SITE_ROOT"/vagrantcache/$vendorfile ];
+        if [ -f "${cachedir}"/$vendorfile ];
         then
             # Extract content
             echo "[SB][`date +%Y-%m-%d\ %X`] Found matching vendor cache file '$vendorfile', now extracting";
             rm -fR "$SITE_ROOT"/vendor 2>/dev/null;
-            tar xzf "$SITE_ROOT"/vagrantcache/$vendorfile;
+            tar xzf "${cachedir}"/$vendorfile;
         else
             # Still no luck, build from scratch with composer
             echo "[SB][`date +%Y-%m-%d\ %X`] No matching vendor cache found. Building with composer";
@@ -210,7 +210,7 @@ if ! INSTANCE_ID=vagrantx schoolbox-data-refresh.sh \
 --sql-schema 'schoolbox' \
 --sql-user 'schoolboxvagrant' \
 --sql-pass 'abc123' \
---cache-dir "$SITE_ROOT/vagrantcache" \
+--cache-dir "${cachedir}" \
 --config amqp_host "'localhost'" \
 --config amqp_user "'guest'" \
 --config amqp_pass "'guest'" \
@@ -267,6 +267,7 @@ mysql --defaults-extra-file=/root/.my.cnf schoolbox < $cachedir/vagrant-secrets.
 # Set ENV VARs for root + vagrant users from vagrant.yaml params
 declare -A env_vars=(
   [INSTANCE_ID]="$instance_id_env_var"
+  [HOST_TYPE]="vagrant"
   [FACTER_primary_php_majver]="$phpversion_supported"
   [FACTER_vagrant_extra_hostname]="$extra_hostname"
   [FACTER_taskd_systemd_service_installed]="$taskd_systemd_service_installed"
@@ -344,11 +345,11 @@ then
                             # Add new file to etag cache
                             echo "$etag $branch-npm.tar.gz" >> npm.etag.cache;
                             # Cleanup for purity
-                            rm -fR "$SITE_ROOT"/vagrantcache/node_modules 2>/dev/null;
+                            rm -fR "${cachedir}"/node_modules 2>/dev/null;
                             # Extract checksum
                             tar xzf $branch-npm.tar.gz node_modules/npm.shrinkwrap.checksum;
                             npmchecksum=`awk '{print $1}' node_modules/npm.shrinkwrap.checksum`;
-                            rm -fR "$SITE_ROOT"/vagrantcache/node_modules 2>/dev/null;
+                            rm -fR "${cachedir}"/node_modules 2>/dev/null;
                             # Add new file to NPM cache
                             echo "$npmchecksum $branch-npm.tar.gz" >> npm.cache;
                             # Check if this is file we need
@@ -365,23 +366,23 @@ then
     cd "$SITE_ROOT" || exit 1;
     if [ "$npmfile" != '' ];
     then
-        if [ -f "$SITE_ROOT"/vagrantcache/$npmfile ];
+        if [ -f "${cachedir}"/$npmfile ];
         then
             # Extract content
             echo "[SB][`date +%Y-%m-%d\ %X`] Found matching NPM cache file ($npmlocksha) '$npmfile', now extracting";
             rm -fR "$SITE_ROOT"/node_modules 2>/dev/null;
-            tar xzf "$SITE_ROOT"/vagrantcache/$npmfile;
+            tar xzf "${cachedir}"/$npmfile;
         else
             # Still no luck, build from scratch with npm
             echo "[SB][`date +%Y-%m-%d\ %X`] Cache content:";
-            cat "$SITE_ROOT"/vagrantcache/npm.cache;
+            cat "${cachedir}"/npm.cache;
             echo "[SB][`date +%Y-%m-%d\ %X`] No matching NPM cache found. Building with npm";
             "$SITE_ROOT"/tools/pkg-build-npm.sh 2>&1;
         fi
     else
         # Still no luck, build from scratch with npm
         echo "[SB][`date +%Y-%m-%d\ %X`] Cache content:";
-        cat "$SITE_ROOT"/vagrantcache/npm.cache;
+        cat "${cachedir}"/npm.cache;
         echo "[SB][`date +%Y-%m-%d\ %X`] No matching NPM cache found. Building with npm";
         "$SITE_ROOT"/tools/pkg-build-npm.sh 2>&1;
     fi
