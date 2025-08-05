@@ -59,6 +59,7 @@ use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecific
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Assessment\Participant\Plan\Model as PlanModel;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
 
 /**
  * Class Controller
@@ -467,10 +468,80 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $this->response = $content;
     }
 
+    /**
+     * Get form for creating a copy for customising the assessment
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws Error
+     * @throws MapperException
+     * @throws RouteNotFound
+     */
     public function getCloneAssessmentForm(IAssessable $assessment): void
     {
+        /* Creating a new clone copy
+         */
+        $clonedAssessment = $assessment->cloneForCopy()
+                                       ->setTitle('');
 
-        $this->response = $this->responseAsJson([]);
+        $data = $this->getAssessmentAsTwigArray($clonedAssessment->getContext(), $clonedAssessment);
+
+        $breadcrumbs = $this->getBakery()->produceFromAssessment($clonedAssessment, $this->getUser())->add([$clonedAssessment->getTitle()]);
+        $data['breadcrumbs'] = $breadcrumbs;
+
+        $data['returnUrlName'] = Redirect::RETURN_URL;
+        $data['returnUrl'] = $this->requestQuery->get(Redirect::RETURN_URL);
+
+        /* Course Managed Field and associated checkbox in the ui
+         */
+        $courseManagedFields = new CourseManagedFields($this->getUser(), $assessment);
+        $data['courseManaged'] = [
+            'isVisible' => $courseManagedFields->isVisible(),
+            'isMutable' => $courseManagedFields->isMutable(),
+            'isReadonly' => $courseManagedFields->isReadonly(),
+        ];
+
+        /* Curriculum Codes prefilled from those associated with the assessment itself
+         * hide nodes with no codes
+         */
+        $data['curriculumNodes'] = $clonedAssessment->getViewableCurriculumNodes()->reindex();
+        $data['canRelocate'] = $clonedAssessment->isSpecification();
+
+        $data['selfAssessmentEnabled'] = $this->getConfigLoader()->get('self_assessment_enabled');
+        $data['defaultGradeGroup'] = $this->getConfigLoader()->get('default_grade_group');
+        $data['custom_assessment_participation'] = $this->getConfigLoader()->get('custom_assessment_participation');
+
+        if ($clonedAssessment instanceof DueWork\Model) {
+            // To be able to view the current student policy if enabling within the submission type
+            $data['lmsStudentPolicy'] = $this->getConfigLoader()->get('lms_student_policy');
+
+            // To determine whether to display the interactive worksheet option
+            $data['kami_enabled'] = $this->getConfigLoader()->get(ConfigMapper::NAME_KAMI_ENABLED);
+
+            $kamiFiles = $this->mimetypeMapper
+                ->findMimeTypesFromExtensions(
+                    array_keys(KamiModel::ALLOWED_FILE_TYPES)
+                );
+
+            $zone = (new Zone('worksheet'))
+                ->setMulti(false)
+                ->setAttachPrompt('Attach a worksheet')
+                ->setAttachmentsLabel('')
+                ->setMimeFilter(implode(",", $kamiFiles))
+                ->setFilesystemContext('worksheet')
+                ->setReadOnly($courseManagedFields->isReadonly()) //
+                ->setFileVar('worksheet');
+            if ($clonedAssessment->getWorksheetTemplate()) {
+                $zone = $zone->attachFiles([$clonedAssessment->getWorksheetTemplate()]);
+            }
+            $data['attachzoneWorksheet'] = $zone->getTwigContext();
+
+            /** @var DueWork\Model $assessment */
+            $data['rubricGrid'] = (RubricDataSource::getInstance())->retrieveGrid($assessment, true, true);
+        }
+
+
+        $this->response = $this->responseFromTemplate("@learningAssessment/create.twig", $data);
     }
 
     /**
