@@ -830,7 +830,7 @@ export default {
                                                     >
                                                         <!-- Modify button available when a learning moment is: draft/submitted/rejected -->
                                                         <li>
-                                                            <a class="button" :href="evidence.object._links.modifyForm"
+                                                            <a class="button" :href="evidence.object._links.modifyForm + '?returnUrl=' + returnUrl"
                                                                 >Modify</a
                                                             >
                                                         </li>
@@ -873,7 +873,7 @@ export default {
                                                 >
                                                     <!-- Modify button available when a learning moment is: draft/submitted/rejected -->
                                                     <li>
-                                                        <a class="button" :href="evidence.object._links.modifyForm"
+                                                        <a class="button" :href="evidence.object._links.modifyForm + '?returnUrl=' + returnUrl"
                                                             >Modify</a
                                                         >
                                                     </li>
@@ -903,7 +903,7 @@ export default {
                                                 <template v-if="'draft' === evidence.object.currentState">
                                                     <!-- Modify button available when a learning moment is: draft -->
                                                     <li>
-                                                        <a class="button" :href="evidence.object._links.modifyForm"
+                                                        <a class="button" :href="evidence.object._links.modifyForm + '?returnUrl=' + returnUrl"
                                                             >Modify</a
                                                         >
                                                     </li>
