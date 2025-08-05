@@ -33,14 +33,10 @@ const props = defineProps<{
                 </ul>
             </section>
         </div>
-        <div v-else class="small-12 column">
-            <section>
-                <div class="empty-state f-no-margins">
-                    <i class="icon-pastoral"></i>
-                    <p>No {{ props.localePastoral }} records matched your report criteria.</p>
-                    <a :href="props.routes.getIndex"> Select Another Report </a>
-                </div>
-            </section>
+        <div v-else class="empty-state-flex-centered f-no-margins">
+            <i class="icon-pastoral"></i>
+            <p>No {{ props.localePastoral }} records matched your report criteria.</p>
+            <a :href="props.routes.getIndex"> Select Another Report </a>
         </div>
     </div>
 </template>

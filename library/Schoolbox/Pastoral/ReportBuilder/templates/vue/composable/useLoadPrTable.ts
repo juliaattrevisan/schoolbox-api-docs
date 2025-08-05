@@ -18,14 +18,25 @@ export function useLoadPrTable(url: Ref<string>): {
     isMoreLoading: Ref<boolean>;
     payload: Ref<TablePayload | null>;
     isEmpty: Ref<boolean>;
+    hasRows: Ref<boolean>;
     loadError: Ref<string | null>;
 } {
     const isNewLoad = window.Vue.ref(false); // to distinguish between loading a new table and loading data for the same table
     const isNewLoading = window.Vue.ref(false); // to notify when a new table is being loaded
     const isMoreLoading = window.Vue.ref(false); // to notify when the data linked to the same table is being loaded
     const payload = window.Vue.ref<TablePayload | null>(null); // to store the payload that matches the current query
-    const isEmpty = window.Vue.computed(() => payload.value === null && !isNewLoading.value); // To show that no payload match the current report table
     const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the load
+    const isEmpty = window.Vue.computed(
+        () =>
+            !isNewLoading.value &&
+            !isMoreLoading.value &&
+            loadError.value === null &&
+            payload.value !== null &&
+            payload.value.metadata.count === 0,
+    ); // To show that no payload match the current report table
+    const hasRows = window.Vue.computed(
+        () => payload.value !== null && payload.value.data.rows.length > 0 && payload.value.metadata.count > 0,
+    ); // To show that the report table has rows
     let controller: AbortController; // to allow aborting the previous search if a new one is started
 
     /**
@@ -96,6 +107,7 @@ export function useLoadPrTable(url: Ref<string>): {
         isMoreLoading,
         payload,
         isEmpty,
+        hasRows,
         loadError,
     };
 }
