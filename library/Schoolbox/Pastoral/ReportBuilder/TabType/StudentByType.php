@@ -230,7 +230,7 @@ class StudentByType extends Cursor implements TabTypeInterface
         }
 
         $totalQuery = "
-            SELECT *
+            SELECT withTotal.*
             FROM (
                     {$this->getResultQuery()}
                 ) withTotal
