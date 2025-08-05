@@ -6,6 +6,7 @@
 import type { PastoralRecord } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
 import type { Config, Routes, SeverityColors } from "../js/types/pastoralReportTypes";
 import PrRecord from "./pr-record.vue";
+import PrEmpty from "./pr-empty.vue";
 
 const props = defineProps<{
     results: PastoralRecord[];
@@ -33,15 +34,7 @@ const props = defineProps<{
                 </ul>
             </section>
         </div>
-        <div v-else class="small-12 column">
-            <section>
-                <div class="empty-state f-no-margins">
-                    <i class="icon-pastoral"></i>
-                    <p>No {{ props.localePastoral }} records matched your report criteria.</p>
-                    <a :href="props.routes.getIndex"> Select Another Report </a>
-                </div>
-            </section>
-        </div>
+        <pr-empty v-else :routes="props.routes" :locale-pastoral="props.localePastoral" />
     </div>
 </template>
 
