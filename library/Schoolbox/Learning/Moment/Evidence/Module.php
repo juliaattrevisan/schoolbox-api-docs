@@ -99,9 +99,9 @@ class Module extends BaseModule
 
         $deleteEvidenceRule = $modifyEvidenceRule;
 
-        /* Superusers, Staff with Learning Moment role permission can view cohort report
+        /* Superusers, Staff with Learning Moment role permission can view/modify cohort report
          */
-        $viewCohortReportRule = new Rule\All(
+        $viewCohortReportRule = $modifyCohortReportRule = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
@@ -241,6 +241,15 @@ class Module extends BaseModule
             'putSubmit',
             $modifyEvidenceRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
+        );
+
+        /* Bulk Publish (typically from Cohort Overview)
+         */
+        $this->register(
+            self::METHOD_PUT,
+            '/bulk/publish',
+            'putBulkPublish',
+            $modifyCohortReportRule,
         );
 
         /* Put an evidence into the Published state as-is;

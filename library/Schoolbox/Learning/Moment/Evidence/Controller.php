@@ -667,6 +667,38 @@ class Controller extends Base
 
 
     /**
+     * Bulk publish a set of $moments
+     *
+     * @return void
+     * @throws Exception
+     * @throws MapperException
+     * @throws RouteNotFound
+     */
+    public function putBulkPublish(): void
+    {
+        die('mog');
+        $stack = [];
+
+//        /* Find all the learning moments to bulk modify
+//         */
+//        $requestBody = $this->request->getParsedBody();
+//
+//        $momentIds = explode(',', $requestBody['momentIds']);
+//
+//        $moments = $this->mapper->findByColumn('id', $momentIds);
+//
+//        /* Process each moment into the next state individually, collecting a $stack
+//         * of translated moments in their new state
+//         */
+//        foreach ($moments as $moment) {
+//             $stack[$moment->getId()] = $this->putWithState($moment, Model::STATUS_PUBLISHED);
+//        }
+
+        $this->response = $this->responseAsJson($stack);
+    }
+
+
+    /**
      * Place $evidence into the new state $state, along with any modifications made to its
      * body, tags, curric nodes, etc. via the Modify form. This might not always be how we
      * putWithState() since you can do this directly from the CTAs on the Activity Feed.

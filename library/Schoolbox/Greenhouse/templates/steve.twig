@@ -1,3 +1,19 @@
+<script>
+    window.onload = function() {
+        fetch('/learning/evidence/bulk/publish', {
+            method: "PUT",
+            body: JSON.stringify({
+                momentIds: [15,16,17],
+            }),
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            }
+        });
+    }
+</script>
+
+
 {#<script>#}
 {#    $(function() {#}
 {#        $('#simForm').submit(function(event) {#}
@@ -11,32 +27,32 @@
 {#        })#}
 {#    });#}
 {#</script>#}
-<div class="small-12 island">
-    <section class="content">
-        <form action="{{ routeLookup('openai.postLessonPlan') }}" method="post" id="simForm">
-            <fieldset>
-                <label>Lesson Plan Id</label>
-                <input type="text" name="lessonPlanId" />
-            </fieldset>
+{#<div class="small-12 island">#}
+{#    <section class="content">#}
+{#        <form action="{{ routeLookup('openai.postLessonPlan') }}" method="post" id="simForm">#}
+{#            <fieldset>#}
+{#                <label>Lesson Plan Id</label>#}
+{#                <input type="text" name="lessonPlanId" />#}
+{#            </fieldset>#}
 
-            <fieldset>
-                <label>Context</label>
-                <input type="text" name="context" />
+{#            <fieldset>#}
+{#                <label>Context</label>#}
+{#                <input type="text" name="context" />#}
 
-                <label>Folder</label>
-                <input type="text" name="folder" />
+{#                <label>Folder</label>#}
+{#                <input type="text" name="folder" />#}
 
-                <label>Lesson Plan Template Field Ids</label>
-                <input type="text" name="lessonPlanTemplateFieldIds" />
+{#                <label>Lesson Plan Template Field Ids</label>#}
+{#                <input type="text" name="lessonPlanTemplateFieldIds" />#}
 
-                <label>Curric Node Ids</label>
-                <input type="text" name="curriculumNodeIds" id="submit" />
-            </fieldset>
+{#                <label>Curric Node Ids</label>#}
+{#                <input type="text" name="curriculumNodeIds" id="submit" />#}
+{#            </fieldset>#}
 
-            <input type="submit" />
-        </form>
-    </section>
-</div>
+{#            <input type="submit" />#}
+{#        </form>#}
+{#    </section>#}
+{#</div>#}
 
 
 
