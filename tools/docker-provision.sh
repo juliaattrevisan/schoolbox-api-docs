@@ -367,13 +367,13 @@ function install_instance() {
   --config etherpad_host "'http://schoolbox-etherpad:9001'" \
   --config etherpad_api_token "'test'" \
   --config external_type "'$EXTERNAL_DB'" \
-  --config EXTERNAL_DB_DB "'$EXTERNAL_DB_DB'" \
-  --config EXTERNAL_DB_HOST "'$EXTERNAL_DB_HOST'" \
+  --config external_db_db "'$EXTERNAL_DB_DB'" \
+  --config external_db_host "'$EXTERNAL_DB_HOST'" \
   --config external_db_user "'schoolbox'" \
   --config external_portal "'https://portal.synergetic.dev.schoolbox.cloud'" \
   --config fixtures_enabled "'1'" \
   --config gotenberg_host "'http://schoolbox-gotenberg:3000'" \
-  --config INSTANCE_REGISTRY_URL "'$INSTANCE_REGISTRY_URL'" \
+  --config instance_registry_url "'$INSTANCE_REGISTRY_URL'" \
   --config ldap_enable "'0'" \
   --config mail_enable "'1'" \
   --config mail_smtp_host "'127.0.0.1'" \
