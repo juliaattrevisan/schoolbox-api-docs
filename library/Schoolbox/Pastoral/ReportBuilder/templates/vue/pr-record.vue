@@ -53,7 +53,6 @@ const props = defineProps<{
                     <sbx-label-pastoral-points
                         v-if="props.config.pastoralPointEnabled && props.record.points"
                         :points="props.record.points"
-                        :title="`${props.record.points} Points`"
                         class="l-flex__item--none"
                     ></sbx-label-pastoral-points>
                 </h3>

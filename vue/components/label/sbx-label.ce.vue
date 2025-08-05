@@ -7,7 +7,7 @@ interface Props {
     /**
      * The title of the label to show the helper text when set
      */
-    title: string;
+    title?: string;
     /**
      * The sentiment of the label, which impacts the color of the label
      */
