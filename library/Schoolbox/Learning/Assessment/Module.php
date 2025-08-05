@@ -38,6 +38,7 @@ use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
+use Schoolbox\Learning\Authorizer\Rule\IsCustomParticipationEnabled;
 use Schoolbox\Learning\Authorizer\Rule\CanAcknowledgeAssessment;
 use Schoolbox\Learning\Authorizer\Rule\CanPreview;
 use Schoolbox\Learning\Authorizer\Rule\CanRespondToAssessment;
@@ -174,8 +175,11 @@ class Module extends BaseModule
 
         $canModifyCustomParticipation = new Rule\All(
             /* Should only be accessible if the custom participation config is enabled
-            */
+             */
             new Rule\IsConfigOn(ConfigMapper::NAME_CUSTOM_ASSESSMENT_PARTICIPATION, $this->getConfig()),
+            /* Check if the custom participation is available
+             */
+            new IsCustomParticipationEnabled(),
             new Rule\Any(
                 $isSuper,
                 new Rule\All(
@@ -359,9 +363,9 @@ class Module extends BaseModule
 
         // Easy access participation endpoint
         // include user in assessment
-        $this->register('POST', "$assRoute/$studentParam/include", 'postInclude', $canModify, $preloadParticipant);
+        $this->register('POST', "$assRoute/$studentParam/include", 'postInclude', $canModifyCustomParticipation, $preloadParticipant);
         // exclude user from assessment
-        $this->register('POST', "$assRoute/$studentParam/exclude", 'postExclude', $canModify, $preloadParticipant);
+        $this->register('POST', "$assRoute/$studentParam/exclude", 'postExclude', $canModifyCustomParticipation, $preloadParticipant);
 
         $this->register('GET', "$assRoute/$studentParam/info", 'getInfo', $canModify, $preloadParticipant);
 

@@ -428,7 +428,7 @@ class Translator
             ->setDefaultOpenSpan($assessmentModel->getDefaultOpenSpan())
             ->setCourseManaged((bool)$assessmentModel->getCourseManaged())
             ->setSebEnabled((bool)$assessmentModel->getSebEnabled())
-            ->setOriginalAssessmentId((int)$assessmentModel->getOriginalAssessmentId())
+            ->setOriginalAssessmentId($assessmentModel->getOriginalAssessmentId())
             ->setWeight($assessmentModel->getWeight())
             ->setPublishAt($assessmentModel->getPublishDate())
             ->setOpenAt($assessmentModel->getOpenDate())

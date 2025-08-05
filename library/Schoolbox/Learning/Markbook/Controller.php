@@ -201,6 +201,17 @@ class Controller extends Base
                             ? $aImpl->getInstructorMarkScheme()
                             : $aImpl->getMarkScheme();
 
+                        $originalUrl = null;
+                        if (null !== $aImpl->getOriginalAssessmentId()) {
+                            $originalAssessment = $this->assessmentMapperProxy->findById($aImpl->getOriginalAssessmentId());
+                            if ($originalAssessment instanceof IAssessable) {
+                                $originalUrl = $this->getRouteIfAuthorized(
+                                    'learningAssessment.getAssessmentParticipationForm',
+                                    ['assessment' => $originalAssessment, 'assessmentId' => $originalAssessment->getId()]
+                                );
+                            }
+                        }
+
                         return [
                             'id'             => $aImpl->getId(),
                             'markVisibility' => $aImpl->getMarkVisibility(),
@@ -387,6 +398,9 @@ class Controller extends Base
                                             ],
                                         ) : null
                                     ),
+                                    /* The original assessment customisation route, if it's a customised copy otherwise null
+                                     */
+                                    'getAssessmentParticipationForm' => $originalUrl,
                                 ]),
                             ],
                         ];
