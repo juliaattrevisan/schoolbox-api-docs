@@ -115,6 +115,19 @@ class Controller extends Base
 
         if ($this->getUser()->getRole()->isStudent()) {
             $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $this->getUser()->getYear());
+        } elseif (1 === $users->count() && $this->getUser()->getRole()->isParent()) {
+            /* If the current user is a parent, and the list of recipients is exactly one,
+             * then the parent is creating a learning moment for one of their children via their activity feed.
+             * Spawn the Submit For Approval button for parents so their learning moments enter moderation queue.
+             *
+             * This forces parents into the same moderation workflow as their children. ALTERNATIVELY you could
+             * require the Learning Moment Moderation role permission on various parent roles; this could allow
+             * some Parent roles to have moderation requirements and others can Publish immediately to the world.
+             *
+             * Note:
+             * This is purely circumstantial since parents can't spawn learning moments for multiple people.
+             */
+            $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $users->first()->getYear());
         }
 
         $params = [

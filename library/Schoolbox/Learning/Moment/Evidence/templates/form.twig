@@ -135,7 +135,7 @@
                     });
                 </script>
 
-                {% if USER.role.isStudent %}
+                {% if USER.role.isStudent or USER.role.isParent %}
                     {% if moderationRequired and (evidence.isDraft or evidence.isRejected) %}
                         <li><button id="submit">Submit for approval</button></li>
 
