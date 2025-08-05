@@ -682,9 +682,7 @@ class Controller extends Base
          */
         $requestBody = $this->request->getParsedBody();
 
-        $momentIds = explode(',', $requestBody['momentIds']);
-
-        $moments = $this->mapper->findByColumn('id', $momentIds);
+        $moments = $this->mapper->findByColumn('id', $requestBody['momentIds']);
 
         /* Process each moment into the next state individually, collecting a $stack
          * of translated moments in their new state
