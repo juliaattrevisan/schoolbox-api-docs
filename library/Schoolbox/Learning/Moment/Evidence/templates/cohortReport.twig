@@ -3,7 +3,11 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbs([folder.name, '/homepage/' ~ folder.id], ['Cohort Learning Moments']) }}
 
+{% set endpoint = routeLookup(
+    'learningMomentEvidence.getCohortReportPayloadDefault',
+    { folder: folder, folderId: folder.id }
+) %}
 <div id="learning-moments-evidence-cohort-report-container">
-    <cohort-report :folder-id="{{ folder.id }}" />
+    <cohort-report endpoint="{{ endpoint }}" />
 </div>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/learningMomentsEvidenceCohortReport.js?v={{ config.site_version }}"></script>

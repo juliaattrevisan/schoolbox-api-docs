@@ -3,8 +3,20 @@
 import { useElementSize } from "@vueuse/core";
 import CrFilters from "./cr-filters.vue";
 import CrResults from "./cr-results.vue";
+import { useCohortReportStore } from "./store/cohortReportStore";
 
 const SINGLE_COLUMN_BREAKPOINT = 800;
+
+interface Props {
+    endpoint: string;
+}
+
+const props = defineProps<Props>();
+const crStore = useCohortReportStore();
+
+window.Vue.onMounted(async () => {
+    await crStore.init(props.endpoint);
+});
 
 const cohortReportEl = window.Vue.useTemplateRef<HTMLDivElement>("cohortReportRef");
 const { width: containerWidth } = useElementSize(cohortReportEl);
