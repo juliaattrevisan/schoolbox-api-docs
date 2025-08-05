@@ -458,7 +458,7 @@ function post_install() {
 function main() {
   load_consts
   load_config
-  setup_aws_sso
+#  setup_aws_sso
 
   cleanup_cache_dir
   download_secrets
