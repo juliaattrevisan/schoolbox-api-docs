@@ -51,8 +51,8 @@ or from an image built from local code, depending on the
 
 > TODO finalise how to pull already built image: Dockerhub? ECR?
 
-However it's run: the config file [taskd.env](../taskd.env) can be used to
-configure it, as per https://github.com/alaress/taskd/blob/master/CONFIGURATION.md.
+However it's run: the config file [docker-taskd.env](../docker-taskd.env) can be
+used to configure it, as per https://github.com/alaress/taskd/blob/master/CONFIGURATION.md.
 
 ## Scripts
 

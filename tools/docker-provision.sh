@@ -5,9 +5,6 @@ declare SITE_ROOT
 declare CACHE_DIR
 declare REQUIRED_CONSTS=(SITE_ROOT CACHE_DIR)
 
-declare AWS_ACCOUNT_ID
-declare AWS_ROLE_NAME
-declare AWS_START_URL
 declare DATA_SOURCE
 declare DATA_FILENAME
 declare CERTIFICATE_SOURCE
@@ -18,7 +15,6 @@ declare INSTANCE_REGISTRY_URL
 declare DEFAULT_INSTANCE_ID
 declare ARTIFACT_SOURCE
 declare REQUIRED_CONFIGS=(\
-  AWS_ACCOUNT_ID AWS_ROLE_NAME AWS_START_URL \
   DATA_SOURCE DATA_FILENAME \
   CERTIFICATE_SOURCE \
   EXTERNAL_DB EXTERNAL_DB_HOST EXTERNAL_DB_DB \
@@ -92,37 +88,15 @@ function load_config() {
   fi
 }
 
-# Setup AWS CLI: copied from `vagrant-provision-pre-puppet.sh`
-function version_gte() {
-  echo -e "$1\n$2" | sort -rCV
-}
-
 function setup_aws_sso() {
-  if [ -f ~/.aws/credentials ]; then
-    if grep -q 'default' ~/.aws/credentials; then
-      log "AWS SSO already set up";
-      return
-    fi
-  fi
-  log "Setting up AWS SSO";
-  mkdir -p ~/.aws
-  echo "[default]
-  sso_session = docker
-  sso_account_id = ${AWS_ACCOUNT_ID}
-  sso_role_name = ${AWS_ROLE_NAME}
-  region = ap-southeast-2
-
-  [sso-session docker]
-  sso_region = ap-southeast-2
-  sso_start_url = ${AWS_START_URL}" > ~/.aws/config
-  params=()
-  params+=(--no-browser)
-  aws_version=$(aws --version 2>&1 | cut -d " " -f1 | cut -d "/" -f2)
-  if version_gte "$aws_version" "2.22.0"; then
-    params+=(--use-device-code)
-  fi
+  # AWS is already configured in ~/.aws/config:
+  # just test if credentials in env, ~/.aws/credentials or wherever are current.
+  log "Testing if logged in to AWS..."
   if ! aws configure list > /dev/null; then
-    aws sso login "${params[@]}"
+    log "Not logged in to AWS: logging in"
+    aws sso login --no-browser --use-device-code
+  else
+    log "Logged in to AWS: continuing"
   fi
 }
 

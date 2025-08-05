@@ -11,6 +11,8 @@ services:
       dockerfile: deploy-image.Dockerfile
       additional_contexts:
         - code=../
+      args:
+        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
     scale: 2
     deploy:
       mode: replicated

@@ -13,8 +13,10 @@ services:
         condition: service_healthy
     build:
       context: ./schoolbox-taskd
+      args:
+        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
     env_file:
       - path: ./schoolbox-taskd/default.env
         required: true
-      - path: ./../taskd.env
+      - path: ./../docker-taskd.env
         required: false

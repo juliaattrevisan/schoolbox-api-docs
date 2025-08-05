@@ -50,6 +50,11 @@ services:
       - php82-bookworm
     container_name: schoolbox-cli
     restart: always
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN}
+      AWS_CREDENTIAL_EXPIRATION: ${AWS_CREDENTIAL_EXPIRATION}
     build:
       context: ./schoolbox-cli
     tty: true
@@ -58,6 +63,7 @@ services:
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
       - caddy-ssl:/etc/nginx/certs/
+      - aws-config:/root/.aws
     # After building: create data dirs
     post_start:
       - command : mkdir -p /var/lib/schoolbox/docker/cache/portrait
@@ -301,6 +307,13 @@ volumes:
       type: none
       o: bind
       device: ./redis-cache/config
+
+  aws-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ../.aws
 
   # Volume for ClamAV signatures
   clamav-data:
