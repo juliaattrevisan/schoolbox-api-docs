@@ -172,7 +172,7 @@ class StudentByType extends Cursor implements TabTypeInterface
         )->getAll();
 
         $totalCount = "CASE WHEN ";
-        $totalCount .= implode(" AND ", array_filter($typeNullValueCheck + $subTypeNullValueCheck));
+        $totalCount .= implode(" AND ", array_filter(array_merge($typeNullValueCheck, $subTypeNullValueCheck)));
         $totalCount .= " THEN NULL ELSE ";
         $totalCount .= "(" . implode(' + ', array_filter([$typeKeys, $subTypeKeys])) . ") END as total";
 
@@ -230,7 +230,7 @@ class StudentByType extends Cursor implements TabTypeInterface
         }
 
         $totalQuery = "
-            SELECT *
+            SELECT withTotal.*
             FROM (
                     {$this->getResultQuery()}
                 ) withTotal
