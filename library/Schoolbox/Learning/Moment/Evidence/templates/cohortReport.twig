@@ -1,0 +1,9 @@
+{# Learning Moments Cohort Report #}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs([folder.name, '/homepage/' ~ folder.id], ['Cohort Learning Moments']) }}
+
+<div id="learning-moments-evidence-cohort-report-container">
+    <cohort-report :folder-id="{{ folder.id }}" />
+</div>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/learningMomentsEvidenceCohortReport.js?v={{ config.site_version }}"></script>

@@ -731,6 +731,22 @@ class Controller extends Base
 
 
     /**
+     * Get the cohort report for a given folder
+     *
+     * @param Folder\Model $folder
+     * @return void
+     */
+    public function getCohortReport(Folder\Model $folder): void
+    {
+        $this->response = $this->responseFromTemplate(
+            '@learningMomentEvidence/cohortReport.twig',
+            [ 'folder' => $folder, ],
+            sprintf('Cohort Learning Moments - %s', $folder->getName())
+        );
+    }
+
+
+    /**
      * Generates a json payload that tells you about learning moments for any of $folder's students
      * that were created between the $from and $to dates, grouped by date, sorted reverse-chronologically.
      *
