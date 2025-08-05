@@ -444,6 +444,38 @@ class Controller extends Base
                     )
                 ]
             ];
+            // temporary update to test multiple table type tabs
+            $mappedOptions[] = [
+                'title' => 'Test',
+                'type' => 'table',
+                'key' => 'studentByType',
+                '_links' => [
+                    'view' => $this->getRouteIfAuthorized(
+                        'pastoralReportBuilder.getReportByTabType',
+                        [
+                            'reportId' => $report->getId(),
+                            'report' => $report,
+                            'tabType' => $key,
+                        ]
+                    ),
+                    'scope' => $this->getRouteIfAuthorized(
+                        'pastoralReportBuilder.getReportByTabTypeScope',
+                        [
+                            'reportId' => $report->getId(),
+                            'report' => $report,
+                            'tabType' => $key,
+                        ]
+                    ),
+                    'scopeExport' => $this->getRouteIfAuthorized(
+                        'pastoralReportBuilder.getReportResultsInScopeExport',
+                        [
+                            'reportId' => $report->getId(),
+                            'report' => $report,
+                            'tabType' => $key,
+                        ]
+                    )
+                ]
+            ];
         }
 
         $tabs = array_merge($defaultSummaryOptions, $mappedOptions);
