@@ -48,6 +48,8 @@ const isImgRounded = window.Vue.computed(() => {
     </div>
 </template>
 
-<style lang="scss">
-@import "@css/core/base/icon-colours";
+<style scoped lang="scss">
+:deep(*) {
+    @import "@css/core/base/icon-colours";
+}
 </style>
