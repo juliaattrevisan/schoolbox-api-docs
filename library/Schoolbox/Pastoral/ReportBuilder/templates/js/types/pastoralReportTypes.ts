@@ -58,8 +58,8 @@ export type Routes = {
 export enum TableHeaderType {
     USER = "User",
     RECORDS_AND_POINTS = "RecordsAndPoints",
-    TREND = "Trend",
     TITLE_AND_SUB_TITLE = "TitleAndSubTitle",
+    TREND = "Trend",
 }
 
 /**
@@ -69,7 +69,7 @@ export type TableHeader = {
     key: string;
     title: string;
     subTitle?: string;
-    type: string | TableHeaderType;
+    type: TableHeaderType;
     isSortable?: boolean;
 };
 
@@ -80,9 +80,25 @@ export type TableHeader = {
 export type RecordsAndPoints = { records: number; points?: never } | { records?: never; points: number | null };
 
 /**
+ * Displays the title and subTitle in the table cell
+ */
+export type TitleAndSubTitle = {
+    title: string;
+    subTitle?: string;
+};
+
+/**
+ * Displays a trend line in the table cell
+ */
+export type Trend = {
+    line: number[];
+    tooltips: string[];
+};
+
+/**
  * The options for a row in the Pastoral Report Table.
  */
-export type RowOptions = string | User | RecordsAndPoints;
+export type RowOptions = User | RecordsAndPoints | TitleAndSubTitle | Trend;
 
 /**
  * The expected payload for a Pastoral Report Table.
