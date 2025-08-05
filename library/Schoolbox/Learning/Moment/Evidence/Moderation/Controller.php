@@ -10,8 +10,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment\Evidence\Moderation;
 
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
+use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Moment\Evidence\Mapper;
@@ -20,7 +22,9 @@ use Schoolbox\Learning\Moment\Evidence\Translator;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Exception;
+use Schoolbox\Resource\Storage;
 use Schoolbox\TokenReplacer;
+use Schoolbox\User;
 
 class Controller extends Base
 {
@@ -45,11 +49,11 @@ class Controller extends Base
      *
      * @api   PUT /learning/evidence/{id}/publish
      * @param Model $evidence
-     * @return void
+     * @return array
      * @throws MapperException
      * @throws Exception
      */
-    public function putPublish(Model $evidence): void
+    public function putPublish(Model $evidence): array
     {
         $requestBody       = $this->request->getParsedBody();
         $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
@@ -93,6 +97,42 @@ class Controller extends Base
 
         /* TODO Post a notification
          */
+
+        $responseTranslator = new Translator\ModelToArray\Base(
+            new User\Translator\Author\ModelToArray(),
+            new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
+            new ScrubAdapter(),
+        );
+
+        return $responseTranslator($evidence);
+    }
+
+
+    /**
+     * Bulk publish a set of $moments
+     *
+     * @return void
+     * @throws Exception
+     * @throws MapperException
+     */
+    public function putBulkPublish(): void
+    {
+        $stack = [];
+
+        /* Find all the learning moments to bulk modify
+         */
+        $requestBody = $this->request->getParsedBody();
+
+        $moments = $this->mapper->findByColumn('id', $requestBody['momentIds']);
+
+        /* Process each moment into the next state individually, collecting a $stack
+         * of translated moments in their new state
+         */
+        foreach ($moments as $moment) {
+            $stack[$moment->getId()] = $this->putPublish($moment);
+        }
+
+        $this->response = $this->responseAsJson($stack);
     }
 
 
@@ -107,7 +147,7 @@ class Controller extends Base
      */
     public function putReject(Model $evidence): void
     {
-        $evidence = $this->reject($evidence);
+        $this->reject($evidence);
 
         /* Redirect back to a place
          */
@@ -116,7 +156,9 @@ class Controller extends Base
         if (!empty($encodedReturnUrl)) {
             $returnUrl = Redirect::decode($encodedReturnUrl);
         } else {
-            $returnUrl = $this->routeGenerator->generate('searchUser.getProfile', ['userId' => $evidence->getRecipient()->getId()]);
+            $returnUrl = $this->routeGenerator->generate('searchUser.getProfile', [
+                'userId' => $evidence->getRecipient()->getId()
+            ]);
         }
 
         /* TODO Post a notification
@@ -159,29 +201,20 @@ class Controller extends Base
      * discussion thread related to $evidence, creating one if it doesn't already exist.
      *
      * @param Model $evidence
-     * @return Model
+     * @return array
      * @throws Exception
      * @throws MapperException
      */
-    private function reject(Model $evidence): Model
+    private function reject(Model $evidence): array
     {
         $requestBody       = $this->request->getParsedBody();
+
         $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
         $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
         $tokenReplacer     = new TokenReplacer\Student(new TokenReplacer\Simple());
 
-        /* This is a pretty convoluted way of doing things just to decide on a subset of nodes
-         * Anyway, this $baseModel contains any curriculum nodes and tags you might have altered
-         */
-        $baseModel = (new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory()))($requestBody)
-            ->setCreator($this->getUser());
-
-        /* Update anything that might have changed
-         */
-        $evidence = $requestTranslator($requestBody, $evidence)
-            ->setBody($tokenReplacer->replace($baseModel->getBody(), $evidence->getRecipient()))
-            ->setTags($baseModel->getTags())
-            ->setCurriculumNodes($baseModel->getCurriculumNodes());
+        $evidence          = $requestTranslator($requestBody, $evidence)
+            ->setBody($tokenReplacer->replace($evidence->getBody(), $evidence->getRecipient()));
 
         /* If a discussion thread never existed, spawn one
          */
@@ -208,13 +241,19 @@ class Controller extends Base
          * Save it to $evidence's discussion thread somehow
          */
         $comment = $this->commentMapper->createModel()
-            ->setContent($requestBody['rejectionReason'])
+            ->setContent($requestBody['rejectionReason'] ?? '')
             ->setAuthor($this->getUser())
             ->setThread($discussionThread);
 
         $this->commentMapper->save($comment);
 
-        return $evidence;
+        $responseTranslator = new Translator\ModelToArray\Base(
+            new User\Translator\Author\ModelToArray(),
+            new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
+            new ScrubAdapter(),
+        );
+
+        return $responseTranslator($evidence);
     }
 
 

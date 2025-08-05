@@ -244,7 +244,7 @@ class Module extends BaseModule
         );
 
         /* Put an evidence into the Published state as-is;
-         * Used from the Activity Feed
+         * Used from the Activity Feed by both students and staffs
          */
         $this->register(
             self::METHOD_PUT,
@@ -252,15 +252,6 @@ class Module extends BaseModule
             'putPublish',
             $modifyEvidenceRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
-        );
-
-        /* Bulk Publish (typically from Cohort Overview)
-         */
-        $this->register(
-            self::METHOD_PUT,
-            '/bulk/publish',
-            'putBulkPublish',
-            $modifyCohortReportRule,
         );
 
         // Evidence modify form
