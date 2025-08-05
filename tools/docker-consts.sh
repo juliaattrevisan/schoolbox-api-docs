@@ -10,7 +10,7 @@ readonly L_ERROR=400;
 
 # Currently this cache is shared between Docker and Vagrant:
 # keep using the Vagrant cache dir for now
-readonly cachedir="$SITE_ROOT"/vagrantcache;
+readonly CACHE_DIR="$SITE_ROOT"/vagrantcache;
 
 function log(){
   $LOG $L_INFO "$1"

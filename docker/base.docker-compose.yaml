@@ -1,7 +1,22 @@
 # Base docker-compose.yaml for local running of a containerised Schoolbox
 # environment.
+#
+# This definition isn't itself enough to run the Schoolbox environment:
+# it must be combined with a docker-compose which defines:
+# * schoolbox-frankenphp
+# * schoolbox-taskd
 
 services:
+  # Base image: only needs to be built, not started
+  # By default, build with ENV=dev
+  php82-bookworm:
+    image: php82-bookworm
+    build:
+      context: ./base-images/php82-bookworm
+      args:
+        ENV: ${ENV:-dev}
+    restart: no
+
   # Frontend web server, mimicking a load balancer and SSL termination endpoint.
   # In the dev environment, forwards requests to one of these containers:
   # * schoolbox-frankenphp-1
@@ -123,7 +138,7 @@ services:
         condition: service_started
     build:
       context: ./schoolbox-digestd
-    env_file: ./default.env
+    env_file: ./schoolbox/default-instance.env
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
@@ -144,7 +159,7 @@ services:
         condition: service_started
     build:
       context: ./schoolbox-scheduled
-    env_file: ./default.env
+    env_file: ./schoolbox/default-instance.env
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
@@ -165,7 +180,7 @@ services:
         condition: service_started
     build:
       context: ./schoolbox-mobiled
-    env_file: ./default.env
+    env_file: ./schoolbox/default-instance.env
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
@@ -186,7 +201,7 @@ services:
         condition: service_started
     build:
       context: ./schoolbox-socketd
-    env_file: ./default.env
+    env_file: ./schoolbox/default-instance.env
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
@@ -199,8 +214,9 @@ services:
         condition: service_healthy
     build:
       context: ./schoolbox-taskd
-    environment:
-      REDIS_HOST: redis-storage
+    env_file:
+      - path: ./schoolbox-taskd/default.env
+        required: true
 
   schoolbox-gotenberg:
     container_name: schoolbox-gotenberg

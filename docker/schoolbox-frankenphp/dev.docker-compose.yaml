@@ -1,21 +1,8 @@
-# docker-compose.yaml for local development.
-# Its FrankenPHP container mounts Schoolbox's code folder as a local mount,
+# This FrankenPHP container mounts Schoolbox's code folder as a local mount,
 # so that changes made locally are made available immediately.
-
-include:
-  - base.docker-compose.yaml
+# This container is intended for local development.
 
 services:
-  # Base image: only needs to be built, not started
-  php82-bookworm:
-    image: php82-bookworm
-    build:
-      context: ./base-images/php82-bookworm
-      args:
-        ENV: dev
-    restart: no
-
-  # Load-balanced FrankenPHP containers
   schoolbox-frankenphp:
     environment:
       DEBUG: "1"

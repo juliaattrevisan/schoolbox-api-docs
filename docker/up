@@ -1,16 +1,46 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 # Always run within root folder
 cd "$(dirname "$0")/.." || exit 1
+
+taskd_compose_file=''
+
+# For now this is hardcoded:
+# eventually, this may allow loading the deployable variant of the FrankenPHP
+# container
+frankenphp_compose_file="docker/schoolbox-frankenphp/dev.docker-compose.yaml"
+
+# Load config to figure out which taskd compose file to use
+declare TASKD_BUILD_FROM_LOCAL
+source ./docker.default.env
+if [ -f ./docker.env ]; then
+    source ./docker.env
+fi
+case "${TASKD_BUILD_FROM_LOCAL}" in
+    1 | true | yes | on)
+        taskd_compose_file="docker/schoolbox-taskd/dev.docker-compose.yaml"
+        ;;
+    *)
+        taskd_compose_file="docker/schoolbox-taskd/deploy.docker-compose.yaml"
+        ;;
+esac
 
 # ensure that the storage folder exists
 mkdir -p ./data/docker/storage
 
 # currently, the `php82-bookworm` image must be built locally before everything
 # else
-docker compose --progress plain build php82-bookworm
+docker compose --progress plain \
+    -f "docker/base.docker-compose.yaml" \
+    -f "${frankenphp_compose_file}" \
+    -f "${taskd_compose_file}" \
+    build php82-bookworm
 
 # start default environment:
 # this has Schoolbox's code folder mounted as a local mount, thus changes made
 # locally are available immediately within the container.
-docker compose --progress plain up -d
+docker compose --progress plain \
+    -f "docker/base.docker-compose.yaml" \
+    -f "${frankenphp_compose_file}" \
+    -f "${taskd_compose_file}" \
+    up -d

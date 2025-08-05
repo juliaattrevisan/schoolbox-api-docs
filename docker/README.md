@@ -6,15 +6,30 @@ within a self-contained development environment.
 
 ## Configuration
 
-The Docker environment is configured with [docker.ini](../docker.ini) in the
+The Docker environment is configured with [docker.env](../docker.env) in the
 root of the Schoolbox folder.
 
 The settings in this file override the defaults in
-[docker.default.ini](../docker.default.ini).
+[docker.default.env](../docker.default.env).
 
 ### Migration from Vagrant
 
-`vagrant.yaml` can be copied to `docker.ini` in Schoolbox's root folder,
+#### Automatic
+
+The script [tools/vagrant-yaml-translate.php](../tools/vagrant-yaml-translate.php)
+can automatically convert `vagrant.yaml` to a format understandable by Docker's
+provision process.
+
+This tool must be run in Vagrant after provision:
+```shell
+vagrant ssh
+cd /usr/share/schoolbox
+tools/vagrant-yaml-translate.php > docker.env
+```
+
+#### Manual
+
+`vagrant.yaml` can be copied to `docker.env` in Schoolbox's root folder,
 however its format will need to be changed from YAML:
 - replace the `:` between key and value with a `=`
 - remove all space between the `=` and the value
@@ -27,6 +42,17 @@ Some fields have also changed name:
 
 Not all Vagrant configuration fields are relevant in Docker: if it's not in
 `docker.default.ini`, it won't be relevant to Docker.
+
+### Task daemon
+
+The task daemon can be configured to run from either an already built image,
+or from an image built from local code, depending on the
+`TASKD_BUILD_FROM_LOCAL` environment variable.
+
+> TODO finalise how to pull already built image: Dockerhub? ECR?
+
+However it's run: the config file [taskd.env](../taskd.env) can be used to
+configure it, as per https://github.com/alaress/taskd/blob/master/CONFIGURATION.md.
 
 ## Scripts
 

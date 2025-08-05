@@ -1,22 +1,9 @@
-# docker-compose.yaml for testing of deployments.
-# Its FrankenPHP container contains Schoolbox's code within its image, thus
+# This FrankenPHP container contains Schoolbox's code within its image, thus
 # changes made to the local file system will not propagate to the FrankenPHP
 # container.
-
-include:
-  - base.docker-compose.yaml
+# This container is intended for testing of deployments.
 
 services:
-  # Base image: only needs to be built, not started
-  php82-bookworm:
-    image: php82-bookworm
-    build:
-      context: ./base-images/php82-bookworm
-      args:
-        ENV: dev
-    restart: no
-
-  # Load-balanced FrankenPHP containers
   schoolbox-frankenphp:
     restart: always
     build:
@@ -28,6 +15,11 @@ services:
     deploy:
       mode: replicated
       replicas: 2
+    healthcheck:
+        test: [ "CMD", "curl", "http://localhost/health" ]
+        interval: 30s
+        timeout: 10s
+        retries: 5
     volumes:
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox

@@ -2,27 +2,27 @@
 # Provisions the Docker environment: port of `vagrant-provision.sh`
 
 declare SITE_ROOT
-declare cachedir
-declare REQUIRED_CONSTS=(SITE_ROOT cachedir)
+declare CACHE_DIR
+declare REQUIRED_CONSTS=(SITE_ROOT CACHE_DIR)
 
-declare aws_account_id
-declare aws_role_name
-declare aws_start_url
-declare data_source
-declare data_filename
-declare external_db
-declare external_db_host
-declare external_db_db
-declare instance_registry_url
-declare default_instance_id
-declare artifact_source
+declare AWS_ACCOUNT_ID
+declare AWS_ROLE_NAME
+declare AWS_START_URL
+declare DATA_SOURCE
+declare DATA_FILENAME
+declare EXTERNAL_DB
+declare EXTERNAL_DB_HOST
+declare EXTERNAL_DB_DB
+declare INSTANCE_REGISTRY_URL
+declare DEFAULT_INSTANCE_ID
+declare ARTIFACT_SOURCE
 declare REQUIRED_CONFIGS=(\
-  aws_account_id aws_role_name aws_start_url \
-  data_source data_filename \
-  external_db external_db_host external_db_db \
-  instance_registry_url \
-  default_instance_id \
-  artifact_source \
+  AWS_ACCOUNT_ID AWS_ROLE_NAME AWS_START_URL \
+  DATA_SOURCE DATA_FILENAME \
+  EXTERNAL_DB EXTERNAL_DB_HOST EXTERNAL_DB_DB \
+  INSTANCE_REGISTRY_URL \
+  DEFAULT_INSTANCE_ID \
+  ARTIFACT_SOURCE \
 )
 
 function verify_args() {
@@ -77,9 +77,9 @@ function load_consts() {
 
 function load_config() {
   # Global vars: load from .ini files
-  source "${SITE_ROOT}/docker.default.ini"
-  if [ -f "${SITE_ROOT}/docker.ini" ]; then
-    source "${SITE_ROOT}/docker.ini"
+  source "${SITE_ROOT}/docker.default.env"
+  if [ -f "${SITE_ROOT}/docker.env" ]; then
+    source "${SITE_ROOT}/docker.env"
   fi
 
   log "Verifying configuration:"
@@ -106,13 +106,13 @@ function setup_aws_sso() {
   mkdir -p ~/.aws
   echo "[default]
   sso_session = docker
-  sso_account_id = ${aws_account_id}
-  sso_role_name = ${aws_role_name}
+  sso_account_id = ${AWS_ACCOUNT_ID}
+  sso_role_name = ${AWS_ROLE_NAME}
   region = ap-southeast-2
 
   [sso-session docker]
   sso_region = ap-southeast-2
-  sso_start_url = ${aws_start_url}" > ~/.aws/config
+  sso_start_url = ${AWS_START_URL}" > ~/.aws/config
   params=()
   params+=(--no-browser)
   aws_version=$(aws --version 2>&1 | cut -d " " -f1 | cut -d "/" -f2)
@@ -126,17 +126,17 @@ function setup_aws_sso() {
 
 function cleanup_cache_dir() {
   log "Cleaning up zero byte files";
-  find "${cachedir}" -type f -empty -delete;
+  find "${CACHE_DIR}" -type f -empty -delete;
 }
 
 function download_secrets() {
   log "Retrieving latest secrets";
   # Download some files from S3: note these still use the Vagrant names
-  if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source"  --file-name "vagrant-secrets.sql" --cache-dir "$cachedir"; then
+  if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$DATA_SOURCE"  --file-name "vagrant-secrets.sql" --cache-dir "$CACHE_DIR"; then
     error "Unable to download s3 file: 'vagrant-secrets.sql': exiting";
     exit 1;
   fi
-  if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source" --file-name "vagrant-cleanup-secrets.sql" --cache-dir "$cachedir"; then
+  if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$DATA_SOURCE" --file-name "vagrant-cleanup-secrets.sql" --cache-dir "$CACHE_DIR"; then
     error "Unable to download s3 file: 'vagrant-cleanup-secrets.sql': exiting";
     exit 1;
   fi
@@ -151,7 +151,7 @@ function set_profile_env_vars() {
   # Set env vars for root + standard user (if one is added)
   local bashrcFiles=(/root/.bashrc)
   declare -A env_vars=(
-    [INSTANCE_ID]="${default_instance_id}"
+    [INSTANCE_ID]="${DEFAULT_INSTANCE_ID}"
     [HOST_TYPE]="docker"
   )
   for config_name in "${!env_vars[@]}"; do
@@ -213,8 +213,8 @@ function download_artifact() {
 
   local cache_file;
   local etag_file;
-  cache_file="${cachedir}/${cache_name}.cache"
-  etag_file="${cachedir}/${cache_name}.etag.cache"
+  cache_file="${CACHE_DIR}/${cache_name}.cache"
+  etag_file="${CACHE_DIR}/${cache_name}.etag.cache"
 
   if [ "$artifact_file" != 'ignore' ]; then
       log "Artifact $artifact_name not up to date: checking for newer version";
@@ -234,7 +234,7 @@ function download_artifact() {
               if [ "$artifact_file" == '' ];
               then
                   local etag;
-                  etag=$(curl -I "${artifact_source}/$branch-${artifact_name}" 2>/dev/null | grep ETag | cut -d'"' -f2);
+                  etag=$(curl -I "${ARTIFACT_SOURCE}/$branch-${artifact_name}" 2>/dev/null | grep ETag | cut -d'"' -f2);
                   if [ $? -eq 0 ];
                   then
                       local check_etag;
@@ -245,7 +245,7 @@ function download_artifact() {
                           local version_artifact_name;
                           version_artifact_name="${branch}-${artifact_name}"
                           log "Downloading latest artifact: ${version_artifact_name}";
-                          wget --no-verbose "${artifact_source}/${version_artifact_name}" -O "${cachedir}/${version_artifact_name}" 2>&1;
+                          wget --no-verbose "${ARTIFACT_SOURCE}/${version_artifact_name}" -O "${CACHE_DIR}/${version_artifact_name}" 2>&1;
                           if [ $? -eq 0 ]; then
                               # This is a new file, so remove old references
                               sed -i "/${version_artifact_name}/d" "$etag_file" 2>/dev/null;
@@ -254,15 +254,15 @@ function download_artifact() {
                               echo "$etag ${version_artifact_name}" >> "$etag_file";
 
                               # Cleanup for purity?
-                              rm -fR "${cachedir}/${extract_dir:?}" 2> /dev/null;
+                              rm -fR "${CACHE_DIR}/${extract_dir:?}" 2> /dev/null;
 
                               # Extract checksum
-                              tar xzf "${cachedir}/${version_artifact_name}" "${checksum_file}";
+                              tar xzf "${CACHE_DIR}/${version_artifact_name}" "${checksum_file}";
                               local version_artifact_checksum
                               version_artifact_checksum=`awk '{print $1}' "${extract_dir}/${checksum_file}"`;
 
                               # Cleanup again
-                              rm -fR "${cachedir}/${extract_dir:?}" 2> /dev/null;
+                              rm -fR "${CACHE_DIR}/${extract_dir:?}" 2> /dev/null;
 
                               # Add new file to vendor cache
                               echo "$version_artifact_checksum ${version_artifact_name}" >> "$cache_file";
@@ -296,11 +296,11 @@ function init_composer_dependencies() {
       log "Vendor artifact up to date: updating autoload and patches";
       composer install -o --no-interaction
   else
-      if [ -f "${cachedir}/${artifact_file}" ]; then
+      if [ -f "${CACHE_DIR}/${artifact_file}" ]; then
           # Extract content
           log "Extracting vendor cache file '${artifact_file}'";
           rm -fR "${vendor_dir}" 2> /dev/null;
-          tar xzf "${cachedir}/${artifact_file}";
+          tar xzf "${CACHE_DIR}/${artifact_file}";
           log "Updating autoload and patches";
           composer install -o --no-interaction
       else
@@ -329,16 +329,16 @@ function init_npm_dependencies() {
   if [ "$artifact_file" = "ignore" ]; then
       log "NPM artifact up to date";
   else
-      if [ -f "${cachedir}/${artifact_file}" ]; then
+      if [ -f "${CACHE_DIR}/${artifact_file}" ]; then
           # Extract content
           log "Found matching NPM cache file: now extracting";
           rm -fR "$SITE_ROOT"/node_modules 2>/dev/null;
           rm -fR "${npm_dir}" 2> /dev/null;
-          tar xzf "${cachedir}/${artifact_file}";
+          tar xzf "${CACHE_DIR}/${artifact_file}";
       else
           # Still no luck, build from scratch
           log "Cache content:";
-          cat "${cachedir}"/npm.cache;
+          cat "${CACHE_DIR}"/npm.cache;
           log "No matching NPM cache found. Building with npm";
           "$SITE_ROOT"/tools/pkg-build-npm.sh 2>&1;
       fi
@@ -356,15 +356,15 @@ function install_instance() {
   # execution (by making calls to site_down.sh/site_up.sh).
   # (The site_down.sh/site_up.sh scripts update the database, so site_down.sh cannot be run until the database has been
   #  created.)
-  if ! INSTANCE_ID="${default_instance_id}" schoolbox-data-refresh \
-  --data-source "$data_source" \
-  --dataset "$data_filename" \
+  if ! INSTANCE_ID="${DEFAULT_INSTANCE_ID}" schoolbox-data-refresh \
+  --data-source "$DATA_SOURCE" \
+  --dataset "$DATA_FILENAME" \
   --skip-bucket-copy \
   --sql-host 'mariadb' \
   --sql-schema 'schoolbox' \
   --sql-user 'schoolboxdocker' \
   --sql-pass 'abc123' \
-  --cache-dir "${cachedir}" \
+  --cache-dir "${CACHE_DIR}" \
   --config amqp_host "'rabbitmq'" \
   --config amqp_user "'guest'" \
   --config amqp_pass "'guest'" \
@@ -374,14 +374,14 @@ function install_instance() {
   --config eotc_enabled "'1'" \
   --config etherpad_host "'http://schoolbox-etherpad:9001'" \
   --config etherpad_api_token "'test'" \
-  --config external_type "'$external_db'" \
-  --config external_db_db "'$external_db_db'" \
-  --config external_db_host "'$external_db_host'" \
+  --config external_type "'$EXTERNAL_DB'" \
+  --config EXTERNAL_DB_DB "'$EXTERNAL_DB_DB'" \
+  --config EXTERNAL_DB_HOST "'$EXTERNAL_DB_HOST'" \
   --config external_db_user "'schoolbox'" \
   --config external_portal "'https://portal.synergetic.dev.schoolbox.cloud'" \
   --config fixtures_enabled "'1'" \
   --config gotenberg_host "'http://schoolbox-gotenberg:3000'" \
-  --config instance_registry_url "'$instance_registry_url'" \
+  --config INSTANCE_REGISTRY_URL "'$INSTANCE_REGISTRY_URL'" \
   --config ldap_enable "'0'" \
   --config mail_enable "'1'" \
   --config mail_smtp_host "'127.0.0.1'" \
@@ -411,15 +411,15 @@ function install_instance() {
 
   log "Applying development environment SQL fixes";
   mariadb -h mariadb -u root -D schoolbox < "${SITE_ROOT}/sql/vagrant.sql"
-  mariadb -h mariadb -u root -D schoolbox < "${cachedir}/vagrant-secrets.sql"
+  mariadb -h mariadb -u root -D schoolbox < "${CACHE_DIR}/vagrant-secrets.sql"
 
   log "Loading all demo data complete";
 }
 
 function post_install() {
   log "Removing system maintenance mode";
-  if INSTANCE_ID="${default_instance_id}" "$SITE_ROOT"/tools/maintenance/site_up.sh -eq 0 ; then
-    log "Maintenance mode disabled on instance '${default_instance_id}'"
+  if INSTANCE_ID="${DEFAULT_INSTANCE_ID}" "$SITE_ROOT"/tools/maintenance/site_up.sh -eq 0 ; then
+    log "Maintenance mode disabled on instance '${DEFAULT_INSTANCE_ID}'"
   else
     warn "Could not disable maintenance mode on instance 'docker': continuing"
   fi

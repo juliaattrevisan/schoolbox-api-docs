@@ -1,0 +1,20 @@
+# This taskd container contains taskd's code within its image, thus changes
+# made to the local file system will not propagate to the FrankenPHP
+# container.
+# This container is intended for:
+# * testing of deployments
+# * development, when the developer does not need to modify taskd's code
+
+services:
+  schoolbox-taskd:
+    container_name: schoolbox-taskd
+    depends_on:
+      redis-storage:
+        condition: service_healthy
+    build:
+      context: ./schoolbox-taskd
+    env_file:
+      - path: ./schoolbox-taskd/default.env
+        required: true
+      - path: ./../taskd.env
+        required: false
