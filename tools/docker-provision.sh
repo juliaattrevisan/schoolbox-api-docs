@@ -91,12 +91,12 @@ function load_config() {
 function setup_aws_sso() {
   # AWS is already configured in ~/.aws/config:
   # just test if credentials in env, ~/.aws/credentials or wherever are current.
-  echo "Testing if logged in to AWS..."
+  log "Testing if logged in to AWS..."
   if ! aws configure list > /dev/null; then
-    echo "Not logged in to AWS: logging in"
+    log "Not logged in to AWS: logging in"
     aws sso login --no-browser --use-device-code
   else
-    echo "Logged in to AWS: continuing"
+    log "Logged in to AWS: continuing"
   fi
 }
 
