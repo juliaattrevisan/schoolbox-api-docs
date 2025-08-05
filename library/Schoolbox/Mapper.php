@@ -346,7 +346,7 @@ abstract class Mapper implements IMapper
         // it doesn't raise an error on Vagrant where INSTANCE_ID comes from
         // an external config, so ignore the "no error to ignore" message here.
         /* @phpstan-ignore-next-line */
-        self::$perfmon = (INSTANCE_ID === 'vagrantx' && self::isWithinWebRequest())
+        self::$perfmon = (in_array(INSTANCE_ID, Instance::DEVELOPMENT_INSTANCE_IDS) && self::isWithinWebRequest())
             ? new DevMonitor(DebugBar::getInstance())
             : new LiveMonitor()
         ;

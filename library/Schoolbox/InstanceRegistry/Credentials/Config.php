@@ -11,6 +11,7 @@ namespace Schoolbox\InstanceRegistry\Credentials;
 
 use Psr\Log\LoggerInterface;
 use Schoolbox\Application\CliKernelAbstract;
+use Schoolbox\Instance;
 
 class Config
 {
@@ -53,7 +54,10 @@ class Config
             /* Note that in CI, INSTANCE_ID will always be 'ci' and trigger phpstannis
              */
             /** @phpstan-ignore-next-line  */
-            if (INSTANCE_ID === 'vagrantx' || in_array($siteType, ['dev', 'vagrant'], true)) {
+            if (
+                in_array(INSTANCE_ID, Instance::DEVELOPMENT_INSTANCE_IDS)
+                || in_array($siteType, ['dev', 'vagrant'], true)
+            ) {
                 $this->logger->debug("No Instance Registry API_KEY and instance is development. That's fine. Exiting.");
                 exit(CliKernelAbstract::EXIT_STATUS_OK);
             }
