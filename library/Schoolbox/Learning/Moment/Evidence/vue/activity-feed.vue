@@ -818,7 +818,7 @@ export default {
                                     <div class="learning-moment-cta small-12 columns">
                                         <ul class="flex-list buttons">
                                             <!-- Student buttons -->
-                                            <template v-if="'student' === config.currentUser.role.type">
+                                            <template v-if="'student' === config.currentUser.role.type || 'parent' === config.currentUser.role.type">
                                                 <!-- student must be the author of the learning moment to have these actions -->
                                                 <template v-if="config.currentUser.id === evidence.object.creator.id">
                                                     <template
