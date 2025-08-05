@@ -481,10 +481,13 @@ abstract class Controller extends ListController implements IAssessmentControlle
     {
         /* Creating a new clone copy
          */
-        $clonedAssessment = $assessment->cloneForCopy()
-                                       ->setTitle('');
+        $assessment = $assessment->setTitle('');
+        $clonedAssessment = $assessment->cloneForCopy();
 
         $data = $this->getAssessmentAsTwigArray($clonedAssessment->getContext(), $clonedAssessment);
+
+        $data['customisedFor'] = $assessment->getId();
+        $data['assessment'] = $assessment;
 
         $breadcrumbs = $this->getBakery()->produceFromAssessment($clonedAssessment, $this->getUser())->add([$clonedAssessment->getTitle()]);
         $data['breadcrumbs'] = $breadcrumbs;
@@ -536,9 +539,27 @@ abstract class Controller extends ListController implements IAssessmentControlle
             }
             $data['attachzoneWorksheet'] = $zone->getTwigContext();
 
-            /** @var DueWork\Model $assessment */
-            $data['rubricGrid'] = (RubricDataSource::getInstance())->retrieveGrid($assessment, true, true);
+            /* Retrieves the grid with assessment id reset to empty so it can be applied to the new assessment
+             * Note: The id in the assessment object will be set to null in the process.
+             */
+            if ($assessment instanceof DueWork\Model) {
+                $data['rubricGrid'] = (RubricDataSource::getInstance())->retrieveGrid($assessment, true, true);
+            }
         }
+
+        $student = explode(',', $this->requestQuery->get('student', ''));
+        $data['participants'] = $assessment->getAllParticipants()
+            ->filter(fn(Participant $participant) => in_array($participant->getUser()->getId(), $student))
+            ->map(function (Participant $participant) {
+                $student = $participant->getUser();
+                return [
+                    'id'         => $student->getId(),
+                    'fullName'   => $participant->getUser()->getFullName(),
+                    'excludedAt' => $participant->getExcludedAt(),
+                    'user'       => $student,
+                    'plan'       => $participant->getPlan(),
+                ];
+            });
 
 
         $this->response = $this->responseFromTemplate("@learningAssessment/create.twig", $data);
