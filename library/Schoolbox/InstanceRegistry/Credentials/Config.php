@@ -28,7 +28,7 @@ class Config
      * Return credentials to hit IR APIs, or exits if not found
      *
      * @param string $siteType
-     * @return array
+     * @return array{string, string} 0: IR URL, 1: IR API key
      */
     public function fetch(string $siteType): array
     {
@@ -37,13 +37,6 @@ class Config
         $irUrl = exec('/usr/local/bin/schoolbox-instance-registry --url 2>/dev/null');
         if (empty($irUrl)) {
             $this->logger->error("IR URL appears invalid: '{$irUrl}'");
-            exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
-        }
-
-        $puppetCert = exec("/usr/local/bin/schoolbox-instance-registry --puppet-cert 2>/dev/null");
-
-        if (empty($puppetCert)) {
-            $this->logger->error("Host puppet cert appears invalid: '{$puppetCert}'");
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
@@ -69,6 +62,6 @@ class Config
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
 
-        return [$irUrl, $irApiKey, $puppetCert];
+        return [$irUrl, $irApiKey];
     }
 }
