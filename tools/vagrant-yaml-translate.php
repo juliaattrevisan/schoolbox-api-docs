@@ -61,7 +61,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App {
         'api_dir'                        => 'API_DIR',
         'aws_account_id'                 => 'AWS_ACCOUNT_ID',
         'aws_role_name'                  => 'AWS_ROLE_NAME',
-        'aws_start_url'                  => 'AWS_ROLE_NAME',
+        'aws_start_url'                  => 'AWS_START_URL',
         'aws_bucket'                     => 'CDN_BUCKET',
         'aws_bucket_prefix'              => 'CDN_BUCKET_PREFIX',
     ];
