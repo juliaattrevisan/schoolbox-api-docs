@@ -8,6 +8,23 @@ function log() {
     echo "$@" >&2
 }
 
+function verify_executables() {
+    log "Verifying Docker installed..."
+    if ! which docker > /dev/null; then
+        log "Docker not installed. Visit either:"
+        log "* https://docs.docker.com/engine/install/ for instructions on installing the Docker CLI tools only"
+        log "* https://www.docker.com/products/docker-desktop/ for instructions on installing the Docker Desktop application"
+        exit 1
+    fi
+
+    log "Verifying AWS CLI installed..."
+    if ! which aws > /dev/null; then
+        log "AWS CLI not installed."
+        log "Visit https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html for instructions on installation."
+        exit 1
+    fi
+}
+
 function create_dirs() {
     # ensure that the AWS folder exists
     mkdir -p .aws
@@ -21,6 +38,7 @@ function create_dirs() {
 }
 
 function main() {
+    verify_executables
     create_dirs
 
     # Which task daemon compose file is used?
