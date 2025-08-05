@@ -448,7 +448,7 @@ class Controller extends Base
             $mappedOptions[] = [
                 'title' => 'Test',
                 'type' => 'table',
-                'key' => 'studentByType',
+                'key' => 'test',
                 '_links' => [
                     'view' => $this->getRouteIfAuthorized(
                         'pastoralReportBuilder.getReportByTabType',
@@ -457,7 +457,7 @@ class Controller extends Base
                             'report' => $report,
                             'tabType' => $key,
                         ]
-                    ),
+                    )."/test",
                     'scope' => $this->getRouteIfAuthorized(
                         'pastoralReportBuilder.getReportByTabTypeScope',
                         [
