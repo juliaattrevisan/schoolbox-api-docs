@@ -15,7 +15,7 @@
 {% else %}
     {{ bread.crumbs(
         [evidence.recipient.fullName, '/search/user/' ~ evidence.recipient.id],
-        ['Learning Moment', routeLookup('@learningMomentEvidence.getEvidenceDetail', {evidenceId: evidence.id})],
+        ['Learning Moment', routeLookupIfAuthorized('@learningMomentEvidence.getEvidenceDetail', {evidenceId: evidence.id})],
         ['Modify']
     ) }}
 
@@ -118,7 +118,7 @@
                 <li><button id="draft">Save for later</button></li>
 
                 {% if isCreate %}
-                    {% set route = routeLookup('learningMomentEvidence.postDraft', {userIds: userIds|join(',')}) %}
+                    {% set route = routeLookupIfAuthorized('learningMomentEvidence.postDraft', {userIds: userIds|join(',')}) %}
                 {% else %}
                     {% set route = routeLookupIfAuthorized('learningMomentEvidence.putDraft', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
                 {% endif %}
@@ -190,7 +190,7 @@
                                     event.preventDefault();
 
                                     {% if evidence.id %}
-                                        {% set route = routeLookup('learningMomentModeration.putPublish', {evidenceId: evidence.id}) %}
+                                        {% set route = routeLookupIfAuthorized('learningMomentModeration.putPublish', {evidenceId: evidence.id}) %}
                                     {% else %}
                                         {# Share a Learning Moment from the Class List #}
                                         {% set route = routeLookupIfAuthorized('learningMomentEvidence.postPublish', {userIds: userIds|join(',')}) %}
@@ -270,7 +270,7 @@
  #    - evidence is in one of draft, submitted, rejected states
  #}
 {% if USER.role.isStaff and USER.role.accessEvidence and evidence.id and (evidence.isDraft or evidence.isSubmitted or evidence.isRejected) %}
-    {% set rejectAction = routeLookup('learningMomentModeration.putReject', {evidenceId: evidence.id}) %}
+    {% set rejectAction = routeLookupIfAuthorized('learningMomentModeration.putReject', {evidenceId: evidence.id}) %}
 
     <div id="rejectModal" class="reveal-modal" data-reveal aria-labelledby="rejectModalTitle" aria-hidden="true" role="dialog">
         <h2 id="rejectModalTitle">Request update</h2>
