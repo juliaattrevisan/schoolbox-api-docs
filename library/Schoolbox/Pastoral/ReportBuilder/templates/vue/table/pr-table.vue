@@ -177,6 +177,7 @@ function onTotalCellSelect(header: TableHeader): void {
     selectedHeader.value = header;
     scopeUrlParams.set("column", selectedHeader.value.key);
     scopeUrlParams.delete("row");
+    scopeUrlParams.delete("cursor");
     scopeUrl.value = `${props.selectedTab._links.scope}?${scopeUrlParams.toString()}`;
     isCellExpanded.value = true; // Open the modal to show related records
 }
@@ -190,6 +191,7 @@ function onRowCellSelect(header: TableHeader, rowId: number): void {
     selectedHeader.value = header;
     scopeUrlParams.set("column", selectedHeader.value.key);
     scopeUrlParams.set("row", rowId.toString());
+    scopeUrlParams.delete("cursor");
     scopeUrl.value = `${props.selectedTab._links.scope}?${scopeUrlParams.toString()}`;
     isCellExpanded.value = true; // Open the modal to show related records
 }
