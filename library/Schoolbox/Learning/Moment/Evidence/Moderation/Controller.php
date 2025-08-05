@@ -69,9 +69,9 @@ class Controller extends Base
         /* Update anything that might have changed
          */
         $evidence = $requestTranslator($requestBody, $evidence)
-            ->setBody($tokenReplacer->replace($baseModel->getBody(), $evidence->getRecipient()))
-            ->setTags($baseModel->getTags())
-            ->setCurriculumNodes($baseModel->getCurriculumNodes());
+            ->setBody($tokenReplacer->replace($baseModel->getBody() ?? $evidence->getBody(), $evidence->getRecipient()))
+            ->setTags($baseModel->getTags() ?? $evidence->getTags())
+            ->setCurriculumNodes($baseModel->getCurriculumNodes() ?? $evidence->getCurriculumNodes());
 
         /* Secret-squirrel access to PUT payload...
          */
