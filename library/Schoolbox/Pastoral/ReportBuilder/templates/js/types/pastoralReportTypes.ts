@@ -58,6 +58,8 @@ export type Routes = {
 export enum TableHeaderType {
     USER = "User",
     RECORDS_AND_POINTS = "RecordsAndPoints",
+    TREND = "Trend",
+    TITLE_AND_SUB_TITLE = "TitleAndSubTitle",
 }
 
 /**
