@@ -128,7 +128,7 @@ abstract class PopulatorTool extends App
 
         /* This endpoint is listed here: https://manage.schoolbox.cloud/api/documentation
          */
-        $endpoint = $this->generateEndpoint($irUrl, $puppetCert, $environment);
+        $endpoint = $this->generateEndpoint($irUrl, $environment);
 
         /* Get the credentials from this special endpoint
          */
@@ -164,14 +164,13 @@ abstract class PopulatorTool extends App
 
 
     /**
-     * Configure the url we use to botain credentials
+     * Configure the url we use to obtain credentials
      *
      * @param string $irUrl
-     * @param string $puppetCert
      * @param string $environment
      * @return string
      */
-    abstract protected function generateEndpoint(string $irUrl, string $puppetCert, string $environment): string;
+    abstract protected function generateEndpoint(string $irUrl, string $environment): string;
 
 
     /**
