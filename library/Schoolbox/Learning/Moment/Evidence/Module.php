@@ -149,7 +149,7 @@ class Module extends BaseModule
         // * Parents may view their own and their kid's
         $this->register(
             self::METHOD_GET,
-            '/user/{userId}',
+            '/user/{userId:\d+}',
             'getMomentsForUser',
             new Rule\All(
                 new Rule\IsLoggedIn(),
@@ -173,7 +173,7 @@ class Module extends BaseModule
          */
         $this->register(
             self::METHOD_GET,
-            '/{evidenceId}',
+            '/{evidenceId:\d+}',
             'getEvidenceDetail',
             $viewEvidenceDetailRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
@@ -182,7 +182,7 @@ class Module extends BaseModule
         // Evidence modify form
         $this->register(
             self::METHOD_GET,
-            '/{evidenceId}/modify',
+            '/{evidenceId:\d+}/modify',
             'getModifyForm',
             $modifyEvidenceRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
@@ -216,7 +216,7 @@ class Module extends BaseModule
          */
         $this->register(
             self::METHOD_PUT,
-            '/{evidenceId}/draft',
+            '/{evidenceId:\d+}/draft',
             'putDraft',
             $modifyEvidenceRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
@@ -237,7 +237,7 @@ class Module extends BaseModule
          */
         $this->register(
             self::METHOD_PUT,
-            '/{evidenceId}/submit',
+            '/{evidenceId:\d+}/submit',
             'putSubmit',
             $modifyEvidenceRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
@@ -257,7 +257,7 @@ class Module extends BaseModule
          */
         $this->register(
             self::METHOD_PUT,
-            '/{evidenceId}/publish',
+            '/{evidenceId:\d+}/publish',
             'putPublish',
             $modifyEvidenceRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
@@ -266,7 +266,7 @@ class Module extends BaseModule
         // Evidence modify form
         $this->register(
             self::METHOD_PUT,
-            '/{evidenceId}',
+            '/{evidenceId:\d+}',
             'putEvidence',
             $modifyEvidenceRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
@@ -276,7 +276,7 @@ class Module extends BaseModule
          */
         $this->register(
             self::METHOD_DELETE,
-            '/{evidenceId}',
+            '/{evidenceId:\d+}',
             'deleteEvidence',
             $deleteEvidenceRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
