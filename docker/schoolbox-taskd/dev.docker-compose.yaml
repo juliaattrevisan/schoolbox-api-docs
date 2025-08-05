@@ -17,3 +17,14 @@ services:
         required: true
       - path: ./../taskd.env
         required: false
+    volumes:
+      - taskd-code:/app
+
+# Also mount taskd's code, so that changes are available without rebuilding
+volumes:
+  taskd-code:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ../../taskd

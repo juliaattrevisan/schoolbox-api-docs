@@ -10,6 +10,7 @@ declare AWS_ROLE_NAME
 declare AWS_START_URL
 declare DATA_SOURCE
 declare DATA_FILENAME
+declare CERTIFICATE_SOURCE
 declare EXTERNAL_DB
 declare EXTERNAL_DB_HOST
 declare EXTERNAL_DB_DB
@@ -19,6 +20,7 @@ declare ARTIFACT_SOURCE
 declare REQUIRED_CONFIGS=(\
   AWS_ACCOUNT_ID AWS_ROLE_NAME AWS_START_URL \
   DATA_SOURCE DATA_FILENAME \
+  CERTIFICATE_SOURCE \
   EXTERNAL_DB EXTERNAL_DB_HOST EXTERNAL_DB_DB \
   INSTANCE_REGISTRY_URL \
   DEFAULT_INSTANCE_ID \
@@ -140,6 +142,21 @@ function download_secrets() {
     error "Unable to download s3 file: 'vagrant-cleanup-secrets.sql': exiting";
     exit 1;
   fi
+}
+
+function download_certs() {
+    log "Retrieving latest wildcard certificate";
+    local filename='tls-wildcard.dev.schoolbox.cloud.tar.gz'
+
+    if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "${CERTIFICATE_SOURCE}" \
+      --file-name "certs/$filename" \
+      --cache-dir "$CACHE_DIR"; then
+      error "Unable to download wildcard certificate: exiting"
+      exit 1
+    fi
+    tar xzfO "$CACHE_DIR/$filename" dev.schoolbox.cloud/fullchain.pem > /etc/nginx/certs/schoolbox-docker-fullchain.crt
+    tar xzfO "$CACHE_DIR/$filename" dev.schoolbox.cloud/privkey.pem > /etc/nginx/certs/schoolbox-docker-private.key
+    tar xzfO "$CACHE_DIR/$filename" dev.schoolbox.cloud/chain.pem > /etc/nginx/certs/schoolbox-docker-intermediate.crt
 }
 
 function mark_safe_for_git() {
@@ -445,6 +462,7 @@ function main() {
 
   cleanup_cache_dir
   download_secrets
+  download_certs
   mark_safe_for_git
   set_profile_env_vars
 

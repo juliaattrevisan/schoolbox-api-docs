@@ -28,6 +28,10 @@ esac
 # ensure that the storage folder exists
 mkdir -p ./data/docker/storage
 
+# ensure the ssl cert folder exists (schoolbox-cli / caddy share):
+# schoolbox-cli must download them so that the Caddy container can use them.
+mkdir -p ./data/docker/ssl
+
 # currently, the `php82-bookworm` image must be built locally before everything
 # else
 docker compose --progress plain \

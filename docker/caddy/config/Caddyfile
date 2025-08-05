@@ -9,7 +9,7 @@ http://*.dev.schoolbox.cloud {
 # Maybe static assets will be served by another container, but that can be
 # figured out later.
 https://*.dev.schoolbox.cloud {
-    tls internal
+    tls /etc/nginx/certs/schoolbox-docker-fullchain.crt /etc/nginx/certs/schoolbox-docker-private.key
     log {
         output stdout
     }
