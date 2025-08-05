@@ -39,7 +39,7 @@ const imageSrc = window.Vue.computed(() => {
         </div>
     </div>
 
-    <div v-else class="ig-feed-response radiolist">
+    <div v-else class="ig-feed-response ig-feed-response-success radiolist">
         <input
             :id="radioId"
             v-model="igStore.selectedFeedEntry"
@@ -77,6 +77,10 @@ const imageSrc = window.Vue.computed(() => {
     img {
         max-width: 200px;
         max-height: 200px;
+    }
+
+    &.ig-feed-response-success img {
+        cursor: zoom-in;
     }
 
     .actions-small-1 {
