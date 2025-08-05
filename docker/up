@@ -8,128 +8,139 @@ function log() {
     echo "$@" >&2
 }
 
-# Which task daemon compose file is used?
-# A different one is used when using a locally built container, vs. using one
-# pulled from the private container registry.
-taskd_compose_file=''
+function create_dirs() {
+    # ensure that the AWS folder exists
+    mkdir -p .aws
 
-# For now this is hardcoded:
-# eventually, this may allow loading the deployable variant of the FrankenPHP
-# container
-frankenphp_compose_file="docker/schoolbox-frankenphp/dev.docker-compose.yaml"
+    # ensure that the storage folder exists
+    mkdir -p ./data/docker/storage
 
-# Load config to figure out which of the following to use:
-# * taskd compose file
-# * private repository
-declare TASKD_BUILD_FROM_LOCAL
-declare PRIVATE_CONTAINER_REGISTRY_TYPE
-declare PRIVATE_CONTAINER_REGISTRY_DOCKERHUB_USERNAME
-declare PRIVATE_CONTAINER_REGISTRY_ECR_ACCOUNT_ID
-declare PRIVATE_CONTAINER_REGISTRY_ECR_REGION
-declare AWS_REGION
-declare AWS_START_URL
-source ./docker.default.env
-if [ -f ./docker.env ]; then
-    source ./docker.env
-fi
-case "${TASKD_BUILD_FROM_LOCAL}" in
-    1 | true | yes | on)
-        taskd_compose_file="docker/schoolbox-taskd/dev.docker-compose.yaml"
-        ;;
-    *)
-        taskd_compose_file="docker/schoolbox-taskd/deploy.docker-compose.yaml"
-        ;;
-esac
+    # ensure the ssl cert folder exists (schoolbox-cli / caddy share):
+    # schoolbox-cli must download them so that the Caddy container can use them.
+    mkdir -p ./data/docker/ssl
+}
 
-# Preconfigure an AWS profile and SSO session, just for this script.
-# it's not possible to pass `aws configure sso` a region or start URL, so that
-# needs to be in the pre-configured AWS config.
-aws_profile='schoolbox-docker'
-mkdir -p .aws
-echo "[default]
-sso_session = ${aws_profile}
-sso_account_id = ${AWS_ACCOUNT_ID}
-sso_role_name = ${AWS_ROLE_NAME}
-region = ${AWS_REGION}
+function main() {
+    create_dirs
 
-[sso-session ${aws_profile}]
-sso_region = ${AWS_REGION}
-sso_start_url = ${AWS_START_URL}" > .aws/config
+    # Which task daemon compose file is used?
+    # A different one is used when using a locally built container, vs. using one
+    # pulled from the private container registry.
+    taskd_compose_file=''
 
-# Then log in to AWS, if not already logged in
-log "Testing if logged in to AWS (region: ${AWS_REGION})..."
-if ! AWS_CONFIG_FILE=.aws/config aws configure list > /dev/null; then
-    log "Not logged in to AWS: logging in"
-    AWS_CONFIG_FILE=.aws/config aws sso login --no-browser --use-device-code
-else
-    log "Logged in to AWS: continuing"
-fi
+    # For now this is hardcoded:
+    # eventually, this may allow loading the deployable variant of the FrankenPHP
+    # container
+    frankenphp_compose_file="docker/schoolbox-frankenphp/dev.docker-compose.yaml"
 
-# Log into whatever repository, as long as not already logged in to that repo
-private_container_registry=''
-test_image='taskd'
-case "${PRIVATE_CONTAINER_REGISTRY_TYPE}" in
-    dockerhub )
-        private_container_registry="docker.io/${PRIVATE_CONTAINER_REGISTRY_DOCKERHUB_USERNAME}"
-        # Test if logged into repo by fetching the test image manifest:
-        # if not, then login
-        log "Testing if logged in to private container registry ${private_container_registry}..."
-        docker manifest inspect "${private_container_registry}/${test_image}" > /dev/null
-        if [ ! $? -eq 0 ]; then
-            log "Not logged in to private container registry: logging in"
-            docker login -u "${PRIVATE_CONTAINER_REGISTRY_DOCKERHUB_USERNAME}"
-        else
-            log "Logged in to private container registry: continuing"
-        fi
-        ;;
-    ecr )
-        private_container_registry="${PRIVATE_CONTAINER_REGISTRY_ECR_ACCOUNT_ID}.dkr.ecr.${PRIVATE_CONTAINER_REGISTRY_ECR_REGION}.amazonaws.com"
-        # As with the Dockerhub variant:
-        # test if logged in by fetching test image manifest, if not then login
-        log "Testing if logged in to private container registry ${private_container_registry}..."
-        docker manifest inspect "${private_container_registry}/${test_image}" > /dev/null
-        if [ ! $? -eq 0 ]; then
-            log "Not logged in to private container registry: logging in"
-            AWS_CONFIG_FILE=.aws/config aws ecr get-login-password --region "${PRIVATE_CONTAINER_REGISTRY_ECR_REGION}" \
-                | docker login -u AWS --password-stdin "${private_container_registry}"
-        else
-            log "Logged in to private container registry: continuing"
-        fi
-        ;;
-    * )
-        log "Invalid PRIVATE_CONTAINER_REGISTRY_TYPE value ${PRIVATE_CONTAINER_REGISTRY_TYPE}: must be dockerhub or ecr" >&2
-        exit 1
-        ;;
-esac
+    # Load config to figure out which of the following to use:
+    # * taskd compose file
+    # * private repository
+    declare TASKD_BUILD_FROM_LOCAL
+    declare PRIVATE_CONTAINER_REGISTRY_TYPE
+    declare PRIVATE_CONTAINER_REGISTRY_DOCKERHUB_USERNAME
+    declare PRIVATE_CONTAINER_REGISTRY_ECR_ACCOUNT_ID
+    declare PRIVATE_CONTAINER_REGISTRY_ECR_REGION
+    declare AWS_REGION
+    declare AWS_START_URL
+    source ./docker.default.env
+    if [ -f ./docker.env ]; then
+        source ./docker.env
+    fi
+    case "${TASKD_BUILD_FROM_LOCAL}" in
+        1 | true | yes | on)
+            taskd_compose_file="docker/schoolbox-taskd/dev.docker-compose.yaml"
+            ;;
+        *)
+            taskd_compose_file="docker/schoolbox-taskd/deploy.docker-compose.yaml"
+            ;;
+    esac
 
-# Put private repository and AWS credentials into an env file for docker compose
-aws_credentials=$(AWS_CONFIG_FILE=.aws/config aws configure export-credentials --format=env-no-export)
-echo "# Do not edit this file: autogenerated by docker/up
-PRIVATE_CONTAINER_REGISTRY=\"${private_container_registry}\"
-${aws_credentials}" > .docker-compose.env
+    # Preconfigure an AWS profile and SSO session, just for this script.
+    # it's not possible to pass `aws configure sso` a region or start URL, so that
+    # needs to be in the pre-configured AWS config.
+    aws_profile='schoolbox-docker'
+    echo "[default]
+    sso_session = ${aws_profile}
+    sso_account_id = ${AWS_ACCOUNT_ID}
+    sso_role_name = ${AWS_ROLE_NAME}
+    region = ${AWS_REGION}
 
-# ensure that the storage folder exists
-mkdir -p ./data/docker/storage
+    [sso-session ${aws_profile}]
+    sso_region = ${AWS_REGION}
+    sso_start_url = ${AWS_START_URL}" > .aws/config
 
-# ensure the ssl cert folder exists (schoolbox-cli / caddy share):
-# schoolbox-cli must download them so that the Caddy container can use them.
-mkdir -p ./data/docker/ssl
+    # Then log in to AWS, if not already logged in
+    log "Testing if logged in to AWS (region: ${AWS_REGION})..."
+    if ! AWS_CONFIG_FILE=.aws/config aws configure list > /dev/null; then
+        log "Not logged in to AWS: logging in"
+        AWS_CONFIG_FILE=.aws/config aws sso login --no-browser --use-device-code
+    else
+        log "Logged in to AWS: continuing"
+    fi
 
-# currently, the `php82-bookworm` image must be built locally before everything
-# else
-docker compose --progress plain \
-    -f "docker/base.docker-compose.yaml" \
-    -f "${frankenphp_compose_file}" \
-    -f "${taskd_compose_file}" \
-    --env-file .docker-compose.env \
-    build php82-bookworm
+    # Log into whatever repository, as long as not already logged in to that repo
+    private_container_registry=''
+    test_image='taskd'
+    case "${PRIVATE_CONTAINER_REGISTRY_TYPE}" in
+        dockerhub )
+            private_container_registry="docker.io/${PRIVATE_CONTAINER_REGISTRY_DOCKERHUB_USERNAME}"
+            # Test if logged into repo by fetching the test image manifest:
+            # if not, then login
+            log "Testing if logged in to private container registry ${private_container_registry}..."
+            docker manifest inspect "${private_container_registry}/${test_image}" > /dev/null
+            if [ ! $? -eq 0 ]; then
+                log "Not logged in to private container registry: logging in"
+                docker login -u "${PRIVATE_CONTAINER_REGISTRY_DOCKERHUB_USERNAME}"
+            else
+                log "Logged in to private container registry: continuing"
+            fi
+            ;;
+        ecr )
+            private_container_registry="${PRIVATE_CONTAINER_REGISTRY_ECR_ACCOUNT_ID}.dkr.ecr.${PRIVATE_CONTAINER_REGISTRY_ECR_REGION}.amazonaws.com"
+            # As with the Dockerhub variant:
+            # test if logged in by fetching test image manifest, if not then login
+            log "Testing if logged in to private container registry ${private_container_registry}..."
+            docker manifest inspect "${private_container_registry}/${test_image}" > /dev/null
+            if [ ! $? -eq 0 ]; then
+                log "Not logged in to private container registry: logging in"
+                AWS_CONFIG_FILE=.aws/config aws ecr get-login-password --region "${PRIVATE_CONTAINER_REGISTRY_ECR_REGION}" \
+                    | docker login -u AWS --password-stdin "${private_container_registry}"
+            else
+                log "Logged in to private container registry: continuing"
+            fi
+            ;;
+        * )
+            log "Invalid PRIVATE_CONTAINER_REGISTRY_TYPE value ${PRIVATE_CONTAINER_REGISTRY_TYPE}: must be dockerhub or ecr" >&2
+            exit 1
+            ;;
+    esac
 
-# start default environment:
-# this has Schoolbox's code folder mounted as a local mount, thus changes made
-# locally are available immediately within the container.
-docker compose --progress plain \
-    -f "docker/base.docker-compose.yaml" \
-    -f "${frankenphp_compose_file}" \
-    -f "${taskd_compose_file}" \
-    --env-file .docker-compose.env \
-    up -d
+    # Put private repository and AWS credentials into an env file for docker compose
+    aws_credentials=$(AWS_CONFIG_FILE=.aws/config aws configure export-credentials --format=env-no-export)
+    echo "# Do not edit this file: autogenerated by docker/up
+    PRIVATE_CONTAINER_REGISTRY=\"${private_container_registry}\"
+    ${aws_credentials}" > .docker-compose.env
+
+
+    # currently, the `php82-bookworm` image must be built locally before everything
+    # else
+    docker compose --progress plain \
+        -f "docker/base.docker-compose.yaml" \
+        -f "${frankenphp_compose_file}" \
+        -f "${taskd_compose_file}" \
+        --env-file .docker-compose.env \
+        build php82-bookworm
+
+    # start default environment:
+    # this has Schoolbox's code folder mounted as a local mount, thus changes made
+    # locally are available immediately within the container.
+    docker compose --progress plain \
+        -f "docker/base.docker-compose.yaml" \
+        -f "${frankenphp_compose_file}" \
+        -f "${taskd_compose_file}" \
+        --env-file .docker-compose.env \
+        up -d
+}
+
+main "$@"
