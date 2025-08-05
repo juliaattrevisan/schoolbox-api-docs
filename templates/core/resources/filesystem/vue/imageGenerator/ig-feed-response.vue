@@ -60,7 +60,7 @@ const imageSrc = window.Vue.computed(() => {
                 <nav>
                     <a :href="imageSrc" class="icon-download" title="Download" download></a>
                 </nav>
-                <img :src="imageSrc" />
+                <img :src="imageSrc" @click="() => igStore.spawnLightbox(props.message.entryKey)" />
             </div>
             <p class="l-mar--0-bottom l-mar-s--top ig-feed-message-content">
                 {{ props.message.message }}

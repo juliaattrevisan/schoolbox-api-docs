@@ -1,4 +1,7 @@
 import { defineStore } from "pinia";
+import type { GalleryItem } from "lightgallery/lg-utils";
+import { IMAGE_LIGHTBOX_CREATE } from "@js/image-lightbox/imageLightboxEvent";
+import type { ImageLightboxCreateEvent } from "@js/image-lightbox/imageLightboxEvent";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
 import type { AiFeedMessage, ImageResponseInProgress } from "../imageGeneratorTypes";
 import { generateImage } from "./imageGeneratorPayload";
@@ -173,6 +176,40 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
         return true;
     }
 
+    /**
+     * Show a lightbox with all the images in the feed
+     * @param entryKey - The entry key that should be selected initially
+     */
+    function spawnLightbox(entryKey: AiFeedMessage["entryKey"]): void {
+        const slides = feed.value
+            .map((item) => {
+                // only show final images
+                if (item.type !== "response" || item.status !== "success" || item.image === null) {
+                    return null;
+                }
+
+                return {
+                    key: item.entryKey,
+                    src: `data:${item.image.mime};base64,${item.image.b64}`,
+                };
+            })
+            .filter((item) => item !== null);
+
+        document.dispatchEvent(
+            new CustomEvent<ImageLightboxCreateEvent["detail"]>(IMAGE_LIGHTBOX_CREATE, {
+                detail: {
+                    targetKey: `ig-feed-lightbox`,
+                    options: {
+                        dynamic: true,
+                        dynamicEl: slides.map((item): GalleryItem => ({ src: item.src })),
+                        index: slides.findIndex((slide) => slide.key === entryKey),
+                    },
+                    onCreated: (gallery) => gallery.openGallery(),
+                },
+            }),
+        );
+    }
+
     return {
         init,
         feed,
@@ -182,5 +219,6 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
         selectedFeedEntry,
         uploadLoading,
         uploadError,
+        spawnLightbox,
     };
 });
