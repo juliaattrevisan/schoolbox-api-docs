@@ -107,6 +107,64 @@ class Controller extends Base
      */
     public function putReject(Model $evidence): void
     {
+        $evidence = $this->reject($evidence);
+
+        /* Redirect back to a place
+         */
+        $encodedReturnUrl = $this->requestPost->get(Redirect::RETURN_URL);
+
+        if (!empty($encodedReturnUrl)) {
+            $returnUrl = Redirect::decode($encodedReturnUrl);
+        } else {
+            $returnUrl = $this->routeGenerator->generate('searchUser.getProfile', ['userId' => $evidence->getRecipient()->getId()]);
+        }
+
+        /* TODO Post a notification
+         */
+
+        $this->response = $this->redirectAfterPost($returnUrl);
+    }
+
+
+    /**
+     * Bulk reject a set of $moments
+     *
+     * @return void
+     * @throws Exception
+     * @throws MapperException
+     */
+    public function putBulkReject(): void
+    {
+        $stack = [];
+
+        /* Find all the learning moments to bulk modify
+         */
+        $requestBody = $this->request->getParsedBody();
+
+        $moments = $this->mapper->findByColumn('id', $requestBody['momentIds']);
+
+        /* Process each moment into the next state individually, collecting a $stack
+         * of translated moments in their new state
+         */
+        foreach ($moments as $moment) {
+            $stack[$moment->getId()] = $this->reject($moment);
+        }
+
+        $this->response = $this->responseAsJson($stack);
+    }
+
+
+    /**
+     * Put an $evidence into Rejected state and spawn any rejection reasons as comments in a
+     * discussion thread related to $evidence, creating one if it doesn't already exist.
+     *
+     * @param Model $evidence
+     * @return Model
+     * @throws Exception
+     * @throws MapperException
+     */
+    private function reject(Model $evidence): Model
+    {
         $requestBody       = $this->request->getParsedBody();
         $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
         $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
@@ -156,20 +214,7 @@ class Controller extends Base
 
         $this->commentMapper->save($comment);
 
-        /* Redirect back to a place
-         */
-        $encodedReturnUrl = $this->requestPost->get(Redirect::RETURN_URL);
-
-        if (!empty($encodedReturnUrl)) {
-            $returnUrl = Redirect::decode($encodedReturnUrl);
-        } else {
-            $returnUrl = $this->routeGenerator->generate('searchUser.getProfile', ['userId' => $evidence->getRecipient()->getId()]);
-        }
-
-        /* TODO Post a notification
-         */
-
-        $this->response = $this->redirectAfterPost($returnUrl);
+        return $evidence;
     }
 
 

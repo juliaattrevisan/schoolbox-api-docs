@@ -56,10 +56,19 @@ class Module extends BaseModule
          */
         $this->register(
             self::METHOD_PUT,
-            '/{evidenceId}/reject',
+            '/{evidenceId:\d+}/reject',
             'putReject',
             $staffOnlyRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
+        );
+
+        /* Bulk reject a set of learning moments
+         */
+        $this->register(
+            self::METHOD_PUT,
+            '/bulk/reject',
+            'putBulkReject',
+            $staffOnlyRule,
         );
     }
 
