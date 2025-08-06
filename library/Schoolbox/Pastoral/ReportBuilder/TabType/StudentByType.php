@@ -204,13 +204,15 @@ class StudentByType extends Cursor implements TabTypeInterface
 
         $orderBy = $this->getOrderBy();
 
+        $minCount = self::MIN_SORT_BY_VALUE;
+
         if (isset($cursor)) {
             $sortingOperator = $this->order == Cursor::ORDER_DIRECTION_DEFAULT ? ' > ' : ' < ';
             if (key_exists('count', $cursor) && ($this->getTypeSubtypeKey()->contains($this->sortBy) | strcasecmp('total', $this->sortBy) === 0)) {
                 $whereParts = "
                 WHERE (
-                          (withTotal.student_id {$sortingOperator} :studentId AND {$this->sortBy} = :countDiscriminator) OR
-                          ({$this->sortBy} {$sortingOperator} :countDiscriminator)
+                          (withTotal.student_id {$sortingOperator} :studentId AND COALESCE({$this->sortBy}, {$minCount}) = COALESCE(:countDiscriminator, {$minCount})) OR
+                          (COALESCE({$this->sortBy}, {$minCount}) {$sortingOperator} COALESCE(:countDiscriminator, {$minCount}))
                       )
                 ";
                 $params['countDiscriminator'] = $cursor['count'];
