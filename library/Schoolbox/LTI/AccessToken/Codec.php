@@ -104,7 +104,7 @@ class Codec implements ICodec
         // Now create a token
         $token = new AccessToken();
         $token->setIdentifier($decoded[self::FIELD_IDENTIFIER]);
-        $token->setUserIdentifier($decoded[self::FIELD_USER_IDENTIFIER]);
+        $token->setUserIdentifier($decoded[self::FIELD_USER_IDENTIFIER] ?? '');
         // Need to fetch client from repository
         $token->setClient($this->clientRepository->getClientEntity($decoded[self::FIELD_CLIENT_ID]));
         foreach ($decoded[self::FIELD_SCOPES] as $scope) {
