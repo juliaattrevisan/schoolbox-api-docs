@@ -853,12 +853,29 @@ class Controller extends Base
                     continue;
                 }
 
+                /* Accumulate a list of associated files for this learning moment
+                 * At the moment there's gonna be just one but SA-20433 causes this to be multiple
+                 */
+                $files = [];
+
+                if (null !== $moment->getStorage()) {
+                    $files = [
+                        [
+                            'hash' => $moment->getStorage()?->getHash(),
+                            'filename' => $moment->getStorage()?->getFilename(),
+                            'mime' => $moment->getStorage()?->getMime(),
+                            'icon' => $moment->getStorage()?->getMimetype()->getIconFile(),
+                        ],
+                    ];
+                }
+
                 /* This is a stack because empty payloads result in a datatype difference in frontend world:
                  * empty payloads emerge as [], but non-empty payloads emerge as {}
                  */
                 $payload[] = [
                     'id' => $moment->getId(),
                     'body' => $moment->getBody(),
+                    'files' => $files,
                     'recipient' => [
                         'id' => $moment->getRecipient()->getId(),
                         'externalId' => $moment->getRecipient()->getExternalId(),
@@ -941,7 +958,7 @@ class Controller extends Base
                 ];
             }
         }
-
+        new \Alaress_Probe($moment, $payload);die();
         $this->response = $this->responseAsJson([
             'status'  => 200,
             'content' => $payload,
