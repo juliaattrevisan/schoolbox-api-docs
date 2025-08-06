@@ -958,7 +958,7 @@ class Controller extends Base
                 ];
             }
         }
-        new \Alaress_Probe($moment, $payload);die();
+
         $this->response = $this->responseAsJson([
             'status'  => 200,
             'content' => $payload,
