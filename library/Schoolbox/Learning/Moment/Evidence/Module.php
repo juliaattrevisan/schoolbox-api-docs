@@ -83,25 +83,53 @@ class Module extends BaseModule
             )
         );
 
-        /* Superusers, Staff can modify or delete an Evidence instance
+        /* Learning Moment Modification
+         *
+         * The modify and delete abilities are accessible to:
+         *     - Superusers
+         *     - Staff w/ Learning Moments role permission
+         *     - Parents of userId
+         *         - when evidence_parent_create is truthy
+         *         - and they are the author of the learning moment
+         *     - Students when they are the author of the learning moment
          *
          * Students and parents can only modify/delete moments that they themselves created
-         * (they can't modify/delete moments spawned by staffs)
+         * (they can't modify/delete moments spawned by staffs etc)
          */
+        $modifyRule = new Rule\All(
+            new Rule\IsConfigOn('evidence_parent_create', $this->getConfig()),
+            new Rule\IsParentOfUser(
+                $this->getExternalUser(),
+                UserMapper::getInstance(),
+                'userId'
+            ),
+            new Rule\IsUser('creatorId')
+        );
+
         $modifyEvidenceRule = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
-                new Rule\IsUser('creatorId'),
+                /* Students when they are the author of the learning moment
+                 */
+                new Rule\All(
+                    new Rule\HasRole(Role::STUDENT),
+                    new Rule\IsUser('creatorId')
+                ),
+                $modifyRule
             )
         );
 
+        /* Learning Moment Deletion
+         *
+         * Ability to delete is synonymous with the ability to modify
+         */
         $deleteEvidenceRule = $modifyEvidenceRule;
 
         /* Superusers, Staff with Learning Moment role permission can view/modify cohort report
          */
-        $viewCohortReportRule = $modifyCohortReportRule = new Rule\All(
+        $viewCohortReportRule = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),

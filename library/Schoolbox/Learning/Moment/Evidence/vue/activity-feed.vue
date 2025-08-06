@@ -59,6 +59,11 @@ export default {
             type: Boolean,
             required: true,
         },
+        evidenceParentCreate: {
+            // whether parents can create learning moments
+            type: Boolean,
+            required: true,
+        }
     },
     data() {
         return {
@@ -818,13 +823,8 @@ export default {
                                     <div class="learning-moment-cta small-12 columns">
                                         <ul class="flex-list buttons">
                                             <!-- Student buttons -->
-                                            <template
-                                                v-if="
-                                                    'student' === config.currentUser.role.type ||
-                                                    'parent' === config.currentUser.role.type
-                                                "
-                                            >
-                                                <!-- student must be the author of the learning moment to have these actions -->
+                                            <template v-if="'student' === config.currentUser.role.type">
+                                                <!-- current user must be the author of the learning moment to have these actions -->
                                                 <template v-if="config.currentUser.id === evidence.object.creator.id">
                                                     <template
                                                         v-if="
@@ -873,6 +873,46 @@ export default {
                                                 </template>
                                             </template>
 
+                                            <!-- Parent buttons -->
+                                            <template v-else-if="'parent' === config.currentUser.role.type && evidenceParentCreate">
+                                                <template
+                                                    v-if="
+                                                        'draft' === evidence.object.currentState ||
+                                                        'submitted' === evidence.object.currentState ||
+                                                        'rejected' === evidence.object.currentState
+                                                    "
+                                                >
+                                                    <!-- Modify button available when a learning moment is: draft/submitted/rejected -->
+                                                    <li>
+                                                        <a
+                                                            class="button"
+                                                            :href="
+                                                                evidence.object._links.modifyForm +
+                                                                '?returnUrl=' +
+                                                                returnUrl
+                                                            "
+                                                            >Modify</a
+                                                        >
+                                                    </li>
+                                                </template>
+
+                                                <template
+                                                    v-if="
+                                                        'draft' === evidence.object.currentState
+                                                    "
+                                                >
+                                                    <!-- Publish button available when a learning moment is: draft/submitted/rejected -->
+                                                    <li>
+                                                        <button
+                                                            class="submit"
+                                                            @click="publishEvidence(evidence.object)"
+                                                        >
+                                                            Publish
+                                                        </button>
+                                                    </li>
+                                                </template>
+                                            </template>
+
                                             <!-- Staff buttons -->
                                             <template v-else-if="'staff' === config.currentUser.role.type">
                                                 <template
@@ -911,24 +951,6 @@ export default {
                                                         >
                                                             Publish
                                                         </button>
-                                                    </li>
-                                                </template>
-                                            </template>
-
-                                            <!-- Parent buttons -->
-                                            <template v-else-if="'parent' === config.currentUser.role.type">
-                                                <template v-if="'draft' === evidence.object.currentState">
-                                                    <!-- Modify button available when a learning moment is: draft -->
-                                                    <li>
-                                                        <a
-                                                            class="button"
-                                                            :href="
-                                                                evidence.object._links.modifyForm +
-                                                                '?returnUrl=' +
-                                                                returnUrl
-                                                            "
-                                                            >Modify</a
-                                                        >
                                                     </li>
                                                 </template>
                                             </template>
