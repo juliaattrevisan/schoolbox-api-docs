@@ -1,5 +1,5 @@
 var scriptValidationRules = $("script[src*=validationRules]");
-
+const validateTitleRoute = scriptValidationRules.attr("data-title-validation");
 /**
  * Validation rules that can be applied to the form on load
  */
@@ -13,7 +13,18 @@ var validateOptions = {
                 },
             },
         },
-        title: { required: true },
+        title: validateTitleRoute ? {
+            required: true,
+            remote: {
+                url: validateTitleRoute,
+                type: "post",
+                data: {
+                    title: () => document.getElementById('title').value
+                }
+            }
+        } : {
+            required: true,
+        },
         weight: {
             required: true,
             number: true,
@@ -73,6 +84,9 @@ var validateOptions = {
         }
     },
     messages: {
+        title: {
+            remote: "The activity can not have the same title as the original activity."
+        },
         weight: "The " + scriptValidationRules.attr("data-locale-grading-proper") + " weight should be zero or greater",
         useRubric: {
             require_from_group: "You must have at least one selected indicator if using a rubric",

@@ -488,6 +488,13 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $data['customisedFor'] = $assessment->getId();
         $data['assessment'] = $assessment;
+        $data['validateTitleRoute'] = $this->getRouteIfAuthorized(
+            'learningAssessment.postValidateTitle',
+            [
+                'assessment' => $assessment,
+                'assessmentId' => $assessment->getId(),
+            ]
+        );
 
         $breadcrumbs = $this->getBakery()->produceFromAssessment($clonedAssessment, $this->getUser())->add([$clonedAssessment->getTitle()]);
         $data['breadcrumbs'] = $breadcrumbs;
@@ -545,7 +552,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
              * Note: The id in the assessment object will be set to null in the process.
              */
             if ($assessment instanceof DueWork\Model) {
-                $data['rubricGrid'] = (RubricDataSource::getInstance())->retrieveGrid($assessment, true, true);
+                $originalAssessment = clone $assessment;
+                $data['rubricGrid'] = (RubricDataSource::getInstance())->retrieveGrid($originalAssessment, true, true);
             }
         }
 
