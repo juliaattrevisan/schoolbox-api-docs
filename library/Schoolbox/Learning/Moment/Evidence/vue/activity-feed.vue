@@ -63,7 +63,7 @@ export default {
             // whether parents can create learning moments
             type: Boolean,
             required: true,
-        }
+        },
     },
     data() {
         return {
@@ -874,7 +874,11 @@ export default {
                                             </template>
 
                                             <!-- Parent buttons -->
-                                            <template v-else-if="'parent' === config.currentUser.role.type && evidenceParentCreate">
+                                            <template
+                                                v-else-if="
+                                                    'parent' === config.currentUser.role.type && evidenceParentCreate
+                                                "
+                                            >
                                                 <template
                                                     v-if="
                                                         'draft' === evidence.object.currentState ||
@@ -896,11 +900,7 @@ export default {
                                                     </li>
                                                 </template>
 
-                                                <template
-                                                    v-if="
-                                                        'draft' === evidence.object.currentState
-                                                    "
-                                                >
+                                                <template v-if="'draft' === evidence.object.currentState">
                                                     <!-- Publish button available when a learning moment is: draft/submitted/rejected -->
                                                     <li>
                                                         <button
