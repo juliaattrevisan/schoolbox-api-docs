@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# Deprecation notice
+# This wasn't picked up in SA-19334, but I believe it's deprecated:
+# this script references instance ID `vagrantx` directly, which won't work in
+# Docker, and `tools/save-data/save-data.php` should supersede it.
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m"
+echo -e "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+
 # Global const
 readonly CACHE_DIR='/usr/share/schoolbox/vagrantcache';
 readonly BUCKET='schoolbox-data';
@@ -245,3 +255,10 @@ main(){
 }
 
 main "$@"
+
+# Deprecation notice
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m"
+echo -e "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
