@@ -11,7 +11,6 @@ namespace Schoolbox\Learning\Moment\Evidence;
 
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
-use DebugBar\DebugBarException;
 use Schoolbox\API\Translator\ModelToArray\Composite;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
@@ -43,21 +42,19 @@ class Controller extends Base
 
 
     /**
-     * Helper for editor templates.
-     */
-    private EditorTemplateHelper $editorTemplateHelper;
-
-
-    /**
      * Constructor
      *
-     * @param Mapper         $mapper
+     * @param Mapper $mapper
      * @param Comment\Mapper $commentMapper
      * @param EditorTemplateHelper    $editorTemplateHelper
+     * @param \Schoolbox\UserMapper $userMapper
      */
-    public function __construct(private Mapper $mapper, private Comment\Mapper $commentMapper, EditorTemplateHelper $editorTemplateHelper)
-    {
-        $this->editorTemplateHelper = $editorTemplateHelper;
+    public function __construct(
+        private Mapper $mapper,
+        private Comment\Mapper $commentMapper,
+        private EditorTemplateHelper $editorTemplateHelper,
+        private \Schoolbox\UserMapper $userMapper
+    ) {
     }
 
 
@@ -794,7 +791,7 @@ class Controller extends Base
         /* These are the user instances associated with $folder's class list of students
          * We'll use this to interset with learning moments $recipients
          */
-        $users = array_fill_keys(\Schoolbox\UserMapper::getInstance()->findByExternalIds($students, \Schoolbox\Role::STUDENT)->indexBy('id')->keys(), true);
+        $users = array_fill_keys($this->userMapper->findByExternalIds($students, \Schoolbox\Role::STUDENT)->indexBy('id')->keys(), true);
 
         /* TODO combine with guys in a group, not just a class list from the externals, then dedupe
          */
