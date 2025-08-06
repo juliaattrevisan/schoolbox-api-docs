@@ -65,7 +65,8 @@
         reverse_proxy schoolbox-etherpad:9001
     }
 
-    handle_path /debugbar* {
+    handle_path /php-debugbar* {
+        file_server
         root * /usr/share/schoolbox/vendor/php-debugbar/php-debugbar/src/DebugBar/Resources
     }
     handle /static* {
