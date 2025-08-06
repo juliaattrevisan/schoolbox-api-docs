@@ -774,7 +774,7 @@ class Controller extends Base
         $this->getCohortReportPayload(
             $folder,
             (new \Alaress_Date_Format($fromDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT))->startOfDay(),
-            (new \Alaress_Date_Format($toDate, \ALaress_Date_Format::DATABASE_DATE_FORMAT))->endOfDay()
+            (new \Alaress_Date_Format($toDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT))->endOfDay()
         );
     }
 
