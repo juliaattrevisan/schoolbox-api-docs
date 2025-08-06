@@ -23,6 +23,7 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Exception;
+use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\TokenReplacer;
@@ -35,15 +36,9 @@ use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 class Controller extends Base
 {
     /**
-     * @var Mapper
+     * Cohort Report for learning moments looks seven days in the past by default
      */
-    private Mapper $mapper;
-
-
-    /**
-     * @var Comment\Mapper
-     */
-    private Comment\Mapper $commentMapper;
+    private const COHORT_REPORT_PAST_THRESHOLD = -7;
 
 
     /**
@@ -59,10 +54,8 @@ class Controller extends Base
      * @param Comment\Mapper $commentMapper
      * @param EditorTemplateHelper    $editorTemplateHelper
      */
-    public function __construct(Mapper $mapper, Comment\Mapper $commentMapper, EditorTemplateHelper $editorTemplateHelper)
+    public function __construct(private Mapper $mapper, private Comment\Mapper $commentMapper, EditorTemplateHelper $editorTemplateHelper)
     {
-        $this->mapper        = $mapper;
-        $this->commentMapper = $commentMapper;
         $this->editorTemplateHelper = $editorTemplateHelper;
     }
 
@@ -732,5 +725,55 @@ class Controller extends Base
         } elseif (Model::STATUS_REJECTED === $state) {
             $evidence->reject($this->getUser());
         }
+    }
+
+
+    /**
+     * Generates a json payload that tells you about learning moments for any of $folder's students
+     * that were created between the $from and $to dates, grouped by date, sorted reverse-chronologically.
+     *
+     * By default, it'll assume $from and $to to be a 7-day range:
+     *   - start of the day 7 days ago
+     *   - end of today
+     *
+     * @param Folder\Model $folder
+     * @param string|null $fromDate
+     * @param string|null $toDate
+     * @return void
+     */
+    public function getCohortReportPayload(Folder\Model $folder, string $fromDate = null, string $toDate = null): void
+    {
+        /* Assume the seven-day default range in the absence of any specific dates
+         */
+        if (null === $fromDate || null === $toDate) {
+            $from = \Alaress_Date_Format::now()->addDays(self::COHORT_REPORT_PAST_THRESHOLD)->startOfDay();
+            $to = \Alaress_Date_Format::now()->endOfDay();
+        } else {
+            $from = (new \Alaress_Date_Format($fromDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT))->startOfDay();
+            $to = (new \Alaress_Date_Format($toDate, \ALaress_Date_Format::DATABASE_DATE_FORMAT))->endOfDay();
+        }
+
+        $this->
+
+        $payload = [
+            'date' => [
+                'moment 1' => [
+                    'id' => null,
+                    'body' => null,
+                    'recipient' => null,
+                    'createdBy' => null,
+                    'hasComments' => null,
+                    'currentStatus' => null,
+                    'date' => [
+                        'createdAt' => null,
+                        'updatedAt' => null,
+                        'submittedAt' => null,
+                        'publishAt' => null,
+                        'rejectedAt' => null,
+                    ]
+                ]
+            ]
+        ];
+
     }
 }

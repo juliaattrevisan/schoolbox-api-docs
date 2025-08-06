@@ -99,6 +99,15 @@ class Module extends BaseModule
 
         $deleteEvidenceRule = $modifyEvidenceRule;
 
+        /* Superusers, Staff with Learning Moment role permission can view cohort report
+         */
+        $viewCohortReportRule = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
+            )
+        );
 
         // Preloaders:
         // convert userIds (a comma-separated list of users) into a user
@@ -272,6 +281,26 @@ class Module extends BaseModule
 //            $isParentOrUserRule,
 //            Closure::fromCallable([$this, 'preloadUser']),
 //        );
+
+        /* Learning Moment Cohort Report payload with a date range
+         */
+        $this->register(
+            self::METHOD_GET,
+            '/cohort/{folderId}/payload/{from}/{to}',
+            'getCohortReportPayload',
+            $viewCohortReportRule,
+            Closure::fromCallable([$this, 'preloadFolder']),
+        );
+
+        /* Learning Moment Cohort Report screen
+         */
+        $this->register(
+            self::METHOD_GET,
+            '/cohort/{folderId}',
+            'getCohortReport',
+            $viewCohortReportRule,
+            Closure::fromCallable([$this, 'preloadFolder']),
+        );
     }
 
 
@@ -302,6 +331,23 @@ class Module extends BaseModule
 
 
     /**
+     * Preload the requested folder for the cohort report
+     *
+     * @param array $params
+     * @return array
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function preloadFolder(array $params): array
+    {
+        return [
+            'folder' => $this->getMapperFactory()
+                ->get(\Schoolbox\Resource\Folder\Mapper::class)
+                ->findById($params['folderId']),
+        ];
+    }
+
+
+    /**
      * Preload the requested student
      *
      * @param array $params
@@ -312,8 +358,8 @@ class Module extends BaseModule
     {
         return [
             'user' => $this->getMapperFactory()
-                           ->get(UserMapper::class)
-                           ->findById($params['userId']),
+                ->get(UserMapper::class)
+                ->findById($params['userId']),
         ];
     }
 
