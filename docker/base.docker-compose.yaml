@@ -55,6 +55,9 @@ services:
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN}
       AWS_CREDENTIAL_EXPIRATION: ${AWS_CREDENTIAL_EXPIRATION}
+      INSTANCE_ID: ${DEFAULT_INSTANCE_ID}
+      HOST_TYPE: docker
+      XDEBUG_CONFIG: "idekey=PHPSTORM"
     build:
       context: ./schoolbox-cli
     tty: true
