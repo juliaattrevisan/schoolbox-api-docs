@@ -148,29 +148,30 @@ function mark_safe_for_git() {
   git config --global --add safe.directory "${SITE_ROOT}"
 }
 
-function set_profile_env_vars() {
-  # Set env vars for root + standard user (if one is added)
-  local bashrcFiles=(/root/.bashrc)
-  declare -A env_vars=(
-    [INSTANCE_ID]="${DEFAULT_INSTANCE_ID}"
-    [HOST_TYPE]="docker"
-  )
-  for config_name in "${!env_vars[@]}"; do
-    config_value=${env_vars[$config_name]}
-    for bashrcFile in "${bashrcFiles[@]}"; do
-      # Remove the config if it exists, then insert it
-      sed -i -E "/^export\s+$config_name\s*=.+/d" ${bashrcFile}
-      echo "export $config_name=\"$config_value\"" >> ${bashrcFile};
-    done
-
-  #  # Need to preserve these ENV vars for vagrant's sudo session
-  #  if ! grep -qE "^Defaults\s+env_keep\s*\+=\s*\".*$config_name" /etc/sudoers.d/vagrant; then
-  #    chmod a+w /etc/sudoers.d/vagrant;
-  #    echo "Defaults env_keep += \"$config_name\"" >> /etc/sudoers.d/vagrant;
-  #    chmod a-w /etc/sudoers.d/vagrant;
-  #  fi
-  done
-}
+# No longer needed, as all env vars are set globally
+#function set_profile_env_vars() {
+#  # Set env vars for root + standard user (if one is added)
+#  local bashrcFiles=(/root/.bashrc)
+#  declare -A env_vars=(
+#    [INSTANCE_ID]="${DEFAULT_INSTANCE_ID}"
+#    [HOST_TYPE]="docker"
+#  )
+#  for config_name in "${!env_vars[@]}"; do
+#    config_value=${env_vars[$config_name]}
+#    for bashrcFile in "${bashrcFiles[@]}"; do
+#      # Remove the config if it exists, then insert it
+#      sed -i -E "/^export\s+$config_name\s*=.+/d" ${bashrcFile}
+#      echo "export $config_name=\"$config_value\"" >> ${bashrcFile};
+#    done
+#
+#  #  # Need to preserve these ENV vars for vagrant's sudo session
+#  #  if ! grep -qE "^Defaults\s+env_keep\s*\+=\s*\".*$config_name" /etc/sudoers.d/vagrant; then
+#  #    chmod a+w /etc/sudoers.d/vagrant;
+#  #    echo "Defaults env_keep += \"$config_name\"" >> /etc/sudoers.d/vagrant;
+#  #    chmod a-w /etc/sudoers.d/vagrant;
+#  #  fi
+#  done
+#}
 
 function init_database() {
   # Timezone data: should be run in mariadb container on setup
@@ -449,7 +450,7 @@ function main() {
   download_secrets
   download_certs
   mark_safe_for_git
-  set_profile_env_vars
+#  set_profile_env_vars
 
   init_composer_dependencies
   init_npm_dependencies
