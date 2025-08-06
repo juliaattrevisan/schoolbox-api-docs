@@ -853,11 +853,10 @@ class Controller extends Base
                     continue;
                 }
 
-                /* Index by moment identifier for vue representation
+                /* This is a stack because empty payloads result in a datatype difference in frontend world:
+                 * empty payloads emerge as [], but non-empty payloads emerge as {}
                  */
-                $index = $moment->getId();
-
-                $payload[$index] = [
+                $payload[] = [
                     'id' => $moment->getId(),
                     'body' => $moment->getBody(),
                     'recipient' => [
