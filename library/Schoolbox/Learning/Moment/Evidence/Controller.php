@@ -876,7 +876,10 @@ class Controller extends Base
                     ],
                     /* This is always set
                      */
-                    'createdAt' => $moment->getCreatedAt()->getDatabase(),
+                    'createdAt' => [
+                        'timestamp' => $moment->getCreatedAt()->getUnixTimestamp(),
+                        'displayAs' => $moment->getCreatedAt()->getLocalShort()
+                    ],
                     'createdBy' => $moment->getCreator() ? [
                         'id' => $moment->getCreator()->getId(),
                         'externalId' => $moment->getCreator()->getExternalId(),
@@ -890,7 +893,10 @@ class Controller extends Base
                      * Anyway, this is the localised version of config's date_short which you can use
                      * to group moments per day.
                      */
-                    'updatedAt' => $moment->getUpdatedAt()->getLocalShort(),
+                    'updatedAt' => [
+                        'timestamp' => $moment->getUpdatedAt()->getUnixTimestamp(),
+                        'displayAs' => $moment->getUpdatedAt()->getLocalShort()
+                    ],
                     /* Whether this moment had comments or not, which affects a user interaction
                      * where they have an opportunity to delete comments upon approval
                      */

@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment\Evidence;
 
+use Alaress\Database\Predicate\Builder;
 use House;
 use PDOStatement;
 use Schoolbox\Discussion\Thread\Mapper as ThreadMapper;
@@ -29,6 +30,7 @@ use Schoolbox\YearLevel\Model as YearLevel;
  * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
  * @method Model[]|GenericCollection findByColumnList($columnName, $columnValue, $options = [])
  * @method Model[]|GenericCollection createCollection($contents = [])
+ * @method Model[]|GenericCollection findByPredicates(Builder $pb, array $options = [])
  */
 class Mapper extends BaseMapper
 {
