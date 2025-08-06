@@ -862,7 +862,7 @@ class Controller extends Base
                     $files = [
                         [
                             'hash' => $moment->getStorage()->getHash(),
-                            'filename' => $moment->getStorage()->getBasename(),
+                            'filename' => $moment->getStorage()->getFilename(),
                             'mime' => $moment->getStorage()->getMime(),
                             'icon' => $moment->getStorage()->getMimetype()->getIconFile(),
                         ],
