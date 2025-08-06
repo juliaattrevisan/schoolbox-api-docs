@@ -498,10 +498,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
         /* Course Managed Field and associated checkbox in the ui
          */
         $courseManagedFields = new CourseManagedFields($this->getUser(), $assessment);
+        /* Creating the new clone assessment as a new individual assessment in the class, so it is no longer course managed
+         */
         $data['courseManaged'] = [
-            'isVisible' => $courseManagedFields->isVisible(),
-            'isMutable' => $courseManagedFields->isMutable(),
-            'isReadonly' => $courseManagedFields->isReadonly(),
+            'isVisible' => false,
+            'isMutable' => false,
+            'isReadonly' => false,
         ];
 
         /* Curriculum Codes prefilled from those associated with the assessment itself
