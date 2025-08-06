@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Moment\Evidence;
 
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\API\Translator\ModelToArray\Composite;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
@@ -20,6 +21,7 @@ use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Moment\Evidence\Moderation\ModerationRequired;
 use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Exception;
@@ -48,12 +50,14 @@ class Controller extends Base
      * @param Comment\Mapper $commentMapper
      * @param EditorTemplateHelper    $editorTemplateHelper
      * @param \Schoolbox\UserMapper $userMapper
+     * @param \External_Class $externalClass
      */
     public function __construct(
         private Mapper $mapper,
         private Comment\Mapper $commentMapper,
         private EditorTemplateHelper $editorTemplateHelper,
-        private \Schoolbox\UserMapper $userMapper
+        private \Schoolbox\UserMapper $userMapper,
+        private \External_Class $externalClass,
     ) {
     }
 
@@ -774,19 +778,20 @@ class Controller extends Base
      *   - start of the day 7 days ago
      *   - end of today
      *
-     * @param Folder\Model $folder
+     * @param Model $folder
      * @param \Alaress_Date_Format $from
      * @param \Alaress_Date_Format $to
      * @return void
+     * @throws MapperException
+     * @throws NotFound
+     * @throws RouteNotFound
      */
     public function getCohortReportPayload(Folder\Model $folder, \Alaress_Date_Format $from, \Alaress_Date_Format $to): void
     {
-        $externalClass = new \External_Class();
-
         /* Get a list of student ids that are in $folder and use a hash lookup
          * to cross reference everything we find later
          */
-        $students = array_column($externalClass->getStudents($folder->getCodeString()), 'synergy_id');
+        $students = array_column($this->externalClass->getStudents($folder->getCodeString()), 'synergy_id');
 
         /* These are the user instances associated with $folder's class list of students
          * We'll use this to interset with learning moments $recipients
@@ -794,9 +799,6 @@ class Controller extends Base
         $users = array_fill_keys($this->userMapper->findByExternalIds($students, \Schoolbox\Role::STUDENT)->indexBy('id')->keys(), true);
 
         /* TODO combine with guys in a group, not just a class list from the externals, then dedupe
-         */
-
-        /* TODO cleanup w/ dependency injections
          */
 
         /* Find all the learning moments in the specified date range
