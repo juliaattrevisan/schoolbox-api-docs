@@ -64,6 +64,7 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\L10n\RosettaStone;
 use Twig\Error\Error;
 use UnexpectedValueException;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 /**
  * Class Controller
@@ -146,7 +147,8 @@ class Controller extends Assessment\Controller
         protected Filter\Mapper $filterMapper,
         protected Filter\Selection\Mapper $filterSelectionMapper,
         protected CourseImplementationMapper $courseImplementationMapper,
-        protected UnitImplementationMapper $unitImplementationMapper
+        protected UnitImplementationMapper $unitImplementationMapper,
+        private EditorTemplateHelper $editorTemplateHelper,
     ) {
         parent::__construct(
             $userMapper,
@@ -326,7 +328,8 @@ class Controller extends Assessment\Controller
              * finishing the modification of le quiz
              */
             'returnUrl' => Redirect::encode($baseUrl),
-            'returnUrlSuffix' => $returnUrlSuffix
+            'returnUrlSuffix' => $returnUrlSuffix,
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ];
 
         $this->response = $this->responseFromTemplate(
@@ -507,6 +510,7 @@ class Controller extends Assessment\Controller
             'participant' => $participant,
             'returnUrlName' => Redirect::RETURN_URL,
             'returnUrlEncoded' => $this->requestQuery->get(Redirect::RETURN_URL), // The returnUrl URL parameter (to be used again as a URL parameter).  (Already encoded, so encoding/decoding necessary).
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ];
 
         $this->response = $this->responseFromTemplate(

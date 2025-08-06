@@ -821,6 +821,7 @@ class Module extends BaseModule
                     $filterSelectionMapper,
                     $courseImplementationMapper,
                     $unitImplementationMapper,
+                    $editorTemplateHelper,
                 );
 
             case Assessment\Task\Controller::class:
