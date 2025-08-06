@@ -40,7 +40,7 @@ class Cursor implements ICursor
     /**
      * A sane value used for comparison of NULL value in the points when querying db
      */
-    public CONST MIN_SORT_BY_VALUE = -99999999;
+    public const MIN_SORT_BY_VALUE = -99999999;
 
     public function __construct(
         protected Helper $helper,
