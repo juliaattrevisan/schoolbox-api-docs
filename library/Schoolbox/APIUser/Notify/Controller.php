@@ -85,11 +85,9 @@ class Controller extends Base
                 }
             }
 
-            /** @phpstan-ignore-next-line - INSTANCE_ID will be an int if it's wholly numeric */
-            $instanceId = (string)INSTANCE_ID;
-            $composite  = new Composite(
-                new Listed($this->redisStorage, $instanceId, $user->getId()),
-                new Unread($this->redisStorage, $instanceId, $user->getId())
+            $composite = new Composite(
+                new Listed($this->redisStorage, (string)INSTANCE_ID, $user->getId()),
+                new Unread($this->redisStorage, (string)INSTANCE_ID, $user->getId())
             );
             $composite->push($bob->build());
         } catch (\Exception $e) {
