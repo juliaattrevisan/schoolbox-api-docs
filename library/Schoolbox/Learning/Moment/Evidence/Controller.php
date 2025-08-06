@@ -22,6 +22,7 @@ use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
+use Schoolbox\Resource\Exception;
 use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\TokenReplacer;
@@ -123,6 +124,19 @@ class Controller extends Base
 
         if ($this->getUser()->getRole()->isStudent()) {
             $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $this->getUser()->getYear());
+        } elseif (1 === $users->count() && $this->getUser()->getRole()->isParent()) {
+            /* If the current user is a parent, and the list of recipients is exactly one,
+             * then the parent is creating a learning moment for one of their children via their activity feed.
+             * Spawn the Submit For Approval button for parents so their learning moments enter moderation queue.
+             *
+             * This forces parents into the same moderation workflow as their children. ALTERNATIVELY you could
+             * require the Learning Moment Moderation role permission on various parent roles; this could allow
+             * some Parent roles to have moderation requirements and others can Publish immediately to the world.
+             *
+             * Note:
+             * This is purely circumstantial since parents can't spawn learning moments for multiple people.
+             */
+            $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $users->first()->getYear());
         }
 
         $params = [
@@ -264,7 +278,7 @@ class Controller extends Base
      * @param Collection|User[] $users
      * @throws MapperException
      */
-    public function postMomentForUsers(Collection $users): void
+    public function postMomentForUsers(Collection $users, string $defaultState = null): void
     {
         /* Since this is a collection of users, each of whom might have a unique
          * configuration (e.g. some year levels require moderation, some don't)
@@ -290,12 +304,14 @@ class Controller extends Base
                 ->setRecipient($user)
                 ->setBody($tokenReplacer->replace($evidenceModel->getBody(), $user));
 
-            /* Accelerate into the next state based on configs and year level settings
-             */
-            if ($moderationRequired) {
-                /* Requires moderation and; needs a human to progress to Published state
+            if (null !== $defaultState) {
+                /* Spawn a learning moment in a particular state
                  */
-                $evidenceModel->submit($this->getUser());
+                $this->updateState($evidenceModel, $defaultState);
+            } elseif ($moderationRequired) {
+                /* Accelerate into the next state based on configs and year level settings
+                 */
+                $evidenceModel->draft();
             } else {
                 /* Does not require moderation; just send it into the world
                  */
@@ -346,6 +362,8 @@ class Controller extends Base
 
         if ($this->getUser()->getRole()->isStudent()) {
             $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $this->getUser()->getYear());
+        } elseif ($this->getUser()->getRole()->isParent()) {
+            $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $evidence->getRecipient()->getYear());
         }
 
         $params = [
@@ -382,6 +400,7 @@ class Controller extends Base
     public function putEvidence(Model $evidence): void
     {
         $requestBody       = $this->request->getParsedBody();
+
         $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
         $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
         $tokenReplacer     = new TokenReplacer\Student(new TokenReplacer\Simple());
@@ -397,7 +416,6 @@ class Controller extends Base
         );
         $this->response     = $this->responseAsJson($responseTranslator($evidence));
     }
-
 
     /**
      * Delete a single moment.
@@ -547,5 +565,172 @@ class Controller extends Base
     private function curriculumTaggingEnabled(): bool
     {
         return $this->getUser()->getRole()->isStaff() && $this->getConfigLoader()->get('curriculum_tagging_enabled');
+    }
+
+
+    /* State changes that bypass, or precede, the moderation workflow
+     * such as drafting, submitting for moderation and publishing immediately to the world
+     */
+
+
+    /**
+     * Craft a new learning moment directly into the Draft state via the Class List "Share a Learning Moment"
+     *
+     * This is almost a direct replica of postMomentForUsers()
+     *
+     * @api   POST /learning/evidence/user/{userIds}/draft
+     * @param Collection $users
+     * @return void
+     * @throws MapperException
+     */
+    public function postDraft(Collection $users): void
+    {
+        $this->postMomentForUsers($users, Model::STATUS_DRAFT);
+    }
+
+
+    /**
+     * Its express purpose is to put the existing $evidence into Draft along with any alterations
+     * to its content such as body, tags, curric nodes, etc.
+     *
+     * @param Model $evidence
+     * @return void
+     * @throws Exception
+     * @throws MapperException
+     *@api   PUT /learning/evidence/{id}/submit
+     */
+    public function putDraft(Model $evidence): void
+    {
+        $this->putWithState($evidence, Model::STATUS_DRAFT);
+    }
+
+
+    /**
+     * Craft a new learning moment directly into the Submitted state, skipping the Drafting state.
+     * This is almost a direct replica of postMomentForUsers() - it just sets a state on the new
+     * instance rather than assume a Draft state.
+     *
+     * @api   POST /learning/evidence/{id}/submit
+     * @param Collection $users
+     * @return void
+     * @throws MapperException
+     */
+    public function postSubmit(Collection $users): void
+    {
+        $this->postMomentForUsers($users, Model::STATUS_SUBMITTED);
+    }
+
+
+    /**
+     * Its express purpose is to put the existing $evidence into Submitted along with any alterations
+     * to its content such as body, tags, curric nodes, etc.
+     *
+     * @param Model $evidence
+     * @return void
+     * @throws Exception
+     * @throws MapperException
+     *@api   PUT /learning/evidence/{id}/submit
+     */
+    public function putSubmit(Model $evidence): void
+    {
+        $this->putWithState($evidence, Model::STATUS_SUBMITTED);
+    }
+
+
+    /**
+     * Craft a new learning moment directly into the Published state, skipping the Submitted state.
+     * This is almost a direct replica of postMomentForUsers() - it just sets a state on the new
+     * instance rather than assume a Submitted state.
+     *
+     * @api   POST /learning/evidence/{id}/publish
+     * @param Collection $users
+     * @return void
+     * @throws MapperException
+     */
+    public function postPublish(Collection $users): void
+    {
+        $this->postMomentForUsers($users, Model::STATUS_PUBLISHED);
+    }
+
+
+    /**
+     * Its express purpose is to put the existing $evidence into Published along with any alterations
+     * to its content such as body, tags, curric nodes, etc.
+     *
+     * @param Model $evidence
+     * @return void
+     * @throws Exception
+     * @throws MapperException
+     *@api   PUT /learning/evidence/{id}/publish
+     */
+    public function putPublish(Model $evidence): void
+    {
+        $this->putWithState($evidence, Model::STATUS_PUBLISHED);
+    }
+
+
+    /**
+     * Place $evidence into the new state $state, along with any modifications made to its
+     * body, tags, curric nodes, etc. via the Modify form. This might not always be how we
+     * putWithState() since you can do this directly from the CTAs on the Activity Feed.
+     *
+     * @param Model $evidence
+     * @param string $state
+     * @return void
+     * @throws Exception
+     * @throws MapperException
+     */
+    private function putWithState(Model $evidence, string $state): void
+    {
+        $requestBody = $this->request->getParsedBody();
+
+        /* This might be empty if submitting directly from the activity feed;
+         *
+         * It'll be an array of stuff from the Modify form though, at which point we take what was
+         * written there and update our model here.
+         */
+        if (!empty($requestBody)) {
+            $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
+            $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
+            $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
+            $evidence = $requestTranslator($requestBody, $evidence)->setBody($tokenReplacer->replace($evidence->getBody(), $evidence->getRecipient()));
+        }
+
+        /* Shove it into the new state, $state
+         */
+        $this->updateState($evidence, $state);
+
+        /* Save it
+         */
+        $this->mapper->save($evidence);
+
+        $responseTranslator = new Translator\ModelToArray\Base(
+            new User\Translator\Author\ModelToArray(),
+            new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
+            new ScrubAdapter(),
+        );
+
+        $this->response = $this->responseAsJson($responseTranslator($evidence));
+    }
+
+
+    /**
+     * Place $evidence into the new state $state
+     *
+     * @param Model $evidence
+     * @param string $state
+     * @return void
+     */
+    private function updateState(Model $evidence, string $state): void
+    {
+        if (Model::STATUS_DRAFT === $state) {
+            $evidence->draft();
+        } elseif (Model::STATUS_SUBMITTED === $state) {
+            $evidence->submit($this->getUser());
+        } elseif (Model::STATUS_PUBLISHED === $state) {
+            $evidence->publish($this->getUser());
+        } elseif (Model::STATUS_REJECTED === $state) {
+            $evidence->reject($this->getUser());
+        }
     }
 }

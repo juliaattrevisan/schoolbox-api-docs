@@ -58,11 +58,29 @@ class Links extends AbstractLinks
             [
                 'evidenceId' => $evidence->getId(),
                 'creatorId'  => $evidence->getCreator()->getId(),
+                'userId'     => $evidence->getRecipient()->getId(),
             ]
         );
 
         $translation['_links']['put'] = $this->getRouteIfAuthorized(
             'learningMomentEvidence.putEvidence',
+            [
+                'evidenceId' => $evidence->getId(),
+                'creatorId'  => $evidence->getCreator()->getId(),
+            ]
+        );
+
+        $translation['_links']['submit'] = $this->getRouteIfAuthorized(
+            'learningMomentEvidence.putSubmit',
+            [
+                'evidenceId' => $evidence->getId(),
+                'creatorId'  => $evidence->getCreator()->getId(),
+                'userId'     => $evidence->getRecipient()->getId(),
+            ]
+        );
+
+        $translation['_links']['publish'] = $this->getRouteIfAuthorized(
+            'learningMomentEvidence.putPublish',
             [
                 'evidenceId' => $evidence->getId(),
                 'creatorId'  => $evidence->getCreator()->getId(),
@@ -76,7 +94,6 @@ class Links extends AbstractLinks
                 'creatorId'  => $evidence->getCreator()->getId(),
             ]
         );
-
 
         return $translation;
     }

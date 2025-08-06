@@ -54,6 +54,11 @@ export default {
             type: Boolean,
             required: true,
         },
+        moderationRequired: {
+            // learning moment moderation requirement
+            type: Boolean,
+            required: true,
+        },
     },
     data() {
         return {
@@ -451,6 +456,50 @@ export default {
                 }
             }
         },
+
+        /**
+         * Put the $evidence into the Submitted state as-is
+         *
+         * @param evidence
+         */
+        submitEvidence(evidence) {
+            const submitLink = evidence?._links?.submit;
+
+            if (submitLink) {
+                this.$refs.toast.activate("Submitting...");
+
+                fetch(submitLink, {
+                    method: "PUT",
+                })
+                    .then(() => {
+                        this.$refs.toast.timeout("Submitted.", true, 2000);
+                        this.loadFilteredContent("", true);
+                    })
+                    .catch(() => this.$refs.toast.timeout("Submit failed", false, 5000));
+            }
+        },
+
+        /**
+         * Put the $evidence into the Published state as-is
+         *
+         * @param evidence
+         */
+        publishEvidence(evidence) {
+            const publishLink = evidence?._links?.publish;
+
+            if (publishLink) {
+                this.$refs.toast.activate("Publishing...");
+
+                fetch(publishLink, {
+                    method: "PUT",
+                })
+                    .then(() => {
+                        this.$refs.toast.timeout("Published.", true, 2000);
+                        this.loadFilteredContent("", true);
+                    })
+                    .catch(() => this.$refs.toast.timeout("Publish failed", false, 5000));
+            }
+        },
     },
 };
 </script>
@@ -629,6 +678,7 @@ export default {
                                                     :alt="!evidence.object.creator.isDeleted ? 'View Profile' : null"
                                                 />
                                                 <p>{{ evidence.object.creator.fullName }}</p>
+
                                                 <time
                                                     class="pipe meta"
                                                     :datetime="formatDate(evidence.object.createdAt)"
@@ -645,6 +695,22 @@ export default {
                                                         )
                                                     }}</time
                                                 >
+                                                <!-- Only show status that isn't published, since that is the default state -->
+                                                <template v-if="'draft' === evidence.object.currentState">
+                                                    <span :class="`moment-${evidence.object.currentState} label`"
+                                                        >Draft</span
+                                                    >
+                                                </template>
+                                                <template v-else-if="'submitted' === evidence.object.currentState">
+                                                    <span :class="`moment-${evidence.object.currentState} label`"
+                                                        >Requiring approval</span
+                                                    >
+                                                </template>
+                                                <template v-else-if="'rejected' === evidence.object.currentState">
+                                                    <span :class="`moment-${evidence.object.currentState} label`"
+                                                        >Requiring update</span
+                                                    >
+                                                </template>
                                             </component>
                                         </div>
                                         <nav v-if="hasMenu(evidence.object)">
@@ -745,6 +811,128 @@ export default {
                                             :cdn-prefix="cdnPrefix"
                                             :site-version="siteVersion"
                                         />
+                                    </div>
+
+                                    <!-- Learning Moment Moderation: Action Buttons -->
+                                    <!-- These are based on role types -->
+                                    <div class="learning-moment-cta small-12 columns">
+                                        <ul class="flex-list buttons">
+                                            <!-- Student buttons -->
+                                            <template
+                                                v-if="
+                                                    'student' === config.currentUser.role.type ||
+                                                    'parent' === config.currentUser.role.type
+                                                "
+                                            >
+                                                <!-- student must be the author of the learning moment to have these actions -->
+                                                <template v-if="config.currentUser.id === evidence.object.creator.id">
+                                                    <template
+                                                        v-if="
+                                                            'draft' === evidence.object.currentState ||
+                                                            'submitted' === evidence.object.currentState ||
+                                                            'rejected' === evidence.object.currentState
+                                                        "
+                                                    >
+                                                        <!-- Modify button available when a learning moment is: draft/submitted/rejected -->
+                                                        <li>
+                                                            <a
+                                                                class="button"
+                                                                :href="
+                                                                    evidence.object._links.modifyForm +
+                                                                    '?returnUrl=' +
+                                                                    returnUrl
+                                                                "
+                                                                >Modify</a
+                                                            >
+                                                        </li>
+                                                    </template>
+
+                                                    <template v-if="'draft' === evidence.object.currentState">
+                                                        <!-- Submit button available when a learning moment is: draft -->
+                                                        <template v-if="moderationRequired">
+                                                            <li>
+                                                                <button
+                                                                    class="submit"
+                                                                    @click="submitEvidence(evidence.object)"
+                                                                >
+                                                                    Submit for approval
+                                                                </button>
+                                                            </li>
+                                                        </template>
+                                                        <template v-else>
+                                                            <li>
+                                                                <button
+                                                                    class="submit"
+                                                                    @click="submitEvidence(evidence.object)"
+                                                                >
+                                                                    Submit
+                                                                </button>
+                                                            </li>
+                                                        </template>
+                                                    </template>
+                                                </template>
+                                            </template>
+
+                                            <!-- Staff buttons -->
+                                            <template v-else-if="'staff' === config.currentUser.role.type">
+                                                <template
+                                                    v-if="
+                                                        'draft' === evidence.object.currentState ||
+                                                        'submitted' === evidence.object.currentState ||
+                                                        'rejected' === evidence.object.currentState
+                                                    "
+                                                >
+                                                    <!-- Modify button available when a learning moment is: draft/submitted/rejected -->
+                                                    <li>
+                                                        <a
+                                                            class="button"
+                                                            :href="
+                                                                evidence.object._links.modifyForm +
+                                                                '?returnUrl=' +
+                                                                returnUrl
+                                                            "
+                                                            >Modify</a
+                                                        >
+                                                    </li>
+                                                </template>
+
+                                                <template
+                                                    v-if="
+                                                        'draft' === evidence.object.currentState ||
+                                                        'submitted' === evidence.object.currentState ||
+                                                        'rejected' === evidence.object.currentState
+                                                    "
+                                                >
+                                                    <!-- Publish button available when a learning moment is: draft/submitted/rejected -->
+                                                    <li>
+                                                        <button
+                                                            class="submit"
+                                                            @click="publishEvidence(evidence.object)"
+                                                        >
+                                                            Publish
+                                                        </button>
+                                                    </li>
+                                                </template>
+                                            </template>
+
+                                            <!-- Parent buttons -->
+                                            <template v-else-if="'parent' === config.currentUser.role.type">
+                                                <template v-if="'draft' === evidence.object.currentState">
+                                                    <!-- Modify button available when a learning moment is: draft -->
+                                                    <li>
+                                                        <a
+                                                            class="button"
+                                                            :href="
+                                                                evidence.object._links.modifyForm +
+                                                                '?returnUrl=' +
+                                                                returnUrl
+                                                            "
+                                                            >Modify</a
+                                                        >
+                                                    </li>
+                                                </template>
+                                            </template>
+                                        </ul>
                                     </div>
                                 </template>
                                 <template v-if="evidence.discriminator === 'badgeAward'">
@@ -1062,5 +1250,9 @@ export default {
 .fade-enter-to,
 .fade-leave-from {
     opacity: 1;
+}
+
+.learning-moment-cta ul {
+    margin-bottom: 1rem;
 }
 </style>

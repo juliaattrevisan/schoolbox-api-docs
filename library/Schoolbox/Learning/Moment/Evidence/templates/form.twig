@@ -12,12 +12,11 @@
     [ 'Share Learning' ]
 ) }}
     {% set heading = 'Share a' %}
-    {% set formAction = routeLookup('learningMomentEvidence.postMomentForUsers', {userIds: userIds|join(',')}) %}
     {% set formMethod = 'post' %}
 {% else %}
     {{ bread.crumbs(
         [evidence.recipient.fullName, '/search/user/' ~ evidence.recipient.id],
-        ['Learning Moment', routeLookup('@learningMomentEvidence.getEvidenceDetail', {evidenceId: evidence.id})],
+        ['Learning Moment', routeLookupIfAuthorized('@learningMomentEvidence.getEvidenceDetail', {evidenceId: evidence.id})],
         ['Modify']
     ) }}
 
@@ -30,11 +29,9 @@
      #}
     {% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted %}
         {% set heading = 'Publish a' %}
-        {% set formAction = routeLookup('learningMomentModeration.putPublish', {evidenceId: evidence.id}) %}
         {% set formMethod = 'put' %}
     {% else %}
         {% set heading = 'Modify' %}
-        {% set formAction = routeLookup('learningMomentEvidence.putEvidence', {evidenceId: evidence.id}) %}
         {% set formMethod = 'put' %}
     {% endif %}
 {% endif %}
@@ -83,96 +80,163 @@
 
 <div class="row">
     <div class="small-12 island">
-        <form action="{{ formAction }}" method="post" id="evidence-form">
-                <section>
-                    <fieldset class="content">
-                        <div class="small-12 columns">
-                            {% block formInputFile %}
-                            {% endblock formInputFile %}
-                            {% block formInputBody %}
-                                {% block formInputBodyMeta %}
-                                    {% if USER.role.staff %}
-                                        <p class="meta">
-                                            Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details on creation.
-                                        </p>
-                                    {% endif %}
-                                {% endblock formInputBodyMeta %}
-                            {% endblock formInputBody %}
-                            <label for="evidence-tags">Tags</label>
-                            <select data-tags name="tags[]" id="evidence-tags" multiple></select>
-                            {% if curriculumTaggingEnabled %}
-                                <label for="curriculum-code-select">
-                                    Curriculum Codes
-                                </label>
-                                    {% include 'sub/curriculumCodeSelector.twig' with
-                                        {
-                                            codeList: curriculumCodes ?? [],
-                                            renderButton: true
-                                        } %}
-                            {% endif %}
-                        </div>
-                    </fieldset>
-                </section>
+        {# form action is intentionally controlled via javascript now #}
+        <form action="" method="post" id="evidence-form">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        {% block formInputFile %}
+                        {% endblock formInputFile %}
+                        {% block formInputBody %}
+                            {% block formInputBodyMeta %}
+                                {% if USER.role.staff %}
+                                    <p class="meta">
+                                        Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details on creation.
+                                    </p>
+                                {% endif %}
+                            {% endblock formInputBodyMeta %}
+                        {% endblock formInputBody %}
+                        <label for="evidence-tags">Tags</label>
+                        <select data-tags name="tags[]" id="evidence-tags" multiple></select>
+                        {% if curriculumTaggingEnabled %}
+                            <label for="curriculum-code-select">
+                                Curriculum Codes
+                            </label>
+                                {% include 'sub/curriculumCodeSelector.twig' with
+                                    {
+                                        codeList: curriculumCodes ?? [],
+                                        renderButton: true
+                                    } %}
+                        {% endif %}
+                    </div>
+                </fieldset>
+            </section>
 
             {# Moderation Workflow
              # Staff and students share this area, but their buttons are differently described
              #}
-            <input type="submit" id="evidence-save" data-test="learning-moment-evidence-form-submit" value="Save" />
+            <ul class="flex-list buttons">
+                <li><button id="draft">Save for later</button></li>
 
-            {% if USER.role.isStudent %}
-                {% if moderationRequired %}
-                    {% set submitText = 'Submit for approval' %}
-                    <input type="submit" id="evidence-submit" data-test="learning-moment-evidence-form-submit" value="Submit" />
+                {% if isCreate %}
+                    {% set route = routeLookupIfAuthorized('learningMomentEvidence.postDraft', {userIds: userIds|join(',')}) %}
+                {% else %}
+                    {% set route = routeLookupIfAuthorized('learningMomentEvidence.putDraft', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
                 {% endif %}
-            {% elseif USER.role.isStaff and USER.role.accessEvidence %}
-                {% if evidence.isSubmitted %}
-                    {# If the moment is in Submitted state, this acts as the transition to Published #}
-                    {% set submitText = 'Approve' %}
 
-                    {# This triggers an async request to Reject+reason #}
-                    <button id="request-update">Request update</button>
+                <script>
+                    $(function() {
+                        $('#draft').on('click', function(event) {
+                            event.preventDefault();
 
-                    {# Publish with optional comment deletion
-                     # This spawns a modal, which allows for the setting of a flag,
-                     # prior to the usual form submission. Sorry about all these cloak-and-dagger input fields
-                     # that I need to deconflict at least four workflows in via form + ckeditor bug
-                     #}
-                    <button id="publish">Approve</button>
+                            $('#evidence-form').attr('action', '{{ route }}');
 
-                    {% if hasComments %}
-                        <input type="hidden" name="delete-comments" id="delete-comments" value="0" />
+                            $('#evidence-persist').trigger('click');
+                        });
+                    });
+                </script>
+
+                {% if USER.role.isStudent or USER.role.isParent %}
+                    {% if moderationRequired and (evidence.isDraft or evidence.isRejected) %}
+                        <li><button id="submit">Submit for approval</button></li>
+
+                        {% if isCreate %}
+                            {% set route = routeLookupIfAuthorized('learningMomentEvidence.postSubmit', {userIds: userIds|join(',')}) %}
+                        {% else %}
+                            {% set route = routeLookupIfAuthorized('learningMomentEvidence.putSubmit', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
+                        {% endif %}
+                    {% elseif moderationRequired and (evidence.isSubmitted or evidence.isPublished) %}
+                        {# noop:
+                         # nothing for the student to do except w8 for staff to move it to the next state because:
+                         #     - it's submitted and has entered the moderation workflow; or
+                         #     - it's already published and you shouldn't be able to publish again
+                         #}
+                    {% else %}
+                        <li><button id="submit">Publish</button></li>
+
+                        {% if isCreate %}
+                            {% set route = routeLookupIfAuthorized('learningMomentEvidence.postPublish', {userIds: userIds|join(',')}) %}
+                        {% else %}
+                            {% set route = routeLookupIfAuthorized('learningMomentEvidence.putPublish', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
+                        {% endif %}
+                    {% endif %}
+
+                    <script>
+                        $(function() {
+                            $('#submit').on('click', function(event) {
+                                event.preventDefault();
+
+                                $('#evidence-form').attr('action', '{{ route }}');
+
+                                $('#evidence-persist').trigger('click');
+                            });
+                        });
+                    </script>
+                {% elseif USER.role.isStaff and USER.role.accessEvidence %}
+                    {# Used to decide if comments should be deleted upon publish #}
+                    <input type="hidden" name="delete-comments" id="delete-comments" value="0" />
+
+                    {% if evidence.isDraft or evidence.isSubmitted or evidence.isRejected %}
+                        {# This triggers an async request to Reject+reason
+                         # For the implementation, scroll down to the modal
+                         #}
+                        {% if evidence.id %}
+                            <li><button id="request-update">Request update</button></li>
+                        {% endif %}
+
+                        {# Publish with optional comment deletion
+                         # This spawns a modal, which allows for the setting of a flag,
+                         # prior to the usual form submission. Sorry about all these cloak-and-dagger input fields
+                         # that I need to deconflict at least four workflows in via form + ckeditor bug
+                         #}
+                        <li><button id="publish" class="submit">Approve</button></li>
 
                         <script>
                             $(function() {
                                 $('#publish').on('click', function(event) {
                                     event.preventDefault();
 
-                                    {# Show the modal with an option to delete comments #}
-                                    $('#deleteCommentsModal').foundation('reveal', 'open');
+                                    {% if evidence.id %}
+                                        {% set route = routeLookupIfAuthorized('learningMomentModeration.putPublish', {evidenceId: evidence.id}) %}
+                                    {% else %}
+                                        {# Share a Learning Moment from the Class List #}
+                                        {% set route = routeLookupIfAuthorized('learningMomentEvidence.postPublish', {userIds: userIds|join(',')}) %}
+                                    {% endif %}
 
-                                    {# Set a special flag for the payload to capture
-                                     # then proceed to submit the form
-                                     #}
-                                    $('#deleteComments').on('click', function (event) {
-                                        event.preventDefault();
+                                    $('#evidence-form').attr('action', '{{ route }}');
 
-                                        $('#delete-comments').val(1);
+                                    {% if hasComments ?? false %}
+                                        {# Show the modal with an option to delete comments #}
+                                        $('#deleteCommentsModal').foundation('reveal', 'open');
 
-                                        $('#evidence-moderate').trigger('click');
-                                    });
+                                        {# Set a special flag for the payload to capture
+                                         # then proceed to submit the form
+                                         #}
+                                        $('#deleteComments').on('click', function (event) {
+                                            event.preventDefault();
 
-                                    {# Continue with no further alterations #}
-                                    $('#preserveComments').on('click', function () {
-                                        $('#evidence-moderate').trigger('click');
-                                    });
+                                            $('#delete-comments').val(1);
+
+                                            $('#evidence-persist').trigger('click');
+                                        });
+
+                                        {# Continue with no further alterations #}
+                                        $('#preserveComments').on('click', function () {
+                                            $('#evidence-persist').trigger('click');
+                                        });
+                                    {% else %}
+                                        $('#evidence-persist').trigger('click');
+                                    {% endif %}
                                 })
                             });
                         </script>
+                    {% elseif isCreate %}
+                        {# "Share a Learning Moment" via the Class List #}
+                        <li><button id="publish">Publish</button></li>
                     {% endif %}
-
-                    <input type="submit" id="evidence-moderate" data-test="learning-moment-evidence-form-submit" value="Approve" style="display:none" />
                 {% endif %}
-            {% endif %}
+            </ul>
+            <input type="submit" id="evidence-persist" data-test="learning-moment-evidence-form-submit" value="Secret Submit" style="display:none" />
         </form>
     </div>
 </div>
@@ -182,21 +246,23 @@
  # Agreeing to that sets a hidden input field which is then interpreted by the
  # buildPayload method, injecting this for controllers to use.
  #}
-{% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted and hasComments %}
+{% if USER.role.isStaff and USER.role.accessEvidence and evidence.id and (evidence.isDraft or evidence.isSubmitted or evidence.isRejected) and hasComments %}
     <div id="deleteCommentsModal" class="reveal-modal" data-reveal aria-labelledby="deleteCommentsModalTitle" aria-hidden="true" role="dialog">
         <h2 id="deleteCommentsModalTitle">Please confirm</h2>
         <p>There are comments on this learning moment that have already been made and will become visible to parents.</p>
         <p>Do you want to delete these comments?</p>
 
-        <button id="deleteComments">Delete and continue</button>
-        <button id="preserveComments">Continue</button>
+        <ul class="flex-list buttons">
+            <li><button id="deleteComments" class="submit">Delete and continue</button></li>
+            <li><button id="preserveComments">Continue</button></li>
+        </ul>
 
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
     <script>
         $(function() {
             $(document).on('closed.fndtn.reveal', '#deleteCommentsModal', function () {
-                $('#evidence-submit').prop('disabled', false);
+                $('#evidence-persist').prop('disabled', false);
             });
         });
     </script>
@@ -205,9 +271,13 @@
 {# Moderation Workflow
  # A secret form that submits a secret payload to the rejection endpoint when the Request Update
  # button is clicked; this exists inside some other form.
+ #
+ # Rejection is available when:
+ #    - evidence.id exists (it's been saved before)
+ #    - evidence is in one of draft, submitted, rejected states
  #}
-{% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted %}
-    {% set rejectAction = routeLookup('learningMomentModeration.putReject', {evidenceId: evidence.id}) %}
+{% if USER.role.isStaff and USER.role.accessEvidence and evidence.id and (evidence.isDraft or evidence.isSubmitted or evidence.isRejected) %}
+    {% set rejectAction = routeLookupIfAuthorized('learningMomentModeration.putReject', {evidenceId: evidence.id}) %}
 
     <div id="rejectModal" class="reveal-modal" data-reveal aria-labelledby="rejectModalTitle" aria-hidden="true" role="dialog">
         <h2 id="rejectModalTitle">Request update</h2>
@@ -248,8 +318,8 @@
                  # prior to payload being constructed, sending you the original text rather than
                  # the updated text. To dodge this ckeditor hankypanky we just simulate a user click
                  #}
-                $('#evidence-moderate').trigger('click');
-            });
+                $('#evidence-persist').trigger('click');
+            %});
         });
     </script>
 {% endif %}
@@ -353,7 +423,7 @@
                 // Build a request to post the form
                 let payload = buildPayload(form),
                     toast   = $('#toast'),
-                    submit  = $('#evidence-form').find('input[type="submit"], button');
+                    submit  = $('#evidence-form, #rejectionForm, #deleteCommentsModal').find('input[type="submit"], button');
 
                 // Toast then post
                 toast.toastActivate('Saving...')

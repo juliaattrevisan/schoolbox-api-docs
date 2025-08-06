@@ -83,17 +83,20 @@ class Module extends BaseModule
             )
         );
 
-        /* Superusers, Staff and Evidence Creators can modify or delete an
-         * Evidence instance
+        /* Superusers, Staff can modify or delete an Evidence instance
+         *
+         * Students and parents can only modify/delete moments that they themselves created
+         * (they can't modify/delete moments spawned by staffs)
          */
         $modifyEvidenceRule = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
-                new Rule\IsUser('creatorId')
+                new Rule\IsUser('creatorId'),
             )
         );
+
         $deleteEvidenceRule = $modifyEvidenceRule;
 
 
@@ -172,6 +175,72 @@ class Module extends BaseModule
             self::METHOD_GET,
             '/{evidenceId}/modify',
             'getModifyForm',
+            $modifyEvidenceRule,
+            Closure::fromCallable([$this, 'preloadEvidence']),
+        );
+
+        /* Create a whole new evidence instance in the Published state, from nothing previously
+         * This is when students are not moderated and spawn a new learning moment directly into
+         * the world, skipping the whole moderation workflow.
+         */
+        $this->register(
+            self::METHOD_POST,
+            '/user/{userIds}/publish',
+            'postPublish',
+            $viewCreateFormRule,
+            $viewCreateFormPreloader
+        );
+
+        /* Create a whole new evidence instance in the Draft state, from nothing previously
+         * This seems unique to the Class List "Share a Learning Moment"
+         */
+        $this->register(
+            self::METHOD_POST,
+            '/user/{userIds}/draft',
+            'postDraft',
+            $viewCreateFormRule,
+            $viewCreateFormPreloader
+        );
+
+        /* Put an evidence into the Draft state as-is;
+         * Used from the Activity Feed
+         */
+        $this->register(
+            self::METHOD_PUT,
+            '/{evidenceId}/draft',
+            'putDraft',
+            $modifyEvidenceRule,
+            Closure::fromCallable([$this, 'preloadEvidence']),
+        );
+
+        /* Create a whole new evidence instance in the Submitted state, from nothing previously
+         */
+        $this->register(
+            self::METHOD_POST,
+            '/user/{userIds}/submit',
+            'postSubmit',
+            $viewCreateFormRule,
+            $viewCreateFormPreloader,
+        );
+
+        /* Put an existing evidence into the Submitted state as-is;
+         * Used from the Activity Feed
+         */
+        $this->register(
+            self::METHOD_PUT,
+            '/{evidenceId}/submit',
+            'putSubmit',
+            $modifyEvidenceRule,
+            Closure::fromCallable([$this, 'preloadEvidence']),
+        );
+
+        /* Put an evidence into the Published state as-is;
+         * Used from the Activity Feed
+         */
+        $this->register(
+            self::METHOD_PUT,
+            '/{evidenceId}/publish',
+            'putPublish',
             $modifyEvidenceRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
         );

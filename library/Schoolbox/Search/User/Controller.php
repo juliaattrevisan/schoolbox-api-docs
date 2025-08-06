@@ -23,6 +23,7 @@ use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Geosnapshot\ValidPhotosAvailable;
 use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Learning\Moment\Evidence\Moderation\ModerationRequired;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Count\Helper as PastoralCountHelper;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
@@ -44,6 +45,7 @@ use Schoolbox\UserMapper;
 use Timetable_ColourManager;
 use Timetable_ColourMapper;
 use Twig\Environment;
+use Twig\Error\Error;
 
 /**
  * The controller for the mock version of the search API.
@@ -211,6 +213,11 @@ class Controller extends BaseController
          */
         $tabs = $this->tabMapper->findRenderable($student, $this->getUser());
 
+        /* Whether Learning Moment Moderation was required for this student; this forces their
+         * learning moment posts to be moderated by a staff before being pushed into the world
+         */
+        $globalConfig = (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED);
+        $moderationRequired = (new ModerationRequired())->isSatisfiedBy($globalConfig, $this->getUser()->getYear());
 
         /* Old implementation below
          */
@@ -626,6 +633,10 @@ class Controller extends BaseController
                 /* Links to be displayed in the 3-dot menu.
                  */
                 'linksInfo' => $this->getProfileThreeDotMenuLinksInfo($viewer, $student),
+                /* Learning Moment Moderation requirement for this student
+                 */
+                'moderationRequired' => $moderationRequired,
+
                 /* Old implementation
                  */
                 'subjects'                 => $subjects,
@@ -645,8 +656,7 @@ class Controller extends BaseController
      * @param User $staff
      * @return void
      * @throws MapperException
-     * @throws \DomainException
-     * @throws \UnexpectedValueException
+     * @throws Error
      */
     private function renderStaff(User $staff): void
     {
