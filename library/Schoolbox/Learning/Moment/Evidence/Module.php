@@ -127,7 +127,9 @@ class Module extends BaseModule
          */
         $deleteEvidenceRule = $modifyEvidenceRule;
 
-        /* Superusers, Staff with Learning Moment role permission can view/modify cohort report
+        /* Learning Moment Cohort Report
+         *
+         * Superusers, Staff with Learning Moment role permission can view/modify cohort report
          */
         $viewCohortReportRule = new Rule\All(
             new Rule\IsLoggedIn(),
