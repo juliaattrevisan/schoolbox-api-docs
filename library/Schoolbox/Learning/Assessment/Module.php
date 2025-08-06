@@ -80,6 +80,9 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
+use Schoolbox\Editor\Templates\Mapper as EditorTemplateMapper;
+use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
 
 /**
  * Class Module
@@ -657,6 +660,11 @@ class Module extends BaseModule
         $linkedAssessmentsMapper   = $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper::class);
         $courseImplementationMapper = $this->getMapperFactory()->get(CourseImplementationMapper::class);
         $unitImplementationMapper = $this->getMapperFactory()->get(UnitImplementationMapper::class);
+        $editorTemplateHelper = new EditorTemplateHelper(
+            $this->getMapperFactory()->get(EditorTemplateMapper::class),
+            EditorTemplatesCategoryModel::FEEDBACK,
+            $this->injector->get('user')
+        );
 
         // used for the course level status page (and filtering from the markbook)
         $filtersAssessmentIdFinder  = $this->injector->get('filters.assessmentIdFinder');
@@ -748,6 +756,7 @@ class Module extends BaseModule
                     $filterSelectionMapper,
                     $courseImplementationMapper,
                     $unitImplementationMapper,
+                    $editorTemplateHelper,
                 );
 
             case Assessment\Project\Controller::class:
