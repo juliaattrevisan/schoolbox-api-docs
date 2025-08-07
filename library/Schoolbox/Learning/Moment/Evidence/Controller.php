@@ -738,6 +738,12 @@ class Controller extends Base
      */
     public function getCohortReport(Folder\Model $folder): void
     {
+        // TODO: Could we send a full set of all possible date ranges to the frontend?
+        // i.e. to deal with pages and not need the frontend to keep re-requesting forever (no blank page loads)
+        //      we could just figure out *all possible learning moments* for this folder, and form the start+end dates here
+        //    - do it via a DB query rather than mappers, no hydrating should occur for performance
+        //      just need to grab all the IDs and use an IN clause I guess, then chunk the dates
+
         $this->response = $this->responseFromTemplate(
             '@learningMomentEvidence/cohortReport.twig',
             [ 'folder' => $folder, ],
