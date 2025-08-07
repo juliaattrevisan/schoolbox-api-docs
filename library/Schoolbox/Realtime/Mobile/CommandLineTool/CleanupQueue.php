@@ -10,11 +10,11 @@ declare(strict_types=1);
 namespace Schoolbox\Realtime\Mobile\CommandLineTool;
 
 use Alaress\Async\Notification\Instance\Instance;
-use ErrorException;
 use Predis\ClientInterface;
 use Predis\Collection\Iterator\Keyspace;
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
+use Throwable;
 
 /**
  * Cleans up the mobile daemon's accumulated message queue.
@@ -122,7 +122,7 @@ class CleanupQueue extends CliTool\App
 
             try {
                 $decodedValue = unserialize($uncompressedValue, ['allowed_classes' => [Instance::class]]);
-            } /** @noinspection PhpRedundantCatchClauseInspection */ catch (ErrorException $e) {
+            } catch (Throwable $e) {
                 $unprocessableKeyCount++;
                 $logger->warning(sprintf('Key "%s" was not unserializable (message: %s): skipping', $key, $e->getMessage()));
                 continue;
