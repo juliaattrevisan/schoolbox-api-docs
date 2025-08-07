@@ -37,6 +37,10 @@ class Cursor implements ICursor
     public const ORDER_DIRECTION_DEFAULT = self::ORDER_DIRECTION_ASC;
     public const ORDER_DIRECTION_ASC = 'ASC';
     public const ORDER_DIRECTION_DESC = 'DESC';
+    /**
+     * A sane value used for comparison of NULL value in the points when querying db
+     */
+    public const MIN_SORT_BY_VALUE = -99999999;
 
     public function __construct(
         protected Helper $helper,

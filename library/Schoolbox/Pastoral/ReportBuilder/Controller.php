@@ -504,7 +504,7 @@ class Controller extends Base
 
             $records        = $factory->retrieveResults($encodedCursor);
             $records        = $factory->process($records, $encodedCursor);
-            $this->response = $this->responseAsJson($records);
+            $this->response = $this->responseAsJson($records, true);
         } catch (\PDOException | DatabaseException $e) {
             $problem = (new ApiProblem('Something has gone wrong, please contact your support if the problem persists'))
                 ->setStatus(500);
@@ -559,7 +559,8 @@ class Controller extends Base
                         ]
                     ]
 
-                ]
+                ],
+                true
             );
         } catch (\PDOException | DatabaseException $e) {
             $problem = (new ApiProblem('Something has gone wrong, please contact your support if the problem persists'))
