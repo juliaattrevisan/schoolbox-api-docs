@@ -355,10 +355,13 @@ class DataSource
      *
      * @param DueWorkModel $assessment
      * @param bool         $getUsages
+     * @param bool $cloneNewRubric if true, it should then return a copy of the rubric grid
+     *                             without the identifier, and can be used to create a clone assessment
+     *
      * @return Grid
      * @throws MapperException
      */
-    public function retrieveGrid(DueWorkModel $assessment, bool $getUsages): Grid
+    public function retrieveGrid(DueWorkModel $assessment, bool $getUsages, bool $cloneNewRubric = false): Grid
     {
         // Build the rowset first
         $grid = new Grid($assessment, $this->retrieveRowSet($assessment->getContext(), $getUsages));
@@ -409,8 +412,9 @@ class DataSource
         foreach ($descriptorModels as $descriptorModel) {
             $levelId     = $descriptorModel->getLevel()->getId();
             $indicatorId = $descriptorModel->getIndicator()->getId();
+            $descriptorId = $cloneNewRubric ? null : $descriptorModel->getId();
             $descriptor  = (new \Schoolbox\Assessment\Rubric\Grid\Descriptor())
-                ->setId($descriptorModel->getId())
+                ->setId($descriptorId)
                 ->setDescription($descriptorModel->getDescription())
                 ->setMaxValue($descriptorModel->getMaxValue());
 
@@ -421,7 +425,7 @@ class DataSource
 
         // Add levels
         foreach ($levelModels as $levelModel) {
-            $levelId = $levelModel->getId();
+            $levelId = $cloneNewRubric ? null : $levelModel->getId();
             $level   = (new \Schoolbox\Assessment\Rubric\Grid\Level())
                 ->setId($levelId)
                 ->setName($levelModel->getName());
@@ -479,6 +483,14 @@ class DataSource
             $grid->getCapabilityUsages()[$capabilityId] = $capabilityUsage;
         }
 
+        /* Reset the assessment id in rubric grid for the cloned copy
+         */
+        if ($cloneNewRubric) {
+            /* Cloning to preserve the id of the original assessment
+             */
+            $cloneAssessment = clone $assessment;
+            $grid = $grid->setAssessment($cloneAssessment->setId(null));
+        }
         return $grid;
     }
 

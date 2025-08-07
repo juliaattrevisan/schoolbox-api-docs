@@ -210,6 +210,7 @@ class Module extends BaseModule
         $this->register('POST', "$assListRoute", 'postCreateAssessment', $canWrite, $preloadContext); // a || c
         $this->register('POST', "$assListRoute/reorder", 'postReorderAssessments', $canWrite, $preloadContext); // a || c
         $this->register('GET', "$assListRoute/new", 'getCreateAssessmentForm', $canWrite, $preloadContext); // a || c
+        $this->register('GET', "$assRoute/clone", 'getCloneAssessmentForm', $canWrite, $preloadAssessment); // a || c
 
         $this->register('GET', "$assRoute", 'getAssessment', $loggedIn, $preloadAssessment);
         $this->register('POST', "$assRoute", 'postUpdateAssessment', $canWrite, $preloadAssessment); // a || c

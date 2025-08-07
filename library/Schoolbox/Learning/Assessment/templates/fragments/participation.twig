@@ -1,4 +1,4 @@
-{% if participants is defined and customisedFor is defined %}
+{% if participants is defined and customisedFor is defined and (assessment.id is null or assessment.id == customisedFor) %}
     {% for participation in assessment.allParticipants  %}
         {% set user = participation.user %}
         {% set userInclude = participation.user.id in (participants | keys) and not participation.excluded %}

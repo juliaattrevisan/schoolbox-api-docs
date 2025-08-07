@@ -358,6 +358,16 @@ class Grid
         return $this->assessment;
     }
 
+    /**
+     * @param DueWork $assessment
+     * @return $this
+     */
+    public function setAssessment(DueWork $assessment): self
+    {
+        $this->assessment = $assessment;
+        return $this;
+    }
+
 
     /**
      * @return RowSet
