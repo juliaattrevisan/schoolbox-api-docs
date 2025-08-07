@@ -342,10 +342,8 @@ abstract class Mapper implements IMapper
 
         // only functional in development
 
-        // This line raises an error on CI, where INSTANCE_ID is always "ci":
-        // it doesn't raise an error on Vagrant where INSTANCE_ID comes from
-        // an external config, so ignore the "no error to ignore" message here.
-        /* @phpstan-ignore-next-line */
+        // This line used to raise a CI error when it was a string compare:
+        // I guess PHPStan doesn't find it if it's an in_array check.
         self::$perfmon = (in_array(INSTANCE_ID, Instance::DEVELOPMENT_INSTANCE_IDS) && self::isWithinWebRequest())
             ? new DevMonitor(DebugBar::getInstance())
             : new LiveMonitor()
