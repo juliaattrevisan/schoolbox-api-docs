@@ -851,21 +851,16 @@ class Controller extends Base
         $payload = [];
 
         if (\count($ids)) {
-            $userLookup = array_fill_keys($ids, true);
-
+            /* Only care about moments whose recipients are in the set of users associated
+             * with $folder: otherwise ignore the learning moment
+             */
             $pb = $this->mapper->getPredicateBuilder()
-                ->between('updated_at', $from, $to);
+                ->between('updated_at', $from, $to)
+                ->in('recipient_id', $ids);
 
             $moments = $this->mapper->findByPredicates($pb)->sortBy('updatedAt', 'DESC');
 
             foreach ($moments as $moment) {
-                /* Only care about moments whose recipients are in the set of users associated
-                 * with $folder: otherwise ignore the learning moment
-                 */
-                if (!array_key_exists($moment->getRecipient()->getId(), $userLookup)) {
-                    continue;
-                }
-
                 /* Accumulate a list of associated files for this learning moment
                  * At the moment there's gonna be just one but SA-20433 causes this to be multiple
                  */
