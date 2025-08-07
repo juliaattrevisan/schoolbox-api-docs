@@ -101,7 +101,7 @@ function setup_aws_sso() {
   fi
 }
 
-function create_ir_conf_file() {
+function create_ir_config_file() {
   log "Creating instance registry configuration";
   echo -e \
     "{\n" \
@@ -387,10 +387,18 @@ function install_instance() {
   fi
 
   log "Applying development environment SQL fixes";
-  mariadb -h mariadb -u root -D schoolbox < "${SITE_ROOT}/sql/vagrant.sql"
-  mariadb -h mariadb -u root -D schoolbox < "${CACHE_DIR}/vagrant-secrets.sql"
+  "$SITE_ROOT"/tools/instance-mariadb.sh < "${SITE_ROOT}/sql/vagrant.sql"
+  "$SITE_ROOT"/tools/instance-mariadb.sh < "${CACHE_DIR}/vagrant-secrets.sql"
 
   log "Loading all demo data complete";
+}
+
+function create_cron_config_file() {
+  log "Creating cron configuration";
+  local timezone;
+  timezone=$("$SITE_ROOT"/tools/instance-mariadb.sh -NBe "select value from config where name = 'date_timezone'")
+  # Hardcode UPS run time to 22:00 for now, I suppose?
+  echo "${DEFAULT_INSTANCE_ID};${timezone};22:00;/var/log/schoolbox/${DEFAULT_INSTANCE_ID}" > /etc/schoolbox/cron_config.ini
 }
 
 function post_install() {
@@ -419,7 +427,7 @@ function main() {
   load_consts
   load_config
   setup_aws_sso
-  create_ir_conf_file
+  create_ir_config_file
 
   cleanup_cache_dir
   download_secrets
@@ -431,6 +439,7 @@ function main() {
 
   init_database
   install_instance
+  create_cron_config_file
   post_install
 }
 
