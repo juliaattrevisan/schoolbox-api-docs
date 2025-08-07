@@ -797,7 +797,8 @@ class Controller extends Base
      */
     public function getCohortReportPayload(Folder\Model $folder, \Alaress_Date_Format $from, \Alaress_Date_Format $to): void
     {
-        $ids = [];
+        $groupIds = [];
+        $classIds = [];
 
         /* Check for a maximum length of time of [now, -1 year at start of day]
          */
@@ -811,35 +812,39 @@ class Controller extends Base
          * to cross reference everything we find later
          */
         if ($folder->isGroup()) {
-            /* Students in a Group
-             */
             $userAccessList = $this->userAccessMapper->findForFolder($folder)
                 ->indexByCallback(static function (UserAccess $userAccess) {
                     return $userAccess->getUser()->getId();
                 });
 
             if ($userAccessList->count()) {
-                $ids = $this->userMapper->findByColumn('id', $userAccessList->keys())
+                $groupIds = $this->userMapper->findByColumn('id', $userAccessList->keys())
                     ->filter(function (\Schoolbox\User $user) {
                         return ($user->getRole()->isStudent());
                     })
                     ->indexBy('id')
                     ->keys();
             }
-        } else {
-            /* Students of a class-coded folder
-             */
+        }
+
+        /* Students of a class-coded folder
+         */
+        if ('' !== $folder->getCodeString()) {
             $students = array_column($this->externalClass->getStudents($folder->getCodeString()), 'synergy_id');
 
             /* These are the user instances associated with $folder's class list of students
              * We'll use this to interset with learning moments $recipients
              */
             if (\count($students)) {
-                $ids = $this->userMapper->findByExternalIds($students, \Schoolbox\Role::STUDENT)
+                $classIds = $this->userMapper->findByExternalIds($students, \Schoolbox\Role::STUDENT)
                     ->indexBy('id')
                     ->keys();
             }
         }
+
+        /* Combine stacks
+         */
+        $ids = array_values(array_unique(array_merge($groupIds, $classIds)));
 
         /* Find all the learning moments in the specified date range
          */
