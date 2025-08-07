@@ -3,9 +3,6 @@
  * Displays a pastoral report in a table format.
  */
 
-import { useTemplateRef, toRefs } from "vue";
-import { useScroll } from "@vueuse/core";
-import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import type {
     Tab,
     TablePayload,
@@ -13,16 +10,16 @@ import type {
     Routes,
     SeverityColors,
     TableHeader,
+    SelectedCell,
 } from "../../js/types/pastoralReportTypes";
 import { TabType } from "../../js/types/pastoralReportTypes";
 import { useLoadPrTable } from "../composable/useLoadPrTable";
-import { useLoadRecords } from "../composable/useLoadRecords";
 import PrEmpty from "../pr-empty.vue";
 import PrTableHeader from "./pr-table-header.vue";
 import PrTableTotalRow from "./pr-table-total-row.vue";
 import PrTableRow from "./pr-table-row.vue";
 import PrTableFooter from "./pr-table-footer.vue";
-import PrRecord from "../pr-record.vue";
+import PrTableModal from "./pr-table-modal.vue";
 
 const props = defineProps<{
     title: string;
@@ -147,41 +144,18 @@ window.Vue.watch(
 
 // #endregion
 
-// #region table cell selected
+// #region cell selection
 
-const isCellExpanded = window.Vue.ref(false);
-const selectedHeader = window.Vue.ref<TableHeader | null>(null);
-const scopeUrl = window.Vue.ref("");
-const scopeUrlParams = new URLSearchParams();
-const {
-    isNewLoad: isNewRecordLoad,
-    isNewLoading: isLoadingNewRecords,
-    isMoreLoading: isLoadingMoreRecords,
-    payload: recordsPayload,
-    loadError: recordsLoadError,
-} = useLoadRecords(scopeUrl);
-
-/**
- * Get the current scope export url to download the related records as CSV
- * @returns - the current scope export URL
- */
-function scopeExportUrl(): string {
-    return props.selectedTab._links.scopeExport
-        ? `${props.selectedTab._links.scopeExport}?${scopeUrlParams.toString()}`
-        : "";
-}
+const selectedCell = window.Vue.ref<SelectedCell | null>(null);
 
 /**
  * Handle total cell selection
  * @param header - the header of the cell that was selected
  */
 function onTotalCellSelect(header: TableHeader): void {
-    selectedHeader.value = header;
-    scopeUrlParams.set("column", selectedHeader.value.key);
-    scopeUrlParams.delete("row");
-    scopeUrlParams.delete("cursor");
-    scopeUrl.value = `${props.selectedTab._links.scope}?${scopeUrlParams.toString()}`;
-    isCellExpanded.value = true; // Open the modal to show related records
+    selectedCell.value = {
+        header,
+    };
 }
 
 /**
@@ -190,28 +164,11 @@ function onTotalCellSelect(header: TableHeader): void {
  * @param rowId - the id of the row that was selected
  */
 function onRowCellSelect(header: TableHeader, rowId: number): void {
-    selectedHeader.value = header;
-    scopeUrlParams.set("column", selectedHeader.value.key);
-    scopeUrlParams.set("row", rowId.toString());
-    scopeUrlParams.delete("cursor");
-    scopeUrl.value = `${props.selectedTab._links.scope}?${scopeUrlParams.toString()}`;
-    isCellExpanded.value = true; // Open the modal to show related records
+    selectedCell.value = {
+        header,
+        rowId,
+    };
 }
-
-/**
- * To display more results when there's lots to display and the user has scrolled to the bottom
- */
-const modalResultsEl = useTemplateRef<HTMLDivElement>("modalResultsRef");
-const { arrivedState } = useScroll(modalResultsEl, {
-    offset: { bottom: 30 },
-});
-const { bottom } = toRefs(arrivedState);
-window.Vue.watch(bottom, (isAtBottom) => {
-    if (isAtBottom && recordsPayload.value && recordsPayload.value.metadata.cursor.next !== null) {
-        scopeUrlParams.set("cursor", recordsPayload.value.metadata.cursor.next);
-        scopeUrl.value = `${props.selectedTab._links.scope}?${scopeUrlParams.toString()}`;
-    }
-});
 
 // #endregion
 
@@ -301,68 +258,16 @@ window.Vue.onUnmounted(() => {
             />
         </div>
     </template>
-    <basic-modal v-model:is-open="isCellExpanded" has-background-click>
-        <div v-if="isNewRecordLoad && isLoadingNewRecords" class="loader"></div>
-        <div v-else-if="isNewRecordLoad && recordsLoadError" class="alert-box alert f-no-margins">
-            Sorry, there was an error during further record retrieval. Please
-            <a href="" title="refresh the page"> refresh the page </a>
-            to try again and contact your support if the problem persists.
-            <template v-if="recordsLoadError && recordsLoadError.length > 0"
-                ><em>Further support info: {{ recordsLoadError }}</em></template
-            >
-        </div>
-        <template v-else-if="selectedHeader !== null">
-            <div class="l-flex-col l-gap-m">
-                <div class="l-flex-row l-flex--justify-space l-gap-s">
-                    <div class="l-flex-col l-gap-s f-no-margins">
-                        <h2>{{ props.title }}</h2>
-                        <p class="meta">
-                            <template v-if="selectedHeader.title !== 'Total'"
-                                >Type: {{ selectedHeader.title }}</template
-                            >
-                            <template v-if="selectedHeader.subTitle"
-                                ><br />Sub-Type: {{ selectedHeader.subTitle }}</template
-                            >
-                        </p>
-                    </div>
-                    <a
-                        v-if="props.selectedTab._links.scopeExport"
-                        :href="scopeExportUrl()"
-                        aria-label="Download related records as CSV"
-                        title="Download related records as CSV"
-                        ><sbx-icon name="download"
-                    /></a>
-                </div>
-                <div ref="modalResultsRef" class="pr-table__records">
-                    <div class="l-flex-col l-gap-s">
-                        <div v-for="record in recordsPayload?.data.results" :key="record.id" class="c-island">
-                            <ul class="information-list threaded">
-                                <pr-record
-                                    :record="record"
-                                    :config="props.config"
-                                    :routes="props.routes"
-                                    :locale-pastoral="props.localePastoral"
-                                    :show-severity="props.showSeverity"
-                                    :severity-colors="props.severityColors"
-                                />
-                            </ul>
-                        </div>
-                    </div>
-                    <div v-if="isLoadingMoreRecords" class="c-island l-pad-s">
-                        <div class="loader"></div>
-                    </div>
-                    <div v-else-if="!isNewRecordLoad && recordsLoadError" class="alert-box alert f-no-margins">
-                        Sorry, there was an error during record retrieval. Please
-                        <a href="" title="refresh the page"> refresh the page </a>
-                        to try again and contact your support if the problem persists.
-                        <template v-if="recordsLoadError && recordsLoadError.length > 0"
-                            ><em>Further support info: {{ recordsLoadError }}</em></template
-                        >
-                    </div>
-                </div>
-            </div>
-        </template>
-    </basic-modal>
+    <pr-table-modal
+        :title="props.title"
+        :selected-tab="props.selectedTab"
+        :config="props.config"
+        :routes="props.routes"
+        :locale-pastoral="props.localePastoral"
+        :show-severity="props.showSeverity"
+        :severity-colors="props.severityColors"
+        :selected-cell="selectedCell"
+    />
 </template>
 
 <style scoped lang="scss">
@@ -379,10 +284,5 @@ window.Vue.onUnmounted(() => {
         top: 0;
         z-index: var(--sbx-depth-ui-sticky);
     }
-}
-
-.pr-table__records {
-    max-height: 650px;
-    overflow-y: auto;
 }
 </style>
