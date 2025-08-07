@@ -355,7 +355,9 @@ class DataSource
      *
      * @param DueWorkModel $assessment
      * @param bool         $getUsages
-     * @param bool         $cloneNewRubric
+     * @param bool $cloneNewRubric if true, it should then return a copy of the rubric grid
+     *                             without the identifier, and can be used to create a clone assessment
+     *
      * @return Grid
      * @throws MapperException
      */
