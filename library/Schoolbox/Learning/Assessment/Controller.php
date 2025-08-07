@@ -701,6 +701,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
                     'fullName' => $participant->getUser()->getFullName(),
                 ]
             );
+
+        if (null !== $assessment->getOriginalAssessmentId()) {
+            $data['customisedFor'] = $assessment->getOriginalAssessmentId();
+        }
+
         $this->response = $this->responseFromTemplate("@learningAssessment/update.twig", $data);
     }
 
