@@ -57,13 +57,18 @@ case "$ENV" in
     rm awscliv2.zip
     rm -rf ./aws
 
-    # NPM install
+    # NPM install for all users into /opt/nvm
     curl "https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh" -o nvm-install
     chmod +x nvm-install
-    bash -c "./nvm-install && source /root/.nvm/nvm.sh && nvm install ${NODE_VERSION}"
+    mkdir -p /opt/nvm
+    NVM_DIR=/opt/nvm bash -c "./nvm-install && source /opt/nvm/nvm.sh && nvm install ${NODE_VERSION}"
     ;;
 esac
 EOF
+
+# Copy NVM profile and sudoers conf
+COPY ./config/profile.d/* /etc/profile.d/
+COPY ./config/sudoers.d/schoolboxsuper /etc/sudoers.d/
 
 # Install Composer (dev only?)
 COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
