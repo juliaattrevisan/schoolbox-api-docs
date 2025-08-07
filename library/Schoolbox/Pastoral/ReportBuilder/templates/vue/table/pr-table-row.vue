@@ -79,34 +79,32 @@ const chartOptions = window.Vue.ref({
         <td
             v-for="header in props.headers"
             :key="header.key"
-            :class="`u-border-right ${header.key === 'user' ? 'u-sticky-left u-sticky-left--row' : ''} ${header.key === 'total' ? 'total-cell' : ''}`"
+            :class="`u-border-right ${header.key === 'user' ? 'u-sticky-left u-sticky-left--row l-pad--0' : ''} ${header.key === 'total' ? 'total-cell' : ''}`"
         >
             <template v-if="header.type == TableHeaderType.USER && isUser(props.rowData[header.key])">
-                <div class="c-card">
-                    <div class="l-flex-row l-gap-m">
-                        <user-photo :user="props.rowData[header.key] as User" render="small" rounded-corners />
-                        <div class="l-flex-col l-flex--justify-center f-no-margins">
-                            <template v-if="isUser(props.rowData[header.key])">
-                                <a
-                                    v-if="(props.rowData[header.key] as User)._links?.profile"
-                                    :href="(props.rowData[header.key] as User)._links!.profile"
-                                    title="View Profile"
-                                >
-                                    {{ (props.rowData[header.key] as User).lastName }},
-                                    {{
-                                        (props.rowData[header.key] as User).preferredName ||
-                                        (props.rowData[header.key] as User).firstName
-                                    }}
-                                </a>
-                                <template v-else>
-                                    {{ (props.rowData[header.key] as User).lastName }},
-                                    {{
-                                        (props.rowData[header.key] as User).preferredName ||
-                                        (props.rowData[header.key] as User).firstName
-                                    }}
-                                </template>
+                <div class="l-flex-row l-gap-m">
+                    <user-photo :user="props.rowData[header.key] as User" render="small" />
+                    <div class="l-flex-col l-flex--justify-center f-no-margins">
+                        <template v-if="isUser(props.rowData[header.key])">
+                            <a
+                                v-if="(props.rowData[header.key] as User)._links?.profile"
+                                :href="(props.rowData[header.key] as User)._links!.profile"
+                                title="View Profile"
+                            >
+                                {{ (props.rowData[header.key] as User).lastName }},
+                                {{
+                                    (props.rowData[header.key] as User).preferredName ||
+                                    (props.rowData[header.key] as User).firstName
+                                }}
+                            </a>
+                            <template v-else>
+                                {{ (props.rowData[header.key] as User).lastName }},
+                                {{
+                                    (props.rowData[header.key] as User).preferredName ||
+                                    (props.rowData[header.key] as User).firstName
+                                }}
                             </template>
-                        </div>
+                        </template>
                     </div>
                 </div>
             </template>
@@ -146,6 +144,10 @@ const chartOptions = window.Vue.ref({
 </template>
 
 <style scoped lang="scss">
+tr:hover {
+    background-color: #f4f3f3; /* to help legibility */
+}
+
 .total-cell {
     background: var(--sbx-pr-table-total-cell-colour);
 }

@@ -503,6 +503,9 @@ table.attempts-table {
 /* make a table <td> sticky, minus 1 z-index so it scrolls underneath the <th> */
 .u-sticky-left--row {
     z-index: calc(var(--sbx-depth-ui-sticky) - 1);
+    &:hover {
+        background-color: #f4f3f3; /* to help legibility */
+    }
 }
 
 /* to accommodate an absolute positioned child */
