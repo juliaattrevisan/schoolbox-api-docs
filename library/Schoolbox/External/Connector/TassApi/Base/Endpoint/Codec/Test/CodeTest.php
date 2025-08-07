@@ -62,6 +62,28 @@ class CodeTest extends TestCase
                 '', '', '',
                 '--'
             ],
+
+            /* Added support for hyphenated year numbers
+             */
+            'Hyphenated 1' => [
+                '-1', 'S117', '1',
+                '-1-S117-1'
+            ],
+
+            'Hyphenated 2' => [
+                '-2', 'S117', '2',
+                '-2-S117-2'
+            ],
+
+            'Hyphenated 3' => [
+                '-PP', 'S117', '3',
+                '-PP-S117-3'
+            ],
+
+            'Hyphenated 4' => [
+                '', 'S117', '4',
+                '-S117-4'
+            ],
         ];
     }
 
@@ -80,5 +102,76 @@ class CodeTest extends TestCase
         $codec = new CodeCodec();
 
         $this->assertEquals($expected, $codec->encode($yearGroup, $subjectCode, $class));
+    }
+
+
+    /**
+     * Data provider for testValidCodeDecode
+     *
+     * @return array
+     */
+    public static function provider_validCodeDecode(): array
+    {
+        return [
+            'Valid Code 1 (all pieces)' => [
+                '11G-009B1-3',
+                ['11G', '009B1', '3']
+            ],
+
+            'Valid Code 2 (no Year Group)' => [
+                '-009B1-3',
+                ['', '009B1', '3']
+            ],
+
+            'Valid Code 3 (no Subject Code)' => [
+                '11G--3',
+                ['11G', '', '3']
+            ],
+
+            'Valid Code 4 (no Class)' => [
+                '11G-009B1-',
+                ['11G', '009B1', '']
+            ],
+
+            'Valid Code 5 (all empty)' => [
+                '--',
+                ['', '', '']
+            ],
+
+            'Hyphenated 1' => [
+                '-1-S117-1',
+                ['-1', 'S117', '1']
+            ],
+
+            'Hyphenated 2' => [
+                '-2-S117-2',
+                ['-2', 'S117', '2']
+            ],
+
+            'Hyphenated 3' => [
+                '-PP-S117-3',
+                ['-PP', 'S117', '3']
+            ],
+
+            'Hyphenated 4' => [
+                '-S117-4',
+                ['', 'S117', '4']
+            ]
+        ];
+    }
+
+
+    /**
+     * Test valid folder code strings
+     *
+     * @param string $code
+     * @param array $expected
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validCodeDecode')]
+    public function testValidCodeDecode(string $code, array $expected): void
+    {
+        $codec = new CodeCodec();
+
+        $this->assertEquals($expected, $codec->decode($code));
     }
 }
