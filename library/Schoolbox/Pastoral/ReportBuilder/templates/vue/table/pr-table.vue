@@ -101,6 +101,7 @@ function resetTableLoad(): void {
  */
 window.Vue.watch(recordsOrPoints, () => {
     viewUrlParams.set("selected", recordsOrPoints.value);
+    viewUrlParams.set("cursor", ""); // Reset cursor on records/points change
     viewUrl.value = `${props.selectedTab._links.view}?${viewUrlParams.toString()}`;
 });
 

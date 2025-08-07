@@ -64,10 +64,6 @@ export function usePagination(
             oldParams.delete("cursor");
             newParams.delete("cursor");
 
-            // Remove selected parameter from both for comparison
-            oldParams.delete("selected");
-            newParams.delete("selected");
-
             // If the remaining parameters are different, reset pagination
             return oldParams.toString() !== newParams.toString();
         } catch (error) {
