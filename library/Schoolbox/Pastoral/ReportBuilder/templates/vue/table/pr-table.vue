@@ -71,7 +71,7 @@ function initSetScrollableHeight(): void {
 
 // #endregion
 
-// #region table load
+// #region table load / sorting / pagination
 
 const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
 const viewUrl = window.Vue.ref("");

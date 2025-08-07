@@ -79,7 +79,9 @@ const upcoming = window.Vue.computed<UpcomingItem[]>(() => {
             <loading-table />
         </div>
     </div>
-    <data-load-error v-else-if="hasLoadError" data-title="Paperly" />
+    <section v-else-if="hasLoadError" class="content">
+        <data-load-error data-title="Paperly" />
+    </section>
     <template v-else>
         <ul class="flex-list flex-wrap buttons">
             <li v-for="feature in paperlyPayload.features" :key="feature.url">

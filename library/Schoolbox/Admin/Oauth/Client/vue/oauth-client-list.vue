@@ -364,7 +364,9 @@ window.Vue.watch(modifySelected, (newSelected) => {
 
 <template>
     <loading-table v-if="isDataLoading" />
-    <data-load-error v-else-if="hasDataLoadError" data-title="client list" />
+    <section v-else-if="hasDataLoadError" class="content">
+        <data-load-error data-title="client list" />
+    </section>
     <div v-else>
         <div class="small-12 island">
             <template v-if="clientList.length === 0">

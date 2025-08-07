@@ -105,7 +105,9 @@ async function onLoaded(): Promise<void> {
     <div class="row">
         <div :id="props.id" class="small-12 columns">
             <loading-table v-if="isLoading" />
-            <data-load-error v-else-if="hasLoadError" :data-title="props.title" />
+            <section v-else-if="hasLoadError" class="content">
+                <data-load-error :data-title="props.title" />
+            </section>
             <v-client-table v-else :data="data" :columns="columns" :options="options" @loaded="onLoaded">
                 <template v-for="slot in templates" :key="slot.key" #[slot.key]="tableData">
                     <template v-if="slot.component === 'image'">
