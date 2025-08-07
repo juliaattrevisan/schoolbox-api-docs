@@ -19,23 +19,21 @@ const props = defineProps<{
 </script>
 
 <template>
-    <div class="row">
-        <div v-if="props.results.length > 0" class="small-12 island">
-            <section v-for="record in props.results" :key="record.id">
-                <ul class="information-list threaded">
-                    <pr-record
-                        :record="record"
-                        :config="props.config"
-                        :routes="props.routes"
-                        :locale-pastoral="props.localePastoral"
-                        :show-severity="props.showSeverity"
-                        :severity-colors="props.severityColors"
-                    />
-                </ul>
-            </section>
+    <div v-if="props.results.length > 0" class="l-flex-col l-gap-s">
+        <div v-for="record in props.results" :key="record.id" class="c-island">
+            <ul class="information-list threaded">
+                <pr-record
+                    :record="record"
+                    :config="props.config"
+                    :routes="props.routes"
+                    :locale-pastoral="props.localePastoral"
+                    :show-severity="props.showSeverity"
+                    :severity-colors="props.severityColors"
+                />
+            </ul>
         </div>
-        <pr-empty v-else :routes="props.routes" :locale-pastoral="props.localePastoral" />
     </div>
+    <pr-empty v-else :routes="props.routes" :locale-pastoral="props.localePastoral" />
 </template>
 
 <style scoped></style>

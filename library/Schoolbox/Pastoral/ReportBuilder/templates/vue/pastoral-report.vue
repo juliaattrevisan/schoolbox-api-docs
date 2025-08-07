@@ -57,14 +57,10 @@ window.Vue.onMounted((): void => {
 </script>
 
 <template>
-    <div class="row actions-small-1">
-        <div class="list-item">
-            <div class="small-12 columns">
-                <h1>{{ props.title }}</h1>
-            </div>
-        </div>
-        <nav>
-            <template v-if="props.results.length">
+    <div class="l-flex-col l-gap-m">
+        <div class="l-flex-row l-flex--justify-space f-no-margins">
+            <h1>{{ props.title }}</h1>
+            <nav v-if="props.results.length">
                 <a
                     v-if="selectedTab._links.export"
                     :href="selectedTab._links.export"
@@ -72,11 +68,9 @@ window.Vue.onMounted((): void => {
                     aria-label="Download Report as CSV"
                 ></a>
                 <!-- <a href="#" class="icon-print" title="Print Report Results" @click.prevent="onPrintSelected"></a> -->
-            </template>
-        </nav>
-    </div>
-    <div class="row">
-        <div class="small-12 island">
+            </nav>
+        </div>
+        <div>
             <dl v-if="props.tabs.length > 1" class="tabs">
                 <dd
                     v-for="tab in props.tabs"

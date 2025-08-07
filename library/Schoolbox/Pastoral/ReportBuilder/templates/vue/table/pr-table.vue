@@ -333,18 +333,20 @@ window.Vue.onUnmounted(() => {
                     /></a>
                 </div>
                 <div ref="modalResultsRef" class="pr-table__records">
-                    <section v-for="record in recordsPayload?.data.results" :key="record.id">
-                        <ul class="information-list threaded">
-                            <pr-record
-                                :record="record"
-                                :config="props.config"
-                                :routes="props.routes"
-                                :locale-pastoral="props.localePastoral"
-                                :show-severity="props.showSeverity"
-                                :severity-colors="props.severityColors"
-                            />
-                        </ul>
-                    </section>
+                    <div class="l-flex-col l-gap-s">
+                        <div v-for="record in recordsPayload?.data.results" :key="record.id" class="c-island">
+                            <ul class="information-list threaded">
+                                <pr-record
+                                    :record="record"
+                                    :config="props.config"
+                                    :routes="props.routes"
+                                    :locale-pastoral="props.localePastoral"
+                                    :show-severity="props.showSeverity"
+                                    :severity-colors="props.severityColors"
+                                />
+                            </ul>
+                        </div>
+                    </div>
                     <div v-if="isLoadingMoreRecords" class="c-island l-pad-s">
                         <div class="loader"></div>
                     </div>
@@ -381,8 +383,5 @@ window.Vue.onUnmounted(() => {
 .pr-table__records {
     max-height: 650px;
     overflow-y: auto;
-    section {
-        margin-bottom: 1rem;
-    }
 }
 </style>
