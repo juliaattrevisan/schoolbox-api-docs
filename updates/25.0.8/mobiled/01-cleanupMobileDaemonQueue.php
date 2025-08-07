@@ -20,17 +20,27 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 // an actual call.
 $di = Kernel::installDependencies((new ContainerBuilder())->newInstance());
 
-/** @var Instance $instance */
-$instance = $di->get('instance');
+$scriptName = realpath(__DIR__ . '/../../../tools/mobile/cleanup-queue.php');
+$script     = 'php ' . escapeshellarg($scriptName) . ' -p';
+$version    = new Schoolbox\Version\Version($di->get('config'));
+if ($version->isCloudHosted()) {
+    echo <<<OUTPUT
+    Not running mobile cleanup queue script as background process on cloud instances.
 
-$sudo           = 'sudo -u ' . escapeshellarg(App::WEB_PROCESS_USER);
-$maxmarksScript = 'php ' . __DIR__ . '/../../../tools/mobile/cleanup-queue.php -p';
-$logFile        = '/var/log/schoolbox/' . INSTANCE_ID . '/mobile-cleanup-queue.log';
+    The below command needs to be run manually on cloud, and only once per cluster:
+    $script
+
+    OUTPUT;
+    exit;
+}
+
+$sudo    = 'sudo -u ' . escapeshellarg(App::WEB_PROCESS_USER);
+$logFile = '/var/log/schoolbox/' . INSTANCE_ID . '/mobile-cleanup-queue.log';
 
 // Can't pipe whilst retaining sudo user AFAIK:
 // need to tee and send output to null
 $tee     = $sudo . ' tee -a ' . escapeshellarg($logFile) . ' > /dev/null';
-$command = $sudo . ' ' . ($maxmarksScript . ' --perform 2>&1 | ' . $tee);
+$command = $sudo . ' ' . ($script . ' --perform 2>&1 | ' . $tee);
 
 // Run the whole thing in background
 echo "Running mobile cleanup queue script as background process:\n$command\n";
@@ -47,4 +57,4 @@ $procStatus = proc_get_status($proc);
 printf("Beginning mobile cleanup queue script (pid: %d)\n", $procStatus['pid']);
 
 // Exit: the process will continue to run in background.
-exit();
+exit;
