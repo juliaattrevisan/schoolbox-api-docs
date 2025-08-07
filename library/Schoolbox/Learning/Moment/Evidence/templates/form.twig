@@ -609,10 +609,12 @@
                 // Update the window history
                 window.history.pushState({}, null, response[0]._links.modifyForm);
             },
-            getFormData: () => JSON.stringify(
-                buildPayload(document.querySelector('#evidence-form'))
-                    .draft = true
-            ),
+            getFormData: () => {
+                let payload = buildPayload(document.querySelector('#evidence-form'));
+                payload.draft = true;
+                payload.body = window.sbProps.editors['evidence-body'].getData();
+                return JSON.stringify(payload);
+            },
             contentType: 'application/json',
         });
         {% endif %}

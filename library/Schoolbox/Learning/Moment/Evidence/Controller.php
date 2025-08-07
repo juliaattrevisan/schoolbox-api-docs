@@ -305,7 +305,7 @@ class Controller extends Base
                 ->setRecipient($user)
                 ->setBody($tokenReplacer->replace($evidenceModel->getBody(), $user));
 
-            if ($this->requestPost->get('draft', false) === 'true') {
+            if (true === $this->requestPost->get('draft', false)) {
                 // autosave draft, save as draft
                 $evidenceModel->draft();
             } else {
@@ -408,6 +408,11 @@ class Controller extends Base
         $tokenReplacer     = new TokenReplacer\Student(new TokenReplacer\Simple());
         $evidence          = $requestTranslator($requestBody, $evidence)
             ->setBody($tokenReplacer->replace($evidence->getBody(), $evidence->getRecipient()));
+
+        if (true === ($requestBody['draft'] ?? false)) {
+            // autosave draft, save as draft
+            $evidence->draft();
+        }
 
         $this->mapper->save($evidence);
 
