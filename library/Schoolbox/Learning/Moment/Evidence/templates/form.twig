@@ -116,27 +116,27 @@
              # Staff and students share this area, but their buttons are differently described
              #}
             <ul class="flex-list buttons">
-                {% if USER.role.isStudent %}
-                    <li><button id="draft">Save for later</button></li>
+                <li><button id="draft">Save for later</button></li>
 
-                    {% if isCreate %}
-                        {% set route = routeLookupIfAuthorized('learningMomentEvidence.postDraft', {userIds: userIds|join(',')}) %}
-                    {% else %}
-                        {% set route = routeLookupIfAuthorized('learningMomentEvidence.putDraft', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
-                    {% endif %}
+                {% if isCreate %}
+                    {% set route = routeLookupIfAuthorized('learningMomentEvidence.postDraft', {userIds: userIds|join(',')}) %}
+                {% else %}
+                    {% set route = routeLookupIfAuthorized('learningMomentEvidence.putDraft', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
+                {% endif %}
 
-                    <script>
-                        $(function() {
-                            $('#draft').on('click', function(event) {
-                                event.preventDefault();
+                <script>
+                    $(function() {
+                        $('#draft').on('click', function(event) {
+                            event.preventDefault();
 
-                                $('#evidence-form').attr('action', '{{ route }}');
+                            $('#evidence-form').attr('action', '{{ route }}');
 
-                                $('#evidence-persist').trigger('click');
-                            });
+                            $('#evidence-persist').trigger('click');
                         });
-                    </script>
+                    });
+                </script>
 
+                {% if USER.role.isStudent %}
                     {% if moderationRequired and (evidence.isDraft or evidence.isRejected) %}
                         <li><button id="submit">Submit for approval</button></li>
 
@@ -152,7 +152,7 @@
                          #     - it's already published and you shouldn't be able to publish again
                          #}
                     {% else %}
-                        <li><button id="submit">Publish</button></li>
+                        <li><button id="submit" class="submit">Publish</button></li>
 
                         {% if isCreate %}
                             {% set route = routeLookupIfAuthorized('learningMomentEvidence.postPublish', {userIds: userIds|join(',')}) %}
@@ -173,26 +173,6 @@
                         });
                     </script>
                 {% elseif USER.role.isParent and config.evidence_parent_create %}
-                    <li><button id="draft">Save for later</button></li>
-
-                    {% if isCreate %}
-                        {% set route = routeLookupIfAuthorized('learningMomentEvidence.postDraft', {userIds: userIds|join(',')}) %}
-                    {% else %}
-                        {% set route = routeLookupIfAuthorized('learningMomentEvidence.putDraft', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
-                    {% endif %}
-
-                    <script>
-                        $(function() {
-                            $('#draft').on('click', function(event) {
-                                event.preventDefault();
-
-                                $('#evidence-form').attr('action', '{{ route }}');
-
-                                $('#evidence-persist').trigger('click');
-                            });
-                        });
-                    </script>
-
                     {# Parents bypass moderation entirely #}
                     <li><button id="submit">Publish</button></li>
 
@@ -216,26 +196,6 @@
                 {% elseif USER.role.isStaff and USER.role.accessEvidence %}
                     {# Used to decide if comments should be deleted upon publish #}
                     <input type="hidden" name="delete-comments" id="delete-comments" value="0" />
-
-                    <li><button id="draft">Save for later</button></li>
-
-                    {% if isCreate %}
-                        {% set route = routeLookupIfAuthorized('learningMomentEvidence.postDraft', {userIds: userIds|join(',')}) %}
-                    {% else %}
-                        {% set route = routeLookupIfAuthorized('learningMomentEvidence.putDraft', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
-                    {% endif %}
-
-                    <script>
-                        $(function() {
-                            $('#draft').on('click', function(event) {
-                                event.preventDefault();
-
-                                $('#evidence-form').attr('action', '{{ route }}');
-
-                                $('#evidence-persist').trigger('click');
-                            });
-                        });
-                    </script>
 
                     {% if evidence.isDraft or evidence.isSubmitted or evidence.isRejected %}
                         {# This triggers an async request to Reject+reason
@@ -293,7 +253,7 @@
                         </script>
                     {% elseif isCreate %}
                         {# "Share a Learning Moment" via the Class List #}
-                        <li><button id="publish">Publish</button></li>
+                        <li><button id="publish" class="submit">Publish</button></li>
                     {% endif %}
                 {% endif %}
             </ul>
