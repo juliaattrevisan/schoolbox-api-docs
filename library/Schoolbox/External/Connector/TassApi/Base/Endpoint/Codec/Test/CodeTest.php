@@ -27,7 +27,7 @@ class CodeTest extends TestCase
      *
      * @return array
      */
-    public static function provider_validCodeEncode(): array
+    public static function providerValidCodeEncode(): array
     {
         /* This code format doesn't enforce Tass to provide all three pieces
          * In fact, Tass might provide none, and we'd still have to proceed
@@ -96,7 +96,7 @@ class CodeTest extends TestCase
      * @param string $class
      * @param string  $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validCodeEncode')]
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidCodeEncode')]
     public function testValidCodeEncode(string $yearGroup, string $subjectCode, string $class, string $expected): void
     {
         $codec = new CodeCodec();
@@ -110,7 +110,7 @@ class CodeTest extends TestCase
      *
      * @return array
      */
-    public static function provider_validCodeDecode(): array
+    public static function providerValidCodeDecode(): array
     {
         return [
             'Valid Code 1 (all pieces)' => [
@@ -174,7 +174,7 @@ class CodeTest extends TestCase
      * @param string $code
      * @param array $expected
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_validCodeDecode')]
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidCodeDecode')]
     public function testValidCodeDecode(string $code, array $expected): void
     {
         $codec = new CodeCodec();
