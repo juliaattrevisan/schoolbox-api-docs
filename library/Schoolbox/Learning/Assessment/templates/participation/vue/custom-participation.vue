@@ -358,7 +358,7 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                     </td>
                     <td>
                         <template v-if="participant.customisedPlan !== null">
-                            <a :href="`${participant.customisedPlan.assessable._links.modify}`">
+                            <a :href="`${participant.customisedPlan.assessable._links.modify}?${getReturnUrl()}`">
                                 {{ participant.customisedPlan.assessable.title }}
                             </a>
                         </template>
