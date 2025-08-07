@@ -401,6 +401,11 @@ function create_cron_config_file() {
   echo "${DEFAULT_INSTANCE_ID};${timezone};22:00;/var/log/schoolbox/${DEFAULT_INSTANCE_ID}" > /etc/schoolbox/cron_config.ini
 }
 
+function create_crontab_files() {
+  log "Creating crontab files";
+  cloud-rebuild-cronjobs --is-primary-host 1 --instance "${DEFAULT_INSTANCE_ID}"
+}
+
 function post_install() {
   log "Removing system maintenance mode";
   if INSTANCE_ID="${DEFAULT_INSTANCE_ID}" "$SITE_ROOT"/tools/maintenance/site_up.sh -eq 0 ; then
@@ -440,6 +445,7 @@ function main() {
   init_database
   install_instance
   create_cron_config_file
+  create_crontab_files
   post_install
 }
 
