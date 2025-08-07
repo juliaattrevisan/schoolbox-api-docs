@@ -58,15 +58,17 @@ window.Vue.onMounted((): void => {
 
 <template>
     <div class="l-flex-col l-gap-m">
-        <div class="l-flex-row l-flex--justify-space f-no-margins">
+        <div class="l-flex-row l-flex--justify-space l-flex--align-end f-no-margins">
             <h1>{{ props.title }}</h1>
             <nav v-if="props.results.length">
                 <a
                     v-if="selectedTab._links.export"
                     :href="selectedTab._links.export"
-                    class="icon-download"
                     aria-label="Download Report as CSV"
-                ></a>
+                    title="Download Report as CSV"
+                >
+                    <sbx-icon name="download" />
+                </a>
                 <!-- <a href="#" class="icon-print" title="Print Report Results" @click.prevent="onPrintSelected"></a> -->
             </nav>
         </div>
