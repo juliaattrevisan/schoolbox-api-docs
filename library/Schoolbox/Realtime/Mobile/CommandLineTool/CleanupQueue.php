@@ -173,7 +173,7 @@ class CleanupQueue extends CliTool\App
 
         // Report on what was done
         $logger->notice(sprintf('Searched keys: %d', $keyCount));
-        $logger->notice(sprintf('.. unprocessable: %d', $instanceKeyCount));
+        $logger->notice(sprintf('.. unprocessable: %d', $unprocessableKeyCount));
         $logger->notice(sprintf('.. message instances: %d', $instanceKeyCount));
         $logger->notice(sprintf('.... no TTL: %d', $instanceKeyNoTtlCount));
         $logger->notice(sprintf('...... TTLs set: %d', $instanceKeyTtlSetCount));
