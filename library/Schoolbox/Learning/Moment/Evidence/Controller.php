@@ -910,13 +910,6 @@ class Controller extends Base
                         'timestamp' => $moment->getCreatedAt()->getUnixTimestamp(),
                         'displayAs' => $moment->getCreatedAt()->getLocalShort()
                     ],
-                    'createdBy' => $moment->getCreator() ? [
-                        'id' => $moment->getCreator()->getId(),
-                        'externalId' => $moment->getCreator()->getExternalId(),
-                        'fullname' => $moment->getCreator()->getFullname(),
-                        'firstname' => $moment->getCreator()->getFirstname(),
-                        'lastname' => $moment->getCreator()->getLastname(),
-                    ] : null,
                     /* We don't store updatedBy, for whatever reason: I suppose it was presumed
                      * to always be the same as its author...
                      *
