@@ -209,6 +209,9 @@
                         <input type="hidden" name="{{ returnUrlName }}" value="{{ returnUrl }}" />
                         <input type="hidden" name="id" value="{{ assessment.id }}" />
                         <input type="hidden" name="folderId" value="{{ assessment.baseContext.folder.id }}" />
+                        {% if customisedFor is defined %}
+                            <input type="hidden" name="customisedFor" value="{{ customisedFor }}" />
+                        {% endif %}
                         {% include '@learningAssessment/'~assessmentType~'/create.twig' with { actionLabel: 'Update' } %}
                     </div>
                 </fieldset>

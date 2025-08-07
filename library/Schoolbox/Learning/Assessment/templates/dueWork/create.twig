@@ -18,6 +18,9 @@
 {# ----------------------------------------------------------- #}
 <fieldset>
     <label class="required" for="title">Title</label>
+    {% if customisedFor is defined %}
+        <p class="meta">The title cannot be the same as the original activity.</p>
+    {% endif %}
     <input type="text" name="title" id="title" data-test="assessment-form-input-title" value="{{ assessment.title }}" required maxlength="255" {% if courseManaged.isReadonly %}readonly{% endif %} />
 
     <div class="row">
