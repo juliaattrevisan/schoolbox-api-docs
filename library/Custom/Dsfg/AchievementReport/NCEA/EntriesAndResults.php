@@ -39,6 +39,12 @@ class EntriesAndResults extends Base
             $result = $current['Result'];
             $strippedResult = $current['StrippedResult'];
 
+            // Note $internalExternal is expected to always be 'IN' or 'EX'.
+            // Some data does not meet this requirement, so if it ain't 'EX', assume it's 'IN'.
+            if ($internalExternal !== 'EX') {
+                $internalExternal = 'IN';
+            }
+
             /* Teachers
              * Trim empty teachers out for course teachers
              */
