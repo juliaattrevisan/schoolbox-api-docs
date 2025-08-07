@@ -851,7 +851,7 @@ class Controller extends Base
         $payload = [];
 
         if (\count($ids)) {
-            $users = array_fill_keys($ids, true);
+            $userLookup = array_fill_keys($ids, true);
 
             $pb = $this->mapper->getPredicateBuilder()
                 ->between('updated_at', $from, $to);
@@ -862,7 +862,7 @@ class Controller extends Base
                 /* Only care about moments whose recipients are in the set of users associated
                  * with $folder: otherwise ignore the learning moment
                  */
-                if (!array_key_exists($moment->getRecipient()->getId(), $users)) {
+                if (!array_key_exists($moment->getRecipient()->getId(), $userLookup)) {
                     continue;
                 }
 
