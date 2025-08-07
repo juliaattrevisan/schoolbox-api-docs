@@ -25,6 +25,8 @@ export default class LearningMomentsPage {
 
     static readonly SUBMIT_BUTTON = "learning-moment-evidence-form-submit";
 
+    static readonly APPROVE_BUTTON = "learning-moment-evidence-form-approve";
+
     static readonly COMMENT_DELETE_BUTTON = "learning-moment-evidence-delete-comment";
 
     static readonly COMMENT_CONFIRM_DELETE_BUTTON = "learning-moment-evidence-delete-comment-confirm";
@@ -116,7 +118,7 @@ export default class LearningMomentsPage {
      * Click evidence submit button
      */
     async clickSubmit(): Promise<void> {
-        await this.page.getByTestId(LearningMomentsPage.SUBMIT_BUTTON).click();
+        await this.page.getByTestId(LearningMomentsPage.APPROVE_BUTTON).click();
     }
 
     /**
