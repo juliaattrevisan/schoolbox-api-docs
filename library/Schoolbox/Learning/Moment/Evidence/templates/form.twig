@@ -81,7 +81,7 @@
 <div class="row">
     <div class="small-12 island">
         {# form action is intentionally controlled via javascript now #}
-        <form action="" method="post" id="evidence-form">
+        <form action="" method="{{ formMethod }}" id="evidence-form" data-action-draft="{{ formAction }}" data-action-submit="{{ formAction }}">
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -350,6 +350,9 @@
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
+{% if (sharingForSelf or (otherUsers | length == 1)) and not evidence.isPublished %}
+    <script src="{{ CDN_PREFIX }}/js/comms/draft.js?v={{ config.site_version }}"></script>
+{% endif %}
 {% block formJs %}
     {% autoescape 'js' %}
         <script type="text/javascript">
@@ -439,7 +442,7 @@
                  # ...it depends on whether you're creating a new thing, or modifying an existing thing
                  # html forms don't support PUT, only the classical POST and GET methods.
                  #}
-                let formMethod = '{{ formMethod }}';
+                let formMethod = form.attributes.method.value;
 
                 // Build a request to post the form
                 let payload = buildPayload(form),
@@ -573,6 +576,40 @@
                 }
             });
         });
+
+        {% if (sharingForSelf or (otherUsers | length == 1)) and not evidence.isPublished %}
+        var $createForm = $('#evidence-form');
+        var $submitButton = $('#evidence-submit');
+        // Init draft plugin
+        $createForm.draft({
+            inputs: ['#evidence-tags', '#curriculum-code-select', 'input[name="curriculumCodes[]"]'],
+            textareas: ['evidence-body'],
+            attachzones: ['#storage-zone'],
+            toaster: $('#toast'),
+            staller: $submitButton,
+            onSaveSuccess: function (response) {
+                // response is either an array (initial create, as multi students may exist (just not in draft mode))
+                // or a single object (update, as only one student is being modified)
+                if (!Array.isArray(response)) { // i mean this is one way... ai auto suggest. lets see how this goes..
+                    response = [response];
+                }
+                // Update the form actions (document, so it works for the save)
+                document.querySelector('#evidence-form').dataset.actionDraft = response[0]._links.put;
+                document.querySelector('#evidence-form').dataset.actionSubmit = response[0]._links.put;
+                document.querySelector('#evidence-form').action = response[0]._links.put;
+                document.querySelector('#evidence-form').method = 'put';
+                // update jquery / draft js (has weird cache)
+                $createForm.data('action-draft', response[0]._links.put);
+                $createForm.data('action-submit', response[0]._links.put);
+                $createForm.attr('action', response[0]._links.put);
+                $createForm.attr('method', 'put');
+                // Update the window history
+                window.history.pushState({}, null, response[0]._links.modifyForm);
+            },
+            getFormData: () => JSON.stringify(buildPayload(document.querySelector('#evidence-form'))),
+            contentType: 'application/json',
+        });
+        {% endif %}
     });
 </script>
 {% endautoescape %}

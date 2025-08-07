@@ -60,6 +60,12 @@
 
                 // The infamous stallSubmit
                 staller: null,
+
+                // overloadable function to get form data
+                getFormData: null,
+
+                // The content type to use for the ajax request
+                contentType: "application/x-www-form-urlencoded; charset=UTF-8",
             };
 
             return $.extend(defaults, options);
@@ -163,6 +169,29 @@
         }
 
         /**
+         * Get the form contents to be sent via ajax
+         * @returns {*|jQuery}
+         */
+        function getFormContents() {
+            var formContents = $(config.element).serializeArray();
+
+            /* Special treatment because ck reasons
+             */
+            for (var i = 0; i < config.textareas.length; i++) {
+                var key = config.textareas[i];
+                formContents.push({
+                    name: key,
+                    value: window.sbProps.editors[key].getData(),
+                });
+            }
+            /* Send draft flag
+             */
+            formContents.push({ name: "draft", value: true });
+
+            return formContents;
+        }
+
+        /**
          * Save the data via ajax, showing a toast for the user
          *
          * @param {jQuery.Deferred} deferred - a deferred object to resolve on successful save
@@ -173,7 +202,7 @@
                 text: "Saving...",
             });
 
-            var formContents = $(config.element).serializeArray();
+            const formContents = (config.getFormData || getFormContents)();
 
             /* Special treatment because ck reasons
              */
@@ -197,6 +226,7 @@
                 url: config.element.data("action-draft"),
                 data: formContents,
                 dataType: "json",
+                contentType: config.contentType,
             })
                 .done(function (responseText) {
                     config.toaster.toastTimeout({

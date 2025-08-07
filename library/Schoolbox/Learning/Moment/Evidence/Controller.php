@@ -305,18 +305,23 @@ class Controller extends Base
                 ->setRecipient($user)
                 ->setBody($tokenReplacer->replace($evidenceModel->getBody(), $user));
 
-            if (null !== $defaultState) {
-                /* Spawn a learning moment in a particular state
-                 */
-                $this->updateState($evidenceModel, $defaultState);
-            } elseif ($moderationRequired) {
-                /* Accelerate into the next state based on configs and year level settings
-                 */
+            if ($this->requestPost->get('draft', false) === 'true') {
+                // autosave draft, save as draft
                 $evidenceModel->draft();
             } else {
-                /* Does not require moderation; just send it into the world
-                 */
-                $evidenceModel->publish($this->getUser());
+                if (null !== $defaultState) {
+                    /* Spawn a learning moment in a particular state
+                     */
+                    $this->updateState($evidenceModel, $defaultState);
+                } elseif ($moderationRequired) {
+                    /* Accelerate into the next state based on configs and year level settings
+                     */
+                    $evidenceModel->draft();
+                } else {
+                    /* Does not require moderation; just send it into the world
+                     */
+                    $evidenceModel->publish($this->getUser());
+                }
             }
 
             $evidenceCollection->add($evidenceModel);
@@ -324,11 +329,7 @@ class Controller extends Base
         $this->mapper->save($evidenceCollection);
         $this->response = $this->responseAsJson(
             $evidenceCollection->map(
-                new Translator\ModelToArray\Base(
-                    new User\Translator\Author\ModelToArray(),
-                    new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
-                    new ScrubAdapter(),
-                ),
+                $this->buildTranslatorWithComments(1),
             )
         )->withStatus(201);
     }
@@ -410,11 +411,7 @@ class Controller extends Base
 
         $this->mapper->save($evidence);
 
-        $responseTranslator = new Translator\ModelToArray\Base(
-            new User\Translator\Author\ModelToArray(),
-            new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
-            new ScrubAdapter(),
-        );
+        $responseTranslator = $this->buildTranslatorWithComments(1);
         $this->response     = $this->responseAsJson($responseTranslator($evidence));
     }
 
