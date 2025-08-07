@@ -332,6 +332,26 @@ class Cursor implements ICursor
              AND e.deleted_at IS NULL
              AND $sqlWhereCondition"
         );
+
+        /* Special roletype-specific behaviours
+         */
+        $roletypeWhereCondition = '';
+
+        /* If the $viewer is a staff member with Learning Moments role permission,
+         * show all the learning moments for a person regardless of what state those
+         * learning moments are in. Staff with this role permission see everything.
+         */
+
+        /* If the $viewer is a parent of the student, only show learning moments that:
+         *    - the parent has authored
+         *    - are in "published" state
+         */
+
+        /* If the $viewer is the student, only show learning moments that:
+         *    - the student has authored
+         *    - are in "published" state
+         */
+
         $params['userIdEvidence'] = $this->viewee->getId();
 
         return [$query, $params];
