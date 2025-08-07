@@ -181,4 +181,86 @@ class CodeTest extends TestCase
 
         $this->assertEquals($expected, $codec->decode($code));
     }
+
+
+    /**
+     * Data provider for testValidEncodeDecode
+     *
+     * @return array
+     */
+    public static function providerValidEncodeDecode(): array
+    {
+        return [
+            'Valid Code 1 (all pieces)' => [
+                '11G-009B1-3',
+                '11G-009B1-3',
+            ],
+
+            'Valid Code 2 (no Year Group)' => [
+                '-009B1-3',
+                '-009B1-3',
+            ],
+
+            'Valid Code 3 (no Subject Code)' => [
+                '11G--3',
+                '11G--3',
+            ],
+
+            'Valid Code 4 (no Class)' => [
+                '11G-009B1-',
+                '11G-009B1-',
+            ],
+
+            'Valid Code 5 (all empty)' => [
+                '--',
+                '--',
+            ],
+
+            'Hyphenated 1' => [
+                '-1-S117-1',
+                '-1-S117-1',
+            ],
+
+            'Hyphenated 2' => [
+                '-2-S117-2',
+                '-2-S117-2',
+            ],
+
+            'Hyphenated 3' => [
+                '-PP-S117-3',
+                '-PP-S117-3',
+            ],
+
+            'Hyphenated 4' => [
+                '-S117-4',
+                '-S117-4',
+            ],
+
+            /* Particularly exotic usage: not sure if legit or not
+             */
+            'Hyphenated Oddball 1' => [
+                '--S117-4',
+                '--S117-4',
+            ],
+        ];
+    }
+
+
+    /**
+     * Test re-encoding
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerValidEncodeDecode')]
+    public function testValidEncodeDecode(string $code, string $expected): void
+    {
+        $codec = new CodeCodec();
+
+        $decoded = $codec->decode($code);
+        $encoded = $codec->encode($decoded[0], $decoded[1], $decoded[2]);
+        $decoded = $codec->decode($encoded);
+        $encoded = $codec->encode($decoded[0], $decoded[1], $decoded[2]);
+        $decoded = $codec->decode($encoded);
+        $encoded = $codec->encode($decoded[0], $decoded[1], $decoded[2]);
+
+        $this->assertEquals($expected, $encoded);
+    }
 }
