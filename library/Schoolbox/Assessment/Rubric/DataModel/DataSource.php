@@ -486,7 +486,10 @@ class DataSource
         /* Reset the assessment id in rubric grid for the cloned copy
          */
         if ($cloneNewRubric) {
-            $grid = $grid->setAssessment($assessment->setId(null));
+            /* Cloning to preserve the id of the original assessment
+             */
+            $cloneAssessment = clone $assessment;
+            $grid = $grid->setAssessment($cloneAssessment->setId(null));
         }
         return $grid;
     }
