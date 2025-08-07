@@ -1,5 +1,5 @@
 var scriptValidationRules = $("script[src*=validationRules]");
-const validateTitleRoute = scriptValidationRules.attr("data-title-validation");
+
 /**
  * Validation rules that can be applied to the form on load
  */
