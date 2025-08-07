@@ -39,6 +39,11 @@ function onTabSelected(tab: Tab): void {
 }
 
 /**
+ *
+ */
+window.Vue.onActivated((): void => {});
+
+/**
  * Load the first tab when the component is mounted,
  * also checking the URL for a tab type.
  */
