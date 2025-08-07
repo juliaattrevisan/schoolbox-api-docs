@@ -22,8 +22,8 @@ if ($existing instanceof \Schoolbox\Bookmark\Model && ($existing->getOwner() !==
     error(\Schoolbox\Error\Mapper::ERROR_PERM_LINK);
 }
 
-if (isset($_REQUEST['url']) && $_REQUEST['url'] && isset($_REQUEST['description']) && $_REQUEST['description']) {
-    $urlFormatter = new Url($_REQUEST['url']);
+if (isset($_POST['url']) && $_POST['url'] && isset($_POST['description']) && $_POST['description']) {
+    $urlFormatter = new Url($_POST['url']);
     try {
         $urlFormatter->normalise();
     } catch (InvalidArgumentException $e) {
@@ -37,13 +37,13 @@ if (isset($_REQUEST['url']) && $_REQUEST['url'] && isset($_REQUEST['description'
 
     if ($existing instanceof \Schoolbox\Bookmark\Model) {
         $existing->setUrl($url);
-        $existing->setDescription($_REQUEST['description']);
+        $existing->setDescription($_POST['description']);
         $bookmarkMapper->save($existing);
     } else {
         $newLink = $bookmarkMapper->createModel()
             ->setOwner($_SESSION['id'])
             ->setUrl($url)
-            ->setDescription($_REQUEST['description']);
+            ->setDescription($_POST['description']);
         $bookmarkMapper->save($newLink);
     }
 } else {
