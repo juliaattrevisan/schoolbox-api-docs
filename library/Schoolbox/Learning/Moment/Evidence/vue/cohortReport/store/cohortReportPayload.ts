@@ -3,12 +3,54 @@ import type { ApiBaseResponse } from "@js/util/sbx/apiUtils";
 
 export type CohortReportEntry = {
     id: number;
-    // TODO
+    body: string;
+    files: {
+        hash: string;
+        filename: string;
+        mime: string;
+        icon: string;
+    }[];
+    recipient: {
+        id: number;
+        externalId: string | null;
+        fullname: string;
+        firstname: string;
+        lastname: string;
+        role: string;
+    };
+    creator: {
+        id: number;
+        externalId: string | null;
+        fullname: string;
+        firstname: string;
+        lastname: string;
+    };
+    createdAt: {
+        timestamp: number;
+        displayAs: string;
+    };
+    createdBy: {
+        id: number;
+        externalId: string | null;
+        fullname: string;
+        firstname: string;
+        lastname: string;
+    } | null;
+    updatedAt: {
+        timestamp: number;
+        displayAs: string;
+    };
+    hasComments: boolean;
+    _links: {
+        submit: string | null;
+        publish: string | null;
+        reject: string | null;
+    };
 };
 
 export type CohortReportApiResponse = {
     status: 200;
-    content: Record<CohortReportEntry["id"], CohortReportEntry>;
+    content: CohortReportEntry[];
 };
 
 /**
@@ -19,7 +61,7 @@ export type CohortReportApiResponse = {
  */
 export async function getCohortReport(url: string): Promise<ApiBaseResponse<CohortReportApiResponse>> {
     return apiRequest<CohortReportApiResponse>({
-        url,
+        url: `${url}/2020-01-01/2025-12-31`,
         method: "GET",
     });
 }

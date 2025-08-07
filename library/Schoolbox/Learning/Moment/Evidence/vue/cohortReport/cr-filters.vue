@@ -1,12 +1,14 @@
 <script lang="ts" setup>
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
+import { useCohortReportStore } from "./store/cohortReportStore";
 
 interface Props {
     isSingleColumn: boolean;
 }
 
 const props = defineProps<Props>();
+const crStore = useCohortReportStore();
 
 const isOpen = window.Vue.ref(true); // whether the filters are shown
 
@@ -37,8 +39,9 @@ window.Vue.watch(
 /**
  * To apply the selected filters
  */
-function applyFilters(): void {
+async function applyFilters(): Promise<void> {
     // TODO
+    await crStore.loadData();
 }
 
 const studentFilter = window.Vue.ref<SearchSelectItem[]>([]);

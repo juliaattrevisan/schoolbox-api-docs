@@ -6,15 +6,18 @@ const crStore = useCohortReportStore();
 
 <template>
     <div class="l-flex-col l-gap-m">
+        <div v-if="crStore.loadError" class="alert-box alert">
+            {{ crStore.loadError }}
+        </div>
+        <div v-else-if="crStore.isLoading" class="small-12 c-island">
+            <section class="content">
+                <div class="loader"></div>
+            </section>
+        </div>
+
         <div class="small-12 c-island">
             <section class="content">
-                <div v-if="crStore.isLoading" class="loader"></div>
-                <div v-else-if="crStore.loadError" class="alert-box alert">
-                    {{ crStore.loadError }}
-                </div>
-                <template v-else>
-                    {{ crStore.results }}
-                </template>
+                {{ crStore.results }}
             </section>
         </div>
     </div>

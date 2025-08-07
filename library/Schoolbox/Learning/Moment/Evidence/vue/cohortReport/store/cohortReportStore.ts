@@ -1,10 +1,11 @@
 import { defineStore } from "pinia";
-import { getCohortReport, type CohortReportApiResponse } from "./cohortReportPayload";
+import { getCohortReport } from "./cohortReportPayload";
+import type { CohortReportEntry } from "./cohortReportPayload";
 
 export const useCohortReportStore = defineStore("cohortReport", () => {
     let endpoint: string | null = null; // the endpoint to fetch the cohort report data
 
-    const results = window.Vue.ref<CohortReportApiResponse>({});
+    const results = window.Vue.ref<CohortReportEntry[]>([]);
 
     const isLoading = window.Vue.ref(true);
     const loadError = window.Vue.ref<string | null>(null);
@@ -25,8 +26,8 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
             return;
         }
 
-        // merge with whatever results we already have
-        Object.assign(results.value, response.data);
+        // merge with whatever results we already have, there shouldn't be dupes
+        results.value.push(...response.data.content);
     }
 
     /**
@@ -42,6 +43,7 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         init,
         results,
         isLoading,
+        loadData,
         loadError,
     };
 });
