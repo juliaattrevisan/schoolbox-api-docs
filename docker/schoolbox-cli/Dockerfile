@@ -75,3 +75,13 @@ RUN \
   apt-get clean -y
 
 WORKDIR /usr/share/schoolbox
+
+# Create users and groups, and set default user
+RUN <<EOF
+echo "%schoolboxsuper ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/schoolboxsuper
+useradd -m -U -G adm,sudo,www-data -s /bin/bash schoolboxsuper
+EOF
+
+# For some reason this causes a message: schoolbox-cli hook exited with status 1
+# The container starts without issue though.
+USER schoolboxsuper
