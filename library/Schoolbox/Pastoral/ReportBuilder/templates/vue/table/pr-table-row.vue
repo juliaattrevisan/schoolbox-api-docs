@@ -4,6 +4,9 @@
  * Renders a single row with cells based on column types.
  */
 
+import { Chart } from "highcharts-vue";
+import "highcharts/modules/accessibility";
+import type { Point } from "highcharts";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { TableHeaderType } from "../../js/types/pastoralReportTypes";
@@ -52,6 +55,49 @@ function isUser(data: RowOptions): data is User {
         data.lastName !== undefined
     );
 }
+
+const chartOptions = window.Vue.ref({
+    accessibility: {
+        description: "Trend of points over the year for type/subtype",
+    },
+    boost: {
+        useGPUTranslations: true,
+    },
+    chart: {
+        height: 50,
+        width: 200,
+    },
+    colors: ["#000"],
+    credits: {
+        enabled: false,
+    },
+    legend: {
+        enabled: false,
+    },
+    title: false,
+    tooltip: {
+        formatter(this: Point): string {
+            return `The value for <b>${this.key}</b> is <b>${this.y}</b>`;
+        },
+        valueSuffix: "Points",
+    },
+    series: [
+        {
+            data: [30, 20, -10, 5, -25, 40, 30, 5, 10, 10, 15, -15],
+            name: "Points",
+        },
+    ],
+    xAxis: {
+        categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+        title: {
+            text: "Months",
+        },
+        visible: false,
+    },
+    yAxis: {
+        visible: false,
+    },
+});
 </script>
 
 <template>
@@ -62,7 +108,7 @@ function isUser(data: RowOptions): data is User {
             :class="`u-border-right ${header.key === 'user' ? 'u-sticky-left u-sticky-left--row' : ''} ${header.key === 'total' ? 'total-cell' : ''}`"
         >
             <template v-if="header.type == TableHeaderType.USER && isUser(props.rowData[header.key])">
-                <div class="c-card">
+                <!-- <div class="c-card">
                     <div class="l-flex-row l-gap-m">
                         <user-photo :user="props.rowData[header.key] as User" render="small" rounded-corners />
                         <div class="l-flex-col l-flex--justify-center f-no-margins">
@@ -88,7 +134,8 @@ function isUser(data: RowOptions): data is User {
                             </template>
                         </div>
                     </div>
-                </div>
+                </div> -->
+                <chart :options="chartOptions"></chart>
             </template>
             <template v-else-if="header.type == TableHeaderType.RECORDS_AND_POINTS">
                 <!-- Change data based on current radio button selection -->
