@@ -240,7 +240,7 @@
                     rowCommentTextarea: '[data-feedback-comment]',
                 },
             },
-            {% if editorTemplates %}
+            {% if editorTemplates is defined %}
                 templates: {{ editorTemplates|json_encode|raw }},
             {% endif %}
         }
