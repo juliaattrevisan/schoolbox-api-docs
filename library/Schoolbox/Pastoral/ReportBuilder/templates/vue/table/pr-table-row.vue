@@ -42,21 +42,6 @@ function onCellSelected(header: TableHeader): void {
 }
 
 /**
- * To cast the row data to a User type
- * @param data - the row data to check
- * @returns true if the data is a User, false otherwise
- */
-function isUser(data: RowOptions): data is User {
-    return (
-        typeof data === "object" &&
-        "firstName" in data &&
-        data.firstName !== undefined &&
-        "lastName" in data &&
-        data.lastName !== undefined
-    );
-}
-
-/**
  * Chart options for the trend chart in the table row.
  */
 const chartOptions = window.Vue.ref({
@@ -81,29 +66,27 @@ const chartOptions = window.Vue.ref({
             :key="header.key"
             :class="`u-border-right ${header.key === 'user' ? 'u-sticky-left u-sticky-left--row l-pad--0' : ''} ${header.key === 'total' ? 'total-cell' : ''}`"
         >
-            <template v-if="header.type == TableHeaderType.USER && isUser(props.rowData[header.key])">
+            <template v-if="header.type == TableHeaderType.USER">
                 <div class="l-flex-row l-gap-m">
                     <user-photo :user="props.rowData[header.key] as User" render="small" />
                     <div class="l-flex-col l-flex--justify-center f-no-margins">
-                        <template v-if="isUser(props.rowData[header.key])">
-                            <a
-                                v-if="(props.rowData[header.key] as User)._links?.profile"
-                                :href="(props.rowData[header.key] as User)._links!.profile"
-                                title="View Profile"
-                            >
-                                {{ (props.rowData[header.key] as User).lastName }},
-                                {{
-                                    (props.rowData[header.key] as User).preferredName ||
-                                    (props.rowData[header.key] as User).firstName
-                                }}
-                            </a>
-                            <template v-else>
-                                {{ (props.rowData[header.key] as User).lastName }},
-                                {{
-                                    (props.rowData[header.key] as User).preferredName ||
-                                    (props.rowData[header.key] as User).firstName
-                                }}
-                            </template>
+                        <a
+                            v-if="(props.rowData[header.key] as User)._links?.profile"
+                            :href="(props.rowData[header.key] as User)._links!.profile"
+                            title="View Profile"
+                        >
+                            {{ (props.rowData[header.key] as User).lastName }},
+                            {{
+                                (props.rowData[header.key] as User).preferredName ||
+                                (props.rowData[header.key] as User).firstName
+                            }}
+                        </a>
+                        <template v-else>
+                            {{ (props.rowData[header.key] as User).lastName }},
+                            {{
+                                (props.rowData[header.key] as User).preferredName ||
+                                (props.rowData[header.key] as User).firstName
+                            }}
                         </template>
                     </div>
                 </div>
