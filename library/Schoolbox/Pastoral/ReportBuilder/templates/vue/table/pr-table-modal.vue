@@ -6,6 +6,7 @@
 import { useTemplateRef, toRefs } from "vue";
 import { useScroll } from "@vueuse/core";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
+import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import type {
     Tab,
     Config,
@@ -86,14 +87,7 @@ window.Vue.watch(bottom, (isAtBottom) => {
 <template>
     <basic-modal v-model:is-open="isOpen" has-background-click>
         <div v-if="isNewLoad && isNewLoading" class="loader"></div>
-        <div v-else-if="isNewLoad && loadError" class="alert-box alert f-no-margins">
-            Sorry, there was an error during further record retrieval. Please
-            <a href="" title="refresh the page"> refresh the page </a>
-            to try again and contact your support if the problem persists.
-            <template v-if="loadError && loadError.length > 0"
-                ><em>Further support info: {{ loadError }}</em></template
-            >
-        </div>
+        <data-load-error v-else-if="isNewLoad && loadError" data-title="record" :further-info="loadError" />
         <template v-else-if="selectedHeader !== null">
             <div class="l-flex-col l-gap-m">
                 <div class="l-flex-row l-flex--justify-space l-gap-s">
@@ -134,14 +128,11 @@ window.Vue.watch(bottom, (isAtBottom) => {
                     <div v-if="isMoreLoading" class="c-island l-pad-s">
                         <div class="loader"></div>
                     </div>
-                    <div v-else-if="!isNewLoad && loadError" class="alert-box alert f-no-margins">
-                        Sorry, there was an error during record retrieval. Please
-                        <a href="" title="refresh the page"> refresh the page </a>
-                        to try again and contact your support if the problem persists.
-                        <template v-if="loadError && loadError.length > 0"
-                            ><em>Further support info: {{ loadError }}</em></template
-                        >
-                    </div>
+                    <data-load-error
+                        v-else-if="!isNewLoad && loadError"
+                        data-title="record"
+                        :further-info="loadError"
+                    />
                 </div>
             </div>
         </template>
