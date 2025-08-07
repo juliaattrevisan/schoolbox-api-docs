@@ -53,7 +53,6 @@ class Config
 
             /* Note that in CI, INSTANCE_ID will always be 'ci' and trigger phpstannis
              */
-            /** @phpstan-ignore-next-line  */
             if (
                 in_array(INSTANCE_ID, Instance::DEVELOPMENT_INSTANCE_IDS)
                 || in_array($siteType, ['dev', 'vagrant'], true)
