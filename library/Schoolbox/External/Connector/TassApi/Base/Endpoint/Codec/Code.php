@@ -86,7 +86,7 @@ class Code
     {
         /* Look for the exotic case where year levels contain a hyphen
          */
-        $pattern = '/^(' . self::SEPARATOR . '[a-zA-Z0-9]+)' . self::SEPARATOR . '([a-zA-Z0-9]+)' . self::SEPARATOR . '([a-zA-Z0-9]+)/';
+        $pattern = '/^(' . self::SEPARATOR . '[a-zA-Z0-9]*)' . self::SEPARATOR . '([a-zA-Z0-9]+)' . self::SEPARATOR . '([a-zA-Z0-9]+)/';
 
         preg_match($pattern, $classCode, $matches);
 

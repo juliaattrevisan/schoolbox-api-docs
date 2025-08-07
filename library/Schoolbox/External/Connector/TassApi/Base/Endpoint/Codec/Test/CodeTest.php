@@ -156,7 +156,14 @@ class CodeTest extends TestCase
             'Hyphenated 4' => [
                 '-S117-4',
                 ['', 'S117', '4']
-            ]
+            ],
+
+            /* Particularly exotic usage: not sure if legit or not
+             */
+            'Hyphenated Oddball 1' => [
+                '--S117-4',
+                ['-', 'S117', '4']
+            ],
         ];
     }
 
