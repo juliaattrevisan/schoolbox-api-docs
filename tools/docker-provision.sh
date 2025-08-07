@@ -318,7 +318,7 @@ function init_npm_dependencies() {
 
   # Ensure nvm.sh is run before building NPM stuff,
   # so the npm versions it installed are available
-  source ~/.nvm/nvm.sh
+  source /opt/nvm/nvm.sh
 
   local npm_dir="$SITE_ROOT/node_modules"
   local npm_file='npm.tar.gz'
