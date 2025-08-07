@@ -1650,20 +1650,4 @@ class ListController extends Web\Controller\Base
             $this->response = $this->responseAsJson($problem->asArray());
         }
     }
-
-    /**
-     * Validate that the title is not the same as the original assessment for the customised copy
-     *
-     * @param IAssessable $assessment
-     * @return void
-     */
-    public function postValidateTitle(IAssessable $assessment): void
-    {
-        $this->response = $this->responseAsJson(
-            strcasecmp(
-                $assessment->getTitle(),
-                $this->requestPost->get('title')
-            ) !== 0
-        );
-    }
 }

@@ -488,13 +488,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $data['customisedFor'] = $assessment->getId();
         $data['assessment'] = $assessment;
-        $data['validateTitleRoute'] = $this->getRouteIfAuthorized(
-            'learningAssessment.postValidateTitle',
-            [
-                'assessment' => $assessment,
-                'assessmentId' => $assessment->getId(),
-            ]
-        );
 
         $breadcrumbs = $this->getBakery()->produceFromAssessment($clonedAssessment, $this->getUser())->add([$clonedAssessment->getTitle()]);
         $data['breadcrumbs'] = $breadcrumbs;

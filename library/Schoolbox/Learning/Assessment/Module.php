@@ -232,7 +232,6 @@ class Module extends BaseModule
         $this->register('GET', "$assRoute/participation/{planId:\d+}/modify", 'getUpdateAssessmentParticipationLearningPlan', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
         $this->register('POST', "$assRoute/participation/{planId:\d+}/modify", 'postUpdateAssessmentParticipationLearningPlan', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
         $this->register('POST', "$assRoute/participation/customisation/include", 'postExistingCustomisationInclude', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
-        $this->register('POST', "$assRoute/participation/customisation/validateTitle", 'postValidateTitle', $canModifyCustomParticipation, $preloadAssessment);
 
         /* Rescore Feedbacks
          */

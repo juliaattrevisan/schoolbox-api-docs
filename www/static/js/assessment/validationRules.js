@@ -13,18 +13,7 @@ var validateOptions = {
                 },
             },
         },
-        title: validateTitleRoute ? {
-            required: true,
-            remote: {
-                url: validateTitleRoute,
-                type: "post",
-                data: {
-                    title: () => document.getElementById('title').value
-                }
-            }
-        } : {
-            required: true,
-        },
+        title: { required: true },
         weight: {
             required: true,
             number: true,
@@ -84,9 +73,6 @@ var validateOptions = {
         }
     },
     messages: {
-        title: {
-            remote: "The activity can not have the same title as the original activity."
-        },
         weight: "The " + scriptValidationRules.attr("data-locale-grading-proper") + " weight should be zero or greater",
         useRubric: {
             require_from_group: "You must have at least one selected indicator if using a rubric",
