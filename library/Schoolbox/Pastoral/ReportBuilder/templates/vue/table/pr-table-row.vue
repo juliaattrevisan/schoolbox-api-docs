@@ -6,11 +6,11 @@
 
 import { Chart } from "highcharts-vue";
 import "highcharts/modules/accessibility";
-import type { Point } from "highcharts";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { TableHeaderType } from "../../js/types/pastoralReportTypes";
 import type { TableHeader, RowOptions, RecordsAndPoints } from "../../js/types/pastoralReportTypes";
+import { trendOptions } from "./config/chartOptions";
 
 const props = defineProps<{
     headers: TableHeader[];
@@ -56,46 +56,20 @@ function isUser(data: RowOptions): data is User {
     );
 }
 
+/**
+ * Chart options for the trend chart in the table row.
+ */
 const chartOptions = window.Vue.ref({
-    accessibility: {
-        description: "Trend of points over the year for type/subtype",
-    },
-    boost: {
-        useGPUTranslations: true,
-    },
-    chart: {
-        height: 50,
-        width: 200,
-    },
-    colors: ["#000"],
-    credits: {
-        enabled: false,
-    },
-    legend: {
-        enabled: false,
-    },
-    title: false,
-    tooltip: {
-        formatter(this: Point): string {
-            return `The value for <b>${this.key}</b> is <b>${this.y}</b>`;
-        },
-        valueSuffix: "Points",
-    },
+    ...trendOptions,
     series: [
         {
+            ...trendOptions.series[0],
             data: [30, 20, -10, 5, -25, 40, 30, 5, 10, 10, 15, -15],
-            name: "Points",
         },
     ],
     xAxis: {
+        ...trendOptions.xAxis,
         categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-        title: {
-            text: "Months",
-        },
-        visible: false,
-    },
-    yAxis: {
-        visible: false,
     },
 });
 </script>
@@ -108,7 +82,7 @@ const chartOptions = window.Vue.ref({
             :class="`u-border-right ${header.key === 'user' ? 'u-sticky-left u-sticky-left--row' : ''} ${header.key === 'total' ? 'total-cell' : ''}`"
         >
             <template v-if="header.type == TableHeaderType.USER && isUser(props.rowData[header.key])">
-                <!-- <div class="c-card">
+                <div class="c-card">
                     <div class="l-flex-row l-gap-m">
                         <user-photo :user="props.rowData[header.key] as User" render="small" rounded-corners />
                         <div class="l-flex-col l-flex--justify-center f-no-margins">
@@ -134,8 +108,7 @@ const chartOptions = window.Vue.ref({
                             </template>
                         </div>
                     </div>
-                </div> -->
-                <chart :options="chartOptions"></chart>
+                </div>
             </template>
             <template v-else-if="header.type == TableHeaderType.RECORDS_AND_POINTS">
                 <!-- Change data based on current radio button selection -->
@@ -161,6 +134,9 @@ const chartOptions = window.Vue.ref({
                 >
                     {{ (props.rowData[header.key] as RecordsAndPoints).points }}
                 </button>
+            </template>
+            <template v-else-if="header.type == TableHeaderType.TREND">
+                <chart :options="chartOptions"></chart>
             </template>
             <template v-else>
                 {{ props.rowData[header.key] }}
