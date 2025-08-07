@@ -79,7 +79,9 @@
             var deferred;
 
             // Listen for changes on inputs
-            config.element.on("change keyup", config.inputs.join(", "), checkForChanges);
+            config.inputs.forEach((input) => {
+                config.element.find(input).on("change keyup", checkForChanges);
+            });
 
             /**
              * Loop through the textareas and listen for changes on them
@@ -203,21 +205,6 @@
             });
 
             const formContents = (config.getFormData || getFormContents)();
-
-            /* Special treatment because ck reasons
-             */
-            for (var i = 0; i < config.textareas.length; i++) {
-                var key = config.textareas[i];
-
-                formContents.push({
-                    name: key,
-                    value: window.sbProps.editors[key].getData(),
-                });
-            }
-
-            /* Send draft flag
-             */
-            formContents.push({ name: "draft", value: true });
 
             /* Transact
              */

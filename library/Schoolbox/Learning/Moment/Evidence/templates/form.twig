@@ -13,6 +13,7 @@
 ) }}
     {% set heading = 'Share a' %}
     {% set formMethod = 'post' %}
+    {% set formAction = routeLookup('learningMomentEvidence.postMomentForUsers', {userIds: userIds|join(',')}) %}
 {% else %}
     {{ bread.crumbs(
         [evidence.recipient.fullName, '/search/user/' ~ evidence.recipient.id],
@@ -30,9 +31,11 @@
     {% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted %}
         {% set heading = 'Publish a' %}
         {% set formMethod = 'put' %}
+        {% set formAction = routeLookup('learningMomentModeration.putPublish', {evidenceId: evidence.id}) %}
     {% else %}
         {% set heading = 'Modify' %}
         {% set formMethod = 'put' %}
+        {% set formAction = routeLookup('learningMomentEvidence.putEvidence', {evidenceId: evidence.id}) %}
     {% endif %}
 {% endif %}
 
@@ -606,7 +609,10 @@
                 // Update the window history
                 window.history.pushState({}, null, response[0]._links.modifyForm);
             },
-            getFormData: () => JSON.stringify(buildPayload(document.querySelector('#evidence-form'))),
+            getFormData: () => JSON.stringify(
+                buildPayload(document.querySelector('#evidence-form'))
+                    .draft = true
+            ),
             contentType: 'application/json',
         });
         {% endif %}
