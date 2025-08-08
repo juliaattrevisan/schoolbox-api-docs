@@ -181,7 +181,7 @@
                             $('#submit').on('click', function(event) {
                                 event.preventDefault();
 
-                                $('#evidence-form').attr('action', '{{ route }}');
+                                $('#evidence-form').attr('action', $('#evidence-form').data('action-submit'));
 
                                 $('#evidence-persist').trigger('click');
                             });
@@ -190,12 +190,6 @@
                 {% elseif USER.role.isParent and config.evidence_parent_create %}
                     {# Parents bypass moderation entirely #}
                     <li><button id="submit" class="submit">Publish</button></li>
-
-                    {% if isCreate %}
-                        {% set route = routeLookupIfAuthorized('learningMomentEvidence.postPublish', {userIds: userIds|join(',')}) %}
-                    {% else %}
-                        {% set route = routeLookupIfAuthorized('learningMomentEvidence.putPublish', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
-                    {% endif %}
 
                     <script>
                         $(function() {
