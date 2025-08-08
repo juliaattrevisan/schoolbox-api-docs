@@ -110,7 +110,7 @@ class CleanupQueue extends CliTool\App
             // Decode the value, only processing Instance objects
             $keyCount++;
             if ($keyCount % self::CHUNK_SIZE === 0) {
-                $logger->notice(sprintf('Searched keys: %d', $keyCount));
+                $logger->notice(sprintf('Searched keys: %d (key: %s)', $keyCount, $key));
             }
 
             $value             = $redis->get($key);
@@ -172,6 +172,7 @@ class CleanupQueue extends CliTool\App
         }
 
         // Report on what was done
+        $logger->notice('Results:');
         $logger->notice(sprintf('Searched keys: %d', $keyCount));
         $logger->notice(sprintf('.. unprocessable: %d', $unprocessableKeyCount));
         $logger->notice(sprintf('.. message instances: %d', $instanceKeyCount));
