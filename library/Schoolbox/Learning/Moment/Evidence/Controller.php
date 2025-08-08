@@ -305,7 +305,7 @@ class Controller extends Base
                 ->setRecipient($user)
                 ->setBody($tokenReplacer->replace($evidenceModel->getBody(), $user));
 
-            if (true === $this->requestPost->get('draft', false)) {
+            if ($this->requestPost->get('draft', false)) {
                 // autosave draft, save as draft
                 $evidenceModel->draft();
             } else {
