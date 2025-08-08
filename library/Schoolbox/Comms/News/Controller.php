@@ -1275,7 +1275,8 @@ class Controller extends Base
              */
             $folderEntityType = Audience\Segment\Strategy\Folder::getEntityType();
 
-            if ($checkFolderAccess &&
+            if (
+                $checkFolderAccess &&
                 $segment->getEntityType() === $folderEntityType &&
                 !$access->getFolderAccess($this->getUser(), (int)$segment->getEntityValue())
             ) {
