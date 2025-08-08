@@ -3,15 +3,7 @@
  * Displays a pastoral report in a table format.
  */
 
-import type {
-    Tab,
-    TablePayload,
-    Config,
-    Routes,
-    SeverityColors,
-    TableHeader,
-    SelectedCell,
-} from "../../js/types/pastoralReportTypes";
+import type { Tab, TablePayload, TableHeader, SelectedCell } from "../../js/types/pastoralReportTypes";
 import { TabType } from "../../js/types/pastoralReportTypes";
 import { useLoadPrTable } from "../composable/useLoadPrTable";
 import PrEmpty from "../pr-empty.vue";
@@ -22,14 +14,8 @@ import PrTableFooter from "./pr-table-footer.vue";
 import PrTableModal from "./pr-table-modal.vue";
 
 const props = defineProps<{
-    title: string;
     selectedTab: Tab;
-    config: Config;
-    routes: Routes;
     recordsAndPoints: string[];
-    localePastoral: string;
-    showSeverity: boolean;
-    severityColors: SeverityColors;
 }>();
 
 // #region scrollable table height
@@ -206,7 +192,7 @@ window.Vue.onUnmounted(() => {
             >
         </div>
     </div>
-    <pr-empty v-else-if="isEmpty" :routes="props.routes" :locale-pastoral="props.localePastoral" />
+    <pr-empty v-else-if="isEmpty" />
     <template v-else-if="hasRows">
         <div
             ref="scrollableRef"
@@ -218,7 +204,6 @@ window.Vue.onUnmounted(() => {
                 <pr-table-header
                     v-model:records-or-points="recordsOrPoints"
                     :headers="(payload as TablePayload).data.tableHeaders"
-                    :config="props.config"
                     :records-and-points="props.recordsAndPoints"
                     :sort-by="sortBy"
                     :order="order"
@@ -258,16 +243,7 @@ window.Vue.onUnmounted(() => {
             />
         </div>
     </template>
-    <pr-table-modal
-        :title="props.title"
-        :selected-tab="props.selectedTab"
-        :config="props.config"
-        :routes="props.routes"
-        :locale-pastoral="props.localePastoral"
-        :show-severity="props.showSeverity"
-        :severity-colors="props.severityColors"
-        :selected-cell="selectedCell"
-    />
+    <pr-table-modal :selected-tab="props.selectedTab" :selected-cell="selectedCell" />
 </template>
 
 <style scoped lang="scss">

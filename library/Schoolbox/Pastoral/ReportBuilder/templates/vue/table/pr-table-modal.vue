@@ -7,28 +7,17 @@ import { useTemplateRef, toRefs } from "vue";
 import { useScroll } from "@vueuse/core";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
-import type {
-    Tab,
-    Config,
-    Routes,
-    SeverityColors,
-    TableHeader,
-    SelectedCell,
-} from "../../js/types/pastoralReportTypes";
+import { useStore } from "../store/pastoralReportStore";
+import type { Tab, TableHeader, SelectedCell } from "../../js/types/pastoralReportTypes";
 import { useLoadRecords } from "../composable/useLoadRecords";
 import PrRecord from "../pr-record.vue";
 
 const props = defineProps<{
-    title: string;
     selectedTab: Tab;
-    config: Config;
-    routes: Routes;
-    localePastoral: string;
-    showSeverity: boolean;
-    severityColors: SeverityColors;
     selectedCell: SelectedCell | null;
 }>();
 
+const store = useStore();
 const isOpen = window.Vue.ref(false);
 const selectedHeader = window.Vue.ref<TableHeader | null>(null);
 const scopeUrl = window.Vue.ref("");
@@ -92,7 +81,7 @@ window.Vue.watch(bottom, (isAtBottom) => {
             <div class="l-flex-col l-gap-m">
                 <div class="l-flex-row l-flex--justify-space l-gap-s">
                     <div class="l-flex-col l-gap-s f-no-margins">
-                        <h2>{{ props.title }}</h2>
+                        <h2>{{ store.title }}</h2>
                         <p class="meta">
                             <template v-if="selectedHeader.title !== 'Total'"
                                 >Type: {{ selectedHeader.title }}</template
@@ -114,14 +103,7 @@ window.Vue.watch(bottom, (isAtBottom) => {
                     <div class="l-flex-col l-gap-s">
                         <div v-for="record in payload?.data.results" :key="record.id" class="c-island">
                             <ul class="information-list threaded">
-                                <pr-record
-                                    :record="record"
-                                    :config="props.config"
-                                    :routes="props.routes"
-                                    :locale-pastoral="props.localePastoral"
-                                    :show-severity="props.showSeverity"
-                                    :severity-colors="props.severityColors"
-                                />
+                                <pr-record :record="record" />
                             </ul>
                         </div>
                     </div>

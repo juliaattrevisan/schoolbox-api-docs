@@ -5,6 +5,9 @@
 import { defineStore } from "pinia";
 import type { Tab, Config, Routes, SeverityColors } from "../../js/types/pastoralReportTypes";
 
+/**
+ * The parameters required to initialize the Pastoral Report Store.
+ */
 type InitParams = {
     title: string;
     export: boolean;

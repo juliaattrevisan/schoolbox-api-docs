@@ -5,15 +5,17 @@
  */
 
 import { capitalizeFirstLetter } from "@js/util/stringUtils";
-import type { TableHeader, Config } from "../../js/types/pastoralReportTypes";
+import { useStore } from "../store/pastoralReportStore";
+import type { TableHeader } from "../../js/types/pastoralReportTypes";
 
 const props = defineProps<{
     headers: TableHeader[];
-    config: Config;
     recordsAndPoints: string[];
     sortBy: string;
     order: "ASC" | "DESC";
 }>();
+
+const store = useStore();
 
 const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
 
@@ -86,7 +88,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
     <thead class="pr-table-header">
         <tr>
             <th :colspan="hasSubTitles ? 1 : props.headers.length" class="u-border-right u-sticky-left">
-                <div v-if="props.config.pastoralPointEnabled" class="checklist">
+                <div v-if="store.config.pastoralPointEnabled" class="checklist">
                     <ul class="option-list l-flex l-gap-m f-no-margins">
                         <li v-for="(option, index) in props.recordsAndPoints" :key="`option-${index}`">
                             <input

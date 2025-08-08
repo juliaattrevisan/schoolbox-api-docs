@@ -4,19 +4,16 @@
  * when no records are available.
  */
 
-import type { Routes } from "../js/types/pastoralReportTypes";
+import { useStore } from "./store/pastoralReportStore";
 
-const props = defineProps<{
-    routes: Routes;
-    localePastoral: string;
-}>();
+const store = useStore();
 </script>
 
 <template>
     <div class="empty-state-flex-centered f-no-margins">
         <i class="icon-pastoral"></i>
-        <p>No {{ props.localePastoral }} records matched your report criteria.</p>
-        <a :href="props.routes.getIndex"> Select Another Report </a>
+        <p>No {{ store.localePastoral }} records matched your report criteria.</p>
+        <a :href="store.routes.getIndex"> Select Another Report </a>
     </div>
 </template>
 
