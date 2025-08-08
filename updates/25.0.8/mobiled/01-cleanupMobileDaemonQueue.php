@@ -28,7 +28,7 @@ if ($version->isCloudHosted()) {
     Not running mobile cleanup queue script as background process on cloud instances.
 
     The below command needs to be run manually on cloud, and only once per cluster:
-    $script
+    $script --multi-instance
 
     OUTPUT;
     exit;
