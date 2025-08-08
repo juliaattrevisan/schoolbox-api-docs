@@ -1252,6 +1252,12 @@ class Controller extends Base
         );
         $translator->buildCache($article);
 
+        /* SA-20576
+         * This is related to the $checkFolderAccess arg which allows you to check $viewer's folder access
+         * to an audiencing segment, conditionally disregarding that segment in specific usages of this method
+         */
+        $folderEntityType = Audience\Segment\Strategy\Folder::getEntityType();
+
         foreach ($article->getAudience() as $segment) {
             if (
                 ($hideIndividualUsers && $segment->getEntityType() === Audience\Segment\Strategy\User::getEntityType())
@@ -1273,8 +1279,6 @@ class Controller extends Base
              * to be mindful about when to exclude elements and when not to exclude elements. This oddball
              * action-at-a-distance emerged from SA-19147.
              */
-            $folderEntityType = Audience\Segment\Strategy\Folder::getEntityType();
-
             if (
                 $checkFolderAccess &&
                 $segment->getEntityType() === $folderEntityType &&
