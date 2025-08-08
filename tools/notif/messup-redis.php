@@ -27,7 +27,7 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Redis Notif Messup', [
     'expiry'  => max(1, $opts['x'] ?? 3600),
 ]);
 
-$kernel->run(function (ContainerInterface $di, LoopInterface $loop, Logger $log, array $opts) use ($kernel) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, Logger $log, array $opts) use ($kernel): void {
     $kernel->deprecationNotice("SA-19334");
 
     $redis  = Redis::getStorageClientInstance();

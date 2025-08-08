@@ -30,7 +30,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Daemon\Kernel('Socket', [Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'p::c::']);
 
 // CREATE WEBSOCKET APP
-$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) use ($kernel) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) use ($kernel): void {
 
     $port = $opts['p'] ?? 9081;
     $conf = $opts['c'] ?? 'socketd.conf';

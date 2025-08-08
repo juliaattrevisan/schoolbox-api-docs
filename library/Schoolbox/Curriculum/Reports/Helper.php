@@ -397,7 +397,7 @@ class Helper
         $inUse = $usage[Cursor::COURSE_IN_USE_RUBRIC] ?? [];
         array_walk(
             $inUse,
-            function ($item) use (&$inUseCap) {
+            function ($item) use (&$inUseCap): void {
                 $inUseCap = array_merge($inUseCap, array_keys($item));
             }
         );

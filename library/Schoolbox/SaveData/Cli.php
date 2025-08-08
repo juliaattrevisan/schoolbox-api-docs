@@ -328,7 +328,7 @@ HELP;
             'SourceFile'    => $path,
             'ACL'           => 'public-read',
             '@http'         => [
-                'progress'  => function ($downloadTotalSize, $downloadSizeSoFar, $uploadTotalSize, $uploadSizeSoFar) {
+                'progress'  => function ($downloadTotalSize, $downloadSizeSoFar, $uploadTotalSize, $uploadSizeSoFar): void {
                     $total =  $this->formatBytes($uploadTotalSize);
                     $soFar = $this->formatBytes($uploadSizeSoFar);
                     echo "\rUploaded {$soFar} of {$total}";

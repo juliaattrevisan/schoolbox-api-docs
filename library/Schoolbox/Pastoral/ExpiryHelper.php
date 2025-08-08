@@ -47,7 +47,7 @@ class ExpiryHelper
         }
 
         $records = $this->pastoralMapper->findByPredicates($pb);
-        $records->map(function (Model $record) use ($defaultExpiry) {
+        $records->map(function (Model $record) use ($defaultExpiry): void {
             $expiryDate = $this->calculateExpireDate(
                 $record->getCreatedAt(),
                 $defaultExpiry,

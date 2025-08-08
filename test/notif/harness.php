@@ -26,7 +26,7 @@ $kernel = new Daemon\Kernel(
     ]
 );
 
-$kernel->run(function ($di, $loop, $log, $opts) {
+$kernel->run(function ($di, $loop, $log, $opts): void {
     /**
      * @var ContainerInterface $di
      * @var LoopInterface $loop

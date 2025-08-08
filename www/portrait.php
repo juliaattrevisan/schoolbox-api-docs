@@ -31,7 +31,7 @@ $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
 $kernel->setupSentryTrace(__FILE__);
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT);
 $kernel->getShutdownHandler()->registerFunction(
-    new ResourceLimitExceededHandler(function () {
+    new ResourceLimitExceededHandler(function (): void {
         header('Cache-Control: no-store');
         SitePage::redirectToBrokenImageWithTransform('portrait', $_GET['size'] ?? '', 504);
     }),
