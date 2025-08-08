@@ -43,8 +43,9 @@ class LearningMomentsController extends Component_Homepage_ControllerAbstract
             $templateHandle,
             '@learning/component/learningMomentsHomepage.twig',
             [
-                'component'         => $this,
-                'readOnly'          => $this->readOnly,
+                'baseUrl' => '/learning/evidence/user/' . $this->getUser()->getId() . '/create',
+                'component' => $this,
+                'readOnly' => $this->readOnly,
             ]
         );
     }

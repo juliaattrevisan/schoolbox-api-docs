@@ -1,20 +1,16 @@
 {# TODO: Add if learning moments enabled condition #}
 {% if true %}
-    <section data-component-content>
-        <ul class="action-list" data-task-list>
-            <li>
-                <div class="list-item">
-                    <div class="card small-12">
-                        <h3>
-                            <a class="title" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: null, studentId: null}) }}">
-                                Take a photo
-                            </a>
-                        </h3>
-                    </div>
-                </div>
-            </li>
-        </ul>
-    </section>
+    <div class="small-12 island">
+        <div class="share-work-buttons">
+            <a data-action="shareLearningMoment" data-test="learning-moment-evidence-share-takeAPhoto" data-take-photo-button href="{{ baseUrl }}?momentType=photo&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-camera share-photo" title="Take a photo">Take a photo</a>
+            <a data-action="shareLearningMoment" data-record-video-button href="{{ baseUrl }}?momentType=video&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-video share-video" title="Record a video">Record a video</a>
+            <a data-action="shareLearningMoment" data-record-audio-button href="{{ baseUrl }}?momentType=audio&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-audio share-audio" title="Record audio">Record audio</a>
+            <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=upload&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-upload share-file" title="Upload file">Upload file</a>
+            <a data-action="shareLearningMoment" data-test="learning-moment-evidence-share-writeSomething" href="{{ baseUrl }}?momentType=text&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-textbox share-text" title="Write something">Write something</a>
+        </div>
+        <!-- Check that the device supports recording audio/video, and if not hide the buttons that aren't supported -->
+        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/checkShareWorkButtons.js?v={{ config.site_version }}"></script>
+    </div>
 {% else %}
     <div class="empty-state">
         <p>
