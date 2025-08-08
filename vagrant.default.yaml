@@ -49,7 +49,7 @@ aws_personal_iam_key: ''
 aws_personal_iam_secret: ''
 
 # Which PHP major version should be enabled? Supported options: ['8.2', '8.4']
-primary_php_majver: '8.4'
+primary_php_majver: '8.2'
 
 
 # Task daemon repo settings: analogous to the Puppet repo settings.
