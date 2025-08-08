@@ -3,6 +3,7 @@
  */
 
 import { parseSseEvent } from "./fetchUtils";
+import { isAbortError } from "@js/util/errorUtils";
 
 /**
  * Metadata typically for paginated API responses
@@ -251,7 +252,10 @@ export async function apiRequest<TResponseData, TBody extends ApiRequestBodyBase
     try {
         response = await request;
     } catch (e) {
-        console.error("Failed to make API request", e, options);
+        if (!isAbortError(e)) {
+            // we only want to log non-abort errors
+            console.error("Failed to make API request", e, options);
+        }
         const failureResponse: ApiBaseResponseUnknownFailure = {
             success: false,
             responseStatus: 0,
