@@ -980,6 +980,9 @@ class Controller extends Base
 
             // Columns: id,Title,Given1,Given2,Preferred,PreferredFormal,Surname,NameExternal,NameInternal,MailNamePrimary,StudentYear,ClassCode,FileSemester,CourseDescription,Endorsement,NCEAStandardNumber,InternalorExternalAssessment,StandardType,StandardTitle,EnteredCredits,Level,Result,StrippedResult,ResultClassification,ResultCredits,WithdrawnFlag,NCEALevel1Description,NCEALevel2Description,NCEALevel3Description,UELiteracyMet,UENumeracyMet,Level1LiteracyMet,Level1NumeracyMet,Lit,Num,ClassTeacher1,ClassTeacher1Email,ClassTeacher1ID,ClassTeacher2,ClassTeacher2Email,ClassTeacher2ID,ClassTeacher3,ClassTeacher3Email,ClassTeacher3ID
             'dbo.uvSchoolBoxNCEAResultsforDataRefreshV2_Year11', // To be used in Year 11 page.
+
+            // Columns: id,Title,Given1,Given2,Preferred,PreferredFormal,Surname,NameExternal,NameInternal,MailNamePrimary,StudentYear,YearLevel,ClassCode,FileSemester,Term,SortOrder,CourseDescription,Comment,ModifiedDate,ModifiedById,ClassTeacher1,ClassTeacher1Email,ClassTeacher1ID,ClassTeacher2,ClassTeacher2Email,ClassTeacher2ID,ClassTeacher3,ClassTeacher3Email,ClassTeacher3ID,ResultType
+            'dbo.uvSchoolBoxReportComments',
         ];
 
         $rowsByViewName = [];
@@ -988,6 +991,10 @@ class Controller extends Base
 
         foreach ($viewNames as $viewName) {
             $query = "SELECT TOP 100 * FROM $viewName WHERE " . (($viewName === 'dbo.uvSchoolBoxSchoolGradeResults') ? 'ID' : 'id') . ' = ' . $externalUser['StudentID'];
+
+            if ($viewName === 'dbo.uvSchoolBoxReportComments') {
+                $query .= " AND YearLevel = '11'";
+            }
 
             $t0 = microtime(true);
             try {
