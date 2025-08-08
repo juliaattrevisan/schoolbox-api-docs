@@ -92,7 +92,7 @@ class CleanupQueue extends CliTool\App
             $subPattern = '*';
         } else {
             $subPattern = INSTANCE_ID;
-            $logger->notice('Scanning queue data for instance: "%s"', $subPattern);
+            $logger->notice(sprintf('Scanning queue data for instance: "%s"', $subPattern));
         }
         /** @var ClientInterface $redis */
         $redis    = $this->getDi()->get('redis.storage');
