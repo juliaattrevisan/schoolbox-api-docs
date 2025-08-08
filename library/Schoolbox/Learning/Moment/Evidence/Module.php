@@ -113,13 +113,7 @@ class Module extends BaseModule
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
-                /* Students when they are the author of the learning moment
-                 */
-                new Rule\All(
-                    new Rule\HasRole(Role::STUDENT),
-                    new Rule\IsUser('creatorId')
-                ),
-                $modifyRule
+                new Rule\IsUser('creatorId')
             )
         );
 
