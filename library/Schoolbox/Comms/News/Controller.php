@@ -1277,6 +1277,8 @@ class Controller extends Base
                 'folder' === $segment->getEntityType() &&
                 !$access->getFolderAccess($this->getUser(), (int)$segment->getEntityValue())
             ) {
+                /* You didn't have access to this folder: pretend this didn't exist.
+                 */
                 continue;
             }
 
