@@ -7,6 +7,7 @@ import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import type { Tab, TablePayload, TableHeader, SelectedCell } from "../../js/types/pastoralReportTypes";
 import { TabType, ViewUrlParam } from "../../js/types/pastoralReportTypes";
 import { useLoadPrTable } from "../composable/useLoadPrTable";
+import { useMaxScrollableHeight } from "../composable/useMaxScrollableHeight";
 import PrEmpty from "../pr-empty.vue";
 import PrTableHeader from "./pr-table-header.vue";
 import PrTableTotalRow from "./pr-table-total-row.vue";
@@ -18,45 +19,6 @@ const props = defineProps<{
     selectedTab: Tab;
     recordsAndPoints: string[];
 }>();
-
-// #region scrollable table height
-
-const resizeObserver = window.Vue.ref<ResizeObserver | null>(null);
-const maxScrollableHeight = window.Vue.ref<string>(`${window.innerHeight}px`);
-
-/**
- * Set the max height to allow the table to sit within the browser window
- */
-function setScrollableHeight(): void {
-    const tabsBottomY = document.querySelector("dl")?.getBoundingClientRect().bottom || 0;
-    const footerHeight = document.getElementById("footer")?.getBoundingClientRect().height || 0;
-
-    const mainSBContainerEl = document.getElementById("container");
-    const mainSBContainerPaddingBtm = mainSBContainerEl
-        ? parseInt(window.getComputedStyle(mainSBContainerEl).paddingBottom, 10)
-        : 0;
-
-    const newHeight = window.innerHeight - tabsBottomY - footerHeight - mainSBContainerPaddingBtm - 1;
-
-    maxScrollableHeight.value = `${newHeight}px`;
-}
-
-/**
- * Initialize the ResizeObserver to adjust the scrollable height
- * when the container changes size
- */
-function initSetScrollableHeight(): void {
-    resizeObserver.value = new ResizeObserver(setScrollableHeight);
-    const containerEl = document.querySelector("#container");
-    if (containerEl) {
-        resizeObserver.value.observe(containerEl);
-    }
-    // Set the initial height, and update it again when the DOM is fully loaded to ensure the footer is included
-    setScrollableHeight();
-    window.addEventListener("DOMContentLoaded", setScrollableHeight, { once: true });
-}
-
-// #endregion
 
 // #region table load / sorting / pagination
 
@@ -158,23 +120,13 @@ function onRowCellSelect(header: TableHeader, rowId: number): void {
 
 // #endregion
 
-/**
- * Start setting the scrollable height on any window resize change
- * and reset the table load to ensure the correct endpoint is set
- */
-window.Vue.onMounted(() => {
-    initSetScrollableHeight();
-    resetTableLoad();
-});
+const { maxScrollableHeight } = useMaxScrollableHeight();
 
 /**
- * Clean up the ResizeObserver when the component is unmounted
+ * Reset the table load to ensure the correct endpoint is set
  */
-window.Vue.onUnmounted(() => {
-    if (resizeObserver.value) {
-        resizeObserver.value.disconnect();
-        resizeObserver.value = null;
-    }
+window.Vue.onMounted(() => {
+    resetTableLoad();
 });
 </script>
 
