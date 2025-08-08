@@ -156,7 +156,7 @@
                         $('#draft').on('click', function(event) {
                             event.preventDefault();
 
-                            $('#evidence-form').attr('action', '{{ routeDraft }}');
+                            $('#evidence-form').attr('action', $('#evidence-form').data('action-draft'));
 
                             $('#evidence-persist').trigger('click');
                         });
@@ -202,7 +202,7 @@
                             $('#submit').on('click', function(event) {
                                 event.preventDefault();
 
-                                $('#evidence-form').attr('action', '{{ routeSubmit }}');
+                                $('#evidence-form').attr('action', $('#evidence-form').data('action-submit'));
 
                                 $('#evidence-persist').trigger('click');
                             });
@@ -232,7 +232,7 @@
                                 $('#publish').on('click', function(event) {
                                     event.preventDefault();
 
-                                    $('#evidence-form').attr('action', '{{ routePublish }}');
+                                    $('#evidence-form').attr('action', $('#evidence-form').data('action-publish'));
 
                                     {% if hasComments ?? false %}
                                         {# Show the modal with an option to delete comments #}
@@ -604,11 +604,14 @@
                 // Update the form actions (document, so it works for the save)
                 document.querySelector('#evidence-form').dataset.actionDraft = response[0]._links.put;
                 document.querySelector('#evidence-form').dataset.actionSubmit = response[0]._links.put;
+                document.querySelector('#evidence-form').dataset.actionPublish = response[0]._links.publish;
                 document.querySelector('#evidence-form').action = response[0]._links.put;
                 document.querySelector('#evidence-form').method = 'put';
+
                 // update jquery / draft js (has weird cache)
                 $createForm.data('action-draft', response[0]._links.put);
                 $createForm.data('action-submit', response[0]._links.put);
+                $createForm.data('action-publish', response[0]._links.publish);
                 $createForm.attr('action', response[0]._links.put);
                 $createForm.attr('method', 'put');
                 // Update the window history
