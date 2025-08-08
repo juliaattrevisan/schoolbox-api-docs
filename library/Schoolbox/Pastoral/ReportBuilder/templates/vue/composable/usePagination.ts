@@ -12,13 +12,13 @@ import type { Metadata } from "@js/util/sbx/apiUtils";
 
 /**
  *
- * @param endpoint -
+ * @param url -
  * @param limit - number of items per page
  * @param metadata - metadata containing pagination information
  * @returns -
  */
 export function usePagination(
-    endpoint: Ref<string>,
+    url: Ref<string>,
     limit: number,
     metadata: Ref<Metadata>,
 ): {
@@ -35,15 +35,15 @@ export function usePagination(
     const cursorIndex = window.Vue.ref(0); // to track the current cursor index
     const currentCursor = window.Vue.computed(() => cursorList.value[cursorIndex.value] || "");
     const hasPaginate = window.Vue.ref<boolean>(false);
-    const hasPrevious = window.Vue.computed(() => cursorIndex.value > 0);
-    const hasNext = window.Vue.computed(() => cursorIndex.value < cursorList.value.length - 1);
+    const hasPrevious = window.Vue.computed(() => metadata.value.cursor.current !== "");
+    const hasNext = window.Vue.computed(() => metadata.value.cursor.next !== null);
     const pageCount = window.Vue.ref(0);
 
     /**
-     * Pagination should currently be reset if sorting on the endpoint changes,
-     * or if the endpoint URL changes in a way that does not include the cursor.
-     * @param oldUrl - the previous endpoint URL
-     * @param newUrl - the new endpoint URL
+     * Pagination should currently be reset if sorting on the url changes,
+     * or if the url URL changes in a way that does not include the cursor.
+     * @param oldUrl - the previous url URL
+     * @param newUrl - the new url URL
      * @returns - true if pagination should be reset
      */
     function shouldResetPagination(oldUrl: string, newUrl: string): boolean {
@@ -95,12 +95,12 @@ export function usePagination(
     }
 
     /**
-     * watch endpoint and if anything other than cursor changes, it means the pagination needs to reset
+     * watch url and if anything other than cursor changes, it means the pagination needs to reset
      */
-    window.Vue.watch(endpoint, (newEndpoint, oldEndpoint) => {
-        if (endpoint.value !== "" && newEndpoint !== oldEndpoint) {
+    window.Vue.watch(url, (newUrl, oldUrl) => {
+        if (url.value !== "" && newUrl !== oldUrl) {
             // Check if this is a URL change that should trigger a reset
-            if (shouldResetPagination(oldEndpoint, newEndpoint)) {
+            if (shouldResetPagination(oldUrl, newUrl)) {
                 reset();
             }
         }
@@ -110,12 +110,13 @@ export function usePagination(
      * Check if the metadata has enough items to paginate
      */
     function checkMetadata(): void {
-        hasPaginate.value = metadata.value.count >= limit;
+        hasPaginate.value = metadata.value.count > limit;
+        // if the count is higher than the limit, we can paginate
         if (hasPaginate.value) {
+            // get the next cursor from metadata
             cursorList.value.push(metadata.value.cursor.next || "");
+            // and update the page count
             pageCount.value = Math.ceil(metadata.value.count / limit);
-            console.warn("Pagination enabled:", cursorList.value);
-            console.warn("Page count:", pageCount.value);
         }
     }
 
