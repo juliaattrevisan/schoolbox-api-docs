@@ -24,7 +24,8 @@ type ApiBaseResponseSuccess<TRespData> = {
 
 type ApiBaseResponseFailure = {
     success: false;
-    message: string;
+    message: string; // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/message
+    name?: string; // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/name
     data?: unknown;
 };
 
@@ -255,6 +256,7 @@ export async function apiRequest<TResponseData, TBody extends ApiRequestBodyBase
             success: false,
             responseStatus: 0,
             message: e instanceof Error ? e.message : "An unexpected error occurred",
+            name: e instanceof Error ? e.name : "Error",
             detail: e,
         };
         return failureResponse;
