@@ -312,7 +312,7 @@ class Controller extends Base
             'article'               => $article,
             'featureImageZone'      => $zone->getTwigContext(),
             'fileZone'              => $fileZone->getTwigContext(),
-            'encodedSegments'       => $this->getAudienceSegments($article),
+            'encodedSegments'       => $this->getAudienceSegments(article: $article),
             'isAutoSavable'         => !$article->isSubmitted() || $article->isRejected(),
             'returnUrl'             => $this->getExplicitReturnUrl(),
             'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(),
@@ -593,7 +593,7 @@ class Controller extends Base
                 'flashMessage'          => $segment->getFlash(ModerationController::ARTICLE_FLASH_MESSAGE_KEY),
                 'isSavedForLater'       => $isSavedForLater,
                 'returnUrl'             => $this->getExplicitReturnUrl(),
-                'encodedSegments'       => $this->getAudienceSegments($article, true),
+                'encodedSegments'       => $this->getAudienceSegments(article: $article, hideIndividualUsers: true, checkFolderAccess: true),
                 'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(true),
                 'entityTypesData'       => $this->getEntityTypesData(false),
                 'isPublishable'         => $this->generateValidSubmittedArticleSpec()->isSatisfiedBy($article),
@@ -1227,14 +1227,19 @@ class Controller extends Base
      * Generate article's audience segments with audience filtering based on the account access permission.
      * If the logged in user is a member of a staff, filtering will be skipped.
      *
+     * Severe warning:
+     * $checkFolderAccess will nullify an audience segment's value, causing it to be hidden in a ui element.
+     * This was intended to be used only on the Detail screen to hide data from certain members of the demographic
+     * and you have to be careful on the Update screen where a news author is using the result of this method
+     * to populate the audience selectize. Sadly there's a coupling between frontend representation for viewers
+     * and authoring representation for authors.
+     *
      * @param Model $article
      * @param boolean $hideIndividualUsers
+     * @param bool $checkFolderAccess
      * @return array
-     * @throws MapperException\InsufficientHydrationException
-     * @throws UnexpectedValueException
-     * @throws UnknownEntityTypeException
      */
-    private function getAudienceSegments(Model $article, $hideIndividualUsers = false): array
+    private function getAudienceSegments(Model $article, $hideIndividualUsers = false, $checkFolderAccess = false): array
     {
         $audienceSegments = [];
 
@@ -1262,7 +1267,13 @@ class Controller extends Base
              * check if this is a folder, and if the user has access to it
              * if no access, remove the folder id, so we hide the link.
              */
-            if (
+            /* Super-important Steve Notes
+             * The Detail screen also uses this method to potentially render a subset of the audiencing.
+             * However, the Update screen ALSO USES THIS to prepopulate the audience selectize so you have
+             * to be mindful about when to exclude elements and when not to exclude elements. This oddball
+             * action-at-a-distance emerged from SA-19147.
+             */
+            if ($checkFolderAccess &&
                 'folder' === $segment->getEntityType() &&
                 !$access->getFolderAccess($this->getUser(), (int)$segment->getEntityValue())
             ) {
