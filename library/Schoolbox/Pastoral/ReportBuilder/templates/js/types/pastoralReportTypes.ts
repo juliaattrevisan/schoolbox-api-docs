@@ -115,7 +115,7 @@ export type TablePayload = {
 /**
  * Params available to the tab._links.view URL.
  */
-export enum ViewUrlParams {
+export enum ViewUrlParam {
     SELECTED = "selected",
     SORT_BY = "sortBy",
     ORDER = "order",
@@ -132,6 +132,15 @@ export type RecordsPayload = {
     };
     metadata: Metadata;
 };
+
+/**
+ * Params available to the tab._links.scope URL.
+ */
+export enum ScopeUrlParam {
+    COLUMN = "column",
+    ROW = "row",
+    CURSOR = "cursor",
+}
 
 /**
  * When a cell is selected in the Pastoral Report Table,

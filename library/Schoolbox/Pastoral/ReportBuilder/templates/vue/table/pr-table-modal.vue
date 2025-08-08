@@ -9,6 +9,7 @@ import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import { useStore } from "../store/pastoralReportStore";
 import type { Tab, TableHeader, SelectedCell } from "../../js/types/pastoralReportTypes";
+import { ScopeUrlParam } from "../../js/types/pastoralReportTypes";
 import { useLoadRecords } from "../composable/useLoadRecords";
 import PrRecord from "../pr-record.vue";
 
@@ -42,13 +43,13 @@ window.Vue.watch(
     (newCell) => {
         if (newCell) {
             selectedHeader.value = newCell.header;
-            scopeUrlParams.set("column", selectedHeader.value.key);
+            scopeUrlParams.set(ScopeUrlParam.COLUMN as string, selectedHeader.value.key);
             if (newCell.rowId !== undefined) {
-                scopeUrlParams.set("row", newCell.rowId.toString());
+                scopeUrlParams.set(ScopeUrlParam.ROW as string, newCell.rowId.toString());
             } else {
-                scopeUrlParams.delete("row");
+                scopeUrlParams.delete(ScopeUrlParam.ROW as string);
             }
-            scopeUrlParams.delete("cursor"); // Clear the cursor to start fresh
+            scopeUrlParams.delete(ScopeUrlParam.CURSOR as string); // Clear the cursor to start fresh
             scopeUrl.value = `${props.selectedTab._links.scope}?${scopeUrlParams.toString()}`;
             isOpen.value = true; // Open the modal to show related records
         } else {
