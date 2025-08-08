@@ -17,6 +17,7 @@ export function useLoadPrTable(url: Ref<string>): {
     isNewLoading: Ref<boolean>;
     isMoreLoading: Ref<boolean>;
     payload: Ref<TablePayload | null>;
+    sortBy: Ref<string>;
     isEmpty: Ref<boolean>;
     hasRows: Ref<boolean>;
     loadError: Ref<string | null>;
@@ -25,6 +26,7 @@ export function useLoadPrTable(url: Ref<string>): {
     const isNewLoading = window.Vue.ref(false); // to notify when a new table is being loaded
     const isMoreLoading = window.Vue.ref(false); // to notify when the data linked to the same table is being loaded
     const payload = window.Vue.ref<TablePayload | null>(null); // to store the payload that matches the current query
+    const sortBy = window.Vue.ref<string>(""); // the current sort by field - this should update when a new payload is loaded
     const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the load
     const isEmpty = window.Vue.computed(
         () =>
@@ -38,6 +40,19 @@ export function useLoadPrTable(url: Ref<string>): {
         () => payload.value !== null && payload.value.data.rows.length > 0 && payload.value.metadata.count > 0,
     ); // To show that the report table has rows
     let controller: AbortController; // to allow aborting the previous search if a new one is started
+
+    /**
+     * get the default sortBy field based on the first sortable header in the payload
+     * @returns the default sortBy field
+     */
+    function getDefaultSortBy(): string {
+        // we assume that the first tableHeader is isSortable true is the default sortBy
+        if (payload.value && payload.value.data.tableHeaders.length > 0) {
+            const firstSortableHeader = payload.value.data.tableHeaders.find((header) => header.isSortable);
+            return firstSortableHeader ? firstSortableHeader.key : "";
+        }
+        return "";
+    }
 
     /**
      * search for payload that match the current query
@@ -87,6 +102,7 @@ export function useLoadPrTable(url: Ref<string>): {
             console.error(error);
         } finally {
             if (isNewLoad.value) {
+                sortBy.value = getDefaultSortBy();
                 isNewLoading.value = false;
             } else {
                 isMoreLoading.value = false;
@@ -109,6 +125,7 @@ export function useLoadPrTable(url: Ref<string>): {
         isNewLoading,
         isMoreLoading,
         payload,
+        sortBy,
         isEmpty,
         hasRows,
         loadError,
