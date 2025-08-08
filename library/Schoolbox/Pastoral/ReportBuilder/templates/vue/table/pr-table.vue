@@ -94,6 +94,10 @@ window.Vue.watch(recordsOrPoints, () => {
  * @param headerKey - the key of the header that was clicked for sorting
  */
 function onSort(headerKey: string): void {
+    // prevent further sorting if already loading
+    if (isNewLoading.value || isMoreLoading.value) {
+        return;
+    }
     // If clicking the same header, toggle sort order
     if (sortBy.value === headerKey) {
         order.value = order.value === "ASC" ? "DESC" : "ASC";

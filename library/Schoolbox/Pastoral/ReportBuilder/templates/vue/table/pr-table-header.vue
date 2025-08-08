@@ -121,7 +121,11 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
                 :key="header.key"
                 :class="`u-border-right title-cell ${header.key === 'user' ? 'u-sticky-left user-cell' : ''} ${header.key === 'total' ? 'total-cell' : ''}`"
             >
-                <button v-if="header.isSortable" class="title-button f-always-show" @click="onSortSelected(header.key)">
+                <button
+                    v-if="header.isSortable"
+                    class="title-button f-always-show"
+                    @click.prevent="onSortSelected(header.key)"
+                >
                     <span>
                         {{ header.subTitle ? header.subTitle : header.title }}
                         {{ header.key === "total" ? capitalizeFirstLetter(recordsOrPoints) : "" }}
