@@ -32,7 +32,7 @@ return RectorConfig::configure()
         // Select PHP 8.4 rules
         AddEscapeArgumentRector::class,
         ExplicitNullableParamTypeRector::class,
-//        DeprecatedAnnotationToDeprecatedAttributeRector::class,
+        DeprecatedAnnotationToDeprecatedAttributeRector::class,
     ])
     ->withTypeCoverageLevel(0)
 ;
