@@ -65,10 +65,11 @@ const modalResultsEl = useTemplateRef<HTMLDivElement>("modalResultsRef");
 const { arrivedState } = useScroll(modalResultsEl, {
     offset: { bottom: 30 },
 });
+
 const { bottom } = toRefs(arrivedState);
 window.Vue.watch(bottom, (isAtBottom) => {
     if (isAtBottom && payload.value && payload.value.metadata.cursor.next !== null) {
-        scopeUrlParams.set("cursor", payload.value.metadata.cursor.next);
+        scopeUrlParams.set(ScopeUrlParam.CURSOR as string, payload.value.metadata.cursor.next);
         scopeUrl.value = `${props.selectedTab._links.scope}?${scopeUrlParams.toString()}`;
     }
 });
