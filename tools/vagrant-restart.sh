@@ -48,7 +48,7 @@ if [[ -n $gotenberg_container_ids ]]; then
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting Gotenberg service";
-docker run -d --rm --network host --name schoolbox_vagrant_gotenberg gotenberg/gotenberg:7;
+docker run -d --rm --network host --name schoolbox_vagrant_gotenberg gotenberg/gotenberg:8;
 
 # Rebuild & restart task daemon
 # if `taskd_build_from_local` then build from the mounted taskd dir

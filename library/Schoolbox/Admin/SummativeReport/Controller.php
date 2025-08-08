@@ -719,29 +719,46 @@ class Controller extends ConfigController
                 $report->getTitle()
             ), 0, Payload\Url::FILENAME_MAX_LENGTH, 'UTF-8') . '.zip';
 
+            $callbackUrl    = (string)$urlBase
+                ->withPath(
+                    $this->routeGenerator->generate(
+                        'apiusernotify.apiUserNotify',
+                        ['userId' => $this->getUser()->getId()]
+                    )
+                );
+            $callbackUser   = call_user_func($userSerializer, $this->getUser());
+            $callbackParams = [
+                'from' => $callbackUser,
+                'to'   => $callbackUser,
+            ];
+
             /* This $message instance is the payload that we send to taskd
              * which it then unpacks, configures its Gotenberg client, and uses
              * to generate the pdfs. This is the bridge between the systems
              */
             $message = $messageFactory
                 ->setUser($this->getUser())
-                ->setCallbackUrl(
-                    (string)$urlBase
-                        ->withPath(
-                            $this->routeGenerator->generate(
-                                'apiusernotify.apiUserNotify',
-                                ['userId' => $this->getUser()->getId()]
-                            )
-                        )
+                ->setCallbackUrl($callbackUrl)
+                ->setCallbackParams(
+                    $callbackParams + [
+                        'message' => sprintf(
+                            'Your summative report %s is ready to download',
+                            $report->getTitle(),
+                        ),
+                    ]
                 )
-                ->setCallbackParams([
-                    'message' => sprintf(
-                        'Your summative report %s is ready to download',
-                        $report->getTitle(),
-                    ),
-                    'from'    => call_user_func($userSerializer, $this->getUser()),
-                    'to'      => call_user_func($userSerializer, $this->getUser()),
-                ])
+                ->setFailureCallbackUrl($callbackUrl)
+                ->setFailureCallbackParams(
+                    $callbackParams + [
+                        'message' => sprintf(
+                            'Your summative report %s could not be downloaded (reason: :message)',
+                            $report->getTitle(),
+                        ),
+                        'messageParams' => [
+                            'message' => '{{response.message}}',
+                        ],
+                    ]
+                )
                 ->setPdfFooterStylesheet(file_get_contents(__DIR__ . self::FOOTER_CSS))
                 ->setOutfile($outfile)
                 ->build();

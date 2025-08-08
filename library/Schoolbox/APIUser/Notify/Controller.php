@@ -12,6 +12,7 @@ namespace Schoolbox\APIUser\Notify;
 
 use Alaress\Async\Notification\Instance\Builder as NotificationInstanceBuilder;
 use Alaress\Async\Notification\Instance\Instance;
+use Alaress\Async\Notification\Parameter;
 use Alaress\Async\Queue\Composite;
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
@@ -51,7 +52,12 @@ class Controller extends Base
             return; //exit early the message field is not set...
         }
         try {
-            $bob  = new NotificationInstanceBuilder();
+            $bob = new NotificationInstanceBuilder(validate: false);
+
+            // Note that setting href to # has the effect of automarking the
+            // notification as read: see SA-17727.
+            // SA-19820 specifically works around this if the href is an empty
+            // anchor.
             $bob->setTitle($data['message'] ?? '')
                 ->setAllowSelfSend(true)
                 ->setSeverity(Logger::INFO)
@@ -61,9 +67,27 @@ class Controller extends Base
                 ->addTopic(sprintf('%s.user.%d', Instance::DELIVERY_INSTANT, $user->getId()))
                 ->putMeta('title', 'Message from ' . ($data['from']['fullName'] ?? 'Unknown User'));
 
+            // Attach any messageParams as well.
+            // Using a `\Schoolbox\Realtime\Notification\Parameter\SimpleParam` causes the unserialization in
+            // `\Schoolbox\Realtime\Subscription\Redis\UnreadRetriever::getUnread` to fail, as for whatever reason the
+            // class is not yet defined.
+            // This should be fixed (as in theory at least it should raise errors elsewhere), but for whatever reason it
+            // doesn't that I have seen.
+            foreach ($data['messageParams'] ?? [] as $key => $value) {
+                if (isset($value)) {
+                    $bob->setParam(
+                        $key,
+                        new Parameter\Param(
+                            $value,
+                            stacking: Parameter\ParameterInterface::STACKING_REPLACE_NO_DECORATION,
+                        ),
+                    );
+                }
+            }
+
             $composite = new Composite(
-                new Listed($this->redisStorage, INSTANCE_ID, $user->getId()),
-                new Unread($this->redisStorage, INSTANCE_ID, $user->getId())
+                new Listed($this->redisStorage, (string)INSTANCE_ID, $user->getId()),
+                new Unread($this->redisStorage, (string)INSTANCE_ID, $user->getId())
             );
             $composite->push($bob->build());
         } catch (\Exception $e) {
