@@ -63,7 +63,7 @@ function initSetScrollableHeight(): void {
 const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
 const viewUrl = window.Vue.ref("");
 const viewUrlParams = new URLSearchParams();
-const LIMIT = 5; // the current set limit for the number of records to fetch at once
+const LIMIT = 20; // the current set limit for the number of records to fetch at once
 const sortBy = window.Vue.ref<string>("user"); // the current sort by field - this should update when payload is loaded
 const order = window.Vue.ref<"ASC" | "DESC">("ASC"); // the current sort order
 const { isNewLoading, isMoreLoading, payload, isEmpty, hasRows, loadError } = useLoadPrTable(viewUrl);
