@@ -11,7 +11,6 @@ declare(strict_types=1);
 use Aura\Di\ContainerBuilder;
 use Schoolbox\Application\CliTool\App;
 use Schoolbox\Application\CliTool\Kernel;
-use Schoolbox\Instance;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 
