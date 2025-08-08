@@ -67,7 +67,14 @@ window.Vue.watch(
     <div v-else-if="selectedNodesStore.hasNoNodes && sharedStore.isReadOnly" class="selected-nodes-container">
         <aside class="meta no-codes-note">No Curriculum Codes have been selected</aside>
     </div>
-    <input ref="inputEl" :id="store.formValueName" :name="store.formValueName" type="hidden" tabindex="-1" :value="ids" />
+    <input
+        ref="inputEl"
+        :id="store.formValueName"
+        :name="store.formValueName"
+        type="hidden"
+        tabindex="-1"
+        :value="ids"
+    />
     <select
         ref="selectEl"
         :id="`${store.formValueName}[]`"
