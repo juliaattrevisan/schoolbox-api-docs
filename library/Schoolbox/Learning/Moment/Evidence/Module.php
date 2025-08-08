@@ -85,29 +85,6 @@ class Module extends BaseModule
             )
         );
 
-        /* Learning Moment Modification
-         *
-         * The modify and delete abilities are accessible to:
-         *     - Superusers
-         *     - Staff w/ Learning Moments role permission
-         *     - Parents of userId
-         *         - when evidence_parent_create is truthy
-         *         - and they are the author of the learning moment
-         *     - Students when they are the author of the learning moment
-         *
-         * Students and parents can only modify/delete moments that they themselves created
-         * (they can't modify/delete moments spawned by staffs etc)
-         */
-        $modifyRule = new Rule\All(
-            new Rule\IsConfigOn('evidence_parent_create', $this->getConfig()),
-            new Rule\IsParentOfUser(
-                $this->getExternalUser(),
-                UserMapper::getInstance(),
-                'userId'
-            ),
-            new Rule\IsUser('creatorId')
-        );
-
         $modifyEvidenceRule = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
