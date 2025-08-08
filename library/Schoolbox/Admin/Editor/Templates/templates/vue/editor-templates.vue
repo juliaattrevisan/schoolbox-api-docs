@@ -275,7 +275,7 @@ async function onDeleteConfirmed(): Promise<void> {
     <basic-modal v-model:is-open="isPreviewOpen" :has-background-click="true">
         <media-article tag="div" :content="(currentTemplate as Template).body"></media-article>
     </basic-modal>
-    <basic-modal v-model:is-open="isDeleteOpen" :has-background-click="true">
+    <basic-modal v-model:is-open="isDeleteOpen" :has-background-click="true" size="s">
         <div class="l-flex-col l-gap-s f-no-margins">
             <h2>Please confirm</h2>
             <p>Are you sure you want to delete this template?</p>
