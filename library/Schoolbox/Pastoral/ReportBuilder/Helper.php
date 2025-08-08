@@ -358,4 +358,27 @@ class Helper
     {
         return $this->params;
     }
+
+    public function getStartDate(): ?Alaress_Date_Format
+    {
+        return $this->report['afterDate'] ?? null;
+    }
+
+    public function getEndDate(): ?Alaress_Date_Format
+    {
+        return $this->report['beforeDate'] ?? null;
+    }
+
+    public function getMonthsInRange(Alaress_Date_Format $startDate, Alaress_Date_Format $endDate, string $format): Collection
+    {
+        $start = (clone $startDate)->startOfMonth();
+        $end = (clone $endDate)->startOfMonth();
+
+        $months = [];
+        while ($start->lte($end)) {
+            $months[] = strtolower($start->getUsingFormat($format));
+            $start->addMonths(1);
+        }
+        return new Collection($months);
+    }
 }

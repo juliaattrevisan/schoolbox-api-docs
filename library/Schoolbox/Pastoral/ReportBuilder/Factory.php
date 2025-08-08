@@ -8,6 +8,7 @@ use Schoolbox\Collection;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Report\Model as PastoralReport;
 use Schoolbox\Pastoral\ReportBuilder\TabType\StudentByType;
+use Schoolbox\Pastoral\ReportBuilder\TabType\TypeByMonth;
 use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserMapper;
 
@@ -36,6 +37,16 @@ class Factory
     ) {
         return match ($type) {
             self::STUDENT_BY_TYPE => new StudentByType(
+                $helper,
+                $this->userTranslator,
+                $this->userMapper,
+                $this->pastoralMapper,
+                $this->resultType,
+                $this->orderBy,
+                $this->order,
+                $this->limit,
+            ),
+            self::TYPE_BY_MONTH => new TypeByMonth(
                 $helper,
                 $this->userTranslator,
                 $this->userMapper,
