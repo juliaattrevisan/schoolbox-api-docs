@@ -46,20 +46,38 @@ class Module extends BaseModule
          */
         $this->register(
             self::METHOD_PUT,
-            '/{evidenceId}/publish',
+            '/{evidenceId:\d+}/publish',
             'putPublish',
             $staffOnlyRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
+        );
+
+        /* Bulk Publish a set of learning moments (typically from Cohort Overview)
+         */
+        $this->register(
+            self::METHOD_PUT,
+            '/bulk/publish',
+            'putBulkPublish',
+            $staffOnlyRule,
         );
 
         /* Reject a Learning Moment
          */
         $this->register(
             self::METHOD_PUT,
-            '/{evidenceId}/reject',
+            '/{evidenceId:\d+}/reject',
             'putReject',
             $staffOnlyRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
+        );
+
+        /* Bulk reject a set of learning moments (typically from Cohort Overview)
+         */
+        $this->register(
+            self::METHOD_PUT,
+            '/bulk/reject',
+            'putBulkReject',
+            $staffOnlyRule,
         );
     }
 

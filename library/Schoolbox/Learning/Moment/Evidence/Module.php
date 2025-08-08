@@ -83,22 +83,61 @@ class Module extends BaseModule
             )
         );
 
-        /* Superusers, Staff can modify or delete an Evidence instance
+        /* Learning Moment Modification
+         *
+         * The modify and delete abilities are accessible to:
+         *     - Superusers
+         *     - Staff w/ Learning Moments role permission
+         *     - Parents of userId
+         *         - when evidence_parent_create is truthy
+         *         - and they are the author of the learning moment
+         *     - Students when they are the author of the learning moment
          *
          * Students and parents can only modify/delete moments that they themselves created
-         * (they can't modify/delete moments spawned by staffs)
+         * (they can't modify/delete moments spawned by staffs etc)
          */
+        $modifyRule = new Rule\All(
+            new Rule\IsConfigOn('evidence_parent_create', $this->getConfig()),
+            new Rule\IsParentOfUser(
+                $this->getExternalUser(),
+                UserMapper::getInstance(),
+                'userId'
+            ),
+            new Rule\IsUser('creatorId')
+        );
+
         $modifyEvidenceRule = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
                 new Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
-                new Rule\IsUser('creatorId'),
+                /* Students when they are the author of the learning moment
+                 */
+                new Rule\All(
+                    new Rule\HasRole(Role::STUDENT),
+                    new Rule\IsUser('creatorId')
+                ),
+                $modifyRule
             )
         );
 
+        /* Learning Moment Deletion
+         *
+         * Ability to delete is synonymous with the ability to modify
+         */
         $deleteEvidenceRule = $modifyEvidenceRule;
 
+        /* Learning Moment Cohort Report
+         *
+         * Superusers, Staff with Learning Moment role permission can view/modify cohort report
+         */
+        $viewCohortReportRule = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasRolePermission(Role::PERMISSION_ACCESS_EVIDENCE, Role::STAFF),
+            )
+        );
 
         // Preloaders:
         // convert userIds (a comma-separated list of users) into a user
@@ -140,7 +179,7 @@ class Module extends BaseModule
         // * Parents may view their own and their kid's
         $this->register(
             self::METHOD_GET,
-            '/user/{userId}',
+            '/user/{userId:\d+}',
             'getMomentsForUser',
             new Rule\All(
                 new Rule\IsLoggedIn(),
@@ -164,7 +203,7 @@ class Module extends BaseModule
          */
         $this->register(
             self::METHOD_GET,
-            '/{evidenceId}',
+            '/{evidenceId:\d+}',
             'getEvidenceDetail',
             $viewEvidenceDetailRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
@@ -173,7 +212,7 @@ class Module extends BaseModule
         // Evidence modify form
         $this->register(
             self::METHOD_GET,
-            '/{evidenceId}/modify',
+            '/{evidenceId:\d+}/modify',
             'getModifyForm',
             $modifyEvidenceRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
@@ -207,7 +246,7 @@ class Module extends BaseModule
          */
         $this->register(
             self::METHOD_PUT,
-            '/{evidenceId}/draft',
+            '/{evidenceId:\d+}/draft',
             'putDraft',
             $modifyEvidenceRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
@@ -228,18 +267,18 @@ class Module extends BaseModule
          */
         $this->register(
             self::METHOD_PUT,
-            '/{evidenceId}/submit',
+            '/{evidenceId:\d+}/submit',
             'putSubmit',
             $modifyEvidenceRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
         );
 
         /* Put an evidence into the Published state as-is;
-         * Used from the Activity Feed
+         * Used from the Activity Feed by both students and staffs
          */
         $this->register(
             self::METHOD_PUT,
-            '/{evidenceId}/publish',
+            '/{evidenceId:\d+}/publish',
             'putPublish',
             $modifyEvidenceRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
@@ -248,7 +287,7 @@ class Module extends BaseModule
         // Evidence modify form
         $this->register(
             self::METHOD_PUT,
-            '/{evidenceId}',
+            '/{evidenceId:\d+}',
             'putEvidence',
             $modifyEvidenceRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
@@ -258,7 +297,7 @@ class Module extends BaseModule
          */
         $this->register(
             self::METHOD_DELETE,
-            '/{evidenceId}',
+            '/{evidenceId:\d+}',
             'deleteEvidence',
             $deleteEvidenceRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
@@ -272,6 +311,34 @@ class Module extends BaseModule
 //            $isParentOrUserRule,
 //            Closure::fromCallable([$this, 'preloadUser']),
 //        );
+
+        /* Learning Moment Cohort Report payload with a date range
+         */
+        $this->register(
+            self::METHOD_GET,
+            '/cohort/{folderId}/payload/{fromDate}/{toDate}',
+            'getCohortReportPayloadRange',
+            $viewCohortReportRule,
+            Closure::fromCallable([$this, 'preloadFolder']),
+        );
+
+        $this->register(
+            self::METHOD_GET,
+            '/cohort/{folderId}/payload',
+            'getCohortReportPayloadDefault',
+            $viewCohortReportRule,
+            Closure::fromCallable([$this, 'preloadFolder']),
+        );
+
+        /* Learning Moment Cohort Report screen
+         */
+        $this->register(
+            self::METHOD_GET,
+            '/cohort/{folderId}',
+            'getCohortReport',
+            $viewCohortReportRule,
+            Closure::fromCallable([$this, 'preloadFolder']),
+        );
     }
 
 
@@ -288,6 +355,9 @@ class Module extends BaseModule
                 EditorTemplatesCategoryModel::LEARNING_MOMENTS,
                 $this->injector->get('user')
             ),
+            $this->getMapperFactory()->get(\Schoolbox\UserMapper::class),
+            new \External_Class(),
+            $this->getMapperFactory()->get(\Schoolbox\Permission\Access\UserAccessMapper::class),
         );
     }
 
@@ -302,6 +372,23 @@ class Module extends BaseModule
 
 
     /**
+     * Preload the requested folder for the cohort report
+     *
+     * @param array $params
+     * @return array
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function preloadFolder(array $params): array
+    {
+        return [
+            'folder' => $this->getMapperFactory()
+                ->get(\Schoolbox\Resource\Folder\Mapper::class)
+                ->findById($params['folderId']),
+        ];
+    }
+
+
+    /**
      * Preload the requested student
      *
      * @param array $params
@@ -312,8 +399,8 @@ class Module extends BaseModule
     {
         return [
             'user' => $this->getMapperFactory()
-                           ->get(UserMapper::class)
-                           ->findById($params['userId']),
+                ->get(UserMapper::class)
+                ->findById($params['userId']),
         ];
     }
 

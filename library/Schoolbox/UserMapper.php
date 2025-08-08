@@ -511,6 +511,36 @@ class UserMapper extends Mapper
 
 
     /**
+     * Find a user by their external id and come with roles, campus, etc
+     *
+     * @param array $ids
+     * @param string $roleType If provided, restrict to this role type.
+     *                         One of `Role::STAFF`, `Role::STUDENT`, `Role::PARENT`, `Role::GUEST`
+     * @return GenericCollection
+     * @throws Mapper\Exception
+     * @throws Mapper\Exception\NotFound
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     */
+    public function findByExternalIds(array $ids, $roleType = null): GenericCollection
+    {
+
+        if (\count($ids) === 0) {
+            throw new Schoolbox\Mapper\Exception('An ID must be provided');
+        }
+
+        $pb = $this->getPredicateBuilder()
+            ->in('synergy_id', $ids);
+
+        if ($roleType) {
+            $pb->equals('g.group_type', $roleType);
+        }
+
+        return $this->findByPredicates($pb);
+    }
+
+
+
+    /**
      * Fetches the user, and all of the user's subjects.
      *
      * NOTE: spawns External\SubjectMapper to find these subjects

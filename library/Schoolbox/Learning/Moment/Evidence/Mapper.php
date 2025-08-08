@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment\Evidence;
 
+use Alaress\Database\Predicate\Builder;
 use House;
 use PDOStatement;
 use Schoolbox\Discussion\Thread\Mapper as ThreadMapper;
@@ -25,6 +26,11 @@ use Schoolbox\YearLevel\Model as YearLevel;
  *
  * @method Model createModel($idValue = null)
  * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model findById($identifierValue)
+ * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
+ * @method Model[]|GenericCollection findByColumnList($columnName, $columnValue, $options = [])
+ * @method Model[]|GenericCollection createCollection($contents = [])
+ * @method Model[]|GenericCollection findByPredicates(Builder $pb, array $options = [])
  */
 class Mapper extends BaseMapper
 {
@@ -99,6 +105,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('recipient.year', 'recipientYear')},
                 {$this->getJoinColumnString('recipient.schoolHouse', 'recipientSchoolHouse')},
                 {$this->getJoinColumnString('recipient.pronoun', 'recipientPronoun')},
+                {$this->getJoinColumnString('recipient.role', 'recipientRole')},
                 {$this->getJoinColumnString('creator', 'creator')},
                 {$this->getJoinColumnString('creator.pronoun', 'creatorPronoun')},
                 {$this->getJoinColumnString('submittedBy', 'submittedBy')},
@@ -123,6 +130,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('recipient.year', 'recipient', 'recipientYear', true)}
             LEFT JOIN {$this->getJoinSql('recipient.schoolHouse', 'recipient', 'recipientSchoolHouse', true)}
             LEFT JOIN {$this->getJoinSql('recipient.pronoun', 'recipient', 'recipientPronoun')}
+            LEFT JOIN {$this->getJoinSql('recipient.role', 'recipient', 'recipientRole')}
             LEFT JOIN {$this->getJoinSql('creator', '', 'creator', true)}
             LEFT JOIN {$this->getJoinSql('creator.pronoun', 'creator', 'creatorPronoun')}
             LEFT JOIN {$this->getJoinSql('submittedBy', '', 'submittedBy', true)}

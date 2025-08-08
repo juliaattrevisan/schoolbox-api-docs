@@ -136,7 +136,7 @@
                     });
                 </script>
 
-                {% if USER.role.isStudent or USER.role.isParent %}
+                {% if USER.role.isStudent %}
                     {% if moderationRequired and (evidence.isDraft or evidence.isRejected) %}
                         <li><button id="submit">Submit for approval</button></li>
 
@@ -152,13 +152,34 @@
                          #     - it's already published and you shouldn't be able to publish again
                          #}
                     {% else %}
-                        <li><button id="submit">Publish</button></li>
+                        <li><button id="submit" class="submit">Publish</button></li>
 
                         {% if isCreate %}
                             {% set route = routeLookupIfAuthorized('learningMomentEvidence.postPublish', {userIds: userIds|join(',')}) %}
                         {% else %}
                             {% set route = routeLookupIfAuthorized('learningMomentEvidence.putPublish', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
                         {% endif %}
+                    {% endif %}
+
+                    <script>
+                        $(function() {
+                            $('#submit').on('click', function(event) {
+                                event.preventDefault();
+
+                                $('#evidence-form').attr('action', '{{ route }}');
+
+                                $('#evidence-persist').trigger('click');
+                            });
+                        });
+                    </script>
+                {% elseif USER.role.isParent and config.evidence_parent_create %}
+                    {# Parents bypass moderation entirely #}
+                    <li><button id="submit">Publish</button></li>
+
+                    {% if isCreate %}
+                        {% set route = routeLookupIfAuthorized('learningMomentEvidence.postPublish', {userIds: userIds|join(',')}) %}
+                    {% else %}
+                        {% set route = routeLookupIfAuthorized('learningMomentEvidence.putPublish', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
                     {% endif %}
 
                     <script>
@@ -232,7 +253,7 @@
                         </script>
                     {% elseif isCreate %}
                         {# "Share a Learning Moment" via the Class List #}
-                        <li><button id="publish">Publish</button></li>
+                        <li><button id="publish" class="submit">Publish</button></li>
                     {% endif %}
                 {% endif %}
             </ul>
@@ -319,7 +340,7 @@
                  # the updated text. To dodge this ckeditor hankypanky we just simulate a user click
                  #}
                 $('#evidence-persist').trigger('click');
-            %});
+            });
         });
     </script>
 {% endif %}
@@ -357,7 +378,7 @@
                      # or putReject() depending on what the staff did. Rejection changes
                      # the form url to go to putReject() where it essentially does the
                      # same thing as putEvidence().
-                    #}
+                     #}
                     rejectionReason: formData.get('rejectionReason'),
                     {# Moderation Workflow
                      # For when someone chose "Delete and continue"
