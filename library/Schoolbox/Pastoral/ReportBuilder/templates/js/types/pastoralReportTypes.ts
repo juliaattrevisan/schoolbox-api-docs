@@ -113,6 +113,17 @@ export type TablePayload = {
 };
 
 /**
+ * Params available to the tab._links.view URL.
+ */
+export enum ViewUrlParams {
+    SELECTED = "selected",
+    SORT_BY = "sortBy",
+    ORDER = "order",
+    LIMIT = "limit",
+    CURSOR = "cursor",
+}
+
+/**
  * The expected payload for a Pastoral records load.
  */
 export type RecordsPayload = {
