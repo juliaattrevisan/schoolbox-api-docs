@@ -286,7 +286,7 @@ async function onDeleteConfirmed(): Promise<void> {
                 <em>Further support info: {{ deleteError }}</em>
             </div>
             <div class="l-flex l-gap-xs f-no-margins">
-                <button class="button submit l-flex__item--1" @click.prevent="onDeleteConfirmed">
+                <button class="button submit l-flex__item--1 alert" @click.prevent="onDeleteConfirmed">
                     {{ isDeleting ? "Deleting..." : "Delete" }}
                 </button>
                 <button class="button l-flex__item--1" @click.prevent="isDeleteOpen = false">Cancel</button>
