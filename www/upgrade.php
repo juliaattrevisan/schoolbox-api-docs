@@ -41,10 +41,10 @@ $cdnPrefixGenerator = $kernel->get('cdnPrefixGenerator');
             </ul>
             <h4>Minimum supported browser versions:</h4>
             <ul>
-                <li>Apple Safari: 14.1</li>
-                <li>Google Chrome: 108</li>
-                <li>Microsoft Edge: 108</li>
-                <li>Mozilla Firefox: 108</li>
+                <li>Apple Safari: 16.4</li>
+                <li>Google Chrome: 112</li>
+                <li>Microsoft Edge: 112</li>
+                <li>Mozilla Firefox: 112</li>
             </ul>
         </section>
     </div>
