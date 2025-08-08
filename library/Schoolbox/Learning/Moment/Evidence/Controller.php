@@ -409,7 +409,7 @@ class Controller extends Base
         $evidence          = $requestTranslator($requestBody, $evidence)
             ->setBody($tokenReplacer->replace($evidence->getBody(), $evidence->getRecipient()));
 
-        if (true === ($requestBody['draft'] ?? false)) {
+        if ($requestBody['draft'] ?? false) {
             // autosave draft, save as draft
             $evidence->draft();
         }
