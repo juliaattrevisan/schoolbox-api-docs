@@ -199,7 +199,6 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
                 $this->onWarning($errNum, $errStr, $errFile, $errLine);
                 return true;
 
-            case E_STRICT:
             case E_DEPRECATED:
             case E_USER_DEPRECATED:
                 // Deprecation notices:

@@ -25,7 +25,7 @@ class Config
     /**
      * Only these types of error are reported to Sentry.
      */
-    private const ERROR_REPORTING = E_ALL & ~E_NOTICE & ~E_USER_NOTICE & ~E_STRICT;
+    private const ERROR_REPORTING = E_ALL & ~E_NOTICE & ~E_USER_NOTICE;
 
     /**
      * Deprecated default sentry DSN, for when `$sentryDsn` isn't provided to
