@@ -1,0 +1,24 @@
+{# TODO: Add if learning moments enabled condition #}
+{% if true %}
+    <section data-component-content>
+        <ul class="action-list" data-task-list>
+            <li>
+                <div class="list-item">
+                    <div class="card small-12">
+                        <h3>
+                            <a class="title" href="{{ routeLookup('learningAssessment.getSummary', {assessmentId: null, studentId: null}) }}">
+                                Take a photo
+                            </a>
+                        </h3>
+                    </div>
+                </div>
+            </li>
+        </ul>
+    </section>
+{% else %}
+    <div class="empty-state">
+        <p>
+            You do not have permission (TODO: find appropriate empty state wording)
+        </p>
+    </div>
+{% endif %}
