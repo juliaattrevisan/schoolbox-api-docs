@@ -54,7 +54,7 @@ class IsUser implements IAuthorizationRule
      * @throws \Alaress\Authorizer\Failure\Base if the request isn't authorized.
      * @throws InsufficientHydrationException If route indicates
      */
-    public function authorize(array $params = [], User $user = null)
+    public function authorize(array $params = [], ?User $user = null)
     {
         // No session user?
         if (!$user instanceof User) {

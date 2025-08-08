@@ -28,7 +28,7 @@ class IsSimilarityCheckEnabled extends AbstractAssessableRule
      * @inheritdoc
      * @throws InvalidArgumentException If unable to locate required params in route args
      */
-    public function authorize(array $params = [], User $user = null)
+    public function authorize(array $params = [], ?User $user = null)
     {
         $assessment = $this->findAssessable($params);
 

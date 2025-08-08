@@ -241,7 +241,7 @@ class DataSource
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function getVisitorCount(int $folderId, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate, string $role = null): int
+    public function getVisitorCount(int $folderId, \Alaress_Date_Format $startDate, \Alaress_Date_Format $endDate, ?string $role = null): int
     {
         $queryParams = [
             'folderId' => $folderId,

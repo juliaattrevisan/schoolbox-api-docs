@@ -287,7 +287,7 @@ class Mapper extends \Schoolbox\Mapper
      * @throws InvalidColumnException
      * @see Model::getDiscreteState()
      */
-    public function getPredicateDraft(string $tableAlias = null): IBuilder
+    public function getPredicateDraft(?string $tableAlias = null): IBuilder
     {
         $prefix = $this->determinePredicateBuilderPrefix($tableAlias);
         return $this->getPredicateBuilder()
@@ -304,7 +304,7 @@ class Mapper extends \Schoolbox\Mapper
      * @throws InvalidColumnException
      * @see Model::getDiscreteState()
      */
-    public function getPredicateRejected(string $tableAlias = null): IBuilder
+    public function getPredicateRejected(?string $tableAlias = null): IBuilder
     {
         $prefix = $this->determinePredicateBuilderPrefix($tableAlias);
         return $this->getPredicateBuilder()
@@ -322,7 +322,7 @@ class Mapper extends \Schoolbox\Mapper
      * @throws InvalidColumnException
      * @see Model::getDiscreteState()
      */
-    public function getPredicateAwaitingModeration(string $tableAlias = null): IBuilder
+    public function getPredicateAwaitingModeration(?string $tableAlias = null): IBuilder
     {
         $prefix = $this->determinePredicateBuilderPrefix($tableAlias);
         return $this->getPredicateBuilder()
@@ -347,7 +347,7 @@ class Mapper extends \Schoolbox\Mapper
      * @throws InvalidColumnException
      * @see Model::getDiscreteState()
      */
-    public function getPredicateAwaitingPublication(Alaress_Date_Format $now = null, string $tableAlias = null): IBuilder
+    public function getPredicateAwaitingPublication(?Alaress_Date_Format $now = null, ?string $tableAlias = null): IBuilder
     {
         $prefix      = $this->determinePredicateBuilderPrefix($tableAlias);
         $nowDatabase = ($now ?? Alaress_Date_Format::now())->getDatabase();
@@ -366,7 +366,7 @@ class Mapper extends \Schoolbox\Mapper
      * @throws InvalidColumnException
      * @see Model::getDiscreteState()
      */
-    public function getPredicateApproved(string $tableAlias = null): IBuilder
+    public function getPredicateApproved(?string $tableAlias = null): IBuilder
     {
         $prefix = $this->determinePredicateBuilderPrefix($tableAlias);
         return $this->getPredicateBuilder()
@@ -385,7 +385,7 @@ class Mapper extends \Schoolbox\Mapper
      * @throws InvalidColumnException
      * @see Model::getDiscreteState()
      */
-    public function getPredicatePublished(Alaress_Date_Format $now = null, string $tableAlias = null): IBuilder
+    public function getPredicatePublished(?Alaress_Date_Format $now = null, ?string $tableAlias = null): IBuilder
     {
         $prefix      = $this->determinePredicateBuilderPrefix($tableAlias);
         $nowDatabase = ($now ?? Alaress_Date_Format::now())->getDatabase();
@@ -409,7 +409,7 @@ class Mapper extends \Schoolbox\Mapper
      * @throws InvalidColumnException
      * @see Model::getDiscreteState()
      */
-    public function getPredicateExpired(Alaress_Date_Format $now = null, string $tableAlias = null): IBuilder
+    public function getPredicateExpired(?Alaress_Date_Format $now = null, ?string $tableAlias = null): IBuilder
     {
         $prefix      = $this->determinePredicateBuilderPrefix($tableAlias);
         $nowDatabase = ($now ?? Alaress_Date_Format::now())->getDatabase();
@@ -433,7 +433,7 @@ class Mapper extends \Schoolbox\Mapper
      * @throws UnderflowException       If state indicates no articles can ever match
      * @throws InvalidArgumentException If state is invalid
      */
-    public function getPredicateForState(int $state, string $tableAlias = null): Builder
+    public function getPredicateForState(int $state, ?string $tableAlias = null): Builder
     {
         if ($state === Model::STATE_NONE) {
             // We could generate a predicate that matches no articles (eg id=0) but that  would

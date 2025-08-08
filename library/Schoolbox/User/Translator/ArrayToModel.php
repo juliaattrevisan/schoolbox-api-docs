@@ -10,7 +10,7 @@ class ArrayToModel extends Base
     /**
      * @inheritDoc
      */
-    public function __invoke(array $array, object $model = null): object
+    public function __invoke(array $array, ?object $model = null): object
     {
         /**
          * loop through array lines

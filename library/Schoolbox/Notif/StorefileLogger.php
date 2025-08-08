@@ -60,7 +60,7 @@ class StorefileLogger implements CacheableLoggerInterface, CompositeLoggerInterf
     public function __construct(
         $filename,
         Storage\IReceiver $receiver,
-        FormatterInterface $formatter = null
+        ?FormatterInterface $formatter = null
     ) {
         $this->file = $filename;
 

@@ -38,7 +38,7 @@ class IsCoachOfTeam implements IAuthorizationRule
     /**
      * {@inheritdoc}
      */
-    public function authorize(array $params = array(), User $user = null)
+    public function authorize(array $params = array(), ?User $user = null)
     {
         if ((($params['context'] ?? null) instanceof Matchup) && (is_numeric($params['teamId']))) {
             /* Viewing the Team Match Page

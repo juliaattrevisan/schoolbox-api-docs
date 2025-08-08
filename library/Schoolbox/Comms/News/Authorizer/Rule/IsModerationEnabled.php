@@ -37,7 +37,7 @@ class IsModerationEnabled implements IAuthorizationRule
      * @inheritdoc
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      */
-    public function authorize(array $params = [], User $user = null): void
+    public function authorize(array $params = [], ?User $user = null): void
     {
         if (!$this->config->get(ConfigMapper::_GLOBAL_MODERATION)) {
             throw new Unauthorized('Global moderation is disabled');

@@ -1197,12 +1197,12 @@ class DemoData
      * * User R
      * * * DueWork - feedbackRequired
      *
-     * @param ISummator $summator
+     * @param ISummator|null $summator
      * @return Project
      * @throws InvalidArgumentException If an unrecognised $userChar is attempted
      * @throws UnexpectedValueException If unable to merge collections
      */
-    public static function getProject(ISummator $summator = null): Project
+    public static function getProject(?ISummator $summator = null): Project
     {
         $resultCacheMapper = ResultCache\Mapper::getInstance();
 

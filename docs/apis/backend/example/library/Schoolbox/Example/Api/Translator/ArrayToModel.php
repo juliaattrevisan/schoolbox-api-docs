@@ -31,13 +31,13 @@ class ArrayToModel extends Base
      * (see https://en.wikipedia.org/wiki/Liskov_substitution_principle), hence
      * the type hinting instead of type definition.
      *
-     * @param array               $array The array representation of the object,
+     * @param array       $array         The array representation of the object,
      *                                   from the JSON request body.
-     * @param (object&Model)|null $model The model (if any) which is being
+     * @param object|null $model         The model (if any) which is being
      *                                   modified.
      * @return Model
      */
-    public function __invoke(array $array, object $model = null): Model
+    public function __invoke(array $array, ?object $model = null): Model
     {
         // Fake strong type definitions here.
         if ($model && !$model instanceof Model) {

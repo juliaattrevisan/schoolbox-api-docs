@@ -391,7 +391,7 @@ class Mapper extends BaseMapper
      * @param string|null $category
      * @return Builder
      */
-    private function buildSearchPredicate(string $keyword, User $user, string $category = null): Builder
+    private function buildSearchPredicate(string $keyword, User $user, ?string $category = null): Builder
     {
         $pb = $this->getPredicateBuilder();
 

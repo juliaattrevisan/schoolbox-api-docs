@@ -13,7 +13,7 @@ class Component_Config_Align extends Component_Config_Abstract
         $key,
         $keyblock,
         $configValue,
-        Component_ControllerAbstract $component = null
+        ?Component_ControllerAbstract $component = null
     ) {
 
         // has an internal block for the select element

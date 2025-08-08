@@ -101,7 +101,7 @@ class External_Isams_Class implements External_ClassInterface
     /**
      * @inheritdoc
      */
-    public function getTeachers(string $classCode, Alaress_Date_Format $date = null): array
+    public function getTeachers(string $classCode, ?Alaress_Date_Format $date = null): array
     {
         if (empty($classCode)) {
             return [];

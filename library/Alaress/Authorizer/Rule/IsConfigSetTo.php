@@ -57,7 +57,7 @@ class IsConfigSetTo implements IAuthorizationRule
     /**
      * {@inheritdoc}
      */
-    public function authorize(array $params = array(), User $user = null)
+    public function authorize(array $params = array(), ?User $user = null)
     {
         if ($this->configLoader->get($this->paramsKey) == $this->paramsValue) {
             return true;

@@ -54,7 +54,7 @@ class Account
      * @return Builder
      * @throws InvalidColumnException
      */
-    public function equalsAccountFolder(int $accountCanvasId, string $folderTableAlias = null): Builder
+    public function equalsAccountFolder(int $accountCanvasId, ?string $folderTableAlias = null): Builder
     {
         return (new Builder($this->schoolboxDb->getQuoter(), $folderTableAlias ?? 'folder'))
             ->regex('name', "^.+\\({$this::canvasIdPrefix()}-{$accountCanvasId}\\)$");

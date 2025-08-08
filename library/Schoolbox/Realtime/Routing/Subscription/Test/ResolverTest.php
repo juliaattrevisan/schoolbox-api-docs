@@ -41,32 +41,32 @@ class ResolverTest extends TestCase
 
 
     /**
-     * @param IRouter $router
+     * @param IRouter|null $router
      * @return Resolver
      */
-    private function newResolver(IRouter $router = null)
+    private function newResolver(?IRouter $router = null)
     {
         return new Resolver($router ?: self::newRouter());
     }
 
 
     /**
-     * @param IDictionary $dict
+     * @param IDictionary|null $dict
      * @return Router
      */
-    private static function newRouter(IDictionary $dict = null)
+    private static function newRouter(?IDictionary $dict = null)
     {
         return new Router($dict ?: new SubscriptionDictionary('.'));
     }
 
 
     /**
-     * @param IDictionary $dict
-     * @throws InvalidArgumentException
-     * @throws OutOfBoundsException
+     * @param IDictionary|null $dict
      * @return IRouter
+     *@throws OutOfBoundsException
+     * @throws InvalidArgumentException
      */
-    private function newLoadedRouter(IDictionary $dict = null)
+    private function newLoadedRouter(?IDictionary $dict = null)
     {
         $router = self::newRouter($dict);
 
@@ -117,12 +117,12 @@ class ResolverTest extends TestCase
 
 
     /**
-     * @param IDictionary $dict
-     * @throws InvalidArgumentException
-     * @throws OutOfBoundsException
+     * @param IDictionary|null $dict
      * @return IRouter
+     *@throws OutOfBoundsException
+     * @throws InvalidArgumentException
      */
-    private static function newRealWorldRouter(IDictionary $dict = null)
+    private static function newRealWorldRouter(?IDictionary $dict = null)
     {
         $router = self::newRouter($dict);
 

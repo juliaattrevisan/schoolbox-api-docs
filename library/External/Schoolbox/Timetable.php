@@ -146,7 +146,7 @@ class External_Schoolbox_Timetable implements External_TimetableInterface
      * {@inheritDoc}
      * @throws \Alaress\Database\Exception
      */
-    public function getPeriodNumber(Campus $campus, $now = 0, User $user = null): array
+    public function getPeriodNumber(Campus $campus, $now = 0, ?User $user = null): array
     {
         $dayNumber = $this->getDayNumber($campus, $now);
         $time      = $now

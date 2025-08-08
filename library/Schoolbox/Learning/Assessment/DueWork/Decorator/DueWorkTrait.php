@@ -339,7 +339,7 @@ trait DueWorkTrait
      * @param array|null $rubricData
      * @return static
      */
-    protected function setRubricData(array $rubricData = null)
+    protected function setRubricData(?array $rubricData = null)
     {
         $this->rubricData = $rubricData;
         return $this;

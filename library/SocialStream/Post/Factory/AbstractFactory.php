@@ -38,10 +38,10 @@ abstract class AbstractFactory
     /**
      * Produce an object
      *
-     * @param array $data
+     * @param array|null $data
      * @return mixed
      */
-    abstract public function produce(array $data = null);
+    abstract public function produce(?array $data = null);
 
     /* Getters/Setters
      */

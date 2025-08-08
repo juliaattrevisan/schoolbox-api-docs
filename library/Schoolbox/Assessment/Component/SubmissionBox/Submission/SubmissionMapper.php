@@ -80,7 +80,7 @@ class SubmissionMapper extends BaseMapper
      * @throws BaseMapper\DefinitionException
      * @throws Participant\Plan\InvalidState
      */
-    public function canParticipate(Submission $object, Submission $previous = null): bool
+    public function canParticipate(Submission $object, ?Submission $previous = null): bool
     {
         if ($previous) {
             // If an update, assume the system is still valid
@@ -101,7 +101,7 @@ class SubmissionMapper extends BaseMapper
      * @throws \UnexpectedValueException
      * @throws Participant\Plan\InvalidState
      */
-    public function insertParticipation(Submission $object, Submission $previous = null): bool
+    public function insertParticipation(Submission $object, ?Submission $previous = null): bool
     {
         if ($previous) {
             // If an update, assume the participation record already exists
@@ -256,12 +256,12 @@ class SubmissionMapper extends BaseMapper
      * Persists all files that have been attached to this submission.
      * This handles added, removed, and updated files.
      *
-     * @param Submission $object
-     * @param Submission $previous (present because this function is used as a post-save callback).
+     * @param Submission      $object
+     * @param Submission|null $previous (present because this function is used as a post-save callback).
      * @throws BaseMapper\DefinitionException
      * @throws \PDOException|MapperException
      */
-    public function persistFiles(Submission $object, Submission $previous = null)
+    public function persistFiles(Submission $object, ?Submission $previous = null)
     {
         $submittedFiles = $object->getFiles();
 

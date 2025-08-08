@@ -36,7 +36,7 @@ class Controller extends ConfigController
      * @since 18.1
      * @api   GET /adminv2/setting/{typeLabel}
      */
-    public function getSettings(string $typeLabel = null): void
+    public function getSettings(?string $typeLabel = null): void
     {
         $typeLabel  = $typeLabel ? urldecode($typeLabel) : 'Site';
 

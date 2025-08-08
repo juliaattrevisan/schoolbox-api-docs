@@ -155,7 +155,7 @@ class Controller extends Base
      * @throws TwigError
      * @throws MapperException
      */
-    private function getCustomGrades(User $viewee, Term\Model $term, string $selectedYear = null): void
+    private function getCustomGrades(User $viewee, Term\Model $term, ?string $selectedYear = null): void
     {
         $markSchemeFactory = new Factory($this->getConfigLoader());
         $gradeHelper       = new Helper(

@@ -29,7 +29,7 @@ class IsShareable extends ArticleAttribute
      * @throws Unauthorized
      * @throws UnexpectedValueException
      */
-    public function authorize(array $params = [], User $user = null): void
+    public function authorize(array $params = [], ?User $user = null): void
     {
         if (!$user) {
             throw new InvalidArgumentException('No session user available to test permissions');

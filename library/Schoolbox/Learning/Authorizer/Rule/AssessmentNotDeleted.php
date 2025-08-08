@@ -29,7 +29,7 @@ class AssessmentNotDeleted extends AbstractAssessableRule
      * @throws NotFound If an IAssessable was unable to be found in route params
      * @throws InvalidArgumentException
      */
-    public function authorize(array $params = [], User $user = null)
+    public function authorize(array $params = [], ?User $user = null)
     {
         $assessable = $this->findAssessable($params);
 

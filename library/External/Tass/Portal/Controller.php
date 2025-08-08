@@ -78,10 +78,10 @@ class Controller extends Alaress\Web\Controller\Base
      * @param string     $productPath The Tass portal path where the Tass product is made available
      * @param array      $deepLinkV2  Injected when generating a SSO v2 token
      * @param bool       $prodMenu    Should Tass render the product menu? Null for default behaviour
-     * @param null|array $deepLinkV1  Injected when generating a SSO v1 token
+     * @param array|null $deepLinkV1  Injected when generating a SSO v1 token
      * @throws \Schoolbox\Application\Exception\Exception If attempting to SSO as an impersonated user
      */
-    private function redirectToTassProduct(string $productCode, string $appCode, string $productPath, array $deepLinkV2, bool $prodMenu, array $deepLinkV1 = null)
+    private function redirectToTassProduct(string $productCode, string $appCode, string $productPath, array $deepLinkV2, bool $prodMenu, ?array $deepLinkV1 = null)
     {
         // We don't permit SSO of impersonated users into external systems
         if ($this->isCurrentUserImpersonated()) {

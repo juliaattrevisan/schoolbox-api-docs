@@ -109,8 +109,8 @@ class Ancestry
      * Find ancestry using findById() which also gives you hydrations
      * on joins and other objects
      *
-     * @param Model $folder
-     * @param Model $stopFolder
+     * @param Model      $folder
+     * @param Model|null $stopFolder
      * @return Collection
      * @throws MapperException if one of the ancestors is deleted or missing somehow
      * @throws MapperException\Deleted
@@ -118,7 +118,7 @@ class Ancestry
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function findParents(Folder $folder, Folder $stopFolder = null)
+    public function findParents(Folder $folder, ?Folder $stopFolder = null)
     {
         return $this->findParentAncestry($folder, false, $stopFolder);
     }
@@ -126,8 +126,8 @@ class Ancestry
     /**
      * Find ancestry using findCheaplyById()
      *
-     * @param Model $folder
-     * @param Model $stopFolder
+     * @param Model      $folder
+     * @param Model|null $stopFolder
      * @return Collection
      * @throws MapperException if one of the ancestors is deleted or missing somehow
      * @throws MapperException\Deleted
@@ -135,7 +135,7 @@ class Ancestry
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    public function findParentsCheaply(Folder $folder, Folder $stopFolder = null)
+    public function findParentsCheaply(Folder $folder, ?Folder $stopFolder = null)
     {
         return $this->findParentAncestry($folder, true, $stopFolder);
     }
@@ -155,7 +155,7 @@ class Ancestry
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\DefinitionException
      */
-    private function findParentAncestry(Folder $folder, bool $cheaply, Folder $stopFolder = null): Collection
+    private function findParentAncestry(Folder $folder, bool $cheaply, ?Folder $stopFolder = null): Collection
     {
         $stack = array($folder);
         $count = 0;

@@ -75,7 +75,7 @@ class External_Synergetic_Class implements External_ClassInterface
      * @param string|null     $fileType
      * @return mixed
      */
-    public function getClass($classCode, \Schoolbox\User $user, int $fileYearOverride = null, int $fileSemesterOverride = null, string $fileType = null)
+    public function getClass($classCode, \Schoolbox\User $user, ?int $fileYearOverride = null, ?int $fileSemesterOverride = null, ?string $fileType = null)
     {
         $classQuery = $this->getClassCodeQuery($classCode);
         $fileSemester = $this->database->legacyQuote($fileSemesterOverride ?? $this->externalUser->getCurrentSemester($user->getExternalId()));
@@ -164,7 +164,7 @@ class External_Synergetic_Class implements External_ClassInterface
      * @param Alaress_Date_Format|null $date
      * @throws Predicate\InvalidColumnException
      */
-    public function getTeachers(string $classCode, Alaress_Date_Format $date = null): array
+    public function getTeachers(string $classCode, ?Alaress_Date_Format $date = null): array
     {
         if (!$classCode) {
             /* Dont bother if you got no code */

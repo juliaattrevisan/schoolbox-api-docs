@@ -487,7 +487,7 @@ class External_Schooledge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getCurrentSemester(string $externalUserId = null): ?string
+    public function getCurrentSemester(?string $externalUserId = null): ?string
     {
         $semester = $this->database->getOne("SELECT Semester FROM SchoolPeriod WHERE IsCurrent = 'Y'");
         return ($semester === null || $semester === false) ? null : (string)$semester;
@@ -497,7 +497,7 @@ class External_Schooledge_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getCurrentYear(string $externalUserId = null): ?string
+    public function getCurrentYear(?string $externalUserId = null): ?string
     {
         $year = $this->database->getOne("SELECT Year FROM SchoolPeriod WHERE IsCurrent = 'Y'");
         return ($year === null || $year === false) ? null : (string)$year;

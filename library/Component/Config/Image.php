@@ -9,7 +9,7 @@
 class Component_Config_Image extends Component_Config_Abstract
 {
 
-    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
+    public function parse(SitePage $page, $key, $keyblock, $configValue, ?Component_ControllerAbstract $component = null)
     {
         // has an internal block for the select element
         $page->setBlock($keyblock, 'config_images', 'config_images_block');

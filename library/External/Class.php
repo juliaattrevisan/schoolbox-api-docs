@@ -55,7 +55,7 @@ class External_Class extends CachingConnectorAbstract implements External_ClassI
     /**
      * @inheritdoc
      */
-    public function getTeachers(string $classCode, Alaress_Date_Format $date = null): array
+    public function getTeachers(string $classCode, ?Alaress_Date_Format $date = null): array
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }

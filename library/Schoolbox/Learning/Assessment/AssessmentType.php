@@ -79,11 +79,11 @@ class AssessmentType implements IType
     /**
      * Get the numeric representation from string representation
      *
-     * @param string            $stringVal
-     * @param AssessmentContext $context
+     * @param string                 $stringVal
+     * @param AssessmentContext|null $context
      * @return IAssessable
      */
-    public static function stringToObject($stringVal, AssessmentContext $context = null)
+    public static function stringToObject($stringVal, ?AssessmentContext $context = null)
     {
         if (self::TYPE_PROJECT === $stringVal) {
             return (new Project())->setContext($context);

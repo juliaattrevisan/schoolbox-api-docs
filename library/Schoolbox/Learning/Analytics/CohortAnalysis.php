@@ -149,12 +149,12 @@ class CohortAnalysis
      * This class depends on all unit, assessment, participation, response and feedback references being fully accounted for.
      *
      * @param Collection|IAssessable[] $dueAssessments IAssessable implementations due in selected Term and cohort/class
-     * @param null|Folder              $classFolder
+     * @param Folder|null              $classFolder
      * @param null|WorkType\Model      $resultFilter   If supplied, filter results for box-plot of DueWork that does not match this type
      * @throws \DomainException
      * @todo inject mapper dependencies
      */
-    public function __construct(Collection $dueAssessments, Folder $classFolder = null, WorkType\Model $resultFilter = null)
+    public function __construct(Collection $dueAssessments, ?Folder $classFolder = null, WorkType\Model $resultFilter = null)
     {
         $this->submissionTypeResultFilter = $resultFilter;
         $this->classFolder                = $classFolder;

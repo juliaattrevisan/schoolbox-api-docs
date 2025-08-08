@@ -110,7 +110,7 @@ class ClassCompiler
      * @param string|null $endDate
      * @return array
      */
-    private function compileSchedule(array $class, string $startDate = null, string $endDate = null): array
+    private function compileSchedule(array $class, ?string $startDate = null, ?string $endDate = null): array
     {
         $schedule = [];
 

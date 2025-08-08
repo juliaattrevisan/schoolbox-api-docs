@@ -445,14 +445,14 @@ class EventRecurrenceMapper
      *
      * @param Event                  $event
      * @param DateTime[]|Traversable $dateSource
-     * @param EventRelations         $eventRelations
+     * @param EventRelations|null    $eventRelations
      * @return Collection|Event[]
      * @throws MapperException
      */
     public function createSequenceFromIterator(
         Event $event,
         $dateSource = null,
-        EventRelations $eventRelations = null
+        ?EventRelations $eventRelations = null
     ) {
         $sequence = $this->getSequenceFromIterator($event, $dateSource);
 

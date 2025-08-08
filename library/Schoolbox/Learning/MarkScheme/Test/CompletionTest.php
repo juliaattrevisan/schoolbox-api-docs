@@ -122,11 +122,11 @@ class CompletionTest extends TestCase
     }
 
     /**
-     * @param mixed $humanReadable
-     * @param TaskResponse $response
+     * @param mixed             $humanReadable
+     * @param TaskResponse|null $response
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('provider_humanReadable_withResponse')]
-    public function test_getNormalised_withResponse($humanReadable, TaskResponse $response = null)
+    public function test_getNormalised_withResponse($humanReadable, ?TaskResponse $response = null)
     {
         if ($response && $response->isMarkedComplete()) {
             $expected = Completion::NORMALISED_MARK_MAX;

@@ -54,7 +54,7 @@ class ObjectTree
      *
      * @param callable|null $hashFunction
      */
-    public function __construct(callable $hashFunction = null)
+    public function __construct(?callable $hashFunction = null)
     {
         $this->hashFunction = $hashFunction ?? static function ($element) {
                 return spl_object_hash($element);

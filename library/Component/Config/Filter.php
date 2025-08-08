@@ -29,7 +29,7 @@ class Component_Config_Filter extends Component_Config_Abstract
         return $return;
     }
 
-    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
+    public function parse(SitePage $page, $key, $keyblock, $configValue, ?Component_ControllerAbstract $component = null)
     {
 
         $filter = self::getFilter((int)$configValue, $this->getFilterFields());

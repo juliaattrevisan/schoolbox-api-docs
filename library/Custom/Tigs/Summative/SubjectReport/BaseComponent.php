@@ -121,10 +121,10 @@ class BaseComponent
      * Returns whether an assessable is due within this component's report's (semester or year) window
      *
      * @param IAssessable $assessable
-     * @param int|null    $semester   If present, filter to this semester, otherwise filter to year
+     * @param int|null    $semester If present, filter to this semester, otherwise filter to year
      * @return bool
      */
-    protected function isDueWithinReportWindow(IAssessable $assessable, int $semester = null): bool
+    protected function isDueWithinReportWindow(IAssessable $assessable, ?int $semester = null): bool
     {
         $semesters = $this->attributes->getCurriculumSemesters();
 

@@ -41,7 +41,7 @@ class Super extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getAudiencingSql(User $user, string $searchPlaceholder = null): ?string
+    public function getAudiencingSql(User $user, ?string $searchPlaceholder = null): ?string
     {
         return "SELECT 0, 'name todo', 'type todo', null as entity_meta from dual WHERE false"; // TODO
     }

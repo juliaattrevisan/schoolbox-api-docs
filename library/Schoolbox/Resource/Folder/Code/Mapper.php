@@ -87,7 +87,7 @@ class Mapper extends \Schoolbox\Mapper
      * @return void
      * @throws \UnexpectedValueException
      */
-    public function applyCodesToCategories(Collection $collection, callable $retrieveFunction = null): void
+    public function applyCodesToCategories(Collection $collection, ?callable $retrieveFunction = null): void
     {
         // Retrieve folder set
         $retrieveFunction = $retrieveFunction ?? static function ($item): Folder\Model {

@@ -286,10 +286,10 @@ class Controller extends Base
      * Filter by class if supplied.
      *
      * @param CourseSpecification $courseSpec
-     * @param Folder              $classFolder
+     * @param Folder|null         $classFolder
      * @return Term[]|GenericCollection
      */
-    protected function getNavigableTerms(CourseSpecification $courseSpec, Folder $classFolder = null)
+    protected function getNavigableTerms(CourseSpecification $courseSpec, ?Folder $classFolder = null)
     {
         /** @var GenericCollection|Term[] $allTerms */
         $allTerms       = $this->termMapper->findAll()->indexBy('id');
@@ -343,14 +343,14 @@ class Controller extends Base
      * Both are processed identically as data is grouped based on task
      * instances' originating task id, not the individual instance id
      *
-     * @param CourseSpecification             $courseSpecification spec from which all data on this page inherits
-     * @param Collection|UnitImplementation[] $unitImplsInTerm     units containing assessments due in current term
-     * @param Collection|IAssessable[]        $dueAssessments      assessments due in current Term
-     * @param Term                            $term                term to filter
-     * @param string                          $routeType           'course'|'folder'
-     * @param Collection                      $courseImplementationFolders  A list of folder instances that contain relevant assessments
-     * @param Folder|null                     $classFolder         if given, the class folder to filter
-     * @param null|WorkType\Model             $submissionType      if specified, a submission type filter
+     * @param CourseSpecification             $courseSpecification         spec from which all data on this page inherits
+     * @param Collection|UnitImplementation[] $unitImplsInTerm             units containing assessments due in current term
+     * @param Collection|IAssessable[]        $dueAssessments              assessments due in current Term
+     * @param Term                            $term                        term to filter
+     * @param string                          $routeType                   'course'|'folder'
+     * @param Collection                      $courseImplementationFolders A list of folder instances that contain relevant assessments
+     * @param Folder|null                     $classFolder                 if given, the class folder to filter
+     * @param null|WorkType\Model             $submissionType              if specified, a submission type filter
      * @throws MapperException
      * @throws \DebugBar\DebugBarException
      * @throws \DomainException
@@ -363,7 +363,7 @@ class Controller extends Base
         Term $term,
         $routeType,
         Collection $courseImplementationFolders,
-        Folder $classFolder = null,
+        ?Folder $classFolder = null,
         WorkType\Model $submissionType = null
     ) {
         // All variants of learning analytics reports could take a while

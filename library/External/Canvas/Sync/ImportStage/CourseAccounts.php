@@ -159,7 +159,7 @@ class CourseAccounts
      * @return array
      * @throws Database\Exception
      */
-    private function buildCanvasCourseAccountTree(array $parentIds = null): array
+    private function buildCanvasCourseAccountTree(?array $parentIds = null): array
     {
         // Base Case:
         if (is_array($parentIds) && !count($parentIds)) {

@@ -40,7 +40,7 @@ class InvalidTransitionException extends DomainException
      * @param int            $code
      * @param Throwable|null $previous
      */
-    public function __construct(int $state, string $message = "", int $code = 0, Throwable $previous = null)
+    public function __construct(int $state, string $message = "", int $code = 0, ?Throwable $previous = null)
     {
         $this->currentState = $state;
         parent::__construct($message, $code, $previous);

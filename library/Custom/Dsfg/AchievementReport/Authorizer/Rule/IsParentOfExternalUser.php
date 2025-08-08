@@ -61,7 +61,7 @@ class IsParentOfExternalUser implements IAuthorizationRule
     /**
      * {@inheritdoc}
      */
-    public function authorize(array $params = array(), User $user = null)
+    public function authorize(array $params = array(), ?User $user = null)
     {
         // You misconfigured or misapplied your route
         if (!array_key_exists($this->paramsKey, $params)) {

@@ -725,7 +725,7 @@ class Controller extends Base
      * @return GenericCollection
      * @throws MapperException
      */
-    private function processPastoralRecords(int $primaryStudentId, Values $post, array $duplicateStudentIds = [], PastoralModel $parent = null): GenericCollection
+    private function processPastoralRecords(int $primaryStudentId, Values $post, array $duplicateStudentIds = [], ?PastoralModel $parent = null): GenericCollection
     {
         return $this->recordProcessor->processPastoralRecords($this->getUser(), $primaryStudentId, $post, $duplicateStudentIds, $parent);
     }

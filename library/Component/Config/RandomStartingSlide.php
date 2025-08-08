@@ -9,7 +9,7 @@
 class Component_Config_RandomStartingSlide extends Component_Config_Abstract
 {
 
-    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
+    public function parse(SitePage $page, $key, $keyblock, $configValue, ?Component_ControllerAbstract $component = null)
     {
         if ($configValue == '1') {
             $page->setVar(array(

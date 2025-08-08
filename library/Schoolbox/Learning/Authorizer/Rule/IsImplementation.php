@@ -24,7 +24,7 @@ class IsImplementation extends AbstractAssessableRule
      * @inheritdoc
      * @throws InvalidArgumentException If unable to locate required params in route args
      */
-    public function authorize(array $params = [], User $user = null)
+    public function authorize(array $params = [], ?User $user = null)
     {
         if ($this->findAssessable($params)->getBaseContext() instanceof UnitSpecification\Model) {
             throw new InvalidPath('Assessment is a Specification');

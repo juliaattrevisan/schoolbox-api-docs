@@ -63,7 +63,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      * @return string|null
      * @throws \DomainException If unable to derive a denominator
      */
-    public function getHumanReadableMark($normalisedMark, IResponse $response = null): ?string
+    public function getHumanReadableMark($normalisedMark, ?IResponse $response = null): ?string
     {
         if (null === $normalisedMark) {
             return null;
@@ -88,7 +88,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      * @return float|int|null
      * @throws \DomainException If unable to derive a denominator
      */
-    protected function deriveDenominator(IResponse $response = null)
+    protected function deriveDenominator(?IResponse $response = null)
     {
         if ($response instanceof QuizAttempt\Model) {
             return $response->getMarksAvailable();
@@ -110,7 +110,7 @@ abstract class TotalMarkAbstract extends AbstractMarkScheme
      * @throws RangeException If evaluated normalised mark is below 0 or above 100
      * @throws \DomainException If unable to derive a denominator
      */
-    public function getNormalisedMark($humanReadableMark, IResponse $response = null): ?float
+    public function getNormalisedMark($humanReadableMark, ?IResponse $response = null): ?float
     {
         $matches = [];
         $pattern = '/^\s*(-?[0-9.]+)/';

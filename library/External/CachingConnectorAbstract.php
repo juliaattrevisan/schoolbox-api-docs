@@ -57,7 +57,7 @@ class CachingConnectorAbstract
      * @param string|null       $timeout (Expects string to support value directly fetched from DB)
      * @throws InvalidArgumentException
      */
-    public function __construct(IConnector $database, IOfflineConnector $offline, Redis $cache, string $timeout = null)
+    public function __construct(IConnector $database, IOfflineConnector $offline, Redis $cache, ?string $timeout = null)
     {
         $this->database         = $database;
         $this->offlineConnector = $offline;
@@ -112,7 +112,7 @@ class CachingConnectorAbstract
      * @return mixed
      * @throws External\Exception
      */
-    protected function getCachedResult(string $method, array $params, int $timeoutOverride = null)
+    protected function getCachedResult(string $method, array $params, ?int $timeoutOverride = null)
     {
         if ($this->isOffline) {
             return $this->bypassCache($method, $params);

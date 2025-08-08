@@ -334,9 +334,9 @@ class Controller extends AbstractController
     /**
      * Return a JSON formatted list of teams
      *
-     * @param null|Division $context
+     * @param Division|null $context
      */
-    private function getJsonList(Division $context = null)
+    private function getJsonList(?Division $context = null)
     {
         $query = trim($this->requestQuery->get('query'));
 

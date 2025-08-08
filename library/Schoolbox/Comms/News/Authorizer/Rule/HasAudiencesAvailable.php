@@ -43,7 +43,7 @@ class HasAudiencesAvailable implements IAuthorizationRule
     /**
      * @inheritdoc
      */
-    public function authorize(array $params = [], User $user = null): void
+    public function authorize(array $params = [], ?User $user = null): void
     {
         if (!$user) {
             throw new Unauthorized("User is required");

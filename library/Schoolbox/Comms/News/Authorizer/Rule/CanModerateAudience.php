@@ -44,7 +44,7 @@ class CanModerateAudience extends ArticleAttribute
      * @throws UnknownEntityTypeException
      * @throws UnexpectedValueException If no article found in params
      */
-    public function authorize(array $params = [], User $user = null): void
+    public function authorize(array $params = [], ?User $user = null): void
     {
         if (!$user) {
             throw new Unauthorized('$user must be provided');

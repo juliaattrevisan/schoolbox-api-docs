@@ -22,7 +22,7 @@ class Any extends Composite
     /**
      * {@inheritdoc}
      */
-    public function authorize(array $params = array(), User $user = null)
+    public function authorize(array $params = array(), ?User $user = null)
     {
         $lastException = null;
         foreach ($this->subRuleList as $subRule) {

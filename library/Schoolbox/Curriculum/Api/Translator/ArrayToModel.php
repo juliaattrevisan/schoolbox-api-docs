@@ -22,7 +22,7 @@ class ArrayToModel extends Base
      * @param object|null $model
      * @return Model
      */
-    public function __invoke(array $array, object $model = null): object
+    public function __invoke(array $array, ?object $model = null): object
     {
         $model ??= new Model();
         $model = $this->setScalar($array, 'id', $model, 'setId');

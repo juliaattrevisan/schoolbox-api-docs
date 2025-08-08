@@ -450,7 +450,7 @@ class Interactions
      * @return int
      * @throws \Alaress\Database\Exception
      */
-    private function calculateNumComments(News\Model $article, string $date = null): int
+    private function calculateNumComments(News\Model $article, ?string $date = null): int
     {
         $query = '
             SELECT COUNT(*) AS numComments

@@ -117,7 +117,7 @@ class SSO
      * @throws SsoTokenGenerationException
      * @throws \RuntimeException
      */
-    public function getUserToken(array $userConf, array $deepLinkV2, bool $prodMenu, array $deepLinkV1 = null): string
+    public function getUserToken(array $userConf, array $deepLinkV2, bool $prodMenu, ?array $deepLinkV1 = null): string
     {
         $conf   = array_merge($this->configuration, $userConf);
         $client = new GuzzleHttp\Client();
@@ -222,7 +222,7 @@ class SSO
      * @throws SsoTokenGenerationException
      * @throws \RuntimeException
      */
-    private function getV1Token(GuzzleHttp\Client $client, array $conf, array $deepLinkV1 = null): string
+    private function getV1Token(GuzzleHttp\Client $client, array $conf, ?array $deepLinkV1 = null): string
     {
         // Don't include a deep-link arg if no deep-link is being requested
         if (\is_array($deepLinkV1) && !empty($deepLinkV1)) {

@@ -16,7 +16,7 @@ class Component_Config_AssessmentTypes extends Component_Config_Abstract
     /**
      * @inheritdoc
      */
-    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null): void
+    public function parse(SitePage $page, $key, $keyblock, $configValue, ?Component_ControllerAbstract $component = null): void
     {
         $di = $page->getDi();
         $ltiEnabled = $di->get('config')->get(ConfigMapper::NAME_LTI_ASSESSMENTS_ENABLE);

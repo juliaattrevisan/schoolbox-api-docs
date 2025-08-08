@@ -136,7 +136,7 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
      * @param User|null        $effector
      * @return void
      */
-    public function notifySystemReload(Component_Config $model, User $effector = null)
+    public function notifySystemReload(Component_Config $model, ?User $effector = null)
     {
         $this->subscriptionCache->cacheRedirects(INSTANCE_ID);
     }

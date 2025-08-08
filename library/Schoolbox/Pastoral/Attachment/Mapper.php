@@ -119,7 +119,7 @@ class Mapper extends BaseMapper
      * @param Model|null $previous
      * @return bool True if model was added to queue, false otherwise.
      */
-    public function syncToPastoralUploadQueue(Model $model, Model $previous = null): bool
+    public function syncToPastoralUploadQueue(Model $model, ?Model $previous = null): bool
     {
         // TODO move this restriction to the pastoral upload Q
         if (

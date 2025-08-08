@@ -176,7 +176,7 @@ class Factory
      * @param Feedback|null $feedback If null, build an empty attachzone
      * @return Zone
      */
-    public function buildForDueWorkFeedback(Feedback $feedback = null): Zone
+    public function buildForDueWorkFeedback(?Feedback $feedback = null): Zone
     {
         $zone = (new Zone('feedbackFiles'))
             ->setMulti(true)

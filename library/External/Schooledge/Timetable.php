@@ -230,7 +230,7 @@ class External_Schooledge_Timetable implements External_TimetableInterface
     /**
      * @inheritdoc
      */
-    public function getPeriodNumber(Campus $campus, $now = 0, \Schoolbox\User $user = null): array
+    public function getPeriodNumber(Campus $campus, $now = 0, ?\Schoolbox\User $user = null): array
     {
         $dateObject    = $this->getDateObjectFromTimestamp($now);
         $timetableDate = $this->getTimetableDate($campus, $dateObject);

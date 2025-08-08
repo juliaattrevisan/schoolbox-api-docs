@@ -452,7 +452,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
      *
      * @throws DomainException
      */
-    private function assertOpen(Participant $participant = null)
+    private function assertOpen(?Participant $participant = null)
     {
         if ($participant != null) {
             $openDate = $participant->getOpenDate();

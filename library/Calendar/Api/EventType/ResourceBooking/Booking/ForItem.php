@@ -26,10 +26,10 @@ class Calendar_Api_EventType_ResourceBooking_Booking_ForItem extends Calendar_Ap
      * @param int        $connectorId
      * @param User       $user
      * @param User       $viewer
-     * @param null|int[] $resourceIds
+     * @param int[]|null $resourceIds
      * @throws DomainException If resource booking module is disabled in config
      */
-    public function __construct(int $connectorId, User $user, User $viewer, array $resourceIds = null)
+    public function __construct(int $connectorId, User $user, User $viewer, ?array $resourceIds = null)
     {
         parent::__construct($connectorId, $user, $viewer);
         $this->resourceIds = $resourceIds;

@@ -395,7 +395,7 @@ abstract class AbstractModuleNotifier implements ModuleNotifierInterface, IDiCon
      * @param array|null $diff
      * @return void
      */
-    protected function raiseNotification(User $effector, $action, $model, Mapper $mapper, array $diff = null)
+    protected function raiseNotification(User $effector, $action, $model, Mapper $mapper, ?array $diff = null)
     {
         if ($this->propagation) {
             $mapper->getEventPropagator()->propagate($effector, $action, $model, $mapper, $diff);

@@ -22,7 +22,7 @@ class ParentCanViewFeedback extends AbstractCanViewFeedback
      * @throws \InvalidArgumentException
      * @throws Unauthorized
      */
-    public function authorize(array $params = [], User $user = null)
+    public function authorize(array $params = [], ?User $user = null)
     {
         if (!$user) {
             throw new \InvalidArgumentException('User object required.');

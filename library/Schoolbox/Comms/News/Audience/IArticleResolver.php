@@ -48,8 +48,8 @@ interface IArticleResolver
      * @param string|null           $relationship Null means don't don't filter by relationship modifier.
      * @param bool                  $publishedOnly Only get published (not awaiting publication or expired) articles
      * @param array                 $orderBy
-     * @param null|int              $limit
+     * @param int|null              $limit
      * @return int[]
      */
-    public function findArticlesForAudience(string $entityType, $entityValue, ?string $relationship, bool $publishedOnly = true, array $orderBy = [], int $limit = null): array;
+    public function findArticlesForAudience(string $entityType, $entityValue, ?string $relationship, bool $publishedOnly = true, array $orderBy = [], ?int $limit = null): array;
 }

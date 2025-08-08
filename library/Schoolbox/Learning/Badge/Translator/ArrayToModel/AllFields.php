@@ -48,12 +48,12 @@ class AllFields extends Base
     /**
      * Convert an array to a model.
      *
-     * @param array             $array
-     * @param object|Model|null $model
+     * @param array       $array
+     * @param object|null $model
      * @return object|Model
      * @throws ResourceException
      */
-    public function __invoke(array $array, object $model = null): object
+    public function __invoke(array $array, ?object $model = null): object
     {
         $model ??= new Model();
         $model = $this->setDate($array, 'createdAt', $model, 'setCreatedAt');

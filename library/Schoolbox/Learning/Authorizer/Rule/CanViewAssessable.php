@@ -32,7 +32,7 @@ class CanViewAssessable extends AbstractAssessableRule
      * @param bool                     $showClosed
      * @param Alaress_Date_Format|null $now
      */
-    public function __construct(Visibility $visibility, bool $showClosed = true, Alaress_Date_Format $now = null)
+    public function __construct(Visibility $visibility, bool $showClosed = true, ?Alaress_Date_Format $now = null)
     {
         $this->visibility = $visibility;
         $this->showClosed = $showClosed;
@@ -44,7 +44,7 @@ class CanViewAssessable extends AbstractAssessableRule
      * @inheritdoc
      * @throws InvalidArgumentException If no assessable found in route params
      */
-    public function authorize(array $params = [], User $user = null): void
+    public function authorize(array $params = [], ?User $user = null): void
     {
         if (!$user) {
             throw new Unauthorized("A user is required to perform this auth check");

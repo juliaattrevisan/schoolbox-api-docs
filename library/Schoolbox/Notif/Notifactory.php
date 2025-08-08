@@ -34,11 +34,11 @@ class Notifactory
     /**
      * Wrapper method for compatibility. Replaces old Notif::__construct($topic, $configLoader)
      *
-     * @param string        $topic
-     * @param IConfigLoader $configLoader
+     * @param string             $topic
+     * @param IConfigLoader|null $configLoader
      * @return NotifInterface
      */
-    public static function create(string $topic = Notif::TOPIC_SYSTEM, IConfigLoader $configLoader = null)
+    public static function create(string $topic = Notif::TOPIC_SYSTEM, ?IConfigLoader $configLoader = null)
     {
         $self = new self($configLoader);
 
@@ -53,7 +53,7 @@ class Notifactory
      * @param TransportInterface|null $transport
      * @param LoggerInterface|null    $log
      */
-    public function __construct(IConfigLoader $configLoader = null, TransportInterface $transport = null, LoggerInterface $log = null)
+    public function __construct(?IConfigLoader $configLoader = null, ?TransportInterface $transport = null, ?LoggerInterface $log = null)
     {
         $this->setConfigLoader($configLoader);
         $this->setTransport($transport);
@@ -81,10 +81,10 @@ class Notifactory
 
 
     /**
-     * @param IConfigLoader $conf
+     * @param IConfigLoader|null $conf
      * @return self
      */
-    public function setConfigLoader(IConfigLoader $conf = null)
+    public function setConfigLoader(?IConfigLoader $conf = null)
     {
         if ($conf) {
             // use the provided config
@@ -112,10 +112,10 @@ class Notifactory
 
 
     /**
-     * @param TransportInterface $transport
+     * @param TransportInterface|null $transport
      * @return self
      */
-    public function setTransport(TransportInterface $transport = null)
+    public function setTransport(?TransportInterface $transport = null)
     {
         $this->transport = $transport ?: Mailer::getConfiguredTransport($this->conf, true);
         return $this;
@@ -123,10 +123,10 @@ class Notifactory
 
 
     /**
-     * @param LoggerInterface $log
+     * @param LoggerInterface|null $log
      * @return self
      */
-    public function setLogger(LoggerInterface $log = null)
+    public function setLogger(?LoggerInterface $log = null)
     {
         $this->log = $log ?: new Lumberjack\Logger(null);
         return $this;

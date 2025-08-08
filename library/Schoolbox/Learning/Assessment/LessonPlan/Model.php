@@ -263,7 +263,7 @@ class Model extends AbstractAssessment
      * @param AssessmentModel|null $assessmentModel
      * @return static
      */
-    public function setAssessmentModel(AssessmentModel $assessmentModel = null): self
+    public function setAssessmentModel(?AssessmentModel $assessmentModel = null): self
     {
         $this->assessmentModel = $assessmentModel;
         return $this;

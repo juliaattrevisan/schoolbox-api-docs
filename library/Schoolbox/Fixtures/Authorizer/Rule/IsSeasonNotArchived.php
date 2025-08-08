@@ -27,7 +27,7 @@ class IsSeasonNotArchived implements IAuthorizationRule
      * @throws Unauthorized If the team's division's season is archived
      * @throws \InvalidArgumentException If unable to locate a Team model in route params
      */
-    public function authorize(array $params = [], User $user = null)
+    public function authorize(array $params = [], ?User $user = null)
     {
         if ($this->findSeason($params)->isArchived()) {
             throw new Unauthorized();

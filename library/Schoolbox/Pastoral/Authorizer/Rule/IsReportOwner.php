@@ -22,7 +22,7 @@ class IsReportOwner implements IAuthorizationRule
     /**
      * {@inheritdoc}
      */
-    public function authorize(array $params = [], User $user = null)
+    public function authorize(array $params = [], ?User $user = null)
     {
         if (empty($params['report']) && empty($params['reportId'])) {
             return true;

@@ -30,8 +30,8 @@ class Transformer
      */
     public function calculateTextColor(
         Color $color,
-        Color $light = null,
-        Color $dark = null,
+        ?Color $light = null,
+        ?Color $dark = null,
         float $threshold = 0.45
     ): Color {
         $luminance = ColorUtils\relative_luminance($this->convertToColorUtilsColor($color));
@@ -65,8 +65,8 @@ class Transformer
         Color $background,
         float $opacity = .35,
         float $saturation = 0.1,
-        Color $light = null,
-        Color $dark = null
+        ?Color $light = null,
+        ?Color $dark = null
     ): Color {
         // Is $background light or dark? Choose a contrasting color for text
         $textColor = $this->calculateTextColor($background, $light, $dark, 0.5);
@@ -120,9 +120,9 @@ class Transformer
      * @return Color
      */
     public function calculateShadedBackgroundColor(
-        Color $foreground = null,
-        Color $light = null,
-        Color $dark = null
+        ?Color $foreground = null,
+        ?Color $light = null,
+        ?Color $dark = null
     ): Color {
         $foregroundColor     = $this->convertToColorUtilsColor($foreground);
         $foregroundHsl       = $foregroundColor->getHsl();

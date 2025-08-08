@@ -51,9 +51,9 @@ class CollectorFactory
      * The mapper passed in here defines the model that will be returned by self->build()->get*();
      * eg. by default, assumes StorageMapper, which means that Collector would return Storage objects.
      *
-     * @param IStorageWrapper $wrapper
+     * @param IStorageWrapper|null $wrapper
      */
-    public function __construct(IStorageWrapper $wrapper = null)
+    public function __construct(?IStorageWrapper $wrapper = null)
     {
         $this->wrapper = $wrapper;
 

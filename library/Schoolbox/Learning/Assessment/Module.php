@@ -468,7 +468,7 @@ class Module extends BaseModule
      * Convert route params into an assessment object
      *
      * @param array     $params
-     * @param null|User $student If provided, only load this student's participation
+     * @param User|null $student If provided, only load this student's participation
      * @return array
      * @throws ApplicationException\Exception If assessment is not found
      * @throws DomainException If user has interaction but not participant record
@@ -477,7 +477,7 @@ class Module extends BaseModule
      * @throws Mapper\DefinitionException If a specified join mapper is not found
      * @throws UnexpectedValueException If unable to derive project participant collections
      */
-    protected function preloadAssessment(array $params, User $student = null): array
+    protected function preloadAssessment(array $params, ?User $student = null): array
     {
         try {
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], $student);
@@ -550,7 +550,7 @@ class Module extends BaseModule
      * @throws MapperException\Deleted
      * @throws NotFoundExceptionInterface
      */
-    protected function preloadAssessmentForParticipant(array $params, User $student = null): array
+    protected function preloadAssessmentForParticipant(array $params, ?User $student = null): array
     {
         /* Module is switched off so no need to process further
          */

@@ -75,7 +75,7 @@ class PrefixGenerator
      * @param string|null $baseUrl
      * @return string
      */
-    private function generateInternal(string $baseUrl = null): string
+    private function generateInternal(?string $baseUrl = null): string
     {
         if (!$this->config->get(ConfigMapper::NAME_SITE_STATIC_ASSET_SERVE_FROM_CDN)) {
             return ($baseUrl ?? '') . self::LOCAL_PREFIX;

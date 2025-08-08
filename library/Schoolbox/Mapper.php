@@ -837,10 +837,10 @@ abstract class Mapper implements IMapper
     }
 
     /**
-     * @param IPropagator $propagator
+     * @param IPropagator|null $propagator
      * @return static
      */
-    public function setEventPropagator(IPropagator $propagator = null)
+    public function setEventPropagator(?IPropagator $propagator = null)
     {
         $this->propagator = $propagator;
         return $this;

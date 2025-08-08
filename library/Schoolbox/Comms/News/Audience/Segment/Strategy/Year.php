@@ -72,7 +72,7 @@ class Year extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getAudiencingSql(User $user, string $searchPlaceholder = null): ?string
+    public function getAudiencingSql(User $user, ?string $searchPlaceholder = null): ?string
     {
         // If user.year is numeric, prefix 'Year ' to read like 'Year 9'
         $entityType = self::getEntityType();
@@ -130,7 +130,7 @@ class Year extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getValidRelationshipModifiers(string $entityMeta = null): array
+    public function getValidRelationshipModifiers(?string $entityMeta = null): array
     {
         return [
             Audience\Model::RELATIONSHIP_SELF,

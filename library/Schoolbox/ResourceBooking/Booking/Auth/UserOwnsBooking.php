@@ -27,13 +27,13 @@ class UserOwnsBooking implements Rule\IAuthorizationRule
     /**
      * Authorizes that this user owns this booking.
      *
-     * @param  array $params Any parameters passed as part of the route.
-     * @param  User  $user   The user to authorize, if any. Null value assumes
+     * @param  array    $params Any parameters passed as part of the route.
+     * @param User|null $user   The user to authorize, if any. Null value assumes
      *                       that no user is logged in.
      *
      * @throws Failure\Unauthorized if the request isn't authorized.
      */
-    public function authorize(array $params = array(), User $user = null)
+    public function authorize(array $params = array(), ?User $user = null)
     {
         // Hopefully, the item has been loaded in the module's preloader.
         // Otherwise, we must fetch it again.

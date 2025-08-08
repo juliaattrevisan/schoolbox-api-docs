@@ -22,12 +22,12 @@ class PayloadBrokenException extends UnexpectedValueException implements IBroker
     /**
      * Construct the exception. Note: The message is NOT binary safe.
      *
-     * @param string    $key
-     * @param Resolver  $resolver
-     * @param int       $code     [optional] The Exception code.
-     * @param Throwable $previous [optional] The previous throwable used for the exception chaining.
+     * @param string         $key
+     * @param Resolver       $resolver
+     * @param int            $code     [optional] The Exception code.
+     * @param Throwable|null $previous [optional] The previous throwable used for the exception chaining.
      */
-    public function __construct($key, Resolver $resolver, $code = 0, Throwable $previous = null)
+    public function __construct($key, Resolver $resolver, $code = 0, ?Throwable $previous = null)
     {
         parent::__construct("Payload for `{$key}` exists but is broken", $code, $previous);
         $this->resolver = $resolver;

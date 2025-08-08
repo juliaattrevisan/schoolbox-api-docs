@@ -135,7 +135,7 @@ class Factory
      * @return Collection
      * @throws RouteNotFound
      */
-    public function produceFromContext(AssessmentContext $context, IAssessable $assessment = null, \Schoolbox\User $user): Collection
+    public function produceFromContext(AssessmentContext $context, ?IAssessable $assessment = null, \Schoolbox\User $user): Collection
     {
         $trail = new Collection();
         $trail->add(['Learning', $this->routeGenerator->generate('learning.getClasses')]);

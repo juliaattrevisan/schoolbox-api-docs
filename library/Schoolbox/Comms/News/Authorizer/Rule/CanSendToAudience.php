@@ -50,7 +50,7 @@ class CanSendToAudience extends ArticleAttribute
      * @throws UnknownEntityTypeException
      * @throws InsufficientHydrationException
      */
-    public function authorize(array $params = [], User $user = null): void
+    public function authorize(array $params = [], ?User $user = null): void
     {
         if (!$user) {
             throw new Unauthorized('$user is required');

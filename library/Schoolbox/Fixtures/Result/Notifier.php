@@ -118,7 +118,7 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStudentResultcreated(Result $result, User $effector, array $diff = null)
+    public function notifyStudentResultcreated(Result $result, User $effector, ?array $diff = null)
     {
         return $this->notifyStudents($result, $effector);
     }
@@ -131,7 +131,7 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStudentResultupdated(Result $result, User $effector, array $diff = null)
+    public function notifyStudentResultupdated(Result $result, User $effector, ?array $diff = null)
     {
         return $this->notifyStudents($result, $effector);
     }
@@ -144,7 +144,7 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyParentResultcreated(Result $result, User $effector, array $diff = null)
+    public function notifyParentResultcreated(Result $result, User $effector, ?array $diff = null)
     {
         return $this->notifyParents($result, $effector);
     }
@@ -157,7 +157,7 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyParentResultupdated(Result $result, User $effector, array $diff = null)
+    public function notifyParentResultupdated(Result $result, User $effector, ?array $diff = null)
     {
         return $this->notifyParents($result, $effector);
     }

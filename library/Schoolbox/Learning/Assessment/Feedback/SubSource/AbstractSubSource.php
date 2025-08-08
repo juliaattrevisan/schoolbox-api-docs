@@ -44,10 +44,10 @@ abstract class AbstractSubSource implements IFeedbackDataSource
 
     /**
      * @param IAssessable $assessment
-     * @param User        $student If set, only return this student's responses
+     * @param User|null   $student If set, only return this student's responses
      * @return Collection|IFeedback[]
      */
-    public function findForAssessment(IAssessable $assessment, User $student = null)
+    public function findForAssessment(IAssessable $assessment, ?User $student = null)
     {
         if ($this->recognizes($assessment)) {
             // Only fetch for student if provided

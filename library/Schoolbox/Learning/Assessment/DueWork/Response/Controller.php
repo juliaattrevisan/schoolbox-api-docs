@@ -135,7 +135,7 @@ class Controller extends Base
     public function getParticularResponseBlind(
         DueWork $assessment,
         User $student,
-        Model $response = null
+        ?Model $response = null
     ): void {
         $this->getParticularResponse($assessment, $student, $response, true);
     }
@@ -163,7 +163,7 @@ class Controller extends Base
     public function getParticularResponse(
         DueWork $assessment,
         User $student,
-        Model $response = null,
+        ?Model $response = null,
         ?bool $blindMode = false
     ): void {
 

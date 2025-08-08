@@ -22,7 +22,7 @@ class IsPublishedOrExpired extends ArticleAttribute
      * @throws Unauthorized
      * @throws UnexpectedValueException
      */
-    public function authorize(array $params = [], User $user = null): void
+    public function authorize(array $params = [], ?User $user = null): void
     {
         $article = $this->findArticleInParams($params);
 

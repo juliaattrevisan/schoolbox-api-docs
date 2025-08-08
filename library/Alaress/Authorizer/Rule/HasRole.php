@@ -43,7 +43,7 @@ class HasRole extends All
     /**
      * {@inheritdoc}
      */
-    public function authorizeMethod(array $params = array(), User $user = null)
+    public function authorizeMethod(array $params = array(), ?User $user = null)
     {
         if ($user instanceof User) {
             if ($user->getRole()->getType() == $this->role) {

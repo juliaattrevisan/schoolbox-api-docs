@@ -15,13 +15,13 @@ use Exception;
 class FilterException extends DomainException
 {
     /**
-     * @param string       $message
-     * @param string|array $expected
-     * @param string|array $actual
-     * @param int          $code
-     * @param Exception    $previous
+     * @param string         $message
+     * @param string|array   $expected
+     * @param string|array   $actual
+     * @param int            $code
+     * @param Exception|null $previous
      */
-    public function __construct($message = "", $expected = null, $actual = null, $code = 0, Exception $previous = null)
+    public function __construct($message = "", $expected = null, $actual = null, $code = 0, ?Exception $previous = null)
     {
         if (isset($expected)) {
             $message = sprintf(

@@ -257,10 +257,10 @@ class Mapper extends BaseMapper
     /**
      * @param Model      $assessment
      * @param Model|null $previous
-     * @throws PDOException
      * @return bool
+     *@throws PDOException
      */
-    protected function createDynamicPlanIfNew(Model $assessment, Model $previous = null)
+    protected function createDynamicPlanIfNew(Model $assessment, ?Model $previous = null)
     {
         if ($previous || $assessment->hasProject() || ($assessment->getPlans() && $assessment->getPlans()->count())) {
             // this is a modify, or a project, or already has plan[s]; do nothing
@@ -400,8 +400,8 @@ class Mapper extends BaseMapper
      *
      * @param User                     $student
      * @param bool                     $usePlanDates Should we try to filter on plan dates instead of assessment dates?
-     * @param null|Alaress_Date_Format $from
-     * @param null|Alaress_Date_Format $to
+     * @param Alaress_Date_Format|null $from
+     * @param Alaress_Date_Format|null $to
      * @return array|int[]
      * @throws BaseMapper\DefinitionException If join name is not on this mapper
      * @throws \Alaress\Database\Predicate\InvalidColumnException
@@ -409,8 +409,8 @@ class Mapper extends BaseMapper
     public function findAssessmentsWithInteractions(
         User $student,
         bool $usePlanDates,
-        Alaress_Date_Format $from = null,
-        Alaress_Date_Format $to = null
+        ?Alaress_Date_Format $from = null,
+        ?Alaress_Date_Format $to = null
     ): array {
         $pb = $this->getPredicateBuilder();
         $pb->isNull('a.deleted_at');

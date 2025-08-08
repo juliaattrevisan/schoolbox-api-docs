@@ -82,7 +82,7 @@ class Mapper extends BaseMapper
      * @return bool
      * @throws MapperException
      */
-    public function assertHeritage(Model $model, Model $previous = null): bool
+    public function assertHeritage(Model $model, ?Model $previous = null): bool
     {
         // Only need to check if the model's parentage has changed
         $parentId         = $model->getParent()?->getId();
@@ -151,7 +151,7 @@ class Mapper extends BaseMapper
      * @param Model      $model
      * @param Model|null $previous
      */
-    public function disableOrReEnableChildren(Model $model, Model $previous = null)
+    public function disableOrReEnableChildren(Model $model, ?Model $previous = null)
     {
         if ($previous) {
             $isEnabled  = $model->getEnabled();

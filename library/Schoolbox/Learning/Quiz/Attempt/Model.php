@@ -286,7 +286,7 @@ class Model implements ISoftDeletable
      * @param User|null $reviewer
      * @return static
      */
-    public function setReviewer(User $reviewer = null)
+    public function setReviewer(?User $reviewer = null)
     {
         $this->reviewer = $reviewer;
         return $this;

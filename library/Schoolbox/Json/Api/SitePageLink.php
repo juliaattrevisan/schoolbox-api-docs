@@ -26,7 +26,7 @@ class SitePageLink implements Link
      * @param string    $href
      * @param bool|null $auth
      */
-    public function __construct(string $href, bool $auth = null)
+    public function __construct(string $href, ?bool $auth = null)
     {
         $this->href = $href;
         $this->auth = $auth;

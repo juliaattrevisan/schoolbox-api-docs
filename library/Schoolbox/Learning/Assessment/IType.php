@@ -25,8 +25,8 @@ interface IType
      * Return all the enumerations of this factory as a regex string,
      * optionally mutated by the given array_map callback
      *
-     * @param callable $map
+     * @param callable|null $map
      * @return string
      */
-    public static function getStringValuesAsRegex(callable $map = null);
+    public static function getStringValuesAsRegex(?callable $map = null);
 }

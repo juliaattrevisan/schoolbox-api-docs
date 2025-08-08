@@ -248,10 +248,10 @@ abstract class AbstractFeedback implements IFeedback
     }
 
     /**
-     * @param IResponse $response
+     * @param IResponse|null $response
      * @return static
      */
-    public function setResponse(IResponse $response = null)
+    public function setResponse(?IResponse $response = null)
     {
         $this->response = $response;
         return $this;

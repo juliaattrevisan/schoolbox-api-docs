@@ -65,7 +65,7 @@ class External_Offline_User implements External_UserInterface, IOfflineConnector
     /**
      * @inheritdoc
      */
-    public function getCurrentSemester(string $externalUserId = null): ?string
+    public function getCurrentSemester(?string $externalUserId = null): ?string
     {
         return null;
     }
@@ -73,7 +73,7 @@ class External_Offline_User implements External_UserInterface, IOfflineConnector
     /**
      * @inheritdoc
      */
-    public function getCurrentYear(string $externalUserId = null): ?string
+    public function getCurrentYear(?string $externalUserId = null): ?string
     {
         return null;
     }

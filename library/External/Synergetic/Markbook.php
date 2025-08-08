@@ -115,7 +115,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      * @param int|null $fileSemesterOverride
      * @todo There's a heap of dependencies in this class that are plucked from the ether. They should be constructor dependencies, injected by a factory.
      */
-    public function __construct(int $markType, LoggerInterface $logger, int $fileYearOverride = null, int $fileSemesterOverride = null)
+    public function __construct(int $markType, LoggerInterface $logger, ?int $fileYearOverride = null, ?int $fileSemesterOverride = null)
     {
         if (null === $fileYearOverride xor null === $fileSemesterOverride) {
             throw new InvalidArgumentException('You must override both year and semester, or neither');

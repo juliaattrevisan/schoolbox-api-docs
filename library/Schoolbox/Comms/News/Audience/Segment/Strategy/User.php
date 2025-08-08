@@ -56,7 +56,7 @@ class User extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getValidRelationshipModifiers(string $entityMeta = null): array
+    public function getValidRelationshipModifiers(?string $entityMeta = null): array
     {
         if ($entityMeta === null || $entityMeta === Role::STUDENT) {
             return [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF, Model::RELATIONSHIP_TEACHERS_OF];
@@ -69,7 +69,7 @@ class User extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getAudiencingSql(\Schoolbox\User $user, string $searchPlaceholder = null): ?string
+    public function getAudiencingSql(\Schoolbox\User $user, ?string $searchPlaceholder = null): ?string
     {
         $keywordFilter = null === $searchPlaceholder
             ? ''
@@ -83,11 +83,11 @@ class User extends SimpleStrategy
                     COALESCE(title, ''),
                     '::',
                     COALESCE(firstname, ''),
-                    '::', 
+                    '::',
                     COALESCE(preferred_name, ''),
-                    '::', 
+                    '::',
                     COALESCE(lastname, ''),
-                    '::', 
+                    '::',
                     COALESCE(synergy_id, ''),
                     '::',
                     `groups`.name
@@ -115,16 +115,16 @@ class User extends SimpleStrategy
             ->in('id', $entityValues);
 
         $sql = "
-            SELECT '{$entityType}' entity_type, user.id entity_value, 
+            SELECT '{$entityType}' entity_type, user.id entity_value,
                 TRIM(CONCAT(
                     COALESCE(title, ''),
                     '::',
                     COALESCE(firstname, ''),
-                    '::', 
+                    '::',
                     COALESCE(preferred_name, ''),
-                    '::', 
+                    '::',
                     COALESCE(lastname, ''),
-                    '::', 
+                    '::',
                     COALESCE(synergy_id, ''),
                     '::',
                     `groups`.name

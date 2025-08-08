@@ -250,12 +250,12 @@ class External_Doublefirst_Timetable implements External_TimetableInterface
     /**
      * Returns the period number for the current time.
      *
-     * @param CampusModel $campus A campus object (internal, not Doublefirst)
-     * @param int $now Optional override of time
-     * @param \Schoolbox\User $user User we are getting the period for (only required by DF)
+     * @param CampusModel          $campus A campus object (internal, not Doublefirst)
+     * @param int                  $now    Optional override of time
+     * @param \Schoolbox\User|null $user   User we are getting the period for (only required by DF)
      * @return array
      */
-    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, \Schoolbox\User $user = null): array
+    public function getPeriodNumber(\Schoolbox\Campus $campus, $now = 0, ?\Schoolbox\User $user = null): array
     {
         /**
          * TODO: This doesn't/can't work for staff. Because each year level has a different timetable structure and

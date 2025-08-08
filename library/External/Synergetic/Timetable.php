@@ -451,7 +451,7 @@ class External_Synergetic_Timetable implements External_TimetableInterface
     /**
      * @inheritDoc
      */
-    public function getPeriodNumber(Campus $campus, $now = 0, \Schoolbox\User $user = null): array
+    public function getPeriodNumber(Campus $campus, $now = 0, ?\Schoolbox\User $user = null): array
     {
         $now = $now ?: time();
 

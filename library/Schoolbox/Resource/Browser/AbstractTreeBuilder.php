@@ -48,11 +48,11 @@ abstract class AbstractTreeBuilder
 
 
     /**
-     * @param Folder\ILocator $locator
+     * @param Folder\ILocator|null $locator
      * @param string $namespace
      * @param string $rootNodeLabel
      */
-    public function __construct(Folder\ILocator $locator = null, $namespace = null, $rootNodeLabel = 'Top Level')
+    public function __construct(?Folder\ILocator $locator = null, $namespace = null, $rootNodeLabel = 'Top Level')
     {
         $this->folderLocator = $locator;
         $this->rootNodeLabel = $rootNodeLabel;
@@ -363,10 +363,10 @@ abstract class AbstractTreeBuilder
         IFolder $folder,
         $type,
         $name = null,
-        Color $colour = null,
-        IStorage $coverImage = null,
-        array $liAttributes = null,
-        array $aAttributes = null,
+        ?Color $colour = null,
+        ?IStorage $coverImage = null,
+        ?array $liAttributes = null,
+        ?array $aAttributes = null,
         array $parentList = [],
         int $sequence = 0,
         ?Alaress_Date_Format $createdAt = null,
@@ -389,12 +389,12 @@ abstract class AbstractTreeBuilder
 
     /**
      * @param Resource\AbstractFile $file
-     * @param string $name
-     * @param array $liAttributes
-     * @param array $aAttributes
+     * @param string                $name
+     * @param array|null            $liAttributes
+     * @param array|null            $aAttributes
      * @return array
      */
-    protected function generateFileArray(Resource\AbstractFile $file, $name = null, array $liAttributes = null, array $aAttributes = null)
+    protected function generateFileArray(Resource\AbstractFile $file, $name = null, ?array $liAttributes = null, ?array $aAttributes = null)
     {
         /* Folders in the root node of My Files have no Parent folder hydrated
          * generateNodeArray() can deal with this, but need to check here first
@@ -437,10 +437,10 @@ abstract class AbstractTreeBuilder
         $parentId,
         $type,
         $name,
-        Color $colour = null,
-        IStorage $coverImage = null,
-        array $liAttributes = null,
-        array $aAttributes = null,
+        ?Color $colour = null,
+        ?IStorage $coverImage = null,
+        ?array $liAttributes = null,
+        ?array $aAttributes = null,
         array $parentList = [],
         int $sequence = 0,
         ?Alaress_Date_Format $createdAt = null,

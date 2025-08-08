@@ -68,7 +68,7 @@ class External_Timetable extends CachingConnectorAbstract implements External_Ti
     /**
      * @inheritDoc
      */
-    public function getPeriodNumber(Campus $campus, $now = 0, \Schoolbox\User $user = null): array
+    public function getPeriodNumber(Campus $campus, $now = 0, ?\Schoolbox\User $user = null): array
     {
         // Period number is more subject to change than most information:
         // set max cache time to 1 minute.
