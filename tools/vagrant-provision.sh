@@ -87,7 +87,7 @@ if [[ $phpversion_supported == '8.4' ]]; then
   cp /etc/php/8.2/mods-available/* /etc/php/8.4/mods-available/
   cp /etc/php/8.2/fpm/pool.d/* /etc/php/8.4/fpm/pool.d/
 
-  # TODO update Composer due to deprecations
+  # TODO update Composer due to deprecation messages
 fi
 
 taskd_build_from_local="${12}";  # Valid values: ['0'|'1']
@@ -493,6 +493,20 @@ else
     rm -f /etc/php/"$phpversion_supported"/cli/conf.d/20-tideways.ini;
     rm -f /etc/php/"$phpversion_supported"/fpm/conf.d/20-xdebug.ini;
     rm -f /etc/php/"$phpversion_supported"/fpm/conf.d/20-tideways.ini;
+fi
+
+if [[ $phpversion_supported == '8.4' ]]; then
+  # Running 8.4? Copy configuration, and stop Puppet for now so that Puppet
+  # doesn't revert back to 8.2.
+  echo "[SB][`date +%Y-%m-%d\ %X`] Copying 8.2 configuration to 8.4";
+
+  # Copy config of php8.4-fpm
+  cp /etc/php/8.2/mods-available/* /etc/php/8.4/mods-available/
+  cp /etc/php/8.2/fpm/pool.d/* /etc/php/8.4/fpm/pool.d/
+
+  service puppet stop
+  service php8.2-fpm stop
+  service php8.4-fpm start
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
