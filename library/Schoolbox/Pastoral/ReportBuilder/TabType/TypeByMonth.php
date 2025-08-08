@@ -104,26 +104,40 @@ class TypeByMonth extends Cursor implements TabTypeInterface
      */
     public function retrieveResults(?string $encodedCursor): Collection
     {
-        $params = [];
+        $params = ['limit' => $this->limit];
         if (null !== $encodedCursor) {
             $cursor = $this->codec->decode($encodedCursor);
         }
 
         $db = $this->pastoralMapper->getDatabase();
 
+        $whereDiscriminator = '';
+        if (isset($cursor)) {
+            $sortingOperator = $this->order == Cursor::ORDER_DIRECTION_DEFAULT ? ' > ' : ' < ';
+            $whereDiscriminator = "
+                WHERE (
+                    title {$sortingOperator} :type OR
+                    (title = :type AND subTitle {$sortingOperator} :subType)
+            )";
+            $params['type'] = $cursor['type'];
+            $params['subType'] = $cursor['subType'];
+        }
         $totalQuery = "
             SELECT withTotal.*
             FROM (
                 {$this->getResultQuery()}
             ) withTotal
+            {$whereDiscriminator}
             GROUP BY title, subTitle
-            ORDER BY title ASC, subTitle ASC;
+            ORDER BY title {$this->order}, subTitle {$this->order}
+            LIMIT :limit
         ";
 
         $result = $db->executeQuery(
             $totalQuery,
             array_merge(
                 $this->params,
+                $params,
                 $this->helper->getParams()
             )
         );
@@ -194,6 +208,29 @@ class TypeByMonth extends Cursor implements TabTypeInterface
         );
         $data = $result->fetch(\PDO::FETCH_ASSOC);
         return new Collection($data);
+    }
+
+    public function next(Collection $collection): ?string
+    {
+        // As usual: if the collection is empty, there is no next
+        if ($collection->count() === 0) {
+            return null;
+        }
+
+        /* If result size is smaller than limit, assumed that it is at the end of pointer and terminate early
+         */
+        if ($collection->count() < $this->limit) {
+            return null;
+        }
+
+        $last = $collection->last();
+
+        $discriminator = [
+            'type' => $last['title'],
+            'subType' => $last['subTitle'],
+        ];
+
+        return $this->codec->encode($discriminator);
     }
 
     /**
