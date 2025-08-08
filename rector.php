@@ -29,10 +29,10 @@ return RectorConfig::configure()
         CombineHostPortLdapUriRector::class,
         RemoveGetClassGetParentClassNoArgsRector::class,
 
-        // Select PHP 8.4 rules
-        AddEscapeArgumentRector::class,
-        ExplicitNullableParamTypeRector::class,
-        DeprecatedAnnotationToDeprecatedAttributeRector::class,
+//        // Select PHP 8.4 rules
+//        AddEscapeArgumentRector::class,
+//        ExplicitNullableParamTypeRector::class,
+//        DeprecatedAnnotationToDeprecatedAttributeRector::class,
     ])
     ->withTypeCoverageLevel(0)
 ;
