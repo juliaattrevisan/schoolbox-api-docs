@@ -1,5 +1,5 @@
 {# TODO: Add if learning moments enabled condition #}
-{% if true %}
+{% if user.role.isStudent %}
     <div class="small-12 island">
         <div class="share-work-buttons">
             <a data-action="shareLearningMoment" data-test="learning-moment-evidence-share-takeAPhoto" data-take-photo-button href="{{ baseUrl }}?momentType=photo&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-camera share-photo" title="Take a photo">Take a photo</a>
@@ -11,10 +11,16 @@
         <!-- Check that the device supports recording audio/video, and if not hide the buttons that aren't supported -->
         <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/checkShareWorkButtons.js?v={{ config.site_version }}"></script>
     </div>
+{% elseif user.role.isStaff %}
+    <div class="empty-state">
+        <p>
+            Staff cannot create learning moments from this component. Instead navigate to a student's activity feed or the class list.
+        </p>
+    </div>
 {% else %}
     <div class="empty-state">
         <p>
-            You do not have permission (TODO: find appropriate empty state wording)
+            You do not have permission to create learning moments from this component.
         </p>
     </div>
 {% endif %}
