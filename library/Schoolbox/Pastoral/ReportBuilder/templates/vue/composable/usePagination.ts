@@ -9,6 +9,7 @@
 
 import type { Ref } from "vue";
 import type { Metadata } from "@js/util/sbx/apiUtils";
+import { ViewUrlParams } from "../../js/types/pastoralReportTypes";
 
 /**
  *
@@ -61,8 +62,8 @@ export function usePagination(
             const newParams = new URLSearchParams(newUrlObj.search);
 
             // Remove cursor parameter from both for comparison
-            oldParams.delete("cursor");
-            newParams.delete("cursor");
+            oldParams.delete(ViewUrlParams.CURSOR as string);
+            newParams.delete(ViewUrlParams.CURSOR as string);
 
             // If the remaining parameters are different, reset pagination
             return oldParams.toString() !== newParams.toString();
