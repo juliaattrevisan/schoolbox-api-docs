@@ -79,12 +79,39 @@
         {% endif %}
     {% endif %}
 </div>
+{% if isCreate %}
+    {% set routeDraft = routeLookupIfAuthorized('learningMomentEvidence.postDraft', {userIds: userIds|join(',')}) %}
+{% else %}
+    {% set routeDraft = routeLookupIfAuthorized('learningMomentEvidence.putDraft', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
+{% endif %}
+
+{% if USER.role.isStudent or USER.role.isParent %}
+    {% if moderationRequired and (evidence.isDraft or evidence.isRejected) %}
+        {% if isCreate %}
+            {% set routeSubmit = routeLookupIfAuthorized('learningMomentEvidence.postSubmit', {userIds: userIds|join(',')}) %}
+        {% else %}
+            {% set routeSubmit = routeLookupIfAuthorized('learningMomentEvidence.putSubmit', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
+        {% endif %}
+    {% elseif moderationRequired and (evidence.isSubmitted or evidence.isPublished) %}
+        {# noop:
+                             # nothing for the student to do except w8 for staff to move it to the next state because:
+                             #     - it's submitted and has entered the moderation workflow; or
+                             #     - it's already published and you shouldn't be able to publish again
+        #}
+    {% else %}
+        {% if isCreate %}
+            {% set routeSubmit = routeLookupIfAuthorized('learningMomentEvidence.postPublish', {userIds: userIds|join(',')}) %}
+        {% else %}
+            {% set routeSubmit = routeLookupIfAuthorized('learningMomentEvidence.putPublish', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
+        {% endif %}
+    {% endif %}
+{% endif %}
 
 
 <div class="row">
     <div class="small-12 island">
         {# form action is intentionally controlled via javascript now #}
-        <form action="" method="{{ formMethod }}" id="evidence-form" data-action-draft="{{ formAction }}" data-action-submit="{{ formAction }}">
+        <form action="" method="{{ formMethod }}" id="evidence-form" data-action-draft="{{ routeDraft }}" data-action-submit="{{ routeSubmit }}" data-action-publish="">
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -121,18 +148,12 @@
             <ul class="flex-list buttons">
                 <li><button id="draft">Save for later</button></li>
 
-                {% if isCreate %}
-                    {% set route = routeLookupIfAuthorized('learningMomentEvidence.postDraft', {userIds: userIds|join(',')}) %}
-                {% else %}
-                    {% set route = routeLookupIfAuthorized('learningMomentEvidence.putDraft', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
-                {% endif %}
-
                 <script>
                     $(function() {
                         $('#draft').on('click', function(event) {
                             event.preventDefault();
 
-                            $('#evidence-form').attr('action', '{{ route }}');
+                            $('#evidence-form').attr('action', '{{ routeDraft }}');
 
                             $('#evidence-persist').trigger('click');
                         });
@@ -142,12 +163,6 @@
                 {% if USER.role.isStudent %}
                     {% if moderationRequired and (evidence.isDraft or evidence.isRejected) %}
                         <li><button id="submit">Submit for approval</button></li>
-
-                        {% if isCreate %}
-                            {% set route = routeLookupIfAuthorized('learningMomentEvidence.postSubmit', {userIds: userIds|join(',')}) %}
-                        {% else %}
-                            {% set route = routeLookupIfAuthorized('learningMomentEvidence.putSubmit', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
-                        {% endif %}
                     {% elseif moderationRequired and (evidence.isSubmitted or evidence.isPublished) %}
                         {# noop:
                          # nothing for the student to do except w8 for staff to move it to the next state because:
@@ -156,12 +171,6 @@
                          #}
                     {% else %}
                         <li><button id="submit" class="submit">Publish</button></li>
-
-                        {% if isCreate %}
-                            {% set route = routeLookupIfAuthorized('learningMomentEvidence.postPublish', {userIds: userIds|join(',')}) %}
-                        {% else %}
-                            {% set route = routeLookupIfAuthorized('learningMomentEvidence.putPublish', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
-                        {% endif %}
                     {% endif %}
 
                     <script>
@@ -190,7 +199,7 @@
                             $('#submit').on('click', function(event) {
                                 event.preventDefault();
 
-                                $('#evidence-form').attr('action', '{{ route }}');
+                                $('#evidence-form').attr('action', '{{ routeSubmit }}');
 
                                 $('#evidence-persist').trigger('click');
                             });
