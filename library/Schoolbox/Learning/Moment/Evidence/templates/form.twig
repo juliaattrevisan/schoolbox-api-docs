@@ -12,7 +12,6 @@
     [ 'Share Learning' ]
 ) }}
     {% set heading = 'Share a' %}
-    {% set formAction = routeLookup('learningMomentEvidence.postMomentForUsers', {userIds: userIds|join(',')}) %}
 {% else %}
     {{ bread.crumbs(
         [evidence.recipient.fullName, '/search/user/' ~ evidence.recipient.id],
@@ -29,10 +28,8 @@
      #}
     {% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted %}
         {% set heading = 'Publish a' %}
-        {% set formAction = routeLookup('learningMomentModeration.putPublish', {evidenceId: evidence.id}) %}
     {% else %}
         {% set heading = 'Modify' %}
-        {% set formAction = routeLookup('learningMomentEvidence.putEvidence', {evidenceId: evidence.id}) %}
     {% endif %}
 {% endif %}
 
@@ -77,12 +74,30 @@
     {% endif %}
 </div>
 {% if isCreate %}
+    {# Share a Learning Moment from the Class List #}
+    {% set routePublish = routeLookupIfAuthorized('learningMomentEvidence.postPublish', {userIds: userIds|join(',')}) %}
     {% set routeDraft = routeLookupIfAuthorized('learningMomentEvidence.postDraft', {userIds: userIds|join(',')}) %}
+    {% set formAction = routeLookup('learningMomentEvidence.postMomentForUsers', {userIds: userIds|join(',')}) %}
 {% else %}
     {% set routeDraft = routeLookupIfAuthorized('learningMomentEvidence.putDraft', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
+    {% set routePublish = routeLookupIfAuthorized('learningMomentEvidence.putPublish', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
+    {# Moderation Workflow
+     # If this Moment is submitted and moderation is required,
+     # the form POSTs to the Moderation controller's postPublish
+     # which will also do other stuff like deleting comments.
+     #
+     # Otherwise, presume updating the Moment's contents as a student
+    #}
+    {% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted %}
+        {% set heading = 'Publish a' %}
+        {% set formAction = routeLookup('learningMomentModeration.putPublish', {evidenceId: evidence.id}) %}
+    {% else %}
+        {% set heading = 'Modify' %}
+        {% set formAction = routeLookup('learningMomentEvidence.putEvidence', {evidenceId: evidence.id}) %}
+    {% endif %}
 {% endif %}
 
-{% if USER.role.isStudent or USER.role.isParent %}
+{% if USER.role.isStudent %}
     {% if moderationRequired and (evidence.isDraft or evidence.isRejected) %}
         {% if isCreate %}
             {% set routeSubmit = routeLookupIfAuthorized('learningMomentEvidence.postSubmit', {userIds: userIds|join(',')}) %}
@@ -102,13 +117,6 @@
             {% set routeSubmit = routeLookupIfAuthorized('learningMomentEvidence.putPublish', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
         {% endif %}
     {% endif %}
-{% endif %}
-
-{% if evidence.id %}
-    {% set routePublish = routeLookupIfAuthorized('learningMomentEvidence.putPublish', {evidenceId: evidence.id, creatorId: evidence.creator.id, userId: evidence.recipient.id }) %}
-{% else %}
-    {# Share a Learning Moment from the Class List #}
-    {% set routePublish = routeLookupIfAuthorized('learningMomentEvidence.postPublish', {userIds: userIds|join(',')}) %}
 {% endif %}
 
 <div class="row">
