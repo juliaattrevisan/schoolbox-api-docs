@@ -358,7 +358,12 @@
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
-{% if (sharingForSelf or (otherUsers | length == 1)) and not evidence.isPublished %}
+{# only autosave draft when:
+ * there is either only sharing for yourself, or 1 other person
+    * the evidence already exists (an evidence entry can only be for 1 user)
+ * AND the evidence is not published
+#}
+{% if (evidence.id or (sharingForSelf or (otherUsers | length == 1))) and not evidence.isPublished %}
     <script src="{{ CDN_PREFIX }}/js/comms/draft.js?v={{ config.site_version }}"></script>
 {% endif %}
 {% block formJs %}
@@ -585,7 +590,12 @@
             });
         });
 
-        {% if (sharingForSelf or (otherUsers | length == 1)) and not evidence.isPublished %}
+        {# only autosave draft when:
+         * there is either only sharing for yourself, or 1 other person
+         * the evidence already exists (an evidence entry can only be for 1 user)
+         * AND the evidence is not published
+        #}
+        {% if (evidence.id or (sharingForSelf or (otherUsers | length == 1))) and not evidence.isPublished %}
         var $createForm = $('#evidence-form');
         var $submitButton = $('#evidence-submit');
         // Init draft plugin

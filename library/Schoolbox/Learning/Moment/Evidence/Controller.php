@@ -706,11 +706,7 @@ class Controller extends Base
          */
         $this->mapper->save($evidence);
 
-        $responseTranslator = new Translator\ModelToArray\Base(
-            new User\Translator\Author\ModelToArray(),
-            new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
-            new ScrubAdapter(),
-        );
+        $responseTranslator = $this->buildTranslatorWithComments(1);
 
         $translated = $responseTranslator($evidence);
 
