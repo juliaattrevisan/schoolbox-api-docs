@@ -3,6 +3,7 @@
  * Displays a pastoral report in a table format.
  */
 
+import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import type { Tab, TablePayload, TableHeader, SelectedCell } from "../../js/types/pastoralReportTypes";
 import { TabType } from "../../js/types/pastoralReportTypes";
 import { useLoadPrTable } from "../composable/useLoadPrTable";
@@ -183,14 +184,7 @@ window.Vue.onUnmounted(() => {
         <div class="loader"></div>
     </div>
     <div v-else-if="loadError" class="c-island l-pad-m">
-        <div class="alert-box alert f-no-margins">
-            Sorry, there was an error during report retrieval. Please
-            <a href="" title="refresh the page"> refresh the page </a>
-            to try again and contact your support if the problem persists.
-            <template v-if="loadError && loadError.length > 0"
-                ><em>Further support info: {{ loadError }}</em></template
-            >
-        </div>
+        <data-load-error data-title="record" :further-info="loadError" />
     </div>
     <pr-empty v-else-if="isEmpty" />
     <template v-else-if="hasRows">
