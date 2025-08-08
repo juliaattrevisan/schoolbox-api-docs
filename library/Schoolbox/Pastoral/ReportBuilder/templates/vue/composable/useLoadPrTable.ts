@@ -63,6 +63,9 @@ export function useLoadPrTable(url: Ref<string>): {
                 signal: controller.signal,
             });
             if (!response.success) {
+                if ("detail" in response && response.detail && response.detail instanceof Error) {
+                    throw response.detail;
+                }
                 throw new Error(response.message || "Failed to load data");
             }
             const newPayload = response.data;
