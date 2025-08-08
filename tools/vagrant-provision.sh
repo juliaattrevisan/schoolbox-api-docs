@@ -43,51 +43,6 @@ if [[ -z $phpversion_supported ]]; then
   echo "You must declare desired PHP major version via script arg" >&2
   exit 1
 fi
-
-if [[ $phpversion_supported == '8.4' ]]; then
-  # Running 8.4? Install it and whatever's required.
-  # Not installable:
-  # * php8.4-ev (install via pecl for now)
-  # * php8.4-pdosqlsrv (install via pecl for now)
-  # * php8.4-ibmdb2 (no longer required)
-  # Additionally required:
-  # * php8.4-dev (for installing pecl)
-  # * PDO_SQLSRV dependencies
-
-  echo "[SB][$(date +%Y-%m-%d\ %X)] Installing PHP 8.4 and dependencies"
-  apt install \
-      php8.4-bcmath \
-      php8.4-cli \
-      php8.4-common \
-      php8.4-curl \
-      php8.4-excimer \
-      php8.4-fpm \
-      php8.4-gd \
-      php8.4-igbinary \
-      php8.4-imagick \
-      php8.4-imap \
-      php8.4-intl \
-      php8.4-ldap \
-      php8.4-mbstring \
-      php8.4-msgpack \
-      php8.4-mysql \
-      php8.4-opcache \
-      php8.4-phpdbg \
-      php8.4-readline \
-      php8.4-redis \
-      php8.4-xdebug \
-      php8.4-xml \
-      php8.4-zip \
-      php8.4 \
-      php8.4-dev
-  update-alternatives --set php /usr/bin/php8.4
-  pecl install ev
-
-  # TODO update Puppet to install newer Composer, instead of updating here
-  echo "[SB][$(date +%Y-%m-%d\ %X)] Updating Composer"
-  curl -sS https://getcomposer.org/installer | php -- --2.8 --install-dir=/usr/local/bin --filename=composer
-fi
-
 taskd_build_from_local="${12}";  # Valid values: ['0'|'1']
 if [[ $taskd_build_from_local != "0" ]] && [[ $taskd_build_from_local != "1" ]]; then
   error " Invalid 'taskd_build_from_local' value. Expected ['0','1']. Found: $taskd_build_from_local";
@@ -491,20 +446,6 @@ else
     rm -f /etc/php/"$phpversion_supported"/cli/conf.d/20-tideways.ini;
     rm -f /etc/php/"$phpversion_supported"/fpm/conf.d/20-xdebug.ini;
     rm -f /etc/php/"$phpversion_supported"/fpm/conf.d/20-tideways.ini;
-fi
-
-if [[ $phpversion_supported == '8.4' ]]; then
-  # Running 8.4? Copy configuration, and stop Puppet for now so that Puppet
-  # doesn't revert back to 8.2.
-  echo "[SB][`date +%Y-%m-%d\ %X`] Copying 8.2 configuration to 8.4";
-
-  # Copy config of php8.4-fpm
-  cp /etc/php/8.2/mods-available/* /etc/php/8.4/mods-available/
-  cp /etc/php/8.2/fpm/pool.d/* /etc/php/8.4/fpm/pool.d/
-
-  service puppet stop
-  service php8.2-fpm stop
-  service php8.4-fpm start
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Ensure all services are running";
