@@ -27,7 +27,7 @@ class FileSystemHandler implements TypeHandlerInterface
      * @param File\ILocator    $locator
      * @param File\IStorageWrapper $wrapper
      */
-    public function __construct(File\ILocator $locator, File\IStorageWrapper $wrapper = null)
+    public function __construct(File\ILocator $locator, ?File\IStorageWrapper $wrapper = null)
     {
         $this->locator = $locator;
         $this->wrapper = $wrapper;

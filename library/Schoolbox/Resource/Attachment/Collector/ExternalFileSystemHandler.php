@@ -26,13 +26,13 @@ class ExternalFileSystemHandler extends FileSystemHandler
      * @param File\ILocator              $locator
      * @param Resource\Storage\IReceiver $receiver
      * @param FetcherInterface           $fetcher
-     * @param File\IStorageWrapper       $wrapper
+     * @param File\IStorageWrapper|null  $wrapper
      */
     public function __construct(
         File\ILocator $locator,
         Resource\Storage\IReceiver $receiver,
         FetcherInterface $fetcher,
-        File\IStorageWrapper $wrapper = null
+        ?File\IStorageWrapper $wrapper = null
     ) {
         parent::__construct($locator, $wrapper);
         $this->receiver = $receiver;

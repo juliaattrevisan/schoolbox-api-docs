@@ -154,7 +154,7 @@ class CohortAnalysis
      * @throws \DomainException
      * @todo inject mapper dependencies
      */
-    public function __construct(Collection $dueAssessments, ?Folder $classFolder = null, WorkType\Model $resultFilter = null)
+    public function __construct(Collection $dueAssessments, ?Folder $classFolder = null, ?WorkType\Model $resultFilter = null)
     {
         $this->submissionTypeResultFilter = $resultFilter;
         $this->classFolder                = $classFolder;

@@ -795,7 +795,7 @@ interface IAssessable extends ISoftDeletable
      * @param null|WorkType\Model $workType
      * @return static
      */
-    public function setWorkType(WorkType\Model $workType = null);
+    public function setWorkType(?WorkType\Model $workType = null);
 
     /**
      * @return GradeGroup|null

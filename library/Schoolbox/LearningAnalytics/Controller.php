@@ -364,7 +364,7 @@ class Controller extends Base
         $routeType,
         Collection $courseImplementationFolders,
         ?Folder $classFolder = null,
-        WorkType\Model $submissionType = null
+        ?WorkType\Model $submissionType = null
     ) {
         // All variants of learning analytics reports could take a while
         $this->extendExecutionTime();
