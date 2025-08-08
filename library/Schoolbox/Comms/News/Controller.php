@@ -1273,8 +1273,10 @@ class Controller extends Base
              * to be mindful about when to exclude elements and when not to exclude elements. This oddball
              * action-at-a-distance emerged from SA-19147.
              */
+            $folderEntityType = Audience\Segment\Strategy\Folder::getEntityType();
+
             if ($checkFolderAccess &&
-                'folder' === $segment->getEntityType() &&
+                $segment->getEntityType() === $folderEntityType &&
                 !$access->getFolderAccess($this->getUser(), (int)$segment->getEntityValue())
             ) {
                 /* You didn't have access to this folder: pretend this didn't exist.
