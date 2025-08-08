@@ -229,9 +229,10 @@ window.Vue.onUnmounted(() => {
                 </tbody>
             </table>
             <pr-table-footer
-                :endpoint="viewUrl"
+                :url="viewUrl"
                 :metadata="(payload as TablePayload).metadata"
                 :limit="LIMIT"
+                :is-loading="isNewLoading || isMoreLoading"
                 @previous="onPaginate"
                 @next="onPaginate"
             />
