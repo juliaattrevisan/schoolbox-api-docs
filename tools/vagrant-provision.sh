@@ -54,6 +54,7 @@ if [[ $phpversion_supported == '8.4' ]]; then
   # * php8.4-dev (for installing pecl)
   # * PDO_SQLSRV dependencies
 
+  echo "[SB][$(date +%Y-%m-%d\ %X)] Installing PHP 8.4 and dependencies"
   apt install \
       php8.4-bcmath \
       php8.4-cli \
@@ -80,14 +81,11 @@ if [[ $phpversion_supported == '8.4' ]]; then
       php8.4 \
       php8.4-dev
   update-alternatives --set php /usr/bin/php8.4
-
   pecl install ev
 
-  # Copy config of php8.4-fpm
-  cp /etc/php/8.2/mods-available/* /etc/php/8.4/mods-available/
-  cp /etc/php/8.2/fpm/pool.d/* /etc/php/8.4/fpm/pool.d/
-
-  # TODO update Composer due to deprecation messages
+  # TODO update Puppet to install newer Composer, instead of updating here
+  echo "[SB][$(date +%Y-%m-%d\ %X)] Updating Composer"
+  curl -sS https://getcomposer.org/installer | php -- --2.8 --install-dir=/usr/local/bin --filename=composer
 fi
 
 taskd_build_from_local="${12}";  # Valid values: ['0'|'1']
