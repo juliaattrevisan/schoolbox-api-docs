@@ -1277,7 +1277,7 @@ class Controller extends Base
                 'folder' === $segment->getEntityType() &&
                 !$access->getFolderAccess($this->getUser(), (int)$segment->getEntityValue())
             ) {
-                $segment->setEntityValue(null);
+                continue;
             }
 
             // Selectize will use 'value' and 'label' to index and display selected items in default rendering.
