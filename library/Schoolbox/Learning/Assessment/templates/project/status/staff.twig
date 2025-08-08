@@ -196,6 +196,7 @@ Data:
                                         {# Learnosity Quiz has two parts: Modify Quiz and Modify Contents #}
                                         {% if assessable is quiz %}
                                             {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessment: assessable, assessmentId: assessable.id}) %}
+                                            <li><a class="icon-class-list" href="{{ routeLookup('learnosity.getHorizontalMarking', {assessment: assessable, assessmentId: assessable.id}) }}">Review horizontally</a></li>
                                             <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" title="Modify this {{ locale.activity }} settings">Modify Settings</a></li>
                                             <li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" title="Modify this {{ locale.activity }} contents">Modify Contents</a></li>
                                         {% else %}
