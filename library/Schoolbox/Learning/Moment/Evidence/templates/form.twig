@@ -114,7 +114,7 @@
 <div class="row">
     <div class="small-12 island">
         {# form action is intentionally controlled via javascript now #}
-        <form action="" method="{% if isCreate %}post{% else %}put{% endif %}" id="evidence-form" data-action-draft="{{ routeDraft }}" data-action-submit="{{ routeSubmit }}" data-action-publish="{{ routePublish }}">
+        <form action="" method="{% if isCreate %}post{% else %}put{% endif %}" id="evidence-form" data-action-draft="{{ routeDraft }}" data-action-submit="{{ formAction }}" data-action-publish="{{ routePublish }}">
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
@@ -603,17 +603,32 @@
                 }
                 // Update the form actions (document, so it works for the save)
                 document.querySelector('#evidence-form').dataset.actionDraft = response[0]._links.put;
-                document.querySelector('#evidence-form').dataset.actionSubmit = response[0]._links.put;
                 document.querySelector('#evidence-form').dataset.actionPublish = response[0]._links.publish;
                 document.querySelector('#evidence-form').action = response[0]._links.put;
                 document.querySelector('#evidence-form').method = 'put';
 
                 // update jquery / draft js (has weird cache)
                 $createForm.data('action-draft', response[0]._links.put);
-                $createForm.data('action-submit', response[0]._links.put);
                 $createForm.data('action-publish', response[0]._links.publish);
                 $createForm.attr('action', response[0]._links.put);
                 $createForm.attr('method', 'put');
+
+                {% if USER.role.isStudent or USER.role.isParent %}
+                    {% if moderationRequired and (evidence.isDraft or evidence.isRejected) %}
+                        $createForm.data('action-submit', response[0]._links.submit);
+                        document.querySelector('#evidence-form').dataset.actionSubmit = response[0]._links.submit;
+                    {% elseif moderationRequired and (evidence.isSubmitted or evidence.isPublished) %}
+                        {# noop:
+                                     # nothing for the student to do except w8 for staff to move it to the next state because:
+                                     #     - it's submitted and has entered the moderation workflow; or
+                                     #     - it's already published and you shouldn't be able to publish again
+                        #}
+                    {% else %}
+                        $createForm.data('action-submit', response[0]._links.publish);
+                        document.querySelector('#evidence-form').dataset.actionSubmit = response[0]._links.publish;
+                    {% endif %}
+                {% endif %}
+
                 // Update the window history
                 window.history.pushState({}, null, response[0]._links.modifyForm);
             },
