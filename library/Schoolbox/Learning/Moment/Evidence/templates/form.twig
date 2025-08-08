@@ -610,9 +610,11 @@
             toaster: $('#toast'),
             staller: $submitButton,
             onSaveSuccess: function (response) {
-                // response is either an array (initial create, as multi students may exist (just not in draft mode))
-                // or a single object (update, as only one student is being modified)
-                if (!Array.isArray(response)) { // i mean this is one way... ai auto suggest. lets see how this goes..
+                // initial create response is an array of students
+                // modify form is a single student (no array)
+                // so we need to check if the response is an array or not
+                // and then update the form action accordingly
+                if (!Array.isArray(response)) {
                     response = [response];
                 }
                 // Update the form actions (document, so it works for the save)
