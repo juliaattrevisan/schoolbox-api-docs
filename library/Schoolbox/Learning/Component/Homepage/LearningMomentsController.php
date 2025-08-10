@@ -23,9 +23,10 @@ class LearningMomentsController extends Component_Homepage_ControllerAbstract
      */
     public function execute(): bool
     {
-        $this->readOnly = $this->getContentPermission() < UserAccess::ACCESS_WRITE;
-
-        return true;
+        if (!parent::execute()) {
+            return false;
+        }
+        return $this->getContentPermission() >= UserAccess::ACCESS_WRITE;
     }
 
     /**
