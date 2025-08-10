@@ -11,12 +11,6 @@ use Twig\Error\SyntaxError;
 class LearningMomentsController extends Component_Homepage_ControllerAbstract
 {
     /**
-     * Does the user have edit access to this component / page
-     * @var bool
-     */
-    private bool $readOnly;
-
-    /**
      * Business logic to collate data ready for output
      *
      * @return bool Whether to continue on and attempt Component render
@@ -47,7 +41,6 @@ class LearningMomentsController extends Component_Homepage_ControllerAbstract
                 'user' => $this->getUser(),
                 'baseUrl' => '/learning/evidence/user/' . $this->getUser()->getId() . '/create',
                 'component' => $this,
-                'readOnly' => $this->readOnly,
             ]
         );
     }
