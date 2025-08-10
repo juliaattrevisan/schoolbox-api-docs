@@ -13,6 +13,7 @@ use Aura\Di\Container;
 use Alaress\Exception\IO\IOException;
 use ErrorException;
 use PDOException;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use RangeException;
@@ -359,10 +360,18 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
      *
      * @param Lumberjack\Logger $logger
      * @return bool
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
+     * @throws ContainerExceptionInterface if somehow Sentry client exists but can't be fetched
      */
     protected function addSentryHandler(Lumberjack\Logger $logger): bool
     {
+        // What if this error is raised before Sentry is even initialized?
+        // This could happen if a vendor library contains an error or
+        // deprecation notice.
+        if (!$this->getDependencyInjector()->has('sentry')) {
+            $logger->warning('Logger is being set up before Sentry is initialized: continuing, but this process will not log to Sentry');
+            return false;
+        }
+
         /** @var HubInterface $sentryClient */
         $sentryClient  = $this->getDependencyInjector()->get('sentry');
         $sentryHandler = new SentryHandler($sentryClient, Monolog\Logger::CRITICAL);
