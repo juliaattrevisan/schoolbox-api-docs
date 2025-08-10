@@ -16,6 +16,7 @@ use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategyBuilder;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Ratchet\Server\IoServer;
+use Ratchet\Session\Serialize\HandlerInterface;
 use Ratchet\Session\Serialize\PhpHandler;
 use React\EventLoop\LoopInterface;
 use React\Socket\SocketServer;
@@ -63,7 +64,17 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
 
     $pipeManager = (new PipeManagerFactory(
         $loop,
-        new PhpHandler(),
+        new class implements HandlerInterface {
+            function serialize(array $data): string
+            {
+                return serialize($data);
+            }
+
+            function unserialize($raw)
+            {
+                return unserialize($raw);
+            }
+        },
         $log,
         $instanceRepository,
         $configRepository,
