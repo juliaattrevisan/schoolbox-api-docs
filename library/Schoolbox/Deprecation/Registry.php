@@ -39,7 +39,7 @@ class Registry
      * they should be added to `PATH_WHITELIST`.
      */
     public const PATH_BLACKLIST = [
-        SITE_root . '/vendor/',
+//        SITE_root . '/vendor/',
     ];
 
     /**
