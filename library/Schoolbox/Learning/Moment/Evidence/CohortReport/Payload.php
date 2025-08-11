@@ -85,6 +85,14 @@ class Payload
         if ($fromDate && $toDate) {
             $from = (new \Alaress_Date_Format($fromDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT))->startOfDay();
             $to = (new \Alaress_Date_Format($toDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT))->endOfDay();
+
+            /* Check for a maximum length of time of [now, -1 year at start of day]
+             */
+            $threshold = \Alaress_Date_Format::now()->addYears(-1)->startOfDay();
+
+            if ($from->lt($threshold)) {
+                $from = $threshold;
+            }
         } else {
             $from = \Alaress_Date_Format::now()->addDays(self::COHORT_REPORT_PAST_THRESHOLD)->startOfDay();
             $to = \Alaress_Date_Format::now()->endOfDay();

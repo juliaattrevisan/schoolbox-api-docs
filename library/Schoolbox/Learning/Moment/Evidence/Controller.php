@@ -797,14 +797,6 @@ class Controller extends Base
         $groupIds = [];
         $classIds = [];
 
-        /* Check for a maximum length of time of [now, -1 year at start of day]
-         */
-        $threshold = \Alaress_Date_Format::now()->addYears(-1)->startOfDay();
-
-        if ($from->lt($threshold)) {
-            $from = $threshold;
-        }
-
         /* Get a list of student ids that are in $folder and use a hash lookup
          * to cross reference everything we find later
          */
