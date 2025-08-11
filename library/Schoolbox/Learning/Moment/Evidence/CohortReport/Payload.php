@@ -85,33 +85,37 @@ class Payload
 
         /* Filter $cohortIds to a set of recipient userIds, if specified
          */
-        $userIds = explode(',', $userIds);
+        if ($userIds) {
+            $userIds = explode(',', $userIds);
 
-        if ($userIds && \count($userIds)) {
-            $cohortIds = $this->findCohortIds($folder);
-            $intersectingUsers = array_intersect($cohortIds, $userIds);
+            if (\count($userIds)) {
+                $cohortIds = $this->findCohortIds($folder);
+                $intersectingUsers = array_intersect($cohortIds, $userIds);
 
-            if (\count($intersectingUsers)) {
-                $placeholders = Builder::getArrayPlaceholders($intersectingUsers, 'intersectingUserIds');
-                $params = array_merge($params, Builder::getArrayParameters($intersectingUsers, 'intersectingUserIds'));
+                if (\count($intersectingUsers)) {
+                    $placeholders = Builder::getArrayPlaceholders($intersectingUsers, 'intersectingUserIds');
+                    $params = array_merge($params, Builder::getArrayParameters($intersectingUsers, 'intersectingUserIds'));
 
-                $query .= "
-                    AND user_id IN {$placeholders}
-                ";
+                    $query .= "
+                        AND user_id IN {$placeholders}
+                    ";
+                }
             }
         }
 
         /* Filter to a set of authors, if specified
          */
-        $authorIds = explode(',', $authorIds);
+        if ($authorIds) {
+            $authorIds = explode(',', $authorIds);
 
-        if ($authorIds && \count($authorIds)) {
-            $placeholders = Builder::getArrayPlaceholders($authorIds, 'authorIds');
-            $params = array_merge($params, Builder::getArrayParameters($authorIds, 'authorIds'));
+            if (\count($authorIds)) {
+                $placeholders = Builder::getArrayPlaceholders($authorIds, 'authorIds');
+                $params = array_merge($params, Builder::getArrayParameters($authorIds, 'authorIds'));
 
-            $query .= "
-                AND created_by IN {$placeholders}
-            ";
+                $query .= "
+                    AND created_by IN {$placeholders}
+                ";
+            }
         }
 
         /* Filter to a date range, if specified; both dates must be specified to use a user-defined date range,
@@ -165,6 +169,8 @@ class Payload
          */
 
         /* TODO Add tag filtering
+         *  Could maybe be reductive, or convert to a raw sql for a mega join
+         *  Mega join sounds too dirty for the number of tags that could exist.
          */
 
         /* Filter to a set of states/statuses, if specified
@@ -235,22 +241,12 @@ class Payload
             }
         }
 
+        $result = $this->mapper->getDatabase()->executeQuery($query, $params);
 
 
-        new \Alaress_Probe($query, $params);
+
+        new \Alaress_Probe($query, $params, $result->fetchAll());
         die();
-
-
-        die();
-
-        /* Could maybe be reductive, or convert to a raw sql for a mega join
-         * Mega join sounds too dirty for the number of tags that could exist.
-         */
-        $tagIds = null;
-
-        /* TODO Curric nodes come later.
-         */
-        $curriculumNodeIds = null;
 
         return $this->mapper->findByPredicates($pb)->sortBy('updatedAt', 'DESC');
     }
