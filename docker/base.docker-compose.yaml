@@ -95,7 +95,7 @@ services:
 
   redis-storage:
     container_name: redis-storage
-    image: redis:7.4
+    image: redis:6.0
     healthcheck:
       test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
       start_period: 30s
@@ -108,7 +108,7 @@ services:
 
   redis-cache:
     container_name: redis-cache
-    image: redis:7.4
+    image: redis:6.0
     healthcheck:
       test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
       start_period: 30s
