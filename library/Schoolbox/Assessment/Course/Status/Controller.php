@@ -255,7 +255,7 @@ class Controller extends WebController\Base
             $twigData['selfReflect'] = false;
             $twigData['selfAssess'] = false;
 
-            $template = '@courseStatus/duework.twig';
+            $template = '@learningAssessment/dueWork/status.twig';
         } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Lti\Model) {
             $twigData['message'] = strip_tags($this->requestQuery->get('lti_msg', ''));
             $twigData['errorMessage'] = strip_tags($this->requestQuery->get('lti_errormsg', ''));
