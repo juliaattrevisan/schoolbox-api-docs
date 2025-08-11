@@ -61,6 +61,7 @@ class LearningMomentsController extends Component_Homepage_ControllerAbstract
                 'baseUrl' => '/learning/evidence/user/' . $this->getUser()->getId() . '/create',
                 'component' => $this,
                 'readOnly' => $this->readOnly,
+                'folder' => $this->getSource(),
             ]
         );
     }

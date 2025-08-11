@@ -12,6 +12,11 @@
             <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=upload&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-upload share-file" title="Upload file">Upload file</a>
             <a data-action="shareLearningMoment" data-test="learning-moment-evidence-share-writeSomething" href="{{ baseUrl }}?momentType=text&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-textbox share-text" title="Write something">Write something</a>
         </div>
+        <div class="component-action">
+            <section>
+                <a class='button' href="{{ routeLookup('searchUser.getProfile', { userId: user.id }) }}" target="_self">View Activity Feed</a>
+            </section>
+        </div>
         <!-- Check that the device supports recording audio/video, and if not hide the buttons that aren't supported -->
         <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/checkShareWorkButtons.js?v={{ config.site_version }}"></script>
     </div>
@@ -20,6 +25,11 @@
         <p>
             Staff cannot create learning moments from this component. Instead navigate to a student's activity feed or the class list.
         </p>
+    </div>
+    <div class="component-action">
+        <section>
+            <a class='button' href="{{ routeLookup('learningMomentEvidence.getCohortReport', { folderId: folder.id }) }}" target="_self">View Cohort Learning Moments</a>
+        </section>
     </div>
 {% else %}
     <div class="empty-state">
