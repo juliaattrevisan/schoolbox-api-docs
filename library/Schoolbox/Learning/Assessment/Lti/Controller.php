@@ -187,11 +187,21 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment): void
     {
+        $aImpls = [];
+        /* for this endpoint, only show participants if the assessment is not a specification
+         * courseStatus.getStatus exists instead for specs */
+        if (!$assessment->isSpecification()) {
+            $aImpls[$assessment->getId()] = [
+                'assessment' => $assessment,
+            ];
+        }
+
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/lti/status.twig',
             [
                 'type'        => Assessment\AssessmentType::objectToString($assessment),
                 'assessment'  => $assessment,
+                'impls'      => $aImpls,
                 'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
                                                    ->add([ $assessment->getTitle(), '' ]),
                 'message'      => strip_tags($this->requestQuery->get('lti_msg', '')),
