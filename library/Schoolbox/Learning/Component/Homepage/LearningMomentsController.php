@@ -21,6 +21,11 @@ class LearningMomentsController extends Component_Homepage_ControllerAbstract
             return false;
         }
 
+        // Only show if learning moments are enabled.
+        if (!$this->getConfigLoader()->get('learning_moments_enabled')) {
+            return false;
+        }
+
         // Parents cannot see the Learning Moments component.
         return !$this->getUser()->getRole()->isParent();
     }
