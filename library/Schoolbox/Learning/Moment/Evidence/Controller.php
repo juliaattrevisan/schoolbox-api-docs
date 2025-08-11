@@ -851,65 +851,13 @@ class Controller extends Base
         $payload = [];
 
         if (\count($ids)) {
-            /* Only care about moments whose recipients are in the set of users associated
-             * with $folder: otherwise ignore the learning moment
-             */
-            $pb = $this->mapper->getPredicateBuilder()
-                ->between('updated_at', $from, $to)
-                ->in('user_id', $ids);
-
-            /* Optionally use filter settings to minimise the result set;
-             */
-            $authorId = (int)($this->requestQuery->get('authorId') ?? null);
-
-            if ($authorId) {
-                $pb = $pb->equals('created_by', $authorId);
-            }
-
-            /* Ensure that the state provided is one of the canonical states we've established
-             * so you can't request moments with the status "cat"
-             */
-            $state = $this->requestQuery->get('state') ?? null;
-
-            /* Do a deep inspection for the pb, which isn't exactly nice; look at the various
-             * *_by and *_at date fields to determine what state a learning moment is in.
-             * We don't have access to the convenience methods isDraft() isPublished() etc.
-             * for the pub; those require hydrated models. Maybe split this out into something
-             * else later.
-             */
-            if (in_array($state, Model::VALID_STATuSES)) {
-                if (Model::STATUS_DRAFT === $state) {
-                    /* TODO maybe we should have had a draft_at and draft_by columns
-                     *  to shortcut this nonsense, but that's also kind of annoying...
-                     */
-                    $pb = $pb
-                        ->isNull('submitted_at')
-                        ->isNull('submitted_by')
-                        ->isNull('published_at')
-                        ->isNull('published_by')
-                        ->isNull('rejected_at')
-                        ->isNull('rejected_by');
-                } elseif (Model::STATUS_SUBMITTED === $state) {
-                    $pb = $pb
-                        ->notNull('submitted_at')
-                        ->notNull('submitted_by');
-                } elseif (Model::STATUS_PUBLISHED === $state) {
-                    $pb = $pb
-                        ->notNull('published_at')
-                        ->notNull('published_by');
-                } elseif (Model::STATUS_REJECTED === $state) {
-                    $pb = $pb
-                        ->notNull('rejected_at')
-                        ->notNull('rejected_by');
-                }
-            }
-
-            /* TODO Tags and curric nodes come later.
-             */
-            $tagIds = null;
-            $curriculumNodeIds = null;
-
-            $moments = $this->mapper->findByPredicates($pb)->sortBy('updatedAt', 'DESC');
+            $moments = $this->mapper->findByFilters(
+                $ids,
+                $from,
+                $to,
+                $this->requestQuery->get('authorId') ?? null,
+                $this->requestQuery->get('state') ?? null
+            );
 
             foreach ($moments as $moment) {
                 /* Accumulate a list of associated files for this learning moment
