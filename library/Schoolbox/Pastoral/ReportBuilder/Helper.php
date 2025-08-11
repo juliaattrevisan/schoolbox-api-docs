@@ -380,7 +380,7 @@ class Helper
 
         $months = [];
         while ($end->gte($start) && count($months) < $maxStack) {
-            array_unshift($months,strtolower($end->getUsingFormat($format)));
+            array_unshift($months, strtolower($end->getUsingFormat($format)));
             $end->addMonths(-1);
         }
         return new Collection($months);
