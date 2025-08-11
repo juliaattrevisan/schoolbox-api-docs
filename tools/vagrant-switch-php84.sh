@@ -43,7 +43,8 @@ echo "Copying 8.2 configuration to 8.4";
 sudo cp /etc/php/8.2/mods-available/* /etc/php/8.4/mods-available/
 sudo cp /etc/php/8.2/fpm/pool.d/* /etc/php/8.4/fpm/pool.d/
 
-# TODO replace session.serialize_handler
+echo "Changing session.serialize_handler to php_serialize";
+echo 'session.serialize_handler = php_serialize' | sudo tee /etc/php/8.4/fpm/conf.d/session-serialize-handler.ini > /dev/null
 
 echo "Stopping Puppet and php8.2-fpm, starting php8.4-fpm";
 sudo service puppet stop
