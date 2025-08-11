@@ -892,6 +892,9 @@ class Controller extends Base
                 //                            'lastname' => $moment->getRejectedBy()->getLastname(),
                 //                        ] : null
                 //                    ],
+                /* Any associated tags which you can find in a db lookup table
+                 */
+                'tags' => $this->getTagsForMoment($moment),
                 /* A shortcut to urls for changing states in this learning moment
                  * Note that a controller method must fulfil this node after the fact, for aura reasons
                  * (not easy to dedupe that implementation, sadly)
@@ -901,6 +904,27 @@ class Controller extends Base
         }
 
         return $payload;
+    }
+
+
+    /**
+     * Convert a set of moment tags into a scalar stack
+     *
+     * @param Model $moment
+     * @return array
+     */
+    private function getTagsForMoment(Model $moment): array
+    {
+        $stack = [];
+
+        foreach ($moment->getTags() as $tag) {
+            $stack[] = [
+                'id' => $tag->getId(),
+                'name' => $tag->getName(),
+            ];
+        }
+
+        return $stack;
     }
 
 
