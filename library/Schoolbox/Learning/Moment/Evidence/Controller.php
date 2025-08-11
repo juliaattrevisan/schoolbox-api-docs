@@ -722,7 +722,7 @@ class Controller extends Base
      */
     private function updateState(Model $evidence, string $state): void
     {
-        if (Evidence\Model::STATUS_DRAFT === $state) {
+        if (Model::STATUS_DRAFT === $state) {
             $evidence->draft();
         } elseif (Model::STATUS_SUBMITTED === $state) {
             $evidence->submit($this->getUser());
@@ -742,7 +742,7 @@ class Controller extends Base
      *   - start of the day 7 days ago
      *   - end of today
      *
-     * @param Model $folder
+     * @param \Schoolbox\Resource\Folder\Model $folder
      * @return void
      * @throws MapperException
      * @throws NotFound

@@ -39,8 +39,6 @@ class Payload
     }
 
 
-
-
     /**
      * Find a set of learning moments for the cohort of users
      *
@@ -259,7 +257,7 @@ class Payload
      * Note that a folder can be both a group and a class-coded folder which derives its
      * members from the Externals
      *
-     * @param Model $folder
+     * @param \Schoolbox\Resource\Folder\Model $folder
      * @return array
      * @throws Exception
      * @throws NotFound
