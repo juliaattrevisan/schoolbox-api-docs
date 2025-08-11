@@ -369,15 +369,19 @@ class Helper
         return $this->report['beforeDate'] ?? null;
     }
 
-    public function getMonthsInRange(Alaress_Date_Format $startDate, Alaress_Date_Format $endDate, string $format): Collection
-    {
+    public function getMonthsInRange(
+        Alaress_Date_Format $startDate,
+        Alaress_Date_Format $endDate,
+        string $format,
+        int $maxStack
+    ): Collection {
         $start = (clone $startDate)->startOfMonth();
         $end = (clone $endDate)->startOfMonth();
 
         $months = [];
-        while ($start->lte($end)) {
-            $months[] = strtolower($start->getUsingFormat($format));
-            $start->addMonths(1);
+        while ($end->gte($start) && count($months) < $maxStack) {
+            array_unshift($months,strtolower($end->getUsingFormat($format)));
+            $end->addMonths(-1);
         }
         return new Collection($months);
     }
