@@ -145,3 +145,4 @@ components:
    - Component_Dashboard_CanvasAssignmentsController
    - Schoolbox\Learning\Component\Dashboard\CurrentLessonPlanController
    - Schoolbox\Learning\Component\Homepage\CurrentLessonPlanController
+   - Schoolbox\Learning\Component\Homepage\LearningMomentsController
