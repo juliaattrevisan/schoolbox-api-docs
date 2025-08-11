@@ -363,7 +363,7 @@ class Controller extends WebController\Base
 
             $twigData['errors'] = $stateMapper->listDisplayValues();
 
-            $template = '@courseStatus/quiz.twig';
+            $template = '@learningAssessment/quiz/status.twig';
             // project doesn't have a status page yet
         } else {
             throw new NotFound('Unsupported assessment type: ' . AssessmentType::objectToString($assessmentSpec));

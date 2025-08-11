@@ -271,9 +271,19 @@ class Controller extends Assessment\Controller
             }
         }
 
+        $aImpls = [];
+        /* for this endpoint, only show participants if the assessment is not a specification
+         * courseStatus.getStatus exists instead for specs */
+        if (!$assessment->isSpecification()) {
+            $aImpls[$assessment->getId()] = [
+                'assessment' => $assessment,
+            ];
+        }
+
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
             'assessment' => $assessment,
+            'aImpls' => $aImpls,
 
             /* Quizzes now support Submission States
              * Annoyingly, Submission States are in the $errors array...
