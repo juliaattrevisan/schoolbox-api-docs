@@ -22,7 +22,7 @@
         <!-- Check that the device supports recording audio/video, and if not hide the buttons that aren't supported -->
         <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/checkShareWorkButtons.js?v={{ config.site_version }}"></script>
     </section>
-{% elseif user.role.isStaff %}
+{% elseif user.role.isStaff and user.role.accessEvidence %}
     <div class="empty-state">
         <p>
             Staff cannot create learning moments from this component. Instead navigate to a student's activity feed or the class list.
