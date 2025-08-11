@@ -39,12 +39,12 @@ $app = new class extends CliTool\App {
         }
         $handle = (new \Alaress\Csv\ValidCSV($handle))->skipBom();
 
-        $headers = fgetcsv($handle, 1000, ",");
+        $headers = fgetcsv($handle, 1000, ",", escape: '');
         $headers = array_flip($headers);
 
 
         /* Iterate over each csv row */
-        while (($row = fgetcsv($handle, 1000, ",")) !== false) {
+        while (($row = fgetcsv($handle, 1000, ",", escape: '')) !== false) {
             /* First lets make sure that the types and subtypes exist and match*/
 
             $currentTypeName = $row[$headers['Current Type']];

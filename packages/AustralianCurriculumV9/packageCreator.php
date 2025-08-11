@@ -13,7 +13,7 @@ function processRowsSubStrand($handle, array &$output_rows, int $lastSubject_id,
     // Set last references to.
     $lastYear_id = $lastStrand_id = $lastSubStrand_id = $nodeParent = 0;
 
-    while (($row = fgetcsv($handle)) !== false) {
+    while (($row = fgetcsv($handle, escape: '')) !== false) {
         // Sanitize the description, and remove the nbsp characters...
         // (Suppress inspection: `$row` can't possibly be false here)
         /** @noinspection PhpAutovivificationOnFalseValuesInspection */

@@ -123,7 +123,7 @@ class Bulk_Folder
         $results = [];
 
         // Parse Header Row
-        $headerRow = fgetcsv($this->fp, 1000, ",");
+        $headerRow = fgetcsv($this->fp, 1000, ",", escape: '');
 
         if ($headerRow === false) {
             throw new UnexpectedValueException("Could not read CSV file.");
@@ -149,7 +149,7 @@ class Bulk_Folder
         $this->folderMapper->unregisterCallback(\Schoolbox\Mapper::CALLBACK_POSTSAVE, 'refreshNotificationRedirects');
 
         $rowIdx = 2; // We have already processed the header in row 1
-        while (($row = fgetcsv($this->fp, 1000, ",")) !== false) {
+        while (($row = fgetcsv($this->fp, 1000, ",", escape: '')) !== false) {
             $results[] = $this->processCsvRow(
                 $rowIdx++,
                 $row,

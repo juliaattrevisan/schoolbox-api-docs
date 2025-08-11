@@ -82,11 +82,11 @@ class LimitedUpdaterTool extends CliTool\App
 Lesson Plan Template Updater (Limited)
 
 Updates lesson plan templates' titles, field descriptions and field bodies for the schoolbox-created
-default data in admin. This matches based on titles: lesson plan template titles and lesson plan 
+default data in admin. This matches based on titles: lesson plan template titles and lesson plan
 template field titles, updating the fields' Field Descriptions to match those contained the csvs.
 It only changes Field Descriptions if both the template title and field title matches exactly.
 
-It won't create new templates or new fields. It won't delete existing templates or fields. 
+It won't create new templates or new fields. It won't delete existing templates or fields.
 
 Usage: php template-updater.php -vvv --perform
 
@@ -248,7 +248,7 @@ HELP;
          */
         $updatedFields = [];
 
-        while ($row = fgetcsv($fp)) {
+        while ($row = fgetcsv($fp, escape: '')) {
             $updatedFields[$row[0]] = $row;
         }
 

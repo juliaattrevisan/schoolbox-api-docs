@@ -28,7 +28,7 @@ function displayRow($row): void
 
 if (($handle = fopen($argv[1], "r")) !== false) {
     $firstRow = null;
-    while (($row = fgetcsv($handle)) !== false) {
+    while (($row = fgetcsv($handle, escape: '')) !== false) {
         if ($firstRow === null) {
             // check if we a uuid field?
             if (in_array(UUID_FIELD, $row)) {

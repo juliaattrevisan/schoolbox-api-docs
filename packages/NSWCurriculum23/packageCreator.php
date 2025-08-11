@@ -21,7 +21,7 @@ function processRowsSubStrand($handle, array &$output_rows, int $lastSubject_id,
     // only some subjects will have Learning Area areas
     $lastLearning_id = $lastSubject_id;
 
-    while (($row = fgetcsv($handle)) !== false) {
+    while (($row = fgetcsv($handle, escape: '')) !== false) {
         // Sanitize the description, and remove the nbsp characters...
         $row[0] = str_replace(' ', ' ', $row[0]);
         $row[0] = trim($row[0]);
