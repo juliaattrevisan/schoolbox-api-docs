@@ -66,6 +66,19 @@ class Payload
             ";
         }
 
+        /* Filter to a set of authors, if specified
+         */
+        $authorIds = explode(',', $authorIds);
+
+        if ($authorIds && \count($authorIds)) {
+            $placeholders = Builder::getArrayPlaceholders($authorIds, 'authorIds');
+            $params = array_merge($params, Builder::getArrayParameters($authorIds, 'authorIds'));
+
+            $query .= "
+                AND created_by IN {$placeholders}
+            ";
+        }
+
         /* Filter to a date range, if specified; both dates must be specified to use a user-defined date range,
          * otherwise resorts to system defaults of [today, -7 days]
          */
@@ -86,17 +99,14 @@ class Payload
             'to' => $to->getDatabase(),
         ]);
 
-        /* Filter to a set of authors, if specified
-         */
 
+
+        new \Alaress_Probe($query, $params);
         die();
 
 //
 //        /* Optionally use filter settings to minimise the result set;
 //         */
-        //        if (\count($authorIds)) {
-        //            $pb = $pb->in('created_by', $authorIds);
-        //        }
         //
         //        /* Ensure that the state provided is one of the canonical states we've established
         //         * so you can't request moments with the status "cat"
