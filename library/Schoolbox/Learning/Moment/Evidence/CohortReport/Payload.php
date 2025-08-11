@@ -59,6 +59,7 @@ class Payload
      * @param string|null $fromDate
      * @param string|null $toDate
      * @param string|null $authorIds
+     * @param string|null $tagIds
      * @param string|null $states
      * @return GenericCollection
      * @throws Exception
@@ -70,15 +71,43 @@ class Payload
         ?string $fromDate,
         ?string $toDate,
         ?string $authorIds,
+        ?string $tagIds,
         ?string $states
     ): GenericCollection {
+        $params = [];
+
+        $wherePieces = [
+            'WHERE deleted_at IS NULL',
+        ];
+
+        /* Set up agglutinated query
+         */
         $query = "
             SELECT id
             FROM {$this->mapper->getTable()}
-            WHERE deleted_at IS NULL
         ";
 
-        $params = [];
+        /* Detect if we needed to filter by Tags
+         * This involves a conditional inner join
+         */
+        $tagJoin = '';
+
+        if ($tagIds) {
+            $tagIds = explode(',', $tagIds);
+
+            if (\count($tagIds)) {
+                $placeholders = Builder::getArrayPlaceholders($tagIds, 'tagIds');
+                $params = array_merge($params, Builder::getArrayParameters($tagIds, 'tagIds'));
+
+                $query .= "
+                    INNER JOIN evidence_tag et ON et.evidence_id = id
+                ";
+
+                $wherePieces[] = "
+                    AND et.tag_id IN {$placeholders}
+                ";
+            }
+        }
 
         /* Filter $cohortIds to a set of recipient userIds, if specified
          */
@@ -93,7 +122,7 @@ class Payload
                     $placeholders = Builder::getArrayPlaceholders($intersectingUsers, 'intersectingUserIds');
                     $params = array_merge($params, Builder::getArrayParameters($intersectingUsers, 'intersectingUserIds'));
 
-                    $query .= "
+                    $wherePieces[] = "
                         AND user_id IN {$placeholders}
                     ";
                 }
@@ -109,7 +138,7 @@ class Payload
                 $placeholders = Builder::getArrayPlaceholders($authorIds, 'authorIds');
                 $params = array_merge($params, Builder::getArrayParameters($authorIds, 'authorIds'));
 
-                $query .= "
+                $wherePieces[] = "
                     AND created_by IN {$placeholders}
                 ";
             }
@@ -134,7 +163,7 @@ class Payload
             $to = \Alaress_Date_Format::now()->endOfDay();
         }
 
-        $query .= "
+        $wherePieces[] = "
             AND updated_at BETWEEN :from AND :to
         ";
 
@@ -234,9 +263,13 @@ class Payload
 
                 $stateQuery = implode(' OR ', $stateQueryPieces);
 
-                $query .= "AND ({$stateQuery})";
+                $wherePieces[] = "AND ({$stateQuery})";
             }
         }
+
+        /* Finally compute WHERE clause
+         */
+        $query .= implode("\n", $wherePieces);
 
         /* All the learning moments that fulfil the filter criteria
          */
