@@ -2,7 +2,9 @@
 
 namespace Schoolbox\Learning\Component\Homepage;
 
+use Aura\Router\Exception\RouteNotFound;
 use Component_Homepage_ControllerAbstract;
+use Psr\Container\ContainerExceptionInterface;
 use Schoolbox\Config\ConfigMapper;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -43,14 +45,24 @@ class LearningMomentsController extends Component_Homepage_ControllerAbstract
      * @throws RuntimeError
      * @throws SyntaxError
      */
-    public function renderTemplate($templateHandle)
+    public function renderTemplate($templateHandle): bool
     {
+        try {
+            $baseUrl = $this->getRouteGenerator()->generate(
+                'learningMomentEvidence.getCreateForm',
+                ['userIds' => $this->getUser()->getId()]
+            );
+        } catch (ContainerExceptionInterface|RouteNotFound) {
+            // The component is useless without the baseUrl, so don't render it.
+            return false;
+        }
+
         return $this->renderTwigTemplate(
             $templateHandle,
             '@learning/component/learningMomentsHomepage.twig',
             [
                 'user' => $this->getUser(),
-                'baseUrl' => '/learning/evidence/user/' . $this->getUser()->getId() . '/create',
+                'baseUrl' => $baseUrl,
                 'component' => $this,
                 'folder' => $this->getSource(),
             ]
