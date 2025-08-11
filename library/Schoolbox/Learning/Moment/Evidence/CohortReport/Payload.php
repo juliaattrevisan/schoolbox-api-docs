@@ -39,6 +39,8 @@ class Payload
     }
 
 
+
+
     /**
      * Find a set of learning moments for the cohort of users
      *
@@ -63,7 +65,6 @@ class Payload
      * @param string|null $authorIds
      * @param string|null $states
      * @return GenericCollection
-     * @throws DebugBarException
      * @throws Exception
      * @throws NotFound
      */
@@ -241,14 +242,13 @@ class Payload
             }
         }
 
-        $result = $this->mapper->getDatabase()->executeQuery($query, $params);
+        /* All the learning moments that fulfil the filter criteria
+         */
+        $momentIds = $this->mapper->getDatabase()->executeQuery($query, $params)->fetchColumnArray('id');
 
-
-
-        new \Alaress_Probe($query, $params, $result->fetchAll());
-        die();
-
-        return $this->mapper->findByPredicates($pb)->sortBy('updatedAt', 'DESC');
+        /* Find fully hydrated instances of these moment ids
+         */
+        return $this->mapper->findByColumn('id', $momentIds)->sortBy('updatedAt', 'DESC');
     }
 
 

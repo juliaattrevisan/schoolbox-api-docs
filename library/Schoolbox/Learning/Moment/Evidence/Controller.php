@@ -17,6 +17,7 @@ use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Comment;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Moment\Evidence\CohortReport\Payload;
 use Schoolbox\Learning\Moment\Evidence\Moderation\ModerationRequired;
@@ -24,7 +25,6 @@ use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Factory;
 use Schoolbox\Learning\Moment\NextRoutes;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\NotFound;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Exception;
@@ -43,7 +43,7 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param Mapper $mapper
+     * @param \Schoolbox\Learning\Moment\Evidence\Mapper $mapper
      * @param Comment\Mapper $commentMapper
      * @param EditorTemplateHelper    $editorTemplateHelper
      * @param \Schoolbox\UserMapper $userMapper
@@ -51,7 +51,7 @@ class Controller extends Base
      * @param \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper
      */
     public function __construct(
-        private Mapper $mapper,
+        private \Schoolbox\Learning\Moment\Evidence\Mapper $mapper,
         private Comment\Mapper $commentMapper,
         private EditorTemplateHelper $editorTemplateHelper,
         private \Schoolbox\UserMapper $userMapper,
@@ -722,7 +722,7 @@ class Controller extends Base
      */
     private function updateState(Model $evidence, string $state): void
     {
-        if (Model::STATUS_DRAFT === $state) {
+        if (Evidence\Model::STATUS_DRAFT === $state) {
             $evidence->draft();
         } elseif (Model::STATUS_SUBMITTED === $state) {
             $evidence->submit($this->getUser());
@@ -742,12 +742,14 @@ class Controller extends Base
      *   - start of the day 7 days ago
      *   - end of today
      *
-     * @param Folder\Model $folder
+     * @param Model $folder
      * @return void
+     * @throws MapperException
+     * @throws NotFound
      */
     public function getCohortReportPayloadDefault(Folder\Model $folder): void
     {
-        (new Payload($this->mapper, $this->userMapper, $this->externalClass,$this->userAccessMapper))->findByFilters(
+        $moments = (new Payload($this->mapper, $this->userMapper, $this->externalClass,$this->userAccessMapper))->findByFilters(
             $folder,
             $this->requestQuery->get('userIds') ?? '',
             $this->requestQuery->get('fromDate') ?? null,
@@ -755,6 +757,16 @@ class Controller extends Base
             $this->requestQuery->get('authorIds') ?? '',
             $this->requestQuery->get('states') ?? '',
         );
+
+        /* Augment with hasComments() evaluation and _links derivations
+         * Sadly these are deeply coupled to Controllers
+         */
+        $payload = $this->convert($moments);
+
+        $this->response = $this->responseAsJson([
+            'status'  => 200,
+            'content' => $payload,
+        ]);
     }
 
 
@@ -813,110 +825,125 @@ class Controller extends Base
                 $this->requestQuery->get('states') ?? null
             );
 
-            foreach ($moments as $moment) {
-                /* Accumulate a list of associated files for this learning moment
-                 * At the moment there's gonna be just one but SA-20433 causes this to be multiple
-                 */
-                $files = [];
 
-                if (null !== $moment->getStorage()) {
-                    $files = [
-                        [
-                            'hash' => $moment->getStorage()->getHash(),
-                            'filename' => $moment->getStorage()->getFilename(),
-                            'mime' => $moment->getStorage()->getMime(),
-                            'icon' => $moment->getStorage()->getMimetype()->getIconFile(),
-                        ],
-                    ];
-                }
-
-                /* This is a stack because empty payloads result in a datatype difference in frontend world:
-                 * empty payloads emerge as [], but non-empty payloads emerge as {}
-                 */
-                $payload[] = [
-                    'id' => $moment->getId(),
-                    'body' => $moment->getBody(),
-                    'files' => $files,
-                    'recipient' => [
-                        'id' => $moment->getRecipient()->getId(),
-                        'externalId' => $moment->getRecipient()->getExternalId(),
-                        'fullname' => $moment->getRecipient()->getFullname(),
-                        'firstname' => $moment->getRecipient()->getFirstname(),
-                        'lastname' => $moment->getRecipient()->getLastname(),
-                        'role' => $moment->getRecipient()->getPreferredTitle()
-                    ],
-                    'creator' => [
-                        'id' => $moment->getCreator()->getId(),
-                        'externalId' => $moment->getCreator()->getExternalId(),
-                        'fullname' => $moment->getCreator()->getFullname(),
-                        'firstname' => $moment->getCreator()->getFirstname(),
-                        'lastname' => $moment->getCreator()->getLastname(),
-                    ],
-                    /* This is always set
-                     */
-                    'createdAt' => [
-                        'timestamp' => $moment->getCreatedAt()->getUnixTimestamp(),
-                        'displayAs' => $moment->getCreatedAt()->getLocalShort()
-                    ],
-                    /* We don't store updatedBy, for whatever reason: I suppose it was presumed
-                     * to always be the same as its author...
-                     *
-                     * Anyway, this is the localised version of config's date_short which you can use
-                     * to group moments per day.
-                     */
-                    'updatedAt' => [
-                        'timestamp' => $moment->getUpdatedAt()->getUnixTimestamp(),
-                        'displayAs' => $moment->getUpdatedAt()->getLocalShort()
-                    ],
-                    /* Whether this moment had comments or not, which affects a user interaction
-                     * where they have an opportunity to delete comments upon approval
-                     */
-                    'hasComments' => $this->hasComments($moment),
-                    // TODO State-specific metadata is currently not needed, but maybe needed later
-                    //
-                    //                    /* Metadata about the current state of a learning moment and any other details
-                    //                     * regarding the current state, such as who actioned a state change etc.
-                    //                     */
-                    //                    'states' => [
-                    //                        'current' => $moment->getCurrentState(),
-                    //                        /* You'll be in one of three alternative states here: submitted/published/rejected
-                    //                         */
-                    //                        'submittedAt' => $moment->getSubmittedAt()?->getDatabase(),
-                    //                        'submittedBy' => $moment->getSubmittedBy() ? [
-                    //                            'id' => $moment->getSubmittedBy()->getId(),
-                    //                            'externalId' => $moment->getSubmittedBy()->getExternalId(),
-                    //                            'fullname' => $moment->getSubmittedBy()->getFullname(),
-                    //                            'firstname' => $moment->getSubmittedBy()->getFirstname(),
-                    //                            'lastname' => $moment->getSubmittedBy()->getLastname(),
-                    //                        ] : null,
-                    //                        'publishAt' => $moment->getPublishedAt()?->getDatabase(),
-                    //                        'publishedBy' => $moment->getPublishedBy() ? [
-                    //                            'id' => $moment->getPublishedBy()->getId(),
-                    //                            'externalId' => $moment->getPublishedBy()->getExternalId(),
-                    //                            'fullname' => $moment->getPublishedBy()->getFullname(),
-                    //                            'firstname' => $moment->getPublishedBy()->getFirstname(),
-                    //                            'lastname' => $moment->getPublishedBy()->getLastname(),
-                    //                        ] : null,
-                    //                        'rejectedAt' => $moment->getRejectedAt()?->getDatabase(),
-                    //                        'rejectedBy' => $moment->getRejectedBy() ? [
-                    //                            'id' => $moment->getRejectedBy()->getId(),
-                    //                            'externalId' => $moment->getRejectedBy()->getExternalId(),
-                    //                            'fullname' => $moment->getRejectedBy()->getFullname(),
-                    //                            'firstname' => $moment->getRejectedBy()->getFirstname(),
-                    //                            'lastname' => $moment->getRejectedBy()->getLastname(),
-                    //                        ] : null
-                    //                    ],
-                    /* A shortcut to urls for changing states in this learning moment
-                     */
-                    '_links' => $this->getNextRoutes($moment),
-                ];
-            }
         }
 
-        $this->response = $this->responseAsJson([
-            'status'  => 200,
-            'content' => $payload,
-        ]);
+
+    }
+
+
+    /**
+     * Convert a fully-hydrated set of $moments into a scalar array that you can nicely
+     * json_encode for snake lord
+     * @param GenericCollection $moments
+     * @return array
+     */
+    private function convert(GenericCollection $moments): array
+    {
+        $payload = [];
+
+        foreach ($moments as $moment) {
+            /* Accumulate a list of associated files for this learning moment
+             * At the moment there's gonna be just one but SA-20433 causes this to be multiple
+             */
+            $files = [];
+
+            if (null !== $moment->getStorage()) {
+                $files = [
+                    [
+                        'hash' => $moment->getStorage()->getHash(),
+                        'filename' => $moment->getStorage()->getFilename(),
+                        'mime' => $moment->getStorage()->getMime(),
+                        'icon' => $moment->getStorage()->getMimetype()->getIconFile(),
+                    ],
+                ];
+            }
+
+            /* This is a stack because empty payloads result in a datatype difference in frontend world:
+             * empty payloads emerge as [], but non-empty payloads emerge as {}
+             */
+            $payload[] = [
+                'id' => $moment->getId(),
+                'body' => $moment->getBody(),
+                'files' => $files,
+                'recipient' => [
+                    'id' => $moment->getRecipient()->getId(),
+                    'externalId' => $moment->getRecipient()->getExternalId(),
+                    'fullname' => $moment->getRecipient()->getFullname(),
+                    'firstname' => $moment->getRecipient()->getFirstname(),
+                    'lastname' => $moment->getRecipient()->getLastname(),
+                    'role' => $moment->getRecipient()->getPreferredTitle()
+                ],
+                'creator' => [
+                    'id' => $moment->getCreator()->getId(),
+                    'externalId' => $moment->getCreator()->getExternalId(),
+                    'fullname' => $moment->getCreator()->getFullname(),
+                    'firstname' => $moment->getCreator()->getFirstname(),
+                    'lastname' => $moment->getCreator()->getLastname(),
+                ],
+                /* This is always set
+                 */
+                'createdAt' => [
+                    'timestamp' => $moment->getCreatedAt()->getUnixTimestamp(),
+                    'displayAs' => $moment->getCreatedAt()->getLocalShort()
+                ],
+                /* We don't store updatedBy, for whatever reason: I suppose it was presumed
+                 * to always be the same as its author...
+                 *
+                 * Anyway, this is the localised version of config's date_short which you can use
+                 * to group moments per day.
+                 */
+                'updatedAt' => [
+                    'timestamp' => $moment->getUpdatedAt()->getUnixTimestamp(),
+                    'displayAs' => $moment->getUpdatedAt()->getLocalShort()
+                ],
+                /* Whether this moment had comments or not, which affects a user interaction
+                 * where they have an opportunity to delete comments upon approval
+                 */
+                'hasComments' => $this->hasComments($moment),
+                // TODO State-specific metadata is currently not needed, but maybe needed later
+                //
+                //                    /* Metadata about the current state of a learning moment and any other details
+                //                     * regarding the current state, such as who actioned a state change etc.
+                //                     */
+                //                    'states' => [
+                //                        'current' => $moment->getCurrentState(),
+                //                        /* You'll be in one of three alternative states here: submitted/published/rejected
+                //                         */
+                //                        'submittedAt' => $moment->getSubmittedAt()?->getDatabase(),
+                //                        'submittedBy' => $moment->getSubmittedBy() ? [
+                //                            'id' => $moment->getSubmittedBy()->getId(),
+                //                            'externalId' => $moment->getSubmittedBy()->getExternalId(),
+                //                            'fullname' => $moment->getSubmittedBy()->getFullname(),
+                //                            'firstname' => $moment->getSubmittedBy()->getFirstname(),
+                //                            'lastname' => $moment->getSubmittedBy()->getLastname(),
+                //                        ] : null,
+                //                        'publishAt' => $moment->getPublishedAt()?->getDatabase(),
+                //                        'publishedBy' => $moment->getPublishedBy() ? [
+                //                            'id' => $moment->getPublishedBy()->getId(),
+                //                            'externalId' => $moment->getPublishedBy()->getExternalId(),
+                //                            'fullname' => $moment->getPublishedBy()->getFullname(),
+                //                            'firstname' => $moment->getPublishedBy()->getFirstname(),
+                //                            'lastname' => $moment->getPublishedBy()->getLastname(),
+                //                        ] : null,
+                //                        'rejectedAt' => $moment->getRejectedAt()?->getDatabase(),
+                //                        'rejectedBy' => $moment->getRejectedBy() ? [
+                //                            'id' => $moment->getRejectedBy()->getId(),
+                //                            'externalId' => $moment->getRejectedBy()->getExternalId(),
+                //                            'fullname' => $moment->getRejectedBy()->getFullname(),
+                //                            'firstname' => $moment->getRejectedBy()->getFirstname(),
+                //                            'lastname' => $moment->getRejectedBy()->getLastname(),
+                //                        ] : null
+                //                    ],
+                /* A shortcut to urls for changing states in this learning moment
+                 * Note that a controller method must fulfil this node after the fact, for aura reasons
+                 * (not easy to dedupe that implementation, sadly)
+                 */
+                '_links' => null,
+            ];
+        }
+
+        return $payload;
     }
 
 
