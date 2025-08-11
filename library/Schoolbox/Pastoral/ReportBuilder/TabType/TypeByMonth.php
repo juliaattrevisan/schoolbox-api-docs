@@ -37,6 +37,19 @@ class TypeByMonth extends Cursor implements TabTypeInterface
         };
     }
 
+    private function getOrderBy(): string
+    {
+        if (strcasecmp($this->sortBy, 'total') === 0) {
+            return "total {$this->order}";
+        }
+
+        if ($this->getMonths()->contains($this->sortBy)) {
+            return "{$this->sortBy} {$this->order}";
+        }
+
+        return "typeName {$this->order}, subtypeName {$this->order}";
+    }
+
     /**
      * @return string
      */
@@ -116,20 +129,29 @@ class TypeByMonth extends Cursor implements TabTypeInterface
         $db = $this->pastoralMapper->getDatabase();
 
         $whereDiscriminator = '';
-        $orderBy = "typeName {$this->order}, subtypeName {$this->order}";
+        $orderBy = $this->getOrderBy();
         if (isset($cursor)) {
             $minValue = Cursor::MIN_SORT_BY_VALUE;
             $sortingOperator = $this->order == Cursor::ORDER_DIRECTION_DEFAULT ? ' > ' : ' < ';
-            $whereDiscriminator = "
+            if ($this->getMonths()->contains($this->sortBy) | strcasecmp($this->sortBy, 'total') === 0) {
+                $whereDiscriminator = "
+                WHERE (
+                  (COALESCE($this->sortBy, {$minValue}) {$sortingOperator} COALESCE(:countDiscriminator, {$minValue})) OR
+                    (COALESCE($this->sortBy, {$minValue}) = COALESCE(:countDiscriminator, {$minValue}) AND typeId {$sortingOperator} :typeId) OR
+                    (COALESCE($this->sortBy, {$minValue}) = COALESCE(:countDiscriminator, {$minValue}) AND typeId = :typeId AND COALESCE(subtypeId, '') {$sortingOperator} COALESCE(:subtypeId, ''))
+                ";
+            } else {
+                $whereDiscriminator  = "
                 WHERE (
                     typeName {$sortingOperator} :type OR
                     (typeName = :type AND COALESCE(subtypeName, '') {$sortingOperator} COALESCE(:subType, '')) OR
                     (typeName = :type AND COALESCE(subtypeName, '') = COALESCE(:subType, '') AND typeId {$sortingOperator} :typeId) OR
                     (typeName = :type AND COALESCE(subtypeName, '') = COALESCE(:subType, '') AND typeId = :typeId AND COALESCE(subtypeId, {$minValue})  {$sortingOperator} COALESCE(:subtypeId, {$minValue}))
             )";
-            $params['type'] = $cursor['type'];
-            $params['subType'] = $cursor['subType'];
-            $params['typeId'] = $cursor['typeId'];
+                $params['type']      = $cursor['type'];
+                $params['subType']   = $cursor['subType'];
+            }
+            $params['typeId']    = $cursor['typeId'];
             $params['subtypeId'] = $cursor['subtypeId'];
         }
         $totalQuery = "
