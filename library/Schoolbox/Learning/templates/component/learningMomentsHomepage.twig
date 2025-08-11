@@ -1,4 +1,9 @@
 {% if user.role.isStudent %}
+    <style>
+        div.share-work-buttons {
+            margin-top: 1rem;
+        }
+    </style>
     <div class="small-12 island">
         <div class="share-work-buttons">
             <a data-action="shareLearningMoment" data-test="learning-moment-evidence-share-takeAPhoto" data-take-photo-button href="{{ baseUrl }}?momentType=photo&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-camera share-photo" title="Take a photo">Take a photo</a>
