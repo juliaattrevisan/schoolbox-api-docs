@@ -742,12 +742,23 @@ class Controller extends Base
      *   - start of the day 7 days ago
      *   - end of today
      *
-     * @param \Schoolbox\Resource\Folder\Model $folder
+     * Also applies any additional filters (expressed as GET params)
+     *
+     * ex. POST the following struct to this endpoint:
+     * [
+     *     userIds: 1,2,3,4
+     *     authorIds: 13,14,15,16
+     *     states:draft,submitted,published,
+     *     from: 2025-01-02
+     *     to: 2025-08-11
+     * ]
+     *
+     * @param Folder\Model $folder
      * @return void
      * @throws MapperException
      * @throws NotFound
      */
-    public function getCohortReportPayloadDefault(Folder\Model $folder): void
+    public function getCohortReportPayload(Folder\Model $folder): void
     {
         $moments = (new Payload($this->mapper, $this->userMapper, $this->externalClass,$this->userAccessMapper))->findByFilters(
             $folder,
@@ -771,70 +782,9 @@ class Controller extends Base
 
 
     /**
-     * Generates a json payload that tells you about learning moments for any of $folder's students
-     * that were created between the $from and $to dates, grouped by date, sorted reverse-chronologically.
-     *
-     * @param Folder\Model $folder
-     * @param string $fromDate
-     * @param string $toDate
-     * @return void
-     */
-    public function getCohortReportPayloadRange(Folder\Model $folder, string $fromDate, string $toDate): void
-    {
-        $this->getCohortReportPayload(
-            $folder,
-            (new \Alaress_Date_Format($fromDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT))->startOfDay(),
-            (new \Alaress_Date_Format($toDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT))->endOfDay()
-        );
-    }
-
-
-    /**
-     * Generates a json payload that tells you about learning moments for any of $folder's students
-     * that were created between the $from and $to dates, grouped by date, sorted reverse-chronologically.
-     *
-     * By default, it'll assume $from and $to to be a 7-day range:
-     *   - start of the day 7 days ago
-     *   - end of today
-     *
-     * @param Folder\Model $folder
-     * @param \Alaress_Date_Format $from
-     * @param \Alaress_Date_Format $to
-     * @return void
-     * @throws MapperException
-     * @throws NotFound
-     * @throws RouteNotFound
-     */
-    public function getCohortReportPayload(Folder\Model $folder, \Alaress_Date_Format $from, \Alaress_Date_Format $to): void
-    {
-        $payload = [];
-
-        if (\count($ids)) {
-            /* Find all the learning moments in the specified date range, along with any user-chosen
-             * filters (all clauses are boolean AND btw)
-             */
-            $moments = $this->mapper->findByFilters(
-                $ids,
-                /* TODO maybe convert these dates to querystring params; they might be optional
-                 */
-                $from,
-                $to,
-                /* Optional author; optional state
-                 */
-                $this->requestQuery->get('authorIds') ?? null,
-                $this->requestQuery->get('states') ?? null
-            );
-
-
-        }
-
-
-    }
-
-
-    /**
      * Convert a fully-hydrated set of $moments into a scalar array that you can nicely
      * json_encode for snake lord
+     *
      * @param GenericCollection $moments
      * @return array
      */

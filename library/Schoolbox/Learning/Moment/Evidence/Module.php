@@ -312,20 +312,12 @@ class Module extends BaseModule
 //            Closure::fromCallable([$this, 'preloadUser']),
 //        );
 
-        /* Learning Moment Cohort Report payload with a date range
+        /* Learning Moment Cohort Report payload with applied filters
          */
         $this->register(
             self::METHOD_GET,
-            '/cohort/{folderId}/payload/{fromDate}/{toDate}',
-            'getCohortReportPayloadRange',
-            $viewCohortReportRule,
-            Closure::fromCallable([$this, 'preloadFolder']),
-        );
-
-        $this->register(
-            self::METHOD_GET,
             '/cohort/{folderId}/payload',
-            'getCohortReportPayloadDefault',
+            'getCohortReportPayload',
             $viewCohortReportRule,
             Closure::fromCallable([$this, 'preloadFolder']),
         );
