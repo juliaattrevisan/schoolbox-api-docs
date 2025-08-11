@@ -42,7 +42,6 @@ use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
 use Alaress\Web\Controller as WebController;
-use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
 use Schoolbox\GenericCollection;

@@ -14,7 +14,6 @@ use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Alaress\Module\Module as BaseModule;
-use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
