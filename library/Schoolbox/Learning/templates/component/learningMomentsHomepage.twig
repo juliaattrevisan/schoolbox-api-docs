@@ -5,6 +5,7 @@
         }
     </style>
     <section>
+        {% set baseUrl = routeLookupIfAuthorized('learningMomentEvidence.getCreateForm') %}
         {% if baseUrl != '' %}
             <div class="share-work-buttons">
                 <a data-action="shareLearningMoment" data-test="learning-moment-evidence-share-takeAPhoto" data-take-photo-button href="{{ baseUrl }}?momentType=photo&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-camera share-photo" title="Take a photo">Take a photo</a>
