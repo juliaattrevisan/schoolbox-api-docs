@@ -15,9 +15,14 @@ use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
-use Schoolbox\GenericCollection;
+use Schoolbox\Filter\Codec;
+use Schoolbox\Filter;
+use Schoolbox\Filter\IFactoryFactory;
 use Schoolbox\Learning\Assessment\Translator\ParticipationPlans;
 use Schoolbox\Learning\Assessment\Translator\Participations;
+use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use LearnositySdk\Utils\Uuid;
 use LogicException;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
@@ -97,6 +102,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param null|string $learnosityConsumerKey
      * @param null|string $learnosityConsumerSecret
      * @param MimetypeMapper|null $mimetypeMapper
+     * @param IFactoryFactory $filterFactoryFactory
+     * @param \Schoolbox\Filter\Mapper $filterMapper
+     * @param Filter\Selection\Mapper $filterSelectionMapper
+     * @param CourseImpl\Mapper $courseImplMapper
+     * @param UnitImpl\Mapper $unitImplMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -1254,5 +1264,56 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 'acceptingResponses' => $assessmentData['acceptingResponses'] ?? false,
             ]
         );
+    }
+
+    /**
+     * @see \Schoolbox\Assessment\Course\Markbook\Controller::convertRequestToFilters
+     * @param CourseSpec\Model $courseSpec
+     * @param array            $request  Indexed by filter.id, option.key
+     * @param bool             $saveToDB Should we persist these selections to the DB ?
+     * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DomainException If this class has not defined what entity it is filtering
+     * @throws \InvalidArgumentException If unable to find the filter mapper class
+     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
+     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
+     */
+    protected function convertRequestToFilters(CourseSpec\Model $courseSpec, array $request, bool $saveToDB): array
+    {
+        $filterMapper = Filter\Mapper::getInstance();
+        $filterSelectionMapper = Filter\Selection\Mapper::getInstance();
+        $filterFactoryFactory = $this->getDi()->get('filters.factoryFactory');
+        $courseImplMapper = CourseImpl\Mapper::getInstance();
+        $unitImplMapper = UnitImpl\Mapper::getInstance();
+
+        $page            = Filter\Page\Model::PAGE_COURSE_MARK_BOOK;
+        $codec           = new Codec($filterMapper, $filterSelectionMapper);
+
+        // Convert Request to Selection models
+        $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
+        if ($saveToDB) {
+            $filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
+        }
+
+        $filters = $filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
+
+        // Ensure that assessments are:
+        // * not Assessment Specs
+        // * Are inside unitImpls that belong to courseImpls that were imported from the courseSpec
+        $courseImpls = $courseImplMapper->findAllByCourseSpecificationId($courseSpec->getId());
+        if ($courseImpls->count()) {
+            $pb          = $unitImplMapper->getPredicateBuilder()->in('course_implementation_id', $courseImpls->getPropertyValues('id'));
+            $unitImplIds = $unitImplMapper->findIdsByPredicates($pb);
+        } else {
+            $unitImplIds = [];
+        }
+        $filters = array_merge($filters, [
+            Filter\Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
+            Filter\Filters\Assessment\NullableContext\UnitImpl\Definition::class => array_combine($unitImplIds, $unitImplIds),
+        ]);
+
+        return [$filters, $codec, $selectionsPerFilter];
     }
 }

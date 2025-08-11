@@ -15,6 +15,7 @@ use Schoolbox\Assessment\Course\Task\Completion as TaskCompletion;
 use Schoolbox\Cyberhound\Url\Translator;
 use Schoolbox\Error;
 use Schoolbox\Error\Mapper;
+use Schoolbox\Filter;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
@@ -27,6 +28,7 @@ use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseDataS
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Preview\Factory as PreviewFactory;
 use Schoolbox\Learning\Assessment\Transactor;
@@ -132,6 +134,41 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment): void
     {
+        $assessments = [];
+        if ($assessment->isSpecification()) {
+            // This report may take a while
+            $this->extendExecutionTime();
+
+//            /**
+//             * we are assuming the links to this page have been appended with
+//             * 'queryArgs'               => $codec->convertSelectionsToQueryString($selectionsPerFilter),
+//             */
+            /** @var CourseSpec\Model $courseSpec */
+            $courseSpec = $assessment->getBaseContext()->getCourse();
+            $queryArgs = $this->requestQuery->getArrayCopy();
+            [$filters,] = $this->convertRequestToFilters($courseSpec, $queryArgs, false);
+            /** @var Filter\Filters\Assessment\IdFinder  $assessmentIdFinder */
+            $assessmentIdFinder = $this->getDi()->get('filters.assessmentIdFinder');
+            $assessmentIds  = $assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
+
+            // Fetch assessments
+            $assessments = $this->getAssessmentMapper()->findAllByIds($assessmentIds);
+//            $assessments = $this->getAssessmentMapper()->findAllImplementationsBySpecificationId($assessment->getId());
+            // filter to only the assessment we are looking for
+            $assessmentSpec = $assessment;
+            $assessments = $assessments->filter(static function (IAssessable $assessment) use ($assessmentSpec) {
+                return $assessment->getSpecificationAssessment()?->getId() === $assessmentSpec->getId();
+            });
+
+            // sort the assessments in a standard order (class page name naturally) which appears to be the same as the main markbook screen
+            $assessments = $assessments->sortByCallback(function (IAssessable $a, IAssessable $b) {
+                return strnatcasecmp($a->getBaseContext()->getFolder()->getTitle(), $b->getBaseContext()->getFolder()->getTitle());
+            });
+
+            // hydrate participants
+            $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, null, true);
+        }
+
         // Ensure completions are sorted most recent first
         foreach ($assessment->getAllParticipants() as $participant) {
             $participant->getAllResponses()->sortByCallback(static function (Assessment\IResponse $responseA, Assessment\IResponse $responseB) {
@@ -146,6 +183,12 @@ class Controller extends Assessment\Controller
             $aImpls[$assessment->getId()] = [
                 'assessment' => $assessment,
             ];
+        } else {
+            foreach ($assessments as $assessmentImpl) {
+                $aImpls[$assessmentImpl->getId()] = [
+                    'assessment' => $assessmentImpl,
+                ];
+            }
         }
 
         $twigData = [
