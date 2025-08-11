@@ -15,15 +15,24 @@ $codeception_data_folder = './test/codeception/_data/';
 $codeception_testdata_path = $codeception_data_folder . 'SmokeTests/GetSmokeTestDataList.csv';
 $codeception_temptestdata_path = $codeception_data_folder . 'SmokeTests/newGetSmokeTestDataList.csv';
 
-$url_pages_csv = array_map('str_getcsv', file($codeception_data_folder . 'SmokeTests/GetSmokeTestUrlList.csv'));
-$persona_csv = array_map('str_getcsv', file($codeception_data_folder . 'SmokeTests/GetSmokeTestPersonaList.csv'));
+$url_pages_csv = array_map(
+    fn ($line) => str_getcsv($line, escape: ''),
+    file($codeception_data_folder . 'SmokeTests/GetSmokeTestUrlList.csv'),
+);
+$persona_csv = array_map(
+    fn ($line) => str_getcsv($line, escape: ''),
+    file($codeception_data_folder . 'SmokeTests/GetSmokeTestPersonaList.csv'),
+);
 
 $directory = $codeception_data_folder . 'SmokeTests/temp';
 if (! is_dir($directory) && ! mkdir($directory) && ! is_dir($directory)) {
     throw new \RuntimeException(sprintf('Directory "%s" was not created', $directory));
 }
 if (file_exists($codeception_testdata_path)) {
-    $old_fetchdata_file = array_map('str_getcsv', file($codeception_testdata_path));
+    $old_fetchdata_file = array_map(
+        fn ($line) => str_getcsv($line, escape: ''),
+        file($codeception_testdata_path),
+    );
 } else {
     $old_fetchdata_file = null;
 }

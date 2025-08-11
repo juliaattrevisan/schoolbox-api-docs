@@ -60,7 +60,7 @@ class UsermediaController extends AbstractController
     protected function isRecordable(string $mimeFilter): bool
     {
         $recordable = false;
-        $csv = str_getcsv($mimeFilter);
+        $csv = str_getcsv($mimeFilter, escape: '');
         foreach ($csv as $mime) {
             $tmp = explode('/', $mime);
             if (in_array($tmp[0], array("video","audio","*",""))) {
