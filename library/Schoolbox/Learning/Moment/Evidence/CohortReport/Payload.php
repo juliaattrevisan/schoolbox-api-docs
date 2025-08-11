@@ -22,14 +22,23 @@ class Payload
 
 
     /**
-     * Find a set of learning moments according to optional filters chosen:
+     * Find a set of learning moments for the cohort of users
      *
-     *   - where the recipients are in $userIds,
+     *     Cohort of Users def.
+     *       A set of user ids in a particular folder (either as a class folder and/or group)
+     *       This is the "cohort of users" (members of a particular folder) which can be further
+     *       reduced by intersecting $userIds, a set of users chosen by the Filters ui
+     *
+     * ...according to optional filters chosen:
+     *
+     *   - where the filtered recipients $userIds is a subset of $cohortIds,
      *   - where updated between a date range specified by [$fromDate, $toDate],
      *   - where moments were authored by $authorId
      *   - where moments are currently in the  state $state
      *
      * These should be considered boolean AND between these clauses.
+     *
+     * @param array $cohortIds
      *
      * @param string|null $userIds
      * @param string|null $fromDate
@@ -39,6 +48,7 @@ class Payload
      * @return GenericCollection
      */
     public function findByFilters(
+        array $cohortIds,
         ?string $userIds,
         ?string $fromDate,
         ?string $toDate,
@@ -58,12 +68,16 @@ class Payload
         $userIds = explode(',', $userIds);
 
         if ($userIds && \count($userIds)) {
-            $placeholders = Builder::getArrayPlaceholders($userIds, 'userIds');
-            $params = array_merge($params, Builder::getArrayParameters($userIds, 'userIds'));
+            $intersectingUsers = array_intersect($cohortIds, $userIds);
 
-            $query .= "
-                AND user_id IN {$placeholders}
-            ";
+            if (\count($intersectingUsers)) {
+                $placeholders = Builder::getArrayPlaceholders($intersectingUsers, 'intersectingUserIds');
+                $params = array_merge($params, Builder::getArrayParameters($intersectingUsers, 'intersectingUserIds'));
+
+                $query .= "
+                    AND user_id IN {$placeholders}
+                ";
+            }
         }
 
         /* Filter to a set of authors, if specified

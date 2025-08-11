@@ -747,7 +747,49 @@ class Controller extends Base
      */
     public function getCohortReportPayloadDefault(Folder\Model $folder): void
     {
+        $groupIds = [];
+        $classIds = [];
+
+        /* Get a list of student ids that are in $folder and use a hash lookup
+         * to cross reference everything we find later
+         */
+        if ($folder->isGroup()) {
+            $userAccessList = $this->userAccessMapper->findForFolder($folder)
+                ->indexByCallback(static function (UserAccess $userAccess) {
+                    return $userAccess->getUser()->getId();
+                });
+
+            if ($userAccessList->count()) {
+                $groupIds = $this->userMapper->findByColumn('id', $userAccessList->keys())
+                    ->filter(function (\Schoolbox\User $user) {
+                        return ($user->getRole()->isStudent());
+                    })
+                    ->indexBy('id')
+                    ->keys();
+            }
+        }
+
+        /* Students of a class-coded folder
+         */
+        if ('' !== $folder->getCodeString()) {
+            $students = array_column($this->externalClass->getStudents($folder->getCodeString()), 'synergy_id');
+
+            /* These are the user instances associated with $folder's class list of students
+             * We'll use this to interset with learning moments $recipients
+             */
+            if (\count($students)) {
+                $classIds = $this->userMapper->findByExternalIds($students, \Schoolbox\Role::STUDENT)
+                    ->indexBy('id')
+                    ->keys();
+            }
+        }
+
+        /* Combine stacks
+         */
+        $cohortIds = array_values(array_unique(array_merge($groupIds, $classIds)));
+
         (new Payload($this->mapper))->findByFilters(
+            $cohortIds,
             $this->requestQuery->get('userIds') ?? null,
             $this->requestQuery->get('fromDate') ?? null,
             $this->requestQuery->get('toDate') ?? null,
@@ -794,47 +836,6 @@ class Controller extends Base
      */
     public function getCohortReportPayload(Folder\Model $folder, \Alaress_Date_Format $from, \Alaress_Date_Format $to): void
     {
-        $groupIds = [];
-        $classIds = [];
-
-        /* Get a list of student ids that are in $folder and use a hash lookup
-         * to cross reference everything we find later
-         */
-        if ($folder->isGroup()) {
-            $userAccessList = $this->userAccessMapper->findForFolder($folder)
-                ->indexByCallback(static function (UserAccess $userAccess) {
-                    return $userAccess->getUser()->getId();
-                });
-
-            if ($userAccessList->count()) {
-                $groupIds = $this->userMapper->findByColumn('id', $userAccessList->keys())
-                    ->filter(function (\Schoolbox\User $user) {
-                        return ($user->getRole()->isStudent());
-                    })
-                    ->indexBy('id')
-                    ->keys();
-            }
-        }
-
-        /* Students of a class-coded folder
-         */
-        if ('' !== $folder->getCodeString()) {
-            $students = array_column($this->externalClass->getStudents($folder->getCodeString()), 'synergy_id');
-
-            /* These are the user instances associated with $folder's class list of students
-             * We'll use this to interset with learning moments $recipients
-             */
-            if (\count($students)) {
-                $classIds = $this->userMapper->findByExternalIds($students, \Schoolbox\Role::STUDENT)
-                    ->indexBy('id')
-                    ->keys();
-            }
-        }
-
-        /* Combine stacks
-         */
-        $ids = array_values(array_unique(array_merge($groupIds, $classIds)));
-
         $payload = [];
 
         if (\count($ids)) {
