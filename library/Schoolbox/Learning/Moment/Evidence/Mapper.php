@@ -351,66 +351,72 @@ class Mapper extends BaseMapper
      *   - authored by $authorId
      *   - and are in the current state $state
      *
-     * @param array $ids
+     * @param array $userIds
      * @param \Alaress_Date_Format $from
      * @param \Alaress_Date_Format $to
-     * @param string|null $authorId
-     * @param string|null $state
+     * @param array|null $authorIds
+     * @param array|null $states
      * @return GenericCollection
      */
     public function findByFilters(
-        array $ids,
+        array $userIds,
         \Alaress_Date_Format $from,
         \Alaress_Date_Format $to,
-        ?string $authorId,
-        ?string $state
+        ?array $authorIds,
+        ?array $states
     ): GenericCollection {
         /* Only care about moments whose recipients are in the set of users associated
          * with $folder: otherwise ignore the learning moment
          */
         $pb = $this->getPredicateBuilder()
-            ->in('user_id', $ids)
+            ->in('user_id', $userIds)
             ->between('updated_at', $from, $to);
 
         /* Optionally use filter settings to minimise the result set;
          */
-        if ($authorId) {
-            $pb = $pb->equals('created_by', $authorId);
+        if (\count($authorIds)) {
+            $pb = $pb->in('created_by', $authorIds);
         }
 
         /* Ensure that the state provided is one of the canonical states we've established
          * so you can't request moments with the status "cat"
          */
-        if (in_array($state, Model::VALID_STATuSES)) {
-            /* Do a deep inspection for the pb, which isn't exactly nice; look at the various
-             * *_by and *_at date fields to determine what state a learning moment is in.
-             * We don't have access to the convenience methods isDraft() isPublished() etc.
-             * for the pub; those require hydrated models. Maybe split this out into something
-             * else later.
-             */
-            if (Model::STATUS_DRAFT === $state) {
-                /* TODO maybe we should have had a draft_at and draft_by columns
-                 *  to shortcut this nonsense, but that's also kind of annoying...
-                 */
-                $pb = $pb
-                    ->isNull('submitted_at')
-                    ->isNull('submitted_by')
-                    ->isNull('published_at')
-                    ->isNull('published_by')
-                    ->isNull('rejected_at')
-                    ->isNull('rejected_by');
-            } elseif (Model::STATUS_SUBMITTED === $state) {
-                $pb = $pb
-                    ->notNull('submitted_at')
-                    ->notNull('submitted_by');
-            } elseif (Model::STATUS_PUBLISHED === $state) {
-                $pb = $pb
-                    ->notNull('published_at')
-                    ->notNull('published_by');
-            } elseif (Model::STATUS_REJECTED === $state) {
-                $pb = $pb
-                    ->notNull('rejected_at')
-                    ->notNull('rejected_by');
+        $validStates = array_intersect($states, Model::VALID_STATuSES);
+
+        /* Do a deep inspection for the pb, which isn't exactly nice; look at the various
+         * *_by and *_at date fields to determine what state a learning moment is in.
+         * We don't have access to the convenience methods isDraft() isPublished() etc.
+         * for the pub; those require hydrated models. Maybe split this out into something
+         * else later.
+         */
+        if (\count($validStates)) {
+            $subpredicate = $this->getPredicateBuilder()->any
+
+            foreach ($validStates as $state) {
+                if (Model::STATUS_DRAFT === $state) {
+                    /* TODO maybe we should have had a draft_at and draft_by columns
+                     *  to shortcut this nonsense, but that's also kind of annoying...
+                     */
+                    $draftPb = $this->getPredicateBuilder()
+                        ->isNull('submitted_at')
+                        ->isNull('submitted_by')
+                        ->isNull('published_at')
+                        ->isNull('published_by')
+                        ->isNull('rejected_at')
+                        ->isNull('rejected_by');
+                } elseif (Model::STATUS_SUBMITTED === $state) {
+                    $submittedPb = $this->getPredicateBuilder()
+                        ->notNull('submitted_at')
+                        ->notNull('submitted_by');
+                } elseif (Model::STATUS_PUBLISHED === $state) {
+                    $publishedPb = $this->getPredicateBuilder()
+                        ->notNull('published_at')
+                        ->notNull('published_by');
+                } elseif (Model::STATUS_REJECTED === $state) {
+                    $rejectedPb = $this->getPredicateBuilder()
+                        ->notNull('rejected_at')
+                        ->notNull('rejected_by');
+                }
             }
         }
 

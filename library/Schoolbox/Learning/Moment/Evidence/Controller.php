@@ -860,8 +860,8 @@ class Controller extends Base
                 $to,
                 /* Optional author; optional state
                  */
-                $this->requestQuery->get('authorId') ?? null,
-                $this->requestQuery->get('state') ?? null
+                $this->requestQuery->get('authorIds') ?? null,
+                $this->requestQuery->get('states') ?? null
             );
 
             foreach ($moments as $moment) {
