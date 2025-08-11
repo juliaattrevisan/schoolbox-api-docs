@@ -147,6 +147,18 @@ class Payload
          *  that isn't necessarily the one whose Cohort Overview you're currently looking at.
          *  If you're in 9ENGA Cohort Overview, you can still see the learning moments that
          *  a student experienced -in some other folder elsewhere-, not just your 9ENGA class.
+         *
+         * Jezwords:
+         *     > There will be 3 places that students can create a learning moment from. Dashboards, the activity feed
+         *     > and any homepage with a component.  As a result, the tagging of a class or group may not occur correctly,
+         *     > and students might also do it wrongly.
+         *     >
+         *     > We therefore want to give a teacher a method to look specifically at things created for a particular
+         *     > class/group, but first and foremost focus on the students belonging to that cohort and make all of the
+         *     > students' learning moments more discoverable.
+         *     >
+         *     > If you're in 3RED Cohort Overview, you can still see the learning moments that
+         *     > a student experienced -in some other folder elsewhere-, not just your 3RED class.
          */
 
         /* TODO Add curriculum node filtering
