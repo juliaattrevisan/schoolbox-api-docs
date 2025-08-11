@@ -87,7 +87,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
 <template>
     <thead class="pr-table-header">
         <tr>
-            <th :colspan="hasSubTitles ? 1 : props.headers.length" class="u-border-right u-sticky-left">
+            <th class="u-border-right u-sticky-left">
                 <div v-if="store.config.pastoralPointEnabled" class="checklist">
                     <ul class="option-list l-flex l-gap-m f-no-margins">
                         <li v-for="(option, index) in props.recordsAndPoints" :key="`option-${index}`">
@@ -114,6 +114,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
                     {{ headerCell.isEmpty ? "" : headerCell.title }}
                 </th>
             </template>
+            <td v-else :colspan="props.headers.length - 2">&nbsp;</td>
         </tr>
         <tr>
             <th

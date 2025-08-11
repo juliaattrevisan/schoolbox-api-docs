@@ -62,9 +62,9 @@ const chartOptions = window.Vue.ref({
 <template>
     <tr>
         <td
-            v-for="header in props.headers"
+            v-for="(header, index) in props.headers"
             :key="header.key"
-            :class="`u-border-right ${header.key === 'user' ? 'u-sticky-left u-sticky-left--row l-pad--0' : ''} ${header.key === 'total' ? 'total-cell' : ''}`"
+            :class="`u-border-right ${index === 0 ? 'u-sticky-left u-sticky-left--row ' : ''} ${header.key === 'user' ? 'l-pad--0' : ''} ${header.key === 'total' ? 'total-cell' : ''}`"
         >
             <template v-if="header.type == TableHeaderType.USER">
                 <div class="l-flex-row l-gap-m">
