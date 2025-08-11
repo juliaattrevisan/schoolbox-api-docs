@@ -85,7 +85,7 @@ window.Vue.watch(
     () => props.selectedTab,
     (newTab) => {
         if (newTab.type === TabType.TABLE) {
-            // endpoint change
+            resetTableLoad();
         }
     },
 );

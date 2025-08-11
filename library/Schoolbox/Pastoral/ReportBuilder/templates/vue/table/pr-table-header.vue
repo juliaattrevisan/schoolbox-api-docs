@@ -117,9 +117,9 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
         </tr>
         <tr>
             <th
-                v-for="header in props.headers"
+                v-for="(header, index) in props.headers"
                 :key="header.key"
-                :class="`u-border-right title-cell ${header.key === 'user' ? 'u-sticky-left user-cell' : ''} ${header.key === 'total' ? 'total-cell' : ''}`"
+                :class="`u-border-right title-cell ${index === 0 ? 'u-sticky-left first-column' : ''} ${header.key === 'total' ? 'total-cell' : ''}`"
             >
                 <button
                     v-if="header.isSortable"
@@ -157,13 +157,14 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
     }
 }
 
-.user-cell {
+.first-column {
     min-width: 250px;
+    width: 250px;
 }
 
 .total-cell {
     background: var(--sbx-pr-table-total-cell-colour);
-    min-width: 100px; // so points/records change doesn't trigger a reflow
+    width: 100px; // so points/records change doesn't trigger a reflow
 }
 
 .title-button {
