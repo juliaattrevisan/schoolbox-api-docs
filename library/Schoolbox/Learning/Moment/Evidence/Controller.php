@@ -18,6 +18,7 @@ use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Moment\Evidence\CohortReport\Payload;
 use Schoolbox\Learning\Moment\Evidence\Moderation\ModerationRequired;
 use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Factory;
 use Schoolbox\Learning\Moment\NextRoutes;
@@ -39,12 +40,6 @@ use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
  */
 class Controller extends Base
 {
-    /**
-     * Cohort Report for learning moments looks seven days in the past by default
-     */
-    private const COHORT_REPORT_PAST_THRESHOLD = -7;
-
-
     /**
      * Constructor
      *
@@ -752,10 +747,12 @@ class Controller extends Base
      */
     public function getCohortReportPayloadDefault(Folder\Model $folder): void
     {
-        $this->getCohortReportPayload(
-            $folder,
-            \Alaress_Date_Format::now()->addDays(self::COHORT_REPORT_PAST_THRESHOLD)->startOfDay(),
-            \Alaress_Date_Format::now()->endOfDay()
+        (new Payload($this->mapper))->findByFilters(
+            $this->requestQuery->get('userIds') ?? null,
+            $this->requestQuery->get('fromDate') ?? null,
+            $this->requestQuery->get('toDate') ?? null,
+            $this->requestQuery->get('authorIds') ?? null,
+            $this->requestQuery->get('states') ?? null,
         );
     }
 
