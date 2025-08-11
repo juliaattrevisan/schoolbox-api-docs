@@ -49,8 +49,8 @@ class Payload
      *
      *   - where the filtered recipients $userIds is a subset of $cohortIds,
      *   - where updated between a date range specified by [$fromDate, $toDate],
-     *   - where moments were authored by $authorId
-     *   - where moments are currently in the  state $state
+     *   - where moments were authored by one of $authorIds
+     *   - where moments are currently in one of the states in $states
      *
      * These should be considered boolean AND between these clauses.
      *
@@ -90,8 +90,6 @@ class Payload
         /* Detect if we needed to filter by Tags
          * This involves a conditional inner join
          */
-        $tagJoin = '';
-
         if ($tagIds) {
             $tagIds = explode(',', $tagIds);
 
@@ -192,11 +190,6 @@ class Payload
          */
 
         /* TODO Add curriculum node filtering
-         */
-
-        /* TODO Add tag filtering
-         *  Could maybe be reductive, or convert to a raw sql for a mega join
-         *  Mega join sounds too dirty for the number of tags that could exist.
          */
 
         /* Filter to a set of states/statuses, if specified

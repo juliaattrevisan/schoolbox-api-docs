@@ -744,10 +744,14 @@ class Controller extends Base
      *
      * Also applies any additional filters (expressed as GET params)
      *
-     * ex. POST the following struct to this endpoint:
+     * ex.
+     * https://vagrant.dev.schoolbox.cloud/learning/evidence/cohort/80/payload?userIds=1,2,3,4&authorIds=13,14,15,16&tagIds=7,8,9&states=draft,submitted,published&from=2025-01-02&to=2025-08-11
+     *
+     * GET the following struct to this endpoint:
      * [
      *     userIds: 1,2,3,4
      *     authorIds: 13,14,15,16
+     *     tagIds: 7,8,9
      *     states:draft,submitted,published,
      *     from: 2025-01-02
      *     to: 2025-08-11
