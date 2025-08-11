@@ -3,6 +3,7 @@
 namespace Schoolbox\Learning\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
@@ -28,7 +29,7 @@ class LearningMomentsController extends Component_Homepage_ControllerAbstract
         }
 
         // Only show if learning moments are enabled.
-        if (!$this->getConfigLoader()->get('learning_moments_enabled')) {
+        if (!$this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED)) {
             return false;
         }
 
