@@ -20,7 +20,9 @@ class LearningMomentsController extends Component_Homepage_ControllerAbstract
         if (!parent::execute()) {
             return false;
         }
-        return $this->getContentPermission() >= UserAccess::ACCESS_WRITE;
+
+        // Parents cannot see the Learning Moments component.
+        return !$this->getUser()->getRole()->isParent();
     }
 
     /**
