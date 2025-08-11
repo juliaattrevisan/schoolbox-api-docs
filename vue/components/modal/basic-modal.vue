@@ -4,16 +4,18 @@
  * for foundation based <reveal-modal /> component
  */
 
-import { useTemplateRef } from "vue";
+import { computed, useTemplateRef } from "vue";
 import { onKeyStroke } from "@vueuse/core";
 import { useFocusTrap } from "@vueuse/integrations/useFocusTrap";
 import { vOnClickOutside } from "@vueuse/components";
 
 interface Props {
     hasBackgroundClick?: boolean; // Whether to close the modal on background click (clicking outside the modal)
+    size?: "m" | "s"; // Size of the modal, 'm' for medium and 's' for small
 }
 const props = defineProps<Props>();
 
+const modalSize = computed(() => props.size || "m"); // Default size is medium
 const modalEl = useTemplateRef<HTMLDivElement | null>("modalEl"); // to get the modal element
 const isOpen = defineModel<boolean>("is-open", { default: false }); // to open/close the modal
 const { activate, deactivate } = useFocusTrap(modalEl); // to keep focus within the modal when open
@@ -66,7 +68,11 @@ function onBackgroundClick(): void {
     <teleport to="body">
         <transition>
             <div v-if="isOpen" ref="modalEl" class="modal">
-                <div v-on-click-outside="onBackgroundClick" class="modal__container">
+                <div
+                    v-on-click-outside="onBackgroundClick"
+                    class="modal__container"
+                    :class="`modal__container--${modalSize}`"
+                >
                     <!-- @slot Reveal modal content goes into this slot -->
                     <div class="modal__container_main"><slot></slot></div>
                     <slot name="footer"></slot>
@@ -103,12 +109,24 @@ function onBackgroundClick(): void {
         top: 100px;
         width: 70%;
     }
+    &__container--m {
+        max-width: 700px;
+    }
+
+    &__container--s {
+        max-width: 500px;
+    }
     /* separate so that the footer can have different padding (i.e. to use component actions) */
     &__container_main {
         padding: var(--spacing-m);
     }
     @media (max-width: 700px) {
         &__container {
+            width: 100%;
+        }
+    }
+    @media (max-width: 520px) {
+        .modal__container--s {
             width: 100%;
         }
     }
