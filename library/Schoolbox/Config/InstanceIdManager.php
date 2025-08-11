@@ -178,7 +178,7 @@ class InstanceIdManager extends CliTool\App
             $this->getLogger()->debug("Renaming '$oldKey' to '$newKey'");
 
             // If a set, we may need to rename the key and the members
-            if ($this->redis->type($oldKey)->getPayload() === 'set') {
+            if ($this->redis->type($oldKey) === 'set') {
                 // Special case, create a new set with modified members
                 $members = $this->redis->smembers($oldKey);
                 foreach ($members as $idx => $member) {

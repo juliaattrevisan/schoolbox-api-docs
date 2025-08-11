@@ -325,12 +325,6 @@ parameters:
 			path: library/Alaress/Probe.php
 
 		-
-			message: '#^Method Alaress\\Redis\\Async\\Client\:\:castEvent\(\) should return Alaress\\Redis\\Async\\Event\\IEvent but returns null\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Alaress/Redis/Async/Client.php
-
-		-
 			message: '#^Call to an undefined method Predis\\ClientInterface\:\:transaction\(\)\.$#'
 			identifier: method.notFound
 			count: 1
