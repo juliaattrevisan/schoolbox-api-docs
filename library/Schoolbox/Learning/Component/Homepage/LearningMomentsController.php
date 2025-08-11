@@ -33,7 +33,7 @@ class LearningMomentsController extends Component_Homepage_ControllerAbstract
         }
 
         // Parents cannot see the Learning Moments component.
-        if (!$this->getUser()->getRole()->isParent()) {
+        if ($this->getUser()->getRole()->isParent()) {
             return false;
         }
 
