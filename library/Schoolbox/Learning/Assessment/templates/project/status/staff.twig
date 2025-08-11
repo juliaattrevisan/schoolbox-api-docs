@@ -140,6 +140,7 @@ Data:
                         {% set hasActions = statusRoute or modifyRoute or deleteRoute %}
                         {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessable.id, assessment: assessable}) %}
                         {% set worksheetClassView = routeLookupIfAuthorized('learningAssessment.getWorksheet', {assessmentId: assessable.id, assessment: assessable}) %}
+                        {% set horizontalMarkingRoute = routeLookupIfAuthorized('learnosity.getHorizontalMarking', {assessment: assessable, assessmentId: assessable.id}) %}
 
                         <li data-assessment="{{ assessable.id }}" data-assessment-title="{{ assessable.title }}">
                             <div{% if hasActions %} class="actions-small-1"{% endif %}>
@@ -196,7 +197,9 @@ Data:
                                         {# Learnosity Quiz has two parts: Modify Quiz and Modify Contents #}
                                         {% if assessable is quiz %}
                                             {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessment: assessable, assessmentId: assessable.id}) %}
-                                            <li><a class="icon-class-list" href="{{ routeLookup('learnosity.getHorizontalMarking', {assessment: assessable, assessmentId: assessable.id}) }}">Review horizontally</a></li>
+                                             {% if horizontalMarkingRoute %}
+                                                <li><a class="icon-class-list" href="{{ horizontalMarkingRoute }}">Review horizontally</a></li>
+                                            {% endif %}
                                             <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" title="Modify this {{ locale.activity }} settings">Modify Settings</a></li>
                                             <li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" title="Modify this {{ locale.activity }} contents">Modify Contents</a></li>
                                         {% else %}
