@@ -25,15 +25,19 @@ sudo apt install -y \
     php8.4-xml \
     php8.4-zip \
     php8.4 \
-    php8.4-dev
+    php8.4-dev \
+    unixodbc-dev
 
 echo "Switching CLI PHP to 8.4"
 sudo update-alternatives --set php /usr/bin/php8.4
 
 echo "Installing ev extension for 8.4"
 yes | sudo pecl install ev
+sudo phpenmod ev
 
-# TODO install SQLSRV PDO driver: requires PECL + headers
+echo "Installing pdo_sqlsrv extension for 8.4"
+yes | sudo pecl install pdo_sqlsrv
+sudo phpenmod pdo_sqlsrv
 
 # TODO update Puppet to install newer Composer, instead of updating here
 echo "Updating Composer to 8.4-compatible version"
