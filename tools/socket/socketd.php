@@ -9,21 +9,18 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Redis;
-use Alaress\Redis\Async;
 use Alaress\WorkerCrew\Pooling\ConfigurationReader;
 use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategyBuilder;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Ratchet\Server\IoServer;
-use Ratchet\Session\Serialize\HandlerInterface;
-use Ratchet\Session\Serialize\PhpHandler;
 use React\EventLoop\LoopInterface;
 use React\Socket\SocketServer;
 use Schoolbox\Application\Daemon;
 use Schoolbox\Application\Daemon\Kernel;
 use Schoolbox\MultiInstance;
 use Schoolbox\Realtime\Pipe\HttpServer;
+use Schoolbox\Realtime\Pipe\PhpSerializeSessionHandler;
 use Schoolbox\Realtime\Pipe\PipeManagerFactory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -64,17 +61,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
 
     $pipeManager = (new PipeManagerFactory(
         $loop,
-        new class implements HandlerInterface {
-            public function serialize(array $data): string
-            {
-                return serialize($data);
-            }
-
-            public function unserialize($raw)
-            {
-                return unserialize($raw);
-            }
-        },
+        new PhpSerializeSessionHandler(),
         $log,
         $instanceRepository,
         $configRepository,
