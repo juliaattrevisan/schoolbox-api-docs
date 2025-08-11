@@ -2,12 +2,13 @@
 
 namespace Schoolbox\Pastoral\ReportBuilder\TabType;
 
+use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
-use Schoolbox\Pastoral\ReportBuilder\Cursor;
+use Schoolbox\Pastoral\ReportBuilder\Base;
 use Schoolbox\Pastoral\SubType\Model as SubType;
 use Schoolbox\Pastoral\Type\Model as Type;
 
-class StudentByType extends Cursor implements TabTypeInterface
+class StudentByType extends Base implements TabTypeInterface, ICursor
 {
     public const COLUMN_KEY_FORMAT = "count_%s_%d";
     public const COLUMN_KEY_REGEX = "/count_(?<type>\w+)_(?<id>\d+)/";
@@ -32,9 +33,9 @@ class StudentByType extends Cursor implements TabTypeInterface
         $this->params[$label] = $label;
 
         return match (strtolower($resultType)) {
-            Cursor::RESULT_TYPE_RECORDS =>
+            self::RESULT_TYPE_RECORDS =>
             "ROUND(COUNT(CASE WHEN distinctRecords.{$typeKey}_id = {$value} THEN 1 END), 2) AS :{$label}",
-            Cursor::RESULT_TYPE_POINTS =>
+            self::RESULT_TYPE_POINTS =>
             "ROUND(SUM(CASE WHEN distinctRecords.{$typeKey}_id = {$value} THEN distinctRecords.points END), 2) AS :{$label}",
             default => throw new \Exception("Unknown result type: '{$resultType}'"),
         };
@@ -204,10 +205,9 @@ class StudentByType extends Cursor implements TabTypeInterface
 
         $orderBy = $this->getOrderBy();
 
-        $minCount = self::MIN_SORT_BY_VALUE;
-
         if (isset($cursor)) {
-            $sortingOperator = $this->order == Cursor::ORDER_DIRECTION_DEFAULT ? ' > ' : ' < ';
+            $minCount = self::MIN_SORT_BY_VALUE;
+            $sortingOperator = $this->order == self::ORDER_DIRECTION_DEFAULT ? ' > ' : ' < ';
             if (key_exists('count', $cursor) && ($this->getTypeSubtypeKey()->contains($this->sortBy) | strcasecmp('total', $this->sortBy) === 0)) {
                 $whereParts = "
                 WHERE (
@@ -289,6 +289,14 @@ class StudentByType extends Cursor implements TabTypeInterface
         );
 
         return $result->rowCount();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function current(Collection $collection): ?string
+    {
+        return null;
     }
 
     public function next(Collection $collection): ?string

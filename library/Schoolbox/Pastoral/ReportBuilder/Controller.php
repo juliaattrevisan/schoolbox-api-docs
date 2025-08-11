@@ -53,6 +53,7 @@ use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Schoolbox\Pastoral\ReportBuilder\Base as Cursor;
 
 class Controller extends Base
 {

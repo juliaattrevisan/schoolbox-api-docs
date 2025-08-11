@@ -4,15 +4,12 @@ namespace Schoolbox\Pastoral\ReportBuilder;
 
 use Alaress\Codec\ICodec;
 use Alaress\Codec\Json\Base64;
-use Schoolbox\API\Cursor\ICursor;
-use Schoolbox\Assessment\Term\Mapper as TermMapper;
-use Schoolbox\Collection;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserMapper;
 use ValueError;
 
-class Cursor implements ICursor
+class Base
 {
     /**
      * Maximum number of results returnable from the cursor at once:
@@ -79,29 +76,5 @@ class Cursor implements ICursor
         ) {
             $this->order = self::ORDER_DIRECTION_DEFAULT;
         }
-    }
-
-    public function next(Collection $collection): ?string
-    {
-        // TODO: Implement next() method.
-        return null;
-    }
-
-    public function current(Collection $collection): ?string
-    {
-        // TODO: Implement current() method.
-        return null;
-    }
-
-    public function retrieveResultCount(): ?int
-    {
-        // TODO: Implement retrieveResultCount() method.
-        return null;
-    }
-
-    public function retrieveResults(?string $encodedCursor): Collection
-    {
-        // TODO: Implement retrieveResults() method.
-        return new Collection();
     }
 }

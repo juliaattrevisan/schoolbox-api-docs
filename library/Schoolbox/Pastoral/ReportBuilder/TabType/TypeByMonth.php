@@ -2,10 +2,11 @@
 
 namespace Schoolbox\Pastoral\ReportBuilder\TabType;
 
+use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
-use Schoolbox\Pastoral\ReportBuilder\Cursor;
+use Schoolbox\Pastoral\ReportBuilder\Base;
 
-class TypeByMonth extends Cursor implements TabTypeInterface
+class TypeByMonth extends Base implements TabTypeInterface, ICursor
 {
     private $params = [];
     private $months = [];
@@ -29,9 +30,9 @@ class TypeByMonth extends Cursor implements TabTypeInterface
     {
         $this->params[$label] = $label;
         return match (strtolower($resultType)) {
-            Cursor::RESULT_TYPE_RECORDS =>
+            self::RESULT_TYPE_RECORDS =>
             "ROUND(COUNT(CASE WHEN monthData.month = '{$label}' THEN 1 END), 2) AS :{$label}",
-            Cursor::RESULT_TYPE_POINTS =>
+            self::RESULT_TYPE_POINTS =>
             "ROUND(SUM(CASE WHEN monthData.month = '{$label}' THEN monthData.points END), 2) AS :{$label}",
             default => throw new \Exception("Unknown result type: '{$resultType}'"),
         };
@@ -131,8 +132,8 @@ class TypeByMonth extends Cursor implements TabTypeInterface
         $whereDiscriminator = '';
         $orderBy = $this->getOrderBy();
         if (isset($cursor)) {
-            $minValue = Cursor::MIN_SORT_BY_VALUE;
-            $sortingOperator = $this->order == Cursor::ORDER_DIRECTION_DEFAULT ? ' > ' : ' < ';
+            $minValue = self::MIN_SORT_BY_VALUE;
+            $sortingOperator = $this->order == self::ORDER_DIRECTION_DEFAULT ? ' > ' : ' < ';
             if ($this->getMonths()->contains($this->sortBy) | strcasecmp($this->sortBy, 'total') === 0) {
                 $whereDiscriminator = "
                 WHERE (
@@ -246,6 +247,14 @@ class TypeByMonth extends Cursor implements TabTypeInterface
         );
         $data = $result->fetch(\PDO::FETCH_ASSOC);
         return new Collection($data);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function current(Collection $collection): ?string
+    {
+        return null;
     }
 
     public function next(Collection $collection): ?string
