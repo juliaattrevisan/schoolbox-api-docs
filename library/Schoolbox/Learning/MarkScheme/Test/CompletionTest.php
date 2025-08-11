@@ -20,8 +20,8 @@ class CompletionTest extends TestCase
     /**
      * @param mixed $normalised
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_normalised')]
-    public function test_getHumanReadable_IncompleteImplicit($normalised)
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNormalised')]
+    public function testGetHumanReadableIncompleteImplicit($normalised)
     {
         $expected = Completion::HUMAN_READABLE_INCOMPLETE;
 
@@ -34,8 +34,8 @@ class CompletionTest extends TestCase
     /**
      * @param mixed $normalised
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_normalised')]
-    public function test_getHumanReadable_IncompleteAsNull($normalised)
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNormalised')]
+    public function testGetHumanReadableIncompleteAsNull($normalised)
     {
         $expected = Completion::HUMAN_READABLE_INCOMPLETE;
 
@@ -48,8 +48,8 @@ class CompletionTest extends TestCase
     /**
      * @param mixed $normalised
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_normalised')]
-    public function test_getHumanReadable_studentMarkedResponseIncomplete($normalised)
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNormalised')]
+    public function testGetHumanReadableStudentMarkedResponseIncomplete($normalised)
     {
         $response = $this->getSelfAssessedResponseMarkedAsIncomplete();
         $markScheme = new Completion();
@@ -63,8 +63,8 @@ class CompletionTest extends TestCase
     /**
      * @param mixed $normalised
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_normalised')]
-    public function test_getHumanReadable_studentMarkedResponseComplete($normalised)
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNormalised')]
+    public function testGetHumanReadableStudentMarkedResponseComplete($normalised)
     {
         $response = $this->getSelfAssessedResponseMarkedAsComplete();
         $markScheme = new Completion();
@@ -80,8 +80,8 @@ class CompletionTest extends TestCase
      * @param mixed $normalised
      * @throws \InvalidArgumentException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_normalised')]
-    public function test_getHumanReadable_teacherMarkedResponseIncomplete($normalised)
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNormalised')]
+    public function testGetHumanReadableTeacherMarkedResponseIncomplete($normalised)
     {
         $response = $this->getTeacherAssessedResponseMarkedAsIncomplete();
         $markScheme = new Completion();
@@ -97,8 +97,8 @@ class CompletionTest extends TestCase
      * @param mixed $normalised
      * @throws \InvalidArgumentException
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_normalised')]
-    public function test_getHumanReadable_teacherMarkedResponseComplete($normalised)
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerNormalised')]
+    public function testGetHumanReadableTeacherMarkedResponseComplete($normalised)
     {
         $response = $this->getTeacherAssessedResponseMarkedAsComplete();
         $markScheme = new Completion();
@@ -112,8 +112,8 @@ class CompletionTest extends TestCase
     /**
      * @param mixed $humanReadable
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_humanReadable_noResponse')]
-    public function test_getNormalised_noResponse($humanReadable)
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerHumanReadableNoResponse')]
+    public function testGetNormalised_noResponse($humanReadable)
     {
         $expected = null;
         $markScheme = new Completion();
@@ -125,8 +125,8 @@ class CompletionTest extends TestCase
      * @param mixed             $humanReadable
      * @param TaskResponse|null $response
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('provider_humanReadable_withResponse')]
-    public function test_getNormalised_withResponse($humanReadable, ?TaskResponse $response = null)
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerHumanReadableWithResponse')]
+    public function testGetNormalisedWithResponse($humanReadable, ?TaskResponse $response = null)
     {
         if ($response && $response->isMarkedComplete()) {
             $expected = Completion::NORMALISED_MARK_MAX;
@@ -146,7 +146,7 @@ class CompletionTest extends TestCase
     /**
      * @return int[][]
      */
-    public static function provider_normalised_valid(): array
+    public static function providerNormalisedValid(): array
     {
         return [
             [0],
@@ -162,7 +162,7 @@ class CompletionTest extends TestCase
     /**
      * @return mixed[][]
      */
-    public static function provider_normalised_invalid(): array
+    public static function providerNormalisedInvalid(): array
     {
         return [
             [null],
@@ -178,15 +178,15 @@ class CompletionTest extends TestCase
     /**
      * @return mixed[][]
      */
-    public static function provider_normalised(): array
+    public static function providerNormalised(): array
     {
-        return array_merge(self::provider_normalised_valid(), self::provider_normalised_invalid());
+        return array_merge(self::providerNormalisedValid(), self::providerNormalisedInvalid());
     }
 
     /**
      * @return string[][]
      */
-    public static function provider_humanReadable_valid(): array
+    public static function providerHumanReadableValid(): array
     {
         return [
             [Completion::HUMAN_READABLE_INCOMPLETE],
@@ -198,7 +198,7 @@ class CompletionTest extends TestCase
     /**
      * @return mixed[][]
      */
-    public static function provider_humanReadable_invalid(): array
+    public static function providerHumanReadableInvalid(): array
     {
         return [
             [null],
@@ -211,9 +211,9 @@ class CompletionTest extends TestCase
     /**
      * @return mixed[][]
      */
-    public static function provider_humanReadable_noResponse(): array
+    public static function providerHumanReadableNoResponse(): array
     {
-        return array_merge(self::provider_humanReadable_valid(), self::provider_humanReadable_invalid());
+        return array_merge(self::providerHumanReadableValid(), self::providerHumanReadableInvalid());
     }
 
 
@@ -221,9 +221,9 @@ class CompletionTest extends TestCase
      * @return array
      * @throws \InvalidArgumentException
      */
-    public static function provider_humanReadable_withResponse(): array
+    public static function providerHumanReadableWithResponse(): array
     {
-        $humanReadableValues = array_merge(self::provider_humanReadable_valid(), self::provider_humanReadable_invalid());
+        $humanReadableValues = array_merge(self::providerHumanReadableValid(), self::providerHumanReadableInvalid());
         $responses = [
             null,
             self::getSelfAssessedResponseMarkedAsIncomplete(),
