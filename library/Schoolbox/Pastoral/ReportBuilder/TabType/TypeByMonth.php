@@ -298,16 +298,17 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
                 'totalRow' => $totalRow,
                 'rows' => $records->map(
                     function (array $record) {
-                        $typeName    = $record['typeName'];
-                        $subtypeName = $record['subtypeName'];
-                        unset($record['typeName'], $record['subtypeName'], $record['typeId'], $record['subtypeId']);
                         $row['type_subtype'] = [
-                            'type' => $typeName,
-                            'subtype' => $subtypeName,
-                            'trend' => [
-                                'line' => array_values($record),
-                                'tooltips' => array_map(fn(string $key) => ucwords(str_replace('_', ' ', $key)), array_keys($record)),
-                            ]
+                            'type' => $record['typeName'],
+                            'subtype' => $record['subtypeName'],
+                            'typeId' => $record['typeId'],
+                            'subtypeId' => $record['subtypeId'],
+
+                        ];
+                        unset($record['typeName'], $record['subtypeName'], $record['typeId'], $record['subtypeId']);
+                        $row['type_subtype']['trend'] = [
+                            'line' => array_values($record),
+                            'tooltips' => array_map(fn(string $key) => ucwords(str_replace('_', ' ', $key)), array_keys($record)),
                         ];
                         return array_merge($row, array_map(fn($value) => [$this->resultType => $value], $record));
                     }

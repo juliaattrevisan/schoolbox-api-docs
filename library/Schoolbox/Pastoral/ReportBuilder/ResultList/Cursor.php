@@ -11,6 +11,7 @@ use Schoolbox\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\ReportBuilder\Factory;
 use Schoolbox\Pastoral\ReportBuilder\Helper;
 use Schoolbox\Pastoral\ReportBuilder\TabType\StudentByType;
+use Schoolbox\Pastoral\ReportBuilder\TabType\TypeByMonth;
 use Schoolbox\Pastoral\SubType\Model as SubType;
 use Schoolbox\Pastoral\Type\Model as Type;
 use ValueError;
@@ -40,7 +41,7 @@ class Cursor implements ICursor
         private PastoralMapper $pastoralMapper,
         private string $tabType,
         private ?string $columnKey,
-        private ?string $rowKey = null,
+        private ?array $rowKey = null,
         private ?int $limit = self::LIMIT_DEFAULT,
         private ?ICodec $codec = null,
     ) {
@@ -58,6 +59,10 @@ class Cursor implements ICursor
             if ($this->limit < self::LIMIT_MIN) {
                 throw new ValueError(sprintf('Limit must be at least %d: %d provided', self::LIMIT_MIN, $this->limit));
             }
+        }
+
+        if (null === $this->rowKey) {
+            throw new ValueError('Row key is required');
         }
         $this->init();
     }
@@ -125,8 +130,9 @@ class Cursor implements ICursor
     {
         $where = $param = [];
         if (null !== $this->rowKey) {
-            $where[] = "p.student_id = :student_id";
-            $param['student_id'] = $this->rowKey;
+            [$rowWhere, $rowParam] = $this->getRowKeyByTabType();
+            $where = array_merge($where, $rowWhere);
+            $param = array_merge($param, $rowParam);
         }
 
         if (null !== $this->columnKey && 'total' !== $this->columnKey) {
@@ -224,12 +230,38 @@ class Cursor implements ICursor
     /**
      * @return array
      */
+    private function getRowKeyByTabType(): array
+    {
+        $query = $param = [];
+        switch ($this->tabType) {
+            case Factory::STUDENT_BY_TYPE:
+                $query[] = "p.student_id = :student_id";
+                $param['student_id'] = $this->rowKey['student_id'];
+                break;
+            case Factory::TYPE_BY_MONTH:
+                $query[] = "p.type_id = :type_id AND COALESCE(p.subtype_id, '') = COALESCE(:subtype_id, '')";
+                $param['type_id'] = $this->rowKey['type']['type_id'];
+                $param['subtype_id'] = $this->rowKey['type']['subtype_id'];
+                break;
+            default:
+                throw new ValueError(sprintf('Unknown tab type: %s', $this->tabType));
+        }
+
+        return [$query, $param];
+    }
+
+    /**
+     * @return array
+     */
     private function getColumnKeyByTabType(): array
     {
         $matches = [];
         switch ($this->tabType) {
             case Factory::STUDENT_BY_TYPE:
                 preg_match(StudentByType::COLUMN_KEY_REGEX, $this->columnKey, $matches);
+                break;
+            case Factory::TYPE_BY_MONTH:
+                preg_match(TypeByMonth::COLUMN_KEY_REGEX, $this->columnKey, $matches);
                 break;
             default:
                 throw new ValueError(sprintf('Unknown tab type: %s', $this->tabType));
