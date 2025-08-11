@@ -71,11 +71,9 @@ class Client
         /** @phpstan-ignore-next-line method.notFound - psubscribe does exist */
         $promise = Promise\all(array_map($this->client->psubscribe(...), $patterns));
         $this->client->on('pmessage', function (string $messagePattern, string $messageChannel, string $payload) use ($patterns, $listener) {
-            foreach ($patterns as $pattern) {
-                if (fnmatch($pattern, $messagePattern)) {
-                    $event = new PMessage($payload, $messageChannel, $messagePattern);
-                    $listener->handle($event);
-                }
+            if (in_array($messagePattern, $patterns)) {
+                $event = new PMessage($payload, $messageChannel, $messagePattern);
+                $listener->handle($event);
             }
         });
         return $promise;
