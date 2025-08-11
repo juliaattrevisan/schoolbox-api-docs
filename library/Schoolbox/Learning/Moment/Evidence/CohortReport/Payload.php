@@ -5,7 +5,7 @@ namespace Schoolbox\Learning\Moment\Evidence\CohortReport;
 use Alaress\Database\Predicate\Builder;
 use DebugBar\DebugBarException;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Moment\Evidence\Mapper;
+use Schoolbox\Learning\Moment\Evidence;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccess;
@@ -24,13 +24,13 @@ class Payload
     /**
      * Constructor
      *
-     * @param Mapper $mapper
+     * @param Evidence\Mapper $mapper
      * @param UserMapper $userMapper
      * @param \External_Class $externalClass
      * @param UserAccessMapper $userAccessMapper
      */
     public function __construct(
-        private \Schoolbox\Learning\Moment\Evidence\Mapper $mapper,
+        private Evidence\Mapper $mapper,
         private \Schoolbox\UserMapper $userMapper,
         private \External_Class $externalClass,
         private \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper,
@@ -155,58 +155,79 @@ class Payload
         /* TODO Add tag filtering
          */
 
+        /* Filter to a set of states/statuses, if specified
+         */
+        $states = explode(',', $states);
 
+        if (\count($states)) {
+            /* Ensure that the state provided is one of the canonical states we've established
+             * so you can't request moments with the status "cat"
+             */
+            $validStates = array_intersect($states, Evidence\Model::VALID_STATuSES);
+
+            /* Do a deep inspection for the pb, which isn't exactly nice; look at the various
+             * *_by and *_at date fields to determine what state a learning moment is in.
+             * We don't have access to the convenience methods isDraft() isPublished() etc.
+             * for the pub; those require hydrated models. Maybe split this out into something
+             * else later.
+             */
+            if (\count($validStates)) {
+                $stateQueryPieces = [];
+
+                foreach ($validStates as $state) {
+                    if (Evidence\Model::STATUS_DRAFT === $state) {
+                        /* TODO maybe we should have had a draft_at and draft_by columns
+                         *  to shortcut this nonsense, but that's also kind of annoying...
+                         */
+                        $stateQueryPieces[] = '(
+                            submitted_at IS NULL
+                            AND submitted_by IS NULL
+                            AND published_at IS NULL
+                            AND published_by IS NULL
+                            AND rejected_at IS NULL
+                            AND rejected_by IS NULL
+                        )';
+                    } elseif (Evidence\Model::STATUS_SUBMITTED === $state) {
+                        $stateQueryPieces[] = '(
+                            submitted_at IS NOT NULL
+                            AND submitted_by IS NOT NULL
+                            AND published_at IS NULL
+                            AND published_by IS NULL
+                            AND rejected_at IS NULL
+                            AND rejected_by IS NULL
+                        )';
+                    } elseif (Evidence\Model::STATUS_PUBLISHED === $state) {
+                        $stateQueryPieces[] = '(
+                            submitted_at IS NULL
+                            AND submitted_by IS NULL
+                            AND published_at IS NOT NULL
+                            AND published_by IS NOT NULL
+                            AND rejected_at IS NULL
+                            AND rejected_by IS NULL
+                        )';
+                    } elseif (Evidence\Model::STATUS_REJECTED === $state) {
+                        $stateQueryPieces[] = '(
+                            submitted_at IS NULL
+                            AND submitted_by IS NULL
+                            AND published_at IS NULL
+                            AND published_by IS NULL
+                            AND rejected_at IS NOT NULL
+                            AND rejected_by IS NOT NULL
+                        )';
+                    }
+                }
+
+                $stateQuery = implode(' OR ', $stateQueryPieces);
+
+                $query .= "AND ({$stateQuery})";
+            }
+        }
 
 
 
         new \Alaress_Probe($query, $params);
         die();
 
-//
-//        /* Optionally use filter settings to minimise the result set;
-//         */
-        //
-        //        /* Ensure that the state provided is one of the canonical states we've established
-        //         * so you can't request moments with the status "cat"
-        //         */
-        //        $validStates = array_intersect($states, Model::VALID_STATuSES);
-        //
-        //        /* Do a deep inspection for the pb, which isn't exactly nice; look at the various
-        //         * *_by and *_at date fields to determine what state a learning moment is in.
-        //         * We don't have access to the convenience methods isDraft() isPublished() etc.
-        //         * for the pub; those require hydrated models. Maybe split this out into something
-        //         * else later.
-        //         */
-        //        if (\count($validStates)) {
-        //            $subpredicate = $this->getPredicateBuilder()->any
-        //
-        //            foreach ($validStates as $state) {
-        //                if (Model::STATUS_DRAFT === $state) {
-        //                    /* TODO maybe we should have had a draft_at and draft_by columns
-        //                     *  to shortcut this nonsense, but that's also kind of annoying...
-        //                     */
-        //                    $draftPb = $this->getPredicateBuilder()
-        //                        ->isNull('submitted_at')
-        //                        ->isNull('submitted_by')
-        //                        ->isNull('published_at')
-        //                        ->isNull('published_by')
-        //                        ->isNull('rejected_at')
-        //                        ->isNull('rejected_by');
-        //                } elseif (Model::STATUS_SUBMITTED === $state) {
-        //                    $submittedPb = $this->getPredicateBuilder()
-        //                        ->notNull('submitted_at')
-        //                        ->notNull('submitted_by');
-        //                } elseif (Model::STATUS_PUBLISHED === $state) {
-        //                    $publishedPb = $this->getPredicateBuilder()
-        //                        ->notNull('published_at')
-        //                        ->notNull('published_by');
-        //                } elseif (Model::STATUS_REJECTED === $state) {
-        //                    $rejectedPb = $this->getPredicateBuilder()
-        //                        ->notNull('rejected_at')
-        //                        ->notNull('rejected_by');
-        //                }
-        //            }
-        //        }
 
         die();
 

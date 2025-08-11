@@ -749,11 +749,11 @@ class Controller extends Base
     {
         (new Payload($this->mapper, $this->userMapper, $this->externalClass,$this->userAccessMapper))->findByFilters(
             $folder,
-            $this->requestQuery->get('userIds') ?? null,
+            $this->requestQuery->get('userIds') ?? '',
             $this->requestQuery->get('fromDate') ?? null,
             $this->requestQuery->get('toDate') ?? null,
-            $this->requestQuery->get('authorIds') ?? null,
-            $this->requestQuery->get('states') ?? null,
+            $this->requestQuery->get('authorIds') ?? '',
+            $this->requestQuery->get('states') ?? '',
         );
     }
 
