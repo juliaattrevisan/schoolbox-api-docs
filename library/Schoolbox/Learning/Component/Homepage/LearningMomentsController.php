@@ -4,19 +4,12 @@ namespace Schoolbox\Learning\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Permission\Access\UserAccess;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
 
 class LearningMomentsController extends Component_Homepage_ControllerAbstract
 {
-    /**
-     * Does the user have access to this component?
-     * @var bool
-     */
-    private bool $readOnly;
-
     /**
      * Business logic to collate data ready for output
      *
@@ -37,8 +30,6 @@ class LearningMomentsController extends Component_Homepage_ControllerAbstract
         if ($this->getUser()->getRole()->isParent()) {
             return false;
         }
-
-        $this->readOnly = $this->getContentPermission() < UserAccess::ACCESS_WRITE;
 
         return true;
     }
@@ -61,7 +52,6 @@ class LearningMomentsController extends Component_Homepage_ControllerAbstract
                 'user' => $this->getUser(),
                 'baseUrl' => '/learning/evidence/user/' . $this->getUser()->getId() . '/create',
                 'component' => $this,
-                'readOnly' => $this->readOnly,
                 'folder' => $this->getSource(),
             ]
         );
