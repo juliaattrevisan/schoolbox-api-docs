@@ -856,7 +856,7 @@ class Controller extends Base
              */
             $pb = $this->mapper->getPredicateBuilder()
                 ->between('updated_at', $from, $to)
-                ->in('recipient_id', $ids);
+                ->in('user_id', $ids);
 
             $moments = $this->mapper->findByPredicates($pb)->sortBy('updatedAt', 'DESC');
 
