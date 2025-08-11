@@ -3,7 +3,15 @@
 namespace Schoolbox\Learning\Moment\Evidence\CohortReport;
 
 use Alaress\Database\Predicate\Builder;
+use DebugBar\DebugBarException;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Moment\Evidence\Mapper;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\Resource\Folder;
+use Schoolbox\UserMapper;
 
 class Payload
 {
@@ -14,9 +22,19 @@ class Payload
 
 
     /**
-     * @param \Schoolbox\Learning\Moment\Evidence\Mapper $mapper
+     * Constructor
+     *
+     * @param Mapper $mapper
+     * @param UserMapper $userMapper
+     * @param \External_Class $externalClass
+     * @param UserAccessMapper $userAccessMapper
      */
-    public function __construct(private \Schoolbox\Learning\Moment\Evidence\Mapper $mapper) {
+    public function __construct(
+        private \Schoolbox\Learning\Moment\Evidence\Mapper $mapper,
+        private \Schoolbox\UserMapper $userMapper,
+        private \External_Class $externalClass,
+        private \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper,
+    ) {
 
     }
 
@@ -38,17 +56,19 @@ class Payload
      *
      * These should be considered boolean AND between these clauses.
      *
-     * @param array $cohortIds
-     *
+     * @param Folder\Model $folder
      * @param string|null $userIds
      * @param string|null $fromDate
      * @param string|null $toDate
      * @param string|null $authorIds
      * @param string|null $states
      * @return GenericCollection
+     * @throws DebugBarException
+     * @throws Exception
+     * @throws NotFound
      */
     public function findByFilters(
-        array $cohortIds,
+        Folder\Model $folder,
         ?string $userIds,
         ?string $fromDate,
         ?string $toDate,
@@ -63,11 +83,12 @@ class Payload
 
         $params = [];
 
-        /* Filter to a set of recipient userIds, if specified
+        /* Filter $cohortIds to a set of recipient userIds, if specified
          */
         $userIds = explode(',', $userIds);
 
         if ($userIds && \count($userIds)) {
+            $cohortIds = $this->findCohortIds($folder);
             $intersectingUsers = array_intersect($cohortIds, $userIds);
 
             if (\count($intersectingUsers)) {
@@ -184,5 +205,62 @@ class Payload
         $curriculumNodeIds = null;
 
         return $this->mapper->findByPredicates($pb)->sortBy('updatedAt', 'DESC');
+    }
+
+
+    /**
+     * Find a set of users who are somehow enrolled in $folder as students,
+     * and/or involved in $folder as group members
+     *
+     * Note that a folder can be both a group and a class-coded folder which derives its
+     * members from the Externals
+     *
+     * @param Model $folder
+     * @return array
+     * @throws Exception
+     * @throws NotFound
+     */
+    private function findCohortIds(\Schoolbox\Resource\Folder\Model $folder): array
+    {
+        $groupIds = [];
+        $classIds = [];
+
+        /* Get a list of student ids that are in $folder and use a hash lookup
+         * to cross reference everything we find later
+         */
+        if ($folder->isGroup()) {
+            $userAccessList = $this->userAccessMapper->findForFolder($folder)
+                ->indexByCallback(static function (UserAccess $userAccess) {
+                    return $userAccess->getUser()->getId();
+                });
+
+            if ($userAccessList->count()) {
+                $groupIds = $this->userMapper->findByColumn('id', $userAccessList->keys())
+                    ->filter(function (\Schoolbox\User $user) {
+                        return ($user->getRole()->isStudent());
+                    })
+                    ->indexBy('id')
+                    ->keys();
+            }
+        }
+
+        /* Students of a class-coded folder
+         */
+        if ('' !== $folder->getCodeString()) {
+            $students = array_column($this->externalClass->getStudents($folder->getCodeString()), 'synergy_id');
+
+            /* These are the user instances associated with $folder's class list of students
+             * We'll use this to interset with learning moments $recipients
+             */
+            if (\count($students)) {
+                $classIds = $this->userMapper->findByExternalIds($students, \Schoolbox\Role::STUDENT)
+                    ->indexBy('id')
+                    ->keys();
+            }
+        }
+
+        /* Combine stacks
+         */
+        return array_values(array_unique(array_merge($groupIds, $classIds)));
     }
 }
