@@ -757,6 +757,7 @@ class Controller extends Base
      *     to: 2025-08-11
      * ]
      *
+     * @api GET /learning/evidence/cohort/{folderId}
      * @param Folder\Model $folder
      * @return void
      * @throws MapperException
