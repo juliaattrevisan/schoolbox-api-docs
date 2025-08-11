@@ -846,15 +846,20 @@ class Controller extends Base
          */
         $ids = array_values(array_unique(array_merge($groupIds, $classIds)));
 
-        /* Find all the learning moments in the specified date range
-         */
         $payload = [];
 
         if (\count($ids)) {
+            /* Find all the learning moments in the specified date range, along with any user-chosen
+             * filters (all clauses are boolean AND btw)
+             */
             $moments = $this->mapper->findByFilters(
                 $ids,
+                /* TODO maybe convert these dates to querystring params; they might be optional
+                 */
                 $from,
                 $to,
+                /* Optional author; optional state
+                 */
                 $this->requestQuery->get('authorId') ?? null,
                 $this->requestQuery->get('state') ?? null
             );
