@@ -66,8 +66,8 @@ class TypeByMonth extends Cursor implements TabTypeInterface
         SELECT
              type.id as typeId,
              subtype.id as subtypeId,
-             type.name as title,
-             subtype.name as subTitle,
+             type.name as typeName,
+             subtype.name as subtypeName,
              {$selectMonthsQuery}
           FROM lu_pastoral_type type
           LEFT JOIN lu_pastoral_subtype subtype ON subtype.pastoral_type_id = type.id
@@ -114,22 +114,21 @@ class TypeByMonth extends Cursor implements TabTypeInterface
         $db = $this->pastoralMapper->getDatabase();
 
         $whereDiscriminator = '';
-        $orderBy = "title {$this->order}, subTitle {$this->order}";
+        $orderBy = "typeName {$this->order}, subtypeName {$this->order}";
         if (isset($cursor)) {
             $minValue = Cursor::MIN_SORT_BY_VALUE;
             $sortingOperator = $this->order == Cursor::ORDER_DIRECTION_DEFAULT ? ' > ' : ' < ';
             $whereDiscriminator = "
                 WHERE (
-                    title {$sortingOperator} :type OR
-                    (title = :type AND COALESCE(subTitle, '') {$sortingOperator} COALESCE(:subType, '')) OR
-                    (title = :type AND COALESCE(subTitle, '') = COALESCE(:subType, '') AND typeId {$sortingOperator} :typeId) OR
-                    (title = :type AND COALESCE(subTitle, '') = COALESCE(:subType, '') AND typeId = :typeId AND COALESCE(subtypeId, {$minValue})  {$sortingOperator} COALESCE(:subtypeId, {$minValue}))
+                    typeName {$sortingOperator} :type OR
+                    (typeName = :type AND COALESCE(subtypeName, '') {$sortingOperator} COALESCE(:subType, '')) OR
+                    (typeName = :type AND COALESCE(subtypeName, '') = COALESCE(:subType, '') AND typeId {$sortingOperator} :typeId) OR
+                    (typeName = :type AND COALESCE(subtypeName, '') = COALESCE(:subType, '') AND typeId = :typeId AND COALESCE(subtypeId, {$minValue})  {$sortingOperator} COALESCE(:subtypeId, {$minValue}))
             )";
             $params['type'] = $cursor['type'];
             $params['subType'] = $cursor['subType'];
             $params['typeId'] = $cursor['typeId'];
             $params['subtypeId'] = $cursor['subtypeId'];
-
         }
         $totalQuery = "
             SELECT withTotal.*
@@ -235,8 +234,8 @@ class TypeByMonth extends Cursor implements TabTypeInterface
         $last = $collection->last();
 
         $discriminator = [
-            'type' => $last['title'],
-            'subType' => $last['subTitle'],
+            'type' => $last['typeName'],
+            'subType' => $last['subtypeName'],
             'typeId' => $last['typeId'],
             'subtypeId' => $last['subtypeId'],
         ];
@@ -260,12 +259,12 @@ class TypeByMonth extends Cursor implements TabTypeInterface
                 'totalRow' => $totalRow,
                 'rows' => $records->map(
                     function (array $record) {
-                        $title    = $record['title'];
-                        $subTitle = $record['subTitle'];
-                        unset($record['title'], $record['subTitle'], $record['typeId'], $record['subtypeId']);
+                        $typeName    = $record['typeName'];
+                        $subtypeName = $record['subtypeName'];
+                        unset($record['typeName'], $record['subtypeName'], $record['typeId'], $record['subtypeId']);
                         $row['type_subtype'] = [
-                            'title' => $title,
-                            'subTitle' => $subTitle,
+                            'type' => $typeName,
+                            'subtype' => $subtypeName,
                         ];
                         return array_merge($row, array_map(fn($value) => [$this->resultType => $value], $record));
                     }
