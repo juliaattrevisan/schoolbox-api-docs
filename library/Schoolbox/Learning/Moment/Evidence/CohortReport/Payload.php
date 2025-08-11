@@ -142,6 +142,21 @@ class Payload
             'to' => $to->getDatabase(),
         ]);
 
+        /* TODO Add "Filter by classes and groups"
+         *  Homepage components allow students to create learning moments from a homepage
+         *  that isn't necessarily the one whose Cohort Overview you're currently looking at.
+         *  If you're in 9ENGA Cohort Overview, you can still see the learning moments that
+         *  a student experienced -in some other folder elsewhere-, not just your 9ENGA class.
+         */
+
+        /* TODO Add curriculum node filtering
+         */
+
+        /* TODO Add tag filtering
+         */
+
+
+
 
 
         new \Alaress_Probe($query, $params);
