@@ -3,7 +3,6 @@
 namespace Schoolbox\Learning\Moment\Evidence\CohortReport;
 
 use Alaress\Database\Predicate\Builder;
-use DebugBar\DebugBarException;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Moment\Evidence;
 use Schoolbox\Mapper\Exception;
@@ -31,11 +30,10 @@ class Payload
      */
     public function __construct(
         private Evidence\Mapper $mapper,
-        private \Schoolbox\UserMapper $userMapper,
+        private UserMapper $userMapper,
         private \External_Class $externalClass,
-        private \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper,
+        private UserAccessMapper $userAccessMapper,
     ) {
-
     }
 
 
@@ -257,18 +255,18 @@ class Payload
      * Note that a folder can be both a group and a class-coded folder which derives its
      * members from the Externals
      *
-     * @param \Schoolbox\Resource\Folder\Model $folder
+     * @param Folder\Model $folder
      * @return array
      * @throws Exception
      * @throws NotFound
      */
-    private function findCohortIds(\Schoolbox\Resource\Folder\Model $folder): array
+    private function findCohortIds(Folder\Model $folder): array
     {
         $groupIds = [];
         $classIds = [];
 
         /* Get a list of student ids that are in $folder and use a hash lookup
-         * to cross reference everything we find later
+         * to cross-reference everything we find later
          */
         if ($folder->isGroup()) {
             $userAccessList = $this->userAccessMapper->findForFolder($folder)
