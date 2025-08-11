@@ -1839,7 +1839,7 @@ class Controller extends Base
         header("Content-Disposition: attachment; filename=\"$filename\"");
 
         $fp = fopen("php://output", 'w');
-        fputcsv($fp, $rowHeadings);
+        fputcsv($fp, $rowHeadings, escape: '');
 
         /**
          * $rowHeadings = [
@@ -1882,7 +1882,7 @@ class Controller extends Base
                 '',
                 $row['id'] ?? 'NULL',
                 $row['textboxBody'] ?? 'NULL',
-            ]);
+            ], escape: '');
         }
 
         // fetch all textboxes with no component from these units
@@ -1943,7 +1943,7 @@ class Controller extends Base
                 '',
                 $row['id'] ?? 'NULL',
                 $row['textboxBody'] ?? 'NULL',
-            ]);
+            ], escape: '');
         }
 
         fclose($fp);
@@ -2052,7 +2052,7 @@ class Controller extends Base
         header("Content-Disposition: attachment; filename=\"$filename\"");
 
         $fp = fopen("php://output", 'w');
-        fputcsv($fp, $rowHeadings);
+        fputcsv($fp, $rowHeadings, escape: '');
 
         /**
          * $rowHeadings = [
@@ -2102,7 +2102,7 @@ class Controller extends Base
                 $curricFilter,
                 null,
                 null,
-            ]);
+            ], escape: '');
         }
 
         $unitPlaceHolder = Builder::getArrayPlaceholders(array_keys($units), 'units');
@@ -2183,7 +2183,7 @@ class Controller extends Base
                 null,
                 'File Count',
                 null,
-            ]);
+            ], escape: '');
         }
 
         fclose($fp);
@@ -2285,7 +2285,7 @@ class Controller extends Base
         header("Content-Disposition: attachment; filename=\"$filename\"");
 
         $fp = fopen("php://output", 'w');
-        fputcsv($fp, $rowHeadings);
+        fputcsv($fp, $rowHeadings, escape: '');
 
         /**
          * $rowHeadings = [
@@ -2317,7 +2317,7 @@ class Controller extends Base
                 $row['assessment.type'] ?? 'NULL',
                 $row['work.type.name'] ?? 'NULL',
                 $row['count'] ?? 'NULL',
-            ]);
+            ], escape: '');
         }
 
         fclose($fp);
@@ -2430,7 +2430,7 @@ class Controller extends Base
         header("Content-Disposition: attachment; filename=\"$filename\"");
 
         $fp = fopen("php://output", 'w');
-        fputcsv($fp, $rowHeadings);
+        fputcsv($fp, $rowHeadings, escape: '');
 
         /**
          * $rowHeadings = [
@@ -2479,7 +2479,7 @@ class Controller extends Base
                 '',
                 $row['id'] ?? 'NULL',
                 $row['textboxBody'] ?? 'NULL',
-            ]);
+            ], escape: '');
         }
 
         // fetch all textboxes not currently housed in a component on the page
@@ -2546,7 +2546,7 @@ class Controller extends Base
                 '',
                 $row['id'] ?? 'NULL',
                 $row['textboxBody'] ?? 'NULL',
-            ]);
+            ], escape: '');
         }
 
         fclose($fp);

@@ -4885,10 +4885,10 @@ class Builder
         ];
 
         $fp = fopen('php://temp', 'w');
-        fputcsv($fp, $headings);
+        fputcsv($fp, $headings, escape: '');
 
         foreach ($this->csvPayload as $row) {
-            fputcsv($fp, $row);
+            fputcsv($fp, $row, escape: '');
         }
 
         rewind($fp);

@@ -158,7 +158,7 @@ class AssessmentAudit
         header("Content-Disposition: attachment; filename=\"$filename\"");
 
         $fp = fopen("php://output", 'w');
-        fputcsv($fp, $rowHeadings);
+        fputcsv($fp, $rowHeadings, escape: '');
 
         /**
          * send csv data to the client
@@ -254,7 +254,7 @@ class AssessmentAudit
                 1 === $row['enable_policy'] ? 'true' : 'false',
                 implode(';', $submissionOptions),
                 $row['parentDeleted']
-            ]);
+            ], escape: '');
         }
 
         //all done, close the file and exit

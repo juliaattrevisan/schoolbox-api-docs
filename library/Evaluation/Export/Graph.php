@@ -392,7 +392,7 @@ class Evaluation_Export_Graph
      */
     public function __outputCSV(&$vals, $key, $filehandler)
     {
-        fputcsv($filehandler, $vals, ',', '"');
+        fputcsv($filehandler, $vals, ',', '"', escape: '');
     }
 
     /* Getters/Setters

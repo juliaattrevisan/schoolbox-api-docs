@@ -180,7 +180,7 @@ array_unshift($output_rows, $output_header);
 // Open the output CSV file and create a CSV writer object
 if (($handle = fopen($output_file, "w")) !== false) {
     foreach ($output_rows as $output_row) {
-        fputcsv($handle, $output_row);
+        fputcsv($handle, $output_row, escape: '');
     }
     fclose($handle);
 }

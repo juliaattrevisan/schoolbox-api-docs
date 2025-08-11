@@ -46,11 +46,11 @@ if (isset($old_fetchdata_file)) {
             if (!array_key_exists($url_entry[2] . $persona[0], $entriesInserted) && ($persona[3] === 'ALL' || $persona[3] === $url_entry[0])) {
                 if (array_key_exists($url_entry[2] . $persona[0], $old_fetchdata_file)) {
                     // If entry exists, copy it and remove it from old list. All left over items will be not created in effect deleting them.
-                    fputcsv($fetchpages_data_file, $old_fetchdata_file[$url_entry[2] . $persona[0]]);
+                    fputcsv($fetchpages_data_file, $old_fetchdata_file[$url_entry[2] . $persona[0]], escape: '');
                     unset($old_fetchdata_file[$url_entry[2] . $persona[0]]);
                 } else {
                     // For each new entry that we have not seen before.
-                    fputcsv($fetchpages_data_file, [$url_entry[0], $url_entry[1], $persona[0], $url_entry[2], 'UNKNOWN']);
+                    fputcsv($fetchpages_data_file, [$url_entry[0], $url_entry[1], $persona[0], $url_entry[2], 'UNKNOWN'], escape: '');
                 }
                 $entriesInserted[$url_entry[2] . $persona[0]] = 0;
             }
@@ -60,7 +60,7 @@ if (isset($old_fetchdata_file)) {
     $deleted_entries_file = fopen($codeception_data_folder . 'SmokeTests/temp/' . date('YmdHis') . '_deletedFetchPagesEntries.csv', 'w');
 
     foreach ($old_fetchdata_file as $old_entry) {
-        fputcsv($deleted_entries_file, $old_entry);
+        fputcsv($deleted_entries_file, $old_entry, escape: '');
     }
 
     fclose($deleted_entries_file);
@@ -69,7 +69,7 @@ if (isset($old_fetchdata_file)) {
 } else {
     foreach ($url_pages_csv as $url_entry) {
         foreach ($persona_csv as $persona) {
-            fputcsv($fetchpages_data_file, [$url_entry[0], $url_entry[1], $persona[0], $url_entry[2], 'UNKNOWN']);
+            fputcsv($fetchpages_data_file, [$url_entry[0], $url_entry[1], $persona[0], $url_entry[2], 'UNKNOWN'], escape: '');
         }
     }
 }

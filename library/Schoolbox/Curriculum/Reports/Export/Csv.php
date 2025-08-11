@@ -100,8 +100,8 @@ class Csv
                 $subheaderRows[] = 'Course Total';
             }
         }
-        fputcsv($fp, $headerRows);
-        fputcsv($fp, $subheaderRows);
+        fputcsv($fp, $headerRows, escape: '');
+        fputcsv($fp, $subheaderRows, escape: '');
     }
 
     /**
@@ -186,7 +186,7 @@ class Csv
         // Calculate the total usage count
         $totalCount = array_sum($courseCount);
         $row = array_merge([$curriculumName, $totalCount], $row);
-        fputcsv($fp, $row);
+        fputcsv($fp, $row, escape: '');
 
         // And output usage for child nodes
         foreach ($usage['children'] ?? [] as $childNode) {

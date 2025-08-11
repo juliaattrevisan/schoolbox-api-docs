@@ -79,7 +79,7 @@ class AbstractCSV
      */
     protected function exportRow(array $rowHeadings, array $rowData): void
     {
-        fputcsv($this->fp, array_merge($rowHeadings, $rowData));
+        fputcsv($this->fp, array_merge($rowHeadings, $rowData), escape: '');
     }
 
 
