@@ -12,7 +12,6 @@
 
 class Component_Config_Description extends Component_Config_Abstract
 {
-
     /**
      * Parse out this config option
      *

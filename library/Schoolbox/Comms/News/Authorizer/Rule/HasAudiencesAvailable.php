@@ -21,7 +21,6 @@ use Schoolbox\Comms\News\Audience\Segment\ISimpleStrategy;
  */
 class HasAudiencesAvailable implements IAuthorizationRule
 {
-
     /** @var GenericCollection|ISimpleStrategy[] */
     private $simpleStrategies;
 

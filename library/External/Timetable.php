@@ -19,7 +19,6 @@ use Schoolbox\Config\Loader;
  */
 class External_Timetable extends CachingConnectorAbstract implements External_TimetableInterface
 {
-
     /**
      * Constructor
      *

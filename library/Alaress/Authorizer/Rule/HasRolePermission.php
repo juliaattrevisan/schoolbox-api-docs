@@ -16,7 +16,6 @@ use Alaress\Authorizer\Failure\Unauthorized;
 
 class HasRolePermission extends All
 {
-
     /**
      * The permission to check against.
      */

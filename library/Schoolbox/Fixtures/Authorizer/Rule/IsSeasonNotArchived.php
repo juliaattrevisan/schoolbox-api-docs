@@ -20,7 +20,6 @@ use Schoolbox\User;
  */
 class IsSeasonNotArchived implements IAuthorizationRule
 {
-
     /**
      * @param array     $params
      * @param User|null $user

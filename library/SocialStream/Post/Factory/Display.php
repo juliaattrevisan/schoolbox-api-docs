@@ -15,7 +15,6 @@ namespace SocialStream\Post\Factory;
  */
 class Display extends AbstractFactory
 {
-
     /**
      * The type of SocialStream Post to manufacture
      * one of ["image", "string", "url", "video"]

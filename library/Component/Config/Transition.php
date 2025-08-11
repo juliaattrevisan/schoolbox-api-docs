@@ -2,7 +2,6 @@
 
 class Component_Config_Transition extends Component_Config_Abstract
 {
-
     protected $options       = array('swipe', 'fade', 'flip', 'cube', 'creative');
     protected $showAllOption = true;
 

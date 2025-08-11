@@ -15,7 +15,6 @@ use InvalidArgumentException;
 
 class IsSafeExamBrowserRequired extends AbstractAssessableRule
 {
-
     /**
      * Check assessment requires SEB in order to be visible
      *

@@ -8,7 +8,6 @@
  */
 class Component_Config_Src extends Component_Config_Abstract
 {
-
     /**
      * Strips /homepage/ prefix from $value if it's there.
      *

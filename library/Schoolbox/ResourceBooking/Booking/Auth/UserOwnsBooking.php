@@ -18,7 +18,6 @@ use Schoolbox\ResourceBooking\Booking\Mapper;
 
 class UserOwnsBooking implements Rule\IAuthorizationRule
 {
-
     /**
      * @var Mapper
      */

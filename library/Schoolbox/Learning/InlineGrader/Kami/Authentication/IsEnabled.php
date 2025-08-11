@@ -17,7 +17,6 @@ use Schoolbox\User;
 
 class IsEnabled implements IAuthorizationRule
 {
-
     /** @var Kami\IConnector */
     private $kamiConnector;
 

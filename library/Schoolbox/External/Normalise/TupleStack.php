@@ -20,7 +20,6 @@ namespace Schoolbox\External\Normalise;
  */
 class TupleStack
 {
-
     /**
      * Take an array of values and do some preprocessing on them
      * Returns a stack of unique, trimmed and non-empty data

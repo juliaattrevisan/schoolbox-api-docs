@@ -27,7 +27,6 @@ use function implode;
  */
 class TreeBuilder
 {
-
     /** @var Folder\Mapper */
     private $folderMapper;
 

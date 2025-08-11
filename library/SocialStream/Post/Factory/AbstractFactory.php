@@ -12,7 +12,6 @@ namespace SocialStream\Post\Factory;
 
 abstract class AbstractFactory
 {
-
     /**
      * The submitted url
      *

@@ -15,7 +15,6 @@ namespace Schoolbox\Test;
  */
 class TestMapper extends AbstractTestMapper
 {
-
     /**
      * @var MapperTest
      */

@@ -15,7 +15,6 @@ use Alaress\Authorizer\Failure\Unauthorized;
 
 class HasRole extends All
 {
-
     /**
      * The role to check against.
      *

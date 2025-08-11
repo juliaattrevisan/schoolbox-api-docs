@@ -15,7 +15,6 @@ use Schoolbox\Comms\News\Audience\Segment\IStrategy;
 
 class Composite implements IStrategy
 {
-
     /**
      * @inheritdoc
      */

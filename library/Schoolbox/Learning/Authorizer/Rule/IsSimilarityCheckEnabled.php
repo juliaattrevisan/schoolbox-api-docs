@@ -21,7 +21,6 @@ use InvalidArgumentException;
  */
 class IsSimilarityCheckEnabled extends AbstractAssessableRule
 {
-
     /**
      * Determine whether Similarity Check was activated for the given $assessment
      *

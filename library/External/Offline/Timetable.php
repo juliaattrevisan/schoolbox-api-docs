@@ -14,7 +14,6 @@ use Schoolbox\Campus;
  */
 class External_Offline_Timetable implements External_TimetableInterface, IOfflineConnector
 {
-
     /**
      * @inheritDoc
      */

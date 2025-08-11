@@ -16,7 +16,6 @@ use Schoolbox\User;
  */
 interface IStrategy
 {
-
     /**
      * Returns this implementation's entityType
      *

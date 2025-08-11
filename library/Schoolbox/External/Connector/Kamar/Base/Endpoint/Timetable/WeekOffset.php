@@ -25,7 +25,6 @@ use Schoolbox\Mapper\Exception;
  */
 class WeekOffset
 {
-
     /**
      * @var TimetableCycleMapper
      */

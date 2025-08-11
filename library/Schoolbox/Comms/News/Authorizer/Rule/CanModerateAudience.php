@@ -24,7 +24,6 @@ use Schoolbox\Comms\News\Exceptions\UnknownEntityTypeException;
  */
 class CanModerateAudience extends ArticleAttribute
 {
-
     /** @var StrategyFactory */
     private $strategyFactory;
 

@@ -11,7 +11,6 @@ namespace Schoolbox\Learning\Assessment;
 
 interface IType
 {
-
     /**
      * Return an array of strings that represent the
      * enumeration this Type factory supports

@@ -38,7 +38,6 @@ use function spl_object_hash;
  */
 class ObjectTree
 {
-
     // Where 1,2,3 are object hashes, and el1, el2, el3 are the object instances
     private $nodes           = [];    // [1 => el1, 2 => el2, 3 => el3]
     private $rootNodes       = [];    // [1 => el1]

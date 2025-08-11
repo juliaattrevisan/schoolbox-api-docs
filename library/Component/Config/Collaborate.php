@@ -12,7 +12,6 @@
 
 class Component_Config_Collaborate extends Component_Config_Abstract
 {
-
     /**
      * Parse out config options
      *

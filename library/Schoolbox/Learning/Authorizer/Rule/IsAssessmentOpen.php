@@ -14,7 +14,6 @@ use Schoolbox\Error;
 
 class IsAssessmentOpen extends AbstractParticipationRule
 {
-
     /**
      * @inheritdoc
      * @throws \InvalidArgumentException If unable to locate an Assessment instance in $params

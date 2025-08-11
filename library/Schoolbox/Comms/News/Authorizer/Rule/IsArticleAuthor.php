@@ -18,7 +18,6 @@ use UnexpectedValueException;
  */
 class IsArticleAuthor extends ArticleAttribute
 {
-
     /**
      * Checks whether a user is the author of the article in $params
      *

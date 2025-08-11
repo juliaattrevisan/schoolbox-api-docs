@@ -9,7 +9,6 @@
  */
 class Component_Config_Time extends Component_Config_Abstract
 {
-
     /**
      * Coerce value to H:i:s format before inserting into database
      *

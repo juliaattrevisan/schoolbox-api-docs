@@ -21,7 +21,6 @@ use Schoolbox\User;
  */
 class IsConfigSetTo implements IAuthorizationRule
 {
-
     /**
      * The array key in $params that contains the config name.
      *

@@ -17,7 +17,6 @@ use Schoolbox\User;
 
 class IsLoggedIn implements IAuthorizationRule
 {
-
     /**
      * @param array     $params
      * @param User|null $user

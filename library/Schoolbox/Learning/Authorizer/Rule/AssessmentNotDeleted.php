@@ -21,7 +21,6 @@ use InvalidArgumentException;
  */
 class AssessmentNotDeleted extends AbstractAssessableRule
 {
-
     /**
      * Ensures the assessment is not soft-deleted
      *

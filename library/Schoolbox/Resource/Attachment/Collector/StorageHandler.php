@@ -14,7 +14,6 @@ use Schoolbox\Resource\File;
 
 class StorageHandler implements TypeHandlerInterface
 {
-
     /** @var Storage\Mapper */
     protected $mapper;
 

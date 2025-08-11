@@ -7,7 +7,6 @@
  */
 class Component_Config_ItemLayout extends Component_Config_Abstract
 {
-
     /**
      * Layout consts corresponding to itemLayout.php component config options
      */

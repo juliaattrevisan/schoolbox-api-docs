@@ -26,7 +26,6 @@ use Throwable;
  */
 class InvalidTransitionException extends DomainException
 {
-
     /**
      * @var int
      * @see Model::STATE_* constants

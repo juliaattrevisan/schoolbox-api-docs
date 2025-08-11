@@ -28,7 +28,6 @@ use Schoolbox\Role;
  */
 class Interactions
 {
-
     /**
      * Number of days in this period
      */

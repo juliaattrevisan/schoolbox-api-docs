@@ -10,7 +10,6 @@
 
 interface External_UserDetentionInterface extends External\IConnector
 {
-
     /**
      * Retrieves a user's awards.
      *

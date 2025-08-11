@@ -17,7 +17,6 @@ use Schoolbox\User;
 
 class IsModerationEnabled implements IAuthorizationRule
 {
-
     /** @var IConfigLoader */
     private $config;
 

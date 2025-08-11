@@ -15,7 +15,6 @@ use UnexpectedValueException;
 
 class PayloadBrokenException extends UnexpectedValueException implements IBrokerException
 {
-
     /** @var Resolver */
     private $resolver;
 

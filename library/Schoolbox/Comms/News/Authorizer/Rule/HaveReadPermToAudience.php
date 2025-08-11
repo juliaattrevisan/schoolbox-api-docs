@@ -25,7 +25,6 @@ use UnexpectedValueException;
  */
 class HaveReadPermToAudience extends ArticleAttribute
 {
-
     /**
      * @var StrategyFactory
      */

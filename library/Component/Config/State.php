@@ -8,7 +8,6 @@
  */
 class Component_Config_State extends Component_Config_Abstract
 {
-
     public function parse(SitePage $page, $key, $keyblock, $configValue, ?Component_ControllerAbstract $component = null)
     {
         // Anything other than "active" gets set to "inactive" directly

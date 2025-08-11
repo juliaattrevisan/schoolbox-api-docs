@@ -17,7 +17,6 @@ use function count;
  */
 class Permutations
 {
-
     /**
      * Generates and returns all permutations of an array.
      *

@@ -25,7 +25,6 @@ use InvalidArgumentException;
  */
 class CanPreview extends AbstractParticipationRule
 {
-
     /**
      * @var Access
      */

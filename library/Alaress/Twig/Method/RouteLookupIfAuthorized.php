@@ -13,7 +13,6 @@ use Schoolbox\User;
 
 class RouteLookupIfAuthorized
 {
-
     /** @var RouteLookup */
     protected $routeLookup;
 

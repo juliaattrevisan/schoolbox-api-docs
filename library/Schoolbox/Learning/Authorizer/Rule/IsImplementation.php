@@ -17,7 +17,6 @@ use InvalidArgumentException;
 
 class IsImplementation extends AbstractAssessableRule
 {
-
     /**
      * Check assessment is not a specification
      *

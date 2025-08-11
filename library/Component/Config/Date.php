@@ -8,7 +8,6 @@
  */
 class Component_Config_Date extends Component_Config_Abstract
 {
-
     /**
      * Coerce value to Y-m-d format before inserting into database.
      *

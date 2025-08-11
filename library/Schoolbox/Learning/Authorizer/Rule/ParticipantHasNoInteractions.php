@@ -17,7 +17,6 @@ use InvalidArgumentException;
  */
 class ParticipantHasNoInteractions extends AbstractParticipationRule
 {
-
     /**
      * Only allow if participant has no submitted responses and no published feedback
      *

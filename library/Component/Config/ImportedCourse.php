@@ -9,7 +9,6 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplement
 
 class Component_Config_ImportedCourse extends Component_Config_Abstract
 {
-
     /**
      * Parse
      *

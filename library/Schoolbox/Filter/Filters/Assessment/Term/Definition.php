@@ -28,7 +28,6 @@ use function array_merge;
  */
 abstract class Definition extends Filter\AbstractDefinition
 {
-
     const KEY_ALL = 'all';        // All terms
     const KEY_FUTURE = 'future';     // All terms in future
     const KEY_CURRENT = 'current';    // current term

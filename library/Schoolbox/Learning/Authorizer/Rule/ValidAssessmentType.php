@@ -18,7 +18,6 @@ use UnexpectedValueException;
 
 class ValidAssessmentType extends AbstractAssessableRule
 {
-
     /** @var string[] */
     private $validTypes;
 

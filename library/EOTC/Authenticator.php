@@ -16,7 +16,6 @@ use Schoolbox\User;
 
 class Authenticator
 {
-
     /**
      * @var EventPermissionMapper
      */

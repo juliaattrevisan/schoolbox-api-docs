@@ -7,7 +7,6 @@
  */
 class Component_Config_ShowHistorical extends Component_Config_Abstract
 {
-
     /**
      * Parse out config options
      *

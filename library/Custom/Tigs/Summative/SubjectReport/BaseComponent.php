@@ -24,7 +24,6 @@ use Schoolbox\User;
  */
 class BaseComponent
 {
-
     /** @var StudentAttributes */
     private $attributes;
 

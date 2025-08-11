@@ -15,7 +15,6 @@ use Schoolbox\Resource\Storage;
 
 class FileSystemHandler implements TypeHandlerInterface
 {
-
     /** @var File\ILocator */
     protected $locator;
 

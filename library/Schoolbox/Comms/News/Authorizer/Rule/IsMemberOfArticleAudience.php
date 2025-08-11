@@ -20,7 +20,6 @@ use UnexpectedValueException;
  */
 class IsMemberOfArticleAudience extends ArticleAttribute
 {
-
     /** @var IUserResolver */
     private $userResolver;
 

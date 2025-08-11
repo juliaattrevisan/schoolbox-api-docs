@@ -10,7 +10,6 @@ use External\IOfflineConnector;
 
 class External_Offline_Class implements External_ClassInterface, IOfflineConnector
 {
-
     /**
      * @inheritdoc
      */

@@ -18,7 +18,6 @@ namespace Schoolbox\Learning\Assessment;
  */
 trait TypeTrait
 {
-
     /**
      * Return as a regex string, optionally mutated by an array_map function
      *

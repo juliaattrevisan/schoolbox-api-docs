@@ -14,7 +14,6 @@ use Schoolbox\User;
 
 class Callback implements IAuthorizationRule
 {
-
     /**
      * @var callable
      */

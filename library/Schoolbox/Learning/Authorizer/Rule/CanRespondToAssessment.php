@@ -15,7 +15,6 @@ use InvalidArgumentException;
 
 class CanRespondToAssessment extends AbstractParticipationRule
 {
-
     /**
      * @var Access
      */

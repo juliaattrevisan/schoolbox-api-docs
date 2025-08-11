@@ -10,7 +10,6 @@
 
 class Component_Config_CommentsAllowed extends Component_Config_Abstract
 {
-
     /**
      * Parse out config options
      *

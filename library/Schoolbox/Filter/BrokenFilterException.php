@@ -20,7 +20,6 @@ use DomainException;
  */
 class BrokenFilterException extends DomainException
 {
-
     /**
      * The filter that is broken
      *

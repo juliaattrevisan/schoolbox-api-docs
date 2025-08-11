@@ -15,7 +15,6 @@ use Throwable;
 
 class PayloadMissingException extends OutOfBoundsException implements IBrokerException
 {
-
     /** @var Resolver */
     private $resolver;
 

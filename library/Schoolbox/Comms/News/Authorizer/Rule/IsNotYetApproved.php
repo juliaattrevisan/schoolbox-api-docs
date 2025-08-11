@@ -14,7 +14,6 @@ use Schoolbox\User;
 
 class IsNotYetApproved extends ArticleAttribute
 {
-
     /**
      * @param array     $params
      * @param User|null $user

@@ -25,7 +25,6 @@ use function get_class;
  */
 class CachingConnectorAbstract
 {
-
     /**
      * May or may not be online/offline
      *

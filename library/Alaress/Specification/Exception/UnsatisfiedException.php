@@ -21,7 +21,6 @@ use UnexpectedValueException;
  */
 class UnsatisfiedException extends UnexpectedValueException
 {
-
     /**
      * The entity that failed the spec.
      *

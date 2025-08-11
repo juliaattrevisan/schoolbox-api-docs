@@ -18,7 +18,6 @@ use Alaress\Authorizer\Failure\Base;
 
 class Any extends Composite
 {
-
     /**
      * {@inheritdoc}
      */

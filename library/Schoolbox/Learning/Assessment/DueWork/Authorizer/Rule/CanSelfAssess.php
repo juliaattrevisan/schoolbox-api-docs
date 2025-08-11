@@ -33,7 +33,6 @@ use UnexpectedValueException;
  */
 class CanSelfAssess extends AbstractParticipationRule
 {
-
     /**
      * Performs an authorization check.
      *

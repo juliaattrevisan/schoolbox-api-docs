@@ -20,7 +20,6 @@ use Schoolbox\User;
  */
 class IsSchoolboxConnector implements IAuthorizationRule
 {
-
     /**
      * @var IConfigLoader
      */

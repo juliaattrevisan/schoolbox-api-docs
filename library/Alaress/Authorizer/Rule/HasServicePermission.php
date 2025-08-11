@@ -16,7 +16,6 @@ use Alaress\Authorizer\Failure\Forbidden;
 
 class HasServicePermission extends All
 {
-
     /**
      * A value of Schoolbox\Permission\Access\UserAccess::SERVICE_*
      *

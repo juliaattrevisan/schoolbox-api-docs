@@ -15,7 +15,6 @@ use Schoolbox\User;
 
 class Authorizer extends PathMatcher
 {
-
     /**
      * @var User
      */

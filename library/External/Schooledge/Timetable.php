@@ -16,7 +16,6 @@ use Schoolbox\UserMapper;
  */
 class External_Schooledge_Timetable implements External_TimetableInterface
 {
-
     /**
      * Timetable date type constant - this date is not in the sequence.
      *

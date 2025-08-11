@@ -22,7 +22,6 @@ use InvalidArgumentException;
  */
 class IsInstructor extends AbstractParticipationRule
 {
-
     /**
      * @var Access
      */

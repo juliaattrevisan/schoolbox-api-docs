@@ -15,7 +15,6 @@ use UnexpectedValueException;
 
 class IsPublishedOrExpired extends ArticleAttribute
 {
-
     /**
      * @param array     $params
      * @param User|null $user

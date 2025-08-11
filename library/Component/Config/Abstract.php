@@ -11,7 +11,6 @@ use Schoolbox\Resource\Folder\Model as Folder;
 
 abstract class Component_Config_Abstract
 {
-
     /**
      * Where this Config's Component resides
      *

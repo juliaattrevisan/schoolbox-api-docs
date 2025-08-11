@@ -7,7 +7,6 @@
  */
 class Component_Config_Align extends Component_Config_Abstract
 {
-
     public function parse(
         SitePage $page,
         $key,

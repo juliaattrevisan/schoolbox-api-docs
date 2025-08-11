@@ -30,7 +30,6 @@ use Schoolbox\Mapper\Exception\InsufficientHydrationException;
  */
 class CanSendToAudience extends ArticleAttribute
 {
-
     /** @var StrategyFactory */
     private $strategyFactory;
 
