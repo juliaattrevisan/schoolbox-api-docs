@@ -52,7 +52,7 @@ class LearningMomentsController extends Component_Homepage_ControllerAbstract
                 'learningMomentEvidence.getCreateForm',
                 ['userIds' => $this->getUser()->getId()]
             );
-        } catch (ContainerExceptionInterface|RouteNotFound) {
+        } catch (ContainerExceptionInterface | RouteNotFound) {
             // The component is useless without the baseUrl, so don't render it.
             return false;
         }
