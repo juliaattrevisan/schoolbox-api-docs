@@ -757,10 +757,11 @@ class Controller extends Base
      * @return void
      * @throws MapperException
      * @throws NotFound
+     * @throws RouteNotFound
      */
     public function getCohortReportPayload(Folder\Model $folder): void
     {
-        $moments = (new Payload($this->mapper, $this->userMapper, $this->externalClass,$this->userAccessMapper))->findByFilters(
+        $moments = (new Payload($this->mapper, $this->userMapper, $this->externalClass, $this->userAccessMapper))->findByFilters(
             $folder,
             $this->requestQuery->get('userIds') ?? '',
             $this->requestQuery->get('fromDate') ?? null,
@@ -787,6 +788,7 @@ class Controller extends Base
      *
      * @param GenericCollection $moments
      * @return array
+     * @throws RouteNotFound
      */
     private function convert(GenericCollection $moments): array
     {
@@ -889,7 +891,7 @@ class Controller extends Base
                  * Note that a controller method must fulfil this node after the fact, for aura reasons
                  * (not easy to dedupe that implementation, sadly)
                  */
-                '_links' => null,
+                '_links' => $this->getNextRoutes($moment),
             ];
         }
 
