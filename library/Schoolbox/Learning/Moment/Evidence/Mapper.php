@@ -356,7 +356,7 @@ class Mapper extends BaseMapper
      * @param \Alaress_Date_Format $to
      * @param string|null $authorId
      * @param string|null $state
-     * @return \Schoolbox\Collection|GenericCollection
+     * @return GenericCollection
      */
     public function findByFilters(
         array $ids,
@@ -364,7 +364,7 @@ class Mapper extends BaseMapper
         \Alaress_Date_Format $to,
         ?string $authorId,
         ?string $state
-    ) {
+    ): GenericCollection {
         /* Only care about moments whose recipients are in the set of users associated
          * with $folder: otherwise ignore the learning moment
          */
