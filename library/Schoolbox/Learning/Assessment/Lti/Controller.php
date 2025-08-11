@@ -201,7 +201,7 @@ class Controller extends Assessment\Controller
             [
                 'type'        => Assessment\AssessmentType::objectToString($assessment),
                 'assessment'  => $assessment,
-                'impls'      => $aImpls,
+                'aImpls'      => $aImpls,
                 'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
                                                    ->add([ $assessment->getTitle(), '' ]),
                 'message'      => strip_tags($this->requestQuery->get('lti_msg', '')),
