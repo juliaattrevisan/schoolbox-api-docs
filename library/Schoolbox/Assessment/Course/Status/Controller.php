@@ -157,6 +157,26 @@ class Controller extends WebController\Base
             'breadcrumbs' => $this->bakery->produceFromAssessment($assessmentSpec, $this->getUser())->add([ $assessmentSpec->getTitle(), '' ]),
         ];
 
+        // class assessment specific data
+        $twigData['aImpls'] = [];
+
+        /** @var Project $assessment */
+        foreach ($assessments as $assessment) {
+            // Calculate summary totals for display purposes
+            $participants = $assessment->getAllParticipants();
+
+            $participantStats = new GenericCollection(Assessment\ParticipantStatistics::class);
+            foreach ($participants as $participant) {
+                $participantStats[$participant->getUser()->getId()] = new Assessment\ParticipantStatistics($participant);
+            }
+
+            $twigData['participantStats'][$assessment->getId()] = $participantStats;
+            $twigData['aImpls'][$assessment->getId()] = [
+                'assessment' => $assessment,
+                'participantStats' => $participantStats,
+            ];
+        }
+
         /** project uses the normal page */
         if ($assessmentSpec instanceof Project) {
             $twigData['baseContext'] = $assessmentSpec->getBaseContext();
@@ -175,26 +195,6 @@ class Controller extends WebController\Base
 
             $twigData['assessmentStats'] = $assessmentStats;
 
-            // class assessment specific data
-            $twigData['aImpls'] = [];
-
-            /** @var Project $assessment */
-            foreach ($assessments as $assessment) {
-                // Calculate summary totals for display purposes
-                $participants = $assessment->getAllParticipants();
-
-                $participantStats = new GenericCollection(Assessment\ParticipantStatistics::class);
-                foreach ($participants as $participant) {
-                    $participantStats[$participant->getUser()->getId()] = new Assessment\ParticipantStatistics($participant);
-                }
-
-                $twigData['participantStats'][$assessment->getId()] = $participantStats;
-                $twigData['aImpls'][$assessment->getId()] = [
-                    'assessment' => $assessment,
-                    'participantStats' => $participantStats,
-                ];
-            }
-
             $template = '@learningAssessment/project/status/staff.twig';
             $this->response = $this->responseFromTemplate(
                 $template,
@@ -209,6 +209,7 @@ class Controller extends WebController\Base
         /** everything else uses a custom page  */
         $twigData['type'] = AssessmentType::objectToString($assessmentSpec);
         $twigData['assessments'] = $assessments;
+        $twigData['assessment'] = $assessmentSpec;
         $twigData['assessmentSpec'] = $assessmentSpec;
         $twigData['courseSpec'] = $courseSpec;
 
@@ -260,7 +261,7 @@ class Controller extends WebController\Base
             $twigData['errorMessage'] = strip_tags($this->requestQuery->get('lti_errormsg', ''));
             $template = '@courseStatus/lti.twig';
         } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Task\Model) {
-            $template = '@courseStatus/task.twig';
+            $template = '@learningAssessment/task/status.twig';
         } elseif ($assessmentSpec instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
             $now = Alaress_Date_Format::now();
 

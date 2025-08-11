@@ -59,10 +59,12 @@
         <ul class="meta">
             {% include '@learning/fragments/meta/dueDate.twig' %}
             {% include '@learning/fragments/meta/workType.twig' %}
-            {{ markVisibilityMeta.markVisibilityMeta(assessment, true) }}
+            {% if not assessment.isSpecification %}
+                {{ markVisibilityMeta.markVisibilityMeta(assessment, true) }}
 
-            {% if readonly ?? false %}
-                <li class="icon-archive">{{ locale.term.proper }} has been archived</li>
+                {% if readonly ?? false %}
+                    <li class="icon-archive">{{ locale.term.proper }} has been archived</li>
+                {% endif %}
             {% endif %}
         </ul>
     </div>
@@ -104,61 +106,93 @@
 
 {% block flashMessage %}{% endblock flashMessage %}
 
-{% set includedParticipants = assessment.allParticipants | filter(participant => not participant.isExcluded) %}
-{% if includedParticipants | length %}
-{% block participantSearchBar %}
-    <div class="row">
-        <div class="small-12 columns">
-            <input type="search" placeholder="Search for a student" data-participant-search>
+{% if aImpls | length %} {# course spec, only show search bar if there are classes that have this assessment #}
+    {% block participantSearchBar %}
+        <div class="row">
+            <div class="small-12 columns">
+                <input type="search" placeholder="Search for a student" data-participant-search>
+            </div>
         </div>
-    </div>
-{% endblock participantSearchBar %}
-<div class="row" data-participant-group>
-    <div class="small-12 island">
-        <div class="empty-state hide" data-empty-filter>
-            <i class="icon-staff-students"></i>
-            <p>
-                No students match the current filters.
-                Add another filter or <a data-filter-show-all>show everything</a>.
-            </p>
-        </div>
-        <section class="content" data-participant-loader>
-            <div class="loader"></div>
-        </section>
-        <section data-assessment-status data-assessment="{{ assessment.id }}" class="hide">
-            <ul class="information-list {{ listClass }}">
-            {% for participant in includedParticipants %}
-
-                {# Construct that represents a participant #}
-                {% set routeArgs = {
-                    viewee: participant.user,
-                    assessmentId: assessment.id,
-                    assessment: assessment,
-                    student: participant.user,
-                    studentId: participant.user.id
-                } %}
-                {% block participant %}{% endblock %}
-            {% endfor %}
-            </ul>
-        </section>
-    </div>
-    {% block participantPaginator %}
-        <div class="small-12 column l-pad-m--top" data-participant-paginator style="display: none">
-            <ul class="pagination">
-            </ul>
-        </div>
-    {% endblock participantPaginator %}
-</div>
-{% else %}
-<div class="row">
-    <div class="small-12 column">
-        <div class="empty-state">
-            <i class="{{ icon.renderClass(assessment) }}"></i>
-            <p>This {{ locale.activity }} has no students participating.</p>
-        </div>
-    </div>
-</div>
+    {% endblock participantSearchBar %}
 {% endif %}
+
+{% for aImpl in aImpls %}
+    <div class="component-container">
+        {% if assessment.isSpecification %}
+        <div class="row">
+            <div class="small-12 columns">
+                <div class="component-titlebar">
+                    <div class="actions-small-1">
+                        <div class="list-item">
+                            <h2>
+                                <a href="/homepage/{{ aImpl.assessment.getBaseContext.getFolder.id }}">
+                                    {{ aImpl.assessment.getBaseContext.getFolder.getTitle }}
+                                </a>
+                            </h2>
+                        </div>
+                        <nav>
+                            <a
+                                    data-collapser="collap-{{ aImpl.assessment.id }}"
+                                    href="#"
+                                    class="icon-up-arrow collapse"
+                                    title="Expand/collapse content"
+                            ></a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% set includedParticipants = aImpl.assessment.allParticipants | filter(participant => not participant.isExcluded) %}
+        {% if includedParticipants | length %}
+            <div class="row" {% if aImpl.assessment.isSpecification %}data-collapse-state="uncollapsed" data-collapsable="collap-{{ aImpl.assessment.id }}" {% endif %} data-participant-group>
+                <div class="small-12 island">
+                    <div class="empty-state hide" data-empty-filter>
+                        <i class="icon-staff-students"></i>
+                        <p>
+                            No students match the current filters.
+                            Add another filter or <a data-filter-show-all>show everything</a>.
+                        </p>
+                    </div>
+                    <section class="content" data-participant-loader data-assessment="{{ aImpl.assessment.id }}">
+                        <div class="loader"></div>
+                    </section>
+                    <section data-assessment-status data-assessment="{{ aImpl.assessment.id }}" class="hide">
+                        <ul class="information-list {{ listClass }}">
+                            {% for participant in includedParticipants %}
+
+                                {# Construct that represents a participant #}
+                                {% set routeArgs = {
+                                    viewee: participant.user,
+                                    assessmentId: aImpl.assessment.id,
+                                    assessment: assessment,
+                                    student: participant.user,
+                                    studentId: participant.user.id
+                                } %}
+                                {% block participant %}{% endblock %}
+                            {% endfor %}
+                        </ul>
+                    </section>
+                </div>
+                {% block participantPaginator %}
+                    <div class="small-12 column l-pad-m--top" data-participant-paginator style="display: none">
+                        <ul class="pagination">
+                        </ul>
+                    </div>
+                {% endblock participantPaginator %}
+            </div>
+        {% else %}
+            <div class="row">
+                <div class="small-12 column">
+                    <div class="empty-state">
+                        <i class="{{ icon.renderClass(assessment) }}"></i>
+                        <p>This {{ locale.activity }} has no students participating.</p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endfor %}
 
 {# Rich text editors / pagination #}
 <script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}'></script>

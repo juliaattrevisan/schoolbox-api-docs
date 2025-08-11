@@ -139,10 +139,20 @@ class Controller extends Assessment\Controller
             });
         }
 
+        $aImpls = [];
+        /* for this endpoint, only show participants if the assessment is not a specification
+         * courseStatus.getStatus exists instead for specs */
+        if (!$assessment->isSpecification()) {
+            $aImpls[$assessment->getId()] = [
+                'assessment' => $assessment,
+            ];
+        }
+
         $twigData = [
             'type'        => Assessment\AssessmentType::objectToString($assessment),
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([ $assessment->getTitle(), '' ]),
             'assessment'  => $assessment,
+            'aImpls'      => $aImpls,
             'writable'    => Access::getInstance()->isInstructor($this->getUser(), $assessment->getContext()->getFolder()),
         ];
 
