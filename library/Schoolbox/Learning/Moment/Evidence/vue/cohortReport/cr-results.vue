@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { useCohortReportStore } from "./store/cohortReportStore";
+import CrResultsGroup from "./cr-results-group.vue";
 
 const crStore = useCohortReportStore();
 
@@ -37,18 +38,12 @@ const resultGroups = window.Vue.computed(() => {
             </section>
         </div>
 
-        <div v-for="(group, index) in resultGroups" :key="index" class="small-12 c-island">
-            <section class="content">
-                <h2 class="l-mar--0-bottom">{{ group.label }}</h2>
-                {{ group.entries }}
-            </section>
-        </div>
-
-        <div class="small-12 c-island">
-            <section class="content">
-                {{ crStore.results }}
-            </section>
-        </div>
+        <cr-results-group
+            v-for="group in resultGroups"
+            :key="group.label"
+            :label="group.label"
+            :entries="group.entries"
+        />
     </div>
 </template>
 
