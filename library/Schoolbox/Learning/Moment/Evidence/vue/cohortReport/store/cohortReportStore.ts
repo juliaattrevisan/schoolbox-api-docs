@@ -6,6 +6,7 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
     let endpoint: string | null = null; // the endpoint to fetch the cohort report data
 
     const results = window.Vue.ref<CohortReportEntry[]>([]);
+    const selectedResults = window.Vue.ref<Record<CohortReportEntry["id"], boolean>>({});
 
     const isLoading = window.Vue.ref(true);
     const loadError = window.Vue.ref<string | null>(null);
@@ -36,12 +37,15 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
      */
     async function init($endpoint: string): Promise<void> {
         endpoint = $endpoint;
+        results.value = [];
+        selectedResults.value = {};
         await loadData();
     }
 
     return {
         init,
         results,
+        selectedResults,
         isLoading,
         loadData,
         loadError,
