@@ -9,8 +9,10 @@ class TypeByMonth extends Cursor implements TabTypeInterface
 {
     private $params = [];
     private $months = [];
-    private const COLUMN_QUERY_MONTH_FORMAT = '%b_%Y';
-    private const COLUMN_DATE_FORMAT = "M_Y";
+    public const COLUMN_QUERY_MONTH_FORMAT = '%b_%Y';
+    public const COLUMN_DATE_FORMAT = "M_Y";
+    public const COLUMN_KEY_REGEX = '/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)_[0-9]{4}$/';
+
 
     private function getMonths(): Collection
     {
@@ -183,6 +185,12 @@ class TypeByMonth extends Cursor implements TabTypeInterface
                 'title' => 'Total',
                 'type' => 'RecordsAndPoints',
                 'isSortable' => true,
+            ],
+            [
+                'key' => 'trend',
+                'title' => 'Trend',
+                'type' => 'Trend',
+                'isSortable' => false,
             ]
         ];
 
@@ -265,6 +273,10 @@ class TypeByMonth extends Cursor implements TabTypeInterface
                         $row['type_subtype'] = [
                             'type' => $typeName,
                             'subtype' => $subtypeName,
+                            'trend' => [
+                                'line' => array_values($record),
+                                'tooltips' => array_map(fn(string $key) => ucwords(str_replace('_', ' ', $key)), array_keys($record)),
+                            ]
                         ];
                         return array_merge($row, array_map(fn($value) => [$this->resultType => $value], $record));
                     }
