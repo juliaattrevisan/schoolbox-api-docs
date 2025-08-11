@@ -14,24 +14,20 @@ INSERT INTO component_config_definition (
     component_definition_id,
     `key`,
     default_value,
-    label,
-    description
+    label
 ) VALUES (
     (SELECT id FROM component_definition WHERE class = 'Schoolbox\\Learning\\Component\\Homepage\\LearningMomentsController'),
     'componentname',
     'Learning Moments',
-    'Heading',
-    null
+    'Heading'
 ), (
     (SELECT id FROM component_definition WHERE class = 'Schoolbox\\Learning\\Component\\Homepage\\LearningMomentsController'),
     'collapse',
     0,
-    'Collapse Content',
-    null
+    'Collapse Content'
 ), (
     (SELECT id FROM component_definition WHERE class = 'Schoolbox\\Learning\\Component\\Homepage\\LearningMomentsController'),
     'showComponentTitle',
     1,
-    'Show Title to Read-Only Users',
-    null
+    'Show Title to Read-Only Users'
 );
