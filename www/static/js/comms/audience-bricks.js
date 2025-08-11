@@ -1195,8 +1195,10 @@ function BrickManager(codec, entityTypeLabelMap) {
         for (var i = 0; i < bricks.length; ++i) {
             var brick = bricks[i];
             if (brick.containsBrick(newBrick)) {
-                selectize.removeItem(key);
-                return false;
+                if (selectize) {
+                    selectize.removeItem(key);
+                    return false;
+                }
             }
             if (brick.canAbsorbBrick(newBrick)) {
                 brickCandidates.push(brick);
