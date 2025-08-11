@@ -134,7 +134,7 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
         if (isset($cursor)) {
             $minValue = self::MIN_SORT_BY_VALUE;
             $sortingOperator = $this->order == self::ORDER_DIRECTION_DEFAULT ? ' > ' : ' < ';
-            if ($this->getMonths()->contains($this->sortBy) | strcasecmp($this->sortBy, 'total') === 0) {
+            if ($this->getMonths()->contains($this->sortBy) || strcasecmp($this->sortBy, 'total') === 0) {
                 $whereDiscriminator = "
                 WHERE (
                   (COALESCE($this->sortBy, {$minValue}) {$sortingOperator} COALESCE(:countDiscriminator, {$minValue})) OR

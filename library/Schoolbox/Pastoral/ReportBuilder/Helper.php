@@ -370,11 +370,17 @@ class Helper
     }
 
     public function getMonthsInRange(
-        Alaress_Date_Format $startDate,
-        Alaress_Date_Format $endDate,
+        ?Alaress_Date_Format $startDate,
+        ?Alaress_Date_Format $endDate,
         string $format,
         int $maxStack
     ): Collection {
+        /* Return empty collection if either date is null.
+         */
+        if (null === $startDate || null === $endDate) {
+            return new Collection();
+        }
+
         $start = (clone $startDate)->startOfMonth();
         $end = (clone $endDate)->startOfMonth();
 
