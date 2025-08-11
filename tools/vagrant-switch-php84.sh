@@ -43,6 +43,8 @@ echo "[SB][`date +%Y-%m-%d\ %X`] Copying 8.2 configuration to 8.4";
 sudo cp /etc/php/8.2/mods-available/* /etc/php/8.4/mods-available/
 sudo cp /etc/php/8.2/fpm/pool.d/* /etc/php/8.4/fpm/pool.d/
 
+# TODO replace session.serialize_handler
+
 echo "[SB][`date +%Y-%m-%d\ %X`] Stopping Puppet and php8.2-fpm, starting php8.4-fpm";
 sudo service puppet stop
 sudo service php8.2-fpm stop
