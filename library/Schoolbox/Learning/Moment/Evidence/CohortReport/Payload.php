@@ -200,7 +200,7 @@ class Payload
             /* Ensure that the state provided is one of the canonical states we've established
              * so you can't request moments with the status "cat"
              */
-            $validStates = array_intersect($states, Evidence\Model::VALID_STATuSES);
+            $validStates = array_intersect($states, Evidence\Model::VALID_STATUSES);
 
             /* Do a deep inspection for the pb, which isn't exactly nice; look at the various
              * *_by and *_at date fields to determine what state a learning moment is in.
