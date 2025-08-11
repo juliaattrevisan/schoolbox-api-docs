@@ -1,6 +1,6 @@
-name: Build and push php82-frankenphp
+name: Build and push php84-frankenphp
 
-# Build new php82-frankenphp images:
+# Build new php84-frankenphp images:
 # * whenever docker/base-images/** changes?
 #   (develop only for now: master and develop will use the same base images)
 # * manually (workflow_dispatch)?
@@ -19,7 +19,7 @@ permissions:
   contents: read
 
 jobs:
-  build-and-push-php82-frankenphp-to-dockerhub:
+  build-and-push-php84-frankenphp-to-dockerhub:
     env:
       AWS_REGION: ap-southeast-2
     strategy:
@@ -55,7 +55,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            alaress/php82-frankenphp
+            alaress/php84-frankenphp
             ${{ vars.FRANKENPHP_ECR_REPO }}
 
       - name: Login to Docker Hub
@@ -64,11 +64,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push php82-frankenphp
+      - name: Build and push php84-frankenphp
         id: build-and-push
         uses: docker/build-push-action@v6
         with:
-          context: docker/base-images/php82-frankenphp
+          context: docker/base-images/php84-frankenphp
           load: true
           provenance: false
           sbom: false
@@ -78,7 +78,7 @@ jobs:
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           labels: ${{ steps.meta.outputs.labels }}
           tags: |
-            alaress/php82-frankenphp
+            alaress/php84-frankenphp
             ${{ vars.FRANKENPHP_ECR_REPO }}
 
       - name: Export digest
@@ -87,7 +87,7 @@ jobs:
           digest="${{ steps.build-and-push.outputs.digest }}"
           touch "${{ runner.temp }}/digests/${digest#sha256:}"
 
-      - name: Upload php82-frankenphp artifact
+      - name: Upload php84-frankenphp artifact
         uses: actions/upload-artifact@v4
         with:
           name: digest-${{ matrix.build.arch }}
@@ -95,11 +95,11 @@ jobs:
           if-no-files-found: 'error'
           retention-days: 1
 
-  join-php82-frankenphp:
+  join-php84-frankenphp:
     env:
       AWS_REGION: ap-southeast-2
     needs:
-      - build-and-push-php82-frankenphp-to-dockerhub
+      - build-and-push-php84-frankenphp-to-dockerhub
     runs-on: onprem-k3s
     steps:
       - name: Meta
@@ -107,7 +107,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            alaress/php82-frankenphp
+            alaress/php84-frankenphp
             ${{ vars.FRANKENPHP_ECR_REPO }}
           tags: |
             type=ref,event=branch,prefix=latest-
@@ -131,16 +131,16 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Download php82-frankenphp artifacts
+      - name: Download php84-frankenphp artifacts
         uses: actions/download-artifact@v4
         with:
           path: ${{ runner.temp }}/digests
           pattern: digest-*
           merge-multiple: 'true'
 
-      - name: Join php82-frankenphp images
+      - name: Join php84-frankenphp images
         working-directory: ${{ runner.temp }}/digests
         run: |
           docker buildx imagetools create $(jq -cr '.tags | map ("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf 'alaress/php82-frankenphp@sha256:%s ' *) \
+            $(printf 'alaress/php84-frankenphp@sha256:%s ' *) \
             $(printf '${{ vars.FRANKENPHP_ECR_REPO }}@sha256:%s ' *)

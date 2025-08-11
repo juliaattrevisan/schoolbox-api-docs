@@ -11,7 +11,7 @@
 ARG ENV=dev
 ARG ARCH=amd64
 
-FROM --platform=linux/${ARCH} php:8.2-cli-bookworm
+FROM --platform=linux/${ARCH} php:8.4-cli-bookworm
 
 # Use install-php-extensions script, and install extensions with that
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
