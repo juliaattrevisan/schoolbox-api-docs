@@ -9,7 +9,7 @@ import "highcharts/modules/accessibility";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { TableHeaderType } from "../../js/types/pastoralReportTypes";
-import type { TableHeader, RowOptions, RecordsAndPoints, TitleAndSubTitle } from "../../js/types/pastoralReportTypes";
+import type { TableHeader, RowOptions, RecordsAndPoints, TypeSubType } from "../../js/types/pastoralReportTypes";
 import { trendOptions } from "./config/chartOptions";
 
 const props = defineProps<{
@@ -116,10 +116,10 @@ const chartOptions = window.Vue.ref({
                     {{ (props.rowData[header.key] as RecordsAndPoints).points }}
                 </button>
             </template>
-            <template v-else-if="header.type == TableHeaderType.TITLE_AND_SUB_TITLE">
-                {{ (props.rowData[header.key] as TitleAndSubTitle).title }}
-                <template v-if="(props.rowData[header.key] as TitleAndSubTitle).subTitle">
-                    <br />({{ (props.rowData[header.key] as TitleAndSubTitle).subTitle }})
+            <template v-else-if="header.type == TableHeaderType.TYPE_SUB_TYPE">
+                {{ (props.rowData[header.key] as TypeSubType).title }}
+                <template v-if="(props.rowData[header.key] as TypeSubType).subTitle">
+                    <br />({{ (props.rowData[header.key] as TypeSubType).subTitle }})
                 </template>
             </template>
             <template v-else-if="header.type == TableHeaderType.TREND">
