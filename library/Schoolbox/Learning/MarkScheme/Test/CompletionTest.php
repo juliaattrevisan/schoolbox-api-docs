@@ -113,7 +113,7 @@ class CompletionTest extends TestCase
      * @param mixed $humanReadable
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('providerHumanReadableNoResponse')]
-    public function testGetNormalised_noResponse($humanReadable)
+    public function testGetNormalisedNoResponse($humanReadable)
     {
         $expected = null;
         $markScheme = new Completion();
