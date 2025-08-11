@@ -93,14 +93,14 @@ if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source" --file-na
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
-mysql_tzinfo_to_sql /usr/share/zoneinfo 2>/dev/null | mysql --defaults-extra-file=/root/.my.cnf mysql 2>/dev/null;
+mariadb-tzinfo-to-sql /usr/share/zoneinfo 2>/dev/null | mariadb --defaults-extra-file=/root/.my.cnf mysql 2>/dev/null;
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MySQL schema";
-mysql --defaults-extra-file=/root/.my.cnf -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';";
+echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MariaDB schema";
+mariadb --defaults-extra-file=/root/.my.cnf -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';";
 
-echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MySQL user";
-mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "CREATE USER 'schoolboxvagrant'@'localhost' IDENTIFIED BY 'abc123'";
-mysql --defaults-extra-file=/root/.my.cnf schoolbox -e "GRANT ALL ON schoolbox.* to 'schoolboxvagrant'@'localhost'";
+echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MariaDB user";
+mariadb --defaults-extra-file=/root/.my.cnf schoolbox -e "CREATE USER 'schoolboxvagrant'@'localhost' IDENTIFIED BY 'abc123'";
+mariadb --defaults-extra-file=/root/.my.cnf schoolbox -e "GRANT ALL ON schoolbox.* to 'schoolboxvagrant'@'localhost'";
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing vendor submodules with composer";
 cd $cachedir || exit;
@@ -261,8 +261,8 @@ else
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes";
-mysql --defaults-extra-file=/root/.my.cnf schoolbox < "$SITE_ROOT"/sql/vagrant.sql
-mysql --defaults-extra-file=/root/.my.cnf schoolbox < $cachedir/vagrant-secrets.sql
+mariadb --defaults-extra-file=/root/.my.cnf schoolbox < "$SITE_ROOT"/sql/vagrant.sql
+mariadb --defaults-extra-file=/root/.my.cnf schoolbox < $cachedir/vagrant-secrets.sql
 
 # Set ENV VARs for root + vagrant users from vagrant.yaml params
 declare -A env_vars=(
@@ -296,8 +296,8 @@ FACTER_vagrant_extra_hostname="$extra_hostname" \
 
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Applying vagrant SQL fixes (post version upgrade)";
-cat "$SITE_ROOT"/sql/vagrant.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
-cat $cachedir/vagrant-secrets.sql | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+cat "$SITE_ROOT"/sql/vagrant.sql | mariadb --defaults-extra-file=/root/.my.cnf schoolbox
+cat $cachedir/vagrant-secrets.sql | mariadb --defaults-extra-file=/root/.my.cnf schoolbox
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Building NPM";
 cd $cachedir;
