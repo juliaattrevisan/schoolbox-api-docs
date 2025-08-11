@@ -65,12 +65,12 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     $pipeManager = (new PipeManagerFactory(
         $loop,
         new class implements HandlerInterface {
-            function serialize(array $data): string
+            public function serialize(array $data): string
             {
                 return serialize($data);
             }
 
-            function unserialize($raw)
+            public function unserialize($raw)
             {
                 return unserialize($raw);
             }

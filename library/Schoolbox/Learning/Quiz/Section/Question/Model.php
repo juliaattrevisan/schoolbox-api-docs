@@ -78,7 +78,7 @@ class Model implements ISoftDeletable
      * Clears any Answers from the clone, and clones this Question's Solution
      * @return void
      */
-    function __clone()
+    public function __clone()
     {
         // clear ID
         $this->id = null;

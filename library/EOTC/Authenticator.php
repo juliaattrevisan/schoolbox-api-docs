@@ -106,10 +106,9 @@ class Authenticator
                     return true;
                 }
             }
-        }
-        /* Determine whether you are an EOTC administrator, in general
-         */
-        else {
+        } else {
+            /* Determine whether you are an EOTC administrator, in general
+             */
             if (count($this->getAllPermissions())) {
                 return true;
             }
