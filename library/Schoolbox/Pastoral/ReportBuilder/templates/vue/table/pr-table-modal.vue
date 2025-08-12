@@ -45,7 +45,7 @@ window.Vue.watch(
             selectedHeader.value = newCell.header;
             scopeUrlParams.set(ScopeUrlParam.COLUMN as string, selectedHeader.value.key);
             if (newCell.rowId !== undefined) {
-                scopeUrlParams.set(ScopeUrlParam.ROW as string, newCell.rowId.toString());
+                scopeUrlParams.set(`${ScopeUrlParam.ROW}[student_id]` as string, newCell.rowId.toString());
             } else {
                 scopeUrlParams.delete(ScopeUrlParam.ROW as string);
             }
