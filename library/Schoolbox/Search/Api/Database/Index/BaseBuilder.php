@@ -212,10 +212,10 @@ abstract class BaseBuilder implements IBuilder
         $html = preg_replace('/<\/?[a-zA-Z][^<>]*>/', ' </$1>', $html);
 
         // Strip the tags.
-        $cleaned = strip_tags($html);
+        $text = strip_tags($html);
 
         // Clean up multiple spaces and trim.
-        return trim(preg_replace('/\s+/', ' ', $cleaned));
+        return trim(preg_replace('/\s+/', ' ', $text));
     }
 
     /**
