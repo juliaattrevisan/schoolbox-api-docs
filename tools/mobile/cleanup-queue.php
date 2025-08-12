@@ -23,5 +23,5 @@ use Schoolbox\Realtime\Mobile\CommandLineTool\CleanupQueue;
 
 require __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Kernel(new CleanupQueue());
+$kernel = new Kernel(new CleanupQueue(), [], true);
 $kernel->runApp();
