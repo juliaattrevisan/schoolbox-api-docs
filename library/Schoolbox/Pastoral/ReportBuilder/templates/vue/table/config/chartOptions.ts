@@ -24,15 +24,6 @@ export const trendOptions: Options = {
     legend: {
         enabled: false,
     },
-    title: {
-        text: undefined,
-    },
-    tooltip: {
-        formatter(this: Point): string {
-            return `The value for <b>${this.key}</b> is <b>${this.y}</b>`;
-        },
-        valueSuffix: "Points",
-    },
     series: [
         {
             data: [],
@@ -40,6 +31,15 @@ export const trendOptions: Options = {
             type: "area" as const,
         },
     ],
+    title: {
+        text: undefined,
+    },
+    tooltip: {
+        formatter(this: Point): string {
+            return `<b>${this.key}:</b> ${this.y} records`;
+        },
+        valueSuffix: "Points",
+    },
     xAxis: {
         categories: [],
         title: {
@@ -54,9 +54,14 @@ export const trendOptions: Options = {
 
 /**
  * Chart options for the trend chart in the table row.
+ * @param rowData - The data for the row, which includes the trend information.
+ * @param recordsOrPoints - The type of data to display (records or points).
  * @returns - The chart options for the trend.
  */
-export function getChartOptions(rowData: { [key: string]: RowOptions }): Options {
+export function getChartOptions(
+    rowData: { [key: string]: RowOptions },
+    recordsOrPoints: "records" | "points",
+): Options {
     const trend = rowData.trend as Trend;
     // run through the line and make any 0 values null
     // trend.line = trend.line.map((value: number | null) => (value === 0 ? null : value));
@@ -71,6 +76,12 @@ export function getChartOptions(rowData: { [key: string]: RowOptions }): Options
                 data: trend.line,
             },
         ],
+        tooltip: {
+            formatter(this: Point): string {
+                return `<b>${this.key}:</b> ${this.y} ${recordsOrPoints}`;
+            },
+            valueSuffix: recordsOrPoints,
+        },
         xAxis: {
             ...trendOptions.xAxis,
             categories: trend.tooltips,

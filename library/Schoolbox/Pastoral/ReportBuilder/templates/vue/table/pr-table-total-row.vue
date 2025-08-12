@@ -88,7 +88,7 @@ function onCellSelected(header: TableHeader): void {
                 </button>
             </template>
             <template v-else-if="header.type == TableHeaderType.TREND">
-                <chart :options="getChartOptions(props.rowData)"></chart>
+                <chart :options="getChartOptions(props.rowData, props.recordsOrPoints)"></chart>
             </template>
             <template v-else>
                 {{ props.rowData[header.key] }}
