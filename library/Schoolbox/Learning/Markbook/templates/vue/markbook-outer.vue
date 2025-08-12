@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Template } from "@js/editor/types/editorTypes";
 import { useMarkbookStore } from "./store/markbookStore";
 import MarkbookInner from "./markbook-inner.vue";
 import MarkbookPopout from "./markbook-popout.vue";
@@ -6,13 +7,14 @@ import MarkbookPopout from "./markbook-popout.vue";
 interface Props {
     type: "course" | "class";
     filterEventKey: string;
+    editorTemplates: Template[];
 }
 
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
 
 window.Vue.onMounted(() => {
-    mbStore.init(props.filterEventKey);
+    mbStore.init(props.filterEventKey, props.editorTemplates);
 
     /**
      * Ensure tooltips are reflowed when the markbook is changed

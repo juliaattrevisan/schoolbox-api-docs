@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import type { Template } from "@js/editor/types/editorTypes";
 import { listenForFilterLoad, listenForFilterLoading } from "@schoolboxLibrary/Filter/templates/ts/filterEvent";
 import type {
     Markbook,
@@ -18,6 +19,8 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
 
     const popoutSelectedCell = window.Vue.ref<MarkbookPopoutSelectedCellInfo | null>(null);
     const feedbackSelectedCell = window.Vue.ref<MarkbookFeedbackSelectedCellInfo | null>(null);
+
+    const editorTemplates = window.Vue.ref<Template[]>([]);
 
     /**
      * If the markbook has more than this number of participants,
@@ -53,13 +56,15 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
     /**
      * Initialise the store
      * @param filterKey - The key of the filter to listen for loading events
+     * @param $editorTemplates - The editor templates to use
      */
-    function init(filterKey: string): void {
+    function init(filterKey: string, $editorTemplates: Template[]): void {
         /**
          * Listen to the filter overlords which control what we show and when we show it
          */
         listenForFilterLoading(filterKey, onLoading);
         listenForFilterLoad<Markbook>(filterKey, (detail) => onMarkbookLoaded(detail.content));
+        editorTemplates.value = $editorTemplates;
     }
 
     /**
@@ -179,6 +184,7 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         orderedClassImplStudents,
         popoutSelectedCell,
         feedbackSelectedCell,
+        editorTemplates,
         aImplHasDraftMarks,
         hasDraftMarks,
     };

@@ -5,6 +5,7 @@
  */
 import locale from "@js/terminology/rosettaStone";
 import { EditorToolbar } from "@js/editor/types/editorTypes";
+import type { Template } from "@js/editor/types/editorTypes";
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 
 interface Props {
@@ -22,6 +23,7 @@ interface Props {
     isRichText?: boolean;
     /** optional prefix for the textarea ID, `comment-[prefix]-[participant.user.id]` */
     prefix?: string;
+    templates?: Template[];
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -33,6 +35,7 @@ const props = withDefaults(defineProps<Props>(), {
     blindMode: false,
     isRichText: false,
     prefix: "",
+    templates: undefined,
 });
 
 /* Allow the ref to be nullable for easier usage, but useEditor requires a string - null will be converted to an empty string */
@@ -62,6 +65,7 @@ async function initEditor(): Promise<void> {
                 maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                 toolbar: props.selfAssessment ? EditorToolbar.COMMENT : EditorToolbar.COMMENT_AI,
                 hasTokens: !props.selfAssessment,
+                templates: props.templates ?? [],
             },
             true,
             resolve,
