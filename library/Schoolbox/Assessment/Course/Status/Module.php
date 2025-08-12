@@ -53,8 +53,6 @@ class Module extends BaseModule
             return $this->buildPreloadCourseAssessment($params);
         };
 
-        // single course level single assessment routes
-        $this->register('GET', '/{courseSpecId:\d+}/assessment/{assessmentId:\d+}/status', 'getStatus', $canSeeCourseMarkbook, $preloadCourseAssessment);
         // publish feedback for a single assessment
         $this->register('POST', '/{courseSpecId:\d+}/assessment/{assessmentId:\d+}/publish', 'postPublishFeedback', $canSeeCourseMarkbook, $preloadCourseAssessment);
     }
@@ -171,13 +169,7 @@ class Module extends BaseModule
 
         return new Controller(
             $this->getMapperFactory()->get(ErrorMapper::class),
-            $this->injector->get('filters.assessmentIdFinder'),
             $this->getAssessmentMapper(),
-            $bakery,
-            new \Schoolbox\Url\Factory($this->getConfig()),
-            (string)$this->getConfig()->get('learnosity_version'),
-            (string)$this->getConfig()->get('learnosity_consumer_key'),
-            (string)$this->getConfig()->get('learnosity_consumer_secret'),
             $this->getMapperFactory()->get(QuizMapper::class),
             $this->injector->get('filters.factoryFactory'),
             $this->getMapperFactory()->get(Filter\Mapper::class),
