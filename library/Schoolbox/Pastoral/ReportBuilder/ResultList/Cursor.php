@@ -61,9 +61,6 @@ class Cursor implements ICursor
             }
         }
 
-        if (null === $this->rowKey) {
-            throw new ValueError('Row key is required');
-        }
         $this->init();
     }
 
