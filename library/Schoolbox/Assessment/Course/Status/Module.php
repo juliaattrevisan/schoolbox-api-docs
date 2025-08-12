@@ -17,9 +17,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Project\ResultCache as ProjectResultCache;
-use Schoolbox\Learning\Quiz\Mapper as QuizMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
@@ -27,9 +25,6 @@ use Schoolbox\Role;
 use Schoolbox\Learning\Assessment\Breadcrumb;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
-use Schoolbox\Filter;
-use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\User;
 
 class Module extends BaseModule
@@ -168,14 +163,7 @@ class Module extends BaseModule
         );
 
         return new Controller(
-            $this->getMapperFactory()->get(ErrorMapper::class),
             $this->getAssessmentMapper(),
-            $this->getMapperFactory()->get(QuizMapper::class),
-            $this->injector->get('filters.factoryFactory'),
-            $this->getMapperFactory()->get(Filter\Mapper::class),
-            $this->getMapperFactory()->get(Filter\Selection\Mapper::class),
-            $this->getMapperFactory()->get(CourseImpl\Mapper::class),
-            $this->getMapperFactory()->get(UnitImpl\Mapper::class),
             $this->injector->get('assessmentDataSource'),
             $this->injector->get('responseDataSource'),
             $this->getMapperFactory()->get(ReturnedWorkMapper::class),

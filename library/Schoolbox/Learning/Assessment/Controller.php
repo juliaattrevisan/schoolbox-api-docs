@@ -1322,11 +1322,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
     /**
      * get all assessments for a spec assessment (filtered from the markbook url params)
      *
-     * @param iAssessable $assessment
+     * @param IAssessable $assessment
      * @return array|Collection
      * @throws MapperException
      */
-    protected function getUnitAssessments(iAssessable $assessment): array|Collection
+    protected function getUnitAssessments(IAssessable $assessment): array|Collection
     {
         $assessments = [];
         if ($assessment->isSpecification()) {
@@ -1337,8 +1337,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
              * we are assuming the links to this page have been appended with
              * 'queryArgs'               => $codec->convertSelectionsToQueryString($selectionsPerFilter),
              */
-            /** @var CourseSpec\Model $courseSpec */
-            $courseSpec = $assessment->getBaseContext()->getCourse();
+
+            /* create tmp vars, to keep stan happy */
+            /** @var UnitSpecification $unitSpec */
+            $unitSpec = $assessment->getBaseContext();
+            $courseSpec = $unitSpec->getCourse();
             $queryArgs = $this->requestQuery->getArrayCopy();
             [$filters,] = $this->convertRequestToFilters($courseSpec, $queryArgs, false);
             $assessmentIds  = $this->filtersAssessmentIdFinder->findIdsByFilters($filters, $this->getUser());
