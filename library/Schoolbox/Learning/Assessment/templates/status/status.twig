@@ -15,6 +15,7 @@
 {% set routeModify = routeModify ?? routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment})  %}
 {% set responseHistory = responseHistory ?? locale.submissionHistory.proper %}
 
+{% set isSpecification = assessment.isSpecification %}
 
 <script src="{{ CDN_PREFIX }}/js/submissions/jquery.combobox.js?v={{ config.site_version }}" type="text/javascript"></script>
 
@@ -47,7 +48,7 @@
             assessmentId: assessment.id,
             assessment: assessment
         }) %}
-        {% if not assessment.isSpecification and viewCustomParticipationRoute and (assessment is dueWork or assessment is quiz or assessment is task) %}
+        {% if not isSpecification and viewCustomParticipationRoute and (assessment is dueWork or assessment is quiz or assessment is task) %}
             <li><a class="icon-group" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
         {% endif %}
 
@@ -59,7 +60,7 @@
         <ul class="meta">
             {% include '@learning/fragments/meta/dueDate.twig' %}
             {% include '@learning/fragments/meta/workType.twig' %}
-            {% if not assessment.isSpecification %}
+            {% if not isSpecification %}
                 {{ markVisibilityMeta.markVisibilityMeta(assessment, true) }}
 
                 {% if readonly ?? false %}
@@ -118,7 +119,7 @@
 
 {% for aImpl in aImpls %}
     <div class="component-container">
-        {% if assessment.isSpecification %}
+        {% if isSpecification %}
         <div class="row">
             <div class="small-12 columns">
                 <div class="component-titlebar">
@@ -143,9 +144,11 @@
             </div>
         </div>
         {% endif %}
-        {% set includedParticipants = aImpl.assessment.allParticipants | filter(participant => not participant.isExcluded) %}
+        {# each class assessment may have different mark scheme / other settings, use that assessment, not the spec #}
+        {% set assessment = aImpl.assessment %}
+        {% set includedParticipants = assessment.allParticipants | filter(participant => not participant.isExcluded) %}
         {% if includedParticipants | length %}
-            <div class="row" {% if aImpl.assessment.isSpecification %}data-collapse-state="uncollapsed" data-collapsable="collap-{{ aImpl.assessment.id }}" {% endif %} data-participant-group>
+            <div class="row" {% if isSpecification %}data-collapse-state="uncollapsed" data-collapsable="collap-{{ assessment.id }}" {% endif %} data-participant-group>
                 <div class="small-12 island">
                     <div class="empty-state hide" data-empty-filter>
                         <i class="icon-staff-students"></i>
@@ -154,17 +157,17 @@
                             Add another filter or <a data-filter-show-all>show everything</a>.
                         </p>
                     </div>
-                    <section class="content" data-participant-loader data-assessment="{{ aImpl.assessment.id }}">
+                    <section class="content" data-participant-loader data-assessment="{{ assessment.id }}">
                         <div class="loader"></div>
                     </section>
-                    <section data-assessment-status data-assessment="{{ aImpl.assessment.id }}" class="hide">
+                    <section data-assessment-status data-assessment="{{ assessment.id }}" class="hide">
                         <ul class="information-list {{ listClass }}">
                             {% for participant in includedParticipants %}
 
                                 {# Construct that represents a participant #}
                                 {% set routeArgs = {
                                     viewee: participant.user,
-                                    assessmentId: aImpl.assessment.id,
+                                    assessmentId: assessment.id,
                                     assessment: assessment,
                                     student: participant.user,
                                     studentId: participant.user.id
@@ -193,6 +196,16 @@
         {% endif %}
     </div>
 {% endfor %}
+{% if aImpls is empty %} {# course spec, only show search bar if there are classes that have this assessment #}
+    <div class="row">
+        <div class="small-12 column">
+            <div class="empty-state">
+                <i class="{{ icon.renderClass(assessment) }}"></i>
+                <p>This {{ locale.activity }} has no students participating.</p>
+            </div>
+        </div>
+    </div>
+{% endif %}
 
 {# Rich text editors / pagination #}
 <script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}'></script>
