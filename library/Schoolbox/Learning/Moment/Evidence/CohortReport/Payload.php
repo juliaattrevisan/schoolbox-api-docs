@@ -21,6 +21,12 @@ class Payload
 
 
     /**
+     * The length of time which each page the frontend loads should span.
+     * This determines the length of each sliding window in findAllPages()
+     */
+    private const SLIDING_WINDOW_SIZE = 7;
+
+    /**
      * Constructor
      *
      * @param Evidence\Mapper $mapper
@@ -34,7 +40,7 @@ class Payload
 
 
     /**
-     * Find a set of learning moments for the cohort of users
+     * Find a set of learning moment IDs for the cohort of users
      *
      *     Cohort of Users def.
      *       A set of user ids in a particular folder (either as a class folder and/or group)
@@ -57,11 +63,11 @@ class Payload
      * @param string|null $authorIds
      * @param string|null $tagIds
      * @param string|null $states
-     * @return GenericCollection
+     * @return array<int>
      * @throws Exception
      * @throws NotFound
      */
-    public function findByFilters(
+    public function findIdsByFilters(
         Folder\Model $folder,
         ?string $userIds,
         ?string $fromDate,
@@ -69,7 +75,7 @@ class Payload
         ?string $authorIds,
         ?string $tagIds,
         ?string $states
-    ): GenericCollection {
+    ): array {
         /* If this $folder had no members, there's no meaningful cohort overview to display:
          * return an empty payload
          */
@@ -287,14 +293,63 @@ class Payload
         $query .= implode("\n", $wherePieces);
 
         /* All the learning moments that fulfil the filter criteria
+         * Don't hydrate them yet as sometimes we don't need to
          */
-        $momentIds = $this->mapper->getDatabase()->executeQuery($query, $params)->fetchColumnArray('id');
+        return $this->mapper->getDatabase()->executeQuery($query, $params)->fetchColumnArray('id');
+    }
 
-        /* Find fully hydrated instances of these moment ids
-         */
-        return $this->mapper->findByColumn('id', $momentIds, ['order' => [
-            'updated_at' => 'ASC'
-        ]]);
+
+    /**
+     * Find all the possible pages that the Cohort Report should load
+     * This avoids the user clicking "Load More" and ending up with a blank page
+     * and also allows us to know when there's nothing more to load
+     *
+     * Essentially this is just a workaround for not having a proper cursor to use
+     *
+     * @param array<int> $momentIds All the moment IDs that should be loaded (i.e. from findIdsByFilters())
+     * @return array<array{start:string,end:string,items:int}>
+     */
+    public function findAllPages(array $momentIds): array
+    {
+        // Find all possible dates and sort desc
+        $pb = $this->mapper->getPredicateBuilder()
+            ->in($this->mapper->getIdentifierColumn(), $momentIds);
+
+        $rows = $this->mapper->findColumnsByPredicates(['created_at'], $pb);
+
+        if (empty($rows)) {
+            return [];
+        }
+
+        $dates = array_map(
+            fn($row) => (new \Alaress_Date_Format(
+                $row['created_at'],
+                \Alaress_Date_Format::DATABASE_DATE_FORMAT
+            ))->startOfDay(),
+            $rows
+        );
+
+        usort($dates, fn($a, $b) => $b->compare($a)); // DESC
+
+        // Now paginate with sliding windows
+        $pages = [];
+        $currentPageEnd = null;
+        foreach ($dates as $date) {
+            // Have we surpassed the current page's end date?
+            if (null === $currentPageEnd || $date->lt($currentPageEnd)) {
+                $currentPageEnd = (clone $date)->addDays(-self::SLIDING_WINDOW_SIZE);
+                $pages[] = [
+                    'items' => 0,
+                    'start' => null, // updated below
+                    'end' => $date->getDatabaseDate(),
+                ];
+            }
+
+            $pages[count($pages) - 1]['items'] += 1;
+            $pages[count($pages) - 1]['start'] = $date->getDatabaseDate();
+        }
+
+        return $pages;
     }
 
 
