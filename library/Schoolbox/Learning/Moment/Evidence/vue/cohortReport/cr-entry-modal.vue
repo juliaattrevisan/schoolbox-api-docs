@@ -35,9 +35,13 @@ async function onReject(): Promise<void> {
 /**
  * Handle the deletion of the selected entries
  */
-function onDelete(): void {
+async function onDelete(): Promise<void> {
+    if (!crmStore.selectedEntries || crmStore.selectedEntries.length === 0) {
+        throw new Error("No entries selected for deletion");
+    }
+
     crmStore.isModalOpen = false;
-    alert("todo");
+    await crStore.deleteEntries(crmStore.selectedEntries.map((entry) => entry.id));
 }
 </script>
 

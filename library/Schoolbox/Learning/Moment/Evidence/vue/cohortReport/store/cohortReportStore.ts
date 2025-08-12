@@ -1,4 +1,5 @@
 import { defineStore } from "pinia";
+import { apiRequest } from "@js/util/sbx/apiUtils";
 import {
     bulkPublishLearningMoments,
     bulkRejectLearningMoments,
@@ -199,6 +200,48 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         });
     }
 
+    /**
+     * Delete learning moment(s)
+     * @param entryIds The entry ID(s) to delete
+     */
+    async function deleteEntries(entryIds: number[]): Promise<void> {
+        // TODO find a bulk delete endpoint?
+        const entries = results.value.filter((e) => entryIds.includes(e.id));
+        if (entries.length === 0) {
+            throw new Error(`No entries found for IDs ${entryIds.join(", ")}`);
+        }
+
+        const toast = window.sbProps.toastActivate(
+            entries.length > 1 ? `Deleting ${entries.length} learning moments` : "Deleting learning moment",
+        );
+        const unsuccessfulIds: number[] = [];
+        await Promise.all(
+            entries.map(async (entry) => {
+                if (!entry._links.delete) {
+                    throw new Error(`Unable to delete an entry (${entry.id})`);
+                }
+
+                loadingEntries.value[entry.id] = true;
+                const response = await apiRequest({
+                    url: entry._links.delete,
+                    method: "DELETE",
+                });
+
+                if (response.success === false) {
+                    toast.timeout({ isSuccess: false, text: response.message });
+                    delete loadingEntries.value[entry.id];
+                    unsuccessfulIds.push(entry.id);
+                }
+            }),
+        );
+
+        if (unsuccessfulIds.length === 0) {
+            toast.timeout({ isSuccess: true, text: "Deleted." });
+        }
+
+        results.value = results.value.filter((e) => !entryIds.includes(e.id) || unsuccessfulIds.includes(e.id));
+    }
+
     return {
         init,
         results,
@@ -211,6 +254,7 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         toggleEntrySelection,
         publishEntries,
         rejectEntries,
+        deleteEntries,
         loadingEntries,
     };
 });

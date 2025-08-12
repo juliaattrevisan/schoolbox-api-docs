@@ -175,6 +175,14 @@ function parseResponse<TResponseData>(
         return failureResponse;
     }
 
+    if (status === 204 && text === "") {
+        // 204 No Content, so we return null data
+        return {
+            success: true,
+            data: null as unknown as TResponseData,
+        };
+    }
+
     try {
         responseJSON = JSON.parse(text) as TResponseData;
     } catch (e) {
