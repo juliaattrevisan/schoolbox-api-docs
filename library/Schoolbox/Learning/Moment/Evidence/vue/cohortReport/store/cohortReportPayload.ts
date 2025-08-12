@@ -8,8 +8,8 @@ export type CohortReportEntry = {
     files: {
         hash: string;
         filename: string;
+        extension: string;
         mime: string;
-        icon: string;
     }[];
     recipient: {
         id: number;

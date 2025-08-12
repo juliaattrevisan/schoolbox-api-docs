@@ -829,8 +829,8 @@ class Controller extends Base
                     [
                         'hash' => $moment->getStorage()->getHash(),
                         'filename' => $moment->getStorage()->getFilename(),
+                        'extension' => $moment->getStorage()->getExtension(),
                         'mime' => $moment->getStorage()->getMime(),
-                        'icon' => $moment->getStorage()->getMimetype()->getIconFile(),
                     ],
                 ];
             }

@@ -33,6 +33,23 @@ const relevantUsers = window.Vue.computed(() => {
         { ...props.entry.creator, label: `Created by ${props.entry.creator.fullname}` },
     ];
 });
+
+const hasMeaningfulBody = window.Vue.computed(() => props.entry.body.trim().length > 0);
+
+/**
+ * The current evidence item that is showing, either:
+ * - the hash of a file to be viewed
+ * - null to show the entry's body instead
+ */
+const selectedEvidence = window.Vue.ref<CohortReportEntry["files"][number]["hash"] | null>(null);
+
+window.Vue.onMounted(() => {
+    // Show the body by default if it's meaningful, otherwise select the first file
+    selectedEvidence.value = null;
+    if (!hasMeaningfulBody.value && props.entry.files.length > 0) {
+        selectedEvidence.value = props.entry.files[0].hash;
+    }
+});
 </script>
 
 <template>
@@ -64,9 +81,33 @@ const relevantUsers = window.Vue.computed(() => {
             </nav>
         </div>
 
-        <div class="l-flex__item--1">
-            <!-- eslint-disable-next-line vue/no-v-html - this is scrubbed on the backend -->
-            <p v-html="props.entry.body"></p>
+        <div class="l-flex__item--1 l-grid l-grid--12">
+            <div class="small-12 medium-8">
+                <!-- eslint-disable-next-line vue/no-v-html - this is scrubbed on the backend -->
+                <p v-html="props.entry.body"></p>
+            </div>
+            <div class="small-12 medium-4 l-flex-col l-gap-s">
+                <div
+                    v-if="hasMeaningfulBody && selectedEvidence !== null"
+                    class="cr-evidence-button l-flex--no-wrap l-flex-row l-gap-xs l-pad-xs"
+                    title="Description"
+                    @click="selectedEvidence = null"
+                >
+                    <img src="/ajax/mime/text/plain" />
+                    <span>Description</span>
+                </div>
+
+                <div
+                    v-for="file in props.entry.files.filter((f) => f.hash !== selectedEvidence)"
+                    :key="file.hash"
+                    class="cr-evidence-button l-flex--no-wrap l-flex-row l-gap-xs l-pad-xs"
+                    :title="`${file.filename}.${file.extension}`"
+                    @click="selectedEvidence = file.hash"
+                >
+                    <img :src="`/ajax/mime/${file.mime}`" />
+                    <span>{{ file.filename }}.{{ file.extension }}</span>
+                </div>
+            </div>
         </div>
 
         <div class="l-flex-row l-mar-s--top l-gap-s">
@@ -77,6 +118,25 @@ const relevantUsers = window.Vue.computed(() => {
 
 <style scoped lang="scss">
 @import "@css/core/base/_colors.scss";
+
+.cr-evidence-button {
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+
+    img {
+        width: 1.5rem;
+    }
+
+    span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &:hover {
+        cursor: pointer;
+        background-color: var(--content-ui-background);
+    }
+}
 
 .cr-result-entry {
     border: 1px solid var(--form-border-color);
