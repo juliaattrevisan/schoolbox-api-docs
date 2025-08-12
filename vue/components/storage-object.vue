@@ -10,19 +10,10 @@
 import { humanFileSize } from "@js/util/fileUtils";
 import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils";
 import type { MediaElementPlayer } from "@js/mediaelementplayer/mepUtils";
+import { ResourceType, type StorageFile } from "@js/resource/resourceUtils";
 
 interface Props {
-    storage: {
-        type: "audio" | "video" | "image" | "file";
-        _links: {
-            stream?: string;
-            poster?: string;
-            image?: string;
-            fetch?: string;
-            icon?: string;
-        };
-        size: number;
-    };
+    storage: StorageFile;
     filename: string;
 }
 
@@ -50,7 +41,7 @@ window.Vue.onMounted(() => {
             if (entry.isIntersecting) {
                 // The component is visible, ready to init the player
                 switch (props.storage.type) {
-                    case "audio":
+                    case ResourceType.AUDIO:
                         player.value = new window.MediaElementPlayer(playerEl.value, {
                             // Override the default iconSprite reference and leave blank to avoid load error
                             // CSS is used to display the icons instead
@@ -59,7 +50,7 @@ window.Vue.onMounted(() => {
                         });
                         break;
 
-                    case "video":
+                    case ResourceType.VIDEO:
                         player.value = new window.MediaElementPlayer(playerEl.value, getConfigForVideo());
                         break;
 
@@ -76,7 +67,7 @@ window.Vue.onMounted(() => {
 });
 
 window.Vue.onBeforeUnmount(() => {
-    if (props.storage.type === "video" && player.value) {
+    if (props.storage.type === ResourceType.VIDEO && player.value) {
         if (!player.value.paused) {
             player.value.pause();
         }
@@ -93,14 +84,17 @@ window.Vue.onBeforeUnmount(() => {
  * @param size - The size in bytes
  * @returns A human-readable file size string
  */
-function filesize(size: number): string {
+function filesize(size: number | null): string {
+    if (size === null) {
+        return "0 B";
+    }
     return humanFileSize(size);
 }
 </script>
 
 <template>
     <video
-        v-if="storage.type === 'video'"
+        v-if="storage.type === ResourceType.VIDEO"
         ref="playerRef"
         controls
         preload="none"
