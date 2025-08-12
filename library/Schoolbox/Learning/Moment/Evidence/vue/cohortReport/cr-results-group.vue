@@ -59,22 +59,26 @@ function toggleAllEntries(): void {
 </script>
 
 <template>
-    <div class="small-12 c-island">
-        <section class="content">
-            <fieldset>
-                <input
-                    :id="`${dataPrefix}-selectAll`"
-                    type="checkbox"
-                    :name="`${dataPrefix}-selectAll`"
-                    :checked="allEntriesSelected"
-                    @change="toggleAllEntries"
-                />
-                <label :for="`${dataPrefix}-selectAll`" class="checkbox-label">
-                    <h2 class="l-mar--0-bottom">{{ props.label }}</h2>
-                </label>
-            </fieldset>
-
-            <fieldset>
+    <div class="l-flex-col">
+        <div class="c-card c-card--border-end">
+            <div class="l-flex-row l-pad-m l-gap-s">
+                <div class="l-flex-col l-flex--justify-center f-no-margins">
+                    <input
+                        :id="`${dataPrefix}-selectAll`"
+                        type="checkbox"
+                        :name="`${dataPrefix}-selectAll`"
+                        :checked="allEntriesSelected"
+                        @change="toggleAllEntries"
+                    />
+                    <label :for="`${dataPrefix}-selectAll`" class="checkbox-label"> </label>
+                </div>
+                <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
+                    <h2>{{ props.label }}</h2>
+                </div>
+            </div>
+        </div>
+        <div class="c-card">
+            <div class="l-flex-col l-gap-s l-pad-m">
                 <template v-for="entry in props.entries" :key="entry.id">
                     <input
                         :id="`${dataPrefix}-select-${entry.id}`"
@@ -87,8 +91,8 @@ function toggleAllEntries(): void {
 
                     <p>{{ entry.body }} - {{ entry.createdAt.displayAs }}</p>
                 </template>
-            </fieldset>
-        </section>
+            </div>
+        </div>
     </div>
 </template>
 
