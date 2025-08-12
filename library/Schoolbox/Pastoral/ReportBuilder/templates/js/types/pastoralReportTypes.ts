@@ -91,7 +91,7 @@ export type TypeSubType = {
  * Displays a trend line in the table cell
  */
 export type Trend = {
-    line: number | null[];
+    line: (number | null)[];
     tooltips: string[];
 };
 

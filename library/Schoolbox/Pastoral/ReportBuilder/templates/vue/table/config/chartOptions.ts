@@ -3,9 +3,9 @@
  * Refer to https://api.highcharts.com/highcharts/ for more details.
  */
 
-import type { Point } from "highcharts";
+import type { Point, Options } from "highcharts";
 
-export const trendOptions = {
+export const trendOptions: Options = {
     accessibility: {
         description: "Trend of points over the year for type/subtype",
     },
@@ -36,7 +36,7 @@ export const trendOptions = {
         {
             data: [],
             name: "Points",
-            type: "line" as const,
+            type: "area" as const,
         },
     ],
     xAxis: {

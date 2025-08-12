@@ -5,6 +5,7 @@
  */
 
 import { Chart } from "highcharts-vue";
+import type { Options } from "highcharts";
 import "highcharts/modules/accessibility";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
@@ -52,11 +53,12 @@ function onCellSelected(header: TableHeader): void {
 
 /**
  * Chart options for the trend chart in the table row.
+ * @returns - The chart options for the trend.
  */
-function getChartOptions() {
+function getChartOptions(): Options {
     const trend = props.rowData.trend as Trend;
     // run through the line and make any 0 values null
-    trend.line = trend.line.map((value: number | null) => (value === 0 ? null : value));
+    // trend.line = trend.line.map((value: number | null) => (value === 0 ? null : value));
     if (trend === undefined) {
         return trendOptions;
     }
