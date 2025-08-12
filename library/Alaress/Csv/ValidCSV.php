@@ -7,7 +7,6 @@ use Schoolbox\Resource\Exception;
 
 class ValidCSV
 {
-
     /**
      * @var resource
      */

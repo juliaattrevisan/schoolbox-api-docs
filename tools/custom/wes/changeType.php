@@ -9,7 +9,6 @@ use Schoolbox\Application\CliTool;
 require_once __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App {
-
     private const OPT_LONG_FILE = 'file:';
     private const OPT_LONG_RUN = 'run';
 

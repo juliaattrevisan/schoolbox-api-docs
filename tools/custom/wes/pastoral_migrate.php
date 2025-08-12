@@ -17,7 +17,6 @@ use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 require_once __DIR__ . '/../../../conf/core/require.php';
 
 $app = new class extends CliTool\App {
-
     private const OPT_LONG_FILE = 'file:';
 
     private array $groupNameIdMap = [];

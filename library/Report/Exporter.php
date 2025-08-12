@@ -9,7 +9,6 @@
  */
 class Report_Exporter
 {
-
     private $reportHeadings = array();
     private $reportData = array();
     private $filename = null;

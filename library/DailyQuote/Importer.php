@@ -15,7 +15,6 @@ namespace DailyQuote;
 
 class Importer
 {
-
     /**
      * Path to the csv containing quotes to import
      *
