@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { slideDown, slideUp } from "@js/util/animateUtils";
 import { useCohortReportStore } from "./store/cohortReportStore";
 import type { CohortReportEntry } from "./store/cohortReportPayload";
 
@@ -9,6 +10,10 @@ interface Props {
 
 const props = defineProps<Props>();
 const crStore = useCohortReportStore();
+
+const isExpanded = window.Vue.ref(true);
+const showExpandedBorder = window.Vue.ref(isExpanded.value);
+const entryListEl = window.Vue.useTemplateRef<HTMLDivElement>("entryListRef");
 
 const dataPrefix = window.Vue.computed(() => {
     const label = props.label.replaceAll(" ", "-");
@@ -56,13 +61,33 @@ function toggleAllEntries(): void {
         });
     }
 }
+
+/**
+ * Toggle the expanded state
+ */
+async function toggleExpanded(): Promise<void> {
+    if (!entryListEl.value) {
+        throw new Error("entryListEl is not defined");
+    }
+
+    isExpanded.value = !isExpanded.value;
+
+    // showExpandedBorder is changed at a different point so the border-end class can be applied at the right time
+    if (isExpanded.value) {
+        showExpandedBorder.value = true;
+        await slideDown(entryListEl.value);
+    } else {
+        await slideUp(entryListEl.value);
+        showExpandedBorder.value = false;
+    }
+}
 </script>
 
 <template>
     <div class="l-flex-col">
-        <div class="c-card c-card--border-end">
-            <div class="l-flex-row l-pad-m l-gap-s">
-                <div class="l-flex-col l-flex--justify-center f-no-margins">
+        <div class="c-card" :class="{ 'c-card--border-end': showExpandedBorder }">
+            <div class="l-flex-row l-pad-s l-gap-s">
+                <div class="l-flex-col l-flex--justify-center f-no-margins l-pad-s--left">
                     <input
                         :id="`${dataPrefix}-selectAll`"
                         type="checkbox"
@@ -75,9 +100,13 @@ function toggleAllEntries(): void {
                 <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
                     <h2>{{ props.label }}</h2>
                 </div>
+                <nav class="c-nav-actions l-flex-row">
+                    <a :class="`icon-${isExpanded ? 'down' : 'up'}-arrow`" @click.prevent="toggleExpanded" />
+                </nav>
             </div>
         </div>
-        <div class="c-card">
+
+        <div ref="entryListRef" class="c-card">
             <div class="l-flex-col l-gap-s l-pad-m">
                 <template v-for="entry in props.entries" :key="entry.id">
                     <input
