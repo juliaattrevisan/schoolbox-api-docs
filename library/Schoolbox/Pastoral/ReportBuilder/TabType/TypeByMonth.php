@@ -209,12 +209,6 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
                 'type' => 'RecordsAndPoints',
                 'isSortable' => true,
             ],
-            [
-                'key' => 'trend',
-                'title' => 'Trend',
-                'type' => 'Trend',
-                'isSortable' => false,
-            ]
         ];
 
         foreach ($this->getMonths() as $month) {
@@ -225,6 +219,13 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
                 'isSortable' => true,
             ];
         }
+
+        $tableHeaders[] = [
+            'key' => 'trend',
+            'title' => 'Trend',
+            'type' => 'Trend',
+            'isSortable' => false,
+        ];
         return $tableHeaders;
     }
 
@@ -306,11 +307,13 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
 
                         ];
                         unset($record['typeName'], $record['subtypeName'], $record['typeId'], $record['subtypeId']);
-                        $row['type_subtype']['trend'] = [
+                        $row = array_merge($row, array_map(fn($value) => [$this->resultType => $value], $record));
+                        unset($record['total']);
+                        $row['trend'] = [
                             'line' => array_values($record),
                             'tooltips' => array_map(fn(string $key) => ucwords(str_replace('_', ' ', $key)), array_keys($record)),
                         ];
-                        return array_merge($row, array_map(fn($value) => [$this->resultType => $value], $record));
+                        return $row;
                     }
                 )->getAll()
             ],
