@@ -24,6 +24,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Filter;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel;
@@ -35,6 +36,8 @@ use Schoolbox\Learning\Assessment\Participant\DataSource;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\DueWork\StateMapper;
@@ -129,6 +132,12 @@ class Controller extends Assessment\Controller
         private string $learnosityVersion,
         #[\SensitiveParameter] private string $learnosityConsumerKey,
         #[\SensitiveParameter] private string $learnosityConsumerSecret,
+        protected Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder,
+        protected Filter\CompositeFactoryFactory $filtersFactoryFactory,
+        protected Filter\Mapper $filterMapper,
+        protected Filter\Selection\Mapper $filterSelectionMapper,
+        protected CourseImplementationMapper $courseImplementationMapper,
+        protected UnitImplementationMapper $unitImplementationMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -148,6 +157,12 @@ class Controller extends Assessment\Controller
             $this->projectResultCacheMapper,
             $lessonPlanTemplateMapper,
             $lessonPlanDataModelMapper,
+            $filtersAssessmentIdFinder,
+            $filtersFactoryFactory,
+            $filterMapper,
+            $filterSelectionMapper,
+            $courseImplementationMapper,
+            $unitImplementationMapper,
             $urlFactory,
             $learnosityVersion,
             $learnosityConsumerKey,

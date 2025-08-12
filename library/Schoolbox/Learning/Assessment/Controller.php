@@ -21,7 +21,9 @@ use Schoolbox\Filter\IFactoryFactory;
 use Schoolbox\Learning\Assessment\Translator\ParticipationPlans;
 use Schoolbox\Learning\Assessment\Translator\Participations;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use LearnositySdk\Utils\Uuid;
 use LogicException;
@@ -126,6 +128,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
         protected Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
+        protected Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder,
+        protected Filter\CompositeFactoryFactory $filtersFactoryFactory,
+        protected Filter\Mapper $filterMapper,
+        protected Filter\Selection\Mapper $filterSelectionMapper,
+        protected CourseImplementationMapper $courseImplementationMapper,
+        protected UnitImplementationMapper $unitImplementationMapper,
         ?\Schoolbox\Url\Factory $urlFactory = null,
         ?string $learnosityVersion = null,
         #[\SensitiveParameter] ?string $learnosityConsumerKey = null,
@@ -1282,30 +1290,24 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     protected function convertRequestToFilters(CourseSpec\Model $courseSpec, array $request, bool $saveToDB): array
     {
-        $filterMapper = Filter\Mapper::getInstance();
-        $filterSelectionMapper = Filter\Selection\Mapper::getInstance();
-        $filterFactoryFactory = $this->getDi()->get('filters.factoryFactory');
-        $courseImplMapper = CourseImpl\Mapper::getInstance();
-        $unitImplMapper = UnitImpl\Mapper::getInstance();
-
         $page            = Filter\Page\Model::PAGE_COURSE_MARK_BOOK;
-        $codec           = new Codec($filterMapper, $filterSelectionMapper);
+        $codec           = new Codec($this->filterMapper, $this->filterSelectionMapper);
 
         // Convert Request to Selection models
         $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
         if ($saveToDB) {
-            $filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
+            $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
         }
 
-        $filters = $filterFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
+        $filters = $this->filtersFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
 
         // Ensure that assessments are:
         // * not Assessment Specs
         // * Are inside unitImpls that belong to courseImpls that were imported from the courseSpec
-        $courseImpls = $courseImplMapper->findAllByCourseSpecificationId($courseSpec->getId());
+        $courseImpls = $this->courseImplementationMapper->findAllByCourseSpecificationId($courseSpec->getId());
         if ($courseImpls->count()) {
-            $pb          = $unitImplMapper->getPredicateBuilder()->in('course_implementation_id', $courseImpls->getPropertyValues('id'));
-            $unitImplIds = $unitImplMapper->findIdsByPredicates($pb);
+            $pb          = $this->unitImplementationMapper->getPredicateBuilder()->in('course_implementation_id', $courseImpls->getPropertyValues('id'));
+            $unitImplIds = $this->unitImplementationMapper->findIdsByPredicates($pb);
         } else {
             $unitImplIds = [];
         }

@@ -26,6 +26,8 @@ use Schoolbox\Learning\Assessment\Participant\DataSource;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
@@ -98,6 +100,12 @@ class Controller extends Assessment\Controller
         protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
+        protected Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder,
+        protected Filter\CompositeFactoryFactory $filtersFactoryFactory,
+        protected Filter\Mapper $filterMapper,
+        protected Filter\Selection\Mapper $filterSelectionMapper,
+        protected CourseImplementationMapper $courseImplementationMapper,
+        protected UnitImplementationMapper $unitImplementationMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -117,6 +125,12 @@ class Controller extends Assessment\Controller
             $projectResultCacheMapper,
             $lessonPlanTemplateMapper,
             $lessonPlanDataModelMapper,
+            $filtersAssessmentIdFinder,
+            $filtersFactoryFactory,
+            $filterMapper,
+            $filterSelectionMapper,
+            $courseImplementationMapper,
+            $unitImplementationMapper,
         );
         $this->taskResponseDataSource = $taskResponseDataSource;
     }
@@ -147,9 +161,7 @@ class Controller extends Assessment\Controller
             $courseSpec = $assessment->getBaseContext()->getCourse();
             $queryArgs = $this->requestQuery->getArrayCopy();
             [$filters,] = $this->convertRequestToFilters($courseSpec, $queryArgs, false);
-            /** @var Filter\Filters\Assessment\IdFinder  $assessmentIdFinder */
-            $assessmentIdFinder = $this->getDi()->get('filters.assessmentIdFinder');
-            $assessmentIds  = $assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
+            $assessmentIds  = $this->filtersAssessmentIdFinder->findIdsByFilters($filters, $this->getUser());
 
             // Fetch assessments
             $assessments = $this->getAssessmentMapper()->findAllByIds($assessmentIds);

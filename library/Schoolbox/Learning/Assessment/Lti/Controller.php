@@ -17,6 +17,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error;
 use Schoolbox\Error\Mapper;
+use Schoolbox\Filter;
 use Schoolbox\Instance;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment;
@@ -31,6 +32,8 @@ use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\LTI\Assessment as LtiAssessment;
@@ -132,6 +135,12 @@ class Controller extends Assessment\Controller
         protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
+        protected Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder,
+        protected Filter\CompositeFactoryFactory $filtersFactoryFactory,
+        protected Filter\Mapper $filterMapper,
+        protected Filter\Selection\Mapper $filterSelectionMapper,
+        protected CourseImplementationMapper $courseImplementationMapper,
+        protected UnitImplementationMapper $unitImplementationMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -151,6 +160,12 @@ class Controller extends Assessment\Controller
             $this->projectResultCacheMapper,
             $lessonPlanTemplateMapper,
             $lessonPlanDataModelMapper,
+            $filtersAssessmentIdFinder,
+            $filtersFactoryFactory,
+            $filterMapper,
+            $filterSelectionMapper,
+            $courseImplementationMapper,
+            $unitImplementationMapper,
         );
         $this->ltiToolMapper            = $ltiToolMapper;
         $this->ltiAssessmentMapper      = $ltiAssessmentMapper;

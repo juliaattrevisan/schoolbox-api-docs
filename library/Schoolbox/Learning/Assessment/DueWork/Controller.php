@@ -31,6 +31,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper;
 use Schoolbox\File\MimetypeMapper;
+use Schoolbox\Filter;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
@@ -38,6 +39,8 @@ use Schoolbox\Learning\Assessment\DueWork\Download\MessageFactory;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\DueWork\StateMapper;
@@ -188,6 +191,12 @@ class Controller extends Assessment\Controller
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
         protected MimetypeMapper $mimeTypeMapper,
+        protected Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder,
+        protected Filter\CompositeFactoryFactory $filtersFactoryFactory,
+        protected Filter\Mapper $filterMapper,
+        protected Filter\Selection\Mapper $filterSelectionMapper,
+        protected CourseImplementationMapper $courseImplementationMapper,
+        protected UnitImplementationMapper $unitImplementationMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -207,6 +216,12 @@ class Controller extends Assessment\Controller
             $this->projectResultCacheMapper,
             $lessonPlanTemplateMapper,
             $lessonPlanDataModelMapper,
+            $filtersAssessmentIdFinder,
+            $filtersFactoryFactory,
+            $filterMapper,
+            $filterSelectionMapper,
+            $courseImplementationMapper,
+            $unitImplementationMapper,
             null,
             null,
             null,
