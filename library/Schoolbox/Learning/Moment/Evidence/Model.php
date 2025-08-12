@@ -34,12 +34,6 @@ class Model implements IFile
 
 
     /**
-     * @var string|null
-     */
-    private ?string $hash = null;
-
-
-    /**
      * @return User
      */
     public function getOwner(): User
@@ -84,26 +78,6 @@ class Model implements IFile
     public function setType(?string $type): self
     {
         $this->type = $type;
-        return $this;
-    }
-
-
-    /**
-     * @return string|null
-     */
-    public function getHash(): ?string
-    {
-        return $this->hash;
-    }
-
-
-    /**
-     * @param string|null $hash
-     * @return $this
-     */
-    public function setHash(?string $hash): self
-    {
-        $this->hash = $hash;
         return $this;
     }
 }
