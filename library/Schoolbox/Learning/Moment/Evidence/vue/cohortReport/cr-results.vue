@@ -29,6 +29,14 @@ const resultGroups = window.Vue.computed(() => {
 
 <template>
     <div class="l-flex-col l-gap-m">
+        <cr-results-group
+            v-for="(group, i) in resultGroups"
+            :key="group.label"
+            :label="group.label"
+            :entries="group.entries"
+            :start-expanded="i === 0"
+        />
+
         <div v-if="crStore.loadError" class="alert-box alert">
             {{ crStore.loadError }}
         </div>
@@ -37,14 +45,6 @@ const resultGroups = window.Vue.computed(() => {
                 <div class="loader"></div>
             </section>
         </div>
-
-        <cr-results-group
-            v-for="(group, i) in resultGroups"
-            :key="group.label"
-            :label="group.label"
-            :entries="group.entries"
-            :start-expanded="i === 0"
-        />
     </div>
 </template>
 
