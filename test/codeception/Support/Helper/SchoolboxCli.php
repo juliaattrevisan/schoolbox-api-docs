@@ -289,7 +289,7 @@ class SchoolboxCli extends \Codeception\Module
      * Returns the first learning moment based on its title.
      *
      * @param string $body
-     * @return \Schoolbox\Learning\Moment\Model;
+     * @return \Schoolbox\Learning\Moment\Model
      */
     public function grabLearningMomentByBody(string $body): \Schoolbox\Learning\Moment\Model
     {
@@ -300,7 +300,7 @@ class SchoolboxCli extends \Codeception\Module
      * Returns the lesson plan template based on its title.
      *
      * @param string $title
-     * @return \Schoolbox\Admin\LessonPlan\Template\Model;
+     * @return \Schoolbox\Admin\LessonPlan\Template\Model
      */
     public function grabLessonPlanTemplateByTitle(?string $title): \Schoolbox\Admin\LessonPlan\Template\Model
     {
@@ -312,7 +312,7 @@ class SchoolboxCli extends \Codeception\Module
      * Returns the lesson plan template field based on its title
      *
      * @param string $title
-     * @return \Schoolbox\Admin\LessonPlan\Template\Field\Model;
+     * @return \Schoolbox\Admin\LessonPlan\Template\Field\Model
      */
     public function grabLessonPlanTemplateFieldByTitle(?string $title): \Schoolbox\Admin\LessonPlan\Template\Field\Model
     {

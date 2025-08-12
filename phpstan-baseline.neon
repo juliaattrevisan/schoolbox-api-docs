@@ -6331,24 +6331,6 @@ parameters:
 			path: test/codeception/Api/Calendar/CalendarEventCreateModifyCest.php
 
 		-
-			message: '#^PHPDoc tag @return has invalid value \(\\Schoolbox\\Admin\\LessonPlan\\Template\\Field\\Model;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 167 on line 5$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: test/codeception/Support/Helper/SchoolboxCli.php
-
-		-
-			message: '#^PHPDoc tag @return has invalid value \(\\Schoolbox\\Admin\\LessonPlan\\Template\\Model;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 156 on line 5$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: test/codeception/Support/Helper/SchoolboxCli.php
-
-		-
-			message: '#^PHPDoc tag @return has invalid value \(\\Schoolbox\\Learning\\Moment\\Evidence\\Model;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 155 on line 5$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: test/codeception/Support/Helper/SchoolboxCli.php
-
-		-
 			message: '#^Trait Tests\\Support\\Payload\\GetTrait is used zero times and is not analysed\.$#'
 			identifier: trait.unused
 			count: 1
