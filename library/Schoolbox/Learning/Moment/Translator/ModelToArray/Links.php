@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Moment\Translator\ModelToArray;
 
 use Schoolbox\API\Translator\AbstractLinks;
-use Schoolbox\Learning\Moment\Evidence;
 
 /**
  * Translator for loading links into the array.

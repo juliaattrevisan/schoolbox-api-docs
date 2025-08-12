@@ -12,7 +12,6 @@ namespace Schoolbox\Learning\Moment\Translator\ModelToArray;
 use Alaress\HTMLPurifier\IPurifier;
 use Error;
 use Schoolbox\Curriculum\Node;
-use Schoolbox\Learning\Moment\Evidence;
 
 /**
  * Translator for translating a learning moment evidence model into an array,

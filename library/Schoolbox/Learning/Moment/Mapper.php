@@ -15,7 +15,6 @@ use PDOStatement;
 use Schoolbox\Discussion\Thread\Mapper as ThreadMapper;
 use Schoolbox\File\Mimetype;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Moment\Model;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;
@@ -40,7 +39,7 @@ class Mapper extends BaseMapper
      */
     protected function mapping(): void
     {
-        $this->hasTable('evidence');
+        $this->hasTable('moment');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('hash', Storage\Mapper::class, 'hash', null, null, 'storage', 'storage');
@@ -288,7 +287,7 @@ class Mapper extends BaseMapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('curriculum_moment', 'cn')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
-            INNER JOIN curriculum_moment cm ON evidence.id = cm.evidence_id
+            INNER JOIN curriculum_moment cm ON moment.id = cm.evidence_id
             INNER JOIN curriculum_node cn ON cm.curriculum_node_id = cn.id AND cn.deleted_at IS NULL
             WHERE {$pb->getWhereIntersect()}
         ";

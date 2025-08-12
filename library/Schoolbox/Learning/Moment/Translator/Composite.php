@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment\Translator;
 
-use Schoolbox\Learning\Moment\Evidence;
-
 /**
  * Composite translator: takes multiple translators, and merges their results
  * together.

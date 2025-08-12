@@ -15,7 +15,6 @@ use Schoolbox\API\Translator\ArrayToModel\Base;
 use Schoolbox\Curriculum\Node\Model as CurriculumNode;
 use Schoolbox\Discussion\Thread\Model as DiscussionThread;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Moment\Evidence;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Exception as ResourceException;
 use Schoolbox\Resource\Storage\Model as StorageModel;

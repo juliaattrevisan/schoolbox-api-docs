@@ -13,8 +13,6 @@ use Alaress\HTMLPurifier\IPurifier;
 use Alaress\Json\Decorator\PropertyDecorator;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Json\Decorator\LinkDecorator;
-use Schoolbox\Learning\Moment\Evidence;
-use Schoolbox\Learning\Moment\Evidence\Discussion;
 use Schoolbox\Mapper\Exception as MapperException;
 
 /**

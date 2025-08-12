@@ -41,7 +41,7 @@ class Cursor implements ICursor
      * Discriminator value for identifying that a retrieved result points to an
      * evidence record.
      */
-    public const DISCRIMINATOR_EVIDENCE = 'evidence';
+    public const DISCRIMINATOR_EVIDENCE = 'moment';
 
     /**
      * Discriminator value for identifying that a retrieved result points to a
@@ -304,9 +304,9 @@ class Cursor implements ICursor
             $query .= 'COUNT(*) ';
         } else {
             $query .= (
-                'e.id                   AS id,
+                'm.id                   AS id,
                  :discriminatorEvidence AS discriminator,
-                 e.created_at           AS date '
+                 m.created_at           AS date '
             );
             $params['discriminatorEvidence'] = self::DISCRIMINATOR_EVIDENCE;
         }
@@ -319,7 +319,7 @@ class Cursor implements ICursor
                      SELECT *
                      FROM moment_tag    AS mt
                      JOIN lu_moment_tag AS lumt ON lumt.id = mt.tag_id
-                     WHERE mt.evidence_id = e.id
+                     WHERE mt.evidence_id = m.id
                      AND lumt.name = :tagEvidence
                  )'
             );
@@ -327,9 +327,9 @@ class Cursor implements ICursor
         }
 
         $query .= (
-            "FROM evidence AS e
-             WHERE e.user_id = :userIdEvidence
-             AND e.deleted_at IS NULL
+            "FROM moment AS m
+             WHERE m.user_id = :userIdEvidence
+             AND m.deleted_at IS NULL
              AND $sqlWhereCondition"
         );
 
@@ -350,7 +350,7 @@ class Cursor implements ICursor
          */
         if ($this->viewer->getRole()->isParent() || $this->viewer->getRole()->isStudent()) {
             $query .= '
-               AND (e.created_by = :createdBy OR e.published_at IS NOT NULL)
+               AND (m.created_by = :createdBy OR m.published_at IS NOT NULL)
             ';
 
             $params['createdBy'] = $this->viewer->getId();
