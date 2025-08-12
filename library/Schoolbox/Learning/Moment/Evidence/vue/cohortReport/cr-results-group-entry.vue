@@ -58,6 +58,15 @@ window.Vue.onMounted(() => {
 
 <template>
     <div
+        v-if="crStore.loadingEntries[props.entry.id]"
+        class="cr-result-entry cr-result-entry--loading l-flex-col l-pad-s"
+        :class="`cr-result-entry--${props.entry.currentState}`"
+    >
+        <div class="loader"></div>
+    </div>
+
+    <div
+        v-else
         class="cr-result-entry l-flex-col l-pad-s actions-small-1"
         :class="`cr-result-entry--${props.entry.currentState}`"
     >
@@ -158,6 +167,11 @@ window.Vue.onMounted(() => {
 
 .cr-result-entry {
     border: 1px solid var(--form-border-color);
+
+    &--loading {
+        opacity: 0.5;
+        pointer-events: none;
+    }
 
     &--draft {
         border-color: $neutral-foreground;

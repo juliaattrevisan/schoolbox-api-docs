@@ -211,5 +211,6 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         toggleEntrySelection,
         publishEntries,
         rejectEntries,
+        loadingEntries,
     };
 });
