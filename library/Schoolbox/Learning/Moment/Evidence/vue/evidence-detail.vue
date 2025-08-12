@@ -4,7 +4,7 @@
 /* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
 import MediaArticle from "@schoolboxVue/components/media-article";
-import Storage from "@schoolboxVue/components/storage";
+import StorageObject from "@schoolboxVue/components/storage-object";
 import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time";
 import CommentThread from "./comment-thread";
 import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
@@ -42,7 +42,7 @@ export default {
      */
     components: {
         MediaArticle,
-        Storage,
+        StorageObject,
         RelativeTime,
         CommentThread,
         CodesList,
@@ -167,7 +167,10 @@ export default {
                                 <!-- The wrapping div is expected by mepUtils.fixVideoPlayerDimensions(). -->
                                 <div v-if="evidence.filename && evidence.storage" class="feed-body small-12 columns">
                                     <article>
-                                        <storage :storage="evidence.storage" :filename="evidence.filename"></storage>
+                                        <storage-object
+                                            :storage="evidence.storage"
+                                            :filename="evidence.filename"
+                                        ></storage-object>
                                     </article>
                                 </div>
                             </section>

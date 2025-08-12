@@ -4,7 +4,7 @@
 /* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
 import MediaArticle from "@schoolboxVue/components/media-article";
-import Storage from "@schoolboxVue/components/storage";
+import StorageObject from "@schoolboxVue/components/storage-object";
 import CommentThread from "./comment-thread";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import Toast from "@schoolboxVue/components/toast";
@@ -23,7 +23,7 @@ export default {
         Toast,
         RevealModal,
         MediaArticle,
-        Storage,
+        StorageObject,
         CommentThread,
         BadgeImage,
         CodesList,
@@ -760,11 +760,11 @@ export default {
                                     <div class="feed-body small-12 columns">
                                         <!-- Is there an attachment? Display it appropriately -->
                                         <article v-if="evidence.object.filename && evidence.object.storage">
-                                            <storage
+                                            <storage-object
                                                 :storage="evidence.object.storage"
                                                 :filename="evidence.object.filename"
                                                 data-test="learning-moment-evidence-media"
-                                            ></storage>
+                                            ></storage-object>
                                         </article>
 
                                         <!-- Display evidence body, with media players initialised -->

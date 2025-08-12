@@ -5,7 +5,7 @@
 /* eslint-enable vue/no-v-html */
 import { getSearchString } from "@js/util/queryUtils";
 import MediaArticle from "@schoolboxVue/components/media-article";
-import Storage from "@schoolboxVue/components/storage";
+import StorageObject from "@schoolboxVue/components/storage-object";
 import Toast from "@schoolboxVue/components/toast";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import AddCommentInput from "@schoolboxVue/components/ckeditor/add-comment-input";
@@ -14,7 +14,7 @@ import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
 export default {
     components: {
         MediaArticle,
-        Storage,
+        StorageObject,
         Toast,
         RevealModal,
         AddCommentInput,
