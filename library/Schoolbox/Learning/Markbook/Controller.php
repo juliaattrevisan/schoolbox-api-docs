@@ -95,6 +95,7 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate('@learningMarkbook/markbookOuter.twig', [
                 'folder'      => $folder,
                 'filterPanel' => $filterPanel,
+                'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
             ], $pageTitle, 'submission');
     }
 
