@@ -305,8 +305,7 @@ class Controller extends Assessment\Controller
         }
 
         $aImpls = [];
-        /* for this endpoint, only show participants if the assessment is not a specification
-         * courseStatus.getStatus exists instead for specs */
+        // impl assessments we can just grab the details, spec we need to get the unit assessments first
         if (!$assessment->isSpecification()) {
             $aImpls[$assessment->getId()] = [
                 'assessment' => $assessment,
