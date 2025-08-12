@@ -288,11 +288,16 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
      */
     public function process(Collection $records, ?string $encodedCursor = null)
     {
+        $totalCount = $this->getTotalCount();
         $totalRow = array_merge(
             ['type_subtype' => 'Total'],
-            $this->getTotalCount()
-                         ->map(fn($count) => [ $this->resultType => is_numeric($count) ? $count / 1 : null ])->getAll()
+            $totalCount->map(fn($count) => [ $this->resultType => is_numeric($count) ? $count / 1 : null ])->getAll()
         );
+        unset($totalCount['total']);
+        $totalRow['trend'] = [
+            'line' => array_values($totalCount->getAll()),
+            'tooltips' => array_map(fn(string $key) => ucwords(str_replace('_', ' ', $key)), $totalCount->keys()),
+        ];
         return [
             'data' => [
                 'tableHeaders' => $this->getTableHeaders(),
