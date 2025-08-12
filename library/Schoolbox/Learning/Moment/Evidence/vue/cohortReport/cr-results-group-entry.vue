@@ -101,7 +101,7 @@ window.Vue.onMounted(() => {
                     ></storage-object>
                 </article>
 
-                <p>
+                <p class="l-mar-s--top">
                     <!-- eslint-disable-next-line vue/no-v-html - this is scrubbed on the backend -->
                     <span v-html="props.entry.blurb"></span>
                     <span v-if="props.entry.showReadMore" class="l-mar-s--top">

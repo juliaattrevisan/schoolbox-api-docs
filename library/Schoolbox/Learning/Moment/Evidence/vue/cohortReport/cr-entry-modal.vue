@@ -1,8 +1,10 @@
 <script lang="ts" setup>
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
+import { useCohortReportStore } from "./store/cohortReportStore";
 import { CohortReportModalType, useCohortReportModalStore } from "./store/cohortReportModalStore";
 
+const crStore = useCohortReportStore();
 const crmStore = useCohortReportModalStore();
 
 const rejectReason = window.Vue.ref<string>("");
@@ -15,15 +17,21 @@ window.Vue.watch(
 );
 
 /**
- * Handle the rejection of an entry
+ * Handle the rejection of the selected entries
  */
-function onReject(): void {
+async function onReject(): Promise<void> {
+    if (!crmStore.selectedEntries || crmStore.selectedEntries.length === 0) {
+        throw new Error("No entries selected for rejection");
+    }
+
     crmStore.isModalOpen = false;
-    alert("todo");
+    // TODO: Support bulk rejection
+    await crStore.rejectEntry(crmStore.selectedEntries[0].id, rejectReason.value);
+    rejectReason.value = "";
 }
 
 /**
- * Handle the deletion of an entry
+ * Handle the deletion of the selected entries
  */
 function onDelete(): void {
     crmStore.isModalOpen = false;
