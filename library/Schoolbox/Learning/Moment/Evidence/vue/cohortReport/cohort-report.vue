@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 /** Learning Moments Cohort Report */
 import { useElementSize } from "@vueuse/core";
+import { useCohortReportStore } from "./store/cohortReportStore";
 import CrFilters from "./cr-filters.vue";
 import CrResults from "./cr-results.vue";
-import { useCohortReportStore } from "./store/cohortReportStore";
+import CrEntryModal from "./cr-entry-modal.vue";
 
 const SINGLE_COLUMN_BREAKPOINT = 800;
 
@@ -40,6 +41,8 @@ const isSingleColumn = window.Vue.computed(() => containerWidth.value < SINGLE_C
             <cr-results class="cohort-report--results" />
         </div>
     </div>
+
+    <cr-entry-modal />
 </template>
 
 <style lang="scss" scoped>

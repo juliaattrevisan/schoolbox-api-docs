@@ -5,6 +5,7 @@ import { EvidenceStatus, evidenceStatusLabels } from "@schoolboxLearningMomentEv
 import { useCohortReportStore } from "./store/cohortReportStore";
 import type { CohortReportEntry } from "./store/cohortReportPayload";
 import CrResultsGroupEntryActions from "./cr-results-group-entry-actions.vue";
+import { CohortReportModalType, useCohortReportModalStore } from "./store/cohortReportModalStore";
 
 interface Props {
     entry: CohortReportEntry;
@@ -13,6 +14,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const crStore = useCohortReportStore();
+const crmStore = useCohortReportModalStore();
 
 const inputId = window.Vue.computed(() => {
     return `${props.dataPrefix}-select-${props.entry.id}`;
@@ -48,13 +50,6 @@ window.Vue.onMounted(() => {
         selectedEvidenceHash.value = props.entry.files[0].hash;
     }
 });
-
-/**
- * Open a modal to show the full body of the entry
- */
-function onReadMore(): void {
-    alert("todo");
-}
 </script>
 
 <template>
@@ -104,7 +99,9 @@ function onReadMore(): void {
                     <!-- eslint-disable-next-line vue/no-v-html - this is scrubbed on the backend -->
                     <span v-html="props.entry.blurb"></span>
                     <span v-if="props.entry.showReadMore" class="l-mar-s--top">
-                        <a @click.prevent="onReadMore">READ MORE</a>
+                        <a @click.prevent="crmStore.openModal(props.entry, CohortReportModalType.READ_MORE)">
+                            READ MORE
+                        </a>
                     </span>
                 </p>
             </div>
