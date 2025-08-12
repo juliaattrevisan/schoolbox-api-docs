@@ -5,7 +5,6 @@
  * @copyright Copyright 2025, Schoolbox Pty Ltd
  * @link      https://schoolbox.education/
  */
-
 declare(strict_types=1);
 
 /**
@@ -23,5 +22,5 @@ use Schoolbox\Realtime\Mobile\CommandLineTool\CleanupQueue;
 
 require __DIR__ . '/../../conf/core/require.php';
 
-$kernel = new Kernel(new CleanupQueue());
+$kernel = new Kernel(new CleanupQueue(), [], true);
 $kernel->runApp();
