@@ -117,9 +117,9 @@ const chartOptions = window.Vue.ref({
                 </button>
             </template>
             <template v-else-if="header.type == TableHeaderType.TYPE_SUB_TYPE">
-                {{ (props.rowData[header.key] as TypeSubType).title }}
-                <template v-if="(props.rowData[header.key] as TypeSubType).subTitle">
-                    <br />({{ (props.rowData[header.key] as TypeSubType).subTitle }})
+                <b>{{ (props.rowData[header.key] as TypeSubType).type }}</b>
+                <template v-if="(props.rowData[header.key] as TypeSubType).subtype">
+                    <br /><em>{{ (props.rowData[header.key] as TypeSubType).subtype }}</em>
                 </template>
             </template>
             <template v-else-if="header.type == TableHeaderType.TREND">

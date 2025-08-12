@@ -80,11 +80,11 @@ export type TableHeader = {
 export type RecordsAndPoints = { records: number; points?: never } | { records?: never; points: number | null };
 
 /**
- * Displays the title and subTitle in the table cell
+ * Displays the type and subtype in the table cell
  */
 export type TypeSubType = {
-    title: string;
-    subTitle?: string;
+    type: string;
+    subtype?: string;
 };
 
 /**
