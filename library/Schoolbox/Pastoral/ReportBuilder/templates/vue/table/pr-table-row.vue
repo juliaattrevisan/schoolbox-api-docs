@@ -36,9 +36,19 @@ const emit = defineEmits<{
 const rowKeys = (): RowKeys => {
     // check if there's a 'user' key in rowData and return its id if it exists
     const user = props.rowData.user as User;
-    return {
-        student_id: user?.id || 0,
-    };
+    if (user) {
+        return {
+            student_id: user.id || 0,
+        };
+    }
+    const typeSubtype = props.rowData.type_subtype as TypeSubType;
+    if (typeSubtype) {
+        return {
+            type_id: typeSubtype.typeId || 0,
+            subtype_id: typeSubtype.subtypeId || 0,
+        };
+    }
+    return {};
 };
 
 /**

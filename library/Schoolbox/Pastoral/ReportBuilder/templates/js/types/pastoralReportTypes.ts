@@ -85,7 +85,9 @@ export type RecordsAndPoints = { records: number; points?: never } | { records?:
  */
 export type TypeSubType = {
     type: string;
+    typeId: number;
     subtype?: string;
+    subtypeId?: number;
 };
 
 /**
