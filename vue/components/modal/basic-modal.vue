@@ -110,7 +110,7 @@ function onBackgroundClick(): void {
         width: 70%;
     }
     &__container--m {
-        max-width: 700px;
+        max-width: 1000px;
     }
 
     &__container--s {
