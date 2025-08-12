@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence\Discussion\Comment;
+namespace Schoolbox\Learning\Moment\Discussion\Comment;
 
 use Alaress\Authorizer as Auth;
 use InvalidArgumentException;
@@ -45,7 +45,7 @@ class Module extends Comment\Module
         /** @var Thread\Mapper $threadMapper */
         $threadMapper = $this->getMapperFactory()->get(Thread\Mapper::class);
 
-        return new Evidence\Discussion\ThreadLocator($threadMapper, $evidenceMapper);
+        return new \Schoolbox\Learning\Moment\Discussion\ThreadLocator($threadMapper, $evidenceMapper);
     }
 
 

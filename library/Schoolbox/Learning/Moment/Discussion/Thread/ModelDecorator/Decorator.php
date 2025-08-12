@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence\Discussion\Thread\ModelDecorator;
+namespace Schoolbox\Learning\Moment\Discussion\Thread\ModelDecorator;
 
 use Schoolbox\Discussion\Thread\ModelDecorator\BaseDecorator;
 use Schoolbox\Json\Api\AuraLink;

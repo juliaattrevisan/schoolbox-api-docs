@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence\Discussion\Thread;
+namespace Schoolbox\Learning\Moment\Discussion\Thread;
 
 use Alaress\Authorizer as Auth;
 use Alaress\Web\Router\PathMatcher;
@@ -69,7 +69,7 @@ class Module extends Thread\Module
         /** @var Thread\Mapper $threadMapper */
         $threadMapper = $this->getMapperFactory()->get(Thread\Mapper::class);
 
-        return new Evidence\Discussion\ThreadLocator($threadMapper, $evidenceMapper);
+        return new \Schoolbox\Learning\Moment\Discussion\ThreadLocator($threadMapper, $evidenceMapper);
     }
 
 
@@ -82,7 +82,7 @@ class Module extends Thread\Module
      */
     protected function buildModelDecoratorFactory(): Thread\ModelDecorator\IFactory
     {
-        return new ModelDecorator\Factory();
+        return new \Schoolbox\Learning\Moment\Discussion\Thread\ModelDecorator\Factory();
     }
 
 
@@ -93,7 +93,7 @@ class Module extends Thread\Module
      */
     protected function buildCommentModelDecoratorFactory(): Comment\ModelDecorator\IFactory
     {
-        return new Evidence\Discussion\Comment\ModelDecorator\Factory();
+        return new \Schoolbox\Learning\Moment\Discussion\Comment\ModelDecorator\Factory();
     }
 
 

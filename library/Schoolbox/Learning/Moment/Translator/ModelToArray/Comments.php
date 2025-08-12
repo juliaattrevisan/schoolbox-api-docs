@@ -122,14 +122,14 @@ class Comments
         $results        = $commentCursor->retrieveResults(null);
         $encodedResults = $results
             ->map(static function (Comment\Model $comment) use ($evidence) {
-                return new Discussion\Comment\ModelDecorator\Decorator($comment, $evidence);
+                return new \Schoolbox\Learning\Moment\Discussion\Comment\ModelDecorator\Decorator($comment, $evidence);
             });
         $encodedResults = $encodedResults
             ->jsonSerialize($this->propertyDecorator, $this->linkDecorator);
 
 
         // Serialize the discussion thread using its decorator
-        $result = (new Discussion\Thread\ModelDecorator\Decorator($evidence->getDiscussionThread(), $evidence))
+        $result = (new \Schoolbox\Learning\Moment\Discussion\Thread\ModelDecorator\Decorator($evidence->getDiscussionThread(), $evidence))
             ->jsonSerialize($this->propertyDecorator, $this->linkDecorator);
 
 

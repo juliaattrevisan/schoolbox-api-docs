@@ -580,7 +580,7 @@ class Model implements ISoftDeletable, IThreadLocation
      */
     public function getCommentNotifier(): ?string
     {
-        return Discussion\Comment\Notifier::class;
+        return \Schoolbox\Learning\Moment\Discussion\Comment\Notifier::class;
     }
 
 

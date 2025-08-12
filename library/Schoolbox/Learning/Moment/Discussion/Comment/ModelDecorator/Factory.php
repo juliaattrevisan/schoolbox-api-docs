@@ -7,16 +7,16 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence\Discussion\Thread\ModelDecorator;
+namespace Schoolbox\Learning\Moment\Discussion\Comment\ModelDecorator;
 
+use Schoolbox\Discussion\Comment\Model;
+use Schoolbox\Discussion\Comment\ModelDecorator\BaseDecorator;
+use Schoolbox\Discussion\Comment\ModelDecorator\IFactory;
 use Schoolbox\Discussion\Thread\Context\IThreadLocation;
-use Schoolbox\Discussion\Thread\Model;
-use Schoolbox\Discussion\Thread\ModelDecorator\BaseDecorator;
-use Schoolbox\Discussion\Thread\ModelDecorator\IFactory;
 
 /**
  * Factory for model decorators for the evidence variant of the discussion
- * thread module.
+ * thread comments module.
  */
 class Factory implements IFactory
 {

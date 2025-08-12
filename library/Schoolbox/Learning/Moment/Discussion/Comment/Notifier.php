@@ -7,17 +7,18 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence\Discussion\Comment;
+namespace Schoolbox\Learning\Moment\Discussion\Comment;
 
 use Alaress\Async\Notification\Instance\Builder;
 use Alaress\Async\Notification\Parameter\Param;
 use Monolog\Logger;
 use Psr\Container\ContainerInterface;
+use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 use Schoolbox\Discussion\Comment\Model as Comment;
 use Schoolbox\Discussion\Thread\Mapper as ThreadMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
-use Schoolbox\Learning\Moment\Evidence\Discussion\ThreadLocator;
+use Schoolbox\Learning\Moment\Discussion\ThreadLocator;
 use Schoolbox\Learning\Moment\Evidence\Mapper as EvidenceMapper;
 use Schoolbox\Learning\Moment\Evidence\Model as Evidence;
 use Schoolbox\Mapper;
@@ -27,7 +28,6 @@ use Schoolbox\Realtime\Notification\Envelope;
 use Schoolbox\Realtime\Notification\Parameter\ChildParam;
 use Schoolbox\Realtime\Notification\Parameter\UserParam;
 use Schoolbox\Realtime\Schedule\Module\AbstractModuleNotifier;
-use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 use Schoolbox\Realtime\Schedule\Trigger\TriggerBundleInterface;
 use Schoolbox\Role;
 use Schoolbox\User;

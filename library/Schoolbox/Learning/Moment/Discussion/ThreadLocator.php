@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence\Discussion;
+namespace Schoolbox\Learning\Moment\Discussion;
 
 use Schoolbox\Discussion\Thread;
 use Schoolbox\Learning\Moment\Evidence;
