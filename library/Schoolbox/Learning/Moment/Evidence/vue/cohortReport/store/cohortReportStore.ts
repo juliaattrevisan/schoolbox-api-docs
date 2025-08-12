@@ -12,6 +12,17 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
     const loadError = window.Vue.ref<string | null>(null);
 
     /**
+     * Clear the current data in the store
+     * i.e. when applying new filters, since we don't want to keep old results
+     */
+    function clearData(): void {
+        results.value = [];
+        selectedResults.value = {};
+        isLoading.value = true;
+        loadError.value = null;
+    }
+
+    /**
      * Load cohort report data
      */
     async function loadData(): Promise<void> {
@@ -37,8 +48,7 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
      */
     async function init($endpoint: string): Promise<void> {
         endpoint = $endpoint;
-        results.value = [];
-        selectedResults.value = {};
+        clearData();
         await loadData();
     }
 
@@ -67,6 +77,7 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         results,
         selectedResults,
         isLoading,
+        clearData,
         loadData,
         loadError,
         isEntrySelected,

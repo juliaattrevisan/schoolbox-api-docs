@@ -41,6 +41,7 @@ window.Vue.watch(
  */
 async function applyFilters(): Promise<void> {
     // TODO
+    crStore.clearData();
     await crStore.loadData();
 }
 
