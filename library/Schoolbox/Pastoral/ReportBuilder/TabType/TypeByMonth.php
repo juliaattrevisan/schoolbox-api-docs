@@ -289,9 +289,11 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
     public function process(Collection $records, ?string $encodedCursor = null)
     {
         $totalCount = $this->getTotalCount();
+        $totalCount = $totalCount->map(fn($count) => is_numeric($count) ? $count / 1 : null);
+
         $totalRow = array_merge(
             ['type_subtype' => 'Total'],
-            $totalCount->map(fn($count) => [ $this->resultType => is_numeric($count) ? $count / 1 : null ])->getAll()
+            $totalCount->map(fn($count) => [ $this->resultType => $count ])->getAll()
         );
         unset($totalCount['total']);
         $totalRow['trend'] = [
