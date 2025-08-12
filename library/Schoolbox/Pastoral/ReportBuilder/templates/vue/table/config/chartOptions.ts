@@ -4,6 +4,7 @@
  */
 
 import type { Point, Options } from "highcharts";
+import type { RowOptions, Trend } from "../../../js/types/pastoralReportTypes";
 
 export const trendOptions: Options = {
     accessibility: {
@@ -50,3 +51,29 @@ export const trendOptions: Options = {
         visible: false,
     },
 };
+
+/**
+ * Chart options for the trend chart in the table row.
+ * @returns - The chart options for the trend.
+ */
+export function getChartOptions(rowData: { [key: string]: RowOptions }): Options {
+    const trend = rowData.trend as Trend;
+    // run through the line and make any 0 values null
+    // trend.line = trend.line.map((value: number | null) => (value === 0 ? null : value));
+    if (trend === undefined) {
+        return trendOptions;
+    }
+    return {
+        ...trendOptions,
+        series: [
+            {
+                ...trendOptions.series[0],
+                data: trend.line,
+            },
+        ],
+        xAxis: {
+            ...trendOptions.xAxis,
+            categories: trend.tooltips,
+        },
+    };
+}

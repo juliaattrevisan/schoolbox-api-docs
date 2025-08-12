@@ -5,7 +5,6 @@
  */
 
 import { Chart } from "highcharts-vue";
-import type { Options } from "highcharts";
 import "highcharts/modules/accessibility";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
@@ -16,9 +15,8 @@ import type {
     RecordsAndPoints,
     TypeSubType,
     RowKeys,
-    Trend,
 } from "../../js/types/pastoralReportTypes";
-import { trendOptions } from "./config/chartOptions";
+import { getChartOptions } from "./config/chartOptions";
 
 const props = defineProps<{
     headers: TableHeader[];
@@ -49,32 +47,6 @@ const rowKeys = (): RowKeys => {
  */
 function onCellSelected(header: TableHeader): void {
     emit("cellSelect", header, rowKeys());
-}
-
-/**
- * Chart options for the trend chart in the table row.
- * @returns - The chart options for the trend.
- */
-function getChartOptions(): Options {
-    const trend = props.rowData.trend as Trend;
-    // run through the line and make any 0 values null
-    // trend.line = trend.line.map((value: number | null) => (value === 0 ? null : value));
-    if (trend === undefined) {
-        return trendOptions;
-    }
-    return {
-        ...trendOptions,
-        series: [
-            {
-                ...trendOptions.series[0],
-                data: trend.line,
-            },
-        ],
-        xAxis: {
-            ...trendOptions.xAxis,
-            categories: trend.tooltips,
-        },
-    };
 }
 </script>
 
@@ -142,7 +114,7 @@ function getChartOptions(): Options {
                 </template>
             </template>
             <template v-else-if="header.type == TableHeaderType.TREND">
-                <chart :options="getChartOptions()"></chart>
+                <chart :options="getChartOptions(props.rowData)"></chart>
             </template>
             <template v-else>
                 {{ props.rowData[header.key] }}

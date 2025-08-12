@@ -4,9 +4,11 @@
  * Renders a single total row with cells based on column types.
  */
 
+import { Chart } from "highcharts-vue";
 import { capitalizeFirstLetter } from "@js/util/stringUtils";
 import { TableHeaderType } from "../../js/types/pastoralReportTypes";
 import type { TableHeader, RowOptions, RecordsAndPoints } from "../../js/types/pastoralReportTypes";
+import { getChartOptions } from "./config/chartOptions";
 
 const props = defineProps<{
     headers: TableHeader[];
@@ -84,6 +86,9 @@ function onCellSelected(header: TableHeader): void {
                 >
                     {{ (props.rowData[header.key] as RecordsAndPoints).points }}
                 </button>
+            </template>
+            <template v-else-if="header.type == TableHeaderType.TREND">
+                <chart :options="getChartOptions(props.rowData)"></chart>
             </template>
             <template v-else>
                 {{ props.rowData[header.key] }}
