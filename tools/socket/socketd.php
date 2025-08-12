@@ -14,6 +14,8 @@ use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategyBuilder;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Ratchet\Server\IoServer;
+use Ratchet\Session\Serialize\PhpBinaryHandler;
+use Ratchet\Session\Serialize\PhpHandler;
 use React\EventLoop\LoopInterface;
 use React\Socket\SocketServer;
 use Schoolbox\Application\Daemon;
@@ -33,6 +35,19 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     $port = $opts['p'] ?? 9081;
     $conf = $opts['c'] ?? 'socketd.conf';
 
+    // Session serialize handler: depends on configuration
+    $sessionSerializeHandlerConfig = strtolower(ini_get('session.serialize_handler'));
+    $sessionSerializeHandler       = match ($sessionSerializeHandlerConfig) {
+        'php_serialize' => new PhpSerializeSessionHandler(),
+        'php'           => new PhpHandler(),
+        'php_binary'    => new PhpBinaryHandler(),
+        default         => throw new RuntimeException(
+            sprintf(
+                'No serialize handler available (session.serialize_handler: "%s")',
+                $sessionSerializeHandlerConfig,
+            ),
+        ),
+    };
 
     // Need the multi-instance repository
     /** @var MultiInstance\InstanceRepository $instanceRepository */
@@ -61,7 +76,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
 
     $pipeManager = (new PipeManagerFactory(
         $loop,
-        new PhpSerializeSessionHandler(),
+        $sessionSerializeHandler,
         $log,
         $instanceRepository,
         $configRepository,
