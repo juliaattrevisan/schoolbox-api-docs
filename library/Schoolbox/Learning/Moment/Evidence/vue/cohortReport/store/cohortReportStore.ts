@@ -42,6 +42,26 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         await loadData();
     }
 
+    /**
+     * @param entryId The entry ID to check
+     * @returns whether the entry is selected
+     */
+    function isEntrySelected(entryId: number): boolean {
+        return !!selectedResults.value[entryId];
+    }
+
+    /**
+     * Toggle selection of a specific entry
+     * @param entryId The entry ID to toggle
+     */
+    function toggleEntrySelection(entryId: number): void {
+        if (selectedResults.value[entryId]) {
+            delete selectedResults.value[entryId];
+        } else {
+            selectedResults.value[entryId] = true;
+        }
+    }
+
     return {
         init,
         results,
@@ -49,5 +69,7 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         isLoading,
         loadData,
         loadError,
+        isEntrySelected,
+        toggleEntrySelection,
     };
 });

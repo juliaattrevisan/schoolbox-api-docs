@@ -2,6 +2,7 @@
 import { slideDown, slideUp } from "@js/util/animateUtils";
 import { useCohortReportStore } from "./store/cohortReportStore";
 import type { CohortReportEntry } from "./store/cohortReportPayload";
+import CrResultsGroupEntry from "./cr-results-group-entry.vue";
 
 interface Props {
     label: string;
@@ -21,46 +22,23 @@ const dataPrefix = window.Vue.computed(() => {
     return `cr-results-group-${label}`;
 });
 
-/**
- * @param entryId The entry ID to check
- * @returns whether the entry is selected
- */
-function isEntrySelected(entryId: number): boolean {
-    return !!crStore.selectedResults[entryId];
-}
-
-/**
- * Toggle selection of a specific entry
- * @param entryId The entry ID to toggle
- */
-function toggleEntrySelection(entryId: number): void {
-    if (crStore.selectedResults[entryId]) {
-        delete crStore.selectedResults[entryId];
-    } else {
-        crStore.selectedResults[entryId] = true;
-    }
-}
-
 /** Whether all entries in this group are selected */
 const allEntriesSelected = window.Vue.computed(() => {
-    return props.entries.every((entry) => isEntrySelected(entry.id));
+    return props.entries.every((entry) => crStore.isEntrySelected(entry.id));
 });
 
 /**
  * Toggle selection of all entries in this group
  */
 function toggleAllEntries(): void {
-    if (allEntriesSelected.value) {
-        // Deselect all entries in this group
-        props.entries.forEach((entry) => {
-            delete crStore.selectedResults[entry.id];
-        });
-    } else {
-        // Select all entries in this group
-        props.entries.forEach((entry) => {
-            crStore.selectedResults[entry.id] = true;
-        });
-    }
+    const newState = !allEntriesSelected.value;
+    props.entries.forEach((entry) => {
+        if (newState === crStore.isEntrySelected(entry.id)) {
+            return; // state is the same, no need to toggle
+        }
+
+        crStore.toggleEntrySelection(entry.id);
+    });
 }
 
 /**
@@ -121,18 +99,12 @@ window.Vue.onMounted(() => {
 
         <div ref="entryListRef" class="c-card">
             <div class="l-flex-col l-gap-s l-pad-m">
-                <template v-for="entry in props.entries" :key="entry.id">
-                    <input
-                        :id="`${dataPrefix}-select-${entry.id}`"
-                        type="checkbox"
-                        :name="`${dataPrefix}-select-${entry.id}`"
-                        :checked="isEntrySelected(entry.id)"
-                        @change="toggleEntrySelection(entry.id)"
-                    />
-                    <label :for="`${dataPrefix}-select-${entry.id}`" class="checkbox-label"></label>
-
-                    <p>{{ entry.body }} - {{ entry.createdAt.displayAs }}</p>
-                </template>
+                <cr-results-group-entry
+                    v-for="entry in props.entries"
+                    :key="entry.id"
+                    :entry="entry"
+                    :data-prefix="dataPrefix"
+                />
             </div>
         </div>
     </div>
