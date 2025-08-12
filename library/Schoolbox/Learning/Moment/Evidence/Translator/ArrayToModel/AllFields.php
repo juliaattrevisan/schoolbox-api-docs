@@ -214,8 +214,8 @@ class AllFields extends Base
                 'id',
                 $model,
                 'setTags',
-                new GenericCollection(Evidence\Tag\Model::class),
-                new Evidence\Tag\Model(),
+                new GenericCollection(\Schoolbox\Learning\Moment\Tag\Model::class),
+                new \Schoolbox\Learning\Moment\Tag\Model(),
                 'setId'
             );
         }

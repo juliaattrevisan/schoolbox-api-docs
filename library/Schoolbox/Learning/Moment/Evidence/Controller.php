@@ -17,6 +17,7 @@ use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Comment;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Moment\Evidence\Moderation\ModerationRequired;
@@ -32,7 +33,6 @@ use Schoolbox\Resource\Storage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\TokenReplacer;
 use Schoolbox\User;
-use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 /**
  * Controller for learning moments.
@@ -452,11 +452,11 @@ class Controller extends Base
      */
     public function getTags()
     {
-        /** @var \Schoolbox\Learning\Moment\Evidence\Tag\Mapper $tagMapper */
+        /** @var \Schoolbox\Learning\Moment\Tag\Mapper $tagMapper */
         $tagMapper = $this->mapper->getJoinMapper('evidence_tag');
         $tags      = $tagMapper->findAll();
         $output    = [];
-        /** @var Tag\Model $tag */
+        /** @var \Schoolbox\Learning\Moment\Tag\Model $tag */
         foreach ($tags as $tag) {
             $output[] = [
                 'id'   => $tag->getId(),

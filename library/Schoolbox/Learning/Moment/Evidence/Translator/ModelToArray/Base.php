@@ -113,7 +113,7 @@ class Base
                         ->reindex()
                 : null,
             'tags'            => $model->getTags()?->map(
-                static function (Evidence\Tag\Model $tag) {
+                static function (\Schoolbox\Learning\Moment\Tag\Model $tag) {
                     return [
                         'id'   => $tag->getId(),
                         'name' => $tag->getName(),

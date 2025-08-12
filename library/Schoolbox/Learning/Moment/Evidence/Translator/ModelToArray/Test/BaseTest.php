@@ -18,8 +18,8 @@ use Schoolbox\Curriculum\Node\Model as CurriculumNode;
 use Schoolbox\Discussion\Thread\Model as DiscussionThread;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Moment\Evidence\Model;
-use Schoolbox\Learning\Moment\Evidence\Tag\Model as EvidenceTag;
 use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Base;
+use Schoolbox\Learning\Moment\Tag\Model as EvidenceTag;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
 

@@ -77,7 +77,7 @@ class Mapper extends BaseMapper
 
         $this->joinsVia(
             'evidence_tag',
-            Tag\Mapper::class,
+            \Schoolbox\Learning\Moment\Tag\Mapper::class,
             'id',
             'tag_id',
             'evidence_id',
@@ -262,7 +262,7 @@ class Mapper extends BaseMapper
         foreach ($evidenceTagStatement as $row) {
             if ($row['et.id'] !== null) {
                 //only step into if the evidence tag is NOT deleted
-                /** @var Tag\Model $evidenceTag */
+                /** @var \Schoolbox\Learning\Moment\Tag\Model $evidenceTag */
                 $evidenceTag = $this->hydrateJoin($row, 'evidence_tag', 'et');
                 $collection[$row['id']]->getTags()->setOffset($evidenceTag->getId(), $evidenceTag);
             }
