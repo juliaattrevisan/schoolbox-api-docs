@@ -96,6 +96,7 @@ window.Vue.onMounted(() => {
                         :storage="selectedEvidence"
                         :filename="selectedEvidence.name"
                         style="max-height: 10rem"
+                        maintain-dims
                         data-test="learning-moment-evidence-media"
                     ></storage-object>
                 </article>

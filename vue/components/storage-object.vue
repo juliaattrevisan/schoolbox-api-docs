@@ -15,6 +15,12 @@ import { ResourceType, type StorageFile } from "@js/resource/resourceUtils";
 interface Props {
     storage: StorageFile;
     filename: string;
+    /**
+     * Whether to force the width/height of the parent element to be the same
+     * as the video element so that mejs doesn't try to resize it
+     * Defaults to false
+     */
+    maintainDims?: boolean;
 }
 
 const props = defineProps<Props>();
@@ -51,6 +57,18 @@ window.Vue.onMounted(() => {
                         break;
 
                     case ResourceType.VIDEO:
+                        if (props.maintainDims && playerEl.value.parentElement) {
+                            if (playerEl.value.offsetWidth === 0) {
+                                // I can't find a better way to deal with the state where the video doesn't
+                                // have a width yet, I guess we could wait for it to load?
+                                // Anyways this ensures that it doesn't end up as 0 and at least has full width instead
+                                playerEl.value.parentElement.style.width = "100%";
+                            } else {
+                                playerEl.value.parentElement.style.height = `${playerEl.value.offsetHeight}px`;
+                                playerEl.value.parentElement.style.width = `${playerEl.value.offsetWidth}px`;
+                            }
+                        }
+
                         player.value = new window.MediaElementPlayer(playerEl.value, getConfigForVideo());
                         break;
 
