@@ -78,6 +78,8 @@ window.Vue.onMounted(() => {
                 >
                     {{ evidenceStatusLabels[props.entry.currentState] }}
                 </span>
+                <!-- To avoid padding changes, shove an &nbsp; in here when the status is published -->
+                <template v-else>&nbsp;</template>
             </label>
         </div>
 

@@ -1,10 +1,16 @@
 import { defineStore } from "pinia";
+import {
+    bulkPublishLearningMoments,
+    bulkRejectLearningMoments,
+} from "@schoolboxLearningMomentEvidence/learningMomentModerationPayload";
+import type { LearningMoment } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 import { getCohortReport } from "./cohortReportPayload";
 import type { CohortReportEntry } from "./cohortReportPayload";
-import { rejectLearningMoment } from "../../../Moderation/learningMomentModerationPayload";
 
 export const useCohortReportStore = defineStore("cohortReport", () => {
-    let endpoint: string | null = null; // the endpoint to fetch the cohort report data
+    let getCohortReportEndpoint: string | null = null; // the endpoint to fetch the cohort report data
+    let putBulkRejectEndpoint: string | null = null; // the endpoint to bulk reject learning moments
+    let putBulkPublishEndpoint: string | null = null; // the endpoint to bulk publish learning moments
 
     const results = window.Vue.ref<CohortReportEntry[]>([]);
     const selectedResults = window.Vue.ref<Record<CohortReportEntry["id"], boolean>>({});
@@ -30,12 +36,12 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
      * Load cohort report data
      */
     async function loadData(): Promise<void> {
-        if (!endpoint) {
+        if (!getCohortReportEndpoint) {
             throw new Error("Cohort report endpoint is not set");
         }
 
         isLoading.value = true;
-        const response = await getCohortReport(endpoint);
+        const response = await getCohortReport(getCohortReportEndpoint);
         isLoading.value = false;
         if (response.success === false) {
             loadError.value = response.message;
@@ -48,10 +54,18 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
 
     /**
      * Initialise the store
-     * @param $endpoint - getCohortReportPayload
+     * @param $getCohortReportEndpoint - getCohortReportPayload
+     * @param $putBulkRejectEndpoint - learningMomentModeration.putBulkReject
+     * @param $putBulkPublishEndpoint - learningMomentModeration.putBulkPublish
      */
-    async function init($endpoint: string): Promise<void> {
-        endpoint = $endpoint;
+    async function init(
+        $getCohortReportEndpoint: string,
+        $putBulkRejectEndpoint: string,
+        $putBulkPublishEndpoint: string,
+    ): Promise<void> {
+        getCohortReportEndpoint = $getCohortReportEndpoint;
+        putBulkRejectEndpoint = $putBulkRejectEndpoint;
+        putBulkPublishEndpoint = $putBulkPublishEndpoint;
         clearData();
         await loadData();
     }
@@ -77,34 +91,112 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
     }
 
     /**
-     * Reject a learning moment
-     * @param entryId The entry ID to reject
-     * @param rejectionReason The reason for rejection
+     * Update the state of an entry based on the response from the API
+     * @param entry - The entry to update
+     * @param responseData - The response data from the API
      */
-    async function rejectEntry(entryId: number, rejectionReason: string): Promise<void> {
-        const entry = results.value.find((e) => e.id === entryId);
-        if (!entry) {
-            throw new Error(`Entry with ID ${entryId} not found`);
-        }
-        if (!entry._links.reject) {
-            throw new Error(`Entry with ID ${entryId} cannot be rejected`);
+    function updateEntryState(
+        entry: CohortReportEntry,
+        responseData: Record<LearningMoment["id"], LearningMoment>,
+    ): void {
+        if (responseData[entry.id] === undefined) {
+            console.error(`No response data found for entry ID ${entry.id}`);
+            return;
         }
 
-        loadingEntries.value[entryId] = true;
-        const toast = window.sbProps.toastActivate("Updating... Please wait");
-        const response = await rejectLearningMoment(entry._links.reject, { rejectionReason });
-        delete loadingEntries.value[entryId];
+        entry.currentState = responseData[entry.id].currentState;
+        Object.assign(entry._links, responseData[entry.id]._links);
+    }
+
+    /**
+     * Publish learning moment(s)
+     * @param entryIds The entry ID(s) to publish
+     */
+    async function publishEntries(entryIds: number[]): Promise<void> {
+        if (putBulkPublishEndpoint === null) {
+            throw new Error("Bulk publish endpoint is not set");
+        }
+
+        const entries = results.value.filter((e) => entryIds.includes(e.id));
+        if (entries.length === 0) {
+            throw new Error(`No entries found for IDs ${entryIds.join(", ")}`);
+        }
+        if (!entries.every((e) => e._links.publish)) {
+            throw new Error(`Unable to publish an entry (${entryIds.join(", ")})`);
+        }
+
+        entries.forEach((entry) => {
+            loadingEntries.value[entry.id] = true;
+        });
+        const toast = window.sbProps.toastActivate(
+            entries.length > 1 ? `Approving ${entries.length} learning moments` : "Approving learning moment",
+        );
+
+        const response = await bulkPublishLearningMoments(putBulkPublishEndpoint, {
+            momentIds: entryIds,
+            deleteComments: true,
+        });
+        entries.forEach((entry) => {
+            delete loadingEntries.value[entry.id];
+        });
 
         if (response.success === false) {
             toast.timeout({ isSuccess: false, text: response.message });
             return;
         }
 
-        toast.timeout({ isSuccess: true, text: "Saved" });
+        toast.timeout({ isSuccess: true, text: "Saved." });
 
         // Figure out the new state from the response
-        entry.currentState = response.data.currentState;
-        Object.assign(entry._links, response.data._links);
+        entries.forEach((entry) => {
+            updateEntryState(entry, response.data);
+        });
+    }
+
+    /**
+     * Reject learning moment(s)
+     * @param entryIds The entry ID(s) to reject
+     * @param rejectionReason The reason for rejection
+     */
+    async function rejectEntries(entryIds: number[], rejectionReason: string): Promise<void> {
+        if (putBulkRejectEndpoint === null) {
+            throw new Error("Bulk reject endpoint is not set");
+        }
+
+        const entries = results.value.filter((e) => entryIds.includes(e.id));
+        if (entries.length === 0) {
+            throw new Error(`No entries found for IDs ${entryIds.join(", ")}`);
+        }
+        if (!entries.every((e) => e._links.reject)) {
+            throw new Error(`Unable to reject an entry (${entryIds.join(", ")})`);
+        }
+
+        entries.forEach((entry) => {
+            loadingEntries.value[entry.id] = true;
+        });
+        const toast = window.sbProps.toastActivate(
+            entries.length > 1 ? `Requesting update for ${entries.length} learning moments` : "Requesting update",
+        );
+
+        const response = await bulkRejectLearningMoments(putBulkRejectEndpoint, {
+            momentIds: entryIds,
+            rejectionReason,
+        });
+        entries.forEach((entry) => {
+            delete loadingEntries.value[entry.id];
+        });
+
+        if (response.success === false) {
+            toast.timeout({ isSuccess: false, text: response.message });
+            return;
+        }
+
+        toast.timeout({ isSuccess: true, text: "Saved." });
+
+        // Figure out the new state from the response
+        entries.forEach((entry) => {
+            updateEntryState(entry, response.data);
+        });
     }
 
     return {
@@ -117,6 +209,7 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         loadError,
         isEntrySelected,
         toggleEntrySelection,
-        rejectEntry,
+        publishEntries,
+        rejectEntries,
     };
 });

@@ -8,6 +8,10 @@
     { folder: folder, folderId: folder.id }
 ) %}
 <div id="learning-moments-evidence-cohort-report-container">
-    <cohort-report endpoint="{{ endpoint }}" />
+    <cohort-report
+        endpoint-get-report="{{ endpoint }}"
+        endpoint-put-bulk-reject="{{ routeLookup('learningMomentModeration.putBulkReject') }}"
+        endpoint-put-bulk-publish="{{ routeLookup('learningMomentModeration.putBulkPublish') }}"
+    />
 </div>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/learningMomentsEvidenceCohortReport.js?v={{ config.site_version }}"></script>

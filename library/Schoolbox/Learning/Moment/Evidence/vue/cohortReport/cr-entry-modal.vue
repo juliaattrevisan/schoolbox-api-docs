@@ -25,8 +25,10 @@ async function onReject(): Promise<void> {
     }
 
     crmStore.isModalOpen = false;
-    // TODO: Support bulk rejection
-    await crStore.rejectEntry(crmStore.selectedEntries[0].id, rejectReason.value);
+    await crStore.rejectEntries(
+        crmStore.selectedEntries.map((entry) => entry.id),
+        rejectReason.value,
+    );
     rejectReason.value = "";
 }
 

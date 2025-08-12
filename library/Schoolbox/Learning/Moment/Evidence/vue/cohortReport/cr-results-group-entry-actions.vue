@@ -15,8 +15,8 @@ const crmStore = useCohortReportModalStore();
 /**
  * Approve this entry
  */
-function onApprove(): void {
-    alert("todo");
+async function onApprove(): Promise<void> {
+    await crStore.publishEntries([props.entry.id]);
 }
 </script>
 

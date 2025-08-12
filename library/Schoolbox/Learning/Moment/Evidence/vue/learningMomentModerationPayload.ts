@@ -1,5 +1,6 @@
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { ApiBaseResponse } from "@js/util/sbx/apiUtils";
+import type { LearningMoment } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 
 // PUT learningMomentModeration.putPublish
 
@@ -8,7 +9,7 @@ type LearningMomentPublishApiPayload = {
     deleteComments?: boolean;
 };
 
-type LearningMomentPublishApiResponse = unknown;
+type LearningMomentPublishApiResponse = unknown; // always redirects to the profile page at the moment...
 
 /**
  * Publish a learning moment
@@ -30,10 +31,10 @@ export function publishLearningMoment(
 // PUT learningMomentModeration.putBulkPublish
 
 type LearningMomentBulkPublishApiPayload = LearningMomentPublishApiPayload & {
-    momentIds: number[];
+    momentIds: LearningMoment["id"][];
 };
 
-type LearningMomentBulkPublishApiResponse = unknown;
+type LearningMomentBulkPublishApiResponse = Record<LearningMoment["id"], LearningMoment>;
 
 /**
  * Bulk publish multiple learning moments
@@ -58,7 +59,7 @@ type LearningMomentRejectApiPayload = {
     rejectionReason: string;
 };
 
-type LearningMomentRejectApiResponse = unknown;
+type LearningMomentRejectApiResponse = unknown; // always redirects to the profile page at the moment...
 
 /**
  * Reject a learning moment
@@ -80,10 +81,10 @@ export function rejectLearningMoment(
 // PUT learningMomentModeration.putBulkReject
 
 type LearningMomentBulkRejectApiPayload = LearningMomentRejectApiPayload & {
-    momentIds: number[];
+    momentIds: LearningMoment["id"][];
 };
 
-type LearningMomentBulkRejectApiResponse = unknown;
+type LearningMomentBulkRejectApiResponse = Record<LearningMoment["id"], LearningMoment>;
 
 /**
  * Bulk reject multiple learning moments

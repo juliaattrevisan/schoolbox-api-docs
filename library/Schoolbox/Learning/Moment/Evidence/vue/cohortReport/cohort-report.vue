@@ -9,14 +9,16 @@ import CrEntryModal from "./cr-entry-modal.vue";
 const SINGLE_COLUMN_BREAKPOINT = 800;
 
 interface Props {
-    endpoint: string;
+    endpointGetReport: string;
+    endpointPutBulkReject: string;
+    endpointPutBulkPublish: string;
 }
 
 const props = defineProps<Props>();
 const crStore = useCohortReportStore();
 
 window.Vue.onMounted(async () => {
-    await crStore.init(props.endpoint);
+    await crStore.init(props.endpointGetReport, props.endpointPutBulkReject, props.endpointPutBulkPublish);
 });
 
 const cohortReportEl = window.Vue.useTemplateRef<HTMLDivElement>("cohortReportRef");
