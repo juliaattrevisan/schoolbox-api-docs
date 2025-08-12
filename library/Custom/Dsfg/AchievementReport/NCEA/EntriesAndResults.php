@@ -32,7 +32,6 @@ class EntriesAndResults extends Base
             $courseName = $current['CourseDescription'];
             $internalExternal = $current['InternalorExternalAssessment'];
             $letter = $current['StrippedResult'];
-            $level = $current['Level'];
             $studentYear = $current['StudentYear'];
             $result = $current['Result'];
             $strippedResult = $current['StrippedResult'];
