@@ -25,6 +25,8 @@ use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Filter;
+use Schoolbox\Filter\CompositeFactoryFactory;
+use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel;
@@ -49,6 +51,7 @@ use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Url\Factory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
@@ -99,10 +102,16 @@ class Controller extends Assessment\Controller
      * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
      * @param QuizAttemptMapper $attemptMapper
      * @param StateMapper $stateMapper
-     * @param \Schoolbox\Url\Factory $urlFactory
+     * @param Factory $urlFactory
      * @param string $learnosityVersion
      * @param string $learnosityConsumerKey
      * @param string $learnosityConsumerSecret
+     * @param IdFinder $filtersAssessmentIdFinder
+     * @param CompositeFactoryFactory $filtersFactoryFactory
+     * @param Filter\Mapper $filterMapper
+     * @param Filter\Selection\Mapper $filterSelectionMapper
+     * @param CourseImplementationMapper $courseImplementationMapper
+     * @param UnitImplementationMapper $unitImplementationMapper
      */
     public function __construct(
         UserMapper $userMapper,

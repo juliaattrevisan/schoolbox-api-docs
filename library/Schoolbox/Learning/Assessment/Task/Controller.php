@@ -16,6 +16,8 @@ use Schoolbox\Cyberhound\Url\Translator;
 use Schoolbox\Error;
 use Schoolbox\Error\Mapper;
 use Schoolbox\Filter;
+use Schoolbox\Filter\CompositeFactoryFactory;
+use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
@@ -30,7 +32,6 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplement
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
-use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Preview\Factory as PreviewFactory;
 use Schoolbox\Learning\Assessment\Transactor;
@@ -62,24 +63,30 @@ class Controller extends Assessment\Controller
     /**
      * Constructor
      *
-     * @param UserMapper                            $userMapper
-     * @param Mapper                                $errorMapper
-     * @param MapperProxy                           $assessmentMapper
-     * @param WorkTypeMapper                        $workTypeMapper
-     * @param Access                                $access
-     * @param Transactor                            $transactor
-     * @param Factory                               $bakery
-     * @param TaskResponseDataSource                $taskResponseDataSource
-     * @param Term\Mapper                           $termMapper
-     * @param DataSource                            $participantDataSource
-     * @param CourseSpecificationMapper             $courseSpecificationMapper
-     * @param UnitSpecificationMapper               $unitSpecificationMapper
-     * @param RosettaStone                          $rosettaStone
-     * @param Replicator                            $replicator
-     * @param LatestViewMapper                      $latestViewMapper
+     * @param UserMapper $userMapper
+     * @param Mapper $errorMapper
+     * @param MapperProxy $assessmentMapper
+     * @param WorkTypeMapper $workTypeMapper
+     * @param Access $access
+     * @param Transactor $transactor
+     * @param Factory $bakery
+     * @param TaskResponseDataSource $taskResponseDataSource
+     * @param Term\Mapper $termMapper
+     * @param DataSource $participantDataSource
+     * @param CourseSpecificationMapper $courseSpecificationMapper
+     * @param UnitSpecificationMapper $unitSpecificationMapper
+     * @param RosettaStone $rosettaStone
+     * @param Replicator $replicator
+     * @param LatestViewMapper $latestViewMapper
      * @param Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
-     * @param LessonPlanTemplateMapper              $lessonPlanTemplateMapper
-     * @param LessonPlanDataModelMapper             $lessonPlanDataModelMapper
+     * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
+     * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
+     * @param IdFinder $filtersAssessmentIdFinder
+     * @param CompositeFactoryFactory $filtersFactoryFactory
+     * @param Filter\Mapper $filterMapper
+     * @param Filter\Selection\Mapper $filterSelectionMapper
+     * @param CourseImplementationMapper $courseImplementationMapper
+     * @param UnitImplementationMapper $unitImplementationMapper
      */
     public function __construct(
         UserMapper $userMapper,

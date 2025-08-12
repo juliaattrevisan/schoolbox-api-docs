@@ -17,12 +17,11 @@ use DomainException;
 use InvalidArgumentException;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Filter;
-use Schoolbox\Filter\IFactoryFactory;
+use Schoolbox\Filter\CompositeFactoryFactory;
+use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use Schoolbox\Learning\Assessment\Translator\ParticipationPlans;
 use Schoolbox\Learning\Assessment\Translator\Participations;
-use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
-use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use LearnositySdk\Utils\Uuid;
@@ -99,16 +98,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
      * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
      * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
+     * @param IdFinder $filtersAssessmentIdFinder
+     * @param CompositeFactoryFactory $filtersFactoryFactory
+     * @param \Schoolbox\Filter\Mapper $filterMapper
+     * @param Filter\Selection\Mapper $filterSelectionMapper
+     * @param CourseImplementationMapper $courseImplementationMapper
+     * @param UnitImplementationMapper $unitImplementationMapper
      * @param null|Factory $urlFactory
      * @param null|string $learnosityVersion
      * @param null|string $learnosityConsumerKey
      * @param null|string $learnosityConsumerSecret
      * @param MimetypeMapper|null $mimetypeMapper
-     * @param IFactoryFactory $filterFactoryFactory
-     * @param \Schoolbox\Filter\Mapper $filterMapper
-     * @param Filter\Selection\Mapper $filterSelectionMapper
-     * @param CourseImpl\Mapper $courseImplMapper
-     * @param UnitImpl\Mapper $unitImplMapper
      */
     public function __construct(
         UserMapper $userMapper,

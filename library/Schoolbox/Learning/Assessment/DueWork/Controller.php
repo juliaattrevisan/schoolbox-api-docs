@@ -32,6 +32,8 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Filter;
+use Schoolbox\Filter\CompositeFactoryFactory;
+use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
@@ -125,38 +127,45 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * @param UserMapper                            $userMapper
-     * @param Mapper                                $errorMapper
-     * @param AssessmentDataSource                  $assessmentMapper
-     * @param WorkTypeMapper                        $workTypeMapper
-     * @param Access                                $access
-     * @param Transactor                            $transactor
-     * @param Factory                               $bakery
-     * @param RubricDataSource                      $rubricMapper
-     * @param RubricResultSetMapper                 $resultSetMapper
-     * @param DueWorkResponseMapper                 $dueWorkResponseMapper
-     * @param ParticipantMapper                     $participantMapper
-     * @param Term\Mapper                           $termMapper
-     * @param SingleFile\Mapper                     $submissionFileMapper
-     * @param Connector                             $kamiConnector
-     * @param Kami\Mapper                           $kamiMapper
-     * @param ParticipantMapper                     $participantDataSource
-     * @param CourseSpecificationMapper             $courseSpecificationMapper
-     * @param UnitSpecificationMapper               $unitSpecificationMapper
-     * @param Replicator                            $replicator
-     * @param Producer                              $producer           for sending the message created by `$messageFactory` to
+     * @param UserMapper $userMapper
+     * @param Mapper $errorMapper
+     * @param AssessmentDataSource $assessmentMapper
+     * @param WorkTypeMapper $workTypeMapper
+     * @param Access $access
+     * @param Transactor $transactor
+     * @param Factory $bakery
+     * @param RubricDataSource $rubricMapper
+     * @param RubricResultSetMapper $resultSetMapper
+     * @param DueWorkResponseMapper $dueWorkResponseMapper
+     * @param ParticipantMapper $participantMapper
+     * @param Term\Mapper $termMapper
+     * @param SingleFile\Mapper $submissionFileMapper
+     * @param Connector $kamiConnector
+     * @param Kami\Mapper $kamiMapper
+     * @param ParticipantMapper $participantDataSource
+     * @param CourseSpecificationMapper $courseSpecificationMapper
+     * @param UnitSpecificationMapper $unitSpecificationMapper
+     * @param Replicator $replicator
+     * @param Producer $producer for sending the message created by `$messageFactory` to
      *                                                                  taskd
-     * @param Turnitin\File\Mapper                  $turnitinFileMapper - for generating the Similarity Report.
-     * @param IFeedbackDataSource                   $feedbackDataSource
-     * @param \Schoolbox\Resource\Folder\Mapper     $folderMapper
-     * @param LatestViewMapper                      $latestViewMapper
-     * @param FilesystemProxy                       $filesystemProxy
-     * @param StateMapper                           $stateMapper
-     * @param RosettaStone                          $rosettaStone
-     * @param MessageFactory                        $dueWorkDownloadMessageFactory
+     * @param Turnitin\File\Mapper $turnitinFileMapper - for generating the Similarity Report.
+     * @param IFeedbackDataSource $feedbackDataSource
+     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
+     * @param LatestViewMapper $latestViewMapper
+     * @param FilesystemProxy $filesystemProxy
+     * @param StateMapper $stateMapper
+     * @param RosettaStone $rosettaStone
+     * @param MessageFactory $dueWorkDownloadMessageFactory
      * @param Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
-     * @param LessonPlanTemplateMapper              $lessonPlanTemplateMapper
-     * @param LessonPlanDataModelMapper             $lessonPlanDataModelMapper
+     * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
+     * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
+     * @param MimetypeMapper $mimeTypeMapper
+     * @param IdFinder $filtersAssessmentIdFinder
+     * @param CompositeFactoryFactory $filtersFactoryFactory
+     * @param Filter\Mapper $filterMapper
+     * @param Filter\Selection\Mapper $filterSelectionMapper
+     * @param CourseImplementationMapper $courseImplementationMapper
+     * @param UnitImplementationMapper $unitImplementationMapper
      */
     public function __construct(
         UserMapper $userMapper,

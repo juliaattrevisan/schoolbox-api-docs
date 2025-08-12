@@ -18,6 +18,8 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Error;
 use Schoolbox\Error\Mapper;
 use Schoolbox\Filter;
+use Schoolbox\Filter\CompositeFactoryFactory;
+use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use Schoolbox\Instance;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment;
@@ -87,29 +89,35 @@ class Controller extends Assessment\Controller
     /**
      * Constructor
      *
-     * @param UserMapper                            $userMapper
-     * @param Mapper                                $errorMapper
-     * @param MapperProxy                           $assessmentMapper
-     * @param WorkTypeMapper                        $workTypeMapper
-     * @param Access                                $access
-     * @param Transactor                            $transactor
-     * @param Factory                               $bakery
-     * @param Term\Mapper                           $termMapper
-     * @param DataSource                            $participantDataSource
-     * @param CourseSpecificationMapper             $courseSpecificationMapper
-     * @param UnitSpecificationMapper               $unitSpecificationMapper
-     * @param RosettaStone                          $rosettaStone
-     * @param Replicator                            $replicator
-     * @param LtiTool\Mapper                        $ltiToolMapper
-     * @param LtiAssessment\Mapper                  $ltiAssessmentMapper
-     * @param LtiAssessmentScore\Mapper             $ltiAssessmentScoreMapper
-     * @param RegistrationRepositoryInterface       $registrations
-     * @param Instance                              $instance
-     * @param UserCodec                             $userCodec
-     * @param LatestViewMapper                      $latestViewMapper
+     * @param UserMapper $userMapper
+     * @param Mapper $errorMapper
+     * @param MapperProxy $assessmentMapper
+     * @param WorkTypeMapper $workTypeMapper
+     * @param Access $access
+     * @param Transactor $transactor
+     * @param Factory $bakery
+     * @param Term\Mapper $termMapper
+     * @param DataSource $participantDataSource
+     * @param CourseSpecificationMapper $courseSpecificationMapper
+     * @param UnitSpecificationMapper $unitSpecificationMapper
+     * @param RosettaStone $rosettaStone
+     * @param Replicator $replicator
+     * @param LtiTool\Mapper $ltiToolMapper
+     * @param LtiAssessment\Mapper $ltiAssessmentMapper
+     * @param LtiAssessmentScore\Mapper $ltiAssessmentScoreMapper
+     * @param RegistrationRepositoryInterface $registrations
+     * @param Instance $instance
+     * @param UserCodec $userCodec
+     * @param LatestViewMapper $latestViewMapper
      * @param Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
-     * @param LessonPlanTemplateMapper              $lessonPlanTemplateMapper
-     * @param LessonPlanDataModelMapper             $lessonPlanDataModelMapper
+     * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
+     * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
+     * @param IdFinder $filtersAssessmentIdFinder
+     * @param CompositeFactoryFactory $filtersFactoryFactory
+     * @param Filter\Mapper $filterMapper
+     * @param Filter\Selection\Mapper $filterSelectionMapper
+     * @param CourseImplementationMapper $courseImplementationMapper
+     * @param UnitImplementationMapper $unitImplementationMapper
      */
     public function __construct(
         UserMapper $userMapper,
