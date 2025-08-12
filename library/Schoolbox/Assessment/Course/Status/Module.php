@@ -22,7 +22,6 @@ use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
-use Schoolbox\Learning\Assessment\Breadcrumb;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\User;
@@ -156,12 +155,6 @@ class Module extends BaseModule
      */
     public function buildController(): Base
     {
-        $bakery = new Breadcrumb\Factory(
-            $this->getRouter()->getGenerator(),
-            $this->getAuthorizer(),
-            $this->getAccessMapper(),
-        );
-
         return new Controller(
             $this->getAssessmentMapper(),
             $this->injector->get('assessmentDataSource'),

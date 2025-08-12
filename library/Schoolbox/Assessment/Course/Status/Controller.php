@@ -27,8 +27,6 @@ use Schoolbox\Learning\Course\DataModel\Specification\Model;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 
-use function array_combine;
-
 class Controller extends WebController\Base
 {
     /**
