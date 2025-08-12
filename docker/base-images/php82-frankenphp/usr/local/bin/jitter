@@ -1,0 +1,32 @@
+#!/bin/bash
+# Sleeps for an amount somewhere between 0 and N seconds
+# Usage:
+#    ./jitter N command args
+# Examples:
+#    ./jitter 0 echo "hello"
+#    ./jitter 10 cat "file with space.txt"
+#    ./jitter 60 ./script.sh --option-with-arg "file with space.txt" --option-no-arg
+
+# Ensure first arg is an integer to sleep for
+if ! [[ $1 =~ ^[0-9]+$ ]] ; then
+   echo "error: First arg must be an integer. Found '$1'" >&2;
+   exit 1
+fi
+
+# Sleep for between 0 and N
+wait=0
+if ! [[ $1 =~ ^0+$ ]]; then
+  wait=$(( RANDOM %= $1 ));
+fi
+export PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games;
+sleep $wait;
+
+# Strip N, reconstruct subsequent command
+shift
+args=()
+while [[ $# -gt 0 ]]; do
+  args+=("$1")
+  shift
+done
+"${args[@]}"
+
