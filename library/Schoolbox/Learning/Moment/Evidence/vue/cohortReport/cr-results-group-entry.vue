@@ -45,6 +45,10 @@ const selectedEvidence = window.Vue.computed(() => {
     return props.entry.files.find((f) => f.hash === selectedEvidenceHash.value) || null;
 });
 
+const selectableEvidence = window.Vue.computed(() => {
+    return props.entry.files.filter((f) => f.hash !== selectedEvidenceHash.value);
+});
+
 window.Vue.onMounted(() => {
     if (props.entry.files.length > 0) {
         selectedEvidenceHash.value = props.entry.files[0].hash;
@@ -85,9 +89,10 @@ window.Vue.onMounted(() => {
         </ul>
 
         <div class="l-flex__item--1 l-grid l-grid--12 l-gap-s l-mar-xs--top">
-            <div class="small-12 medium-8">
-                <article v-if="selectedEvidence !== null && selectedEvidence.hash">
+            <div class="small-12" :class="{ 'medium-8': selectableEvidence.length > 0 }">
+                <article v-if="selectedEvidence !== null && selectedEvidence.hash" style="width: fit-content">
                     <storage-object
+                        :key="selectedEvidence.hash"
                         :storage="selectedEvidence"
                         :filename="selectedEvidence.name"
                         style="max-height: 10rem"
@@ -106,9 +111,9 @@ window.Vue.onMounted(() => {
                 </p>
             </div>
 
-            <div class="small-12 medium-4 l-flex-col l-gap-s">
+            <div v-if="selectableEvidence.length > 0" class="small-12 medium-4 l-flex-col l-gap-s">
                 <div
-                    v-for="storage in props.entry.files.filter((f) => f.hash !== selectedEvidenceHash)"
+                    v-for="storage in selectableEvidence"
                     :key="storage.hash"
                     class="cr-evidence-button l-flex--no-wrap l-flex-row l-gap-xs l-pad-xs"
                     :title="`${storage.name}.${storage.type}`"
