@@ -56,7 +56,7 @@ jobs:
         with:
           images: |
             alaress/php84-frankenphp
-            ${{ vars.FRANKENPHP_ECR_REPO }}
+            ${{ vars.FRANKENPHP_ECR_REPO }}-php8.4
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -80,7 +80,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           tags: |
             alaress/php84-frankenphp
-            ${{ vars.FRANKENPHP_ECR_REPO }}
+            ${{ vars.FRANKENPHP_ECR_REPO }}-php8.4
 
       - name: Export digest
         run: |
@@ -109,7 +109,7 @@ jobs:
         with:
           images: |
             alaress/php84-frankenphp
-            ${{ vars.FRANKENPHP_ECR_REPO }}
+            ${{ vars.FRANKENPHP_ECR_REPO }}-php8.4
           tags: |
             type=ref,event=branch,prefix=latest-
             type=raw,value=latest-${{ github.ref_name }}
@@ -144,4 +144,4 @@ jobs:
         run: |
           docker buildx imagetools create $(jq -cr '.tags | map ("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
             $(printf 'alaress/php84-frankenphp@sha256:%s ' *) \
-            $(printf '${{ vars.FRANKENPHP_ECR_REPO }}@sha256:%s ' *)
+            $(printf '${{ vars.FRANKENPHP_ECR_REPO }}-php8.4@sha256:%s ' *)
