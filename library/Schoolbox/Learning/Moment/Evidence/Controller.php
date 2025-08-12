@@ -855,7 +855,7 @@ class Controller extends Base
                  */
                 'createdAt' => [
                     'timestamp' => $moment->getCreatedAt()->getUnixTimestamp(),
-                    'displayAs' => $moment->getCreatedAt()->getLocalShort(),
+                    'displayAs' => $moment->getCreatedAt()->getShortDateOnly(),
                     'rfc' => $moment->getCreatedAt()->toRfc3339String(),
                 ],
                 /* We don't store updatedBy, for whatever reason: I suppose it was presumed
@@ -866,7 +866,7 @@ class Controller extends Base
                  */
                 'updatedAt' => [
                     'timestamp' => $moment->getUpdatedAt()->getUnixTimestamp(),
-                    'displayAs' => $moment->getUpdatedAt()->getLocalShort(),
+                    'displayAs' => $moment->getUpdatedAt()->getShortDateOnly(),
                     'rfc' => $moment->getUpdatedAt()->toRfc3339String(),
                 ],
                 /* Whether this moment had comments or not, which affects a user interaction
