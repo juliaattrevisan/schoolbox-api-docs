@@ -15,6 +15,7 @@ import type {
     RecordsAndPoints,
     TypeSubType,
     RowKeys,
+    Trend,
 } from "../../js/types/pastoralReportTypes";
 import { trendOptions } from "./config/chartOptions";
 
@@ -52,19 +53,27 @@ function onCellSelected(header: TableHeader): void {
 /**
  * Chart options for the trend chart in the table row.
  */
-const chartOptions = window.Vue.ref({
-    ...trendOptions,
-    series: [
-        {
-            ...trendOptions.series[0],
-            data: [30, 20, -10, 5, -25, 40, 30, 5, 10, 10, 15, -15],
+function getChartOptions() {
+    const trend = props.rowData.trend as Trend;
+    // run through the line and make any 0 values null
+    trend.line = trend.line.map((value: number | null) => (value === 0 ? null : value));
+    if (trend === undefined) {
+        return trendOptions;
+    }
+    return {
+        ...trendOptions,
+        series: [
+            {
+                ...trendOptions.series[0],
+                data: trend.line,
+            },
+        ],
+        xAxis: {
+            ...trendOptions.xAxis,
+            categories: trend.tooltips,
         },
-    ],
-    xAxis: {
-        ...trendOptions.xAxis,
-        categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-    },
-});
+    };
+}
 </script>
 
 <template>
@@ -131,7 +140,7 @@ const chartOptions = window.Vue.ref({
                 </template>
             </template>
             <template v-else-if="header.type == TableHeaderType.TREND">
-                <chart :options="chartOptions"></chart>
+                <chart :options="getChartOptions()"></chart>
             </template>
             <template v-else>
                 {{ props.rowData[header.key] }}
