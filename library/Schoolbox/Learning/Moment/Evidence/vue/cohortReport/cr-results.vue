@@ -39,10 +39,11 @@ const resultGroups = window.Vue.computed(() => {
         </div>
 
         <cr-results-group
-            v-for="group in resultGroups"
+            v-for="(group, i) in resultGroups"
             :key="group.label"
             :label="group.label"
             :entries="group.entries"
+            :start-expanded="i === 0"
         />
     </div>
 </template>

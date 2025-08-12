@@ -6,12 +6,13 @@ import type { CohortReportEntry } from "./store/cohortReportPayload";
 interface Props {
     label: string;
     entries: CohortReportEntry[];
+    startExpanded: boolean;
 }
 
 const props = defineProps<Props>();
 const crStore = useCohortReportStore();
 
-const isExpanded = window.Vue.ref(true);
+const isExpanded = window.Vue.ref(props.startExpanded);
 const showExpandedBorder = window.Vue.ref(isExpanded.value);
 const entryListEl = window.Vue.useTemplateRef<HTMLDivElement>("entryListRef");
 
@@ -81,6 +82,18 @@ async function toggleExpanded(): Promise<void> {
         showExpandedBorder.value = false;
     }
 }
+
+window.Vue.onMounted(() => {
+    if (!entryListEl.value) {
+        throw new Error("entryListEl is not defined");
+    }
+
+    isExpanded.value = props.startExpanded;
+    showExpandedBorder.value = isExpanded.value;
+
+    // Ensure the element matches the initial expanded state correctly (as slideDown/Up may not have run yet)
+    entryListEl.value.style.display = isExpanded.value ? "" : "none";
+});
 </script>
 
 <template>
