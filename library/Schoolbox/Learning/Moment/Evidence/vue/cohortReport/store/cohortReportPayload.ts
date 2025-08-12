@@ -5,6 +5,8 @@ import type { EvidenceStatus } from "@schoolboxLearningMomentEvidence/evidenceTy
 export type CohortReportEntry = {
     id: number;
     body: string;
+    blurb: string;
+    showReadMore: boolean;
     files: {
         hash: string;
         filename: string;

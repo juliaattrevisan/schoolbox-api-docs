@@ -41,6 +41,11 @@ use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 class Controller extends Base
 {
     /**
+     * Length of the blurb to show in the cohort report
+     */
+    private const COHORT_REPORT_BLURB_LENGTH = 90;
+
+    /**
      * Constructor
      *
      * @param \Schoolbox\Learning\Moment\Evidence\Mapper $mapper
@@ -835,6 +840,30 @@ class Controller extends Base
                 ];
             }
 
+            /* The actual body may be too long or contain too much HTML (i.e. images/videos)
+                * so we can't just show it in the cohort report as-is.
+                * Similar to news, provide a cut-down blurb of the body content to show instead
+                */
+            $blurb = \TextFormatter::cutSentence(
+                \Scrub::html2text($moment->getBody()),
+                self::COHORT_REPORT_BLURB_LENGTH,
+            );
+
+            /* If the learning moment has a body content, there's something to read
+                * (ripped from news land)
+                *
+                * It might be the same as the blurb, but there are complications with
+                * that comparison. The blurb could essentially be a strip_tags of the body,
+                * but if the body contained html only (e.g. an image or a video or an iframe)
+                * then strip_tags will remove whatever was there; it's valid content that should
+                * be seen by users, but has been inadvertently misunderstood by a boolean outcome
+                * and we don't have an easy answer to that problem
+                *
+                * For now, presume there's something to see
+                * Show the link
+                */
+            $showReadMore = '' !== (string)$moment->getBody();
+
             /* This is a stack because empty payloads result in a datatype difference in frontend world:
              * empty payloads emerge as [], but non-empty payloads emerge as {}
              */
@@ -843,6 +872,8 @@ class Controller extends Base
             $payload[] = [
                 'id' => $moment->getId(),
                 'body' => \Scrub::html($moment->getBody()),
+                'blurb' => $blurb,
+                'showReadMore' => $showReadMore,
                 'files' => $files,
                 /* TODO we usually add role for extra meta about students and staffs, especially in cohorty scenarios
                  *  since there's a higher likelihood of encountering people with same- or same-sounding names.
