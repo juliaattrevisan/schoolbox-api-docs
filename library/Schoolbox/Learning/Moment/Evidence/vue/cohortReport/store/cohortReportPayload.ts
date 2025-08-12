@@ -44,9 +44,11 @@ export type CohortReportEntry = {
     hasComments: boolean;
     currentState: EvidenceStatus;
     _links: {
-        submit: string | null;
+        submit: null;
         publish: string | null;
         reject: string | null;
+        modifyForm: string | null;
+        delete: string | null;
     };
 };
 

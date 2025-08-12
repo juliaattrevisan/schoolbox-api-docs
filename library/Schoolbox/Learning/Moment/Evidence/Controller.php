@@ -984,6 +984,18 @@ class Controller extends Base
             ]);
         }
 
+        /* non-state dependent actions */
+        $links['modifyForm'] = $this->getRouteIfAuthorized('learningMomentEvidence.getModifyForm', [
+            'evidenceId' => $moment->getId(),
+            'creatorId'  => $moment->getCreator()->getId(),
+            'userId'     => $moment->getRecipient()->getId(),
+        ]);
+
+        $links['delete'] = $this->getRouteIfAuthorized('learningMomentEvidence.deleteEvidence', [
+            'evidenceId' => $moment->getId(),
+            'creatorId'  => $moment->getCreator()->getId(),
+        ]);
+
         return $links;
     }
 }
