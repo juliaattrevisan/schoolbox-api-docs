@@ -26,8 +26,6 @@ class EntriesAndResults extends Base
     public function findData()
     {
         $finalStack = [];
-        $totalEnteredCredits = [];
-
         $allResults = $this->findEntries();
 
         foreach ($allResults as $current) {
@@ -112,14 +110,7 @@ class EntriesAndResults extends Base
                         ]
                     ]
                 ];
-
-                $totalEnteredCredits[$level] = [
-                    'IN' => 0,
-                    'EX' => 0
-                ];
             }
-
-            $totalEnteredCredits[$level][$internalExternal] += $current['EnteredCredits'];
 
             $finalStack[$courseName]['summary']['level'] = $current['Level'];
             $finalStack[$courseName]['summary']['totalEnteredCredits'] += $current['EnteredCredits'];
