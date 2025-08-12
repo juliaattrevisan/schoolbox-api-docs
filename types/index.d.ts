@@ -12,6 +12,7 @@ import type { DefineComponent } from "vue";
 import type { SbxEditor } from "@js/editor/types/editorTypes";
 import type { RosettaStone } from "@js/terminology/rosettaStone";
 import type { injectScriptsIfNotLoaded } from "@js/util/domUtils";
+import type { MediaElementPlayer } from "@js/mediaelementplayer/mepUtils";
 import type { Toast } from "@schoolboxVue/components/toast/sbxToastTypes";
 import type { SbxGlobalDocumentEventHandlerMap, SbxGlobalElementEventHandlerMap } from "./sbxEvents";
 
@@ -35,6 +36,7 @@ declare global {
         };
         jQuery: JQueryStatic;
         Dropzone: Dropzone;
+        MediaElementPlayer: MediaElementPlayer;
         sbProps: {
             ckeditor5LicenseKey: string;
             iframelyLicenseKey: string;

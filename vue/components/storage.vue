@@ -1,100 +1,107 @@
-<script>
-/* eslint-disable eslint-comments/disable-enable-pair -- see below */
-/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
-/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
-/* eslint-enable vue/no-v-html */
+<script lang="ts" setup>
 /**
  * Render the given storage object appropriately.
  *
- * * Audio and video files have a MediaElement player attached
- * * Images are rendered in a `<img>` tag
- * * Other files are rendered with an `<a>` tag, providing a link for download
+ * Audio and video files have a MediaElement player attached
+ * Images are rendered in a `<img>` tag
+ * Other files are rendered with an `<a>` tag, providing a link for download
  */
 
 import { humanFileSize } from "@js/util/fileUtils";
-import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils.ts";
+import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils";
+import type { MediaElementPlayer } from "@js/mediaelementplayer/mepUtils";
 
-export default {
-    name: "storage",
-    props: {
-        storage: {
-            type: Object,
-            default: {},
-        },
-        filename: {
-            type: String,
-            default: "",
-        },
-    },
-    computed: {
-        MediaElementPlayer: () => window.MediaElementPlayer,
-    },
-    data() {
-        return {
-            player: null,
+interface Props {
+    storage: {
+        type: "audio" | "video" | "image" | "file";
+        _links: {
+            stream?: string;
+            poster?: string;
+            image?: string;
+            fetch?: string;
+            icon?: string;
         };
-    },
-    mounted() {
-        // We need to wait for the source element to be visible first before initialising the MediaElement player
-        // otherwise it will never render correctly (see SA-18855)
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    // The component is visible, ready to init the player
-                    switch (this.storage.type) {
-                        case "audio":
-                            this.player = new this.MediaElementPlayer(this.$el, {
-                                // Override the default iconSprite reference and leave blank to avoid load error
-                                // CSS is used to display the icons instead
-                                // refer to https://github.com/mediaelement/mediaelement/blob/master/docs/api.md#configuration
-                                iconSprite: ``,
-                            });
-                            break;
+        size: number;
+    };
+    filename: string;
+}
 
-                        case "video":
-                            this.player = new this.MediaElementPlayer(this.$el, getConfigForVideo());
-                            break;
+const props = defineProps<Props>();
+const playerEl = window.Vue.useTemplateRef<HTMLElement>("playerRef");
 
-                        default:
-                            break;
-                    }
+const player = window.Vue.ref<MediaElementPlayer | null>(null);
 
-                    // Disconnect the observer after we've initialised the player
-                    observer.disconnect();
+window.Vue.onMounted(() => {
+    if (playerEl.value === null) {
+        // shouldn't get here, console.error rather than throw to avoid breaking other functionality
+        console.error("Unable to initialise MediaElement player, playerEl is null");
+        return;
+    }
+
+    // We need to wait for the source element to be visible first before initialising the MediaElement player
+    // otherwise it will never render correctly (see SA-18855)
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (!playerEl.value) {
+                console.error("Unable to initialise MediaElement player, playerEl is null");
+                return;
+            }
+
+            if (entry.isIntersecting) {
+                // The component is visible, ready to init the player
+                switch (props.storage.type) {
+                    case "audio":
+                        player.value = new window.MediaElementPlayer(playerEl.value, {
+                            // Override the default iconSprite reference and leave blank to avoid load error
+                            // CSS is used to display the icons instead
+                            // refer to https://github.com/mediaelement/mediaelement/blob/master/docs/api.md#configuration
+                            iconSprite: ``,
+                        });
+                        break;
+
+                    case "video":
+                        player.value = new window.MediaElementPlayer(playerEl.value, getConfigForVideo());
+                        break;
+
+                    default:
+                        break;
                 }
-            });
+
+                // Disconnect the observer after we've initialised the player
+                observer.disconnect();
+            }
         });
-        observer.observe(this.$el);
-    },
-    beforeUnmount() {
-        switch (this.storage.type) {
-            case "audio":
-            case "video":
-                if (this.player) {
-                    if (!this.player.paused) {
-                        this.player.pause();
-                    }
-                    this.player.remove();
-                    this.player = null;
-                }
-                break;
+    });
+    observer.observe(playerEl.value);
+});
+
+window.Vue.onBeforeUnmount(() => {
+    if (props.storage.type === "video" && player.value) {
+        if (!player.value.paused) {
+            player.value.pause();
         }
-    },
-    methods: {
-        filesize(size) {
-            // This uses the JEDEC standard (1KB = 1024B),
-            // rather than the SI standard (1KB = 1000B, 1KiB = 1024B):
-            // Schoolbox's file size rendering uses the JEDEC standard for
-            // better or worse.
-            return humanFileSize(size);
-        },
-    },
-};
+        player.value.remove();
+        player.value = null;
+    }
+});
+
+/**
+ * This uses the JEDEC standard (1KB = 1024B),
+ * rather than the SI standard (1KB = 1000B, 1KiB = 1024B):
+ * Schoolbox's file size rendering uses the JEDEC standard for
+ * better or worse.
+ * @param size - The size in bytes
+ * @returns A human-readable file size string
+ */
+function filesize(size: number): string {
+    return humanFileSize(size);
+}
 </script>
 
 <template>
     <video
         v-if="storage.type === 'video'"
+        ref="playerRef"
         controls
         preload="none"
         style="width: 100%; height: 100%"
@@ -102,11 +109,17 @@ export default {
     >
         <source type="video/mp4" :src="storage._links.stream" />
     </video>
-    <audio v-else-if="storage.type === 'audio'" controls preload="none" style="width: 100%; height: 100%">
+    <audio
+        v-else-if="storage.type === 'audio'"
+        ref="playerRef"
+        controls
+        preload="none"
+        style="width: 100%; height: 100%"
+    >
         <source type="audio/mpeg" :src="storage._links.stream" />
     </audio>
-    <img v-else-if="storage.type === 'image'" :src="storage._links.image" :alt="filename" />
-    <a v-else :href="storage._links.fetch">
+    <img v-else-if="storage.type === 'image'" ref="playerRef" :src="storage._links.image" :alt="filename" />
+    <a v-else ref="playerRef" :href="storage._links.fetch">
         <img :src="storage._links.icon" :alt="filename" /> {{ filename }}
         <span class="meta">({{ filesize(storage.size) }})</span>
     </a>
