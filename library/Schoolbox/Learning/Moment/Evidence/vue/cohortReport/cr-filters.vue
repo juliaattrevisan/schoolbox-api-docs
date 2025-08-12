@@ -64,19 +64,19 @@ const authorFilter = window.Vue.ref<SearchSelectItem[]>([]);
                 <div class="filters__inner-container l-flex-col l-gap-m">
                     <search-select
                         v-model:selected="studentFilter"
-                        label="Filter by student"
+                        label="Filter by student(s)"
                         label-id="students"
                         endpoint="/ajax/user.php?roleTypeID=student&"
                         :is-single-select="false"
-                        placeholder="Select students"
+                        placeholder="Select student(s)"
                     />
                     <search-select
                         v-model:selected="authorFilter"
-                        label="Filter by author"
+                        label="Filter by author(s)"
                         label-id="author"
                         endpoint="/ajax/user.php?groupID=0&"
-                        :is-single-select="true"
-                        placeholder="Select author"
+                        :is-single-select="false"
+                        placeholder="Select author(s)"
                     />
                     <!-- TODO: filter by source -->
                     <!-- TODO: filter by start/end dates -->
