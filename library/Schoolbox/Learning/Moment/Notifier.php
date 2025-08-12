@@ -14,7 +14,6 @@ use Psr\Container\ContainerInterface;
 use Schoolbox\Learning\Moment\Model as Evidence;
 use Alaress\Async\Notification\Instance\Builder;
 use Monolog\Logger;
-use Schoolbox\Learning\Moment\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\MapperFactory;
 use Schoolbox\Realtime\Message\NSMapper;

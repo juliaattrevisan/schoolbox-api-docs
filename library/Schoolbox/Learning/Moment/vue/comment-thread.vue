@@ -305,7 +305,7 @@ export default {
                                     <!--
                                         Infer that a user is deleted by absence of a profile link.
                                         Note that adding an isDeleted property can't be done easily due to use of
-                                        decorators in Evidence/Translator/ModelToArray/Comments->loadAndTranslateCommentsInDiscussionThread().
+                                        decorators in Translator/ModelToArray/Comments->loadAndTranslateCommentsInDiscussionThread().
                                     -->
                                     <component
                                         :is="comment.author._links.profile ? 'a' : 'span'"

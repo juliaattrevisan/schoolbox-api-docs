@@ -26,11 +26,11 @@ use UnexpectedValueException;
 /**
  * Feed for a user's learning moment feed.
  *
- * This combines dueWorkFeedback, evidence and badgeAwards into the one cursored result.
+ * This combines dueWorkFeedback, learning moments and badgeAwards into the one cursored result.
  *
  * The purpose of a cursor
  * -----------------------
- * A call to Cursor->retrieveResults() will return a list of items that are either 'evidence', 'badgeAward', or
+ * A call to Cursor->retrieveResults() will return a list of items that are either 'moment', 'badgeAward', or
  * 'dueWorkFeedback', sorted into buckets according to date.  The purpose of the cursor is to uniquely identify a
  * position in this sorted list.  Since each type of item has its own set of IDs, ID alone is not enough information.
  * We need the date, the type of object, and the object's ID.  For more info see the comments in the ICursor class.
@@ -39,7 +39,7 @@ class Cursor implements ICursor
 {
     /**
      * Discriminator value for identifying that a retrieved result points to an
-     * evidence record.
+     * learning moment record.
      */
     public const DISCRIMINATOR_EVIDENCE = 'moment';
 

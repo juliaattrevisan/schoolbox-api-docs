@@ -14,7 +14,6 @@ use Alaress\Web\Router\PathMatcher;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Discussion\Thread;
-use Schoolbox\Learning\Moment\Evidence;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
