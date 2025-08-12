@@ -32,8 +32,8 @@ const resultGroups = window.Vue.computed(() => {
     <div class="l-flex-col l-gap-m">
         <cr-results-group
             v-for="(group, i) in resultGroups"
-            :key="group.label"
             :id="group.id"
+            :key="group.label"
             :label="group.label"
             :entries="group.entries"
             :start-expanded="i === 0"

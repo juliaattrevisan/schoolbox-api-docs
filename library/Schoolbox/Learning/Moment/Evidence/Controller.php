@@ -52,12 +52,14 @@ class Controller extends Base
      * @param Comment\Mapper $commentMapper
      * @param EditorTemplateHelper    $editorTemplateHelper
      * @param \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper
+     * @param Storage\Translator\ModelToArray $storageTranslator
      */
     public function __construct(
         private \Schoolbox\Learning\Moment\Evidence\Mapper $mapper,
         private Comment\Mapper $commentMapper,
         private EditorTemplateHelper $editorTemplateHelper,
         private \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper,
+        private Storage\Translator\ModelToArray $storageTranslator,
     ) {
     }
 
@@ -830,14 +832,7 @@ class Controller extends Base
             $files = [];
 
             if (null !== $moment->getStorage()) {
-                $files = [
-                    [
-                        'hash' => $moment->getStorage()->getHash(),
-                        'filename' => $moment->getStorage()->getFilename(),
-                        'extension' => $moment->getStorage()->getExtension(),
-                        'mime' => $moment->getStorage()->getMime(),
-                    ],
-                ];
+                $files[] = call_user_func($this->storageTranslator, $moment->getStorage());
             }
 
             /* The actual body may be too long or contain too much HTML (i.e. images/videos)

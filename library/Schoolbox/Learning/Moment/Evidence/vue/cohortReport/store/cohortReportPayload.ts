@@ -1,5 +1,6 @@
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { ApiBaseResponse } from "@js/util/sbx/apiUtils";
+import type { StorageFile } from "@js/resource/resourceUtils";
 import type { EvidenceStatus } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 
 export type CohortReportEntry = {
@@ -7,12 +8,7 @@ export type CohortReportEntry = {
     body: string;
     blurb: string;
     showReadMore: boolean;
-    files: {
-        hash: string;
-        filename: string;
-        extension: string;
-        mime: string;
-    }[];
+    files: StorageFile[];
     recipient: {
         id: number;
         externalId: string | null;

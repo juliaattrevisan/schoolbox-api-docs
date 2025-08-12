@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import StorageObject from "@schoolboxVue/components/storage-object.vue";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { EvidenceStatus, evidenceStatusLabels } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 import { useCohortReportStore } from "./store/cohortReportStore";
@@ -38,6 +39,9 @@ const relevantUsers = window.Vue.computed(() => {
  * The current evidence item hash that should be shown
  */
 const selectedEvidenceHash = window.Vue.ref<CohortReportEntry["files"][number]["hash"] | null>(null);
+const selectedEvidence = window.Vue.computed(() => {
+    return props.entry.files.find((f) => f.hash === selectedEvidenceHash.value) || null;
+});
 
 window.Vue.onMounted(() => {
     if (props.entry.files.length > 0) {
@@ -58,23 +62,25 @@ function onReadMore(): void {
         class="cr-result-entry l-flex-col l-pad-s actions-small-1"
         :class="`cr-result-entry--${props.entry.currentState}`"
     >
-        <input
-            :id="inputId"
-            type="checkbox"
-            :name="inputId"
-            :checked="crStore.isEntrySelected(props.entry.id)"
-            @change="crStore.toggleEntrySelection(props.entry.id)"
-        />
-        <label :for="inputId" class="checkbox-label l-flex__item--1">
-            <!-- Only show status that isn't published, since that is the default state -->
-            <span
-                v-if="props.entry.currentState !== EvidenceStatus.PUBLISHED"
-                class="label"
-                :class="`label--moment-${props.entry.currentState}`"
-            >
-                {{ evidenceStatusLabels[props.entry.currentState] }}
-            </span>
-        </label>
+        <div>
+            <input
+                :id="inputId"
+                type="checkbox"
+                :name="inputId"
+                :checked="crStore.isEntrySelected(props.entry.id)"
+                @change="crStore.toggleEntrySelection(props.entry.id)"
+            />
+            <label :for="inputId" class="checkbox-label l-flex__item--1">
+                <!-- Only show status that isn't published, since that is the default state -->
+                <span
+                    v-if="props.entry.currentState !== EvidenceStatus.PUBLISHED"
+                    class="label"
+                    :class="`label--moment-${props.entry.currentState}`"
+                >
+                    {{ evidenceStatusLabels[props.entry.currentState] }}
+                </span>
+            </label>
+        </div>
 
         <nav class="c-nav-actions">
             <sbx-pop-out :content-id="dropdownId"></sbx-pop-out>
@@ -83,27 +89,36 @@ function onReadMore(): void {
             <cr-results-group-entry-actions :entry="props.entry" />
         </ul>
 
-        <div class="l-flex__item--1 l-grid l-grid--12 l-mar-xs--top">
+        <div class="l-flex__item--1 l-grid l-grid--12 l-gap-s l-mar-xs--top">
             <div class="small-12 medium-8">
+                <article v-if="selectedEvidence !== null && selectedEvidence.hash">
+                    <storage-object
+                        :storage="selectedEvidence"
+                        :filename="selectedEvidence.name"
+                        style="max-height: 10rem"
+                        data-test="learning-moment-evidence-media"
+                    ></storage-object>
+                </article>
+
                 <p>
                     <!-- eslint-disable-next-line vue/no-v-html - this is scrubbed on the backend -->
-                    <div v-html="props.entry.blurb"></div>
-                    <div v-if="props.entry.showReadMore" class="l-mar-s--top">
+                    <span v-html="props.entry.blurb"></span>
+                    <span v-if="props.entry.showReadMore" class="l-mar-s--top">
                         <a @click.prevent="onReadMore">READ MORE</a>
-                    </div>
+                    </span>
                 </p>
             </div>
 
             <div class="small-12 medium-4 l-flex-col l-gap-s">
                 <div
-                    v-for="file in props.entry.files.filter((f) => f.hash !== selectedEvidenceHash)"
-                    :key="file.hash"
+                    v-for="storage in props.entry.files.filter((f) => f.hash !== selectedEvidenceHash)"
+                    :key="storage.hash"
                     class="cr-evidence-button l-flex--no-wrap l-flex-row l-gap-xs l-pad-xs"
-                    :title="`${file.filename}.${file.extension}`"
-                    @click="selectedEvidenceHash = file.hash"
+                    :title="`${storage.name}.${storage.type}`"
+                    @click="selectedEvidenceHash = storage.hash"
                 >
-                    <img :src="`/ajax/mime/${file.mime}`" />
-                    <span>{{ file.filename }}.{{ file.extension }}</span>
+                    <img :src="`/ajax/mime/${storage.mime}`" />
+                    <span>{{ storage.name }}.{{ storage.type }}</span>
                 </div>
             </div>
         </div>
