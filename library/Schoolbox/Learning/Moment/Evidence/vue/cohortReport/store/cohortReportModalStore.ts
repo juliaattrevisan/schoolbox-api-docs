@@ -3,6 +3,7 @@ import type { CohortReportEntry } from "./cohortReportPayload";
 
 export enum CohortReportModalType {
     READ_MORE,
+    CONFIRM_PUBLISH,
     CONFIRM_REJECT,
     CONFIRM_DELETE,
 }

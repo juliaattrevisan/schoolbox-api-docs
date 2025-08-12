@@ -115,8 +115,9 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
     /**
      * Publish learning moment(s)
      * @param entryIds The entry ID(s) to publish
+     * @param deleteComments Whether to delete comments associated with the learning moment
      */
-    async function publishEntries(entryIds: number[]): Promise<void> {
+    async function publishEntries(entryIds: number[], deleteComments: boolean): Promise<void> {
         if (putBulkPublishEndpoint === null) {
             throw new Error("Bulk publish endpoint is not set");
         }
@@ -138,7 +139,7 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
 
         const response = await bulkPublishLearningMoments(putBulkPublishEndpoint, {
             momentIds: entryIds,
-            deleteComments: true,
+            deleteComments,
         });
         entries.forEach((entry) => {
             delete loadingEntries.value[entry.id];
@@ -154,6 +155,10 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         // Figure out the new state from the response
         entries.forEach((entry) => {
             updateEntryState(entry, response.data);
+
+            if (deleteComments) {
+                entry.hasComments = false; // assume comments are deleted
+            }
         });
     }
 
@@ -200,6 +205,8 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         // Figure out the new state from the response
         entries.forEach((entry) => {
             updateEntryState(entry, response.data);
+
+            entry.hasComments = true; // assume this generated a comment, blank comments seem to count
         });
     }
 

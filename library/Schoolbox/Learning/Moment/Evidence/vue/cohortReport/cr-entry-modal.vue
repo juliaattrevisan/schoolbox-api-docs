@@ -17,6 +17,22 @@ window.Vue.watch(
 );
 
 /**
+ * Handle the publishing of the selected entries
+ * @param deleteComments Whether to delete comments associated with the learning moment
+ */
+async function onPublish(deleteComments: boolean): Promise<void> {
+    if (!crmStore.selectedEntries || crmStore.selectedEntries.length === 0) {
+        throw new Error("No entries selected for publishing");
+    }
+
+    crmStore.isModalOpen = false;
+    await crStore.publishEntries(
+        crmStore.selectedEntries.map((entry) => entry.id),
+        deleteComments,
+    );
+}
+
+/**
  * Handle the rejection of the selected entries
  */
 async function onReject(): Promise<void> {
@@ -63,6 +79,24 @@ async function onDelete(): Promise<void> {
                 <!-- eslint-disable-next-line vue/no-v-html - this is scrubbed on the backend -->
                 <div class="l-mar-s--top" v-html="entry.body"></div>
             </template>
+        </template>
+
+        <template v-else-if="crmStore.modalType === CohortReportModalType.CONFIRM_PUBLISH">
+            <h2>Please confirm</h2>
+            <p>
+                There are comments on this learning moment that have already been made and will become visible to
+                parents.
+            </p>
+            <p>Do you want to delete these comments?</p>
+
+            <ul class="flex-list buttons">
+                <li>
+                    <button type="submit" class="submit" @click="() => onPublish(true)">Delete and continue</button>
+                </li>
+                <li>
+                    <button type="submit" @click="() => onPublish(false)">Continue</button>
+                </li>
+            </ul>
         </template>
 
         <template v-else-if="crmStore.modalType === CohortReportModalType.CONFIRM_REJECT">
