@@ -9,6 +9,7 @@ import { EditorToolbar } from "@js/editor/types/editorTypes";
 import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
+import { useStudentItemStore } from "./store/studentItemStore";
 
 interface Props {
     student: Student; // the student to display
@@ -22,6 +23,7 @@ const comment = useEditor(props.student.attemptResponse.comment ?? "", `#${edito
     hasTokens: true,
     maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
     toolbar: EditorToolbar.COMMENT_AI,
+    templates: useStudentItemStore().editorTemplates,
 });
 const isSaving = window.Vue.ref(false);
 const hasSaved = window.Vue.ref(false);
