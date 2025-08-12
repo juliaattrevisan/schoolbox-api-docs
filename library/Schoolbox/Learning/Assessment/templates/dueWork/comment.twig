@@ -12,6 +12,7 @@
         isRichText:         bool            Should the textarea be rendered as a rich text editor?
         prefix              string          Optional prefix to the textarea ID (comment-[prefix]-[participant.user.id])
     ]
+    editorTemplates array Retrieve any pre-existing editor templates to insert into the 'Body' rich text editor
 #}
 
 {% if selfAssessment %}
@@ -58,6 +59,9 @@
                     toolbar: "comment_ai",
                 {% endif %}
                 mirrorChangeEvents: true, // To keep jquery.dynamic-feedback.js in sync
+                {% if editorTemplates %}
+                    templates: {{ editorTemplates|json_encode|raw }},
+                {% endif %}
             },
         }),
     );

@@ -50,6 +50,7 @@ use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Receiver;
 use Schoolbox\Url\Uri;
 use Schoolbox\User;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 class Controller extends Base
 {
@@ -105,7 +106,8 @@ class Controller extends Base
         private FilesystemProxy $filesystemProxy,
         private ?Turnitin\File\Api $turnitinFileApi,
         private Receiver $filesystemReceiver,
-        private DueWorkFeedbackMapperProxy $feedbackMapperProxy
+        private DueWorkFeedbackMapperProxy $feedbackMapperProxy,
+        private EditorTemplateHelper $editorTemplateHelper
     ) {
         $this->errorMapper        = $errorMapper;
         $this->responseDataSource = $responseDataSource;
@@ -281,6 +283,7 @@ class Controller extends Base
             'studentView' => false,
             'selfAssess' => false,
             'selfReflect' => false,
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(), // Add this line
         ];
 
         /* Rubrics data
