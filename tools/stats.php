@@ -282,7 +282,7 @@ $app = new class extends CliTool\App {
             'curriculum_rubric_capability'  => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_rubric_capability cnfrc on curriculum_node.id = cnfrc.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
             'curriculum_folder'             => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_category cnfc on curriculum_node.id = cnfc.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
             'curriculum_badge'              => 'SELECT count(*) FROM curriculum_node JOIN curriculum_badge cb on curriculum_node.id = cb.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
-            'curriculum_evidence'           => 'SELECT count(*) FROM curriculum_node JOIN curriculum_evidence ce on curriculum_node.id = ce.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
+            'curriculum_moment'             => 'SELECT count(*) FROM curriculum_node JOIN curriculum_moment cm on curriculum_node.id = cm.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
 
             //Mobile Users
             'mobile_registrations'      => 'SELECT count(*) FROM `mobile_app_registry` WHERE mobile_app_registry.deleted_at is null',

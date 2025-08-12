@@ -65,7 +65,7 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->joinsVia(
-            'curriculum_evidence',
+            'curriculum_moment',
             \Schoolbox\Curriculum\Node\Mapper::class,
             'id',
             'curriculum_node_id',
@@ -204,7 +204,7 @@ class Mapper extends BaseMapper
 
             // Set the list of curriculum codes as an empty collection:
             // these will be hydrated in `hydrateCurriculumNodesIntoCollection`
-            $model->setCurriculumNodes($this->getJoinMapper('curriculum_evidence')->createCollection());
+            $model->setCurriculumNodes($this->getJoinMapper('curriculum_moment')->createCollection());
 
             /* Set submitter/publisher/rejecter
              */
@@ -286,17 +286,17 @@ class Mapper extends BaseMapper
         $query       = "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('curriculum_evidence', 'cn')}
+                {$this->getJoinColumnString('curriculum_moment', 'cn')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
-            INNER JOIN curriculum_evidence ce ON evidence.id = ce.evidence_id
-            INNER JOIN curriculum_node cn ON ce.curriculum_node_id = cn.id AND cn.deleted_at IS NULL
+            INNER JOIN curriculum_moment cm ON evidence.id = cm.evidence_id
+            INNER JOIN curriculum_node cn ON cm.curriculum_node_id = cn.id AND cn.deleted_at IS NULL
             WHERE {$pb->getWhereIntersect()}
         ";
 
         $curriculumNodeStatement = $this->database->query($query, $pb->getParams());
         foreach ($curriculumNodeStatement as $row) {
             /** @var \Schoolbox\Curriculum\Node\Model $curriculumNode */
-            $curriculumNode = $this->hydrateJoin($row, 'curriculum_evidence', 'cn');
+            $curriculumNode = $this->hydrateJoin($row, 'curriculum_moment', 'cn');
             $collection[$row['id']]->getCurriculumNodes()->setOffset($curriculumNode->getId(), $curriculumNode);
         }
         return $collection;
@@ -320,7 +320,7 @@ class Mapper extends BaseMapper
         $query = "
             SELECT {$curriculumNodeMapper->getColumnString('cn')}
             FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('curriculum_evidence', '', 'cn')}
+            LEFT JOIN {$this->getJoinSql('curriculum_moment', '', 'cn')}
             WHERE {$this->getTable()}.{$this->getIdentifierColumn()} = :evidenceId
         ";
 

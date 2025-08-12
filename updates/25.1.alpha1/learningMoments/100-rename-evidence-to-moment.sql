@@ -5,3 +5,5 @@
 rename table lu_evidence_tag to lu_moment_tag;
 
 rename table evidence_tag to moment_tag;
+
+rename table curriculum_evidence to curriculum_moment;
