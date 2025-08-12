@@ -12,6 +12,7 @@ import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
+import { useStudentItemStore } from "./store/studentItemStore";
 
 interface Props {
     student: Student; // the student to display
@@ -20,12 +21,14 @@ interface Props {
     hasMarkVisibility: boolean; // whether marks and feedback are visible to the user
 }
 const props = defineProps<Props>();
+const studentItemStore = useStudentItemStore();
 const editorId = `comment-${props.student.elementId}-${props.item.reference}`;
 const comment = props.isReadOnly
     ? window.Vue.ref("")
     : useEditor(props.item.questions[0].response?.comment ?? "", `#${editorId}`, {
           targetElements: [`#${editorId}`],
           hasTokens: true,
+          templates: studentItemStore.editorTemplates,
       }); // Use a ckeditor for the comments field
 const isSaving = window.Vue.ref(false);
 const hasSaved = window.Vue.ref(false);

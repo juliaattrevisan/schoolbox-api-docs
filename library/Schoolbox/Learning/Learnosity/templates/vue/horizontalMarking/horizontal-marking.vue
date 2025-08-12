@@ -9,7 +9,9 @@ import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/
 import type { StudentAttemptResponse } from "@schoolboxLearnosity/js/types/StudentAttemptResponse";
 import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
 import type { AssessmentMarkData } from "@schoolboxLearnosity/js/types/AssessmentMarkData";
+import type { Template } from "@js/editor/types/editorTypes";
 import { useStore } from "./store/horizontalMarkingStore";
+import { useStudentItemStore } from "../student/store/studentItemStore";
 import { useItemsStore } from "./store/hmItemsStore";
 import { useStudentsStore } from "./store/hmStudentsStore";
 import { loadReports } from "./util/loadReports";
@@ -29,9 +31,11 @@ interface Props {
     reportPayloads: string[]; // the report payloads to load from the Learnosity Reports API
     markData: AssessmentMarkData; // the mark type data linked to the assessment
     statusPage: string; // the status page to link to once user has finished marking
+    editorTemplates: Template[];
 }
 const props = defineProps<Props>();
 const store = useStore();
+const studentItemStore = useStudentItemStore();
 const itemsStore = useItemsStore();
 
 /**
@@ -48,6 +52,7 @@ const hasStudents = window.Vue.computed(() => {
  */
 window.Vue.onMounted(async () => {
     store.init(props.markData, props.statusPage);
+    studentItemStore.init(props.editorTemplates);
     itemsStore.init(props.items);
     useStudentsStore().init(props.students, props.itemResponses, props.attemptResponses, props.urls);
     await window.Vue.nextTick(); // update the DOM to ensure the elements are available for the reports to be loaded into
