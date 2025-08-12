@@ -3,7 +3,7 @@
  * Refer to https://api.highcharts.com/highcharts/ for more details.
  */
 
-import type { Point, Options } from "highcharts";
+import type { Point, Options, SeriesOptionsType } from "highcharts";
 import type { RowOptions, Trend } from "../../../js/types/pastoralReportTypes";
 
 export const trendOptions: Options = {
@@ -72,7 +72,7 @@ export function getChartOptions(
         ...trendOptions,
         series: [
             {
-                ...trendOptions.series[0],
+                ...(trendOptions.series as SeriesOptionsType[])[0],
                 data: trend.line,
             },
         ],
