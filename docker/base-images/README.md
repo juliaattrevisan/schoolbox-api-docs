@@ -7,8 +7,8 @@ It is not expected that the base images will need to be rebuilt upon every merge
 or pull request: they should only need to be rebuilt periodically.
 
 It's also not expected that they will ever need to be built or pushed manually:
-the Github action
-[build-and-push-base-images.yaml](../../.github/workflows/build-and-push-base-images.yaml)
+the Github actions for building and pushing base images
+[build-and-push-*.yaml](../../.github/workflows/)
 ought to be able to build and push automatically.
 
 To build the images:
