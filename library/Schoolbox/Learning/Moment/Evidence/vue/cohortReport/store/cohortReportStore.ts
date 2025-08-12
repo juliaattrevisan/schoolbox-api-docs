@@ -42,7 +42,10 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         }
 
         isLoading.value = true;
-        const response = await getCohortReport(getCohortReportEndpoint);
+        const response = await getCohortReport(getCohortReportEndpoint, {
+            fromDate: "2020-01-01",
+            toDate: "2025-12-31",
+        });
         isLoading.value = false;
         if (response.success === false) {
             loadError.value = response.message;

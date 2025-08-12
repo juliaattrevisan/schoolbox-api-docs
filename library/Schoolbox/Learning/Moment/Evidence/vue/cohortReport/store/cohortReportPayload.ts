@@ -42,6 +42,15 @@ export type CohortReportEntry = {
     };
 };
 
+type CohortReportApiPayload = {
+    userIds?: number[];
+    fromDate?: string;
+    toDate?: string;
+    authorIds?: number[];
+    tagIds?: number[];
+    states?: EvidenceStatus[];
+};
+
 export type CohortReportApiResponse = {
     status: 200;
     content: CohortReportEntry[];
@@ -51,11 +60,16 @@ export type CohortReportApiResponse = {
  * Fetch the cohort report data from the API
  * TODO: Add date range
  * @param url - The endpoint to fetch
+ * @param body - The request body, if any
  * @returns The response from the API
  */
-export async function getCohortReport(url: string): Promise<ApiBaseResponse<CohortReportApiResponse>> {
-    return apiRequest<CohortReportApiResponse>({
-        url: `${url}/2020-01-01/2025-12-31`,
+export async function getCohortReport(
+    url: string,
+    body: CohortReportApiPayload = {},
+): Promise<ApiBaseResponse<CohortReportApiResponse>> {
+    return apiRequest<CohortReportApiResponse, CohortReportApiPayload>({
+        url: `${url}`,
         method: "GET",
+        body,
     });
 }

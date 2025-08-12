@@ -4,7 +4,7 @@
 {{ bread.crumbs([folder.name, '/homepage/' ~ folder.id], ['Cohort Learning Moments']) }}
 
 {% set endpoint = routeLookup(
-    'learningMomentEvidence.getCohortReportPayloadDefault',
+    'learningMomentEvidence.getCohortReportPayload',
     { folder: folder, folderId: folder.id }
 ) %}
 <div id="learning-moments-evidence-cohort-report-container">
