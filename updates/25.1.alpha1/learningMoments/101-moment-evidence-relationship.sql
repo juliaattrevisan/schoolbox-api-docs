@@ -2,9 +2,9 @@ create table moment_evidence
 (
     id        int auto_increment
         primary key,
-    moment_id int                                                                 not null,
+    moment_id int unsigned                                                        not null,
     type      ENUM ('photo', 'text', 'upload', 'video', 'audio') default 'upload' not null,
-    hash      VARCHAR(100) CHARSET ascii                                          not null,
+    hash      VARCHAR(100) CHARSET ascii                                          null,
     filename  varchar(255)                                                        not null,
     constraint moment_evidence_moment_id_fk
         foreign key (moment_id) references moment (id),
