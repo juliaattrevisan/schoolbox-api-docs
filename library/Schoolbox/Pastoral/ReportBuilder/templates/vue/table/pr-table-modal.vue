@@ -52,7 +52,9 @@ window.Vue.watch(
                     }
                 });
             } else {
-                scopeUrlParams.delete(ScopeUrlParam.ROW as string);
+                scopeUrlParams.delete(`${ScopeUrlParam.ROW}[student_id]`);
+                scopeUrlParams.delete(`${ScopeUrlParam.ROW}[type_id]`);
+                scopeUrlParams.delete(`${ScopeUrlParam.ROW}[subtype_id]`);
             }
             scopeUrlParams.delete(ScopeUrlParam.CURSOR as string); // Clear the cursor to start fresh
             scopeUrl.value = `${props.selectedTab._links.scope}?${scopeUrlParams.toString()}`;
