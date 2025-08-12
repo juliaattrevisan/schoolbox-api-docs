@@ -842,7 +842,7 @@ class Controller extends Base
 
             $payload[] = [
                 'id' => $moment->getId(),
-                'body' => $moment->getBody(),
+                'body' => \Scrub::html($moment->getBody()),
                 'files' => $files,
                 /* TODO we usually add role for extra meta about students and staffs, especially in cohorty scenarios
                  *  since there's a higher likelihood of encountering people with same- or same-sounding names.

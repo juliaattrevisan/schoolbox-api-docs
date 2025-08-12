@@ -35,7 +35,8 @@ const inputId = window.Vue.computed(() => {
         </span>
     </label>
 
-    <p>{{ props.entry.body }} - {{ props.entry.createdAt.displayAs }}</p>
+    <!-- eslint-disable-next-line vue/no-v-html -- this is scrubbed on the backend -->
+    <p v-html="props.entry.body"></p>
 </template>
 
 <style scoped></style>
