@@ -299,7 +299,7 @@ class SchoolboxCli extends \Codeception\Module
     /**
      * Returns the lesson plan template based on its title.
      *
-     * @param string $title
+     * @param null|string $title
      * @return \Schoolbox\Admin\LessonPlan\Template\Model
      */
     public function grabLessonPlanTemplateByTitle(?string $title): \Schoolbox\Admin\LessonPlan\Template\Model
@@ -311,7 +311,7 @@ class SchoolboxCli extends \Codeception\Module
     /**
      * Returns the lesson plan template field based on its title
      *
-     * @param string $title
+     * @param null|string $title
      * @return \Schoolbox\Admin\LessonPlan\Template\Field\Model
      */
     public function grabLessonPlanTemplateFieldByTitle(?string $title): \Schoolbox\Admin\LessonPlan\Template\Field\Model
