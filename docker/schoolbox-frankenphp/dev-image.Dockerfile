@@ -5,13 +5,14 @@
 #      otherwise, build with dev dependencies.
 ARG ENV=dev
 ARG ARCH=amd64
+ARG PHP_VERSION
 
 # Currently alpine can drop-in replace bookworm:
 # just replace "bookworm" with "alpine" in the `FROM` line below.
 # Image size: alpine 355MB, bookworm 653MB.
 # Attempting to `apt install` required packages and only copy compiled
 # extensions actually bloats the bookworm image to 743MB.
-FROM --platform=linux/${ARCH} dunglas/frankenphp:1.8-php8.4-bookworm
+FROM --platform=linux/${ARCH} dunglas/frankenphp:1.8-php${PHP_VERSION}-bookworm
 
 # Ensure ENV is accessible by this build step:
 # otherwise, xDebug will be installed below.
@@ -70,7 +71,7 @@ COPY ./config/frankenphp/* /etc/frankenphp/
 
 
 # Stage 2: build final image
-#FROM --platform=linux/${ARCH} dunglas/frankenphp:1.5-php8.4-bookworm AS final
+#FROM --platform=linux/${ARCH} dunglas/frankenphp:1.5-php${PHP_VERSION}-bookworm AS final
 #ARG ENV
 #ARG SERVER_NAME
 #

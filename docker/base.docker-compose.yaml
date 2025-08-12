@@ -9,12 +9,13 @@
 services:
   # Base image: only needs to be built, not started
   # By default, build with ENV=dev
-  php84-bookworm:
-    image: php84-bookworm
+  php-bookworm:
+    image: php-bookworm
     build:
-      context: ./base-images/php84-bookworm
+      context: ./base-images/php-bookworm
       args:
         ENV: ${ENV:-dev}
+        PHP_VERSION: ${PHP_VERSION}
     restart: no
 
   # Frontend web server, mimicking a load balancer and SSL termination endpoint.
@@ -47,7 +48,7 @@ services:
   # own container will go here for now.
   schoolbox-cli:
     depends_on:
-      - php84-bookworm
+      - php-bookworm
     container_name: schoolbox-cli
     restart: always
     environment:
@@ -146,7 +147,7 @@ services:
         condition: service_healthy
       redis-storage:
         condition: service_healthy
-      php84-bookworm:
+      php-bookworm:
         condition: service_started
     build:
       context: ./schoolbox-digestd
@@ -167,7 +168,7 @@ services:
         condition: service_healthy
       redis-storage:
         condition: service_healthy
-      php84-bookworm:
+      php-bookworm:
         condition: service_started
     build:
       context: ./schoolbox-scheduled
@@ -188,7 +189,7 @@ services:
         condition: service_healthy
       redis-storage:
         condition: service_healthy
-      php84-bookworm:
+      php-bookworm:
         condition: service_started
     build:
       context: ./schoolbox-mobiled
@@ -209,7 +210,7 @@ services:
         condition: service_healthy
       redis-storage:
         condition: service_healthy
-      php84-bookworm:
+      php-bookworm:
         condition: service_started
     build:
       context: ./schoolbox-socketd

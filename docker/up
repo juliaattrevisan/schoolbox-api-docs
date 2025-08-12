@@ -165,14 +165,14 @@ function start_containers() {
     # FrankenPHP container.
     frankenphp_compose_file="docker/schoolbox-frankenphp/dev.docker-compose.yaml"
 
-    # currently, the `php84-bookworm` image must be built locally before
+    # currently, the `php-bookworm` image must be built locally before
     # everything else
     docker compose --progress plain \
         -f "docker/base.docker-compose.yaml" \
         -f "${frankenphp_compose_file}" \
         -f "${taskd_compose_file}" \
         --env-file .docker-compose.env \
-        build php84-bookworm
+        build php-bookworm
 
     # start default environment:
     # this has Schoolbox's code folder mounted as a local mount, thus changes
