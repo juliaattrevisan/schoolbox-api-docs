@@ -84,6 +84,8 @@ class Mapper extends \Schoolbox\Mapper
             $resultSet[$result->getId()] = $result->setStorage($storage->setMimetype($mime));
         }
 
-        return $resultSet;
+        /* Sort arbitrarily by created_at in ascending order: oldest file first.
+         */
+        return $resultSet->sortBy('createdAt', 'asc');
     }
 }
