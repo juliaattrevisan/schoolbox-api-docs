@@ -5,6 +5,7 @@ import type { CohortReportEntry } from "./store/cohortReportPayload";
 import CrResultsGroupEntry from "./cr-results-group-entry.vue";
 
 interface Props {
+    id: string | number;
     label: string;
     entries: CohortReportEntry[];
     startExpanded: boolean;
@@ -17,10 +18,7 @@ const isExpanded = window.Vue.ref(props.startExpanded);
 const showExpandedBorder = window.Vue.ref(isExpanded.value);
 const entryListEl = window.Vue.useTemplateRef<HTMLDivElement>("entryListRef");
 
-const dataPrefix = window.Vue.computed(() => {
-    const label = props.label.replaceAll(" ", "-");
-    return `cr-results-group-${label}`;
-});
+const dataPrefix = window.Vue.computed(() => `cr-results-group-${props.id}`);
 
 /** Whether all entries in this group are selected */
 const allEntriesSelected = window.Vue.computed(() => {

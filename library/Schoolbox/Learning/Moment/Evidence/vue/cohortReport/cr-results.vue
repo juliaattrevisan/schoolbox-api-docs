@@ -21,6 +21,7 @@ const resultGroups = window.Vue.computed(() => {
     return Object.values(groups)
         .sort((a, b) => b[0].createdAt.timestamp - a[0].createdAt.timestamp)
         .map((entries) => ({
+            id: entries[0].createdAt.timestamp,
             label: entries[0].createdAt.displayAs,
             entries: entries.sort((a, b) => b.updatedAt.timestamp - a.updatedAt.timestamp),
         }));
@@ -32,6 +33,7 @@ const resultGroups = window.Vue.computed(() => {
         <cr-results-group
             v-for="(group, i) in resultGroups"
             :key="group.label"
+            :id="group.id"
             :label="group.label"
             :entries="group.entries"
             :start-expanded="i === 0"
