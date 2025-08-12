@@ -13,28 +13,16 @@ export type CohortReportEntry = {
         id: number;
         externalId: string | null;
         fullname: string;
-        firstname: string;
-        lastname: string;
-        role: string;
     };
     creator: {
         id: number;
         externalId: string | null;
         fullname: string;
-        firstname: string;
-        lastname: string;
     };
     createdAt: {
         timestamp: number;
         displayAs: string;
     };
-    createdBy: {
-        id: number;
-        externalId: string | null;
-        fullname: string;
-        firstname: string;
-        lastname: string;
-    } | null;
     updatedAt: {
         timestamp: number;
         displayAs: string;

@@ -902,40 +902,6 @@ class Controller extends Base
                 /* The current state of the learning moment
                  */
                 'currentState' => $moment->getCurrentState(),
-                // TODO State-specific metadata is currently not needed, but maybe needed later
-                //
-                //                    /* Metadata about the current state of a learning moment and any other details
-                //                     * regarding the current state, such as who actioned a state change etc.
-                //                     */
-                //                    'states' => [
-                //                        'current' => $moment->getCurrentState(),
-                //                        /* You'll be in one of three alternative states here: submitted/published/rejected
-                //                         */
-                //                        'submittedAt' => $moment->getSubmittedAt()?->getDatabase(),
-                //                        'submittedBy' => $moment->getSubmittedBy() ? [
-                //                            'id' => $moment->getSubmittedBy()->getId(),
-                //                            'externalId' => $moment->getSubmittedBy()->getExternalId(),
-                //                            'fullname' => $moment->getSubmittedBy()->getFullname(),
-                //                            'firstname' => $moment->getSubmittedBy()->getFirstname(),
-                //                            'lastname' => $moment->getSubmittedBy()->getLastname(),
-                //                        ] : null,
-                //                        'publishAt' => $moment->getPublishedAt()?->getDatabase(),
-                //                        'publishedBy' => $moment->getPublishedBy() ? [
-                //                            'id' => $moment->getPublishedBy()->getId(),
-                //                            'externalId' => $moment->getPublishedBy()->getExternalId(),
-                //                            'fullname' => $moment->getPublishedBy()->getFullname(),
-                //                            'firstname' => $moment->getPublishedBy()->getFirstname(),
-                //                            'lastname' => $moment->getPublishedBy()->getLastname(),
-                //                        ] : null,
-                //                        'rejectedAt' => $moment->getRejectedAt()?->getDatabase(),
-                //                        'rejectedBy' => $moment->getRejectedBy() ? [
-                //                            'id' => $moment->getRejectedBy()->getId(),
-                //                            'externalId' => $moment->getRejectedBy()->getExternalId(),
-                //                            'fullname' => $moment->getRejectedBy()->getFullname(),
-                //                            'firstname' => $moment->getRejectedBy()->getFirstname(),
-                //                            'lastname' => $moment->getRejectedBy()->getLastname(),
-                //                        ] : null
-                //                    ],
                 /* Any associated tags which you can find in a db lookup table
                  */
                 'tags' => $this->getTagsForMoment($moment),
