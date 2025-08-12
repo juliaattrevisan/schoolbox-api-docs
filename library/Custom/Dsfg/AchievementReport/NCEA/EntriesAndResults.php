@@ -178,17 +178,17 @@ class EntriesAndResults extends Base
      */
     private function findEntries(): array
     {
-        if ($this->getDbTableName() === self::MAIN_DB_TABLE_NCEA) {
-            $dbTableName = 'dbo.uvSchoolBoxNCEAResultsV2';
-        } else {
-            $dbTableName = $this->getDbTableName();
-        }
+        $dbTableName = (
+            ($this->getDbTableName() === self::MAIN_DB_TABLE_NCEA)
+            ? 'dbo.uvSchoolBoxNCEAResultsV2'
+            : $this->getDbTableName()
+        );
 
-        if ($dbTableName === self::MAIN_DB_TABLE_YEAR11) {
-            $columnForSorting = 'CourseDescriptionForSorting';
-        } else {
-            $columnForSorting = 'CourseDescription';
-        }
+        $columnForSorting = (
+            ($dbTableName === self::MAIN_DB_TABLE_YEAR11)
+            ? 'CourseDescriptionForSorting'
+            : 'CourseDescription'
+        );
 
         $params = [
             'externalId' => $this->getExternalUserId(),
