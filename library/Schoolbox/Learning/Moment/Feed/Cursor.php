@@ -318,9 +318,9 @@ class Cursor implements ICursor
                 'EXISTS(
                      SELECT *
                      FROM evidence_tag    AS et
-                     JOIN lu_evidence_tag AS luet ON luet.id = et.tag_id
+                     JOIN lu_moment_tag AS lumt ON lumt.id = et.tag_id
                      WHERE et.evidence_id = e.id
-                     AND luet.name = :tagEvidence
+                     AND lumt.name = :tagEvidence
                  )'
             );
             $params['tagEvidence'] = $this->filter['tag'];

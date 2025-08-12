@@ -21,7 +21,7 @@ class Mapper extends BaseMapper
      */
     protected function mapping(): void
     {
-        $this->hasTable('lu_evidence_tag');
+        $this->hasTable('lu_moment_tag');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('name', self::TYPE_STRING);
