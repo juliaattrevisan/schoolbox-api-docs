@@ -181,7 +181,7 @@ abstract class BaseBuilder implements IBuilder
      */
     private function normaliseAsHtml(string $content): string
     {
-        return $this->normaliseAsText(htmlspecialchars_decode(strip_tags($content)));
+        return $this->normaliseAsText(htmlspecialchars_decode($this->stripTagsPreserveWordBreaks($content)));
     }
 
     /**
@@ -200,6 +200,22 @@ abstract class BaseBuilder implements IBuilder
                 $content,
             ),
         );
+    }
+
+    /**
+     * @param string $html
+     * @return string
+     */
+    private function stripTagsPreserveWordBreaks(string $html): string
+    {
+        // Add spaces before closing tags to preserve word boundaries.
+        $html = preg_replace('/<\/([^>]+)>/', ' </$1>', $html);
+
+        // Strip the tags.
+        $cleaned = strip_tags($html);
+
+        // Clean up multiple spaces and trim.
+        return trim(preg_replace('/\s+/', ' ', $cleaned));
     }
 
     /**
