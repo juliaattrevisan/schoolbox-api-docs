@@ -449,7 +449,9 @@ export default {
     },
     computed: {
         showCheckboxes: function () {
-            return this.learningMomentsEnabled || this.mailEnabled;
+            return (
+                this.learningMomentsEnabled || this.badgesEnabled || this.pastoralEnabled || this.currentUserCanEmail
+            );
         },
         allStudentIds: function () {
             let ids = [],
@@ -548,7 +550,7 @@ export default {
                 </dd>
             </dl>
 
-            <section class="content">
+            <section v-if="showCheckboxes" class="content">
                 <ul class="flex-list flex-wrap buttons">
                     <li v-if="learningMomentsEnabled">
                         <a
