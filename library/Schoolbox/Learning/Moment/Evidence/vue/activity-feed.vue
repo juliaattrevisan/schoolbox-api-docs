@@ -677,44 +677,56 @@ export default {
                                                         : null
                                                 "
                                                 :title="!evidence.object.creator.isDeleted ? 'View Profile' : null"
+                                                class="l-gap-s"
                                             >
-                                                <img
-                                                    :src="evidence.object.creator._links.avatar"
-                                                    :alt="!evidence.object.creator.isDeleted ? 'View Profile' : null"
-                                                />
-                                                <p>{{ evidence.object.creator.fullName }}</p>
+                                                <div class="l-flex-row l-flex--align-center">
+                                                    <img
+                                                        :src="evidence.object.creator._links.avatar"
+                                                        :alt="
+                                                            !evidence.object.creator.isDeleted ? 'View Profile' : null
+                                                        "
+                                                    />
+                                                    <p>{{ evidence.object.creator.fullName }}</p>
 
-                                                <time
-                                                    class="pipe meta"
-                                                    :datetime="formatDate(evidence.object.createdAt)"
-                                                    :title="
-                                                        formatDate(
-                                                            evidence.object.createdAt,
-                                                            dateDisplayFormats.dayjsDatetime,
-                                                        )
-                                                    "
-                                                    >{{
-                                                        formatDate(
-                                                            evidence.object.createdAt,
-                                                            dateDisplayFormats.dayjsTime,
-                                                        )
-                                                    }}</time
-                                                >
+                                                    <time
+                                                        class="pipe meta"
+                                                        :datetime="formatDate(evidence.object.createdAt)"
+                                                        :title="
+                                                            formatDate(
+                                                                evidence.object.createdAt,
+                                                                dateDisplayFormats.dayjsDatetime,
+                                                            )
+                                                        "
+                                                        >{{
+                                                            formatDate(
+                                                                evidence.object.createdAt,
+                                                                dateDisplayFormats.dayjsTime,
+                                                            )
+                                                        }}</time
+                                                    >
+                                                </div>
+
                                                 <!-- Only show status that isn't published, since that is the default state -->
                                                 <template v-if="'draft' === evidence.object.currentState">
-                                                    <span :class="`moment-${evidence.object.currentState} label`"
-                                                        >Draft</span
+                                                    <span
+                                                        :class="`label label--moment-${evidence.object.currentState} l-mar--0`"
                                                     >
+                                                        Draft
+                                                    </span>
                                                 </template>
                                                 <template v-else-if="'submitted' === evidence.object.currentState">
-                                                    <span :class="`moment-${evidence.object.currentState} label`"
-                                                        >Requiring approval</span
+                                                    <span
+                                                        :class="`label label--moment-${evidence.object.currentState} l-mar--0`"
                                                     >
+                                                        Requiring approval
+                                                    </span>
                                                 </template>
                                                 <template v-else-if="'rejected' === evidence.object.currentState">
-                                                    <span :class="`moment-${evidence.object.currentState} label`"
-                                                        >Requiring update</span
+                                                    <span
+                                                        :class="`label label--moment-${evidence.object.currentState} l-mar--0`"
                                                     >
+                                                        Requiring update
+                                                    </span>
                                                 </template>
                                             </component>
                                         </div>
