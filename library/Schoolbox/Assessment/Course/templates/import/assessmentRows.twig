@@ -175,7 +175,7 @@
                         unitDate: defaultDueDate,
                         endOfDay: true,
                         inputPrefix: inputPrefix ~ '[' ~ assessment.id ~ ']',
-                        dateLabel: (assessment is lessonPlan ? 'Lesson': 'Due'),
+                        dateLabel: (assessment is lessonPlan ? locale.translate('lessonPlan', false, true): 'Due'),
                         dateProperty: 'due',
                         dateSyncStart: dueSyncStart,
                         dateSyncEnd: dueSyncEnd,
