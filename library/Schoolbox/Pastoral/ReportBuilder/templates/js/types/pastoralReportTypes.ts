@@ -143,11 +143,20 @@ export enum ScopeUrlParam {
 }
 
 /**
+ * Keys that can be passed to identify a specific row in the table
+ */
+export type RowKeys = {
+    student_id?: number;
+    type_id?: number;
+    subtype_id?: number;
+};
+
+/**
  * When a cell is selected in the Pastoral Report Table,
  * it will only contain the header when the total row is selected,
  * or both the header and rowId when a specific row is selected.
  */
 export type SelectedCell = {
     header: TableHeader;
-    rowId?: number;
+    rowKeys?: RowKeys;
 };

@@ -9,7 +9,13 @@ import "highcharts/modules/accessibility";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { TableHeaderType } from "../../js/types/pastoralReportTypes";
-import type { TableHeader, RowOptions, RecordsAndPoints, TypeSubType } from "../../js/types/pastoralReportTypes";
+import type {
+    TableHeader,
+    RowOptions,
+    RecordsAndPoints,
+    TypeSubType,
+    RowKeys,
+} from "../../js/types/pastoralReportTypes";
 import { trendOptions } from "./config/chartOptions";
 
 const props = defineProps<{
@@ -19,7 +25,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    cellSelect: [header: TableHeader, rowId: number];
+    cellSelect: [header: TableHeader, rowKeys: RowKeys];
 }>();
 
 /**
@@ -27,10 +33,12 @@ const emit = defineEmits<{
  * it'll return the user's id, otherwise it defaults to 0.
  * @returns - The id of the row, or 0 if not defined.
  */
-const rowId = (): number => {
+const rowKeys = (): RowKeys => {
     // check if there's a 'user' key in rowData and return its id if it exists
     const user = props.rowData.user as User;
-    return user?.id || 0; // Default to 0 if user is not defined
+    return {
+        student_id: user?.id || 0,
+    };
 };
 
 /**
@@ -38,7 +46,7 @@ const rowId = (): number => {
  * @param header - the header of the cell that was clicked
  */
 function onCellSelected(header: TableHeader): void {
-    emit("cellSelect", header, rowId());
+    emit("cellSelect", header, rowKeys());
 }
 
 /**

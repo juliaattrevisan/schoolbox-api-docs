@@ -4,7 +4,7 @@
  */
 
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
-import type { Tab, TablePayload, TableHeader, SelectedCell } from "../../js/types/pastoralReportTypes";
+import type { Tab, TablePayload, TableHeader, SelectedCell, RowKeys } from "../../js/types/pastoralReportTypes";
 import { TabType, ViewUrlParam } from "../../js/types/pastoralReportTypes";
 import { useLoadPrTable } from "../composable/useLoadPrTable";
 import { useMaxScrollableHeight } from "../composable/useMaxScrollableHeight";
@@ -109,12 +109,12 @@ function onTotalCellSelect(header: TableHeader): void {
 /**
  * Handle row cell selection
  * @param header - the header of the cell that was selected
- * @param rowId - the id of the row that was selected
+ * @param rowKeys - the keys of the row that was selected
  */
-function onRowCellSelect(header: TableHeader, rowId: number): void {
+function onRowCellSelect(header: TableHeader, rowKeys: RowKeys): void {
     selectedCell.value = {
         header,
-        rowId,
+        rowKeys,
     };
 }
 
