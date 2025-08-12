@@ -53,35 +53,36 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
-    <div class="cr-result-entry l-flex-col l-pad-s" :class="`cr-result-entry--${props.entry.currentState}`">
-        <div class="l-flex-row l-gap-s">
-            <input
-                :id="inputId"
-                type="checkbox"
-                :name="inputId"
-                :checked="crStore.isEntrySelected(props.entry.id)"
-                @change="crStore.toggleEntrySelection(props.entry.id)"
-            />
-            <label :for="inputId" class="checkbox-label l-flex__item--1">
-                <!-- Only show status that isn't published, since that is the default state -->
-                <span
-                    v-if="props.entry.currentState !== EvidenceStatus.PUBLISHED"
-                    class="label"
-                    :class="`label--moment-${props.entry.currentState}`"
-                >
-                    {{ evidenceStatusLabels[props.entry.currentState] }}
-                </span>
-            </label>
+    <div
+        class="cr-result-entry l-flex-col l-pad-s actions-small-1"
+        :class="`cr-result-entry--${props.entry.currentState}`"
+    >
+        <input
+            :id="inputId"
+            type="checkbox"
+            :name="inputId"
+            :checked="crStore.isEntrySelected(props.entry.id)"
+            @change="crStore.toggleEntrySelection(props.entry.id)"
+        />
+        <label :for="inputId" class="checkbox-label l-flex__item--1">
+            <!-- Only show status that isn't published, since that is the default state -->
+            <span
+                v-if="props.entry.currentState !== EvidenceStatus.PUBLISHED"
+                class="label"
+                :class="`label--moment-${props.entry.currentState}`"
+            >
+                {{ evidenceStatusLabels[props.entry.currentState] }}
+            </span>
+        </label>
 
-            <nav class="c-nav-actions">
-                <sbx-pop-out :content-id="dropdownId"></sbx-pop-out>
-                <ul :id="dropdownId" class="f-dropdown" data-dropdown-content>
-                    <cr-results-group-entry-actions :entry="props.entry" />
-                </ul>
-            </nav>
-        </div>
+        <nav class="c-nav-actions">
+            <sbx-pop-out :content-id="dropdownId"></sbx-pop-out>
+        </nav>
+        <ul :id="dropdownId" class="f-dropdown" data-dropdown-content>
+            <cr-results-group-entry-actions :entry="props.entry" />
+        </ul>
 
-        <div class="l-flex__item--1 l-grid l-grid--12">
+        <div class="l-flex__item--1 l-grid l-grid--12 l-mar-xs--top">
             <div class="small-12 medium-8">
                 <!-- eslint-disable-next-line vue/no-v-html - this is scrubbed on the backend -->
                 <p v-html="props.entry.body"></p>
