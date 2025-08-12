@@ -14,6 +14,12 @@ use Schoolbox\User;
 
 abstract class Base extends AchievementReportBase
 {
+    /**
+     * Source database table names for the NCEA and Year 11 reports.
+     *
+     * The Year 11 report is generated using the same code as the NCEA report, but uses a different data source.
+     * The Year 11 report also displays data in a different order in a couple of places.
+     */
     const MAIN_DB_TABLE_NCEA = 'dbo.uvSchoolBoxNCEAResults';
     const MAIN_DB_TABLE_YEAR11 = 'dbo.uvSchoolBoxNCEAResultsforDataRefreshV2_Year11';
 
