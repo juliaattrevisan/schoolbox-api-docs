@@ -72,8 +72,9 @@ export function getChartOptions(
         ...trendOptions,
         series: [
             {
-                ...(trendOptions.series as SeriesOptionsType[])[0],
                 data: trend.line,
+                name: recordsOrPoints,
+                type: "area" as const,
             },
         ],
         tooltip: {
