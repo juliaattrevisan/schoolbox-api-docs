@@ -25,6 +25,12 @@ class CourseCreditSummary extends Base
      */
     private function findCourseCreditSummary(): array
     {
+        $columnForSorting = (
+            ($this->getDbTableName() === self::MAIN_DB_TABLE_YEAR11)
+            ? 'CourseDescriptionForSorting'
+            : 'CourseDescription'
+        );
+
         $params = [
             'externalId' => $this->getExternalUserId(),
             'year' => $this->year
@@ -46,6 +52,8 @@ class CourseCreditSummary extends Base
                 id = :externalId AND
                 WithdrawnFlag = 0 AND
                 StudentYear = :year
+            ORDER BY
+                ' . $columnForSorting . ' ASC
         ';
 
         return $this->db->executeQuery($query, $params)->fetchAll();
@@ -55,9 +63,9 @@ class CourseCreditSummary extends Base
     /**
      * Returns data for twig rendering
      *
-     * @return mixed
+     * @return array
      */
-    public function findData()
+    public function findData(): array
     {
         $finalStack = [
             'courses' => [],
@@ -128,8 +136,6 @@ class CourseCreditSummary extends Base
                 }
             }
         }
-
-        ksort($finalStack['courses']);
 
         return $finalStack;
     }

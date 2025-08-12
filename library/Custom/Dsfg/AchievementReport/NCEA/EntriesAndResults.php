@@ -21,20 +21,15 @@ class EntriesAndResults extends Base
     /**
      * Returns data for twig rendering
      *
-     * @return mixed
+     * @return array
      */
-    public function findData()
+    public function findData(): array
     {
         $finalStack = [];
         $allResults = $this->findEntries();
 
         foreach ($allResults as $current) {
             $courseName = $current['CourseDescription'];
-
-            $finalStack[$courseName] = [
-                'CourseDescriptionForSorting' => $current['CourseDescriptionForSorting']
-            ];
-
             $internalExternal = $current['InternalorExternalAssessment'];
             $letter = $current['StrippedResult'];
             $level = $current['Level'];
@@ -150,14 +145,6 @@ class EntriesAndResults extends Base
             }
         }
 
-        uasort(
-            $finalStack,
-            function ($a, $b)
-            {
-                return $a['CourseDescriptionForSorting'] <=> $b['CourseDescriptionForSorting'];
-            }
-        );
-
         return $finalStack;
     }
 
@@ -213,6 +200,8 @@ class EntriesAndResults extends Base
                 id = :externalId AND
                 WithdrawnFlag = 0
                 AND StudentYear = :year
+            ORDER BY
+                ' . $columnForSorting . ' ASC
         ';
 
         return $this->db->executeQuery($query, $params)->fetchAll();
