@@ -293,6 +293,13 @@ class Controller extends Assessment\Controller
             $aImpls[$assessment->getId()] = [
                 'assessment' => $assessment,
             ];
+        } else {
+            $assessments = $this->getUnitAssessments($assessment);
+            foreach ($assessments as $assessmentImpl) {
+                $aImpls[$assessmentImpl->getId()] = [
+                    'assessment' => $assessmentImpl,
+                ];
+            }
         }
 
         $twigData = [

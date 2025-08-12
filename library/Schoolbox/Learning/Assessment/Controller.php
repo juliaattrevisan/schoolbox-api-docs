@@ -128,12 +128,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
         protected Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
-        protected Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder,
-        protected Filter\CompositeFactoryFactory $filtersFactoryFactory,
-        protected Filter\Mapper $filterMapper,
-        protected Filter\Selection\Mapper $filterSelectionMapper,
-        protected CourseImplementationMapper $courseImplementationMapper,
-        protected UnitImplementationMapper $unitImplementationMapper,
+        private Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder,
+        private Filter\CompositeFactoryFactory $filtersFactoryFactory,
+        private Filter\Mapper $filterMapper,
+        private Filter\Selection\Mapper $filterSelectionMapper,
+        private CourseImplementationMapper $courseImplementationMapper,
+        private UnitImplementationMapper $unitImplementationMapper,
         ?\Schoolbox\Url\Factory $urlFactory = null,
         ?string $learnosityVersion = null,
         #[\SensitiveParameter] ?string $learnosityConsumerKey = null,
@@ -1288,7 +1288,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @throws \UnderflowException
      * @throws \UnexpectedValueException
      */
-    protected function convertRequestToFilters(CourseSpec\Model $courseSpec, array $request, bool $saveToDB): array
+    private function convertRequestToFilters(CourseSpec\Model $courseSpec, array $request, bool $saveToDB): array
     {
         $page            = Filter\Page\Model::PAGE_COURSE_MARK_BOOK;
         $codec           = new Codec($this->filterMapper, $this->filterSelectionMapper);
@@ -1317,5 +1317,48 @@ abstract class Controller extends ListController implements IAssessmentControlle
         ]);
 
         return [$filters, $codec, $selectionsPerFilter];
+    }
+
+    /**
+     * get all assessments for a spec assessment (filtered from the markbook url params)
+     *
+     * @param iAssessable $assessment
+     * @return array|Collection
+     * @throws MapperException
+     */
+    protected function getUnitAssessments(iAssessable $assessment): array|Collection
+    {
+        $assessments = [];
+        if ($assessment->isSpecification()) {
+            // This report may take a while
+            $this->extendExecutionTime();
+
+            /**
+             * we are assuming the links to this page have been appended with
+             * 'queryArgs'               => $codec->convertSelectionsToQueryString($selectionsPerFilter),
+             */
+            /** @var CourseSpec\Model $courseSpec */
+            $courseSpec = $assessment->getBaseContext()->getCourse();
+            $queryArgs = $this->requestQuery->getArrayCopy();
+            [$filters,] = $this->convertRequestToFilters($courseSpec, $queryArgs, false);
+            $assessmentIds  = $this->filtersAssessmentIdFinder->findIdsByFilters($filters, $this->getUser());
+
+            // Fetch assessments
+            $assessments = $this->getAssessmentMapper()->findAllByIds($assessmentIds);
+            // filter to only the assessment we are looking for
+            $assessmentSpec = $assessment;
+            $assessments = $assessments->filter(static function (IAssessable $assessment) use ($assessmentSpec) {
+                return $assessment->getSpecificationAssessment()?->getId() === $assessmentSpec->getId();
+            });
+
+            // sort the assessments in a standard order (class page name naturally) which appears to be the same as the main markbook screen
+            $assessments = $assessments->sortByCallback(function (IAssessable $a, IAssessable $b) {
+                return strnatcasecmp($a->getBaseContext()->getFolder()->getTitle(), $b->getBaseContext()->getFolder()->getTitle());
+            });
+
+            // hydrate participants
+            $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, null, true);
+        }
+        return $assessments;
     }
 }

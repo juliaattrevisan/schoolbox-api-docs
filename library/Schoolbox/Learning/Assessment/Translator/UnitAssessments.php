@@ -143,12 +143,10 @@ class UnitAssessments
             $baseContext = $assessment->getBaseContext();
             if ($baseContext instanceof \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model) {
                 $statusLink = [
-                    "route" => "courseStatus.getStatus",
+                    "route" => "learningAssessment.getStatus",
                     "params" => [
                         'assessmentId' => $assessment->getId(),
                         'assessment'   => $assessment,
-                        'courseSpecId' => $baseContext->getCourse()->getId(),
-                        'courseSpec'   => $baseContext->getCourse(),
                     ],
                 ];
             }

@@ -148,39 +148,6 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment): void
     {
-        $assessments = [];
-        if ($assessment->isSpecification()) {
-            // This report may take a while
-            $this->extendExecutionTime();
-
-//            /**
-//             * we are assuming the links to this page have been appended with
-//             * 'queryArgs'               => $codec->convertSelectionsToQueryString($selectionsPerFilter),
-//             */
-            /** @var CourseSpec\Model $courseSpec */
-            $courseSpec = $assessment->getBaseContext()->getCourse();
-            $queryArgs = $this->requestQuery->getArrayCopy();
-            [$filters,] = $this->convertRequestToFilters($courseSpec, $queryArgs, false);
-            $assessmentIds  = $this->filtersAssessmentIdFinder->findIdsByFilters($filters, $this->getUser());
-
-            // Fetch assessments
-            $assessments = $this->getAssessmentMapper()->findAllByIds($assessmentIds);
-//            $assessments = $this->getAssessmentMapper()->findAllImplementationsBySpecificationId($assessment->getId());
-            // filter to only the assessment we are looking for
-            $assessmentSpec = $assessment;
-            $assessments = $assessments->filter(static function (IAssessable $assessment) use ($assessmentSpec) {
-                return $assessment->getSpecificationAssessment()?->getId() === $assessmentSpec->getId();
-            });
-
-            // sort the assessments in a standard order (class page name naturally) which appears to be the same as the main markbook screen
-            $assessments = $assessments->sortByCallback(function (IAssessable $a, IAssessable $b) {
-                return strnatcasecmp($a->getBaseContext()->getFolder()->getTitle(), $b->getBaseContext()->getFolder()->getTitle());
-            });
-
-            // hydrate participants
-            $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, null, true);
-        }
-
         // Ensure completions are sorted most recent first
         foreach ($assessment->getAllParticipants() as $participant) {
             $participant->getAllResponses()->sortByCallback(static function (Assessment\IResponse $responseA, Assessment\IResponse $responseB) {
@@ -196,6 +163,7 @@ class Controller extends Assessment\Controller
                 'assessment' => $assessment,
             ];
         } else {
+            $assessments = $this->getUnitAssessments($assessment);
             foreach ($assessments as $assessmentImpl) {
                 $aImpls[$assessmentImpl->getId()] = [
                     'assessment' => $assessmentImpl,
