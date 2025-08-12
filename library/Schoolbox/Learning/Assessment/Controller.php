@@ -1343,13 +1343,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $unitSpec = $assessment->getBaseContext();
             $courseSpec = $unitSpec->getCourse();
             $queryArgs = $this->requestQuery->getArrayCopy();
+
+            // never save filters to the db (there is no way to update them from this page, and it we bookmark it, and load it will alter the filters saved...)
             [$filters,] = $this->convertRequestToFilters($courseSpec, $queryArgs, false);
             $assessmentIds  = $this->filtersAssessmentIdFinder->findIdsByFilters($filters, $this->getUser());
 
             // Fetch assessments
             $assessments = $this->getAssessmentMapper()->findAllByIds($assessmentIds);
-            // filter to only the assessment we are looking for
+
+            // tmp var to make it easier to filter (the loop and the spec passed through)
             $assessmentSpec = $assessment;
+            // filter to only the assessment we are looking for (those that match the filter and are children of the assessment spec)
             $assessments = $assessments->filter(static function (IAssessable $assessment) use ($assessmentSpec) {
                 return $assessment->getSpecificationAssessment()?->getId() === $assessmentSpec->getId();
             });
