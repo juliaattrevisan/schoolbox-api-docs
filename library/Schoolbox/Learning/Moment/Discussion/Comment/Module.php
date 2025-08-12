@@ -23,7 +23,6 @@ use Schoolbox\UserMapper;
  */
 class Module extends Comment\Module
 {
-
     /**
      * @var string
      */
