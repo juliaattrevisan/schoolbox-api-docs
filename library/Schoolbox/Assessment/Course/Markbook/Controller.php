@@ -35,6 +35,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Throwable;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 use function array_combine;
 use function func_get_args;
@@ -52,6 +53,7 @@ class Controller extends WebController\Base
      * @param Access                             $access
      * @param StateMapper                        $stateMapper
      * @param IPurifier                          $purifier
+     * @param EditorTemplateHelper               $editorTemplateHelper
      */
     public function __construct(
         private Filter\IFactoryFactory $filterFactoryFactory,
@@ -64,6 +66,7 @@ class Controller extends WebController\Base
         private Access $access,
         private StateMapper $stateMapper,
         private IPurifier $purifier,
+        private EditorTemplateHelper $editorTemplateHelper
     ) {
     }
 
@@ -155,6 +158,7 @@ class Controller extends WebController\Base
                 'viewee'      => $this->getUser(),
                 'filterPanel' => $filterPanel,
                 'canAccessPopOut' => $this->getCanAccessPopOut($courseSpec),
+                'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
             ],
             "Course Markbook: {$courseSpec->getTitle()}",
             'submission'
