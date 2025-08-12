@@ -283,8 +283,7 @@ class Controller extends Base
             'studentView' => false,
             'selfAssess' => false,
             'selfReflect' => false,
-            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(), // Add this line
-        ];
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
 
         /* Rubrics data
         */

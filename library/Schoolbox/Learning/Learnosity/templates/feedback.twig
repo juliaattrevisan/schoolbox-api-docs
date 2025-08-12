@@ -25,7 +25,7 @@
 <script src="{{ CDN_PREFIX }}/js/submissions/jquery.combobox.js?v={{ config.site_version }}"></script>
 
 <div class="l-flex-col l-gap-l l-pad-m f-no-margins">
-    <h1>Feedback bah {{ assessment.title }}</h1>
+    <h1>Feedback {{ assessment.title }}</h1>
     <div id="quiz-feedback-container">
         <quiz-feedback
             :student="{{ student|json_encode }}"

@@ -34,6 +34,7 @@ use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 use function func_get_args;
 
@@ -56,6 +57,7 @@ class Controller extends Base
         private Filter\IFactoryFactory $filterFactoryFactory,
         private StateMapper $stateMapper,
         private IPurifier $purifier,
+        private EditorTemplateHelper $editorTemplateHelper
     ) {
     }
 
@@ -448,6 +450,7 @@ class Controller extends Base
                     'normaliseAs' => $state->getNormaliseAs(),
                 ])->reindex(),
                 'filtersQueryArgs' => $codec->convertSelectionsToQueryString($selectionsPerFilter),
+                'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
             ];
 
             $this->response = $this->responseAsJson([

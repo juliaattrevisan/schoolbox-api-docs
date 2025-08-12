@@ -22,6 +22,10 @@ use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
+use Schoolbox\Editor\Templates\Mapper as EditorTemplateMapper;
+use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
+
 
 class Module extends BaseModule
 {
@@ -94,6 +98,11 @@ class Module extends BaseModule
             $this->injector->get('filters.factoryFactory'),
             $this->getMapperFactory()->get(StateMapper::class),
             new ScrubAdapter(),
+            $editorTemplateHelper = new EditorTemplateHelper(
+                $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                EditorTemplatesCategoryModel::FEEDBACK,
+                $this->injector->get('user')
+            )
         );
     }
 
