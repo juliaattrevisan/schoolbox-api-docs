@@ -32,6 +32,11 @@ class EntriesAndResults extends Base
 
         foreach ($allResults as $current) {
             $courseName = $current['CourseDescription'];
+
+            $finalStack[$courseName] = [
+                'CourseDescriptionForSorting' => $current['CourseDescriptionForSorting']
+            ];
+
             $internalExternal = $current['InternalorExternalAssessment'];
             $letter = $current['StrippedResult'];
             $level = $current['Level'];
@@ -154,7 +159,13 @@ class EntriesAndResults extends Base
             }
         }
 
-        ksort($finalStack);
+        uasort(
+            $finalStack,
+            function ($a, $b)
+            {
+                return $a['CourseDescriptionForSorting'] <=> $b['CourseDescriptionForSorting'];
+            }
+        );
 
         return $finalStack;
     }
@@ -173,6 +184,12 @@ class EntriesAndResults extends Base
             $dbTableName = $this->getDbTableName();
         }
 
+        if ($dbTableName === self::MAIN_DB_TABLE_YEAR11) {
+            $columnForSorting = 'CourseDescriptionForSorting';
+        } else {
+            $columnForSorting = 'CourseDescription';
+        }
+
         $params = [
             'externalId' => $this->getExternalUserId(),
             'year' => $this->year
@@ -181,6 +198,7 @@ class EntriesAndResults extends Base
         $query = '
             SELECT
                 CourseDescription,
+                ' . $columnForSorting . ' AS CourseDescriptionForSorting,
                 ClassTeacher1,
                 ClassTeacher1Email,
                 ClassTeacher2,
