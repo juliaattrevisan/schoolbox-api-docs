@@ -33,7 +33,7 @@
 
         <li><a class="icon-modify" href="{{ routeModify }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Settings</a></li>
         <li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Contents</a></li>
-        {% if not assessment.isSpecification %}
+        {% if not isSpecification %}
         <li><a class="icon-quiz" href="{{ rescoreRoute }}" data-rescore>Rescore all attempts</a></li>
 
         <script>
@@ -73,20 +73,20 @@
 {% set responseHistory = locale.attemptHistory.proper %}
 
 {% block headerOptions %}
-    {% if not assessment.isSpecification %}
-    <li>
-        <a class="icon-class-list" href="{{ routeLookup('learnosity.getHorizontalMarking', { assessmentId: assessment.id }) }}">Review horizontally</a>
-    </li>
-    <li>
-        <a class="icon-download" data-download="attempts" href="{{ routeLookup('learnosity.getExportAttempts', { assessmentId: assessment.id }) }}">Download All</a>
-    </li>
-    <li class="separator">Bulk Actions</li>
-    <li>
-        <a class="icon-approve" data-reveal-id="mass-review">Mark attempts as reviewed&hellip;</a>
-    </li>
-    <li>
-        <a class="icon-delete" data-reveal-id="mass-delete">Delete unreviewed attempts&hellip;</a>
-    </li>
+    {% if not isSpecification %}
+        <li>
+            <a class="icon-class-list" href="{{ routeLookup('learnosity.getHorizontalMarking', { assessmentId: assessment.id }) }}">Review horizontally</a>
+        </li>
+        <li>
+            <a class="icon-download" data-download="attempts" href="{{ routeLookup('learnosity.getExportAttempts', { assessmentId: assessment.id }) }}">Download All</a>
+        </li>
+        <li class="separator">Bulk Actions</li>
+        <li>
+            <a class="icon-approve" data-reveal-id="mass-review">Mark attempts as reviewed&hellip;</a>
+        </li>
+        <li>
+            <a class="icon-delete" data-reveal-id="mass-delete">Delete unreviewed attempts&hellip;</a>
+        </li>
     {% endif %}
 {% endblock %}
 
