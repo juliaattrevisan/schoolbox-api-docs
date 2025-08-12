@@ -96,7 +96,7 @@ window.Vue.onMounted(() => {
         </div>
 
         <div ref="entryListRef" class="c-card">
-            <div class="l-grid l-gap-m l-pad-m">
+            <div class="cr-results-grid l-grid l-gap-m l-pad-m">
                 <cr-results-group-entry
                     v-for="entry in props.entries"
                     :key="entry.id"
@@ -108,4 +108,8 @@ window.Vue.onMounted(() => {
     </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.cr-results-grid {
+    grid-template-columns: repeat(auto-fit, minmax(21rem, 1fr));
+}
+</style>
