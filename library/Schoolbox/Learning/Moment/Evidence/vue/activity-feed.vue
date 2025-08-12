@@ -15,6 +15,7 @@ import NodeDetails from "@schoolboxCurriculum/vue/node-details";
 import foundationMixin from "@schoolboxVue/components/foundation-mixin";
 import userProfileConstants from "../../../vue/user-profile/constants";
 import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
+import { EvidenceStatus, evidenceStatusLabels } from "./evidenceTypes";
 
 export default {
     components: {
@@ -87,6 +88,9 @@ export default {
             },
 
             showFeed: true,
+
+            EvidenceStatus,
+            evidenceStatusLabels,
         };
     },
     computed: {
@@ -707,27 +711,13 @@ export default {
                                                 </div>
 
                                                 <!-- Only show status that isn't published, since that is the default state -->
-                                                <template v-if="'draft' === evidence.object.currentState">
-                                                    <span
-                                                        :class="`label label--moment-${evidence.object.currentState} l-mar--0`"
-                                                    >
-                                                        Draft
-                                                    </span>
-                                                </template>
-                                                <template v-else-if="'submitted' === evidence.object.currentState">
-                                                    <span
-                                                        :class="`label label--moment-${evidence.object.currentState} l-mar--0`"
-                                                    >
-                                                        Requiring approval
-                                                    </span>
-                                                </template>
-                                                <template v-else-if="'rejected' === evidence.object.currentState">
-                                                    <span
-                                                        :class="`label label--moment-${evidence.object.currentState} l-mar--0`"
-                                                    >
-                                                        Requiring update
-                                                    </span>
-                                                </template>
+                                                <span
+                                                    v-if="evidence.object.currentState !== EvidenceStatus.PUBLISHED"
+                                                    class="label l-mar--0"
+                                                    :class="`label--moment-${evidence.object.currentState}`"
+                                                >
+                                                    {{ evidenceStatusLabels[evidence.object.currentState] }}
+                                                </span>
                                             </component>
                                         </div>
                                         <nav v-if="hasMenu(evidence.object)">

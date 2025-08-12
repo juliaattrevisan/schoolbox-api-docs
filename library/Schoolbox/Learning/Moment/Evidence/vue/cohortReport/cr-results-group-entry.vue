@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { EvidenceStatus, evidenceStatusLabels } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 import { useCohortReportStore } from "./store/cohortReportStore";
 import type { CohortReportEntry } from "./store/cohortReportPayload";
 
@@ -20,12 +21,21 @@ const inputId = window.Vue.computed(() => {
         :id="inputId"
         type="checkbox"
         :name="inputId"
-        :checked="crStore.isEntrySelected(entry.id)"
-        @change="crStore.toggleEntrySelection(entry.id)"
+        :checked="crStore.isEntrySelected(props.entry.id)"
+        @change="crStore.toggleEntrySelection(props.entry.id)"
     />
-    <label :for="inputId" class="checkbox-label"></label>
+    <label :for="inputId" class="checkbox-label">
+        <!-- Only show status that isn't published, since that is the default state -->
+        <span
+            v-if="props.entry.currentState !== EvidenceStatus.PUBLISHED"
+            class="label"
+            :class="`label--moment-${props.entry.currentState}`"
+        >
+            {{ evidenceStatusLabels[props.entry.currentState] }}
+        </span>
+    </label>
 
-    <p>{{ entry.body }} - {{ entry.createdAt.displayAs }}</p>
+    <p>{{ props.entry.body }} - {{ props.entry.createdAt.displayAs }}</p>
 </template>
 
 <style scoped></style>

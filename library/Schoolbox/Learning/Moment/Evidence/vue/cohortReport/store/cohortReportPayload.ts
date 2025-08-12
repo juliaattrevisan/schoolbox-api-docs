@@ -1,5 +1,6 @@
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { ApiBaseResponse } from "@js/util/sbx/apiUtils";
+import type { EvidenceStatus } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 
 export type CohortReportEntry = {
     id: number;
@@ -41,6 +42,7 @@ export type CohortReportEntry = {
         displayAs: string;
     };
     hasComments: boolean;
+    currentState: EvidenceStatus;
     _links: {
         submit: string | null;
         publish: string | null;
