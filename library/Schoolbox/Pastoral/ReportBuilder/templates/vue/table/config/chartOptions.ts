@@ -72,9 +72,6 @@ export function getChartOptions(
     recordsOrPoints: "records" | "points",
 ): Options {
     const trend = rowData.trend as Trend;
-    if (recordsOrPoints === "points") {
-        console.warn(trend.line);
-    }
     if (trend === undefined) {
         return trendOptions;
     }
@@ -82,8 +79,10 @@ export function getChartOptions(
         ...trendOptions,
         series: [
             {
+                color: recordsOrPoints === "points" ? "#4fa74f" : "#000",
                 data: trend.line,
                 name: recordsOrPoints,
+                negativeColor: recordsOrPoints === "points" ? "#fa4a47" : "#000",
                 point: {
                     events: {
                         click(this: Point): void {
