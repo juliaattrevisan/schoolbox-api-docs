@@ -305,7 +305,7 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
         );
         unset($totalCount['total']);
         $totalRow['trend'] = [
-            'line' => array_values($totalCount->getAll()),
+            'line' => array_values(array_map(fn($value) => $value ?? 0, $totalCount->getAll())),
             'tooltips' => array_map(fn(string $key) => ucwords(str_replace('_', ' ', $key)), $totalCount->keys()),
         ];
         return [
@@ -325,7 +325,7 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
                         $row = array_merge($row, array_map(fn($value) => [$this->resultType => $value], $record));
                         unset($record['total']);
                         $row['trend'] = [
-                            'line' => array_values($record),
+                            'line' => array_values(array_map(fn($value) => $value ?? 0, $record)),
                             'tooltips' => array_map(fn(string $key) => ucwords(str_replace('_', ' ', $key)), array_keys($record)),
                         ];
                         return $row;
