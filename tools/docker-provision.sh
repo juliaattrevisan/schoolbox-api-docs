@@ -12,13 +12,14 @@ declare EXTERNAL_DB
 declare EXTERNAL_DB_HOST
 declare EXTERNAL_DB_DB
 declare INSTANCE_REGISTRY_URL
+declare INSTANCE_REGISTRY_API_KEY
 declare DEFAULT_INSTANCE_ID
 declare ARTIFACT_SOURCE
 declare REQUIRED_CONFIGS=(\
   DATA_SOURCE DATA_FILENAME \
   CERTIFICATE_SOURCE \
   EXTERNAL_DB EXTERNAL_DB_HOST EXTERNAL_DB_DB \
-  INSTANCE_REGISTRY_URL \
+  INSTANCE_REGISTRY_URL INSTANCE_REGISTRY_API_KEY \
   DEFAULT_INSTANCE_ID \
   ARTIFACT_SOURCE \
 )
@@ -98,6 +99,15 @@ function setup_aws_sso() {
   else
     log "Logged in to AWS: continuing"
   fi
+}
+
+function create_ir_conf_file() {
+  log "Creating instance registry configuration";
+  echo -e \
+    "{\n" \
+    "  \"instance_registry_url_override\": \"${INSTANCE_REGISTRY_URL}\",\n" \
+    "  \"instance_registry_api_token\": \"${INSTANCE_REGISTRY_API_KEY}\"\n" \
+    "}" > /etc/schoolbox/instance-registry.json
 }
 
 function cleanup_cache_dir() {
@@ -366,13 +376,13 @@ function install_instance() {
   --config etherpad_host "'http://schoolbox-etherpad:9001'" \
   --config etherpad_api_token "'test'" \
   --config external_type "'$EXTERNAL_DB'" \
-  --config EXTERNAL_DB_DB "'$EXTERNAL_DB_DB'" \
-  --config EXTERNAL_DB_HOST "'$EXTERNAL_DB_HOST'" \
+  --config external_db_db "'$EXTERNAL_DB_DB'" \
+  --config external_db_host "'$EXTERNAL_DB_HOST'" \
   --config external_db_user "'schoolbox'" \
   --config external_portal "'https://portal.synergetic.dev.schoolbox.cloud'" \
   --config fixtures_enabled "'1'" \
   --config gotenberg_host "'http://schoolbox-gotenberg:3000'" \
-  --config INSTANCE_REGISTRY_URL "'$INSTANCE_REGISTRY_URL'" \
+  --config instance_registry_url "'$INSTANCE_REGISTRY_URL'" \
   --config ldap_enable "'0'" \
   --config mail_enable "'1'" \
   --config mail_smtp_host "'127.0.0.1'" \
@@ -433,6 +443,7 @@ function main() {
   load_consts
   load_config
   setup_aws_sso
+  create_ir_conf_file
 
   cleanup_cache_dir
   download_secrets

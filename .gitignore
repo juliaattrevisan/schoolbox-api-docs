@@ -45,3 +45,7 @@ docker.env
 docker-taskd.env
 .aws/
 .docker-compose.env
+
+# IR configuration is created by the Docker provision process:
+# it should not be committed
+docker/schoolbox/config/instance-registry.json

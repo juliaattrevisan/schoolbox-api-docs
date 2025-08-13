@@ -939,6 +939,9 @@ fi
 # Sync plan-type with instance registry
 get_plan_type_from_instance_registry() {
   local -r instance_registry_url="$(schoolbox-instance-registry --url)";
+
+  # Note: the Puppet cert is currently required to derive the plan type.
+  # Ideally, the IR query would require only the destination instance ID.
   local -r puppet_cert="$(schoolbox-instance-registry --puppet-cert)";
   local -r api_key="$(schoolbox-instance-registry --api-key)";
 

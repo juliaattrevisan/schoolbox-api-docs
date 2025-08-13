@@ -44,7 +44,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App {
         'puppet_dir'                     => null,
         'puppet_debug'                   => null,
         'instance_registry_url_override' => 'INSTANCE_REGISTRY_URL',
-        'instance_registry_api_key'      => null,
+        'instance_registry_api_key'      => 'INSTANCE_REGISTRY_API_KEY',
         'instance_id_env_var'            => 'DEFAULT_INSTANCE_ID',
         'puppet_sync_type'               => null,
         'force_upgrade'                  => null,
@@ -61,7 +61,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App {
         'api_dir'                        => 'API_DIR',
         'aws_account_id'                 => 'AWS_ACCOUNT_ID',
         'aws_role_name'                  => 'AWS_ROLE_NAME',
-        'aws_start_url'                  => 'AWS_ROLE_NAME',
+        'aws_start_url'                  => 'AWS_START_URL',
         'aws_bucket'                     => 'CDN_BUCKET',
         'aws_bucket_prefix'              => 'CDN_BUCKET_PREFIX',
     ];
