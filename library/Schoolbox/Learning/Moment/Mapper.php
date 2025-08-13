@@ -257,12 +257,17 @@ class Mapper extends BaseMapper
 
         $pb = $this->getPredicateBuilder()->in('id', $momentIds);
 
+        /** @var \Schoolbox\Learning\Moment\Evidence\Mapper $evidenceMapper */
+        $evidenceMapper = $this->getJoinMapper('moment_evidence');
+
         $query = "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('moment_evidence', 'me')}
+                {$this->getJoinColumnString('moment_evidence', 'me')},
+                {$evidenceMapper->getJoinColumnString('storage', 'storage')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('moment_evidence', '', 'me')}
+            INNER JOIN {$evidenceMapper->getJoinSql('storage', 'me', 'storage')}
             WHERE {$pb->getWhereIntersect()}
         ";
 
@@ -272,6 +277,14 @@ class Mapper extends BaseMapper
             if ($row['me.id'] !== null) {
                 /** @var \Schoolbox\Learning\Moment\Evidence\Model $evidence */
                 $evidence = $this->hydrateJoin($row, 'moment_evidence', 'me');
+
+                /** @var \Schoolbox\Resource\Storage\Model $storage */
+                $storage = $evidenceMapper->hydrateJoin($row, 'storage', 'storage');
+
+                if ($storage) {
+                    $evidence->setStorage($storage);
+                }
+
                 $collection[$row['id']]->getEvidence()->setOffset($evidence->getId(), $evidence);
             }
         }
