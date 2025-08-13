@@ -15,7 +15,7 @@ services:
       context: ./base-images/php-bookworm
       args:
         ENV: ${ENV:-dev}
-        PHP_VERSION: ${PHP_VERSION}
+        PHP_MAJOR_VERSION: ${PHP_MAJOR_VERSION}
     restart: no
 
   # Frontend web server, mimicking a load balancer and SSL termination endpoint.

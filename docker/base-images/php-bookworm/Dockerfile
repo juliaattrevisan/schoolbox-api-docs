@@ -10,9 +10,9 @@
 #      otherwise, build with dev dependencies.
 ARG ENV=dev
 ARG ARCH=amd64
-ARG PHP_VERSION
+ARG PHP_MAJOR_VERSION
 
-FROM --platform=linux/${ARCH} php:${PHP_VERSION}-cli-bookworm
+FROM --platform=linux/${ARCH} php:${PHP_MAJOR_VERSION}-cli-bookworm
 
 # Use install-php-extensions script, and install extensions with that
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
@@ -29,7 +29,7 @@ case "$ENV" in
 esac
 EOF
 COPY ./config/php/* /usr/local/etc/php/conf.d/
-COPY ./config/php${PHP_VERSION}/* /usr/local/etc/php/conf.d/
+COPY ./config/php${PHP_MAJOR_VERSION}/* /usr/local/etc/php/conf.d/
 
 # Copy scripts from puppet-alaress as-is for now
 COPY ./usr/bin/* /usr/bin/

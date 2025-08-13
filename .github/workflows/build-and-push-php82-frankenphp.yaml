@@ -75,7 +75,7 @@ jobs:
           outputs: type=image,push-by-digest=true,name-canonical=true,push=true
           build-args: |
             ENV=prod
-            PHP_VERSION=8.2
+            PHP_MAJOR_VERSION=8.2
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           labels: ${{ steps.meta.outputs.labels }}
           tags: |

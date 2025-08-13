@@ -4,10 +4,10 @@
 # ENV: if prod or production, build with prod dependencies only;
 #      otherwise, build with dev dependencies.
 ARG ENV=dev
-ARG PHP_VERSION
+ARG PHP_MAJOR_VERSION
 
 # TODO should this support ARCH as well?
-FROM dunglas/frankenphp:1.8-php${PHP_VERSION}-bookworm
+FROM dunglas/frankenphp:1.8-php${PHP_MAJOR_VERSION}-bookworm
 
 # Ensure ENV is accessible by this build step:
 # otherwise, xDebug will be installed below.
@@ -67,7 +67,7 @@ COPY ./usr/local/bin/* /usr/local/bin/
 RUN ln -s /usr/local/bin/php /usr/bin/php
 # Copy configuration files
 COPY ./config/php/* /usr/local/etc/php/conf.d/
-COPY ./config/php${PHP_VERSION}/* /usr/local/etc/php/conf.d/
+COPY ./config/php${PHP_MAJOR_VERSION}/* /usr/local/etc/php/conf.d/
 COPY ./config/imagemagick/* /etc/ImageMagick-6/
 COPY ./config/frankenphp/* /etc/frankenphp/
 

@@ -11,7 +11,7 @@ services:
       context: ./schoolbox-frankenphp
       dockerfile: dev-image.Dockerfile
       args:
-        PHP_VERSION: ${PHP_VERSION}
+        PHP_MAJOR_VERSION: ${PHP_MAJOR_VERSION}
     scale: 2
     deploy:
       mode: replicated

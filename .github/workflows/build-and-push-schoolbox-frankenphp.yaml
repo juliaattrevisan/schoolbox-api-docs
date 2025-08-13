@@ -113,7 +113,7 @@ jobs:
           build-args: |
             ENV=prod
             TAG=latest-${{ github.event.release.target_commitish }}
-            PHP_VERSION=${{ matrix.phpVersion }}
+            PHP_MAJOR_VERSION=${{ matrix.phpVersion }}
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
             alaress/schoolbox-frankenphp

@@ -88,7 +88,7 @@ jobs:
             ENV=prod
             ARCH=${{ matrix.build.arch }}
             TAG=latest-${{ github.base_ref }}-${{ matrix.phpVersion }}
-            PHP_VERSION=${{ matrix.phpVersion }}
+            PHP_MAJOR_VERSION=${{ matrix.phpVersion }}
           tags: |
             schoolbox-frankenphp-${{ matrix.build.arch }}-php${{ matrix.phpVersion }}
 
