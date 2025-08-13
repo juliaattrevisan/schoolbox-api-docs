@@ -59,48 +59,48 @@
 
                 {# For the Year 11 report, only display the results table if courseName contains 'NCEA'. #}
                 {% if navigation['selected'] is not 'year11' or 'NCEA' in courseName %}
-                {# Summary table for Internally and Externally graded assessments
-                 # This is the pink and blue table
-                 #}
-                <tr>
-                    <td colspan="8">
-                        <table class="no-margin">
-                            <thead>
-                            <tr>
-                                <th colspan="2"></th>
-                                {% for currentType, typeSettings in creditSummary.allTypes %}
-                                    <th colspan="6" class="centered {{ typeSettings.css }}">{{ typeSettings.long }}</th>
-                                {% endfor %}
-                            </tr>
-                            <tr>
-                                <th class="level">Level</th>
-                                <th class="numeric">Total Entered Credits</th>
-                                {% for currentType, typeSettings in entriesAndResults.allTypes %}
-                                    <th class="numeric">Entered Credits</th>
-                                    {% for currentLetter in entriesAndResults.allLetters %}
-                                        <th class="numeric">{{ currentLetter }}</th>
+                    {# Summary table for Internally and Externally graded assessments
+                     # This is the pink and blue table
+                     #}
+                    <tr>
+                        <td colspan="8">
+                            <table class="no-margin">
+                                <thead>
+                                <tr>
+                                    <th colspan="2"></th>
+                                    {% for currentType, typeSettings in creditSummary.allTypes %}
+                                        <th colspan="6" class="centered {{ typeSettings.css }}">{{ typeSettings.long }}</th>
                                     {% endfor %}
-                                    <th class="numeric">Available</th>
-                                {% endfor %}
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr>
-                                <td class="level">{{ allData.summary.level }}</td>
-                                <td class="numeric">{{ allData.summary.totalEnteredCredits }}</td>
+                                </tr>
+                                <tr>
+                                    <th class="level">Level</th>
+                                    <th class="numeric">Total Entered Credits</th>
+                                    {% for currentType, typeSettings in entriesAndResults.allTypes %}
+                                        <th class="numeric">Entered Credits</th>
+                                        {% for currentLetter in entriesAndResults.allLetters %}
+                                            <th class="numeric">{{ currentLetter }}</th>
+                                        {% endfor %}
+                                        <th class="numeric">Available</th>
+                                    {% endfor %}
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td class="level">{{ allData.summary.level }}</td>
+                                    <td class="numeric">{{ allData.summary.totalEnteredCredits }}</td>
 
-                                {% for currentType, typeSettings in entriesAndResults.allTypes %}
-                                    <td class="numeric">{{ allData.summary.type[currentType].enteredCredits }}</td>
-                                    {% for currentLetter in entriesAndResults.allLetters %}
-                                        <td class="numeric">{{ allData.summary.type[currentType].letters[currentLetter] }}</td>
+                                    {% for currentType, typeSettings in entriesAndResults.allTypes %}
+                                        <td class="numeric">{{ allData.summary.type[currentType].enteredCredits }}</td>
+                                        {% for currentLetter in entriesAndResults.allLetters %}
+                                            <td class="numeric">{{ allData.summary.type[currentType].letters[currentLetter] }}</td>
+                                        {% endfor %}
+                                        <td class="numeric">{{ allData.summary.type[currentType].availableCredits }}</td>
                                     {% endfor %}
-                                    <td class="numeric">{{ allData.summary.type[currentType].availableCredits }}</td>
-                                {% endfor %}
-                            </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                </tr>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
                 {% endif %}
 
                 {# Comments
