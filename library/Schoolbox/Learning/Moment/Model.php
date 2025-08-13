@@ -29,16 +29,6 @@ class Model implements ISoftDeletable, IThreadLocation
 
 
     /**
-     * The types of evidence
-     */
-    public const MOMENT_TYPE_TEXT   = 'text';
-    public const MOMENT_TYPE_UPLOAD = 'upload';
-    public const MOMENT_TYPE_PHOTO  = 'photo';
-    public const MOMENT_TYPE_AUDIO  = 'audio';
-    public const MOMENT_TYPE_VIDEO  = 'video';
-
-
-    /**
      * Find the current state of a learning moment
      * "draft" is inferred if none of the others are applicable.
      */

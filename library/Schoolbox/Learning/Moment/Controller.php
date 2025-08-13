@@ -117,7 +117,7 @@ class Controller extends Base
         // Which variant is being shown?
         // * text
         // * upload
-        $momentType = $this->requestQuery->get('momentType') ?: Model::MOMENT_TYPE_TEXT;
+        $momentType = $this->requestQuery->get('momentType') ?: Evidence\Model::MOMENT_TYPE_TEXT;
         $template   = $this->getTemplateFromType($momentType);
 
         /* Students get their learning moment moderation requirement tested;
@@ -486,29 +486,29 @@ class Controller extends Base
              ->setThumbnailSize(64)
              ->setModalTitle('Select file');
         switch ($momentType) {
-            case Model::MOMENT_TYPE_PHOTO:
+            case Evidence\Model::MOMENT_TYPE_PHOTO:
                 $zone->setAttachPrompt('take a picture')
                      ->setIconClass('icon-camera')
                      ->setUseModal(false)
                      ->setCapture(true)
                      ->setMimeFilter('image/*');
                 break;
-            case Model::MOMENT_TYPE_AUDIO:
+            case Evidence\Model::MOMENT_TYPE_AUDIO:
                 $zone->setAttachPrompt('record audio')
                      ->setIconClass('icon-audio')
                      ->setUseModal(false)
                      ->setCapture(true)
                      ->setMimeFilter('audio/*');
                 break;
-            case Model::MOMENT_TYPE_VIDEO:
+            case Evidence\Model::MOMENT_TYPE_VIDEO:
                 $zone->setAttachPrompt('record video')
                      ->setIconClass('icon-video')
                      ->setUseModal(false)
                      ->setCapture(true)
                      ->setMimeFilter('video/*');
                 break;
-            case Model::MOMENT_TYPE_UPLOAD:
-            case Model::MOMENT_TYPE_TEXT:
+            case Evidence\Model::MOMENT_TYPE_UPLOAD:
+            case Evidence\Model::MOMENT_TYPE_TEXT:
             default:
                 break;
         }
@@ -524,15 +524,15 @@ class Controller extends Base
     private function getTemplateFromType(string $momentType): string
     {
         switch ($momentType) {
-            case Model::MOMENT_TYPE_PHOTO:
+            case Evidence\Model::MOMENT_TYPE_PHOTO:
                 return '@learningMomentEvidence/form/photo.twig';
-            case Model::MOMENT_TYPE_AUDIO:
+            case Evidence\Model::MOMENT_TYPE_AUDIO:
                 return '@learningMomentEvidence/form/audio.twig';
-            case Model::MOMENT_TYPE_VIDEO:
+            case Evidence\Model::MOMENT_TYPE_VIDEO:
                 return '@learningMomentEvidence/form/video.twig';
-            case Model::MOMENT_TYPE_UPLOAD:
+            case Evidence\Model::MOMENT_TYPE_UPLOAD:
                 return '@learningMomentEvidence/form/upload.twig';
-            case Model::MOMENT_TYPE_TEXT:
+            case Evidence\Model::MOMENT_TYPE_TEXT:
             default:
                 return '@learningMomentEvidence/form/text.twig';
         }
