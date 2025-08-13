@@ -68,7 +68,7 @@ function onCellSelected(header: TableHeader): void {
             :class="`u-border-right ${index === 0 ? 'u-sticky-left u-sticky-left--row ' : ''} ${header.key === 'user' ? 'l-pad--0' : ''} ${header.key === 'total' ? 'total-cell' : ''}`"
         >
             <template v-if="header.type == TableHeaderType.USER">
-                <div class="l-flex-row l-gap-m">
+                <div class="l-flex-row l-flex--no-wrap l-gap-m">
                     <user-photo :user="props.rowData[header.key] as User" render="small" />
                     <div class="l-flex-col l-flex--justify-center f-no-margins">
                         <a

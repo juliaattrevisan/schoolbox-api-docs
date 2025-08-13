@@ -165,7 +165,8 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
 
 .total-cell {
     background: var(--sbx-pr-table-total-cell-colour);
-    width: 100px; // so points/records change doesn't trigger a reflow
+    min-width: 110px; // so points/records change doesn't trigger a reflow
+    width: 110px;
 }
 
 .title-button {
