@@ -209,7 +209,7 @@ abstract class BaseBuilder implements IBuilder
     private function stripTagsPreserveWordBreaks(string $html): string
     {
         // Add spaces before HTML tags to preserve word boundaries.
-        $html = preg_replace('/<\/?[a-zA-Z][^<>]*>/', ' </$1>', $html);
+        $html = preg_replace('/<\/?[a-zA-Z-][a-zA-Z0-9-]{0,20}(?:\s[^>]*)?>/', ' </$1>', $html);
 
         // Strip the tags.
         $text = strip_tags($html);
