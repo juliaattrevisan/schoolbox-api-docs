@@ -18,7 +18,7 @@ import type {
 } from "../../js/types/pastoralReportTypes";
 import { getChartOptions } from "./config/chartOptions";
 import { useStore } from "../store/pastoralReportStore";
-import { getMeta } from "../util/pastoralReportUtils";
+import { getRowKeys, getMeta } from "../util/pastoralReportUtils";
 
 const props = defineProps<{
     headers: TableHeader[];
@@ -31,34 +31,11 @@ const emit = defineEmits<{
 }>();
 
 /**
- * Returns the row id, currently if there's a 'user' key in rowData,
- * it'll return the user's id, otherwise it defaults to 0.
- * @returns - The id of the row, or 0 if not defined.
- */
-const rowKeys = (): RowKeys => {
-    // check if there's a 'user' key in rowData and return its id if it exists
-    const user = props.rowData.user as User;
-    if (user) {
-        return {
-            student_id: user.id || 0,
-        };
-    }
-    const typeSubtype = props.rowData.type_subtype as TypeSubType;
-    if (typeSubtype) {
-        return {
-            type_id: typeSubtype.typeId || 0,
-            subtype_id: typeSubtype.subtypeId || 0,
-        };
-    }
-    return {};
-};
-
-/**
  * Handles the cell click
  * @param header - the header of the cell that was clicked
  */
 function onCellSelected(header: TableHeader): void {
-    emit("cellSelect", header, rowKeys(), getMeta(useStore().selectedTab, header, props.rowData));
+    emit("cellSelect", header, getRowKeys(props.rowData), getMeta(useStore().selectedTab, header, props.rowData));
 }
 </script>
 
