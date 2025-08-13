@@ -83,7 +83,7 @@ abstract class PopulatorTool extends App
         /* Obtain instance registry configuration vars,
          * cold exiting upon any failures
          */
-        [$irUrl, $irApiKey,] = (new Config($this->getLogger()))->fetch($siteType);
+        [$irUrl, $irApiKey] = (new Config($this->getLogger()))->fetch($siteType);
 
         /* Obtain learnosity credentials from instance registry in a set of key-value tuples,
          * remapping siteType into something Instance Registry understands
