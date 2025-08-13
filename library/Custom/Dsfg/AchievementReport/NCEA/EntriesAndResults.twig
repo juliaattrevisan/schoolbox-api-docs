@@ -57,6 +57,8 @@
                     {% endif %}
                 {% endfor %}
 
+                {# For the Year 11 report, only display the results table if courseName contains 'NCEA'. #}
+                {% if navigation['selected'] is not 'year11' or 'NCEA' in courseName %}
                 {# Summary table for Internally and Externally graded assessments
                  # This is the pink and blue table
                  #}
@@ -99,6 +101,7 @@
                         </table>
                     </td>
                 </tr>
+                {% endif %}
 
                 {# Comments
                  # A list of comments per subject, ordered by Term
