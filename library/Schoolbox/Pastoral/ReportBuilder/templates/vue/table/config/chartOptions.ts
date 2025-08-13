@@ -16,6 +16,7 @@ export const trendOptions: Options = {
     chart: {
         className: "highcharts-trend-chart",
         height: 50,
+        spacing: [0, 0, 0, 0],
         width: 200,
     },
     colors: ["#000"],
@@ -25,11 +26,25 @@ export const trendOptions: Options = {
     legend: {
         enabled: false,
     },
+    plotOptions: {
+        area: {
+            marker: {
+                enabled: false,
+                symbol: "circle",
+                radius: 2,
+                states: {
+                    hover: {
+                        enabled: true,
+                    },
+                },
+            },
+        },
+    },
     series: [
         {
             data: [],
             name: "Points",
-            type: "area" as const,
+            type: "area",
         },
     ],
     title: {
@@ -65,7 +80,7 @@ export function getChartOptions(
 ): Options {
     const trend = rowData.trend as Trend;
     // run through the line and make any 0 values null
-    // trend.line = trend.line.map((value: number | null) => (value === 0 ? null : value));
+    trend.line = trend.line.map((value: number | null) => (value === null ? 0 : value));
     if (trend === undefined) {
         return trendOptions;
     }

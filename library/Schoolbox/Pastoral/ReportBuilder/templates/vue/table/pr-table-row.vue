@@ -133,10 +133,14 @@ function onCellSelected(header: TableHeader): void {
     </tr>
 </template>
 
-<style scoped lang="scss">
+<style>
 tr:hover {
     background-color: #f4f3f3; /* to help legibility */
 }
+
+/* tr:hover .highcharts-trend-chart .highcharts-background {
+    fill: #f4f3f3;
+} */
 
 .total-cell {
     background: var(--sbx-pr-table-total-cell-colour);
