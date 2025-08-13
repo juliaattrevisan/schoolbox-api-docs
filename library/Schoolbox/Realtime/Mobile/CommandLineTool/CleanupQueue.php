@@ -121,7 +121,7 @@ class CleanupQueue extends CliTool\App
             }
 
             try {
-                $decodedValue = unserialize($uncompressedValue, ['allowed_classes' => [Instance::class]]);
+                $decodedValue = unserialize($uncompressedValue);
             } catch (Throwable $e) {
                 $unprocessableKeyCount++;
                 $logger->warning(sprintf('Key "%s" was not unserializable (message: %s): skipping', $key, $e->getMessage()));
