@@ -64,7 +64,7 @@ class MutableFieldsOnlyTest extends TestCase
                 ],
                 'filename' => 'test.gif',
             ],
-            (new Model())
+            (new \Schoolbox\Learning\Moment\Evidence\Model())
                 ->setStorage((new Storage())->setHash('1234567890123456789012345678901234567890'))
                 ->setFilename('test.gif'),
         ];
@@ -93,7 +93,7 @@ class MutableFieldsOnlyTest extends TestCase
             [
                 'file' => 'file:1234567890123456789012345678901234567890:test.gif',
             ],
-            (new Model())
+            (new \Schoolbox\Learning\Moment\Evidence\Model())
                 ->setStorage($storage)
                 ->setFilename('test.gif'),
             $storage,
@@ -121,11 +121,13 @@ class MutableFieldsOnlyTest extends TestCase
             ->setBody('test')
             ->setCreator((new User())->setId($oldId))
             ->setRecipient((new User())->setId($oldId))
-            ->setType(Model::MOMENT_TYPE_UPLOAD)
             ->setDiscussionThread((new DiscussionThread())->setId($oldId))
-            ->setStorage((new Storage())->setHash('1234567890123456789012345678901234567890'))
-            ->setFilename('test.gif');
+            ->setEvidence(new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class));
 
+        $baseModel->getEvidence()->add((new \Schoolbox\Learning\Moment\Evidence\Model())
+            ->setType(\Schoolbox\Learning\Moment\Evidence\Model::MOMENT_TYPE_UPLOAD)
+            ->setStorage((new Storage())->setHash('1234567890123456789012345678901234567890'))
+            ->setFilename('test.gif'));
 
         // ID is not mutable
         yield 'update id' => [
@@ -254,83 +256,6 @@ class MutableFieldsOnlyTest extends TestCase
             ['recipient' => ['id' => null],],
             (clone $baseModel),
             (clone $baseModel),
-        ];
-
-
-        // File is mutable, by either a file upload or a storage+filename
-        // Will need to mock the collector factory though
-        $storage1 = (new Storage())
-            ->setHash('9876543210987654321098765432109876543210')
-            ->setBasename('test.png');
-
-        yield 'update file' => [
-            [
-                'file' => 'file:9876543210987654321098765432109876543210:test.png',
-            ],
-            (clone $baseModel),
-            (clone $baseModel)
-                ->setStorage($storage1)
-                ->setFilename('test.png'),
-            $storage1,
-        ];
-
-        yield 'null file' => [
-            [
-                'file' => null,
-            ],
-            (clone $baseModel),
-            (clone $baseModel)
-                ->setStorage(null)
-                ->setFilename(null),
-        ];
-
-
-        // Storage and filename are mutable:
-        // but will they ever be mutated via their individual fields?
-        $storage2 = (new Storage())->setHash('12345');
-        yield 'update storage' => [
-            [
-                'storage' => ['hash' => '12345'],
-            ],
-            (clone $baseModel),
-            (clone $baseModel)->setStorage($storage2),
-            $storage2,
-        ];
-
-        yield 'null storage' => [
-            [
-                'storage' => null,
-            ],
-            (clone $baseModel),
-            (clone $baseModel)
-                ->setStorage(null),
-        ];
-
-        yield 'null storage hash' => [
-            [
-                'storage' => ['hash' => null],
-            ],
-            (clone $baseModel),
-            (clone $baseModel)
-                ->setStorage(null),
-        ];
-
-        yield 'update filename' => [
-            [
-                'filename' => 'test.png',
-            ],
-            (clone $baseModel),
-            (clone $baseModel)
-                ->setFilename('test.png'),
-        ];
-
-        yield 'null filename' => [
-            [
-                'filename' => null,
-            ],
-            (clone $baseModel),
-            (clone $baseModel)
-                ->setFilename(null),
         ];
     }
 

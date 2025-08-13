@@ -15,17 +15,11 @@ namespace Schoolbox\Learning\Moment\Translator\ArrayToModel;
  *
  * The only fields which may be mutated are:
  * * body
- * * file
- * * storage
- * * filename
  */
 class MutableFieldsOnly extends AllFields
 {
     private const MUTABLE_FIELDS = [
         'body'     => true,
-        'file'     => true,
-        'storage'  => true,
-        'filename' => true,
         'tags'     => true,
         'type'     => true,
     ];

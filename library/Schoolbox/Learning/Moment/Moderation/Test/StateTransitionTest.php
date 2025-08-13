@@ -169,7 +169,6 @@ class StateTransitionTest extends TestCase
             'normal process' => [
                 (new \Schoolbox\Learning\Moment\Model())
                     ->setCreator($jana)
-                    ->setType('text')
                     ->setRecipient($jana)
             ],
 
@@ -180,7 +179,6 @@ class StateTransitionTest extends TestCase
             'everything was preset' => [
                 (new \Schoolbox\Learning\Moment\Model())
                     ->setCreator($jana)
-                    ->setType('text')
                     ->setRecipient($jana)
                     ->setSubmittedBy($jana)
                     ->setSubmittedAt(\Alaress_Date_Format::now())
@@ -197,7 +195,6 @@ class StateTransitionTest extends TestCase
             'half was preset' => [
                 (new \Schoolbox\Learning\Moment\Model())
                     ->setCreator($jana)
-                    ->setType('text')
                     ->setRecipient($jana)
                     ->setSubmittedBy(null)
                     ->setSubmittedAt(\Alaress_Date_Format::now())
