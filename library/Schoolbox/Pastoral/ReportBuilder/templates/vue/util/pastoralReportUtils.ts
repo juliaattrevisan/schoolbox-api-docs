@@ -57,7 +57,7 @@ export function getMeta(
     if (selectedTab?.title === TabTitle.TYPE_BY_MONTH) {
         const typeSubtype = rowData?.type_subtype as TypeSubType;
         meta.push(
-            `${header.title} ${typeSubtype ? `| Type: ${typeSubtype.type} ${typeSubtype && typeSubtype.subtype ? `(${typeSubtype.subtype})` : ""}` : ""}`,
+            `${header.title} ${typeSubtype ? `| ${typeSubtype.type} ${typeSubtype && typeSubtype.subtype ? `(${typeSubtype.subtype})` : ""}` : ""}`,
         );
         return meta;
     }
