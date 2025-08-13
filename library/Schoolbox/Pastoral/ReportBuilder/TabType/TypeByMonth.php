@@ -213,6 +213,12 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
                 'type' => 'RecordsAndPoints',
                 'isSortable' => true,
             ],
+            [
+                'key' => 'trend',
+                'title' => 'Trend',
+                'type' => 'Trend',
+                'isSortable' => false,
+            ],
         ];
 
         foreach ($this->getMonths() as $month) {
@@ -224,12 +230,6 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
             ];
         }
 
-        $tableHeaders[] = [
-            'key' => 'trend',
-            'title' => 'Trend',
-            'type' => 'Trend',
-            'isSortable' => false,
-        ];
         return $tableHeaders;
     }
 
