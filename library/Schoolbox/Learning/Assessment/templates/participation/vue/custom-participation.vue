@@ -56,6 +56,10 @@ const hasCustomisedInSelection = window.Vue.computed(() => {
 const loadError = window.Vue.ref<string | null>(null);
 const studentPastoralCounts = window.Vue.ref<Record<string, StudentPastoralCountBadge[]>>({});
 
+/**
+ * Quiz and LTI activity types can't be copied so prevent access
+ * to the button when the activity is either of these
+ */
 const showCopyButton = window.Vue.computed(() => {
     const type = (props.baseAssessable || "").toLowerCase().trim();
     return !(type === "quiz" || type === "lti");
