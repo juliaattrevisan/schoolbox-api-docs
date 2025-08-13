@@ -15,7 +15,7 @@ export const trendOptions: Options = {
     },
     chart: {
         height: 50,
-        spacing: [0, 0, 0, 0],
+        spacing: [5, 0, 5, 0],
         width: 200,
     },
     colors: ["#000"],
@@ -49,12 +49,6 @@ export const trendOptions: Options = {
     title: {
         text: undefined,
     },
-    tooltip: {
-        formatter(this: Point): string {
-            return `<b>${this.key}:</b> ${this.y} records`;
-        },
-        valueSuffix: "Points",
-    },
     xAxis: {
         categories: [],
         title: {
@@ -78,8 +72,9 @@ export function getChartOptions(
     recordsOrPoints: "records" | "points",
 ): Options {
     const trend = rowData.trend as Trend;
-    // run through the line and make any 0 values null
-    trend.line = trend.line.map((value: number | null) => (value === null ? 0 : value));
+    if (recordsOrPoints === "points") {
+        console.warn(trend.line);
+    }
     if (trend === undefined) {
         return trendOptions;
     }
@@ -89,12 +84,22 @@ export function getChartOptions(
             {
                 data: trend.line,
                 name: recordsOrPoints,
+                point: {
+                    events: {
+                        click(this: Point): void {
+                            if (this.y !== 0) {
+                                console.warn("open modal?");
+                            }
+                        },
+                    },
+                },
                 type: "area" as const,
             },
         ],
         tooltip: {
-            formatter(this: Point): string {
-                return `<b>${this.key}:</b> ${this.y} ${recordsOrPoints}`;
+            formatter(this: Point): string | false {
+                const withoutSuffix = recordsOrPoints.substring(0, recordsOrPoints.length - 1);
+                return `<b>${this.key}:</b> ${this.y} ${this.y === 1 || this.y === -1 ? withoutSuffix : withoutSuffix + "s"}`;
             },
             valueSuffix: recordsOrPoints,
         },
