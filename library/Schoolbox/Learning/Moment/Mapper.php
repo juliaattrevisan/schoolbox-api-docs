@@ -251,6 +251,12 @@ class Mapper extends BaseMapper
     }
 
 
+    /**
+     * Slap all the evidence files into the Moment's instance
+     *
+     * @param GenericCollection $collection
+     * @return GenericCollection
+     */
     private function hydrateEvidenceIntoCollection(GenericCollection $collection): GenericCollection
     {
         $momentIds = $collection->keys();
@@ -264,10 +270,12 @@ class Mapper extends BaseMapper
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('moment_evidence', 'me')},
-                {$evidenceMapper->getJoinColumnString('storage', 'storage')}
+                {$evidenceMapper->getJoinColumnString('storage', 'storage')},
+                {$evidenceMapper->getJoinColumnString('storage.allowedFileExtension', 'm')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('moment_evidence', '', 'me')}
             INNER JOIN {$evidenceMapper->getJoinSql('storage', 'me', 'storage')}
+            LEFT JOIN {$evidenceMapper->getJoinSql('storage.allowedFileExtension', 'storage', 'm', true)}
             WHERE {$pb->getWhereIntersect()}
         ";
 
@@ -280,6 +288,13 @@ class Mapper extends BaseMapper
 
                 /** @var \Schoolbox\Resource\Storage\Model $storage */
                 $storage = $evidenceMapper->hydrateJoin($row, 'storage', 'storage');
+
+                /** @var \Schoolbox\File\Mimetype $mime */
+                $mime = $evidenceMapper->hydrateJoin($row, 'storage.allowedFileExtension', 'm');
+
+                if ($mime) {
+                    $storage->setMimeType($mime);
+                }
 
                 if ($storage) {
                     $evidence->setStorage($storage);
