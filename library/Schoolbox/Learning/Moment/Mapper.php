@@ -42,12 +42,9 @@ class Mapper extends BaseMapper
         $this->hasTable('moment');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('hash', Storage\Mapper::class, 'hash', null, null, 'storage', 'storage');
-        $this->uses('filename', self::TYPE_STRING);
         $this->uses('body', self::TYPE_STRING);
         $this->joins('discussion_thread_id', ThreadMapper::class, 'id', null, null, 'discussionThread');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'recipient', 'recipient');
-        $this->uses('type', self::TYPE_STRING);
         /* For moderation workflow
          */
         $this->joins('submitted_by', UserMapper::class, 'id', null, null, 'submittedBy', 'submittedBy');
