@@ -21,6 +21,7 @@ class MutableFieldsOnly extends AllFields
     private const MUTABLE_FIELDS = [
         'body'     => true,
         'tags'     => true,
+        'evidence' => true,
         'type'     => true,
     ];
 
