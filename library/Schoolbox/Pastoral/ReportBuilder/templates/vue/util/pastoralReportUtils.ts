@@ -41,28 +41,24 @@ export function getMeta(
     rowData?: { [key: string]: RowOptions },
 ): string[] {
     const meta = [];
-    // Return the type/sub-type and student if student cell selected
+    /**
+     * For example: "Academic (Academic Honesty)" or "Joffrey Buckner | Wellbeing (Behaviour)"
+     */
     if (selectedTab?.title === TabTitle.STUDENT_BY_TYPE) {
-        meta.push(`Type: ${header.title}`);
-        if (header.subTitle) {
-            meta.push(`Sub-Type: ${header.subTitle}`);
-        }
-        if (rowData !== undefined && rowData.user) {
-            const user = rowData.user as User;
-            meta.push(`Student: ${user.firstName} ${user.lastName}`);
-        }
+        const user = rowData?.user as User;
+        meta.push(
+            `${user ? `${user.firstName} ${user.lastName} | ` : ""} ${header.title} ${header.subTitle ? `(${header.subTitle})` : ""}`,
+        );
         return meta;
     }
-    // Return the type/sub-type or just the month
+    /**
+     * For example: "Apr 2025" or "Aug 2025 | Type: Academic (Behaviour)"
+     */
     if (selectedTab?.title === TabTitle.TYPE_BY_MONTH) {
-        if (rowData !== undefined && rowData.type_subtype) {
-            const typeSubtype = rowData.type_subtype as TypeSubType;
-            meta.push(`Type: ${typeSubtype.type}`);
-            if (typeSubtype.subtype) {
-                meta.push(`Sub-Type: ${typeSubtype.subtype}`);
-            }
-        }
-        meta.push(`Month: ${header.title}`);
+        const typeSubtype = rowData?.type_subtype as TypeSubType;
+        meta.push(
+            `${header.title} ${typeSubtype ? `| Type: ${typeSubtype.type} ${typeSubtype && typeSubtype.subtype ? `(${typeSubtype.subtype})` : ""}` : ""}`,
+        );
         return meta;
     }
     return [];
