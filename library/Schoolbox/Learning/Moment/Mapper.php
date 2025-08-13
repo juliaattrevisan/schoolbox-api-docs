@@ -86,6 +86,16 @@ class Mapper extends BaseMapper
             null,
             'tags'
         );
+
+        $this->hasJoin(
+            'moment_evidence',
+            [
+                'multiple'  => true,
+                'mapper'    => Evidence\Mapper::class,
+                'this_key'  => 'id',
+                'other_key' => 'moment_id',
+            ]
+        );
     }
 
 
@@ -99,8 +109,6 @@ class Mapper extends BaseMapper
         return "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('storage', 'storage')},
-                {$this->getJoinColumnString('storage.allowedFileExtension', 'mimetype')},
                 {$this->getJoinColumnString('recipient', 'recipient')},
                 {$this->getJoinColumnString('recipient.year', 'recipientYear')},
                 {$this->getJoinColumnString('recipient.schoolHouse', 'recipientSchoolHouse')},
@@ -124,8 +132,6 @@ class Mapper extends BaseMapper
     {
         return "
             FROM {$this->getTable()}
-            LEFT JOIN {$this->getJoinSql('storage', '', 'storage')}
-            LEFT JOIN {$this->getJoinSql('storage.allowedFileExtension', 'storage', 'mimetype')}
             LEFT JOIN {$this->getJoinSql('recipient', '', 'recipient', true)}
             LEFT JOIN {$this->getJoinSql('recipient.year', 'recipient', 'recipientYear', true)}
             LEFT JOIN {$this->getJoinSql('recipient.schoolHouse', 'recipient', 'recipientSchoolHouse', true)}
@@ -158,16 +164,16 @@ class Mapper extends BaseMapper
             /** @noinspection PhpUnhandledExceptionInspection */
             $model = $this->hydrate($row);
 
-            /** @var Storage\Model|null $storage */
-            $storage = $this->hydrateJoin($row, 'storage', 'storage');
-            if ($storage) {
-                /** @var Mimetype|null $mimetype */
-                $mimetype = $this->hydrateJoin($row, 'storage.allowedFileExtension', 'mimetype');
-                if ($mimetype) {
-                    $storage->setMimetype($mimetype);
-                }
-            }
-            $model->setStorage($storage);
+//            /** @var Storage\Model|null $storage */
+//            $storage = $this->hydrateJoin($row, 'storage', 'storage');
+//            if ($storage) {
+//                /** @var Mimetype|null $mimetype */
+//                $mimetype = $this->hydrateJoin($row, 'storage.allowedFileExtension', 'mimetype');
+//                if ($mimetype) {
+//                    $storage->setMimetype($mimetype);
+//                }
+//            }
+//            $model->setStorage($storage);
 
             /** @var User|null $recipient */
             $recipient = $this->hydrateJoin($row, 'recipient', 'recipient');
@@ -205,6 +211,10 @@ class Mapper extends BaseMapper
             // these will be hydrated in `hydrateCurriculumNodesIntoCollection`
             $model->setCurriculumNodes($this->getJoinMapper('curriculum_moment')->createCollection());
 
+            /* Initialise evidence stack
+             */
+            $model->setEvidence($this->getJoinMapper('moment_evidence')->createCollection());
+
             /* Set submitter/publisher/rejecter
              */
             /** @var \Schoolbox\User $submitter */
@@ -230,10 +240,45 @@ class Mapper extends BaseMapper
 
             $collection[$model->getId()] = $model;
         }
+
+        /* Add extra bits to each moment in the set
+         */
         $collection = $this->hydrateTagsIntoCollection($collection);
+        $collection = $this->hydrateEvidenceIntoCollection($collection);
+
         if ($this->getConfigLoader()->get('curriculum_tagging_enabled')) {
             $collection = $this->hydrateCurriculumNodesIntoCollection($collection);
         }
+
+        return $collection;
+    }
+
+
+    private function hydrateEvidenceIntoCollection(GenericCollection $collection): GenericCollection
+    {
+        $momentIds = $collection->keys();
+
+        $pb = $this->getPredicateBuilder()->in('id', $momentIds);
+
+        $query = "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('moment_evidence', 'me')}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
+            INNER JOIN {$this->getJoinSql('moment_evidence', '', 'me')}
+            WHERE {$pb->getWhereIntersect()}
+        ";
+
+        $momentEvidenceStatement = $this->database->query($query, $pb->getParams());
+
+        foreach ($momentEvidenceStatement as $row) {
+            if ($row['me.id'] !== null) {
+                /** @var \Schoolbox\Learning\Moment\Evidence\Model $evidence */
+                $evidence = $this->hydrateJoin($row, 'moment_evidence', 'me');
+                $collection[$row['id']]->getEvidence()->setOffset($evidence->getId(), $evidence);
+            }
+        }
+
         return $collection;
     }
 

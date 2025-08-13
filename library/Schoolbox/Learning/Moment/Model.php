@@ -113,6 +113,13 @@ class Model implements ISoftDeletable, IThreadLocation
      */
     private string $type;
 
+
+    /**
+     * @var GenericCollection|null
+     */
+    private ?GenericCollection $evidence = null;
+
+
     /**
      * @var GenericCollection|null
      */
@@ -700,6 +707,30 @@ class Model implements ISoftDeletable, IThreadLocation
     public function setRejectedBy(?User $rejectedBy): self
     {
         $this->rejectedBy = $rejectedBy;
+        return $this;
+    }
+
+
+
+    /**
+     * Get a set of evidence instances for this moment
+     *
+     * @return GenericCollection|null
+     */
+    public function getEvidence(): ?GenericCollection
+    {
+        return $this->evidence;
+    }
+
+
+    /**
+     *
+     * @param GenericCollection|null $evidence
+     * @return $this
+     */
+    public function setEvidence(?GenericCollection $evidence): self
+    {
+        $this->evidence = $evidence;
         return $this;
     }
 }
