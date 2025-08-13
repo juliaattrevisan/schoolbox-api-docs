@@ -149,8 +149,8 @@
     <div class="list-item">
         <div class="small-12 column">
             <h1>Create
-                {% if assessment.typeName is defined %}
-                    {{ assessment.typeName }}
+                {% if assessment.defaultTypeName is defined %}
+                    {{ assessment.defaultTypeName }}
                 {% else %}
                     Activity
                 {% endif %}
