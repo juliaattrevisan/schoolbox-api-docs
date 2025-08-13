@@ -83,7 +83,7 @@ class Base
             $recipient = null;
         }
 
-        return [
+        $moment = [
             'id'               => $model->getId(),
             'createdAt'        => $model->getCreatedAt()?->getUsingFormat(DATE_ATOM),
             'updatedAt'        => $model->getUpdatedAt()?->getUsingFormat(DATE_ATOM),
@@ -92,24 +92,21 @@ class Base
             'discussionThread' => $model->getDiscussionThread()
                 ? ['id' => $model->getDiscussionThread()->getId()]
                 : null,
-            'filename'         => $model->getFilename(),
             'recipient'        => $recipient,
-            'storage'          => $model->getStorage()
-                ? call_user_func($this->storageTranslator, $model->getStorage())
-                : null,
+            'evidence'         => [],
             'currentState' => $model->getCurrentState(),
             'curriculumNodes' => $model->getViewableCurriculumNodes()
                 ? $model->getViewableCurriculumNodes()
-                        ->map(
-                            static function (Node\Model $node) {
-                                return [
-                                    'id'   => $node->getId(),
-                                    'name' => $node->getName(),
-                                    'code' => $node->getCode(),
-                                ];
-                            }
-                        )
-                        ->reindex()
+                    ->map(
+                        static function (Node\Model $node) {
+                            return [
+                                'id'   => $node->getId(),
+                                'name' => $node->getName(),
+                                'code' => $node->getCode(),
+                            ];
+                        }
+                    )
+                    ->reindex()
                 : null,
             'tags'            => $model->getTags()?->map(
                 static function (\Schoolbox\Learning\Moment\Tag\Model $tag) {
@@ -121,5 +118,16 @@ class Base
             )->reindex(),
             '_links'           => [],
         ];
+
+        /* Process storage instances separately, if any exist
+         */
+        foreach ($model->getEvidence() as $evidence) {
+            $moment['evidence'][] = [
+                'storage' => call_user_func($this->storageTranslator, $evidence->getStorage()),
+                'filename' => $evidence->getFilename(),
+            ];
+        }
+
+        return $moment;
     }
 }

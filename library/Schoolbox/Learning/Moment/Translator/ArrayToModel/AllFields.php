@@ -61,8 +61,7 @@ class AllFields extends Base
     public function __invoke(array $json, ?object $model = null): object
     {
         if (!isset($model)) {
-            $model = (new \Schoolbox\Learning\Moment\Model())
-                ->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class)));
+            $model = (new \Schoolbox\Learning\Moment\Model());
         }
 
 
@@ -161,6 +160,10 @@ class AllFields extends Base
                     $evidence->setStorage($file)
                         ->setFilename($file->getBasename());
 
+                    if (null === $model->getEvidence()) {
+                        $model->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class)));
+                    }
+
                     $model->getEvidence()->add($evidence);
                 }
             }
@@ -182,6 +185,10 @@ class AllFields extends Base
                         $storage = (new StorageModel())->setHash($json['storage']['hash']);
 
                         $evidence->setStorage($storage);
+                    }
+
+                    if (null === $model->getEvidence()) {
+                        $model->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class)));
                     }
 
                     $model->getEvidence()->add($evidence);
