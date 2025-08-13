@@ -4,7 +4,7 @@
  * for foundation based <reveal-modal /> component
  */
 
-import { computed, useTemplateRef } from "vue";
+import { useTemplateRef } from "vue";
 import { onKeyStroke } from "@vueuse/core";
 import { useFocusTrap } from "@vueuse/integrations/useFocusTrap";
 import { vOnClickOutside } from "@vueuse/components";
@@ -15,7 +15,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const modalSize = computed(() => props.size || "m"); // Default size is medium
+const modalSize = window.Vue.computed(() => props.size || "m"); // Default size is medium
 const modalEl = useTemplateRef<HTMLDivElement | null>("modalEl"); // to get the modal element
 const isOpen = defineModel<boolean>("is-open", { default: false }); // to open/close the modal
 const { activate, deactivate } = useFocusTrap(modalEl); // to keep focus within the modal when open
@@ -68,11 +68,7 @@ function onBackgroundClick(): void {
     <teleport to="body">
         <transition>
             <div v-if="isOpen" ref="modalEl" class="modal">
-                <div
-                    v-on-click-outside="onBackgroundClick"
-                    class="modal__container"
-                    :class="`modal__container--${modalSize}`"
-                >
+                <div v-on-click-outside="onBackgroundClick" :class="`modal__container modal__container--${modalSize}`">
                     <!-- @slot Reveal modal content goes into this slot -->
                     <div class="modal__container_main"><slot></slot></div>
                     <slot name="footer"></slot>
@@ -104,31 +100,42 @@ function onBackgroundClick(): void {
         background: white;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
         margin: 0 auto;
-        max-width: 62.5rem;
         position: relative;
         top: 100px;
-        width: 70%;
     }
-    &__container--m {
-        max-width: 1000px;
+    /* set the width and breakpoint based on the existence of the size class */
+    /* I feel there should be a better way to do this with v-bind() and loop, but for now this will do */
+    &:has(.modal__container--m) {
+        .modal__container--m {
+            width: 1000px;
+        }
+        @media (max-width: 1100px) {
+            .modal__container--m {
+                width: 100%;
+            }
+            .close-modal {
+                right: 0;
+                top: -3rem;
+            }
+        }
     }
-
-    &__container--s {
-        max-width: 500px;
+    &:has(.modal__container--s) {
+        .modal__container--s {
+            width: 500px;
+        }
+        @media (max-width: 600px) {
+            .modal__container--s {
+                width: 100%;
+            }
+            .close-modal {
+                right: 0;
+                top: -3rem;
+            }
+        }
     }
     /* separate so that the footer can have different padding (i.e. to use component actions) */
     &__container_main {
         padding: var(--spacing-m);
-    }
-    @media (max-width: 700px) {
-        &__container {
-            width: 100%;
-        }
-    }
-    @media (max-width: 520px) {
-        .modal__container--s {
-            width: 100%;
-        }
     }
 }
 
@@ -137,10 +144,6 @@ function onBackgroundClick(): void {
     position: absolute;
     right: -2rem;
     top: -3rem;
-    @media (max-width: 700px) {
-        right: 0;
-        top: -3rem;
-    }
 }
 
 // Fade in/out animation, linked to <transition> in the template
