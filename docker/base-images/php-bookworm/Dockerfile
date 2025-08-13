@@ -29,6 +29,7 @@ case "$ENV" in
 esac
 EOF
 COPY ./config/php/* /usr/local/etc/php/conf.d/
+COPY ./config/php${PHP_VERSION}/* /usr/local/etc/php/conf.d/
 
 # Copy scripts from puppet-alaress as-is for now
 COPY ./usr/bin/* /usr/bin/
