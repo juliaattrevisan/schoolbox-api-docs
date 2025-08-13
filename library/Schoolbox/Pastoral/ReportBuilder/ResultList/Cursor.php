@@ -133,9 +133,9 @@ class Cursor implements ICursor
         }
 
         if (null !== $this->columnKey && 'total' !== $this->columnKey) {
-            $match = $this->getColumnKeyByTabType();
-            $where[] = "p.{$match['type']}_id = :column_id";
-            $param['column_id'] = $match['id'];
+            [$rowWhere, $rowParam] = $this->getColumnKeyByTabType();
+            $where = array_merge($where, $rowWhere);
+            $param = array_merge($param, $rowParam);
         }
 
         return [
@@ -224,6 +224,7 @@ class Cursor implements ICursor
         return $results;
     }
 
+
     /**
      * @return array
      */
@@ -252,22 +253,26 @@ class Cursor implements ICursor
      */
     private function getColumnKeyByTabType(): array
     {
-        $matches = [];
+        $query = $param = [];
         switch ($this->tabType) {
             case Factory::STUDENT_BY_TYPE:
-                preg_match(StudentByType::COLUMN_KEY_REGEX, $this->columnKey, $matches);
+                if (!preg_match(StudentByType::COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
+                    throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey));
+                }
+                $query[] = "p.{$matches['type']}_id = :type_id";
+                $param['type_id'] = $matches['id'];
                 break;
             case Factory::TYPE_BY_MONTH:
-                preg_match(TypeByMonth::COLUMN_KEY_REGEX, $this->columnKey, $matches);
+                if (!preg_match(TypeByMonth::COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
+                    throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey));
+                }
+                $monthFormat = TypeByMonth::COLUMN_QUERY_MONTH_FORMAT;
+                $query[] = "DATE_FORMAT(COALESCE(p.occurred_on, p.created_at), '{$monthFormat}') = :monthKey";
+                $param['monthKey'] = $this->columnKey;
                 break;
             default:
                 throw new ValueError(sprintf('Unknown tab type: %s', $this->tabType));
         }
-
-        if (empty($matches)) {
-            throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey));
-        }
-
-        return $matches;
+        return [$query, $param];
     }
 }
