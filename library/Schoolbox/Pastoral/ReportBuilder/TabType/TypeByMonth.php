@@ -284,7 +284,7 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
             'subtypeId' => $last['subtypeId'],
         ];
 
-        if ($this->getMonths()->contains($this->sortBy) | strcasecmp('total', $this->sortBy) == 0) {
+        if ($this->getMonths()->contains($this->sortBy) || strcasecmp('total', $this->sortBy) == 0) {
             $discriminator['count'] = $last[$this->sortBy];
         }
 

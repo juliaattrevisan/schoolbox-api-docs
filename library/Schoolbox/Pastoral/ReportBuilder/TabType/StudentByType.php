@@ -319,7 +319,7 @@ class StudentByType extends Base implements TabTypeInterface, ICursor
 
         $discriminator = [ 'id' => $last['student_id']];
 
-        if ($this->getTypeSubtypeKey()->contains($this->sortBy) | strcasecmp('total', $this->sortBy) == 0) {
+        if ($this->getTypeSubtypeKey()->contains($this->sortBy) || strcasecmp('total', $this->sortBy) == 0) {
             $discriminator['count'] = $last[$this->sortBy];
         }
 
