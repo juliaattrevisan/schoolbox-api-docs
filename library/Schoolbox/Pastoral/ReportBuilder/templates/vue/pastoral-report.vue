@@ -116,5 +116,6 @@ window.Vue.onMounted((): void => {
 <style>
 :root {
     --sbx-pr-table-total-cell-colour: #eee;
+    --sbx-pr-table-row-hover-colour: #f4f3f3;
 }
 </style>

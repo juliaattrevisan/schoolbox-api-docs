@@ -30,7 +30,7 @@ function onCellSelected(header: TableHeader): void {
 </script>
 
 <template>
-    <tr>
+    <tr class="total-row">
         <td
             v-for="(header, index) in props.headers"
             :key="header.key"
@@ -97,8 +97,11 @@ function onCellSelected(header: TableHeader): void {
     </tr>
 </template>
 
-<style scoped lang="scss">
-td {
+<style lang="scss">
+tr.total-row {
     background: var(--sbx-pr-table-total-cell-colour);
+    .highcharts-background {
+        fill: var(--sbx-pr-table-total-cell-colour);
+    }
 }
 </style>

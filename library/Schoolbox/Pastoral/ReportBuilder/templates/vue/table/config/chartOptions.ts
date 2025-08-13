@@ -14,7 +14,6 @@ export const trendOptions: Options = {
         useGPUTranslations: true,
     },
     chart: {
-        className: "highcharts-trend-chart",
         height: 50,
         spacing: [0, 0, 0, 0],
         width: 200,
