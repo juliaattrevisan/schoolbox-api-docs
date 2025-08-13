@@ -149,8 +149,8 @@
     <div class="list-item">
         <div class="small-12 column">
             <h1>Create
-                {% if assessment.typeName is defined %}
-                    {{ assessment.typeName }}
+                {% if assessment.defaultTypeName is defined %}
+                    {{ assessment.defaultTypeName }}
                 {% else %}
                     Activity
                 {% endif %}
@@ -177,7 +177,7 @@
                     {% include 'sub/userListMetadata.twig'
                         with {
                         users:    participants,
-                        message: customisedFor is defined ? 'Creating copy for ' : 'Creating for '
+                        message: customisedFor is defined ? 'Customisation for ' : 'Creating for '
                     } only
                     %}
                 </li>
