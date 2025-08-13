@@ -26,15 +26,13 @@ class LearningMomentsController extends Component_Homepage_ControllerAbstract
             return false;
         }
 
-        $user = $this->getUser();
-
         // Do not show to parents.
-        if ($user->getRole()->isParent()) {
+        if ($this->getUser()->getRole()->isParent()) {
             return false;
         }
 
         // Only show to students if learning moments are enabled for the student's year level.
-        if ($user->getRole()->isStudent() && !$user->getYear()?->getLearningMomentsEnabled()) {
+        if ($this->getUser()->getRole()->isStudent() && !$this->getUser()->getYear()?->getLearningMomentsEnabled()) {
             return false;
         }
 
