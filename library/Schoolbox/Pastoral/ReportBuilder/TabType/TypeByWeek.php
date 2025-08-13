@@ -10,9 +10,8 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
 {
     private $params = [];
     private $weeks = [];
-    public const COLUMN_QUERY_WEEK_FORMAT = '%u_%Y';
     public const COLUMN_QUERY_KEY = 'week_%d';
-    public const COLUMN_KEY_REGEX = '/^([0-9]{1,2})_[0-9]{4}$/';
+    public const COLUMN_KEY_REGEX = '/(week)_(?<index>\d+)/';
     public const MAX_COLUMN_COUNT = 12; // Maximum number of weeks to display
 
     private function getWeeks(): Collection
@@ -36,9 +35,9 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
         $this->params["weekEnd{$label}"] = $end->toIso8601String();
         return match (strtolower($resultType)) {
             self::RESULT_TYPE_RECORDS =>
-                "ROUND(COUNT(CASE WHEN reportDate >= :weekStart{$label} AND reportDate <= :weekEnd{$label} THEN 1 END), 2) AS :{$label}",
+                "ROUND(COUNT(CASE WHEN reportDate BETWEEN :weekStart{$label} AND :weekEnd{$label} THEN 1 END), 2) AS :{$label}",
             self::RESULT_TYPE_POINTS =>
-                "ROUND(SUM(CASE WHEN reportDate >= :weekStart{$label} AND reportDate <= :weekEnd{$label} THEN weekData.points END), 2) AS :{$label}",
+                "ROUND(SUM(CASE WHEN reportDate BETWEEN :weekStart{$label} AND :weekEnd{$label} THEN weekData.points END), 2) AS :{$label}",
             default => throw new \Exception("Unknown result type: '{$resultType}'"),
         };
     }
