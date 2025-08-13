@@ -83,10 +83,12 @@ class BaseTest extends TestCase
                 'createdAt'        => '2020-01-01T00:00:00+00:00',
                 'updatedAt'        => '2020-02-01T00:00:00+00:00',
                 'evidence'         => [
-                    'storage'          => [
-                        'hash' => '1234567890123456789012345678901234567890',
-                    ],
-                    'filename'         => 'test.gif',
+                    [
+                        'storage'          => [
+                            'hash' => '1234567890123456789012345678901234567890',
+                        ],
+                        'filename'         => 'test.gif',
+                    ]
                 ],
                 'creator'          => ['id' => 55],
                 'recipient'        => ['id' => 193],
