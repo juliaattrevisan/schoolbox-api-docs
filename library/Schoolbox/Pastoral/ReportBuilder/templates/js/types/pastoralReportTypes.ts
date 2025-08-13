@@ -12,11 +12,20 @@ export enum TabType {
 }
 
 /**
+ * Pastoral report tab titles
+ */
+export enum TabTitle {
+    LIST = "List",
+    STUDENT_BY_TYPE = "Student by Type/Sub-Type",
+    TYPE_BY_MONTH = "Type/Sub-Type by Month",
+}
+
+/**
  * Pastoral report tab type (from your Vue component)
  */
 export type Tab = {
     type: TabType;
-    title: string;
+    title: TabTitle;
     key: string; // Unique key for the tab, used for routing
     _links: {
         view: string; // URL to view the tab
@@ -161,5 +170,6 @@ export type RowKeys = {
  */
 export type SelectedCell = {
     header: TableHeader;
+    meta: string[];
     rowKeys?: RowKeys;
 };

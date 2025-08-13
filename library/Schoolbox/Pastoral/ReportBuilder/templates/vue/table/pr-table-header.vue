@@ -10,12 +10,12 @@ import type { TableHeader } from "../../js/types/pastoralReportTypes";
 
 const props = defineProps<{
     headers: TableHeader[];
-    recordsAndPoints: string[];
     sortBy: string;
     order: "ASC" | "DESC";
 }>();
 
 const store = useStore();
+const recordsAndPoints = window.Vue.ref(["records", "points"]); // to toggle the tables between records and points
 
 const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
 
@@ -90,7 +90,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
             <th class="u-border-right u-sticky-left">
                 <div v-if="store.config.pastoralPointEnabled" class="checklist">
                     <ul class="option-list l-flex l-gap-m f-no-margins">
-                        <li v-for="(option, index) in props.recordsAndPoints" :key="`option-${index}`">
+                        <li v-for="(option, index) in recordsAndPoints" :key="`option-${index}`">
                             <input
                                 :id="option"
                                 v-model="recordsOrPoints"

@@ -9,6 +9,8 @@ import { capitalizeFirstLetter } from "@js/util/stringUtils";
 import { TableHeaderType } from "../../js/types/pastoralReportTypes";
 import type { TableHeader, RowOptions, RecordsAndPoints } from "../../js/types/pastoralReportTypes";
 import { getChartOptions } from "./config/chartOptions";
+import { useStore } from "../store/pastoralReportStore";
+import { getMeta } from "../util/pastoralReportUtils";
 
 const props = defineProps<{
     headers: TableHeader[];
@@ -17,7 +19,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    cellSelect: [header: TableHeader];
+    cellSelect: [header: TableHeader, meta: string[]];
 }>();
 
 /**
@@ -25,7 +27,7 @@ const emit = defineEmits<{
  * @param header - the header of the cell that was clicked
  */
 function onCellSelected(header: TableHeader): void {
-    emit("cellSelect", header);
+    emit("cellSelect", header, getMeta(useStore().selectedTab, header));
 }
 </script>
 

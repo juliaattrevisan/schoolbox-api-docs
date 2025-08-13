@@ -34,6 +34,7 @@ export const useStore = defineStore(`pastoralReportStore`, () => {
     const localePastoral = window.Vue.ref<string>("");
     const showSeverity = window.Vue.ref<boolean>(false);
     const severityColors = window.Vue.ref<SeverityColors>({});
+    const selectedTab = window.Vue.ref<Tab | null>(null); // the currently selected tab, defaulting to the first tab type
 
     /**
      * Initializes the store with the provided parameters.
@@ -49,6 +50,7 @@ export const useStore = defineStore(`pastoralReportStore`, () => {
         localePastoral.value = params.localePastoral;
         showSeverity.value = params.showSeverity;
         severityColors.value = params.severityColors;
+        selectedTab.value = params.tabs[0]; // default to the first tab type
     }
 
     return {
@@ -62,5 +64,6 @@ export const useStore = defineStore(`pastoralReportStore`, () => {
         localePastoral,
         showSeverity,
         severityColors,
+        selectedTab,
     };
 });

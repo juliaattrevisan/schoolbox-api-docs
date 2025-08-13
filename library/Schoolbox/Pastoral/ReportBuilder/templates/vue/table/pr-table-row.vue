@@ -17,6 +17,8 @@ import type {
     RowKeys,
 } from "../../js/types/pastoralReportTypes";
 import { getChartOptions } from "./config/chartOptions";
+import { useStore } from "../store/pastoralReportStore";
+import { getMeta } from "../util/pastoralReportUtils";
 
 const props = defineProps<{
     headers: TableHeader[];
@@ -25,7 +27,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    cellSelect: [header: TableHeader, rowKeys: RowKeys];
+    cellSelect: [header: TableHeader, rowKeys: RowKeys, meta: string[]];
 }>();
 
 /**
@@ -56,7 +58,7 @@ const rowKeys = (): RowKeys => {
  * @param header - the header of the cell that was clicked
  */
 function onCellSelected(header: TableHeader): void {
-    emit("cellSelect", header, rowKeys());
+    emit("cellSelect", header, rowKeys(), getMeta(useStore().selectedTab, header, props.rowData));
 }
 </script>
 

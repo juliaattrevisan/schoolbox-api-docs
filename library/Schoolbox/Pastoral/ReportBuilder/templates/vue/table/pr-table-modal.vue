@@ -8,13 +8,12 @@ import { useScroll } from "@vueuse/core";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import { useStore } from "../store/pastoralReportStore";
-import type { Tab, TableHeader, SelectedCell } from "../../js/types/pastoralReportTypes";
+import type { TableHeader, SelectedCell } from "../../js/types/pastoralReportTypes";
 import { ScopeUrlParam } from "../../js/types/pastoralReportTypes";
 import { useLoadRecords } from "../composable/useLoadRecords";
 import PrRecord from "../pr-record.vue";
 
 const props = defineProps<{
-    selectedTab: Tab;
     selectedCell: SelectedCell | null;
 }>();
 
@@ -30,8 +29,8 @@ const { isNewLoad, isNewLoading, isMoreLoading, payload, loadError } = useLoadRe
  * @returns - the current scope export URL
  */
 function scopeExportUrl(): string {
-    return props.selectedTab._links.scopeExport
-        ? `${props.selectedTab._links.scopeExport}?${scopeUrlParams.toString()}`
+    return store.selectedTab?._links.scopeExport
+        ? `${store.selectedTab?._links.scopeExport}?${scopeUrlParams.toString()}`
         : "";
 }
 
@@ -58,7 +57,7 @@ window.Vue.watch(
                     }
                 });
             }
-            scopeUrl.value = `${props.selectedTab._links.scope}?${scopeUrlParams.toString()}`;
+            scopeUrl.value = `${store.selectedTab?._links.scope}?${scopeUrlParams.toString()}`;
             isOpen.value = true; // Open the modal to show related records
         } else {
             isOpen.value = false; // Close the modal when no cell is selected
@@ -78,7 +77,7 @@ const { bottom } = toRefs(arrivedState);
 window.Vue.watch(bottom, (isAtBottom) => {
     if (isAtBottom && payload.value && payload.value.metadata.cursor.next !== null) {
         scopeUrlParams.set(ScopeUrlParam.CURSOR as string, payload.value.metadata.cursor.next);
-        scopeUrl.value = `${props.selectedTab._links.scope}?${scopeUrlParams.toString()}`;
+        scopeUrl.value = `${store.selectedTab?._links.scope}?${scopeUrlParams.toString()}`;
     }
 });
 </script>
@@ -92,17 +91,14 @@ window.Vue.watch(bottom, (isAtBottom) => {
                 <div class="l-flex-row l-flex--justify-space l-gap-s">
                     <div class="l-flex-col l-gap-s f-no-margins">
                         <h2>{{ store.title }}</h2>
-                        <p class="meta">
-                            <template v-if="selectedHeader.title !== 'Total'"
-                                >Type: {{ selectedHeader.title }}</template
-                            >
-                            <template v-if="selectedHeader.subTitle"
-                                ><br />Sub-Type: {{ selectedHeader.subTitle }}</template
-                            >
+                        <p v-if="props.selectedCell" class="meta">
+                            <template v-for="(meta, index) in props.selectedCell.meta" :key="index">
+                                {{ meta }}<br />
+                            </template>
                         </p>
                     </div>
                     <a
-                        v-if="props.selectedTab._links.scopeExport"
+                        v-if="store.selectedTab?._links.scopeExport"
                         :href="scopeExportUrl()"
                         aria-label="Download related records as CSV"
                         title="Download related records as CSV"

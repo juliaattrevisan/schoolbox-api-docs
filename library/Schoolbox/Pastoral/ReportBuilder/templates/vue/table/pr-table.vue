@@ -4,10 +4,11 @@
  */
 
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
-import type { Tab, TablePayload, TableHeader, SelectedCell, RowKeys } from "../../js/types/pastoralReportTypes";
+import type { TablePayload, TableHeader, SelectedCell, RowKeys } from "../../js/types/pastoralReportTypes";
 import { TabType, ViewUrlParam } from "../../js/types/pastoralReportTypes";
 import { useLoadPrTable } from "../composable/useLoadPrTable";
 import { useMaxScrollableHeight } from "../composable/useMaxScrollableHeight";
+import { useStore } from "../store/pastoralReportStore";
 import PrEmpty from "../pr-empty.vue";
 import PrTableHeader from "./pr-table-header.vue";
 import PrTableTotalRow from "./pr-table-total-row.vue";
@@ -15,13 +16,9 @@ import PrTableRow from "./pr-table-row.vue";
 import PrTableFooter from "./pr-table-footer.vue";
 import PrTableModal from "./pr-table-modal.vue";
 
-const props = defineProps<{
-    selectedTab: Tab;
-    recordsAndPoints: string[];
-}>();
-
 // #region table load / sorting / pagination
 
+const store = useStore();
 const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
 const viewUrl = window.Vue.ref("");
 const viewUrlParams = new URLSearchParams();
@@ -38,7 +35,7 @@ function resetTableLoad(): void {
     viewUrlParams.set(ViewUrlParam.LIMIT as string, LIMIT.toString());
     viewUrlParams.set(ViewUrlParam.SORT_BY as string, sortBy.value);
     viewUrlParams.set(ViewUrlParam.ORDER as string, order.value);
-    viewUrl.value = `${props.selectedTab._links.view}?${viewUrlParams.toString()}`;
+    viewUrl.value = `${store.selectedTab?._links.view}?${viewUrlParams.toString()}`;
 }
 
 /**
@@ -47,7 +44,7 @@ function resetTableLoad(): void {
 window.Vue.watch(recordsOrPoints, () => {
     viewUrlParams.set(ViewUrlParam.SELECTED as string, recordsOrPoints.value);
     viewUrlParams.set(ViewUrlParam.CURSOR as string, ""); // Reset cursor on records/points change
-    viewUrl.value = `${props.selectedTab._links.view}?${viewUrlParams.toString()}`;
+    viewUrl.value = `${store.selectedTab?._links.view}?${viewUrlParams.toString()}`;
 });
 
 /**
@@ -66,7 +63,7 @@ function onSort(headerKey: string): void {
     viewUrlParams.set(ViewUrlParam.SORT_BY as string, sortBy.value);
     viewUrlParams.set(ViewUrlParam.ORDER as string, order.value);
     viewUrlParams.set(ViewUrlParam.CURSOR as string, ""); // Reset cursor on sort change
-    viewUrl.value = `${props.selectedTab._links.view}?${viewUrlParams.toString()}`;
+    viewUrl.value = `${store.selectedTab?._links.view}?${viewUrlParams.toString()}`;
 }
 
 /**
@@ -75,16 +72,16 @@ function onSort(headerKey: string): void {
  */
 function onPaginate(cursor: string): void {
     viewUrlParams.set(ViewUrlParam.CURSOR as string, cursor);
-    viewUrl.value = `${props.selectedTab._links.view}?${viewUrlParams.toString()}`;
+    viewUrl.value = `${store.selectedTab?._links.view}?${viewUrlParams.toString()}`;
 }
 
 /**
  * when the endpoint changes trigger a new load
  */
 window.Vue.watch(
-    () => props.selectedTab,
+    () => store.selectedTab,
     (newTab) => {
-        if (newTab.type === TabType.TABLE) {
+        if (newTab?.type === TabType.TABLE) {
             resetTableLoad();
         }
     },
@@ -99,10 +96,12 @@ const selectedCell = window.Vue.ref<SelectedCell | null>(null);
 /**
  * Handle total cell selection
  * @param header - the header of the cell that was selected
+ * @param meta - the metadata associated with the cell
  */
-function onTotalCellSelect(header: TableHeader): void {
+function onTotalCellSelect(header: TableHeader, meta: string[]): void {
     selectedCell.value = {
         header,
+        meta,
     };
 }
 
@@ -110,11 +109,13 @@ function onTotalCellSelect(header: TableHeader): void {
  * Handle row cell selection
  * @param header - the header of the cell that was selected
  * @param rowKeys - the keys of the row that was selected
+ * @param meta - the metadata associated with the cell
  */
-function onRowCellSelect(header: TableHeader, rowKeys: RowKeys): void {
+function onRowCellSelect(header: TableHeader, rowKeys: RowKeys, meta: string[]): void {
     selectedCell.value = {
         header,
         rowKeys,
+        meta,
     };
 }
 
@@ -149,7 +150,6 @@ window.Vue.onMounted(() => {
                 <pr-table-header
                     v-model:records-or-points="recordsOrPoints"
                     :headers="(payload as TablePayload).data.tableHeaders"
-                    :records-and-points="props.recordsAndPoints"
                     :sort-by="sortBy"
                     :order="order"
                     @sort="onSort"
@@ -189,7 +189,7 @@ window.Vue.onMounted(() => {
             />
         </div>
     </template>
-    <pr-table-modal :selected-tab="props.selectedTab" :selected-cell="selectedCell" />
+    <pr-table-modal :selected-cell="selectedCell" />
 </template>
 
 <style scoped lang="scss">
