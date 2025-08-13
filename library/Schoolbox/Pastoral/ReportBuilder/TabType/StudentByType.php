@@ -208,7 +208,10 @@ class StudentByType extends Base implements TabTypeInterface, ICursor
         if (isset($cursor)) {
             $minCount = self::MIN_SORT_BY_VALUE;
             $sortingOperator = $this->order == self::ORDER_DIRECTION_DEFAULT ? ' > ' : ' < ';
-            if (key_exists('count', $cursor) && ($this->getTypeSubtypeKey()->contains($this->sortBy) || strcasecmp('total', $this->sortBy) === 0)) {
+            if (
+                array_key_exists('count', $cursor) &&
+                ($this->getTypeSubtypeKey()->contains($this->sortBy) || strcasecmp('total', $this->sortBy) === 0)
+            ) {
                 $whereParts = "
                 WHERE (
                           (withTotal.student_id {$sortingOperator} :studentId AND COALESCE({$this->sortBy}, {$minCount}) = COALESCE(:countDiscriminator, {$minCount})) OR

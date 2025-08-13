@@ -134,13 +134,17 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
         if (isset($cursor)) {
             $minValue = self::MIN_SORT_BY_VALUE;
             $sortingOperator = $this->order == self::ORDER_DIRECTION_DEFAULT ? ' > ' : ' < ';
-            if ($this->getMonths()->contains($this->sortBy) || strcasecmp($this->sortBy, 'total') === 0) {
+            if (
+                array_key_exists('count', $cursor) &&
+                ($this->getMonths()->contains($this->sortBy) || strcasecmp($this->sortBy, 'total') === 0)
+            ) {
                 $whereDiscriminator = "
                 WHERE (
                   (COALESCE($this->sortBy, {$minValue}) {$sortingOperator} COALESCE(:countDiscriminator, {$minValue})) OR
                     (COALESCE($this->sortBy, {$minValue}) = COALESCE(:countDiscriminator, {$minValue}) AND typeId {$sortingOperator} :typeId) OR
-                    (COALESCE($this->sortBy, {$minValue}) = COALESCE(:countDiscriminator, {$minValue}) AND typeId = :typeId AND COALESCE(subtypeId, '') {$sortingOperator} COALESCE(:subtypeId, ''))
-                ";
+                    (COALESCE($this->sortBy, {$minValue}) = COALESCE(:countDiscriminator, {$minValue}) AND typeId = :typeId AND COALESCE(subtypeId, {$minValue}) {$sortingOperator} COALESCE(:subtypeId, {$minValue}))
+                )";
+                $params['countDiscriminator'] = $cursor['count'];
             } else {
                 $whereDiscriminator  = "
                 WHERE (
@@ -279,6 +283,10 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
             'typeId' => $last['typeId'],
             'subtypeId' => $last['subtypeId'],
         ];
+
+        if ($this->getMonths()->contains($this->sortBy) | strcasecmp('total', $this->sortBy) == 0) {
+            $discriminator['count'] = $last[$this->sortBy];
+        }
 
         return $this->codec->encode($discriminator);
     }
