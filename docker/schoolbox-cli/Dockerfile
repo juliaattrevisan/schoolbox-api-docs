@@ -12,7 +12,7 @@ ARG NODE_VERSION=20
 # since keys are publicly accessible on that page, I'm not counting them as
 # private information.
 # Also, install tools required by cron tasks and CLI:
-# * git, mariadb client, ffmpeg, imagemagick, sudo, jq
+# * cron itself, git, mariadb client, ffmpeg, imagemagick, sudo, jq
 RUN \
   apt-get update && \
   apt-get install -y gnupg && \
@@ -23,6 +23,7 @@ RUN \
   apt-get update && \
   apt-get install -y \
     intelliscl \
+    cron \
     git \
     mariadb-client \
     ffmpeg \
