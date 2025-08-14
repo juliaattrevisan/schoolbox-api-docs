@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import type { StorageFile } from "@js/resource/resourceUtils";
+import { IMAGE_LIGHTBOX_CREATE } from "@js/image-lightbox/imageLightboxEvent";
+import type { ImageLightboxCreateEvent } from "@js/image-lightbox/imageLightboxEvent";
 import StorageObject from "@schoolboxVue/components/storage-object.vue";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { EvidenceStatus, evidenceStatusLabels } from "@schoolboxLearningMomentEvidence/evidenceTypes";
@@ -54,6 +57,29 @@ window.Vue.onMounted(() => {
         selectedEvidenceHash.value = props.entry.files[0].hash;
     }
 });
+
+/**
+ * Show a lightbox for a specific file if it has an image link
+ * @param file The file to show in the lightbox
+ */
+function spawnLightbox(file: StorageFile): void {
+    if (!file._links.image) {
+        return; // no link available, can't show lightbox
+    }
+
+    document.dispatchEvent(
+        new CustomEvent<ImageLightboxCreateEvent["detail"]>(IMAGE_LIGHTBOX_CREATE, {
+            detail: {
+                targetKey: `ig-feed-lightbox`,
+                options: {
+                    dynamic: true,
+                    dynamicEl: [{ src: file._links.image }],
+                },
+                onCreated: (gallery) => gallery.openGallery(),
+            },
+        }),
+    );
+}
 </script>
 
 <template>
@@ -101,7 +127,11 @@ window.Vue.onMounted(() => {
 
         <div class="l-flex__item--1 l-grid l-grid--12 l-gap-s l-mar-xs--top">
             <div class="small-12" :class="{ 'medium-8': selectableEvidence.length > 0 }">
-                <article v-if="selectedEvidence !== null && selectedEvidence.hash" style="width: fit-content">
+                <article
+                    v-if="selectedEvidence !== null && selectedEvidence.hash"
+                    style="width: fit-content"
+                    @click="spawnLightbox(selectedEvidence)"
+                >
                     <storage-object
                         :key="selectedEvidence.hash"
                         :storage="selectedEvidence"
