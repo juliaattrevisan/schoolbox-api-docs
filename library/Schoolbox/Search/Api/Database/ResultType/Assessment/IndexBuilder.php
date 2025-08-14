@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Assessment;
 
 use Alaress_Date_Format;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable\Identifier;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\Model;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
@@ -170,49 +171,21 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
-        $queryString = "
-            SELECT
-                assessment.id,
-                CONCAT(
-                    '" . Hydrator::BASE_TYPE . ".',
-                    COALESCE(
-                        IF(task.id, '" . AssessmentType::TYPE_TASK . "', NULL),
-                        IF(assess.assessment_id, '" . AssessmentType::TYPE_QUIZ . "', NULL),
-                        IF(lti_assessment.assessment_id, '" . AssessmentType::TYPE_LTI_ASSESSMENT . "', NULL),
-                        IF(submission_box.id, '" . AssessmentType::TYPE_DUE_WORK . "', NULL),
-                        IF(project.id, '" . AssessmentType::TYPE_PROJECT . "', NULL),
-                        IF(lesson_plan.id, '" . AssessmentType::TYPE_LESSON_PLAN . "', NULL)
-                    )
-                ) AS type
-            FROM mv_assessment_relation
-            JOIN assessment ON mv_assessment_relation.assessment_id = assessment.id
-            LEFT JOIN project ON (
-                assessment.id=project.assessment_id
-            )
-            LEFT JOIN lti_assessment ON (
-                assessment.id = lti_assessment.assessment_id
-            )
-            LEFT JOIN submission_box ON (
-                assessment.id = submission_box.assessment_id
-            )
-            LEFT JOIN task ON (
-                task.assessment_id = assessment.id
-            )
-            LEFT JOIN assess ON (
-                assess.assessment_id = assessment.id
-            )
-            LEFT JOIN lesson_plan ON (
-                lesson_plan.assessment_id = assessment.id
-            )
-            WHERE assessment.deleted_at IS NOT NULL
-        ";
+        $queryString = (
+            // Select all search_index rows linked to deleted assessments.
+            "SELECT search_index.identifier, search_index.type
+            FROM search_index
+            JOIN assessment ON search_index.identifier = assessment.id
+            WHERE search_index.type like 'assessment%'
+            AND assessment.deleted_at IS NOT NULL"
+        );
         $params = [];
         if ($fromDate) {
-            $queryString        .= ' AND assessment.deleted_at >= :fromDate';
+            $queryString .= ' AND assessment.deleted_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString      .= ' AND assessment.deleted_at <= :toDate';
+            $queryString .= ' AND assessment.deleted_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
