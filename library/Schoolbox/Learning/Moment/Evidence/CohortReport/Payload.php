@@ -156,7 +156,7 @@ class Payload
             $from = (new \Alaress_Date_Format($fromDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT))->startOfDay();
             $to = (new \Alaress_Date_Format($toDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT))->endOfDay();
 
-            /* Check for a maximum length of time of [now, -1 year at start of day]
+            /* Check for a maximum length of time of [-1 year from $to at start of day, $to]
              */
             $threshold = $to->addYears(-1)->startOfDay();
 
