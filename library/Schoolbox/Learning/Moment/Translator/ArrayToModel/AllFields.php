@@ -169,29 +169,34 @@ class AllFields extends Base
             }
         }
 
-        if (array_key_exists('storage', $json)) {
-            if (isset($json['storage'])) {
-                if (
-                    is_array($json['storage'])
-                    && array_key_exists('hash', $json['storage'])
-                ) {
-                    $evidence = new \Schoolbox\Learning\Moment\Evidence\Model();
+        if (array_key_exists('evidence', $json)) {
+            if (isset($json['evidence'])) {
+                if (is_array($json['evidence'])) {
+                    foreach ($json['evidence'] as $evidenceStruct) {
+                        /* No hash? No trabajo
+                         */
+                        if (!array_key_exists('hash', $evidenceStruct)) {
+                            continue;
+                        }
 
-                    if (array_key_exists('filename', $json)) {
-                        $evidence->setFilename($json['filename']);
+                        $evidence = new \Schoolbox\Learning\Moment\Evidence\Model();
+
+                        if (array_key_exists('filename', $evidenceStruct)) {
+                            $evidence->setFilename($evidenceStruct['filename']);
+                        }
+
+                        if (isset($evidenceStruct['hash'])) {
+                            $storage = (new StorageModel())->setHash($evidenceStruct['hash']);
+
+                            $evidence->setStorage($storage);
+                        }
+
+                        if (null === $model->getEvidence()) {
+                            $model->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class)));
+                        }
+
+                        $model->getEvidence()->add($evidence);
                     }
-
-                    if (isset($json['storage']['hash'])) {
-                        $storage = (new StorageModel())->setHash($json['storage']['hash']);
-
-                        $evidence->setStorage($storage);
-                    }
-
-                    if (null === $model->getEvidence()) {
-                        $model->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class)));
-                    }
-
-                    $model->getEvidence()->add($evidence);
                 }
             }
         }
