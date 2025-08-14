@@ -769,8 +769,8 @@ class Controller extends Base
         $moments = (new Payload($this->mapper, $this->userMapper, $this->externalClass, $this->userAccessMapper))->findByFilters(
             $folder,
             $this->requestQuery->get('userIds') ?? '',
-            $this->requestQuery->get('fromDate') ?? null,
-            $this->requestQuery->get('toDate') ?? null,
+            $this->requestQuery->get('from') ?? null,
+            $this->requestQuery->get('to') ?? null,
             $this->requestQuery->get('authorIds') ?? '',
             $this->requestQuery->get('tagIds') ?? '',
             $this->requestQuery->get('states') ?? '',
