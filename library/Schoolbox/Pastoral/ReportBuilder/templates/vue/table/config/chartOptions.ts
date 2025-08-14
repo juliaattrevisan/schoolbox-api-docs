@@ -15,7 +15,7 @@ export const trendOptions: Options = {
     },
     chart: {
         height: 50,
-        spacing: [5, 0, 5, 0],
+        spacing: [10, 0, 10, 0],
         width: 200,
     },
     colors: ["#000"],
