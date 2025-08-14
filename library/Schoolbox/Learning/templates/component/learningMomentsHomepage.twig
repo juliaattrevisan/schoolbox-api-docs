@@ -1,0 +1,38 @@
+{% if user.role.isStudent %}
+    <section>
+        {% set baseUrl = routeLookupIfAuthorized('learningMomentEvidence.getCreateForm', { userIds: user.id }) %}
+        {% if baseUrl != '' %}
+            <div class="share-work-buttons l-mar-m">
+                <a data-action="shareLearningMoment" data-test="learning-moment-evidence-share-takeAPhoto" data-take-photo-button href="{{ baseUrl }}?momentType=photo&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-camera share-photo" title="Take a photo">Take a photo</a>
+                <a data-action="shareLearningMoment" data-record-video-button href="{{ baseUrl }}?momentType=video&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-video share-video" title="Record a video">Record a video</a>
+                <a data-action="shareLearningMoment" data-record-audio-button href="{{ baseUrl }}?momentType=audio&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-audio share-audio" title="Record audio">Record audio</a>
+                <a data-action="shareLearningMoment" href="{{ baseUrl }}?momentType=upload&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-upload share-file" title="Upload file">Upload file</a>
+                <a data-action="shareLearningMoment" data-test="learning-moment-evidence-share-writeSomething" href="{{ baseUrl }}?momentType=text&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-textbox share-text" title="Write something">Write something</a>
+            </div>
+        {% endif %}
+        <div class="component-action">
+            <section>
+                <a class='button' href="{{ routeLookup('searchUser.getProfile', { userId: user.id }) }}#tab-activity" target="_self">View Activity Feed</a>
+            </section>
+        </div>
+        <!-- Check that the device supports recording audio/video, and if not hide the buttons that aren't supported -->
+        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/checkShareWorkButtons.js?v={{ config.site_version }}"></script>
+    </section>
+{% elseif user.role.isStaff and user.role.accessEvidence %}
+    <div class="empty-state">
+        <p>
+            Staff cannot create learning moments from this component. Instead navigate to a student's activity feed or the class list.
+        </p>
+    </div>
+    <div class="component-action">
+        <section>
+            <a class='button' href="{{ routeLookup('learningMomentEvidence.getCohortReport', { folderId: folder.id }) }}" target="_self">View Cohort Learning Moments</a>
+        </section>
+    </div>
+{% else %}
+    <div class="empty-state">
+        <p>
+            You do not have permission to create learning moments from this component.
+        </p>
+    </div>
+{% endif %}

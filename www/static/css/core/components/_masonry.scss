@@ -445,3 +445,8 @@ $masonry-drop-background: $input-focus-bg-color;
     @extend .icon-paperly;
     color: $icon-color-paperly;
 }
+
+.icon-masonry-Schoolbox_Learning_Component_Homepage_LearningMomentsController:before {
+    @extend .icon-share;
+    color: $icon-color-learning-moment;
+}
