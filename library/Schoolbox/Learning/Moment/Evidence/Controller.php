@@ -830,6 +830,11 @@ class Controller extends Base
                     'fullname' => $moment->getRecipient()->getFullname(),
                     'firstname' => $moment->getRecipient()->getFirstname(),
                     'lastname' => $moment->getRecipient()->getLastname(),
+                    /* TODO we usually add role for extra meta about students, especially in cohorty scenarios
+                     *  since there's a higher likelihood of encountering people with same- or same-sounding names.
+                     *  Role description helps distinguish them. But it wasn't in any of the designs. I'm expecting
+                     *  to need this further down the trail
+                     */
                     'role' => $moment->getRecipient()->getPreferredTitle()
                 ],
                 'creator' => [
