@@ -67,12 +67,12 @@ class Controller extends Assessment\Controller
         protected Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
-        protected Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder,
-        protected Filter\CompositeFactoryFactory $filtersFactoryFactory,
-        protected Filter\Mapper $filterMapper,
-        protected Filter\Selection\Mapper $filterSelectionMapper,
-        protected CourseImplementationMapper $courseImplementationMapper,
-        protected UnitImplementationMapper $unitImplementationMapper
+        protected ?Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder = null,
+        protected ?Filter\CompositeFactoryFactory $filtersFactoryFactory = null,
+        protected ?Filter\Mapper $filterMapper = null,
+        protected ?Filter\Selection\Mapper $filterSelectionMapper = null,
+        protected ?CourseImplementationMapper $courseImplementationMapper = null,
+        protected ?UnitImplementationMapper $unitImplementationMapper = null
     ) {
         parent::__construct(
             $userMapper,

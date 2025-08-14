@@ -46,6 +46,28 @@ use Twig\Error\Error;
 
 class Controller extends Assessment\Controller
 {
+    /**
+     * @param UserMapper $userMapper
+     * @param ErrorMapper $errorMapper
+     * @param AssessmentMapperProxy $assessmentMapper
+     * @param WorkTypeMapper $workTypeMapper
+     * @param Access $access
+     * @param Transactor $transactor
+     * @param BreadcrumbFactory $bakery
+     * @param Term\Mapper $termMapper
+     * @param Participant\DataSource $participantDataSource
+     * @param CourseSpecification\Mapper $courseSpecificationMapper
+     * @param UnitSpecification\Mapper $unitSpecificationMapper
+     * @param RosettaStone $rosettaStone
+     * @param Replicator $replicator
+     * @param LatestViewMapper $latestViewMapper
+     * @param Project\ResultCache\Mapper $projectResultCacheMapper
+     * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
+     * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
+     * @param CourseImplementation\Mapper $courseImplementationMapper
+     * @param UnitImplementation\Mapper $unitImplementationMapper
+     * @param LinkedAssessmentsMapper $linkedAssessmentsMapper
+     */
     public function __construct(
         UserMapper $userMapper,
         ErrorMapper $errorMapper,
