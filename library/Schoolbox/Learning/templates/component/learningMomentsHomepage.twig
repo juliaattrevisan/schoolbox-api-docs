@@ -1,8 +1,13 @@
 {% if user.role.isStudent %}
+    <style>
+        div.share-work-buttons {
+            margin: 1rem;
+        }
+    </style>
     <section>
         {% set baseUrl = routeLookupIfAuthorized('learningMomentEvidence.getCreateForm', { userIds: user.id }) %}
         {% if baseUrl != '' %}
-            <div class="share-work-buttons homepage-component">
+            <div class="share-work-buttons">
                 <a data-action="shareLearningMoment" data-test="learning-moment-evidence-share-takeAPhoto" data-take-photo-button href="{{ baseUrl }}?momentType=photo&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-camera share-photo" title="Take a photo">Take a photo</a>
                 <a data-action="shareLearningMoment" data-record-video-button href="{{ baseUrl }}?momentType=video&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-video share-video" title="Record a video">Record a video</a>
                 <a data-action="shareLearningMoment" data-record-audio-button href="{{ baseUrl }}?momentType=audio&amp;{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}" class="icon-audio share-audio" title="Record audio">Record audio</a>
