@@ -19,7 +19,6 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Learning\Moment\Evidence\CohortReport\Payload;
 use Schoolbox\Learning\Moment\Evidence\Moderation\ModerationRequired;
 use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Factory;
 use Schoolbox\Learning\Moment\NextRoutes;
