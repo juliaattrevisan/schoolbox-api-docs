@@ -194,6 +194,12 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
                 'type' => 'RecordsAndPoints',
                 'isSortable' => true,
             ],
+            [
+                'key' => 'trend',
+                'title' => 'Trend',
+                'type' => 'Trend',
+                'isSortable' => false,
+            ],
         ];
         foreach ($this->getWeeks() as $week) {
             $tableHeaders[] = [
@@ -203,12 +209,6 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
                 'isSortable' => true,
             ];
         }
-        $tableHeaders[] = [
-            'key' => 'trend',
-            'title' => 'Trend',
-            'type' => 'Trend',
-            'isSortable' => false,
-        ];
         return $tableHeaders;
     }
 
