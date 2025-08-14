@@ -904,6 +904,10 @@ class Controller extends Base
                 /* Any associated tags which you can find in a db lookup table
                  */
                 'tags' => $this->getTagsForMoment($moment),
+                /* Add any associated curriculum nodes
+                 * TODO will be added in a future ticket that has yet to be written.
+                 */
+                'curriculumNodes' => [],
                 /* A shortcut to urls for changing states in this learning moment
                  * Note that a controller method must fulfil this node after the fact, for aura reasons
                  * (not easy to dedupe that implementation, sadly)
