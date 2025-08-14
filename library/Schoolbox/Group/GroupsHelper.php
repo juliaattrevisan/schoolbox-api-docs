@@ -260,7 +260,7 @@ class GroupsHelper
                 /**
                  * $modifyLink = $this->router->generate(
                  * 'folder.getFolderModify',
-                 * ['id' => $folder->getId(), 'folder' => $folder]$routeGenerator
+                 * ['id' => $folder->getId(), 'folder' => $folder]
                  * );
                  */
                 $modifyLink = sprintf('/resource/folder/%d/modify', $folder->getId());
