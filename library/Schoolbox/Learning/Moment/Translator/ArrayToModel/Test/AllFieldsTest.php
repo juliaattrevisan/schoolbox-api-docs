@@ -63,10 +63,12 @@ class AllFieldsTest extends TestCase
 
         yield 'storage' => [
             [
-                'storage'  => [
-                    'hash' => '1234567890123456789012345678901234567890',
+                'evidence'  => [
+                    [
+                        'hash' => '1234567890123456789012345678901234567890',
+                        'filename' => 'test.gif',
+                    ]
                 ],
-                'filename' => 'test.gif',
             ],
             (new Model())
                 ->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class))->add(
@@ -101,7 +103,9 @@ class AllFieldsTest extends TestCase
 
         yield 'file upload' => [
             [
-                'file' => 'file:1234567890123456789012345678901234567890:test.gif',
+                'evidence' => [
+                    'file' => 'file:1234567890123456789012345678901234567890:test.gif',
+                ],
             ],
             (new Model())
                 ->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class))->add(
