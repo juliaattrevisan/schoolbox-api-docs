@@ -127,17 +127,17 @@ class IndexBuilder extends BaseBuilder
             SELECT si.identifier, si.type
             FROM search_index si
             JOIN link l ON si.identifier = l.id
-            JOIN folder f ON l.category = f.id
+            JOIN folder fo ON l.category = fo.id
             WHERE si.type = "link"
-            AND COALESCE(l.deleted_at, f.deleted_at) IS NOT NULL
+            AND COALESCE(l.deleted_at, fo.deleted_at) IS NOT NULL
         ';
         $params = [];
         if ($fromDate) {
-            $queryString .= ' AND COALESCE(l.deleted_at, f.deleted_at) >= :fromDate';
+            $queryString .= ' AND COALESCE(l.deleted_at, fo.deleted_at) >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString .= ' AND COALESCE(l.deleted_at, f.deleted_at) <= :toDate';
+            $queryString .= ' AND COALESCE(l.deleted_at, fo.deleted_at) <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
