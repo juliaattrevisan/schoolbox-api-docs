@@ -123,6 +123,13 @@ class Payload
                     $wherePieces[] = "
                         AND user_id IN {$placeholders}
                     ";
+                } else {
+                    $placeholders = Builder::getArrayPlaceholders($cohortIds, 'cohortIds');
+                    $params = array_merge($params, Builder::getArrayParameters($cohortIds, 'cohortIds'));
+
+                    $wherePieces[] = "
+                        AND user_id IN {$placeholders}
+                    ";
                 }
             }
         }
