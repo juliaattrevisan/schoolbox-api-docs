@@ -72,7 +72,7 @@ async function onDelete(): Promise<void> {
                 <div class="card small-12 compact">
                     <div class="l-flex-row l-flex--align-center">
                         <user-photo :user="entry.creator" class="l-mar-s--right" size="xsmall" />
-                        <p>{{ entry.creator.fullname }}</p>
+                        <p>{{ entry.creator.fullName }}</p>
                     </div>
                 </div>
                 <div class="clearfix"></div>

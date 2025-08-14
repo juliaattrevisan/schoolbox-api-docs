@@ -30,13 +30,13 @@ const dropdownId = window.Vue.computed(() => {
 const relevantUsers = window.Vue.computed(() => {
     // when creator/recipient are the same, only show one user
     if (props.entry.creator.id === props.entry.recipient.id) {
-        return [{ ...props.entry.creator, label: props.entry.creator.fullname }];
+        return [{ ...props.entry.creator, label: props.entry.creator.fullName }];
     }
 
     // otherwise show both with meaningful labels
     return [
-        { ...props.entry.recipient, label: `Received by ${props.entry.recipient.fullname}` },
-        { ...props.entry.creator, label: `Created by ${props.entry.creator.fullname}` },
+        { ...props.entry.recipient, label: `Received by ${props.entry.recipient.fullName}` },
+        { ...props.entry.creator, label: `Created by ${props.entry.creator.fullName}` },
     ];
 });
 
