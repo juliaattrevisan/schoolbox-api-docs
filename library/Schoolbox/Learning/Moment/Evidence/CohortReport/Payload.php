@@ -314,45 +314,6 @@ class Payload
      */
     private function findCohortIds(Folder\Model $folder): array
     {
-        $groupIds = [];
-        $classIds = [];
-
-        /* Get a list of student ids that are in $folder and use a hash lookup
-         * to cross-reference everything we find later
-         */
-        if ($folder->isGroup()) {
-            $userAccessList = $this->userAccessMapper->findForFolder($folder)
-                ->indexByCallback(static function (UserAccess $userAccess) {
-                    return $userAccess->getUser()->getId();
-                });
-
-            if ($userAccessList->count()) {
-                $groupIds = $this->userMapper->findByColumn('id', $userAccessList->keys())
-                    ->filter(function (\Schoolbox\User $user) {
-                        return ($user->getRole()->isStudent());
-                    })
-                    ->indexBy('id')
-                    ->keys();
-            }
-        }
-
-        /* Students of a class-coded folder
-         */
-        if ('' !== $folder->getCodeString()) {
-            $students = array_column($this->externalClass->getStudents($folder->getCodeString()), 'synergy_id');
-
-            /* These are the user instances associated with $folder's class list of students
-             * We'll use this to intersect with learning moments $recipients
-             */
-            if (\count($students)) {
-                $classIds = $this->userMapper->findByExternalIds($students, \Schoolbox\Role::STUDENT)
-                    ->indexBy('id')
-                    ->keys();
-            }
-        }
-
-        /* Combine stacks
-         */
-        return array_values(array_unique(array_merge($groupIds, $classIds)));
+        return $this->userAccessMapper->findUsersInCategory($folder, \Schoolbox\Role::STUDENT)->indexBy('id')->keys();
     }
 }
