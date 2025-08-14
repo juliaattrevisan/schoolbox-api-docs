@@ -13,6 +13,7 @@ declare AWS_REGION
 declare AWS_START_URL
 
 declare private_container_registry
+declare docker_compose_args
 
 # Log to stderr
 function log() {
@@ -137,6 +138,12 @@ function build_docker_compose_env() {
     ${aws_credentials}" > .docker-compose.env
 }
 
+function build_docker_compose_args() {
+    # Currently, this is simply the list of parameters from the CLI:
+    # future versions may be more sophisticated in what they allow.
+    docker_compose_args="$*"
+}
+
 function start_containers() {
     # Which task daemon compose file is used?
     # A different one is used when using a locally built container, vs. using
@@ -173,7 +180,7 @@ function start_containers() {
         -f "${frankenphp_compose_file}" \
         -f "${taskd_compose_file}" \
         --env-file .docker-compose.env \
-        up -d
+        up -d $docker_compose_args
 }
 
 function main() {
@@ -182,8 +189,9 @@ function main() {
     load_config
     login_to_aws
     login_to_container_registry
+    build_docker_compose_args "$@"
     build_docker_compose_env
-    start_containers
+    start_containers "$@"
 }
 
 main "$@"

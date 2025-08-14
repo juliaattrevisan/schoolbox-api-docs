@@ -60,6 +60,7 @@ The name of these scripts is intended to mirror the Vagrant commands for setting
 up the Vagrant development environment.
 
 - `up`: builds and starts containers for development environment
+  - this script accepts the same parameters as `docker compose build`
 - `down`: stops containers
 - `provision`: sets up the Schoolbox instance in the started containers
   (`up` must be run first)
