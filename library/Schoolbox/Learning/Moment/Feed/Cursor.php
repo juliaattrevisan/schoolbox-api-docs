@@ -43,6 +43,13 @@ class Cursor implements ICursor
      */
     public const DISCRIMINATOR_EVIDENCE = 'moment';
 
+
+    /**
+     * This was the old discriminator that some people might have used via our api
+     */
+    public const DISCRIMINATOR_EVIDENCE_OLD = 'evidence';
+
+
     /**
      * Discriminator value for identifying that a retrieved result points to a
      * badge award.
@@ -241,6 +248,15 @@ class Cursor implements ICursor
             // the cursor contains 'date', 'id', 'discriminator' fields
             $cursor = $this->codec->decode($encodedCursor);
             if (isset($cursor['date']) && isset($cursor['id']) && isset($cursor['discriminator'])) {
+                $cursorDiscriminator = $cursor['discriminator'];
+
+                /* Forcibly map old "evidence" discriminator to new "moment" discriminator for backwards compatibility
+                 * FIXME remove in 25.2 or whatever comes next
+                 */
+                if (self::DISCRIMINATOR_EVIDENCE_OLD === $cursor['discriminator']) {
+                    $cursorDiscriminator = self::DISCRIMINATOR_EVIDENCE;
+                }
+
                 // The usual cursor where part:
                 // fetch items from before the last item's date, as well as ones
                 // which match the last item's date and whose other fields are less
@@ -254,8 +270,8 @@ class Cursor implements ICursor
                 $params['date1']          = $cursor['date'];
                 $params['date2']          = $cursor['date'];
                 $params['date3']          = $cursor['date'];
-                $params['discriminator2'] = $cursor['discriminator'];
-                $params['discriminator3'] = $cursor['discriminator'];
+                $params['discriminator2'] = $cursorDiscriminator;
+                $params['discriminator3'] = $cursorDiscriminator;
                 $params['id3']            = $cursor['id'];
             }
         }
