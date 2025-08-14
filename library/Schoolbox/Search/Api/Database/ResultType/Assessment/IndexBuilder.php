@@ -170,14 +170,14 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
-        $queryString = (
-            // Select all search_index rows linked to deleted assessments.
-            "SELECT search_index.identifier AS id, search_index.type
+        // Select all search_index rows linked to deleted assessments.
+        $queryString = '
+            SELECT search_index.identifier AS id, search_index.type
             FROM search_index
             JOIN assessment ON search_index.identifier = assessment.id
-            WHERE search_index.type like 'assessment%'
-            AND assessment.deleted_at IS NOT NULL"
-        );
+            WHERE search_index.type like "assessment%"
+            AND assessment.deleted_at IS NOT NULL
+        ';
         $params = [];
         if ($fromDate) {
             $queryString .= ' AND assessment.deleted_at >= :fromDate';
