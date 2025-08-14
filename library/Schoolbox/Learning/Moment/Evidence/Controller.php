@@ -820,30 +820,19 @@ class Controller extends Base
             /* This is a stack because empty payloads result in a datatype difference in frontend world:
              * empty payloads emerge as [], but non-empty payloads emerge as {}
              */
+            $userTranslator = new \Schoolbox\User\Translator\ModelToArray();
+
             $payload[] = [
                 'id' => $moment->getId(),
                 'body' => $moment->getBody(),
                 'files' => $files,
-                'recipient' => [
-                    'id' => $moment->getRecipient()->getId(),
-                    'externalId' => $moment->getRecipient()->getExternalId(),
-                    'fullname' => $moment->getRecipient()->getFullname(),
-                    'firstname' => $moment->getRecipient()->getFirstname(),
-                    'lastname' => $moment->getRecipient()->getLastname(),
-                    /* TODO we usually add role for extra meta about students, especially in cohorty scenarios
-                     *  since there's a higher likelihood of encountering people with same- or same-sounding names.
-                     *  Role description helps distinguish them. But it wasn't in any of the designs. I'm expecting
-                     *  to need this further down the trail
-                     */
-                    'role' => $moment->getRecipient()->getPreferredTitle()
-                ],
-                'creator' => [
-                    'id' => $moment->getCreator()->getId(),
-                    'externalId' => $moment->getCreator()->getExternalId(),
-                    'fullname' => $moment->getCreator()->getFullname(),
-                    'firstname' => $moment->getCreator()->getFirstname(),
-                    'lastname' => $moment->getCreator()->getLastname(),
-                ],
+                /* TODO we usually add role for extra meta about students and staffs, especially in cohorty scenarios
+                 *  since there's a higher likelihood of encountering people with same- or same-sounding names.
+                 *  Role description helps distinguish them. But it wasn't in any of the designs. I'm expecting
+                 *  to need this further down the trail
+                 */
+                'recipient' => $userTranslator->convertLinkedUser($moment->getRecipient()),
+                'creator' => $userTranslator->convertLinkedUser($moment->getCreator()),
                 /* This is always set
                  */
                 'createdAt' => [
