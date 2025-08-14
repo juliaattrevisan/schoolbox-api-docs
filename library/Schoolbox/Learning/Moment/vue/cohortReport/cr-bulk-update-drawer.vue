@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { fromEntriesOf, keysOf } from "@js/util/arrayUtils";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
+import { evidenceStatusLabels } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 import { useCohortReportStore } from "./store/cohortReportStore";
 import { CohortReportModalType, useCohortReportModalStore } from "./store/cohortReportModalStore";
 import type { CohortReportEntry } from "./store/cohortReportPayload";
@@ -34,8 +35,30 @@ const selectedResultActions = window.Vue.computed(() => {
     return actionEntries;
 });
 
+const selectedResultStatuses = window.Vue.computed(() => {
+    const statuses = keysOf(crStore.selectedResults).reduce((acc, key) => {
+        const entry = crStore.results.find((e) => String(e.id) === String(key));
+        if (!entry || !crStore.selectedResults[key]) {
+            return acc; // entry not found/selected, skip
+        }
+
+        const amt = acc.get(entry.currentState) || 0;
+        acc.set(entry.currentState, amt + 1);
+
+        return acc;
+    }, new Map<CohortReportEntry["currentState"], number>());
+
+    const labelKeys = keysOf(evidenceStatusLabels);
+
+    return Array.from(statuses.entries())
+        .sort((a, b) => labelKeys.indexOf(a[0]) - labelKeys.indexOf(b[0]))
+        .map(([state, count]) => `${count} ${evidenceStatusLabels[state]}`)
+        .join(", ")
+        .toLowerCase();
+});
+
 const totalSelectedResults = window.Vue.computed(() => {
-    return Object.values(crStore.selectedResults).filter((selected) => selected).length;
+    return Object.values(crStore.selectedResults).filter((selected) => !!selected).length;
 });
 
 /**
@@ -79,9 +102,10 @@ async function onAction(type: keyof typeof selectedResultActions.value): Promise
 
 <template>
     <bottom-drawer :show-drawer="totalSelectedResults > 0">
-        <h3 class="selected-count">
+        <h3 class="selected-count l-mar-s--right">
             <em>{{ totalSelectedResults }} records selected</em>
         </h3>
+        <div class="meta l-mar-s--right">({{ selectedResultStatuses }})</div>
         <button class="button-clear" @click.prevent="clearSelection">Clear selection</button>
 
         <div class="l-flex-row l-flex--justify l-gap-xs">
@@ -112,13 +136,10 @@ async function onAction(type: keyof typeof selectedResultActions.value): Promise
     </bottom-drawer>
 </template>
 
-<style scoped>
-.selected-count {
-    margin-right: 1rem;
-}
-
+<style scoped lang="scss">
 .button-clear,
-.selected-count {
+.selected-count,
+.meta {
     display: inline-block;
 }
 
