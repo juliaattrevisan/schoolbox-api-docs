@@ -59,6 +59,9 @@
                     toolbar: "comment_ai",
                 {% endif %}
                 mirrorChangeEvents: true, // To keep jquery.dynamic-feedback.js in sync
+                {% if editorTemplates is defined %}
+                    templates: {{ editorTemplates|json_encode|raw }},
+                {% endif %}
             },
         }),
     );
