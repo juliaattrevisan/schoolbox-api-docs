@@ -350,17 +350,23 @@ class Controller extends Base
      */
     public function getModifyForm(Model $evidence): void
     {
+        /* TODO massive assumption atm
+         *  This was predicated on moments having exactly one file associated with it,
+         *  but now there can be many files associated with it. Display the first
+         *  evidence by default until a user changes it, I guess?
+         */
+
         // Which variant is being shown?
         // * text
         // * upload
-        $momentType = $evidence->getType();
+        $momentType = $evidence->getEvidence()->first()->getType();
         $template   = $this->getTemplateFromType($momentType);
 
         /* Attachzone stuff for existing attachments
          */
         $zone = $this->buildAttachzone($momentType);
-        if ($evidence->getStorage()) {
-            $zone->attachFiles([$evidence->getStorage()->getHash()]);
+        if ($evidence->getEvidence()->first()->getStorage()) {
+            $zone->attachFiles([$evidence->getEvidence()->first()->getStorage()->getHash()]);
         }
 
         /* Students get their learning moment moderation requirement tested;

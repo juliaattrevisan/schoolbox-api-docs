@@ -9,13 +9,13 @@
                         {% block formInputFileLabel %}
 						{% endblock formInputFileLabel %}
                     </label>
-                    <input type="hidden" name="filename" id="evidence-filename" value="{{ isCreate ? '' : evidence.filename }}" />
-                    <input type="hidden" name="file" id="file" value="{{ isCreate ? '' : 'store:' ~ evidence.storage.hash ~ ':' ~ evidence.filename }}" />
+                    <input type="hidden" name="filename" id="evidence-filename" value="{{ isCreate ? '' : evidence.evidence.first.filename }}" />
+                    <input type="hidden" name="file" id="file" value="{{ isCreate ? '' : 'store:' ~ evidence.evidence.first.storage.hash ~ ':' ~ evidence.evidence.first.filename }}" />
                     <div id="evidence-media-recording">
                         <evidence-media-recording
                             moment-type="{{ momentType }}"
                             {% if isCreate == false %}
-                            :pre-recorded-data="{{ evidence.storage|json_encode }}"
+                            :pre-recorded-data="{{ evidence.evidence.first.storage|json_encode }}"
                             {% endif %}
                             filename-id="evidence-filename"
                             storage-id="file"
