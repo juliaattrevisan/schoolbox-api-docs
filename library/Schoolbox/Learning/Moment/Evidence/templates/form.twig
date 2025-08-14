@@ -106,9 +106,9 @@
         {% endif %}
     {% elseif moderationRequired and (evidence.isSubmitted or evidence.isPublished) %}
         {# noop:
-                             # nothing for the student to do except w8 for staff to move it to the next state because:
-                             #     - it's submitted and has entered the moderation workflow; or
-                             #     - it's already published and you shouldn't be able to publish again
+         # nothing for the student to do except w8 for staff to move it to the next state because:
+         #     - it's submitted and has entered the moderation workflow; or
+         #     - it's already published and you shouldn't be able to publish again
         #}
     {% else %}
         {% if isCreate %}
