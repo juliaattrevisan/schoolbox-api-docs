@@ -318,7 +318,7 @@ class DailyData implements IStrategy
         $truncatedRoom = mb_substr($room, 0, self::MAXLENGTH_ROOM_LOCATION);
         /* Throw a warning if the truncated version is different from the one we started
          * with; that's an indication that we just lost data, the school will need to shorten it
-         * but it appears that sometimes schools will have many venus for the event, hence
+         * but it appears that sometimes schools will have many venues for the event, hence
          * unavoidable truncation (can't do schema change in point releases, but possibly expanding
          * it in the future if required?)
          */
