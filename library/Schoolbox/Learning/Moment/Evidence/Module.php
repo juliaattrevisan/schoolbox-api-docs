@@ -347,8 +347,6 @@ class Module extends BaseModule
                 EditorTemplatesCategoryModel::LEARNING_MOMENTS,
                 $this->injector->get('user')
             ),
-            $this->getMapperFactory()->get(\Schoolbox\UserMapper::class),
-            new \External_Class(),
             $this->getMapperFactory()->get(\Schoolbox\Permission\Access\UserAccessMapper::class),
         );
     }

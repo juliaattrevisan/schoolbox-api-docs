@@ -46,16 +46,12 @@ class Controller extends Base
      * @param \Schoolbox\Learning\Moment\Evidence\Mapper $mapper
      * @param Comment\Mapper $commentMapper
      * @param EditorTemplateHelper    $editorTemplateHelper
-     * @param \Schoolbox\UserMapper $userMapper
-     * @param \External_Class $externalClass
      * @param \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper
      */
     public function __construct(
         private \Schoolbox\Learning\Moment\Evidence\Mapper $mapper,
         private Comment\Mapper $commentMapper,
         private EditorTemplateHelper $editorTemplateHelper,
-        private \Schoolbox\UserMapper $userMapper,
-        private \External_Class $externalClass,
         private \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper,
     ) {
     }
@@ -766,7 +762,7 @@ class Controller extends Base
      */
     public function getCohortReportPayload(Folder\Model $folder): void
     {
-        $moments = (new Payload($this->mapper, $this->userMapper, $this->externalClass, $this->userAccessMapper))->findByFilters(
+        $moments = (new Payload($this->mapper, $this->userAccessMapper))->findByFilters(
             $folder,
             $this->requestQuery->get('userIds') ?? '',
             $this->requestQuery->get('from') ?? null,

@@ -24,14 +24,10 @@ class Payload
      * Constructor
      *
      * @param Evidence\Mapper $mapper
-     * @param UserMapper $userMapper
-     * @param \External_Class $externalClass
      * @param UserAccessMapper $userAccessMapper
      */
     public function __construct(
         private Evidence\Mapper $mapper,
-        private UserMapper $userMapper,
-        private \External_Class $externalClass,
         private UserAccessMapper $userAccessMapper,
     ) {
     }
