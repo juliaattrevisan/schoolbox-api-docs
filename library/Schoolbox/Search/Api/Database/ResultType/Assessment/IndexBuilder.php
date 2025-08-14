@@ -197,10 +197,6 @@ class IndexBuilder extends BaseBuilder
         $query->execute($params);
         $this->logger->info(sprintf('Deleting search indices for %d assessments', $query->rowCount()));
         foreach ($query as $row) {
-            // Somehow this row has no type?
-            if (!isset($row['type'])) {
-                continue;
-            }
             yield $this->buildIndex(
                 (string)$row['id'],
                 null,
