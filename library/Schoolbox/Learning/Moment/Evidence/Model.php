@@ -49,6 +49,17 @@ class Model implements ISoftDeletable, IThreadLocation
 
 
     /**
+     * A shortlist of available status consts that a model can exist in.
+     */
+    public const VALID_STATUSES = [
+        self::STATUS_DRAFT,
+        self::STATUS_SUBMITTED,
+        self::STATUS_PUBLISHED,
+        self::STATUS_REJECTED,
+    ];
+
+
+    /**
      * The file content (if any) that was uploaded to the learning moment.
      *
      * @var IStorage|null

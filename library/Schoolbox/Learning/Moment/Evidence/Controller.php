@@ -17,13 +17,14 @@ use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Comment;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Learning\Moment\Evidence\CohortReport\Payload;
 use Schoolbox\Learning\Moment\Evidence\Moderation\ModerationRequired;
 use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Factory;
 use Schoolbox\Learning\Moment\NextRoutes;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\NotFound;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Exception;
@@ -40,27 +41,17 @@ use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 class Controller extends Base
 {
     /**
-     * Cohort Report for learning moments looks seven days in the past by default
-     */
-    private const COHORT_REPORT_PAST_THRESHOLD = -7;
-
-
-    /**
      * Constructor
      *
-     * @param Mapper $mapper
+     * @param \Schoolbox\Learning\Moment\Evidence\Mapper $mapper
      * @param Comment\Mapper $commentMapper
      * @param EditorTemplateHelper    $editorTemplateHelper
-     * @param \Schoolbox\UserMapper $userMapper
-     * @param \External_Class $externalClass
      * @param \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper
      */
     public function __construct(
-        private Mapper $mapper,
+        private \Schoolbox\Learning\Moment\Evidence\Mapper $mapper,
         private Comment\Mapper $commentMapper,
         private EditorTemplateHelper $editorTemplateHelper,
-        private \Schoolbox\UserMapper $userMapper,
-        private \External_Class $externalClass,
         private \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper,
     ) {
     }
@@ -747,223 +738,193 @@ class Controller extends Base
      *   - start of the day 7 days ago
      *   - end of today
      *
-     * @param Folder\Model $folder
-     * @return void
-     */
-    public function getCohortReportPayloadDefault(Folder\Model $folder): void
-    {
-        $this->getCohortReportPayload(
-            $folder,
-            \Alaress_Date_Format::now()->addDays(self::COHORT_REPORT_PAST_THRESHOLD)->startOfDay(),
-            \Alaress_Date_Format::now()->endOfDay()
-        );
-    }
-
-
-    /**
-     * Generates a json payload that tells you about learning moments for any of $folder's students
-     * that were created between the $from and $to dates, grouped by date, sorted reverse-chronologically.
+     * Also applies any additional filters (expressed as GET params)
      *
-     * @param Folder\Model $folder
-     * @param string $fromDate
-     * @param string $toDate
-     * @return void
-     */
-    public function getCohortReportPayloadRange(Folder\Model $folder, string $fromDate, string $toDate): void
-    {
-        $this->getCohortReportPayload(
-            $folder,
-            (new \Alaress_Date_Format($fromDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT))->startOfDay(),
-            (new \Alaress_Date_Format($toDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT))->endOfDay()
-        );
-    }
-
-
-    /**
-     * Generates a json payload that tells you about learning moments for any of $folder's students
-     * that were created between the $from and $to dates, grouped by date, sorted reverse-chronologically.
+     * ex.
+     * https://vagrant.dev.schoolbox.cloud/learning/evidence/cohort/80/payload?userIds=1,2,3,4&authorIds=13,14,15,16&tagIds=7,8,9&states=draft,submitted,published&from=2025-01-02&to=2025-08-11
      *
-     * By default, it'll assume $from and $to to be a 7-day range:
-     *   - start of the day 7 days ago
-     *   - end of today
+     * GET the following struct to this endpoint:
+     * [
+     *     userIds: 1,2,3,4
+     *     authorIds: 13,14,15,16
+     *     tagIds: 7,8,9
+     *     states:draft,submitted,published,
+     *     from: 2025-01-02
+     *     to: 2025-08-11
+     * ]
      *
+     * @api GET /learning/evidence/cohort/{folderId}
      * @param Folder\Model $folder
-     * @param \Alaress_Date_Format $from
-     * @param \Alaress_Date_Format $to
      * @return void
      * @throws MapperException
      * @throws NotFound
      * @throws RouteNotFound
      */
-    public function getCohortReportPayload(Folder\Model $folder, \Alaress_Date_Format $from, \Alaress_Date_Format $to): void
+    public function getCohortReportPayload(Folder\Model $folder): void
     {
-        $groupIds = [];
-        $classIds = [];
+        $moments = (new Payload($this->mapper, $this->userAccessMapper))->findByFilters(
+            $folder,
+            $this->requestQuery->get('userIds') ?? '',
+            $this->requestQuery->get('from') ?? null,
+            $this->requestQuery->get('to') ?? null,
+            $this->requestQuery->get('authorIds') ?? '',
+            $this->requestQuery->get('tagIds') ?? '',
+            $this->requestQuery->get('states') ?? '',
+        );
 
-        /* Check for a maximum length of time of [now, -1 year at start of day]
+        /* Augment with hasComments() evaluation and _links derivations
+         * Sadly these are deeply coupled to Controllers
          */
-        $threshold = \Alaress_Date_Format::now()->addYears(-1)->startOfDay();
-
-        if ($from->lt($threshold)) {
-            $from = $threshold;
-        }
-
-        /* Get a list of student ids that are in $folder and use a hash lookup
-         * to cross reference everything we find later
-         */
-        if ($folder->isGroup()) {
-            $userAccessList = $this->userAccessMapper->findForFolder($folder)
-                ->indexByCallback(static function (UserAccess $userAccess) {
-                    return $userAccess->getUser()->getId();
-                });
-
-            if ($userAccessList->count()) {
-                $groupIds = $this->userMapper->findByColumn('id', $userAccessList->keys())
-                    ->filter(function (\Schoolbox\User $user) {
-                        return ($user->getRole()->isStudent());
-                    })
-                    ->indexBy('id')
-                    ->keys();
-            }
-        }
-
-        /* Students of a class-coded folder
-         */
-        if ('' !== $folder->getCodeString()) {
-            $students = array_column($this->externalClass->getStudents($folder->getCodeString()), 'synergy_id');
-
-            /* These are the user instances associated with $folder's class list of students
-             * We'll use this to interset with learning moments $recipients
-             */
-            if (\count($students)) {
-                $classIds = $this->userMapper->findByExternalIds($students, \Schoolbox\Role::STUDENT)
-                    ->indexBy('id')
-                    ->keys();
-            }
-        }
-
-        /* Combine stacks
-         */
-        $ids = array_values(array_unique(array_merge($groupIds, $classIds)));
-
-        /* Find all the learning moments in the specified date range
-         */
-        $payload = [];
-
-        if (\count($ids)) {
-            /* Only care about moments whose recipients are in the set of users associated
-             * with $folder: otherwise ignore the learning moment
-             */
-            $pb = $this->mapper->getPredicateBuilder()
-                ->between('updated_at', $from, $to)
-                ->in('user_id', $ids);
-
-            $moments = $this->mapper->findByPredicates($pb)->sortBy('updatedAt', 'DESC');
-
-            foreach ($moments as $moment) {
-                /* Accumulate a list of associated files for this learning moment
-                 * At the moment there's gonna be just one but SA-20433 causes this to be multiple
-                 */
-                $files = [];
-
-                if (null !== $moment->getStorage()) {
-                    $files = [
-                        [
-                            'hash' => $moment->getStorage()->getHash(),
-                            'filename' => $moment->getStorage()->getFilename(),
-                            'mime' => $moment->getStorage()->getMime(),
-                            'icon' => $moment->getStorage()->getMimetype()->getIconFile(),
-                        ],
-                    ];
-                }
-
-                /* This is a stack because empty payloads result in a datatype difference in frontend world:
-                 * empty payloads emerge as [], but non-empty payloads emerge as {}
-                 */
-                $payload[] = [
-                    'id' => $moment->getId(),
-                    'body' => $moment->getBody(),
-                    'files' => $files,
-                    'recipient' => [
-                        'id' => $moment->getRecipient()->getId(),
-                        'externalId' => $moment->getRecipient()->getExternalId(),
-                        'fullname' => $moment->getRecipient()->getFullname(),
-                        'firstname' => $moment->getRecipient()->getFirstname(),
-                        'lastname' => $moment->getRecipient()->getLastname(),
-                        'role' => $moment->getRecipient()->getPreferredTitle()
-                    ],
-                    'creator' => [
-                        'id' => $moment->getCreator()->getId(),
-                        'externalId' => $moment->getCreator()->getExternalId(),
-                        'fullname' => $moment->getCreator()->getFullname(),
-                        'firstname' => $moment->getCreator()->getFirstname(),
-                        'lastname' => $moment->getCreator()->getLastname(),
-                    ],
-                    /* This is always set
-                     */
-                    'createdAt' => [
-                        'timestamp' => $moment->getCreatedAt()->getUnixTimestamp(),
-                        'displayAs' => $moment->getCreatedAt()->getLocalShort()
-                    ],
-                    /* We don't store updatedBy, for whatever reason: I suppose it was presumed
-                     * to always be the same as its author...
-                     *
-                     * Anyway, this is the localised version of config's date_short which you can use
-                     * to group moments per day.
-                     */
-                    'updatedAt' => [
-                        'timestamp' => $moment->getUpdatedAt()->getUnixTimestamp(),
-                        'displayAs' => $moment->getUpdatedAt()->getLocalShort()
-                    ],
-                    /* Whether this moment had comments or not, which affects a user interaction
-                     * where they have an opportunity to delete comments upon approval
-                     */
-                    'hasComments' => $this->hasComments($moment),
-                    // TODO State-specific metadata is currently not needed, but maybe needed later
-                    //
-                    //                    /* Metadata about the current state of a learning moment and any other details
-                    //                     * regarding the current state, such as who actioned a state change etc.
-                    //                     */
-                    //                    'states' => [
-                    //                        'current' => $moment->getCurrentState(),
-                    //                        /* You'll be in one of three alternative states here: submitted/published/rejected
-                    //                         */
-                    //                        'submittedAt' => $moment->getSubmittedAt()?->getDatabase(),
-                    //                        'submittedBy' => $moment->getSubmittedBy() ? [
-                    //                            'id' => $moment->getSubmittedBy()->getId(),
-                    //                            'externalId' => $moment->getSubmittedBy()->getExternalId(),
-                    //                            'fullname' => $moment->getSubmittedBy()->getFullname(),
-                    //                            'firstname' => $moment->getSubmittedBy()->getFirstname(),
-                    //                            'lastname' => $moment->getSubmittedBy()->getLastname(),
-                    //                        ] : null,
-                    //                        'publishAt' => $moment->getPublishedAt()?->getDatabase(),
-                    //                        'publishedBy' => $moment->getPublishedBy() ? [
-                    //                            'id' => $moment->getPublishedBy()->getId(),
-                    //                            'externalId' => $moment->getPublishedBy()->getExternalId(),
-                    //                            'fullname' => $moment->getPublishedBy()->getFullname(),
-                    //                            'firstname' => $moment->getPublishedBy()->getFirstname(),
-                    //                            'lastname' => $moment->getPublishedBy()->getLastname(),
-                    //                        ] : null,
-                    //                        'rejectedAt' => $moment->getRejectedAt()?->getDatabase(),
-                    //                        'rejectedBy' => $moment->getRejectedBy() ? [
-                    //                            'id' => $moment->getRejectedBy()->getId(),
-                    //                            'externalId' => $moment->getRejectedBy()->getExternalId(),
-                    //                            'fullname' => $moment->getRejectedBy()->getFullname(),
-                    //                            'firstname' => $moment->getRejectedBy()->getFirstname(),
-                    //                            'lastname' => $moment->getRejectedBy()->getLastname(),
-                    //                        ] : null
-                    //                    ],
-                    /* A shortcut to urls for changing states in this learning moment
-                     */
-                    '_links' => $this->getNextRoutes($moment),
-                ];
-            }
-        }
+        $payload = $this->convert($moments);
 
         $this->response = $this->responseAsJson([
             'status'  => 200,
             'content' => $payload,
         ]);
+    }
+
+
+    /**
+     * Convert a fully-hydrated set of $moments into a scalar array that you can nicely
+     * json_encode for snake lord
+     *
+     * @param GenericCollection $moments
+     * @return array
+     * @throws RouteNotFound
+     */
+    private function convert(GenericCollection $moments): array
+    {
+        $payload = [];
+
+        foreach ($moments as $moment) {
+            /* Accumulate a list of associated files for this learning moment
+             * At the moment there's gonna be just one but SA-20433 causes this to be multiple
+             */
+            $files = [];
+
+            if (null !== $moment->getStorage()) {
+                $files = [
+                    [
+                        'hash' => $moment->getStorage()->getHash(),
+                        'filename' => $moment->getStorage()->getFilename(),
+                        'mime' => $moment->getStorage()->getMime(),
+                        'icon' => $moment->getStorage()->getMimetype()->getIconFile(),
+                    ],
+                ];
+            }
+
+            /* This is a stack because empty payloads result in a datatype difference in frontend world:
+             * empty payloads emerge as [], but non-empty payloads emerge as {}
+             */
+            $userTranslator = new \Schoolbox\User\Translator\ModelToArray();
+
+            $payload[] = [
+                'id' => $moment->getId(),
+                'body' => $moment->getBody(),
+                'files' => $files,
+                /* TODO we usually add role for extra meta about students and staffs, especially in cohorty scenarios
+                 *  since there's a higher likelihood of encountering people with same- or same-sounding names.
+                 *  Role description helps distinguish them. But it wasn't in any of the designs. I'm expecting
+                 *  to need this further down the trail
+                 */
+                'recipient' => $userTranslator->convertLinkedUser($moment->getRecipient()),
+                'creator' => $userTranslator->convertLinkedUser($moment->getCreator()),
+                /* This is always set
+                 */
+                'createdAt' => [
+                    'timestamp' => $moment->getCreatedAt()->getUnixTimestamp(),
+                    'displayAs' => $moment->getCreatedAt()->getLocalShort(),
+                    'rfc' => $moment->getCreatedAt()->toRfc3339String(),
+                ],
+                /* We don't store updatedBy, for whatever reason: I suppose it was presumed
+                 * to always be the same as its author...
+                 *
+                 * Anyway, this is the localised version of config's date_short which you can use
+                 * to group moments per day.
+                 */
+                'updatedAt' => [
+                    'timestamp' => $moment->getUpdatedAt()->getUnixTimestamp(),
+                    'displayAs' => $moment->getUpdatedAt()->getLocalShort(),
+                    'rfc' => $moment->getUpdatedAt()->toRfc3339String(),
+                ],
+                /* Whether this moment had comments or not, which affects a user interaction
+                 * where they have an opportunity to delete comments upon approval
+                 */
+                'hasComments' => $this->hasComments($moment),
+                /* The current state of the learning moment
+                 */
+                'currentState' => $moment->getCurrentState(),
+                // TODO State-specific metadata is currently not needed, but maybe needed later
+                //
+                //                    /* Metadata about the current state of a learning moment and any other details
+                //                     * regarding the current state, such as who actioned a state change etc.
+                //                     */
+                //                    'states' => [
+                //                        'current' => $moment->getCurrentState(),
+                //                        /* You'll be in one of three alternative states here: submitted/published/rejected
+                //                         */
+                //                        'submittedAt' => $moment->getSubmittedAt()?->getDatabase(),
+                //                        'submittedBy' => $moment->getSubmittedBy() ? [
+                //                            'id' => $moment->getSubmittedBy()->getId(),
+                //                            'externalId' => $moment->getSubmittedBy()->getExternalId(),
+                //                            'fullname' => $moment->getSubmittedBy()->getFullname(),
+                //                            'firstname' => $moment->getSubmittedBy()->getFirstname(),
+                //                            'lastname' => $moment->getSubmittedBy()->getLastname(),
+                //                        ] : null,
+                //                        'publishAt' => $moment->getPublishedAt()?->getDatabase(),
+                //                        'publishedBy' => $moment->getPublishedBy() ? [
+                //                            'id' => $moment->getPublishedBy()->getId(),
+                //                            'externalId' => $moment->getPublishedBy()->getExternalId(),
+                //                            'fullname' => $moment->getPublishedBy()->getFullname(),
+                //                            'firstname' => $moment->getPublishedBy()->getFirstname(),
+                //                            'lastname' => $moment->getPublishedBy()->getLastname(),
+                //                        ] : null,
+                //                        'rejectedAt' => $moment->getRejectedAt()?->getDatabase(),
+                //                        'rejectedBy' => $moment->getRejectedBy() ? [
+                //                            'id' => $moment->getRejectedBy()->getId(),
+                //                            'externalId' => $moment->getRejectedBy()->getExternalId(),
+                //                            'fullname' => $moment->getRejectedBy()->getFullname(),
+                //                            'firstname' => $moment->getRejectedBy()->getFirstname(),
+                //                            'lastname' => $moment->getRejectedBy()->getLastname(),
+                //                        ] : null
+                //                    ],
+                /* Any associated tags which you can find in a db lookup table
+                 */
+                'tags' => $this->getTagsForMoment($moment),
+                /* Add any associated curriculum nodes
+                 * TODO will be added in a future ticket that has yet to be written.
+                 */
+                'curriculumNodes' => [],
+                /* A shortcut to urls for changing states in this learning moment
+                 * Note that a controller method must fulfil this node after the fact, for aura reasons
+                 * (not easy to dedupe that implementation, sadly)
+                 */
+                '_links' => $this->getNextRoutes($moment),
+            ];
+        }
+
+        return $payload;
+    }
+
+
+    /**
+     * Convert a set of moment tags into a scalar stack
+     *
+     * @param Model $moment
+     * @return array
+     */
+    private function getTagsForMoment(Model $moment): array
+    {
+        $stack = [];
+
+        foreach ($moment->getTags() as $tag) {
+            $stack[] = [
+                'id' => $tag->getId(),
+                'name' => $tag->getName(),
+            ];
+        }
+
+        return $stack;
     }
 
 
