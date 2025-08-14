@@ -864,6 +864,9 @@ class Controller extends Base
                  * where they have an opportunity to delete comments upon approval
                  */
                 'hasComments' => $this->hasComments($moment),
+                /* The current state of the learning moment
+                 */
+                'currentState' => $moment->getCurrentState(),
                 // TODO State-specific metadata is currently not needed, but maybe needed later
                 //
                 //                    /* Metadata about the current state of a learning moment and any other details
