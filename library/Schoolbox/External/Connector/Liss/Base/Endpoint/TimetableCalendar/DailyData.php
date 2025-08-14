@@ -313,8 +313,8 @@ class DailyData implements IStrategy
         if (null !== $room) {
             /* Forcibly truncate the room location to 255 characters, which is the maximum allowed
              * characters in the current schema. If the room location is longer than that, we
-             * truncate it and log a warning, and that there wil be a desync between the import data
-             * and the one that stores in the database.
+             * truncate it and log a warning, and that there will be a desync between the import data
+             * and the one that is stored in the database.
              */
             $truncatedRoom = mb_substr($room, 0, self::MAXLENGTH_ROOM_LOCATION);
             /* Throw a warning if the truncated version is different from the one we started
