@@ -40,9 +40,9 @@ window.Vue.watch(
  * To apply the selected filters
  */
 async function applyFilters(): Promise<void> {
-    // TODO
+    // TODO (perhaps split this into a crStore.applyFilters() and keep track of the current filters so that subsequent page loads still work)
     crStore.clearData();
-    await crStore.loadData();
+    await crStore.loadNextPage();
 }
 
 const studentFilter = window.Vue.ref<SearchSelectItem[]>([]);

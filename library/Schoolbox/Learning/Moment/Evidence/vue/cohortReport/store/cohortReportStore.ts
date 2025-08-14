@@ -16,11 +16,14 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
     const results = window.Vue.ref<CohortReportEntry[]>([]);
     const selectedResults = window.Vue.ref<Record<CohortReportEntry["id"], boolean>>({});
 
-    // When processing actions on entries, this is used to track the state
-    const loadingEntries = window.Vue.ref<Record<CohortReportEntry["id"], boolean>>({});
+    const hasSearched = window.Vue.ref<boolean>(false);
+    const nextCursor = window.Vue.ref<string | null>(null);
 
     const isLoading = window.Vue.ref(true);
     const loadError = window.Vue.ref<string | null>(null);
+
+    // When processing actions on entries, this is used to track the state
+    const loadingEntries = window.Vue.ref<Record<CohortReportEntry["id"], boolean>>({});
 
     /**
      * Clear the current data in the store
@@ -29,22 +32,28 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
     function clearData(): void {
         results.value = [];
         selectedResults.value = {};
+        hasSearched.value = false;
+        nextCursor.value = null;
         isLoading.value = true;
         loadError.value = null;
     }
 
     /**
-     * Load cohort report data
+     * Load the next page of results
      */
-    async function loadData(): Promise<void> {
+    async function loadNextPage(): Promise<void> {
         if (!getCohortReportEndpoint) {
             throw new Error("Cohort report endpoint is not set");
         }
 
+        if (hasSearched.value && nextCursor.value === null) {
+            return; // No next page to load
+        }
+
         isLoading.value = true;
         const response = await getCohortReport(getCohortReportEndpoint, {
-            fromDate: "2020-01-01",
-            toDate: "2025-12-31",
+            cursor: nextCursor.value,
+            // TODO: Add filters here in SA-20436
         });
         isLoading.value = false;
         if (response.success === false) {
@@ -52,8 +61,11 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
             return;
         }
 
+        nextCursor.value = response.data.metadata.cursor.next;
+        hasSearched.value = true; // mark that nextCursor is now usable
+
         // merge with whatever results we already have, there shouldn't be dupes
-        results.value.push(...response.data.content);
+        results.value.push(...response.data.data);
     }
 
     /**
@@ -71,7 +83,7 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         putBulkRejectEndpoint = $putBulkRejectEndpoint;
         putBulkPublishEndpoint = $putBulkPublishEndpoint;
         clearData();
-        await loadData();
+        await loadNextPage();
     }
 
     /**
@@ -258,7 +270,8 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         selectedResults,
         isLoading,
         clearData,
-        loadData,
+        nextCursor,
+        loadNextPage,
         loadError,
         isEntrySelected,
         toggleEntrySelection,

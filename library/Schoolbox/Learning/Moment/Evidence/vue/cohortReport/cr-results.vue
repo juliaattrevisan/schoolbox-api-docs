@@ -47,6 +47,8 @@ const resultGroups = window.Vue.computed(() => {
                 <div class="loader"></div>
             </section>
         </div>
+        <button v-else-if="crStore.nextCursor !== null" @click="crStore.loadNextPage">Load more results</button>
+        <div v-else class="alert-box">All results have been loaded</div>
     </div>
 </template>
 

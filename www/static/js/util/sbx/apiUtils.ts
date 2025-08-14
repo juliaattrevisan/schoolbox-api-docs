@@ -118,7 +118,7 @@ async function buildRequest(
             // Remove any undefined values from the query string
             const filteredBody = Object.fromEntries(
                 Object.entries(options.body as Record<string, string | string[]>).filter(
-                    ([, value]) => value !== undefined,
+                    ([, value]) => value !== undefined && value !== null,
                 ),
             );
 
