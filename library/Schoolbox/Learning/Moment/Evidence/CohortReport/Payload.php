@@ -74,6 +74,17 @@ class Payload
         ?string $tagIds,
         ?string $states
     ): GenericCollection {
+        /* If this $folder had no members, there's no meaningful cohort overview to display:
+         * return an empty payload
+         */
+        $cohortIds = $this->findCohortIds($folder);
+
+        if (!\count($cohortIds)) {
+            return $this->mapper->createCollection();
+        }
+
+        /* Otherwise we have guys to filter upon
+         */
         $params = [];
 
         $wherePieces = [
@@ -113,7 +124,6 @@ class Payload
             $userIds = explode(',', $userIds);
 
             if (\count($userIds)) {
-                $cohortIds = $this->findCohortIds($folder);
                 $intersectingUsers = array_intersect($cohortIds, $userIds);
 
                 if (\count($intersectingUsers)) {
