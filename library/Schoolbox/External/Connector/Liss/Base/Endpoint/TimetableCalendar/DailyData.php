@@ -58,6 +58,10 @@ class DailyData implements IStrategy
      */
     private array $classInvolvements = [];
 
+    /**
+     * Maximum length of a room location
+     */
+    private const MAXLENGTH_ROOM_LOCATION = 255;
 
     /**
      * Constructor.
@@ -306,10 +310,33 @@ class DailyData implements IStrategy
             $event = $this->eventMapper->createModel();
         }
 
+        /* Forcibly truncate the room location to 255 characters, which is the maximum allowed
+         * characters in the current schema. If the room location is longer than that, we
+         * truncate it and log a warning, and that there wil be a desync between the import data
+         * and the one that stores in the database.
+         */
+        $truncatedRoom = mb_substr($room, 0, self::MAXLENGTH_ROOM_LOCATION);
+        /* Throw a warning if the truncated version is different from the one we started
+         * with; that's an indication that we just lost data, the school will need to shorten it
+         * but it appears that sometimes schools will have many venus for the event, hence
+         * unavoidable truncation (can't do schema change in point releases, but possibly expanding
+         * it in the future if required?)
+         */
+        if ($truncatedRoom !== $room) {
+            $this->log->warning(
+                sprintf(
+                    'Event "%s" location truncation: was "%s", but shortened to "%s".',
+                    $title,
+                    $room,
+                    $truncatedRoom
+                )
+            );
+        }
+
         $event
             ->setTitle($title)
             ->setDetail($detail)
-            ->setLocation($room)
+            ->setLocation($truncatedRoom)
             ->setCode($classCode)
             ->setDay($day)
             ->setPeriod($period)
