@@ -225,40 +225,40 @@ class Payload
                              *  to shortcut this nonsense, but that's also kind of annoying...
                              */
                             $stateQueryPieces[] = '(
-                            submitted_at IS NULL
-                            AND submitted_by IS NULL
-                            AND published_at IS NULL
-                            AND published_by IS NULL
-                            AND rejected_at IS NULL
-                            AND rejected_by IS NULL
-                        )';
+                                submitted_at IS NULL
+                                AND submitted_by IS NULL
+                                AND published_at IS NULL
+                                AND published_by IS NULL
+                                AND rejected_at IS NULL
+                                AND rejected_by IS NULL
+                            )';
                         } elseif (Evidence\Model::STATUS_SUBMITTED === $state) {
                             $stateQueryPieces[] = '(
-                            submitted_at IS NOT NULL
-                            AND submitted_by IS NOT NULL
-                            AND published_at IS NULL
-                            AND published_by IS NULL
-                            AND rejected_at IS NULL
-                            AND rejected_by IS NULL
-                        )';
+                                submitted_at IS NOT NULL
+                                AND submitted_by IS NOT NULL
+                                AND published_at IS NULL
+                                AND published_by IS NULL
+                                AND rejected_at IS NULL
+                                AND rejected_by IS NULL
+                            )';
                         } elseif (Evidence\Model::STATUS_PUBLISHED === $state) {
                             $stateQueryPieces[] = '(
-                            submitted_at IS NULL
-                            AND submitted_by IS NULL
-                            AND published_at IS NOT NULL
-                            AND published_by IS NOT NULL
-                            AND rejected_at IS NULL
-                            AND rejected_by IS NULL
-                        )';
+                                submitted_at IS NULL
+                                AND submitted_by IS NULL
+                                AND published_at IS NOT NULL
+                                AND published_by IS NOT NULL
+                                AND rejected_at IS NULL
+                                AND rejected_by IS NULL
+                            )';
                         } elseif (Evidence\Model::STATUS_REJECTED === $state) {
                             $stateQueryPieces[] = '(
-                            submitted_at IS NULL
-                            AND submitted_by IS NULL
-                            AND published_at IS NULL
-                            AND published_by IS NULL
-                            AND rejected_at IS NOT NULL
-                            AND rejected_by IS NOT NULL
-                        )';
+                                submitted_at IS NULL
+                                AND submitted_by IS NULL
+                                AND published_at IS NULL
+                                AND published_by IS NULL
+                                AND rejected_at IS NOT NULL
+                                AND rejected_by IS NOT NULL
+                            )';
                         }
                     }
 
