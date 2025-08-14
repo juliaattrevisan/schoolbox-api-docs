@@ -18,7 +18,6 @@ export const trendOptions: Options = {
         spacing: [10, 0, 10, 0],
         width: 200,
     },
-    colors: ["#000"],
     credits: {
         enabled: false,
     },
@@ -55,18 +54,18 @@ export const trendOptions: Options = {
             enabled: false, // Hide tick text/labels
         },
         plotLines: [
+            // Force the axis to always include 0
             {
                 color: "#000",
                 width: 2,
                 value: 0,
             },
         ],
-        // Force the axis to always include 0
         softMax: 1, // Ensure positive values have some space
         softMin: -1, // Ensure negative values have some space
         startOnTick: false, // so the plotline is shown with at least one value
         title: {
-            text: undefined,
+            text: undefined, // to hide the text
         },
     },
 };
@@ -111,6 +110,8 @@ export function getChartOptions(
                 const pluralSuffix = this.y === 1 || this.y === -1 ? withoutSuffix : `${withoutSuffix}s`;
                 return `<b>${this.key}:</b> ${this.y} ${pluralSuffix}`;
             },
+            hideDelay: 0,
+            outside: true,
             valueSuffix: recordsOrPoints,
         },
         xAxis: {
