@@ -16,15 +16,15 @@ export function getRowKeys(rowData: { [key: string]: RowOptions }): RowKeys {
     const user = rowData.user as User;
     if (user) {
         return {
-            student_id: user.id || 0,
+            "[student_id]": user.id || 0,
         };
     }
     // otherwise, check for 'type_subtype' and return its ids if it exists
     const typeSubtype = rowData.type_subtype as TypeSubType;
     if (typeSubtype) {
         return {
-            type_id: typeSubtype.typeId || 0,
-            subtype_id: typeSubtype.subtypeId || 0,
+            "[type][type_id]": typeSubtype.typeId || 0,
+            "[type][subtype_id]": typeSubtype.subtypeId || 0,
         };
     }
     return {};

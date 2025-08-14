@@ -158,9 +158,9 @@ export enum ScopeUrlParam {
  * Keys that can be passed to identify a specific row in the table
  */
 export type RowKeys = {
-    student_id?: number;
-    type_id?: number;
-    subtype_id?: number;
+    "[student_id]"?: number;
+    "[type][type_id]"?: number;
+    "[type][subtype_id]"?: number;
 };
 
 /**

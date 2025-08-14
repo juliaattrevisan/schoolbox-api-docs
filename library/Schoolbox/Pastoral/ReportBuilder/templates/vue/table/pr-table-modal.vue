@@ -42,10 +42,11 @@ window.Vue.watch(
     (newCell) => {
         if (newCell) {
             selectedHeader.value = newCell.header;
-            // clear out the old row params
-            scopeUrlParams.delete(`${ScopeUrlParam.ROW}[student_id]`);
-            scopeUrlParams.delete(`${ScopeUrlParam.ROW}[type_id]`);
-            scopeUrlParams.delete(`${ScopeUrlParam.ROW}[subtype_id]`);
+            // clear out any existing row params
+            const paramsToDelete = Array.from(scopeUrlParams.keys()).filter((key) =>
+                key.includes(ScopeUrlParam.ROW as string),
+            );
+            paramsToDelete.forEach((param) => scopeUrlParams.delete(param));
             scopeUrlParams.delete(ScopeUrlParam.CURSOR as string); // Clear the cursor to start fresh
             // now start setting the new ones
             scopeUrlParams.set(ScopeUrlParam.COLUMN as string, selectedHeader.value.key);
@@ -53,7 +54,7 @@ window.Vue.watch(
                 // loop through the RowKeys object and set any any params that are provided
                 Object.entries(newCell.rowKeys as Record<string, number>).forEach(([key, value]) => {
                     if (value !== undefined) {
-                        scopeUrlParams.set(`${ScopeUrlParam.ROW}[${key}]`, value.toString());
+                        scopeUrlParams.set(`${ScopeUrlParam.ROW}${key}`, value.toString());
                     }
                 });
             }

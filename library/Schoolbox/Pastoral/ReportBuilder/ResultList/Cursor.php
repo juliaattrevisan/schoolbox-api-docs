@@ -238,8 +238,8 @@ class Cursor implements ICursor
                 break;
             case Factory::TYPE_BY_MONTH:
                 $query[] = "p.type_id = :type_id AND COALESCE(p.subtype_id, '') = COALESCE(:subtype_id, '')";
-                $param['type_id'] = $this->rowKey['type_id'];
-                $param['subtype_id'] = $this->rowKey['subtype_id'];
+                $param['type_id'] = $this->rowKey['type']['type_id'];
+                $param['subtype_id'] = $this->rowKey['type']['subtype_id'];
                 break;
             default:
                 throw new ValueError(sprintf('Unknown tab type: %s', $this->tabType));
