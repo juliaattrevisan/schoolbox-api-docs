@@ -108,7 +108,7 @@ class Model implements ISoftDeletable
         ],
         Factory::TYPE_BY_WEEK => [
             'label' => 'Type/Sub-Type by Week',
-            'tooltip' => 'This table will display a maximum of 10 weeks of past data, counting back from the most recent record\'s date',
+            'tooltip' => 'This table will display a maximum of 12 weeks of past data, counting back from the most recent record\'s date',
             'type' => 'table',
         ],
 //        Factory::STUDENT_BY_MONTH => [
@@ -118,7 +118,7 @@ class Model implements ISoftDeletable
 //        ],
 //        Factory::STUDENT_BY_WEEK => [
 //            'label' => 'Student by Week',
-//            'tooltip' => 'This table will display a maximum of 10 weeks of past data, counting back from the most recent record\'s date',
+//            'tooltip' => 'This table will display a maximum of 12 weeks of past data, counting back from the most recent record\'s date',
 //            'type' => 'table',
 //        ],
     ];
