@@ -108,12 +108,14 @@ class IndexBuilder extends BaseBuilder
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         // Select all search_index rows linked to deleted blogs.
+        // Note if the parent folder is deleted, the blog is considered to be deleted also regardless of its own deleted_at value.
         $queryString = '
             SELECT si.identifier, si.type
             FROM search_index si
             JOIN blog b ON si.identifier = b.id
+            JOIN folder f ON b.folder_id = f.id
             WHERE si.type = "blog"
-            AND b.deleted_at IS NOT NULL
+            AND COALESCE(b.deleted_at, f.deleted_at) IS NOT NULL
         ';
         $params = [];
         if ($fromDate) {
