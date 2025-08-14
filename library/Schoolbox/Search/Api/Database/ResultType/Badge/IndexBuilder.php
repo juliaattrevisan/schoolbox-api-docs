@@ -109,7 +109,7 @@ class IndexBuilder extends BaseBuilder
             SELECT si.identifier, si.type
             FROM search_index si
             JOIN badge b ON si.identifier = b.id
-            WHERE search_index.type = "badge"
+            WHERE si.type = "badge"
             AND b.deleted_at IS NOT NULL
         ';
         $params = [];

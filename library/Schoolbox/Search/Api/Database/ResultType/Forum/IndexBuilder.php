@@ -124,7 +124,7 @@ class IndexBuilder extends BaseBuilder
             SELECT si.identifier, si.type
             FROM search_index si
             JOIN forumPost fp ON si.identifier = fp.postID
-            WHERE search_index.type = "forum"
+            WHERE si.type = "forum"
             AND fp.deleted_at IS NOT NULL
         ';
         $params = [];

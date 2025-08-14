@@ -126,7 +126,7 @@ class IndexBuilder extends BaseBuilder
             SELECT si.identifier, si.type
             FROM search_index si
             JOIN link l ON si.identifier = l.id
-            WHERE search_index.type = "link"
+            WHERE si.type = "link"
             AND l.deleted_at IS NOT NULL
         ';
         $params = [];

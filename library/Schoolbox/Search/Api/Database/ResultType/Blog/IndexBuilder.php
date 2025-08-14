@@ -112,7 +112,7 @@ class IndexBuilder extends BaseBuilder
             SELECT si.identifier, si.type
             FROM search_index si
             JOIN blog b ON si.identifier = b.id
-            WHERE search_index.type = "blog"
+            WHERE si.type = "blog"
             AND b.deleted_at IS NOT NULL
         ';
         $params = [];

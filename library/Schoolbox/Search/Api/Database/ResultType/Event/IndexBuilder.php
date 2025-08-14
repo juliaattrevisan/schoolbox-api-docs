@@ -111,7 +111,7 @@ class IndexBuilder extends BaseBuilder
             SELECT si.identifier, si.type
             FROM search_index si
             JOIN event e ON si.identifier = e.id
-            WHERE search_index.type = "event"
+            WHERE si.type = "event"
             AND e.deleted_at IS NOT NULL
         ';
         $params = [];

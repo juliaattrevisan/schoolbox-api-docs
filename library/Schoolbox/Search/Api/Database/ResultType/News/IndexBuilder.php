@@ -112,7 +112,7 @@ class IndexBuilder extends BaseBuilder
             SELECT si.identifier, si.type
             FROM search_index si
             JOIN comms_news_article n ON si.identifier = n.id
-            WHERE search_index.type = "news"
+            WHERE si.type = "news"
             AND NOT ' . $this->getSqlConditionForCurrentlyPublished() . '
         ';
         $params = [];
