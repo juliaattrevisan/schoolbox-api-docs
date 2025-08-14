@@ -107,13 +107,15 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
-        // Remove all articles that are not currently published.
-        $queryString = 'SELECT
-            n.id
-            FROM comms_news_article n
-            WHERE NOT ' . $this->getSqlConditionForCurrentlyPublished() . '
+        // Select all search_index rows linked to unpublished news articles.
+        $queryString = '
+            SELECT si.identifier, si.type
+            FROM search_index si
+            JOIN comms_news_article n ON si.identifier = n.id
+            WHERE search_index.type = "news"
+            AND NOT ' . $this->getSqlConditionForCurrentlyPublished() . '
         ';
-        $params      = [];
+        $params = [];
         if ($fromDate) {
             $queryString .= ' AND n.deleted_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
