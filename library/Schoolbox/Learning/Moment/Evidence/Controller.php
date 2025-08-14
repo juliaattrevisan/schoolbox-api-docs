@@ -327,6 +327,10 @@ class Controller extends Base
             $evidenceCollection->add($evidenceModel);
         }
         $this->mapper->save($evidenceCollection);
+        /**
+         * use buildTranslatorWithComments as that contains the _links needed for draft.js
+         * where the other translator had excluded _links (for historic reasons)
+         */
         $this->response = $this->responseAsJson(
             $evidenceCollection->map(
                 $this->buildTranslatorWithComments(1),
@@ -416,6 +420,10 @@ class Controller extends Base
 
         $this->mapper->save($evidence);
 
+        /**
+         * use buildTranslatorWithComments as that contains the _links needed for draft.js
+         * where the other translator had excluded _links (for historic reasons)
+         */
         $responseTranslator = $this->buildTranslatorWithComments(1);
         $this->response     = $this->responseAsJson($responseTranslator($evidence));
     }
@@ -706,6 +714,10 @@ class Controller extends Base
          */
         $this->mapper->save($evidence);
 
+        /**
+         * use buildTranslatorWithComments as that contains the _links needed for draft.js
+         * where the other translator had excluded _links (for historic reasons)
+         */
         $responseTranslator = $this->buildTranslatorWithComments(1);
 
         $translated = $responseTranslator($evidence);
