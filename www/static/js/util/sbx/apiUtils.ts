@@ -20,7 +20,6 @@ export type Metadata = {
 type ApiBaseResponseSuccess<TRespData> = {
     success: true;
     data: TRespData;
-    metadata?: Metadata;
 };
 
 type ApiBaseResponseFailure = {
