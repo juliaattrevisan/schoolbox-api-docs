@@ -126,20 +126,16 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
 
     /**
      * Publish learning moment(s)
-     * @param entryIds The entry ID(s) to publish
+     * @param entries The entry/entries to publish
      * @param deleteComments Whether to delete comments associated with the learning moment
      */
-    async function publishEntries(entryIds: number[], deleteComments: boolean): Promise<void> {
+    async function publishEntries(entries: CohortReportEntry[], deleteComments: boolean): Promise<void> {
         if (putBulkPublishEndpoint === null) {
             throw new Error("Bulk publish endpoint is not set");
         }
 
-        const entries = results.value.filter((e) => entryIds.includes(e.id));
-        if (entries.length === 0) {
-            throw new Error(`No entries found for IDs ${entryIds.join(", ")}`);
-        }
         if (!entries.every((e) => e._links.publish)) {
-            throw new Error(`Unable to publish an entry (${entryIds.join(", ")})`);
+            throw new Error("Unable to publish an entry");
         }
 
         entries.forEach((entry) => {
@@ -150,7 +146,7 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         );
 
         const response = await bulkPublishLearningMoments(putBulkPublishEndpoint, {
-            momentIds: entryIds,
+            momentIds: entries.map((e) => e.id),
             deleteComments,
         });
         entries.forEach((entry) => {
@@ -176,20 +172,16 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
 
     /**
      * Reject learning moment(s)
-     * @param entryIds The entry ID(s) to reject
+     * @param entries The entry/entries to reject
      * @param rejectionReason The reason for rejection
      */
-    async function rejectEntries(entryIds: number[], rejectionReason: string): Promise<void> {
+    async function rejectEntries(entries: CohortReportEntry[], rejectionReason: string): Promise<void> {
         if (putBulkRejectEndpoint === null) {
             throw new Error("Bulk reject endpoint is not set");
         }
 
-        const entries = results.value.filter((e) => entryIds.includes(e.id));
-        if (entries.length === 0) {
-            throw new Error(`No entries found for IDs ${entryIds.join(", ")}`);
-        }
         if (!entries.every((e) => e._links.reject)) {
-            throw new Error(`Unable to reject an entry (${entryIds.join(", ")})`);
+            throw new Error("Unable to reject an entry");
         }
 
         entries.forEach((entry) => {
@@ -200,7 +192,7 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         );
 
         const response = await bulkRejectLearningMoments(putBulkRejectEndpoint, {
-            momentIds: entryIds,
+            momentIds: entries.map((e) => e.id),
             rejectionReason,
         });
         entries.forEach((entry) => {
@@ -224,13 +216,12 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
 
     /**
      * Delete learning moment(s)
-     * @param entryIds The entry ID(s) to delete
+     * @param entries The entry/entries to delete
      */
-    async function deleteEntries(entryIds: number[]): Promise<void> {
+    async function deleteEntries(entries: CohortReportEntry[]): Promise<void> {
         // TODO find a bulk delete endpoint?
-        const entries = results.value.filter((e) => entryIds.includes(e.id));
-        if (entries.length === 0) {
-            throw new Error(`No entries found for IDs ${entryIds.join(", ")}`);
+        if (!entries.every((e) => e._links.delete)) {
+            throw new Error("Unable to delete an entry");
         }
 
         const toast = window.sbProps.toastActivate(
@@ -261,7 +252,7 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
             toast.timeout({ isSuccess: true, text: "Deleted." });
         }
 
-        results.value = results.value.filter((e) => !entryIds.includes(e.id) || unsuccessfulIds.includes(e.id));
+        results.value = results.value.filter((e) => !entries.includes(e) || unsuccessfulIds.includes(e.id));
     }
 
     return {

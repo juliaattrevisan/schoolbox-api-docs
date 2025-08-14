@@ -26,10 +26,7 @@ async function onPublish(deleteComments: boolean): Promise<void> {
     }
 
     crmStore.isModalOpen = false;
-    await crStore.publishEntries(
-        crmStore.selectedEntries.map((entry) => entry.id),
-        deleteComments,
-    );
+    await crStore.publishEntries(crmStore.selectedEntries, deleteComments);
 }
 
 /**
@@ -41,10 +38,7 @@ async function onReject(): Promise<void> {
     }
 
     crmStore.isModalOpen = false;
-    await crStore.rejectEntries(
-        crmStore.selectedEntries.map((entry) => entry.id),
-        rejectReason.value,
-    );
+    await crStore.rejectEntries(crmStore.selectedEntries, rejectReason.value);
     rejectReason.value = "";
 }
 
@@ -57,7 +51,7 @@ async function onDelete(): Promise<void> {
     }
 
     crmStore.isModalOpen = false;
-    await crStore.deleteEntries(crmStore.selectedEntries.map((entry) => entry.id));
+    await crStore.deleteEntries(crmStore.selectedEntries);
 }
 </script>
 
