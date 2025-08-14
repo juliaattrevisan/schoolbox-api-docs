@@ -316,7 +316,7 @@ class Payload
             $students = array_column($this->externalClass->getStudents($folder->getCodeString()), 'synergy_id');
 
             /* These are the user instances associated with $folder's class list of students
-             * We'll use this to interset with learning moments $recipients
+             * We'll use this to intersect with learning moments $recipients
              */
             if (\count($students)) {
                 $classIds = $this->userMapper->findByExternalIds($students, \Schoolbox\Role::STUDENT)
