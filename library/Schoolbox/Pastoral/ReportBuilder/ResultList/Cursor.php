@@ -11,6 +11,7 @@ use Schoolbox\Pastoral\Model as PastoralModel;
 use Schoolbox\Pastoral\ReportBuilder\Factory;
 use Schoolbox\Pastoral\ReportBuilder\Helper;
 use Schoolbox\Pastoral\ReportBuilder\TabType\StudentByType;
+use Schoolbox\Pastoral\ReportBuilder\TabType\TypeByMonth;
 use Schoolbox\Pastoral\SubType\Model as SubType;
 use Schoolbox\Pastoral\Type\Model as Type;
 use ValueError;
@@ -40,7 +41,7 @@ class Cursor implements ICursor
         private PastoralMapper $pastoralMapper,
         private string $tabType,
         private ?string $columnKey,
-        private ?string $rowKey = null,
+        private ?array $rowKey = null,
         private ?int $limit = self::LIMIT_DEFAULT,
         private ?ICodec $codec = null,
     ) {
@@ -59,6 +60,7 @@ class Cursor implements ICursor
                 throw new ValueError(sprintf('Limit must be at least %d: %d provided', self::LIMIT_MIN, $this->limit));
             }
         }
+
         $this->init();
     }
 
@@ -125,14 +127,15 @@ class Cursor implements ICursor
     {
         $where = $param = [];
         if (null !== $this->rowKey) {
-            $where[] = "p.student_id = :student_id";
-            $param['student_id'] = $this->rowKey;
+            [$rowWhere, $rowParam] = $this->getRowKeyByTabType();
+            $where = array_merge($where, $rowWhere);
+            $param = array_merge($param, $rowParam);
         }
 
         if (null !== $this->columnKey && 'total' !== $this->columnKey) {
-            $match = $this->getColumnKeyByTabType();
-            $where[] = "p.{$match['type']}_id = :column_id";
-            $param['column_id'] = $match['id'];
+            [$rowWhere, $rowParam] = $this->getColumnKeyByTabType();
+            $where = array_merge($where, $rowWhere);
+            $param = array_merge($param, $rowParam);
         }
 
         return [
@@ -221,24 +224,55 @@ class Cursor implements ICursor
         return $results;
     }
 
+
     /**
      * @return array
      */
-    private function getColumnKeyByTabType(): array
+    private function getRowKeyByTabType(): array
     {
-        $matches = [];
+        $query = $param = [];
         switch ($this->tabType) {
             case Factory::STUDENT_BY_TYPE:
-                preg_match(StudentByType::COLUMN_KEY_REGEX, $this->columnKey, $matches);
+                $query[] = "p.student_id = :student_id";
+                $param['student_id'] = $this->rowKey['student_id'];
+                break;
+            case Factory::TYPE_BY_MONTH:
+                $query[] = "p.type_id = :type_id AND COALESCE(p.subtype_id, '') = COALESCE(:subtype_id, '')";
+                $param['type_id'] = $this->rowKey['type']['type_id'];
+                $param['subtype_id'] = $this->rowKey['type']['subtype_id'];
                 break;
             default:
                 throw new ValueError(sprintf('Unknown tab type: %s', $this->tabType));
         }
 
-        if (empty($matches)) {
-            throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey));
-        }
+        return [$query, $param];
+    }
 
-        return $matches;
+    /**
+     * @return array
+     */
+    private function getColumnKeyByTabType(): array
+    {
+        $query = $param = [];
+        switch ($this->tabType) {
+            case Factory::STUDENT_BY_TYPE:
+                if (!preg_match(StudentByType::COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
+                    throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey));
+                }
+                $query[] = "p.{$matches['type']}_id = :type_id";
+                $param['type_id'] = $matches['id'];
+                break;
+            case Factory::TYPE_BY_MONTH:
+                if (!preg_match(TypeByMonth::COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
+                    throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey));
+                }
+                $monthFormat = TypeByMonth::COLUMN_QUERY_MONTH_FORMAT;
+                $query[] = "DATE_FORMAT(COALESCE(p.occurred_on, p.created_at), '{$monthFormat}') = :monthKey";
+                $param['monthKey'] = $this->columnKey;
+                break;
+            default:
+                throw new ValueError(sprintf('Unknown tab type: %s', $this->tabType));
+        }
+        return [$query, $param];
     }
 }

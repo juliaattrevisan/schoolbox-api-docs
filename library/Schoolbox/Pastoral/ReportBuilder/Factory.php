@@ -2,19 +2,16 @@
 
 namespace Schoolbox\Pastoral\ReportBuilder;
 
-use Alaress\Codec\ICodec;
-use Schoolbox\Assessment\Term\Mapper as TermMapper;
-use Schoolbox\Collection;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
-use Schoolbox\Pastoral\Report\Model as PastoralReport;
 use Schoolbox\Pastoral\ReportBuilder\TabType\StudentByType;
+use Schoolbox\Pastoral\ReportBuilder\TabType\TypeByMonth;
 use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserMapper;
 
 class Factory
 {
     public const STUDENT_BY_TYPE  = 'studentByType';
-//    public const TYPE_BY_MONTH    = 'typeByMonth';
+    public const TYPE_BY_MONTH    = 'typeByMonth';
 //    public const TYPE_BY_WEEK     = 'typeByWeek';
 //    public const STUDENT_BY_MONTH = 'studentByMonth';
 //    public const STUDENT_BY_WEEK  = 'studentByWeek';
@@ -26,7 +23,7 @@ class Factory
         private string $resultType,
         private ?string $orderBy,
         private ?string $order,
-        private int $limit = Cursor::LIMIT_DEFAULT,
+        private int $limit = Base::LIMIT_DEFAULT,
     ) {
     }
 
@@ -41,7 +38,17 @@ class Factory
                 $this->userMapper,
                 $this->pastoralMapper,
                 $this->resultType,
-                $this->orderBy,
+                $this->orderBy ?? Base::SORT_BY_STUDENT_DEFAULT,
+                $this->order,
+                $this->limit,
+            ),
+            self::TYPE_BY_MONTH => new TypeByMonth(
+                $helper,
+                $this->userTranslator,
+                $this->userMapper,
+                $this->pastoralMapper,
+                $this->resultType,
+                $this->orderBy ?? Base::SORT_BY_TYPE_DEFAULT,
                 $this->order,
                 $this->limit,
             ),

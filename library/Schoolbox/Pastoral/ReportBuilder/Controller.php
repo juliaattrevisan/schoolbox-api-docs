@@ -53,6 +53,7 @@ use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel;
 use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Schoolbox\Pastoral\ReportBuilder\Base as Cursor;
 
 class Controller extends Base
 {
@@ -478,7 +479,7 @@ class Controller extends Base
             $limit = $this->requestQuery->getInt('limit', Cursor::LIMIT_DEFAULT);
             $encodedCursor = $this->requestQuery->get('cursor');
             $resultType = $this->requestQuery->get('selected', Cursor::RESULT_TYPE_RECORDS);
-            $sortBy = $this->requestQuery->get('sortBy', Cursor::SORT_BY_DEFAULT);
+            $sortBy = $this->requestQuery->get('sortBy');
             $order = $this->requestQuery->get('order', Cursor::ORDER_DIRECTION_DEFAULT);
 
             $factory = (new Factory(
