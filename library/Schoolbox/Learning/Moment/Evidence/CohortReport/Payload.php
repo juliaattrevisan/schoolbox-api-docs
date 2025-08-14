@@ -296,7 +296,9 @@ class Payload
 
         /* Find fully hydrated instances of these moment ids
          */
-        return $this->mapper->findByColumn('id', $momentIds)->sortBy('updatedAt', 'DESC');
+        return $this->mapper->findByColumn('id', $momentIds, ['order' => [
+            'updated_at' => 'ASC'
+        ]]);
     }
 
 
