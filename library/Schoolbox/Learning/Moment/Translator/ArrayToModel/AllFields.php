@@ -117,6 +117,8 @@ class AllFields extends Base
             }
         }
 
+        /* TODO fix this; it doesn't understand many-to-one atm
+         */
         if (array_key_exists('type', $json)) {
             $model->setType($json['type']);
         }
