@@ -785,9 +785,9 @@ class Controller extends Base
      */
     public function getCohortReportPayload(Folder\Model $folder): void
     {
-        $payload = (new Payload($this->mapper, $this->userAccessMapper));
-
-        $momentIds = $payload->findIdsByFilters(
+        $cursor = new CohortReport\Cursor(
+            $this->mapper,
+            $this->userAccessMapper,
             $folder,
             $this->requestQuery->get('userIds') ?? '',
             $this->requestQuery->get('from') ?? null,
@@ -797,21 +797,22 @@ class Controller extends Base
             $this->requestQuery->get('states') ?? '',
         );
 
-        $pages = $payload->findAllPages($momentIds);
-
-        /* Find fully hydrated instances of these moment ids
-         */
-        $moments = $this->mapper->findByColumn('id', $momentIds)->sortBy('updatedAt', 'DESC');
+        $results = $cursor->retrieveResults($this->requestQuery->get('cursor') ?? null);
 
         /* Augment with hasComments() evaluation and _links derivations
          * Sadly these are deeply coupled to Controllers
          */
-        $payloadContent = $this->convert($moments);
+        $payload = $this->convert($results);
 
         $this->response = $this->responseAsJson([
-            'status'  => 200,
-            'content' => $payloadContent,
-            'pages'   => $pages,
+            'data'   => $payload,
+            'metadata' => [
+                'count'  => $cursor->retrieveResultCount(),
+                'cursor' => [
+                    'current' => $this->requestQuery->get('cursor') ?? $cursor->current($results),
+                    'next'    => $cursor->next($results),
+                ],
+            ],
         ]);
     }
 

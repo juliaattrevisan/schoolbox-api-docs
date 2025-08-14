@@ -2,42 +2,152 @@
 
 namespace Schoolbox\Learning\Moment\Evidence\CohortReport;
 
+use Alaress\Codec\ICodec;
+use Alaress\Codec\Json\Base64;
 use Alaress\Database\Predicate\Builder;
+use Schoolbox\API\Cursor\ICursor;
+use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Moment\Evidence;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\NotFound;
-use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
-use Schoolbox\UserMapper;
 
-class Payload
+/**
+ * Cursor for the cohort report payload
+ *
+ * Retrieves all learning moments for each day up to DAYS_PER_REQUEST days in each page
+ * Respects any filters applied, as specified in the constructor
+ */
+class Cursor implements ICursor
 {
     /**
-     * Cohort Report for learning moments looks seven days in the past by default
+     * The length of time in days which each page of results should cover
      */
-    private const COHORT_REPORT_PAST_THRESHOLD = -7;
-
+    private const DAYS_PER_REQUEST = 7;
 
     /**
-     * The length of time which each page the frontend loads should span.
-     * This determines the length of each sliding window in findAllPages()
+     * The codec implementation used for the cursor.
      */
-    private const SLIDING_WINDOW_SIZE = 7;
+    private ICodec $codec;
 
     /**
      * Constructor
      *
      * @param Evidence\Mapper $mapper
      * @param UserAccessMapper $userAccessMapper
+     * @param Folder\Model $folder
+     * @param string|null $userIds
+     * @param string|null $fromDate
+     * @param string|null $toDate
+     * @param string|null $authorIds
+     * @param string|null $tagIds
+     * @param string|null $states
      */
     public function __construct(
         private Evidence\Mapper $mapper,
         private UserAccessMapper $userAccessMapper,
+        private Folder\Model $folder,
+        private ?string $userIds = null,
+        private ?string $fromDate = null,
+        private ?string $toDate = null,
+        private ?string $authorIds = null,
+        private ?string $tagIds = null,
+        private ?string $states = null,
     ) {
+        $this->codec = new Base64();
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function next(Collection $collection): ?string
+    {
+        if ($collection->count() === 0) {
+            return null;
+        }
+
+        // The next cursor points to the day after the oldest item in the collection
+        $earliestDate = null;
+        foreach ($collection as $evidence) {
+            if ($earliestDate === null || $evidence->getCreatedAt()->lt($earliestDate)) {
+                $earliestDate = $evidence->getCreatedAt();
+            }
+        }
+
+        // TODO: bug, this doesn't detect the last cursor correctly. need to check if we hit the end
+
+        // Encode the cursor with the earliest date we've seen
+        return $this->codec->encode([
+            'lastDate' => $earliestDate->addDays(-1)->getDatabaseDate(),
+        ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function current(Collection $collection): ?string
+    {
+        if ($collection->count() === 0) {
+            return null;
+        }
+
+        // The current cursor points to the day after the most recent item in the collection
+        $latestDate = null;
+        foreach ($collection as $evidence) {
+            if ($latestDate === null || $evidence->getCreatedAt()->gt($latestDate)) {
+                $latestDate = $evidence->getCreatedAt();
+            }
+        }
+
+        return $this->codec->encode([
+            'lastDate' =>  $latestDate->addDays(1)->getDatabaseDate(),
+        ]);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function retrieveResultCount(): ?int
+    {
+        $momentIds = $this->findIdsByFilters();
+        return count($momentIds);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function retrieveResults(?string $encodedCursor): Collection
+    {
+        try {
+            // All the moment IDs that match the filters
+            $momentIds = $this->findIdsByFilters();
+
+            if (empty($momentIds)) {
+                return new GenericCollection(Evidence\Model::class);
+            }
+
+            // Determine the date range for this page
+            $dateRange = $this->getDateRangeForCursor($encodedCursor, $momentIds);
+            if ($dateRange === null) {
+                return new GenericCollection(Evidence\Model::class);
+            }
+
+            // Build predicate to get moments within the date range
+            $pb = $this->mapper->getPredicateBuilder()
+                ->in($this->mapper->getIdentifierColumn(), $momentIds)
+                ->between('created_at', $dateRange['from'], $dateRange['to']);
+
+            // Get the results ordered by creation date descending, then by ID descending
+            return $this->mapper->findByPredicates(
+                $pb,
+                [ 'order' => [ 'created_at' => 'DESC' ] ]
+            );
+        } catch (Exception | NotFound $e) {
+            return new GenericCollection(Evidence\Model::class);
+        }
+    }
 
     /**
      * Find a set of learning moment IDs for the cohort of users
@@ -56,37 +166,24 @@ class Payload
      *
      * These should be considered boolean AND between these clauses.
      *
-     * @param Folder\Model $folder
-     * @param string|null $userIds
-     * @param string|null $fromDate
-     * @param string|null $toDate
-     * @param string|null $authorIds
-     * @param string|null $tagIds
-     * @param string|null $states
      * @return array<int>
      * @throws Exception
      * @throws NotFound
      */
-    public function findIdsByFilters(
-        Folder\Model $folder,
-        ?string $userIds,
-        ?string $fromDate,
-        ?string $toDate,
-        ?string $authorIds,
-        ?string $tagIds,
-        ?string $states
-    ): array {
+    private function findIdsByFilters(): array
+    {
         /* If this $folder had no members, there's no meaningful cohort overview to display:
          * return an empty payload
          */
-        $cohortIds = $this->findCohortIds($folder);
+        $cohortIds = $this->findCohortIds($this->folder);
 
         if (!\count($cohortIds)) {
-            return $this->mapper->createCollection();
+            return [];
         }
 
         /* Otherwise we have guys to filter upon
          */
+
         $params = [];
 
         $wherePieces = [
@@ -103,8 +200,8 @@ class Payload
         /* Detect if we needed to filter by Tags
          * This involves a conditional inner join
          */
-        if ($tagIds) {
-            $tagIds = explode(',', $tagIds);
+        if ($this->tagIds) {
+            $tagIds = explode(',', $this->tagIds);
 
             if (\count($tagIds)) {
                 $placeholders = Builder::getArrayPlaceholders($tagIds, 'tagIds');
@@ -122,8 +219,8 @@ class Payload
 
         /* Filter $cohortIds to a set of recipient userIds, if specified
          */
-        if ($userIds) {
-            $userIds = explode(',', $userIds);
+        if ($this->userIds) {
+            $userIds = explode(',', $this->userIds);
 
             if (\count($userIds)) {
                 $intersectingUsers = array_intersect($cohortIds, $userIds);
@@ -155,8 +252,8 @@ class Payload
 
         /* Filter to a set of authors, if specified
          */
-        if ($authorIds) {
-            $authorIds = explode(',', $authorIds);
+        if ($this->authorIds) {
+            $authorIds = explode(',', $this->authorIds);
 
             if (\count($authorIds)) {
                 $placeholders = Builder::getArrayPlaceholders($authorIds, 'authorIds');
@@ -168,33 +265,23 @@ class Payload
             }
         }
 
-        /* Filter to a date range, if specified; both dates must be specified to use a user-defined date range,
-         * otherwise resorts to system defaults of [today, -7 days]
+        /* Filter to a date range, if specified (either FROM, TO, neither, or both)
          */
-        if ($fromDate && $toDate) {
-            $from = (new \Alaress_Date_Format($fromDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT))->startOfDay();
-            $to = (new \Alaress_Date_Format($toDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT))->endOfDay();
+        $from = null;
+        if ($this->fromDate) {
+            $from = (new \Alaress_Date_Format($this->fromDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT))->startOfDay();
 
-            /* Check for a maximum length of time of [-1 year from $to at start of day, $to]
-             */
-            $threshold = (new \Alaress_Date_Format($toDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT))->addYears(-1)->startOfDay();
-
-            if ($from->lt($threshold)) {
-                $from = $threshold;
-            }
-        } else {
-            $from = \Alaress_Date_Format::now()->addDays(self::COHORT_REPORT_PAST_THRESHOLD)->startOfDay();
-            $to = \Alaress_Date_Format::now()->endOfDay();
+            $wherePieces[] = "AND created_at >= :from";
+            $params['from'] = $from->getDatabase();
         }
 
-        $wherePieces[] = "
-            AND updated_at BETWEEN :from AND :to
-        ";
+        $to = null;
+        if ($this->toDate) {
+            $to = (new \Alaress_Date_Format($this->toDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT))->endOfDay();
 
-        $params = array_merge($params, [
-            'from' => $from->getDatabase(),
-            'to' => $to->getDatabase(),
-        ]);
+            $wherePieces[] = "AND created_at <= :to";
+            $params['to'] = $to->getDatabase();
+        }
 
         /* TODO Add "Filter by classes and groups"
          *  Homepage components allow students to create learning moments from a homepage
@@ -220,14 +307,12 @@ class Payload
 
         /* Filter to a set of states/statuses, if specified
          */
-        if ($states) {
-            $states = explode(',', $states);
-
-            if (\count($states)) {
-                /* Ensure that the state provided is one of the canonical states we've established
-                 * so you can't request moments with the status "cat"
-                 */
-                $validStates = array_intersect($states, Evidence\Model::VALID_STATUSES);
+        $states = explode(',', $this->states ?? '');
+        if (\count($states)) {
+            /* Ensure that the state provided is one of the canonical states we've established
+             * so you can't request moments with the status "cat"
+             */
+            $validStates = array_intersect($states, Evidence\Model::VALID_STATUSES);
 
                 /* Do a deep inspection for the pb, which isn't exactly nice; look at the various
                  * *_by and *_at date fields to determine what state a learning moment is in.
@@ -235,56 +320,55 @@ class Payload
                  * for the pub; those require hydrated models. Maybe split this out into something
                  * else later.
                  */
-                if (\count($validStates)) {
-                    $stateQueryPieces = [];
+            if (\count($validStates)) {
+                $stateQueryPieces = [];
 
-                    foreach ($validStates as $state) {
-                        if (Evidence\Model::STATUS_DRAFT === $state) {
-                            /* TODO maybe we should have had a draft_at and draft_by columns
-                             *  to shortcut this nonsense, but that's also kind of annoying...
-                             */
-                            $stateQueryPieces[] = '(
-                                submitted_at IS NULL
-                                AND submitted_by IS NULL
-                                AND published_at IS NULL
-                                AND published_by IS NULL
-                                AND rejected_at IS NULL
-                                AND rejected_by IS NULL
-                            )';
-                        } elseif (Evidence\Model::STATUS_SUBMITTED === $state) {
-                            $stateQueryPieces[] = '(
-                                submitted_at IS NOT NULL
-                                AND submitted_by IS NOT NULL
-                                AND published_at IS NULL
-                                AND published_by IS NULL
-                                AND rejected_at IS NULL
-                                AND rejected_by IS NULL
-                            )';
-                        } elseif (Evidence\Model::STATUS_PUBLISHED === $state) {
-                            $stateQueryPieces[] = '(
-                                submitted_at IS NULL
-                                AND submitted_by IS NULL
-                                AND published_at IS NOT NULL
-                                AND published_by IS NOT NULL
-                                AND rejected_at IS NULL
-                                AND rejected_by IS NULL
-                            )';
-                        } elseif (Evidence\Model::STATUS_REJECTED === $state) {
-                            $stateQueryPieces[] = '(
-                                submitted_at IS NULL
-                                AND submitted_by IS NULL
-                                AND published_at IS NULL
-                                AND published_by IS NULL
-                                AND rejected_at IS NOT NULL
-                                AND rejected_by IS NOT NULL
-                            )';
-                        }
+                foreach ($validStates as $state) {
+                    if (Evidence\Model::STATUS_DRAFT === $state) {
+                        /* TODO maybe we should have had a draft_at and draft_by columns
+                         *  to shortcut this nonsense, but that's also kind of annoying...
+                         */
+                        $stateQueryPieces[] = '(
+                            submitted_at IS NULL
+                            AND submitted_by IS NULL
+                            AND published_at IS NULL
+                            AND published_by IS NULL
+                            AND rejected_at IS NULL
+                            AND rejected_by IS NULL
+                        )';
+                    } elseif (Evidence\Model::STATUS_SUBMITTED === $state) {
+                        $stateQueryPieces[] = '(
+                            submitted_at IS NOT NULL
+                            AND submitted_by IS NOT NULL
+                            AND published_at IS NULL
+                            AND published_by IS NULL
+                            AND rejected_at IS NULL
+                            AND rejected_by IS NULL
+                        )';
+                    } elseif (Evidence\Model::STATUS_PUBLISHED === $state) {
+                        $stateQueryPieces[] = '(
+                            submitted_at IS NULL
+                            AND submitted_by IS NULL
+                            AND published_at IS NOT NULL
+                            AND published_by IS NOT NULL
+                            AND rejected_at IS NULL
+                            AND rejected_by IS NULL
+                        )';
+                    } elseif (Evidence\Model::STATUS_REJECTED === $state) {
+                        $stateQueryPieces[] = '(
+                            submitted_at IS NULL
+                            AND submitted_by IS NULL
+                            AND published_at IS NULL
+                            AND published_by IS NULL
+                            AND rejected_at IS NOT NULL
+                            AND rejected_by IS NOT NULL
+                        )';
                     }
-
-                    $stateQuery = implode(' OR ', $stateQueryPieces);
-
-                    $wherePieces[] = "AND ({$stateQuery})";
                 }
+
+                $stateQuery = implode(' OR ', $stateQueryPieces);
+
+                $wherePieces[] = "AND ({$stateQuery})";
             }
         }
 
@@ -293,34 +377,32 @@ class Payload
         $query .= implode("\n", $wherePieces);
 
         /* All the learning moments that fulfil the filter criteria
-         * Don't hydrate them yet as sometimes we don't need to
          */
         return $this->mapper->getDatabase()->executeQuery($query, $params)->fetchColumnArray('id');
     }
 
 
     /**
-     * Find all the possible pages that the Cohort Report should load
-     * This avoids the user clicking "Load More" and ending up with a blank page
-     * and also allows us to know when there's nothing more to load
+     * Get the date range for the current cursor position
      *
-     * Essentially this is just a workaround for not having a proper cursor to use
-     *
-     * @param array<int> $momentIds All the moment IDs that should be loaded (i.e. from findIdsByFilters())
-     * @return array<array{start:string,end:string,items:int}>
+     * @param string|null $encodedCursor
+     * @param array<int> $momentIds
+     * @return array{from:string,to:string}|null
      */
-    public function findAllPages(array $momentIds): array
+    private function getDateRangeForCursor(?string $encodedCursor, array $momentIds): ?array
     {
-        // Find all possible dates and sort desc
+        // Find all possible dates for each moment ID
+        // TODO: could avoid this second query if $momentIds already contained the dates
         $pb = $this->mapper->getPredicateBuilder()
             ->in($this->mapper->getIdentifierColumn(), $momentIds);
 
         $rows = $this->mapper->findColumnsByPredicates(['created_at'], $pb);
 
         if (empty($rows)) {
-            return [];
+            return null;
         }
 
+        // Parse and sort the dates
         $dates = array_map(
             fn($row) => (new \Alaress_Date_Format(
                 $row['created_at'],
@@ -331,25 +413,35 @@ class Payload
 
         usort($dates, fn($a, $b) => $b->compare($a)); // DESC
 
-        // Now paginate with sliding windows
-        $pages = [];
-        $currentPageEnd = null;
-        foreach ($dates as $date) {
-            // Have we surpassed the current page's end date?
-            if (null === $currentPageEnd || $date->lt($currentPageEnd)) {
-                $currentPageEnd = (clone $date)->addDays(-self::SLIDING_WINDOW_SIZE);
-                $pages[] = [
-                    'items' => 0,
-                    'start' => null, // updated below
-                    'end' => $date->getDatabaseDate(),
-                ];
-            }
+        // Find the first date to start the sliding window
+        $toDate = null;
+        if ($encodedCursor !== null && $encodedCursor !== '') {
+            $decoded = $this->codec->decode($encodedCursor);
+            if (isset($decoded['lastDate'])) {
+                $nextDate = new \Alaress_Date_Format($decoded['lastDate'], \Alaress_Date_Format::DATABASE_DATE_FORMAT);
 
-            $pages[count($pages) - 1]['items'] += 1;
-            $pages[count($pages) - 1]['start'] = $date->getDatabaseDate();
+                // Find next relevant date after (or including) the cursor date
+                foreach ($dates as $date) {
+                    if ($date->lte($nextDate)) {
+                        $toDate = $date;
+                        break;
+                    }
+                }
+            }
         }
 
-        return $pages;
+        // If there wasn't a valid cursor, start from the most recent date
+        if ($toDate === null) {
+            $toDate = $dates[0];
+        }
+
+        // The oldest date is X-1 days before the start date since startOfDay/endOfDay is used below
+        $fromDate = (clone $toDate)->addDays(1 - self::DAYS_PER_REQUEST);
+
+        return [
+            'from' => $fromDate->startOfDay()->getDatabase(),
+            'to' => $toDate->endOfDay()->getDatabase(),
+        ];
     }
 
 
