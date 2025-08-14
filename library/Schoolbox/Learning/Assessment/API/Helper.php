@@ -471,7 +471,7 @@ class Helper
                 `aa1`.`reviewed_at`                     AS `completion_date`,
                 `aa1`.`comment`                         AS `comment`,
                 `aa1`.`mark`                            AS `mark`,
-                (`aa1`.`mark` / `aa1`.`max_mark` * 100) AS `norm_mark`,
+                `aa1`.`norm_mark`                       AS `norm_mark`,
                 $participantFields,
                 $reviewerFields
             from (
@@ -686,7 +686,7 @@ class Helper
                 `aa1`.`finish`                          AS `completion_date`,
                 `aa1`.`comment`                         AS `comment`,
                 `aa1`.`mark`                            AS `mark`,
-                (`aa1`.`mark` / `aa1`.`max_mark` * 100) AS `norm_mark`,
+                `aa1`.`norm_mark`                       AS `norm_mark`,
                 $participantFields,
                 $submitterFields
             from (
