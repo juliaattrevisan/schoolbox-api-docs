@@ -76,11 +76,31 @@ class Cursor implements ICursor
             }
         }
 
-        // TODO: bug, this doesn't detect the last cursor correctly. need to check if we hit the end
+        $nextCursorDate = $earliestDate->addDays(-1);
 
-        // Encode the cursor with the earliest date we've seen
+        // However, there may be no more results left... so check if the cursor is valid
+        // Find the learning moment that would start the next page
+        $momentIds = $this->findIdsByFilters();
+        if (empty($momentIds)) {
+            return null;
+        }
+        $momentDates = $this->findMomentDates($momentIds);
+
+        $nextMoment = null;
+        foreach ($momentDates as $date) {
+            if ($date->lte($nextCursorDate)) {
+                $nextMoment = $date;
+                break;
+            }
+        }
+
+        if ($nextMoment === null) {
+            // No more results left, so no cursor
+            return null;
+        }
+
         return $this->codec->encode([
-            'lastDate' => $earliestDate->addDays(-1)->getDatabaseDate(),
+            'lastDate' => $nextCursorDate->getDatabaseDate(),
         ]);
     }
 
@@ -129,7 +149,8 @@ class Cursor implements ICursor
             }
 
             // Determine the date range for this page
-            $dateRange = $this->getDateRangeForCursor($encodedCursor, $momentIds);
+            $momentDates = $this->findMomentDates($momentIds);
+            $dateRange = $this->getDateRangeForCursor($encodedCursor, $momentDates);
             if ($dateRange === null) {
                 return new GenericCollection(Evidence\Model::class);
             }
@@ -383,36 +404,42 @@ class Cursor implements ICursor
 
 
     /**
-     * Get the date range for the current cursor position
+     * Find all the createdAt dates for the learning moments to be used when determining the date range
+     * Returns the startOfDay equivalent of each date, sorted in descending order (most recent first)
      *
-     * @param string|null $encodedCursor
      * @param array<int> $momentIds
-     * @return array{from:string,to:string}|null
+     * @return array<int,\Alaress_Date_Format>
      */
-    private function getDateRangeForCursor(?string $encodedCursor, array $momentIds): ?array
+    public function findMomentDates(array $momentIds): array
     {
-        // Find all possible dates for each moment ID
-        // TODO: could avoid this second query if $momentIds already contained the dates
-        $pb = $this->mapper->getPredicateBuilder()
-            ->in($this->mapper->getIdentifierColumn(), $momentIds);
-
-        $rows = $this->mapper->findColumnsByPredicates(['created_at'], $pb);
-
-        if (empty($rows)) {
-            return null;
+        if (empty($momentIds)) {
+            return [];
         }
 
-        // Parse and sort the dates
+        $pb = $this->mapper->getPredicateBuilder()
+            ->in($this->mapper->getIdentifierColumn(), $momentIds);
+        $rows = $this->mapper->findColumnsByPredicates(['created_at'], $pb);
+
         $dates = array_map(
-            fn($row) => (new \Alaress_Date_Format(
-                $row['created_at'],
-                \Alaress_Date_Format::DATABASE_DATE_FORMAT
-            ))->startOfDay(),
+            fn($row) => (new \Alaress_Date_Format($row['created_at'], \Alaress_Date_Format::DATABASE_DATE_FORMAT))->startOfDay(),
             $rows
         );
 
         usort($dates, fn($a, $b) => $b->compare($a)); // DESC
 
+        return $dates;
+    }
+
+
+    /**
+     * Get the date range for the current cursor position
+     *
+     * @param string|null $encodedCursor
+     * @param array<int,\Alaress_Date_Format> $momentDates
+     * @return array{from:string,to:string}|null
+     */
+    private function getDateRangeForCursor(?string $encodedCursor, array $momentDates): ?array
+    {
         // Find the first date to start the sliding window
         $toDate = null;
         if ($encodedCursor !== null && $encodedCursor !== '') {
@@ -421,18 +448,23 @@ class Cursor implements ICursor
                 $nextDate = new \Alaress_Date_Format($decoded['lastDate'], \Alaress_Date_Format::DATABASE_DATE_FORMAT);
 
                 // Find next relevant date after (or including) the cursor date
-                foreach ($dates as $date) {
+                foreach ($momentDates as $date) {
                     if ($date->lte($nextDate)) {
                         $toDate = $date;
                         break;
                     }
+                }
+
+                // If we didn't find anything, no point in continuing
+                if ($toDate === null) {
+                    return null;
                 }
             }
         }
 
         // If there wasn't a valid cursor, start from the most recent date
         if ($toDate === null) {
-            $toDate = $dates[0];
+            $toDate = $momentDates[0];
         }
 
         // The oldest date is X-1 days before the start date since startOfDay/endOfDay is used below
