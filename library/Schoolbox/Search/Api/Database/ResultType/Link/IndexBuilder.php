@@ -121,19 +121,21 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
-        $queryString = "SELECT
-            l.id
-            FROM link l
-            INNER JOIN folder fo ON l.category = fo.id
-            WHERE COALESCE(l.deleted_at, fo.deleted_at) IS NOT NULL
-        ";
-        $params      = [];
+        // Select all search_index rows linked to deleted links.
+        $queryString = '
+            SELECT si.identifier, si.type
+            FROM search_index si
+            JOIN link l ON si.identifier = l.id
+            WHERE search_index.type = "link"
+            AND l.deleted_at IS NOT NULL
+        ';
+        $params = [];
         if ($fromDate) {
-            $queryString        .= ' AND COALESCE(l.deleted_at, fo.deleted_at) >= :fromDate';
+            $queryString .= ' AND l.deleted_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString      .= ' AND COALESCE(l.deleted_at, fo.deleted_at) <= :toDate';
+            $queryString .= ' AND l.deleted_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
