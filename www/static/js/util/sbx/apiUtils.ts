@@ -43,20 +43,6 @@ export type ApiBaseResponse<TRespData> =
 /** The base type for an API request body */
 type ApiRequestBodyBase = Record<string, unknown> | FormData;
 
-/**
- * The expected response data for a cursor-based API request
- */
-export type ApiCursorResponseData<TData> = {
-    data: TData[];
-    metadata: {
-        count: number;
-        cursor: {
-            current: string | null;
-            next: string | null;
-        };
-    };
-};
-
 interface ApiRequestOptions<TBody extends ApiRequestBodyBase | undefined = undefined> {
     /**
      * The API endpoint to send the request to

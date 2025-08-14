@@ -1,5 +1,5 @@
 import { buildApiRequest } from "@js/util/sbx/apiUtils";
-import type { ApiCursorResponseData } from "@js/util/sbx/apiUtils";
+import type { Metadata } from "@js/util/sbx/apiUtils";
 import type { StorageFile } from "@js/resource/resourceUtils";
 import type { EvidenceStatus } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 
@@ -51,7 +51,12 @@ type CohortReportApiPayload = {
     states?: EvidenceStatus[];
 };
 
-export const getCohortReport = buildApiRequest<ApiCursorResponseData<CohortReportEntry>, CohortReportApiPayload>({
+type CohortReportApiResponse = {
+    data: CohortReportEntry[];
+    metadata: Metadata;
+};
+
+export const getCohortReport = buildApiRequest<CohortReportApiResponse, CohortReportApiPayload>({
     method: "GET",
     url: null, // forces the URL to be set when calling the function
 });
