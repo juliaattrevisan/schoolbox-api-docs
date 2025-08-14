@@ -42,6 +42,8 @@ class Controller extends Base
     private GroupsHelper $groupsHelper;
 
     public function __construct(
+        \Alaress\Authorizer\Authorizer $authorizer,
+        \Aura\Router\Generator $routeGenerator,
         private UserMapper $userMapper,
         private GroupMapper $groupMapper,
         private UserAccessMapper $userAccessMapper,
@@ -52,6 +54,8 @@ class Controller extends Base
         private RosettaStone $l10n,
     ) {
         $this->groupsHelper = new GroupsHelper(
+            $authorizer,
+            $routeGenerator,
             $groupMapper,
             $userAccessMapper,
             $folderMapper,
