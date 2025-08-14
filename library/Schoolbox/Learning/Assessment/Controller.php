@@ -98,12 +98,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
      * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
      * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
-     * @param IdFinder $filtersAssessmentIdFinder
-     * @param CompositeFactoryFactory $filtersFactoryFactory
-     * @param \Schoolbox\Filter\Mapper $filterMapper
-     * @param Filter\Selection\Mapper $filterSelectionMapper
-     * @param CourseImplementationMapper $courseImplementationMapper
-     * @param UnitImplementationMapper $unitImplementationMapper
+     * @param IdFinder|null $filtersAssessmentIdFinder
+     * @param CompositeFactoryFactory|null $filtersFactoryFactory
+     * @param Filter\Mapper|null $filterMapper
+     * @param Filter\Selection\Mapper|null $filterSelectionMapper
+     * @param CourseImplementationMapper|null $courseImplementationMapper
+     * @param UnitImplementationMapper|null $unitImplementationMapper
      * @param null|Factory $urlFactory
      * @param null|string $learnosityVersion
      * @param null|string $learnosityConsumerKey
@@ -128,12 +128,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
         protected Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
-        private Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder,
-        private Filter\CompositeFactoryFactory $filtersFactoryFactory,
-        private Filter\Mapper $filterMapper,
-        private Filter\Selection\Mapper $filterSelectionMapper,
-        private CourseImplementationMapper $courseImplementationMapper,
-        private UnitImplementationMapper $unitImplementationMapper,
+        private ?Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder = null,
+        private ?Filter\CompositeFactoryFactory $filtersFactoryFactory = null,
+        private ?Filter\Mapper $filterMapper = null,
+        private ?Filter\Selection\Mapper $filterSelectionMapper = null,
+        private ?CourseImplementationMapper $courseImplementationMapper = null,
+        private ?UnitImplementationMapper $unitImplementationMapper = null,
         ?\Schoolbox\Url\Factory $urlFactory = null,
         ?string $learnosityVersion = null,
         #[\SensitiveParameter] ?string $learnosityConsumerKey = null,
