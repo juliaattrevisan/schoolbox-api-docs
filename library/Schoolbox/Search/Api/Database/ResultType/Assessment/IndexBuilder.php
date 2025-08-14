@@ -172,7 +172,7 @@ class IndexBuilder extends BaseBuilder
     {
         $queryString = (
             // Select all search_index rows linked to deleted assessments.
-            "SELECT search_index.identifier, search_index.type
+            "SELECT search_index.identifier AS id, search_index.type
             FROM search_index
             JOIN assessment ON search_index.identifier = assessment.id
             WHERE search_index.type like 'assessment%'
