@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Assessment;
 
 use Alaress_Date_Format;
-use Schoolbox\External\Connector\Isams\Base\Endpoint\Timetable\Identifier;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\DataModel\Model;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
