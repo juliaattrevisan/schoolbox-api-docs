@@ -4,10 +4,12 @@
 # ENV: if prod or production, build with prod dependencies only;
 #      otherwise, build with dev dependencies.
 ARG ENV=dev
-ARG PHP_MAJOR_VERSION
+ARG PHP_MAJOR_VERSION=8.4
 
 # TODO should this support ARCH as well?
 FROM dunglas/frankenphp:1.8-php${PHP_MAJOR_VERSION}-bookworm
+
+ARG PHP_MAJOR_VERSION
 
 # Ensure ENV is accessible by this build step:
 # otherwise, xDebug will be installed below.

@@ -5,7 +5,7 @@
 #      otherwise, build with dev dependencies.
 ARG ENV=dev
 ARG ARCH=amd64
-ARG PHP_MAJOR_VERSION
+ARG PHP_MAJOR_VERSION=8.4
 
 # Currently alpine can drop-in replace bookworm:
 # just replace "bookworm" with "alpine" in the `FROM` line below.
@@ -17,6 +17,7 @@ FROM --platform=linux/${ARCH} dunglas/frankenphp:1.8-php${PHP_MAJOR_VERSION}-boo
 # Ensure ENV is accessible by this build step:
 # otherwise, xDebug will be installed below.
 ARG ENV
+ARG PHP_MAJOR_VERSION
 
 # Install additional extensions
 # (not in https://github.com/shinsenter/php?tab=readme-ov-file#pre-installed-php-extensions)

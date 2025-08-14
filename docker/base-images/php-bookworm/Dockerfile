@@ -10,9 +10,11 @@
 #      otherwise, build with dev dependencies.
 ARG ENV=dev
 ARG ARCH=amd64
-ARG PHP_MAJOR_VERSION
+ARG PHP_MAJOR_VERSION=8.4
 
 FROM --platform=linux/${ARCH} php:${PHP_MAJOR_VERSION}-cli-bookworm
+
+ARG PHP_MAJOR_VERSION
 
 # Use install-php-extensions script, and install extensions with that
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
