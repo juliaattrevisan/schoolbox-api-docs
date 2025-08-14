@@ -194,29 +194,30 @@ class Payload
 
         /* Filter to a set of states/statuses, if specified
          */
-        $states = explode(',', $states);
+        if ($states) {
+            $states = explode(',', $states);
 
-        if (\count($states)) {
-            /* Ensure that the state provided is one of the canonical states we've established
-             * so you can't request moments with the status "cat"
-             */
-            $validStates = array_intersect($states, Evidence\Model::VALID_STATUSES);
+            if (\count($states)) {
+                /* Ensure that the state provided is one of the canonical states we've established
+                 * so you can't request moments with the status "cat"
+                 */
+                $validStates = array_intersect($states, Evidence\Model::VALID_STATUSES);
 
-            /* Do a deep inspection for the pb, which isn't exactly nice; look at the various
-             * *_by and *_at date fields to determine what state a learning moment is in.
-             * We don't have access to the convenience methods isDraft() isPublished() etc.
-             * for the pub; those require hydrated models. Maybe split this out into something
-             * else later.
-             */
-            if (\count($validStates)) {
-                $stateQueryPieces = [];
+                /* Do a deep inspection for the pb, which isn't exactly nice; look at the various
+                 * *_by and *_at date fields to determine what state a learning moment is in.
+                 * We don't have access to the convenience methods isDraft() isPublished() etc.
+                 * for the pub; those require hydrated models. Maybe split this out into something
+                 * else later.
+                 */
+                if (\count($validStates)) {
+                    $stateQueryPieces = [];
 
-                foreach ($validStates as $state) {
-                    if (Evidence\Model::STATUS_DRAFT === $state) {
-                        /* TODO maybe we should have had a draft_at and draft_by columns
-                         *  to shortcut this nonsense, but that's also kind of annoying...
-                         */
-                        $stateQueryPieces[] = '(
+                    foreach ($validStates as $state) {
+                        if (Evidence\Model::STATUS_DRAFT === $state) {
+                            /* TODO maybe we should have had a draft_at and draft_by columns
+                             *  to shortcut this nonsense, but that's also kind of annoying...
+                             */
+                            $stateQueryPieces[] = '(
                             submitted_at IS NULL
                             AND submitted_by IS NULL
                             AND published_at IS NULL
@@ -224,8 +225,8 @@ class Payload
                             AND rejected_at IS NULL
                             AND rejected_by IS NULL
                         )';
-                    } elseif (Evidence\Model::STATUS_SUBMITTED === $state) {
-                        $stateQueryPieces[] = '(
+                        } elseif (Evidence\Model::STATUS_SUBMITTED === $state) {
+                            $stateQueryPieces[] = '(
                             submitted_at IS NOT NULL
                             AND submitted_by IS NOT NULL
                             AND published_at IS NULL
@@ -233,8 +234,8 @@ class Payload
                             AND rejected_at IS NULL
                             AND rejected_by IS NULL
                         )';
-                    } elseif (Evidence\Model::STATUS_PUBLISHED === $state) {
-                        $stateQueryPieces[] = '(
+                        } elseif (Evidence\Model::STATUS_PUBLISHED === $state) {
+                            $stateQueryPieces[] = '(
                             submitted_at IS NULL
                             AND submitted_by IS NULL
                             AND published_at IS NOT NULL
@@ -242,8 +243,8 @@ class Payload
                             AND rejected_at IS NULL
                             AND rejected_by IS NULL
                         )';
-                    } elseif (Evidence\Model::STATUS_REJECTED === $state) {
-                        $stateQueryPieces[] = '(
+                        } elseif (Evidence\Model::STATUS_REJECTED === $state) {
+                            $stateQueryPieces[] = '(
                             submitted_at IS NULL
                             AND submitted_by IS NULL
                             AND published_at IS NULL
@@ -251,12 +252,13 @@ class Payload
                             AND rejected_at IS NOT NULL
                             AND rejected_by IS NOT NULL
                         )';
+                        }
                     }
+
+                    $stateQuery = implode(' OR ', $stateQueryPieces);
+
+                    $wherePieces[] = "AND ({$stateQuery})";
                 }
-
-                $stateQuery = implode(' OR ', $stateQueryPieces);
-
-                $wherePieces[] = "AND ({$stateQuery})";
             }
         }
 
