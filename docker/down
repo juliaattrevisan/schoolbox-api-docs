@@ -11,11 +11,11 @@ docker compose --progress plain \
     -f "docker/schoolbox-taskd/dev.docker-compose.yaml" \
     -f "docker/schoolbox-frankenphp/dev.docker-compose.yaml" \
     --env-file .docker-compose.env \
-    down
+    down "$@"
 
 docker compose --progress plain \
     -f "docker/base.docker-compose.yaml" \
     -f "docker/schoolbox-taskd/deploy.docker-compose.yaml" \
     -f "docker/schoolbox-frankenphp/deploy.docker-compose.yaml" \
     --env-file .docker-compose.env \
-    down
+    down "$@"

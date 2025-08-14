@@ -41,8 +41,18 @@ case "$ENV" in
   prod | production)
     ;;
   *)
-    # AWS CLI install
+    # Supporting tools install
     apt-get install -y zip pv wget
+    ;;
+esac
+EOF
+
+RUN <<EOF
+case "$ENV" in
+  prod | production)
+    ;;
+  *)
+    # AWS CLI install
     case "$ARCH" in
       arm64)
         export AWS_CLI_ARCH='aarch64'
@@ -56,14 +66,27 @@ case "$ENV" in
     ./aws/install
     rm awscliv2.zip
     rm -rf ./aws
-
-    # NPM install
-    curl "https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh" -o nvm-install
-    chmod +x nvm-install
-    bash -c "./nvm-install && source /root/.nvm/nvm.sh && nvm install ${NODE_VERSION}"
     ;;
 esac
 EOF
+
+RUN <<EOF
+case "$ENV" in
+  prod | production)
+    ;;
+  *)
+    # NPM install for all users into /opt/nvm
+    curl "https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh" -o nvm-install
+    chmod +x nvm-install
+    mkdir -p /opt/nvm
+    NVM_DIR=/opt/nvm bash -c "./nvm-install && source /opt/nvm/nvm.sh && nvm install ${NODE_VERSION}"
+    ;;
+esac
+EOF
+
+# Copy NVM profile and sudoers conf
+COPY ./config/profile.d/* /etc/profile.d/
+COPY ./config/sudoers.d/* /etc/sudoers.d/
 
 # Install Composer (dev only?)
 COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
@@ -75,3 +98,12 @@ RUN \
   apt-get clean -y
 
 WORKDIR /usr/share/schoolbox
+
+# Create users and groups, and set default user
+RUN <<EOF
+useradd -m -U -G adm,sudo,www-data -s /bin/bash schoolboxsuper
+EOF
+
+# For some reason this causes a message: schoolbox-cli hook exited with status 1
+# The container starts without issue though.
+USER schoolboxsuper

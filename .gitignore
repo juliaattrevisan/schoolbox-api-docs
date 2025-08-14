@@ -49,3 +49,7 @@ docker-taskd.env
 # IR configuration is created by the Docker provision process:
 # it should not be committed
 docker/schoolbox/config/instance-registry.json
+
+# This file is required by schoolbox-cli for building a crontab:
+# the provision process will build it
+docker/schoolbox/config/cron_config.ini

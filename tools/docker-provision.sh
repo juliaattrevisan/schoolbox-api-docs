@@ -101,7 +101,7 @@ function setup_aws_sso() {
   fi
 }
 
-function create_ir_conf_file() {
+function create_ir_config_file() {
   log "Creating instance registry configuration";
   echo -e \
     "{\n" \
@@ -146,30 +146,6 @@ function download_certs() {
 function mark_safe_for_git() {
   log "Adding Schoolbox dir ${SITE_ROOT} as safe for Git";
   git config --global --add safe.directory "${SITE_ROOT}"
-}
-
-function set_profile_env_vars() {
-  # Set env vars for root + standard user (if one is added)
-  local bashrcFiles=(/root/.bashrc)
-  declare -A env_vars=(
-    [INSTANCE_ID]="${DEFAULT_INSTANCE_ID}"
-    [HOST_TYPE]="docker"
-  )
-  for config_name in "${!env_vars[@]}"; do
-    config_value=${env_vars[$config_name]}
-    for bashrcFile in "${bashrcFiles[@]}"; do
-      # Remove the config if it exists, then insert it
-      sed -i -E "/^export\s+$config_name\s*=.+/d" ${bashrcFile}
-      echo "export $config_name=\"$config_value\"" >> ${bashrcFile};
-    done
-
-  #  # Need to preserve these ENV vars for vagrant's sudo session
-  #  if ! grep -qE "^Defaults\s+env_keep\s*\+=\s*\".*$config_name" /etc/sudoers.d/vagrant; then
-  #    chmod a+w /etc/sudoers.d/vagrant;
-  #    echo "Defaults env_keep += \"$config_name\"" >> /etc/sudoers.d/vagrant;
-  #    chmod a-w /etc/sudoers.d/vagrant;
-  #  fi
-  done
 }
 
 function init_database() {
@@ -317,7 +293,7 @@ function init_npm_dependencies() {
 
   # Ensure nvm.sh is run before building NPM stuff,
   # so the npm versions it installed are available
-  source ~/.nvm/nvm.sh
+  source /opt/nvm/nvm.sh
 
   local npm_dir="$SITE_ROOT/node_modules"
   local npm_file='npm.tar.gz'
@@ -411,10 +387,23 @@ function install_instance() {
   fi
 
   log "Applying development environment SQL fixes";
-  mariadb -h mariadb -u root -D schoolbox < "${SITE_ROOT}/sql/vagrant.sql"
-  mariadb -h mariadb -u root -D schoolbox < "${CACHE_DIR}/vagrant-secrets.sql"
+  "$SITE_ROOT"/tools/instance-mariadb.sh < "${SITE_ROOT}/sql/vagrant.sql"
+  "$SITE_ROOT"/tools/instance-mariadb.sh < "${CACHE_DIR}/vagrant-secrets.sql"
 
   log "Loading all demo data complete";
+}
+
+function create_cron_config_file() {
+  log "Creating cron configuration";
+  local timezone;
+  timezone=$("$SITE_ROOT"/tools/instance-mariadb.sh -NBe "select value from config where name = 'date_timezone'")
+  # Hardcode UPS run time to 22:00 for now, I suppose?
+  echo "${DEFAULT_INSTANCE_ID};${timezone};22:00;/var/log/schoolbox/${DEFAULT_INSTANCE_ID}" > /etc/schoolbox/cron_config.ini
+}
+
+function create_crontab_files() {
+  log "Creating crontab files";
+  cloud-rebuild-cronjobs --is-primary-host 1 --instance "${DEFAULT_INSTANCE_ID}"
 }
 
 function post_install() {
@@ -443,19 +432,20 @@ function main() {
   load_consts
   load_config
   setup_aws_sso
-  create_ir_conf_file
+  create_ir_config_file
 
   cleanup_cache_dir
   download_secrets
   download_certs
   mark_safe_for_git
-  set_profile_env_vars
 
   init_composer_dependencies
   init_npm_dependencies
 
   init_database
   install_instance
+  create_cron_config_file
+  create_crontab_files
   post_install
 }
 

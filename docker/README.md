@@ -68,6 +68,16 @@ up the Vagrant development environment.
 - `clean`: cleans up the temporary and cache files which the Docker development
   environment may create
 
+`up` and `down` also pass through any arguments to their `docker compose up` and
+`docker compose down` calls, respectively. For example:
+- `up --build` builds images before starting containers
+- `down -v` removes volumes (e.g. database data) when stopping containers:
+  useful for when testing a new database version
+
+See the documentation for the `docker compose` commands for more information:
+- [up](https://docs.docker.com/reference/cli/docker/compose/up/)
+- [down](https://docs.docker.com/reference/cli/docker/compose/down/)
+
 These scripts should all be run with `sudo`, unless your current user has been
 added to the Docker group: see
 https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user.

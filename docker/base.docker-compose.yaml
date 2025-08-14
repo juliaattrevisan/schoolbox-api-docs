@@ -55,6 +55,9 @@ services:
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN}
       AWS_CREDENTIAL_EXPIRATION: ${AWS_CREDENTIAL_EXPIRATION}
+      INSTANCE_ID: ${INSTANCE_ID}
+      HOST_TYPE: docker
+      XDEBUG_CONFIG: "idekey=PHPSTORM"
     build:
       context: ./schoolbox-cli
     tty: true
@@ -78,7 +81,7 @@ services:
   # staging or production envs.
   mariadb:
     container_name: mariadb
-    image: mariadb:11.4
+    image: mariadb:10.6
     healthcheck:
       test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
       start_period: 30s
@@ -92,7 +95,7 @@ services:
 
   redis-storage:
     container_name: redis-storage
-    image: redis:7.4
+    image: redis:6.0
     healthcheck:
       test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
       start_period: 30s
@@ -105,7 +108,7 @@ services:
 
   redis-cache:
     container_name: redis-cache
-    image: redis:7.4
+    image: redis:6.0
     healthcheck:
       test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
       start_period: 30s
