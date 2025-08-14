@@ -57,7 +57,7 @@ export function getMeta(
     /**
      * For example: "Apr 2025" or "Aug 2025 | Type: Academic (Behaviour)"
      */
-    if (selectedTab?.title === TabTitle.TYPE_BY_MONTH) {
+    if (selectedTab?.title === TabTitle.TYPE_BY_MONTH || selectedTab?.title === TabTitle.TYPE_BY_WEEK) {
         const typeSubtype = rowData?.type_subtype as TypeSubType;
         meta.push(
             `${header.title} ${typeSubtype ? `| ${typeSubtype.type} ${typeSubtype && typeSubtype.subtype ? `(${typeSubtype.subtype})` : ""}` : ""}`,
