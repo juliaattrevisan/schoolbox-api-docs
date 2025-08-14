@@ -110,6 +110,12 @@ window.Vue.onMounted(() => {
 
 <style scoped>
 .cr-results-grid {
-    grid-template-columns: repeat(auto-fit, minmax(21rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(24rem, 1fr));
+}
+
+@media screen and (max-width: 30rem) {
+    .cr-results-grid {
+        grid-template-columns: 1fr;
+    }
 }
 </style>
