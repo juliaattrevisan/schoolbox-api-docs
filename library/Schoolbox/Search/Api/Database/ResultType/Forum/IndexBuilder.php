@@ -120,20 +120,22 @@ class IndexBuilder extends BaseBuilder
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         // Select all search_index rows linked to deleted forum posts.
+        // Note if the parent forumThread is deleted, the forumPost is considered to be deleted also regardless of its own deleted_at value.
         $queryString = '
             SELECT si.identifier, si.type
             FROM search_index si
             JOIN forumPost fp ON si.identifier = fp.postID
+            JOIN forumThread ft ON fp.threadID = ft.threadID
             WHERE si.type = "forum"
-            AND fp.deleted_at IS NOT NULL
+            AND COALESCE(fp.deleted_at, ft.deleted_at) IS NOT NULL
         ';
         $params = [];
         if ($fromDate) {
-            $queryString .= ' AND fp.deleted_at >= :fromDate';
+            $queryString .= ' AND COALESCE(fp.deleted_at, ft.deleted_at) >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString .= ' AND fp.deleted_at <= :toDate';
+            $queryString .= ' AND COALESCE(fp.deleted_at, ft.deleted_at) <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
