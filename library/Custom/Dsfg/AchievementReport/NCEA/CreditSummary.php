@@ -8,6 +8,9 @@
 
 namespace Custom\Dsfg\AchievementReport\NCEA;
 
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\User;
+
 class CreditSummary extends Base
 {
     /**
@@ -16,6 +19,26 @@ class CreditSummary extends Base
      * @var string
      */
     protected $heading = 'Credit Summary - All Years';
+
+
+    /**
+     * Constructor
+     *
+     * @param User        $user
+     * @param array       $externalUser
+     * @param IConnector  $db
+     * @param string|null $year
+     * @param string      $dbTableName
+     */
+    public function __construct(User $user, array $externalUser, IConnector $db, $year, string $dbTableName)
+    {
+        parent::__construct($user, $externalUser, $db, $year, $dbTableName);
+
+        if ($dbTableName === self::MAIN_DB_TABLE_YEAR11) {
+            // Override heading because the Year 11 report concerns only one year, and thd default heading includes 'All Years'.
+            $this->heading = 'Credit Summary';
+        }
+    }
 
 
     /**
