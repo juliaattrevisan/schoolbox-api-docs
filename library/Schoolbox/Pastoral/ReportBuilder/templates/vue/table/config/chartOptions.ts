@@ -28,14 +28,7 @@ export const trendOptions: Options = {
     plotOptions: {
         area: {
             marker: {
-                enabled: false,
-                symbol: "circle",
                 radius: 2,
-                states: {
-                    hover: {
-                        enabled: true,
-                    },
-                },
             },
         },
     },
@@ -57,7 +50,24 @@ export const trendOptions: Options = {
         visible: false,
     },
     yAxis: {
-        visible: false,
+        endOnTick: false, // so the plotline is shown with at least one value
+        labels: {
+            enabled: false, // Hide tick text/labels
+        },
+        plotLines: [
+            {
+                color: "#000",
+                width: 2,
+                value: 0,
+            },
+        ],
+        // Force the axis to always include 0
+        softMax: 1, // Ensure positive values have some space
+        softMin: -1, // Ensure negative values have some space
+        startOnTick: false, // so the plotline is shown with at least one value
+        title: {
+            text: undefined,
+        },
     },
 };
 
@@ -79,10 +89,10 @@ export function getChartOptions(
         ...trendOptions,
         series: [
             {
-                color: recordsOrPoints === "points" ? "#4fa74f" : "#000",
+                color: recordsOrPoints === "points" ? "#4fa74f" : "var(--accent-foreground)",
                 data: trend.line,
                 name: recordsOrPoints,
-                negativeColor: recordsOrPoints === "points" ? "#fa4a47" : "#000",
+                negativeColor: recordsOrPoints === "points" ? "#fa4a47" : "var(--accent-foreground)",
                 point: {
                     events: {
                         click(this: Point): void {
