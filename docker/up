@@ -144,14 +144,6 @@ function build_docker_compose_args() {
     docker_compose_args="$*"
 }
 
-function create_default_cron_config_file() {
-  log "Creating default cron configuration";
-  local timezone;
-  timezone=$(cat /etc/timezone)
-  # Hardcode UPS run time to 22:00 for now, I suppose?
-  echo "${DEFAULT_INSTANCE_ID};${timezone};22:00;/var/log/schoolbox/${DEFAULT_INSTANCE_ID}" > docker/schoolbox/config/cron_config.ini
-}
-
 function start_containers() {
     # Which task daemon compose file is used?
     # A different one is used when using a locally built container, vs. using
@@ -190,7 +182,9 @@ function start_containers() {
         --env-file .docker-compose.env \
         up -d $docker_compose_args
 
-    # start cron in schoolbox-cli container
+    # start cron in schoolbox-cli container, so that cron tasks actually run:
+    # even though this is in a post_start in docker/base.docker-compose.yaml,
+    # it is not guaranteed to run on docker/up
     docker exec -it schoolbox-cli sudo /etc/init.d/cron start
 }
 
@@ -201,7 +195,6 @@ function main() {
     login_to_aws
     login_to_container_registry
     build_docker_compose_args "$@"
-    create_default_cron_config_file
     build_docker_compose_env
     start_containers "$@"
 }
