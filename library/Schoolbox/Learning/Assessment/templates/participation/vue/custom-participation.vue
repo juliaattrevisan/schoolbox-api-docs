@@ -20,7 +20,6 @@ interface Props {
     assessmentId: number;
     customisations: (Plan | CustomisedPlan)[];
     includeInExistingCustomisation: string;
-    baseAssessable: string;
 }
 const props = defineProps<Props>();
 
@@ -55,15 +54,6 @@ const hasCustomisedInSelection = window.Vue.computed(() => {
 
 const loadError = window.Vue.ref<string | null>(null);
 const studentPastoralCounts = window.Vue.ref<Record<string, StudentPastoralCountBadge[]>>({});
-
-/**
- * Quiz and LTI activity types can't be copied so prevent access
- * to the button when the activity is either of these
- */
-const showCopyButton = window.Vue.computed(() => {
-    const type = (props.baseAssessable || "").toLowerCase().trim();
-    return !(type === "quiz" || type === "lti");
-});
 
 /**
  * Fetch the pastoral counts for the students
@@ -432,7 +422,7 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                                         </button>
                                     </li>
                                     <li class="separator">Create</li>
-                                    <li v-if="showCopyButton">
+                                    <li v-if="getAssessmentParticipationCopyActivity">
                                         <a
                                             class="icon-copy"
                                             :href="`${getAssessmentParticipationCopyActivity}?student=${participant.user.id}&original=${assessmentId}&${getReturnUrl()}`"
@@ -489,7 +479,7 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                             Include in Existing Customisation
                         </button>
                     </div>
-                    <div v-if="showCopyButton" class="l-flex__item--1-auto">
+                    <div v-if="getAssessmentParticipationCopyActivity" class="l-flex__item--1-auto">
                         <a
                             class="icon-copy submit"
                             data-test="custom-participation-copy-activity"
