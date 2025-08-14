@@ -1,5 +1,5 @@
-import { apiRequest } from "@js/util/sbx/apiUtils";
-import type { ApiBaseResponse } from "@js/util/sbx/apiUtils";
+import { buildApiRequest } from "@js/util/sbx/apiUtils";
+import type { ApiCursorResponseData } from "@js/util/sbx/apiUtils";
 import type { StorageFile } from "@js/resource/resourceUtils";
 import type { EvidenceStatus } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 
@@ -51,25 +51,7 @@ type CohortReportApiPayload = {
     states?: EvidenceStatus[];
 };
 
-export type CohortReportApiResponse = {
-    status: 200;
-    content: CohortReportEntry[];
-};
-
-/**
- * Fetch the cohort report data from the API
- * TODO: Add date range
- * @param url - The endpoint to fetch
- * @param body - The request body, if any
- * @returns The response from the API
- */
-export async function getCohortReport(
-    url: string,
-    body: CohortReportApiPayload = {},
-): Promise<ApiBaseResponse<CohortReportApiResponse>> {
-    return apiRequest<CohortReportApiResponse, CohortReportApiPayload>({
-        url: `${url}`,
-        method: "GET",
-        body,
-    });
-}
+export const getCohortReport = buildApiRequest<ApiCursorResponseData<CohortReportEntry>, CohortReportApiPayload>({
+    method: "GET",
+    url: null, // forces the URL to be set when calling the function
+});
