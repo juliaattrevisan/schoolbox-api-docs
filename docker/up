@@ -189,6 +189,9 @@ function start_containers() {
         -f "${taskd_compose_file}" \
         --env-file .docker-compose.env \
         up -d $docker_compose_args
+
+    # start cron in schoolbox-cli container
+    docker exec -it schoolbox-cli sudo /etc/init.d/cron start
 }
 
 function main() {
