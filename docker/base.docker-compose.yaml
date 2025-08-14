@@ -67,7 +67,7 @@ services:
       - schoolbox-config:/etc/schoolbox
       - caddy-ssl:/etc/nginx/certs/
       - aws-config:/root/.aws
-    # After building: create data dirs
+    # After building: create data dirs, start cron
     post_start:
       - command : mkdir -p /var/lib/schoolbox/docker/cache/portrait
       - command : mkdir -p /var/lib/schoolbox/docker/cache/stream
@@ -75,6 +75,7 @@ services:
       - command : mkdir -p /var/lib/schoolbox/docker/files
       - command : mkdir -p /var/lib/schoolbox/docker/purifier
       - command : mkdir -p /var/lib/schoolbox/docker/twig
+      - command : sudo /etc/init.d/cron start
 
   # Database services:
   # these are containers only in a development environment, they won't be on

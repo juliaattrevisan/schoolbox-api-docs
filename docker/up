@@ -181,6 +181,11 @@ function start_containers() {
         -f "${taskd_compose_file}" \
         --env-file .docker-compose.env \
         up -d $docker_compose_args
+
+    # start cron in schoolbox-cli container, so that cron tasks actually run:
+    # even though this is in a post_start in docker/base.docker-compose.yaml,
+    # it is not guaranteed to run on docker/up
+    docker exec -it schoolbox-cli sudo /etc/init.d/cron start
 }
 
 function main() {
