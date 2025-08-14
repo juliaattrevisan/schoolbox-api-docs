@@ -122,20 +122,22 @@ class IndexBuilder extends BaseBuilder
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         // Select all search_index rows linked to deleted links.
+        // Note if the parent folder is deleted, the link is considered to be deleted also regardless of its own deleted_at value.
         $queryString = '
             SELECT si.identifier, si.type
             FROM search_index si
             JOIN link l ON si.identifier = l.id
+            JOIN folder f ON l.category = f.id
             WHERE si.type = "link"
-            AND l.deleted_at IS NOT NULL
+            AND COALESCE(l.deleted_at, f.deleted_at) IS NOT NULL
         ';
         $params = [];
         if ($fromDate) {
-            $queryString .= ' AND l.deleted_at >= :fromDate';
+            $queryString .= ' AND COALESCE(l.deleted_at, f.deleted_at) >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString .= ' AND l.deleted_at <= :toDate';
+            $queryString .= ' AND COALESCE(l.deleted_at, f.deleted_at) <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
