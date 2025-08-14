@@ -41,9 +41,14 @@ use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 class Controller extends Base
 {
     /**
-     * Length of the blurb to show in the cohort report
+     * Length of the blurb to show in the cohort report when there is evidence attached (ideally <= 3 lines)
      */
-    private const COHORT_REPORT_BLURB_LENGTH = 90;
+    private const COHORT_REPORT_BLURB_LENGTH = 180;
+
+    /**
+     * Length of the blurb to show in the cohort report when there is no other evidence attached
+     */
+    private const COHORT_REPORT_BLURB_LENGTH_EXTENDED = 400;
 
     /**
      * Constructor
@@ -840,27 +845,27 @@ class Controller extends Base
             }
 
             /* The actual body may be too long or contain too much HTML (i.e. images/videos)
-                * so we can't just show it in the cohort report as-is.
-                * Similar to news, provide a cut-down blurb of the body content to show instead
-                */
+             * so we can't just show it in the cohort report as-is.
+             * Similar to news, provide a cut-down blurb of the body content to show instead
+             */
             $blurb = \TextFormatter::cutSentence(
                 \Scrub::html2text($moment->getBody()),
-                self::COHORT_REPORT_BLURB_LENGTH,
+                count($files) > 0 ? self::COHORT_REPORT_BLURB_LENGTH : self::COHORT_REPORT_BLURB_LENGTH_EXTENDED,
             );
 
             /* If the learning moment has a body content, there's something to read
-                * (ripped from news land)
-                *
-                * It might be the same as the blurb, but there are complications with
-                * that comparison. The blurb could essentially be a strip_tags of the body,
-                * but if the body contained html only (e.g. an image or a video or an iframe)
-                * then strip_tags will remove whatever was there; it's valid content that should
-                * be seen by users, but has been inadvertently misunderstood by a boolean outcome
-                * and we don't have an easy answer to that problem
-                *
-                * For now, presume there's something to see
-                * Show the link
-                */
+             * (ripped from news land)
+             *
+             * It might be the same as the blurb, but there are complications with
+             * that comparison. The blurb could essentially be a strip_tags of the body,
+             * but if the body contained html only (e.g. an image or a video or an iframe)
+             * then strip_tags will remove whatever was there; it's valid content that should
+             * be seen by users, but has been inadvertently misunderstood by a boolean outcome
+             * and we don't have an easy answer to that problem
+             *
+             * For now, presume there's something to see
+             * Show the link
+             */
             $showReadMore = '' !== (string)$moment->getBody();
 
             /* This is a stack because empty payloads result in a datatype difference in frontend world:
