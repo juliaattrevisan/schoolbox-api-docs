@@ -108,7 +108,8 @@ export function getChartOptions(
         tooltip: {
             formatter(this: Point): string | false {
                 const withoutSuffix = recordsOrPoints.substring(0, recordsOrPoints.length - 1);
-                return `<b>${this.key}:</b> ${this.y} ${this.y === 1 || this.y === -1 ? withoutSuffix : withoutSuffix + "s"}`;
+                const pluralSuffix = this.y === 1 || this.y === -1 ? withoutSuffix : `${withoutSuffix}s`;
+                return `<b>${this.key}:</b> ${this.y} ${pluralSuffix}`;
             },
             valueSuffix: recordsOrPoints,
         },

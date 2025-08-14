@@ -33,6 +33,9 @@ export function getRowKeys(rowData: { [key: string]: RowOptions }): RowKeys {
 /**
  * Get current metadata for the current modal selection,
  * which will vary depending on the table and current cell selection
+ * @param selectedTab - The currently selected tab.
+ * @param header - The header information for the current cell.
+ * @param rowData - The data for the current row.s
  * @returns An array of metadata strings.
  */
 export function getMeta(

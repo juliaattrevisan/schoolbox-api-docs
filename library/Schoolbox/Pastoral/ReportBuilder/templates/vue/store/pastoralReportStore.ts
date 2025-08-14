@@ -50,7 +50,8 @@ export const useStore = defineStore(`pastoralReportStore`, () => {
         localePastoral.value = params.localePastoral;
         showSeverity.value = params.showSeverity;
         severityColors.value = params.severityColors;
-        selectedTab.value = params.tabs[0]; // default to the first tab type
+        const [firstTab] = params.tabs; // Use array destructuring
+        selectedTab.value = firstTab; // default to the first tab type
     }
 
     return {

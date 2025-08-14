@@ -2,8 +2,8 @@
  * Utilities for accessing API endpoints and receiving fully typed responses
  */
 
-import { parseSseEvent } from "./fetchUtils";
 import { isAbortError } from "@js/util/errorUtils";
+import { parseSseEvent } from "./fetchUtils";
 
 /**
  * Metadata typically for paginated API responses
