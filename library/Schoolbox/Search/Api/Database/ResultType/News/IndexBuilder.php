@@ -109,7 +109,7 @@ class IndexBuilder extends BaseBuilder
     {
         // Select all search_index rows linked to unpublished news articles.
         $queryString = '
-            SELECT si.identifier, si.type
+            SELECT si.identifier AS id, si.type
             FROM search_index si
             JOIN comms_news_article n ON si.identifier = n.id
             WHERE si.type = "' . Hydrator::BASE_TYPE . '"

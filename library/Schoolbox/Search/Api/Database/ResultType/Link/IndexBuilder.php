@@ -124,7 +124,7 @@ class IndexBuilder extends BaseBuilder
         // Select all search_index rows linked to deleted links.
         // Note if the parent folder is deleted, the link is considered to be deleted also regardless of its own deleted_at value.
         $queryString = '
-            SELECT si.identifier, si.type
+            SELECT si.identifier AS id, si.type
             FROM search_index si
             JOIN link l ON si.identifier = l.id
             JOIN folder fo ON l.category = fo.id

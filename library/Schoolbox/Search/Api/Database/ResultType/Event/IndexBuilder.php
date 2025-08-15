@@ -108,7 +108,7 @@ class IndexBuilder extends BaseBuilder
     {
         // Select all search_index rows linked to deleted blogs.
         $queryString = '
-            SELECT si.identifier, si.type
+            SELECT si.identifier AS id, si.type
             FROM search_index si
             JOIN event e ON si.identifier = e.id
             WHERE si.type = "' . Hydrator::BASE_TYPE . '"

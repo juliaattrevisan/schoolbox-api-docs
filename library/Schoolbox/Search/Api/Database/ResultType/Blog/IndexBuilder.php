@@ -110,7 +110,7 @@ class IndexBuilder extends BaseBuilder
         // Select all search_index rows linked to deleted blogs.
         // Note if the parent folder is deleted, the blog is considered to be deleted also regardless of its own deleted_at value.
         $queryString = '
-            SELECT si.identifier, si.type
+            SELECT si.identifier AS id, si.type
             FROM search_index si
             JOIN blog b ON si.identifier = b.id
             JOIN folder f ON b.folder_id = f.id

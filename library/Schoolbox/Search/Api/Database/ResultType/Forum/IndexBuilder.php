@@ -122,7 +122,7 @@ class IndexBuilder extends BaseBuilder
         // Select all search_index rows linked to deleted forum posts.
         // Note if the parent forumThread is deleted, the forumPost is considered to be deleted also regardless of its own deleted_at value.
         $queryString = '
-            SELECT si.identifier, si.type
+            SELECT si.identifier AS id, si.type
             FROM search_index si
             JOIN forumPost fp ON si.identifier = fp.postID
             JOIN forumThread ft ON fp.threadID = ft.threadID
