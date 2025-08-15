@@ -1760,6 +1760,7 @@ class Controller extends Base
         //build the csv
         $rowHeadings = [
             'Course Title',
+            'Subject Code',
             'Course Homepage ID',
             'Course ID',
             'Course Framework',
@@ -1780,6 +1781,7 @@ class Controller extends Base
         $courseQuery = $database->prepareQuery("
         SELECT
             courseFolder.name AS 'course.name',
+            course_specification.subject_code AS 'course.subject_code',
             courseFolder.id AS 'course.id',
             course_specification.id AS 'course_specification.id',
             courseTemplates.name AS 'framework'
@@ -1844,6 +1846,7 @@ class Controller extends Base
         /**
          * $rowHeadings = [
          * 'Course Title',
+         * 'Subject Code',
          * 'Course Homepage ID',
          * 'Course Specification ID',
          * 'Course Framework',
@@ -1872,6 +1875,7 @@ class Controller extends Base
             //build the row and send
             fputcsv($fp, [
                 $courses[$row['folder_id']]['course.name'],
+                $courses[$row['folder_id']]['course.subject_code'],
                 $courses[$row['folder_id']]['course.id'],
                 $courses[$row['folder_id']]['course_specification.id'],
                 $courses[$row['folder_id']]['framework'],
@@ -1911,6 +1915,7 @@ class Controller extends Base
         /**
          * $rowHeadings = [
          * 'Course Title',
+         * 'Subject Code',
          * 'Course Homepage ID',
          * 'Course ID',
          * 'Course Framework',
@@ -1933,6 +1938,7 @@ class Controller extends Base
             //build the row and send
             fputcsv($fp, [
                 $courses[$row['folderId']]['course.name'],
+                $courses[$row['folderId']]['course.subject_code'],
                 $courses[$row['folderId']]['course.id'],
                 $courses[$row['folderId']]['course_specification.id'],
                 $courses[$row['folderId']]['framework'],
