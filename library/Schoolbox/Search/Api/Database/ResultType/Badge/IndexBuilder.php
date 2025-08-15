@@ -106,7 +106,7 @@ class IndexBuilder extends BaseBuilder
     {
         // Select all search_index rows linked to deleted badges.
         $queryString = '
-            SELECT si.identifier, si.type
+            SELECT si.identifier AS id, si.type
             FROM search_index si
             JOIN badge b ON si.identifier = b.id
             WHERE si.type = "badge"
