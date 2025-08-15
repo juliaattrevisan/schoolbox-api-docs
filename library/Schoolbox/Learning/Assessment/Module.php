@@ -575,8 +575,7 @@ class Module extends BaseModule
         $assessmentType = AssessmentType::objectToString($assessment);
         if (
             AssessmentType::TYPE_PROJECT === $assessmentType ||
-            AssessmentType::TYPE_LESSON_PLAN === $assessmentType ||
-            AssessmentType::TYPE_LTI_ASSESSMENT === $assessmentType
+            AssessmentType::TYPE_LESSON_PLAN === $assessmentType
         ) {
             throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
         }
