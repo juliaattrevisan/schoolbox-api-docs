@@ -1723,6 +1723,7 @@ class Controller extends Base
         SELECT
             cs.id AS 'Course ID',
             fcs.name AS 'Course Name',
+            cs.subject_code AS 'Subject Code',
             cs.template_id AS 'Framework ID',
             ct.name AS 'Framework',
             '' AS 'New Framework ID',
