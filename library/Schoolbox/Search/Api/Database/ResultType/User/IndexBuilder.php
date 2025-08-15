@@ -113,10 +113,10 @@ class IndexBuilder extends BaseBuilder
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         $queryString = '
-            SELECT u.id, CONCAT("' . Hydrator::BASE_TYPE . '.", r.group_type) AS type
-            FROM user u
-            LEFT JOIN `groups` AS r ON u.group_id = r.id
-            WHERE search_index.type like "' . Hydrator::BASE_TYPE . '%"
+            SELECT si.identifier AS id, si.type
+            FROM search_index si
+            JOIN user u ON si.identifier = u.id
+            WHERE si.type like "' . Hydrator::BASE_TYPE . '%"
             AND u.deleted_at IS NOT NULL
         ';
         $params = [];
