@@ -14,7 +14,6 @@ use Schoolbox\Resource\File\Model;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 use Schoolbox\Search\Api\Database\Index\BuildType;
-use Schoolbox\Search\Api\Database\ResultType\Assessment\Hydrator;
 
 /**
  * Index builder for files.
