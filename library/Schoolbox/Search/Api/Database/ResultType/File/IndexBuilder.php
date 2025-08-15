@@ -14,6 +14,7 @@ use Schoolbox\Resource\File\Model;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 use Schoolbox\Search\Api\Database\Index\BuildType;
+use Schoolbox\Search\Api\Database\ResultType\Assessment\Hydrator;
 
 /**
  * Index builder for files.
@@ -163,23 +164,23 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
-        $subtypeExpression = self::SUBTYPE_EXPRESSION;
-        $joinStatement     = self::JOIN_STATEMENT;
-        $queryString       = "
-            SELECT
-                f.id,
-                $subtypeExpression AS sub_type
-                FROM file f
-                $joinStatement
-                WHERE COALESCE(f.deleted_at, fo.deleted_at) IS NOT NULL
-        ";
+        // Select all search_index rows linked to deleted files.
+        // Note if the parent folder is deleted, the file is considered to be deleted also regardless of its own deleted_at value.
+        $queryString = '
+            SELECT si.identifier AS id, si.type
+            FROM search_index si
+            JOIN file f ON si.identifier = f.id
+            LEFT JOIN folder fo ON f.category = fo.id
+            WHERE si.type like "' . Hydrator::BASE_TYPE . '%"
+            AND COALESCE(f.deleted_at, fo.deleted_at) IS NOT NULL
+        ';
         $params      = [];
         if ($fromDate) {
-            $queryString        .= ' AND COALESCE(f.deleted_at, fo.deleted_at) >= :fromDate';
+            $queryString .= ' AND COALESCE(f.deleted_at, fo.deleted_at) >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString      .= ' AND COALESCE(f.deleted_at, fo.deleted_at) <= :toDate';
+            $queryString .= ' AND COALESCE(f.deleted_at, fo.deleted_at) <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
