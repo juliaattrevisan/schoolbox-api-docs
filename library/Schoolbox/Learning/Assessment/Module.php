@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -190,6 +191,23 @@ class Module extends BaseModule
             )
         );
 
+        $canCopyAssessmentCustomParticipation = new Rule\All(
+            $canModifyCustomParticipation,
+            new Rule\Callback(function (array $param): void {
+                /* At the moment, we want to restrict the copying of custom participation
+                 * for LTI assessments and quizzes, which will be handled in the future, so
+                 * for the time being, we will leave it out.
+                 */
+                $assessmentType = AssessmentType::objectToString($param['assessment']);
+                if (
+                    AssessmentType::TYPE_LTI_ASSESSMENT === $assessmentType ||
+                    AssessmentType::TYPE_QUIZ === $assessmentType
+                ) {
+                    throw new Unauthorized(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+                }
+            }),
+        );
+
         // pluralise for REST
         $contextTypes = AssessmentContextType::getStringValuesAsRegex(function ($name) {
             return $name . 's';
@@ -210,7 +228,7 @@ class Module extends BaseModule
         $this->register('POST', "$assListRoute", 'postCreateAssessment', $canWrite, $preloadContext); // a || c
         $this->register('POST', "$assListRoute/reorder", 'postReorderAssessments', $canWrite, $preloadContext); // a || c
         $this->register('GET', "$assListRoute/new", 'getCreateAssessmentForm', $canWrite, $preloadContext); // a || c
-        $this->register('GET', "$assRoute/clone", 'getCloneAssessmentForm', $canWrite, $preloadAssessment); // a || c
+        $this->register('GET', "$assRoute/clone", 'getCloneAssessmentForm', $canCopyAssessmentCustomParticipation, $preloadAssessment); // a || c
 
         $this->register('GET', "$assRoute", 'getAssessment', $loggedIn, $preloadAssessment);
         $this->register('POST', "$assRoute", 'postUpdateAssessment', $canWrite, $preloadAssessment); // a || c
