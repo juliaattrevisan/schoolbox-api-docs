@@ -235,13 +235,19 @@ class Cursor implements ICursor
         switch ($this->tabType) {
             case Factory::STUDENT_BY_TYPE:
                 $query[] = "p.student_id = :student_id";
+                if (!isset($this->rowKey['type'])) {
+                    throw new ValueError('Student ID is required');
+                }
                 $param['student_id'] = $this->rowKey['student_id'];
                 break;
             case Factory::TYPE_BY_WEEK:
             case Factory::TYPE_BY_MONTH:
                 $query[] = "p.type_id = :type_id AND COALESCE(p.subtype_id, '') = COALESCE(:subtype_id, '')";
+                if (!isset($this->rowKey['type']['type_id'])) {
+                    throw new ValueError('Type ID is required');
+                }
                 $param['type_id'] = $this->rowKey['type']['type_id'];
-                $param['subtype_id'] = $this->rowKey['type']['subtype_id'];
+                $param['subtype_id'] = $this->rowKey['type']['subtype_id'] ?? null;
                 break;
             default:
                 throw new ValueError(sprintf('Unknown tab type: %s', $this->tabType));
