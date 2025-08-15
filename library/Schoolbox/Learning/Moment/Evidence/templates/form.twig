@@ -174,7 +174,7 @@
                     </script>
                 {% elseif USER.role.isParent and config.evidence_parent_create %}
                     {# Parents bypass moderation entirely #}
-                    <li><button id="submit">Publish</button></li>
+                    <li><button id="submit" class="submit">Publish</button></li>
 
                     {% if isCreate %}
                         {% set route = routeLookupIfAuthorized('learningMomentEvidence.postPublish', {userIds: userIds|join(',')}) %}
