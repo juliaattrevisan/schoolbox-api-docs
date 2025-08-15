@@ -196,7 +196,7 @@ class IndexBuilder extends BaseBuilder
             yield $this->buildIndex(
                 (string)$row['id'],
                 null,
-                Hydrator::BASE_TYPE . '.' . $row['sub_type'],
+                $row['type'],
                 null,
                 true,
                 null,
