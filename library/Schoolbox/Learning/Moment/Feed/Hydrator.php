@@ -75,6 +75,7 @@ class Hydrator
         foreach ($results as $result) {
             switch ($result['discriminator'] ?? null) {
                 case Cursor::DISCRIMINATOR_EVIDENCE:
+                case Cursor::DISCRIMINATOR_EVIDENCE_OLD:
                     $hasEvidence = true;
                     $evidencePb->all(
                         $this->evidenceMapper->getPredicateBuilder()
@@ -148,6 +149,7 @@ class Hydrator
         foreach ($results as $i => $result) {
             switch ($result['discriminator'] ?? null) {
                 case Cursor::DISCRIMINATOR_EVIDENCE:
+                case Cursor::DISCRIMINATOR_EVIDENCE_OLD:
                     // Find the evidence
                     $return[$i] = [
                         'discriminator' => $result['discriminator'],
