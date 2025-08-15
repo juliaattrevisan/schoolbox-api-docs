@@ -898,15 +898,15 @@ class Controller extends Base
         $navigation = new NCEA\CourseCreditSummaryNavigation($user, $externalUser, $db, null, $dbTableName);
         $allYears = $navigation->findData();
 
-        if (\count($allYears)) {
-            /* Course Credit Summary year selectors
-             */
-            $output['data']['courseCreditSummaryNavigation'] = [
-                'heading' => $navigation->getHeading(),
-                'all' => $allYears,
-                'selected' => $year
-            ];
+        /* Course Credit Summary year selectors
+         */
+        $output['data']['courseCreditSummaryNavigation'] = [
+            'heading' => $navigation->getHeading(),
+            'all' => $allYears,
+            'selected' => $year
+        ];
 
+        if (\count($allYears)) {
             /* Conditionally, if a year was selected; do another round of
              * processing specific to that year. Otherwise skip all this
              * shenanigans altogether
