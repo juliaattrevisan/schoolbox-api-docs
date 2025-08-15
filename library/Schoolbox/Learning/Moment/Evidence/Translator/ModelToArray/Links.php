@@ -67,6 +67,7 @@ class Links extends AbstractLinks
             [
                 'evidenceId' => $evidence->getId(),
                 'creatorId'  => $evidence->getCreator()->getId(),
+                'userId'     => $evidence->getRecipient()->getId(),
             ]
         );
 
@@ -84,6 +85,7 @@ class Links extends AbstractLinks
             [
                 'evidenceId' => $evidence->getId(),
                 'creatorId'  => $evidence->getCreator()->getId(),
+                'userId'     => $evidence->getRecipient()->getId(),
             ]
         );
 
