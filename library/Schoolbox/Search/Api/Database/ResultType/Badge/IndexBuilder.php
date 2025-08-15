@@ -109,7 +109,7 @@ class IndexBuilder extends BaseBuilder
             SELECT si.identifier AS id, si.type
             FROM search_index si
             JOIN badge b ON si.identifier = b.id
-            WHERE si.type = "badge"
+            WHERE si.type = "' . Hydrator::BASE_TYPE . '"
             AND b.deleted_at IS NOT NULL
         ';
         $params = [];

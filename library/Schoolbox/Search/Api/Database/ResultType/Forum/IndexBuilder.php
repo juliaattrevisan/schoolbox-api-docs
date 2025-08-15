@@ -126,7 +126,7 @@ class IndexBuilder extends BaseBuilder
             FROM search_index si
             JOIN forumPost fp ON si.identifier = fp.postID
             JOIN forumThread ft ON fp.threadID = ft.threadID
-            WHERE si.type = "forum"
+            WHERE si.type = "' . Hydrator::BASE_TYPE . '"
             AND COALESCE(fp.deleted_at, ft.deleted_at) IS NOT NULL
         ';
         $params = [];

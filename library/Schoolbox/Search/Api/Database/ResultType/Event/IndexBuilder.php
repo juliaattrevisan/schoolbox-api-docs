@@ -111,7 +111,7 @@ class IndexBuilder extends BaseBuilder
             SELECT si.identifier, si.type
             FROM search_index si
             JOIN event e ON si.identifier = e.id
-            WHERE si.type = "event"
+            WHERE si.type = "' . Hydrator::BASE_TYPE . '"
             AND e.deleted_at IS NOT NULL
         ';
         $params = [];

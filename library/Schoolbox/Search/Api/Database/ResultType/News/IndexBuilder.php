@@ -112,7 +112,7 @@ class IndexBuilder extends BaseBuilder
             SELECT si.identifier, si.type
             FROM search_index si
             JOIN comms_news_article n ON si.identifier = n.id
-            WHERE si.type = "news"
+            WHERE si.type = "' . Hydrator::BASE_TYPE . '"
             AND NOT ' . $this->getSqlConditionForCurrentlyPublished() . '
         ';
         $params = [];

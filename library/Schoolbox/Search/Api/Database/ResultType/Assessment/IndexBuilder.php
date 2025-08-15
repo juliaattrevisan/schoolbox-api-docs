@@ -175,7 +175,7 @@ class IndexBuilder extends BaseBuilder
             SELECT search_index.identifier AS id, search_index.type
             FROM search_index
             JOIN assessment ON search_index.identifier = assessment.id
-            WHERE search_index.type like "assessment%"
+            WHERE search_index.type like "' . Hydrator::BASE_TYPE . '%"
             AND assessment.deleted_at IS NOT NULL
         ';
         $params = [];

@@ -128,7 +128,7 @@ class IndexBuilder extends BaseBuilder
             FROM search_index si
             JOIN link l ON si.identifier = l.id
             JOIN folder fo ON l.category = fo.id
-            WHERE si.type = "link"
+            WHERE si.type = "' . Hydrator::BASE_TYPE . '"
             AND COALESCE(l.deleted_at, fo.deleted_at) IS NOT NULL
         ';
         $params = [];
