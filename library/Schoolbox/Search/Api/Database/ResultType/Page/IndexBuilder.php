@@ -16,6 +16,7 @@ use Schoolbox\Resource\Group;
 use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 use Schoolbox\Search\Api\Database\Index\BuildType;
+use Schoolbox\Search\Api\Database\ResultType\User\Hydrator;
 
 /**
  * Index builder for pages/folders.
@@ -156,14 +157,13 @@ class IndexBuilder extends BaseBuilder
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         // Pass 1: delete all indices for deleted folders
-        $queryString = "
-            SELECT
-                f.id,
-                " . $this->buildTypeExpression() . " AS type
-            FROM folder f
-            " . $this->getJoinsFromFolderForTypeExpression() . "
-            WHERE f.deleted_at IS NOT NULL
-        ";
+        $queryString = '
+            SELECT si.identifier AS id, si.type
+            FROM search_index si
+            JOIN folder f ON si.identifier = f.id
+            WHERE si.type like "' . Hydrator::BASE_TYPE . '%"
+            AND f.deleted_at IS NOT NULL
+        ';
         $params = [];
         if ($fromDate) {
             $queryString .= ' AND f.deleted_at >= :fromDate';
