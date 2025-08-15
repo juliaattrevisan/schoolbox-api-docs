@@ -104,7 +104,9 @@ class AllFieldsTest extends TestCase
         yield 'file upload' => [
             [
                 'evidence' => [
-                    'file' => 'file:1234567890123456789012345678901234567890:test.gif',
+                    [
+                        'file' => 'file:1234567890123456789012345678901234567890:test.gif',
+                    ]
                 ],
             ],
             (new Model())
