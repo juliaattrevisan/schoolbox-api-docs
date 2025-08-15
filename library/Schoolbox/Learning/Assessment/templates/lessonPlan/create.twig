@@ -63,7 +63,7 @@
          #}
         <template v-slot:date>
             {% if context.baseContext is not unitSpecification %}
-                {{ dateForm.dateField('Lesson', 'due', assessment.dueAt, '#publishDate', '') }}
+                {{ dateForm.dateField(locale.translate('lessonPlan', false, true), 'due', assessment.dueAt, '#publishDate', '') }}
             {% endif %}
         </template>
 
