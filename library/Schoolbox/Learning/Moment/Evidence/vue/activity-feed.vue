@@ -863,9 +863,9 @@ export default {
                                                             <li>
                                                                 <button
                                                                     class="submit"
-                                                                    @click="submitEvidence(evidence.object)"
+                                                                    @click="publishEvidence(evidence.object)"
                                                                 >
-                                                                    Submit
+                                                                    Publish
                                                                 </button>
                                                             </li>
                                                         </template>
