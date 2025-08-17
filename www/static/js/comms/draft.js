@@ -47,6 +47,15 @@
                 // These shouldn't go into 'inputs' because of the strtotime functionality we have on date fields
                 datepickers: [],
 
+                /**
+                 * An array of files that we need to be uploaded before saving the draft.
+                 * Currently this is used to upload a media recording on the learning
+                 * moments page. We pass in two form elements { input: <input hidden>, upload: <input hidden> }
+                 * Input is used to indicate when a media recording is available for upload
+                 * And upload is used to store the file hash of the media recording when uploaded
+                 */
+                files: [],
+
                 /* Activation element
                  * The thing that gets disabled while saving
                  */
@@ -194,11 +203,51 @@
         }
 
         /**
+         * Do we have files we need to upload prior to saving?
+         * If so trigger the upload for each and wait for them
+         * to be uploaded before continuing with draft saving
+         *
+         * @param {jQuery.Deferred} deferred - a deferred object to resolve on successful save
+         */
+        function hasFilesToUpload(deferred) {
+            if (config.files.length > 0) {
+                // If the input is not empty and the upload also doesn't have a value, we need to upload the file
+                const filesToUpload = config.files.filter(
+                    (file) =>
+                        document.querySelector(file.input).value !== "" &&
+                        document.querySelector(file.upload).value === "",
+                );
+                if (filesToUpload.length > 0) {
+                    let filesUploaded = 0;
+                    // We assume the file upload to be managed elsewhere (like evidence-media-recording.vue)
+                    filesToUpload.forEach((file) => {
+                        document.querySelector(file.upload).addEventListener("draft__onUploadComplete", () => {
+                            filesUploaded += 1;
+                            if (filesUploaded === filesToUpload.length) {
+                                // All files have been uploaded, continue with the save
+                                save(deferred);
+                            }
+                        });
+                        document.querySelector(file.upload).dispatchEvent(new CustomEvent("draft__onDraftSave"));
+                    });
+                    // Wait for all files to be uploaded before continuing
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        }
+
+        /**
          * Save the data via ajax, showing a toast for the user
          *
          * @param {jQuery.Deferred} deferred - a deferred object to resolve on successful save
          */
         function save(deferred) {
+            if (hasFilesToUpload(deferred)) {
+                // Files are being uploaded, wait for them to finish
+                return;
+            }
             // Init toast
             config.toaster.toastActivate({
                 text: "Saving...",

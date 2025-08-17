@@ -149,10 +149,25 @@ export default {
          */
         onRecordedMediaReady(recordedData) {
             this.recordedData = recordedData;
+            document.getElementById("file").addEventListener("draft__onDraftSave", this.onAutoSave);
             document.getElementById("evidence-filename").value = this.recordedData.name; //to pass form submit validation check
             if (this.isFirstRecording) {
                 this.isFirstRecording = false;
                 document.addEventListener("evidence-media-recording__onFormSubmit", this.onFormSubmit); //to prevent the form from being submitted until the media is uploaded
+            }
+        },
+
+        /**
+         * draft.js has triggered an auto save, so we need to upload the media
+         * now rather than on form submit
+         */
+        async onAutoSave() {
+            this.checkRecording();
+            const responseData = await this.uploadMediaAndReturnResponse();
+            if (!this.hasUploadError) {
+                this.addHiddenInputs(responseData);
+                this.displayUploadSuccessful();
+                document.getElementById("file").dispatchEvent(new CustomEvent("draft__onUploadComplete"));
             }
         },
 
