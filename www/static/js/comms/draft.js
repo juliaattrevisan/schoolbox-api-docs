@@ -51,8 +51,8 @@
                  * An array of files that we need to be uploaded before saving the draft.
                  * Currently this is used to upload a media recording on the learning
                  * moments page. We pass in two form elements { filename: <input hidden>, storage: <input hidden> }
-                 * Input is used to indicate when a media recording is available for upload
-                 * And upload is used to store the file hash of the media recording when uploaded
+                 * Filename is used to indicate when a media recording is available for upload
+                 * And storage is used to store the file hash of the media recording when uploaded
                  */
                 files: [],
 
