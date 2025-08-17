@@ -46,6 +46,13 @@ function verify_executables() {
     fi
 }
 
+function output_help() {
+    if [[ "$*" =~ '--help' ]] || [[ "$*" =~ '-h' ]] ; then
+        docker compose up --help;
+        exit;
+    fi
+}
+
 function create_dirs() {
     # ensure that the AWS folder exists
     mkdir -p .aws
@@ -192,6 +199,7 @@ function start_containers() {
 
 function main() {
     verify_executables
+    output_help "$@"
     create_dirs
     load_config
     login_to_aws
