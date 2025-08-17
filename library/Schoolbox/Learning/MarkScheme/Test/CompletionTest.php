@@ -144,7 +144,7 @@ class CompletionTest extends TestCase
     // ==================== Data Providers ====================
 
     /**
-     * @return int[][]
+     * @return array<array<int|float>>
      */
     public static function providerNormalisedValid(): array
     {
@@ -160,7 +160,7 @@ class CompletionTest extends TestCase
     }
 
     /**
-     * @return mixed[][]
+     * @return array<array<int|string|null>>
      */
     public static function providerNormalisedInvalid(): array
     {
@@ -176,7 +176,7 @@ class CompletionTest extends TestCase
     }
 
     /**
-     * @return mixed[][]
+     * @return array<array<int|float|string|null>>
      */
     public static function providerNormalised(): array
     {
@@ -184,7 +184,7 @@ class CompletionTest extends TestCase
     }
 
     /**
-     * @return string[][]
+     * @return array<array<string>>
      */
     public static function providerHumanReadableValid(): array
     {
@@ -196,7 +196,7 @@ class CompletionTest extends TestCase
     }
 
     /**
-     * @return mixed[][]
+     * @return array<array<int|string|null>>
      */
     public static function providerHumanReadableInvalid(): array
     {
@@ -209,7 +209,7 @@ class CompletionTest extends TestCase
     }
 
     /**
-     * @return mixed[][]
+     * @return array<array<int|string|null>>
      */
     public static function providerHumanReadableNoResponse(): array
     {
