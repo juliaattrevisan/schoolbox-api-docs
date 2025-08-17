@@ -224,9 +224,9 @@ async function includeParticipantInExistingPlan(): Promise<void> {
         // add the activity to each participant
         selectedParticipants.value.forEach((participant) => {
             if ("assessable" in activity) {
-                participant.customisedPlan = activity;
+                participant.customisedPlan = { ...activity };
             } else {
-                participant.plan = activity;
+                participant.plan = { ...activity };
             }
         });
         toast.timeout({ text: "Customisation added successfully", isSuccess: true });
@@ -414,7 +414,7 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                                     </li>
                                     <li>
                                         <button
-                                            v-if="customisations.length > 0"
+                                            v-if="props.customisations.length > 0"
                                             class="icon-list"
                                             @click.prevent="openIncludeModal(participant)"
                                         >
@@ -474,7 +474,7 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                     <div class="l-flex__item--1-auto">
                         <button class="icon-staff-students submit" @click.prevent="excludeSelected">Exclude</button>
                     </div>
-                    <div v-if="customisations.length > 0" class="l-flex__item--1-auto">
+                    <div v-if="props.customisations.length > 0" class="l-flex__item--1-auto">
                         <button class="icon-list submit" @click.prevent="isIncludeOpen = true">
                             Include in Existing Customisation
                         </button>
@@ -519,7 +519,11 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                 <label for="activitySelect">Customisation</label>
                 <select id="activitySelect" v-model="selectedActivityId" class="f-no-margins">
                     <option value="null" disabled>Select customisation</option>
-                    <option v-for="customisation in customisations" :key="customisation.id" :value="customisation.id">
+                    <option
+                        v-for="customisation in props.customisations"
+                        :key="customisation.id"
+                        :value="customisation.id"
+                    >
                         {{ getCustomisationLabel(customisation) }}
                     </option>
                 </select>
