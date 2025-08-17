@@ -83,6 +83,7 @@ export default {
 
     mounted() {
         this.initContainerHeight();
+        this.getElements();
     },
 
     methods: {
@@ -206,6 +207,7 @@ export default {
          *
          */
         async onFormSubmit() {
+            this.storageElement.removeEventListener("draft__onDraftSave", this.onAutoSave); // no need to respond to draft save when submitting
             this.checkRecording();
             const responseData = await this.uploadMediaAndReturnResponse();
             if (!this.hasUploadError) {
