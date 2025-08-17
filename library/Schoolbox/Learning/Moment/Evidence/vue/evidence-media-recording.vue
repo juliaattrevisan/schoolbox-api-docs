@@ -39,6 +39,16 @@ export default {
             type: Object,
             required: false,
         },
+        filenameId: {
+            // to uniquely identify the filename input element
+            type: String,
+            required: true,
+        },
+        storageId: {
+            // to uniquely identify the storage input element
+            type: String,
+            required: true,
+        },
     },
 
     data() {
@@ -58,6 +68,8 @@ export default {
             isFirstRecording: true, //prevent multiple recordings coming through
             deviceWidth: 0, //to restore to device dimensions if expanding/contracting on over-media-modal changes
             deviceHeight: 0, //to restore to device dimensions if expanding/contracting on over-media-modal changes
+            filenameElement: null,
+            storageElement: null,
         };
     },
 
@@ -120,6 +132,24 @@ export default {
          */
         updateContainerHeight() {
             this.targetHeight = this.$refs.container.getBoundingClientRect().width * this.currentRatio + "px"; //so there's no height jumps on switching videos
+        },
+
+        /**
+         * Get the DOM elements for the filename and storage inputs
+         */
+        getElements() {
+            this.filenameElement = document.getElementById(this.filenameId);
+            if (this.filenameElement === null) {
+                console.warn(
+                    `Element with id ${this.filenameId} not found. Ensure the filename input element is present in the DOM.`,
+                );
+            }
+            this.storageElement = document.getElementById(this.storageId);
+            if (this.storageElement === null) {
+                console.warn(
+                    `Element with id ${this.storageId} not found. Ensure the storage input element is present in the DOM.`,
+                );
+            }
         },
 
         /**
