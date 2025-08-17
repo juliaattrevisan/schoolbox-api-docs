@@ -179,8 +179,8 @@ export default {
          */
         onRecordedMediaReady(recordedData) {
             this.recordedData = recordedData;
-            document.getElementById("file").addEventListener("draft__onDraftSave", this.onAutoSave);
-            document.getElementById("evidence-filename").value = this.recordedData.name; //to pass form submit validation check
+            this.storageElement.addEventListener("draft__onDraftSave", this.onAutoSave);
+            this.filenameElement.value = this.recordedData.name; //to pass form submit validation check
             if (this.isFirstRecording) {
                 this.isFirstRecording = false;
                 document.addEventListener("evidence-media-recording__onFormSubmit", this.onFormSubmit); //to prevent the form from being submitted until the media is uploaded
@@ -197,7 +197,7 @@ export default {
             if (!this.hasUploadError) {
                 this.addHiddenInputs(responseData);
                 this.displayUploadSuccessful();
-                document.getElementById("file").dispatchEvent(new CustomEvent("draft__onUploadComplete"));
+                this.storageElement.dispatchEvent(new CustomEvent("draft__onUploadComplete"));
             }
         },
 
@@ -328,7 +328,7 @@ export default {
          * @params {Object}
          */
         addHiddenInputs(responseData) {
-            document.getElementById("file").value = `${responseData.hash}:${this.recordedData.name}`; //to retrieve the file reference
+            this.storageElement.value = `${responseData.hash}:${this.recordedData.name}`; //to retrieve the file reference
         },
 
         /**
@@ -360,8 +360,8 @@ export default {
          *
          */
         clearHiddenInputs() {
-            document.getElementById("evidence-filename").value = "";
-            document.getElementById("file").value = "";
+            this.filenameElement.value = "";
+            this.storageElement.value = "";
         },
 
         /**
