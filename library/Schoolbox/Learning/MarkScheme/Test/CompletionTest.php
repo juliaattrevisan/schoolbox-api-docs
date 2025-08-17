@@ -160,7 +160,7 @@ class CompletionTest extends TestCase
     }
 
     /**
-     * @return array<array<int|string|null>>
+     * @return array<array>
      */
     public static function providerNormalisedInvalid(): array
     {
@@ -196,7 +196,7 @@ class CompletionTest extends TestCase
     }
 
     /**
-     * @return array<array<int|string|null>>
+     * @return array<array>
      */
     public static function providerHumanReadableInvalid(): array
     {
@@ -218,7 +218,7 @@ class CompletionTest extends TestCase
 
 
     /**
-     * @return array
+     * @return array<array>
      * @throws \InvalidArgumentException
      */
     public static function providerHumanReadableWithResponse(): array
