@@ -607,8 +607,11 @@
                 $createForm.draft({
                     inputs: ['#evidence-tags', '#curriculum-code-select', 'input[name="curriculumCodes[]"]'],
                     textareas: ['evidence-body'],
-                    attachzones: ['#storage-zone'],
-                    files: [{ filename: '#evidence-filename', storage: '#file' }],
+                    {# only check files if we are accepting files #}
+                    {% if momentType != 'text' %}
+                        attachzones: ['#storage-zone'],
+                        files: [{ filename: '#evidence-filename', storage: '#file' }],
+                    {% endif %}
                     toaster: $('#toast'),
                     staller: $submitButton,
                     onSaveSuccess: function (response) {
