@@ -1121,7 +1121,8 @@ class Controller extends Base
                 $this->stateMapper->findAll(),
                 $assessment->getMarkType(),
                 $assessment->getGradeGroup()
-            ))->convert()
+            ))->convert(),
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ], sprintf(
             'Feedback for %s in %s',
             $student->getFullName(),

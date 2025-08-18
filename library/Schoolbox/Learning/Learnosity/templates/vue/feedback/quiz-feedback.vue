@@ -3,6 +3,7 @@
  * To provide feedback on a individual students attempt at a quiz
  */
 
+import type { Template } from "@js/editor/types/editorTypes";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItemQuestionResponse } from "@schoolboxLearnosity/js/types/StudentItemQuestionResponse";
 import type { StudentAttemptResponse } from "@schoolboxLearnosity/js/types/StudentAttemptResponse";
@@ -10,6 +11,7 @@ import type { StudentUrls } from "@schoolboxLearnosity/js/types/StudentUrls";
 import type { AssessmentMarkData } from "@schoolboxLearnosity/js/types/AssessmentMarkData";
 import type { LearnosityReportInitOptions } from "@schoolboxLearnosity/vue/learnosityReportTypes";
 import { useStore } from "./store/quizFeedbackStore";
+import { useStudentItemStore } from "../student/store/studentItemStore";
 import { useStudentStore } from "./store/qfStudentStore";
 import { loadReport } from "./util/loadReport";
 import QfStudent from "./student/qf-student.vue";
@@ -26,10 +28,12 @@ interface Props {
     markData: AssessmentMarkData; // the mark type data linked to the assessment
     urls?: StudentUrls; // the urls to use for the students to update their scores and comments
     statusPage?: string; // the status page to link to once user has finished marking
+    editorTemplates: Template[];
 }
 
 const props = defineProps<Props>();
 const store = useStore();
+const studentItemStore = useStudentItemStore();
 const studentStore = useStudentStore();
 
 /**
@@ -38,6 +42,7 @@ const studentStore = useStudentStore();
  */
 window.Vue.onMounted(async () => {
     store.init(props.isReadOnly, props.hasMarkVisibility, props.markData, props.statusPage);
+    studentItemStore.init(props.editorTemplates);
     useStudentStore().init(props.student, props.itemResponses, props.attemptResponse, props.urls, props.isReviewed);
     await window.Vue.nextTick(); // update the DOM to ensure the elements are available for the reports to be loaded into
     loadReport(props.reportInitOptions, props.hasMarkVisibility);
