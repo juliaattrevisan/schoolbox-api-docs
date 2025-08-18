@@ -1,6 +1,6 @@
 <?php
 
-namespace Schoolbox\Learning\Moment\Evidence\Moderation;
+namespace Schoolbox\Learning\Moment\Moderation;
 
 use Schoolbox\YearLevel;
 use Schoolbox\YearLevel\Model;

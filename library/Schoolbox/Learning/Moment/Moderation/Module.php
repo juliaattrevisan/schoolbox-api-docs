@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence\Moderation;
+namespace Schoolbox\Learning\Moment\Moderation;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;

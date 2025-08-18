@@ -20,7 +20,7 @@ use Schoolbox\Discussion\Comment;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Learning\Moment\Evidence\Moderation\ModerationRequired;
+use Schoolbox\Learning\Moment\Moderation\ModerationRequired;
 use Schoolbox\Learning\Moment\NextRoutes;
 use Schoolbox\Learning\Moment\Translator\ModelToArray\Factory;
 use Schoolbox\Mapper\Exception as MapperException;

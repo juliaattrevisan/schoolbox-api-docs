@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Module as DueworkFeedbac
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Module as DueworkFeedbackModule;
 use Schoolbox\Learning\Assessment\DueWork\Response\Module as DueworkResponseModule;
 use Schoolbox\Learning\Assessment\Exporter\Module as AssessmentExporterModule;
+use Schoolbox\Learning\Assessment\LessonPlan\Activities\Module as LessonPlanActivitiesModule;
 use Schoolbox\Learning\Assessment\Module as AssessmentModule;
 use Schoolbox\Learning\Assessment\Timeline\Module as TimelineModule;
 use Schoolbox\Learning\Badge\Award\Module as BadgeAwardModule;
@@ -31,15 +32,14 @@ use Schoolbox\Learning\Module as LearningModule;
 use Schoolbox\Learning\Moment\Evidence\Discussion\Comment\Module as EvidenceCommentModule;
 use Schoolbox\Learning\Moment\Evidence\Discussion\Thread\Module as EvidenceThreadModule;
 use Schoolbox\Learning\Moment\Evidence\Module as EvidenceModule;
-use Schoolbox\Learning\Moment\Evidence\Moderation\Module as LearningMomentModerationModule;
 use Schoolbox\Learning\Moment\Feed\Module as FeedModule;
+use Schoolbox\Learning\Moment\Moderation\Module as LearningMomentModerationModule;
 use Schoolbox\Learning\Moment\StudentToolkit\Module as StudentToolkitModule;
-use Schoolbox\Learning\Quiz\Module as QuizModule;
 use Schoolbox\Learning\Quiz\Attempt\Module as QuizAttemptModule;
-use Schoolbox\Learning\Turnitin\Module as TurnitinModule;
+use Schoolbox\Learning\Quiz\Module as QuizModule;
 use Schoolbox\Learning\Student\Module as StudentCourseModule;
+use Schoolbox\Learning\Turnitin\Module as TurnitinModule;
 use Schoolbox\Learning\Upcoming;
-use Schoolbox\Learning\Assessment\LessonPlan\Activities\Module as LessonPlanActivitiesModule;
 
 class Learning extends ModuleLoader
 {

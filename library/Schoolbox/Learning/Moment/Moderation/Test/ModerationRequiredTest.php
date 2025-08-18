@@ -13,11 +13,11 @@
 // All new classes should use strict typing.
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence\Moderation\Test;
+namespace Schoolbox\Learning\Moment\Moderation\Test;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Learning\Moment\Evidence\Moderation\ModerationRequired;
+use Schoolbox\Learning\Moment\Moderation\ModerationRequired;
 use Schoolbox\YearLevel\Model;
 
 /**
