@@ -235,11 +235,11 @@ class Cursor implements ICursor
                 $params = array_merge($params, Builder::getArrayParameters($tagIds, 'tagIds'));
 
                 $query .= "
-                    INNER JOIN evidence_tag et ON et.evidence_id = id
+                    INNER JOIN moment_tag mt ON mt.moment_id = id
                 ";
 
                 $wherePieces[] = "
-                    AND et.tag_id IN {$placeholders}
+                    AND mt.tag_id IN {$placeholders}
                 ";
             }
         }
@@ -480,18 +480,5 @@ class Cursor implements ICursor
             'from' => $fromDate->startOfDay()->getDatabase(),
             'to' => $toDate->endOfDay()->getDatabase(),
         ];
-    }
-
-
-    /**
-
-     *
-     * @param Folder\Model $folder
-     * @return array
-     * @throws Exception
-     * @throws NotFound
-     */
-    private function findCohortIds(Folder\Model $folder): array
-    {
     }
 }
