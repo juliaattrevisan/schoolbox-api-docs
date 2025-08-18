@@ -35,7 +35,7 @@
             detail: {
                 maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                 targetElements: ['#event-detail'],
-                {% if editorTemplates %}
+                {% if editorTemplates is defined %}
                     templates: {{ editorTemplates|json_encode|raw }},
                 {% endif %}
             }
