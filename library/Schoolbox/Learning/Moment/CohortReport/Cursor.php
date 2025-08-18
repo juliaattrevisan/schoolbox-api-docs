@@ -193,11 +193,17 @@ class Cursor implements ICursor
      */
     private function findIdsByFilters(): array
     {
+        /* Find a set of users who are somehow enrolled in $folder as students,
+         * and/or involved in $folder as group members
+         *
+         * Note that a folder can be both a group and a class-coded folder which derives its
+         * members from the Externals
+         */
+        $cohortIds = $this->userAccessMapper->findUsersInCategory($this->folder, \Schoolbox\Role::STUDENT)->indexBy('id')->keys();
+
         /* If this $folder had no members, there's no meaningful cohort overview to display:
          * return an empty payload
          */
-        $cohortIds = $this->findCohortIds($this->folder);
-
         if (!\count($cohortIds)) {
             return [];
         }
@@ -478,11 +484,7 @@ class Cursor implements ICursor
 
 
     /**
-     * Find a set of users who are somehow enrolled in $folder as students,
-     * and/or involved in $folder as group members
-     *
-     * Note that a folder can be both a group and a class-coded folder which derives its
-     * members from the Externals
+
      *
      * @param Folder\Model $folder
      * @return array
@@ -491,6 +493,5 @@ class Cursor implements ICursor
      */
     private function findCohortIds(Folder\Model $folder): array
     {
-        return $this->userAccessMapper->findUsersInCategory($folder, \Schoolbox\Role::STUDENT)->indexBy('id')->keys();
     }
 }
