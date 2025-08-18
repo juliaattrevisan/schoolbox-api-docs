@@ -18,7 +18,7 @@
                             Upload File
                         {% endblock formInputFileLabel %}
                     </label>
-                    <input type="hidden" name="filename" id="evidence-filename" {{ isCreate ? '' : 'value="'~evidence.filename~'"' }}/>
+                    <input type="hidden" name="filename" id="evidence-filename" {{ isCreate ? '' : 'value="'~evidence.evidence.first.filename~'"' }}/>
                     {% include 'sub/attachzone.twig' with { attachzone: zone } %}
                     {% block formInputFilePreview %}
                     {% endblock formInputFilePreview %}
