@@ -937,18 +937,49 @@ class Controller extends Base
                 /* Entries And Results for a specific year
                  */
 
-                $comments = new Comments\Comments($user, $externalUser, $db, $year);
+                $data = $entriesAndResults->findData();
+                $commentsObj = new Comments\Comments($user, $externalUser, $db, $year);
+                $comments = (
+                    $dbTableName === NCEA\Base::MAIN_DB_TABLE_YEAR11
+                    ? $commentsObj->findYear11Data()
+                    : $commentsObj->findNCEAData()
+                );
+
+                if ($dbTableName === NCEA\Base::MAIN_DB_TABLE_YEAR11) {
+                    // Loop through data as is done in the Twig template, and remove duplicate comments.
+                    // Duplicate comments are those that will have already been displayed under a subject with the same class code.
+                    // This is done here rather than in Comments.php, because the order in which the comments are displayed is
+                    // important, and the order in which the comments are displayed is determined by the sort order of $data.
+                    $commentsAlreadyDisplayedByClassCode = [];
+                    foreach ($data as $courseName => $allData) {
+                        if (count($comments[$year]['courses'][$courseName]['terms'] ?? []) > 0) {
+                            $classCode = $comments[$year]['courses'][$courseName]['classCode'];
+                            if (!array_key_exists($classCode, $commentsAlreadyDisplayedByClassCode)) {
+                                $commentsAlreadyDisplayedByClassCode[$classCode] = [];
+                            }
+                            foreach ($comments[$year]['courses'][$courseName]['terms'] as $term => $commentData) {
+                                if (($commentData['comment'] ?? '') !== '') {
+                                    if (in_array($commentData['comment'], $commentsAlreadyDisplayedByClassCode[$classCode], false)) {
+                                        // In the Twig template in processed, this comment will already have been displayed under a
+                                        // subject with this class code.  So clear this comment so it doesn't get displayed again.
+                                        $comments[$year]['courses'][$courseName]['terms'][$term]['comment'] = ''; // Remove duplicate comment.
+                                    } else {
+                                        // This comment will be displayed in the Twig template.
+                                        // Remember that it has been displayed.
+                                        $commentsAlreadyDisplayedByClassCode[$classCode][] = $commentData['comment'];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
 
                 /* Get all the comments for $year for this user
                  * Then rearrange all the subjects
                  */
                 $output['data']['entriesAndResults'] = [
-                    'data' => $entriesAndResults->findData(),
-                    'comments' => (
-                        $dbTableName === NCEA\Base::MAIN_DB_TABLE_YEAR11
-                        ? $comments->findYear11Data()
-                        : $comments->findNCEAData()
-                    ),
+                    'data' => $data,
+                    'comments' => $comments,
                     'allLetters' => $entriesAndResults->getLetterRegistry(),
                     'allTypes' => self::TYPES,
                     'year' => $year,
