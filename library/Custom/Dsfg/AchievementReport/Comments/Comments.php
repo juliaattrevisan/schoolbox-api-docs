@@ -12,7 +12,6 @@ use Custom\Dsfg\AchievementReport\NormaliseTeachers;
 
 class Comments extends Base
 {
-
     /**
      * Consts corresponding to ResultType (that's synonymous with a report type)
      * Each comment belongs to one of these reports
