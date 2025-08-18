@@ -33,7 +33,6 @@ use UnexpectedValueException;
  */
 class CanSelfAssess extends AbstractParticipationRule
 {
-
     /**
      * Performs an authorization check.
      *
@@ -50,7 +49,7 @@ class CanSelfAssess extends AbstractParticipationRule
      *                                  instance in $params
      * @throws UnexpectedValueException
      */
-    public function authorize(array $params = [], User $user = null)
+    public function authorize(array $params = [], ?User $user = null)
     {
         // If there's no session, this test fails
         if (!$user instanceof User) {

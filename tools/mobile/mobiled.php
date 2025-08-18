@@ -46,7 +46,7 @@ $kernel = new Daemon\Kernel(
 );
 
 // Create the mobile app delivery daemon.
-$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags): void {
     /** @var Instance $instance */
     $instance   = $di->get('instance');
     $instanceId = $instance->getId();
@@ -175,7 +175,7 @@ HELP;
 
         // due to the async nature of STOMP:
         // only register consumer once the connection is actually established
-        $stomp->connect()->then(function () use ($broker, $scheduler, $log, $asyncRedis) {
+        $stomp->connect()->then(function () use ($broker, $scheduler, $log, $asyncRedis): void {
             $log->info('Connected to STOMP', ['char' => '+']);
             $broker->registerConsumer($scheduler);
             $log->debug('Consuming amqp://' . Broker::QUEUE);

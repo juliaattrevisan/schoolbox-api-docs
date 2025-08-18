@@ -28,7 +28,7 @@ $kernel = new Daemon\Kernel(
     ]
 );
 
-$kernel->run(function (ContainerInterface $di, LoopInterface $loop, Logger $log, array $opts) use ($kernel) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, Logger $log, array $opts) use ($kernel): void {
     $kernel->deprecationNotice("SA-19334");
 
     $perform = \array_key_exists('perform', $opts);

@@ -463,14 +463,14 @@ abstract class Base
      * Attempts to authorize a route for a user. Returns the URL for that route
      * if authorized, and false if not.
      *
-     * @param  string $name   The name of the route to authorize and generate.
-     * @param  array  $params Any params to pass to the route generator.
-     * @param  User   $user   The user to authorize the route for. Defaults to
+     * @param  string   $name   The name of the route to authorize and generate.
+     * @param  array    $params Any params to pass to the route generator.
+     * @param User|null $user   The user to authorize the route for. Defaults to
      *                        currently authenticated user.
      * @return string|bool    The URL for the route if authorized, false if not.
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function getRouteIfAuthorized($name, array $params = array(), User $user = null)
+    public function getRouteIfAuthorized($name, array $params = array(), ?User $user = null)
     {
         if (!($user instanceof User)) {
             $user = $this->getUser();
@@ -866,13 +866,13 @@ abstract class Base
 
     /**
      * Create an error exception that can be thrown and output by the kernel
-     * @param int|null        $errorCode
+     * @param int|null       $errorCode
      * @param Throwable|null $previous
-     * @param string          $additionalInfo
-     * @param int             $httpStatusCode
+     * @param string         $additionalInfo
+     * @param int            $httpStatusCode
      * @return \Exception
      */
-    protected function generateException(?int $errorCode, Throwable $previous = null, string $additionalInfo = '', int $httpStatusCode = 400)
+    protected function generateException(?int $errorCode, ?Throwable $previous = null, string $additionalInfo = '', int $httpStatusCode = 400)
     {
         return $this->eg->generateException($errorCode, $previous, $additionalInfo, $httpStatusCode);
     }

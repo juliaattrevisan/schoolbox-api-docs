@@ -28,8 +28,8 @@ trait MockDateObject
     protected static function buildDateObject(
         $dateTime = null,
         $dateFormat = null,
-        DateTimeZone $timezone = null,
-        Alaress_Date_Locale_Interface $locale = null
+        ?DateTimeZone $timezone = null,
+        ?Alaress_Date_Locale_Interface $locale = null
     ) {
         return new Alaress_Date_Format(
             $dateTime,

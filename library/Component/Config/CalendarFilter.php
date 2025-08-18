@@ -34,7 +34,7 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
      * @return void
      * @throws JsonException
      */
-    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
+    public function parse(SitePage $page, $key, $keyblock, $configValue, ?Component_ControllerAbstract $component = null)
     {
         $di = $page->getDi();
 

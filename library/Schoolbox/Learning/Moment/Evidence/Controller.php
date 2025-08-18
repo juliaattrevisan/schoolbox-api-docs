@@ -279,7 +279,7 @@ class Controller extends Base
      * @param Collection|User[] $users
      * @throws MapperException
      */
-    public function postMomentForUsers(Collection $users, string $defaultState = null): void
+    public function postMomentForUsers(Collection $users, ?string $defaultState = null): void
     {
         /* Since this is a collection of users, each of whom might have a unique
          * configuration (e.g. some year levels require moderation, some don't)

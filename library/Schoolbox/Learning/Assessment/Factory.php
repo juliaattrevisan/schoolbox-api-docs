@@ -387,7 +387,7 @@ class Factory
      * @throws MapperException
      * @throws ResourceException
      */
-    public function produce(IAssessable $assessment = null): IAssessable
+    public function produce(?IAssessable $assessment = null): IAssessable
     {
         if ($assessment instanceof IAssessable) {
             return $this->produceFromExistingAssessment($assessment);

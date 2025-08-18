@@ -91,7 +91,7 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
     /**
      * @inheritdoc
      */
-    public function getCurrentSemester(string $externalUserId = null): ?string
+    public function getCurrentSemester(?string $externalUserId = null): ?string
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
@@ -99,7 +99,7 @@ class External_User extends CachingConnectorAbstract implements External_UserInt
     /**
      * {@inheritdoc}
      */
-    public function getCurrentYear(string $externalUserId = null): ?string
+    public function getCurrentYear(?string $externalUserId = null): ?string
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }

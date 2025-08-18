@@ -211,10 +211,10 @@ class Model implements IAssessableDataModel, IAssessmentContextDataModel, ISoftD
     }
 
     /**
-     * @param GradeGroup $gradeGroup
+     * @param GradeGroup|null $gradeGroup
      * @return static
      */
-    public function setGradeGroup(GradeGroup $gradeGroup = null)
+    public function setGradeGroup(?GradeGroup $gradeGroup = null)
     {
         $this->gradeGroup = $gradeGroup;
         return $this;

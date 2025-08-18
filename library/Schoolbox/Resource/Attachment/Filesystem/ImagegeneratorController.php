@@ -81,7 +81,7 @@ class ImagegeneratorController extends AbstractController
      */
     protected function allowsImage(string $mimeFilter): bool
     {
-        $csv = str_getcsv($mimeFilter);
+        $csv = str_getcsv($mimeFilter, escape: '');
         foreach ($csv as $mime) {
             $tmp = explode('/', $mime);
             if (in_array($tmp[0], array("image","*",""))) {

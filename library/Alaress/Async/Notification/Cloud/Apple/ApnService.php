@@ -70,7 +70,7 @@ class ApnService extends AbstractService
         string $appIdentifier,
         string $appTitle,
         string $certPath,
-        string $passPhrase = null
+        ?string $passPhrase = null
     ) {
         parent::__construct($registryMapper, $appIdentifier);
         $this->appTitle   = $appTitle;

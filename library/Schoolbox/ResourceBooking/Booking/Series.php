@@ -93,7 +93,7 @@ class Series
         ?string $repeatUntil = null,
         ?array $related = null,
         ?string $repeat = null,
-        Campus $campus = null
+        ?Campus $campus = null
     ) {
         $dateParts = [];
         $series    = [];

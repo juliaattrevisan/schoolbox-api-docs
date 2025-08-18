@@ -14,14 +14,13 @@ use Schoolbox\User;
 
 class IsNotYetApproved extends ArticleAttribute
 {
-
     /**
      * @param array     $params
      * @param User|null $user
      * @throws Unauthorized
      * @throws \UnexpectedValueException
      */
-    public function authorize(array $params = [], User $user = null): void
+    public function authorize(array $params = [], ?User $user = null): void
     {
         $article = $this->findArticleInParams($params);
 

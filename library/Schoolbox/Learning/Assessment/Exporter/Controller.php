@@ -405,7 +405,7 @@ class Controller extends BaseController
      *
      * @param IAssessable              $assessmentSpec
      * @param AssessmentContext        $context
-     * @param null|int                 $sequence
+     * @param int|null                 $sequence
      * @param Alaress_Date_Format|null $publishDate
      * @param Alaress_Date_Format|null $openDate
      * @param Alaress_Date_Format|null $dueDate
@@ -419,11 +419,11 @@ class Controller extends BaseController
     protected function exportToNewContext(
         IAssessable $assessmentSpec,
         AssessmentContext $context,
-        int $sequence = null,
-        Alaress_Date_Format $publishDate = null,
-        Alaress_Date_Format $openDate = null,
-        Alaress_Date_Format $dueDate = null,
-        Alaress_Date_Format $closeDate = null
+        ?int $sequence = null,
+        ?Alaress_Date_Format $publishDate = null,
+        ?Alaress_Date_Format $openDate = null,
+        ?Alaress_Date_Format $dueDate = null,
+        ?Alaress_Date_Format $closeDate = null
     ): IAssessable {
 
         if ($context instanceof UnitImplementation\Model) {
@@ -496,7 +496,7 @@ class Controller extends BaseController
      * @throws \LogicException
      * @throws \UnexpectedValueException
      */
-    protected function buildImplementationsForSpecification(IAssessable $assessmentSpec, array $unitImplIds = null): GenericCollection
+    protected function buildImplementationsForSpecification(IAssessable $assessmentSpec, ?array $unitImplIds = null): GenericCollection
     {
         $defaultDueTime   = $this->getConfigLoader()->get('lms_duetime_default');
 

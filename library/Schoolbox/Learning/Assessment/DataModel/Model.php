@@ -315,7 +315,7 @@ class Model implements ISoftDeletable
      * @param IAssessmentContextDataModel|null $context
      * @return static
      */
-    public function setAssessmentContext(IAssessmentContextDataModel $context = null)
+    public function setAssessmentContext(?IAssessmentContextDataModel $context = null)
     {
         if ($context instanceof Folder) {
             return $this->setContextFolder($context)
@@ -635,10 +635,10 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @param null|WorkType $workType
+     * @param WorkType|null $workType
      * @return static
      */
-    public function setWorkType(WorkType $workType = null)
+    public function setWorkType(?WorkType $workType = null)
     {
         $this->workType = $workType;
         return $this;
@@ -671,10 +671,10 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Task $task
+     * @param Task|null $task
      * @return static
      */
-    public function setTask(Task $task = null)
+    public function setTask(?Task $task = null)
     {
         $this->task = $task;
         return $this;
@@ -689,10 +689,10 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param DueWork $dueWork
+     * @param DueWork|null $dueWork
      * @return static
      */
-    public function setDueWork(DueWork $dueWork = null)
+    public function setDueWork(?DueWork $dueWork = null)
     {
         $this->dueWork = $dueWork;
         return $this;
@@ -707,10 +707,10 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Quiz $quiz
+     * @param Quiz|null $quiz
      * @return static
      */
-    public function setQuiz(Quiz $quiz = null)
+    public function setQuiz(?Quiz $quiz = null)
     {
         $this->quiz = $quiz;
         return $this;
@@ -764,10 +764,10 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Project $project
+     * @param Project|null $project
      * @return static
      */
-    public function setProject(Project $project = null)
+    public function setProject(?Project $project = null)
     {
         $this->project = $project;
         return $this;
@@ -782,10 +782,10 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Folder $contextFolder
+     * @param Folder|null $contextFolder
      * @return static
      */
-    public function setContextFolder(Folder $contextFolder = null)
+    public function setContextFolder(?Folder $contextFolder = null)
     {
         $this->contextFolder = $contextFolder;
         return $this;
@@ -800,10 +800,10 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param UnitSpecification $contextUnitSpecification
+     * @param UnitSpecification|null $contextUnitSpecification
      * @return static
      */
-    public function setContextUnitSpecification(UnitSpecification $contextUnitSpecification = null)
+    public function setContextUnitSpecification(?UnitSpecification $contextUnitSpecification = null)
     {
         $this->contextUnitSpecification = $contextUnitSpecification;
         return $this;
@@ -818,10 +818,10 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param UnitImplementation $contextUnitImplementation
+     * @param UnitImplementation|null $contextUnitImplementation
      * @return static
      */
-    public function setContextUnitImplementation(UnitImplementation $contextUnitImplementation = null)
+    public function setContextUnitImplementation(?UnitImplementation $contextUnitImplementation = null)
     {
         $this->contextUnitImplementation = $contextUnitImplementation;
         return $this;
@@ -836,10 +836,10 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Project $contextProject
+     * @param Project|null $contextProject
      * @return static
      */
-    public function setContextProject(Project $contextProject = null)
+    public function setContextProject(?Project $contextProject = null)
     {
         $this->contextProject = $contextProject;
         return $this;
@@ -854,10 +854,10 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param Model $specificationAssessment
+     * @param Model|null $specificationAssessment
      * @return static
      */
-    public function setSpecificationAssessment(Model $specificationAssessment = null)
+    public function setSpecificationAssessment(?Model $specificationAssessment = null)
     {
         $this->specificationAssessment = $specificationAssessment;
         return $this;

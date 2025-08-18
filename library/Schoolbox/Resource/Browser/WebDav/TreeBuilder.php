@@ -22,9 +22,9 @@ class TreeBuilder extends AbstractTreeBuilder
     /**
      * Constructor
      *
-     * @param PortfolioWebDAV $dav
+     * @param PortfolioWebDAV|null $dav
      */
-    public function __construct(PortfolioWebDAV $dav = null)
+    public function __construct(?PortfolioWebDAV $dav = null)
     {
         parent::__construct($dav, 'webdavfile', 'Drives');
 

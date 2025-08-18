@@ -70,22 +70,22 @@ class Update extends Payload\Request
         $this->setFormParam('resource_moderation_type_id', $resource_moderation_type_id);
     }
 
-    public function setMinLeadTime(string $minute, string $hour = null, string $day = null)
+    public function setMinLeadTime(string $minute, ?string $hour = null, ?string $day = null)
     {
         $this->setTime('min_lead_time', $minute, $hour, $day);
     }
 
-    public function setMinResTime(string $minute, string $hour = null, string $day = null)
+    public function setMinResTime(string $minute, ?string $hour = null, ?string $day = null)
     {
         $this->setTime('min_reservation_time', $minute, $hour, $day);
     }
 
-    public function setMaxResTime(string $minute, string $hour = null, string $day = null)
+    public function setMaxResTime(string $minute, ?string $hour = null, ?string $day = null)
     {
         $this->setTime('max_reservation_time', $minute, $hour, $day);
     }
 
-    private function setTime(string $timeType, string $minute, string $hour = null, string $day = null)
+    private function setTime(string $timeType, string $minute, ?string $hour = null, ?string $day = null)
     {
         $this->setFormParam($timeType . '[minute]', $minute);
         if (isset($hour)) {

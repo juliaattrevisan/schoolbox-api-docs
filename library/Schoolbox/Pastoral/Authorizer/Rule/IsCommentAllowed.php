@@ -31,7 +31,7 @@ class IsCommentAllowed implements IAuthorizationRule
     /**
      * {@inheritdoc}
      */
-    public function authorize(array $params = [], User $user = null)
+    public function authorize(array $params = [], ?User $user = null)
     {
         if (!isset($params['record'])) {
             if (!isset($params['recordId'])) {

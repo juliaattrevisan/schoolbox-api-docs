@@ -15,7 +15,6 @@ namespace SocialStream\Post\Factory;
  */
 class Display extends AbstractFactory
 {
-
     /**
      * The type of SocialStream Post to manufacture
      * one of ["image", "string", "url", "video"]
@@ -39,10 +38,10 @@ class Display extends AbstractFactory
     /**
      * Produce an instance of SocialStream_Post_Abstract subclass
      *
-     * @param array $data
+     * @param array|null $data
      * @return \SocialStream_Post_Abstract
      */
-    public function produce(array $data = null): \SocialStream_Post_Abstract
+    public function produce(?array $data = null): \SocialStream_Post_Abstract
     {
         switch ($this->type) {
             case \SocialStream_Post_Image::TYPE:

@@ -209,7 +209,7 @@ if (is_numeric($_REQUEST['cid'])) {
             }
 
             if (count($configInstances)) {
-                $componentConfigInstanceMapper->getDatabase()->transact(function () use ($componentConfigInstanceMapper, $configInstances) {
+                $componentConfigInstanceMapper->getDatabase()->transact(function () use ($componentConfigInstanceMapper, $configInstances): void {
                     $componentConfigInstanceMapper->save($configInstances);
                 });
             }

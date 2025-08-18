@@ -364,11 +364,11 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @param null|PastoralSubType $subtype
+     * @param PastoralSubType|null $subtype
      *
      * @return self
      */
-    public function setSubType(PastoralSubType $subtype = null): self
+    public function setSubType(?PastoralSubType $subtype = null): self
     {
         $this->subtype = $subtype;
 
@@ -384,11 +384,11 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @param null|Model $parent
+     * @param Model|null $parent
      *
      * @return self
      */
-    public function setParent(Model $parent = null): self
+    public function setParent(?Model $parent = null): self
     {
         $this->parent = $parent;
 
@@ -404,11 +404,11 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @param null|PastoralSeverity $severity
+     * @param PastoralSeverity|null $severity
      *
      * @return self
      */
-    public function setSeverity(PastoralSeverity $severity = null): self
+    public function setSeverity(?PastoralSeverity $severity = null): self
     {
         $this->severity = $severity;
 

@@ -1,6 +1,6 @@
 ARG ARCH=amd64
 
-FROM --platform=linux/${ARCH} php82-bookworm
+FROM --platform=linux/${ARCH} php-bookworm
 
 WORKDIR /usr/share/schoolbox
 

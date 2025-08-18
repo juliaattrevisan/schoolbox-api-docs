@@ -21,7 +21,6 @@ use Schoolbox\User;
  */
 class IsConfigSetTo implements IAuthorizationRule
 {
-
     /**
      * The array key in $params that contains the config name.
      *
@@ -57,7 +56,7 @@ class IsConfigSetTo implements IAuthorizationRule
     /**
      * {@inheritdoc}
      */
-    public function authorize(array $params = array(), User $user = null)
+    public function authorize(array $params = array(), ?User $user = null)
     {
         if ($this->configLoader->get($this->paramsKey) == $this->paramsValue) {
             return true;

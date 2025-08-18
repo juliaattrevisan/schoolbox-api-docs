@@ -4975,12 +4975,6 @@ parameters:
 			path: library/Schoolbox/Learning/MarkScheme/Test/AssessableTest.php
 
 		-
-			message: '#^Method Schoolbox\\Learning\\MarkScheme\\Test\\CompletionTest\:\:provider_normalised_valid\(\) should return array\<array\<int\>\> but returns array\<int, list\<float\|int\>\>\.$#'
-			identifier: return.type
-			count: 1
-			path: library/Schoolbox/Learning/MarkScheme/Test/CompletionTest.php
-
-		-
 			message: '#^PHPDoc tag @var above a method has no effect\.$#'
 			identifier: varTag.misplaced
 			count: 1

@@ -132,9 +132,9 @@ class Validation
     /**
      * Attempts to validate the creation or update of a booking from post data.
      *
-     * @param Item\Model $resource
-     * @param Values     $postData
-     * @param Booking    $existingBooking  If provided, this is the booking that is being updated.
+     * @param Item\Model   $resource
+     * @param Values       $postData
+     * @param Booking|null $existingBooking If provided, this is the booking that is being updated.
      *                                     Leave it out of conflict checks.
      * @return array
      * @throws \PDOException
@@ -145,7 +145,7 @@ class Validation
     public function validateBookingFromPostData(
         Item\Model $resource,
         Values $postData,
-        Booking $existingBooking = null
+        ?Booking $existingBooking = null
     ) {
         // Check:
         // Beginning and end of booking are valid datetime
@@ -406,7 +406,7 @@ class Validation
      * @param Item\Model $resource
      * @param DateTime   $startDate
      * @param DateTime   $endDate
-     * @param Model      $existingBooking
+     * @param Model|null $existingBooking
      * @return array
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
@@ -415,7 +415,7 @@ class Validation
         Item\Model $resource,
         DateTime $startDate,
         DateTime $endDate,
-        Model $existingBooking = null
+        ?Model $existingBooking = null
     ) {
         $errors = [];
 

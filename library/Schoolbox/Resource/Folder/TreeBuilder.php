@@ -27,7 +27,6 @@ use function implode;
  */
 class TreeBuilder
 {
-
     /** @var Folder\Mapper */
     private $folderMapper;
 
@@ -56,7 +55,7 @@ class TreeBuilder
      * @throws UnderflowException
      * @throws UnexpectedValueException
      */
-    public function buildTree(int $rootId, callable $hashFunction = null, Builder $extraPb = null): ObjectTree
+    public function buildTree(int $rootId, ?callable $hashFunction = null, ?Builder $extraPb = null): ObjectTree
     {
         $folderTree = new ObjectTree($hashFunction);
         $root       = $this->getRoot($rootId);
@@ -105,7 +104,7 @@ class TreeBuilder
      * @throws UnderflowException
      * @throws Mapper\Exception
      */
-    private function addFoldersToTreeRecursive(ObjectTree $folderTree, array $parents, Builder $extraPb = null): void
+    private function addFoldersToTreeRecursive(ObjectTree $folderTree, array $parents, ?Builder $extraPb = null): void
     {
         // Base Case:
         if (!count($parents)) {

@@ -12,7 +12,6 @@
 
 class Component_Config_Description extends Component_Config_Abstract
 {
-
     /**
      * Parse out this config option
      *
@@ -22,7 +21,7 @@ class Component_Config_Description extends Component_Config_Abstract
      * @param mixed                             $configValue
      * @param Component_ControllerAbstract|null $component
      */
-    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
+    public function parse(SitePage $page, $key, $keyblock, $configValue, ?Component_ControllerAbstract $component = null)
     {
         $page->setVar('COMPONENT_CONFIG_DESCRIPTION', $configValue);
     }

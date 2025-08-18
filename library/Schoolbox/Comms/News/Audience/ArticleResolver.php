@@ -465,7 +465,7 @@ class ArticleResolver implements IArticleResolver
         ?string $relationship,
         bool $publishedOnly = true,
         array $orderBy = [],
-        int $limit = null
+        ?int $limit = null
     ): array {
         // Simple equality case
         if (Strategy\Composite::getEntityType() !== $entityType) {
@@ -509,7 +509,7 @@ class ArticleResolver implements IArticleResolver
         ?string $relationship,
         bool $publishedOnly = true,
         array $orderBy = [],
-        int $limit = null
+        ?int $limit = null
     ): array {
 
         // Don't attempt to match a segment if the system is not configured to permit null entity values for the given entity type
@@ -585,7 +585,7 @@ class ArticleResolver implements IArticleResolver
         ?string $entityValue2,
         bool $publishedOnly = true,
         array $orderBy = [],
-        int $limit = null
+        ?int $limit = null
     ): array {
         $pb = $this->complexMapper->getCombinationMatchPredicate($entityType1, $entityValue1, $entityType2, $entityValue2);
 

@@ -654,7 +654,7 @@ class ListController extends Web\Controller\Base
      * @throws Deleted
      * @throws DomainException
      */
-    protected function persistAssessment(User $user, $postData, IAssessable $assessment = null): array
+    protected function persistAssessment(User $user, $postData, ?IAssessable $assessment = null): array
     {
         /* If an assessment couldn't be produced, bail out
          * and let mage see the errors set by $this->sendError

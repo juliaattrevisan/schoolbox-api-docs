@@ -389,11 +389,11 @@ HELP;
 
         /* Skip header row
          */
-        $row = fgetcsv($fp);
+        $row = fgetcsv($fp, escape: '');
 
         /* Maintain a row counter
          */
-        for ($i = 2; $row = fgetcsv($fp); ++$i) {
+        for ($i = 2; $row = fgetcsv($fp, escape: ''); ++$i) {
             $this->refreshLock($lock);
 
             /* Ignore column 0, that's the Academic Cycle id we don't care about
@@ -509,11 +509,11 @@ HELP;
 
         /* Skip header row
          */
-        $row = fgetcsv($fp);
+        $row = fgetcsv($fp, escape: '');
 
         /* Maintain a row counter
          */
-        for ($i = 2; $row = fgetcsv($fp); ++$i) {
+        for ($i = 2; $row = fgetcsv($fp, escape: ''); ++$i) {
             $this->refreshLock($lock);
 
             /* Ignore column 0, that's the Academic Cycle id we don't care about
@@ -643,11 +643,11 @@ HELP;
 
         /* Skip header row
          */
-        $row = fgetcsv($fp);
+        $row = fgetcsv($fp, escape: '');
 
         /* Maintain a row counter
          */
-        for ($i = 2; $row = fgetcsv($fp); ++$i) {
+        for ($i = 2; $row = fgetcsv($fp, escape: ''); ++$i) {
             $this->refreshLock($lock);
 
             /* Ignore column 0, that's the Academic Cycle id we don't care about
@@ -763,11 +763,11 @@ HELP;
 
         /* Skip header row
          */
-        $row = fgetcsv($fp);
+        $row = fgetcsv($fp, escape: '');
 
         /* Maintain a row counter
          */
-        for ($i = 2; $row = fgetcsv($fp); ++$i) {
+        for ($i = 2; $row = fgetcsv($fp, escape: ''); ++$i) {
             $this->refreshLock($lock);
 
             /* Ignore column 0, that's the Academic Cycle id we don't care about

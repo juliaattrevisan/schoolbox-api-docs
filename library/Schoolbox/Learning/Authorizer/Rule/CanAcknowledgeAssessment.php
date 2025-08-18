@@ -16,7 +16,6 @@ use InvalidArgumentException;
 
 class CanAcknowledgeAssessment extends AbstractParticipationRule
 {
-
     /**
      * @var Access
      */
@@ -39,7 +38,7 @@ class CanAcknowledgeAssessment extends AbstractParticipationRule
      * @throws Failure\Base If unable to respond because student has reached response limit
      * @throws InvalidArgumentException If unable to locate an IAssessable or User instance in route params
      */
-    public function authorize(array $params = [], User $user = null)
+    public function authorize(array $params = [], ?User $user = null)
     {
         $assessment = $this->findAssessable($params);
 

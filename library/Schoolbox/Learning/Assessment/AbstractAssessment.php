@@ -411,7 +411,7 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @inheritdoc
      */
-    public function isPublished(?User $student, Alaress_Date_Format $now = null): bool
+    public function isPublished(?User $student, ?Alaress_Date_Format $now = null): bool
     {
         if (null === $now) {
             $now = Alaress_Date_Format::now();
@@ -428,7 +428,7 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @inheritdoc
      */
-    public function isOpen(User $student, Alaress_Date_Format $now = null): bool
+    public function isOpen(User $student, ?Alaress_Date_Format $now = null): bool
     {
         $participant = $this->getParticipantIfExtant($student);
 
@@ -452,7 +452,7 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @inheritdoc
      */
-    public function isOverdue(Alaress_Date_Format $now = null)
+    public function isOverdue(?Alaress_Date_Format $now = null)
     {
         if (null === $now) {
             $now = Alaress_Date_Format::now();
@@ -466,7 +466,7 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @inheritdoc
      */
-    public function isPastClose(Alaress_Date_Format $now = null)
+    public function isPastClose(?Alaress_Date_Format $now = null)
     {
         if (null === $now) {
             $now = Alaress_Date_Format::now();
@@ -1261,7 +1261,7 @@ abstract class AbstractAssessment implements IAssessable
      * @param IAssessable|null $specification
      * @return static
      */
-    public function setSpecificationAssessment(IAssessable $specification = null)
+    public function setSpecificationAssessment(?IAssessable $specification = null)
     {
         $this->specificationAssessment = $specification;
         return $this;
@@ -1298,10 +1298,10 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
-     * @param null|WorkType $workType
+     * @param WorkType|null $workType
      * @return static
      */
-    public function setWorkType(WorkType $workType = null)
+    public function setWorkType(?WorkType $workType = null)
     {
         $this->workType = $workType;
         return $this;

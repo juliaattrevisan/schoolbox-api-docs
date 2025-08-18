@@ -7,7 +7,6 @@ use Schoolbox\Resource\Exception;
 
 class ValidCSV
 {
-
     /**
      * @var resource
      */
@@ -88,7 +87,7 @@ class ValidCSV
     {
         //scans headers for utf8 characters, to make sure they are correct.
         $this->skipBom();
-        $headers = fgetcsv($this->fp, 0);
+        $headers = fgetcsv($this->fp, 0, escape: '');
         $cellCount = 0;
         foreach ($headers as $heading) {
             $cellCount++;
@@ -111,7 +110,7 @@ class ValidCSV
         rewind($this->fp);
         //parse csv
         $lineCount = 0;
-        while (!feof($this->fp) && ($line = fgetcsv($this->fp)) !== false) {
+        while (!feof($this->fp) && ($line = fgetcsv($this->fp, escape: '')) !== false) {
             $logger->debug(sprintf('checking line: "%d", "%s"', $lineCount, implode('","', $line)));
             $lineCount++;
             $cellCount = 0;

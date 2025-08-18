@@ -372,7 +372,7 @@ abstract class Evaluation_Export_CSV
      */
     public function __outputCSV(&$vals, $key, $filehandler)
     {
-        fputcsv($filehandler, $vals, ',', '"');
+        fputcsv($filehandler, $vals, ',', '"', escape: '');
     }
 
     /* Getters/Setters

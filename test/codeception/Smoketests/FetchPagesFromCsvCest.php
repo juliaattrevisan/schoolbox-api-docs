@@ -215,7 +215,10 @@ class FetchPagesFromCsvCest
      */
     protected function urlProvider()
     {
-        $csvData = array_map('str_getcsv', file(codecept_data_dir('/SmokeTests/GetSmokeTestDataList.csv')));
+        $csvData = array_map(
+            fn ($line) => str_getcsv($line, escape: ''),
+            file(codecept_data_dir('/SmokeTests/GetSmokeTestDataList.csv')),
+        );
 
         return $csvData;
     }

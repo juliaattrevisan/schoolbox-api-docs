@@ -254,7 +254,7 @@ class MockConnector implements IConnector
      *
      * @throws BadMethodCallException
      */
-    public function query(string $sql, array $parameters = null): IStatement
+    public function query(string $sql, ?array $parameters = null): IStatement
     {
         $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
@@ -549,7 +549,7 @@ class MockConnector implements IConnector
      *
      * @throws BadMethodCallException
      */
-    public function getRow(string $sql, array $parameters = null)
+    public function getRow(string $sql, ?array $parameters = null)
     {
         $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
@@ -559,7 +559,7 @@ class MockConnector implements IConnector
      *
      * @throws BadMethodCallException
      */
-    public function getOne(string $sql, array $parameters = null)
+    public function getOne(string $sql, ?array $parameters = null)
     {
         $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
@@ -569,7 +569,7 @@ class MockConnector implements IConnector
      *
      * @throws BadMethodCallException
      */
-    public function getAll(string $sql, array $parameters = null): array
+    public function getAll(string $sql, ?array $parameters = null): array
     {
         $this->raiseUnsupportedMethodException(__FUNCTION__);
     }
@@ -579,7 +579,7 @@ class MockConnector implements IConnector
      *
      * @throws BadMethodCallException
      */
-    public function getIterator(string $sql, array $parameters = null): IIterator
+    public function getIterator(string $sql, ?array $parameters = null): IIterator
     {
         $this->raiseUnsupportedMethodException(__FUNCTION__);
     }

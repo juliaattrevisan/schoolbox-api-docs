@@ -25,7 +25,6 @@ use UnexpectedValueException;
  */
 class HaveReadPermToAudience extends ArticleAttribute
 {
-
     /**
      * @var StrategyFactory
      */
@@ -48,7 +47,7 @@ class HaveReadPermToAudience extends ArticleAttribute
      * @throws \Schoolbox\Mapper\Exception\InsufficientHydrationException
      * @throws \DomainException
      */
-    public function authorize(array $params = [], User $user = null): void
+    public function authorize(array $params = [], ?User $user = null): void
     {
         if (!$user) {
             throw new Unauthorized("User cannot be null");

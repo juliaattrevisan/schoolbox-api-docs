@@ -9,7 +9,6 @@
  */
 class Report_Exporter
 {
-
     private $reportHeadings = array();
     private $reportData = array();
     private $filename = null;
@@ -81,7 +80,7 @@ class Report_Exporter
         $outstream = fopen("php://output", 'r');
 
         // output the column headings
-        fputcsv($outstream, $this->getHeadings());
+        fputcsv($outstream, $this->getHeadings(), escape: '');
 
         // use array iteratively
         if (is_array($this->getData()) || $this->getData() instanceof Traversable) {
@@ -111,6 +110,6 @@ class Report_Exporter
             $datum[] = $row[$dbCol];
         }
 
-        fputcsv($outstream, $datum);
+        fputcsv($outstream, $datum, escape: '');
     }
 }

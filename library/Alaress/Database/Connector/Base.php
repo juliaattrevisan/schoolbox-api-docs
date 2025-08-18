@@ -558,7 +558,7 @@ class Base implements IConnector
     /**
      * @inheritdoc
      */
-    public function getRow(string $sql, array $parameters = null)
+    public function getRow(string $sql, ?array $parameters = null)
     {
         return $this->executeQuery($sql, $parameters)->fetch();
     }
@@ -566,7 +566,7 @@ class Base implements IConnector
     /**
      * @inheritdoc
      */
-    public function getOne(string $sql, array $parameters = null)
+    public function getOne(string $sql, ?array $parameters = null)
     {
         return $this->executeQuery($sql, $parameters)->fetchColumn();
     }
@@ -574,7 +574,7 @@ class Base implements IConnector
     /**
      * @inheritdoc
      */
-    public function getAll(string $sql, array $parameters = null): array
+    public function getAll(string $sql, ?array $parameters = null): array
     {
         return $this->executeQuery($sql, $parameters)->fetchAll();
     }
@@ -582,7 +582,7 @@ class Base implements IConnector
     /**
      * @inheritdoc
      */
-    public function getIterator(string $sql, array $parameters = null): IIterator
+    public function getIterator(string $sql, ?array $parameters = null): IIterator
     {
         return $this->getQueryIterator($sql, $parameters);
     }
@@ -590,7 +590,7 @@ class Base implements IConnector
     /**
      * @inheritdoc
      */
-    public function query(string $sql, array $parameters = null): IStatement
+    public function query(string $sql, ?array $parameters = null): IStatement
     {
         $result = $this->prepareQuery($sql, $parameters);
         $result->execute();

@@ -23,13 +23,13 @@ class CanModerateItem implements Rule\IAuthorizationRule
     /**
      * Authorizes that this user is a moderator for this item.
      *
-     * @param  array $params Any parameters passed as part of the route.
-     * @param  User  $user   The user to authorize, if any. Null value assumes
+     * @param  array    $params Any parameters passed as part of the route.
+     * @param User|null $user   The user to authorize, if any. Null value assumes
      *                       that no user is logged in.
      *
      * @throws Failure\Unauthorized if the request isn't authorized.
      */
-    public function authorize(array $params = array(), User $user = null)
+    public function authorize(array $params = array(), ?User $user = null)
     {
         // Authorize results should be cached, as hitting DB for each perm
         // check is expensive.

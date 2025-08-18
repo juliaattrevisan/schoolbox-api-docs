@@ -129,7 +129,7 @@ interface IAssessable extends ISoftDeletable
      * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function isPublished(?User $student, Alaress_Date_Format $now = null): bool;
+    public function isPublished(?User $student, ?Alaress_Date_Format $now = null): bool;
 
 
     /**
@@ -138,28 +138,28 @@ interface IAssessable extends ISoftDeletable
      * Note this includes the overdue period.
      *
      * @param User                     $student
-     * @param null|Alaress_Date_Format $now Optional value of now for testing
+     * @param Alaress_Date_Format|null $now Optional value of now for testing
      * @return bool
      */
-    public function isOpen(User $student, Alaress_Date_Format $now = null): bool;
+    public function isOpen(User $student, ?Alaress_Date_Format $now = null): bool;
 
 
     /**
      * Are we past the due date and before the close date?
      *
-     * @param null|Alaress_Date_Format $now  Optional value of now for testing
+     * @param Alaress_Date_Format|null $now Optional value of now for testing
      * @return bool
      */
-    public function isOverdue(Alaress_Date_Format $now = null);
+    public function isOverdue(?Alaress_Date_Format $now = null);
 
 
     /**
      * Are we after the close date? (does not consider if we are before open date)
      *
-     * @param null|Alaress_Date_Format $now  Optional value of now for testing
+     * @param Alaress_Date_Format|null $now Optional value of now for testing
      * @return bool
      */
-    public function isPastClose(Alaress_Date_Format $now = null);
+    public function isPastClose(?Alaress_Date_Format $now = null);
 
 
     /**
@@ -199,7 +199,7 @@ interface IAssessable extends ISoftDeletable
      * @param IAssessable|null $specification
      * @return static
      */
-    public function setSpecificationAssessment(IAssessable $specification = null);
+    public function setSpecificationAssessment(?IAssessable $specification = null);
 
     /**
      * Is this assessment a specification?
@@ -795,7 +795,7 @@ interface IAssessable extends ISoftDeletable
      * @param null|WorkType\Model $workType
      * @return static
      */
-    public function setWorkType(WorkType\Model $workType = null);
+    public function setWorkType(?WorkType\Model $workType = null);
 
     /**
      * @return GradeGroup|null

@@ -16,14 +16,13 @@ use InvalidArgumentException;
 
 class IsSpecification extends AbstractAssessableRule
 {
-
     /**
      * Check assessment is a specification
      *
      * @inheritdoc
      * @throws InvalidArgumentException If unable to locate required params in route args
      */
-    public function authorize(array $params = [], User $user = null)
+    public function authorize(array $params = [], ?User $user = null)
     {
         if (!$this->findAssessable($params)->getBaseContext() instanceof UnitSpecification\Model) {
             throw new InvalidPath('Assessment is not a Specification');

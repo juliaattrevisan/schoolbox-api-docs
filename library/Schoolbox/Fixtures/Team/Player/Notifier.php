@@ -122,7 +122,7 @@ class Notifier extends AbstractModuleNotifier
      * @throws \InvalidArgumentException
      * @throws \OutOfBoundsException
      */
-    public function notifyStudentRemoved(TeamPlayer $teamPlayer, User $effector, array $diff = null)
+    public function notifyStudentRemoved(TeamPlayer $teamPlayer, User $effector, ?array $diff = null)
     {
         $team = $this->getTeamMapper()->findById($teamPlayer->getTeam()->getId());
 
@@ -151,7 +151,7 @@ class Notifier extends AbstractModuleNotifier
      * @throws \InvalidArgumentException
      * @throws \OutOfBoundsException
      */
-    public function notifyParentRemoved(TeamPlayer $teamPlayer, User $effector, array $diff = null)
+    public function notifyParentRemoved(TeamPlayer $teamPlayer, User $effector, ?array $diff = null)
     {
         $team = $this->getTeamMapper()->findById($teamPlayer->getTeam()->getId());
 

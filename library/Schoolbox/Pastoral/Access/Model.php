@@ -208,11 +208,11 @@ class Model implements ISoftDeletable, Pastoral\IPastoralAccess
     }
 
     /**
-     * @param null|Role $role
+     * @param Role|null $role
      *
      * @return $this
      */
-    public function setRole(Role $role = null): self
+    public function setRole(?Role $role = null): self
     {
         $this->role = $role;
 
@@ -246,11 +246,11 @@ class Model implements ISoftDeletable, Pastoral\IPastoralAccess
     }
 
     /**
-     * @param null|User $user
+     * @param User|null $user
      *
      * @return self
      */
-    public function setUser(User $user = null): self
+    public function setUser(?User $user = null): self
     {
         $this->user = $user;
 
@@ -266,11 +266,11 @@ class Model implements ISoftDeletable, Pastoral\IPastoralAccess
     }
 
     /**
-     * @param null|Group $group
+     * @param Group|null $group
      *
      * @return self
      */
-    public function setGroup(Group $group = null): self
+    public function setGroup(?Group $group = null): self
     {
         $this->group = $group;
 

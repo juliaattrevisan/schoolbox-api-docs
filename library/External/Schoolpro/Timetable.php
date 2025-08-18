@@ -133,7 +133,7 @@ class External_Schoolpro_Timetable implements External_TimetableInterface
     /**
      * @inheritDoc
      */
-    public function getPeriodNumber(Campus $campus, $now = 0, \Schoolbox\User $user = null): array
+    public function getPeriodNumber(Campus $campus, $now = 0, ?\Schoolbox\User $user = null): array
     {
         $statement = $this->getConnector()->prepareStoredProcedure('sbGetPeriodNumber');
         $statement->bindInputs([

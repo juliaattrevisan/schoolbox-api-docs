@@ -198,7 +198,7 @@ class Connection
      * @throws StompException if `$ackMode` isn't recognized
      *                        (@see https://stomp.github.io/stomp-specification-1.2.html#SUBSCRIBE_ack_Header)
      */
-    public function subscribe(string $destination, string $ackMode, string $subscriptionId = null): string
+    public function subscribe(string $destination, string $ackMode, ?string $subscriptionId = null): string
     {
         $subId          = $subscriptionId ?? uniqid('', true);
         $subscribeFrame = $this->protocol->getSubscribeFrame($destination, $subId, $ackMode);

@@ -132,6 +132,15 @@ class TracedPdoStatement extends PDOStatement
         return $this->statement->getColumnMeta($column);
     }
 
+    /**
+     * Added `ReturnTypeWillChange` attribute, because 8.4 adds types to this
+     * method: they don't exist in 8.2.
+     *
+     * @param int   $mode
+     * @param mixed ...$args
+     * @return bool
+     */
+    #[\ReturnTypeWillChange]
     public function setFetchMode($mode, ...$args): bool
     {
         return $this->statement->setFetchMode($mode, ...$args);

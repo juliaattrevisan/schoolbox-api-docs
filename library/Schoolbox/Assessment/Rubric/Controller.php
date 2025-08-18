@@ -529,7 +529,7 @@ class Controller extends BaseController
         $fp = fopen('php://temp', 'r+b');
         foreach ($array as $row) {
             $row = array_map(fn ($x) => trim($x ?? ''), $row);
-            fputcsv($fp, $row);
+            fputcsv($fp, $row, escape: '');
         }
         rewind($fp);
         $result = stream_get_contents($fp);

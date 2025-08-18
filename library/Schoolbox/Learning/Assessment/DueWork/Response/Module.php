@@ -258,7 +258,7 @@ class Module extends BaseModule
             new Rule\IsSuperuser(),
             $this->buildRuleHasWriteAccess(),
             new Rule\Callback(
-                static function (array $params = [], User $user = null): void {
+                static function (array $params = [], ?User $user = null): void {
                     // students who own the kami worksheet, can always view the state of the draft feedback
                     if (isset($params['kami'])) {
                         /** @var Kami\Model $kamiModel */

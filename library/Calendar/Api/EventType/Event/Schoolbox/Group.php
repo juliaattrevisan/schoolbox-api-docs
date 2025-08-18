@@ -28,7 +28,7 @@ class Calendar_Api_EventType_Event_Schoolbox_Group extends Calendar_Api_EventTyp
      * @param User     $viewer
      * @param int|null $groupId
      */
-    public function __construct(int $connectorId, User $user, User $viewer, int $groupId = null)
+    public function __construct(int $connectorId, User $user, User $viewer, ?int $groupId = null)
     {
         parent::__construct($connectorId, $user, $viewer);
         $this->group_id = $groupId;

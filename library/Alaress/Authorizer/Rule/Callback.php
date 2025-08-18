@@ -14,7 +14,6 @@ use Schoolbox\User;
 
 class Callback implements IAuthorizationRule
 {
-
     /**
      * @var callable
      */
@@ -32,7 +31,7 @@ class Callback implements IAuthorizationRule
     /**
      * {@inheritdoc}
      */
-    public function authorize(array $params = array(), User $user = null, $target = null)
+    public function authorize(array $params = array(), ?User $user = null, $target = null)
     {
         return call_user_func($this->callback, $params, $user, $target);
     }

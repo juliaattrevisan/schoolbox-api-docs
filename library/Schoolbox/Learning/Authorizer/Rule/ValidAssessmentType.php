@@ -18,7 +18,6 @@ use UnexpectedValueException;
 
 class ValidAssessmentType extends AbstractAssessableRule
 {
-
     /** @var string[] */
     private $validTypes;
 
@@ -42,7 +41,7 @@ class ValidAssessmentType extends AbstractAssessableRule
      * @throws InvalidArgumentException If unable to locate an Assessment instance in $params
      * @throws UnexpectedValueException If passed assessment is not recognised
      */
-    public function authorize(array $params = [], User $user = null)
+    public function authorize(array $params = [], ?User $user = null)
     {
         $assessable     = $this->findAssessable($params);
         $assessmentType = AssessmentType::objectToString($assessable);

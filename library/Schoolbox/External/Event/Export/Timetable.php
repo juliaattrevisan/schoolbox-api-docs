@@ -61,12 +61,12 @@ class Timetable
         /* Header row
          */
         $fp = fopen('php://temp', 'w');
-        fputcsv($fp, $headings);
+        fputcsv($fp, $headings, escape: '');
 
         /* SUDS Timetable records
          */
         $statement = $this->mapper->getDatabase()->prepare("
-            SELECT * 
+            SELECT *
             FROM {$this->mapper->getTable()}
             WHERE classification = :classification
             ORDER BY start_at
@@ -83,7 +83,7 @@ class Timetable
                 $row[$heading] = $timetableEvent[$column];
             }
 
-            fputcsv($fp, array_values($row));
+            fputcsv($fp, array_values($row), escape: '');
         }
 
         rewind($fp);

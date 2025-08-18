@@ -26,10 +26,10 @@ class Calendar_Api_EventType_ResourceBooking_Booking_ForCategory extends Calenda
      * @param int      $connectorId
      * @param User     $user
      * @param User     $viewer
-     * @param null|int $categoryId   A resource category id
+     * @param int|null $categoryId A resource category id
      * @throws DomainException
      */
-    public function __construct(int $connectorId, User $user, User $viewer, int $categoryId = null)
+    public function __construct(int $connectorId, User $user, User $viewer, ?int $categoryId = null)
     {
         parent::__construct($connectorId, $user, $viewer);
         $this->categoryId = $categoryId;

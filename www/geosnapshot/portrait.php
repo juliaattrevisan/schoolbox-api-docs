@@ -51,7 +51,7 @@ if (
 
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT);
 $kernel->getShutdownHandler()->registerFunction(
-    new ResourceLimitExceededHandler(function () {
+    new ResourceLimitExceededHandler(function (): void {
         header('Cache-Control: no-store');
         SitePage::redirectToBrokenImageWithTransform('portrait', TRANSFORM_KEY, 504);
     }),

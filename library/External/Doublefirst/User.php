@@ -787,7 +787,7 @@ class External_Doublefirst_User implements External_UserInterface
      *
      * @inheritDoc
      */
-    public function getCurrentSemester(string $externalUserId = null): ?string
+    public function getCurrentSemester(?string $externalUserId = null): ?string
     {
         return date('m') < 6 ? '1' : '2';
     }
@@ -795,7 +795,7 @@ class External_Doublefirst_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getCurrentYear(string $externalUserId = null): ?string
+    public function getCurrentYear(?string $externalUserId = null): ?string
     {
         $year = $this->getDatabase()->getOne("SELECT CurrentAcademicYear FROM ClusterMaster");
         return ($year === null || $year === false) ? null : (string)$year;

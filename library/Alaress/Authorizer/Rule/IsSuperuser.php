@@ -29,10 +29,10 @@ class IsSuperuser extends All
 
 
     /**
-     * @param array $params
-     * @param User  $user
+     * @param array     $params
+     * @param User|null $user
      */
-    public function authorizeMethod(array $params = array(), User $user = null)
+    public function authorizeMethod(array $params = array(), ?User $user = null)
     {
         if (!($user instanceof User && $user->getId() && $user->isSuperuser())) {
             throw new Unauthorized();

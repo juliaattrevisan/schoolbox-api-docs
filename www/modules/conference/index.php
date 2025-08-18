@@ -32,7 +32,7 @@ if (!file_exists($mapFile) || !is_readable($mapFile)) {
 
 if (($handle = fopen($mapFile, 'r')) !== false) {
     $handle = (new \Alaress\Csv\ValidCSV($handle))->skipBom();
-    while (($row = fgetcsv($handle, 1000, ',')) !== false) {
+    while (($row = fgetcsv($handle, 1000, ',', escape: '')) !== false) {
             $map[$row[0]] = $row[1];
     }
     fclose($handle);

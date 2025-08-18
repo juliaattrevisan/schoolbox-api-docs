@@ -66,14 +66,14 @@ class Creational extends AbstractFactory
      * Populate it with the information from $_POST etc
      * Spawn metadata and thumbnails where appropriate
      *
-     * @param array $data
+     * @param array|null $data
      * @return \SocialStream_Post_Abstract
      * @throws \DomainException
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function produce(array $data = null): \SocialStream_Post_Abstract
+    public function produce(?array $data = null): \SocialStream_Post_Abstract
     {
 
         // if data contains an attachment

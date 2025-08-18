@@ -367,11 +367,11 @@ class Model implements ISoftDeletable, IThreadLocation
      * Set a learning moment to Submitted status, along with its effector,
      * ready for the next state transition to Published or Rejected
      *
-     * @param User $effector
+     * @param User                      $effector
      * @param \Alaress_Date_Format|null $now
      * @return $this
      */
-    public function submit(User $effector, \Alaress_Date_Format $now = null): self
+    public function submit(User $effector, ?\Alaress_Date_Format $now = null): self
     {
         $this->setSubmittedBy($effector);
 
@@ -398,11 +398,11 @@ class Model implements ISoftDeletable, IThreadLocation
     /**
      * Set a learning moment to Published status, along with its effector
      *
-     * @param User $effector
+     * @param User                      $effector
      * @param \Alaress_Date_Format|null $now
      * @return $this
      */
-    public function publish(User $effector, \Alaress_Date_Format $now = null): self
+    public function publish(User $effector, ?\Alaress_Date_Format $now = null): self
     {
         $this->setPublishedBy($effector);
 
@@ -430,11 +430,11 @@ class Model implements ISoftDeletable, IThreadLocation
     /**
      * Set a learning moment to Rejected status, along with its effector
      *
-     * @param User $effector
+     * @param User                      $effector
      * @param \Alaress_Date_Format|null $now
      * @return $this
      */
-    public function reject(User $effector, \Alaress_Date_Format $now = null): self
+    public function reject(User $effector, ?\Alaress_Date_Format $now = null): self
     {
         $this->setRejectedBy($effector);
 

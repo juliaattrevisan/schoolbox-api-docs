@@ -9,12 +9,13 @@
 services:
   # Base image: only needs to be built, not started
   # By default, build with ENV=dev
-  php82-bookworm:
-    image: php82-bookworm
+  php-bookworm:
+    image: php-bookworm
     build:
-      context: ./base-images/php82-bookworm
+      context: ./base-images/php-bookworm
       args:
         ENV: ${ENV:-dev}
+        PHP_MAJOR_VERSION: ${PHP_MAJOR_VERSION}
     restart: no
 
   # Frontend web server, mimicking a load balancer and SSL termination endpoint.
@@ -47,8 +48,9 @@ services:
   # own container will go here for now.
   schoolbox-cli:
     depends_on:
-      - php82-bookworm
+      - php-bookworm
     container_name: schoolbox-cli
+    pull_policy: never
     restart: always
     environment:
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
@@ -137,6 +139,7 @@ services:
   # These will be implemented as separate containers (if they aren't already).
   schoolbox-digestd:
     container_name: schoolbox-digestd
+    pull_policy: never
     depends_on:
       mariadb:
         condition: service_healthy
@@ -146,7 +149,7 @@ services:
         condition: service_healthy
       redis-storage:
         condition: service_healthy
-      php82-bookworm:
+      php-bookworm:
         condition: service_started
     build:
       context: ./schoolbox-digestd
@@ -158,6 +161,7 @@ services:
 
   schoolbox-scheduled:
     container_name: schoolbox-scheduled
+    pull_policy: never
     depends_on:
       mariadb:
         condition: service_healthy
@@ -167,7 +171,7 @@ services:
         condition: service_healthy
       redis-storage:
         condition: service_healthy
-      php82-bookworm:
+      php-bookworm:
         condition: service_started
     build:
       context: ./schoolbox-scheduled
@@ -179,6 +183,7 @@ services:
 
   schoolbox-mobiled:
     container_name: schoolbox-mobiled
+    pull_policy: never
     depends_on:
       mariadb:
         condition: service_healthy
@@ -188,7 +193,7 @@ services:
         condition: service_healthy
       redis-storage:
         condition: service_healthy
-      php82-bookworm:
+      php-bookworm:
         condition: service_started
     build:
       context: ./schoolbox-mobiled
@@ -200,6 +205,7 @@ services:
 
   schoolbox-socketd:
     container_name: schoolbox-socketd
+    pull_policy: never
     depends_on:
       mariadb:
         condition: service_healthy
@@ -209,7 +215,7 @@ services:
         condition: service_healthy
       redis-storage:
         condition: service_healthy
-      php82-bookworm:
+      php-bookworm:
         condition: service_started
     build:
       context: ./schoolbox-socketd

@@ -109,7 +109,7 @@ class Queue extends ResourceVideo
      * @throws MapperException
      * @throws \League\Flysystem\UnableToReadFile
      */
-    public function process(Filesystem $filesystem, LoggerInterface $logger = null)
+    public function process(Filesystem $filesystem, ?LoggerInterface $logger = null)
     {
         // Grab transcoding configuration
 

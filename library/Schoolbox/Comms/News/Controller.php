@@ -916,7 +916,7 @@ class Controller extends Base
      * @api   GET /news/archive{/year,month}
      * @since 18.1
      */
-    public function getArchive(int $year = null, int $month = null): void
+    public function getArchive(?int $year = null, ?int $month = null): void
     {
         $pageTitle = 'News Archive';
 

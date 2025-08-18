@@ -72,7 +72,7 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
     /**
      * @inheritdoc
      */
-    public function getTeachers(string $classCode, Alaress_Date_Format $date = null): array
+    public function getTeachers(string $classCode, ?Alaress_Date_Format $date = null): array
     {
 
         // Setup handling multiple codes

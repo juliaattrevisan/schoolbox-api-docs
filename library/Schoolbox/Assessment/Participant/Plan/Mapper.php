@@ -113,11 +113,11 @@ class Mapper extends BaseMapper
     /**
      * Find plans that match the predicate, and load their participants if they have any.
      *
-     * @param Builder $pb
+     * @param Builder|null $pb
      * @return Model[]|GenericCollection
      * @throws BaseMapper\Exception
      */
-    public function findPlansAndParticipants(Builder $pb = null): GenericCollection
+    public function findPlansAndParticipants(?Builder $pb = null): GenericCollection
     {
         $query = "
             SELECT {$this->getColumnString()},

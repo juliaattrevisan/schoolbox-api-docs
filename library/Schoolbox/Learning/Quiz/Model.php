@@ -359,10 +359,10 @@ class Model implements ISoftDeletable, IAssessableDataModel
      * The assessment model must be allowed to be NULL, because this can be used
      * to hydrate surveys.
      *
-     * @param AssessmentModel $assessmentModel
+     * @param AssessmentModel|null $assessmentModel
      * @return static
      */
-    public function setAssessmentModel(AssessmentModel $assessmentModel = null)
+    public function setAssessmentModel(?AssessmentModel $assessmentModel = null)
     {
         $this->assessmentModel = $assessmentModel;
         return $this;
@@ -765,10 +765,10 @@ class Model implements ISoftDeletable, IAssessableDataModel
     }
 
     /**
-     * @param GradeGroup $gradeGroup
+     * @param GradeGroup|null $gradeGroup
      * @return static
      */
-    public function setGradeGroup(GradeGroup $gradeGroup = null)
+    public function setGradeGroup(?GradeGroup $gradeGroup = null)
     {
         $this->gradeGroup = $gradeGroup;
         return $this;

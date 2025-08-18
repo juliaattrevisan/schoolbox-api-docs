@@ -32,7 +32,7 @@ $kernel = new Daemon\Kernel(
     ]
 );
 
-$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts) use ($kernel) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts) use ($kernel): void {
     $kernel->deprecationNotice("SA-19334");
 
     // If no instance ID is provided, fall back to default if it exists

@@ -29,7 +29,7 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 
 $kernel = new Schoolbox\Application\Daemon\Kernel('Route Worker');
 
-$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log): void {
     // extract things from DI and build the worker
 
     /** @var ClientInterface $client */

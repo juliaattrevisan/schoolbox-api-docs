@@ -34,7 +34,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Daemon\Kernel('Schedule', [Daemon\Kernel::OPTION_ERRORS => E_ALL,]);
 
 // CREATE SCHEDULER APP
-$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) use (&$scheduler) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) use (&$scheduler): void {
     /** @var Notif $notif */
     $notif = $di->get('notif');
 
@@ -71,7 +71,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $jit->restoreSchedule($amqp, Broker::QUEUE);
 
         // due to the async nature of STOMP, only register the consumer once the connection is actually established
-        $stomp->connect()->then(function () use ($scheduleBroker, $scheduler, $log, $asyncRedis) {
+        $stomp->connect()->then(function () use ($scheduleBroker, $scheduler, $log, $asyncRedis): void {
             $log->info('Connected to STOMP', ['char' => '+']);
 
             $scheduleBroker->registerConsumer($scheduler);

@@ -399,7 +399,7 @@ class Controller extends Base
     {
         $courseUnitSpecs = [];
         array_map(
-            function ($id) use (&$courseUnitSpecs) {
+            function ($id) use (&$courseUnitSpecs): void {
                 $courseUnitSpecs[$id] = $this->helper->filterUserPermission(
                     $this->courseUnitSpecificationMapper->findByColumn('course_specification_id', $id, [
                         'order' => ['f.sequence' => 'DESC', 'f.id' => 'ASC']

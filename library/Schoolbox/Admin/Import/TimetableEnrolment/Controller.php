@@ -93,12 +93,12 @@ class Controller extends UserAccount\Controller
             'Class Code',
             'Class Title',
             'Student Code',
-        ]);
+        ], escape: '');
 
         /* Export properties into the same format as the csv
          */
         while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
-            fputcsv($fp, $row);
+            fputcsv($fp, $row, escape: '');
         }
 
         rewind($fp);

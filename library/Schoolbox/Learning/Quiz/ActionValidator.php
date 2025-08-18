@@ -81,13 +81,13 @@ class ActionValidator
     /**
      * Returns whether the specified user is permitted to attempt the quiz.
      *
-     * @param User $user
-     * @param Quiz\Model $quiz
+     * @param User               $user
+     * @param Quiz\Model         $quiz
      * @param IConfigLoader|null $config
      * @return bool
      * @throws Exception
      */
-    public function canAttemptQuiz(User $user, Quiz\Model $quiz, IConfigLoader $config = null): bool
+    public function canAttemptQuiz(User $user, Quiz\Model $quiz, ?IConfigLoader $config = null): bool
     {
         if (!$this->canSeeQuiz($user, $quiz)) {
             return false;

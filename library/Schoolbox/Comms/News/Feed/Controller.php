@@ -122,7 +122,7 @@ class Controller extends Base
      * @throws PDOException
      * @throws UnderflowException
      */
-    private function renderArticlesAsXml(array $articleIdFilter, string $topicSlug, Folder\Model $folder = null): void
+    private function renderArticlesAsXml(array $articleIdFilter, string $topicSlug, ?Folder\Model $folder = null): void
     {
         if (!(new ValidTopic($this->topicMapper))->isSatisfiedBy($topicSlug)) {
             throw new NotFound("No topic found with slug '$topicSlug'");

@@ -339,7 +339,7 @@ class Controller extends Base
      * @param string|null $message
      * @param string|null $redirect
      */
-    private function buildAjaxResponse(int $httpCode, int $errorCode, string $message = null, string $redirect = null): void
+    private function buildAjaxResponse(int $httpCode, int $errorCode, ?string $message = null, ?string $redirect = null): void
     {
         $data = ['errorCode' => $errorCode,];
 

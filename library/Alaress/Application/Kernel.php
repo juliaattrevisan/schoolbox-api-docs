@@ -398,7 +398,7 @@ abstract class Kernel
     protected function registerExceptionHandling(): void
     {
         $this->previousExceptionHandler = set_exception_handler(
-            function ($e) {
+            function ($e): void {
                 if (is_callable($this->previousExceptionHandler)) {
                     // The previous handler may rethrow the same exception.
                     // If it does, catch and shutdown as per normal:

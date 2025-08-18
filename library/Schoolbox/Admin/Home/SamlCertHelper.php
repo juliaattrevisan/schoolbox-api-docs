@@ -52,7 +52,7 @@ class SamlCertHelper
     public function buildWidget(
         string $idpCertificate,
         string $idpMetadataUrl,
-        Alaress_Date_Format $nowOverride = null,
+        ?Alaress_Date_Format $nowOverride = null,
     ): SamlWidget {
         /*
          * Time value used in testing to simulate and reproduce different test cases.

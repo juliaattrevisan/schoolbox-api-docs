@@ -46,11 +46,11 @@ class Mapping
     /**
      * Decompose an instance
      *
-     * @param ISummator $summator
-     * @throws \InvalidArgumentException
+     * @param ISummator|null $summator
      * @return string
+     *@throws \InvalidArgumentException
      */
-    public function decompose(ISummator $summator = null): string
+    public function decompose(?ISummator $summator = null): string
     {
         if ($summator instanceof WeightedAverage) {
             return SummatorFactory::WEIGHTED_AVERAGE;

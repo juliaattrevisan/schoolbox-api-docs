@@ -69,7 +69,7 @@ class Csv extends Base
          */
         $handle = fopen($this->getFile(), 'r');
         $handle = (new \Alaress\Csv\ValidCSV($handle))->skipBom();
-        $headerRow = fgetcsv($handle, 0, ",");
+        $headerRow = fgetcsv($handle, 0, ",", escape: '');
 
         $eventTypeMapper = new EventTypeMapper();
 
@@ -82,7 +82,7 @@ class Csv extends Base
         $hasOwnerColumn = array_key_exists('event owner id', $headerColumns);
         $hasGroupColumn = array_key_exists('group ids', $headerColumns);
 
-        while (($thisRow = fgetcsv($handle, 0, ",")) !== false) {
+        while (($thisRow = fgetcsv($handle, 0, ",", escape: '')) !== false) {
             // The CSV file will not contain character encoding info, so just assume a compatible encoding has been used.
             // Previously we stripped non-ASCII characters here, but users complained about loss of data.
 

@@ -76,7 +76,7 @@ class CollectionTest extends TestCase
      * @param TestMapper|null $mapper
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('getTestHydrateErrorCases')]
-    public function testHydrateErrorCases($input, TestMapper $mapper = null): void
+    public function testHydrateErrorCases($input, ?TestMapper $mapper = null): void
     {
         $this->expectException(TypeError::class);
         $this->object->hydrate($input, $mapper);
@@ -98,7 +98,7 @@ class CollectionTest extends TestCase
      * @param TestMapper|null $mapper
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('getTestDehydrateTypeErrorCases')]
-    public function testDehydrateTypeErrorCases($input, TestMapper $mapper = null): void
+    public function testDehydrateTypeErrorCases($input, ?TestMapper $mapper = null): void
     {
         $this->expectException(TypeError::class);
         $this->object->dehydrate($input, $mapper);
@@ -109,7 +109,7 @@ class CollectionTest extends TestCase
      * @param TestMapper|null $mapper
      */
     #[\PHPUnit\Framework\Attributes\DataProvider('getTestDehydrateGetterNotDefinedErrorCases')]
-    public function testDehydrateGetterNotDefinedErrorCases($input, TestMapper $mapper = null): void
+    public function testDehydrateGetterNotDefinedErrorCases($input, ?TestMapper $mapper = null): void
     {
         $this->expectException(Error::class);
         $this->object->dehydrate($input, $mapper);

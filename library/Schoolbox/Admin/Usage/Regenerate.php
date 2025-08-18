@@ -39,7 +39,7 @@ class Regenerate
      * @param LoggerInterface|null $logger //used for the cli script tools/storage/usageCache.php
      * @return void
      */
-    public function regenerateUsage(LoggerInterface $logger = null): void
+    public function regenerateUsage(?LoggerInterface $logger = null): void
     {
         $logger?->info("Clearing all cache's");
         //clear the cache for all cached queries

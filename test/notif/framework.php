@@ -32,7 +32,7 @@ $kernel = new Daemon\Kernel(
     ]
 );
 
-$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts): void {
 
     $framework = new Framework($di, $loop, $log, $opts['env'] ?? null, $opts['logdir'] ?? null);
 

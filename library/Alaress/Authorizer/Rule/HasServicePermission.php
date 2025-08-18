@@ -16,7 +16,6 @@ use Alaress\Authorizer\Failure\Forbidden;
 
 class HasServicePermission extends All
 {
-
     /**
      * A value of Schoolbox\Permission\Access\UserAccess::SERVICE_*
      *
@@ -73,7 +72,7 @@ class HasServicePermission extends All
     /**
      * {@inheritdoc}
      */
-    public function authorizeMethod(array $params = array(), User $user = null)
+    public function authorizeMethod(array $params = array(), ?User $user = null)
     {
         if ($user instanceof User) {
             // Check this user's permissions against this item's service and

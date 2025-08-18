@@ -38,7 +38,7 @@ class Exception extends \RuntimeException
      * @param int|null       $httpStatusCode
      * @param string         $information // Extra information to be displayed on the error page (inside a < p >)
      */
-    public function __construct(string $message = "", ?int $code = 0, Throwable $previous = null, ?int $httpStatusCode = null, string $information = '')
+    public function __construct(string $message = "", ?int $code = 0, ?Throwable $previous = null, ?int $httpStatusCode = null, string $information = '')
     {
         parent::__construct($message, $code, $previous);
         if ($httpStatusCode !== null) {

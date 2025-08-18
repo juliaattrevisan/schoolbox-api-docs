@@ -50,11 +50,11 @@ class Helper
             }
             //send the headers as a csv object, but only the first time
             if (!$sentHeaders) {
-                fputcsv($fp, $rowHeadings);
+                fputcsv($fp, $rowHeadings, escape: '');
                 //set to true, so it does not send the headers again
                 $sentHeaders = true;
             }
-            fputcsv($fp, $rowOutput);
+            fputcsv($fp, $rowOutput, escape: '');
         }
         exit;
     }

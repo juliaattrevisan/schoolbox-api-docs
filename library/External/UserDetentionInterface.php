@@ -10,7 +10,6 @@
 
 interface External_UserDetentionInterface extends External\IConnector
 {
-
     /**
      * Retrieves a user's awards.
      *
@@ -33,10 +32,10 @@ interface External_UserDetentionInterface extends External\IConnector
     /**
      * Retrieves a user's detentions.
      *
-     * @param string   $externalId The student's external ID.
-     * @param DateTime $fromDate   The date to fetch from, or null to get all
+     * @param string        $externalId The student's external ID.
+     * @param DateTime|null $fromDate   The date to fetch from, or null to get all
      *                             in the past.
-     * @param DateTime $toDate     The date to fetch until, or null to get all
+     * @param DateTime|null $toDate     The date to fetch until, or null to get all
      *                             in the future.
      *
      * @return array A list of records, each with the following fields:
@@ -45,15 +44,15 @@ interface External_UserDetentionInterface extends External\IConnector
      *               * DetentionDescription: why the student has detention
      *               * DetentionComment:     any comments from the teacher
      */
-    public function getDetentions(string $externalId, DateTime $fromDate = null, DateTime $toDate = null): array;
+    public function getDetentions(string $externalId, ?DateTime $fromDate = null, ?DateTime $toDate = null): array;
 
     /**
      * Retrieves a user's absences that do not have an absence code.
      *
-     * @param string   $externalId The student's external ID.
-     * @param DateTime $fromDate   The date to fetch from, or null to get all
+     * @param string        $externalId The student's external ID.
+     * @param DateTime|null $fromDate   The date to fetch from, or null to get all
      *                             in the past.
-     * @param DateTime $toDate     The date to fetch until, or null to get all
+     * @param DateTime|null $toDate     The date to fetch until, or null to get all
      *                             in the future.
      *
      * @return array A list of records, each with the following fields:
@@ -70,5 +69,5 @@ interface External_UserDetentionInterface extends External\IConnector
      *               * LateArrivalFlag:     was student late or totally absent?
      *               * LateArrivalTime:     if late, when arrived (H:i:s format)
      */
-    public function getAbsences(string $externalId, DateTime $fromDate = null, DateTime $toDate = null): array;
+    public function getAbsences(string $externalId, ?DateTime $fromDate = null, ?DateTime $toDate = null): array;
 }

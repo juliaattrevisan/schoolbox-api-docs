@@ -92,8 +92,8 @@ class PreSignedUrlService
         string $path,
         array $cacheControlItems = ['private', 'must-revalidate'],
         string $disposition = self::DISPOSITION_INLINE,
-        string $mimeTypeOverride = null,
-        string $fileNameOverride = null
+        ?string $mimeTypeOverride = null,
+        ?string $fileNameOverride = null
     ): PreSignedUrlDataObject {
         $duration = $expireAt->getUnixTimeStamp() - time();
         if ($duration < 0) {

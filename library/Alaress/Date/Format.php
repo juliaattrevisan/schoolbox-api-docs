@@ -76,10 +76,10 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * Returns an instance of static at the current time.
      * Method gives precedence to REQUEST_TIME, but accepts that outside HTTP requests, it doesn't exist.
      *
-     * @param IClock $clock
+     * @param IClock|null $clock
      * @return self
      */
-    public static function now(IClock $clock = null): self
+    public static function now(?IClock $clock = null): self
     {
         if ($clock) {
             // always give precendence to a clock if passed in
@@ -118,8 +118,8 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      */
     public static function newFromTimestamp(
         int $timestamp,
-        DateTimeZone $timezone = null,
-        Alaress_Date_Locale_Interface $locale = null
+        ?DateTimeZone $timezone = null,
+        ?Alaress_Date_Locale_Interface $locale = null
     ) {
         if (!$locale instanceof Alaress_Date_Locale_Interface) {
             // @codeCoverageIgnoreStart
@@ -134,9 +134,9 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * Static constructor: creates a new date, with the format based on
      * $locale->localFormat().
      *
-     * @param string                        $dateTime
-     * @param DateTimeZone                  $timezone Optional timezone
-     * @param Alaress_Date_Locale_Interface $locale   Optional locale, falls back to
+     * @param string                             $dateTime
+     * @param DateTimeZone|null                  $timezone Optional timezone
+     * @param Alaress_Date_Locale_Interface|null $locale   Optional locale, falls back to
      *                                                new Alaress_Date_Locale_Config()
      *
      * @return static
@@ -144,8 +144,8 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      */
     public static function newLocal(
         $dateTime,
-        DateTimeZone $timezone = null,
-        Alaress_Date_Locale_Interface $locale = null
+        ?DateTimeZone $timezone = null,
+        ?Alaress_Date_Locale_Interface $locale = null
     ) {
         if (!$locale instanceof Alaress_Date_Locale_Interface) {
             // @codeCoverageIgnoreStart
@@ -160,17 +160,17 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * Static constructor: creates a new date, with the format based on
      * $locale->localShortFormat().
      *
-     * @param string                        $dateTime
-     * @param DateTimeZone                  $timezone Optional timezone
-     * @param Alaress_Date_Locale_Interface $locale   Optional locale, falls back to
+     * @param string                             $dateTime
+     * @param DateTimeZone|null                  $timezone Optional timezone
+     * @param Alaress_Date_Locale_Interface|null $locale   Optional locale, falls back to
      *                                                new Alaress_Date_Locale_Config()
      *
      * @return static
      */
     public static function newLocalShort(
         $dateTime,
-        DateTimeZone $timezone = null,
-        Alaress_Date_Locale_Interface $locale = null
+        ?DateTimeZone $timezone = null,
+        ?Alaress_Date_Locale_Interface $locale = null
     ) {
         if (!$locale instanceof Alaress_Date_Locale_Interface) {
             // @codeCoverageIgnoreStart
@@ -185,17 +185,17 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * Static constructor: creates a new date, with the format based on URL_FORMAT.
      *
-     * @param string                        $dateTime
-     * @param DateTimeZone                  $timezone Optional timezone
-     * @param Alaress_Date_Locale_Interface $locale   Optional locale, falls back to
+     * @param string                             $dateTime
+     * @param DateTimeZone|null                  $timezone Optional timezone
+     * @param Alaress_Date_Locale_Interface|null $locale   Optional locale, falls back to
      *                                                new Alaress_Date_Locale_Config()
      *
      * @return static
      */
     public static function newUrlDate(
         $dateTime,
-        DateTimeZone $timezone = null,
-        Alaress_Date_Locale_Interface $locale = null
+        ?DateTimeZone $timezone = null,
+        ?Alaress_Date_Locale_Interface $locale = null
     ) {
         if (!$locale instanceof Alaress_Date_Locale_Interface) {
             // @codeCoverageIgnoreStart
@@ -209,17 +209,17 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     /**
      * Static constructor: creates a new date, with the format based on DATABASE_FORMAT.
      *
-     * @param string                        $dateTime
-     * @param DateTimeZone                  $timezone Optional timezone
-     * @param Alaress_Date_Locale_Interface $locale   Optional locale, falls back to
+     * @param string                             $dateTime
+     * @param DateTimeZone|null                  $timezone Optional timezone
+     * @param Alaress_Date_Locale_Interface|null $locale   Optional locale, falls back to
      *                                                new Alaress_Date_Locale_Config()
      *
      * @return static
      */
     public static function newDatabaseDate(
         $dateTime,
-        DateTimeZone $timezone = null,
-        Alaress_Date_Locale_Interface $locale = null
+        ?DateTimeZone $timezone = null,
+        ?Alaress_Date_Locale_Interface $locale = null
     ) {
         if (!$locale instanceof Alaress_Date_Locale_Interface) {
             // @codeCoverageIgnoreStart
@@ -302,15 +302,15 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * Choose your locale as well; this would probably come from the Config
      * table rather than have a concrete instantiation
      *
-     * @see Alaress_Date_Strategy_Abstract->setFromFormat() for param description
-     *
      * @param string|int|object             $dateTime
      * @param string|array                  $dateFormat If array, try each in turn until it works
-     * @param DateTimeZone                  $timezone The timezone of the date, or null to use default
+     * @param DateTimeZone|null             $timezone The timezone of the date, or null to use default
      * @param Alaress_Date_Locale_Interface $locale
      * @throws InvalidArgumentException If unable to build date
+     *@see Alaress_Date_Strategy_Abstract->setFromFormat() for param description
+     *
      */
-    public function __construct($dateTime = null, $dateFormat = null, DateTimeZone $timezone = null, $locale = null)
+    public function __construct($dateTime = null, $dateFormat = null, ?DateTimeZone $timezone = null, $locale = null)
     {
         if ($locale instanceof Alaress_Date_Locale_Interface) {
             $this->setLocale($locale);
@@ -343,12 +343,12 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * * `$dateTime instanceof DateTime or Alaress_Date_Format`:
      *   copies $dateTime's time, and timezone if $timezone is null
      *
-     * @param mixed        $dateTime
-     * @param DateTimeZone $timezone The timezone of the date, or null to use default
+     * @param mixed             $dateTime
+     * @param DateTimeZone|null $timezone The timezone of the date, or null to use default
      *
      * @return Carbon|null
      */
-    protected function buildLaravelDate($dateTime = null, DateTimeZone $timezone = null)
+    protected function buildLaravelDate($dateTime = null, ?DateTimeZone $timezone = null)
     {
         if (!isset($dateTime)) {
             // Nothing set? set it to now
@@ -1934,10 +1934,10 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * e.g today at 2:00pm, tomorrow at 8:00am, Saturday at 3:30pm (if within a week)
      * Defaults back to short date if date is a week or further from $now
      *
-     * @param Alaress_Date_Format $now
+     * @param Alaress_Date_Format|null $now
      * @return string
      */
-    public function getRelativeDay(Alaress_Date_Format $now = null)
+    public function getRelativeDay(?Alaress_Date_Format $now = null)
     {
         if (!$now instanceof Alaress_Date_Format) {
             $now = Alaress_Date_Format::now();
@@ -1982,10 +1982,10 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
      * Get a relative time without midnight
      * Matches behaviour of getRelativeDay but removes ' at 11:59pm' if present
      *
-     * @param Alaress_Date_Format $now
+     * @param Alaress_Date_Format|null $now
      * @return string
      */
-    public function getRelativeDayWithoutMidnight(Alaress_Date_Format $now = null)
+    public function getRelativeDayWithoutMidnight(?Alaress_Date_Format $now = null)
     {
         $relativeTime = $this->getRelativeDay($now);
 

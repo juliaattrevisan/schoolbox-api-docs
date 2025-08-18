@@ -133,7 +133,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
      * @throws Schoolbox\Mapper\Exception
      * @throws Schoolbox\Mapper\Exception\Deleted
      */
-    public function canParticipate(ReturnedWork $object, ReturnedWork $previous = null): bool
+    public function canParticipate(ReturnedWork $object, ?ReturnedWork $previous = null): bool
     {
         if ($previous) {
             // If an update, assume the system is still valid
@@ -155,7 +155,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
      * @throws UnexpectedValueException
      * @throws InvalidArgumentException If assessment not sufficiently hydrated
      */
-    public function insertParticipation(ReturnedWork $object, ReturnedWork $previous = null): bool
+    public function insertParticipation(ReturnedWork $object, ?ReturnedWork $previous = null): bool
     {
         $assessment = $this->getSubmissionBoxMapper()->findById($object->getSubmissionBox()->getId())->getAssessmentModel();
         if (!$previous) {
@@ -222,7 +222,7 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
      * @param ReturnedWork|null $previous
      * @return bool
      */
-    public function createExtension(ReturnedWork $object, ReturnedWork $previous = null): bool
+    public function createExtension(ReturnedWork $object, ?ReturnedWork $previous = null): bool
     {
         $assessment = $this->getSubmissionBoxMapper()->findById($object->getSubmissionBox()->getId())->getAssessmentModel();
         if ($object->isPublished() && $object->getResubmissionRequired()) {
@@ -371,11 +371,11 @@ class ReturnedWorkMapper extends Schoolbox\Mapper
      *
      * Saves all attached files in this returned work.
      *
-     * @param ReturnedWork $object
-     * @param ReturnedWork $previous
+     * @param ReturnedWork      $object
+     * @param ReturnedWork|null $previous
      * @throws Schoolbox\Mapper\Exception
      */
-    public function persistFiles(ReturnedWork $object, ReturnedWork $previous = null)
+    public function persistFiles(ReturnedWork $object, ?ReturnedWork $previous = null)
     {
         $joinMapper = $this->getJoinMapper('files');
 

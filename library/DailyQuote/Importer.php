@@ -15,7 +15,6 @@ namespace DailyQuote;
 
 class Importer
 {
-
     /**
      * Path to the csv containing quotes to import
      *
@@ -45,7 +44,7 @@ class Importer
     {
         $inputFile = fopen($this->getInputFile(), 'r');
         $inputFile = (new \Alaress\Csv\ValidCSV($inputFile))->skipBom();
-        while ($row = fgetcsv($inputFile, 4096)) {
+        while ($row = fgetcsv($inputFile, 4096, escape: '')) {
             $quote = new \DailyQuote\Quote();
             $quote->setDescription(trim($row[0]));
             $quote->setAuthor(trim($row[1]));

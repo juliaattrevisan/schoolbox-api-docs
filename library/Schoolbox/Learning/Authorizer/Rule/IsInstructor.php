@@ -22,7 +22,6 @@ use InvalidArgumentException;
  */
 class IsInstructor extends AbstractParticipationRule
 {
-
     /**
      * @var Access
      */
@@ -45,7 +44,7 @@ class IsInstructor extends AbstractParticipationRule
      * @param Access        $access
      * @param callable|null $folderLocator
      */
-    public function __construct(Access $access, callable $folderLocator = null)
+    public function __construct(Access $access, ?callable $folderLocator = null)
     {
         $this->access             = $access;
         $this->folderLocator      = $folderLocator;
@@ -60,7 +59,7 @@ class IsInstructor extends AbstractParticipationRule
      * @throws InvalidArgumentException If unable to locate an User instance in route params
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function authorize(array $params = [], User $user = null)
+    public function authorize(array $params = [], ?User $user = null)
     {
 
         $folder = is_callable($this->folderLocator)

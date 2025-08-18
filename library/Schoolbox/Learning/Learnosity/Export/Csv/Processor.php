@@ -416,7 +416,7 @@ class Processor
 
             $row[] = $attempt->getReviewed()?->getShort();
 
-            fputcsv($output, $row, ',', '"');
+            fputcsv($output, $row, ',', '"', escape: '');
         }
     }
 

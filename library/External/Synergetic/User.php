@@ -1366,7 +1366,7 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * {@inheritdoc}
      */
-    public function getCurrentSemester(string $externalUserId = null): string
+    public function getCurrentSemester(?string $externalUserId = null): string
     {
         $fileSemester = $this->findFileYearAndSemester($externalUserId)['semester'] ?? null;
 
@@ -1376,7 +1376,7 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * {@inheritdoc}
      */
-    public function getCurrentYear(string $externalUserId = null): string
+    public function getCurrentYear(?string $externalUserId = null): string
     {
         $fileYear = $this->findFileYearAndSemester($externalUserId)['year'] ?? null;
 

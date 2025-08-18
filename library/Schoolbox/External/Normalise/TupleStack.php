@@ -20,18 +20,17 @@ namespace Schoolbox\External\Normalise;
  */
 class TupleStack
 {
-
     /**
      * Take an array of values and do some preprocessing on them
      * Returns a stack of unique, trimmed and non-empty data
      *
      * Only processes scalars. Non-scalars are discarded from the result set.
      *
-     * @param array       $stack  A one-dimensional stack of scalars
-     * @param string|null $split  Optionally, a char used to split values
+     * @param array       $stack A one-dimensional stack of scalars
+     * @param string|null $split Optionally, a char used to split values
      * @return array
      */
-    public function normaliseValues(array $stack, string $split = null): array
+    public function normaliseValues(array $stack, ?string $split = null): array
     {
         /* If you specified a character to split upon,
          * iterate and explode, then merge the exploded pieces in to $processed

@@ -55,7 +55,7 @@ class SchoolHouse extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getAudiencingSql(User $user, string $searchPlaceholder = null): ?string
+    public function getAudiencingSql(User $user, ?string $searchPlaceholder = null): ?string
     {
         $keywordFilter = null === $searchPlaceholder ? '' : "AND house LIKE :{$searchPlaceholder}";
 
@@ -93,7 +93,7 @@ class SchoolHouse extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getValidRelationshipModifiers(string $entityMeta = null): array
+    public function getValidRelationshipModifiers(?string $entityMeta = null): array
     {
         return [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF];
     }

@@ -49,8 +49,8 @@ class WrappedReadableResourceStream implements Listenable, ReadableStreamInterfa
     public function __construct(
         $stream,
         LoopInterface $loop,
-        StreamListener $listener = null,
-        int $readChunkSize = null
+        ?StreamListener $listener = null,
+        ?int $readChunkSize = null
     ) {
         $this->streamObject  = new ReadableResourceStream($stream, $loop, $readChunkSize);
         $this->listenerStore = new SplObjectStorage();

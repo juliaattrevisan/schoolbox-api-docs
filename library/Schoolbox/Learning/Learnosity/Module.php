@@ -604,8 +604,8 @@ class Module extends BaseModule
     /**
      * Convert route params into an assessment object
      *
-     * @param array $params
-     * @param null|User $student If provided, only load this student's participation
+     * @param array     $params
+     * @param User|null $student If provided, only load this student's participation
      * @return array
      * @throws ContainerExceptionInterface
      * @throws DefinitionException If a specified join mapper is not found
@@ -617,7 +617,7 @@ class Module extends BaseModule
      * @throws UnexpectedValueException If unable to derive project participant collections
      * @throws \Exception If not found or deleted
      */
-    protected function preloadAssessment(array $params, User $student = null): array
+    protected function preloadAssessment(array $params, ?User $student = null): array
     {
         try {
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], $student);
@@ -641,7 +641,7 @@ class Module extends BaseModule
      * Convert route params into an assessment object, and a destination
      * assessment object.
      *
-     * @param array $params
+     * @param array     $params
      * @param User|null $student
      * @return array
      * @throws ContainerExceptionInterface
@@ -653,7 +653,7 @@ class Module extends BaseModule
      * @throws NotFoundExceptionInterface
      * @throws UnexpectedValueException If unable to derive project participant collections
      */
-    protected function preloadAssessmentAndDestinationAssessment(array $params, User $student = null): array
+    protected function preloadAssessmentAndDestinationAssessment(array $params, ?User $student = null): array
     {
         $sourceAssessment      = $this->preloadAssessment(
             ['assessmentId' => $params['sourceId']],

@@ -25,5 +25,5 @@ interface ITranslator
      *                           model
      * @return object `$model` with the fields from `$array` applied to it
      */
-    public function __invoke(array $array, object $model = null): object;
+    public function __invoke(array $array, ?object $model = null): object;
 }

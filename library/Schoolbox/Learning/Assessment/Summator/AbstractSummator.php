@@ -32,7 +32,7 @@ abstract class AbstractSummator implements ISummator
      *
      * @param MarkDerivation\IStrategy|null $strategy
      */
-    public function __construct(MarkDerivation\IStrategy $strategy = null)
+    public function __construct(?MarkDerivation\IStrategy $strategy = null)
     {
         $this->markDerivationStrategy = $strategy ?? new MarkDerivation\Standard();
     }

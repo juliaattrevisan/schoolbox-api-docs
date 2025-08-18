@@ -344,7 +344,7 @@ HELP;
 
         /* Start with header row
          */
-        fputcsv($outstream, self::HEADINGS);
+        fputcsv($outstream, self::HEADINGS, escape: '');
 
         /* Find a list of student ids to process one at a time
          * For every student, get all the stuff they need
@@ -555,7 +555,7 @@ HELP;
     private function outputRows(array $rows, mixed $outstream): void
     {
         foreach ($rows as $row) {
-            fputcsv($outstream, $row);
+            fputcsv($outstream, $row, escape: '');
 
             $this->numRows++;
         }

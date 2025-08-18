@@ -29,13 +29,13 @@ class IsRouteAuthorized
      * Performs a reverse lookup on the route given its name, and checks if that
      * path is accessible to the given user.
      *
-     * @param  string    $name   The name of the route to look up.
-     * @param  array     $params Any params to pass as part of the route.
-     * @param  User|null $user   The user to authorize. If not set, defaults to
+     * @param  string   $name    The name of the route to look up.
+     * @param  array    $params  Any params to pass as part of the route.
+     * @param User|null $user    The user to authorize. If not set, defaults to
      *                           the currently logged in user.
      * @return bool
      */
-    public function execute(string $name, array $params = [], User $user = null)
+    public function execute(string $name, array $params = [], ?User $user = null)
     {
         if (!($user instanceof User)) {
             $user = $this->session->getAuthUser();

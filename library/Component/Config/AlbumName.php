@@ -18,7 +18,7 @@ class Component_Config_AlbumName extends Component_Config_Abstract
      * @throws PDOException
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
+    public function parse(SitePage $page, $key, $keyblock, $configValue, ?Component_ControllerAbstract $component = null)
     {
         $page->setVar([
             'COMPONENT_INSTANCE_ID' => $component->getInstance()->getId(),

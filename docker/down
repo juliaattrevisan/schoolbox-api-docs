@@ -1,7 +1,12 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 # Always run within root folder
 cd "$(dirname "$0")/.." || exit 1
+
+if [[ "$*" =~ '--help' ]] || [[ "$*" =~ '-h' ]] ; then
+    docker compose down --help;
+    exit;
+fi
 
 # Stop containers for all docker-compose configurations:
 # don't need to stop all possible permutations, just need to ensure each

@@ -28,7 +28,6 @@ use function array_merge;
  */
 abstract class Definition extends Filter\AbstractDefinition
 {
-
     const KEY_ALL = 'all';        // All terms
     const KEY_FUTURE = 'future';     // All terms in future
     const KEY_CURRENT = 'current';    // current term
@@ -60,8 +59,8 @@ abstract class Definition extends Filter\AbstractDefinition
         Filter\Page\Option\Mapper $filterOptionMapper,
         Filter\Page\Option\Defaults\Mapper $filterDefaultMapper,
         GenericCollection $terms,
-        Term\Model $currentTerm = null,
-        Term\Model $previousTerm = null
+        ?Term\Model $currentTerm = null,
+        ?Term\Model $previousTerm = null
     ) {
         parent::__construct($filter, $filterOptionMapper, $filterDefaultMapper);
         $this->terms        = $terms;

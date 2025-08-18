@@ -350,7 +350,7 @@ class Controller extends Base
         header("Content-Disposition: attachment; filename=\"$filename\"");
 
         $fp = fopen("php://output", 'w');
-        fputcsv($fp, $rowHeadings);
+        fputcsv($fp, $rowHeadings, escape: '');
 
         /**
          * $rowHeadings = [
@@ -392,7 +392,7 @@ class Controller extends Base
                 $row['textboxHeading'] ?? 'NULL',
                 $row['id'] ?? 'NULL',
                 $row['textboxBody'] ?? 'NULL',
-            ]);
+            ], escape: '');
         }
 
         // fetch all textboxes with no component from these units
@@ -451,7 +451,7 @@ class Controller extends Base
                 $row['textboxHeading'] ?? 'NULL',
                 $row['id'] ?? 'NULL',
                 $row['textboxBody'] ?? 'NULL',
-            ]);
+            ], escape: '');
         }
         exit(1);
     }

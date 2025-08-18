@@ -53,7 +53,7 @@ class Visibility
      * @param bool                     $respectSivo
      * @return bool
      */
-    public function isVisibleToUser(IAssessable $assessment, User $viewer, bool $showClosed, Alaress_Date_Format $now = null, bool $respectSivo = true): bool
+    public function isVisibleToUser(IAssessable $assessment, User $viewer, bool $showClosed, ?Alaress_Date_Format $now = null, bool $respectSivo = true): bool
     {
         $now = $now ?? Alaress_Date_Format::now();
 
@@ -93,7 +93,7 @@ class Visibility
      * @param bool                     $respectSivo
      * @return bool
      */
-    public function isVisibleToUserOrChildOfUser(IAssessable $assessment, User $viewer, bool $showClosed, Alaress_Date_Format $now = null, bool $respectSivo = true): bool
+    public function isVisibleToUserOrChildOfUser(IAssessable $assessment, User $viewer, bool $showClosed, ?Alaress_Date_Format $now = null, bool $respectSivo = true): bool
     {
         $now = $now ?? Alaress_Date_Format::now();
 

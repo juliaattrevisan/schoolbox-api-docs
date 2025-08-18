@@ -19,14 +19,14 @@ class MockPropagator implements IPropagator
     /**
      * Take CRUD parameters and propagate triggers. Returns the key used to store the event in Redis.
      *
-     * @param User   $subject
-     * @param string $verb
-     * @param object $object
-     * @param Mapper $mapper
-     * @param array  $diff
+     * @param User       $subject
+     * @param string     $verb
+     * @param object     $object
+     * @param Mapper     $mapper
+     * @param array|null $diff
      * @return string
      */
-    public function propagate(User $subject, $verb, $object, $mapper, array $diff = null)
+    public function propagate(User $subject, $verb, $object, $mapper, ?array $diff = null)
     {
         return '';
     }

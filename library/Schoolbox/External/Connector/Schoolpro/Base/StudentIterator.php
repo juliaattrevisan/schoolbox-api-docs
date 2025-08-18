@@ -158,7 +158,7 @@ class StudentIterator extends IteratorIterator
     /**
      * @param User\Student|null $currentItem
      */
-    protected function setCurrentItem(User\Student $currentItem = null)
+    protected function setCurrentItem(?User\Student $currentItem = null)
     {
         $this->currentItem = $currentItem;
     }

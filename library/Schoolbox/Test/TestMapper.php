@@ -15,16 +15,15 @@ namespace Schoolbox\Test;
  */
 class TestMapper extends AbstractTestMapper
 {
-
     /**
      * @var MapperTest
      */
     private $test;
 
     /**
-     * @param MapperTest $test
+     * @param MapperTest|null $test
      */
-    public function __construct(MapperTest $test = null)
+    public function __construct(?MapperTest $test = null)
     {
         parent::__construct();
         $this->test = isset($test) ? $test : null;
@@ -75,7 +74,7 @@ class TestMapper extends AbstractTestMapper
             'other_key' => 'id',
         ]);
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE, function (TestModel $model, TestModel $previous = null) {
+        $this->registerCallback(self::CALLBACK_POSTSAVE, function (TestModel $model, ?TestModel $previous = null) {
             $this->test->internalTestNotSame($model, $previous);
             return true;
         });

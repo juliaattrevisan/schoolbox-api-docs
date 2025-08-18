@@ -1087,14 +1087,14 @@ class AccessTest extends TestCase
      * @throws UnexpectedValueException
      */
     private function newAccess(
-        array $config = null,
-        array $folderData = null,
-        array $folderCodeData = null,
-        array $roleData = null,
-        array $userData = null,
-        array $userAccessData = null,
-        array $roleAccessData = null,
-        array $externalUserData = null,
+        ?array $config = null,
+        ?array $folderData = null,
+        ?array $folderCodeData = null,
+        ?array $roleData = null,
+        ?array $userData = null,
+        ?array $userAccessData = null,
+        ?array $roleAccessData = null,
+        ?array $externalUserData = null,
         bool $enableCache = self::ENABLE_CACHE
     ): Access {
         // Reset the singleton instance

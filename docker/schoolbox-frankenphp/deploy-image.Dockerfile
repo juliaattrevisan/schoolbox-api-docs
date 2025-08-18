@@ -4,8 +4,9 @@
 # ENV: if prod or production, build with prod dependencies only;
 #      otherwise, build with dev dependencies.
 ARG ENV=dev
+ARG PHP_MAJOR_VERSION=8.4
 ARG PRIVATE_CONTAINER_REGISTRY=476058706527.dkr.ecr.ap-southeast-2.amazonaws.com
-ARG IMAGE=${PRIVATE_CONTAINER_REGISTRY}/frankenphp-base
+ARG IMAGE=${PRIVATE_CONTAINER_REGISTRY}/frankenphp-base-php${PHP_MAJOR_VERSION}
 ARG TAG=latest
 FROM ${IMAGE}:${TAG}
 # code from code context to image.

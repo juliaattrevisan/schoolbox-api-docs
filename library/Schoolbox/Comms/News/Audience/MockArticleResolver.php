@@ -40,7 +40,7 @@ class MockArticleResolver implements IArticleResolver
         ?string $relationship,
         bool $publishedOnly = true,
         array $orderBy = [],
-        int $limit = null
+        ?int $limit = null
     ): array {
         $allArticleIds   = \array_keys(MockUserResolver::ARTICLE_AUDIENCES);
         $countArticleIds = \count($allArticleIds);

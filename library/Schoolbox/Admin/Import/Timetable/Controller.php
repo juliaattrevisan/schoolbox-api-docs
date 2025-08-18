@@ -117,7 +117,7 @@ class Controller extends UserAccount\Controller
             'Class Title',
             'Class Room',
             'Teacher Code'
-        ]);
+        ], escape: '');
 
         /* Export properties into the same format as the csv
          */
@@ -152,7 +152,7 @@ class Controller extends UserAccount\Controller
                 $class->getTeacher()
             ];
 
-            fputcsv($fp, $row);
+            fputcsv($fp, $row, escape: '');
         }
 
         rewind($fp);

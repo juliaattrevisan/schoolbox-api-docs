@@ -105,7 +105,7 @@ class FixturesTeam extends SimpleStrategy
     /**
      * @inheritDoc
      */
-    public function getAudiencingSql(User $user, string $searchPlaceholder = null): ?string
+    public function getAudiencingSql(User $user, ?string $searchPlaceholder = null): ?string
     {
         $keywordFilter = null === $searchPlaceholder ? '' : "AND CONCAT(st.name, ' (', sd.name, ', ', ss.name, ')') LIKE :{$searchPlaceholder}";
 
@@ -221,7 +221,7 @@ class FixturesTeam extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getValidRelationshipModifiers(string $entityMeta = null): array
+    public function getValidRelationshipModifiers(?string $entityMeta = null): array
     {
         return [Model::RELATIONSHIP_SELF, Model::RELATIONSHIP_PARENTS_OF];
     }

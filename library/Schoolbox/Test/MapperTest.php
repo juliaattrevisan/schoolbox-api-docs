@@ -247,10 +247,10 @@ class MapperTest extends TestCase
     /**
      * Called from the Mapper::postSave() callback
      *
-     * @param TestModel $model
-     * @param TestModel $previous
+     * @param TestModel      $model
+     * @param TestModel|null $previous
      */
-    public function internalTestNotSame(TestModel $model, TestModel $previous = null)
+    public function internalTestNotSame(TestModel $model, ?TestModel $previous = null)
     {
         // we don't care about the actual content of these two objects, but if
         // these two variables point to the same memory address, this test must fail

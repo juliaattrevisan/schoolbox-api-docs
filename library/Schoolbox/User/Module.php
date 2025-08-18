@@ -60,7 +60,7 @@ class Module extends BaseModule
                  *    is a pastoral moderator at an equal or lower level than logged-in-user
                  * )
                  */
-                function ($params, User $user) {
+                function ($params, User $user): void {
                     // In this function, the logged-in user is a non-superuser (because of Rule\Any(Rule\isSuperuser, ..., [thisRule]).
 
                     $userToImpersonate = $params['user'];

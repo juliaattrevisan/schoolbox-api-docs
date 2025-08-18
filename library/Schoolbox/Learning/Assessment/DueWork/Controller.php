@@ -914,7 +914,7 @@ class Controller extends Assessment\Controller
     {
         $fp = fopen('php://temp', 'w');
         foreach ($array as $row) {
-            fputcsv($fp, $row);
+            fputcsv($fp, $row, escape: '');
         }
         rewind($fp);
         $contents = stream_get_contents($fp);

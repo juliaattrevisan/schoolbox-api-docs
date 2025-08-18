@@ -61,21 +61,21 @@ interface IMarkScheme
      * If a Participant has no Response and/or Feedback, $normalisedMark and $humanReadable will be null
      *
      * @param null|float     $normalisedMark
-     * @param IResponse|null $response          The response we wish to get the mark from
+     * @param IResponse|null $response The response we wish to get the mark from
      * @return string|null
      */
-    public function getHumanReadableMark($normalisedMark, IResponse $response = null): ?string;
+    public function getHumanReadableMark($normalisedMark, ?IResponse $response = null): ?string;
 
     /**
      * Returns a float from 0 to 100.0 inclusive.
      *
      * If a Participant has no Response and/or Feedback, $normalisedMark and $humanReadable will be null
      *
-     * @param string|null $humanReadableMark
-     * @param IResponse|null $response          Most recent submitted response
+     * @param string|null    $humanReadableMark
+     * @param IResponse|null $response Most recent submitted response
      * @return float|null
      */
-    public function getNormalisedMark($humanReadableMark, IResponse $response = null): ?float;
+    public function getNormalisedMark($humanReadableMark, ?IResponse $response = null): ?float;
 
     /**
      * Converts a value submitted from the form into a standardised

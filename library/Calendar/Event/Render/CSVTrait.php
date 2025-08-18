@@ -55,7 +55,7 @@ trait CSVTrait
          * it's important to capture the byte length of the generated line each time
          * because it's reasonable to expect the size of a line can exceed 100k bytes
          */
-        $lineByteLength = fputcsv($fd, $data);
+        $lineByteLength = fputcsv($fd, $data, escape: '');
         rewind($fd);
 
         /**

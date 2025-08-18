@@ -87,7 +87,7 @@ if (!isset($opts['d'])) {
 
 
 // daemon (subscribe / consume) mode
-$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts): void {
 
     $daemon = $opts['channel'] ?? (\readline('Daemon name [test]: ') ?: 'test');
 

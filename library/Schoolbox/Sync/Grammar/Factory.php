@@ -39,10 +39,10 @@ class Factory
 
     /**
      * @param LoggerInterface $log
-     * @param UserMapper      $userMapper
-     * @param RuleMapper      $ruleMapper
+     * @param UserMapper|null $userMapper
+     * @param RuleMapper|null $ruleMapper
      */
-    public function __construct(LoggerInterface $log, UserMapper $userMapper = null, RuleMapper $ruleMapper = null)
+    public function __construct(LoggerInterface $log, ?UserMapper $userMapper = null, ?RuleMapper $ruleMapper = null)
     {
         $this->log        = $log;
         $this->userMapper = $userMapper ?: UserMapper::getInstance();

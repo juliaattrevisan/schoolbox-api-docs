@@ -44,7 +44,7 @@ class BackupRetention
     /**
      * @param Alaress_Date_Format|null $now Injectable for deterministic testing
      */
-    public function __construct(Alaress_Date_Format $now = null)
+    public function __construct(?Alaress_Date_Format $now = null)
     {
         $this->now = $now ?? Alaress_Date_Format::now();
     }

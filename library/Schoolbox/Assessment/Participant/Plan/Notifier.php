@@ -971,7 +971,7 @@ class Notifier extends AbstractModuleNotifier implements SourceInterface
      * @throws DeletedException
      * @throws BaseMapper\Exception
      */
-    public function notifyUpdated(Model $plan, User $effector, array $diff = null): Envelope
+    public function notifyUpdated(Model $plan, User $effector, ?array $diff = null): Envelope
     {
         $assessment = $this->retrieveAssessmentDomainModel($plan);
         $envelope   = new Envelope();

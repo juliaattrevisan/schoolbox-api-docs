@@ -1083,14 +1083,14 @@ class Controller extends Base\Base
      * List the courses. Returns a combined array of Folder instances
      * and information about any found Units and their task counts
      *
-     * @param string|null $searchParam  If null, filter out courses residing outside Faculty root
+     * @param string|null         $searchParam If null, filter out courses residing outside Faculty root
      * @return array
-     * @var Folder[] $data['lineage']
-     * @var CourseSpecification[] $data['courses']
      * @throws \DomainException
      * @throws \OverflowException
+     *@var Folder[]               $data        ['lineage']
+     * @var CourseSpecification[] $data        ['courses']
      */
-    protected function getCourseData(string $searchParam = null): array
+    protected function getCourseData(?string $searchParam = null): array
     {
         // Use the new mapper to get the list of courses
         $findOptions = ['order' => ['f.name' => 'asc']];

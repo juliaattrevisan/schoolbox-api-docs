@@ -53,13 +53,13 @@ class Ruleset implements Hydrator\HydratorInterface
      * @param Rule\Model[]            $rules
      * @param Hydrator\Custom\Model[] $customRules
      * @param Config\Model            $config
-     * @param GrammarRuleset          $grammar
+     * @param GrammarRuleset|null     $grammar
      */
     public function __construct(
         $rules,
         $customRules,
         Config\Model $config,
-        GrammarRuleset $grammar = null
+        ?GrammarRuleset $grammar = null
     ) {
         $this->rules       = $rules;
         $this->customRules = $customRules;

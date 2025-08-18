@@ -16,7 +16,6 @@ use Schoolbox\User;
 
 class Authenticator
 {
-
     /**
      * @var EventPermissionMapper
      */
@@ -77,11 +76,11 @@ class Authenticator
      * Allow all EOTC Administrators to see Approved events
      * Allow all EOTC Administrators to see Rejected events
      *
-     * @param User $user
-     * @param Event $event
+     * @param User       $user
+     * @param Event|null $event
      * @return bool
      */
-    public function isEOTCAdministrator(User $user, Event $event = null)
+    public function isEOTCAdministrator(User $user, ?Event $event = null)
     {
         if ($user->isSuperuser()) {
             return true;
@@ -107,10 +106,9 @@ class Authenticator
                     return true;
                 }
             }
-        }
-        /* Determine whether you are an EOTC administrator, in general
-         */
-        else {
+        } else {
+            /* Determine whether you are an EOTC administrator, in general
+             */
             if (count($this->getAllPermissions())) {
                 return true;
             }

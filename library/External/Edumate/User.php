@@ -265,7 +265,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     /**
      * @inheritdoc
      */
-    public function getCurrentSemester(string $externalUserId = null): ?string
+    public function getCurrentSemester(?string $externalUserId = null): ?string
     {
         $stmt = $this->getConnection()->prepareQuery("
             SELECT REPORT_PERIOD
@@ -288,7 +288,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     /**
      * @inheritdoc
      */
-    public function getCurrentYear(string $externalUserId = null): ?string
+    public function getCurrentYear(?string $externalUserId = null): ?string
     {
         return date('Y');
     }

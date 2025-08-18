@@ -305,7 +305,7 @@ class Controller extends Base
         $this->response = $this->responseFromStream(new \GuzzleHttp\Psr7\Stream($fp), $filename, 'text/csv; charset=utf-8');
 
         // output headers
-        fputcsv($fp, ['id', 'curriculum_node_parent_id', 'name', 'code', 'order', 'description', 'uuid']);
+        fputcsv($fp, ['id', 'curriculum_node_parent_id', 'name', 'code', 'order', 'description', 'uuid'], escape: '');
 
         $this->csvChildren($fp, $node, true);
     }
@@ -330,7 +330,7 @@ class Controller extends Base
             $node->getOrder(),
             $node->getDescription(),
             $node->getUuid(),
-        ]);
+        ], escape: '');
 
         /**
          * for each of this node's children, csv output its children recursively

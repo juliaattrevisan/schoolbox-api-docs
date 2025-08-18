@@ -217,7 +217,7 @@ abstract class AbstractCsvImporterFactory
      */
     private function readCsvLine($fp, int $maxLevels): ?array
     {
-        $line = fgetcsv($fp);
+        $line = fgetcsv($fp, escape: '');
 
         if ($line === false) {
             // EOF

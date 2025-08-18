@@ -72,7 +72,7 @@ class Mapper extends BaseMapper
      * @param bool       $getDeletedDivisions Whether to count deleted divisions
      * @return int[]
      */
-    public function getDivisionCounts(array $seasonIds = null, $getDeletedSeasons = false, $getDeletedDivisions = false)
+    public function getDivisionCounts(?array $seasonIds = null, $getDeletedSeasons = false, $getDeletedDivisions = false)
     {
         $query = "
             SELECT s.id AS 'season_id', COUNT(d.id) AS 'division_count'
@@ -117,7 +117,7 @@ class Mapper extends BaseMapper
      * @param bool       $getDeletedMatches Whether to count deleted matches
      * @return int[]
      */
-    public function getMatchCounts(array $seasonIds = null, $getDeletedSeasons = false, $getDeletedMatches = false)
+    public function getMatchCounts(?array $seasonIds = null, $getDeletedSeasons = false, $getDeletedMatches = false)
     {
         $query = "
             SELECT s.id AS 'season_id', COUNT(m.id) AS 'match_count'

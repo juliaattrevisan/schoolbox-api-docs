@@ -73,7 +73,7 @@ if ($perform) {
 }
 
 set_error_handler(
-    function ($num, $string, $file, $line) {
+    function ($num, $string, $file, $line): void {
         // cast catchable fatal error to runtime exception so it gets ditched
         throw new RuntimeException("$string in $file:$line");
     },
@@ -94,20 +94,20 @@ $amqpConn->bindQueue(INSTANCE_ID . '.sb.reviewsched', 'deadmessage');
 $amqpConn->closeConnection();
 unset($amqpConn);
 
-$stomp->connect()->then(function (IClient $stomp) use ($d, $loop, $perform, $kernel) {
+$stomp->connect()->then(function (IClient $stomp) use ($d, $loop, $perform, $kernel): void {
 
     $di = $kernel->getDependencyInjector();
 
-    $timer = $loop->addTimer(4, function () {
+    $timer = $loop->addTimer(4, function (): void {
         exit(0);
     });
 
     $stomp->subscribeWithAck(
         INSTANCE_ID . '.sb.sched',
         IClient::ACK_MODE_CLIENT_INDIVIDUAL,
-        function (IFrame $frame, IAckResolver $resolver) use ($d, $loop, &$timer, $perform, $di) {
+        function (IFrame $frame, IAckResolver $resolver) use ($d, $loop, &$timer, $perform, $di): void {
             $loop->cancelTimer($timer);
-            $timer = $loop->addTimer(4, function () {
+            $timer = $loop->addTimer(4, function (): void {
                 exit(0);
             });
 
@@ -263,7 +263,7 @@ function interrogate($input, LoggerInterface $log, ContainerInterface $di)
     $exit = 0;
 
     restore_error_handler();
-    register_shutdown_function(function (LoggerInterface $d) {
+    register_shutdown_function(function (LoggerInterface $d): void {
         $last = error_get_last();
 
         if (in_array($last['type'], [ E_ERROR, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR, E_RECOVERABLE_ERROR ], true)) {

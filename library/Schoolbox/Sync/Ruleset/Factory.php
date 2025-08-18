@@ -192,14 +192,14 @@ class Factory
     /**
      * Produce ruleset data based on Role Type
      *
-     * @param string          $rulesetId      Role type - typically one of student|parent|staff
-     * @param LoggerInterface $log            The logger instance. Not optional.
-     * @param GrammarFactory  $grammarFactory An optional grammar builder, for converting the ruleset to grammar rules.
+     * @param string               $rulesetId      Role type - typically one of student|parent|staff
+     * @param LoggerInterface|null $log            The logger instance. Not optional.
+     * @param GrammarFactory|null  $grammarFactory An optional grammar builder, for converting the ruleset to grammar rules.
      *                                        Required if the UPS is to be run on users.
      *
      * @return Ruleset
      */
-    public function produceRuleset($rulesetId, LoggerInterface $log = null, GrammarFactory $grammarFactory = null)
+    public function produceRuleset($rulesetId, ?LoggerInterface $log = null, ?GrammarFactory $grammarFactory = null)
     {
         $rules       = $this->findRuleset($rulesetId);
         $customRules = Hydrator\Custom\Mapper::getInstance()->findByColumnList(

@@ -17,7 +17,6 @@ use Schoolbox\User;
 
 class IsEnabled implements IAuthorizationRule
 {
-
     /** @var Kami\IConnector */
     private $kamiConnector;
 
@@ -37,7 +36,7 @@ class IsEnabled implements IAuthorizationRule
      * @return bool
      * @throws Unauthorized
      */
-    public function authorize(array $params = [], User $user = null): bool
+    public function authorize(array $params = [], ?User $user = null): bool
     {
         if (!$this->kamiConnector->isEnabled()) {
             throw new Unauthorized('Kami integration is not enabled');

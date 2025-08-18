@@ -42,7 +42,7 @@ class CanActUponContext implements IAuthorizationRule
     /**
      * @inheritdoc
      */
-    public function authorize(array $params = [], User $user = null): void
+    public function authorize(array $params = [], ?User $user = null): void
     {
         // Extract context
         $context = $params['context'] ?? null;

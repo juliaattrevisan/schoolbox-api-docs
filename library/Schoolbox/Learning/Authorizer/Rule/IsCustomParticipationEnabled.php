@@ -14,7 +14,7 @@ use Schoolbox\User;
 
 class IsCustomParticipationEnabled extends AbstractAssessableRule
 {
-    public function authorize(array $params = [], User $user = null)
+    public function authorize(array $params = [], ?User $user = null)
     {
         $assessable = $this->findAssessable($params);
 

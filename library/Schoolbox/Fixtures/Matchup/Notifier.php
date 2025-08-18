@@ -190,12 +190,12 @@ class Notifier extends AbstractModuleNotifier
     /**
      * Setup upcoming match notification when existing match updated (Students)
      *
-     * @param User $effector
-     * @param Matchup $matchup
+     * @param User       $effector
+     * @param Matchup    $matchup
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStudentUpdated(Matchup $matchup, User $effector, array $diff = null)
+    public function notifyStudentUpdated(Matchup $matchup, User $effector, ?array $diff = null)
     {
         $envelope = new Envelope();
         $matchup  = $this->notifierHelper->hydrateMatch($matchup);
@@ -299,12 +299,12 @@ class Notifier extends AbstractModuleNotifier
     /**
      * Setup upcoming match notification when existing match updated (Parents of players)
      *
-     * @param User $effector
-     * @param Matchup $matchup
+     * @param User       $effector
+     * @param Matchup    $matchup
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyParentUpdated(Matchup $matchup, User $effector, array $diff = null)
+    public function notifyParentUpdated(Matchup $matchup, User $effector, ?array $diff = null)
     {
         $envelope = new Envelope();
         $matchup  = $this->notifierHelper->hydrateMatch($matchup);

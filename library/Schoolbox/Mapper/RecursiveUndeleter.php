@@ -427,16 +427,16 @@ class RecursiveUndeleter
      * @param IMapper                  $childMapper
      * @param string                   $foreignKeyColumn
      * @param int[]                    $parentIds
-     * @param null|Alaress_Date_Format $deletedAfter
-     * @param null|Alaress_Date_Format $deletedBefore
+     * @param Alaress_Date_Format|null $deletedAfter
+     * @param Alaress_Date_Format|null $deletedBefore
      * @return GenericCollection|ISoftDeletable[]
      */
     private function findDeletedChildModels(
         IMapper $childMapper,
         $foreignKeyColumn,
         array $parentIds,
-        Alaress_Date_Format $deletedAfter = null,
-        Alaress_Date_Format $deletedBefore = null
+        ?Alaress_Date_Format $deletedAfter = null,
+        ?Alaress_Date_Format $deletedBefore = null
     ) {
         $childModels = $childMapper
             ->findByColumn($foreignKeyColumn, $parentIds, ['deleted' => true])
@@ -607,14 +607,14 @@ class RecursiveUndeleter
      *
      * @param IMapper                  $parentMapper
      * @param Collection               $deletedParentModels
-     * @param null|Alaress_Date_Format $after
-     * @param null|Alaress_Date_Format $before
+     * @param Alaress_Date_Format|null $after
+     * @param Alaress_Date_Format|null $before
      */
     private function recursiveFindDeletedModels(
         IMapper $parentMapper,
         Collection $deletedParentModels,
-        Alaress_Date_Format $after = null,
-        Alaress_Date_Format $before = null
+        ?Alaress_Date_Format $after = null,
+        ?Alaress_Date_Format $before = null
     ): void {
         $mapperClass = get_class($parentMapper);
         $this->checkRegistry($mapperClass);

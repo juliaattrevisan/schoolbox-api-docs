@@ -350,8 +350,8 @@ class Controller extends Base
         Participant $participant,
         array $postVars,
         string $reviewRoute,
-        IFeedback $mostRecentFeedback = null,
-        IResponse $response = null
+        ?IFeedback $mostRecentFeedback = null,
+        ?IResponse $response = null
     ): Model {
 
         // Check whether new rubric data and/or attachments are being passed through

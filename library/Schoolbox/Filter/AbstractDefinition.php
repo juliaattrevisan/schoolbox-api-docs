@@ -215,7 +215,7 @@ abstract class AbstractDefinition implements IDefinition
      * @inheritdoc
      * @throws \Schoolbox\Mapper\Exception            If unable to generate a mapper's model
      */
-    public function normalisePageOptions(Page\Model $pageFilter, string $roleTypeFilter = null): GenericCollection
+    public function normalisePageOptions(Page\Model $pageFilter, ?string $roleTypeFilter = null): GenericCollection
     {
         $this->insertAbstractOptions($pageFilter);
         $this->insertDynamicOptions($pageFilter);

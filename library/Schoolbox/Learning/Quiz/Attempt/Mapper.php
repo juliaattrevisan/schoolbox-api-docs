@@ -118,7 +118,7 @@ class Mapper extends BaseMapper
      * @throws BaseMapper\DefinitionException
      * @throws Participant\Plan\InvalidState If permitting the save would cause the system to enter an invalid state
      */
-    public function canParticipate(Model $object, Model $previous = null): bool
+    public function canParticipate(Model $object, ?Model $previous = null): bool
     {
         if ($previous) {
             // If an update, assume the system is still valid
@@ -139,7 +139,7 @@ class Mapper extends BaseMapper
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function insertParticipation(Model $object, Model $previous = null): bool
+    public function insertParticipation(Model $object, ?Model $previous = null): bool
     {
         if ($previous) {
             // If an update, assume the participation record already exists

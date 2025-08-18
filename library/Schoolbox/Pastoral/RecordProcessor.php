@@ -98,7 +98,7 @@ class RecordProcessor
         int $primaryStudentId,
         Values $post,
         array $duplicateStudentIds = [],
-        PastoralModel $parent = null
+        ?PastoralModel $parent = null
     ): GenericCollection {
         $heading = trim((string)$post->get('heading'));
         if (empty($heading)) {

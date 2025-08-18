@@ -36,7 +36,7 @@ class IsTrue implements IAuthorizationRule
     /**
      * {@inheritdoc}
      */
-    public function authorize(array $params = array(), User $user = null)
+    public function authorize(array $params = array(), ?User $user = null)
     {
         if ($this->value == true) {
             return true;

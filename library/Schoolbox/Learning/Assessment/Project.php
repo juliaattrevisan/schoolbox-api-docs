@@ -71,9 +71,9 @@ class Project extends AbstractAssessment implements AssessmentContext
     /**
      * Project constructor.
      *
-     * @param ISummator $summator
+     * @param ISummator|null $summator
      */
-    public function __construct(ISummator $summator = null)
+    public function __construct(?ISummator $summator = null)
     {
         /* I know Dr hates hook methods, so do this instead
          */
@@ -601,10 +601,10 @@ class Project extends AbstractAssessment implements AssessmentContext
     }
 
     /**
-     * @param ISummator $summator
+     * @param ISummator|null $summator
      * @return $this
      */
-    public function setSummator(ISummator $summator = null)
+    public function setSummator(?ISummator $summator = null)
     {
         $this->summator = $summator;
         return $this;

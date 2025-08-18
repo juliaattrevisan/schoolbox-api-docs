@@ -151,7 +151,7 @@ class External_Schooledge_Class implements External_ClassInterface
     /**
      * @inheritDoc
      */
-    public function getTeachers(string $classCode, Alaress_Date_Format $date = null): array
+    public function getTeachers(string $classCode, ?Alaress_Date_Format $date = null): array
     {
         if (!$classCode) {
             /* Dont bother if you got no code */

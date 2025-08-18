@@ -25,7 +25,6 @@ use Schoolbox\Mapper\Exception;
  */
 class WeekOffset
 {
-
     /**
      * @var TimetableCycleMapper
      */
@@ -51,7 +50,7 @@ class WeekOffset
      * @param Alaress_Date_Format  $date
      * @param LoggerInterface|null $log
      */
-    public function __construct(TimetableCycleMapper $timetableCycleMapper, Alaress_Date_Format $date, LoggerInterface $log = null)
+    public function __construct(TimetableCycleMapper $timetableCycleMapper, Alaress_Date_Format $date, ?LoggerInterface $log = null)
     {
         $this->timetableCycleMapper = $timetableCycleMapper;
         $this->date = $date;

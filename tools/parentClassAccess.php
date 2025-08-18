@@ -106,7 +106,7 @@ $app = new class extends CliTool\App
 
         $handle = (new \Alaress\Csv\ValidCSV($handle))->skipBom();
 
-        while (($row = fgetcsv($handle)) !== false) {
+        while (($row = fgetcsv($handle, escape: '')) !== false) {
             if (count($row) > 1) {
                 if (!isset($classes[$row[0]])) {
                     $classes[$row[0]] = [];

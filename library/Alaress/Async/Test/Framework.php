@@ -50,7 +50,7 @@ class Framework
      * @param string|null        $logDir
      * @param string             $rootDir
      */
-    public function __construct($di, $loop, $log, string $env = null, string $logDir = null, $rootDir = SITE_root)
+    public function __construct($di, $loop, $log, ?string $env = null, ?string $logDir = null, $rootDir = SITE_root)
     {
         $this->di = $di;
         $this->loop = $loop;

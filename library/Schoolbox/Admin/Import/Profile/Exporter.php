@@ -185,7 +185,7 @@ class Exporter
         /* Header row
          */
         $fp = fopen('php://temp', 'w');
-        fputcsv($fp, $headings);
+        fputcsv($fp, $headings, escape: '');
 
         /* Yank each profile; if there aren't any profiles to load, send back a default csv's contents
          */
@@ -244,7 +244,7 @@ class Exporter
 
             /* Values only, comma separated
              */
-            fputcsv($fp, array_values($row));
+            fputcsv($fp, array_values($row), escape: '');
         }
 
         rewind($fp);

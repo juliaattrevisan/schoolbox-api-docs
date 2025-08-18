@@ -347,7 +347,7 @@ class NullConnector implements IConnector
     /**
      * @inheritDoc
      */
-    public function getRow(string $sql, array $parameters = null)
+    public function getRow(string $sql, ?array $parameters = null)
     {
         return false;
     }
@@ -356,7 +356,7 @@ class NullConnector implements IConnector
     /**
      * @inheritDoc
      */
-    public function getOne(string $sql, array $parameters = null)
+    public function getOne(string $sql, ?array $parameters = null)
     {
         return '';
     }
@@ -365,7 +365,7 @@ class NullConnector implements IConnector
     /**
      * @inheritDoc
      */
-    public function getAll(string $sql, array $parameters = null): array
+    public function getAll(string $sql, ?array $parameters = null): array
     {
         return [];
     }
@@ -374,7 +374,7 @@ class NullConnector implements IConnector
     /**
      * @inheritDoc
      */
-    public function getIterator(string $sql, array $parameters = null): IIterator
+    public function getIterator(string $sql, ?array $parameters = null): IIterator
     {
         throw new Exception('Not supported.');
     }
@@ -383,7 +383,7 @@ class NullConnector implements IConnector
     /**
      * @inheritDoc
      */
-    public function query(string $sql, array $parameters = null): IStatement
+    public function query(string $sql, ?array $parameters = null): IStatement
     {
         throw new Exception('Not supported.');
     }

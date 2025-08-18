@@ -304,11 +304,11 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param null|PastoralSeverity $value
+     * @param PastoralSeverity|null $value
      *
      * @return static
      */
-    public function setSeverity(PastoralSeverity $value = null): self
+    public function setSeverity(?PastoralSeverity $value = null): self
     {
         $this->severity = $value;
 
@@ -595,10 +595,10 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param null|string $relativeDateString
+     * @param string|null $relativeDateString
      * @return self
      */
-    public function setRelativeDateString(string $relativeDateString = null): self
+    public function setRelativeDateString(?string $relativeDateString = null): self
     {
         $this->relativeDateString = $relativeDateString;
 
@@ -614,11 +614,11 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param null|Alaress_Date_Format $beforeDate
+     * @param Alaress_Date_Format|null $beforeDate
      *
      * @return self
      */
-    public function setBeforeDate(Alaress_Date_Format $beforeDate = null): self
+    public function setBeforeDate(?Alaress_Date_Format $beforeDate = null): self
     {
         $this->beforeDate = $beforeDate;
 
@@ -634,11 +634,11 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param null|Alaress_Date_Format $afterDate
+     * @param Alaress_Date_Format|null $afterDate
      *
      * @return self
      */
-    public function setAfterDate(Alaress_Date_Format $afterDate = null): self
+    public function setAfterDate(?Alaress_Date_Format $afterDate = null): self
     {
         $this->afterDate = $afterDate;
 

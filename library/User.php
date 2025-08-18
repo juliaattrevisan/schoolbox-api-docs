@@ -239,7 +239,7 @@ class User extends DeprecatedModel
      * @return array|bool
      * @throws Exception
      */
-    public function ajaxSearch($keyword, $group = 0, $residentialHouseIds = array(), $limit = false, bool $enabled = null)
+    public function ajaxSearch($keyword, $group = 0, $residentialHouseIds = array(), $limit = false, ?bool $enabled = null)
     {
         //search for a user based on at least one of the above fields
         //assumes at least one contains something

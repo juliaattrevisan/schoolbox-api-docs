@@ -233,7 +233,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      * @inheritDoc
      * @throws Exception
      */
-    public function getPeriodNumber(Campus $campus, $now = 0, \Schoolbox\User $user = null): array
+    public function getPeriodNumber(Campus $campus, $now = 0, ?\Schoolbox\User $user = null): array
     {
         $now = date('g:ia', $now ?: time());
 

@@ -58,7 +58,7 @@ class Replicator
      * @param IAssessable       $source             the assessment to replicate
      * @param AssessmentContext $destinationContext the location into which to replicate the assessment
      * @param User              $newOwner           who should own the newly created assessment
-     * @param null|int          $sequence           enable explicit sequence setting
+     * @param int|null          $sequence           enable explicit sequence setting
      * @return IAssessable if any part of the replication fails
      * @throws \InvalidArgumentException If Destination Quiz already has Sections
      * @throws \UnexpectedValueException
@@ -68,7 +68,7 @@ class Replicator
         IAssessable $source,
         AssessmentContext $destinationContext,
         User $newOwner,
-        int $sequence = null
+        ?int $sequence = null
     ): IAssessable {
         $newAssessment = $source->cloneForCopy();
         $newAssessment->setContext($destinationContext);
