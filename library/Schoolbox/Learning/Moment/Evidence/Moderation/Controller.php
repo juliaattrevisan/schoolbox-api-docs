@@ -128,7 +128,7 @@ class Controller extends Base
     {
         $stack = [];
 
-        /* Find all the learning moments to bulk modify
+        /* Find all the learning moments to bulk publish
          */
         $requestBody = $this->request->getParsedBody();
 
@@ -189,7 +189,7 @@ class Controller extends Base
     {
         $stack = [];
 
-        /* Find all the learning moments to bulk modify
+        /* Find all the learning moments to bulk reject
          */
         $requestBody = $this->request->getParsedBody();
 
@@ -271,6 +271,25 @@ class Controller extends Base
         $translated['_links'] = $this->getNextRoutes($evidence);
 
         return $translated;
+    }
+
+
+    /**
+     * Bulk delete a set of $moments
+     *
+     * @return void
+     */
+    public function deleteBulkDelete(): void
+    {
+        $stack = [];
+
+        /* Find all the learning moments to bulk modify
+         */
+        $requestBody = $this->request->getParsedBody();
+
+        $this->mapper->deleteByColumn('id', $requestBody['momentIds']);
+
+        $this->response = $this->responseAsJson($stack);
     }
 
 
