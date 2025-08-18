@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Storage\GC;
 
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Instance;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
 /**
@@ -41,6 +42,12 @@ class CommandLineTool extends CliTool\App
     private const OPT_SHORT_THRESHOLD = 't:';
 
     /**
+     * --force-run-on-staging: unless this flag is provided, do not allow this
+     * tool to run on staging instances.
+     */
+    private const OPT_LONG_FORCE_RUN_ON_STAGING = 'force-run-on-staging';
+
+    /**
      * Default garbage collection threshold.
      */
     private const DEFAULT_THRESHOLD = '2 months ago';
@@ -50,7 +57,11 @@ class CommandLineTool extends CliTool\App
      */
     public function getShortOpts(): array
     {
-        return [self::OPT_SHORT_HELP, self::OPT_SHORT_LIMIT, self::OPT_SHORT_THRESHOLD];
+        return [
+            self::OPT_SHORT_HELP,
+            self::OPT_SHORT_LIMIT,
+            self::OPT_SHORT_THRESHOLD,
+        ];
     }
 
     /**
@@ -60,6 +71,7 @@ class CommandLineTool extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
+            self::OPT_LONG_FORCE_RUN_ON_STAGING,
         ];
     }
 
@@ -72,19 +84,52 @@ class CommandLineTool extends CliTool\App
             echo <<<HELP
 Usage: gc-storage.php [-p] [-vvv] [-n{limit}]
 
-    -h, --help:     Print this help text and exit
-    -p:             perform: *without* this flag, GC will only do a dry run
-    -v[v[v]]:       verbosity: how much activity will be logged
-    -n={limit}:     the number of storage records to check, in ascending order of `last_accessed` defaults to 1000
-    -t={threshold}: threshold: do not attempt to garbage collect storage records last checked more recently than this
-                    date threshold, defaults to 2 months ago.
-                    If provided, must be supplied as one of:
-                    * a "YYYY-MM-DD HH:MM:SS" date
-                    * a timestamp
-                    * a relative date value understandable by `strtotime`
+    -h, --help:             Print this help text and exit
+    -p:                     perform: *without* this flag, GC will only do a dry run
+    -v[v[v]]:               verbosity: how much activity will be logged
+    -n={limit}:             the number of storage records to check, in ascending order of `last_accessed` defaults to
+                            1000.
+    -t={threshold}:         threshold: do not attempt to garbage collect storage records last checked more recently than
+                            this date threshold, defaults to 2 months ago.
+                            If provided, must be supplied as one of:
+                            * a "YYYY-MM-DD HH:MM:SS" date
+                            * a timestamp
+                            * a relative date value understandable by `strtotime`
+    --force-run-on-staging: unless this flag is provided, this tool will not run on a staging instance.
+                            Since staging and production instances will likely share file storage, deleting a file from
+                            staging will delete it from production as well.
+                            If this flag is provided, the run must be further confirmed by answering a prompt.
 
 HELP;
             exit;
+        }
+
+        $logger = $this->getLogger();
+        if ($this->perform()) {
+            /** @var Instance $instance */
+            $instance = $this->getDi()->get('instance');
+            if ($instance->isStaging()) {
+                $forceRunOnStaging = $this->getOpt(self::OPT_LONG_FORCE_RUN_ON_STAGING);
+                if ($forceRunOnStaging) {
+                    $logger->warning('Running in perform mode on a staging instance: this could delete data on the production instance!');
+                    while (true) {
+                        $continue = strtolower($this->readLine('Continue? [y/N]: '));
+                        if ($continue === 'y') {
+                            break;
+                        }
+                        if ($continue === 'n') {
+                            exit(CliKernelAbstract::EXIT_STATUS_OK);
+                        }
+                    }
+                } else {
+                    $logger->notice('Refusing to run in perform mode on a staging instance without the --force-run-on-staging flag.');
+                    exit(CliKernelAbstract::EXIT_STATUS_OK);
+                }
+            } else {
+                $logger->notice('Running in perform mode: this will permanently garbage collect files.');
+            }
+        } else {
+            $logger->notice('Running in dry-run mode: use -p flag to permanently garbage collect files.');
         }
 
         $limit         = $this->getOptAsInt(self::OPT_SHORT_LIMIT, self::DEFAULT_LIMIT);
@@ -94,15 +139,15 @@ HELP;
         $mapper        = StorageMapper::getInstance();
         $gc = new GarbageCollector(
             $mapper,
-            $this->getLogger(),
+            $logger,
             $limit,
             $thresholdDate,
             $this->perform(),
         );
         $gc = $gc
-            ->addCheck(new Check\ForeignKeyRelation($db, $this->getLogger(), SQL_db, $mapper->getTable()))
-            ->addCheck(new Check\CharacterField($db, $this->getLogger()))
-            ->addCheck(new Check\TextField($db, $this->getLogger(), SQL_db, $mapper->getTable()))
+            ->addCheck(new Check\ForeignKeyRelation($db, $logger, SQL_db, $mapper->getTable()))
+            ->addCheck(new Check\CharacterField($db, $logger))
+            ->addCheck(new Check\TextField($db, $logger, SQL_db, $mapper->getTable()))
         ;
 
         $deleted = $gc->purge();
