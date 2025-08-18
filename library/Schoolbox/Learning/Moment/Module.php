@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence;
+namespace Schoolbox\Learning\Moment;
 
 use Alaress\Authorizer\Failure\Forbidden;
 use Alaress\Authorizer\Rule;
@@ -16,6 +16,8 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Closure;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
+use Schoolbox\Learning\Moment\Controller;
+use Schoolbox\Learning\Moment\Mapper;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Role;
 use Schoolbox\User;

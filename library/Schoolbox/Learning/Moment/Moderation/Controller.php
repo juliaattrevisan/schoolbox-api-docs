@@ -16,8 +16,8 @@ use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Learning\Moment\Evidence\Mapper;
-use Schoolbox\Learning\Moment\Evidence\Model;
+use Schoolbox\Learning\Moment\Mapper;
+use Schoolbox\Learning\Moment\Model;
 use Schoolbox\Learning\Moment\Evidence\Translator;
 use Schoolbox\Learning\Moment\NextRoutes;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -37,7 +37,7 @@ class Controller extends Base
      * @param \Schoolbox\Discussion\Thread\Mapper $discussionThreadMapper
      */
     public function __construct(
-        private \Schoolbox\Learning\Moment\Evidence\Mapper $mapper,
+        private \Schoolbox\Learning\Moment\Mapper $mapper,
         private Comment\Mapper $commentMapper,
         private \Schoolbox\Discussion\Thread\Mapper $discussionThreadMapper,
     ) {

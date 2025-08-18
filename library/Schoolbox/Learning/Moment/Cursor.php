@@ -16,8 +16,8 @@ use InvalidArgumentException;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Moment\Evidence\Mapper;
-use Schoolbox\Learning\Moment\Evidence\Model;
+use Schoolbox\Learning\Moment\Mapper;
+use Schoolbox\Learning\Moment\Model;
 use Schoolbox\User;
 
 /**

@@ -21,7 +21,7 @@ use Schoolbox\Learning\Assessment\Quiz\Feedback\Translator\ModelToArray\Factory 
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Badge\Award\Mapper as BadgeAwardMapper;
 use Schoolbox\Learning\Badge\Award\Translator\ModelToArray\Factory as BadgeAwardTranslatorFactory;
-use Schoolbox\Learning\Moment\Evidence\Mapper as EvidenceMapper;
+use Schoolbox\Learning\Moment\Mapper as EvidenceMapper;
 use Schoolbox\Learning\Moment\Feed\Translator\ModelToArray;
 use Schoolbox\Learning\Moment\Translator\ModelToArray\Factory as EvidenceTranslatorFactory;
 use Schoolbox\User;

@@ -51,9 +51,9 @@ class AllFields extends Base
      * Translate the array representation of the evidence into a model.
      *
      * @param array                      $json
-     * @param object|Evidence\Model|null $model If provided, update this model;
+     * @param object|\Schoolbox\Learning\Moment\Model|null $model If provided, update this model;
      *                                   otherwise create a new one
-     * @return object|Evidence\Model
+     * @return object|\Schoolbox\Learning\Moment\Model
      * @throws ResourceException        if the collector factory can't find the
      *                                  file that was uploaded
      * @throws InvalidArgumentException if attempting to set creator or
@@ -62,7 +62,7 @@ class AllFields extends Base
     public function __invoke(array $json, ?object $model = null): object
     {
         if (!isset($model)) {
-            $model = new Evidence\Model();
+            $model = new \Schoolbox\Learning\Moment\Model();
         }
 
 

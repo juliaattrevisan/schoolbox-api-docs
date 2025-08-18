@@ -29,7 +29,7 @@ use Alaress\Lumberjack\Logger;
 use Alaress_Date_Format;
 use Component\Eportfolio as ComponentEportfolio;
 use Eportfolio;
-use Schoolbox\Learning\Moment\Evidence\Model;
+use Schoolbox\Learning\Moment\Model;
 use SocialStream\PostMapper;
 use UnexpectedValueException;
 use OutOfBoundsException;
@@ -274,7 +274,7 @@ class RecursiveUndeleter
         ],
         Discussion\Comment\Mapper::class    => [],
         Eportfolio\PageMapper::class        => [],
-        Evidence\Mapper::class              => [],
+        \Schoolbox\Learning\Moment\Mapper::class              => [],
         Blog\Homepage\Post\Mapper::class                => [
             Blog\Homepage\Comment\Mapper::class,
             Blog\Homepage\Image\Mapper::class,

@@ -31,7 +31,7 @@ use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Learning\Module as LearningModule;
 use Schoolbox\Learning\Moment\Discussion\Comment\Module as EvidenceCommentModule;
 use Schoolbox\Learning\Moment\Discussion\Thread\Module as EvidenceThreadModule;
-use Schoolbox\Learning\Moment\Evidence\Module as EvidenceModule;
+use Schoolbox\Learning\Moment\Module as EvidenceModule;
 use Schoolbox\Learning\Moment\Feed\Module as FeedModule;
 use Schoolbox\Learning\Moment\Moderation\Module as LearningMomentModerationModule;
 use Schoolbox\Learning\Moment\StudentToolkit\Module as StudentToolkitModule;

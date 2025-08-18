@@ -21,9 +21,9 @@ class ThreadLocator extends Thread\Context\BaseThreadLocator
      * Constructor
      *
      * @param Thread\Mapper   $threadMapper
-     * @param Evidence\Mapper $mapper
+     * @param \Schoolbox\Learning\Moment\Mapper $mapper
      */
-    public function __construct(Thread\Mapper $threadMapper, Evidence\Mapper $mapper)
+    public function __construct(Thread\Mapper $threadMapper, \Schoolbox\Learning\Moment\Mapper $mapper)
     {
         parent::__construct($threadMapper, $mapper, 'discussion_thread_id');
     }

@@ -66,10 +66,10 @@ class Base
 
 
     /**
-     * @param Evidence\Model $model
+     * @param \Schoolbox\Learning\Moment\Model $model
      * @return array
      */
-    public function __invoke(Evidence\Model $model): array
+    public function __invoke(\Schoolbox\Learning\Moment\Model $model): array
     {
         // Creator and recipient cannot be null in persisted entities.
         // Allow them to be null when translating though?

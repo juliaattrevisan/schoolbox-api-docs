@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence;
+namespace Schoolbox\Learning\Moment;
 
 use Alaress\Database\Predicate\Builder;
 use House;
@@ -15,6 +15,7 @@ use PDOStatement;
 use Schoolbox\Discussion\Thread\Mapper as ThreadMapper;
 use Schoolbox\File\Mimetype;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Moment\Model;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Storage;
 use Schoolbox\User;

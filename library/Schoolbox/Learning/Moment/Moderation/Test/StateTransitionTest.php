@@ -17,7 +17,7 @@ namespace Schoolbox\Learning\Moment\Moderation\Test;
 
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Schoolbox\Learning\Moment\Evidence\Model;
+use Schoolbox\Learning\Moment\Model;
 use Schoolbox\User;
 
 /**
@@ -167,7 +167,7 @@ class StateTransitionTest extends TestCase
             /* The usual starting pint
              */
             'normal process' => [
-                (new \Schoolbox\Learning\Moment\Evidence\Model())
+                (new \Schoolbox\Learning\Moment\Model())
                     ->setCreator($jana)
                     ->setType('text')
                     ->setRecipient($jana)
@@ -178,7 +178,7 @@ class StateTransitionTest extends TestCase
              * either by choice or by mistake
              */
             'everything was preset' => [
-                (new \Schoolbox\Learning\Moment\Evidence\Model())
+                (new \Schoolbox\Learning\Moment\Model())
                     ->setCreator($jana)
                     ->setType('text')
                     ->setRecipient($jana)
@@ -195,7 +195,7 @@ class StateTransitionTest extends TestCase
              * either by choice or by mistake
              */
             'half was preset' => [
-                (new \Schoolbox\Learning\Moment\Evidence\Model())
+                (new \Schoolbox\Learning\Moment\Model())
                     ->setCreator($jana)
                     ->setType('text')
                     ->setRecipient($jana)

@@ -93,7 +93,7 @@ class Module extends BaseModule
     private function preloadEvidence(array $params): array
     {
         $evidence = $this->getMapperFactory()
-            ->get(\Schoolbox\Learning\Moment\Evidence\Mapper::class)
+            ->get(\Schoolbox\Learning\Moment\Mapper::class)
             ->findById($params['evidenceId']);
 
         return [
@@ -110,7 +110,7 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
-            $this->getMapperFactory()->get(\Schoolbox\Learning\Moment\Evidence\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Learning\Moment\Mapper::class),
             $this->getMapperFactory()->get(CommentMapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Discussion\Thread\Mapper::class),
         );

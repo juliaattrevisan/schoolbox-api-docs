@@ -39,8 +39,8 @@ class Module extends Comment\Module
      */
     protected function buildContext(): Thread\Context\IThreadLocator
     {
-        /** @var Evidence\Mapper $evidenceMapper */
-        $evidenceMapper = $this->getMapperFactory()->get(Evidence\Mapper::class);
+        /** @var \Schoolbox\Learning\Moment\Mapper $evidenceMapper */
+        $evidenceMapper = $this->getMapperFactory()->get(\Schoolbox\Learning\Moment\Mapper::class);
 
         /** @var Thread\Mapper $threadMapper */
         $threadMapper = $this->getMapperFactory()->get(Thread\Mapper::class);
@@ -77,7 +77,7 @@ class Module extends Comment\Module
                             $this->getExternalUser(),
                             $userMapper,
                             static function (array $params) {
-                                /** @var Evidence\Model $evidence */
+                                /** @var \Schoolbox\Learning\Moment\Model $evidence */
                                 $evidence = $params['context'];
                                 return $evidence->getRecipient()->getId();
                             },

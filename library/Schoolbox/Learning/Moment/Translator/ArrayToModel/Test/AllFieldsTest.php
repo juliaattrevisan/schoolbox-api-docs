@@ -15,7 +15,7 @@ use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Discussion\Thread\Model as DiscussionThread;
-use Schoolbox\Learning\Moment\Evidence\Model;
+use Schoolbox\Learning\Moment\Model;
 use Schoolbox\Learning\Moment\Translator\ArrayToModel\AllFields;
 use Schoolbox\Resource\Attachment\Collector\Collector;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;

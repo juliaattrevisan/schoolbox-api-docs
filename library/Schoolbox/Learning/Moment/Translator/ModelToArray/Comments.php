@@ -83,10 +83,10 @@ class Comments
 
 
     /**
-     * @param Evidence\Model $evidence
+     * @param \Schoolbox\Learning\Moment\Model $evidence
      * @return array
      */
-    public function __invoke(Evidence\Model $evidence): array
+    public function __invoke(\Schoolbox\Learning\Moment\Model $evidence): array
     {
         $translation = [];
 
@@ -106,12 +106,12 @@ class Comments
      * discussion thread, and then translating them into the discussion thread's
      * JSON schema structure.
      *
-     * @param Evidence\Model $evidence
+     * @param \Schoolbox\Learning\Moment\Model $evidence
      * @return array
      * @throws MapperException if a query error occurs when retrieving or
      *                         counting comments
      */
-    private function loadAndTranslateCommentsInDiscussionThread(Evidence\Model $evidence): array
+    private function loadAndTranslateCommentsInDiscussionThread(\Schoolbox\Learning\Moment\Model $evidence): array
     {
         $commentCursor  = new Comment\Cursor(
             $this->commentMapper,

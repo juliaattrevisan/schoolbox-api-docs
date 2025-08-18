@@ -24,10 +24,10 @@ class NextRoutes
      * because it depends on a pre-existing logic that we shouldn't replicate here.
      * There doesn't seem to be a convenient way to compartmentalise getRouteIfAuthorized()
      *
-     * @param Evidence\Model $moment
+     * @param \Schoolbox\Learning\Moment\Model $moment
      * @return array
      */
-    public function generate(Evidence\Model $moment): array
+    public function generate(\Schoolbox\Learning\Moment\Model $moment): array
     {
         /* You can't SOBO a learning moment, so this is always null for now:
          * That might change later

@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence;
+namespace Schoolbox\Learning\Moment;
 
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
@@ -21,6 +21,7 @@ use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Moment\Cursor;
+use Schoolbox\Learning\Moment\Model;
 use Schoolbox\Learning\Moment\Moderation\ModerationRequired;
 use Schoolbox\Learning\Moment\NextRoutes;
 use Schoolbox\Learning\Moment\Translator\ModelToArray\Factory;
@@ -53,14 +54,14 @@ class Controller extends Base
     /**
      * Constructor
      *
-     * @param \Schoolbox\Learning\Moment\Evidence\Mapper $mapper
+     * @param \Schoolbox\Learning\Moment\Mapper $mapper
      * @param Comment\Mapper $commentMapper
      * @param EditorTemplateHelper    $editorTemplateHelper
      * @param \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper
      * @param Storage\Translator\ModelToArray $storageTranslator
      */
     public function __construct(
-        private \Schoolbox\Learning\Moment\Evidence\Mapper $mapper,
+        private \Schoolbox\Learning\Moment\Mapper $mapper,
         private Comment\Mapper $commentMapper,
         private EditorTemplateHelper $editorTemplateHelper,
         private \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper,

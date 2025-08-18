@@ -17,7 +17,7 @@ use Schoolbox\Collection;
 use Schoolbox\Curriculum\Node\Model as CurriculumNode;
 use Schoolbox\Discussion\Thread\Model as DiscussionThread;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Moment\Evidence\Model;
+use Schoolbox\Learning\Moment\Model;
 use Schoolbox\Learning\Moment\Tag\Model as EvidenceTag;
 use Schoolbox\Learning\Moment\Translator\ModelToArray\Base;
 use Schoolbox\Resource\Storage\Model as Storage;

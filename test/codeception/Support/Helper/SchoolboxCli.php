@@ -289,11 +289,11 @@ class SchoolboxCli extends \Codeception\Module
      * Returns the first learning moment based on its title.
      *
      * @param string $body
-     * @return \Schoolbox\Learning\Moment\Evidence\Model;
+     * @return \Schoolbox\Learning\Moment\Model;
      */
-    public function grabLearningMomentByBody(string $body): \Schoolbox\Learning\Moment\Evidence\Model
+    public function grabLearningMomentByBody(string $body): \Schoolbox\Learning\Moment\Model
     {
-        return \Schoolbox\Learning\Moment\Evidence\Mapper::getInstance()->findOneByColumn('body', $body);
+        return \Schoolbox\Learning\Moment\Mapper::getInstance()->findOneByColumn('body', $body);
     }
 
     /**

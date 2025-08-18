@@ -17,7 +17,7 @@ use Schoolbox\Learning\Assessment\Quiz\Feedback\MapperProxy as QuizFeedbackMappe
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Badge\Award\Mapper as BadgeAwardMapper;
-use Schoolbox\Learning\Moment\Evidence\Mapper as EvidenceMapper;
+use Schoolbox\Learning\Moment\Mapper as EvidenceMapper;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
 use Schoolbox\User;

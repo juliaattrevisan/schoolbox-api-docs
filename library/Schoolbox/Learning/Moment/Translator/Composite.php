@@ -45,10 +45,10 @@ class Composite
 
 
     /**
-     * @param Evidence\Model $evidence
+     * @param \Schoolbox\Learning\Moment\Model $evidence
      * @return array
      */
-    public function __invoke(Evidence\Model $evidence): array
+    public function __invoke(\Schoolbox\Learning\Moment\Model $evidence): array
     {
         $translations = [];
         foreach ($this->translators as $translator) {
