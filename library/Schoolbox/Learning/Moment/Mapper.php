@@ -68,7 +68,7 @@ class Mapper extends BaseMapper
             \Schoolbox\Curriculum\Node\Mapper::class,
             'id',
             'curriculum_node_id',
-            'evidence_id',
+            'moment_id',
             null,
             null,
             null,
@@ -80,7 +80,7 @@ class Mapper extends BaseMapper
             \Schoolbox\Learning\Moment\Tag\Mapper::class,
             'id',
             'tag_id',
-            'evidence_id',
+            'moment_id',
             null,
             null,
             null,
@@ -287,7 +287,7 @@ class Mapper extends BaseMapper
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('curriculum_moment', 'cn')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
-            INNER JOIN curriculum_moment cm ON moment.id = cm.evidence_id
+            INNER JOIN curriculum_moment cm ON moment.id = cm.moment_id
             INNER JOIN curriculum_node cn ON cm.curriculum_node_id = cn.id AND cn.deleted_at IS NULL
             WHERE {$pb->getWhereIntersect()}
         ";

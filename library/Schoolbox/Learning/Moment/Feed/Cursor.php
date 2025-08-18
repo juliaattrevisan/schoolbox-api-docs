@@ -319,7 +319,7 @@ class Cursor implements ICursor
                      SELECT *
                      FROM moment_tag    AS mt
                      JOIN lu_moment_tag AS lumt ON lumt.id = mt.tag_id
-                     WHERE mt.evidence_id = m.id
+                     WHERE mt.moment_id = m.id
                      AND lumt.name = :tagEvidence
                  )'
             );

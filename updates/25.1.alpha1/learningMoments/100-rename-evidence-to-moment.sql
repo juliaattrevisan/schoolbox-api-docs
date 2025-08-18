@@ -9,3 +9,10 @@ rename table evidence_tag to moment_tag;
 rename table curriculum_evidence to curriculum_moment;
 
 rename table evidence to moment;
+
+alter table curriculum_moment
+    change evidence_id moment_id int unsigned not null;
+
+alter table moment_tag
+    change evidence_id moment_id int unsigned not null;
+
