@@ -76,7 +76,7 @@ class Cursor implements ICursor
             }
         }
 
-        $nextCursorDate = $earliestDate->addDays(-1);
+        $nextCursorDate = (clone $earliestDate)->addDays(-1);
 
         // However, there may be no more results left... so check if the cursor is valid
         // Find the learning moment that would start the next page
@@ -122,7 +122,7 @@ class Cursor implements ICursor
         }
 
         return $this->codec->encode([
-            'lastDate' =>  $latestDate->addDays(1)->getDatabaseDate(),
+            'lastDate' =>  (clone $latestDate)->addDays(1)->getDatabaseDate(),
         ]);
     }
 
