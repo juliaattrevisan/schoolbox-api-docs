@@ -41,6 +41,16 @@ export default {
             type: Boolean,
             default: false,
         },
+
+        /**
+         * Is a full diff (with number of hours, minutes, etc.) displayed?
+         *
+         * If not: show diff as days only.
+         */
+        fullDiff: {
+            type: Boolean,
+            default: false,
+        },
     },
 
     /**
@@ -95,15 +105,22 @@ export default {
          *                     constructor.
          */
         renderFormattedDatetimes(datetime) {
-            let now = dayjs().startOf("d"),
-                date = dayjs(datetime),
-                dayDiff = date.diff(now, "d"),
+            let now        = dayjs(),
+                date       = dayjs(datetime),
                 dateFormat = this.dateOnly ? this.dateDisplayFormats.dayjs : this.dateDisplayFormats.dayjsDatetime;
 
             let struct = {
                 absolute: date.format(dateFormat),
                 relative: "",
             };
+
+            // Full diff format (e.g. hours, minutes, seconds)
+            if (this.fullDiff) {
+                struct.relative = dayjs.duration(date.diff(now)).humanize(true);
+                return struct;
+            }
+
+            let dayDiff = date.diff(now.startOf('d'), "d");
 
             /* We determine a relative time equivalence based on how different
              * $datetime was, compared to today. Anything outside the (-1, 1) range

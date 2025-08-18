@@ -88,7 +88,7 @@ export default {
                         </span>
                         <span>
                             &mdash;
-                            <relative-time :datetime="article.publishAt"></relative-time>
+                            <relative-time :datetime="article.publishAt" full-diff></relative-time>
                         </span>
                         <span v-if="article.topics.length">
                             in

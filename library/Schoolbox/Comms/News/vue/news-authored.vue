@@ -227,7 +227,7 @@ export default {
                                 </h3>
                                 <p class="meta">
                                     <b>{{ article.status }}</b>
-                                    <relative-time :datetime="article.statusDate"></relative-time>
+                                    <relative-time :datetime="article.statusDate" full-diff></relative-time>
                                 </p>
                             </div>
                         </div>
