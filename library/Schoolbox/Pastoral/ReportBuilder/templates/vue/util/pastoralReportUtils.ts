@@ -2,7 +2,7 @@
  * Any utility functions for the Pastoral Report.
  */
 
-import type { User } from "@schoolboxLibrary/types/User";
+import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import type { Tab, TableHeader, RowOptions, TypeSubType, RowKeys } from "../../js/types/pastoralReportTypes";
 import { TabTitle } from "../../js/types/pastoralReportTypes";
 
