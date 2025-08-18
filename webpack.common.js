@@ -141,7 +141,7 @@ module.exports = {
 
         // Learning
         learningMomentsEvidenceCohortReport:
-            "./library/Schoolbox/Learning/Moment/Evidence/vue/cohortReport/learningMomentsEvidenceCohortReport.ts",
+            "./library/Schoolbox/Learning/Moment/vue/cohortReport/learningMomentsEvidenceCohortReport.ts",
         learningMomentsEvidenceDetail:
             "./library/Schoolbox/Learning/Moment/vue/learningMomentsEvidenceDetail.ts",
         userProfileFeeds: "./library/Schoolbox/Learning/vue/user-profile/userProfileFeeds.ts",
@@ -387,10 +387,7 @@ module.exports = {
             "@schoolboxLibrary": path.resolve(__dirname, "library/Schoolbox"),
             "@schoolboxCalendarEvent": path.resolve(__dirname, "library/Schoolbox/Calendar/Event/templates/vue"),
             "@schoolboxCommsNews": path.resolve(__dirname, "library/Schoolbox/Comms/News"),
-            "@schoolboxLearningMomentEvidence": path.resolve(
-                __dirname,
-                "library/Schoolbox/Learning/Moment/vue",
-            ),
+            "@schoolboxLearningMomentEvidence": path.resolve(__dirname, "library/Schoolbox/Learning/Moment/vue"),
             "@schoolboxCurriculum": path.resolve(__dirname, "library/Schoolbox/Curriculum/templates/"),
             "@schoolboxBadge": path.resolve(__dirname, "library/Schoolbox/Learning/Badge/"),
             "@schoolboxAssessment": path.resolve(__dirname, "library/Schoolbox/Assessment/"),
