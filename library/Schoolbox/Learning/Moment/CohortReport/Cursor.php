@@ -1,6 +1,6 @@
 <?php
 
-namespace Schoolbox\Learning\Moment\Evidence\CohortReport;
+namespace Schoolbox\Learning\Moment\CohortReport;
 
 use Alaress\Codec\ICodec;
 use Alaress\Codec\Json\Base64;
@@ -8,7 +8,7 @@ use Alaress\Database\Predicate\Builder;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
-use Schoolbox\Learning\Moment\Evidence;
+use Schoolbox\Learning\Moment;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccessMapper;
@@ -35,7 +35,7 @@ class Cursor implements ICursor
     /**
      * Constructor
      *
-     * @param Evidence\Mapper $mapper
+     * @param Moment\Mapper $mapper
      * @param UserAccessMapper $userAccessMapper
      * @param Folder\Model $folder
      * @param string|null $userIds
@@ -46,7 +46,7 @@ class Cursor implements ICursor
      * @param string|null $states
      */
     public function __construct(
-        private Evidence\Mapper $mapper,
+        private Moment\Mapper $mapper,
         private UserAccessMapper $userAccessMapper,
         private Folder\Model $folder,
         private ?string $userIds = null,
@@ -145,14 +145,14 @@ class Cursor implements ICursor
             $momentIds = $this->findIdsByFilters();
 
             if (empty($momentIds)) {
-                return new GenericCollection(Evidence\Model::class);
+                return new GenericCollection(Moment\Model::class);
             }
 
             // Determine the date range for this page
             $momentDates = $this->findMomentDates($momentIds);
             $dateRange = $this->getDateRangeForCursor($encodedCursor, $momentDates);
             if ($dateRange === null) {
-                return new GenericCollection(Evidence\Model::class);
+                return new GenericCollection(Moment\Model::class);
             }
 
             // Build predicate to get moments within the date range
@@ -166,7 +166,7 @@ class Cursor implements ICursor
                 [ 'order' => [ 'created_at' => 'DESC' ] ]
             );
         } catch (Exception | NotFound $e) {
-            return new GenericCollection(Evidence\Model::class);
+            return new GenericCollection(Moment\Model::class);
         }
     }
 
@@ -333,7 +333,7 @@ class Cursor implements ICursor
             /* Ensure that the state provided is one of the canonical states we've established
              * so you can't request moments with the status "cat"
              */
-            $validStates = array_intersect($states, Evidence\Model::VALID_STATUSES);
+            $validStates = array_intersect($states, Moment\Model::VALID_STATUSES);
 
                 /* Do a deep inspection for the pb, which isn't exactly nice; look at the various
                  * *_by and *_at date fields to determine what state a learning moment is in.
@@ -345,7 +345,7 @@ class Cursor implements ICursor
                 $stateQueryPieces = [];
 
                 foreach ($validStates as $state) {
-                    if (Evidence\Model::STATUS_DRAFT === $state) {
+                    if (Moment\Model::STATUS_DRAFT === $state) {
                         /* TODO maybe we should have had a draft_at and draft_by columns
                          *  to shortcut this nonsense, but that's also kind of annoying...
                          */
@@ -357,7 +357,7 @@ class Cursor implements ICursor
                             AND rejected_at IS NULL
                             AND rejected_by IS NULL
                         )';
-                    } elseif (Evidence\Model::STATUS_SUBMITTED === $state) {
+                    } elseif (Moment\Model::STATUS_SUBMITTED === $state) {
                         $stateQueryPieces[] = '(
                             submitted_at IS NOT NULL
                             AND submitted_by IS NOT NULL
@@ -366,7 +366,7 @@ class Cursor implements ICursor
                             AND rejected_at IS NULL
                             AND rejected_by IS NULL
                         )';
-                    } elseif (Evidence\Model::STATUS_PUBLISHED === $state) {
+                    } elseif (Moment\Model::STATUS_PUBLISHED === $state) {
                         $stateQueryPieces[] = '(
                             submitted_at IS NULL
                             AND submitted_by IS NULL
@@ -375,7 +375,7 @@ class Cursor implements ICursor
                             AND rejected_at IS NULL
                             AND rejected_by IS NULL
                         )';
-                    } elseif (Evidence\Model::STATUS_REJECTED === $state) {
+                    } elseif (Moment\Model::STATUS_REJECTED === $state) {
                         $stateQueryPieces[] = '(
                             submitted_at IS NULL
                             AND submitted_by IS NULL
