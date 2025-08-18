@@ -999,7 +999,7 @@ class Controller extends Base
             $query = "SELECT TOP 100 * FROM $viewName WHERE " . (($viewName === 'dbo.uvSchoolBoxSchoolGradeResults') ? 'ID' : 'id') . ' = ' . $externalUser['StudentID'];
 
             if ($viewName === 'dbo.uvSchoolBoxReportComments') {
-                $query .= " AND YearLevel = '11'";
+                $query .= " AND YearLevel = '11' AND ResultType IN ('NCEA', 'Year 11')";
             }
 
             $t0 = microtime(true);
