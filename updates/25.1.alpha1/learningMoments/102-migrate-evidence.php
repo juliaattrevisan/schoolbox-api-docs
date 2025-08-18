@@ -155,6 +155,11 @@ HELP;
 
                 if ($this->perform()) {
                     $evidenceStatement->execute($evidence);
+
+                    $this->getLogger()->info(sprintf(
+                        'Updated learning moment %s to have new moment_evidence',
+                        $moment['id'],
+                    ));
                 }
             }
         } catch (\Alaress\Lock\LockRefreshException $e) {
