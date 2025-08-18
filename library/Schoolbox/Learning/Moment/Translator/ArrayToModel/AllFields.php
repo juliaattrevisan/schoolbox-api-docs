@@ -117,12 +117,6 @@ class AllFields extends Base
             }
         }
 
-        /* TODO fix this; it doesn't understand many-to-one atm
-         */
-        if (array_key_exists('type', $json)) {
-            $model->setType($json['type']);
-        }
-
         if (array_key_exists('discussionThread', $json)) {
             if (isset($json['discussionThread'])) {
                 if (is_array($json['discussionThread']) && array_key_exists('id', $json['discussionThread'])) {
@@ -152,6 +146,7 @@ class AllFields extends Base
             if (isset($json['evidence'])) {
                 if (is_array($json['evidence'])) {
                     foreach ($json['evidence'] as $evidenceStruct) {
+
                         // File upload may be either:
                         // * an extant storage hash
                         // * a triplet passed from a resource attacher, to be transformed into a
@@ -162,7 +157,8 @@ class AllFields extends Base
                                 $evidence = new \Schoolbox\Learning\Moment\Evidence\Model();
 
                                 $evidence->setStorage($file)
-                                    ->setFilename($file->getBasename());
+                                    ->setFilename($file->getBasename())
+                                    ->setType($json['type']);
 
                                 if (null === $model->getEvidence()) {
                                     $model->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class)));
