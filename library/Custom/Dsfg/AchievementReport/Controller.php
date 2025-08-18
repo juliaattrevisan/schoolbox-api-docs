@@ -950,6 +950,7 @@ class Controller extends Base
                     // Duplicate comments are those that will have already been displayed under a subject with the same class code.
                     // This is done here rather than in Comments.php, because the order in which the comments are displayed is
                     // important, and the order in which the comments are displayed is determined by the sort order of $data.
+                    // This is done here rather than in the Twig template because array manipulation in Twig is painful.
                     $commentsAlreadyDisplayedByClassCode = [];
                     foreach ($data as $courseName => $allData) {
                         if (count($comments[$year]['courses'][$courseName]['terms'] ?? []) > 0) {
