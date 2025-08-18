@@ -356,16 +356,19 @@ class Controller extends Base
          *  evidence by default until a user changes it, I guess?
          */
 
-        // Which variant is being shown?
-        // * text
-        // * upload
-        $momentType = $evidence->getEvidence()->first()->getType();
+        /* Each moment has a body of text that always exists. The default usage here is MOMENT_TYPE_TEXT.
+         *
+         * Additionally, a learning moment comes with an optional piece(s) of evidence with a particular
+         * type which are defined in Evidence\Model. These can be photo/video/audio/upload for now.
+         * In the absence of any evidence, we presume text-only, which is MOMENT_TYPE_TEXT.
+         */
+        $momentType = $evidence->getEvidence()->first()?->getType() ?? Evidence\Model::MOMENT_TYPE_TEXT;
         $template   = $this->getTemplateFromType($momentType);
 
         /* Attachzone stuff for existing attachments
          */
         $zone = $this->buildAttachzone($momentType);
-        if ($evidence->getEvidence()->first()->getStorage()) {
+        if ($evidence->getEvidence()->first()?->getStorage()) {
             $zone->attachFiles([$evidence->getEvidence()->first()->getStorage()->getHash()]);
         }
 
