@@ -39,6 +39,11 @@ class Mapper extends BaseMapper implements IReceiver
     public const FILENAME_MAX_LENGTH = 250;
 
     /**
+     * Is deletion of files from the file system allowed from staging instances?
+     */
+    private bool $allowStagingDeleteStorage = false;
+
+    /**
      * @return void
      * @throws MapperException
      */
@@ -132,10 +137,11 @@ class Mapper extends BaseMapper implements IReceiver
     }
 
     /**
-     * Post-delete callback
+     * Post-delete callback: delete the file and any transforms or transcodes
+     * from the filesystem.
      *
-     * TODO this shouldn't be necessary: storage files should be cleaned up by
-     *      another process
+     * This will refuse to delete files if this is a staging instance, unless
+     * `$this->allowStagingDeleteStorage` is true.
      *
      * @param Model $storage
      */
@@ -366,5 +372,23 @@ class Mapper extends BaseMapper implements IReceiver
     public function getStorageFilesystemProxy()
     {
         return self::getDi()->get('filesystem.storageProxy');
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAllowStagingDeleteStorage(): bool
+    {
+        return $this->allowStagingDeleteStorage;
+    }
+
+    /**
+     * @param bool $allowStagingDeleteStorage
+     * @return $this
+     */
+    public function setAllowStagingDeleteStorage(bool $allowStagingDeleteStorage): self
+    {
+        $this->allowStagingDeleteStorage = $allowStagingDeleteStorage;
+        return $this;
     }
 }

@@ -105,6 +105,7 @@ HELP;
         }
 
         $logger = $this->getLogger();
+        $mapper = StorageMapper::getInstance();
         if ($this->perform()) {
             /** @var Instance $instance */
             $instance = $this->getDi()->get('instance');
@@ -115,6 +116,7 @@ HELP;
                     while (true) {
                         $continue = strtolower($this->readLine('Continue? [y/N]: '));
                         if ($continue === 'y') {
+                            $mapper->setAllowStagingDeleteStorage(true);
                             break;
                         }
                         if ($continue === 'n') {
@@ -136,7 +138,6 @@ HELP;
         $threshold     = $this->getOpt(self::OPT_SHORT_THRESHOLD);
         $thresholdDate = $this->buildDate($threshold ?? self::DEFAULT_THRESHOLD);
         $db            = $this->getDatabaseInternal();
-        $mapper        = StorageMapper::getInstance();
         $gc = new GarbageCollector(
             $mapper,
             $logger,
