@@ -17,6 +17,7 @@ use Schoolbox\Collection;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Instance;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -141,12 +142,19 @@ class Mapper extends BaseMapper implements IReceiver
      * from the filesystem.
      *
      * This will refuse to delete files if this is a staging instance, unless
-     * `$this->allowStagingDeleteStorage` is true.
+     * `$this->allowStagingDeleteStorage` is true: this is because filesystems
+     * may be shared between staging and production, and thus deleting from
+     * staging could delete from production.
      *
      * @param Model $storage
      */
     public function deleteStorage(Model $storage)
     {
+        /** @var Instance $instance */
+        $instance = self::getDi()->get('instance');
+        if ($instance->isStaging() && !$this->allowStagingDeleteStorage) {
+            return;
+        }
         $this->getStorageFilesystemProxy()->delete($storage);
     }
 
