@@ -43,7 +43,7 @@ export default {
         },
 
         /**
-         * Is a full diff (with number of hours, minutes, etc.) displayed?
+         * Is a full diff (e.g. the most significant component) displayed?
          *
          * If not: show diff as days only.
          */
@@ -114,12 +114,17 @@ export default {
                 relative: "",
             };
 
-            // Full diff format (e.g. hours, minutes, seconds)
+            // Full diff format (e.g. hours, minutes, seconds):
+            // just output whatever the dayJS diff would output, which is the
+            // most significant component of the diff.
             if (this.fullDiff) {
                 struct.relative = dayjs.duration(date.diff(now)).humanize(true);
                 return struct;
             }
 
+            // Standard diff format:
+            // Just output days, with "today", "yesterday" or "tomorrow" if
+            // appropriate.
             let dayDiff = date.diff(now.startOf('d'), "d");
 
             /* We determine a relative time equivalence based on how different
