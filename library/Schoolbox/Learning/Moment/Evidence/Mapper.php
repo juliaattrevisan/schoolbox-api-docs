@@ -76,7 +76,7 @@ class Mapper extends BaseMapper
         );
 
         $this->joinsVia(
-            'evidence_tag',
+            'moment_tag',
             \Schoolbox\Learning\Moment\Tag\Mapper::class,
             'id',
             'tag_id',
@@ -199,7 +199,7 @@ class Mapper extends BaseMapper
 
             // Set the list of tags as an empty collection:
             // these will be hydrated in `hydrateTagsIntoCollection`
-            $model->setTags($this->getJoinMapper('evidence_tag')->createCollection());
+            $model->setTags($this->getJoinMapper('moment_tag')->createCollection());
 
             // Set the list of curriculum codes as an empty collection:
             // these will be hydrated in `hydrateCurriculumNodesIntoCollection`
@@ -252,18 +252,18 @@ class Mapper extends BaseMapper
         $query       = "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('evidence_tag', 'et')}
+                {$this->getJoinColumnString('moment_tag', 'mt')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
-            INNER JOIN {$this->getJoinSql('evidence_tag', '', 'et')}
+            INNER JOIN {$this->getJoinSql('moment_tag', '', 'mt')}
             WHERE {$pb->getWhereIntersect()}
         ";
 
         $evidenceTagStatement = $this->database->query($query, $pb->getParams());
         foreach ($evidenceTagStatement as $row) {
-            if ($row['et.id'] !== null) {
+            if ($row['mt.id'] !== null) {
                 //only step into if the evidence tag is NOT deleted
                 /** @var \Schoolbox\Learning\Moment\Tag\Model $evidenceTag */
-                $evidenceTag = $this->hydrateJoin($row, 'evidence_tag', 'et');
+                $evidenceTag = $this->hydrateJoin($row, 'moment_tag', 'mt');
                 $collection[$row['id']]->getTags()->setOffset($evidenceTag->getId(), $evidenceTag);
             }
         }

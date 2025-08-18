@@ -453,7 +453,7 @@ class Controller extends Base
     public function getTags()
     {
         /** @var \Schoolbox\Learning\Moment\Tag\Mapper $tagMapper */
-        $tagMapper = $this->mapper->getJoinMapper('evidence_tag');
+        $tagMapper = $this->mapper->getJoinMapper('moment_tag');
         $tags      = $tagMapper->findAll();
         $output    = [];
         /** @var \Schoolbox\Learning\Moment\Tag\Model $tag */

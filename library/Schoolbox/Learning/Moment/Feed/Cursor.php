@@ -317,9 +317,9 @@ class Cursor implements ICursor
             $sqlWhereCondition = (
                 'EXISTS(
                      SELECT *
-                     FROM evidence_tag    AS et
-                     JOIN lu_moment_tag AS lumt ON lumt.id = et.tag_id
-                     WHERE et.evidence_id = e.id
+                     FROM moment_tag    AS mt
+                     JOIN lu_moment_tag AS lumt ON lumt.id = mt.tag_id
+                     WHERE mt.evidence_id = e.id
                      AND lumt.name = :tagEvidence
                  )'
             );
