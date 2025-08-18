@@ -76,6 +76,9 @@
                 {% if canWrite %}
                     <div class="grip compact"></div>
                 {% endif %}
+                {% if assessment.id == 32 %}
+                <a class="expand-link icon-up-arrow l-pad-s--left" data-interaction="toggle-expanded" data-interaction-state="collapsed"></a>
+                {% endif %}
                 <div class="list-item">
                     <div class="small-12 compact card wrap-down">
                         {% set title = attribute(locale, assessment.typeName|lower) is defined ? attribute(locale, assessment.typeName|lower).proper : assessment.typeName %}
@@ -199,6 +202,77 @@
                     </ul>
                 {% endif %}
             </div>
+            {% if assessment.id == 32 %}
+            <ul class="information-list threaded">
+                <li class="child" data-unit-assessment="x" style="">
+                    <div class="actions-small-1">
+                        <div class="list-item">
+                            <div class="small-12 compact card wrap-down">
+                                <a title="Learning Activity" href="/learning/assessments/33/1">
+                                    <span class="icon-task"></span>
+                                    <p>Pre unit customised task</p>
+                                </a>
+                                <p class="meta">
+                                    <span title="Wednesday August 6th 2025 5:00pm">Due
+                                    <time datetime="2025-08-06T17:00:00+10:00">Aug 6, 2025 at 5:00pm</time></span>&nbsp;|&nbsp;<span class="gradient-2">1/2 students completed</span>
+                                </p>
+                            </div>
+                        </div>
+                        <nav>
+                            <sbx-pop-out content-id="component3374-options-task33"></sbx-pop-out>
+                        </nav>
+                        <ul data-dropdown-content="" class="f-dropdown" id="component3374-options-task33" aria-hidden="true">
+                            <li class="separator">Activity</li>
+                            <li><a href="/learning/assessments/33/status" class="icon-progress">View Status</a></li>
+                            <li><a class="icon-group" href="/learning/assessments/33/participation">Student Participation</a></li>
+                            <li><a class="icon-modify" href="/learning/assessments/33/modify?returnUrl=L2hvbWVwYWdlLzgwI2NvbXBvbmVudDMzNzQ%3D" title="Modify this assessment">Modify</a></li>
+                            <li><a href="/learning/assessments/33/delete" class="icon-delete" data-action="delete" title="Delete this assessment">Delete</a></li>
+                            <li class="separator">Course</li>
+                            <li>
+                                <a href="/course/export/unitspecs/12/assessment/33" class="icon-export" data-reveal-id="component3374-save-to-course-modal-33" data-method="PUT" data-spec-assessment-id="1" data-spec-assessment-title="Post to Forum: Prologue">Save to Course...</a>
+                                <div id="component3374-save-to-course-modal-33" class="reveal-modal" data-reveal="" aria-hidden="true" role="dialog">
+                                    <h2>Are you sure you wish to save this activity back to its course?</h2>
+                                    <div data-display-if-spec-assessment-exists="" class="warning alert-box ">
+                                        <p>
+                                            The original activity
+                                            “<span data-spec-assessment-title="">Post to Forum: Prologue</span>”
+                                            in the course
+
+                                            <span data-display-if-spec-assessment-deleted="" class="hide">
+                                                has been deleted; it will be <strong>restored</strong> and <strong>replaced</strong>
+                                            </span>
+                                            <span data-display-if-spec-assessment-not-deleted="" class="">
+                                                will be <strong>replaced</strong>
+                                            </span>
+                                            with this activity.
+                                        </p>
+                                        <p>
+                                            Any other imports into classes of the original activity will
+                                            <strong>not</strong> be updated.
+                                        </p>
+                                    </div>
+                                    <p data-display-if-spec-assessment-not-exists="" class="hide">
+                                    This activity
+                                    “<span data-spec-assessment-title="">Post to Forum: Prologue</span>”
+                                    does not yet exist in the course;
+                                                it will be added.
+                                    </p>
+                                    <ul class="flex-list buttons">
+                                        <li>
+                                            <a href="/course/export/unitspecs/12/assessment/33" data-method="PUT" class="button submit" data-action="save-to-course" data-related-component="component3374">Yes</a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="button" data-action="save-to-course-cancel" data-related-component="component3374">No</a>
+                                        </li>
+                                    </ul>
+                                    <a class="close-reveal-modal" aria-label="Close">×</a>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+            </ul>
+            {% endif %}
         </li>
     {% endfor %}
 </ul>
