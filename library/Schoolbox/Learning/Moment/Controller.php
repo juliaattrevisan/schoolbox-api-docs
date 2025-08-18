@@ -857,7 +857,7 @@ class Controller extends Base
              */
             $files = [];
 
-            if (null !== $moment->getStorage()) {
+            if (null !== $moment->getEvidence()->first()?->getStorage()) {
                 $files[] = call_user_func($this->storageTranslator, $moment->getStorage());
             }
 
