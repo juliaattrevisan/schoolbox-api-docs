@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace Schoolbox\Group;
 
 use Alaress\Color\ColorFactory;
+use Alaress\Authorizer\Authorizer;
+use Aura\Router\Generator;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -33,6 +35,10 @@ class GroupsHelper
     public const NOTENROLED = 'notEnroled';
     public const PENDING    = 'pending';
 
+    private Authorizer $authorizer;
+
+    private Generator $routeGenerator;
+
     private GroupMapper $groupMapper;
 
     private UserAccessMapper $userAccessMapper;
@@ -47,12 +53,16 @@ class GroupsHelper
      * constructor for dependency injection
      */
     public function __construct(
+        Authorizer $authorizer,
+        Generator $routeGenerator,
         GroupMapper $groupMapper,
         UserAccessMapper $userAccessMapper,
         FolderMapper $folderMapper,
         Timetable_ColourMapper $timetableColourMapper,
         RerouteOverrideMapper $reRouteOverrideMapper
     ) {
+        $this->authorizer            = $authorizer;
+        $this->routeGenerator        = $routeGenerator;
         $this->groupMapper           = $groupMapper;
         $this->userAccessMapper      = $userAccessMapper;
         $this->folderMapper          = $folderMapper;
@@ -257,6 +267,15 @@ class GroupsHelper
             } else {
                 $modifyLink = false;
             }
+            $canAccessCohortReport = $this->authorizer->isPathAuthorizedForUser(
+                'learningMomentEvidence.getCohortReport',
+                ['folder' => $folder, 'folderId' => $folder->getId()],
+                $user
+            );
+            $cohortReportLink = $canAccessCohortReport ? $this->routeGenerator->generate(
+                'learningMomentEvidence.getCohortReport',
+                [ 'folder' => $folder, 'folderId' => $folder->getId() ]
+            ) : false;
             $possibleGroups[] = [
                 'id'                => $folder->getId(),
                 'name'              => $folder->getName(),
@@ -274,6 +293,7 @@ class GroupsHelper
                 'isPrivate'         => $folder->getGroup()->isPrivate(),
                 'modifyLink'        => $modifyLink,
                 'hasHomepage'       => $folder->hasHomepage(),
+                'cohortReportLink'  => $cohortReportLink,
             ];
         }
         return $possibleGroups;

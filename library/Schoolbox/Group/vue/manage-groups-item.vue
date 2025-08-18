@@ -445,6 +445,11 @@ export default {
                                     >Cancel membership request</a
                                 >
                             </li>
+                            <li v-if="group.cohortReportLink">
+                                <a :href="group.cohortReportLink" class="icon-share" title="Cohort Learning Moments"
+                                    >Cohort Learning Moments</a
+                                >
+                            </li>
                         </ul>
                     </template>
                 </div>

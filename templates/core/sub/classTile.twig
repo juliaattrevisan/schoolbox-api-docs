@@ -40,6 +40,8 @@
                 {% if classMarkbookRoute %}<li><a href="{{ classMarkbookRoute }}" class="icon-curriculum">Class Markbook</a></li>{% endif %}
                 {% set rubricMarkbookRoute = routeLookupIfAuthorized('rubricMarkbook.getMarkbook', {folder: class, folderId: class.id}) %}
                 {% if rubricMarkbookRoute %}<li><a href="{{ rubricMarkbookRoute }}" class="icon-curriculum">Rubric Markbook</a></li>{% endif %}
+                {% set cohortReportRoute = routeLookupIfAuthorized('learningMomentEvidence.getCohortReport', {folder: class, folderId: class.id}) %}
+                {% if cohortReportRoute %}<li><a href="{{ cohortReportRoute }}" class="icon-share">Cohort Learning Moments</a></li>{% endif %}
                 {% set badgeAwardRoute = routeLookupIfAuthorized('learningBadgeAward.getListPage', {folder: class, folderId: class.id}) %}
                 {% if badgeAwardRoute %}<li><a href="{{ badgeAwardRoute }}" class="icon-achievement">Badge Report</a></li>{% endif %}
                 {% set classPastoralRoute = routeLookupIfAuthorized('pastoralClassReportModule.getReport', {folder: class, folderId: class.id}) %}

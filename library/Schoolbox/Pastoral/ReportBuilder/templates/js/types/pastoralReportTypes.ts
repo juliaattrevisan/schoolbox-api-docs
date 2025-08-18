@@ -1,4 +1,4 @@
-import type { User } from "@schoolboxLibrary/types/User";
+import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import type { Metadata } from "@js/util/sbx/apiUtils";
 import type { PastoralRecord } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
 

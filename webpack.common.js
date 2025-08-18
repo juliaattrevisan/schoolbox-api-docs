@@ -140,6 +140,8 @@ module.exports = {
         newsRssLink: "./library/Schoolbox/Comms/News/vue/newsRssLink.ts",
 
         // Learning
+        learningMomentsEvidenceCohortReport:
+            "./library/Schoolbox/Learning/Moment/Evidence/vue/cohortReport/learningMomentsEvidenceCohortReport.ts",
         learningMomentsEvidenceDetail:
             "./library/Schoolbox/Learning/Moment/Evidence/vue/learningMomentsEvidenceDetail.ts",
         userProfileFeeds: "./library/Schoolbox/Learning/vue/user-profile/userProfileFeeds.ts",

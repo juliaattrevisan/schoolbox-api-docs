@@ -64,6 +64,8 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
+            $this->getAuthorizer(),
+            $this->getRouter()->getGenerator(),
             $this->getMapperFactory()->get(GroupMapper::class),
             $this->getMapperFactory()->get(UserAccessMapper::class),
             $this->getMapperFactory()->get(FolderMapper::class),

@@ -4,7 +4,7 @@
  * Renders a single row with cells based on column types.
  */
 
-import type { User } from "@schoolboxLibrary/types/User";
+import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { TableHeaderType } from "../../js/types/pastoralReportTypes";
 import type { TableHeader, RowOptions, RecordsAndPoints } from "../../js/types/pastoralReportTypes";
@@ -44,7 +44,13 @@ function onCellSelected(header: TableHeader): void {
  * @returns true if the data is a User, false otherwise
  */
 function isUser(data: RowOptions): data is User {
-    return (data as User).firstName !== undefined && (data as User).lastName !== undefined;
+    return (
+        typeof data === "object" &&
+        "firstName" in data &&
+        data.firstName !== undefined &&
+        "lastName" in data &&
+        data.lastName !== undefined
+    );
 }
 </script>
 

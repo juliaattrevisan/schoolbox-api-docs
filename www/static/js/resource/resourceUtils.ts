@@ -4,6 +4,21 @@
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { ApiBaseResponse } from "@js/util/sbx/apiUtils";
 
+export type StorageFile = {
+    name: string;
+    hash: string;
+    mime: string;
+    type: ResourceType;
+    size: number | null;
+    _links: {
+        fetch?: string;
+        icon?: string;
+        image?: string;
+        stream?: string;
+        poster?: string;
+    };
+};
+
 export interface AsyncUploadResponseError {
     success: false;
     error: number;
@@ -20,20 +35,7 @@ export interface AsyncUploadResponseSuccess {
         type: string | null;
         size: number;
         name: string;
-        file: {
-            name: string;
-            hash: string;
-            mime: string;
-            type: ResourceType;
-            size: number | null;
-            _links: {
-                fetch?: string;
-                icon?: string;
-                image?: string;
-                stream?: string;
-                poster?: string;
-            };
-        };
+        file: StorageFile;
     };
 }
 

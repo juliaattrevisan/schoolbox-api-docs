@@ -123,6 +123,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         $this->setBlock($templateHandle, 'student_grades', 'student_grades_block');
         $this->setBlock($templateHandle, 'class_list', 'class_list_block');
         $this->setBlock($templateHandle, 'award_list_link', 'award_list_link_block');
+        $this->setBlock($templateHandle, 'cohort_report_link', 'cohort_report_link_block');
         $this->setBlock($templateHandle, 'markbook_link', 'markbook_link_block');
         $this->setBlock($templateHandle, 'rubric_markbook_link', 'rubric_markbook_link_block');
         $this->setBlock($templateHandle, 'course_markbook_link', 'course_markbook_link_block');
@@ -186,6 +187,21 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
                 $this->parse('course_markbook_link_block', 'course_markbook_link');
                 $hasClassActions = true;
             }
+        }
+
+        // Cohort Report
+        if (
+            ($isClassPage || $isGroupPage)
+            && $authorizer->isPathAuthorizedForUser('learningMomentEvidence.getCohortReport', $folderParams, $this->getUser())
+        ) {
+            $this->setVar(
+                'COHORT_REPORT_LINK',
+                $this->getRouteGenerator()->generate('learningMomentEvidence.getCohortReport', $folderParams)
+            );
+            $this->parse('cohort_report_link_block', 'cohort_report_link');
+            $hasClassActions = true;
+        } else {
+            $this->setVar('cohort_report_link_block');
         }
 
         // Badge Report

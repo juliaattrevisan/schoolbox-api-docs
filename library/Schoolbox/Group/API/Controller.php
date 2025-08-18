@@ -33,6 +33,8 @@ class Controller extends Base
     /**
      * Controller constructor.
      *
+     * @param \Alaress\Authorizer\Authorizer $authorizer
+     * @param \Aura\Router\Generator $routeGenerator
      * @param UserAccessMapper       $userAccessMapper
      * @param GroupMapper            $groupMapper
      * @param FolderMapper           $folderMapper
@@ -40,6 +42,8 @@ class Controller extends Base
      * @param RerouteOverrideMapper  $reRouteOverrideMapper
      */
     public function __construct(
+        \Alaress\Authorizer\Authorizer $authorizer,
+        \Aura\Router\Generator $routeGenerator,
         UserAccessMapper $userAccessMapper,
         GroupMapper $groupMapper,
         FolderMapper $folderMapper,
@@ -48,6 +52,8 @@ class Controller extends Base
     ) {
         $this->userAccessMapper = $userAccessMapper;
         $this->groupsHelper     = new GroupsHelper(
+            $authorizer,
+            $routeGenerator,
             $groupMapper,
             $userAccessMapper,
             $folderMapper,

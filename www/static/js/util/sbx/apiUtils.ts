@@ -20,7 +20,6 @@ export type Metadata = {
 type ApiBaseResponseSuccess<TRespData> = {
     success: true;
     data: TRespData;
-    metadata?: Metadata;
 };
 
 type ApiBaseResponseFailure = {
@@ -119,7 +118,7 @@ async function buildRequest(
             // Remove any undefined values from the query string
             const filteredBody = Object.fromEntries(
                 Object.entries(options.body as Record<string, string | string[]>).filter(
-                    ([, value]) => value !== undefined,
+                    ([, value]) => value !== undefined && value !== null,
                 ),
             );
 
@@ -173,6 +172,14 @@ function parseResponse<TResponseData>(
             detail: null,
         };
         return failureResponse;
+    }
+
+    if (status === 204 && text === "") {
+        // 204 No Content, so we return null data
+        return {
+            success: true,
+            data: null as unknown as TResponseData,
+        };
     }
 
     try {
@@ -368,4 +375,36 @@ export async function sseApiRequest<
     // Otherwise, we got the final event, so stop reading and return it
     await reader.cancel();
     return parseResponse<TResponseData>(finalResponseData, response.status);
+}
+
+// Overrides for buildApiRequest to allow for an optional URL which changes the return type
+export function buildApiRequest<TResponseData, TBody extends ApiRequestBodyBase | undefined = undefined>(
+    options: Omit<ApiRequestOptions<TBody>, "body">,
+): (body?: TBody) => Promise<ApiBaseResponse<TResponseData>>;
+
+export function buildApiRequest<TResponseData, TBody extends ApiRequestBodyBase | undefined = undefined>(
+    options: Omit<ApiRequestOptions<TBody>, "url" | "body"> & { url: null },
+): (url: string, body?: TBody) => Promise<ApiBaseResponse<TResponseData>>;
+
+/**
+ * Builds an API request function with the given options
+ * @param options - The options to define the API request, excluding the body
+ * @returns - A function that takes an optional body and returns a promise that resolves to the response from the server
+ * @see apiRequest for details on the options
+ */
+export function buildApiRequest<TResponseData, TBody extends ApiRequestBodyBase | undefined = undefined>(
+    options: Omit<ApiRequestOptions<TBody>, "url" | "body"> & { url: string | null },
+):
+    | ((url: string, body?: TBody) => Promise<ApiBaseResponse<TResponseData>>)
+    | ((body?: TBody) => Promise<ApiBaseResponse<TResponseData>>) {
+    const targetUrl = options.url;
+    if (targetUrl === null) {
+        return (url: string, body?: TBody): Promise<ApiBaseResponse<TResponseData>> => {
+            return apiRequest<TResponseData, TBody>({ ...options, url, body });
+        };
+    }
+
+    return (body?: TBody): Promise<ApiBaseResponse<TResponseData>> => {
+        return apiRequest<TResponseData, TBody>({ ...options, url: targetUrl, body });
+    };
 }

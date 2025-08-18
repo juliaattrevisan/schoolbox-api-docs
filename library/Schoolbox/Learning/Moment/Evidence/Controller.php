@@ -19,7 +19,6 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Learning\Moment\Evidence\CohortReport\Payload;
 use Schoolbox\Learning\Moment\Evidence\Moderation\ModerationRequired;
 use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Factory;
 use Schoolbox\Learning\Moment\NextRoutes;
@@ -41,18 +40,30 @@ use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 class Controller extends Base
 {
     /**
+     * Length of the blurb to show in the cohort report when there is evidence attached (ideally <= 3 lines)
+     */
+    private const COHORT_REPORT_BLURB_LENGTH = 180;
+
+    /**
+     * Length of the blurb to show in the cohort report when there is no other evidence attached
+     */
+    private const COHORT_REPORT_BLURB_LENGTH_EXTENDED = 400;
+
+    /**
      * Constructor
      *
      * @param \Schoolbox\Learning\Moment\Evidence\Mapper $mapper
      * @param Comment\Mapper $commentMapper
      * @param EditorTemplateHelper    $editorTemplateHelper
      * @param \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper
+     * @param Storage\Translator\ModelToArray $storageTranslator
      */
     public function __construct(
         private \Schoolbox\Learning\Moment\Evidence\Mapper $mapper,
         private Comment\Mapper $commentMapper,
         private EditorTemplateHelper $editorTemplateHelper,
         private \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper,
+        private Storage\Translator\ModelToArray $storageTranslator,
     ) {
     }
 
@@ -731,6 +742,22 @@ class Controller extends Base
 
 
     /**
+     * Get the cohort report for a given folder
+     *
+     * @param Folder\Model $folder
+     * @return void
+     */
+    public function getCohortReport(Folder\Model $folder): void
+    {
+        $this->response = $this->responseFromTemplate(
+            '@learningMomentEvidence/cohortReport.twig',
+            [ 'folder' => $folder, ],
+            sprintf('Cohort Learning Moments - %s', $folder->getName())
+        );
+    }
+
+
+    /**
      * Generates a json payload that tells you about learning moments for any of $folder's students
      * that were created between the $from and $to dates, grouped by date, sorted reverse-chronologically.
      *
@@ -762,7 +789,9 @@ class Controller extends Base
      */
     public function getCohortReportPayload(Folder\Model $folder): void
     {
-        $moments = (new Payload($this->mapper, $this->userAccessMapper))->findByFilters(
+        $cursor = new CohortReport\Cursor(
+            $this->mapper,
+            $this->userAccessMapper,
             $folder,
             $this->requestQuery->get('userIds') ?? '',
             $this->requestQuery->get('from') ?? null,
@@ -772,14 +801,22 @@ class Controller extends Base
             $this->requestQuery->get('states') ?? '',
         );
 
+        $results = $cursor->retrieveResults($this->requestQuery->get('cursor') ?? null);
+
         /* Augment with hasComments() evaluation and _links derivations
          * Sadly these are deeply coupled to Controllers
          */
-        $payload = $this->convert($moments);
+        $payload = $this->convert($results);
 
         $this->response = $this->responseAsJson([
-            'status'  => 200,
-            'content' => $payload,
+            'data'   => $payload,
+            'metadata' => [
+                'count'  => $cursor->retrieveResultCount(),
+                'cursor' => [
+                    'current' => $this->requestQuery->get('cursor') ?? $cursor->current($results),
+                    'next'    => $cursor->next($results),
+                ],
+            ],
         ]);
     }
 
@@ -803,15 +840,32 @@ class Controller extends Base
             $files = [];
 
             if (null !== $moment->getStorage()) {
-                $files = [
-                    [
-                        'hash' => $moment->getStorage()->getHash(),
-                        'filename' => $moment->getStorage()->getFilename(),
-                        'mime' => $moment->getStorage()->getMime(),
-                        'icon' => $moment->getStorage()->getMimetype()->getIconFile(),
-                    ],
-                ];
+                $files[] = call_user_func($this->storageTranslator, $moment->getStorage());
             }
+
+            /* The actual body may be too long or contain too much HTML (i.e. images/videos)
+             * so we can't just show it in the cohort report as-is.
+             * Similar to news, provide a cut-down blurb of the body content to show instead
+             */
+            $blurb = \TextFormatter::cutSentence(
+                \Scrub::html2text($moment->getBody()),
+                count($files) > 0 ? self::COHORT_REPORT_BLURB_LENGTH : self::COHORT_REPORT_BLURB_LENGTH_EXTENDED,
+            );
+
+            /* If the learning moment has a body content, there's something to read
+             * (ripped from news land)
+             *
+             * It might be the same as the blurb, but there are complications with
+             * that comparison. The blurb could essentially be a strip_tags of the body,
+             * but if the body contained html only (e.g. an image or a video or an iframe)
+             * then strip_tags will remove whatever was there; it's valid content that should
+             * be seen by users, but has been inadvertently misunderstood by a boolean outcome
+             * and we don't have an easy answer to that problem
+             *
+             * For now, presume there's something to see
+             * Show the link
+             */
+            $showReadMore = '' !== (string)$moment->getBody();
 
             /* This is a stack because empty payloads result in a datatype difference in frontend world:
              * empty payloads emerge as [], but non-empty payloads emerge as {}
@@ -820,7 +874,9 @@ class Controller extends Base
 
             $payload[] = [
                 'id' => $moment->getId(),
-                'body' => $moment->getBody(),
+                'body' => \Scrub::html($moment->getBody()),
+                'blurb' => $blurb,
+                'showReadMore' => $showReadMore,
                 'files' => $files,
                 /* TODO we usually add role for extra meta about students and staffs, especially in cohorty scenarios
                  *  since there's a higher likelihood of encountering people with same- or same-sounding names.
@@ -833,7 +889,7 @@ class Controller extends Base
                  */
                 'createdAt' => [
                     'timestamp' => $moment->getCreatedAt()->getUnixTimestamp(),
-                    'displayAs' => $moment->getCreatedAt()->getLocalShort(),
+                    'displayAs' => $moment->getCreatedAt()->getShortDateOnly(),
                     'rfc' => $moment->getCreatedAt()->toRfc3339String(),
                 ],
                 /* We don't store updatedBy, for whatever reason: I suppose it was presumed
@@ -844,7 +900,7 @@ class Controller extends Base
                  */
                 'updatedAt' => [
                     'timestamp' => $moment->getUpdatedAt()->getUnixTimestamp(),
-                    'displayAs' => $moment->getUpdatedAt()->getLocalShort(),
+                    'displayAs' => $moment->getUpdatedAt()->getShortDateOnly(),
                     'rfc' => $moment->getUpdatedAt()->toRfc3339String(),
                 ],
                 /* Whether this moment had comments or not, which affects a user interaction
@@ -854,40 +910,6 @@ class Controller extends Base
                 /* The current state of the learning moment
                  */
                 'currentState' => $moment->getCurrentState(),
-                // TODO State-specific metadata is currently not needed, but maybe needed later
-                //
-                //                    /* Metadata about the current state of a learning moment and any other details
-                //                     * regarding the current state, such as who actioned a state change etc.
-                //                     */
-                //                    'states' => [
-                //                        'current' => $moment->getCurrentState(),
-                //                        /* You'll be in one of three alternative states here: submitted/published/rejected
-                //                         */
-                //                        'submittedAt' => $moment->getSubmittedAt()?->getDatabase(),
-                //                        'submittedBy' => $moment->getSubmittedBy() ? [
-                //                            'id' => $moment->getSubmittedBy()->getId(),
-                //                            'externalId' => $moment->getSubmittedBy()->getExternalId(),
-                //                            'fullname' => $moment->getSubmittedBy()->getFullname(),
-                //                            'firstname' => $moment->getSubmittedBy()->getFirstname(),
-                //                            'lastname' => $moment->getSubmittedBy()->getLastname(),
-                //                        ] : null,
-                //                        'publishAt' => $moment->getPublishedAt()?->getDatabase(),
-                //                        'publishedBy' => $moment->getPublishedBy() ? [
-                //                            'id' => $moment->getPublishedBy()->getId(),
-                //                            'externalId' => $moment->getPublishedBy()->getExternalId(),
-                //                            'fullname' => $moment->getPublishedBy()->getFullname(),
-                //                            'firstname' => $moment->getPublishedBy()->getFirstname(),
-                //                            'lastname' => $moment->getPublishedBy()->getLastname(),
-                //                        ] : null,
-                //                        'rejectedAt' => $moment->getRejectedAt()?->getDatabase(),
-                //                        'rejectedBy' => $moment->getRejectedBy() ? [
-                //                            'id' => $moment->getRejectedBy()->getId(),
-                //                            'externalId' => $moment->getRejectedBy()->getExternalId(),
-                //                            'fullname' => $moment->getRejectedBy()->getFullname(),
-                //                            'firstname' => $moment->getRejectedBy()->getFirstname(),
-                //                            'lastname' => $moment->getRejectedBy()->getLastname(),
-                //                        ] : null
-                //                    ],
                 /* Any associated tags which you can find in a db lookup table
                  */
                 'tags' => $this->getTagsForMoment($moment),
@@ -961,6 +983,18 @@ class Controller extends Base
                 'evidenceId' => $moment->getId(),
             ]);
         }
+
+        /* non-state dependent actions */
+        $links['modifyForm'] = $this->getRouteIfAuthorized('learningMomentEvidence.getModifyForm', [
+            'evidenceId' => $moment->getId(),
+            'creatorId'  => $moment->getCreator()->getId(),
+            'userId'     => $moment->getRecipient()->getId(),
+        ]);
+
+        $links['delete'] = $this->getRouteIfAuthorized('learningMomentEvidence.deleteEvidence', [
+            'evidenceId' => $moment->getId(),
+            'creatorId'  => $moment->getCreator()->getId(),
+        ]);
 
         return $links;
     }
