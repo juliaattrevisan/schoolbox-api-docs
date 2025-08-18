@@ -180,6 +180,8 @@ export default {
          */
         onRecordedMediaReady(recordedData) {
             this.recordedData = recordedData;
+            // remove the event listeners to prevent multiple uploads
+            this.storageElement.removeEventListener("draft__onDraftSave", this.onAutoSave);
             this.storageElement.addEventListener("draft__onDraftSave", this.onAutoSave);
             this.filenameElement.value = this.recordedData.name; //to pass form submit validation check
             if (this.isFirstRecording) {
