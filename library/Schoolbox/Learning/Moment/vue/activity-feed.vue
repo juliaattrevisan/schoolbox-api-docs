@@ -98,6 +98,7 @@ export default {
         config: () => window.learningEvidenceFeedConfig,
         dateDisplayFormats: () => window.dateDisplayFormats,
         groupedEvidence() {
+          console.log(this.groupFeedResults(this.data))
             return this.groupFeedResults(this.data);
         },
         currentCount() {
@@ -759,10 +760,10 @@ export default {
 
                                     <div class="feed-body small-12 columns">
                                         <!-- Is there an attachment? Display it appropriately -->
-                                        <article v-if="evidence.object.filename && evidence.object.storage">
+                                        <article v-if="evidence.object.evidence[0]?.filename && evidence.object.evidence[0]?.storage">
                                             <storage-object
-                                                :storage="evidence.object.storage"
-                                                :filename="evidence.object.filename"
+                                                :storage="evidence.object.evidence[0].storage"
+                                                :filename="evidence.object.evidence[0].filename"
                                                 data-test="learning-moment-evidence-media"
                                             ></storage-object>
                                         </article>
