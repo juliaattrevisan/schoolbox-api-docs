@@ -214,8 +214,9 @@
                 // If the filename is not empty and the storage is, we need to upload the file
                 const filesToUpload = config.files.filter(
                     (file) =>
-                        document.querySelector(file.filename).value !== "" &&
-                        document.querySelector(file.storage).value === "",
+                        // storage or filename may not exist, so check and null coalesce
+                        document.querySelector(file.filename)?.value !== "" &&
+                        document.querySelector(file.storage)?.value === "",
                 );
                 if (filesToUpload.length > 0) {
                     let filesUploaded = 0;
