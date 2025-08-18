@@ -112,14 +112,22 @@ HELP;
             if ($instance->isStaging()) {
                 $forceRunOnStaging = $this->getOpt(self::OPT_LONG_FORCE_RUN_ON_STAGING);
                 if ($forceRunOnStaging) {
-                    $logger->warning('Running in perform mode on a staging instance: this could delete data on the production instance!');
+                    $logger->warning('Running in perform mode on a staging instance: this could delete data on the production instance! Choose an option:');
+                    $logger->warning('y: delete from database and filesystem, possibly affecting production');
+                    $logger->warning('n: delete from database, do not delete from filesystem');
+                    $logger->warning('q: exit');
                     while (true) {
-                        $continue = strtolower($this->readLine('Continue? [y/N]: '));
+                        $continue = strtolower($this->readLine('Allow deletion? [y/n/q]: '));
                         if ($continue === 'y') {
+                            $logger->warning('Deleting filesystem data on staging instance, possibly affecting production');
                             $mapper->setAllowStagingDeleteStorage(true);
                             break;
                         }
                         if ($continue === 'n') {
+                            $logger->notice('Not deleting filesystem data on staging instance');
+                            break;
+                        }
+                        if ($continue === 'q') {
                             exit(CliKernelAbstract::EXIT_STATUS_OK);
                         }
                     }
