@@ -12,6 +12,8 @@ type UserLinks = {
 export type User = {
     externalId?: number;
     fullName: string;
+    firstname: string;
+    lastname: string;
     givenName: string;
     id: number;
     preferredName?: string | null;
