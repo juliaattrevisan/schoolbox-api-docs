@@ -16,7 +16,6 @@ use Schoolbox\Resource\Group;
 use Schoolbox\Resource\HomepageConfig;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 use Schoolbox\Search\Api\Database\Index\BuildType;
-use Schoolbox\Search\Api\Database\ResultType\User\Hydrator;
 
 /**
  * Index builder for pages/folders.
@@ -199,14 +198,14 @@ class IndexBuilder extends BaseBuilder
         // Required so that if, e.g. a homepage template is added to a folder,
         // the folder's previous "page.folder" index is deleted whilst
         // preserving its "page.homepage" index.
-        $queryString = "
-            SELECT
-                f.id,
-                " . $this->buildTypeExpression() . " AS type
-            FROM folder f
-            " . $this->getJoinsFromFolderForTypeExpression() . "
-            WHERE f.deleted_at IS NULL
-        ";
+        $queryString = '
+            SELECT si.identifier AS id, si.type AS typeFromIndex, ' . $this->buildTypeExpression() . ' AS typeFromFolder
+            FROM search_index si
+            JOIN folder f ON si.identifier = f.id
+            ' . $this->getJoinsFromFolderForTypeExpression() . '
+            WHERE si.type like "' . Hydrator::BASE_TYPE . '%"
+            AND si.type <> ' . $this->buildTypeExpression() . '
+        ';
         $params = [];
         if ($fromDate) {
             $queryString .= ' AND f.updated_at >= :fromDate';
@@ -221,21 +220,17 @@ class IndexBuilder extends BaseBuilder
         }
         $query = $this->connector->prepareQuery($queryString);
         $query->execute($params);
-        $this->logger->info(sprintf('Deleting search indices for %d pages/folders', $query->rowCount()));
+        $this->logger->info(sprintf('Deleting search indices for %d pages/folders (mismatched types)', $query->rowCount()));
         foreach ($query as $row) {
-            foreach (Hydrator::SUB_TYPES as $subType) {
-                if ($subType !== $row['type']) {
-                    yield $this->buildIndex(
-                        (string)$row['id'],
-                        null,
-                        $subType,
-                        null,
-                        false,
-                        null,
-                        null,
-                    );
-                }
-            }
+            yield $this->buildIndex(
+                (string)$row['id'],
+                null,
+                $row['typeFromIndex'],
+                null,
+                false,
+                null,
+                null,
+            );
         }
     }
 
