@@ -14,8 +14,6 @@
     </div>
 </div>
 
-{% set commentsAlreadyDisplayed = [] %}
-
 {% for courseName, allData in entriesAndResults.data %}
 <div class="row">
     <div class="small-12 island">
@@ -115,10 +113,7 @@
                         <p class="subheading">Comments</p>
                         {% for term, commentData in entriesAndResults.comments[year].courses[courseName].terms %}
                             {% if (commentData.comment ?? '')|length %}
-                                {% if commentData.comment not in commentsAlreadyDisplayed %}
-                                    <p>Term {{ term }} - {{ commentData.comment }}&mdash;{{ macro.renderTeachers(commentData.teachers) }}</p>
-                                    {% set commentsAlreadyDisplayed = commentsAlreadyDisplayed|merge([fullComment]) %}
-                                {% endif %}
+                                <p>Term {{ term }} - {{ commentData.comment }}&mdash;{{ macro.renderTeachers(commentData.teachers) }}</p>
                             {% endif %}
                         {% endfor %}
                     </td>
