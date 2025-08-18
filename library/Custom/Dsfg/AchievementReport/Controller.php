@@ -937,12 +937,18 @@ class Controller extends Base
                 /* Entries And Results for a specific year
                  */
 
+                $comments = new Comments\Comments($user, $externalUser, $db, $year);
+
                 /* Get all the comments for $year for this user
                  * Then rearrange all the subjects
                  */
                 $output['data']['entriesAndResults'] = [
                     'data' => $entriesAndResults->findData(),
-                    'comments' => (new Comments\Comments($user, $externalUser, $db, $year))->findNCEAData(),
+                    'comments' => (
+                        $dbTableName === NCEA\Base::MAIN_DB_TABLE_YEAR11
+                        ? $comments->findYear11Data()
+                        : $comments->findNCEAData()
+                    ),
                     'allLetters' => $entriesAndResults->getLetterRegistry(),
                     'allTypes' => self::TYPES,
                     'year' => $year,
