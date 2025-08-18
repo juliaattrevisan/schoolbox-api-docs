@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence;
+namespace Schoolbox\Learning\Moment;
 
 use Alaress\Codec\ICodec;
 use Alaress\Codec\Json\Base64;
@@ -16,6 +16,8 @@ use InvalidArgumentException;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Moment\Evidence\Mapper;
+use Schoolbox\Learning\Moment\Evidence\Model;
 use Schoolbox\User;
 
 /**
