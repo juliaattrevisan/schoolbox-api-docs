@@ -59,6 +59,7 @@ async function applyFilters(): Promise<void> {
 }
 
 const tagsSelectLoaded = window.Vue.ref(false);
+const isChangingTags = window.Vue.ref(false);
 
 /**
  * Initialise the selectize for evidence tags
@@ -92,14 +93,31 @@ window.Vue.onMounted(async () => {
             load: (query: string, callback: (results: SelectizeSelectorItem[]) => void): void => {
                 callback(evidenceTags);
             },
-            onChange(value: string[]): void {
+            async onChange(value: string[]): Promise<void> {
+                isChangingTags.value = true;
                 crfStore.evidenceTagsFilter = value.map((v) => parseInt(v, 10));
+
+                await window.Vue.nextTick();
+                isChangingTags.value = false;
             },
         },
         value: [],
         multiple: true,
     });
 });
+
+/**
+ * Persist changes to the evidence tags back to the selectize
+ */
+window.Vue.watch(
+    () => crfStore.evidenceTagsFilter,
+    (newValue) => {
+        if (!evidenceTagsEl.value) return;
+        if (isChangingTags.value) return; // internal change, no need to update
+
+        evidenceTagsEl.value.selectize.setValue(newValue, true);
+    },
+);
 </script>
 
 <template>
@@ -144,7 +162,6 @@ window.Vue.onMounted(async () => {
                     />
 
                     <!-- TODO: filter by curric codes [SA-20736] -->
-                    <!-- TODO: filter by tags -->
 
                     <label class="cr-selectize-label">
                         Filter by tags
