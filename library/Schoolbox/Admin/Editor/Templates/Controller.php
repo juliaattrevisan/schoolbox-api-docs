@@ -19,17 +19,21 @@ use Schoolbox\Editor\Templates\Model as TemplateModel;
 use Schoolbox\Editor\Templates\Mapper as TemplateMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Config\ConfigMapper;
 
 class Controller extends Base
 {
     /**
      * Controller constructor.
      *
+     * @param IConfigLoader $config
      * @param ErrorMapper $errorMapper
      * @param CategoryMapper $categoryMapper
      * @param TemplateMapper $templateMapper
      */
     public function __construct(
+        private IConfigLoader $config,
         private ErrorMapper $errorMapper,
         private CategoryMapper $categoryMapper,
         private TemplateMapper $templateMapper,
