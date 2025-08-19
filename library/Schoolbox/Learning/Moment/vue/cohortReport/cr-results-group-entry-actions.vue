@@ -23,7 +23,7 @@ async function onApprove(): Promise<void> {
     }
 
     // Otherwise just publish immediately
-    await crStore.publishEntries([props.entry.id], false);
+    await crStore.publishEntries([props.entry], false);
 }
 </script>
 
