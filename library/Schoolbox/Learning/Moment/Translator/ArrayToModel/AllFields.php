@@ -150,7 +150,7 @@ class AllFields extends Base
                         // * an extant storage hash
                         // * a triplet passed from a resource attacher, to be transformed into a
                         //   storage hash by the collector factory
-                        if (isset($evidenceStruct['file']) || '' !== $evidenceStruct['file']) {
+                        if (isset($evidenceStruct['file']) && '' !== $evidenceStruct['file']) {
                             $file = $this->collectorFactory->build([$evidenceStruct['file']])->getFirst();
                             if ($file) {
                                 $evidence = new \Schoolbox\Learning\Moment\Evidence\Model();
