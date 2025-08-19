@@ -1007,14 +1007,12 @@ class Controller extends Base
      */
     public function deleteBulkDelete(): void
     {
-        $stack = [];
-
-        /* Find all the learning moments to bulk modify
+        /* Find all the learning moments to bulk delete
          */
         $requestBody = $this->request->getParsedBody();
 
         $this->mapper->deleteByColumn('id', $requestBody['momentIds']);
 
-        $this->response = $this->responseAsJson($stack);
+        $this->response = $this->responseEmpty(204);
     }
 }
