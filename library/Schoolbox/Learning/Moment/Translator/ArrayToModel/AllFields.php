@@ -146,7 +146,6 @@ class AllFields extends Base
             if (isset($json['evidence'])) {
                 if (is_array($json['evidence'])) {
                     foreach ($json['evidence'] as $evidenceStruct) {
-
                         // File upload may be either:
                         // * an extant storage hash
                         // * a triplet passed from a resource attacher, to be transformed into a
