@@ -3,6 +3,8 @@ import { keysOf } from "@js/util/arrayUtils";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 // import locale from "@js/terminology/rosettaStone";
 import type { SelectizeSelectorItem } from "@js/vendors/selectize/selectizeSelectorTypes";
+import DateRange from "@schoolboxVue/components/dateTimePicker/date-range.vue";
+import { EMPTY_DATE } from "@schoolboxVue/components/dateTimePicker/datePickerTypes";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import { evidenceStatusLabels } from "@schoolboxLearningMomentEvidence/evidenceTypes";
@@ -17,6 +19,7 @@ interface Props {
 const props = defineProps<Props>();
 const crStore = useCohortReportStore();
 
+const dateRangeEl = window.Vue.useTemplateRef<InstanceType<typeof DateRange>>("dateRangeRef");
 const evidenceTagsEl = window.Vue.useTemplateRef<HTMLSelectElement>("evidenceTagsRef");
 
 const isOpen = window.Vue.ref(true); // whether the filters are shown
@@ -49,6 +52,9 @@ window.Vue.watch(
  * To apply the selected filters
  */
 async function applyFilters(): Promise<void> {
+    // clear the invalid date inputs (if any) to correctly reflect what filters are being applied
+    dateRangeEl.value?.clearInvalidDates();
+
     // TODO (perhaps split this into a crStore.applyFilters() and keep track of the current filters so that subsequent page loads still work)
     crStore.clearData();
     await crStore.loadNextPage();
@@ -58,6 +64,8 @@ const studentFilter = window.Vue.ref<SearchSelectItem[]>([]);
 const authorFilter = window.Vue.ref<SearchSelectItem[]>([]);
 const stateFilter = window.Vue.ref<EvidenceStatus[]>(keysOf(evidenceStatusLabels));
 const evidenceTagsFilter = window.Vue.ref<SelectizeSelectorItem["id"][]>([]);
+const startDateFilter = window.Vue.ref<string>(EMPTY_DATE);
+const endDateFilter = window.Vue.ref<string>(EMPTY_DATE);
 
 const tagsSelectLoaded = window.Vue.ref(false);
 
@@ -137,7 +145,12 @@ window.Vue.onMounted(async () => {
                     <!-- TODO: filter by classes/groups [SA-20735] -->
                     <!-- <label> Filter by {{ locale.class.properPlural() }} and Groups </label> -->
 
-                    <!-- TODO: filter by start/end dates -->
+                    <date-range
+                        ref="dateRangeRef"
+                        v-model:start-date="startDateFilter"
+                        v-model:end-date="endDateFilter"
+                        id-prefix="cr-filters"
+                    />
 
                     <!-- TODO: filter by curric codes [SA-20736] -->
                     <!-- TODO: filter by tags -->

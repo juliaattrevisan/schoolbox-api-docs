@@ -3,15 +3,13 @@
  */
 
 import { defineStore } from "pinia";
+import { EMPTY_DATE, INVALID_DATE } from "@schoolboxVue/components/dateTimePicker/datePickerTypes";
 import type { FiltersFormData } from "../../../js/types/FiltersFormData";
 
 export type FilterDateRange = {
     startDate: string;
     endDate: string;
 };
-
-export const EMPTY_DATE = ""; // the value to use when the date is not set
-export const INVALID_DATE = "Invalid Date"; // the string dayjs returns when a date is not valid
 
 export const useFilterDateRangeStore = defineStore("spFilterDateRange", () => {
     const startDate = window.Vue.ref(EMPTY_DATE);
