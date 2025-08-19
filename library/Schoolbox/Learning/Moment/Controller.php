@@ -876,7 +876,7 @@ class Controller extends Base
             $files = [];
 
             if (null !== $moment->getEvidence()->first()?->getStorage()) {
-                $files[] = call_user_func($this->storageTranslator, $moment->getStorage());
+                $files[] = call_user_func($this->storageTranslator, $moment->getEvidence()->first()->getStorage());
             }
 
             /* The actual body may be too long or contain too much HTML (i.e. images/videos)
