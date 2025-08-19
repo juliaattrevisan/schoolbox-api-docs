@@ -350,12 +350,6 @@ class Controller extends Base
          */
         foreach ($momentCollection as $moment) {
             foreach ($moment->getEvidence() as $evidence) {
-                print_r(sprintf(
-                    'moment id: %s, evidence: %s %s',
-                    $moment->getId(),
-                    $evidence->getId(),
-                    $evidence->getFilename()
-                ));
                 $evidence->setMoment($moment);
             }
 
