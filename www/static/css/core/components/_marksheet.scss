@@ -95,6 +95,16 @@
             width: 200px; // when zooming out max-width stops working, this ensures it's always 200px
             overflow: hidden;
             white-space: normal;
+
+            // Correctly clip long names in the first column
+            .profile-cell-clip {
+                overflow: hidden;
+
+                a {
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                }
+            }
         }
 
         // Table cells
