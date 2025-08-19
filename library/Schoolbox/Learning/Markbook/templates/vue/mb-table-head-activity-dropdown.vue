@@ -18,6 +18,13 @@ const viewStatusLink = window.Vue.computed(() => {
     }
     return null;
 });
+
+const viewStudentParticipationLink = window.Vue.computed(() => {
+    if (props.activity._links?.studentParticipation && mbStore.data) {
+        return `${getReturnUrl(props.activity._links.studentParticipation)}&${mbStore.data.filtersQueryArgs}`;
+    }
+    return null;
+});
 </script>
 
 <template>
@@ -38,6 +45,12 @@ const viewStatusLink = window.Vue.computed(() => {
     </li>
     <li v-if="viewStatusLink" :data-test="`markbook-assessment-dropdown-${props.activity.id}-view-status`">
         <a :href="viewStatusLink" class="icon-progress">View Status</a>
+    </li>
+    <li
+        v-if="viewStudentParticipationLink"
+        :data-test="`markbook-assessment-dropdown-${props.activity.id}-student-participation`"
+    >
+        <a :href="viewStudentParticipationLink" class="icon-group">Student Participation</a>
     </li>
     <li
         v-if="props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK && viewStatusLink"
