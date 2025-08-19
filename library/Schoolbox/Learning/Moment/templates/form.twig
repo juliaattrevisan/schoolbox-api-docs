@@ -174,7 +174,7 @@
                 {% if USER.role.isStudent %}
                     {% set action = 'submit' %}
                     {% if moderationRequired and (evidence.isDraft or evidence.isRejected) %}
-                        <li><button id="submit">Submit for approval</button></li>
+                        <li><button id="submit" class="submit">Submit for approval</button></li>
                     {% elseif moderationRequired and (evidence.isSubmitted or evidence.isPublished) %}
                         {# noop:
                          # nothing for the student to do except w8 for staff to move it to the next state because:
