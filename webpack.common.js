@@ -142,8 +142,7 @@ module.exports = {
         // Learning
         learningMomentsEvidenceCohortReport:
             "./library/Schoolbox/Learning/Moment/vue/cohortReport/learningMomentsEvidenceCohortReport.ts",
-        learningMomentsEvidenceDetail:
-            "./library/Schoolbox/Learning/Moment/vue/learningMomentsEvidenceDetail.ts",
+        learningMomentsEvidenceDetail: "./library/Schoolbox/Learning/Moment/vue/learningMomentsEvidenceDetail.ts",
         userProfileFeeds: "./library/Schoolbox/Learning/vue/user-profile/userProfileFeeds.ts",
         badgeList: "./library/Schoolbox/Learning/Badge/vue/badgeList.ts",
         badgeListForm: "./library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.ts",
