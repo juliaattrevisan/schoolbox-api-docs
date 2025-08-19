@@ -200,7 +200,7 @@ function parseResponse<TResponseData>(
     /* Does the response match the expected format? For now this is just any object
      * as most of our endpoints don't return any field to indicate success or failure
      */
-    if (typeof responseJSON !== "object" || responseJSON === null || Array.isArray(responseJSON)) {
+    if (typeof responseJSON !== "object" || responseJSON === null) {
         const failureResponse: ApiBaseResponseUnknownFailure = {
             success: false,
             responseStatus: status,
