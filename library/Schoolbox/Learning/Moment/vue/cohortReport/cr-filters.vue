@@ -1,6 +1,9 @@
 <script lang="ts" setup>
+import { keysOf } from "@js/util/arrayUtils";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
+import { evidenceStatusLabels } from "@schoolboxLearningMomentEvidence/evidenceTypes";
+import type { EvidenceStatus } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 import { useCohortReportStore } from "./store/cohortReportStore";
 
 interface Props {
@@ -47,6 +50,7 @@ async function applyFilters(): Promise<void> {
 
 const studentFilter = window.Vue.ref<SearchSelectItem[]>([]);
 const authorFilter = window.Vue.ref<SearchSelectItem[]>([]);
+const stateFilter = window.Vue.ref<EvidenceStatus[]>(keysOf(evidenceStatusLabels));
 </script>
 
 <template>
@@ -82,7 +86,23 @@ const authorFilter = window.Vue.ref<SearchSelectItem[]>([]);
                     <!-- TODO: filter by start/end dates -->
                     <!-- TODO: filter by curric codes -->
                     <!-- TODO: filter by tags -->
-                    <!-- TODO: filter by state -->
+
+                    <div>
+                        <label>Filter by state</label>
+                        <div class="l-grid l-gap-s l-grid--2-col">
+                            <div v-for="(label, status) in evidenceStatusLabels" :key="status">
+                                <input
+                                    :id="`cr-filters-${status}`"
+                                    v-model="stateFilter"
+                                    type="checkbox"
+                                    :value="status"
+                                />
+                                <label :for="`cr-filters-${status}`" class="checkbox-label">
+                                    {{ label }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="l-flex-row">
                         <button
