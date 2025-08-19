@@ -1,10 +1,10 @@
 <script>
     window.onload = function() {
         // fetch('/learning/evidence/moderation/bulk/reject', {
-        fetch('/learning/evidence/moderation/bulk/publish', {
-            method: "PUT",
+        fetch('/learning/evidence/moderation/bulk/delete', {
+            method: "DELETE",
             body: JSON.stringify({
-                momentIds: [14,15,16,17],
+                momentIds: [13,14],
             }),
             headers: {
                 Accept: "application/json",

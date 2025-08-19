@@ -304,6 +304,15 @@ class Module extends BaseModule
             $viewCohortReportRule,
             Closure::fromCallable([$this, 'preloadFolder']),
         );
+
+        /* Bulk Delete a set of learning moments (typically from Cohort Overview)
+         */
+        $this->register(
+            self::METHOD_DELETE,
+            '/bulk/delete',
+            'deleteBulkDelete',
+            $viewCohortReportRule,
+        );
     }
 
 

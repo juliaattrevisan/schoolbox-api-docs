@@ -1008,4 +1008,21 @@ class Controller extends Base
 
         return $links;
     }
+
+
+    /**
+     * Bulk delete a set of $moments
+     *
+     * @return void
+     */
+    public function deleteBulkDelete(): void
+    {
+        /* Find all the learning moments to bulk delete
+         */
+        $requestBody = $this->request->getParsedBody();
+
+        $this->mapper->deleteByColumn('id', $requestBody['momentIds']);
+
+        $this->response = $this->responseEmpty(204);
+    }
 }

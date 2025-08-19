@@ -128,7 +128,7 @@ class Controller extends Base
     {
         $stack = [];
 
-        /* Find all the learning moments to bulk modify
+        /* Find all the learning moments to bulk publish
          */
         $requestBody = $this->request->getParsedBody();
 
@@ -189,7 +189,7 @@ class Controller extends Base
     {
         $stack = [];
 
-        /* Find all the learning moments to bulk modify
+        /* Find all the learning moments to bulk reject
          */
         $requestBody = $this->request->getParsedBody();
 
