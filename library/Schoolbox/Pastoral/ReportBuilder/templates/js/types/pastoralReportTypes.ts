@@ -1,3 +1,4 @@
+import type { XrangePointOptionsObject } from "highcharts";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import type { Metadata } from "@js/util/sbx/apiUtils";
 import type { PastoralRecord } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
@@ -11,11 +12,20 @@ export enum TabType {
 }
 
 /**
+ * Pastoral report tab titles
+ */
+export enum TabTitle {
+    LIST = "List",
+    STUDENT_BY_TYPE = "Student by Type/Sub-Type",
+    TYPE_BY_MONTH = "Type/Sub-Type by Month",
+}
+
+/**
  * Pastoral report tab type (from your Vue component)
  */
 export type Tab = {
     type: TabType;
-    title: string;
+    title: TabTitle;
     key: string; // Unique key for the tab, used for routing
     _links: {
         view: string; // URL to view the tab
@@ -58,6 +68,8 @@ export type Routes = {
 export enum TableHeaderType {
     USER = "User",
     RECORDS_AND_POINTS = "RecordsAndPoints",
+    TYPE_SUB_TYPE = "TypeSubtype",
+    TREND = "Trend",
 }
 
 /**
@@ -67,7 +79,7 @@ export type TableHeader = {
     key: string;
     title: string;
     subTitle?: string;
-    type: string | TableHeaderType;
+    type: TableHeaderType;
     isSortable?: boolean;
 };
 
@@ -78,9 +90,27 @@ export type TableHeader = {
 export type RecordsAndPoints = { records: number; points?: never } | { records?: never; points: number | null };
 
 /**
+ * Displays the type and subtype in the table cell
+ */
+export type TypeSubType = {
+    type: string;
+    typeId: number;
+    subtype?: string;
+    subtypeId?: number;
+};
+
+/**
+ * Displays a trend line in the table cell
+ */
+export type Trend = {
+    line: XrangePointOptionsObject[];
+    tooltips: string[];
+};
+
+/**
  * The options for a row in the Pastoral Report Table.
  */
-export type RowOptions = string | User | RecordsAndPoints;
+export type RowOptions = User | RecordsAndPoints | TypeSubType | Trend;
 
 /**
  * The expected payload for a Pastoral Report Table.
@@ -95,6 +125,17 @@ export type TablePayload = {
 };
 
 /**
+ * Params available to the tab._links.view URL.
+ */
+export enum ViewUrlParam {
+    SELECTED = "selected",
+    SORT_BY = "sortBy",
+    ORDER = "order",
+    LIMIT = "limit",
+    CURSOR = "cursor",
+}
+
+/**
  * The expected payload for a Pastoral records load.
  */
 export type RecordsPayload = {
@@ -102,4 +143,33 @@ export type RecordsPayload = {
         results: PastoralRecord[];
     };
     metadata: Metadata;
+};
+
+/**
+ * Params available to the tab._links.scope URL.
+ */
+export enum ScopeUrlParam {
+    COLUMN = "column",
+    ROW = "row",
+    CURSOR = "cursor",
+}
+
+/**
+ * Keys that can be passed to identify a specific row in the table
+ */
+export type RowKeys = {
+    "[student_id]"?: number;
+    "[type][type_id]"?: number;
+    "[type][subtype_id]"?: number;
+};
+
+/**
+ * When a cell is selected in the Pastoral Report Table,
+ * it will only contain the header when the total row is selected,
+ * or both the header and rowId when a specific row is selected.
+ */
+export type SelectedCell = {
+    header: TableHeader;
+    meta: string[];
+    rowKeys?: RowKeys;
 };

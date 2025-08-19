@@ -2,6 +2,7 @@
  * Utilities for accessing API endpoints and receiving fully typed responses
  */
 
+import { isAbortError } from "@js/util/errorUtils";
 import { parseSseEvent } from "./fetchUtils";
 
 /**
@@ -24,7 +25,8 @@ type ApiBaseResponseSuccess<TRespData> = {
 
 type ApiBaseResponseFailure = {
     success: false;
-    message: string;
+    message: string; // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/message
+    name?: string; // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/name
     data?: unknown;
 };
 
@@ -250,11 +252,15 @@ export async function apiRequest<TResponseData, TBody extends ApiRequestBodyBase
     try {
         response = await request;
     } catch (e) {
-        console.error("Failed to make API request", e, options);
+        if (!isAbortError(e)) {
+            // we only want to log non-abort errors
+            console.error("Failed to make API request", e, options);
+        }
         const failureResponse: ApiBaseResponseUnknownFailure = {
             success: false,
             responseStatus: 0,
             message: e instanceof Error ? e.message : "An unexpected error occurred",
+            name: e instanceof Error ? e.name : "Error",
             detail: e,
         };
         return failureResponse;

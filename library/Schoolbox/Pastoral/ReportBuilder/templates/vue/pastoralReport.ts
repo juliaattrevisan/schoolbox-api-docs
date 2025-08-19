@@ -1,7 +1,10 @@
+import { createPinia } from "pinia";
 import PastoralReport from "./pastoral-report.vue";
 
 window.Vue.createApp({
     components: {
         PastoralReport,
     },
-}).mount("#pastoral-report-container");
+})
+    .use(createPinia())
+    .mount("#pastoral-report-container");

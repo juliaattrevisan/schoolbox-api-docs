@@ -4,9 +4,13 @@
  * Renders a single total row with cells based on column types.
  */
 
+import { Chart } from "highcharts-vue";
 import { capitalizeFirstLetter } from "@js/util/stringUtils";
 import { TableHeaderType } from "../../js/types/pastoralReportTypes";
 import type { TableHeader, RowOptions, RecordsAndPoints } from "../../js/types/pastoralReportTypes";
+import { getChartOptions } from "./config/chartOptions";
+import { useStore } from "../store/pastoralReportStore";
+import { getMeta } from "../util/pastoralReportUtils";
 
 const props = defineProps<{
     headers: TableHeader[];
@@ -15,7 +19,7 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    cellSelect: [header: TableHeader];
+    cellSelect: [header: TableHeader, meta: string[]];
 }>();
 
 /**
@@ -23,16 +27,16 @@ const emit = defineEmits<{
  * @param header - the header of the cell that was clicked
  */
 function onCellSelected(header: TableHeader): void {
-    emit("cellSelect", header);
+    emit("cellSelect", header, getMeta(useStore().selectedTab, header));
 }
 </script>
 
 <template>
-    <tr>
+    <tr class="total-row">
         <td
-            v-for="header in props.headers"
+            v-for="(header, index) in props.headers"
             :key="header.key"
-            :class="`u-border-right ${header.key === 'user' ? 'u-sticky-left u-sticky-left--row' : ''}`"
+            :class="`u-border-right ${index === 0 ? 'u-sticky-left u-sticky-left--row' : ''}`"
         >
             <!-- The first cell is always just 'Total Records/Points' text -->
             <template v-if="header.key === props.headers[0].key">
@@ -85,6 +89,9 @@ function onCellSelected(header: TableHeader): void {
                     {{ (props.rowData[header.key] as RecordsAndPoints).points }}
                 </button>
             </template>
+            <template v-else-if="header.type == TableHeaderType.TREND">
+                <chart :options="getChartOptions(props.rowData, props.recordsOrPoints)"></chart>
+            </template>
             <template v-else>
                 {{ props.rowData[header.key] }}
             </template>
@@ -92,8 +99,17 @@ function onCellSelected(header: TableHeader): void {
     </tr>
 </template>
 
-<style scoped lang="scss">
-td {
+<style lang="scss">
+tr.total-row {
     background: var(--sbx-pr-table-total-cell-colour);
+    td.u-sticky-left {
+        background: var(--sbx-pr-table-total-cell-colour);
+        &:hover {
+            background-color: var(--sbx-pr-table-row-hover-colour);
+        }
+    }
+    .highcharts-background {
+        fill: var(--sbx-pr-table-total-cell-colour);
+    }
 }
 </style>

@@ -8,9 +8,10 @@ import type { Metadata } from "@js/util/sbx/apiUtils";
 import { usePagination } from "../composable/usePagination";
 
 const props = defineProps<{
-    endpoint: string;
+    url: string;
     metadata: Metadata;
     limit: number;
+    isLoading: boolean; // if the table is currently loading, hide the pagination controls
 }>();
 
 const emit = defineEmits<{
@@ -19,7 +20,7 @@ const emit = defineEmits<{
 }>();
 
 const { cursorIndex, hasNext, toNext, hasPrevious, toPrevious, currentCursor, hasPaginate } = usePagination(
-    toRef(() => props.endpoint),
+    toRef(() => props.url),
     props.limit,
     toRef(() => props.metadata),
 );
@@ -42,7 +43,10 @@ function onNextSelected(): void {
 </script>
 
 <template>
-    <div class="pr-table-footer l-flex-row l-flex--align-center l-flex--justify-end l-gap-m l-pad-m">
+    <div
+        v-if="!props.isLoading"
+        class="pr-table-footer l-flex-row l-flex--align-center l-flex--justify-end l-gap-m l-pad-m"
+    >
         <p class="f-no-margins">
             <b
                 >{{ cursorIndex * props.limit + 1 }}-{{

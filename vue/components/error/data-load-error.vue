@@ -5,7 +5,7 @@
 
 interface Props {
     dataTitle?: string;
-    furtherInfo?: string;
+    furtherInfo?: string | null;
 }
 const props = withDefaults(defineProps<Props>(), {
     dataTitle: "",
@@ -21,17 +21,15 @@ function onRefreshSelected(): void {
 </script>
 
 <template>
-    <section class="content">
-        <div class="alert-box alert">
-            Sorry, we are currently unable to load the {{ props.dataTitle }} data. Please
-            <a href="#refresh-page" @click.prevent="onRefreshSelected">refresh the page</a>
-            to try again and contact your support if the problem persists.
-            <em v-if="props.furtherInfo">
-                <br />
-                <strong>Further information:</strong> {{ props.furtherInfo }}
-            </em>
-        </div>
-    </section>
+    <div class="alert-box alert f-no-margins" data-test="data-load-error">
+        Sorry, we are currently unable to load the {{ props.dataTitle }} data. Please
+        <a href="#refresh-page" @click.prevent="onRefreshSelected">refresh the page</a>
+        to try again and contact your support if the problem persists.
+        <em v-if="props.furtherInfo && props.furtherInfo.length !== null">
+            <br />
+            <strong>Further information:</strong> {{ props.furtherInfo }}
+        </em>
+    </div>
 </template>
 
 <style scoped></style>

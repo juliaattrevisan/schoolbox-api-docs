@@ -199,7 +199,9 @@ async function onDeleteConfirmed(): Promise<void> {
             </dd>
         </dl>
         <loading-table v-if="isLoading" />
-        <data-load-error v-else-if="loadError" :data-title="currentCategory.name" :further-info="loadError" />
+        <section v-else-if="loadError" class="content">
+            <data-load-error :data-title="kebabToTitleCase(currentCategory.name)" :further-info="loadError" />
+        </section>
         <div v-else-if="currentTemplates.length === 0" class="empty-state-flex-centered">
             <i class="icon-textbox"></i>
             <p>No {{ kebabToTitleCase(currentCategory.name) }} templates have been created.</p>

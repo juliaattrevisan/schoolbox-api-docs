@@ -5,15 +5,17 @@
  */
 
 import { capitalizeFirstLetter } from "@js/util/stringUtils";
-import type { TableHeader, Config } from "../../js/types/pastoralReportTypes";
+import { useStore } from "../store/pastoralReportStore";
+import type { TableHeader } from "../../js/types/pastoralReportTypes";
 
 const props = defineProps<{
     headers: TableHeader[];
-    config: Config;
-    recordsAndPoints: string[];
     sortBy: string;
     order: "ASC" | "DESC";
 }>();
+
+const store = useStore();
+const recordsAndPoints = window.Vue.ref(["records", "points"]); // to toggle the tables between records and points
 
 const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
 
@@ -85,10 +87,10 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
 <template>
     <thead class="pr-table-header">
         <tr>
-            <th :colspan="hasSubTitles ? 1 : props.headers.length" class="u-border-right u-sticky-left">
-                <div v-if="props.config.pastoralPointEnabled" class="checklist">
+            <th class="u-border-right u-sticky-left">
+                <div v-if="store.config.pastoralPointEnabled" class="checklist">
                     <ul class="option-list l-flex l-gap-m f-no-margins">
-                        <li v-for="(option, index) in props.recordsAndPoints" :key="`option-${index}`">
+                        <li v-for="(option, index) in recordsAndPoints" :key="`option-${index}`">
                             <input
                                 :id="option"
                                 v-model="recordsOrPoints"
@@ -112,14 +114,19 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
                     {{ headerCell.isEmpty ? "" : headerCell.title }}
                 </th>
             </template>
+            <td v-else :colspan="props.headers.length - 2">&nbsp;</td>
         </tr>
         <tr>
             <th
-                v-for="header in props.headers"
+                v-for="(header, index) in props.headers"
                 :key="header.key"
-                :class="`u-border-right title-cell ${header.key === 'user' ? 'u-sticky-left user-cell' : ''} ${header.key === 'total' ? 'total-cell' : ''}`"
+                :class="`u-border-right title-cell ${index === 0 ? 'u-sticky-left first-column' : ''} ${header.key === 'total' ? 'total-cell' : ''}`"
             >
-                <button v-if="header.isSortable" class="title-button f-always-show" @click="onSortSelected(header.key)">
+                <button
+                    v-if="header.isSortable"
+                    class="title-button f-always-show"
+                    @click.prevent="onSortSelected(header.key)"
+                >
                     <span>
                         {{ header.subTitle ? header.subTitle : header.title }}
                         {{ header.key === "total" ? capitalizeFirstLetter(recordsOrPoints) : "" }}
@@ -151,13 +158,15 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
     }
 }
 
-.user-cell {
+.first-column {
     min-width: 250px;
+    width: 250px;
 }
 
 .total-cell {
     background: var(--sbx-pr-table-total-cell-colour);
-    min-width: 100px; // so points/records change doesn't trigger a reflow
+    min-width: 110px; // so points/records change doesn't trigger a reflow
+    width: 110px;
 }
 
 .title-button {

@@ -4,10 +4,21 @@
  * Renders a single row with cells based on column types.
  */
 
+import { Chart } from "highcharts-vue";
+import "highcharts/modules/accessibility";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { TableHeaderType } from "../../js/types/pastoralReportTypes";
-import type { TableHeader, RowOptions, RecordsAndPoints } from "../../js/types/pastoralReportTypes";
+import type {
+    TableHeader,
+    RowOptions,
+    RecordsAndPoints,
+    TypeSubType,
+    RowKeys,
+} from "../../js/types/pastoralReportTypes";
+import { getChartOptions } from "./config/chartOptions";
+import { useStore } from "../store/pastoralReportStore";
+import { getRowKeys, getMeta } from "../util/pastoralReportUtils";
 
 const props = defineProps<{
     headers: TableHeader[];
@@ -16,77 +27,47 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-    cellSelect: [header: TableHeader, rowId: number];
+    cellSelect: [header: TableHeader, rowKeys: RowKeys, meta: string[]];
 }>();
-
-/**
- * Returns the row id, currently if there's a 'user' key in rowData,
- * it'll return the user's id, otherwise it defaults to 0.
- * @returns - The id of the row, or 0 if not defined.
- */
-const rowId = (): number => {
-    // check if there's a 'user' key in rowData and return its id if it exists
-    const user = props.rowData.user as User;
-    return user?.id || 0; // Default to 0 if user is not defined
-};
 
 /**
  * Handles the cell click
  * @param header - the header of the cell that was clicked
  */
 function onCellSelected(header: TableHeader): void {
-    emit("cellSelect", header, rowId());
-}
-
-/**
- * To cast the row data to a User type
- * @param data - the row data to check
- * @returns true if the data is a User, false otherwise
- */
-function isUser(data: RowOptions): data is User {
-    return (
-        typeof data === "object" &&
-        "firstName" in data &&
-        data.firstName !== undefined &&
-        "lastName" in data &&
-        data.lastName !== undefined
-    );
+    emit("cellSelect", header, getRowKeys(props.rowData), getMeta(useStore().selectedTab, header, props.rowData));
 }
 </script>
 
 <template>
     <tr>
         <td
-            v-for="header in props.headers"
+            v-for="(header, index) in props.headers"
             :key="header.key"
-            :class="`u-border-right ${header.key === 'user' ? 'u-sticky-left u-sticky-left--row' : ''} ${header.key === 'total' ? 'total-cell' : ''}`"
+            :class="`u-border-right ${index === 0 ? 'u-sticky-left u-sticky-left--row ' : ''} ${header.key === 'user' ? 'l-pad--0' : ''} ${header.key === 'total' ? 'total-cell' : ''}`"
         >
-            <template v-if="header.type == TableHeaderType.USER && isUser(props.rowData[header.key])">
-                <div class="c-card">
-                    <div class="l-flex-row l-gap-m">
-                        <user-photo :user="props.rowData[header.key] as User" render="small" rounded-corners />
-                        <div class="l-flex-col l-flex--justify-center f-no-margins">
-                            <template v-if="isUser(props.rowData[header.key])">
-                                <a
-                                    v-if="(props.rowData[header.key] as User)._links?.profile"
-                                    :href="(props.rowData[header.key] as User)._links!.profile"
-                                    title="View Profile"
-                                >
-                                    {{ (props.rowData[header.key] as User).lastName }},
-                                    {{
-                                        (props.rowData[header.key] as User).preferredName ||
-                                        (props.rowData[header.key] as User).firstName
-                                    }}
-                                </a>
-                                <template v-else>
-                                    {{ (props.rowData[header.key] as User).lastName }},
-                                    {{
-                                        (props.rowData[header.key] as User).preferredName ||
-                                        (props.rowData[header.key] as User).firstName
-                                    }}
-                                </template>
-                            </template>
-                        </div>
+            <template v-if="header.type == TableHeaderType.USER">
+                <div class="l-flex-row l-flex--no-wrap l-gap-m">
+                    <user-photo :user="props.rowData[header.key] as User" render="small" />
+                    <div class="l-flex-col l-flex--justify-center f-no-margins">
+                        <a
+                            v-if="(props.rowData[header.key] as User)._links?.profile"
+                            :href="(props.rowData[header.key] as User)._links!.profile"
+                            title="View Profile"
+                        >
+                            {{ (props.rowData[header.key] as User).lastName }},
+                            {{
+                                (props.rowData[header.key] as User).preferredName ||
+                                (props.rowData[header.key] as User).firstName
+                            }}
+                        </a>
+                        <template v-else>
+                            {{ (props.rowData[header.key] as User).lastName }},
+                            {{
+                                (props.rowData[header.key] as User).preferredName ||
+                                (props.rowData[header.key] as User).firstName
+                            }}
+                        </template>
                     </div>
                 </div>
             </template>
@@ -115,6 +96,15 @@ function isUser(data: RowOptions): data is User {
                     {{ (props.rowData[header.key] as RecordsAndPoints).points }}
                 </button>
             </template>
+            <template v-else-if="header.type == TableHeaderType.TYPE_SUB_TYPE">
+                <b>{{ (props.rowData[header.key] as TypeSubType).type }}</b>
+                <template v-if="(props.rowData[header.key] as TypeSubType).subtype">
+                    <br /><em>{{ (props.rowData[header.key] as TypeSubType).subtype }}</em>
+                </template>
+            </template>
+            <template v-else-if="header.type == TableHeaderType.TREND">
+                <chart :options="getChartOptions(props.rowData, props.recordsOrPoints)"></chart>
+            </template>
             <template v-else>
                 {{ props.rowData[header.key] }}
             </template>
@@ -122,7 +112,15 @@ function isUser(data: RowOptions): data is User {
     </tr>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss">
+tr:hover {
+    /* to help legibility, keeping the row in focus */
+    background-color: var(--sbx-pr-table-row-hover-colour);
+    .highcharts-background {
+        fill: var(--sbx-pr-table-row-hover-colour);
+    }
+}
+
 .total-cell {
     background: var(--sbx-pr-table-total-cell-colour);
 }

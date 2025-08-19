@@ -108,12 +108,6 @@ $table-margin-bottom: rem-calc(($base-font-size - 2));
             padding: $table-row-padding;
             text-align: $default-float;
         }
-
-        &.even,
-        &.alt,
-        &:nth-of-type(even) {
-            background: $table-even-row-bg;
-        }
     }
 
     thead tr th,
@@ -503,6 +497,9 @@ table.attempts-table {
 /* make a table <td> sticky, minus 1 z-index so it scrolls underneath the <th> */
 .u-sticky-left--row {
     z-index: calc(var(--sbx-depth-ui-sticky) - 1);
+    &:hover {
+        background-color: #f4f3f3; /* to help legibility */
+    }
 }
 
 /* to accommodate an absolute positioned child */
