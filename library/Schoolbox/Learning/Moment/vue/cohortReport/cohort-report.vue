@@ -12,6 +12,7 @@ interface Props {
     endpointGetReport: string;
     endpointPutBulkReject: string;
     endpointPutBulkPublish: string;
+    endpointGetEvidenceTags: string;
 }
 
 const props = defineProps<Props>();
@@ -39,7 +40,11 @@ const isSingleColumn = window.Vue.computed(() => containerWidth.value < SINGLE_C
             class="cohort-report small-12 l-grid l-gap-xl"
             :class="{ 'cohort-report--single-column': isSingleColumn }"
         >
-            <cr-filters class="cohort-report--filters" :is-single-column="isSingleColumn" />
+            <cr-filters
+                class="cohort-report--filters"
+                :is-single-column="isSingleColumn"
+                :endpoint-get-evidence-tags="props.endpointGetEvidenceTags"
+            />
             <cr-results class="cohort-report--results" />
         </div>
     </div>

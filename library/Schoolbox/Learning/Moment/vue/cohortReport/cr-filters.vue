@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { keysOf } from "@js/util/arrayUtils";
+import { apiRequest } from "@js/util/sbx/apiUtils";
 // import locale from "@js/terminology/rosettaStone";
+import type { SelectizeSelectorItem } from "@js/vendors/selectize/selectizeSelectorTypes";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import { evidenceStatusLabels } from "@schoolboxLearningMomentEvidence/evidenceTypes";
@@ -8,11 +10,14 @@ import type { EvidenceStatus } from "@schoolboxLearningMomentEvidence/evidenceTy
 import { useCohortReportStore } from "./store/cohortReportStore";
 
 interface Props {
+    endpointGetEvidenceTags: string;
     isSingleColumn: boolean;
 }
 
 const props = defineProps<Props>();
 const crStore = useCohortReportStore();
+
+const evidenceTagsEl = window.Vue.useTemplateRef<HTMLSelectElement>("evidenceTagsRef");
 
 const isOpen = window.Vue.ref(true); // whether the filters are shown
 
@@ -52,6 +57,50 @@ async function applyFilters(): Promise<void> {
 const studentFilter = window.Vue.ref<SearchSelectItem[]>([]);
 const authorFilter = window.Vue.ref<SearchSelectItem[]>([]);
 const stateFilter = window.Vue.ref<EvidenceStatus[]>(keysOf(evidenceStatusLabels));
+const evidenceTagsFilter = window.Vue.ref<SelectizeSelectorItem["id"][]>([]);
+
+const tagsSelectLoaded = window.Vue.ref(false);
+
+/**
+ * Initialise the selectize for evidence tags
+ */
+window.Vue.onMounted(async () => {
+    // We only need to fetch this once, it won't change and there's no filtering
+    const response = await apiRequest<SelectizeSelectorItem[]>({
+        url: props.endpointGetEvidenceTags,
+        method: "GET",
+    });
+
+    if (!response.success) {
+        console.warn("Failed to load evidence tags filter", response);
+        return;
+    }
+
+    // only show the real select once we're ready to initialise it
+    tagsSelectLoaded.value = true;
+    await window.Vue.nextTick();
+    if (!evidenceTagsEl.value) {
+        throw new Error("Evidence tags select element not found");
+    }
+
+    const evidenceTags = response.data;
+    $(evidenceTagsEl.value).selectizeSelector({
+        selectize: {
+            placeholder: "Select tags",
+            preload: true,
+            persist: true,
+            hideSelected: true,
+            load: (query: string, callback: (results: SelectizeSelectorItem[]) => void): void => {
+                callback(evidenceTags);
+            },
+            onChange(value: string[]): void {
+                evidenceTagsFilter.value = value.map((v) => parseInt(v, 10));
+            },
+        },
+        value: [],
+        multiple: true,
+    });
+});
 </script>
 
 <template>
@@ -91,6 +140,18 @@ const stateFilter = window.Vue.ref<EvidenceStatus[]>(keysOf(evidenceStatusLabels
 
                     <!-- TODO: filter by curric codes [SA-20736] -->
                     <!-- TODO: filter by tags -->
+
+                    <label class="cr-selectize-label">
+                        Filter by tags
+                        <input
+                            v-if="!tagsSelectLoaded"
+                            type="text"
+                            class="search-input f-no-margins"
+                            placeholder="Select tags"
+                            disabled
+                        />
+                        <select v-else ref="evidenceTagsRef" name="tags[]" multiple></select>
+                    </label>
 
                     <div>
                         <label>Filter by state</label>
@@ -142,5 +203,10 @@ const stateFilter = window.Vue.ref<EvidenceStatus[]>(keysOf(evidenceStatusLabels
         padding: var(--spacing-xs) 0;
         text-align: left;
     }
+}
+
+// We're controlling margins here, so override it from the selectize plugin styles
+.cr-selectize-label > :deep(.selectize-control) {
+    margin-bottom: 0;
 }
 </style>
