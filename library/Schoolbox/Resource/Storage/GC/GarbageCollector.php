@@ -129,12 +129,19 @@ class GarbageCollector
 
         $this->log->info('Starting with ' . count($this->list) . ' files');
 
-        // iterate the checks, and retain the intersection each time
-        $staleList = $this->list;
-        foreach ($this->checks as $check) {
-            $this->log->notice('Applying ' . get_class($check), ['char' => '+']);
-            $staleList = $check->getStale($staleList);
-            $this->log->info('Retained ' . count($staleList) . ' stale');
+        // Split stale list into batches before checking
+        $batches = array_chunk($this->list, $this->batchSize);
+        $staleList = [];
+        $i = 1;
+        foreach ($batches as $batch) {
+            $this->log->notice(sprintf('Processing batch %d/%d', $i++, count($batches)));
+            // iterate the checks, and retain the intersection each time
+            foreach ($this->checks as $check) {
+                $this->log->info('Applying ' . get_class($check));
+                $batch = $check->getStale($batch);
+                $this->log->info('Retained ' . count($batch) . ' stale');
+            }
+            $staleList = array_merge($staleList, $batch);
         }
 
         return $staleList;
