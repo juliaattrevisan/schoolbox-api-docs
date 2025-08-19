@@ -87,8 +87,12 @@ Usage: gc-storage.php [-p] [-vvv] [-n{limit}]
     -h, --help:             Print this help text and exit
     -p:                     perform: *without* this flag, GC will only do a dry run
     -v[v[v]]:               verbosity: how much activity will be logged
-    -n={limit}:             the number of storage records to check, in ascending order of `last_accessed` defaults to
-                            1000.
+    -n={limit}:             the number of storage records to check, in ascending order of `last_accessed`.
+                            Defaults to 1000.
+    --max-time={max-time}:  process hashes in batches until the script has been running for this many seconds.
+                            Defaults to no max time.
+    --batch={batch-size}:   process this many hashes per batch.
+                            Defaults to 10.
     -t={threshold}:         threshold: do not attempt to garbage collect storage records last checked more recently than
                             this date threshold, defaults to 2 months ago.
                             If provided, must be supplied as one of:
