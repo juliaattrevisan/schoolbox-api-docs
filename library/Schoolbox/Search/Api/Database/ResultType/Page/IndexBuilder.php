@@ -204,8 +204,9 @@ class IndexBuilder extends BaseBuilder
             JOIN folder f ON si.identifier = f.id
             ' . $this->getJoinsFromFolderForTypeExpression() . '
             WHERE si.type like "' . Hydrator::BASE_TYPE . '%"
-            AND si.type <> ' . $this->buildTypeExpression() . '
+            HAVING typeFromIndex <> typeFromFolder
         ';
+
         $params = [];
         if ($fromDate) {
             $queryString .= ' AND f.updated_at >= :fromDate';
