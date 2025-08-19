@@ -8,12 +8,12 @@ import StorageObject from "@schoolboxVue/components/storage-object";
 import CommentThread from "./comment-thread";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import Toast from "@schoolboxVue/components/toast";
-import AwardDetailModal from "../../../Badge/Award/vue/award-detail-modal";
-import BadgeImage from "../../../Badge/vue/badge-image";
+import AwardDetailModal from "../../Badge/Award/vue/award-detail-modal";
+import BadgeImage from "../../Badge/vue/badge-image";
 import CodesList from "@schoolboxCurriculum/vue/codes-list";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details";
 import foundationMixin from "@schoolboxVue/components/foundation-mixin";
-import userProfileConstants from "../../../vue/user-profile/constants";
+import userProfileConstants from "../../vue/user-profile/constants";
 import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
 import { EvidenceStatus, evidenceStatusLabels } from "./evidenceTypes";
 
@@ -664,7 +664,7 @@ export default {
                         </h2>
                         <ul class="information-list">
                             <li v-for="(evidence, index) in evidenceGroup.evidence" class="feed-item" :key="index">
-                                <template v-if="evidence.discriminator === 'evidence'">
+                                <template v-if="evidence.discriminator === 'moment'">
                                     <!-- This evidence isn't necessarily editable -->
                                     <div
                                         :class="{

@@ -1,4 +1,4 @@
-import ActivityFeed from "../../Moment/Evidence/vue/activity-feed.vue";
+import ActivityFeed from "../../Moment/vue/activity-feed.vue";
 import GoalFeed from "../../Badge/Award/vue/goal-feed.vue";
 import AchievementFeed from "../../Badge/Award/vue/achievement-feed.vue";
 

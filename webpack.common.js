@@ -143,14 +143,14 @@ module.exports = {
         learningMomentsEvidenceCohortReport:
             "./library/Schoolbox/Learning/Moment/Evidence/vue/cohortReport/learningMomentsEvidenceCohortReport.ts",
         learningMomentsEvidenceDetail:
-            "./library/Schoolbox/Learning/Moment/Evidence/vue/learningMomentsEvidenceDetail.ts",
+            "./library/Schoolbox/Learning/Moment/vue/learningMomentsEvidenceDetail.ts",
         userProfileFeeds: "./library/Schoolbox/Learning/vue/user-profile/userProfileFeeds.ts",
         badgeList: "./library/Schoolbox/Learning/Badge/vue/badgeList.ts",
         badgeListForm: "./library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.ts",
         badgeReport: "./library/Schoolbox/Learning/Badge/Award/vue/badgeReport.ts",
         awardWithEvidenceBadgeList: "./library/Schoolbox/Learning/Badge/Award/vue/awardWithEvidenceBadgeList.ts",
-        evidenceMediaRecording: "./library/Schoolbox/Learning/Moment/Evidence/vue/evidenceMediaRecording.ts",
-        checkShareWorkButtons: "./library/Schoolbox/Learning/Moment/Evidence/templates/js/checkShareWorkButtons.js",
+        evidenceMediaRecording: "./library/Schoolbox/Learning/Moment/vue/evidenceMediaRecording.ts",
+        checkShareWorkButtons: "./library/Schoolbox/Learning/Moment/templates/js/checkShareWorkButtons.js",
         similarityReport:
             "./library/Schoolbox/Learning/Assessment/templates/dueWork/vue/similarityReport/similarityReport.ts",
         linkedActivities:
@@ -389,7 +389,7 @@ module.exports = {
             "@schoolboxCommsNews": path.resolve(__dirname, "library/Schoolbox/Comms/News"),
             "@schoolboxLearningMomentEvidence": path.resolve(
                 __dirname,
-                "library/Schoolbox/Learning/Moment/Evidence/vue",
+                "library/Schoolbox/Learning/Moment/vue",
             ),
             "@schoolboxCurriculum": path.resolve(__dirname, "library/Schoolbox/Curriculum/templates/"),
             "@schoolboxBadge": path.resolve(__dirname, "library/Schoolbox/Learning/Badge/"),

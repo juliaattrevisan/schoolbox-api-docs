@@ -66,7 +66,7 @@ class Cursor implements ICursor
     /**
      * This is the set of feed item types that we expect to receive from the client.
      *
-     * NOTE: There is a matching array in library/Schoolbox/Learning/Moment/Evidence/vue/feed.vue.
+     * NOTE: There is a matching array in library/Schoolbox/Learning/Moment/vue/feed.vue.
      *       If any change is made to this array, a similar change should be made to that array.
      */
     private const FILTER_NAMES = ['goals', 'learningMoments', 'achievements', 'feedback'];
