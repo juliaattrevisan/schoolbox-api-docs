@@ -16,6 +16,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentDataModel;
+use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -166,11 +167,13 @@ class ParticipationHelper
                     $keepExistingParticipation = true;
                 }
 
-                $customisation = $this->mapperProxy->findAllCustomisedAssessment($this->mapperProxy->translateToDomainModel($this->assessment));
-                $test = $customisation->first()?->getParticipantIfExtant($this->userMapper->createModel($userId));
-                if (null !== $test) {
-                    $test->setExcludedAt(\Alaress_Date_Format::now());
-                    $participantMapper->save($test);
+                $customisedPlan = $this->getCustomisedParticipation($userId);
+                /* If the student has a customised plan, exclude them from the customised plan after adding back to
+                 * the original assessment plan.
+                 */
+                if (null !== $customisedPlan) {
+                    $customisedPlan->setExcludedAt(\Alaress_Date_Format::now());
+                    $participantMapper->save($customisedPlan);
                 }
             }
 
@@ -196,5 +199,19 @@ class ParticipationHelper
     {
         $planMapper = $this->participantDataSource->getPlanMapper();
         return $planMapper->findOneByColumnList(['assessment_id' => $this->assessment->getId(), 'is_dynamic' => true]);
+    }
+
+    /**
+     * Find the participation of the student in the customised assessment.
+     *
+     * @param int $userId
+     * @return Participant|null
+     * @throws MapperException
+     */
+    private function getCustomisedParticipation(int $userId): ?Participant
+    {
+        $customisation = $this->mapperProxy->findAllCustomisedAssessment($this->mapperProxy->translateToDomainModel($this->assessment));
+        $customisedPlan = $customisation->first()?->getParticipantIfExtant($this->userMapper->createModel($userId));
+        return $customisedPlan;
     }
 }
