@@ -28,6 +28,43 @@ const playerEl = window.Vue.useTemplateRef<HTMLElement>("playerRef");
 
 const player = window.Vue.ref<MediaElementPlayer | null>(null);
 
+/**
+ * This allows deferring the player initialisation until the video is ready
+ *
+ * When initialising the MediaElement player for a video and props.maintainDims is true,
+ * the element won't have a width/height until the poster image is loaded, so to avoid
+ * MediaElement creating an invisible player we need to wait for the poster first
+ * @param el - The video element to initialise the player on
+ * @param posterLoaded whether we attempted to load the poster image
+ */
+function initialiseVideoPlayer(el: HTMLElement, posterLoaded: boolean = false): void {
+    if (props.maintainDims && el.parentElement) {
+        if (el.offsetWidth === 0) {
+            // the poster hasn't loaded yet, if we were to initialise the player now
+            // then it would be invisible... so wait for the poster to exist and try again
+            const img = el.getAttribute("poster");
+            if (img && !posterLoaded) {
+                const imgEl = new Image();
+                imgEl.onload = (): void => {
+                    // now try again, if it still doesn't have dimensions then skips to below
+                    initialiseVideoPlayer(el, true);
+                };
+                imgEl.src = img;
+                return;
+            }
+
+            // no poster? as a last resort just set the parent to be 100% width/height so it at least renders
+            el.parentElement.style.height = "100%";
+        } else {
+            // found valid dimensions! set the parent to match it so it doesn't resize
+            el.parentElement.style.height = `${el.offsetHeight}px`;
+            el.parentElement.style.width = `${el.offsetWidth}px`;
+        }
+    }
+
+    player.value = new window.MediaElementPlayer(el, getConfigForVideo());
+}
+
 window.Vue.onMounted(() => {
     if (playerEl.value === null) {
         // shouldn't get here, console.error rather than throw to avoid breaking other functionality
@@ -57,19 +94,7 @@ window.Vue.onMounted(() => {
                         break;
 
                     case ResourceType.VIDEO:
-                        if (props.maintainDims && playerEl.value.parentElement) {
-                            if (playerEl.value.offsetWidth === 0) {
-                                // I can't find a better way to deal with the state where the video doesn't
-                                // have a width yet, I guess we could wait for it to load?
-                                // Anyways this ensures that it doesn't end up as 0 and at least has full width instead
-                                playerEl.value.parentElement.style.width = "100%";
-                            } else {
-                                playerEl.value.parentElement.style.height = `${playerEl.value.offsetHeight}px`;
-                                playerEl.value.parentElement.style.width = `${playerEl.value.offsetWidth}px`;
-                            }
-                        }
-
-                        player.value = new window.MediaElementPlayer(playerEl.value, getConfigForVideo());
+                        initialiseVideoPlayer(playerEl.value);
                         break;
 
                     default:
