@@ -127,14 +127,21 @@ class GarbageCollector
         }
         $this->list = $this->mapper->findScalarByPredicates('hash', $pb, $queryOptions);
 
-        $this->log->info('Starting with ' . count($this->list) . ' files');
+        $this->log->notice('Starting with ' . count($this->list) . ' hashes');
 
         // Split stale list into batches before checking
-        $batches = array_chunk($this->list, $this->batchSize);
+        $batches   = array_chunk($this->list, $this->batchSize);
+        $i         = 1;
         $staleList = [];
-        $i = 1;
         foreach ($batches as $batch) {
-            $this->log->notice(sprintf('Processing batch %d/%d', $i++, count($batches)));
+            $this->log->notice(
+                sprintf(
+                    'Processing %d hashes (batch %d/%d)',
+                    count($batch),
+                    $i++,
+                    count($batches),
+                ),
+            );
             // iterate the checks, and retain the intersection each time
             foreach ($this->checks as $check) {
                 $this->log->info('Applying ' . get_class($check));
@@ -161,7 +168,7 @@ class GarbageCollector
         $this->preserve(array_diff($this->list, $purge));
 
         if (!count($purge)) {
-            $this->log->notice("No files to delete", ['char' => '-']);
+            $this->log->notice("No hashes to delete", ['char' => '-']);
             return 0;
         }
 
@@ -170,9 +177,9 @@ class GarbageCollector
             try {
                 $this->removeFromStorage($hash);
             } catch (MapperException $e) {
-                $this->log->error("Could not delete storage file '$hash' due to a database issue: " . $e->getMessage());
+                $this->log->error("Could not delete storage hash '$hash' due to a database issue: " . $e->getMessage());
             } catch (FlysystemException $e) {
-                $this->log->error("Could not delete storage file '$hash' due to filesystem issue: " . $e->getMessage());
+                $this->log->error("Could not delete storage hash '$hash' due to filesystem issue: " . $e->getMessage());
             }
         }
 
