@@ -820,12 +820,12 @@ class Controller extends Base
      *
      * GET the following struct to this endpoint:
      * [
-     *     userIds: 1,2,3,4
-     *     authorIds: 13,14,15,16
-     *     tagIds: 7,8,9
-     *     states:draft,submitted,published,
-     *     from: 2025-01-02
-     *     to: 2025-08-11
+     *     userIds: [1,2,3,4],
+     *     authorIds: [13,14,15,16],
+     *     tagIds: [7,8,9],
+     *     states: ["draft","submitted","published"],
+     *     from: "2025-01-02",
+     *     to: "2025-08-11"
      * ]
      *
      * @api GET /learning/evidence/cohort/{folderId}
@@ -837,16 +837,21 @@ class Controller extends Base
      */
     public function getCohortReportPayload(Folder\Model $folder): void
     {
+        $userIds = $this->requestQuery->get('userIds') ?? [];
+        $authorIds = $this->requestQuery->get('authorIds') ?? [];
+        $tagIds = $this->requestQuery->get('tagIds') ?? [];
+        $states = $this->requestQuery->get('states') ?? [];
+
         $cursor = new CohortReport\Cursor(
             $this->mapper,
             $this->userAccessMapper,
             $folder,
-            $this->requestQuery->get('userIds') ?? '',
+            is_array($userIds) ? $userIds : explode(',', $userIds),
             $this->requestQuery->get('from') ?? null,
             $this->requestQuery->get('to') ?? null,
-            $this->requestQuery->get('authorIds') ?? '',
-            $this->requestQuery->get('tagIds') ?? '',
-            $this->requestQuery->get('states') ?? '',
+            is_array($authorIds) ? $authorIds : explode(',', $authorIds),
+            is_array($tagIds) ? $tagIds : explode(',', $tagIds),
+            is_array($states) ? $states : explode(',', $states),
         );
 
         $results = $cursor->retrieveResults($this->requestQuery->get('cursor') ?? null);
