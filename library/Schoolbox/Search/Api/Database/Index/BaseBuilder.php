@@ -41,12 +41,12 @@ abstract class BaseBuilder implements IBuilder
     /**
      * Strategy for adding an index from HTML content.
      */
-    protected const INDEX_STRATEGY_HTML = 'html';
+    public const INDEX_STRATEGY_HTML = 'html';
 
     /**
      * Strategy for adding an index from standard text content.
      */
-    protected const INDEX_STRATEGY_TEXT = 'text';
+    public const INDEX_STRATEGY_TEXT = 'text';
 
     /**
      * Maximum length of the fulltext index.
