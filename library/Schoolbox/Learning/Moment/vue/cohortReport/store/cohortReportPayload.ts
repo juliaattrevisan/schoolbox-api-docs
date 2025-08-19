@@ -35,7 +35,7 @@ export type CohortReportEntry = {
     };
 };
 
-type CohortReportApiPayload = {
+export type CohortReportApiPayload = {
     cursor?: string | null;
     userIds?: number[];
     from?: string;

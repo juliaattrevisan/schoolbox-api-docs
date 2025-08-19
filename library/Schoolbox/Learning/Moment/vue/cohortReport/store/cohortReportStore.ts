@@ -6,12 +6,9 @@ import {
 } from "@schoolboxLearningMomentEvidence/learningMomentModerationPayload";
 import type { LearningMoment } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 import { getCohortReport } from "./cohortReportPayload";
-import type { CohortReportEntry } from "./cohortReportPayload";
-import { useCohortReportFiltersStore } from "./cohortReportFiltersStore";
+import type { CohortReportEntry, CohortReportApiPayload } from "./cohortReportPayload";
 
 export const useCohortReportStore = defineStore("cohortReport", () => {
-    const crfStore = useCohortReportFiltersStore();
-
     let getCohortReportEndpoint: string | null = null; // the endpoint to fetch the cohort report data
     let putBulkRejectEndpoint: string | null = null; // the endpoint to bulk reject learning moments
     let putBulkPublishEndpoint: string | null = null; // the endpoint to bulk publish learning moments
@@ -21,6 +18,12 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
 
     const hasSearched = window.Vue.ref<boolean>(false);
     const nextCursor = window.Vue.ref<string | null>(null);
+
+    /**
+     * The filters that were used for the last search so that we can keep loading more results
+     * even if the user changes the filters without clicking "Apply filters" again
+     */
+    const activeFilters = window.Vue.ref<Omit<CohortReportApiPayload, "cursor">>({});
 
     const isLoading = window.Vue.ref(true);
     const loadError = window.Vue.ref<string | null>(null);
@@ -37,6 +40,7 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         selectedResults.value = {};
         hasSearched.value = false;
         nextCursor.value = null;
+        activeFilters.value = {};
         isLoading.value = true;
         loadError.value = null;
     }
@@ -56,12 +60,7 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         isLoading.value = true;
         const response = await getCohortReport(getCohortReportEndpoint, {
             cursor: nextCursor.value,
-            userIds: Object.values(crfStore.studentFilter).map((s) => s.id),
-            authorIds: Object.values(crfStore.authorFilter).map((a) => a.id),
-            tagIds: crfStore.evidenceTagsFilter,
-            states: crfStore.stateFilter,
-            from: crfStore.startDateFilter ? window.dayjs(crfStore.startDateFilter).format("YYYY-MM-DD") : undefined,
-            to: crfStore.endDateFilter ? window.dayjs(crfStore.endDateFilter).format("YYYY-MM-DD") : undefined,
+            ...activeFilters.value,
         });
         isLoading.value = false;
         if (response.success === false) {
@@ -279,6 +278,7 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         isLoading,
         clearData,
         nextCursor,
+        activeFilters,
         loadNextPage,
         loadError,
         isEntrySelected,

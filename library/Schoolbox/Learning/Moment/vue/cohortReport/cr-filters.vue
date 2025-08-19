@@ -5,7 +5,6 @@ import type { SelectizeSelectorItem } from "@js/vendors/selectize/selectizeSelec
 import DateRange from "@schoolboxVue/components/dateTimePicker/date-range.vue";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import { evidenceStatusLabels } from "@schoolboxLearningMomentEvidence/evidenceTypes";
-import { useCohortReportStore } from "./store/cohortReportStore";
 import { useCohortReportFiltersStore } from "./store/cohortReportFiltersStore";
 
 interface Props {
@@ -14,7 +13,6 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const crStore = useCohortReportStore();
 const crfStore = useCohortReportFiltersStore();
 
 const dateRangeEl = window.Vue.useTemplateRef<InstanceType<typeof DateRange>>("dateRangeRef");
@@ -53,9 +51,7 @@ async function applyFilters(): Promise<void> {
     // clear the invalid date inputs (if any) to correctly reflect what filters are being applied
     dateRangeEl.value?.clearInvalidDates();
 
-    // clear existing data in the store as it's now invalid, then load the first page
-    crStore.clearData();
-    await crStore.loadNextPage();
+    await crfStore.applyFilters();
 }
 
 const tagsSelectLoaded = window.Vue.ref(false);

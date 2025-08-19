@@ -34,8 +34,7 @@ const resultGroups = window.Vue.computed(() => {
  */
 async function onResetFilters(): Promise<void> {
     crfStore.resetFilters();
-    crStore.clearData();
-    await crStore.loadNextPage();
+    await crfStore.applyFilters();
 }
 </script>
 
