@@ -55,8 +55,7 @@ class CharacterField extends Base
      */
     private const SELECT_SEARCH_DATA_LENGTH_QUERY = <<<SQL
         SELECT
-            t.TABLE_ROWS             AS `row_count`,
-            c.CHARACTER_OCTET_LENGTH AS `column_size`
+            t.TABLE_ROWS * c.CHARACTER_OCTET_LENGTH AS `search_data_length`
         FROM information_schema.TABLES t
         INNER JOIN information_schema.COLUMNS c
             ON  t.TABLE_SCHEMA = c.TABLE_SCHEMA
@@ -101,7 +100,7 @@ class CharacterField extends Base
                         'column' => $column,
                     ]);
                     $row = $query->fetch();
-                    $data['extra']['search_data_length'] += ($row['row_count'] * $row['column_size']);
+                    $data['extra']['search_data_length'] += $row['search_data_length'];
                 }
             }
         }
