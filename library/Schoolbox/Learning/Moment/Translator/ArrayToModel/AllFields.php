@@ -146,56 +146,53 @@ class AllFields extends Base
         // * an extant storage hash
         // * a triplet passed from a resource attacher, to be transformed into a
         //   storage hash by the collector factory
-        if (array_key_exists('file', $json)) {
-            if (!isset($json['file']) || '' === $json['file']) {
-                // If the file is not set, then we should set the storage and filename to null
-                $model
-                    ->setFilename(null)
-                    ->setStorage(null);
-            } else {
-                $file = $this->collectorFactory->build([$json['file']])->getFirst();
-                if ($file) {
-                    $evidence = new \Schoolbox\Learning\Moment\Evidence\Model();
-
-                    $evidence->setStorage($file)
-                        ->setFilename($file->getBasename());
-
-                    if (null === $model->getEvidence()) {
-                        $model->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class)));
-                    }
-
-                    $model->getEvidence()->add($evidence);
-                }
-            }
-        }
-
         if (array_key_exists('evidence', $json)) {
             if (isset($json['evidence'])) {
                 if (is_array($json['evidence'])) {
                     foreach ($json['evidence'] as $evidenceStruct) {
-                        /* No hash? No trabajo
-                         */
-                        if (!array_key_exists('hash', $evidenceStruct)) {
-                            continue;
+                        // File upload may be either:
+                        // * an extant storage hash
+                        // * a triplet passed from a resource attacher, to be transformed into a
+                        //   storage hash by the collector factory
+                        if (isset($evidenceStruct['file']) || '' !== $evidenceStruct['file']) {
+                            $file = $this->collectorFactory->build([$evidenceStruct['file']])->getFirst();
+                            if ($file) {
+                                $evidence = new \Schoolbox\Learning\Moment\Evidence\Model();
+
+                                $evidence->setStorage($file)
+                                    ->setFilename($file->getBasename());
+
+                                if (null === $model->getEvidence()) {
+                                    $model->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class)));
+                                }
+
+                                $model->getEvidence()->add($evidence);
+                            }
+                        } else {
+                            /* No hash? No trabajo
+                             */
+                            if (!array_key_exists('hash', $evidenceStruct)) {
+                                continue;
+                            }
+
+                            $evidence = new \Schoolbox\Learning\Moment\Evidence\Model();
+
+                            if (array_key_exists('filename', $evidenceStruct)) {
+                                $evidence->setFilename($evidenceStruct['filename']);
+                            }
+
+                            if (isset($evidenceStruct['hash'])) {
+                                $storage = (new StorageModel())->setHash($evidenceStruct['hash']);
+
+                                $evidence->setStorage($storage);
+                            }
+
+                            if (null === $model->getEvidence()) {
+                                $model->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class)));
+                            }
+
+                            $model->getEvidence()->add($evidence);
                         }
-
-                        $evidence = new \Schoolbox\Learning\Moment\Evidence\Model();
-
-                        if (array_key_exists('filename', $evidenceStruct)) {
-                            $evidence->setFilename($evidenceStruct['filename']);
-                        }
-
-                        if (isset($evidenceStruct['hash'])) {
-                            $storage = (new StorageModel())->setHash($evidenceStruct['hash']);
-
-                            $evidence->setStorage($storage);
-                        }
-
-                        if (null === $model->getEvidence()) {
-                            $model->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class)));
-                        }
-
-                        $model->getEvidence()->add($evidence);
                     }
                 }
             }
