@@ -12,13 +12,19 @@ interface Props {
     endpointGetReport: string;
     endpointPutBulkReject: string;
     endpointPutBulkPublish: string;
+    endpointDeleteBulkEvidence: string;
 }
 
 const props = defineProps<Props>();
 const crStore = useCohortReportStore();
 
 window.Vue.onMounted(async () => {
-    await crStore.init(props.endpointGetReport, props.endpointPutBulkReject, props.endpointPutBulkPublish);
+    await crStore.init(
+        props.endpointGetReport,
+        props.endpointPutBulkReject,
+        props.endpointPutBulkPublish,
+        props.endpointDeleteBulkEvidence,
+    );
 });
 
 const cohortReportEl = window.Vue.useTemplateRef<HTMLDivElement>("cohortReportRef");
