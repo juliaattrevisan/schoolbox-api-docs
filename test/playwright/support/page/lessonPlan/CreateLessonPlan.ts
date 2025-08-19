@@ -13,6 +13,8 @@ export default class CreateLessonPlan {
 
     static readonly DATA_TEST_LINK_ACTIVITY_BUTTON = "lesson-plan-link-activities-link";
 
+    static readonly LINK_ACTIVITY_BUTTON = "a.button.expand.icon-link";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -51,16 +53,11 @@ export default class CreateLessonPlan {
 
     /**
      * Ticks an assessment checkbox
-     * @param assessmentTitle - The assessment title to tick
      * @param checkboxNumber - The checkbox number to tick
      */
-    async tickAssessmentCheckbox(assessmentTitle: string, checkboxNumber: number): Promise<void> {
+    async tickAssessmentCheckbox(checkboxNumber: string): Promise<void> {
         // await this.page.locator(`label[for=chk-assessment-${checkboxNumber}]`).click();
-        await this.page
-            .getByRole("list")
-            .filter({ hasText: `${assessmentTitle}` })
-            .locator(`#chk-assessment-${checkboxNumber}`)
-            .click();
+        await this.page.locator(`label.checkbox-label[for=chk-assessment-${checkboxNumber}]`).click();
     }
 
     /**
@@ -69,5 +66,12 @@ export default class CreateLessonPlan {
      */
     async clickLinkActivities(): Promise<void> {
         await this.page.locator(CreateLessonPlan.DATA_TEST_LINK_ACTIVITY_BUTTON).click();
+    }
+
+    /**
+     * Clicks the link activity button on the modal
+     */
+    async clickLinkActivityButton(): Promise<void> {
+        await this.page.locator(CreateLessonPlan.LINK_ACTIVITY_BUTTON).click();
     }
 }

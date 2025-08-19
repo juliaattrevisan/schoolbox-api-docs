@@ -40,7 +40,7 @@ function toggleActivitySelection(): void {
                 :disabled="props.activity.id === props.sourceId"
                 @change="toggleActivitySelection()"
             />
-            <label :for="'chk-assessment-' + props.activity.id" class="checkbox-label"></label>
+            <label :for="'chk-assessment-' + props.activity.id" class="checkbox-label">&nbsp;</label>
         </div>
         <div class="small-12 compact card wrap-down">
             <span :class="'icon-' + kebabCase(props.activity.assessmentType)"></span>
