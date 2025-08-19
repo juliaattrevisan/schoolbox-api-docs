@@ -68,9 +68,12 @@ class AllFieldsTest extends TestCase
                 ],
                 'filename' => 'test.gif',
             ],
-            (new \Schoolbox\Learning\Moment\Evidence\Model())
-                ->setStorage((new Storage())->setHash('1234567890123456789012345678901234567890'))
-                ->setFilename('test.gif'),
+            (new Model())
+                ->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class))->add(
+                    (new \Schoolbox\Learning\Moment\Evidence\Model())
+                        ->setStorage((new Storage())->setHash('1234567890123456789012345678901234567890'))
+                        ->setFilename('test.gif')
+                ))
         ];
 
         yield 'users' => [
@@ -100,10 +103,13 @@ class AllFieldsTest extends TestCase
             [
                 'file' => 'file:1234567890123456789012345678901234567890:test.gif',
             ],
-            (new \Schoolbox\Learning\Moment\Evidence\Model())
-                ->setStorage($storage)
-                ->setFilename('test.gif'),
-            $storage,
+            (new Model())
+                ->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class))->add(
+                    (new \Schoolbox\Learning\Moment\Evidence\Model())
+                        ->setStorage($storage)
+                        ->setFilename('test.gif')
+                )),
+            $storage
         ];
     }
 

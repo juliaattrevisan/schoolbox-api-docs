@@ -61,7 +61,8 @@ class AllFields extends Base
     public function __invoke(array $json, ?object $model = null): object
     {
         if (!isset($model)) {
-            $model = new \Schoolbox\Learning\Moment\Model();
+            $model = (new \Schoolbox\Learning\Moment\Model())
+                ->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class)));
         }
 
 
@@ -155,13 +156,15 @@ class AllFields extends Base
             } else {
                 $file = $this->collectorFactory->build([$json['file']])->getFirst();
                 if ($file) {
-                    $model
-                        ->setFilename($file->getBasename())
-                        ->setStorage($file);
+                    $evidence = new \Schoolbox\Learning\Moment\Evidence\Model();
+
+                    $evidence->setStorage($file)
+                        ->setFilename($file->getBasename());
+
+                    $model->getEvidence()->add($evidence);
                 }
             }
         }
-
 
         if (array_key_exists('storage', $json)) {
             if (isset($json['storage'])) {
@@ -169,19 +172,23 @@ class AllFields extends Base
                     is_array($json['storage'])
                     && array_key_exists('hash', $json['storage'])
                 ) {
-                    if (!isset($json['storage']['hash'])) {
-                        $model->setStorage(null);
-                    } else {
-                        $model->setStorage((new StorageModel())->setHash($json['storage']['hash']));
+                    $evidence = new \Schoolbox\Learning\Moment\Evidence\Model();
+
+                    if (array_key_exists('filename', $json)) {
+                        $evidence->setFilename($json['filename']);
                     }
+
+                    if (isset($json['storage']['hash'])) {
+                        $storage = (new StorageModel())->setHash($json['storage']['hash']);
+
+                        $evidence->setStorage($storage);
+                    }
+
+                    $model->getEvidence()->add($evidence);
                 }
-            } else {
-                $model->setStorage(null);
             }
         }
-        if (array_key_exists('filename', $json)) {
-            $model->setFilename($json['filename']);
-        }
+
 
         // Set curriculum nodes
         if (array_key_exists('curriculumNodes', $json)) {
