@@ -85,13 +85,17 @@ abstract class Base implements Check
                 $newStale   = [];
                 $this->logger->info(
                     sprintf(
-                        '. searching columns (%s)... (%d hashes, max search length: %s)',
+                        '. searching columns (%s)...',
                         implode(',', $columns),
-                        $staleCount,
+                    ),
+                );
+                $this->logger->info(
+                    sprintf(
+                        '. max search space: %s',
                         isset($columnData['extra']['search_data_length'])
                             ? Alaress_Byte_Format::bytesToString($columnData['extra']['search_data_length'], renderIec: true)
                             : 'unknown',
-                    )
+                    ),
                 );
                 foreach ($stale as $hash) {
                     $query->execute(['hash' => $hash]);
