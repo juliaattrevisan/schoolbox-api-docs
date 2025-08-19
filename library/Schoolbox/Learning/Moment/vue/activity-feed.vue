@@ -98,7 +98,6 @@ export default {
         config: () => window.learningEvidenceFeedConfig,
         dateDisplayFormats: () => window.dateDisplayFormats,
         groupedEvidence() {
-          console.log(this.groupFeedResults(this.data))
             return this.groupFeedResults(this.data);
         },
         currentCount() {
