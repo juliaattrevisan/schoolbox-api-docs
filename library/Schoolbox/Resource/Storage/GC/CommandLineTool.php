@@ -199,10 +199,8 @@ HELP;
             ->addCheck(new Check\TextField($db, $logger, SQL_db, $mapper->getTable()))
         ;
 
-        $deleted = $gc->purge();
-
-        // if nothing was deleted, consider that an error case?
-        exit($deleted ? CliKernelAbstract::EXIT_STATUS_OK : CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
+        $gc->purge();
+        exit(CliKernelAbstract::EXIT_STATUS_OK);
     }
 
     /**
