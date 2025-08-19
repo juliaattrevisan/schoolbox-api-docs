@@ -9,7 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\GC\Check;
 
+use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Statement\IStatement;
+use Psr\Log\LoggerInterface;
 
 /**
  * Check for whether the storage hash is contained within a prescribed set of
@@ -49,12 +51,61 @@ class CharacterField extends Base
     ];
 
     /**
+     * Query for fetching the length of the data which is searched.
+     */
+    private const SELECT_SEARCH_DATA_LENGTH_QUERY = <<<SQL
+        SELECT
+            t.TABLE_ROWS             AS `row_count`,
+            c.CHARACTER_OCTET_LENGTH AS `column_size`
+        FROM information_schema.TABLES t
+        INNER JOIN information_schema.COLUMNS c
+            ON  t.TABLE_SCHEMA = c.TABLE_SCHEMA
+            AND t.TABLE_NAME   = c.TABLE_NAME
+        WHERE t.TABLE_SCHEMA = :schema
+          AND t.TABLE_NAME   = :table
+          AND c.COLUMN_NAME  = :column
+        SQL;
+
+    /**
+     * Constructor
+     *
+     * @param IConnector      $db     Database connection
+     * @param LoggerInterface $logger Logger
+     * @param string          $schema The database schema which `$db` uses: required for building list of foreign keys.
+     */
+    public function __construct(
+        IConnector $db,
+        LoggerInterface $logger,
+        private string $schema,
+    ) {
+        parent::__construct($db, $logger);
+    }
+
+    /**
      * Builds a list of tables and columns which represent character fields
      * which may contain storage hashes, but are not foreign keys.
      */
     protected function buildTableColumnList(): array
     {
-        return self::FIELDS;
+        $query = $this->db->prepareQuery(self::SELECT_SEARCH_DATA_LENGTH_QUERY);
+
+        // search_data_length: consider TABLES.TABLE_ROWS * COLUMNS.CHARACTER_OCTET_LENGTH
+        $fields = self::FIELDS;
+        foreach ($fields as $table => &$tableData) {
+            foreach ($tableData as &$data) {
+                $data['extra']['search_data_length'] = 0;
+                foreach ($data['columns'] as $column) {
+                    $query->execute([
+                        'schema' => $this->schema,
+                        'table'  => $table,
+                        'column' => $column,
+                    ]);
+                    $row = $query->fetch();
+                    $data['extra']['search_data_length'] += ($row['row_count'] * $row['column_size']);
+                }
+            }
+        }
+        return $fields;
     }
 
     /**

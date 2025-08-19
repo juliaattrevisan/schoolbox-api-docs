@@ -155,7 +155,7 @@ HELP;
         );
         $gc = $gc
             ->addCheck(new Check\ForeignKeyRelation($db, $logger, SQL_db, $mapper->getTable()))
-            ->addCheck(new Check\CharacterField($db, $logger))
+            ->addCheck(new Check\CharacterField($db, $logger, SQL_db))
             ->addCheck(new Check\TextField($db, $logger, SQL_db, $mapper->getTable()))
         ;
 
