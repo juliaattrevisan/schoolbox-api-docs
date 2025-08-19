@@ -30,7 +30,8 @@
 /var/log/schoolbox/*/storage-usageCache.log
 /var/log/schoolbox/*/learnosity-restart-pending.log
 /var/log/schoolbox/*/learnosity-poll-processing.log
-/var/log/schoolbox/*/learnosity-mass-restore.log {
+/var/log/schoolbox/*/learnosity-mass-restore.log
+/var/log/schoolbox/*/garbage-collect.log {
     weekly
     missingok
     rotate 4
