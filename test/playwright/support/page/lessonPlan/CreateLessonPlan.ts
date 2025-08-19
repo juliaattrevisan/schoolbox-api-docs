@@ -62,7 +62,6 @@ export default class CreateLessonPlan {
 
     /**
      * Clicks Link Activity button
-     * @param unitNumber - The unit number to click
      */
     async clickLinkActivities(): Promise<void> {
         await this.page.locator(CreateLessonPlan.DATA_TEST_LINK_ACTIVITY_BUTTON).click();
