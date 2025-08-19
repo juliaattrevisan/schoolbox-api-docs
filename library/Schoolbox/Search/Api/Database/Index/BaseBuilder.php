@@ -181,7 +181,16 @@ abstract class BaseBuilder implements IBuilder
      */
     private function normaliseAsHtml(string $content): string
     {
-        return $this->normaliseAsText(htmlspecialchars_decode($this->stripTagsPreserveWordBreaks($content)));
+        // Add a space before each tag before stripping tags.
+        // This will ensure that word breaks are preserved when the tags are stripped in situations like this:
+        // <div>These<br/>are</div><div>separate</div>words.
+        $text = strip_tags(str_replace('<', ' <', $content));
+
+        // Decode any special characters.
+        $text = htmlspecialchars_decode($text);
+
+        // Remove multiple spaces and trim.
+        return $this->normaliseAsText($text);
     }
 
     /**
@@ -200,21 +209,6 @@ abstract class BaseBuilder implements IBuilder
                 $content,
             ),
         );
-    }
-
-    /**
-     * @param string $html
-     * @return string
-     */
-    private function stripTagsPreserveWordBreaks(string $html): string
-    {
-        // Add a space before each tag before stripping tags.
-        // This will ensure that word breaks are preserved when the tags are stripped in situations like this:
-        // <div>These<br/>are</div><div>separate</div>words.
-        $text = strip_tags(str_replace('<', ' <', $html));
-
-        // Clean up multiple spaces and trim.
-        return trim(preg_replace('/\s+/', ' ', $text));
     }
 
     /**
