@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { keysOf } from "@js/util/arrayUtils";
+// import locale from "@js/terminology/rosettaStone";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import { evidenceStatusLabels } from "@schoolboxLearningMomentEvidence/evidenceTypes";
@@ -82,9 +83,13 @@ const stateFilter = window.Vue.ref<EvidenceStatus[]>(keysOf(evidenceStatusLabels
                         :is-single-select="false"
                         placeholder="Select author(s)"
                     />
-                    <!-- TODO: filter by source -->
+
+                    <!-- TODO: filter by classes/groups [SA-20735] -->
+                    <!-- <label> Filter by {{ locale.class.properPlural() }} and Groups </label> -->
+
                     <!-- TODO: filter by start/end dates -->
-                    <!-- TODO: filter by curric codes -->
+
+                    <!-- TODO: filter by curric codes [SA-20736] -->
                     <!-- TODO: filter by tags -->
 
                     <div>
