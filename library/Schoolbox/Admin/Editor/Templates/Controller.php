@@ -47,7 +47,27 @@ class Controller extends Base
     public function getPlanCategories(): GenericCollection
     {
         $categories = $this->categoryMapper->findAll()->sortNaturally('name');
-        return $categories;
+
+        // Define which categories require which config settings to be enabled
+        $categoryConfigMap = [
+            'badge-evidence' => 'editor_templates_badge_evidence_enabled',
+            'feedback' => 'editor_templates_feedback_enabled',
+            'learning-activity' => 'editor_templates_learning_activity_enabled',
+            'learning-moments' => 'editor_templates_learning_moments_enabled',
+        ];
+
+        // Filter out categories where the feature is disabled
+        return $categories->filter(function (CategoryModel $category) use ($categoryConfigMap) {
+            $categoryName = $category->getName();
+
+            // If this category has a config requirement, check if it's enabled
+            if (isset($categoryConfigMap[$categoryName])) {
+                return $this->config->get($categoryConfigMap[$categoryName]);
+            }
+
+            // Categories without config requirements are always included
+            return true;
+        });
     }
 
     /**
