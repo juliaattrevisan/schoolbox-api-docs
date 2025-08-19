@@ -118,19 +118,20 @@ window.Vue.onMounted(async () => {
                 <div class="filters__inner-container l-flex-col l-gap-m">
                     <search-select
                         v-model:selected="studentFilter"
-                        label="Filter by student(s)"
+                        label="Filter by students"
                         label-id="students"
                         endpoint="/ajax/user.php?roleTypeID=student&"
                         :is-single-select="false"
-                        placeholder="Select student(s)"
+                        placeholder="Search for students..."
                     />
+
                     <search-select
                         v-model:selected="authorFilter"
-                        label="Filter by author(s)"
+                        label="Filter by authors"
                         label-id="author"
                         endpoint="/ajax/user.php?groupID=0&"
                         :is-single-select="false"
-                        placeholder="Select author(s)"
+                        placeholder="Search for users..."
                     />
 
                     <!-- TODO: filter by classes/groups [SA-20735] -->
