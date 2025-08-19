@@ -379,15 +379,14 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                                 ></sbx-pop-out>
                             </nav>
                             <ul :id="`participant-${participant.user.id}`" data-dropdown-content="" class="f-dropdown">
-                                <template v-if="participant.excludedAt !== null">
+                                <template
+                                    v-if="
+                                        participant.excludedAt !== null ||
+                                        participant.plan.name !== null ||
+                                        participant.customisedPlan !== null
+                                    "
+                                >
                                     <li class="separator">Manage</li>
-                                    <li>
-                                        <button class="icon-close" @click.prevent="includeParticipant(participant)">
-                                            Remove Customisation
-                                        </button>
-                                    </li>
-                                </template>
-                                <template v-else-if="participant.plan.name !== null">
                                     <li>
                                         <button class="icon-close" @click.prevent="includeParticipant(participant)">
                                             Remove Customisation
