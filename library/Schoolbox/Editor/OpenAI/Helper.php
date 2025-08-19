@@ -55,31 +55,6 @@ class Helper
     public const string FEATURE_DIALOGAGENT = 'dialogagent';
     // Differentiation Profiles
     public const string FEATURE_DIFFERENTIATION = 'differentiation';
-    private const SUPPORTED_STRUCTURED_OUTPUT_MODELS = [
-        self::ENDPOINT_TYPE_OPENAI => [
-//            'gpt-3.5-turbo' => false,
-//            'gpt-4' => false,
-            'gpt-4o' => true,
-            'gpt-4o-mini' => true,
-            'gpt-4.1' => true,
-            'gpt-4.1-mini' => true,
-            'gpt-5' => true,
-            'gpt-5-mini' => true,
-//            'gpt-4-turbo' => false
-        ],
-        self::ENDPOINT_TYPE_AZURE => [
-//            'gpt-3.5-turbo' => false,
-//            'gpt-4' => false,
-            'gpt-4o' => true,
-            'gpt-4o-mini' => true,
-            'gpt-4.1' => true,
-            'gpt-4.1-mini' => true,
-            'gpt-5' => true,
-            'gpt-5-mini' => true,
-//            'gpt-4-turbo' => false
-        ],
-    ];
-
 
     /**
      * Learning Activity Customisation
