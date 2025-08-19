@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Storage\GC\Check;
 
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Statement\IStatement;
+use Alaress_Byte_Format;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 
@@ -84,9 +85,12 @@ abstract class Base implements Check
                 $newStale   = [];
                 $this->logger->info(
                     sprintf(
-                        '. searching columns (%s)... (%d hashes)',
+                        '. searching columns (%s)... (%d hashes, max search length: %s)',
                         implode(',', $columns),
                         $staleCount,
+                        isset($columnData['extra']['search_data_length'])
+                            ? Alaress_Byte_Format::bytesToString($columnData['extra']['search_data_length'], renderIec: true)
+                            : 'unknown',
                     )
                 );
                 foreach ($stale as $hash) {

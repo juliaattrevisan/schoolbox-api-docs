@@ -31,18 +31,25 @@ class ForeignKeyRelation extends Base
      * * `primary_column`: the column in `primary_table` which the foreign key
      *    joins onto
      *    (should always be `hash`, but is not guaranteed to be)
+     * * `search_data_length`: the max size of the data in which the key could
+     *    exist
+     *    (in this case, the index length? maybe the row count * key size?)
      */
     private const SELECT_FK_RELATIONS_QUERY = <<<SQL
         select
             fks.TABLE_NAME             as `table`,
             kcu.COLUMN_NAME            as `column`,
             fks.REFERENCED_TABLE_NAME  as primary_table,
-            kcu.REFERENCED_COLUMN_NAME as primary_column
+            kcu.REFERENCED_COLUMN_NAME as primary_column,
+            t.INDEX_LENGTH             as search_data_length
         from information_schema.REFERENTIAL_CONSTRAINTS fks
         inner join information_schema.KEY_COLUMN_USAGE kcu
             on  fks.CONSTRAINT_SCHEMA = kcu.TABLE_SCHEMA
             and fks.TABLE_NAME        = kcu.TABLE_NAME
             and fks.CONSTRAINT_NAME   = kcu.CONSTRAINT_NAME
+        inner join information_schema.TABLES t
+            on  kcu.TABLE_SCHEMA = t.TABLE_SCHEMA
+            and kcu.TABLE_NAME   = t.TABLE_NAME
         where fks.CONSTRAINT_SCHEMA        = :schema
           and fks.UNIQUE_CONSTRAINT_SCHEMA = :schema
           and fks.REFERENCED_TABLE_NAME    = :table
@@ -105,8 +112,9 @@ class ForeignKeyRelation extends Base
             $tableColumnList[$table][] = [
                 'columns' => [$column],
                 'extra'   => [
-                    'primary_table'  => $row['primary_table'],
-                    'primary_column' => $row['primary_column'],
+                    'primary_table'      => $row['primary_table'],
+                    'primary_column'     => $row['primary_column'],
+                    'search_data_length' => $row['search_data_length'],
                 ],
             ];
         }
