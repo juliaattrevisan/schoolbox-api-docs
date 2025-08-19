@@ -5026,19 +5026,19 @@ parameters:
 			message: '#^If condition is always true\.$#'
 			identifier: if.alwaysTrue
 			count: 1
-			path: library/Schoolbox/Learning/Moment/Evidence/Translator/ArrayToModel/AllFields.php
+			path: library/Schoolbox/Learning/Moment/Translator/ArrayToModel/AllFields.php
 
 		-
 			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\Resource\\Attachment\\Collector\\CollectorFactory is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
 			identifier: varTag.nativeType
 			count: 2
-			path: library/Schoolbox/Learning/Moment/Evidence/Translator/ArrayToModel/Test/AllFieldsTest.php
+			path: library/Schoolbox/Learning/Moment/Translator/ArrayToModel/Test/AllFieldsTest.php
 
 		-
 			message: '#^PHPDoc tag @var with type PHPUnit\\Framework\\MockObject\\MockObject\|Schoolbox\\Resource\\Attachment\\Collector\\CollectorFactory is not subtype of native type PHPUnit\\Framework\\MockObject\\MockObject\.$#'
 			identifier: varTag.nativeType
 			count: 2
-			path: library/Schoolbox/Learning/Moment/Evidence/Translator/ArrayToModel/Test/MutableFieldsOnlyTest.php
+			path: library/Schoolbox/Learning/Moment/Translator/ArrayToModel/Test/MutableFieldsOnlyTest.php
 
 		-
 			message: '#^Method Schoolbox\\Learning\\Quiz\\Attempt\\Mapper\:\:getQuizMapper\(\) should return Schoolbox\\Learning\\Quiz\\Mapper but returns Schoolbox\\Mapper\.$#'
@@ -6329,24 +6329,6 @@ parameters:
 			identifier: identical.alwaysFalse
 			count: 1
 			path: test/codeception/Api/Calendar/CalendarEventCreateModifyCest.php
-
-		-
-			message: '#^PHPDoc tag @return has invalid value \(\\Schoolbox\\Admin\\LessonPlan\\Template\\Field\\Model;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 167 on line 5$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: test/codeception/Support/Helper/SchoolboxCli.php
-
-		-
-			message: '#^PHPDoc tag @return has invalid value \(\\Schoolbox\\Admin\\LessonPlan\\Template\\Model;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 156 on line 5$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: test/codeception/Support/Helper/SchoolboxCli.php
-
-		-
-			message: '#^PHPDoc tag @return has invalid value \(\\Schoolbox\\Learning\\Moment\\Evidence\\Model;\)\: Unexpected token ";", expected TOKEN_HORIZONTAL_WS at offset 155 on line 5$#'
-			identifier: phpDoc.parseError
-			count: 1
-			path: test/codeception/Support/Helper/SchoolboxCli.php
 
 		-
 			message: '#^Trait Tests\\Support\\Payload\\GetTrait is used zero times and is not analysed\.$#'

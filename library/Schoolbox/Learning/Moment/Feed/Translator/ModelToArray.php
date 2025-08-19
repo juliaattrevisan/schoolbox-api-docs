@@ -49,6 +49,7 @@ class ModelToArray
         // Set the object and its date of creation into the return
         switch ($result['discriminator'] ?? null) {
             case Cursor::DISCRIMINATOR_EVIDENCE:
+            case Cursor::DISCRIMINATOR_EVIDENCE_OLD:
                 $return['object'] = $this->evidenceTranslator->__invoke($result['object']);
                 $return['date']   = $return['object']['createdAt'];
                 break;

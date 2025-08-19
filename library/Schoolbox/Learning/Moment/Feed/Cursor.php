@@ -26,11 +26,11 @@ use UnexpectedValueException;
 /**
  * Feed for a user's learning moment feed.
  *
- * This combines dueWorkFeedback, evidence and badgeAwards into the one cursored result.
+ * This combines dueWorkFeedback, learning moments and badgeAwards into the one cursored result.
  *
  * The purpose of a cursor
  * -----------------------
- * A call to Cursor->retrieveResults() will return a list of items that are either 'evidence', 'badgeAward', or
+ * A call to Cursor->retrieveResults() will return a list of items that are either 'moment', 'badgeAward', or
  * 'dueWorkFeedback', sorted into buckets according to date.  The purpose of the cursor is to uniquely identify a
  * position in this sorted list.  Since each type of item has its own set of IDs, ID alone is not enough information.
  * We need the date, the type of object, and the object's ID.  For more info see the comments in the ICursor class.
@@ -39,9 +39,16 @@ class Cursor implements ICursor
 {
     /**
      * Discriminator value for identifying that a retrieved result points to an
-     * evidence record.
+     * learning moment record.
      */
-    public const DISCRIMINATOR_EVIDENCE = 'evidence';
+    public const DISCRIMINATOR_EVIDENCE = 'moment';
+
+
+    /**
+     * This was the old discriminator that some people might have used via our api
+     */
+    public const DISCRIMINATOR_EVIDENCE_OLD = 'evidence';
+
 
     /**
      * Discriminator value for identifying that a retrieved result points to a
@@ -66,7 +73,7 @@ class Cursor implements ICursor
     /**
      * This is the set of feed item types that we expect to receive from the client.
      *
-     * NOTE: There is a matching array in library/Schoolbox/Learning/Moment/Evidence/vue/feed.vue.
+     * NOTE: There is a matching array in library/Schoolbox/Learning/Moment/vue/feed.vue.
      *       If any change is made to this array, a similar change should be made to that array.
      */
     private const FILTER_NAMES = ['goals', 'learningMoments', 'achievements', 'feedback'];
@@ -241,6 +248,15 @@ class Cursor implements ICursor
             // the cursor contains 'date', 'id', 'discriminator' fields
             $cursor = $this->codec->decode($encodedCursor);
             if (isset($cursor['date']) && isset($cursor['id']) && isset($cursor['discriminator'])) {
+                $cursorDiscriminator = $cursor['discriminator'];
+
+                /* Forcibly map old "evidence" discriminator to new "moment" discriminator for backwards compatibility
+                 * FIXME remove in 25.2 or whatever comes next
+                 */
+                if (self::DISCRIMINATOR_EVIDENCE_OLD === $cursor['discriminator']) {
+                    $cursorDiscriminator = self::DISCRIMINATOR_EVIDENCE;
+                }
+
                 // The usual cursor where part:
                 // fetch items from before the last item's date, as well as ones
                 // which match the last item's date and whose other fields are less
@@ -254,8 +270,8 @@ class Cursor implements ICursor
                 $params['date1']          = $cursor['date'];
                 $params['date2']          = $cursor['date'];
                 $params['date3']          = $cursor['date'];
-                $params['discriminator2'] = $cursor['discriminator'];
-                $params['discriminator3'] = $cursor['discriminator'];
+                $params['discriminator2'] = $cursorDiscriminator;
+                $params['discriminator3'] = $cursorDiscriminator;
                 $params['id3']            = $cursor['id'];
             }
         }
@@ -304,9 +320,9 @@ class Cursor implements ICursor
             $query .= 'COUNT(*) ';
         } else {
             $query .= (
-                'e.id                   AS id,
+                'm.id                   AS id,
                  :discriminatorEvidence AS discriminator,
-                 e.created_at           AS date '
+                 m.created_at           AS date '
             );
             $params['discriminatorEvidence'] = self::DISCRIMINATOR_EVIDENCE;
         }
@@ -317,19 +333,19 @@ class Cursor implements ICursor
             $sqlWhereCondition = (
                 'EXISTS(
                      SELECT *
-                     FROM evidence_tag    AS et
-                     JOIN lu_evidence_tag AS luet ON luet.id = et.tag_id
-                     WHERE et.evidence_id = e.id
-                     AND luet.name = :tagEvidence
+                     FROM moment_tag    AS mt
+                     JOIN lu_moment_tag AS lumt ON lumt.id = mt.tag_id
+                     WHERE mt.moment_id = m.id
+                     AND lumt.name = :tagEvidence
                  )'
             );
             $params['tagEvidence'] = $this->filter['tag'];
         }
 
         $query .= (
-            "FROM evidence AS e
-             WHERE e.user_id = :userIdEvidence
-             AND e.deleted_at IS NULL
+            "FROM moment AS m
+             WHERE m.user_id = :userIdEvidence
+             AND m.deleted_at IS NULL
              AND $sqlWhereCondition"
         );
 
@@ -350,7 +366,7 @@ class Cursor implements ICursor
          */
         if ($this->viewer->getRole()->isParent() || $this->viewer->getRole()->isStudent()) {
             $query .= '
-               AND (e.created_by = :createdBy OR e.published_at IS NOT NULL)
+               AND (m.created_by = :createdBy OR m.published_at IS NOT NULL)
             ';
 
             $params['createdBy'] = $this->viewer->getId();

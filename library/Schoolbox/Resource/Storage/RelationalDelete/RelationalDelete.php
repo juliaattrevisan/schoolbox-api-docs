@@ -249,7 +249,7 @@ class RelationalDelete implements IRelationalDelete
 
             // evidence.hash
             new Nullable(
-                \Schoolbox\Learning\Moment\Evidence\Mapper::getInstance(),
+                \Schoolbox\Learning\Moment\Mapper::getInstance(),
                 $this->logger,
                 ['storage'],
                 'hash'

@@ -17,7 +17,7 @@ use Schoolbox\Learning\Assessment\Quiz\Feedback\MapperProxy as QuizFeedbackMappe
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Badge\Award\Mapper as BadgeAwardMapper;
-use Schoolbox\Learning\Moment\Evidence\Mapper as EvidenceMapper;
+use Schoolbox\Learning\Moment\Mapper as EvidenceMapper;
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedback;
 use Schoolbox\Learning\Assessment\Quiz\Feedback\Model as QuizFeedback;
 use Schoolbox\User;
@@ -75,6 +75,7 @@ class Hydrator
         foreach ($results as $result) {
             switch ($result['discriminator'] ?? null) {
                 case Cursor::DISCRIMINATOR_EVIDENCE:
+                case Cursor::DISCRIMINATOR_EVIDENCE_OLD:
                     $hasEvidence = true;
                     $evidencePb->all(
                         $this->evidenceMapper->getPredicateBuilder()
@@ -148,6 +149,7 @@ class Hydrator
         foreach ($results as $i => $result) {
             switch ($result['discriminator'] ?? null) {
                 case Cursor::DISCRIMINATOR_EVIDENCE:
+                case Cursor::DISCRIMINATOR_EVIDENCE_OLD:
                     // Find the evidence
                     $return[$i] = [
                         'discriminator' => $result['discriminator'],
