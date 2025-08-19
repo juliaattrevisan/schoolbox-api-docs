@@ -130,25 +130,67 @@ class GarbageCollector
         $this->log->notice('Starting with ' . count($this->list) . ' hashes');
 
         // Split stale list into batches before checking
-        $batches   = array_chunk($this->list, $this->batchSize);
-        $i         = 1;
-        $staleList = [];
+        $batches        = array_chunk($this->list, $this->batchSize);
+        $i              = 1;
+        $staleList      = [];
+        $startTime      = microtime(true);
+        $totalProcessed = 0;
         foreach ($batches as $batch) {
+            $batchStartTime = microtime(true);
             $this->log->notice(
                 sprintf(
-                    'Processing %d hashes (batch %d/%d)',
-                    count($batch),
-                    $i++,
+                    'Processing hash batch %d/%d (%d hashes)',
+                    $i,
                     count($batches),
+                    count($batch),
                 ),
             );
+
             // iterate the checks, and retain the intersection each time
+            $staleBatch = $batch;
             foreach ($this->checks as $check) {
                 $this->log->info('Applying ' . get_class($check));
-                $batch = $check->getStale($batch);
-                $this->log->info('Retained ' . count($batch) . ' stale');
+                $staleBatch = $check->getStale($staleBatch);
+                $this->log->info('Retained ' . count($staleBatch) . ' stale');
             }
-            $staleList = array_merge($staleList, $batch);
+            $staleList = array_merge($staleList, $staleBatch);
+
+            // Log time spent in this batch
+            $batchEndTime = microtime(true);
+            $this->log->notice(
+                sprintf(
+                    'Batch %d processed: %0.2fs (%d/%d stale)',
+                    $i,
+                    $batchEndTime - $batchStartTime,
+                    count($staleBatch),
+                    count($batch),
+                ),
+            );
+
+            // Log time spent across all batches thus far
+            $totalRuntime   = $batchEndTime - $startTime;
+            $totalProcessed += count($batch);
+            $this->log->notice(
+                sprintf(
+                    'Total runtime: %0.2fs (%d/%d stale)',
+                    $totalRuntime,
+                    count($staleList),
+                    $totalProcessed,
+                ),
+            );
+
+            // If total runtime exceeds max time: stop processing
+            if ($totalRuntime > $this->maxTime) {
+                $this->log->notice(
+                    sprintf(
+                        'Max runtime of %ds exceeded: finishing processing and moving on to deletion',
+                        $this->maxTime,
+                    ),
+                );
+                break;
+            }
+
+            $i++;
         }
 
         return $staleList;
