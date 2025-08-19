@@ -46,13 +46,25 @@ class CommandLineTool extends CliTool\App
      */
     private const DEFAULT_THRESHOLD = '2 months ago';
 
+    /**
+     * --batch={batch-size}: process this many records per batch.
+     */
     private const OPT_LONG_BATCH_SIZE = 'batch:';
 
+    /**
+     * Default batch size.
+     */
     private const DEFAULT_BATCH_SIZE = 10;
 
+    /**
+     * --max-time={max-time}: run for this many seconds before exiting.
+     */
     private const OPT_LONG_MAX_TIME = 'max-time:';
 
-    private const DEFAULT_MAX_TIME = -1;
+    /**
+     * Default max time: if not set or <= 0, no max time is set.
+     */
+    private const DEFAULT_MAX_TIME = null;
 
     /**
      * --force-run-on-staging: unless this flag is provided, do not allow this
@@ -156,19 +168,30 @@ HELP;
             $logger->notice('Running in dry-run mode: use -p flag to permanently garbage collect files.');
         }
 
+        $batchSize = $this->getOptAsInt(self::OPT_LONG_BATCH_SIZE, self::DEFAULT_BATCH_SIZE);
+        if ($batchSize <= 0) {
+            $batchSize = self::DEFAULT_BATCH_SIZE;
+        }
         $limit = $this->getOptAsInt(self::OPT_SHORT_LIMIT, self::DEFAULT_LIMIT);
         if ($limit <= 0) {
             $limit = null;
         }
+        $maxTime = $this->getOptAsInt(self::OPT_LONG_MAX_TIME, self::DEFAULT_MAX_TIME);
+        if ($maxTime <= 0) {
+            $maxTime = null;
+        }
+
         $threshold     = $this->getOpt(self::OPT_SHORT_THRESHOLD);
         $thresholdDate = $this->buildDate($threshold ?? self::DEFAULT_THRESHOLD);
         $db            = $this->getDatabaseInternal();
         $gc = new GarbageCollector(
             $mapper,
             $logger,
-            $limit,
-            $thresholdDate,
             $this->perform(),
+            $batchSize,
+            limit: $limit,
+            maxTime: $maxTime,
+            thresholdDate: $thresholdDate,
         );
         $gc = $gc
             ->addCheck(new Check\ForeignKeyRelation($db, $logger, SQL_db, $mapper->getTable()))

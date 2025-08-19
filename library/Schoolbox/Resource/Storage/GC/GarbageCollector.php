@@ -43,18 +43,22 @@ class GarbageCollector
      *
      * @param StorageMapper            $mapper        Storage mapper: used for fetching and deleting records.
      * @param LoggerInterface          $log           Logger
-     * @param int|null                 $limit         Maximum number of storage records to process: null if no limit.
-     * @param Alaress_Date_Format|null $thresholdDate Do not process any storage records which were last processed more
-     *                                                recently than this date.
      * @param bool                     $perform       If true, actually delete storage records and update the last
      *                                                processed time: otherwise, only output what would've been deleted.
+     * @param int                      $batchSize     The maximum number of results to process per batch.
+     * @param int|null                 $limit         Maximum number of storage records to process: null if no limit.
+     * @param int|null                 $maxTime       Maximum amount of time to run for, in seconds: null if no limit.
+     * @param Alaress_Date_Format|null $thresholdDate Do not process any storage records which were last processed more
+     *                                                recently than this date.
      */
     public function __construct(
         private StorageMapper $mapper,
         private LoggerInterface $log,
-        private ?int $limit,
+        private bool $perform,
+        private int $batchSize,
+        private ?int $limit = null,
+        private ?int $maxTime = null,
         private ?Alaress_Date_Format $thresholdDate = null,
-        private bool $perform = false,
     ) {
     }
 
@@ -82,9 +86,15 @@ class GarbageCollector
     {
         // Build the query
         $this->log->info('Restricting garbage collection to:');
+        $this->log->info(sprintf('  hashes per batch: %d', $this->batchSize));
         if (isset($this->limit)) {
-            $this->log->info(sprintf('  limit: %d', $this->limit));
+            $this->log->info(sprintf('  max hashes: %d', $this->limit));
         }
+        if (isset($this->maxTime)) {
+            $this->log->info(sprintf('  max execution time: %d s', $this->maxTime));
+        }
+
+        $this->log->info('Filtering hashes to:');
         $this->log->info('  expired_at: null');
         $pb = $this->mapper->getPredicateBuilder()
             ->isNull('expired_at');
