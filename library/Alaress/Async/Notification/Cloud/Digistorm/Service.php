@@ -96,6 +96,7 @@ class Service extends AbstractService
         $payload['title']   = $this->appTitle;
         $payload['message'] = $title;
         $payload['ids']     = $tokens;
+        $payload['module']  = $instance->getNamespace();
 
         // need a HTTP client (should this be injected?)
         $client = new Client();
