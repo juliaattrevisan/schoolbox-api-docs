@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\API\Token\JwtParser;
 
 use Firebase\JWT\Key;
+use Psr\Log\LoggerInterface;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
@@ -31,14 +32,16 @@ class SelfIssued extends Base
      *
      * @param UserMapper        $userMapper  Mapper for retrieving users once the user in the JWT is identified.
      * @param IConfigLoader     $config      Standard configuration store.
+     * @param LoggerInterface   $log         Logger
      * @param User\Token\Mapper $tokenMapper Mapper for retrieving user tokens.
      */
     public function __construct(
         UserMapper $userMapper,
         IConfigLoader $config,
+        LoggerInterface $log,
         private User\Token\Mapper $tokenMapper,
     ) {
-        parent::__construct($userMapper, $config);
+        parent::__construct($userMapper, $config, $log);
     }
 
     /**

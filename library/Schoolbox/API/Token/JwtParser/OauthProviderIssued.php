@@ -11,6 +11,7 @@ namespace Schoolbox\API\Token\JwtParser;
 
 use Firebase\JWT as JwtLibrary;
 use GuzzleHttp\Client;
+use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Oidc\CacheHelper;
 use Schoolbox\Config\ConfigMapper;
@@ -40,18 +41,20 @@ class OauthProviderIssued extends Base
     /**
      * Constructor
      *
-     * @param UserMapper     $userMapper Mapper for retrieving users once the user in the JWT is identified.
-     * @param IConfigLoader  $config     Standard configuration store.
-     * @param Client         $httpClient HTTP client: required for retrieving JWKS from oAuth provider
-     * @param CacheInterface $oidcCache  Required for caching discovery response and keys
+     * @param UserMapper      $userMapper Mapper for retrieving users once the user in the JWT is identified.
+     * @param IConfigLoader   $config     Standard configuration store.
+     * @param LoggerInterface $log       Logger
+     * @param Client          $httpClient HTTP client: required for retrieving JWKS from oAuth provider
+     * @param CacheInterface  $oidcCache  Required for caching discovery response and keys
      */
     public function __construct(
         UserMapper $userMapper,
         IConfigLoader $config,
+        LoggerInterface $log,
         private Client $httpClient,
         private CacheInterface $oidcCache,
     ) {
-        parent::__construct($userMapper, $config);
+        parent::__construct($userMapper, $config, $log);
     }
 
     /**

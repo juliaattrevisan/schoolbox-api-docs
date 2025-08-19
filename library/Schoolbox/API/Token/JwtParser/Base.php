@@ -12,6 +12,7 @@ namespace Schoolbox\API\Token\JwtParser;
 use DomainException;
 use Firebase\JWT as JwtLibrary;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
@@ -45,12 +46,14 @@ abstract class Base implements IParser
     /**
      * Constructor
      *
-     * @param UserMapper    $userMapper Mapper for retrieving users once the user in the JWT is identified.
-     * @param IConfigLoader $config     Standard configuration store.
+     * @param UserMapper      $userMapper Mapper for retrieving users once the user in the JWT is identified.
+     * @param IConfigLoader   $config     Standard configuration store.
+     * @param LoggerInterface $log        Logger
      */
     public function __construct(
         protected UserMapper $userMapper,
         protected IConfigLoader $config,
+        protected LoggerInterface $log,
     ) {
     }
 

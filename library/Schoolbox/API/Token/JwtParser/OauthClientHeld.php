@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\API\Token\JwtParser;
 
 use Firebase\JWT\Key;
+use Psr\Log\LoggerInterface;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
@@ -39,6 +40,7 @@ class OauthClientHeld extends Base
      *
      * @param UserMapper          $userMapper         User mapper: required for fetching users based on their username.
      * @param IConfigLoader       $config             Configuration store.
+     * @param LoggerInterface     $log                Logger
      * @param RelyingParty\Mapper $relyingPartyMapper Relying party mapper: required for verifying that the client is
      *                                                known to this instance, and also for determining the user if the
      *                                                access token contains no subject.
@@ -46,9 +48,10 @@ class OauthClientHeld extends Base
     public function __construct(
         UserMapper $userMapper,
         IConfigLoader $config,
+        LoggerInterface $log,
         private RelyingParty\Mapper $relyingPartyMapper
     ) {
-        parent::__construct($userMapper, $config);
+        parent::__construct($userMapper, $config, $log);
     }
 
     /**
