@@ -412,4 +412,16 @@ class Mapper extends BaseMapper
 
         return $nodes;
     }
+
+
+    /**
+     * Persist evidence
+     *
+     * @param Model $moment
+     * @return void
+     */
+    public function saveEvidence(Model $moment): void
+    {
+        $this->cascadeJoin('moment_evidence', ['moment_id' => $moment->getId()], $moment->getEvidence());
+    }
 }

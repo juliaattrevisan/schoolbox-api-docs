@@ -297,44 +297,59 @@ class Controller extends Base
         //set the return code to 201 (Created)
 
         // Save the evidence
-        $evidenceCollection = $this->mapper->createCollection();
+        $momentCollection = $this->mapper->createCollection();
         $baseModel          = (new \Schoolbox\Learning\Moment\Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory()))($requestBody)
             ->setCreator($this->getUser());
+
         $tokenReplacer      = new TokenReplacer\Student(new TokenReplacer\Simple());
         foreach ($users as $user) {
-            $evidenceModel = clone $baseModel;
-            $evidenceModel = $evidenceModel
+            $momentModel = clone $baseModel;
+            $momentModel = $momentModel
                 ->setRecipient($user)
-                ->setBody($tokenReplacer->replace($evidenceModel->getBody(), $user));
+                ->setBody($tokenReplacer->replace($momentModel->getBody(), $user));
 
             if ($this->requestPost->get('draft', false)) {
                 // autosave draft, save as draft
-                $evidenceModel->draft();
+                $momentModel->draft();
             } else {
                 if (null !== $defaultState) {
                     /* Spawn a learning moment in a particular state
                      */
-                    $this->updateState($evidenceModel, $defaultState);
+                    $this->updateState($momentModel, $defaultState);
                 } elseif ($moderationRequired) {
                     /* Accelerate into the next state based on configs and year level settings
                      */
-                    $evidenceModel->draft();
+                    $momentModel->draft();
                 } else {
                     /* Does not require moderation; just send it into the world
                      */
-                    $evidenceModel->publish($this->getUser());
+                    $momentModel->publish($this->getUser());
                 }
             }
 
-            $evidenceCollection->add($evidenceModel);
+            $momentCollection->add($momentModel);
         }
-        $this->mapper->save($evidenceCollection);
+
+        $this->mapper->save($momentCollection);
+
+        /* For some reason this is necessary. The MutableFieldsOnly translator spawns a new Moment instance,
+         * disconnecting it from the relationship contained inside each Evidence instance. This means we have
+         * to map the ids manually, which seems a bit counter-intuitive.
+         */
+        foreach ($momentCollection as $moment) {
+            foreach ($moment->getEvidence() as $evidence) {
+                $evidence->setMoment($moment);
+            }
+
+            $this->mapper->saveEvidence($moment);
+        }
+
         /**
          * use buildTranslatorWithComments as that contains the _links needed for draft.js
          * where the other translator had excluded _links (for historic reasons)
          */
         $this->response = $this->responseAsJson(
-            $evidenceCollection->map(
+            $momentCollection->map(
                 $this->buildTranslatorWithComments(1),
             )
         )->withStatus(201);

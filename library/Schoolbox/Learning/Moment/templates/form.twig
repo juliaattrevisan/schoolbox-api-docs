@@ -391,7 +391,9 @@
             let formData = new FormData(form),
                 payload = {
                     body: formData.get('body'),
-                    file: formData.get('file'),
+                    evidence: [{
+                        file: formData.get('file')
+                    }],
                     curriculumNodes: [],
                     tags: [],
                     type: '{{ momentType }}',
@@ -491,7 +493,7 @@
                             throw new Error("Save failed!");
                         }
                         toast.toastTimeout({text: 'Saved'});
-                        window.location.href = '{{ RETURN_URL.previous.decoded ?? '/' }}';
+                        {#window.location.href = '{{ RETURN_URL.previous.decoded ?? '/' }}';#}
                         isSubmittingForm = false;
                     })
                     .catch(() => {
