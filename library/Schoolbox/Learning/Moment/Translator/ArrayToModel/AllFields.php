@@ -174,7 +174,8 @@ class AllFields extends Base
                                 continue;
                             }
 
-                            $evidence = new \Schoolbox\Learning\Moment\Evidence\Model();
+                            $evidence = (new \Schoolbox\Learning\Moment\Evidence\Model())
+                                ->setMoment($model);
 
                             if (array_key_exists('filename', $evidenceStruct)) {
                                 $evidence->setFilename($evidenceStruct['filename']);

@@ -61,6 +61,21 @@ class AllFieldsTest extends TestCase
                 ->setDeletedAt(new Alaress_Date_Format('2020-03-01T00:00:00+00:00', DATE_ATOM, $timezone)),
         ];
 
+        /* Craft this like we normally would
+         */
+        $moment = (new Model())
+            ->setEvidence(new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class));
+
+        $storage = (new Storage())
+            ->setHash('1234567890123456789012345678901234567890');
+
+        $evidence = (new \Schoolbox\Learning\Moment\Evidence\Model())
+            ->setMoment($moment)
+            ->setStorage($storage)
+            ->setFilename('test.gif');
+
+        $moment->getEvidence()->add($evidence);
+
         yield 'storage' => [
             [
                 'evidence'  => [
@@ -70,12 +85,7 @@ class AllFieldsTest extends TestCase
                     ]
                 ],
             ],
-            (new Model())
-                ->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class))->add(
-                    (new \Schoolbox\Learning\Moment\Evidence\Model())
-                        ->setStorage((new Storage())->setHash('1234567890123456789012345678901234567890'))
-                        ->setFilename('test.gif')
-                ))
+            $moment
         ];
 
         yield 'users' => [
@@ -96,10 +106,21 @@ class AllFieldsTest extends TestCase
                 ->setDiscussionThread((new DiscussionThread())->setId(14)),
         ];
 
-        // Storage file upload
+        /* Craft this like we normally would
+         */
+        $moment = (new Model())
+            ->setEvidence(new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class));
+
         $storage = (new Storage())
             ->setHash('1234567890123456789012345678901234567890')
             ->setBasename('test.gif');
+
+        $evidence = (new \Schoolbox\Learning\Moment\Evidence\Model())
+            ->setMoment($moment)
+            ->setStorage($storage)
+            ->setFilename('test.gif');
+
+        $moment->getEvidence()->add($evidence);
 
         yield 'file upload' => [
             [
@@ -109,12 +130,7 @@ class AllFieldsTest extends TestCase
                     ]
                 ],
             ],
-            (new Model())
-                ->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class))->add(
-                    (new \Schoolbox\Learning\Moment\Evidence\Model())
-                        ->setStorage($storage)
-                        ->setFilename('test.gif')
-                )),
+            $moment,
             $storage
         ];
     }

@@ -57,7 +57,22 @@ class MutableFieldsOnlyTest extends TestCase
             (new Model()),
         ];
 
-        yield 'evidence' => [
+        /* Craft this like we normally would
+         */
+        $moment = (new Model())
+            ->setEvidence(new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class));
+
+        $storage = (new Storage())
+            ->setHash('1234567890123456789012345678901234567890');
+
+        $evidence = (new \Schoolbox\Learning\Moment\Evidence\Model())
+            ->setMoment($moment)
+            ->setStorage($storage)
+            ->setFilename('test.gif');
+
+        $moment->getEvidence()->add($evidence);
+
+        yield 'storage' => [
             [
                 'evidence'  => [
                     [
@@ -66,12 +81,7 @@ class MutableFieldsOnlyTest extends TestCase
                     ]
                 ],
             ],
-            (new Model())
-                ->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class))->add(
-                    (new \Schoolbox\Learning\Moment\Evidence\Model())
-                        ->setStorage((new Storage())->setHash('1234567890123456789012345678901234567890'))
-                        ->setFilename('test.gif')
-                ))
+            $moment
         ];
 
         yield 'users' => [
@@ -89,10 +99,21 @@ class MutableFieldsOnlyTest extends TestCase
             (new Model()),
         ];
 
-        // Storage file upload: require a mock here
+        /* Craft this like we normally would
+         */
+        $moment = (new Model())
+            ->setEvidence(new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class));
+
         $storage = (new Storage())
             ->setHash('1234567890123456789012345678901234567890')
             ->setBasename('test.gif');
+
+        $evidence = (new \Schoolbox\Learning\Moment\Evidence\Model())
+            ->setMoment($moment)
+            ->setStorage($storage)
+            ->setFilename('test.gif');
+
+        $moment->getEvidence()->add($evidence);
 
         yield 'file upload' => [
             [
@@ -102,12 +123,7 @@ class MutableFieldsOnlyTest extends TestCase
                     ]
                 ]
             ],
-            (new Model())
-                ->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class))->add(
-                    (new \Schoolbox\Learning\Moment\Evidence\Model())
-                        ->setStorage($storage)
-                        ->setFilename('test.gif')
-                )),
+            $moment,
             $storage,
         ];
     }
