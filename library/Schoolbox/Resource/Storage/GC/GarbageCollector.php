@@ -121,8 +121,8 @@ class GarbageCollector
                 'hash'       => 'asc',
             ],
         ];
-        if (isset($limit)) {
-            $queryOptions['limit']  = $limit;
+        if (isset($this->limit)) {
+            $queryOptions['limit']  = $this->limit;
             $queryOptions['offset'] = 0;
         }
         $this->list = $this->mapper->findScalarByPredicates('hash', $pb, $queryOptions);
