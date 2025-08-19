@@ -32,6 +32,15 @@ const viewStudentParticipationLink = window.Vue.computed(() => {
     <li v-if="props.activity._links?.summary" :data-test="`markbook-assessment-dropdown-${props.activity.id}-view`">
         <a :href="getReturnUrl(props.activity._links.summary)" class="icon-view">View</a>
     </li>
+    <li v-if="viewStatusLink" :data-test="`markbook-assessment-dropdown-${props.activity.id}-view-status`">
+        <a :href="viewStatusLink" class="icon-progress">View Status</a>
+    </li>
+    <li
+        v-if="viewStudentParticipationLink"
+        :data-test="`markbook-assessment-dropdown-${props.activity.id}-student-participation`"
+    >
+        <a :href="viewStudentParticipationLink" class="icon-group">Student Participation</a>
+    </li>
     <li v-if="props.activity._links?.modify" :data-test="`markbook-assessment-dropdown-${props.activity.id}-modify`">
         <a :href="getReturnUrl(props.activity._links.modify)" class="icon-modify">
             {{ props.activity.assessmentType === ACTIVITY_TYPE_QUIZ ? "Modify Settings" : "Modify" }}
@@ -42,15 +51,6 @@ const viewStudentParticipationLink = window.Vue.computed(() => {
         :data-test="`markbook-assessment-dropdown-${props.activity.id}-modify-content`"
     >
         <a :href="getReturnUrl(props.activity._links.modifyContent)" class="icon-modify">Modify Content</a>
-    </li>
-    <li v-if="viewStatusLink" :data-test="`markbook-assessment-dropdown-${props.activity.id}-view-status`">
-        <a :href="viewStatusLink" class="icon-progress">View Status</a>
-    </li>
-    <li
-        v-if="viewStudentParticipationLink"
-        :data-test="`markbook-assessment-dropdown-${props.activity.id}-student-participation`"
-    >
-        <a :href="viewStudentParticipationLink" class="icon-group">Student Participation</a>
     </li>
     <li
         v-if="props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK && viewStatusLink"
