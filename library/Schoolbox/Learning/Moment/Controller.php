@@ -306,7 +306,19 @@ class Controller extends Base
             $momentModel = clone $baseModel;
             $momentModel = $momentModel
                 ->setRecipient($user)
-                ->setBody($tokenReplacer->replace($momentModel->getBody(), $user));
+                ->setBody($tokenReplacer->replace($momentModel->getBody(), $user))
+                ->setEvidence(new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class));
+
+            /* Deep Clone
+             *
+             * This is super painfully extravagant. Surely there's a better way than this.
+             * TODO Maybe implement a magic __clone method inside $baseModel's instance?
+             */
+            foreach ($baseModel->getEvidence() as $evidence) {
+                $newEvidence = clone $evidence;
+
+                $momentModel->getEvidence()->add($newEvidence);
+            }
 
             if ($this->requestPost->get('draft', false)) {
                 // autosave draft, save as draft
@@ -338,6 +350,12 @@ class Controller extends Base
          */
         foreach ($momentCollection as $moment) {
             foreach ($moment->getEvidence() as $evidence) {
+                print_r(sprintf(
+                    'moment id: %s, evidence: %s %s',
+                    $moment->getId(),
+                    $evidence->getId(),
+                    $evidence->getFilename()
+                ));
                 $evidence->setMoment($moment);
             }
 
