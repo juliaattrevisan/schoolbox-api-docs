@@ -6,7 +6,17 @@ import SbxIcon from "@schoolboxVue/components/icon/sbx-icon.ce.vue";
 /**
  * As Vue is now stored globally, provide reference to these functions so tests can still run without browser context
  */
-import { ref, computed, watch, onMounted, onUnmounted, onBeforeUnmount, nextTick, defineCustomElement } from "vue";
+import {
+    ref,
+    computed,
+    watch,
+    onMounted,
+    onUnmounted,
+    onBeforeUnmount,
+    nextTick,
+    defineCustomElement,
+    useTemplateRef,
+} from "vue";
 window.Vue = {};
 window.Vue.ref = ref;
 window.Vue.computed = computed;
@@ -16,6 +26,7 @@ window.Vue.onUnmounted = onUnmounted;
 window.Vue.onBeforeUnmount = onBeforeUnmount;
 window.Vue.nextTick = nextTick;
 window.Vue.defineCustomElement = defineCustomElement;
+window.Vue.useTemplateRef = useTemplateRef;
 
 /**
  * Assign defaults to sbProps to prevent errors in tests
