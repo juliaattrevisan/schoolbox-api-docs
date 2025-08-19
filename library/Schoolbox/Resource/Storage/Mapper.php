@@ -17,6 +17,7 @@ use Schoolbox\Collection;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Instance;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -37,6 +38,11 @@ class Mapper extends BaseMapper implements IReceiver
      * Max length for filenames: anything longer causes issues on upload.
      */
     public const FILENAME_MAX_LENGTH = 250;
+
+    /**
+     * Is deletion of files from the file system allowed from staging instances?
+     */
+    private bool $allowStagingDeleteStorage = false;
 
     /**
      * @return void
@@ -132,15 +138,23 @@ class Mapper extends BaseMapper implements IReceiver
     }
 
     /**
-     * Post-delete callback
+     * Post-delete callback: delete the file and any transforms or transcodes
+     * from the filesystem.
      *
-     * TODO this shouldn't be necessary: storage files should be cleaned up by
-     *      another process
+     * This will refuse to delete files if this is a staging instance, unless
+     * `$this->allowStagingDeleteStorage` is true: this is because filesystems
+     * may be shared between staging and production, and thus deleting from
+     * staging could delete from production.
      *
      * @param Model $storage
      */
     public function deleteStorage(Model $storage)
     {
+        /** @var Instance $instance */
+        $instance = self::getDi()->get('instance');
+        if ($instance->isStaging() && !$this->allowStagingDeleteStorage) {
+            return;
+        }
         $this->getStorageFilesystemProxy()->delete($storage);
     }
 
@@ -366,5 +380,23 @@ class Mapper extends BaseMapper implements IReceiver
     public function getStorageFilesystemProxy()
     {
         return self::getDi()->get('filesystem.storageProxy');
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAllowStagingDeleteStorage(): bool
+    {
+        return $this->allowStagingDeleteStorage;
+    }
+
+    /**
+     * @param bool $allowStagingDeleteStorage
+     * @return $this
+     */
+    public function setAllowStagingDeleteStorage(bool $allowStagingDeleteStorage): self
+    {
+        $this->allowStagingDeleteStorage = $allowStagingDeleteStorage;
+        return $this;
     }
 }
