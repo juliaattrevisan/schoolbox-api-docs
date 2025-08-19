@@ -1,8 +1,10 @@
 <script lang="ts" setup>
 import { useCohortReportStore } from "./store/cohortReportStore";
+import { useCohortReportFiltersStore } from "./store/cohortReportFiltersStore";
 import CrResultsGroup from "./cr-results-group.vue";
 
 const crStore = useCohortReportStore();
+const crfStore = useCohortReportFiltersStore();
 
 /**
  * The results split into pages per day (based on entry.createdAt.displayAs)
@@ -26,6 +28,15 @@ const resultGroups = window.Vue.computed(() => {
             entries: entries.sort((a, b) => b.updatedAt.timestamp - a.updatedAt.timestamp),
         }));
 });
+
+/**
+ * When the reset filters button is clicked
+ */
+async function onResetFilters(): Promise<void> {
+    crfStore.resetFilters();
+    crStore.clearData();
+    await crStore.loadNextPage();
+}
 </script>
 
 <template>
@@ -48,6 +59,13 @@ const resultGroups = window.Vue.computed(() => {
             </section>
         </div>
         <button v-else-if="crStore.nextCursor !== null" @click="crStore.loadNextPage">Load more results</button>
+        <div v-else-if="crStore.results.length === 0" class="empty-state-flex-centered">
+            <i class="icon-search"></i>
+            <p>
+                There are no learning moments matching the current filters.
+                <button @click="onResetFilters">Reset filters</button> to see all available learning moments.
+            </p>
+        </div>
         <div v-else class="alert-box">All results have been loaded</div>
     </div>
 </template>
