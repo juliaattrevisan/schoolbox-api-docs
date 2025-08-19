@@ -26,7 +26,10 @@ export type MarkbookActivity = Pick<Activity, "id" | "title" | "assessmentType">
         mean: string | null;
         draftMean: string | null;
     } | null;
-    _links: Pick<NonNullable<Activity["_links"]>, "status" | "summary" | "modify" | "modifyContent"> | null;
+    _links: Pick<
+        NonNullable<Activity["_links"]>,
+        "status" | "summary" | "modify" | "modifyContent" | "studentParticipation"
+    > | null;
     _routes: {
         postFeedbacks: string | null;
     };
