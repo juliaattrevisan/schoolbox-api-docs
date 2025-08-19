@@ -302,7 +302,10 @@ class ProfileHandler
                 if (self::BASE_PROFILE_PROPERTY === $property) {
                     $params[$property] = $identifierValue;
                 } else if ($mapping[$property]['hydrator'] instanceof Date) {
-                    $params[$property] = $newObject->$getter()->getDatabase();
+                    /* A date field might be null, esp. when those dates are optional
+                     * Prime examples are enrolment dates, leaving dates, employment dates etc.
+                     */
+                    $params[$property] = $newObject->$getter()?->getDatabase();
                 } else {
                     $val = $newObject->$getter();
 
