@@ -188,10 +188,17 @@ window.Vue.watch(
                         </div>
                     </div>
 
-                    <div class="l-flex-row">
+                    <div class="l-flex-row l-flex--no-wrap l-gap-m">
                         <button
-                            class="button submit l-flex__item--1 f-no-margins"
+                            class="button l-flex__item--1 icon-close f-no-margins"
                             data-test="cr-filter-clear-button"
+                            @click.prevent="crfStore.resetFilters"
+                        >
+                            Clear filters
+                        </button>
+                        <button
+                            class="button submit l-flex__item--1 icon-search f-no-margins"
+                            data-test="cr-filter-apply-button"
                             @click.prevent="applyFilters"
                         >
                             Apply filters
