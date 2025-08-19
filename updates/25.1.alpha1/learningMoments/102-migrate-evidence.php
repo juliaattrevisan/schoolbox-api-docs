@@ -26,20 +26,6 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 $app = new class extends CliTool\App
 {
     /**
-     * Make sure to add your locking script to the Lock Inspector tool
-     * const LOCK_NAMES in Inspector.php
-     */
-    public const LOCK_NAME = 'learningMomentsMigration';
-
-
-    /**
-     * Decide how long this should be based on your usage
-     * You might have to adjust it, but it should cover the cost of an iteration
-     */
-    private const LOCK_TTL = 10;
-
-
-    /**
      * --help
      *
      * Print help text for those who don't know how to use this tool
@@ -83,17 +69,6 @@ HELP;
             return;
         }
 
-        /* Decide how loudly to announce lock acquisition failure
-         *
-         * Simply using $lock = $this->acquireLock() will keep you safe, even if you don't
-         * specifically check for acquisition
-         */
-        try {
-            $lock = $this->acquireLock(self::LOCK_NAME, self::LOCK_TTL);
-        } catch (\RuntimeException $e) {
-            return;
-        }
-
         $db = $this->getDatabaseInternal();
 
         /* We're going be doing this more than a few times: prepare it only once, for speed
@@ -117,8 +92,6 @@ HELP;
 
         try {
             foreach ($moments as $moment) {
-                $this->refreshLock($lock);
-
                 /* Move it! We json-encode this for logging reasons
                  */
                 $evidence = [
@@ -147,12 +120,6 @@ HELP;
              */
             return;
         }
-
-        /* Announce lock release
-         */
-        $this->getLogger()->debug('Releasing lock');
-
-        $lock->release();
     }
 
 
