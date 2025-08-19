@@ -43,7 +43,7 @@ class GarbageCollector
      *
      * @param StorageMapper            $mapper        Storage mapper: used for fetching and deleting records.
      * @param LoggerInterface          $log           Logger
-     * @param int                      $limit         Maximum number of storage records to process.
+     * @param int|null                 $limit         Maximum number of storage records to process: null if no limit.
      * @param Alaress_Date_Format|null $thresholdDate Do not process any storage records which were last processed more
      *                                                recently than this date.
      * @param bool                     $perform       If true, actually delete storage records and update the last
@@ -52,7 +52,7 @@ class GarbageCollector
     public function __construct(
         private StorageMapper $mapper,
         private LoggerInterface $log,
-        private int $limit,
+        private ?int $limit,
         private ?Alaress_Date_Format $thresholdDate = null,
         private bool $perform = false,
     ) {
@@ -82,7 +82,9 @@ class GarbageCollector
     {
         // Build the query
         $this->log->info('Restricting garbage collection to:');
-        $this->log->info(sprintf('  limit: %d', $this->limit));
+        if (isset($this->limit)) {
+            $this->log->info(sprintf('  limit: %d', $this->limit));
+        }
         $this->log->info('  expired_at: null');
         $pb = $this->mapper->getPredicateBuilder()
             ->isNull('expired_at');
@@ -103,18 +105,17 @@ class GarbageCollector
         }
 
         // Find the records
-        $this->list = $this->mapper->findScalarByPredicates(
-            'hash',
-            $pb,
-            [
-                'order'  => [
-                    'last_gc_at' => 'asc',
-                    'hash'       => 'asc',
-                ],
-                'limit'  => $this->limit,
-                'offset' => 0,
-            ]
-        );
+        $queryOptions = [
+            'order'  => [
+                'last_gc_at' => 'asc',
+                'hash'       => 'asc',
+            ],
+        ];
+        if (isset($limit)) {
+            $queryOptions['limit']  = $limit;
+            $queryOptions['offset'] = 0;
+        }
+        $this->list = $this->mapper->findScalarByPredicates('hash', $pb, $queryOptions);
 
         $this->log->info('Starting with ' . count($this->list) . ' files');
 
