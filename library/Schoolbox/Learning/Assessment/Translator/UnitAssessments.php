@@ -142,11 +142,14 @@ class UnitAssessments
 
             /**
              * Create a link for the student participation page if the assessment is
-             * within an implementation and is not a project or lesson plan
+             * within an implementation, is not a project or lesson plan and is not
+             * a child assessment (a custom participation activity)
              */
             if ($assessment->getBaseContext() instanceof \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model
                 && $assessment instanceof Project === false
-                && $assessment instanceof \Schoolbox\Learning\Assessment\LessonPlan\Model === false) {
+                && $assessment instanceof \Schoolbox\Learning\Assessment\LessonPlan\Model === false
+                && $assessment->getOriginalAssessmentId() === null
+            ) {
                 $studentParticipationLink = [
                     "route" => "learningAssessment.getAssessmentParticipationForm",
                     "params" => [
