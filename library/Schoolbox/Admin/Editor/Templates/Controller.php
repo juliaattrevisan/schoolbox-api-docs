@@ -18,6 +18,7 @@ use Schoolbox\Admin\Editor\Templates\Category\Mapper as CategoryMapper;
 use Schoolbox\Editor\Templates\Model as TemplateModel;
 use Schoolbox\Editor\Templates\Mapper as TemplateMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\GenericCollection;
 
 class Controller extends Base
 {
@@ -36,12 +37,22 @@ class Controller extends Base
     }
 
     /**
+     * Only get the categories available on the current plan
+     * @return GenericCollection
+     */
+    public function getPlanCategories(): GenericCollection
+    {
+        $categories = $this->categoryMapper->findAll()->sortNaturally('name');
+        return $categories;
+    }
+
+    /**
      * Display list of editor template categories
      */
     public function getList(): void
     {
         // Get the categories from the mapper and transform each category into an array
-        $categories = $this->categoryMapper->findAll()->sortNaturally('name');
+        $categories = $this->getPlanCategories();
         $translator = new ModelToArray();
 
         $this->response = $this->responseFromTemplate(
