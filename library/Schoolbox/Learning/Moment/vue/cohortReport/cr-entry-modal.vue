@@ -79,7 +79,7 @@ async function onDelete(): Promise<void> {
             <h2>Please confirm</h2>
             <p>
                 There are comments on
-                {{ crmStore.selectedEntries.length === 1 ? "this learning moment" : "these learning moments" }}. that
+                {{ crmStore.selectedEntries.length === 1 ? "this learning moment" : "these learning moments" }} that
                 have already been made and will become visible to parents.
             </p>
             <p>Do you want to delete these comments?</p>
