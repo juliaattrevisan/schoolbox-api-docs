@@ -766,7 +766,7 @@ class ListController extends Web\Controller\Base
     private function saveParticipationData(IAssessable $assessment, GenericCollection $plans, array $inclusionFlags, array $userPlanIndices): void
     {
         $assessmentDataModel = $this->assessmentMapper->translateToDataModel($assessment);
-        $participationHelper = (new Participant\ParticipationHelper($assessmentDataModel, $this->participantDataSource, $this->getUserMapper()));
+        $participationHelper = (new Participant\ParticipationHelper($assessmentDataModel, $this->participantDataSource, $this->getUserMapper(), $this->assessmentMapper));
         // plans are saved; persistipation
         foreach ($inclusionFlags as $userId => $userIncluded) {
             /** @var PlanModel|null $userPlan */
@@ -1003,7 +1003,7 @@ class ListController extends Web\Controller\Base
     public function postInclude(IAssessable $assessment, User $student): void
     {
         $assessmentDataModel = $this->assessmentMapper->translateToDataModel($assessment);
-        $partitionHelper = new ParticipationHelper($assessmentDataModel, $this->participantDataSource, $this->userMapper);
+        $partitionHelper = new ParticipationHelper($assessmentDataModel, $this->participantDataSource, $this->userMapper, $this->assessmentMapper);
         try {
             $partitionHelper->include($student->getId(), null);
             // Update project mark as the excluded assessment may affect the project result
@@ -1028,7 +1028,7 @@ class ListController extends Web\Controller\Base
     public function postExclude(IAssessable $assessment, User $student): void
     {
         $assessmentDataModel = $this->assessmentMapper->translateToDataModel($assessment);
-        $partitionHelper = new ParticipationHelper($assessmentDataModel, $this->participantDataSource, $this->userMapper);
+        $partitionHelper = new ParticipationHelper($assessmentDataModel, $this->participantDataSource, $this->userMapper, $this->assessmentMapper);
         try {
             $partitionHelper->exclude($student->getId(), null);
 
@@ -1623,12 +1623,12 @@ class ListController extends Web\Controller\Base
         $students = $this->getUserMapper()->findByColumn('id', $studentIds);
         try {
             $assessmentDataModel = $this->assessmentMapper->translateToDataModel($assessment);
-            $participationHelper = (new Participant\ParticipationHelper($assessmentDataModel, $this->participantDataSource, $this->getUserMapper()));
+            $participationHelper = (new Participant\ParticipationHelper($assessmentDataModel, $this->participantDataSource, $this->getUserMapper(), $this->assessmentMapper));
 
             if (null !== $assessmentId) {
                 $customisedAssessment          = $this->getAssessmentMapper()->findById($assessmentId);
                 $customisedAssessmentDataModel = $this->assessmentMapper->translateToDataModel(($customisedAssessment));
-                $customisedParticipationHelper = (new Participant\ParticipationHelper($customisedAssessmentDataModel, $this->participantDataSource, $this->getUserMapper()));
+                $customisedParticipationHelper = (new Participant\ParticipationHelper($customisedAssessmentDataModel, $this->participantDataSource, $this->getUserMapper(), $this->assessmentMapper));
                 foreach ($students as $student) {
                     $customisedParticipationHelper->include($student->getId(), $customisedAssessment->getDynamicPlan());
                     /* If it's new/cloned activity make sure we exclude it from the source assessment

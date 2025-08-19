@@ -14,7 +14,9 @@ use Schoolbox\Assessment\Participant\Model as ParticipantModel;
 use Schoolbox\Assessment\Participant\Plan\Model as PlanModel;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentDataModel;
+use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
@@ -26,8 +28,12 @@ class ParticipationHelper
      */
     private ?Collection $existingParticipationPerUser = null;
 
-    public function __construct(private AssessmentDataModel $assessment, private DataSource $participantDataSource, private UserMapper $userMapper)
-    {
+    public function __construct(
+        private AssessmentDataModel $assessment,
+        private DataSource $participantDataSource,
+        private UserMapper $userMapper,
+        private MapperProxy $mapperProxy,
+    ) {
     }
 
     /**
@@ -158,6 +164,13 @@ class ParticipationHelper
                     $existingParticipation->setExcludedAt(null);
                     $participantMapper->save($existingParticipation);
                     $keepExistingParticipation = true;
+                }
+
+                $customisation = $this->mapperProxy->findAllCustomisedAssessment($this->mapperProxy->translateToDomainModel($this->assessment));
+                $test = $customisation->first()?->getParticipantIfExtant($this->userMapper->createModel($userId));
+                if (null !== $test) {
+                    $test->setExcludedAt(\Alaress_Date_Format::now());
+                    $participantMapper->save($test);
                 }
             }
 
