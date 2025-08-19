@@ -7,8 +7,11 @@ import {
 import type { LearningMoment } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 import { getCohortReport } from "./cohortReportPayload";
 import type { CohortReportEntry } from "./cohortReportPayload";
+import { useCohortReportFiltersStore } from "./cohortReportFiltersStore";
 
 export const useCohortReportStore = defineStore("cohortReport", () => {
+    const crfStore = useCohortReportFiltersStore();
+
     let getCohortReportEndpoint: string | null = null; // the endpoint to fetch the cohort report data
     let putBulkRejectEndpoint: string | null = null; // the endpoint to bulk reject learning moments
     let putBulkPublishEndpoint: string | null = null; // the endpoint to bulk publish learning moments
@@ -53,7 +56,12 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         isLoading.value = true;
         const response = await getCohortReport(getCohortReportEndpoint, {
             cursor: nextCursor.value,
-            // TODO: Add filters here in SA-20436
+            userIds: Object.values(crfStore.studentFilter).map((s) => s.id),
+            authorIds: Object.values(crfStore.authorFilter).map((a) => a.id),
+            tagIds: crfStore.evidenceTagsFilter,
+            states: crfStore.stateFilter,
+            from: crfStore.startDateFilter ? window.dayjs(crfStore.startDateFilter).format("YYYY-MM-DD") : undefined,
+            to: crfStore.endDateFilter ? window.dayjs(crfStore.endDateFilter).format("YYYY-MM-DD") : undefined,
         });
         isLoading.value = false;
         if (response.success === false) {

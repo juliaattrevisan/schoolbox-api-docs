@@ -1,15 +1,12 @@
 <script lang="ts" setup>
-import { keysOf } from "@js/util/arrayUtils";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 // import locale from "@js/terminology/rosettaStone";
 import type { SelectizeSelectorItem } from "@js/vendors/selectize/selectizeSelectorTypes";
 import DateRange from "@schoolboxVue/components/dateTimePicker/date-range.vue";
-import { EMPTY_DATE } from "@schoolboxVue/components/dateTimePicker/datePickerTypes";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
-import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import { evidenceStatusLabels } from "@schoolboxLearningMomentEvidence/evidenceTypes";
-import type { EvidenceStatus } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 import { useCohortReportStore } from "./store/cohortReportStore";
+import { useCohortReportFiltersStore } from "./store/cohortReportFiltersStore";
 
 interface Props {
     endpointGetEvidenceTags: string;
@@ -18,6 +15,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const crStore = useCohortReportStore();
+const crfStore = useCohortReportFiltersStore();
 
 const dateRangeEl = window.Vue.useTemplateRef<InstanceType<typeof DateRange>>("dateRangeRef");
 const evidenceTagsEl = window.Vue.useTemplateRef<HTMLSelectElement>("evidenceTagsRef");
@@ -55,17 +53,10 @@ async function applyFilters(): Promise<void> {
     // clear the invalid date inputs (if any) to correctly reflect what filters are being applied
     dateRangeEl.value?.clearInvalidDates();
 
-    // TODO (perhaps split this into a crStore.applyFilters() and keep track of the current filters so that subsequent page loads still work)
+    // clear existing data in the store as it's now invalid, then load the first page
     crStore.clearData();
     await crStore.loadNextPage();
 }
-
-const studentFilter = window.Vue.ref<SearchSelectItem[]>([]);
-const authorFilter = window.Vue.ref<SearchSelectItem[]>([]);
-const stateFilter = window.Vue.ref<EvidenceStatus[]>(keysOf(evidenceStatusLabels));
-const evidenceTagsFilter = window.Vue.ref<SelectizeSelectorItem["id"][]>([]);
-const startDateFilter = window.Vue.ref<string>(EMPTY_DATE);
-const endDateFilter = window.Vue.ref<string>(EMPTY_DATE);
 
 const tagsSelectLoaded = window.Vue.ref(false);
 
@@ -102,7 +93,7 @@ window.Vue.onMounted(async () => {
                 callback(evidenceTags);
             },
             onChange(value: string[]): void {
-                evidenceTagsFilter.value = value.map((v) => parseInt(v, 10));
+                crfStore.evidenceTagsFilter = value.map((v) => parseInt(v, 10));
             },
         },
         value: [],
@@ -125,7 +116,7 @@ window.Vue.onMounted(async () => {
             <div class="filters__container" :style="{ 'grid-template-rows': isOpen ? '1fr' : '0fr' }">
                 <div class="filters__inner-container l-flex-col l-gap-m">
                     <search-select
-                        v-model:selected="studentFilter"
+                        v-model:selected="crfStore.studentFilter"
                         label="Filter by students"
                         label-id="students"
                         endpoint="/ajax/user.php?roleTypeID=student&"
@@ -134,7 +125,7 @@ window.Vue.onMounted(async () => {
                     />
 
                     <search-select
-                        v-model:selected="authorFilter"
+                        v-model:selected="crfStore.authorFilter"
                         label="Filter by authors"
                         label-id="author"
                         endpoint="/ajax/user.php?groupID=0&"
@@ -147,8 +138,8 @@ window.Vue.onMounted(async () => {
 
                     <date-range
                         ref="dateRangeRef"
-                        v-model:start-date="startDateFilter"
-                        v-model:end-date="endDateFilter"
+                        v-model:start-date="crfStore.startDateFilter"
+                        v-model:end-date="crfStore.endDateFilter"
                         id-prefix="cr-filters"
                     />
 
@@ -173,7 +164,7 @@ window.Vue.onMounted(async () => {
                             <div v-for="(label, status) in evidenceStatusLabels" :key="status">
                                 <input
                                     :id="`cr-filters-${status}`"
-                                    v-model="stateFilter"
+                                    v-model="crfStore.stateFilter"
                                     type="checkbox"
                                     :value="status"
                                 />

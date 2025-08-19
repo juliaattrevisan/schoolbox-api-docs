@@ -38,8 +38,8 @@ export type CohortReportEntry = {
 type CohortReportApiPayload = {
     cursor?: string | null;
     userIds?: number[];
-    fromDate?: string;
-    toDate?: string;
+    from?: string;
+    to?: string;
     authorIds?: number[];
     tagIds?: number[];
     states?: EvidenceStatus[];
