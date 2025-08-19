@@ -353,12 +353,13 @@ class Kernel extends WebKernelAbstract
                     $userMapper             = $mapperFactory->get(UserMapper::class);
                     $tokenMapper            = $mapperFactory->get(TokenMapper::class);
                     $relyingPartyMapper     = $mapperFactory->get(RelyingPartyMapper::class);
+                    $logger                 = new NullLogger();
                     return new JwtParser\Composite(
-                        new JwtParser\OtherInstanceIssued($userMapper, $config),
-                        new JwtParser\SelfIssued($userMapper, $config, $tokenMapper),
-                        new JwtParser\OauthProviderIssued($userMapper, $config, $httpClient, $oidcCache),
-                        new JwtParser\InstanceRegistryIssued($userMapper, $config),
-                        new JwtParser\OauthClientHeld($userMapper, $config, $relyingPartyMapper),
+                        new JwtParser\OtherInstanceIssued($userMapper, $config, $logger),
+                        new JwtParser\SelfIssued($userMapper, $config, $logger, $tokenMapper),
+                        new JwtParser\OauthProviderIssued($userMapper, $config, $logger, $httpClient, $oidcCache),
+                        new JwtParser\InstanceRegistryIssued($userMapper, $config, $logger),
+                        new JwtParser\OauthClientHeld($userMapper, $config, $logger, $relyingPartyMapper),
                     );
                 }
             )
