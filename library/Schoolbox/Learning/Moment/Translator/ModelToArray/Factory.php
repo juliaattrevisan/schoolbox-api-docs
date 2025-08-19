@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray;
+namespace Schoolbox\Learning\Moment\Translator\ModelToArray;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;

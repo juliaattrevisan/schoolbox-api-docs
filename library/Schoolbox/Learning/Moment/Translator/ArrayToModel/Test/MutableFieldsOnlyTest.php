@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\Test;
+namespace Schoolbox\Learning\Moment\Translator\ArrayToModel\Test;
 
 use Alaress_Date_Format;
 use DateTimeZone;
@@ -15,7 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Discussion\Thread\Model as DiscussionThread;
 use Schoolbox\Learning\Moment\Evidence\Model;
-use Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\MutableFieldsOnly;
+use Schoolbox\Learning\Moment\Translator\ArrayToModel\MutableFieldsOnly;
 use Schoolbox\Resource\Attachment\Collector\Collector;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\IStorage;
@@ -27,7 +27,7 @@ use Schoolbox\User;
  * evidence, when only the subset of fields which is mutable by API calls is
  * converted.
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\MutableFieldsOnly::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Learning\Moment\Translator\ArrayToModel\MutableFieldsOnly::class)]
 class MutableFieldsOnlyTest extends TestCase
 {
     /**

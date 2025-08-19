@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence\Translator;
+namespace Schoolbox\Learning\Moment\Translator;
 
 use Schoolbox\Learning\Moment\Evidence;
 

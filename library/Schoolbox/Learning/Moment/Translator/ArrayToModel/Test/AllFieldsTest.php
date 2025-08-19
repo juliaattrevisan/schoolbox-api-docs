@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\Test;
+namespace Schoolbox\Learning\Moment\Translator\ArrayToModel\Test;
 
 use Alaress_Date_Format;
 use DateTimeZone;
@@ -16,7 +16,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Discussion\Thread\Model as DiscussionThread;
 use Schoolbox\Learning\Moment\Evidence\Model;
-use Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\AllFields;
+use Schoolbox\Learning\Moment\Translator\ArrayToModel\AllFields;
 use Schoolbox\Resource\Attachment\Collector\Collector;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\IStorage;
@@ -27,7 +27,7 @@ use Schoolbox\User;
  * Tests for converting from an array to model representation of learning moment
  * evidence.
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel\AllFields::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Learning\Moment\Translator\ArrayToModel\AllFields::class)]
 class AllFieldsTest extends TestCase
 {
     /**

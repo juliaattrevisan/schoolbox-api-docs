@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel;
+namespace Schoolbox\Learning\Moment\Translator\ArrayToModel;
 
 /**
  * Array-to-model translator which filters out fields which may not be mutated

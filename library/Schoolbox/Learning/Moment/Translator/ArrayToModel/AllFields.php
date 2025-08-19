@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence\Translator\ArrayToModel;
+namespace Schoolbox\Learning\Moment\Translator\ArrayToModel;
 
 use Alaress_Date_Format;
 use InvalidArgumentException;

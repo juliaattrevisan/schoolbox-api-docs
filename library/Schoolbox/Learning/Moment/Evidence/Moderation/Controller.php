@@ -58,14 +58,14 @@ class Controller extends Base
     public function putPublish(Model $evidence): array
     {
         $requestBody       = $this->request->getParsedBody();
-        $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
+        $requestTranslator = new \Schoolbox\Learning\Moment\Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
         $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
         $tokenReplacer     = new TokenReplacer\Student(new TokenReplacer\Simple());
 
         /* This is a pretty convoluted way of doing things just to decide on a subset of nodes
          * Anyway, this $baseModel contains any curriculum nodes and tags you might have altered
          */
-        $baseModel = (new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory()))($requestBody)
+        $baseModel = (new \Schoolbox\Learning\Moment\Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory()))($requestBody)
             ->setCreator($this->getUser());
 
         /* Update anything that might have changed
@@ -100,7 +100,7 @@ class Controller extends Base
         /* TODO Post a notification
          */
 
-        $responseTranslator = new Translator\ModelToArray\Base(
+        $responseTranslator = new \Schoolbox\Learning\Moment\Translator\ModelToArray\Base(
             new User\Translator\Author\ModelToArray(),
             new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
             new ScrubAdapter(),
@@ -220,7 +220,7 @@ class Controller extends Base
     {
         $requestBody       = $this->request->getParsedBody();
 
-        $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
+        $requestTranslator = new \Schoolbox\Learning\Moment\Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
         $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
         $tokenReplacer     = new TokenReplacer\Student(new TokenReplacer\Simple());
 
@@ -258,7 +258,7 @@ class Controller extends Base
 
         $this->commentMapper->save($comment);
 
-        $responseTranslator = new Translator\ModelToArray\Base(
+        $responseTranslator = new \Schoolbox\Learning\Moment\Translator\ModelToArray\Base(
             new User\Translator\Author\ModelToArray(),
             new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
             new ScrubAdapter(),

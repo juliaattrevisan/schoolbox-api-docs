@@ -21,8 +21,8 @@ use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Moment\Evidence\Moderation\ModerationRequired;
-use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Factory;
 use Schoolbox\Learning\Moment\NextRoutes;
+use Schoolbox\Learning\Moment\Translator\ModelToArray\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
@@ -296,7 +296,7 @@ class Controller extends Base
 
         // Save the evidence
         $evidenceCollection = $this->mapper->createCollection();
-        $baseModel          = (new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory()))($requestBody)
+        $baseModel          = (new \Schoolbox\Learning\Moment\Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory()))($requestBody)
             ->setCreator($this->getUser());
         $tokenReplacer      = new TokenReplacer\Student(new TokenReplacer\Simple());
         foreach ($users as $user) {
@@ -407,7 +407,7 @@ class Controller extends Base
     {
         $requestBody       = $this->request->getParsedBody();
 
-        $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
+        $requestTranslator = new \Schoolbox\Learning\Moment\Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
         $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
         $tokenReplacer     = new TokenReplacer\Student(new TokenReplacer\Simple());
         $evidence          = $requestTranslator($requestBody, $evidence)
@@ -700,7 +700,7 @@ class Controller extends Base
          * written there and update our model here.
          */
         if (!empty($requestBody)) {
-            $requestTranslator = new Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
+            $requestTranslator = new \Schoolbox\Learning\Moment\Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
             $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
             $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
             $evidence = $requestTranslator($requestBody, $evidence)->setBody($tokenReplacer->replace($evidence->getBody(), $evidence->getRecipient()));

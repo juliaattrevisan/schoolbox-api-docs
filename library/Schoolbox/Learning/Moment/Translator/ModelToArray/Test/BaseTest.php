@@ -7,7 +7,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Test;
+namespace Schoolbox\Learning\Moment\Translator\ModelToArray\Test;
 
 use Alaress\HTMLPurifier\Adapter\MockAdapter;
 use Alaress_Date_Format;
@@ -18,8 +18,8 @@ use Schoolbox\Curriculum\Node\Model as CurriculumNode;
 use Schoolbox\Discussion\Thread\Model as DiscussionThread;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Moment\Evidence\Model;
-use Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Base;
 use Schoolbox\Learning\Moment\Tag\Model as EvidenceTag;
+use Schoolbox\Learning\Moment\Translator\ModelToArray\Base;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\User;
 
@@ -27,7 +27,7 @@ use Schoolbox\User;
  * Tests for converting from a model to array representation of learning moment
  * evidence.
  */
-#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Learning\Moment\Evidence\Translator\ModelToArray\Base::class)]
+#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\Learning\Moment\Translator\ModelToArray\Base::class)]
 class BaseTest extends TestCase
 {
     /**
