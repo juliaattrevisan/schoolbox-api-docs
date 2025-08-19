@@ -2,12 +2,12 @@
 
 namespace Schoolbox\Pastoral\ReportBuilder;
 
+use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\SubType\Model as SubType;
-use Alaress_Date_Format;
 
 class Helper
 {
@@ -20,6 +20,14 @@ class Helper
         private IConfigLoader $configLoader,
     ) {
         $this->setFilters();
+    }
+
+    /**
+     * @return IConfigLoader
+     */
+    public function getConfigLoader(): IConfigLoader
+    {
+        return $this->configLoader;
     }
 
     /**
@@ -390,5 +398,64 @@ class Helper
             $end->addMonths(-1);
         }
         return new Collection($months);
+    }
+
+    /**
+     * @param Alaress_Date_Format|null $startDate
+     * @param Alaress_Date_Format|null $endDate
+     * @param string                   $format
+     * @param string                   $labelFormat
+     * @param int                      $maxStack
+     * @return Collection
+     */
+    public function getWeeksInRange(
+        ?Alaress_Date_Format $startDate,
+        ?Alaress_Date_Format $endDate,
+        string $format,
+        string $labelFormat,
+        int $maxStack
+    ): Collection {
+        /* Return empty collection if either date is null.
+         */
+        if (null === $startDate || null === $endDate) {
+            return new Collection();
+        }
+        $weekStartDayOfWeek = $this->configLoader->get('calendar_start_day');
+
+        $start = clone $startDate;
+        $end = clone $endDate;
+
+        $weeks = [];
+        $current = (clone $end);
+        $index = 0;
+        while ($current->gte($start) && count($weeks) < $maxStack) {
+            if ($current->getWeekDayNumber() !== $weekStartDayOfWeek) {
+                // Adjust current to the start of the week
+                $weekStart = (clone $current)->previous((int)$weekStartDayOfWeek);
+            } else {
+                $weekStart = clone $current;
+            };
+            $weekEnd = (clone $weekStart)->addDays(6);
+
+            // Ensure weekStart and weekEnd are within the original range
+            $rangeStart = clone $startDate;
+            $rangeEnd = clone $endDate;
+            $actualStart = $weekStart->lt($rangeStart) ? $rangeStart : $weekStart;
+            $actualEnd = $weekEnd->gt($rangeEnd) ? $rangeEnd : $weekEnd;
+
+            $key = sprintf($format, $index++);
+            array_unshift(
+                $weeks,
+                [
+                    'start' => $actualStart->startOfDay(),
+                    'end' => $actualEnd->endOfDay(),
+                    'key' => $key,
+                    'label' => $actualStart->getUsingFormat($labelFormat) . ' - ' .
+                        $actualEnd->getUsingFormat($labelFormat),
+                ]
+            );
+            $current->addWeeks(-1);
+        }
+        return new Collection($weeks);
     }
 }

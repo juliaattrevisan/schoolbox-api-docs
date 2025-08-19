@@ -12,6 +12,7 @@ use Schoolbox\Pastoral\ReportBuilder\Factory;
 use Schoolbox\Pastoral\ReportBuilder\Helper;
 use Schoolbox\Pastoral\ReportBuilder\TabType\StudentByType;
 use Schoolbox\Pastoral\ReportBuilder\TabType\TypeByMonth;
+use Schoolbox\Pastoral\ReportBuilder\TabType\TypeByWeek;
 use Schoolbox\Pastoral\SubType\Model as SubType;
 use Schoolbox\Pastoral\Type\Model as Type;
 use ValueError;
@@ -234,12 +235,19 @@ class Cursor implements ICursor
         switch ($this->tabType) {
             case Factory::STUDENT_BY_TYPE:
                 $query[] = "p.student_id = :student_id";
+                if (!isset($this->rowKey['type'])) {
+                    throw new ValueError('Student ID is required');
+                }
                 $param['student_id'] = $this->rowKey['student_id'];
                 break;
+            case Factory::TYPE_BY_WEEK:
             case Factory::TYPE_BY_MONTH:
                 $query[] = "p.type_id = :type_id AND COALESCE(p.subtype_id, '') = COALESCE(:subtype_id, '')";
+                if (!isset($this->rowKey['type']['type_id'])) {
+                    throw new ValueError('Type ID is required');
+                }
                 $param['type_id'] = $this->rowKey['type']['type_id'];
-                $param['subtype_id'] = $this->rowKey['type']['subtype_id'];
+                $param['subtype_id'] = $this->rowKey['type']['subtype_id'] ?? null;
                 break;
             default:
                 throw new ValueError(sprintf('Unknown tab type: %s', $this->tabType));
@@ -269,6 +277,25 @@ class Cursor implements ICursor
                 $monthFormat = TypeByMonth::COLUMN_QUERY_MONTH_FORMAT;
                 $query[] = "DATE_FORMAT(COALESCE(p.occurred_on, p.created_at), '{$monthFormat}') = :monthKey";
                 $param['monthKey'] = $this->columnKey;
+                break;
+            case Factory::TYPE_BY_WEEK:
+                if (!preg_match(TypeByWeek::COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
+                    throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey));
+                }
+                $weeks = $this->helper->getWeeksInRange(
+                    $this->helper->getStartDate(),
+                    $this->helper->getEndDate(),
+                    TypeByWeek::COLUMN_QUERY_KEY,
+                    $this->helper->getConfigLoader()->get('date_short'),
+                    TypeByWeek::MAX_COLUMN_COUNT,
+                );
+                if (!$weeks->offsetExists($matches['index'])) {
+                    throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey));
+                }
+                $query[] = "COALESCE(p.occurred_on, p.created_at) BETWEEN :start AND :end";
+                $week = array_reverse($weeks->getAll())[$matches['index']];
+                $param['start'] = $week['start']->toIso8601String();
+                $param['end'] = $week['end']->toIso8601String();
                 break;
             default:
                 throw new ValueError(sprintf('Unknown tab type: %s', $this->tabType));
