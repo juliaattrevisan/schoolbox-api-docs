@@ -106,7 +106,7 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
-        // Select all search_index rows linked to deleted blogs.
+        // Select all search_index rows linked to deleted events.
         $queryString = '
             SELECT si.identifier AS id, si.type
             FROM search_index si
