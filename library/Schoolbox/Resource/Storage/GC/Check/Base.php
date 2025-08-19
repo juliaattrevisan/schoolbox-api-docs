@@ -89,11 +89,21 @@ abstract class Base implements Check
                         implode(',', $columns),
                     ),
                 );
-                $this->logger->info(
+
+                $searchDataLength = $columnData['extra']['search_data_length'] ?? null;
+                $this->logger->debug(
                     sprintf(
-                        '. max search space: %s',
-                        isset($columnData['extra']['search_data_length'])
-                            ? Alaress_Byte_Format::bytesToString($columnData['extra']['search_data_length'], renderIec: true)
+                        '.. max search space per hash: %s',
+                        isset($searchDataLength)
+                            ? Alaress_Byte_Format::bytesToString($searchDataLength, renderIec: true)
+                            : 'unknown',
+                    ),
+                );
+                $this->logger->debug(
+                    sprintf(
+                        '.. total search size: %s',
+                        isset($searchDataLength)
+                            ? Alaress_Byte_Format::bytesToString($searchDataLength * count($stale), renderIec: true)
                             : 'unknown',
                     ),
                 );
