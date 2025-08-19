@@ -109,6 +109,8 @@ HELP;
         $query = "
             SELECT id, hash, filename, type, created_at
             FROM moment
+            WHERE hash IS NOT NULL
+            AND filename IS NOT NULL
         ";
 
         $moments = $db->query($query)->fetchAll();
@@ -117,34 +119,12 @@ HELP;
             foreach ($moments as $moment) {
                 $this->refreshLock($lock);
 
-                /* No hash? No trabajo
-                 */
-                if (!$moment['hash']) {
-                    $this->getLogger()->info(sprintf(
-                        'Moment id %s: does not have a file hash. Skipping',
-                        $moment['id']
-                    ));
-
-                    continue;
-                }
-
-                /* No filename? No trabajo
-                 */
-                if (!$moment['filename']) {
-                    $this->getLogger()->info(sprintf(
-                        'Moment id %s: does not have a file name. Skipping',
-                        $moment['id']
-                    ));
-
-                    continue;
-                }
-
                 /* Move it! We json-encode this for logging reasons
                  */
                 $evidence = [
                     'momentId' => $moment['id'],
-                    'type'     => $moment['type'],
-                    'hash'     => $moment['hash'],
+                    'type' => $moment['type'],
+                    'hash' => $moment['hash'],
                     'filename' => $moment['filename'],
                     'createdAt' => $moment['created_at'],
                 ];
