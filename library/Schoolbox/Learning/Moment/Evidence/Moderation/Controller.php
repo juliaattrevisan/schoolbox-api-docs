@@ -275,25 +275,6 @@ class Controller extends Base
 
 
     /**
-     * Bulk delete a set of $moments
-     *
-     * @return void
-     */
-    public function deleteBulkDelete(): void
-    {
-        $stack = [];
-
-        /* Find all the learning moments to bulk modify
-         */
-        $requestBody = $this->request->getParsedBody();
-
-        $this->mapper->deleteByColumn('id', $requestBody['momentIds']);
-
-        $this->response = $this->responseAsJson($stack);
-    }
-
-
-    /**
      * Checks whether curriculum tagging is enabled
      */
     private function curriculumTaggingEnabled(): bool
