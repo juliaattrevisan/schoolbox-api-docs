@@ -72,9 +72,11 @@ This converts the 1:1 relationship between moments to the 1:n relationship it al
 separating the Learning Moment from all the pieces of supporting Evidence (files). A Learning Moment
 is related to multiple Evidence.
 
-To do that we move all the hash/filename/type values from `moment` to `moment_evidence`
+To do that we move all the hash/filename/type values from `moment` to `moment_evidence`.
 
-Usage: 102-migrate-evidence.php --perform
+This always runs in perform mode as part of the upgrade.
+
+Usage: 102-migrate-evidence.php
 
 
 HELP;
@@ -153,25 +155,17 @@ HELP;
                     json_encode($evidence)
                 ));
 
-                if ($this->perform()) {
-                    $evidenceStatement->execute($evidence);
+                $evidenceStatement->execute($evidence);
 
-                    $this->getLogger()->info(sprintf(
-                        'Updated learning moment %s to have new moment_evidence',
-                        $moment['id'],
-                    ));
-                }
+                $this->getLogger()->info(sprintf(
+                    'Updated learning moment %s to have new moment_evidence',
+                    $moment['id'],
+                ));
             }
         } catch (\Alaress\Lock\LockRefreshException $e) {
             /* Lock TTL expired; just leave politely
              */
             return;
-        }
-
-        /* Announce conclusion
-         */
-        if (!$this->perform()) {
-            $this->getLogger()->info('Planning finished.');
         }
 
         /* Announce lock release
