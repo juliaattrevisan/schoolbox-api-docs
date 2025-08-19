@@ -305,30 +305,35 @@ class Controller extends Base
                 ->setRecipient($user)
                 ->setBody($tokenReplacer->replace($evidenceModel->getBody(), $user));
 
-            if (null !== $defaultState) {
-                /* Spawn a learning moment in a particular state
-                 */
-                $this->updateState($evidenceModel, $defaultState);
-            } elseif ($moderationRequired) {
-                /* Accelerate into the next state based on configs and year level settings
-                 */
+            if ($this->requestPost->get('draft', false)) {
+                // autosave draft, save as draft
                 $evidenceModel->draft();
             } else {
-                /* Does not require moderation; just send it into the world
-                 */
-                $evidenceModel->publish($this->getUser());
+                if (null !== $defaultState) {
+                    /* Spawn a learning moment in a particular state
+                     */
+                    $this->updateState($evidenceModel, $defaultState);
+                } elseif ($moderationRequired) {
+                    /* Accelerate into the next state based on configs and year level settings
+                     */
+                    $evidenceModel->draft();
+                } else {
+                    /* Does not require moderation; just send it into the world
+                     */
+                    $evidenceModel->publish($this->getUser());
+                }
             }
 
             $evidenceCollection->add($evidenceModel);
         }
         $this->mapper->save($evidenceCollection);
+        /**
+         * use buildTranslatorWithComments as that contains the _links needed for draft.js
+         * where the other translator had excluded _links (for historic reasons)
+         */
         $this->response = $this->responseAsJson(
             $evidenceCollection->map(
-                new Translator\ModelToArray\Base(
-                    new User\Translator\Author\ModelToArray(),
-                    new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
-                    new ScrubAdapter(),
-                ),
+                $this->buildTranslatorWithComments(1),
             )
         )->withStatus(201);
     }
@@ -408,13 +413,18 @@ class Controller extends Base
         $evidence          = $requestTranslator($requestBody, $evidence)
             ->setBody($tokenReplacer->replace($evidence->getBody(), $evidence->getRecipient()));
 
+        if ($requestBody['draft'] ?? false) {
+            // autosave draft, save as draft
+            $evidence->draft();
+        }
+
         $this->mapper->save($evidence);
 
-        $responseTranslator = new Translator\ModelToArray\Base(
-            new User\Translator\Author\ModelToArray(),
-            new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
-            new ScrubAdapter(),
-        );
+        /**
+         * use buildTranslatorWithComments as that contains the _links needed for draft.js
+         * where the other translator had excluded _links (for historic reasons)
+         */
+        $responseTranslator = $this->buildTranslatorWithComments(1);
         $this->response     = $this->responseAsJson($responseTranslator($evidence));
     }
 
@@ -704,11 +714,11 @@ class Controller extends Base
          */
         $this->mapper->save($evidence);
 
-        $responseTranslator = new Translator\ModelToArray\Base(
-            new User\Translator\Author\ModelToArray(),
-            new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfigLoader())),
-            new ScrubAdapter(),
-        );
+        /**
+         * use buildTranslatorWithComments as that contains the _links needed for draft.js
+         * where the other translator had excluded _links (for historic reasons)
+         */
+        $responseTranslator = $this->buildTranslatorWithComments(1);
 
         $translated = $responseTranslator($evidence);
 

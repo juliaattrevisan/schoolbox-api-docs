@@ -137,6 +137,11 @@ class Notifier extends AbstractModuleNotifier
     {
         $envelope = new Envelope();
 
+        // if the evidence is draft (now draft, may have just been created, may have been moved to draft, do not notify
+        if ($model->isDraft()) {
+            return $envelope;
+        }
+
         try {
             /** @var Evidence $evidence */
             $evidence = $this->mapper->findById($model->getId());

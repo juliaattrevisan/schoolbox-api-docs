@@ -148,7 +148,8 @@ class AllFields extends Base
         // * a triplet passed from a resource attacher, to be transformed into a
         //   storage hash by the collector factory
         if (array_key_exists('file', $json)) {
-            if (!isset($json['file'])) {
+            if (!isset($json['file']) || '' === $json['file']) {
+                // If the file is not set, then we should set the storage and filename to null
                 $model
                     ->setFilename(null)
                     ->setStorage(null);

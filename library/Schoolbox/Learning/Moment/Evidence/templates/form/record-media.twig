@@ -17,6 +17,8 @@
                             {% if isCreate == false %}
                             :pre-recorded-data="{{ evidence.storage|json_encode }}"
                             {% endif %}
+                            filename-id="evidence-filename"
+                            storage-id="file"
                         />
                     </div>
                     <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/evidenceMediaRecording.js?v={{ config.site_version }}"></script>

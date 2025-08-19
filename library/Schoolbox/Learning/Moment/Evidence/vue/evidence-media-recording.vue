@@ -39,6 +39,16 @@ export default {
             type: Object,
             required: false,
         },
+        filenameId: {
+            // to uniquely identify the filename input element
+            type: String,
+            required: true,
+        },
+        storageId: {
+            // to uniquely identify the storage input element
+            type: String,
+            required: true,
+        },
     },
 
     data() {
@@ -58,6 +68,8 @@ export default {
             isFirstRecording: true, //prevent multiple recordings coming through
             deviceWidth: 0, //to restore to device dimensions if expanding/contracting on over-media-modal changes
             deviceHeight: 0, //to restore to device dimensions if expanding/contracting on over-media-modal changes
+            filenameElement: null,
+            storageElement: null,
         };
     },
 
@@ -71,6 +83,7 @@ export default {
 
     mounted() {
         this.initContainerHeight();
+        this.getElements();
     },
 
     methods: {
@@ -123,6 +136,24 @@ export default {
         },
 
         /**
+         * Get the DOM elements for the filename and storage inputs
+         */
+        getElements() {
+            this.filenameElement = document.getElementById(this.filenameId);
+            if (this.filenameElement === null) {
+                console.warn(
+                    `Element with id ${this.filenameId} not found. Ensure the filename input element is present in the DOM.`,
+                );
+            }
+            this.storageElement = document.getElementById(this.storageId);
+            if (this.storageElement === null) {
+                console.warn(
+                    `Element with id ${this.storageId} not found. Ensure the storage input element is present in the DOM.`,
+                );
+            }
+        },
+
+        /**
          * currently to update the container ratio to match the dimensions of the recording device
          *
          * @params { Number }
@@ -149,10 +180,27 @@ export default {
          */
         onRecordedMediaReady(recordedData) {
             this.recordedData = recordedData;
-            document.getElementById("evidence-filename").value = this.recordedData.name; //to pass form submit validation check
+            // remove the event listeners to prevent multiple uploads
+            this.storageElement.removeEventListener("draft__onDraftSave", this.onAutoSave);
+            this.storageElement.addEventListener("draft__onDraftSave", this.onAutoSave);
+            this.filenameElement.value = this.recordedData.name; //to pass form submit validation check
             if (this.isFirstRecording) {
                 this.isFirstRecording = false;
                 document.addEventListener("evidence-media-recording__onFormSubmit", this.onFormSubmit); //to prevent the form from being submitted until the media is uploaded
+            }
+        },
+
+        /**
+         * draft.js has triggered an auto save, so we need to upload the media
+         * now rather than on form submit
+         */
+        async onAutoSave() {
+            this.checkRecording();
+            const responseData = await this.uploadMediaAndReturnResponse();
+            if (!this.hasUploadError) {
+                this.addHiddenInputs(responseData);
+                this.displayUploadSuccessful();
+                this.storageElement.dispatchEvent(new CustomEvent("draft__onUploadComplete"));
             }
         },
 
@@ -161,6 +209,7 @@ export default {
          *
          */
         async onFormSubmit() {
+            this.storageElement.removeEventListener("draft__onDraftSave", this.onAutoSave); // no need to respond to draft save when submitting
             this.checkRecording();
             const responseData = await this.uploadMediaAndReturnResponse();
             if (!this.hasUploadError) {
@@ -283,7 +332,7 @@ export default {
          * @params {Object}
          */
         addHiddenInputs(responseData) {
-            document.getElementById("file").value = `${responseData.hash}:${this.recordedData.name}`; //to retrieve the file reference
+            this.storageElement.value = `${responseData.hash}:${this.recordedData.name}`; //to retrieve the file reference
         },
 
         /**
@@ -315,8 +364,8 @@ export default {
          *
          */
         clearHiddenInputs() {
-            document.getElementById("evidence-filename").value = "";
-            document.getElementById("file").value = "";
+            this.filenameElement.value = "";
+            this.storageElement.value = "";
         },
 
         /**

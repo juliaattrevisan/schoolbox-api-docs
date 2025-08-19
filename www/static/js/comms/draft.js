@@ -47,6 +47,15 @@
                 // These shouldn't go into 'inputs' because of the strtotime functionality we have on date fields
                 datepickers: [],
 
+                /**
+                 * An array of files that we need to be uploaded before saving the draft.
+                 * Currently this is used to upload a media recording on the learning
+                 * moments page. We pass in two form elements { filename: <input hidden>, storage: <input hidden> }
+                 * Filename is used to indicate when a media recording is available for upload
+                 * And storage is used to store the file hash of the media recording when uploaded
+                 */
+                files: [],
+
                 /* Activation element
                  * The thing that gets disabled while saving
                  */
@@ -60,6 +69,12 @@
 
                 // The infamous stallSubmit
                 staller: null,
+
+                // overloadable function to get form data
+                getFormData: null,
+
+                // The content type to use for the ajax request
+                contentType: "application/x-www-form-urlencoded; charset=UTF-8",
             };
 
             return $.extend(defaults, options);
@@ -73,7 +88,9 @@
             var deferred;
 
             // Listen for changes on inputs
-            config.element.on("change keyup", config.inputs.join(", "), checkForChanges);
+            config.inputs.forEach((input) => {
+                config.element.find(input).on("change keyup", checkForChanges);
+            });
 
             /**
              * Loop through the textareas and listen for changes on them
@@ -163,32 +180,81 @@
         }
 
         /**
-         * Save the data via ajax, showing a toast for the user
-         *
-         * @param {jQuery.Deferred} deferred - a deferred object to resolve on successful save
+         * Get the form contents to be sent via ajax
+         * @returns {*|jQuery}
          */
-        function save(deferred) {
-            // Init toast
-            config.toaster.toastActivate({
-                text: "Saving...",
-            });
-
+        function getFormContents() {
             var formContents = $(config.element).serializeArray();
 
             /* Special treatment because ck reasons
              */
             for (var i = 0; i < config.textareas.length; i++) {
                 var key = config.textareas[i];
-
                 formContents.push({
                     name: key,
                     value: window.sbProps.editors[key].getData(),
                 });
             }
-
             /* Send draft flag
              */
             formContents.push({ name: "draft", value: true });
+
+            return formContents;
+        }
+
+        /**
+         * Do we have files we need to upload prior to saving?
+         * If so trigger the upload for each and wait for them
+         * to be uploaded before continuing with draft saving
+         *
+         * @param {jQuery.Deferred} deferred - a deferred object to resolve on successful save
+         */
+        function hasFilesToUpload(deferred) {
+            if (config.files.length > 0) {
+                // If the filename is not empty and the storage is, we need to upload the file
+                const filesToUpload = config.files.filter(
+                    (file) =>
+                        // storage or filename may not exist, so check and null coalesce
+                        document.querySelector(file.filename)?.value !== "" &&
+                        document.querySelector(file.storage)?.value === "",
+                );
+                if (filesToUpload.length > 0) {
+                    let filesUploaded = 0;
+                    // We assume the file upload to be managed elsewhere (like evidence-media-recording.vue)
+                    filesToUpload.forEach((file) => {
+                        document.querySelector(file.storage).addEventListener("draft__onUploadComplete", () => {
+                            filesUploaded += 1;
+                            if (filesUploaded === filesToUpload.length) {
+                                // All files have been uploaded, continue with the save
+                                save(deferred);
+                            }
+                        });
+                        document.querySelector(file.storage).dispatchEvent(new CustomEvent("draft__onDraftSave"));
+                    });
+                    // Wait for all files to be uploaded before continuing
+                    return true;
+                }
+                return false;
+            }
+            return false;
+        }
+
+        /**
+         * Save the data via ajax, showing a toast for the user
+         *
+         * @param {jQuery.Deferred} deferred - a deferred object to resolve on successful save
+         */
+        function save(deferred) {
+            if (hasFilesToUpload(deferred)) {
+                // Files are being uploaded, wait for them to finish
+                return;
+            }
+            // Init toast
+            config.toaster.toastActivate({
+                text: "Saving...",
+            });
+
+            const formContents = (config.getFormData || getFormContents)();
 
             /* Transact
              */
@@ -197,6 +263,7 @@
                 url: config.element.data("action-draft"),
                 data: formContents,
                 dataType: "json",
+                contentType: config.contentType,
             })
                 .done(function (responseText) {
                     config.toaster.toastTimeout({
