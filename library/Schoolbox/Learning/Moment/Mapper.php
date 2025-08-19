@@ -422,6 +422,11 @@ class Mapper extends BaseMapper
      */
     public function saveEvidence(Model $moment): void
     {
-        $this->cascadeJoin('moment_evidence', ['moment_id' => $moment->getId()], $moment->getEvidence());
+        /* Moments without evidence won't have a collection instantiated
+         * e.g. you just wrote in the body, didn't attach anything
+         */
+        if (null !== $moment->getEvidence()) {
+            $this->cascadeJoin('moment_evidence', ['moment_id' => $moment->getId()], $moment->getEvidence());
+        }
     }
 }
