@@ -123,7 +123,7 @@ class IndexBuilder extends BaseBuilder
         }
         if ($subject) {
             if (!$this->accepts($subject, BuildType::DELETE)) {
-                return;
+                return null;
             }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::DELETE, $queryString, $params);
         }

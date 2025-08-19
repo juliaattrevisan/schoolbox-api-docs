@@ -105,7 +105,7 @@ class IndexBuilder extends BaseBuilder
     /**
      * @inheritdoc
      */
-    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
+    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): Iterable
     {
         // Select all search_index rows linked to deleted blogs.
         // Note if the parent folder is deleted, the blog is considered to be deleted also regardless of its own deleted_at value.
@@ -128,7 +128,7 @@ class IndexBuilder extends BaseBuilder
         }
         if ($subject) {
             if (!$this->accepts($subject, BuildType::DELETE)) {
-                return;
+                return null;
             }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::DELETE, $queryString, $params);
         }
