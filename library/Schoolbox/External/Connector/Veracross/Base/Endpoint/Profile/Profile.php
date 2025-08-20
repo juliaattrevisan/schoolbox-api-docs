@@ -707,6 +707,12 @@ class Profile implements IStrategy
             foreach ($staffPage['data'] as $staff) {
                 $externalId = trim((string)$staff['id']);
 
+                /* Only import for specific users
+                 */
+                if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                    continue;
+                }
+
                 $firstname = trim((string)$staff['first_name']);
                 $firstnamePreferred = trim((string)$staff['preferred_name']);
 
