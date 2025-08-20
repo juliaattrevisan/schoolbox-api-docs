@@ -430,7 +430,7 @@ class NavigationSelector
 
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
-            FROM uvSchoolBoxCoCurricularClasses
+            FROM dbo.uvSchoolBoxCoCurricularClasses
             WHERE StudentID = :externalId
         ";
 
