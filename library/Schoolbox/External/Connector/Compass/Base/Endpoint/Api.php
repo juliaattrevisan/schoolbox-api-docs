@@ -116,8 +116,10 @@ class Api implements IApi
         return new Client([
             'headers' => $headers,
             'timeout' => $timeout,
-            'http_errors' => false,
-
+            /* Loudly die, forcing devs to process exceptions thrown by guzzle, preventing you from
+             * inspecting it via getStatusCode() the same way you would with a successful request.
+             */
+            'http_errors' => true,
             /* See https://docs.guzzlephp.org/en/stable/quickstart.html for usage
              * There's a little thing about relative urls here
              */
