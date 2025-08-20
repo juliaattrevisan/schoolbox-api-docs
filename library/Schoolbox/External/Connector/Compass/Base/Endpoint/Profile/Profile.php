@@ -1255,6 +1255,28 @@ class Profile implements IStrategy
                 // Compass' CDN.
                 $response = $this->api->getClient()->get($url);
                 $image    = $response->getBody()->getContents();
+
+                /* Compass denies access due to cloudflare: any html response is invalid
+                 * for image data, so we can just leave immediately upon detecting this
+                 */
+                if (403 === $response->getStatusCode()) {
+                    $this->log->warning(sprintf(
+                        'Invalid photo data for %s; returned http %s %s.',
+                        $baseProfile->getExternalId(),
+                        $response->getStatusCode(),
+                        $response->getReasonPhrase()
+                    ));
+                }
+
+                if (str_contains($image, 'DOCTYPE html')) {
+                    $this->log->warning(sprintf(
+                        'Invalid photo data for %s; contains html instead of image binary. Skipping',
+                        $baseProfile->getExternalId()
+                    ));
+
+                    return;
+                }
+
                 break;
             } catch (\Exception $e) {
                 $this->log->warning(sprintf(
