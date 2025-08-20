@@ -12,8 +12,6 @@ namespace Schoolbox\API\Token\JwtParser;
 use Firebase\JWT\JWK;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use JsonException;
-use Schoolbox\API\Token\JwtParser\Exception\Rejected;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -46,7 +44,7 @@ class InstanceRegistryIssued extends Base
         $claims = $this->decodeWithoutVerification($jwt);
 
         // Ensure that the JWT was issued by the instance registry
-        $this->log->debug(
+        $this->log->info(
             sprintf(
                 'Checking if JWT contains claim "%s", and that its host matches config "%s"',
                 self::CLAIM_ISS,
@@ -55,15 +53,24 @@ class InstanceRegistryIssued extends Base
         );
         $irUrl       = $this->config->get(ConfigMapper::NAME_INSTANCE_REGISTRY_URL);
         $claimIssuer = $claims[self::CLAIM_ISS] ?? null;
+        $this->log->debug(
+            sprintf(
+                'JWT %s: %s, config %s: %s',
+                self::CLAIM_ISS,
+                $claimIssuer,
+                ConfigMapper::NAME_INSTANCE_REGISTRY_URL,
+                $irUrl,
+            )
+        );
         if (
             !(
                 isset($claimIssuer) &&
                 parse_url($claimIssuer, PHP_URL_HOST) === parse_url($irUrl, PHP_URL_HOST)
             )
         ) {
-            $this->log->debug(
+            $this->log->info(
                 sprintf(
-                    'JWT claim "%s" hostname does not match config "%s": using next parser',
+                    'JWT claim "%s" hostname does not match config "%s"',
                     self::CLAIM_ISS,
                     ConfigMapper::NAME_INSTANCE_REGISTRY_URL,
                 ),
@@ -72,7 +79,7 @@ class InstanceRegistryIssued extends Base
         }
 
         // Ensure that the JWT's instance ID claim matches this instance's ID
-        $this->log->debug(
+        $this->log->info(
             sprintf(
                 'Checking if JWT contains claim "%s", and that its host matches instance ID',
                 self::CLAIM_INSTANCE_ID,
@@ -80,17 +87,17 @@ class InstanceRegistryIssued extends Base
         );
         $claimInstanceId = $claims[self::CLAIM_INSTANCE_ID] ?? null;
         if ($claimInstanceId !== (string)INSTANCE_ID) {
-            $this->log->debug(
+            $this->log->info(
                 sprintf(
-                    'JWT claim "%s" does not match instance ID: using next parser',
+                    'JWT claim "%s" does not match instance ID',
                     self::CLAIM_INSTANCE_ID,
                 ),
             );
         }
 
-        $this->log->debug(
+        $this->log->info(
             sprintf(
-                'JWT claims "%s" hostname matches config "%s", and "%s" matches instance ID: using this parser',
+                'JWT claims "%s" hostname matches config "%s", and "%s" matches instance ID',
                 self::CLAIM_ISS,
                 ConfigMapper::NAME_INSTANCE_REGISTRY_URL,
                 self::CLAIM_INSTANCE_ID,
@@ -108,7 +115,7 @@ class InstanceRegistryIssued extends Base
         // Retrieve the JWKs from the instance registry.
         try {
             $this->log->debug(sprintf('Querying instance registry for its JWKS'));
-            $jwk = json_decode(
+            $jwks = json_decode(
                 $client->get(
                     $this->config->get(ConfigMapper::NAME_INSTANCE_REGISTRY_URL) . '/api/jwks'
                 )
@@ -119,26 +126,18 @@ class InstanceRegistryIssued extends Base
                 JSON_THROW_ON_ERROR
             );
         } catch (GuzzleException $e) {
-            $message = 'Unable to retrieve instance registry JWKS';
-            $this->log->error($message . sprintf(' (message: %s)', $e->getMessage()));
-            throw new Exception\Rejected($message, $e->getCode(), $e);
+            throw new Exception\Rejected('Unable to retrieve instance registry JWKS', $e->getCode(), $e);
         } catch (\JsonException $e) {
-            $message = 'Unable to parse instance registry JWKS';
-            $this->log->error($message . sprintf(' (message: %s)', $e->getMessage()));
-            throw new Exception\Rejected($message, $e->getCode(), $e);
+            throw new Exception\Rejected('Unable to parse instance registry JWKS', $e->getCode(), $e);
         }
 
-        // Verify the JWT using the JWKs.
-        if (
-            $this->decode(
-                $jwt,
-                JWK::parseKeySet($jwk, self::DEFAULT_SIGNING_ALGORITHM),
-                (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
-            )
-        ) {
-            return $this->findUser(UserMapper::USERNAME_ALARESS_ADMIN, null);
-        }
-
-        throw new Rejected('Unable to verify JWT');
+        // Verify the JWT using the JWKS,
+        // then find Schoolbox Admin and log them in.
+        $this->decode(
+            $jwt,
+            JWK::parseKeySet($jwks, self::DEFAULT_SIGNING_ALGORITHM),
+            (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
+        );
+        return $this->findUser(UserMapper::USERNAME_ALARESS_ADMIN, null);
     }
 }
