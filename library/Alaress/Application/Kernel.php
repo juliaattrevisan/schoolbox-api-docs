@@ -2067,7 +2067,14 @@ abstract class Kernel
                     $userMapper         = $mapperFactory->get(UserMapper::class);
                     $tokenMapper        = $mapperFactory->get(TokenMapper::class);
                     $relyingPartyMapper = $mapperFactory->get(RelyingPartyMapper::class);
-                    $logger             = new Logger(STDOUT, STDOUT, Level::Debug, [], true, 'jwtParser');
+                    $logger             = new Logger(
+                        STDOUT,
+                        STDOUT,
+                        $config->get(ConfigMapper::NAME_DEBUG_MODE) ? Level::Debug : Level::Info,
+                        [],
+                        true,
+                        'jwtParser',
+                    );
                     return new JwtParser\Composite(
                         $logger,
                         new JwtParser\OtherInstanceIssued($userMapper, $config, $logger),
