@@ -162,9 +162,11 @@ class NavigationSelector
      */
     private function navigationData(): void
     {
+        $userYear = $this->user->getYear()?->getName();
+
         $availableNavigation = [];
 
-        if ($this->hasMYP()) {
+        if ($userYear !== '11' && $this->hasMYP()) {
             $availableNavigation[self::MYP_KEY] = [
                 'url' => $this->routeGenerator->generate('achievementreport.getMyp', [
                     'externalUserId' => $this->externalUser['StudentID'],
@@ -214,6 +216,15 @@ class NavigationSelector
                     'externalUserId' => $this->externalUser['StudentID'],
                 ]),
                 'label' => 'School Grades'
+            ];
+        }
+
+        if ($userYear === '11' && $this->hasMYP()) {
+            $availableNavigation[self::MYP_KEY] = [
+                'url' => $this->routeGenerator->generate('achievementreport.getMyp', [
+                    'externalUserId' => $this->externalUser['StudentID'],
+                ]),
+                'label' => 'MYP',
             ];
         }
 
