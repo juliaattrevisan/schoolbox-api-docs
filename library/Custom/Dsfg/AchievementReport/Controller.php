@@ -780,12 +780,7 @@ class Controller extends Base
      */
     public function getMyp(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
-        /* Default to this year if none specified
-         */
-        $currentYear  = (int)date('Y');
-        $selectedYear = $year ?? $currentYear;
-        $mypBase      = new MYP\Base($user, $externalUser, $db, $selectedYear);
-        $mypData      = $mypBase->findData();
+        $currentYear = (int)date('Y');
 
         // get historical data
         $currentYearLevel = (int)$user->getYear()->getName();
@@ -794,15 +789,35 @@ class Controller extends Base
             if ($yearLevel === $currentYearLevel) {
                 break;
             }
-            $historicalYear              = $currentYear - ($currentYearLevel - $yearLevel);
-            $historicalMypBase           = new MYP\Base($user, $externalUser, $db, $historicalYear);
-            $historical[$historicalYear] = [
-                'subjects' => $historicalMypBase->findData(),
-                'grades'   => $historicalMypBase->getMYPGrade(),
-            ];
+            $historicalYear    = $currentYear - ($currentYearLevel - $yearLevel);
+            $historicalMypBase = new MYP\Base($user, $externalUser, $db, $historicalYear);
+
+            $subjects = $historicalMypBase->findData();
+            $grades   = $historicalMypBase->getMYPGrade();
+
+            if (count($grades) > 0) {
+                $historical[$historicalYear] = [
+                    'subjects' => $subjects,
+                    'grades'   => $grades,
+                ];
+            }
         }
 
         krsort($historical); // Ensure historical tabs are displayed in reverse chronological order.
+
+        /* Default to this year if none specified
+         */
+        $selectedYear = $year ?? $currentYear;
+        $historicalYears = array_keys($historical);
+
+        /* If no data for the selected year and data exists for at least one year, select the most recent year with data.
+         */
+        if (!in_array($selectedYear, $historicalYears, false) && count($historicalYears) > 0) {
+            $selectedYear = $historicalYears[0];
+        }
+
+        $mypBase = new MYP\Base($user, $externalUser, $db, $selectedYear);
+        $mypData = $mypBase->findData();
 
         $this->response = $this->responseFromTemplate(
             '@myp/index.twig',
@@ -813,7 +828,7 @@ class Controller extends Base
                 ],
                 'externalUser' => $externalUser,
                 'user'         => $user,
-                'year'         => $currentYear,
+                'year'         => $selectedYear,
                 'headings'     => $mypData['headings'],
                 'subjects'     => $mypData['data'],
                 'grades'       => $mypBase->getMYPGrade(),
