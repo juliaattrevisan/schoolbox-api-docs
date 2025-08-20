@@ -64,10 +64,28 @@ class OauthClientHeld extends Base
     {
         $claims    = $this->decodeWithoutVerification($jwt);
         $audiences = (array)($claims[self::CLAIM_AUD] ?? []);
+        $this->log->debug(
+            sprintf(
+                'Checking if JWT contains claim "%s", and that it is a known relying party',
+                self::CLAIM_AUD,
+            )
+        );
+
         if (empty($audiences)) {
+            $this->log->debug(sprintf('JWT claim "%s" is empty: using next parser', self::CLAIM_AUD));
             return false;
         }
-        return $this->relyingPartyMapper->countByColumnList(['client_id' => $audiences]) > 0;
+
+        $accepts = $this->relyingPartyMapper->countByColumnList(['client_id' => $audiences]) > 0;
+        $this->log->debug(
+            sprintf(
+                $accepts
+                    ? 'JWT claim "%s" value matches a relying party: using this parser'
+                    : 'JWT claim "%s" value does not match a relying party: using next parser',
+                self::CLAIM_AUD,
+            )
+        );
+        return $accepts;
     }
 
     /**
@@ -92,9 +110,17 @@ class OauthClientHeld extends Base
         // TODO validate JTI?
         // TODO perform other validation from SelfIssued here
         if ($claims[self::CLAIM_SUB]) {
+            $this->log->debug(sprintf('JWT contains claim "%s": searching for users which match', self::CLAIM_SUB));
             return $this->findUser($claims[self::CLAIM_SUB], self::CLAIM_SUB);
         }
 
+        $this->log->debug(
+            sprintf(
+                'JWT does not contain claim "%s": finding relying party for claim "%s"',
+                self::CLAIM_SUB,
+                self::CLAIM_AUD,
+            ),
+        );
         $audiences = (array)($claims[self::CLAIM_AUD] ?? []);
         foreach ($audiences as $audience) {
             $relyingParty = $this->relyingPartyMapper->findByClientId($audience);
@@ -102,12 +128,13 @@ class OauthClientHeld extends Base
                 return $relyingParty->getClientCredentialsUser();
             }
         }
-        throw new Exception\InvalidIdentity(
-            sprintf(
-                'JWT "%s" claim does not exist, and "%s" contains no audience with a client credentials user',
-                self::CLAIM_SUB,
-                self::CLAIM_AUD,
-            )
+
+        $message = sprintf(
+            'JWT "%s" claim does not exist, and "%s" contains no audience with a client credentials user',
+            self::CLAIM_SUB,
+            self::CLAIM_AUD,
         );
+        $this->log->error($message);
+        throw new Exception\InvalidIdentity($message);
     }
 }
