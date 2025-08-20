@@ -77,25 +77,25 @@ class OtherInstanceIssued extends Base
             );
             $jwks = json_decode($client->get($response['url'])->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
         } catch (GuzzleException $e) {
-            $message = sprintf('Unable to retrieve instance details for instance "%s"', $instanceId);
-            $this->log->error($message . sprintf(' (message: %s)', $e->getMessage()));
-            throw new Exception\Rejected($message, $e->getCode(), $e);
+            throw new Exception\Rejected(
+                sprintf('Unable to retrieve instance details for instance "%s"', $instanceId),
+                $e->getCode(),
+                $e,
+            );
         } catch (\JsonException $e) {
-            $message = sprintf('Unable to parse instance details for instance "%s"', $instanceId);
-            $this->log->error($message . sprintf(' (message: %s)', $e->getMessage()));
-            throw new Exception\Rejected($message, $e->getCode(), $e);
+            throw new Exception\Rejected(
+                sprintf('Unable to parse instance details for instance "%s"', $instanceId),
+                $e->getCode(),
+                $e,
+            );
         }
 
         $keySet = JWK::parseKeySet($jwks, Jwt::SIGNING_ALGORITHM);
         if (!isset($headers['kid'])) {
             if (count($keySet) !== 1) {
-                $message = sprintf(
-                    'Instance "%s" has %d keys in its JWKS, but the JWT does not specify a "kid" claim',
-                    $instanceId,
-                    count($keySet),
+                throw new Exception\Rejected(
+                    sprintf('Instance "%s" has %d keys in its JWKS, but the JWT does not specify a "kid" claim', $instanceId, count($keySet)),
                 );
-                $this->log->error($message);
-                throw new Exception\Rejected($message);
             }
             $keySet = $keySet[Jwt::KEY_ID];
         }
@@ -111,17 +111,13 @@ class OtherInstanceIssued extends Base
         // create a session for the user matching the email address in the JWT
         $email = $claims[self::CLAIM_EMAIL] ?? null;
         if (!isset($email)) {
-            $message = sprintf('JWT must contain an "%s" claim', self::CLAIM_EMAIL);
-            $this->log->error($message);
-            throw new Exception\InvalidIdentity($message);
+            throw new Exception\InvalidIdentity(sprintf('JWT must contain an "%s" claim', self::CLAIM_EMAIL));
         }
 
         // The email must be valid too, or at least not blank
         $email = (string)$email;
         if (trim($email) === '') {
-            $message = sprintf('JWT "%s" claim must not be empty', self::CLAIM_EMAIL);
-            $this->log->error($message);
-            throw new Exception\InvalidIdentity($message);
+            throw new Exception\InvalidIdentity(sprintf('JWT "%s" claim must not be empty', self::CLAIM_EMAIL));
         }
         return $this->findUser($email, self::CLAIM_EMAIL);
     }
