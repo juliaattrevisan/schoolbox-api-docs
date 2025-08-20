@@ -89,7 +89,12 @@ class Composite implements IParser
         foreach ($this->parsers as $parser) {
             if ($parser->accepts($jwt)) {
                 $this->log->info(sprintf('Parser "%s" accepts JWT: determining user', get_class($parser)));
-                $user = $parser->determineUser($jwt);
+                try {
+                    $user = $parser->determineUser($jwt);
+                } catch (Exception\Base $e) {
+                    $this->log->error(sprintf('Could not determine user (message: %s)', $e->getMessage()));
+                    throw $e;
+                }
                 $this->bypassIpTracking = $parser->bypassIpTracking();
                 return $user;
             }
