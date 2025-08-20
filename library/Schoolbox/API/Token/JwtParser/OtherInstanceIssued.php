@@ -111,13 +111,17 @@ class OtherInstanceIssued extends Base
         // create a session for the user matching the email address in the JWT
         $email = $claims[self::CLAIM_EMAIL] ?? null;
         if (!isset($email)) {
-            throw new Exception\InvalidIdentity(sprintf('JWT must contain an "%s" claim', self::CLAIM_EMAIL));
+            $message = sprintf('JWT must contain an "%s" claim', self::CLAIM_EMAIL);
+            $this->log->error($message);
+            throw new Exception\InvalidIdentity($message);
         }
 
         // The email must be valid too, or at least not blank
         $email = (string)$email;
         if (trim($email) === '') {
-            throw new Exception\InvalidIdentity(sprintf('JWT "%s" claim must not be empty', self::CLAIM_EMAIL));
+            $message = sprintf('JWT "%s" claim must not be empty', self::CLAIM_EMAIL);
+            $this->log->error($message);
+            throw new Exception\InvalidIdentity($message);
         }
         return $this->findUser($email, self::CLAIM_EMAIL);
     }

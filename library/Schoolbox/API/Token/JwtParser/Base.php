@@ -174,8 +174,10 @@ abstract class Base implements IParser
      */
     protected function findUser(string $username, ?string $sourceClaim): User
     {
+        $this->log->debug(sprintf('Searching for user with username "%s"', $username));
         $user = $this->userMapper->findByUsername($username);
         if (!$user && $this->config->get(ConfigMapper::NAME_AUTH_EMAIL_ENABLED)) {
+            $this->log->debug(sprintf('No user found: searching for user with alt_email "%s"', $username));
             $user = $this->userMapper->findByColumnList(['alt_email' => $username], ['deleted' => false])->first();
         }
 
@@ -183,12 +185,14 @@ abstract class Base implements IParser
             $message = isset($sourceClaim)
                 ? sprintf('JWT "%s" claim does not match a user', $sourceClaim)
                 : sprintf('No user with username "%s" found', $username);
+            $this->log->error($message);
             throw new Exception\InvalidIdentity($message);
         }
         if (!$user->getEnabled()) {
             $message = isset($sourceClaim)
                 ? sprintf('JWT "%s" claim matches a deactivated user', $sourceClaim)
                 : sprintf('User with username "%s" is deactivated', $username);
+            $this->log->error($message);
             throw new Exception\InvalidIdentity($message);
         }
 
