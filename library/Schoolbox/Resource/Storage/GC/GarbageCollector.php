@@ -43,18 +43,22 @@ class GarbageCollector
      *
      * @param StorageMapper            $mapper        Storage mapper: used for fetching and deleting records.
      * @param LoggerInterface          $log           Logger
-     * @param int                      $limit         Maximum number of storage records to process.
-     * @param Alaress_Date_Format|null $thresholdDate Do not process any storage records which were last processed more
-     *                                                recently than this date.
      * @param bool                     $perform       If true, actually delete storage records and update the last
      *                                                processed time: otherwise, only output what would've been deleted.
+     * @param int                      $batchSize     The maximum number of results to process per batch.
+     * @param int|null                 $limit         Maximum number of storage records to process: null if no limit.
+     * @param int|null                 $maxTime       Maximum amount of time to run for, in seconds: null if no limit.
+     * @param Alaress_Date_Format|null $thresholdDate Do not process any storage records which were last processed more
+     *                                                recently than this date.
      */
     public function __construct(
         private StorageMapper $mapper,
         private LoggerInterface $log,
-        private int $limit,
+        private bool $perform,
+        private int $batchSize,
+        private ?int $limit = null,
+        private ?int $maxTime = null,
         private ?Alaress_Date_Format $thresholdDate = null,
-        private bool $perform = false,
     ) {
     }
 
@@ -82,7 +86,15 @@ class GarbageCollector
     {
         // Build the query
         $this->log->info('Restricting garbage collection to:');
-        $this->log->info(sprintf('  limit: %d', $this->limit));
+        $this->log->info(sprintf('  hashes per batch: %d', $this->batchSize));
+        if (isset($this->limit)) {
+            $this->log->info(sprintf('  max hashes: %d', $this->limit));
+        }
+        if (isset($this->maxTime)) {
+            $this->log->info(sprintf('  max execution time: %d s', $this->maxTime));
+        }
+
+        $this->log->info('Filtering hashes to:');
         $this->log->info('  expired_at: null');
         $pb = $this->mapper->getPredicateBuilder()
             ->isNull('expired_at');
@@ -103,27 +115,82 @@ class GarbageCollector
         }
 
         // Find the records
-        $this->list = $this->mapper->findScalarByPredicates(
-            'hash',
-            $pb,
-            [
-                'order'  => [
-                    'last_gc_at' => 'asc',
-                    'hash'       => 'asc',
-                ],
-                'limit'  => $this->limit,
-                'offset' => 0,
-            ]
-        );
+        $queryOptions = [
+            'order'  => [
+                'last_gc_at' => 'asc',
+                'hash'       => 'asc',
+            ],
+        ];
+        if (isset($this->limit)) {
+            $queryOptions['limit']  = $this->limit;
+            $queryOptions['offset'] = 0;
+        }
+        $this->list = $this->mapper->findScalarByPredicates('hash', $pb, $queryOptions);
 
-        $this->log->info('Starting with ' . count($this->list) . ' files');
+        $this->log->notice('Starting with ' . count($this->list) . ' hashes');
 
-        // iterate the checks, and retain the intersection each time
-        $staleList = $this->list;
-        foreach ($this->checks as $check) {
-            $this->log->notice('Applying ' . get_class($check), ['char' => '+']);
-            $staleList = $check->getStale($staleList);
-            $this->log->info('Retained ' . count($staleList) . ' stale');
+        // Split stale list into batches before checking
+        $batches        = array_chunk($this->list, $this->batchSize);
+        $i              = 1;
+        $staleList      = [];
+        $startTime      = microtime(true);
+        $totalProcessed = 0;
+        foreach ($batches as $batch) {
+            $batchStartTime = microtime(true);
+            $this->log->notice(
+                sprintf(
+                    'Processing hash batch %d/%d (%d hashes)',
+                    $i,
+                    count($batches),
+                    count($batch),
+                ),
+            );
+
+            // iterate the checks, and retain the intersection each time
+            $staleBatch = $batch;
+            foreach ($this->checks as $check) {
+                $this->log->info('Applying ' . get_class($check));
+                $staleBatch = $check->getStale($staleBatch);
+                $this->log->info('Retained ' . count($staleBatch) . ' stale');
+            }
+            $staleList = array_merge($staleList, $staleBatch);
+
+            // Log time spent in this batch
+            $batchEndTime = microtime(true);
+            $this->log->notice(
+                sprintf(
+                    'Batch %d processed: %0.2fs (%d/%d stale)',
+                    $i,
+                    $batchEndTime - $batchStartTime,
+                    count($staleBatch),
+                    count($batch),
+                ),
+            );
+
+            // Log time spent across all batches thus far
+            $totalRuntime   = $batchEndTime - $startTime;
+            $totalProcessed += count($batch);
+            $this->log->notice(
+                sprintf(
+                    'Total runtime: %0.2fs (%d/%d stale)',
+                    $totalRuntime,
+                    count($staleList),
+                    $totalProcessed,
+                ),
+            );
+
+            // If total runtime exceeds max time: stop processing
+            if (isset($this->maxTime) && $totalRuntime > $this->maxTime) {
+                $this->log->notice(
+                    sprintf(
+                        'Max runtime of %ds exceeded: finishing processing and moving on to deletion',
+                        $this->maxTime,
+                    ),
+                );
+                break;
+            }
+
+            $i++;
         }
 
         return $staleList;
@@ -143,7 +210,7 @@ class GarbageCollector
         $this->preserve(array_diff($this->list, $purge));
 
         if (!count($purge)) {
-            $this->log->notice("No files to delete", ['char' => '-']);
+            $this->log->notice("No hashes to delete", ['char' => '-']);
             return 0;
         }
 
@@ -152,9 +219,9 @@ class GarbageCollector
             try {
                 $this->removeFromStorage($hash);
             } catch (MapperException $e) {
-                $this->log->error("Could not delete storage file '$hash' due to a database issue: " . $e->getMessage());
+                $this->log->error("Could not delete storage hash '$hash' due to a database issue: " . $e->getMessage());
             } catch (FlysystemException $e) {
-                $this->log->error("Could not delete storage file '$hash' due to filesystem issue: " . $e->getMessage());
+                $this->log->error("Could not delete storage hash '$hash' due to filesystem issue: " . $e->getMessage());
             }
         }
 

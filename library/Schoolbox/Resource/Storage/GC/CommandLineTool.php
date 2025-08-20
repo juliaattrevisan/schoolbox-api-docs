@@ -42,15 +42,35 @@ class CommandLineTool extends CliTool\App
     private const OPT_SHORT_THRESHOLD = 't:';
 
     /**
+     * Default garbage collection threshold.
+     */
+    private const DEFAULT_THRESHOLD = '2 months ago';
+
+    /**
+     * --batch={batch-size}: process this many records per batch.
+     */
+    private const OPT_LONG_BATCH_SIZE = 'batch:';
+
+    /**
+     * Default batch size.
+     */
+    private const DEFAULT_BATCH_SIZE = 10;
+
+    /**
+     * --max-time={max-time}: run for this many seconds before exiting.
+     */
+    private const OPT_LONG_MAX_TIME = 'max-time:';
+
+    /**
+     * Default max time: if not set or <= 0, no max time is set.
+     */
+    private const DEFAULT_MAX_TIME = null;
+
+    /**
      * --force-run-on-staging: unless this flag is provided, do not allow this
      * tool to run on staging instances.
      */
     private const OPT_LONG_FORCE_RUN_ON_STAGING = 'force-run-on-staging';
-
-    /**
-     * Default garbage collection threshold.
-     */
-    private const DEFAULT_THRESHOLD = '2 months ago';
 
     /**
      * @inheritdoc
@@ -71,6 +91,8 @@ class CommandLineTool extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
+            self::OPT_LONG_BATCH_SIZE,
+            self::OPT_LONG_MAX_TIME,
             self::OPT_LONG_FORCE_RUN_ON_STAGING,
         ];
     }
@@ -87,8 +109,12 @@ Usage: gc-storage.php [-p] [-vvv] [-n{limit}]
     -h, --help:             Print this help text and exit
     -p:                     perform: *without* this flag, GC will only do a dry run
     -v[v[v]]:               verbosity: how much activity will be logged
-    -n={limit}:             the number of storage records to check, in ascending order of `last_accessed` defaults to
-                            1000.
+    -n={limit}:             the maximum number of storage records to check.
+                            Defaults to 1000: if <= 0, do not limit number of records.
+    --max-time={max-time}:  process hashes in batches until the script has been running for this many seconds.
+                            Defaults to no max time: if <= 0, do not limit the time the script runs for.
+    --batch={batch-size}:   process this many hashes per batch.
+                            Defaults to 10.
     -t={threshold}:         threshold: do not attempt to garbage collect storage records last checked more recently than
                             this date threshold, defaults to 2 months ago.
                             If provided, must be supplied as one of:
@@ -142,27 +168,39 @@ HELP;
             $logger->notice('Running in dry-run mode: use -p flag to permanently garbage collect files.');
         }
 
-        $limit         = $this->getOptAsInt(self::OPT_SHORT_LIMIT, self::DEFAULT_LIMIT);
+        $batchSize = $this->getOptAsInt(self::OPT_LONG_BATCH_SIZE, self::DEFAULT_BATCH_SIZE);
+        if ($batchSize <= 0) {
+            $batchSize = self::DEFAULT_BATCH_SIZE;
+        }
+        $limit = $this->getOptAsInt(self::OPT_SHORT_LIMIT, self::DEFAULT_LIMIT);
+        if ($limit <= 0) {
+            $limit = null;
+        }
+        $maxTime = $this->getOptAsInt(self::OPT_LONG_MAX_TIME, self::DEFAULT_MAX_TIME);
+        if ($maxTime <= 0) {
+            $maxTime = null;
+        }
+
         $threshold     = $this->getOpt(self::OPT_SHORT_THRESHOLD);
         $thresholdDate = $this->buildDate($threshold ?? self::DEFAULT_THRESHOLD);
         $db            = $this->getDatabaseInternal();
         $gc = new GarbageCollector(
             $mapper,
             $logger,
-            $limit,
-            $thresholdDate,
             $this->perform(),
+            $batchSize,
+            limit: $limit,
+            maxTime: $maxTime,
+            thresholdDate: $thresholdDate,
         );
         $gc = $gc
             ->addCheck(new Check\ForeignKeyRelation($db, $logger, SQL_db, $mapper->getTable()))
-            ->addCheck(new Check\CharacterField($db, $logger))
+            ->addCheck(new Check\CharacterField($db, $logger, SQL_db))
             ->addCheck(new Check\TextField($db, $logger, SQL_db, $mapper->getTable()))
         ;
 
-        $deleted = $gc->purge();
-
-        // if nothing was deleted, consider that an error case?
-        exit($deleted ? CliKernelAbstract::EXIT_STATUS_OK : CliKernelAbstract::EXIT_STATUS_KERNEL_ERROR);
+        $gc->purge();
+        exit(CliKernelAbstract::EXIT_STATUS_OK);
     }
 
     /**

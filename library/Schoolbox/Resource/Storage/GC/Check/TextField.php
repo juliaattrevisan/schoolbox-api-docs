@@ -29,7 +29,8 @@ class TextField extends Base
      */
     private const SELECT_TEXT_FIELDS_QUERY = <<<SQL
         SELECT c.TABLE_NAME AS `table`,
-               c.COLUMN_NAME AS `column`
+               c.COLUMN_NAME AS `column`,
+               t.DATA_LENGTH AS `search_data_length`
         FROM information_schema.COLUMNS c
         INNER JOIN information_schema.TABLES t ON c.TABLE_NAME = t.TABLE_NAME
         WHERE c.TABLE_SCHEMA = :schema
@@ -148,6 +149,9 @@ class TextField extends Base
 
             $tableColumnList[$table][0] ??= [
                 'columns' => [],
+                'extra'   => [
+                    'search_data_length' => $row['search_data_length'],
+                ]
             ];
             $tableColumnList[$table][0]['columns'][] = $column;
         }
