@@ -66,7 +66,15 @@ class OauthProviderIssued extends Base
         // Check the token's audience to determine if it is actually from the
         // oAuth provider.
         $claims = $this->decodeWithoutVerification($jwt);
+        $this->log->debug(
+            sprintf(
+                'Checking if JWT contains claim "%s", and that it matches config "%s"',
+                self::CLAIM_AUD,
+                ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID,
+            )
+        );
         if (!$this->claimAudienceMatchesConfiguredClientId($claims)) {
+            $this->log->debug(sprintf('JWT claim "%s" does not match config: using next parser', self::CLAIM_AUD));
             return false;
         }
 
@@ -74,12 +82,30 @@ class OauthProviderIssued extends Base
         // TODO remove this in 23.0: issuer must be provided, and match JWT
         $oauthIssuer = trim((string)($this->config->get(ConfigMapper::NAME_OAUTH_ISSUER) ?? ''));
         if ($oauthIssuer === '') {
+            $this->log->warning(
+                sprintf(
+                    'Config "%s" is empty: accepting regardless of JWT claim "%s". (This will likely be removed in the future)',
+                    ConfigMapper::NAME_OAUTH_ISSUER,
+                    self::CLAIM_ISS,
+                )
+            );
             return true;
         }
 
         // If the issuer is provided: it must match the issuer in the JWT
         $jwtIssuer = trim((string)($claims[self::CLAIM_ISS] ?? ''));
-        return $jwtIssuer === $oauthIssuer;
+        $accepts   = $jwtIssuer === $oauthIssuer;
+        $this->log->debug(
+            sprintf(
+                $accepts
+                    ? 'JWT claim "%s" value "%s" matches config "%s": using this parser'
+                    : 'JWT claim "%s" value "%s" does not match config "%s": using next parser',
+                self::CLAIM_ISS,
+                $claims[self::CLAIM_ISS],
+                ConfigMapper::NAME_OAUTH_ISSUER,
+            )
+        );
+        return $accepts;
     }
 
     /**
