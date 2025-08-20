@@ -107,6 +107,7 @@ class InstanceRegistryIssued extends Base
         $client = new Client();
         // Retrieve the JWKs from the instance registry.
         try {
+            $this->log->debug(sprintf('Querying instance registry for its JWKS'));
             $jwk = json_decode(
                 $client->get(
                     $this->config->get(ConfigMapper::NAME_INSTANCE_REGISTRY_URL) . '/api/jwks'
@@ -117,9 +118,16 @@ class InstanceRegistryIssued extends Base
                 512,
                 JSON_THROW_ON_ERROR
             );
-        } catch (GuzzleException | JsonException $e) {
-            throw new Rejected(sprintf('Unable to retrieve JWKs from instance registry: %s', $e->getMessage()));
+        } catch (GuzzleException $e) {
+            $message = 'Unable to retrieve instance registry JWKS';
+            $this->log->error($message . sprintf(' (message: %s)', $e->getMessage()));
+            throw new Exception\Rejected($message, $e->getCode(), $e);
+        } catch (\JsonException $e) {
+            $message = 'Unable to parse instance registry JWKS';
+            $this->log->error($message . sprintf(' (message: %s)', $e->getMessage()));
+            throw new Exception\Rejected($message, $e->getCode(), $e);
         }
+
         // Verify the JWT using the JWKs.
         if (
             $this->decode(
