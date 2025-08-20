@@ -64,29 +64,18 @@ class OauthClientHeld extends Base
     {
         $claims    = $this->decodeWithoutVerification($jwt);
         $audiences = (array)($claims[self::CLAIM_AUD] ?? []);
-        $this->log->info(
+        $this->log->debug(
             sprintf(
-                'Checking if JWT contains claim "%s", and that it is a known relying party',
+                'Checking JWT %s "%s" against %s.client_id values',
                 self::CLAIM_AUD,
+                implode(',', $audiences),
+                $this->relyingPartyMapper->getTable(),
             )
         );
-        $this->log->debug(sprintf('JWT %s: %s', self::CLAIM_AUD, implode(',', $audiences)));
-
         if (empty($audiences)) {
-            $this->log->info(sprintf('JWT claim "%s" is empty', self::CLAIM_AUD));
             return false;
         }
-
-        $accepts = $this->relyingPartyMapper->countByColumnList(['client_id' => $audiences]) > 0;
-        $this->log->info(
-            sprintf(
-                $accepts
-                    ? 'JWT claim "%s" value matches a relying party'
-                    : 'JWT claim "%s" value does not match a relying party',
-                self::CLAIM_AUD,
-            )
-        );
-        return $accepts;
+        return $this->relyingPartyMapper->countByColumnList(['client_id' => $audiences]) > 0;
     }
 
     /**

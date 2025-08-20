@@ -66,27 +66,24 @@ class OauthProviderIssued extends Base
         // Check the token's audience to determine if it is actually from the
         // oAuth provider.
         $claims = $this->decodeWithoutVerification($jwt);
-        $this->log->info(
-            sprintf(
-                'Checking if JWT contains claim "%s", and that it matches config "%s"',
-                self::CLAIM_AUD,
-                ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID,
-            )
-        );
         if (!$this->claimAudienceMatchesConfiguredClientId($claims)) {
-            $this->log->info(
-                sprintf(
-                    'JWT claim "%s" does not match config "%s"',
-                    self::CLAIM_AUD,
-                    ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID,
-                )
-            );
             return false;
         }
 
+        $oauthIssuer = trim((string)($this->config->get(ConfigMapper::NAME_OAUTH_ISSUER) ?? ''));
+        $jwtIssuer   = trim((string)($claims[self::CLAIM_ISS] ?? ''));
+        $this->log->debug(
+            sprintf(
+                'Checking JWT %s "%s" against config %s "%s"',
+                self::CLAIM_ISS,
+                $jwtIssuer,
+                ConfigMapper::NAME_OAUTH_ISSUER,
+                $oauthIssuer,
+            )
+        );
+
         // If no issuer is provided: always return true
         // TODO remove this in 23.0: issuer must be provided, and match JWT
-        $oauthIssuer = trim((string)($this->config->get(ConfigMapper::NAME_OAUTH_ISSUER) ?? ''));
         if ($oauthIssuer === '') {
             $this->log->warning(
                 sprintf(
@@ -99,18 +96,7 @@ class OauthProviderIssued extends Base
         }
 
         // If the issuer is provided: it must match the issuer in the JWT
-        $jwtIssuer = trim((string)($claims[self::CLAIM_ISS] ?? ''));
-        $accepts   = $jwtIssuer === $oauthIssuer;
-        $this->log->info(
-            sprintf(
-                $accepts
-                    ? 'JWT claim "%s" matches config "%s"'
-                    : 'JWT claim "%s" does not match config "%s"',
-                self::CLAIM_ISS,
-                ConfigMapper::NAME_OAUTH_ISSUER,
-            )
-        );
-        return $accepts;
+        return $jwtIssuer === $oauthIssuer;
     }
 
     /**
@@ -183,7 +169,15 @@ class OauthProviderIssued extends Base
     {
         $audiences     = (array)($claims[self::CLAIM_AUD] ?? []);
         $oauthClientId = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID);
-        $this->log->debug(sprintf('JWT %d: %s', self::CLAIM_AUD, implode(',', $audiences)));
+        $this->log->debug(
+            sprintf(
+                'Checking JWT %s "%s" against config %s "%s"',
+                self::CLAIM_AUD,
+                implode(',', $audiences),
+                ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID,
+                $oauthClientId,
+            )
+        );
         return in_array($oauthClientId, $audiences, true);
     }
 }
