@@ -66,7 +66,6 @@ abstract class Base implements IParser
         $previousLeeway         = JwtLibrary\JWT::$leeway;
         JwtLibrary\JWT::$leeway = $leeway;
         try {
-            $this->log->debug('Decoding and verifying JWT');
             return (array)JwtLibrary\JWT::decode($jwt, $keyOrKeySet);
         } catch (
             InvalidArgumentException
@@ -75,7 +74,6 @@ abstract class Base implements IParser
             | JwtLibrary\BeforeValidException
             | JwtLibrary\ExpiredException $e
         ) {
-            $this->log->error(sprintf('Could not decode and verify JWT (message: %s', $e->getMessage()));
             throw new Exception\Rejected($e->getMessage(), $e->getCode(), $e);
         } finally {
             JwtLibrary\JWT::$leeway = $previousLeeway;

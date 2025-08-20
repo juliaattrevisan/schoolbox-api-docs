@@ -36,10 +36,10 @@ class Composite implements IParser
     /**
      * Constructor
      *
-     * @param LoggerInterface $logger
+     * @param LoggerInterface $log
      * @param IParser         ...$parsers
      */
-    public function __construct(private LoggerInterface $logger, IParser ...$parsers)
+    public function __construct(private LoggerInterface $log, IParser ...$parsers)
     {
         $this->parsers = $parsers;
     }
@@ -49,16 +49,16 @@ class Composite implements IParser
      */
     public function accepts(#[SensitiveParameter] string $jwt): bool
     {
-        $this->logger->info('Checking all parsers for whether they accept JWT');
+        $this->log->info('Checking all parsers for whether they accept JWT');
         foreach ($this->parsers as $parser) {
-            $this->logger->debug(sprintf('Checking if parser "%s" accepts JWT', get_class($parser)));
+            $this->log->debug(sprintf('Checking if parser "%s" accepts JWT', get_class($parser)));
             if ($parser->accepts($jwt)) {
-                $this->logger->info(sprintf('Parser "%s" accepts JWT: using this parser', get_class($parser)));
+                $this->log->info(sprintf('Parser "%s" accepts JWT: using this parser', get_class($parser)));
                 return true;
             }
-            $this->logger->debug(sprintf('Parser "%s" does not accept JWT: checking next parser', get_class($parser)));
+            $this->log->debug(sprintf('Parser "%s" does not accept JWT: checking next parser', get_class($parser)));
         }
-        $this->logger->info('No parsers accept JWT: thus, composite does not accept JWT');
+        $this->log->info('No parsers accept JWT: thus, composite does not accept JWT');
         return false;
     }
 
@@ -69,8 +69,13 @@ class Composite implements IParser
     {
         foreach ($this->parsers as $parser) {
             if ($parser->accepts($jwt)) {
-                $this->logger->info(sprintf('Parser "%s" accepts JWT: decoding', get_class($parser)));
-                return $parser->decode($jwt, $keyOrKeySet, $leeway);
+                $this->log->info(sprintf('Parser "%s" accepts JWT: decoding', get_class($parser)));
+                try {
+                    return $parser->decode($jwt, $keyOrKeySet, $leeway);
+                } catch (Exception\Rejected $e) {
+                    $this->log->error(sprintf('Could not decode JWT (message: %s)', $e->getMessage()));
+                    throw $e;
+                }
             }
         }
         throw new Exception\Rejected('No parser in this object accepts this JWT');
@@ -83,7 +88,7 @@ class Composite implements IParser
     {
         foreach ($this->parsers as $parser) {
             if ($parser->accepts($jwt)) {
-                $this->logger->info(sprintf('Parser "%s" accepts JWT: determining user', get_class($parser)));
+                $this->log->info(sprintf('Parser "%s" accepts JWT: determining user', get_class($parser)));
                 $user = $parser->determineUser($jwt);
                 $this->bypassIpTracking = $parser->bypassIpTracking();
                 return $user;
