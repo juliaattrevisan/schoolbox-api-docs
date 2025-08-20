@@ -142,7 +142,7 @@ class Profile implements IStrategy
         /* Students might have profile pics;
          * Staff might have profile pics
          */
-        $this->photoLookup = (new Photo($this->api, $this->watchlist));
+        $this->photoLookup = (new Photo($this->baseProfileMapper, $this->api, $this->watchlist));
     }
 
 
@@ -843,6 +843,8 @@ class Profile implements IStrategy
      */
     private function importPhoto(UserProfile\Model $baseProfile, ?array $photoLookup): void
     {
-echo 'test';
+        $externalId = $baseProfile->getExternalId();
+
+        echo 'test';
     }
 }

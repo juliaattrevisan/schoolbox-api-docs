@@ -11,6 +11,7 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Profile\Profile;
 use Schoolbox\External\Connector\Watchlist;
+use Schoolbox\External\Profile as UserProfile;
 
 class Photo
 {
@@ -25,11 +26,15 @@ class Photo
     /**
      * Constructor
      *
+     * @param UserProfile\Mapper $baseProfileMapper
      * @param IApi $api
      * @param array $watchlist
      */
-    public function __construct(private IApi $api, private array $watchlist)
-    {
+    public function __construct(
+        private UserProfile\Mapper $baseProfileMapper,
+        private IApi $api,
+        private array $watchlist
+    ) {
     }
 
 
@@ -43,6 +48,23 @@ class Photo
         /* If we generated this lookup previously, just recycle it
          */
         if (null === $this->lookup) {
+            /* A list of existing externalIds and when their profiles were last touched
+             */
+            $existing = [];
+
+            /* Generate a mega lookup of modified times to save requesting this iteratively
+             */
+            $stmt = $this->baseProfileMapper->getDatabase()->executeQuery("
+                SELECT external_id, updated_at
+                FROM {$this->baseProfileMapper->getBaseTableName()} sup
+            ");
+
+            foreach ($stmt->fetchAll() as $row) {
+                $existing[$row['external_id']] = new \Alaress_Date_Format($row['updated_at'], \Alaress_Date_Format::DATABASE_FORMAT);
+            }
+
+            /* Find out what veracross files exist and when they were last touched
+             */
             $this->lookup = [];
 
             $generator = $this->api->retrieve('GET', 'person_photos', Profile::SCOPE);
@@ -59,13 +81,22 @@ class Photo
                         continue;
                     }
 
-                    /* Overwrite with lookupped values
-                     * If any of the following fields has contents, then they have a Medical Alert
+                    /* If this photo was modified more recently than the profile itself,
+                     * the profile picture changed some time after the profile was last updated;
+                     * we need to download and assign this pic.
+                     *
+                     * Otherwise the photo is older than the profile and hasn't changed since
+                     * at least one previous import; no changes required for this photo.
+                     * It's already up to date.
+                     *
+                     * TODO but what about profiles that never had a pic to start with?
                      */
-                    $this->lookup[$externalId] = [
-                        'url' => $record['download_url'],
-                        'modifiedAt' => $record['last_modified_date'],
-                    ];
+                    $lastModified = new \Alaress_Date_Format($record['last_modified_date'], \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS);
+                    $existingModified = $existing[$externalId]['modifiedAt'];
+
+                    if ($lastModified->gt($existingModified)) {
+                        $this->lookup[$externalId] = $record['download_url'];
+                    }
                 }
             }
         }
