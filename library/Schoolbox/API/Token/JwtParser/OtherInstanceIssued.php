@@ -77,39 +77,25 @@ class OtherInstanceIssued extends Base
             );
             $jwks = json_decode($client->get($response['url'])->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
         } catch (GuzzleException $e) {
-            $this->log->error(
-                sprintf(
-                    'Unable to retrieve instance details for instance "%s" (message: %s)',
-                    $instanceId,
-                    $e->getMessage(),
-                )
-            );
-            throw new Exception\Rejected(
-                sprintf('Unable to retrieve instance details for instance ID "%s"', $instanceId),
-                $e->getCode(),
-                $e,
-            );
+            $message = sprintf('Unable to retrieve instance details for instance "%s"', $instanceId);
+            $this->log->error($message . sprintf(' (message: %s)', $e->getMessage()));
+            throw new Exception\Rejected($message, $e->getCode(), $e);
         } catch (\JsonException $e) {
-            $this->log->error(
-                sprintf(
-                    'Unable to parse instance details for instance "%s" (message: %s)',
-                    $instanceId,
-                    $e->getMessage(),
-                )
-            );
-            throw new Exception\Rejected(
-                sprintf('Unable to parse instance details for instance ID "%s"', $instanceId),
-                $e->getCode(),
-                $e,
-            );
+            $message = sprintf('Unable to parse instance details for instance "%s"', $instanceId);
+            $this->log->error($message . sprintf(' (message: %s)', $e->getMessage()));
+            throw new Exception\Rejected($message, $e->getCode(), $e);
         }
 
         $keySet = JWK::parseKeySet($jwks, Jwt::SIGNING_ALGORITHM);
         if (!isset($headers['kid'])) {
             if (count($keySet) !== 1) {
-                throw new Exception\Rejected(
-                    sprintf('Instance "%s" has %d keys in its JWKS, but the JWT does not specify a "kid" claim', $instanceId, count($keySet)),
+                $message = sprintf(
+                    'Instance "%s" has %d keys in its JWKS, but the JWT does not specify a "kid" claim',
+                    $instanceId,
+                    count($keySet),
                 );
+                $this->log->error($message);
+                throw new Exception\Rejected($message);
             }
             $keySet = $keySet[Jwt::KEY_ID];
         }
