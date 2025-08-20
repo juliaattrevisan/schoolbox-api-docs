@@ -64,24 +64,25 @@ class OauthClientHeld extends Base
     {
         $claims    = $this->decodeWithoutVerification($jwt);
         $audiences = (array)($claims[self::CLAIM_AUD] ?? []);
-        $this->log->debug(
+        $this->log->info(
             sprintf(
                 'Checking if JWT contains claim "%s", and that it is a known relying party',
                 self::CLAIM_AUD,
             )
         );
+        $this->log->debug(sprintf('JWT %s: %s', self::CLAIM_AUD, implode(',', $audiences)));
 
         if (empty($audiences)) {
-            $this->log->debug(sprintf('JWT claim "%s" is empty: using next parser', self::CLAIM_AUD));
+            $this->log->info(sprintf('JWT claim "%s" is empty', self::CLAIM_AUD));
             return false;
         }
 
         $accepts = $this->relyingPartyMapper->countByColumnList(['client_id' => $audiences]) > 0;
-        $this->log->debug(
+        $this->log->info(
             sprintf(
                 $accepts
-                    ? 'JWT claim "%s" value matches a relying party: using this parser'
-                    : 'JWT claim "%s" value does not match a relying party: using next parser',
+                    ? 'JWT claim "%s" value matches a relying party'
+                    : 'JWT claim "%s" value does not match a relying party',
                 self::CLAIM_AUD,
             )
         );
@@ -110,11 +111,11 @@ class OauthClientHeld extends Base
         // TODO validate JTI?
         // TODO perform other validation from SelfIssued here
         if ($claims[self::CLAIM_SUB]) {
-            $this->log->debug(sprintf('JWT contains claim "%s": searching for users which match', self::CLAIM_SUB));
+            $this->log->info(sprintf('JWT contains claim "%s": searching for users which match', self::CLAIM_SUB));
             return $this->findUser($claims[self::CLAIM_SUB], self::CLAIM_SUB);
         }
 
-        $this->log->debug(
+        $this->log->info(
             sprintf(
                 'JWT does not contain claim "%s": finding relying party for claim "%s"',
                 self::CLAIM_SUB,
@@ -129,12 +130,12 @@ class OauthClientHeld extends Base
             }
         }
 
-        $message = sprintf(
-            'JWT "%s" claim does not exist, and "%s" contains no audience with a client credentials user',
-            self::CLAIM_SUB,
-            self::CLAIM_AUD,
+        throw new Exception\InvalidIdentity(
+            sprintf(
+                'JWT "%s" claim does not exist, and "%s" contains no audience with a client credentials user',
+                self::CLAIM_SUB,
+                self::CLAIM_AUD,
+            )
         );
-        $this->log->error($message);
-        throw new Exception\InvalidIdentity($message);
     }
 }
