@@ -20,6 +20,7 @@ use Http\Discovery\Psr17Factory;
 use League\Flysystem\Filesystem;
 use Monolog\Level;
 use Proxy\Server as ProxyServer;
+use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Psr\SimpleCache\CacheInterface;
 use Schoolbox\API\Token\Jwt;
@@ -349,20 +350,14 @@ class Kernel extends WebKernelAbstract
             $di->lazy(
                 function () use ($di, $config, $mapperFactory) {
                     /** @var GuzzleHttp\Client $httpClient */
-                    /** @var CacheInterface $oidcCache */
                     $httpClient         = $di->get('httpClient');
+                    /** @var CacheInterface $oidcCache */
                     $oidcCache          = $di->get('oidc.cache');
+                    /** @var LoggerInterface $logger */
+                    $logger             = $di->get('user.jwtParser.logger');
                     $userMapper         = $mapperFactory->get(UserMapper::class);
                     $tokenMapper        = $mapperFactory->get(TokenMapper::class);
                     $relyingPartyMapper = $mapperFactory->get(RelyingPartyMapper::class);
-                    $logger             = new Logger(
-                        STDOUT,
-                        STDOUT,
-                        $config->get(ConfigMapper::NAME_DEBUG_MODE) ? Level::Debug : Level::Info,
-                        [],
-                        true,
-                        'jwtParser',
-                    );
                     return new JwtParser\Composite(
                         $logger,
                         new JwtParser\OtherInstanceIssued($userMapper, $config, $logger),
@@ -373,6 +368,22 @@ class Kernel extends WebKernelAbstract
                     );
                 }
             )
+        );
+
+        // Logger for JWT parsing
+        $di->set(
+            'user.jwtParser.logger',
+            $di->lazyNew(
+                Logger::class,
+                [
+                    STDOUT,
+                    STDOUT,
+                    $config->get(ConfigMapper::NAME_DEBUG_MODE) ? Level::Debug : Level::Info,
+                    [],
+                    true,
+                    'jwtParser',
+                ],
+            ),
         );
 
         $di->set(

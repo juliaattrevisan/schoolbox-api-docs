@@ -60,6 +60,7 @@ use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ClientRepository;
 use Predis;
 use Proxy\Server as ProxyServer;
+use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Psr\SimpleCache\CacheInterface;
 use RuntimeException;
@@ -2061,20 +2062,14 @@ abstract class Kernel
             $di->lazy(
                 function () use ($di, $config, $mapperFactory) {
                     /** @var GuzzleHttp\Client $httpClient */
-                    /** @var CacheInterface $oidcCache */
                     $httpClient         = $di->get('httpClient');
+                    /** @var CacheInterface $oidcCache */
                     $oidcCache          = $di->get('oidc.cache');
+                    /** @var LoggerInterface $logger */
+                    $logger             = $di->get('user.jwtParser.logger');
                     $userMapper         = $mapperFactory->get(UserMapper::class);
                     $tokenMapper        = $mapperFactory->get(TokenMapper::class);
                     $relyingPartyMapper = $mapperFactory->get(RelyingPartyMapper::class);
-                    $logger             = new Logger(
-                        STDOUT,
-                        STDOUT,
-                        $config->get(ConfigMapper::NAME_DEBUG_MODE) ? Level::Debug : Level::Info,
-                        [],
-                        true,
-                        'jwtParser',
-                    );
                     return new JwtParser\Composite(
                         $logger,
                         new JwtParser\OtherInstanceIssued($userMapper, $config, $logger),
@@ -2085,6 +2080,22 @@ abstract class Kernel
                     );
                 }
             )
+        );
+
+        // Logger for JWT parsing
+        $di->set(
+            'user.jwtParser.logger',
+            $di->lazyNew(
+                Logger::class,
+                [
+                    STDOUT,
+                    STDOUT,
+                    $config->get(ConfigMapper::NAME_DEBUG_MODE) ? Level::Debug : Level::Info,
+                    [],
+                    true,
+                    'jwtParser',
+                ],
+            ),
         );
 
         // Lock factory
