@@ -15,9 +15,15 @@ use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
-use Schoolbox\GenericCollection;
+use Schoolbox\Filter\Codec;
+use Schoolbox\Filter;
+use Schoolbox\Filter\CompositeFactoryFactory;
+use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use Schoolbox\Learning\Assessment\Translator\ParticipationPlans;
 use Schoolbox\Learning\Assessment\Translator\Participations;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use LearnositySdk\Utils\Uuid;
 use LogicException;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
@@ -92,6 +98,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
      * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
      * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
+     * @param IdFinder|null $filtersAssessmentIdFinder
+     * @param CompositeFactoryFactory|null $filtersFactoryFactory
+     * @param Filter\Mapper|null $filterMapper
+     * @param Filter\Selection\Mapper|null $filterSelectionMapper
+     * @param CourseImplementationMapper|null $courseImplementationMapper
+     * @param UnitImplementationMapper|null $unitImplementationMapper
      * @param null|Factory $urlFactory
      * @param null|string $learnosityVersion
      * @param null|string $learnosityConsumerKey
@@ -116,6 +128,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
         protected Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
+        private ?Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder = null,
+        private ?Filter\CompositeFactoryFactory $filtersFactoryFactory = null,
+        private ?Filter\Mapper $filterMapper = null,
+        private ?Filter\Selection\Mapper $filterSelectionMapper = null,
+        private ?CourseImplementationMapper $courseImplementationMapper = null,
+        private ?UnitImplementationMapper $unitImplementationMapper = null,
         ?\Schoolbox\Url\Factory $urlFactory = null,
         ?string $learnosityVersion = null,
         #[\SensitiveParameter] ?string $learnosityConsumerKey = null,
@@ -1254,5 +1272,100 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 'acceptingResponses' => $assessmentData['acceptingResponses'] ?? false,
             ]
         );
+    }
+
+    /**
+     * @see \Schoolbox\Assessment\Course\Markbook\Controller::convertRequestToFilters
+     * @param CourseSpec\Model $courseSpec
+     * @param array            $request  Indexed by filter.id, option.key
+     * @param bool             $saveToDB Should we persist these selections to the DB ?
+     * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DomainException If this class has not defined what entity it is filtering
+     * @throws \InvalidArgumentException If unable to find the filter mapper class
+     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
+     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
+     */
+    private function convertRequestToFilters(CourseSpec\Model $courseSpec, array $request, bool $saveToDB): array
+    {
+        $page            = Filter\Page\Model::PAGE_COURSE_MARK_BOOK;
+        $codec           = new Codec($this->filterMapper, $this->filterSelectionMapper);
+
+        // Convert Request to Selection models
+        $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
+        if ($saveToDB) {
+            $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
+        }
+
+        $filters = $this->filtersFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
+
+        // Ensure that assessments are:
+        // * not Assessment Specs
+        // * Are inside unitImpls that belong to courseImpls that were imported from the courseSpec
+        $courseImpls = $this->courseImplementationMapper->findAllByCourseSpecificationId($courseSpec->getId());
+        if ($courseImpls->count()) {
+            $pb          = $this->unitImplementationMapper->getPredicateBuilder()->in('course_implementation_id', $courseImpls->getPropertyValues('id'));
+            $unitImplIds = $this->unitImplementationMapper->findIdsByPredicates($pb);
+        } else {
+            $unitImplIds = [];
+        }
+        $filters = array_merge($filters, [
+            Filter\Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
+            Filter\Filters\Assessment\NullableContext\UnitImpl\Definition::class => array_combine($unitImplIds, $unitImplIds),
+        ]);
+
+        return [$filters, $codec, $selectionsPerFilter];
+    }
+
+    /**
+     * get all assessments for a spec assessment (filtered from the markbook url params)
+     *
+     * @param IAssessable $assessment
+     * @return array|Collection
+     * @throws MapperException
+     */
+    protected function getUnitAssessments(IAssessable $assessment): array|Collection
+    {
+        $assessments = [];
+        if ($assessment->isSpecification()) {
+            // This report may take a while
+            $this->extendExecutionTime();
+
+            /**
+             * we are assuming the links to this page have been appended with
+             * 'queryArgs'               => $codec->convertSelectionsToQueryString($selectionsPerFilter),
+             */
+
+            /* create tmp vars, to keep stan happy */
+            /** @var UnitSpecification $unitSpec */
+            $unitSpec = $assessment->getBaseContext();
+            $courseSpec = $unitSpec->getCourse();
+            $queryArgs = $this->requestQuery->getArrayCopy();
+
+            // never save filters to the db (there is no way to update them from this page, and it we bookmark it, and load it will alter the filters saved...)
+            [$filters,] = $this->convertRequestToFilters($courseSpec, $queryArgs, false);
+            $assessmentIds  = $this->filtersAssessmentIdFinder->findIdsByFilters($filters, $this->getUser());
+
+            // Fetch assessments
+            $assessments = $this->getAssessmentMapper()->findAllByIds($assessmentIds);
+
+            // tmp var to make it easier to filter (the loop and the spec passed through)
+            $assessmentSpec = $assessment;
+            // filter to only the assessment we are looking for (those that match the filter and are children of the assessment spec)
+            $assessments = $assessments->filter(static function (IAssessable $assessment) use ($assessmentSpec) {
+                return $assessment->getSpecificationAssessment()?->getId() === $assessmentSpec->getId();
+            });
+
+            // sort the assessments in a standard order (class page name naturally) which appears to be the same as the main markbook screen
+            $assessments = $assessments->sortByCallback(function (IAssessable $a, IAssessable $b) {
+                return strnatcasecmp($a->getBaseContext()->getFolder()->getTitle(), $b->getBaseContext()->getFolder()->getTitle());
+            });
+
+            // hydrate participants
+            $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, null, true);
+        }
+        return $assessments;
     }
 }

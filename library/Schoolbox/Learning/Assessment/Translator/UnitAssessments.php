@@ -131,7 +131,7 @@ class UnitAssessments
     {
         $links = [];
         if ($this->routeGenerator) {
-            /** The status page for implementations is different to specifications */
+            /** The status page is the same for all assessments */
             $statusLink = [
                 "route" => "learningAssessment.getStatus",
                 "params" => [
@@ -139,19 +139,6 @@ class UnitAssessments
                     'assessment'   => $assessment,
                 ],
             ];
-
-            $baseContext = $assessment->getBaseContext();
-            if ($baseContext instanceof \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model) {
-                $statusLink = [
-                    "route" => "courseStatus.getStatus",
-                    "params" => [
-                        'assessmentId' => $assessment->getId(),
-                        'assessment'   => $assessment,
-                        'courseSpecId' => $baseContext->getCourse()->getId(),
-                        'courseSpec'   => $baseContext->getCourse(),
-                    ],
-                ];
-            }
 
             $availableLinks = [
                 'summary' => ["route" => "learningAssessment.getSummary", "params" => [

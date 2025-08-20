@@ -24,6 +24,9 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term\Mapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Filter;
+use Schoolbox\Filter\CompositeFactoryFactory;
+use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel;
@@ -35,6 +38,8 @@ use Schoolbox\Learning\Assessment\Participant\DataSource;
 use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\DueWork\StateMapper;
@@ -46,6 +51,7 @@ use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Url\Factory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Learning\Quiz\Model as Quiz;
@@ -96,10 +102,16 @@ class Controller extends Assessment\Controller
      * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
      * @param QuizAttemptMapper $attemptMapper
      * @param StateMapper $stateMapper
-     * @param \Schoolbox\Url\Factory $urlFactory
+     * @param Factory $urlFactory
      * @param string $learnosityVersion
      * @param string $learnosityConsumerKey
      * @param string $learnosityConsumerSecret
+     * @param IdFinder $filtersAssessmentIdFinder
+     * @param CompositeFactoryFactory $filtersFactoryFactory
+     * @param Filter\Mapper $filterMapper
+     * @param Filter\Selection\Mapper $filterSelectionMapper
+     * @param CourseImplementationMapper $courseImplementationMapper
+     * @param UnitImplementationMapper $unitImplementationMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -129,6 +141,12 @@ class Controller extends Assessment\Controller
         private string $learnosityVersion,
         #[\SensitiveParameter] private string $learnosityConsumerKey,
         #[\SensitiveParameter] private string $learnosityConsumerSecret,
+        protected Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder,
+        protected Filter\CompositeFactoryFactory $filtersFactoryFactory,
+        protected Filter\Mapper $filterMapper,
+        protected Filter\Selection\Mapper $filterSelectionMapper,
+        protected CourseImplementationMapper $courseImplementationMapper,
+        protected UnitImplementationMapper $unitImplementationMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -148,6 +166,12 @@ class Controller extends Assessment\Controller
             $this->projectResultCacheMapper,
             $lessonPlanTemplateMapper,
             $lessonPlanDataModelMapper,
+            $filtersAssessmentIdFinder,
+            $filtersFactoryFactory,
+            $filterMapper,
+            $filterSelectionMapper,
+            $courseImplementationMapper,
+            $unitImplementationMapper,
             $urlFactory,
             $learnosityVersion,
             $learnosityConsumerKey,
@@ -271,9 +295,25 @@ class Controller extends Assessment\Controller
             }
         }
 
+        $aImpls = [];
+        // impl assessments we can just grab the details, spec we need to get the unit assessments first
+        if (!$assessment->isSpecification()) {
+            $aImpls[$assessment->getId()] = [
+                'assessment' => $assessment,
+            ];
+        } else {
+            $assessments = $this->getUnitAssessments($assessment);
+            foreach ($assessments as $assessmentImpl) {
+                $aImpls[$assessmentImpl->getId()] = [
+                    'assessment' => $assessmentImpl,
+                ];
+            }
+        }
+
         $twigData = [
             'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle(), '']),
             'assessment' => $assessment,
+            'aImpls' => $aImpls,
 
             /* Quizzes now support Submission States
              * Annoyingly, Submission States are in the $errors array...
