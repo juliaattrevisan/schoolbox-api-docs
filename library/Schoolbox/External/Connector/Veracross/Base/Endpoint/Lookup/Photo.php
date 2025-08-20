@@ -55,12 +55,18 @@ class Photo
             /* Generate a mega lookup of modified times to save requesting this iteratively
              */
             $stmt = $this->baseProfileMapper->getDatabase()->executeQuery("
-                SELECT external_id, updated_at
+                SELECT 
+                    sup.external_id, sup.updated_at, 
+                    u.portrait_hash
                 FROM {$this->baseProfileMapper->getBaseTableName()} sup
+                INNER JOIN `user` u ON sup.external_id = u.synergy_id                
             ");
 
             foreach ($stmt->fetchAll() as $row) {
-                $existing[$row['external_id']] = new \Alaress_Date_Format($row['updated_at'], \Alaress_Date_Format::DATABASE_FORMAT);
+                $existing[$row['external_id']] = [
+                    'modifiedAt' => new \Alaress_Date_Format($row['updated_at'], \Alaress_Date_Format::DATABASE_FORMAT),
+                    'portraitHash' => $row['portrait_hash'],
+                ];
             }
 
             /* Find out what veracross files exist and when they were last touched
@@ -81,6 +87,14 @@ class Photo
                         continue;
                     }
 
+                    /* If the existing user never had a portrait hash,
+                     * they never had a portrait pic: assign it
+                     */
+                    if (null === $existing[$externalId]['portraitHash']) {
+                        $this->lookup[$externalId] = $record['download_url'];
+                        continue;
+                    }
+
                     /* If this photo was modified more recently than the profile itself,
                      * the profile picture changed some time after the profile was last updated;
                      * we need to download and assign this pic.
@@ -88,8 +102,6 @@ class Photo
                      * Otherwise the photo is older than the profile and hasn't changed since
                      * at least one previous import; no changes required for this photo.
                      * It's already up to date.
-                     *
-                     * TODO but what about profiles that never had a pic to start with?
                      */
                     $lastModified = new \Alaress_Date_Format($record['last_modified_date'], \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS);
                     $existingModified = $existing[$externalId]['modifiedAt'];
@@ -101,6 +113,12 @@ class Photo
             }
         }
 
+        /* This lookup contains tuples for people whose photos need updating either because:
+         *     - they never had one previously
+         *     - or, the photo is newer than the last time we touched their profile
+         *
+         * The absence of a tuple means no changes required for that externalId
+         */
         return $this->lookup;
     }
 }
