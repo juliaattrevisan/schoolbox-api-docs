@@ -1261,7 +1261,9 @@ class Profile implements IStrategy
                  */
                 $exit = false;
 
-                if (400 <= $response->getStatusCode()) {
+                /* Not sure how strictly Compass obeys status codes, but ok
+                 */
+                if (200 != $response->getStatusCode()) {
                     $this->log->warning(sprintf(
                         'Invalid photo data for %s; returned http %s %s.',
                         $baseProfile->getExternalId(),
