@@ -90,7 +90,7 @@ class Photo
                     /* If the existing user never had a portrait hash,
                      * they never had a portrait pic: assign it
                      */
-                    if (null === $existing[$externalId]['portraitHash']) {
+                    if (!isset($existing[$externalId]) || null === $existing[$externalId]['portraitHash']) {
                         $this->lookup[$externalId] = $record['download_url'];
                         continue;
                     }
