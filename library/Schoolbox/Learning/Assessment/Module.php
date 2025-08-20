@@ -31,6 +31,7 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\File\MimetypeMapper;
+use Schoolbox\Filter;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
@@ -657,6 +658,12 @@ class Module extends BaseModule
         $courseImplementationMapper = $this->getMapperFactory()->get(CourseImplementationMapper::class);
         $unitImplementationMapper = $this->getMapperFactory()->get(UnitImplementationMapper::class);
 
+        // used for the course level status page (and filtering from the markbook)
+        $filtersAssessmentIdFinder  = $this->injector->get('filters.assessmentIdFinder');
+        $filtersFactoryFactory      = $this->injector->get('filters.factoryFactory');
+        $filterMapper               = $this->getMapperFactory()->get(Filter\Mapper::class);
+        $filterSelectionMapper      = $this->getMapperFactory()->get(Filter\Selection\Mapper::class);
+
         /** @var AssessmentMapperProxy $assessmentDataSource */
         $assessmentDataSource = $this->injector->get('assessmentDataSource');
 
@@ -735,6 +742,12 @@ class Module extends BaseModule
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
                     MimetypeMapper::getInstance(),
+                    $filtersAssessmentIdFinder,
+                    $filtersFactoryFactory,
+                    $filterMapper,
+                    $filterSelectionMapper,
+                    $courseImplementationMapper,
+                    $unitImplementationMapper,
                 );
 
             case Assessment\Project\Controller::class:
@@ -756,6 +769,12 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
+                    $filtersAssessmentIdFinder,
+                    $filtersFactoryFactory,
+                    $filterMapper,
+                    $filterSelectionMapper,
+                    $courseImplementationMapper,
+                    $unitImplementationMapper,
                 );
 
             case Assessment\Quiz\Controller::class:
@@ -787,6 +806,12 @@ class Module extends BaseModule
                     (string)$this->getConfig()->get('learnosity_version'),
                     (string)$this->getConfig()->get('learnosity_consumer_key'),
                     (string)$this->getConfig()->get('learnosity_consumer_secret'),
+                    $filtersAssessmentIdFinder,
+                    $filtersFactoryFactory,
+                    $filterMapper,
+                    $filterSelectionMapper,
+                    $courseImplementationMapper,
+                    $unitImplementationMapper,
                 );
 
             case Assessment\Task\Controller::class:
@@ -809,6 +834,12 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
+                    $filtersAssessmentIdFinder,
+                    $filtersFactoryFactory,
+                    $filterMapper,
+                    $filterSelectionMapper,
+                    $courseImplementationMapper,
+                    $unitImplementationMapper,
                 );
 
             case Assessment\Lti\Controller::class:
@@ -836,6 +867,12 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
+                    $filtersAssessmentIdFinder,
+                    $filtersFactoryFactory,
+                    $filterMapper,
+                    $filterSelectionMapper,
+                    $courseImplementationMapper,
+                    $unitImplementationMapper,
                 );
 
             case Assessment\LessonPlan\Controller::class:

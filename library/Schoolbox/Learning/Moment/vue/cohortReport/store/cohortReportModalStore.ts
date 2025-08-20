@@ -15,11 +15,11 @@ export const useCohortReportModalStore = defineStore("cohortReportModal", () => 
 
     /**
      * Open the modal
-     * @param entry - The entry to show in the modal
+     * @param entries - The entry/entries to show in the modal
      * @param type - The type of modal to show
      */
-    function openModal(entry: CohortReportEntry | CohortReportEntry[], type: CohortReportModalType): void {
-        selectedEntries.value = Array.isArray(entry) ? entry : [entry];
+    function openModal(entries: CohortReportEntry | CohortReportEntry[], type: CohortReportModalType): void {
+        selectedEntries.value = Array.isArray(entries) ? entries : [entries];
         modalType.value = type;
         isModalOpen.value = true;
     }

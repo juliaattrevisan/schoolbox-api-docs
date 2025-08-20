@@ -2,6 +2,7 @@
 import { useCohortReportStore } from "./store/cohortReportStore";
 import { useCohortReportFiltersStore } from "./store/cohortReportFiltersStore";
 import CrResultsGroup from "./cr-results-group.vue";
+import CrBulkUpdateDrawer from "./cr-bulk-update-drawer.vue";
 
 const crStore = useCohortReportStore();
 const crfStore = useCohortReportFiltersStore();
@@ -66,6 +67,8 @@ async function onResetFilters(): Promise<void> {
             </p>
         </div>
         <div v-else class="alert-box">All results have been loaded</div>
+
+        <cr-bulk-update-drawer />
     </div>
 </template>
 

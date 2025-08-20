@@ -58,6 +58,13 @@ class NormaliseContentTest extends TestCase
                 'Testing & encoding <script> and "quotes" \'here\'',
             ],
 
+            // HTML Entities decoded by html_entity_decode() - broader coverage
+            [
+                'Testing &amp; &lt;script&gt; &quot;quotes&quot; &#039;apostrophe&#039; &copy; &reg; &trade; &euro; &pound; &yen; &sect; &para; &middot; &raquo; &laquo; &hellip;',
+                BaseBuilder::INDEX_STRATEGY_HTML,
+                'Testing & <script> "quotes" \'apostrophe\' © ® ™ € £ ¥ § ¶ · » « …',
+            ],
+
             // Multiple Spaces and Whitespace
             [
                 'Multiple    spaces     should    be    normalized',

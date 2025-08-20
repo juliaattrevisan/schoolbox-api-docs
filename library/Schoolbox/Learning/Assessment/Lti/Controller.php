@@ -17,6 +17,9 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Error;
 use Schoolbox\Error\Mapper;
+use Schoolbox\Filter;
+use Schoolbox\Filter\CompositeFactoryFactory;
+use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use Schoolbox\Instance;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment;
@@ -31,6 +34,8 @@ use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\LTI\Assessment as LtiAssessment;
@@ -84,29 +89,35 @@ class Controller extends Assessment\Controller
     /**
      * Constructor
      *
-     * @param UserMapper                            $userMapper
-     * @param Mapper                                $errorMapper
-     * @param MapperProxy                           $assessmentMapper
-     * @param WorkTypeMapper                        $workTypeMapper
-     * @param Access                                $access
-     * @param Transactor                            $transactor
-     * @param Factory                               $bakery
-     * @param Term\Mapper                           $termMapper
-     * @param DataSource                            $participantDataSource
-     * @param CourseSpecificationMapper             $courseSpecificationMapper
-     * @param UnitSpecificationMapper               $unitSpecificationMapper
-     * @param RosettaStone                          $rosettaStone
-     * @param Replicator                            $replicator
-     * @param LtiTool\Mapper                        $ltiToolMapper
-     * @param LtiAssessment\Mapper                  $ltiAssessmentMapper
-     * @param LtiAssessmentScore\Mapper             $ltiAssessmentScoreMapper
-     * @param RegistrationRepositoryInterface       $registrations
-     * @param Instance                              $instance
-     * @param UserCodec                             $userCodec
-     * @param LatestViewMapper                      $latestViewMapper
+     * @param UserMapper $userMapper
+     * @param Mapper $errorMapper
+     * @param MapperProxy $assessmentMapper
+     * @param WorkTypeMapper $workTypeMapper
+     * @param Access $access
+     * @param Transactor $transactor
+     * @param Factory $bakery
+     * @param Term\Mapper $termMapper
+     * @param DataSource $participantDataSource
+     * @param CourseSpecificationMapper $courseSpecificationMapper
+     * @param UnitSpecificationMapper $unitSpecificationMapper
+     * @param RosettaStone $rosettaStone
+     * @param Replicator $replicator
+     * @param LtiTool\Mapper $ltiToolMapper
+     * @param LtiAssessment\Mapper $ltiAssessmentMapper
+     * @param LtiAssessmentScore\Mapper $ltiAssessmentScoreMapper
+     * @param RegistrationRepositoryInterface $registrations
+     * @param Instance $instance
+     * @param UserCodec $userCodec
+     * @param LatestViewMapper $latestViewMapper
      * @param Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
-     * @param LessonPlanTemplateMapper              $lessonPlanTemplateMapper
-     * @param LessonPlanDataModelMapper             $lessonPlanDataModelMapper
+     * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
+     * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
+     * @param IdFinder $filtersAssessmentIdFinder
+     * @param CompositeFactoryFactory $filtersFactoryFactory
+     * @param Filter\Mapper $filterMapper
+     * @param Filter\Selection\Mapper $filterSelectionMapper
+     * @param CourseImplementationMapper $courseImplementationMapper
+     * @param UnitImplementationMapper $unitImplementationMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -132,6 +143,12 @@ class Controller extends Assessment\Controller
         protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
+        protected Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder,
+        protected Filter\CompositeFactoryFactory $filtersFactoryFactory,
+        protected Filter\Mapper $filterMapper,
+        protected Filter\Selection\Mapper $filterSelectionMapper,
+        protected CourseImplementationMapper $courseImplementationMapper,
+        protected UnitImplementationMapper $unitImplementationMapper
     ) {
         parent::__construct(
             $userMapper,
@@ -151,6 +168,12 @@ class Controller extends Assessment\Controller
             $this->projectResultCacheMapper,
             $lessonPlanTemplateMapper,
             $lessonPlanDataModelMapper,
+            $filtersAssessmentIdFinder,
+            $filtersFactoryFactory,
+            $filterMapper,
+            $filterSelectionMapper,
+            $courseImplementationMapper,
+            $unitImplementationMapper,
         );
         $this->ltiToolMapper            = $ltiToolMapper;
         $this->ltiAssessmentMapper      = $ltiAssessmentMapper;
@@ -187,11 +210,27 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment): void
     {
+        $aImpls = [];
+        // impl assessments we can just grab the details, spec we need to get the unit assessments first
+        if (!$assessment->isSpecification()) {
+            $aImpls[$assessment->getId()] = [
+                'assessment' => $assessment,
+            ];
+        } else {
+            $assessments = $this->getUnitAssessments($assessment);
+            foreach ($assessments as $assessmentImpl) {
+                $aImpls[$assessmentImpl->getId()] = [
+                    'assessment' => $assessmentImpl,
+                ];
+            }
+        }
+
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/lti/status.twig',
             [
                 'type'        => Assessment\AssessmentType::objectToString($assessment),
                 'assessment'  => $assessment,
+                'aImpls'      => $aImpls,
                 'breadcrumbs' => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())
                                                    ->add([ $assessment->getTitle(), '' ]),
                 'message'      => strip_tags($this->requestQuery->get('lti_msg', '')),

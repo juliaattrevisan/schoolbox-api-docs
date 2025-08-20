@@ -18,6 +18,7 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\External\User as ExternalUser;
 use Schoolbox\GenericCollection;
+use Schoolbox\Filter;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
@@ -31,6 +32,8 @@ use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper\Exception;
@@ -64,6 +67,12 @@ class Controller extends Assessment\Controller
         protected Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
+        protected ?Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder = null,
+        protected ?Filter\CompositeFactoryFactory $filtersFactoryFactory = null,
+        protected ?Filter\Mapper $filterMapper = null,
+        protected ?Filter\Selection\Mapper $filterSelectionMapper = null,
+        protected ?CourseImplementationMapper $courseImplementationMapper = null,
+        protected ?UnitImplementationMapper $unitImplementationMapper = null
     ) {
         parent::__construct(
             $userMapper,
@@ -83,6 +92,12 @@ class Controller extends Assessment\Controller
             $this->projectResultCacheMapper,
             $lessonPlanTemplateMapper,
             $lessonPlanDataModelMapper,
+            $filtersAssessmentIdFinder,
+            $filtersFactoryFactory,
+            $filterMapper,
+            $filterSelectionMapper,
+            $courseImplementationMapper,
+            $unitImplementationMapper,
         );
     }
 
@@ -155,7 +170,6 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment): void
     {
-
         // Calculate summary totals for display purposes
         $participants = $assessment->getAllParticipants();
 
@@ -170,27 +184,42 @@ class Controller extends Assessment\Controller
             $participantStats[$participant->getUser()->getId()] = new Assessment\ParticipantStatistics($participant);
         }
 
-        $aImpls = [];
-        /* for this endpoint, only show participants if the assessment is not a specification
-         * courseStatus.getStatus exists instead for specs */
-        if (!$assessment->isSpecification()) {
-            $aImpls[$assessment->getId()] = [
-                'assessment' => $assessment,
-                'participantStats' => $participantStats,
-            ];
-        }
-
         $twigData = [
             'breadcrumbs'      => $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]),
             'baseContext'      => $assessment->getBaseContext(),
             'assessment'       => $assessment,
-            'aImpls'           => $aImpls,
             'assessmentStats'  => $assessmentStats,
             'returnUrl'        =>
-            $this->requestQuery->get(Redirect::RETURN_URL)
-                ? Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL))
-                : $this->getSession()->getHistory(),
+                $this->requestQuery->get(Redirect::RETURN_URL)
+                    ? Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL))
+                    : $this->getSession()->getHistory(),
         ];
+
+        // impl assessments we can just grab the details, spec we need to get the unit assessments first
+        if (!$assessment->isSpecification()) {
+            $twigData['aImpls'][$assessment->getId()] = [
+                'assessment' => $assessment,
+                'participantStats' => $participantStats,
+            ];
+        } else {
+            $assessments = $this->getUnitAssessments($assessment);
+            /** @var Project $assessment */
+            foreach ($assessments as $assessment) {
+                // Calculate summary totals for display purposes
+                $participants = $assessment->getAllParticipants();
+
+                $participantStats = new GenericCollection(Assessment\ParticipantStatistics::class);
+                foreach ($participants as $participant) {
+                    $participantStats[$participant->getUser()->getId()] = new Assessment\ParticipantStatistics($participant);
+                }
+
+                $twigData['participantStats'][$assessment->getId()] = $participantStats;
+                $twigData['aImpls'][$assessment->getId()] = [
+                    'assessment' => $assessment,
+                    'participantStats' => $participantStats,
+                ];
+            }
+        }
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/project/status/staff.twig',
