@@ -51,24 +51,21 @@ class Photo
                 /* Avengers Assemble!
                  */
                 foreach ($page['data'] as $record) {
-                    var_dump($record);
-//
-//                    $externalId = trim((string)$record['id']);
-//
-//                    /* Only import for specific users
-//                     */
-//                    if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
-//                        continue;
-//                    }
-//
-//                    /* Overwrite with lookupped values
-//                     * If any of the following fields has contents, then they have a Medical Alert
-//                     */
-//                    foreach (['allergies_symptoms', 'current_medications', 'general_medical_notes'] as $field) {
-//                        if ('' !== trim((string)$record[$field])) {
-//                            $this->lookup[$externalId] = true;
-//                        }
-//                    }
+                    $externalId = trim((string)$record['id']);
+
+                    /* Only import for specific users
+                     */
+                    if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                        continue;
+                    }
+
+                    /* Overwrite with lookupped values
+                     * If any of the following fields has contents, then they have a Medical Alert
+                     */
+                    $this->lookup[$externalId] = [
+                        'url' => $record['download_url'],
+                        'modifiedAt' => $record['last_modified_date'],
+                    ];
                 }
             }
         }
