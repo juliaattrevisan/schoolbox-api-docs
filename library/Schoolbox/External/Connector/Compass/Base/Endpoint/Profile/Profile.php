@@ -1259,7 +1259,7 @@ class Profile implements IStrategy
                 /* Compass denies access due to cloudflare: any html response is invalid
                  * for image data, so we can just leave immediately upon detecting this
                  */
-                if (403 === $response->getStatusCode()) {
+                if (400 <= $response->getStatusCode()) {
                     $this->log->warning(sprintf(
                         'Invalid photo data for %s; returned http %s %s.',
                         $baseProfile->getExternalId(),
