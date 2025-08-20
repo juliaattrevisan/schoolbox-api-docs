@@ -107,6 +107,12 @@ class OauthProviderIssued extends Base
         // Determine JWKS for this provider
         $oauthIdp        = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER);
         $candidateClaims = explode(',', $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS));
+        $this->log->info(
+            sprintf(
+                'Searching for users which match candidate claims "%s"',
+                implode(',', $candidateClaims),
+            )
+        );
 
         $cache = new CacheHelper($this->httpClient, $this->oidcCache);
         $jwks  = $cache->retrieveJsonWebKeySet(new Uri($oauthIdp));
@@ -130,18 +136,14 @@ class OauthProviderIssued extends Base
         foreach ($candidateClaims as $candidateClaim) {
             $candidateClaim = trim($candidateClaim);
             if (isset($claims[$candidateClaim])) {
-                $this->log->info(sprintf('Searching for users which match candidate claim "%s"', $candidateClaim));
-                $this->log->debug(sprintf('JWT %s: %s', $candidateClaim, $claims[$candidateClaim]));
+                $this->log->debug(sprintf('Checking JWT %s "%s" matches username', $candidateClaim, $claims[$candidateClaim]));
                 try {
                     return $this->findUser($claims[$candidateClaim], $candidateClaim);
                 } catch (Exception\InvalidIdentity $e) {
                     $failureMessage = $e->getMessage();
                 }
             } else {
-                $failureMessage = sprintf(
-                    'JWT "%s" claim is empty',
-                    $candidateClaim
-                );
+                $failureMessage = sprintf('JWT "%s" claim is empty', $candidateClaim);
             }
             $messages[] = $failureMessage;
         }

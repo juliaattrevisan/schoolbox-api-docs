@@ -99,19 +99,14 @@ abstract class Base implements IParser
         if (!isset($this->decodeWithoutVerificationResults[$jwt])) {
             $parts = explode('.', $jwt);
             if (count($parts) !== 3) {
-                $message = 'Could not parse JWT: must contain a header, payload and signature';
-                $this->log->error($message);
-                throw new Exception\Unparseable($message);
+                throw new Exception\Unparseable('Could not parse JWT: must contain a header, payload and signature');
             }
             [, $payload,] = $parts;
             try {
-                $this->log->debug('Parsing JWT payload without verification');
                 $this->decodeWithoutVerificationResults[$jwt]
                     = (array)JwtLibrary\JWT::jsonDecode(JwtLibrary\JWT::urlsafeB64Decode($payload));
             } catch (DomainException $e) {
-                $message = sprintf('Could not parse JWT payload (message: %s)', $e->getMessage());
-                $this->log->error($message);
-                throw new Exception\Unparseable($message, $e->getCode(), $e);
+                throw new Exception\Unparseable(sprintf('Could not parse JWT payload (message: %s)', $e->getMessage()), $e->getCode(), $e);
             }
         }
         return $this->decodeWithoutVerificationResults[$jwt];
@@ -132,19 +127,14 @@ abstract class Base implements IParser
         if (!isset($this->decodeHeadersResults[$jwt])) {
             $parts = explode('.', $jwt);
             if (count($parts) !== 3) {
-                $message = 'Could not parse JWT: must contain a header, payload and signature';
-                $this->log->error($message);
-                throw new Exception\Unparseable($message);
+                throw new Exception\Unparseable('Could not parse JWT: must contain a header, payload and signature');
             }
             [$header,] = $parts;
             try {
-                $this->log->debug('Parsing JWT header without verification');
                 $this->decodeHeadersResults[$jwt]
                     = (array)JwtLibrary\JWT::jsonDecode(JwtLibrary\JWT::urlsafeB64Decode($header));
             } catch (DomainException $e) {
-                $message = sprintf('Could not parse JWT header (message: %s)', $e->getMessage());
-                $this->log->error($message);
-                throw new Exception\Unparseable($message, $e->getCode(), $e);
+                throw new Exception\Unparseable(sprintf('Could not parse JWT header (message: %s)', $e->getMessage()), $e->getCode(), $e);
             }
         }
         return $this->decodeHeadersResults[$jwt];
@@ -183,16 +173,13 @@ abstract class Base implements IParser
             $message = isset($sourceClaim)
                 ? sprintf('JWT "%s" claim does not match a user', $sourceClaim)
                 : sprintf('No user with username "%s" found', $username);
-            $this->log->error($message);
             throw new Exception\InvalidIdentity($message);
         }
 
-        $this->log->info(sprintf('Found user: (username: "%s")', $user->getUsername()));
         if (!$user->getEnabled()) {
             $message = isset($sourceClaim)
                 ? sprintf('JWT "%s" claim matches a deactivated user', $sourceClaim)
                 : sprintf('User with username "%s" is deactivated', $username);
-            $this->log->error($message);
             throw new Exception\InvalidIdentity($message);
         }
 

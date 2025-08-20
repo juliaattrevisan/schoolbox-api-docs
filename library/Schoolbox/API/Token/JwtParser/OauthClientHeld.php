@@ -106,7 +106,7 @@ class OauthClientHeld extends Base
 
         $this->log->info(
             sprintf(
-                'JWT does not contain claim "%s": finding relying party for claim "%s"',
+                'JWT does not contain claim "%s": finding relying party for claim "%s", and then returning its client credentials user',
                 self::CLAIM_SUB,
                 self::CLAIM_AUD,
             ),
