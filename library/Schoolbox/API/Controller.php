@@ -302,6 +302,7 @@ class Controller extends Base
             $response = 'Password has expired';
             $status   = 400;
         }
+        $this->jwtParserLogger->warning(sprintf('Could not extract user from JWT (reason: %s)', $response));
 
         $this->response = $this->responseAsJson($response)->withStatus($status);
         return null;
