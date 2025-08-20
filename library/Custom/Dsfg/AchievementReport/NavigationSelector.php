@@ -28,7 +28,7 @@ class NavigationSelector
     public const COMMENTS_KEY = 'comments';
     public const COCURRICULAR_KEY = 'coCurricular';
     public const MYP_KEY = 'myp';
-
+    public const DBVIEWTESTS_KEY = 'dbViewTests';
 
     /**
      * MSSQL db handler
@@ -270,7 +270,7 @@ class NavigationSelector
         }
 
         if (in_array($_SESSION['username'], ['alaress', 'psingh', 'swalker'])) {
-            $availableNavigation[self::COCURRICULAR_KEY] = [
+            $availableNavigation[self::DBVIEWTESTS_KEY] = [
                 'url' => $this->routeGenerator->generate('achievementreport.getDbViewTests', [
                     'externalUserId' => $this->externalUser['StudentID'],
                 ]),
