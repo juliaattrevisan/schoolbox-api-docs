@@ -18,6 +18,7 @@ export enum TabTitle {
     LIST = "List",
     STUDENT_BY_TYPE = "Student by Type/Sub-Type",
     TYPE_BY_MONTH = "Type/Sub-Type by Month",
+    TYPE_BY_WEEK = "Type/Sub-Type by Week",
 }
 
 /**

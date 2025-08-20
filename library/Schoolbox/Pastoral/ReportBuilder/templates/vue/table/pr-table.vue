@@ -192,7 +192,7 @@ window.Vue.onMounted(() => {
     <pr-table-modal :selected-cell="selectedCell" />
 </template>
 
-<style scoped lang="scss">
+<style lang="scss">
 .scrollable {
     overflow-y: auto;
 }
@@ -206,5 +206,9 @@ window.Vue.onMounted(() => {
         top: 0;
         z-index: var(--sbx-depth-ui-sticky);
     }
+}
+
+.highcharts-tooltip-container {
+    z-index: var(--sbx-depth-pop-over) !important;
 }
 </style>

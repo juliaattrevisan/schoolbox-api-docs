@@ -120,7 +120,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
             <th
                 v-for="(header, index) in props.headers"
                 :key="header.key"
-                :class="`u-border-right title-cell ${index === 0 ? 'u-sticky-left first-column' : ''} ${header.key === 'total' ? 'total-cell' : ''}`"
+                :class="`u-border-right title-column ${index === 0 ? 'u-sticky-left first-column' : ''} ${header.key === 'total' ? 'total-column' : ''} ${header.key === 'trend' ? 'trend-column' : ''}`"
             >
                 <button
                     v-if="header.isSortable"
@@ -148,7 +148,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
 </template>
 
 <style scoped lang="scss">
-.title-cell {
+.title-column {
     min-width: 120px; // given the titles can be long, this ensures they don't wrap too much
     &:has(.title-button) {
         padding: 0; // padding is handled by the button instead
@@ -163,10 +163,14 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
     width: 250px;
 }
 
-.total-cell {
-    background: var(--sbx-pr-table-total-cell-colour);
+.total-column {
+    background: var(--sbx-pr-table-total-column-colour);
     min-width: 110px; // so points/records change doesn't trigger a reflow
     width: 110px;
+}
+
+.trend-column {
+    width: 220px;
 }
 
 .title-button {
@@ -182,14 +186,6 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
     width: 100%;
     &:hover {
         background: none;
-    }
-}
-
-.sort-indicator {
-    margin-left: 0.5rem;
-    font-weight: bold;
-    &--inactive {
-        opacity: 0.3;
     }
 }
 </style>
