@@ -187,7 +187,7 @@ abstract class BaseBuilder implements IBuilder
         $text = strip_tags(str_replace('<', ' <', $content));
 
         // Decode any special characters.
-        $text = htmlspecialchars_decode($text);
+        $text = html_entity_decode($text);
 
         // Remove multiple spaces and trim.
         return self::normaliseAsText($text);
