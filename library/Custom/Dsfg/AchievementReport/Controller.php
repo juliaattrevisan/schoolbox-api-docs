@@ -1036,6 +1036,10 @@ class Controller extends Base
 
             // Columns: id,Title,Given1,Given2,Preferred,PreferredFormal,Surname,NameExternal,NameInternal,MailNamePrimary,StudentYear,YearLevel,ClassCode,FileSemester,Term,SortOrder,CourseDescription,Comment,ModifiedDate,ModifiedById,ClassTeacher1,ClassTeacher1Email,ClassTeacher1ID,ClassTeacher2,ClassTeacher2Email,ClassTeacher2ID,ClassTeacher3,ClassTeacher3Email,ClassTeacher3ID,ResultType
             'dbo.uvSchoolBoxReportComments',
+
+            'dbo.uvSchoolBoxMYPResults_CurrentOverview',
+
+            'dbo.uvSchoolBoxCoCurricularClasses',
         ];
 
         $rowsByViewName = [];
@@ -1043,7 +1047,17 @@ class Controller extends Base
         $queryTimeSecondsByViewName = [];
 
         foreach ($viewNames as $viewName) {
-            $query = "SELECT TOP 100 * FROM $viewName WHERE " . (($viewName === 'dbo.uvSchoolBoxSchoolGradeResults') ? 'ID' : 'id') . ' = ' . $externalUser['StudentID'];
+            $idColumnName = match ($viewName) {
+                'dbo.uvSchoolBoxSchoolGradeResults' => 'ID',
+                'dbo.uvSchoolBoxMYPResults_CurrentOverview' => 'ID',
+                'dbo.uvSchoolBoxCoCurricularClasses' => 'StudentID',
+                default => 'id',
+            };
+            $query = (
+                "SELECT TOP 100 *
+                 FROM $viewName
+                 WHERE $idColumnName = " . $externalUser['StudentID']
+            );
 
             if ($viewName === 'dbo.uvSchoolBoxReportComments') {
                 $query .= " AND YearLevel = '11' AND ResultType IN ('NCEA', 'Year 11')";
@@ -1073,7 +1087,7 @@ class Controller extends Base
             }
 
             if (count($rows) === 0) {
-                echo "Table empty.\n";
+                echo "No rows found.\n";
                 continue;
             }
 
