@@ -66,7 +66,7 @@ class OauthProviderIssued extends Base
         // Check the token's audience to determine if it is actually from the
         // oAuth provider.
         $claims = $this->decodeWithoutVerification($jwt);
-        $this->log->debug(
+        $this->log->info(
             sprintf(
                 'Checking if JWT contains claim "%s", and that it matches config "%s"',
                 self::CLAIM_AUD,
@@ -74,9 +74,9 @@ class OauthProviderIssued extends Base
             )
         );
         if (!$this->claimAudienceMatchesConfiguredClientId($claims)) {
-            $this->log->debug(
+            $this->log->info(
                 sprintf(
-                    'JWT claim "%s" does not match config "%s": using next parser',
+                    'JWT claim "%s" does not match config "%s"',
                     self::CLAIM_AUD,
                     ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID,
                 )
@@ -90,7 +90,7 @@ class OauthProviderIssued extends Base
         if ($oauthIssuer === '') {
             $this->log->warning(
                 sprintf(
-                    'Config "%s" is empty: accepting regardless of JWT claim "%s". (This will likely be removed in the future)',
+                    'Config "%s" is empty: accepting regardless of JWT claim "%s". (This should be removed in the future)',
                     ConfigMapper::NAME_OAUTH_ISSUER,
                     self::CLAIM_ISS,
                 )
@@ -101,13 +101,12 @@ class OauthProviderIssued extends Base
         // If the issuer is provided: it must match the issuer in the JWT
         $jwtIssuer = trim((string)($claims[self::CLAIM_ISS] ?? ''));
         $accepts   = $jwtIssuer === $oauthIssuer;
-        $this->log->debug(
+        $this->log->info(
             sprintf(
                 $accepts
-                    ? 'JWT claim "%s" value "%s" matches config "%s": using this parser'
-                    : 'JWT claim "%s" value "%s" does not match config "%s": using next parser',
+                    ? 'JWT claim "%s" matches config "%s"'
+                    : 'JWT claim "%s" does not match config "%s"',
                 self::CLAIM_ISS,
-                $claims[self::CLAIM_ISS],
                 ConfigMapper::NAME_OAUTH_ISSUER,
             )
         );
@@ -137,15 +136,24 @@ class OauthProviderIssued extends Base
             $sessionLength,
         );
 
+        // Should not need to re-check audience,
+        // because it was checked in accepts already.
         if (!$this->claimAudienceMatchesConfiguredClientId($claims)) {
-            $message = sprintf(
-                'JWT claim "%s" does not match config "%s"',
-                self::CLAIM_AUD,
-                ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID,
+            throw new Exception\Rejected(
+                sprintf(
+                    'JWT claim "%s" does not match config "%s"',
+                    self::CLAIM_AUD,
+                    ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID,
+                )
             );
-            $this->log->error($message);
-            throw new Exception\Rejected($message);
         }
+
+        $this->log->info(
+            sprintf(
+                'Checking users against candidate claims in config "%s"',
+                ConfigMapper::_CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS
+            ),
+        );
 
         // The identification in the token seems to be in one of two claims:
         // * "preferred_username" matches a Schoolbox username
@@ -155,7 +163,8 @@ class OauthProviderIssued extends Base
         foreach ($candidateClaims as $candidateClaim) {
             $candidateClaim = trim($candidateClaim);
             if (isset($claims[$candidateClaim])) {
-                $this->log->debug(sprintf('Searching for users which match candidate claim "%s"', $candidateClaim));
+                $this->log->info(sprintf('Searching for users which match candidate claim "%s"', $candidateClaim));
+                $this->log->debug(sprintf('JWT %s: %s', $candidateClaim, $claims[$candidateClaim]));
                 try {
                     return $this->findUser($claims[$candidateClaim], $candidateClaim);
                 } catch (Exception\InvalidIdentity $e) {
@@ -171,9 +180,9 @@ class OauthProviderIssued extends Base
         }
 
         // Candidate claims found no user: can't use it
-        $message = sprintf('JWT contains no claim matching a user (%s)', implode('; ', $messages));
-        $this->log->error($message);
-        throw new Exception\InvalidIdentity($message);
+        throw new Exception\InvalidIdentity(
+            sprintf('JWT contains no claim matching a user (%s)', implode('; ', $messages)),
+        );
     }
 
     /**
@@ -186,6 +195,7 @@ class OauthProviderIssued extends Base
     {
         $audiences     = (array)($claims[self::CLAIM_AUD] ?? []);
         $oauthClientId = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID);
+        $this->log->debug(sprintf('JWT %d: %s', self::CLAIM_AUD, implode(',', $audiences)));
         return in_array($oauthClientId, $audiences, true);
     }
 }
