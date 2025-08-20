@@ -20,8 +20,8 @@ use SensitiveParameter;
 /**
  * Parser for JWTs issued by another instance.
  *
- * It's expected that the other instance's JWT public key be stored in the
- * instance registry mapper's table.
+ * It's expected that the other instance's JWKS URL will be provided by the
+ * instance registry.
  */
 class OtherInstanceIssued extends Base
 {
@@ -39,7 +39,17 @@ class OtherInstanceIssued extends Base
     public function accepts(#[SensitiveParameter] string $jwt): bool
     {
         $claims = $this->decodeWithoutVerification($jwt);
-        return isset($claims[self::CLAIM_INSTANCE_ID]);
+        $this->log->debug(sprintf('Checking if JWT contains claim "%s"', self::CLAIM_INSTANCE_ID));
+        $accepts = isset($claims[self::CLAIM_INSTANCE_ID]);
+        $this->log->debug(
+            sprintf(
+                $accepts
+                    ? ('JWT contains claim "%s": using this parser')
+                    : ('JWT does not contain claim "%s": using next parser'),
+                self::CLAIM_INSTANCE_ID,
+            )
+        );
+        return $accepts;
     }
 
     /**
@@ -54,6 +64,7 @@ class OtherInstanceIssued extends Base
         $instanceId       = $unverifiedClaims[self::CLAIM_INSTANCE_ID];
         $client           = new Client();
         try {
+            $this->log->debug(sprintf('Querying instance registry for JWKS for instance "%s"', $instanceId));
             $response = json_decode(
                 $client->get(
                     $this->config->get(ConfigMapper::NAME_INSTANCE_REGISTRY_URL) . '/api/instances/' . $instanceId . "/jwks?toInstance=" . INSTANCE_ID
@@ -65,9 +76,31 @@ class OtherInstanceIssued extends Base
                 JSON_THROW_ON_ERROR
             );
             $jwks = json_decode($client->get($response['url'])->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
-        } catch (GuzzleException | \JsonException $e) {
+        } catch (GuzzleException $e) {
+            $this->log->error(
+                sprintf(
+                    'Unable to retrieve instance details for instance "%s" (message: %s)',
+                    $instanceId,
+                    $e->getMessage(),
+                )
+            );
             throw new Exception\Rejected(
                 sprintf('Unable to retrieve instance details for instance ID "%s"', $instanceId),
+                $e->getCode(),
+                $e,
+            );
+        } catch (\JsonException $e) {
+            $this->log->error(
+                sprintf(
+                    'Unable to parse instance details for instance "%s" (message: %s)',
+                    $instanceId,
+                    $e->getMessage(),
+                )
+            );
+            throw new Exception\Rejected(
+                sprintf('Unable to parse instance details for instance ID "%s"', $instanceId),
+                $e->getCode(),
+                $e,
             );
         }
 
