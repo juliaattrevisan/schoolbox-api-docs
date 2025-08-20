@@ -319,6 +319,7 @@ class Factory implements IFactory
                 $this->host,
                 $this->key,
                 $this->watchlist,
+                Loader::getInstance()->get('photo_sis_import'),
                 Loader::getInstance()->get('date_timezone'),
                 /* Profile pieces
                  */

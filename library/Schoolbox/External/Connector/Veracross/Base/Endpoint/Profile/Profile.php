@@ -21,6 +21,7 @@ use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\EmergencyContact
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Health;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Household;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Language;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Photo;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Relationship;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\ValueListConverter;
 use Schoolbox\External\Connector\Watchlist;
@@ -86,6 +87,14 @@ class Profile implements IStrategy
 
 
     /**
+     * A list of people's profile pics and where to grab them
+     *
+     * @var Photo
+     */
+    private Photo $photoLookup;
+
+
+    /**
      * Profile constructor.
      *
      * @param ValidStrats $validStrats
@@ -93,6 +102,7 @@ class Profile implements IStrategy
      * @param bool $perform
      * @param IApi $api
      * @param array $watchlist
+     * @param bool $includePhoto
      * @param Mapper $baseProfileMapper
      * @param UserProfile\Student\Mapper $studentProfileMapper
      * @param UserProfile\Parent\Mapper $parentProfileMapper
@@ -105,6 +115,7 @@ class Profile implements IStrategy
         private bool $perform,
         private IApi $api,
         private array $watchlist,
+        private bool $includePhoto,
         private UserProfile\Mapper $baseProfileMapper,
         private UserProfile\Student\Mapper $studentProfileMapper,
         private UserProfile\Parent\Mapper $parentProfileMapper,
@@ -125,6 +136,11 @@ class Profile implements IStrategy
         /* Shared lookups
          */
         $this->contactInfoLookup = new ContactInfo($this->api);
+
+        /* Students might have profile pics;
+         * Staff might have profile pics
+         */
+        $this->photoLookup = (new Photo($this->api, $this->watchlist));
     }
 
 
@@ -166,6 +182,14 @@ class Profile implements IStrategy
          */
         $this->log->debug('Prefetching languages...');
         $languageLookup = (new Language($this->api, $this->watchlist))->generate();
+
+        /* Optionally process profile pics
+         */
+        $photoLookup = null;
+
+        if ($this->includePhoto) {
+            $photoLookup = $this->photoLookup->generate();
+        }
 
         /* Only available when Families strat is enabled
          */
@@ -512,6 +536,19 @@ class Profile implements IStrategy
                     $this->profileHandler->saveStudentProfile($studentProfile, $oldStudentProfile);
                 }
 
+                /* Find their profile pic
+                 */
+                if ($this->includePhoto) {
+                    $this->log->debug(sprintf(
+                        'Fetching picture for %s %s (%s)',
+                        $studentBaseProfile->getFirstname(),
+                        $studentBaseProfile->getLastname(),
+                        $studentBaseProfile->getExternalId()
+                    ));
+
+                    $this->importPhoto($studentBaseProfile, $photoLookup);
+                }
+
                 /* Add their parents' profile data
                  */
                 if ($this->validStrats->isFamiliesStratEnabled()) {
@@ -792,5 +829,18 @@ class Profile implements IStrategy
                 }
             }
         }
+    }
+
+
+    /**
+     * Import a profile picture for the given profile
+     *
+     * @param UserProfile\Model $baseProfile
+     * @param array|null $photoLookup
+     * @return void
+     */
+    private function importPhoto(UserProfile\Model $baseProfile, ?array $photoLookup): void
+    {
+echo 'test';
     }
 }

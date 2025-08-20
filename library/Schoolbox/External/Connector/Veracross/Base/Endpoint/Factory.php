@@ -57,23 +57,24 @@ class Factory
     /**
      * Factory constructor.
      *
-     * @param ValidStrats                                $validStrats
-     * @param LoggerInterface                            $log
-     * @param bool                                       $perform
-     * @param string                                     $host
-     * @param string                                     $key
-     * @param array                                      $watchlist
-     * @param string                                     $timezone
-     * @param Mapper                                     $baseProfileMapper
-     * @param UserProfile\Student\Mapper                 $studentProfileMapper
-     * @param UserProfile\Parent\Mapper                  $parentProfileMapper
-     * @param UserProfile\Staff\Mapper                   $staffProfileMapper
-     * @param UserProfile\Relationship\Mapper            $relationshipMapper
-     * @param \Schoolbox\External\Event\Mapper           $eventMapper
-     * @param ClassEntryMapper                           $classEntryMapper
-     * @param ClassInvolvementMapper                     $classInvolvementMapper
-     * @param ClassPeriodMapper                          $classPeriodMapper
-     * @param TimetablePeriodMapper                      $periodMapper
+     * @param ValidStrats $validStrats
+     * @param LoggerInterface $log
+     * @param bool $perform
+     * @param string $host
+     * @param string $key
+     * @param array $watchlist
+     * @param bool $includePhoto
+     * @param string $timezone
+     * @param Mapper $baseProfileMapper
+     * @param UserProfile\Student\Mapper $studentProfileMapper
+     * @param UserProfile\Parent\Mapper $parentProfileMapper
+     * @param UserProfile\Staff\Mapper $staffProfileMapper
+     * @param UserProfile\Relationship\Mapper $relationshipMapper
+     * @param \Schoolbox\External\Event\Mapper $eventMapper
+     * @param ClassEntryMapper $classEntryMapper
+     * @param ClassInvolvementMapper $classInvolvementMapper
+     * @param ClassPeriodMapper $classPeriodMapper
+     * @param TimetablePeriodMapper $periodMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      */
     public function __construct(
@@ -83,6 +84,7 @@ class Factory
         private string $host,
         #[SensitiveParameter] private string $key,
         private array $watchlist,
+        private bool $includePhoto,
         private string $timezone,
         /* Profile pieces */
         private UserProfile\Mapper $baseProfileMapper,
@@ -143,6 +145,7 @@ class Factory
                     $this->perform,
                     $api,
                     $this->watchlist,
+                    $this->includePhoto,
                     $this->baseProfileMapper,
                     $this->studentProfileMapper,
                     $this->parentProfileMapper,
