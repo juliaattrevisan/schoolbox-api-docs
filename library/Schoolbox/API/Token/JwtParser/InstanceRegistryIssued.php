@@ -44,18 +44,11 @@ class InstanceRegistryIssued extends Base
         $claims = $this->decodeWithoutVerification($jwt);
 
         // Ensure that the JWT was issued by the instance registry
-        $this->log->info(
-            sprintf(
-                'Checking if JWT contains claim "%s", and that its host matches config "%s"',
-                self::CLAIM_ISS,
-                ConfigMapper::NAME_INSTANCE_REGISTRY_URL,
-            ),
-        );
         $irUrl       = $this->config->get(ConfigMapper::NAME_INSTANCE_REGISTRY_URL);
         $claimIssuer = $claims[self::CLAIM_ISS] ?? null;
         $this->log->debug(
             sprintf(
-                'JWT %s: %s, config %s: %s',
+                'Checking JWT %s "%s" against config %s "%s" (hostname must match)',
                 self::CLAIM_ISS,
                 $claimIssuer,
                 ConfigMapper::NAME_INSTANCE_REGISTRY_URL,
@@ -68,42 +61,20 @@ class InstanceRegistryIssued extends Base
                 parse_url($claimIssuer, PHP_URL_HOST) === parse_url($irUrl, PHP_URL_HOST)
             )
         ) {
-            $this->log->info(
-                sprintf(
-                    'JWT claim "%s" hostname does not match config "%s"',
-                    self::CLAIM_ISS,
-                    ConfigMapper::NAME_INSTANCE_REGISTRY_URL,
-                ),
-            );
             return false;
         }
 
         // Ensure that the JWT's instance ID claim matches this instance's ID
-        $this->log->info(
-            sprintf(
-                'Checking if JWT contains claim "%s", and that its host matches instance ID',
-                self::CLAIM_INSTANCE_ID,
-            ),
-        );
         $claimInstanceId = $claims[self::CLAIM_INSTANCE_ID] ?? null;
-        if ($claimInstanceId !== (string)INSTANCE_ID) {
-            $this->log->info(
-                sprintf(
-                    'JWT claim "%s" does not match instance ID',
-                    self::CLAIM_INSTANCE_ID,
-                ),
-            );
-        }
-
-        $this->log->info(
+        $this->log->debug(
             sprintf(
-                'JWT claims "%s" hostname matches config "%s", and "%s" matches instance ID',
-                self::CLAIM_ISS,
-                ConfigMapper::NAME_INSTANCE_REGISTRY_URL,
+                'Checking JWT %s "%s" against instance ID %s',
                 self::CLAIM_INSTANCE_ID,
-            ),
+                $claimInstanceId,
+                INSTANCE_ID,
+            )
         );
-        return true;
+        return $claimInstanceId === (string)INSTANCE_ID;
     }
 
     /**

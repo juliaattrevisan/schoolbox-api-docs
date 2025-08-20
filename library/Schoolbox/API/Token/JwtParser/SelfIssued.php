@@ -49,39 +49,18 @@ class SelfIssued extends Base
      */
     public function accepts(#[SensitiveParameter] string $jwt): bool
     {
-        $claims = $this->decodeWithoutVerification($jwt);
+        $claims             = $this->decodeWithoutVerification($jwt);
         $thisInstanceIssuer = $this->determineThisInstanceIssuer();
-        $this->log->info(
-            sprintf(
-                'Checking if JWT contains claim "%s", and that it matches this instance "%s"',
-                self::CLAIM_ISS,
-                $thisInstanceIssuer,
-            )
-        );
         $this->log->debug(
             sprintf(
-                'JWT %s: %s',
+                'Checking JWT %s "%s" against this instance "%s"',
                 self::CLAIM_ISS,
                 $claims[self::CLAIM_ISS],
+                $thisInstanceIssuer,
             ),
         );
 
-        if (!isset($claims[self::CLAIM_ISS])) {
-            $this->log->info(sprintf('JWT does not contain claim "%s"', self::CLAIM_ISS));
-            return false;
-        }
-
-        $accepts = $claims[self::CLAIM_ISS] === $this->determineThisInstanceIssuer();
-        $this->log->info(
-            sprintf(
-                $accepts
-                    ? 'JWT claim "%s" matches this instance "%s"'
-                    : 'JWT claim "%s" does not match this instance "%s"',
-                self::CLAIM_ISS,
-                $thisInstanceIssuer,
-            )
-        );
-        return $accepts;
+        return isset($claims[self::CLAIM_ISS]) && $claims[self::CLAIM_ISS] === $thisInstanceIssuer;
     }
 
     /**
