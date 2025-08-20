@@ -16,6 +16,7 @@ use Alaress\Database\Connector\NullConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Image\ProcessorFactory;
+use Alaress\Lumberjack\Logger;
 use Alaress\Module\Cache as ModuleCache;
 use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Module\Registry;
@@ -53,6 +54,7 @@ use Http\Discovery\Psr17Factory;
 use InvalidArgumentException;
 use League\Flysystem\Filesystem;
 use LogicException;
+use Monolog\Level;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ClientRepository;
@@ -2059,13 +2061,13 @@ abstract class Kernel
             $di->lazy(
                 function () use ($di, $config, $mapperFactory) {
                     /** @var GuzzleHttp\Client $httpClient */
-                    $httpClient             = $di->get('httpClient');
                     /** @var CacheInterface $oidcCache */
-                    $oidcCache              = $di->get('oidc.cache');
-                    $userMapper             = $mapperFactory->get(UserMapper::class);
-                    $tokenMapper            = $mapperFactory->get(TokenMapper::class);
-                    $relyingPartyMapper     = $mapperFactory->get(RelyingPartyMapper::class);
-                    $logger                 = new NullLogger();
+                    $httpClient         = $di->get('httpClient');
+                    $oidcCache          = $di->get('oidc.cache');
+                    $userMapper         = $mapperFactory->get(UserMapper::class);
+                    $tokenMapper        = $mapperFactory->get(TokenMapper::class);
+                    $relyingPartyMapper = $mapperFactory->get(RelyingPartyMapper::class);
+                    $logger             = new Logger(STDOUT, STDOUT, Level::Debug, [], true, 'jwtParser');
                     return new JwtParser\Composite(
                         $logger,
                         new JwtParser\OtherInstanceIssued($userMapper, $config, $logger),

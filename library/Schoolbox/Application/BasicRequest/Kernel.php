@@ -11,12 +11,14 @@ namespace Schoolbox\Application\BasicRequest;
 use Alaress\Database\Connector\IConnector;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Image\ProcessorFactory;
+use Alaress\Lumberjack\Logger;
 use Alaress\Sentry\Tracing\GuzzleTracingMiddleware;
 use Alaress\Sentry\Tracing\Tracer;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
 use GuzzleHttp;
 use Http\Discovery\Psr17Factory;
 use League\Flysystem\Filesystem;
+use Monolog\Level;
 use Proxy\Server as ProxyServer;
 use Psr\Log\NullLogger;
 use Psr\SimpleCache\CacheInterface;
@@ -347,13 +349,13 @@ class Kernel extends WebKernelAbstract
             $di->lazy(
                 function () use ($di, $config, $mapperFactory) {
                     /** @var GuzzleHttp\Client $httpClient */
-                    $httpClient             = $di->get('httpClient');
                     /** @var CacheInterface $oidcCache */
-                    $oidcCache              = $di->get('oidc.cache');
-                    $userMapper             = $mapperFactory->get(UserMapper::class);
-                    $tokenMapper            = $mapperFactory->get(TokenMapper::class);
-                    $relyingPartyMapper     = $mapperFactory->get(RelyingPartyMapper::class);
-                    $logger                 = new NullLogger();
+                    $httpClient         = $di->get('httpClient');
+                    $oidcCache          = $di->get('oidc.cache');
+                    $userMapper         = $mapperFactory->get(UserMapper::class);
+                    $tokenMapper        = $mapperFactory->get(TokenMapper::class);
+                    $relyingPartyMapper = $mapperFactory->get(RelyingPartyMapper::class);
+                    $logger             = new Logger(STDOUT, STDOUT, Level::Debug, [], true, 'jwtParser');
                     return new JwtParser\Composite(
                         $logger,
                         new JwtParser\OtherInstanceIssued($userMapper, $config, $logger),
