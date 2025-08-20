@@ -26,10 +26,7 @@ async function onPublish(deleteComments: boolean): Promise<void> {
     }
 
     crmStore.isModalOpen = false;
-    await crStore.publishEntries(
-        crmStore.selectedEntries.map((entry) => entry.id),
-        deleteComments,
-    );
+    await crStore.publishEntries(crmStore.selectedEntries, deleteComments);
 }
 
 /**
@@ -41,10 +38,7 @@ async function onReject(): Promise<void> {
     }
 
     crmStore.isModalOpen = false;
-    await crStore.rejectEntries(
-        crmStore.selectedEntries.map((entry) => entry.id),
-        rejectReason.value,
-    );
+    await crStore.rejectEntries(crmStore.selectedEntries, rejectReason.value);
     rejectReason.value = "";
 }
 
@@ -57,7 +51,7 @@ async function onDelete(): Promise<void> {
     }
 
     crmStore.isModalOpen = false;
-    await crStore.deleteEntries(crmStore.selectedEntries.map((entry) => entry.id));
+    await crStore.deleteEntries(crmStore.selectedEntries);
 }
 </script>
 
@@ -84,8 +78,9 @@ async function onDelete(): Promise<void> {
         <template v-else-if="crmStore.modalType === CohortReportModalType.CONFIRM_PUBLISH">
             <h2>Please confirm</h2>
             <p>
-                There are comments on this learning moment that have already been made and will become visible to
-                parents.
+                There are comments on
+                {{ crmStore.selectedEntries.length === 1 ? "this learning moment" : "these learning moments" }} that
+                have already been made and will become visible to parents.
             </p>
             <p>Do you want to delete these comments?</p>
 
@@ -101,8 +96,19 @@ async function onDelete(): Promise<void> {
 
         <template v-else-if="crmStore.modalType === CohortReportModalType.CONFIRM_REJECT">
             <h2>Request update</h2>
-            <p>You have requested the student updates their learning moment before it is published.</p>
-            <p>Provide feedback to the student. This will appear as a comment that can be deleted later.</p>
+            <p>
+                You have requested the
+                {{
+                    crmStore.selectedEntries.length === 1
+                        ? "student updates their learning moment before it is published"
+                        : "students update their learning moments before they are published"
+                }}.
+            </p>
+            <p>
+                Provide feedback to the
+                {{ crmStore.selectedEntries.length === 1 ? "student" : "students" }}. This will appear as a comment that
+                can be deleted later.
+            </p>
 
             <textarea v-model="rejectReason" name="rejectionReason"></textarea>
             <button type="submit" class="icon-surveys" @click="onReject">Request update</button>
@@ -110,7 +116,10 @@ async function onDelete(): Promise<void> {
 
         <template v-else-if="crmStore.modalType === CohortReportModalType.CONFIRM_DELETE">
             <h2>Please confirm</h2>
-            <p>Are you sure you wish to delete this Learning Moment?</p>
+            <p>
+                Are you sure you wish to delete
+                {{ crmStore.selectedEntries.length === 1 ? "this learning moment" : "these learning moments" }}?
+            </p>
             <ul class="flex-list buttons">
                 <li>
                     <a

@@ -12,6 +12,7 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
     let getCohortReportEndpoint: string | null = null; // the endpoint to fetch the cohort report data
     let putBulkRejectEndpoint: string | null = null; // the endpoint to bulk reject learning moments
     let putBulkPublishEndpoint: string | null = null; // the endpoint to bulk publish learning moments
+    let deleteBulkEvidenceEndpoint: string | null = null; // the endpoint to bulk delete learning moments
 
     const results = window.Vue.ref<CohortReportEntry[]>([]);
     const selectedResults = window.Vue.ref<Record<CohortReportEntry["id"], boolean>>({});
@@ -73,15 +74,19 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
      * @param $getCohortReportEndpoint - getCohortReportPayload
      * @param $putBulkRejectEndpoint - learningMomentModeration.putBulkReject
      * @param $putBulkPublishEndpoint - learningMomentModeration.putBulkPublish
+     * @param $deleteBulkEvidenceEndpoint - learningMomentEvidence.deleteBulkDelete
      */
     async function init(
         $getCohortReportEndpoint: string,
         $putBulkRejectEndpoint: string,
         $putBulkPublishEndpoint: string,
+        $deleteBulkEvidenceEndpoint: string,
     ): Promise<void> {
         getCohortReportEndpoint = $getCohortReportEndpoint;
         putBulkRejectEndpoint = $putBulkRejectEndpoint;
         putBulkPublishEndpoint = $putBulkPublishEndpoint;
+        deleteBulkEvidenceEndpoint = $deleteBulkEvidenceEndpoint;
+
         clearData();
         await loadNextPage();
     }
@@ -126,20 +131,16 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
 
     /**
      * Publish learning moment(s)
-     * @param entryIds The entry ID(s) to publish
+     * @param entries The entry/entries to publish
      * @param deleteComments Whether to delete comments associated with the learning moment
      */
-    async function publishEntries(entryIds: number[], deleteComments: boolean): Promise<void> {
+    async function publishEntries(entries: CohortReportEntry[], deleteComments: boolean): Promise<void> {
         if (putBulkPublishEndpoint === null) {
             throw new Error("Bulk publish endpoint is not set");
         }
 
-        const entries = results.value.filter((e) => entryIds.includes(e.id));
-        if (entries.length === 0) {
-            throw new Error(`No entries found for IDs ${entryIds.join(", ")}`);
-        }
         if (!entries.every((e) => e._links.publish)) {
-            throw new Error(`Unable to publish an entry (${entryIds.join(", ")})`);
+            throw new Error("Unable to publish an entry");
         }
 
         entries.forEach((entry) => {
@@ -150,7 +151,7 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         );
 
         const response = await bulkPublishLearningMoments(putBulkPublishEndpoint, {
-            momentIds: entryIds,
+            momentIds: entries.map((e) => e.id),
             deleteComments,
         });
         entries.forEach((entry) => {
@@ -176,20 +177,16 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
 
     /**
      * Reject learning moment(s)
-     * @param entryIds The entry ID(s) to reject
+     * @param entries The entry/entries to reject
      * @param rejectionReason The reason for rejection
      */
-    async function rejectEntries(entryIds: number[], rejectionReason: string): Promise<void> {
+    async function rejectEntries(entries: CohortReportEntry[], rejectionReason: string): Promise<void> {
         if (putBulkRejectEndpoint === null) {
             throw new Error("Bulk reject endpoint is not set");
         }
 
-        const entries = results.value.filter((e) => entryIds.includes(e.id));
-        if (entries.length === 0) {
-            throw new Error(`No entries found for IDs ${entryIds.join(", ")}`);
-        }
         if (!entries.every((e) => e._links.reject)) {
-            throw new Error(`Unable to reject an entry (${entryIds.join(", ")})`);
+            throw new Error("Unable to reject an entry");
         }
 
         entries.forEach((entry) => {
@@ -200,7 +197,7 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         );
 
         const response = await bulkRejectLearningMoments(putBulkRejectEndpoint, {
-            momentIds: entryIds,
+            momentIds: entries.map((e) => e.id),
             rejectionReason,
         });
         entries.forEach((entry) => {
@@ -224,44 +221,43 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
 
     /**
      * Delete learning moment(s)
-     * @param entryIds The entry ID(s) to delete
+     * @param entries The entry/entries to delete
      */
-    async function deleteEntries(entryIds: number[]): Promise<void> {
-        // TODO find a bulk delete endpoint?
-        const entries = results.value.filter((e) => entryIds.includes(e.id));
-        if (entries.length === 0) {
-            throw new Error(`No entries found for IDs ${entryIds.join(", ")}`);
+    async function deleteEntries(entries: CohortReportEntry[]): Promise<void> {
+        if (deleteBulkEvidenceEndpoint === null) {
+            throw new Error("Bulk delete endpoint is not set");
         }
 
+        if (!entries.every((e) => e._links.delete)) {
+            throw new Error("Unable to delete an entry");
+        }
+
+        entries.forEach((entry) => {
+            loadingEntries.value[entry.id] = true;
+        });
         const toast = window.sbProps.toastActivate(
             entries.length > 1 ? `Deleting ${entries.length} learning moments` : "Deleting learning moment",
         );
-        const unsuccessfulIds: number[] = [];
-        await Promise.all(
-            entries.map(async (entry) => {
-                if (!entry._links.delete) {
-                    throw new Error(`Unable to delete an entry (${entry.id})`);
-                }
 
-                loadingEntries.value[entry.id] = true;
-                const response = await apiRequest({
-                    url: entry._links.delete,
-                    method: "DELETE",
-                });
+        const response = await apiRequest({
+            url: deleteBulkEvidenceEndpoint,
+            method: "DELETE",
+            body: {
+                momentIds: entries.map((e) => e.id),
+            },
+        });
 
-                if (response.success === false) {
-                    toast.timeout({ isSuccess: false, text: response.message });
-                    delete loadingEntries.value[entry.id];
-                    unsuccessfulIds.push(entry.id);
-                }
-            }),
-        );
+        entries.forEach((entry) => {
+            delete loadingEntries.value[entry.id];
+        });
 
-        if (unsuccessfulIds.length === 0) {
-            toast.timeout({ isSuccess: true, text: "Deleted." });
+        if (response.success === false) {
+            toast.timeout({ isSuccess: false, text: response.message });
+            return;
         }
 
-        results.value = results.value.filter((e) => !entryIds.includes(e.id) || unsuccessfulIds.includes(e.id));
+        toast.timeout({ isSuccess: true, text: "Deleted." });
+        results.value = results.value.filter((e) => !entries.includes(e));
     }
 
     return {

@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { useCohortReportStore } from "./store/cohortReportStore";
 import CrResultsGroup from "./cr-results-group.vue";
+import CrBulkUpdateDrawer from "./cr-bulk-update-drawer.vue";
 
 const crStore = useCohortReportStore();
 
@@ -49,6 +50,8 @@ const resultGroups = window.Vue.computed(() => {
         </div>
         <button v-else-if="crStore.nextCursor !== null" @click="crStore.loadNextPage">Load more results</button>
         <div v-else class="alert-box">All results have been loaded</div>
+
+        <cr-bulk-update-drawer />
     </div>
 </template>
 
