@@ -50,7 +50,32 @@ class SelfIssued extends Base
     public function accepts(#[SensitiveParameter] string $jwt): bool
     {
         $claims = $this->decodeWithoutVerification($jwt);
-        return isset($claims[self::CLAIM_ISS]) && $claims[self::CLAIM_ISS] === $this->determineThisInstanceIssuer();
+        $thisInstanceIssuer = $this->determineThisInstanceIssuer();
+        $this->log->debug(
+            sprintf(
+                'Checking if JWT contains claim "%s", and that it matches this instance "%s"',
+                self::CLAIM_ISS,
+                $thisInstanceIssuer,
+            )
+        );
+
+        if (!isset($claims[self::CLAIM_ISS])) {
+            $this->log->debug(sprintf('JWT does not contain claim "%s": using next parser', self::CLAIM_ISS));
+            return false;
+        }
+
+        $accepts = $claims[self::CLAIM_ISS] === $this->determineThisInstanceIssuer();
+        $this->log->debug(
+            sprintf(
+                $accepts
+                    ? 'JWT claim "%s" value "%s" matches this instance "%s": using this parser'
+                    : 'JWT claim "%s" value "%s" does not match this instance "%s": using next parser',
+                self::CLAIM_ISS,
+                $claims[self::CLAIM_ISS],
+                $thisInstanceIssuer,
+            )
+        );
+        return $accepts;
     }
 
     /**
@@ -64,15 +89,15 @@ class SelfIssued extends Base
             (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
         );
         if (!isset($claims[self::CLAIM_SUB])) {
-            throw new Exception\InvalidIdentity(
-                sprintf('JWT must contain a "%s"', self::CLAIM_SUB)
-            );
+            $message = sprintf('JWT must contain a "%s" claim', self::CLAIM_SUB);
+            $this->log->error($message);
+            throw new Exception\InvalidIdentity($message);
         }
         $username = $claims[self::CLAIM_SUB];
         if (trim($username) === '') {
-            throw new Exception\InvalidIdentity(
-                sprintf('JWT "%s" claim must not be empty', self::CLAIM_SUB)
-            );
+            $message = sprintf('JWT "%s" claim must not be empty', self::CLAIM_SUB);
+            $this->log->error($message);
+            throw new Exception\InvalidIdentity($message);
         }
         $user = $this->findUser($claims[self::CLAIM_SUB], self::CLAIM_SUB);
         if (isset($claims[self::CLAIM_JTI])) {
@@ -86,14 +111,19 @@ class SelfIssued extends Base
                     ]
                 );
                 if ($token->getExpiry() && $token->getExpiry()->isPast()) {
-                    throw new Exception\Rejected('The JWT ID provided has expired');
+                    $message = 'The JWT ID provided has expired';
+                    $this->log->error($message);
+                    throw new Exception\Rejected($message);
                 }
             } catch (MapperException $e) {
                 // could not find a token with user id and jwt id
-                throw new Exception\Rejected('The JWT ID provided does not match a token for the given user', 0, $e);
+                $message = 'The JWT ID provided does not match a token for the given user';
+                $this->log->error($message . sprintf(' (message: %s)', $e->getMessage()));
+                throw new Exception\Rejected($message, $e->getCode(), $e);
             }
         }
         if (isset($claims[self::CUSTOM_CLAIM_TASKD]) && $claims[self::CUSTOM_CLAIM_TASKD] === 1) {
+            $this->log->info(sprintf('Claim "%s" is set: bypassing IP tracking', self::CUSTOM_CLAIM_TASKD));
             $this->bypassIpTracking = true;
         }
 

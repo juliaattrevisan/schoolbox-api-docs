@@ -188,6 +188,8 @@ abstract class Base implements IParser
             $this->log->error($message);
             throw new Exception\InvalidIdentity($message);
         }
+
+        $this->log->info(sprintf('Found user: (username: "%s")', $user->getUsername()));
         if (!$user->getEnabled()) {
             $message = isset($sourceClaim)
                 ? sprintf('JWT "%s" claim matches a deactivated user', $sourceClaim)
