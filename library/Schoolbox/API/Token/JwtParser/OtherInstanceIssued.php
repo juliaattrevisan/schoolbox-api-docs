@@ -38,18 +38,10 @@ class OtherInstanceIssued extends Base
      */
     public function accepts(#[SensitiveParameter] string $jwt): bool
     {
-        $claims = $this->decodeWithoutVerification($jwt);
-        $this->log->info(sprintf('Checking if JWT contains claim "%s"', self::CLAIM_INSTANCE_ID));
-        $accepts = isset($claims[self::CLAIM_INSTANCE_ID]);
-        $this->log->debug(
-            sprintf(
-                $accepts
-                    ? 'JWT contains claim "%s"'
-                    : 'JWT does not contain claim "%s"',
-                self::CLAIM_INSTANCE_ID,
-            )
-        );
-        return $accepts;
+        $claims     = $this->decodeWithoutVerification($jwt);
+        $instanceId = $claims[self::CLAIM_INSTANCE_ID] ?? null;
+        $this->log->debug(sprintf('Checking JWT %s "%s" is set', self::CLAIM_INSTANCE_ID, $instanceId));
+        return isset($instanceId);
     }
 
     /**
@@ -64,8 +56,6 @@ class OtherInstanceIssued extends Base
         $instanceId       = $unverifiedClaims[self::CLAIM_INSTANCE_ID];
         $client           = new Client();
         try {
-            $this->log->info(sprintf('Querying instance registry for JWKS for other instance'));
-            $this->log->debug(sprintf('JWT %s: %s', self::CLAIM_INSTANCE_ID, $instanceId));
             $response = json_decode(
                 $client->get(
                     $this->config->get(ConfigMapper::NAME_INSTANCE_REGISTRY_URL) . '/api/instances/' . $instanceId . "/jwks?toInstance=" . INSTANCE_ID
@@ -111,8 +101,13 @@ class OtherInstanceIssued extends Base
         // Now the JWT is decoded and verified:
         // create a session for the user matching the email address in the JWT
         $email = $claims[self::CLAIM_EMAIL] ?? null;
-        $this->log->info(sprintf('Verifying JWT claim "%s"', self::CLAIM_EMAIL));
-        $this->log->debug(sprintf('JWT %s: %s', self::CLAIM_EMAIL, $email));
+        $this->log->debug(
+            sprintf(
+                'Verifying JWT claim %s "%s" exists and matches a user',
+                self::CLAIM_EMAIL,
+                $email,
+            )
+        );
         if (!isset($email)) {
             throw new Exception\InvalidIdentity(sprintf('JWT must contain an "%s" claim', self::CLAIM_EMAIL));
         }

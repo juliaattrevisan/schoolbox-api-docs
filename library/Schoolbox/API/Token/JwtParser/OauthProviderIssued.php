@@ -122,13 +122,6 @@ class OauthProviderIssued extends Base
             $sessionLength,
         );
 
-        $this->log->info(
-            sprintf(
-                'Checking users against candidate claims in config "%s"',
-                ConfigMapper::_CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS
-            ),
-        );
-
         // The identification in the token seems to be in one of two claims:
         // * "preferred_username" matches a Schoolbox username
         // * "https://cloudwork.id/claims/sis_id" matches an external ID

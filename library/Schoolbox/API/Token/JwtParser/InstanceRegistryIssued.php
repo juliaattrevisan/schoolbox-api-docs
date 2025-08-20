@@ -85,7 +85,6 @@ class InstanceRegistryIssued extends Base
         $client = new Client();
         // Retrieve the JWKs from the instance registry.
         try {
-            $this->log->debug(sprintf('Querying instance registry for its JWKS'));
             $jwks = json_decode(
                 $client->get(
                     $this->config->get(ConfigMapper::NAME_INSTANCE_REGISTRY_URL) . '/api/jwks'
