@@ -136,18 +136,6 @@ class OauthProviderIssued extends Base
             $sessionLength,
         );
 
-        // Should not need to re-check audience,
-        // because it was checked in accepts already.
-        if (!$this->claimAudienceMatchesConfiguredClientId($claims)) {
-            throw new Exception\Rejected(
-                sprintf(
-                    'JWT claim "%s" does not match config "%s"',
-                    self::CLAIM_AUD,
-                    ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID,
-                )
-            );
-        }
-
         $this->log->info(
             sprintf(
                 'Checking users against candidate claims in config "%s"',
