@@ -74,7 +74,13 @@ class OauthProviderIssued extends Base
             )
         );
         if (!$this->claimAudienceMatchesConfiguredClientId($claims)) {
-            $this->log->debug(sprintf('JWT claim "%s" does not match config: using next parser', self::CLAIM_AUD));
+            $this->log->debug(
+                sprintf(
+                    'JWT claim "%s" does not match config "%s": using next parser',
+                    self::CLAIM_AUD,
+                    ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID,
+                )
+            );
             return false;
         }
 
@@ -132,9 +138,13 @@ class OauthProviderIssued extends Base
         );
 
         if (!$this->claimAudienceMatchesConfiguredClientId($claims)) {
-            throw new Exception\Rejected(
-                sprintf('JWT "%s" claim does not match configured client ID', self::CLAIM_AUD)
+            $message = sprintf(
+                'JWT claim "%s" does not match config "%s"',
+                self::CLAIM_AUD,
+                ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID,
             );
+            $this->log->error($message);
+            throw new Exception\Rejected($message);
         }
 
         // The identification in the token seems to be in one of two claims:
@@ -145,6 +155,7 @@ class OauthProviderIssued extends Base
         foreach ($candidateClaims as $candidateClaim) {
             $candidateClaim = trim($candidateClaim);
             if (isset($claims[$candidateClaim])) {
+                $this->log->debug(sprintf('Searching for users which match candidate claim "%s"', $candidateClaim));
                 try {
                     return $this->findUser($claims[$candidateClaim], $candidateClaim);
                 } catch (Exception\InvalidIdentity $e) {
@@ -160,9 +171,9 @@ class OauthProviderIssued extends Base
         }
 
         // Candidate claims found no user: can't use it
-        throw new Exception\InvalidIdentity(
-            sprintf('JWT contains no claim matching a user (%s)', implode('; ', $messages))
-        );
+        $message = sprintf('JWT contains no claim matching a user (%s)', implode('; ', $messages));
+        $this->log->error($message);
+        throw new Exception\InvalidIdentity($message);
     }
 
     /**
