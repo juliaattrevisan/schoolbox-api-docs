@@ -456,11 +456,21 @@ class NavigationSelector
      */
     private function hasMYP(): bool
     {
-        $currentYear = (int)date('Y');
-        return
-            $this->user->getYear()->getName() == 7
-            || $this->user->getYear()->getName() == 8
-            || ($this->user->getYear()->getName() == 9 && $currentYear >= 2023)
-            || ($this->user->getYear()->getName() == 10 && $currentYear >= 2024);
+        if (!isset($this->externalUser['StudentID'])) {
+            return false;
+        }
+
+        $params = [
+            'externalId' => $this->externalUser['StudentID'],
+        ];
+
+        $query = "
+            SELECT TOP 1 COUNT(*) AS 'computed'
+            FROM dbo.uvSchoolBoxMYPResults_CurrentOverview
+            WHERE ID = :externalId
+        ";
+
+        return (bool)$this->db->getOne($query, $params);
+
     }
 }
