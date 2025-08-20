@@ -13,7 +13,6 @@ use Firebase\JWT\JWK;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use JsonException;
-use Schoolbox\API\Token\JwtParser\Exception\InvalidIdentity;
 use Schoolbox\API\Token\JwtParser\Exception\Rejected;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\User;
@@ -44,14 +43,60 @@ class InstanceRegistryIssued extends Base
      */
     public function accepts(#[SensitiveParameter] string $jwt): bool
     {
-        $claims      = $this->decodeWithoutVerification($jwt);
-        $ir_url      = $this->config->get(ConfigMapper::NAME_INSTANCE_REGISTRY_URL);
-        $instance_id = $claims[self::CLAIM_INSTANCE_ID] ?? null;
-        // Ensures that the JWT was issued by the instance registry, and that
-        // the instance ID custom claim matches the instance ID of this instance.
-        return isset($claims[self::CLAIM_ISS]) &&
-            parse_url($claims[self::CLAIM_ISS], PHP_URL_HOST) === parse_url($ir_url, PHP_URL_HOST) &&
-            $instance_id === (string)INSTANCE_ID;
+        $claims = $this->decodeWithoutVerification($jwt);
+
+        // Ensure that the JWT was issued by the instance registry
+        $this->log->debug(
+            sprintf(
+                'Checking if JWT contains claim "%s", and that its host matches config "%s"',
+                self::CLAIM_ISS,
+                ConfigMapper::NAME_INSTANCE_REGISTRY_URL,
+            ),
+        );
+        $irUrl       = $this->config->get(ConfigMapper::NAME_INSTANCE_REGISTRY_URL);
+        $claimIssuer = $claims[self::CLAIM_ISS] ?? null;
+        if (
+            !(
+                isset($claimIssuer) &&
+                parse_url($claimIssuer, PHP_URL_HOST) === parse_url($irUrl, PHP_URL_HOST)
+            )
+        ) {
+            $this->log->debug(
+                sprintf(
+                    'JWT claim "%s" hostname does not match config "%s": using next parser',
+                    self::CLAIM_ISS,
+                    ConfigMapper::NAME_INSTANCE_REGISTRY_URL,
+                ),
+            );
+            return false;
+        }
+
+        // Ensure that the JWT's instance ID claim matches this instance's ID
+        $this->log->debug(
+            sprintf(
+                'Checking if JWT contains claim "%s", and that its host matches instance ID',
+                self::CLAIM_INSTANCE_ID,
+            ),
+        );
+        $claimInstanceId = $claims[self::CLAIM_INSTANCE_ID] ?? null;
+        if ($claimInstanceId !== (string)INSTANCE_ID) {
+            $this->log->debug(
+                sprintf(
+                    'JWT claim "%s" does not match instance ID: using next parser',
+                    self::CLAIM_INSTANCE_ID,
+                ),
+            );
+        }
+
+        $this->log->debug(
+            sprintf(
+                'JWT claims "%s" hostname matches config "%s", and "%s" matches instance ID: using this parser',
+                self::CLAIM_ISS,
+                ConfigMapper::NAME_INSTANCE_REGISTRY_URL,
+                self::CLAIM_INSTANCE_ID,
+            ),
+        );
+        return true;
     }
 
     /**
