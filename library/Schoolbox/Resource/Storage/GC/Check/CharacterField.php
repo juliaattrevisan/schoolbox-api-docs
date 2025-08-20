@@ -99,8 +99,10 @@ class CharacterField extends Base
                         'table'  => $table,
                         'column' => $column,
                     ]);
-                    $row = $query->fetch();
-                    $data['extra']['search_data_length'] += $row['search_data_length'];
+                    $searchDataLength = $query->fetchColumn();
+                    if ($searchDataLength !== false) {
+                        $data['extra']['search_data_length'] += (int)$searchDataLength;
+                    }
                 }
             }
         }

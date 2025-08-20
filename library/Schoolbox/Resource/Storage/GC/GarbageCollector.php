@@ -180,7 +180,7 @@ class GarbageCollector
             );
 
             // If total runtime exceeds max time: stop processing
-            if ($totalRuntime > $this->maxTime) {
+            if (isset($this->maxTime) && $totalRuntime > $this->maxTime) {
                 $this->log->notice(
                     sprintf(
                         'Max runtime of %ds exceeded: finishing processing and moving on to deletion',
