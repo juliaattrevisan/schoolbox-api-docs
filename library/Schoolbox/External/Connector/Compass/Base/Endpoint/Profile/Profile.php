@@ -1259,6 +1259,8 @@ class Profile implements IStrategy
                 /* Compass denies access due to cloudflare: any html response is invalid
                  * for image data, so we can just leave immediately upon detecting this
                  */
+                $exit = false;
+
                 if (400 <= $response->getStatusCode()) {
                     $this->log->warning(sprintf(
                         'Invalid photo data for %s; returned http %s %s.',
@@ -1266,6 +1268,8 @@ class Profile implements IStrategy
                         $response->getStatusCode(),
                         $response->getReasonPhrase()
                     ));
+
+                    $exit = true;
                 }
 
                 if (str_contains($image, 'DOCTYPE html')) {
@@ -1274,6 +1278,13 @@ class Profile implements IStrategy
                         $baseProfile->getExternalId()
                     ));
 
+                    $exit = true;
+                }
+
+                /* Exit for either of two reasons: 4xx class http status code or higher,
+                 * or the image data contains html, surfacing reasons to a more visible place.
+                 */
+                if ($exit) {
                     return;
                 }
 
