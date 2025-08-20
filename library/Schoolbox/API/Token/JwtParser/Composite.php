@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\API\Token\JwtParser;
 
 use Psr\Log\LoggerInterface;
-use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\User;
 use SensitiveParameter;
 
@@ -78,7 +77,10 @@ class Composite implements IParser
                 }
             }
         }
-        throw new Exception\Rejected('No parser in this object accepts this JWT');
+
+        $message = 'No parser in this object accepts this JWT';
+        $this->log->error($message);
+        throw new Exception\Rejected($message);
     }
 
     /**
@@ -99,7 +101,10 @@ class Composite implements IParser
                 return $user;
             }
         }
-        throw new NotFound();
+
+        $message = 'No parser in this object accepts this JWT';
+        $this->log->error($message);
+        throw new Exception\Rejected($message);
     }
 
     /**
