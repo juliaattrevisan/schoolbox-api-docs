@@ -1309,7 +1309,7 @@ class Profile implements IStrategy
         }
 
         if (!$image) {
-            $this->log->debug(sprintf(
+            $this->log->warning(sprintf(
                 'Profile picture: could not decode image data for %s %s (%s)',
                 $baseProfile->getFirstname(),
                 $baseProfile->getLastname(),
