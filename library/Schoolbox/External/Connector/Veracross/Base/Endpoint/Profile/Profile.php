@@ -56,6 +56,7 @@ class Profile implements IStrategy
      * relationships:list
      * staff_faculty:list
      * contact_info:list
+     * person_photos:list
      */
     public const SCOPE = '
         students:list
@@ -66,6 +67,7 @@ class Profile implements IStrategy
         relationships:list
         staff_faculty:list
         contact_info:list
+        person_photos:list
     ';
 
 

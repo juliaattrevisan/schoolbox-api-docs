@@ -9,6 +9,8 @@
 namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup;
 
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Profile\Profile;
+use Schoolbox\External\Connector\Watchlist;
 
 class Photo
 {
@@ -38,6 +40,39 @@ class Photo
      */
     public function generate(): array
     {
-        return [];
+        /* If we generated this lookup previously, just recycle it
+         */
+        if (null === $this->lookup) {
+            $this->lookup = [];
+
+            $generator = $this->api->retrieve('GET', 'person_photos', Profile::SCOPE);
+
+            foreach ($generator as $page) {
+                /* Avengers Assemble!
+                 */
+                foreach ($page['data'] as $record) {
+                    var_dump($record);
+//
+//                    $externalId = trim((string)$record['id']);
+//
+//                    /* Only import for specific users
+//                     */
+//                    if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+//                        continue;
+//                    }
+//
+//                    /* Overwrite with lookupped values
+//                     * If any of the following fields has contents, then they have a Medical Alert
+//                     */
+//                    foreach (['allergies_symptoms', 'current_medications', 'general_medical_notes'] as $field) {
+//                        if ('' !== trim((string)$record[$field])) {
+//                            $this->lookup[$externalId] = true;
+//                        }
+//                    }
+                }
+            }
+        }
+
+        return $this->lookup;
     }
 }
