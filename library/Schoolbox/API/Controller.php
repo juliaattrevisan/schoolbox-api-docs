@@ -11,6 +11,7 @@ namespace Schoolbox\API;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
 use Authenticator;
+use Psr\Log\LoggerInterface;
 use Schoolbox\API\Token\JwtParser;
 use Schoolbox\Application\Exception\AccessDenied as SchoolboxAccessDeniedException;
 use Schoolbox\Application\Exception\AccountDisabled as SchoolboxAccountDisabledException;
@@ -28,49 +29,28 @@ use SensitiveParameter;
 class Controller extends Base
 {
     /**
-     * Authenticator, for creating a user session.
-     */
-    private Authenticator $auth;
-
-    /**
-     * Registry mapper, for performing CRUD actions on a registration for a
-     * mobile app.
-     */
-    private RegistryMapper $registryMapper;
-
-    /**
-     * Service mapper, for finding the mobile app to register the authenticating
-     * user within.
-     */
-    private ServiceMapper $serviceMapper;
-
-    /**
-     * JWT parser, for validating and identifying a user in a token generated
-     * by any of:
-     * * this instance
-     * * this instance's oAuth provider
-     * * another instance (as stored in the instance registry table)
-     */
-    private JwtParser\IParser $jwtParser;
-
-    /**
      * Constructor
      *
-     * @param Authenticator     $auth
-     * @param RegistryMapper    $registryMapper
-     * @param ServiceMapper     $serviceMapper
-     * @param JwtParser\IParser $jwtParser
+     * @param Authenticator     $auth            Authenticator, for creating a user session.
+     * @param RegistryMapper    $registryMapper  Registry mapper, for performing CRUD actions on a registration for a
+     *                                           mobile app.
+     * @param ServiceMapper     $serviceMapper   Service mapper, for finding the mobile app to register the
+     *                                           authenticating user within.
+     * @param JwtParser\IParser $jwtParser       JWT parser, for validating and identifying a user in a token generated
+     *                                           by any of:
+     *                                           * this instance
+     *                                           * this instance's oAuth provider
+     *                                           * another instance (as stored in the instance registry table)
+     * @param LoggerInterface   $jwtParserLogger Logger for logging the parsing of JWTs, and the successful or failed
+     *                                           extraction of a Schoolbox user from said JWT.
      */
     public function __construct(
-        Authenticator $auth,
-        RegistryMapper $registryMapper,
-        ServiceMapper $serviceMapper,
-        JwtParser\IParser $jwtParser,
+        private Authenticator $auth,
+        private RegistryMapper $registryMapper,
+        private ServiceMapper $serviceMapper,
+        private JwtParser\IParser $jwtParser,
+        private LoggerInterface $jwtParserLogger,
     ) {
-        $this->auth           = $auth;
-        $this->registryMapper = $registryMapper;
-        $this->serviceMapper  = $serviceMapper;
-        $this->jwtParser      = $jwtParser;
     }
 
 
