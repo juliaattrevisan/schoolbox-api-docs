@@ -185,9 +185,9 @@
 {% set canImport = importRoute is not null and (assessment is not defined or assessment.id is null) %}
 {% if canImport %}
     <div id="importModal" class="reveal-modal" data-reveal>
-        <h2>Import a {{ config.title }} quiz</h2>
+        <h2>Import a quiz</h2>
 
-        <p>Select a file that has been exported from {{ config.title }} to create a duplicate version of the quiz for modification.</p>
+        <p>Select a file that has been exported to create a duplicate version of the quiz.</p>
 
         <div id="import-loader" style="display:none">
             <div class="loader"></div>
