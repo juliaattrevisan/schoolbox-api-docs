@@ -5677,12 +5677,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Timetable/TimetableNotifier.php
 
 		-
-			message: '#^Dead catch \- InvalidArgumentException is never thrown in the try block\.$#'
-			identifier: catch.neverThrown
-			count: 1
-			path: library/Schoolbox/Realtime/Timetable/TimetableScheduler.php
-
-		-
 			message: '#^Property Schoolbox\\Realtime\\WorkNotifier\:\:\$log \(Psr\\Log\\LoggerInterface\) in empty\(\) is not falsy\.$#'
 			identifier: empty.property
 			count: 1
