@@ -196,6 +196,9 @@ module.exports = {
         // Image Generator
         imageGenerator: "./templates/core/resources/filesystem/vue/imageGenerator/imageGenerator.ts",
 
+        // Basic file drop
+        fileDrop: "./www/static/js/resource/fileDrop.ts",
+
         // Class
         classList: "./library/Schoolbox/Learning/vue/classList.ts",
         classSelector: "./library/Schoolbox/Assessment/Course/templates/vue/classSelector/classSelector.ts",

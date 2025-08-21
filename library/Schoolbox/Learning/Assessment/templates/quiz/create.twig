@@ -5,10 +5,29 @@
 
 <fieldset>
     {# ----------------------------------------------------------- #}
-    {# Title #}
+    {# Title and Import #}
     {# ----------------------------------------------------------- #}
+    {% set importRoute = routeLookupIfAuthorized('learningQuiz.postImport', {
+        contextId: context.id,
+        contextType: contextType
+    }) %}
+    {# Can only import on creation, not modify #}
+    {% set canImport = importRoute is not null and assessment.id is null %}
+
     <label class="required" for="title">Title</label>
-    <input type="text" name="title" id="title" value="{{ assessment.title }}" required maxlength="255"/>
+    <div class="input-group">
+        <input type="text" name="title" id="title" value="{{ assessment.title }}" required maxlength="255"/>
+        {% if canImport %}
+            <button
+                type="button"
+                class="button icon-upload"
+                title="Import a quiz from a file"
+                data-reveal-id="importModal"
+            >
+                Import Quiz
+            </button>
+        {% endif %}
+    </div>
 
     {# ----------------------------------------------------------- #}
     {# Work Type #}

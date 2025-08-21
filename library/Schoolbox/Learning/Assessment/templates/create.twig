@@ -157,16 +157,6 @@
             </h1>
          </div>
      </div>
-     {% if assessment is defined and assessment is quiz %}
-     <nav>
-         <sbx-pop-out content-id="header-options"></sbx-pop-out>
-     </nav>
-     <ul id="header-options" class="f-dropdown" data-dropdown-content="" aria-hidden="true">
-         <li>
-             <a class="icon-upload" title="Import a quiz and its contents from a file you uploaded" data-reveal-id="importModal">Import quiz</a>
-         </li>
-     </ul>
-     {% endif %}
 </div>
 
 {% if participants ?? [] is not empty %}
@@ -187,64 +177,63 @@
 {% endif %}
 
 
-{# Legacy Quiz XML Import
- # We haven't really subclassed the assessment create screen like this before...
- # To minimise master fallout I'll just inject the quiz-specific stuff right here
- #}
-{% if assessment is defined and assessment is quiz %}
-    <script type="text/javascript" src="{{CDN_PREFIX}}/js/resource/jquery.resourceAttach.js?v={SITE_VERSION}"></script>
+{% set importRoute = routeLookupIfAuthorized('learningQuiz.postImport', {
+    contextId: context.id,
+    contextType: contextType
+}) %}
+{# Can only import on creation, not modify #}
+{% set canImport = importRoute is not null and (assessment is not defined or assessment.id is null) %}
+{% if canImport %}
+    <div id="importModal" class="reveal-modal" data-reveal>
+        <h2>Import a quiz</h2>
+
+        <p>Select a file that has been exported to create a duplicate version of the quiz.</p>
+
+        <div id="import-loader" style="display:none">
+            <div class="loader"></div>
+            <p class="text-center">Importing quiz...</p>
+        </div>
+
+        <form id='importForm' method="post" action="{{ importRoute }}" enctype="multipart/form-data">
+            <input type="hidden" name="contextId" value="{{ context.id }}" />
+            <input type="hidden" name="contextType" value="{{ contextType }}" />
+            <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
+
+            <section>
+                <fieldset class="no-pad">
+                    <div class="small-12 columns no-pad">
+                        <div data-vue-app="file-drop">
+                            <file-drop
+                                id="quiz-attachment"
+                                accept="text/xml, application/xml, application/json"
+                                input-name="attachment"
+                                required
+                            />
+                        </div>
+                        <script src="{{ CDN_PREFIX }}/js/bundle/fileDrop.js?v={{ config.site_version }}"></script>
+                    </div>
+                </fieldset>
+            </section>
+            <div class="component-action">
+                <section>
+                    <button class="button" type="submit">Upload</button>
+                </section>
+            </div>
+        </form>
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
     <script>
         $(function() {
-            $('[data-import]').on('click', function(event) {
-                event.preventDefault();
+            const importForm = document.querySelector("#importForm");
+            const importLoader = document.querySelector("#import-loader");
 
-                $('#importForm').submit().hide();
-                $('#import-actions').hide();
-                $('#import-loader').show();
+            // show the loader on successful submission (valid file)
+            importForm.addEventListener("submit", function(event) {
+                importForm.style.display = "none";
+                importLoader.style.display = "block";
             });
         });
     </script>
-
-    <div id="importModal" class="reveal-modal" data-reveal>
-        <h2>Import a {{ config.title }} quiz</h2>
-
-        <p>Select a file that has been exported from {{ config.title }} to create a duplicate version of the quiz for modification.</p>
-
-        {% set importRoute = routeLookup('learningQuiz.postImport', {
-            contextId: context.id,
-            contextType: contextType
-        }) %}
-
-        {% if importRoute %}
-            <div id="import-loader" style="display:none">
-                <div class="loader"></div>
-                <p class="text-center">Importing quiz...</p>
-            </div>
-
-            <form id='importForm' method="post" action="{{ importRoute }}" enctype="multipart/form-data">
-                <input type="hidden" name="contextId" value="{{ context.id }}" />
-                <input type="hidden" name="contextType" value="{{ contextType }}" />
-                <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
-
-                <section>
-                    <fieldset class="no-pad">
-                        <div class="small-12 columns no-pad">
-                            {# $('input[name=attachment]')[0].files[0].name #}
-                            <input type="file" name="attachment" accept="text/xml, application/xml, application/json" />
-                        </div>
-                    </fieldset>
-                </section>
-            </form>
-            <div id='import-actions' class="component-action">
-                <section>
-                    <a class="button" data-import>
-                        Upload
-                    </a>
-                </section>
-            </div>
-        {% endif %}
-        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-    </div>
 {% endif %}
 
 {% if assessmentType is defined and assessmentType|length %}
