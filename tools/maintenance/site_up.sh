@@ -13,7 +13,7 @@ sql_host=$(INSTANCE_ID="$instanceId" schoolbox-read-instances --option SQL_host)
 sql_schema=$(INSTANCE_ID="$instanceId" schoolbox-read-instances --option SQL_db);
 
 # On success, MySQL will output nothing, and exit with status code 0.
-output=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -BNe "UPDATE config SET value=0 WHERE name='maintenance_mode'" 2>&1)
+output=$(mariadb -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -BNe "UPDATE config SET value=0 WHERE name='maintenance_mode'" 2>&1)
 statusCode=$?
 
 if [[ "$output" == '' && statusCode -eq 0 ]]; then

@@ -32,10 +32,10 @@ QUERY="SELECT CONCAT_WS('.', '$sqldb', TABLE_NAME) FROM INFORMATION_SCHEMA.TABLE
 AWKST='{print "SET foreign_key_checks = 0; ALTER TABLE", $1, "ENGINE=INNODB; SET foreign_key_checks = 1; "}'
 
 # log intention
-mysql -B -N -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "$QUERY" | awk "$AWKST"
+mariadb -B -N -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "$QUERY" | awk "$AWKST"
 
 # execute
-mysql -B -N -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "$QUERY" | awk "$AWKST" | mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb
+mariadb -B -N -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "$QUERY" | awk "$AWKST" | mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb
 
 # Deprecation notice
 echo -e "\033[1;33m/******************************************************************************************/\033[0m"

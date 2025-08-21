@@ -25,7 +25,7 @@ tools/vagrant-rebuild-database.sh
 service rabbitmq-server start
 
 # ensure notifications go everywhere always
-mysql schoolbox < sql/notifications-all-instant.sql
+mariadb schoolbox < sql/notifications-all-instant.sql
 
 # create a special hell for yourself (we don't need socket or digest presently)
 service schoolbox-cloud-scheduled@vagrantx start

@@ -70,23 +70,23 @@ restart_services() {
 # Prepare instance to be archived so it can be deployed to new SB environments
 cleanup_vagrant() {
   log "Reverting vagrant-specific changes";
-  mysql --defaults-extra-file=~/.my.cnf schoolbox < /usr/share/schoolbox/sql/vagrant-cleanup.sql;
-  mysql --defaults-extra-file=~/.my.cnf schoolbox < $CACHE_DIR/vagrant-cleanup-secrets.sql;
+  mariadb --defaults-extra-file=~/.my.cnf schoolbox < /usr/share/schoolbox/sql/vagrant-cleanup.sql;
+  mariadb --defaults-extra-file=~/.my.cnf schoolbox < $CACHE_DIR/vagrant-cleanup-secrets.sql;
   log "Applying data dir sql changes";
-  /usr/share/schoolbox/tools/generate-dir-sql.sh /var/lib/schoolbox | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+  /usr/share/schoolbox/tools/generate-dir-sql.sh /var/lib/schoolbox | mariadb --defaults-extra-file=/root/.my.cnf schoolbox
 
   # These files are not migrated by s3-migration tool, so will cause issues if we use the generated dataset with S3
   log "Deleting invalid 'storage_transform' rows"
-  mysql --defaults-extra-file=~/.my.cnf schoolbox -e "DELETE st FROM storage_transform st LEFT JOIN storage s ON st.hash = s.hash WHERE s.storage_id IS NULL";
+  mariadb --defaults-extra-file=~/.my.cnf schoolbox -e "DELETE st FROM storage_transform st LEFT JOIN storage s ON st.hash = s.hash WHERE s.storage_id IS NULL";
 }
 
 # Update instance to act like a vagrant development environment
 localise_vagrant() {
   log "Re-localising vagrant"
-  mysql schoolbox < /usr/share/schoolbox/sql/vagrant.sql;
-  mysql schoolbox < "${CACHE_DIR}"/vagrant-secrets.sql;
+  mariadb schoolbox < /usr/share/schoolbox/sql/vagrant.sql;
+  mariadb schoolbox < "${CACHE_DIR}"/vagrant-secrets.sql;
   log "Applying data dir sql changes";
-  /usr/share/schoolbox/tools/generate-dir-sql.sh "$INSTANCE_DATA_DIR" | mysql --defaults-extra-file=/root/.my.cnf schoolbox
+  /usr/share/schoolbox/tools/generate-dir-sql.sh "$INSTANCE_DATA_DIR" | mariadb --defaults-extra-file=/root/.my.cnf schoolbox
 }
 
 # Parse CLI args
@@ -168,7 +168,7 @@ cleanup_initial_dataset(){
     log "Cleaning data for Initial dataset";
     log "Cleaning: log tables";
     for table_name in cmsLog user_activity_log login_log msg_reroute_override user_assume_log user_password_reset_request ups_log; do
-      mysql --defaults-extra-file=~/.my.cnf schoolbox -e "TRUNCATE $table_name";
+      mariadb --defaults-extra-file=~/.my.cnf schoolbox -e "TRUNCATE $table_name";
     done
   fi
 }

@@ -93,7 +93,7 @@ if ! $SITE_ROOT/tools/download-s3-file.sh --data-source "$data_source" --file-na
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Updating timezone data";
-mariadb-tzinfo-to-sql /usr/share/zoneinfo 2>/dev/null | mariadb --defaults-extra-file=/root/.my.cnf mysql 2>/dev/null;
+mariadb-tzinfo-to-sql /usr/share/zoneinfo 2>/dev/null | mariadb --defaults-extra-file=/root/.my.cnf mariadb 2>/dev/null;
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Creating Schoolbox MariaDB schema";
 mariadb --defaults-extra-file=/root/.my.cnf -e "CREATE DATABASE schoolbox CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';";

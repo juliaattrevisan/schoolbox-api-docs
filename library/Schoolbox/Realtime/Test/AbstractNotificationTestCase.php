@@ -240,7 +240,7 @@ abstract class AbstractNotificationTestCase extends AbstractTestCase
      */
     protected function weaponsToMaximum()
     {
-        shell_exec("mysql schoolbox < /usr/share/schoolbox/sql/notifications-all-instant.sql 2>&1");
+        shell_exec("mariadb schoolbox < /usr/share/schoolbox/sql/notifications-all-instant.sql 2>&1");
         $this->log->notice('Weapons to maximum');
     }
 

@@ -37,10 +37,10 @@ else
 	sqldb=$(schoolbox-conf --conf="$conffile" --option=SQL_db);
 	if [ "$1" == "" ]
 	then
-		mysql --skip-column-names -u$sqluser -p$sqlpasswd -h $sqlhost -e "SELECT value FROM config WHERE name='site_school_code' LIMIT 1" $sqldb
+		mariadb --skip-column-names -u$sqluser -p$sqlpasswd -h $sqlhost -e "SELECT value FROM config WHERE name='site_school_code' LIMIT 1" $sqldb
 	else
 		echo "Updating site_school_code to \"$1\""
-		mysql -u$sqluser -p$sqlpasswd -h $sqlhost -e "UPDATE config SET value='$1' WHERE name='site_school_code' LIMIT 1" $sqldb
+		mariadb -u$sqluser -p$sqlpasswd -h $sqlhost -e "UPDATE config SET value='$1' WHERE name='site_school_code' LIMIT 1" $sqldb
 
 	fi
 fi

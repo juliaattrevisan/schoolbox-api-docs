@@ -30,7 +30,7 @@ sqlhost=$(schoolbox-conf --conf="$conffile" --option=SQL_host);
 sqldb=$(schoolbox-conf --conf="$conffile" --option=SQL_db);
 
 # Collect current SQL version
-sqlver=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='site_version' \G;" | grep 'value' | cut -d' ' -f2`;
+sqlver=`mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='site_version' \G;" | grep 'value' | cut -d' ' -f2`;
 
 if [ -z $sqlver ];
 then
@@ -38,7 +38,7 @@ then
 	exit;
 fi
 
-backupdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='backup_dir' \G;" | grep 'value' | cut -d' ' -f2`;
+backupdir=`mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='backup_dir' \G;" | grep 'value' | cut -d' ' -f2`;
 backupdir=`readlink -f $backupdir/../`
 backupfile="$backupdir/$sqlver-`date +%Y-%m-%d_%H-%M-%S`.sql";
 
