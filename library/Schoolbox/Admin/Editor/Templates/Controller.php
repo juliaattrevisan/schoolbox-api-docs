@@ -11,7 +11,6 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Editor\Templates;
 
 use Alaress\Web\Controller\Base;
-use PSpell\Config;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Editor\Templates\Category\ModelToArray;
 use Schoolbox\Admin\Editor\Templates\Category\Model as CategoryModel;
