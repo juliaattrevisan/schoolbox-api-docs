@@ -309,15 +309,18 @@ class Controller extends Base
                 ->setBody($tokenReplacer->replace($momentModel->getBody(), $user))
                 ->setEvidence(new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class));
 
-            /* Deep Clone
-             *
-             * This is super painfully extravagant. Surely there's a better way than this.
-             * TODO Maybe implement a magic __clone method inside $baseModel's instance?
-             */
-            foreach ($baseModel->getEvidence() as $evidence) {
-                $newEvidence = clone $evidence;
+            // only clone evidence if it exists...
+            if (null !== $baseModel->getEvidence()) {
+                /* Deep Clone
+                 *
+                 * This is super painfully extravagant. Surely there's a better way than this.
+                 * TODO Maybe implement a magic __clone method inside $baseModel's instance?
+                 */
+                foreach ($baseModel->getEvidence() as $evidence) {
+                    $newEvidence = clone $evidence;
 
-                $momentModel->getEvidence()->add($newEvidence);
+                    $momentModel->getEvidence()->add($newEvidence);
+                }
             }
 
             if ($this->requestPost->get('draft', false)) {
