@@ -98,7 +98,7 @@ h3.lrn-report-item-title {
 .lrn.lrn-author .lrn-author-item-content {
     min-height: auto;
 }
-.lrn-btn.lrn-btn-default.lrn-btn-icon-left {
+.lrn-btn.lrn-author-btn-default.lrn-author-btn-icon-left {
     background-color: var(--content-ui-background) !important;
     color: var(--content-ui-foreground) !important;
     line-height: inherit !important;
@@ -119,7 +119,7 @@ h3.lrn-report-item-title {
 }
 
 /* update the pen icon */
-.lrn-i-edit::before {
+.lrn-author-i-edit::before {
     content: "\e645";
     font-family: "schoolbox";
 }
@@ -130,12 +130,12 @@ h3.lrn-report-item-title {
 }
 
 /* updated icons styles */
-.lrn-i-search::before {
+.lrn-author-i-search::before {
     content: "\e660";
     font-family: "schoolbox";
     vertical-align: middle;
 }
-.lrn-i-plus-small:before {
+.lrn-author-i-plus-small:before {
     content: "\e600";
     font-family: "schoolbox";
     vertical-align: middle;
