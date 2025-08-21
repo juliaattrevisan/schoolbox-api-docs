@@ -219,8 +219,14 @@
                 <section>
                     <fieldset class="no-pad">
                         <div class="small-12 columns no-pad">
-                            {# $('input[name=attachment]')[0].files[0].name #}
-                            <input type="file" name="attachment" accept="text/xml, application/xml, application/json" />
+                            <div data-vue-app="file-drop">
+                                <file-drop
+                                    id="quiz-attachment"
+                                    accept="text/xml, application/xml, application/json"
+                                    input-name="attachment"
+                                />
+                            </div>
+                            <script src="{{ CDN_PREFIX }}/js/bundle/fileDrop.js?v={{ config.site_version }}"></script>
                         </div>
                     </fieldset>
                 </section>

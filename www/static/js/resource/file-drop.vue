@@ -14,6 +14,11 @@ interface Props {
     accept?: string;
     class?: string;
     /**
+     * To make this act as a normal form input, specify an inputName
+     * This will create a hidden input that a form will include upon submission
+     */
+    inputName?: string;
+    /**
      * The disabled state is intended to be used only when currentFile has a meaningful value
      * It prevents removing of files to let us show a preview as if it were uploaded
      * Currently this will not visually affect the file drop zone if currentFile is null
@@ -31,18 +36,44 @@ const props = withDefaults(defineProps<Props>(), {
     placeholder: "Click or drag here to attach files",
     accept: "*/*",
     class: "l-mar-s--bottom",
+    inputName: undefined,
     disabled: false,
     fileHandler: () => true,
 });
 
-const currentFile = defineModel<FileDropFile | null>("currentFile", { required: true });
+const currentFile = defineModel<FileDropFile | null>("currentFile", { default: null });
 
 const { reset, open, onChange, onCancel } = useFileDialog({
     accept: props.accept,
     multiple: false,
 });
 
-const importFileName = window.Vue.ref<string | null>(null);
+const hiddenInputRef = window.Vue.ref<HTMLInputElement | null>(null);
+
+/**
+ * Keep the hidden input in sync with currentFile
+ */
+window.Vue.watch(
+    currentFile,
+    (file) => {
+        if (hiddenInputRef.value === null) {
+            return;
+        }
+
+        // no file? clear it
+        if (file === null || file.error !== false) {
+            hiddenInputRef.value.value = "";
+            hiddenInputRef.value.files = null;
+            return;
+        }
+
+        // otherwise, set the file
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file.file);
+        hiddenInputRef.value.files = dataTransfer.files;
+    },
+    { immediate: true },
+);
 
 /**
  * When the file import is cancelled
@@ -81,7 +112,6 @@ async function handleLoad(file: FileDropFile): Promise<void> {
 function handleFiles(files: FileList | null): void {
     if (files === null || files.length === 0) {
         handleCancel();
-        importFileName.value = null;
         return;
     }
 
@@ -130,9 +160,19 @@ function handleDrop(event: DragEvent): void {
 </script>
 
 <template>
+    <!-- A hidden input so that actual forms can use this -->
+    <input
+        v-if="props.inputName"
+        ref="hiddenInputRef"
+        type="file"
+        :name="props.inputName"
+        :accept="props.accept"
+        style="display: none"
+    />
+
     <div v-if="currentFile" class="ab-upload ab-upload-panel" :class="props.class">
         <div class="dzone dz-clickable dz-started" style="border: 0">
-            <file-drop-preview :file="currentFile" :disabled="props.disabled" @remove="currentFile = null" />
+            <file-drop-preview :file="currentFile" :disabled="props.disabled" @remove="handleCancel" />
         </div>
     </div>
 
@@ -148,7 +188,7 @@ function handleDrop(event: DragEvent): void {
         @dragleave="isOverDropZone = false"
         @dragend="isOverDropZone = false"
     >
-        <input :id="props.id" type="file" :accept="props.accept" @change="console.log('File selected')" />
+        <input :id="props.id" type="file" :accept="props.accept" :name="props.inputName" />
         <div class="dzone icon-attach">
             <span>{{ props.placeholder }}</span>
         </div>
