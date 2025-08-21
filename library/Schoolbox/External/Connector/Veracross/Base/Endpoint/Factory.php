@@ -70,6 +70,7 @@ class Factory
      * @param UserProfile\Parent\Mapper $parentProfileMapper
      * @param UserProfile\Staff\Mapper $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
+     * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
      * @param \Schoolbox\External\Event\Mapper $eventMapper
      * @param ClassEntryMapper $classEntryMapper
      * @param ClassInvolvementMapper $classInvolvementMapper
@@ -92,13 +93,14 @@ class Factory
         private UserProfile\Parent\Mapper $parentProfileMapper,
         private UserProfile\Staff\Mapper $staffProfileMapper,
         private UserProfile\Relationship\Mapper $relationshipMapper,
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
         /* Timetable pieces */
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private ClassEntryMapper $classEntryMapper,
         private ClassInvolvementMapper $classInvolvementMapper,
         private ClassPeriodMapper $classPeriodMapper,
         private TimetablePeriodMapper $periodMapper,
-        private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
+        private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
     ) {
     }
 
@@ -150,7 +152,8 @@ class Factory
                     $this->studentProfileMapper,
                     $this->parentProfileMapper,
                     $this->staffProfileMapper,
-                    $this->relationshipMapper
+                    $this->relationshipMapper,
+                    $this->storageMapper,
                 ))
                 ->add(new Profile\Cleanup(
                     $this->log,

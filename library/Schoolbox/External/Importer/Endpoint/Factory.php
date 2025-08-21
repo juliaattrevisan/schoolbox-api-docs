@@ -328,6 +328,7 @@ class Factory implements IFactory
                 UserProfile\Parent\Mapper::getInstance()->disableCache(),
                 UserProfile\Staff\Mapper::getInstance()->disableCache(),
                 UserProfile\Relationship\Mapper::getInstance()->disableCache(),
+                \Schoolbox\Resource\Storage\Mapper::getInstance()->disableCache(),
                 /* Timetable pieces
                  */
                 \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),

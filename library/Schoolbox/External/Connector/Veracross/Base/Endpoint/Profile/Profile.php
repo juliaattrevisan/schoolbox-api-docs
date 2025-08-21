@@ -11,6 +11,8 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\Profile;
 
 use Alaress_Date_Format;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
@@ -72,6 +74,13 @@ class Profile implements IStrategy
 
 
     /**
+     * How long to wait if we're trying to access a veracross-generated url
+     * for profile pics
+     */
+    private const TIMEOUT = 15;
+
+
+    /**
      * Special event query generator that saves partial rows
      *
      * @var ProfileHandler
@@ -97,6 +106,14 @@ class Profile implements IStrategy
 
 
     /**
+     * A dedicated guzzle client purely to access a veracross-generated url
+     *
+     * @var Client
+     */
+    private Client $client;
+
+
+    /**
      * Profile constructor.
      *
      * @param ValidStrats $validStrats
@@ -110,6 +127,7 @@ class Profile implements IStrategy
      * @param UserProfile\Parent\Mapper $parentProfileMapper
      * @param UserProfile\Staff\Mapper $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
+     * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
      */
     public function __construct(
         private ValidStrats $validStrats,
@@ -122,7 +140,8 @@ class Profile implements IStrategy
         private UserProfile\Student\Mapper $studentProfileMapper,
         private UserProfile\Parent\Mapper $parentProfileMapper,
         private UserProfile\Staff\Mapper $staffProfileMapper,
-        private UserProfile\Relationship\Mapper $relationshipMapper
+        private UserProfile\Relationship\Mapper $relationshipMapper,
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
     ) {
         /* Profile Chandler that saves a subset of profile records' columns
          * to minimise changes to the db, due to db ignoring the indexes
@@ -143,6 +162,14 @@ class Profile implements IStrategy
          * Staff might have profile pics
          */
         $this->photoLookup = (new Photo($this->baseProfileMapper, $this->api, $this->watchlist));
+
+        /* A random guzzle client with no special configuration,
+         * used purely to access a url Veracross has generated for us.
+         */
+        $this->client = new Client([
+            'timeout' => self::TIMEOUT,
+            'http_errors' => true,
+        ]);
     }
 
 
@@ -399,6 +426,19 @@ class Profile implements IStrategy
                     ->setFirstnamePreferred($firstnamePreferred)
                     ->setLastname($lastname);
 
+                /* Find their profile pic and assign it, if applicable
+                 */
+                if ($this->includePhoto) {
+                    $this->log->debug(sprintf(
+                        'Fetching picture for %s %s (%s)',
+                        $studentBaseProfile->getFirstname(),
+                        $studentBaseProfile->getLastname(),
+                        $studentBaseProfile->getExternalId()
+                    ));
+
+                    $this->importPhoto($studentBaseProfile, $photoLookup);
+                }
+
                 /* Then save it
                  */
                 if ($this->perform) {
@@ -536,19 +576,6 @@ class Profile implements IStrategy
                  */
                 if ($this->perform) {
                     $this->profileHandler->saveStudentProfile($studentProfile, $oldStudentProfile);
-                }
-
-                /* Find their profile pic
-                 */
-                if ($this->includePhoto) {
-                    $this->log->debug(sprintf(
-                        'Fetching picture for %s %s (%s)',
-                        $studentBaseProfile->getFirstname(),
-                        $studentBaseProfile->getLastname(),
-                        $studentBaseProfile->getExternalId()
-                    ));
-
-                    $this->importPhoto($studentBaseProfile, $photoLookup);
                 }
 
                 /* Add their parents' profile data
@@ -840,16 +867,62 @@ class Profile implements IStrategy
      * @param UserProfile\Model $baseProfile
      * @param array|null $photoLookup
      * @return void
+     * @throws GuzzleException
      */
     private function importPhoto(UserProfile\Model $baseProfile, ?array $photoLookup): void
     {
         $externalId = $baseProfile->getExternalId();
 
-        if (null !== ($photoLookup[$externalId] ?? null)) {
-            print_r($photoLookup[$externalId]);
-            die();
+        /* This person doesn't have a photo,
+         * or, their existing picture doesn't need changing.
+         * Exit early
+         */
+        if (null === ($photoLookup[$externalId] ?? null)) {
+            $this->log->debug(sprintf(
+                'No changes required for user %s; they already have the latest, or no pic exists',
+                $externalId
+            ));
+
+            return;
         }
 
-        echo 'test';
+        /* Start the part where we save the image
+         */
+        $this->log->debug(sprintf(
+            'Importing profile picture for %s %s (%s)',
+            $baseProfile->getFirstname(),
+            $baseProfile->getLastname(),
+            $baseProfile->getExternalId()
+        ));
+
+        /* Only try to persist images if perform mode is activated
+         */
+        if (!$this->perform) {
+            return;
+        }
+
+        /* Otherwise, all the parts are here and valid; continue with the persistence
+         * to storage and assignation to the $baseProfile by reference
+         */
+        try {
+            $response = $this->client->request('GET', $photoLookup[$externalId]);
+            $fileContents = $response->getBody()->getContents();
+
+            $portrait = $this->storageMapper->acceptStream($baseProfile->getExternalId() . '.jpg', $fileContents);
+
+            /* You get a picture if any of the following occur:
+             *     - you don't have a portrait yet; you can get one added
+             *     - your existing picture is different to the one we just got; update it
+             */
+            if (!$baseProfile->getPortrait() || ($baseProfile->getPortrait()->getHash() !== $portrait->getHash())) {
+                $baseProfile->setPortrait($portrait);
+            }
+        } catch (\Exception $e) {
+            // noop, but warn the cli that something unusual has transpired
+            $this->log->warning(sprintf(
+                'Profile picture: exception thrown. %s',
+                $e->getMessage()
+            ));
+        }
     }
 }
