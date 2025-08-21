@@ -182,19 +182,6 @@
  # To minimise master fallout I'll just inject the quiz-specific stuff right here
  #}
 {% if assessment is defined and assessment is quiz %}
-    <script type="text/javascript" src="{{CDN_PREFIX}}/js/resource/jquery.resourceAttach.js?v={SITE_VERSION}"></script>
-    <script>
-        $(function() {
-            $('[data-import]').on('click', function(event) {
-                event.preventDefault();
-
-                $('#importForm').submit().hide();
-                $('#import-actions').hide();
-                $('#import-loader').show();
-            });
-        });
-    </script>
-
     <div id="importModal" class="reveal-modal" data-reveal>
         <h2>Import a {{ config.title }} quiz</h2>
 
@@ -230,17 +217,27 @@
                         </div>
                     </fieldset>
                 </section>
+                <div class="component-action">
+                    <section>
+                        <button class="button" type="submit">Upload</button>
+                    </section>
+                </div>
             </form>
-            <div id='import-actions' class="component-action">
-                <section>
-                    <a class="button" data-import>
-                        Upload
-                    </a>
-                </section>
-            </div>
         {% endif %}
         <a class="close-reveal-modal" aria-label="Close">&#215;</a>
     </div>
+    <script>
+        $(function() {
+            const importForm = document.querySelector("#importForm");
+            const importLoader = document.querySelector("#import-loader");
+
+            // show the loader on successful submission (valid file)
+            importForm.addEventListener("submit", function(event) {
+                importForm.style.display = "none";
+                importLoader.style.display = "block";
+            });
+        });
+    </script>
 {% endif %}
 
 {% if assessmentType is defined and assessmentType|length %}

@@ -48,7 +48,7 @@ const { reset, open, onChange, onCancel } = useFileDialog({
     multiple: false,
 });
 
-const hiddenInputRef = window.Vue.ref<HTMLInputElement | null>(null);
+const inputEl = window.Vue.useTemplateRef<HTMLInputElement>("inputRef");
 
 /**
  * Keep the hidden input in sync with currentFile
@@ -56,21 +56,21 @@ const hiddenInputRef = window.Vue.ref<HTMLInputElement | null>(null);
 window.Vue.watch(
     currentFile,
     (file) => {
-        if (hiddenInputRef.value === null) {
+        if (inputEl.value === null) {
             return;
         }
 
         // no file? clear it
         if (file === null || file.error !== false) {
-            hiddenInputRef.value.value = "";
-            hiddenInputRef.value.files = null;
+            inputEl.value.value = "";
+            inputEl.value.files = null;
             return;
         }
 
         // otherwise, set the file
         const dataTransfer = new DataTransfer();
         dataTransfer.items.add(file.file);
-        hiddenInputRef.value.files = dataTransfer.files;
+        inputEl.value.files = dataTransfer.files;
     },
     { immediate: true },
 );
@@ -160,47 +160,48 @@ function handleDrop(event: DragEvent): void {
 </script>
 
 <template>
-    <!-- A hidden input so that actual forms can use this -->
-    <input
-        v-if="props.inputName"
-        ref="hiddenInputRef"
-        type="file"
-        :name="props.inputName"
-        :accept="props.accept"
-        style="display: none"
-    />
-
-    <div v-if="currentFile" class="ab-upload ab-upload-panel" :class="props.class">
-        <div class="dzone dz-clickable dz-started" style="border: 0">
-            <file-drop-preview :file="currentFile" :disabled="props.disabled" @remove="handleCancel" />
+    <div>
+        <div v-if="currentFile" class="ab-upload ab-upload-panel" :class="props.class">
+            <div class="dzone dz-clickable dz-started" style="border: 0">
+                <file-drop-preview :file="currentFile" :disabled="props.disabled" @remove="handleCancel" />
+            </div>
         </div>
+
+        <label
+            v-else
+            :for="props.id"
+            class="attachzone s64"
+            :class="{ 'dz-drag-hover': isOverDropZone && !props.disabled, [props.class]: true }"
+            :style="{ pointerEvents: props.disabled ? 'none' : undefined }"
+            @click.prevent="handleClick"
+            @drop.prevent="handleDrop"
+            @dragover="handleDragOver"
+            @dragleave="isOverDropZone = false"
+            @dragend="isOverDropZone = false"
+        >
+            <div class="dzone icon-attach">
+                <span>{{ props.placeholder }}</span>
+            </div>
+        </label>
+
+        <!-- Always render this hidden input so that forms can access it for validation -->
+        <input :id="props.id" ref="inputRef" type="file" :accept="props.accept" :name="props.inputName" required />
     </div>
-
-    <label
-        v-else
-        :for="props.id"
-        class="attachzone s64"
-        :class="{ 'dz-drag-hover': isOverDropZone && !props.disabled, [props.class]: true }"
-        :style="{ pointerEvents: props.disabled ? 'none' : undefined }"
-        @click.prevent="handleClick"
-        @drop.prevent="handleDrop"
-        @dragover="handleDragOver"
-        @dragleave="isOverDropZone = false"
-        @dragend="isOverDropZone = false"
-    >
-        <input :id="props.id" type="file" :accept="props.accept" :name="props.inputName" />
-        <div class="dzone icon-attach">
-            <span>{{ props.placeholder }}</span>
-        </div>
-    </label>
 </template>
 
 <style scoped lang="scss">
 label.attachzone {
     font-weight: normal;
+}
 
-    input {
-        display: none;
-    }
+/** Hide the actual file input, but still allow the browser to validate it */
+input {
+    opacity: 0;
+    position: absolute;
+    pointer-events: none;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
 }
 </style>
