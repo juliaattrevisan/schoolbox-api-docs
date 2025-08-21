@@ -180,7 +180,7 @@ window.Vue.watch(currentFile, async (file) => {
         return;
     }
 
-    if (props.autoUploadToStorage === false || file.storageHash !== null) {
+    if (props.autoUploadToStorage === false || file.storageHash) {
         return; // don't auto upload, or file is already uploaded - nothing to do
     }
 
