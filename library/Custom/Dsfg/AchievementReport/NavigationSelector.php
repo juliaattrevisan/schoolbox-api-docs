@@ -485,6 +485,5 @@ class NavigationSelector
         ";
 
         return (bool)$this->db->getOne($query, $params);
-
     }
 }
