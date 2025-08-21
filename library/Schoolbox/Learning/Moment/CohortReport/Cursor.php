@@ -242,7 +242,7 @@ class Cursor implements ICursor
 
         /* Filter $cohortIds to a set of recipient userIds, if specified
          */
-        $intersectingUsers = \count($this->userIds) ? array_intersect($cohortIds, $this->userIds) : [];
+        $intersectingUsers = $this->userIds && \count($this->userIds) ? array_intersect($cohortIds, $this->userIds) : [];
         if (\count($intersectingUsers)) {
             $placeholders = Builder::getArrayPlaceholders($intersectingUsers, 'intersectingUserIds');
             $params = array_merge($params, Builder::getArrayParameters($intersectingUsers, 'intersectingUserIds'));
