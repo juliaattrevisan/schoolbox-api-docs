@@ -26,11 +26,11 @@ export interface AsyncUploadResponseError {
     hash: "";
 }
 
-export interface AsyncUploadResponseSuccess {
+export interface AsyncUploadResponseSuccess<IsMulti extends boolean = false> {
     success: true;
     error: 200;
     message: "OK";
-    hash: string[];
+    hash: IsMulti extends true ? string[] : string;
     meta: {
         type: string | null;
         size: number;
@@ -40,7 +40,9 @@ export interface AsyncUploadResponseSuccess {
 }
 
 // A response from /storage/asyncUpload.php
-export type AsyncUploadResponse = AsyncUploadResponseError | AsyncUploadResponseSuccess;
+export type AsyncUploadResponse<IsMulti extends boolean = false> =
+    | AsyncUploadResponseError
+    | AsyncUploadResponseSuccess<IsMulti>;
 
 /**
  * Upload a file
@@ -51,7 +53,7 @@ export type AsyncUploadResponse = AsyncUploadResponseError | AsyncUploadResponse
 export async function uploadFileToStorage(
     file: File,
     expiryDate?: Date | null,
-): Promise<ApiBaseResponse<AsyncUploadResponseSuccess>> {
+): Promise<ApiBaseResponse<AsyncUploadResponseSuccess<false>>> {
     const formData = new FormData();
     formData.append("upload", file);
 
@@ -61,7 +63,7 @@ export async function uploadFileToStorage(
         url += `?expiryDate=${encodeURIComponent(expiryDateRFC3339)}`;
     }
 
-    const response = await apiRequest<AsyncUploadResponse, FormData>({
+    const response = await apiRequest<AsyncUploadResponse<false>, FormData>({
         url,
         method: "POST",
         body: formData,
