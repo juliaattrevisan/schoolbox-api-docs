@@ -229,7 +229,7 @@ class Trie
         }
 
         if (empty($this->data)) {
-            unset($this->data);
+            $this->data = [];
         }
 
         // finalise sorting
@@ -243,7 +243,7 @@ class Trie
             }
         } else {
             // we are a leaf node, these tidbits are irrelevant
-            unset($this->tries);
+            $this->tries = [];
         }
     }
 

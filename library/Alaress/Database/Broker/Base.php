@@ -47,8 +47,8 @@ abstract class Base implements IBroker
     /** @var IConnector $connector Link back to the connector object that invoked the broker */
     protected $connector;
 
-    /** @var PDO $pdo The PDO object that does all the real work */
-    protected $pdo;
+    /** @var PDO|null $pdo The PDO object that does all the real work */
+    protected $pdo = null;
 
     /** @var Collector The debugging collector */
     protected $collector = null;
@@ -89,7 +89,7 @@ abstract class Base implements IBroker
         // This personally irks me quite badly as there is no disconnect function in PDO- they just say we need to unset or NULL out the
         // variable and let PHP garbage collection get around to it. How about you trust us to close the damn socket!
 
-        unset($this->pdo);
+        $this->pdo = null;
 
         // Force GC because im cynical and don't trust the magical fairies to clean up after me
 
@@ -105,7 +105,7 @@ abstract class Base implements IBroker
 
         // Close any existing connection (this seems a bit flaky- why is there no close function?)
 
-        unset($this->pdo);
+        $this->pdo = null;
 
         // Set any database connection options that we want to allow
 

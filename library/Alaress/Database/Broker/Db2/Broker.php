@@ -97,7 +97,7 @@ class Broker extends Base
     public function connect($options = [])
     {
         // Close any existing connection (this seems a bit flaky- why is there no close function?)
-        unset($this->pdo);
+        $this->pdo = null;
 
         if ($options['schema'] ?? null) {
             $this->postConnectQueries = ['SET SCHEMA ' . $options['schema']];

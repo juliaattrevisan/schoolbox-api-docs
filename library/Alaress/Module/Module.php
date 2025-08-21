@@ -186,7 +186,7 @@ class Module
             }
 
             // no need that no more
-            unset($this->routeIndex);
+            $this->routeIndex = [];
 
             // manual route init
             $this->initRoutes($basePath);
@@ -223,7 +223,7 @@ class Module
             $this->addRoutePreload($this->getPathMatcher(), $regex, $preload);
         }
         // no need that no more
-        unset($this->preloadIndex);
+        $this->preloadIndex = [];
 
         // configure pre-registered permissions
         foreach ($this->permissionIndex as [$rule, $methods]) {
@@ -232,7 +232,7 @@ class Module
             $this->addRoutePermission($this->getAuthorizer(), $regex, $rule);
         }
         // no need that no more
-        unset($this->permissionIndex);
+        $this->permissionIndex = [];
 
         // manual preloads
         $this->initRoutePreloads($this->getPathMatcher());

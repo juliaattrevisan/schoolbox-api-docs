@@ -5365,18 +5365,6 @@ parameters:
 			path: library/Schoolbox/Notif/StoredisLogger.php
 
 		-
-			message: '#^Method Schoolbox\\Pastoral\\Audience\\Controller\:\:postAudienceTypeModify\(\) has PDOException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Pastoral/Audience/Controller.php
-
-		-
-			message: '#^Method Schoolbox\\Pastoral\\Audience\\Controller\:\:postAudienceTypeModify\(\) has UnexpectedValueException in PHPDoc @throws tag but it''s not thrown\.$#'
-			identifier: throws.unusedType
-			count: 1
-			path: library/Schoolbox/Pastoral/Audience/Controller.php
-
-		-
 			message: '#^PHPDoc tag @var with type Schoolbox\\Pastoral\\Type\\TypeAbstract is not subtype of native type Schoolbox\\Pastoral\\SubType\\Model\|Schoolbox\\Pastoral\\Type\\Model\.$#'
 			identifier: varTag.nativeType
 			count: 1
@@ -5689,12 +5677,6 @@ parameters:
 			path: library/Schoolbox/Realtime/Timetable/TimetableNotifier.php
 
 		-
-			message: '#^Dead catch \- InvalidArgumentException is never thrown in the try block\.$#'
-			identifier: catch.neverThrown
-			count: 1
-			path: library/Schoolbox/Realtime/Timetable/TimetableScheduler.php
-
-		-
 			message: '#^Property Schoolbox\\Realtime\\WorkNotifier\:\:\$log \(Psr\\Log\\LoggerInterface\) in empty\(\) is not falsy\.$#'
 			identifier: empty.property
 			count: 1
@@ -5969,12 +5951,6 @@ parameters:
 			identifier: method.resultUnused
 			count: 1
 			path: library/Schoolbox/ResourceBooking/Booking/Validation.php
-
-		-
-			message: '#^Dead catch \- Schoolbox\\Application\\Exception\\NotFound is never thrown in the try block\.$#'
-			identifier: catch.neverThrown
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Item/Controller.php
 
 		-
 			message: '#^Method Schoolbox\\ResourceBooking\\Item\\Model\:\:addModerator\(\) should return \$this\(Schoolbox\\ResourceBooking\\Item\\Model\) but returns iterable\<Schoolbox\\User\>&Schoolbox\\Collection\.$#'

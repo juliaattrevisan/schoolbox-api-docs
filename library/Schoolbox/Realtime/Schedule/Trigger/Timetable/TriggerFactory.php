@@ -10,12 +10,12 @@
 namespace Schoolbox\Realtime\Schedule\Trigger\Timetable;
 
 use Alaress\Date\IClock;
+use InvalidArgumentException;
 use OutOfBoundsException;
 use Schoolbox\Campus;
 
 class TriggerFactory
 {
-
     /** @var callable[] */
     private $strats;
 
@@ -42,7 +42,9 @@ class TriggerFactory
     /**
      * @param string $label
      * @param Campus $campus
-     * @throws OutOfBoundsException
+     * @throws OutOfBoundsException     if `$label` doesn't exist in strats
+     * @throws InvalidArgumentException happens in the strat's callback somehow,
+     *                                  maybe on creating `External_Timetable`?
      * @return TimetableTrigger
      */
     public function buildTrigger($label, Campus $campus)

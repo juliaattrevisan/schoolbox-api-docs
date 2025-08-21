@@ -15,7 +15,6 @@ use RuntimeException;
 
 class WorkerArray implements WorkerBundleInterface
 {
-
     /** @var Worker[] */
     protected $workers = array();
 
@@ -43,7 +42,7 @@ class WorkerArray implements WorkerBundleInterface
         foreach ($this->workers as $pid => $worker) {
             unset($this->workers[$pid]);
         }
-        unset($this->workers);
+        $this->workers = [];
     }
 
 
