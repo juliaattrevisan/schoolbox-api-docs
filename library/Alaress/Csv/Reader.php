@@ -176,7 +176,7 @@ class Reader implements \Iterator
     {
         if (is_resource($this->fp)) {
             fclose($this->fp);
-            unset($this->fp);
+            $this->fp = null;
         }
         $this->current_key = 0;
         $this->current_row = [];

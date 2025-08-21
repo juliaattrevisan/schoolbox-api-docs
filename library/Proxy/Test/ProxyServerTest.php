@@ -32,9 +32,9 @@ class ProxyServerTest extends TestCase
 
 
     /**
-     * @var \Proxy\Server
+     * @var \Proxy\Server|null
      */
-    protected $proxyServer;
+    protected $proxyServer = null;
 
     protected function setUp(): void
     {
@@ -45,7 +45,7 @@ class ProxyServerTest extends TestCase
     {
         parent::tearDown();
         // destroy the object so another test can't accidentally use it
-        unset($this->proxyServer);
+        $this->proxyServer = null;
     }
 
 

@@ -152,7 +152,6 @@ class InputStreamListener extends AbstractIOStreamListener
      */
     protected function resetBuffer($isBuffering = false)
     {
-        unset($this->buffer);
         $this->buffer    = '';
         $this->buffering = $isBuffering;
     }

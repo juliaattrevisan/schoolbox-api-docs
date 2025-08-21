@@ -71,7 +71,7 @@ class WorkerResponder
         }
 
         $exitStatus = proc_close($this->pp);
-        unset($this->pp);
+        $this->pp   = null;
         return $exitStatus;
     }
 

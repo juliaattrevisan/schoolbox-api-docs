@@ -28,7 +28,7 @@ class Router implements IRouter
     protected $dictionary;
 
     /** @var Trie[] */
-    protected $cache;
+    protected $cache = [];
 
     /** @var RouteFactory */
     private $factory;
@@ -127,7 +127,7 @@ class Router implements IRouter
      */
     public function lock()
     {
-        unset($this->cache);
+        $this->cache = [];
         $this->root->lock();
     }
 
@@ -139,7 +139,7 @@ class Router implements IRouter
      */
     public function dropAll()
     {
-        unset($this->cache);
+        $this->cache = [];
         $this->root->reset();
         return $this;
     }

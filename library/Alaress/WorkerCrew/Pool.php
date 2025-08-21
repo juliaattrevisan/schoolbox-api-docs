@@ -84,10 +84,8 @@ class Pool extends EventEmitter implements PoolInterface
     public function __destruct()
     {
         $this->releaseWorkers();
-        unset(
-            $this->ioListeners,
-            $this->workers
-        );
+        $this->ioListeners = [];
+        $this->workers     = [];
     }
 
 

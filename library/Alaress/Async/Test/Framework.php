@@ -81,7 +81,7 @@ class Framework
             }
         }
         // and finish off with removing this altogether
-        unset($this->daemonInstances);
+        $this->daemonInstances = [];
     }
 
 

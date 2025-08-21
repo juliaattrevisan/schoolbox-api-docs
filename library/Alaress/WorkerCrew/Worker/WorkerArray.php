@@ -43,7 +43,7 @@ class WorkerArray implements WorkerBundleInterface
         foreach ($this->workers as $pid => $worker) {
             unset($this->workers[$pid]);
         }
-        unset($this->workers);
+        $this->workers = [];
     }
 
 
