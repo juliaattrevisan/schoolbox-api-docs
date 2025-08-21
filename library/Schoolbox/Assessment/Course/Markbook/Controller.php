@@ -280,12 +280,10 @@ class Controller extends WebController\Base
                         '_routes'         => [
                             'postFeedbacks' => $assessment->isSpecification()
                                 ? $this->getRouteIfAuthorized(
-                                    'courseStatus.postPublishFeedback',
+                                    'learningDueWorkFeedback.postParticipantFeedbacks',
                                     [
                                         'assessment'   => $assessment,
                                         'assessmentId' => $assessment->getId(),
-                                        'courseSpec'   => $courseSpec,
-                                        'courseSpecId' => $courseSpec->getId(),
                                     ]
                                 )
                                 : null,
