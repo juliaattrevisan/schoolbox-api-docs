@@ -1,5 +1,6 @@
 import { debounce } from "lodash";
 import type { Reactive, Ref } from "vue";
+import type { Plan } from "@schoolboxLibrary/Learning/Assessment/templates/participation/js/types/customParticipationTypes";
 
 interface DynamicFeedbackEditableData {
     hrMarkInstructor: Ref<string | null>;
@@ -16,11 +17,7 @@ interface DynamicFeedbackData extends DynamicFeedbackEditableData {
 interface DynamicFeedbackExtraData {
     hasSubmittedResponse: Ref<boolean>;
     hasPublishedFeedback: Ref<boolean>;
-    plan: Reactive<{
-        isDynamic: boolean;
-        name: string | null;
-        dueDate: string | null;
-    }>;
+    plan: Reactive<Pick<Plan, "isDynamic" | "name" | "dueDate">>;
 }
 
 interface PostModifyResponsePayload {
@@ -29,11 +26,7 @@ interface PostModifyResponsePayload {
     normalisedMark: number | null;
     humanReadableMark: string | null;
     humanReadableInstructorMark: string | null;
-    plan: {
-        isDynamic: boolean;
-        name: string | null;
-        dueDate: string | null;
-    };
+    plan: Pick<Plan, "isDynamic" | "name" | "dueDate">;
 }
 
 const TIMEOUT_DURATION_MS = 600; // After how many milliseconds should we auto-save user input
