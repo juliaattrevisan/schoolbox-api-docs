@@ -78,13 +78,22 @@ class Controller extends Base
         // Get the categories from the mapper and transform each category into an array
         $categories = $this->getPlanCategories();
         $translator = new ModelToArray();
+        $categoriesArray = [];
+
+        /**
+         * This needs to be done as Vue expects a proper array with sequential numeric keys,
+         * and the filtering can disrupt this.
+         */
+        foreach ($categories->map($translator) as $category) {
+            $categoriesArray[] = $category;
+        }
 
         $this->response = $this->responseFromTemplate(
             '@adminEditorTemplates/list.twig',
             [
                 'pageCurrent' => $this->routeGenerator->generate('adminEditorTemplates.getList'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminEditorTemplates.getList')),
-                'categories' => $categories->map($translator),
+                'categories' => $categoriesArray,
             ]
         );
     }
