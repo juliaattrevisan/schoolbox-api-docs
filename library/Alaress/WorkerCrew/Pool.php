@@ -44,8 +44,8 @@ class Pool extends EventEmitter implements PoolInterface
     /** @var DispatchStrategyInterface */
     protected $strat;
 
-    /** @var WorkerBundleInterface */
-    protected $workers;
+    /** @var WorkerBundleInterface|null */
+    protected $workers = null;
 
     /** @var LoggerInterface */
     protected $log;
@@ -85,7 +85,7 @@ class Pool extends EventEmitter implements PoolInterface
     {
         $this->releaseWorkers();
         $this->ioListeners = [];
-        $this->workers     = [];
+        $this->workers     = null;
     }
 
 

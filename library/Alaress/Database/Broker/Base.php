@@ -47,8 +47,8 @@ abstract class Base implements IBroker
     /** @var IConnector $connector Link back to the connector object that invoked the broker */
     protected $connector;
 
-    /** @var PDO $pdo The PDO object that does all the real work */
-    protected $pdo;
+    /** @var PDO|null $pdo The PDO object that does all the real work */
+    protected $pdo = null;
 
     /** @var Collector The debugging collector */
     protected $collector = null;
