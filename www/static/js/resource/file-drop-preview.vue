@@ -3,6 +3,7 @@ import type { FileDropFile } from "./fileDropTypes";
 
 interface Props {
     file: FileDropFile;
+    isUploading?: boolean;
     disabled?: boolean;
 }
 
@@ -60,6 +61,7 @@ const fileSize = window.Vue.computed(() => {
             'dz-file-preview': previewType.type === 'file',
             'dz-image-preview': previewType.type === 'image',
             'dz-error': props.file.error !== false,
+            'dz-success': props.file.storageHash !== undefined,
         }"
         style="margin: 0"
     >
@@ -86,7 +88,7 @@ const fileSize = window.Vue.computed(() => {
             </div>
         </div>
 
-        <div v-if="!props.disabled" class="dz-close">
+        <div v-if="!props.disabled && !props.isUploading" class="dz-close">
             <a class="button dz-remove no-margin" @click="emit('remove')">×</a>
         </div>
     </div>
