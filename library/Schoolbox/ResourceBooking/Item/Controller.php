@@ -74,12 +74,7 @@ class Controller extends Base
         $this->paginator->setUrl($this->request->getUri()->__toString());
         $list = $this->mapper->createCollection();
         if ($catId) {
-            try {
-                $category = $this->mapper->getJoinMapper('category')->findById($catId);
-            } catch (SchoolboxNotFoundException $e) {
-                $this->response = $this->responseEmpty(404);
-                return;
-            }
+            $category = $this->mapper->getJoinMapper('category')->findById($catId);
         }
 
         $user = $this->getUser();

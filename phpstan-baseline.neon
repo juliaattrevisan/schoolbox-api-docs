@@ -5959,12 +5959,6 @@ parameters:
 			path: library/Schoolbox/ResourceBooking/Booking/Validation.php
 
 		-
-			message: '#^Dead catch \- Schoolbox\\Application\\Exception\\NotFound is never thrown in the try block\.$#'
-			identifier: catch.neverThrown
-			count: 1
-			path: library/Schoolbox/ResourceBooking/Item/Controller.php
-
-		-
 			message: '#^Method Schoolbox\\ResourceBooking\\Item\\Model\:\:addModerator\(\) should return \$this\(Schoolbox\\ResourceBooking\\Item\\Model\) but returns iterable\<Schoolbox\\User\>&Schoolbox\\Collection\.$#'
 			identifier: return.type
 			count: 1
