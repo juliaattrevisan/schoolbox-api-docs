@@ -55,11 +55,8 @@ class Photo
             /* Generate a mega lookup of modified times to save requesting this iteratively
              */
             $stmt = $this->baseProfileMapper->getDatabase()->executeQuery("
-                SELECT 
-                    sup.external_id, sup.updated_at, 
-                    u.portrait_hash
-                FROM {$this->baseProfileMapper->getBaseTableName()} sup
-                INNER JOIN `user` u ON sup.external_id = u.synergy_id                
+                SELECT external_id, updated_at, portrait_hash
+                FROM {$this->baseProfileMapper->getBaseTableName()}
             ");
 
             foreach ($stmt->fetchAll() as $row) {
