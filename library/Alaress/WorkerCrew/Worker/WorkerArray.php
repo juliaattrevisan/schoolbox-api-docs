@@ -15,7 +15,6 @@ use RuntimeException;
 
 class WorkerArray implements WorkerBundleInterface
 {
-
     /** @var Worker[] */
     protected $workers = array();
 

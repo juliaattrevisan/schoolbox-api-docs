@@ -16,7 +16,6 @@ use Schoolbox\Campus;
 
 class TriggerFactory
 {
-
     /** @var callable[] */
     private $strats;
 

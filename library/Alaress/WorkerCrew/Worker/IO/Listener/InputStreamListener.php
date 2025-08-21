@@ -22,7 +22,6 @@ use React\EventLoop\LoopInterface;
 
 class InputStreamListener extends AbstractIOStreamListener
 {
-
     /** @var LoopInterface */
     protected $loop;
 
