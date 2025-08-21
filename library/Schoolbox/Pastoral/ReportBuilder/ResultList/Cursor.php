@@ -235,7 +235,7 @@ class Cursor implements ICursor
         switch ($this->tabType) {
             case Factory::STUDENT_BY_TYPE:
                 $query[] = "p.student_id = :student_id";
-                if (!isset($this->rowKey['type'])) {
+                if (!isset($this->rowKey['student_id'])) {
                     throw new ValueError('Student ID is required');
                 }
                 $param['student_id'] = $this->rowKey['student_id'];
