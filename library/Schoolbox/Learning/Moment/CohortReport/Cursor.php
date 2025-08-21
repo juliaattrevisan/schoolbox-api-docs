@@ -261,7 +261,7 @@ class Cursor implements ICursor
 
         /* Filter to a set of authors, if specified
          */
-        if ($this->tagIds && count($this->authorIds)) {
+        if ($this->authorIds && count($this->authorIds)) {
             $placeholders = Builder::getArrayPlaceholders($this->authorIds, 'authorIds');
             $params = array_merge($params, Builder::getArrayParameters($this->authorIds, 'authorIds'));
 
@@ -312,7 +312,7 @@ class Cursor implements ICursor
 
         /* Filter to a set of states/statuses, if specified
          */
-        if ($this->tagIds && \count($this->states)) {
+        if ($this->states && \count($this->states)) {
             /* Ensure that the state provided is one of the canonical states we've established
              * so you can't request moments with the status "cat"
              */
