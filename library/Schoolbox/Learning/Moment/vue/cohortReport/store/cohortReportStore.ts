@@ -6,7 +6,7 @@ import {
 } from "@schoolboxLearningMomentEvidence/learningMomentModerationPayload";
 import type { LearningMoment } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 import { getCohortReport } from "./cohortReportPayload";
-import type { CohortReportEntry } from "./cohortReportPayload";
+import type { CohortReportEntry, CohortReportApiPayload } from "./cohortReportPayload";
 
 export const useCohortReportStore = defineStore("cohortReport", () => {
     let getCohortReportEndpoint: string | null = null; // the endpoint to fetch the cohort report data
@@ -19,6 +19,12 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
 
     const hasSearched = window.Vue.ref<boolean>(false);
     const nextCursor = window.Vue.ref<string | null>(null);
+
+    /**
+     * The filters that were used for the last search so that we can keep loading more results
+     * even if the user changes the filters without clicking "Apply filters" again
+     */
+    const activeFilters = window.Vue.ref<Omit<CohortReportApiPayload, "cursor">>({});
 
     const isLoading = window.Vue.ref(true);
     const loadError = window.Vue.ref<string | null>(null);
@@ -35,6 +41,7 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         selectedResults.value = {};
         hasSearched.value = false;
         nextCursor.value = null;
+        activeFilters.value = {};
         isLoading.value = true;
         loadError.value = null;
     }
@@ -54,7 +61,7 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         isLoading.value = true;
         const response = await getCohortReport(getCohortReportEndpoint, {
             cursor: nextCursor.value,
-            // TODO: Add filters here in SA-20436
+            ...activeFilters.value,
         });
         isLoading.value = false;
         if (response.success === false) {
@@ -267,6 +274,7 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         isLoading,
         clearData,
         nextCursor,
+        activeFilters,
         loadNextPage,
         loadError,
         isEntrySelected,

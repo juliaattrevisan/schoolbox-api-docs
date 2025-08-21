@@ -3,12 +3,13 @@
  */
 
 import { defineStore } from "pinia";
+import { EMPTY_DATE } from "@schoolboxVue/components/dateTimePicker/datePickerTypes";
 import { useQueryStore } from "./spQueryStore";
 import { useFiltersStore } from "../filters/store/spFiltersStore";
 import type { FilterType } from "../filters/store/spFilterTypesStore";
 import { useFilterTypesStore } from "../filters/store/spFilterTypesStore";
 import type { FilterDateRange } from "../filters/store/spFilterDateRangeStore";
-import { EMPTY_DATE, useFilterDateRangeStore } from "../filters/store/spFilterDateRangeStore";
+import { useFilterDateRangeStore } from "../filters/store/spFilterDateRangeStore";
 import type { Creator } from "../filters/store/spFilterCreatorsStore";
 import { useFilterCreatorsStore } from "../filters/store/spFilterCreatorsStore";
 

@@ -38,23 +38,23 @@ class Cursor implements ICursor
      * @param Moment\Mapper $mapper
      * @param UserAccessMapper $userAccessMapper
      * @param Folder\Model $folder
-     * @param string|null $userIds
+     * @param array|null $userIds
      * @param string|null $fromDate
      * @param string|null $toDate
-     * @param string|null $authorIds
-     * @param string|null $tagIds
-     * @param string|null $states
+     * @param array|null $authorIds
+     * @param array|null $tagIds
+     * @param array|null $states
      */
     public function __construct(
         private Moment\Mapper $mapper,
         private UserAccessMapper $userAccessMapper,
         private Folder\Model $folder,
-        private ?string $userIds = null,
+        private ?array $userIds = null,
         private ?string $fromDate = null,
         private ?string $toDate = null,
-        private ?string $authorIds = null,
-        private ?string $tagIds = null,
-        private ?string $states = null,
+        private ?array $authorIds = null,
+        private ?array $tagIds = null,
+        private ?array $states = null,
     ) {
         $this->codec = new Base64();
     }
@@ -227,47 +227,29 @@ class Cursor implements ICursor
         /* Detect if we needed to filter by Tags
          * This involves a conditional inner join
          */
-        if ($this->tagIds) {
-            $tagIds = explode(',', $this->tagIds);
+        if ($this->tagIds && \count($this->tagIds)) {
+            $placeholders = Builder::getArrayPlaceholders($this->tagIds, 'tagIds');
+            $params = array_merge($params, Builder::getArrayParameters($this->tagIds, 'tagIds'));
 
-            if (\count($tagIds)) {
-                $placeholders = Builder::getArrayPlaceholders($tagIds, 'tagIds');
-                $params = array_merge($params, Builder::getArrayParameters($tagIds, 'tagIds'));
+            $query .= "
+                INNER JOIN moment_tag mt ON mt.moment_id = id
+            ";
 
-                $query .= "
-                    INNER JOIN moment_tag mt ON mt.moment_id = id
-                ";
-
-                $wherePieces[] = "
-                    AND mt.tag_id IN {$placeholders}
-                ";
-            }
+            $wherePieces[] = "
+                AND mt.tag_id IN {$placeholders}
+            ";
         }
 
         /* Filter $cohortIds to a set of recipient userIds, if specified
          */
-        if ($this->userIds) {
-            $userIds = explode(',', $this->userIds);
+        $intersectingUsers = $this->userIds && \count($this->userIds) ? array_intersect($cohortIds, $this->userIds) : [];
+        if (\count($intersectingUsers)) {
+            $placeholders = Builder::getArrayPlaceholders($intersectingUsers, 'intersectingUserIds');
+            $params = array_merge($params, Builder::getArrayParameters($intersectingUsers, 'intersectingUserIds'));
 
-            if (\count($userIds)) {
-                $intersectingUsers = array_intersect($cohortIds, $userIds);
-
-                if (\count($intersectingUsers)) {
-                    $placeholders = Builder::getArrayPlaceholders($intersectingUsers, 'intersectingUserIds');
-                    $params = array_merge($params, Builder::getArrayParameters($intersectingUsers, 'intersectingUserIds'));
-
-                    $wherePieces[] = "
-                        AND user_id IN {$placeholders}
-                    ";
-                } else {
-                    $placeholders = Builder::getArrayPlaceholders($cohortIds, 'cohortIds');
-                    $params = array_merge($params, Builder::getArrayParameters($cohortIds, 'cohortIds'));
-
-                    $wherePieces[] = "
-                        AND user_id IN {$placeholders}
-                    ";
-                }
-            }
+            $wherePieces[] = "
+                AND user_id IN {$placeholders}
+            ";
         } else {
             $placeholders = Builder::getArrayPlaceholders($cohortIds, 'cohortIds');
             $params = array_merge($params, Builder::getArrayParameters($cohortIds, 'cohortIds'));
@@ -279,17 +261,13 @@ class Cursor implements ICursor
 
         /* Filter to a set of authors, if specified
          */
-        if ($this->authorIds) {
-            $authorIds = explode(',', $this->authorIds);
+        if ($this->authorIds && count($this->authorIds)) {
+            $placeholders = Builder::getArrayPlaceholders($this->authorIds, 'authorIds');
+            $params = array_merge($params, Builder::getArrayParameters($this->authorIds, 'authorIds'));
 
-            if (\count($authorIds)) {
-                $placeholders = Builder::getArrayPlaceholders($authorIds, 'authorIds');
-                $params = array_merge($params, Builder::getArrayParameters($authorIds, 'authorIds'));
-
-                $wherePieces[] = "
-                    AND created_by IN {$placeholders}
-                ";
-            }
+            $wherePieces[] = "
+                AND created_by IN {$placeholders}
+            ";
         }
 
         /* Filter to a date range, if specified (either FROM, TO, neither, or both)
@@ -334,19 +312,18 @@ class Cursor implements ICursor
 
         /* Filter to a set of states/statuses, if specified
          */
-        $states = explode(',', $this->states ?? '');
-        if (\count($states)) {
+        if ($this->states && \count($this->states)) {
             /* Ensure that the state provided is one of the canonical states we've established
              * so you can't request moments with the status "cat"
              */
-            $validStates = array_intersect($states, Moment\Model::VALID_STATUSES);
+            $validStates = array_intersect($this->states, Moment\Model::VALID_STATUSES);
 
-                /* Do a deep inspection for the pb, which isn't exactly nice; look at the various
-                 * *_by and *_at date fields to determine what state a learning moment is in.
-                 * We don't have access to the convenience methods isDraft() isPublished() etc.
-                 * for the pub; those require hydrated models. Maybe split this out into something
-                 * else later.
-                 */
+            /* Do a deep inspection for the pb, which isn't exactly nice; look at the various
+             * *_by and *_at date fields to determine what state a learning moment is in.
+             * We don't have access to the convenience methods isDraft() isPublished() etc.
+             * for the pub; those require hydrated models. Maybe split this out into something
+             * else later.
+             */
             if (\count($validStates)) {
                 $stateQueryPieces = [];
 

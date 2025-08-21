@@ -13,6 +13,7 @@ import type { SbxEditor } from "@js/editor/types/editorTypes";
 import type { RosettaStone } from "@js/terminology/rosettaStone";
 import type { injectScriptsIfNotLoaded } from "@js/util/domUtils";
 import type { MediaElementPlayer } from "@js/mediaelementplayer/mepUtils";
+import type { SelectizeSelectorOptions } from "@js/vendors/selectize/selectizeSelectorTypes";
 import type { Toast } from "@schoolboxVue/components/toast/sbxToastTypes";
 import type { SbxGlobalDocumentEventHandlerMap, SbxGlobalElementEventHandlerMap } from "./sbxEvents";
 
@@ -114,6 +115,11 @@ declare global {
         data(key: "plugin_resourceAttach"): {
             dropzone: Dropzone;
         };
+        /**
+         * From jquery.selectize-selector.js
+         */
+        selectizeSelector(options: SelectizeSelectorOptions): JQuery;
+        selectizeSelector<TData, TValue>(options: SelectizeSelectorOptions<TData, TValue>): JQuery;
     }
 
     // Fix types when importing .vue files and using with window.Vue.createApp
