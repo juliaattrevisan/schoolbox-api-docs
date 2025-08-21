@@ -317,6 +317,8 @@ class Controller extends Base
      * @return void
      * @throws MapperException
      * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \PDOException
+     * @throws \UnexpectedValueException
      */
     private function postAudienceModify(Pastoral\Type\Model $type, ?Pastoral\SubType\Model $currentType, Values $post): void
     {
