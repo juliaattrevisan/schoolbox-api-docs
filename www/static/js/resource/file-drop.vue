@@ -198,6 +198,7 @@ function handleDrop(event: DragEvent): void {
             :accept="props.accept"
             :name="props.inputName"
             :required="props.required || undefined"
+            autocomplete="off"
         />
     </div>
 </template>
