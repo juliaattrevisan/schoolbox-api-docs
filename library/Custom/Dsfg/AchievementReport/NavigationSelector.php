@@ -176,8 +176,11 @@ class NavigationSelector
         }
 
         /* Conditionally add NCEA option
+         *
+         * Note the NCEA report is not shown for Year 11 students because all
+         * the NCEA data for Year 11 students is now included in the Year 11 tab.
          */
-        if ($this->hasNcea()) {
+        if ($userYear !== '11' && $this->hasNcea()) {
             $availableNavigation[self::NCEA_KEY] = [
                 'url' => $this->routeGenerator->generate('achievementreport.getNcea', [
                     'externalUserId' => $this->externalUser['StudentID'],
@@ -198,11 +201,8 @@ class NavigationSelector
         }
 
         /* Conditionally add Year 11 option
-         *
-         * Note the NCEA report is not shown for Year 11 students because all
-         * the NCEA data for Year 11 students is now included in the Year 11 tab.
          */
-        if ($userYear !== '11' && $this->hasNcea()) {
+        if ($userYear !== '11' && $this->hasYear11()) {
             $availableNavigation[self::YEAR11_KEY] = [
                 'url' => $this->routeGenerator->generate('achievementreport.getYear11', [
                     'externalUserId' => $this->externalUser['StudentID'],
