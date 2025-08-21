@@ -121,20 +121,18 @@ class NavigationSelector
 
         /* Everyone else gets an evaluation based on the year string from lu_year_level
          */
-        if (($this->user->getYear()->getName() >= 1) && ($this->user->getYear()->getName() <= 6)) {
+        if ($this->user->getYear()->getName() == 11) {
+            if ($this->hasYear11()) {
+                $this->defaultReport = self::YEAR11_KEY;
+            } else {
+                $this->defaultReport = ['error' => 'Year 11 student has no data in the database view for Year 11.'];
+            }
+        } elseif (($this->user->getYear()->getName() >= 1) && ($this->user->getYear()->getName() <= 6)) {
             $this->defaultReport = self::STANDARDISEDTEST_KEY;
         } elseif ($this->hasMYP()) {
             $this->defaultReport = self::MYP_KEY;
         } elseif (($this->user->getYear()->getName() >= 9) && ($this->user->getYear()->getName() <= 10)) {
             $this->defaultReport = self::SCHOOLGRADES_KEY;
-        } elseif ($this->user->getYear()->getName() == 11) {
-            /* NCEA for year 11 specifically
-             */
-            if ($this->hasNcea()) {
-                $this->defaultReport = self::NCEA_KEY;
-            } else {
-                $this->defaultReport = ['error' => 'Year 11 student not in NCEA.'];
-            }
         } elseif (($this->user->getYear()->getName() >= 12) && ($this->user->getYear()->getName() <= 13)) {
             /* Need to decide whether this is an IB or an NCEA student
              */

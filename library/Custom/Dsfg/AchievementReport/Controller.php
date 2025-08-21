@@ -72,7 +72,6 @@ class Controller extends Base
                     'message' => $this->getConfigLoader()->get('dio_achievement_report_unavailable')
                 ]
             );
-
             return;
         }
 
@@ -95,7 +94,6 @@ class Controller extends Base
                         'year' => $year
                     ])
                 );
-
                 break;
 
             case NavigationSelector::IB_KEY:
@@ -105,7 +103,6 @@ class Controller extends Base
                         'year' => $year
                     ])
                 );
-
                 break;
 
             case NavigationSelector::NCEA_KEY:
@@ -115,7 +112,6 @@ class Controller extends Base
                         'year' => $year
                     ])
                 );
-
                 break;
 
             case NavigationSelector::COMMENTS_KEY:
@@ -125,7 +121,6 @@ class Controller extends Base
                         'year' => $year
                     ])
                 );
-
                 break;
 
             case NavigationSelector::STANDARDISEDTEST_KEY:
@@ -135,7 +130,6 @@ class Controller extends Base
                         'year' => $year
                     ])
                 );
-
                 break;
 
             case NavigationSelector::COCURRICULAR_KEY:
@@ -145,7 +139,6 @@ class Controller extends Base
                         'year' => $year
                     ])
                 );
-
                 break;
 
             case NavigationSelector::MYP_KEY:
@@ -155,7 +148,15 @@ class Controller extends Base
                         'year'           => $year,
                     ])
                 );
+                break;
 
+            case NavigationSelector::YEAR11_KEY:
+                $this->response = $this->redirectFound(
+                    $this->routeGenerator->generate('achievementreport.getYear11', [
+                        'externalUserId' => $externalUser['StudentID'],
+                        'year'           => $year,
+                    ])
+                );
                 break;
 
             /* Error state - render an error page and leave it
@@ -168,7 +169,6 @@ class Controller extends Base
                         'errorMessage' => $report['error']
                     ]
                 );
-
                 break;
         }
     }
