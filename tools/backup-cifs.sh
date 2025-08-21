@@ -198,7 +198,7 @@ then
 
 	# Backup SQL
 	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting backup of MySQL DB" >> $logfile;
-	mysqldump --single-transaction --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u $sql_user -p$sql_pass $sql_db 2>>$logfile > $targetdir/$sql_db-$DAY0.sql;
+	mariadb-dump --single-transaction --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u $sql_user -p$sql_pass $sql_db 2>>$logfile > $targetdir/$sql_db-$DAY0.sql;
 	if [ $? -ne 0 ];
 	then
 		echo -e "Error: SQL Backup Failed" >> $logfile;

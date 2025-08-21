@@ -88,7 +88,7 @@ $app    = new class extends CliTool\App {
         $filename = INSTANCE_ID . "_schoolbox_" . date("Y-m-d") . ".sql";
         $filepath = $this->getConfig()->get(ConfigMapper::NAME_BACKUP_DIR) . "/{$filename}";
         exec(
-            "mysqldump --single-transaction -f --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u {$dbUser} \
+            "mariadb-dump --single-transaction -f --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u {$dbUser} \
         -p{$dbPass} -h {$dbHost} {$dbSchema} > {$filepath}"
         );
         exec("gzip {$filepath}");

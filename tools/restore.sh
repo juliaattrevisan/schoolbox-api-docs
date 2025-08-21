@@ -756,7 +756,7 @@ fi
 echo -e "\nStarting restore of the database";
 ## Backup the current DB config separately
 config_table_dump_file=/tmp/"$sqldb"-config-"$(date -I)".sql
-if ! mysqldump --single-transaction --allow-keywords --default-character-set=utf8mb4 -i -e -q -a --skip-extended-insert -c -u "$sqluser" -p"$sqlpasswd" -h "$sqlhost" "$sqldb" config > "$config_table_dump_file"; then
+if ! mariadb-dump --single-transaction --allow-keywords --default-character-set=utf8mb4 -i -e -q -a --skip-extended-insert -c -u "$sqluser" -p"$sqlpasswd" -h "$sqlhost" "$sqldb" config > "$config_table_dump_file"; then
   echo "Unable to backup config table from current database" >&2
   exit 1
 fi

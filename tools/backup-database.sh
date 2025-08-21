@@ -43,7 +43,7 @@ backupdir=`readlink -f $backupdir/../`
 backupfile="$backupdir/$sqlver-`date +%Y-%m-%d_%H-%M-%S`.sql";
 
 mkdir -p $backupdir;
-mysqldump --single-transaction -f --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile 2>&1;
+mariadb-dump --single-transaction -f --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile 2>&1;
 
 echo "Backup of database at version $sqlver located at: $backupfile";
 exit;

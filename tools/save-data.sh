@@ -191,7 +191,7 @@ cleanup_deleted_and_log_files(){
 # Dump database to file
 dump_db_and_restore_vagrant(){
   log "Exporting database";
-  if ! mysqldump --defaults-extra-file=~/.my.cnf --single-transaction -f --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c schoolbox > "$INSTANCE_DATA_DIR"/schoolbox.sql; then
+  if ! mariadb-dump --defaults-extra-file=~/.my.cnf --single-transaction -f --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c schoolbox > "$INSTANCE_DATA_DIR"/schoolbox.sql; then
     error "Error: exporting database failed";
     localise_vagrant;
     restart_services;

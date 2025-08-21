@@ -470,7 +470,7 @@ function empty_schema(){
   done
 
   log "Dropping all database tables..."
-  if ! mysqldump --single-transaction --no-tablespaces --add-drop-table --no-data -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" | grep -e '^DROP \| FOREIGN_KEY_CHECKS' | mariadb -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema"; then
+  if ! mariadb-dump --single-transaction --no-tablespaces --add-drop-table --no-data -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" | grep -e '^DROP \| FOREIGN_KEY_CHECKS' | mariadb -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema"; then
     error "Unable to drop database tables"
     exit 1;
   fi
