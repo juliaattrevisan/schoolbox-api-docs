@@ -4,6 +4,7 @@
  */
 
 import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
+import type { Plan } from "@schoolboxLibrary/Learning/Assessment/templates/participation/js/types/customParticipationTypes";
 import type { MarkScheme, SubmissionErrorStates } from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/markScheme";
 
 // Types for semantic clarity when referring to them later on...
@@ -56,12 +57,7 @@ export type MarkbookClassImplActivityParticipant = {
      * Instead, the markbook popout will load this data when the user asks to create/edit feedback for a quiz or due work
      */
     extraInfo?: ActivityInfoResponsePayload;
-    /** the following are only used the class markbook at the moment: */
-    plan?: {
-        isDynamic: boolean;
-        name: string | null;
-        dueDate: string | null;
-    };
+    plan: Pick<Plan, "isDynamic" | "name" | "dueDate">;
 };
 
 export type MarkbookClassImplActivity = {

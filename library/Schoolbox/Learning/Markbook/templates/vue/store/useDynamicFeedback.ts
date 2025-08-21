@@ -1,5 +1,6 @@
 import { debounce } from "lodash";
-import type { Ref } from "vue";
+import type { Reactive, Ref } from "vue";
+import type { Plan } from "@schoolboxLibrary/Learning/Assessment/templates/participation/js/types/customParticipationTypes";
 
 interface DynamicFeedbackEditableData {
     hrMarkInstructor: Ref<string | null>;
@@ -16,6 +17,7 @@ interface DynamicFeedbackData extends DynamicFeedbackEditableData {
 interface DynamicFeedbackExtraData {
     hasSubmittedResponse: Ref<boolean>;
     hasPublishedFeedback: Ref<boolean>;
+    plan: Reactive<Pick<Plan, "isDynamic" | "name" | "dueDate">>;
 }
 
 interface PostModifyResponsePayload {
@@ -24,6 +26,7 @@ interface PostModifyResponsePayload {
     normalisedMark: number | null;
     humanReadableMark: string | null;
     humanReadableInstructorMark: string | null;
+    plan: Pick<Plan, "isDynamic" | "name" | "dueDate">;
 }
 
 const TIMEOUT_DURATION_MS = 600; // After how many milliseconds should we auto-save user input
@@ -268,6 +271,7 @@ export function useDynamicFeedback(
             toast.timeout({ text: "Feedback published", isSuccess: true });
 
             dataExtra.hasPublishedFeedback.value = true;
+            Object.assign(dataExtra.plan, respData.plan);
 
             /* persist the published data */
             dataPublished.responseId.value = respData.id;

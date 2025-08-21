@@ -416,6 +416,17 @@ class Controller extends Base
             $this->getFeedbackDataSource()->save($feedback);
         }
 
+        /**
+         * We need to retrieve the new plan below, but it won't have been hydrated into $participant yet
+         * Force re-hydration so that we can get the actual plan
+         */
+        $this->participantDataSource->loadParticipationIntoAssessment(
+            $feedback->getAssessable(),
+            $participant->getUser()
+        );
+
+        $plan = $feedback->getAssessable()->getParticipantIfExtant($participant->getUser())->getPlan();
+
         $data = [
             'success' => true,
             'message' => 'OK',
@@ -424,6 +435,11 @@ class Controller extends Base
             'normalisedMark'              => $feedback->getNormalisedMark(),
             'humanReadableMark'           => $feedback->getHumanReadableMark(),
             'humanReadableInstructorMark' => $feedback->getHumanReadableInstructorMark(),
+            'plan' => [
+                'isDynamic' => $plan->getIsDynamic(),
+                'name' => $plan->getName(),
+                'dueDate' => $plan->getDueDate()?->getShort() ?? null,
+            ],
         ];
 
         $this->respond('', $data);

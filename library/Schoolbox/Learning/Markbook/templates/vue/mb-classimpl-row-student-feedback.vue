@@ -116,6 +116,7 @@ function getCellInfo() {
         {
             hasSubmittedResponse: window.Vue.toRef(participant, "hasSubmittedResponse"),
             hasPublishedFeedback: window.Vue.toRef(participant, "hasPublishedFeedback"),
+            plan: window.Vue.reactive(participant.plan),
         },
         {
             route: postFeedback,
