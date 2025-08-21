@@ -19,10 +19,10 @@ import * as imageUploader from "@caspingus/lt/src/authoring/extensions/ui/imageU
  */
 function adjustItemsListHeader() {
     const questionItemsListHeader = document.querySelector(
-        "ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-ui-no-preview",
+        "ul.lrn-author-list-view.lrn-author-list-unstyled.lrn-author-list-divider.lrn-author-ui-no-preview",
     );
     const questionItemsList = document.querySelector(
-        "ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider:not(.lrn-author-ui-no-preview)",
+        "ul.lrn-author-list-view.lrn-author-list-unstyled.lrn-author-list-divider:not(.lrn-author-ui-no-preview)",
     );
 
     if (questionItemsListHeader && questionItemsList) {
