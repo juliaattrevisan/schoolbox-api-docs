@@ -227,7 +227,7 @@ class Cursor implements ICursor
         /* Detect if we needed to filter by Tags
          * This involves a conditional inner join
          */
-        if (\count($this->tagIds)) {
+        if ($this->tagIds && \count($this->tagIds)) {
             $placeholders = Builder::getArrayPlaceholders($this->tagIds, 'tagIds');
             $params = array_merge($params, Builder::getArrayParameters($this->tagIds, 'tagIds'));
 
@@ -261,7 +261,7 @@ class Cursor implements ICursor
 
         /* Filter to a set of authors, if specified
          */
-        if (count($this->authorIds)) {
+        if ($this->tagIds && count($this->authorIds)) {
             $placeholders = Builder::getArrayPlaceholders($this->authorIds, 'authorIds');
             $params = array_merge($params, Builder::getArrayParameters($this->authorIds, 'authorIds'));
 
@@ -312,7 +312,7 @@ class Cursor implements ICursor
 
         /* Filter to a set of states/statuses, if specified
          */
-        if (\count($this->states)) {
+        if ($this->tagIds && \count($this->states)) {
             /* Ensure that the state provided is one of the canonical states we've established
              * so you can't request moments with the status "cat"
              */
