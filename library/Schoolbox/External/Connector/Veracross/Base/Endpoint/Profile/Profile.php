@@ -759,6 +759,14 @@ class Profile implements IStrategy
         $this->log->debug('Prefetching contact info...');
         $contactInfoLookup = $this->contactInfoLookup->generate();
 
+        /* Optionally process profile pics
+         */
+        $photoLookup = null;
+
+        if ($this->includePhoto) {
+            $photoLookup = $this->photoLookup->generate();
+        }
+
         /* Get ready to remember an indexed set of Value Lists for Students
          */
         $staffLookupConverter = new ValueListConverter();
@@ -824,6 +832,19 @@ class Profile implements IStrategy
                     ->setFirstname($firstname)
                     ->setFirstnamePreferred($firstnamePreferred)
                     ->setLastname($lastname);
+
+                /* Find their profile pic and assign it, if applicable
+                 */
+                if ($this->includePhoto) {
+                    $this->log->debug(sprintf(
+                        'Fetching picture for %s %s (%s)',
+                        $staffBaseProfile->getFirstname(),
+                        $staffBaseProfile->getLastname(),
+                        $staffBaseProfile->getExternalId()
+                    ));
+
+                    $this->importPhoto($staffBaseProfile, $photoLookup);
+                }
 
                 /* Then save it
                  */
