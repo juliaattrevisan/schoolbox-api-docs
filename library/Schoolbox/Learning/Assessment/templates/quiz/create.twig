@@ -5,7 +5,7 @@
 
 <fieldset>
     {# ----------------------------------------------------------- #}
-    {# Title #}
+    {# Title and Import #}
     {# ----------------------------------------------------------- #}
     <label class="required" for="title">Title</label>
     <div class="input-group">
@@ -19,6 +19,64 @@
             Import Quiz
         </button>
     </div>
+
+    <div id="importModal" class="reveal-modal" data-reveal>
+        <h2>Import a {{ config.title }} quiz</h2>
+
+        <p>Select a file that has been exported from {{ config.title }} to create a duplicate version of the quiz for modification.</p>
+
+        {% set importRoute = routeLookup('learningQuiz.postImport', {
+            contextId: context.id,
+            contextType: contextType
+        }) %}
+
+        {% if importRoute %}
+            <div id="import-loader" style="display:none">
+                <div class="loader"></div>
+                <p class="text-center">Importing quiz...</p>
+            </div>
+
+            <form id='importForm' method="post" action="{{ importRoute }}" enctype="multipart/form-data">
+                <input type="hidden" name="contextId" value="{{ context.id }}" />
+                <input type="hidden" name="contextType" value="{{ contextType }}" />
+                <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
+
+                <section>
+                    <fieldset class="no-pad">
+                        <div class="small-12 columns no-pad">
+                            <div data-vue-app="file-drop">
+                                <file-drop
+                                    id="quiz-attachment"
+                                    accept="text/xml, application/xml, application/json"
+                                    input-name="attachment"
+                                    required
+                                />
+                            </div>
+                            <script src="{{ CDN_PREFIX }}/js/bundle/fileDrop.js?v={{ config.site_version }}"></script>
+                        </div>
+                    </fieldset>
+                </section>
+                <div class="component-action">
+                    <section>
+                        <button class="button" type="submit">Upload</button>
+                    </section>
+                </div>
+            </form>
+        {% endif %}
+        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+    </div>
+    <script>
+        $(function() {
+            const importForm = document.querySelector("#importForm");
+            const importLoader = document.querySelector("#import-loader");
+
+            // show the loader on successful submission (valid file)
+            importForm.addEventListener("submit", function(event) {
+                importForm.style.display = "none";
+                importLoader.style.display = "block";
+            });
+        });
+    </script>
 
     {# ----------------------------------------------------------- #}
     {# Work Type #}
