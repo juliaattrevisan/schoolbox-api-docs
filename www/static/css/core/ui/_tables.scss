@@ -145,7 +145,7 @@ table {
         }
     }
     .profile-cell {
-        min-width: 180px !important; /* 180px matches 'left' value used when making next column sticky for purpose of horizontal scrolling. */
+        min-width: 200px !important; /* 200px matches 'left' value used when making next column sticky for purpose of horizontal scrolling. */
         padding: 0;
 
         .card img {
@@ -363,7 +363,7 @@ $rotate-span-width: 11rem;
 
     th.fixed-left:nth-child(2) {
         @media #{$medium-up} {
-            left: 180px; /* 180px to match width of a .profile-cell table cell. */
+            left: 200px; /* 200px to match width of a .profile-cell table cell. */
         }
     }
 

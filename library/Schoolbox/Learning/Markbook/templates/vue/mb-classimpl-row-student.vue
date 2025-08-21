@@ -42,7 +42,7 @@ const isFaded = window.Vue.computed(() => {
             <div class="c-card">
                 <div class="l-flex-row l-gap-m l-pad-s">
                     <user-photo v-if="!mbStore.isDegraded" :user="student" render="small" rounded-corners />
-                    <div class="l-flex-col l-flex--justify-center f-no-margins">
+                    <div class="l-flex-col l-flex--justify-center f-no-margins profile-cell-clip">
                         <a :href="`/search/user/${student.id}`" title="View Profile">
                             {{ student.lastName }}, {{ student.givenName }}
                         </a>
