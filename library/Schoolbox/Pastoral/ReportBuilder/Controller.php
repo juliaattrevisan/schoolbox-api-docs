@@ -570,7 +570,7 @@ class Controller extends Base
         } catch (\Exception | \ValueError $e) {
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($e->getCode());
-            $this->response = $this->responseAsJson($problem->asArray());
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus(400);
         }
     }
 
