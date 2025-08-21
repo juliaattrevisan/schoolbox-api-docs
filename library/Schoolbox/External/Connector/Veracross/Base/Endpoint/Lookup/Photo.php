@@ -79,7 +79,7 @@ class Photo
                 /* Avengers Assemble!
                  */
                 foreach ($page['data'] as $record) {
-                    $externalId = trim((string)$record['id']);
+                    $externalId = trim((string)$record['person_id']);
 
                     /* Only import for specific users
                      */

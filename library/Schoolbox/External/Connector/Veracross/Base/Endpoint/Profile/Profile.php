@@ -845,6 +845,11 @@ class Profile implements IStrategy
     {
         $externalId = $baseProfile->getExternalId();
 
+        if (null !== ($photoLookup[$externalId] ?? null)) {
+            print_r($photoLookup[$externalId]);
+            die();
+        }
+
         echo 'test';
     }
 }
