@@ -379,8 +379,11 @@ class Controller extends WebController\Base
                                                         'responseId'   => $marks['draft']['responseId'] ?? null,
                                                     ],
                                                 ],
-                                                /* unused on the course markbook: */
-                                                // 'plan' => ...,
+                                                'plan' => [
+                                                    'isDynamic' => $participant->getPlan()->getIsDynamic(),
+                                                    'name' => $participant->getPlan()->getName(),
+                                                    'dueDate' => $participant->getPlan()->getDueDate()?->getShort() ?? null,
+                                                ],
                                             ];
                                         }
                                     ),
