@@ -104,19 +104,26 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
-        $queryString = "SELECT b.id FROM badge b WHERE deleted_at IS NOT NULL";
-        $params      = [];
+        // Select all search_index rows linked to deleted badges.
+        $queryString = '
+            SELECT si.identifier AS id, si.type
+            FROM search_index si
+            JOIN badge b ON si.identifier = b.id
+            WHERE si.type = "' . Hydrator::BASE_TYPE . '"
+            AND b.deleted_at IS NOT NULL
+        ';
+        $params = [];
         if ($fromDate) {
-            $queryString        .= ' AND b.deleted_at >= :fromDate';
+            $queryString .= ' AND b.deleted_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString      .= ' AND b.deleted_at <= :toDate';
+            $queryString .= ' AND b.deleted_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
             if (!$this->accepts($subject, BuildType::DELETE)) {
-                return;
+                return null;
             }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::DELETE, $queryString, $params);
         }

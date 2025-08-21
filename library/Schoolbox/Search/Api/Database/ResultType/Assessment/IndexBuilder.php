@@ -170,54 +170,26 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
-        $queryString = "
-            SELECT
-                assessment.id,
-                CONCAT(
-                    '" . Hydrator::BASE_TYPE . ".',
-                    COALESCE(
-                        IF(task.id, '" . AssessmentType::TYPE_TASK . "', NULL),
-                        IF(assess.assessment_id, '" . AssessmentType::TYPE_QUIZ . "', NULL),
-                        IF(lti_assessment.assessment_id, '" . AssessmentType::TYPE_LTI_ASSESSMENT . "', NULL),
-                        IF(submission_box.id, '" . AssessmentType::TYPE_DUE_WORK . "', NULL),
-                        IF(project.id, '" . AssessmentType::TYPE_PROJECT . "', NULL),
-                        IF(lesson_plan.id, '" . AssessmentType::TYPE_LESSON_PLAN . "', NULL)
-                    )
-                ) AS type
-            FROM mv_assessment_relation
-            JOIN assessment ON mv_assessment_relation.assessment_id = assessment.id
-            LEFT JOIN project ON (
-                assessment.id=project.assessment_id
-            )
-            LEFT JOIN lti_assessment ON (
-                assessment.id = lti_assessment.assessment_id
-            )
-            LEFT JOIN submission_box ON (
-                assessment.id = submission_box.assessment_id
-            )
-            LEFT JOIN task ON (
-                task.assessment_id = assessment.id
-            )
-            LEFT JOIN assess ON (
-                assess.assessment_id = assessment.id
-            )
-            LEFT JOIN lesson_plan ON (
-                lesson_plan.assessment_id = assessment.id
-            )
-            WHERE assessment.deleted_at IS NOT NULL
-        ";
+        // Select all search_index rows linked to deleted assessments.
+        $queryString = '
+            SELECT search_index.identifier AS id, search_index.type
+            FROM search_index
+            JOIN assessment ON search_index.identifier = assessment.id
+            WHERE search_index.type like "' . Hydrator::BASE_TYPE . '%"
+            AND assessment.deleted_at IS NOT NULL
+        ';
         $params = [];
         if ($fromDate) {
-            $queryString        .= ' AND assessment.deleted_at >= :fromDate';
+            $queryString .= ' AND assessment.deleted_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString      .= ' AND assessment.deleted_at <= :toDate';
+            $queryString .= ' AND assessment.deleted_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
             if (!$this->accepts($subject, BuildType::DELETE)) {
-                return;
+                return null;
             }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::DELETE, $queryString, $params);
         }
@@ -225,10 +197,6 @@ class IndexBuilder extends BaseBuilder
         $query->execute($params);
         $this->logger->info(sprintf('Deleting search indices for %d assessments', $query->rowCount()));
         foreach ($query as $row) {
-            // Somehow this row has no type?
-            if (!isset($row['type'])) {
-                continue;
-            }
             yield $this->buildIndex(
                 (string)$row['id'],
                 null,

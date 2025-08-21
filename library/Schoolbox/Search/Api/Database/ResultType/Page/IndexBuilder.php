@@ -156,14 +156,13 @@ class IndexBuilder extends BaseBuilder
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         // Pass 1: delete all indices for deleted folders
-        $queryString = "
-            SELECT
-                f.id,
-                " . $this->buildTypeExpression() . " AS type
-            FROM folder f
-            " . $this->getJoinsFromFolderForTypeExpression() . "
-            WHERE f.deleted_at IS NOT NULL
-        ";
+        $queryString = '
+            SELECT si.identifier AS id, si.type
+            FROM search_index si
+            JOIN folder f ON si.identifier = f.id
+            WHERE si.type like "' . Hydrator::BASE_TYPE . '%"
+            AND f.deleted_at IS NOT NULL
+        ';
         $params = [];
         if ($fromDate) {
             $queryString .= ' AND f.deleted_at >= :fromDate';
@@ -175,7 +174,7 @@ class IndexBuilder extends BaseBuilder
         }
         if ($subject) {
             if (!$this->accepts($subject, BuildType::DELETE)) {
-                return;
+                return null;
             }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::DELETE, $queryString, $params);
         }
@@ -199,14 +198,15 @@ class IndexBuilder extends BaseBuilder
         // Required so that if, e.g. a homepage template is added to a folder,
         // the folder's previous "page.folder" index is deleted whilst
         // preserving its "page.homepage" index.
-        $queryString = "
-            SELECT
-                f.id,
-                " . $this->buildTypeExpression() . " AS type
-            FROM folder f
-            " . $this->getJoinsFromFolderForTypeExpression() . "
-            WHERE f.deleted_at IS NULL
-        ";
+        $queryString = '
+            SELECT si.identifier AS id, si.type AS typeFromIndex, ' . $this->buildTypeExpression() . ' AS typeFromFolder
+            FROM search_index si
+            JOIN folder f ON si.identifier = f.id
+            ' . $this->getJoinsFromFolderForTypeExpression() . '
+            WHERE si.type like "' . Hydrator::BASE_TYPE . '%"
+            HAVING typeFromIndex <> typeFromFolder
+        ';
+
         $params = [];
         if ($fromDate) {
             $queryString .= ' AND f.updated_at >= :fromDate';
@@ -221,21 +221,17 @@ class IndexBuilder extends BaseBuilder
         }
         $query = $this->connector->prepareQuery($queryString);
         $query->execute($params);
-        $this->logger->info(sprintf('Deleting search indices for %d pages/folders', $query->rowCount()));
+        $this->logger->info(sprintf('Deleting search indices for %d pages/folders (mismatched types)', $query->rowCount()));
         foreach ($query as $row) {
-            foreach (Hydrator::SUB_TYPES as $subType) {
-                if ($subType !== $row['type']) {
-                    yield $this->buildIndex(
-                        (string)$row['id'],
-                        null,
-                        $subType,
-                        null,
-                        false,
-                        null,
-                        null,
-                    );
-                }
-            }
+            yield $this->buildIndex(
+                (string)$row['id'],
+                null,
+                $row['typeFromIndex'],
+                null,
+                false,
+                null,
+                null,
+            );
         }
     }
 

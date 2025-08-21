@@ -272,7 +272,7 @@ class IndexBuilder extends BaseBuilder
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
         if ($subject !== null && !$this->accepts($subject, BuildType::DELETE)) {
-            return;
+            return null;
         }
 
         // Examine and clean up every search index for textboxes
@@ -295,7 +295,7 @@ class IndexBuilder extends BaseBuilder
             $searchIndexQueryString .= ' AND identifier LIKE :componentIdentifier';
             $searchIndexParams['componentIdentifier'] = '%-' . $subject->getInstanceId() . '-%';
         } elseif ($subject !== null) { // Note $subject will be null when this is run from tools/search/buildIndex.php
-            return;
+            return null;
         }
         $searchIndexQuery = $this->connector->prepareQuery($searchIndexQueryString);
 

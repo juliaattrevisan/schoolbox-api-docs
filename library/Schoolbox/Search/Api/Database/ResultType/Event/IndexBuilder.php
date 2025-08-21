@@ -106,23 +106,26 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
-        $queryString = "SELECT
-            e.id
-            FROM event e
-            WHERE e.deleted_at IS NOT NULL
-        ";
-        $params       = [];
+        // Select all search_index rows linked to deleted events.
+        $queryString = '
+            SELECT si.identifier AS id, si.type
+            FROM search_index si
+            JOIN event e ON si.identifier = e.id
+            WHERE si.type = "' . Hydrator::BASE_TYPE . '"
+            AND e.deleted_at IS NOT NULL
+        ';
+        $params = [];
         if ($fromDate) {
-            $queryString        .= ' AND e.deleted_at >= :fromDate';
+            $queryString .= ' AND e.deleted_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString      .= ' AND e.deleted_at <= :toDate';
+            $queryString .= ' AND e.deleted_at <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
             if (!$this->accepts($subject, BuildType::DELETE)) {
-                return;
+                return null;
             }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::DELETE, $queryString, $params);
         }

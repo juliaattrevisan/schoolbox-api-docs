@@ -119,12 +119,16 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
-        $queryString = "SELECT
-            fp.postID as id
-            FROM forumThread ft
-            LEFT JOIN forumPost fp ON fp.threadID = ft.threadID
-            WHERE COALESCE(fp.deleted_at, ft.deleted_at) IS NOT NULL
-        ";
+        // Select all search_index rows linked to deleted forum posts.
+        // Note if the parent forumThread is deleted, the forumPost is considered to be deleted also regardless of its own deleted_at value.
+        $queryString = '
+            SELECT si.identifier AS id, si.type
+            FROM search_index si
+            JOIN forumPost fp ON si.identifier = fp.postID
+            JOIN forumThread ft ON fp.threadID = ft.threadID
+            WHERE si.type = "' . Hydrator::BASE_TYPE . '"
+            AND COALESCE(fp.deleted_at, ft.deleted_at) IS NOT NULL
+        ';
         $params = [];
         if ($fromDate) {
             $queryString .= ' AND COALESCE(fp.deleted_at, ft.deleted_at) >= :fromDate';
@@ -136,7 +140,7 @@ class IndexBuilder extends BaseBuilder
         }
         if ($subject) {
             if (!$this->accepts($subject, BuildType::DELETE)) {
-                return;
+                return null;
             }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::DELETE, $queryString, $params);
         }

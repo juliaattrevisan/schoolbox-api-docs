@@ -191,7 +191,7 @@ class IndexBuilder extends BaseBuilder
         ?object $subject
     ): iterable {
         if ($subject !== null && !$this->accepts($subject, BuildType::DELETE)) {
-            return;
+            return null;
         }
 
         // Examine and clean up every search index for tiles.
@@ -217,7 +217,7 @@ class IndexBuilder extends BaseBuilder
             $searchIndexQueryString .= ' AND identifier LIKE :componentIdentifier';
             $searchIndexParams['componentIdentifier'] = '%-' . $subject->getId();
         } elseif ($subject !== null) { // Note $subject will be null when this is run from tools/search/buildIndex.php
-            return;
+            return null;
         }
         $searchIndexQuery = $this->connector->prepareQuery($searchIndexQueryString);
 
