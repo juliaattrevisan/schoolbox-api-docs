@@ -105,8 +105,8 @@ export default {
          *                     constructor.
          */
         renderFormattedDatetimes(datetime) {
-            let now        = dayjs(),
-                date       = dayjs(datetime),
+            let now = dayjs(),
+                date = dayjs(datetime),
                 dateFormat = this.dateOnly ? this.dateDisplayFormats.dayjs : this.dateDisplayFormats.dayjsDatetime;
 
             let struct = {
@@ -125,7 +125,7 @@ export default {
             // Standard diff format:
             // Just output days, with "today", "yesterday" or "tomorrow" if
             // appropriate.
-            let dayDiff = date.diff(now.startOf('d'), "d");
+            let dayDiff = date.diff(now.startOf("d"), "d");
 
             /* We determine a relative time equivalence based on how different
              * $datetime was, compared to today. Anything outside the (-1, 1) range
