@@ -23,7 +23,7 @@ cd /usr/share/schoolbox/tools;
 ./create-data-dirs.sh /var/lib/schoolbox;
 
 echo "$vag Updating timezone data";
-mysql_tzinfo_to_sql /usr/share/zoneinfo | mariadb -u root -ptnp879 mysql;
+mariadb-tzinfo-to-sql /usr/share/zoneinfo | mariadb -u root -ptnp879 mysql;
 
 echo "$vag Removing current Schoolbox MySQL database";
 mariadb -u root -ptnp879 -e "SET MAX_STATEMENT_TIME=0; DROP DATABASE IF EXISTS schoolbox";

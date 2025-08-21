@@ -158,7 +158,7 @@ $app    = new class extends CliTool\App {
         $this->setOTFSCredentials();
         $this->buildS3Client();
         $this->createBackupDirectoriesInS3();
-        $this->getLogger()->info("Backing up MySQL database for " . INSTANCE_ID);
+        $this->getLogger()->info("Backing up MariaDB database for " . INSTANCE_ID);
         [$filename, $filepath] = $this->generateDailyBackup();
         $this->getLogger()->info("Uploading daily backup to S3 bucket.");
         $this->uploadFileToS3(self::DAILY_PREFIX . $filename, $filepath);
