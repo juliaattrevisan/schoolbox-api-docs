@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Editor\Templates;
 
 use Alaress\Web\Controller\Base;
+use PSpell\Config;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Editor\Templates\Category\ModelToArray;
 use Schoolbox\Admin\Editor\Templates\Category\Model as CategoryModel;
@@ -50,10 +51,10 @@ class Controller extends Base
 
         // Define which categories require which config settings to be enabled
         $categoryConfigMap = [
-            'badge-evidence' => 'editor_templates_badge_evidence_enabled',
-            'feedback' => 'editor_templates_feedback_enabled',
-            'learning-activity' => 'editor_templates_learning_activity_enabled',
-            'learning-moments' => 'editor_templates_learning_moments_enabled',
+            'badge-evidence' => ConfigMapper::NAME_BADGES_ENABLED,
+            'feedback' => ConfigMapper::NAME_LMS_ENABLED,
+            'learning-activity' => ConfigMapper::NAME_LMS_ENABLED,
+            'learning-moments' => ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED,
         ];
 
         // Filter out categories where the feature is disabled
