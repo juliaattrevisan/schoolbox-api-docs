@@ -90,12 +90,6 @@ config:
   report_staff_access: { hide: false }
   parent_directory_enabled: { edit: true }
 
-  #Editor templates
-  editor_templates_badge_evidence_enabled: {hide: true}
-  editor_templates_feedback_enabled: {hide: false}
-  editor_templates_learning_activity_enabled: {hide: true}
-  editor_templates_learning_moments_enabled: {hide: false}
-
   # APIs
   weather_api_key: { hide: true }
   googledrive_enabled: { hide: false }
