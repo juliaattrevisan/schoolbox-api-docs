@@ -157,16 +157,6 @@
             </h1>
          </div>
      </div>
-     {% if assessment is defined and assessment is quiz %}
-     <nav>
-         <sbx-pop-out content-id="header-options"></sbx-pop-out>
-     </nav>
-     <ul id="header-options" class="f-dropdown" data-dropdown-content="" aria-hidden="true">
-         <li>
-             <a class="icon-upload" title="Import a quiz and its contents from a file you uploaded" data-reveal-id="importModal">Import quiz</a>
-         </li>
-     </ul>
-     {% endif %}
 </div>
 
 {% if participants ?? [] is not empty %}

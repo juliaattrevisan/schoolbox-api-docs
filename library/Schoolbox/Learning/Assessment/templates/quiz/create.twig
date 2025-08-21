@@ -8,7 +8,17 @@
     {# Title #}
     {# ----------------------------------------------------------- #}
     <label class="required" for="title">Title</label>
-    <input type="text" name="title" id="title" value="{{ assessment.title }}" required maxlength="255"/>
+    <div class="input-group">
+        <input type="text" name="title" id="title" value="{{ assessment.title }}" required maxlength="255"/>
+        <button
+            type="button"
+            class="button icon-upload"
+            title="Import a quiz and its contents from a file you uploaded"
+            data-reveal-id="importModal"
+        >
+            Import Quiz
+        </button>
+    </div>
 
     {# ----------------------------------------------------------- #}
     {# Work Type #}
