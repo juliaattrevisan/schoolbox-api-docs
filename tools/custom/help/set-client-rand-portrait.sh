@@ -54,11 +54,11 @@ set_image() {
   sql_pass=$(schoolbox-read-instances --option SQL_passwd)
   sql_db=$(schoolbox-read-instances --option SQL_db)
 
-  for i in $(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -BNe "SELECT synergy_id FROM user WHERE group_id in ('6','7','8','13') AND synergy_id IS NOT NULL AND synergy_id != ''" 2>/dev/null); do
+  for i in $(mariadb -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -BNe "SELECT synergy_id FROM user WHERE group_id in ('6','7','8','13') AND synergy_id IS NOT NULL AND synergy_id != ''" 2>/dev/null); do
     rand=$((RANDOM % ${#hashes[@]} + 1))
     hash=${hashes[$rand]}
     log "setting profile image for user $i as $hash"
-    if [[ ! $(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -BNe "UPDATE user SET portrait_hash = '$hash' WHERE synergy_id = '$i'") ]]; then
+    if [[ ! $(mariadb -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -BNe "UPDATE user SET portrait_hash = '$hash' WHERE synergy_id = '$i'") ]]; then
       error "Couldn't set image for user $i"
     fi
   done

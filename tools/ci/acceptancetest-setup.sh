@@ -22,7 +22,7 @@ rabbitmqctl add_user schoolbox schoolbox
 rabbitmqctl add_vhost schoolbox
 rabbitmqctl set_permissions -p schoolbox schoolbox ".*" ".*" ".*"
 
-mysql schoolbox -e "UPDATE config SET value = 'schoolbox' WHERE name IN ('amqp_user', 'amqp_pass', 'amqp_vhost', 'site_hostname')"
+mariadb schoolbox -e "UPDATE config SET value = 'schoolbox' WHERE name IN ('amqp_user', 'amqp_pass', 'amqp_vhost', 'site_hostname')"
 
 service rabbitmq-server restart
 

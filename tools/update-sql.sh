@@ -145,7 +145,7 @@ execute_upgrade_script(){
   log "Starting script: $script"
   if [[ $script == *".sql" ]]; then
     # Check for and report errors
-    if ! (echo 'SET MAX_STATEMENT_TIME=0; '; cat "$script") | mysql  -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db"; then
+    if ! (echo 'SET MAX_STATEMENT_TIME=0; '; cat "$script") | mariadb  -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db"; then
       error "Error running update: $script"
       error_int=1;
       error_msg="$error_msg,$script";
@@ -186,7 +186,7 @@ execute_upgrade_scripts(){
     done
 
     # Update the config table to show current release version
-    mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -e "UPDATE \`config\` SET value='$release' WHERE name='site_version';";
+    mariadb -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -e "UPDATE \`config\` SET value='$release' WHERE name='site_version';";
   done
 }
 
@@ -250,7 +250,7 @@ set_site_package(){
     package_version=$(dpkg -s schoolbox | grep Version | awk '{print $2}')
   fi
   log "Setting 'site_package' to '$package_version'"
-  mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -e "UPDATE config SET value = '$package_version' WHERE name = 'site_package';"
+  mariadb -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -e "UPDATE config SET value = '$package_version' WHERE name = 'site_package';"
 }
 
 
@@ -266,7 +266,7 @@ main(){
   # Build update version list, derive latest version, collect current SQL version
   version_list=$(find /usr/share/schoolbox/updates -mindepth 1 -maxdepth 1 -type d -printf %f\\n | sort -V)
   new_ver=$(echo "$version_list" | tail -n 1)
-  sql_ver=$(mysql -u "$sql_user" -p"$sql_pass" -h "$sql_host" "$sql_db" -e "SELECT value FROM config WHERE name='site_version' \G;" | grep 'value' | cut -d' ' -f2);
+  sql_ver=$(mariadb -u "$sql_user" -p"$sql_pass" -h "$sql_host" "$sql_db" -e "SELECT value FROM config WHERE name='site_version' \G;" | grep 'value' | cut -d' ' -f2);
   check_sql_versions "$new_ver" "$sql_ver"
 
   # Determine first release to apply

@@ -88,7 +88,7 @@ $app    = new class extends CliTool\App {
         $filename = INSTANCE_ID . "_schoolbox_" . date("Y-m-d") . ".sql";
         $filepath = $this->getConfig()->get(ConfigMapper::NAME_BACKUP_DIR) . "/{$filename}";
         exec(
-            "mysqldump --single-transaction -f --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u {$dbUser} \
+            "mariadb-dump --single-transaction -f --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u {$dbUser} \
         -p{$dbPass} -h {$dbHost} {$dbSchema} > {$filepath}"
         );
         exec("gzip {$filepath}");
@@ -158,7 +158,7 @@ $app    = new class extends CliTool\App {
         $this->setOTFSCredentials();
         $this->buildS3Client();
         $this->createBackupDirectoriesInS3();
-        $this->getLogger()->info("Backing up MySQL database for " . INSTANCE_ID);
+        $this->getLogger()->info("Backing up MariaDB database for " . INSTANCE_ID);
         [$filename, $filepath] = $this->generateDailyBackup();
         $this->getLogger()->info("Uploading daily backup to S3 bucket.");
         $this->uploadFileToS3(self::DAILY_PREFIX . $filename, $filepath);

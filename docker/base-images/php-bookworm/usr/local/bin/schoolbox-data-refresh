@@ -307,11 +307,11 @@ export_sql_credentials(){
 function fetch_old_su_password() {
   # If a new install, this table won't exist.
   local table_count;
-  table_count=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" -ss -e "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$sql_schema' AND TABLE_NAME = 'user'")
+  table_count=$(mariadb -h "$sql_host" -u "$sql_user" -p"$sql_passwd" -ss -e "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$sql_schema' AND TABLE_NAME = 'user'")
 
   # If table exists, fetch password hash
   if [[ $table_count == 1 ]]; then
-    su_password_hash=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e 'SELECT password FROM user WHERE username = "alaress" LIMIT 1')
+    su_password_hash=$(mariadb -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e 'SELECT password FROM user WHERE username = "alaress" LIMIT 1')
   fi
 }
 
@@ -319,7 +319,7 @@ function fetch_old_su_password() {
 function fetch_existing_config() {
   # If a new install, this table won't exist.
   local table_count;
-  table_count=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" -ss -e "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$sql_schema' AND TABLE_NAME = 'config'")
+  table_count=$(mariadb -h "$sql_host" -u "$sql_user" -p"$sql_passwd" -ss -e "SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = '$sql_schema' AND TABLE_NAME = 'config'")
 
   # If table exists, fetch existing config
   if [[ $table_count == 1 ]]; then
@@ -328,7 +328,7 @@ function fetch_existing_config() {
       # Only fetch from DB if not already provided as CLI arg
       if [[ ! -v "config[$config_name]" ]]; then
         # Need to distinguish NULL and 'NULL' (string)
-        config_value_and_isnull=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e "SELECT value, value IS NULL FROM config WHERE name = '$config_name' LIMIT 1")
+        config_value_and_isnull=$(mariadb -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e "SELECT value, value IS NULL FROM config WHERE name = '$config_name' LIMIT 1")
         IFS=$'\t' read -r -a array <<< "$config_value_and_isnull"
         config_value=${array[0]}
         is_null=${array[1]}
@@ -462,15 +462,15 @@ set_ownership_and_permissions(){
 # Drop all database views and tables
 function empty_schema(){
   log "Dropping all database views..."
-  for db_view in $(mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e 'SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE LIKE "VIEW"'); do
-    if ! mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -e "SET MAX_STATEMENT_TIME=0; DROP view $db_view"; then
+  for db_view in $(mariadb -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e 'SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_TYPE LIKE "VIEW"'); do
+    if ! mariadb -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -e "SET MAX_STATEMENT_TIME=0; DROP view $db_view"; then
       error "Unable to drop database view: $db_view"
       error 1;
     fi
   done
 
   log "Dropping all database tables..."
-  if ! mysqldump --single-transaction --no-tablespaces --add-drop-table --no-data -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" | grep -e '^DROP \| FOREIGN_KEY_CHECKS' | mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema"; then
+  if ! mariadb-dump --single-transaction --no-tablespaces --add-drop-table --no-data -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" | grep -e '^DROP \| FOREIGN_KEY_CHECKS' | mariadb -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema"; then
     error "Unable to drop database tables"
     exit 1;
   fi
@@ -481,7 +481,7 @@ function empty_schema(){
 function import_dataset(){
   local instance_data_dir=$1
   log "Loading dataset into database schema '$sql_schema'..."
-  if ! (echo "SET MAX_STATEMENT_TIME=0; "; pv "$instance_data_dir"/schoolbox.sql) | sed -E "s/^\/\*\!50013 DEFINER=.+\*\//\/\* Fallback to default DEFINER \*\//g" | mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema"; then
+  if ! (echo "SET MAX_STATEMENT_TIME=0; "; pv "$instance_data_dir"/schoolbox.sql) | sed -E "s/^\/\*\!50013 DEFINER=.+\*\//\/\* Fallback to default DEFINER \*\//g" | mariadb -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema"; then
     error "Unable to import database"
     exit 1;
   fi
@@ -492,7 +492,7 @@ function import_dataset(){
 ## Copy's S3 bucket contents from dataset bucket to this instance's bucket
 #function copy_bucket_contents(){
 #  local bucket_dataset;
-#  bucket_dataset=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e "SELECT value FROM config WHERE name = 'otfs_s3_bucket'")
+#  bucket_dataset=$(mariadb -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e "SELECT value FROM config WHERE name = 'otfs_s3_bucket'")
 #
 #  if [[ -z $bucket_dataset ]]; then
 #    log "Dataset does not have an S3 bucket configured, skipping bucket copy"
@@ -529,7 +529,7 @@ function import_dataset(){
 # 2. After update scripts have finished to populate any new config that did not exist in an old dataset
 function localise_database_config(){
   for key in "${!config[@]}"; do
-    if ! mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -e "UPDATE config SET value=${config[$key]} WHERE name='$key'"; then
+    if ! mariadb -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -e "UPDATE config SET value=${config[$key]} WHERE name='$key'"; then
       error "Unable to set config '$key' to ${config[$key]}"
       exit 1;
     fi
@@ -540,7 +540,7 @@ function localise_database_config(){
 # Restore the SU password hash we captured earlier
 function restore_su_password() {
   if [[ -n $su_password_hash ]]; then
-    if mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -e "UPDATE user SET password = '$su_password_hash' WHERE username = 'alaress'"; then
+    if mariadb -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -e "UPDATE user SET password = '$su_password_hash' WHERE username = 'alaress'"; then
       log "Password hash for 'alaress' user restored to '$su_password_hash'"
     else
       error "Error. Unable to restore alaress user password hash to '$su_password_hash'"
@@ -588,7 +588,7 @@ function create_data_dirs(){
     local data_dir_value="${instance_data_dir}/${data_dir_map[$data_dir_name]}"
     log "Setting data_dir '$data_dir_name' => '$data_dir_value'"
     sql_cmd="UPDATE config SET value = '$data_dir_value' WHERE name = '$data_dir_name'"
-    if ! mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e "$sql_cmd"; then
+    if ! mariadb -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e "$sql_cmd"; then
       error "Unable to set '$data_dir_value' to '$data_dir_name'"
       exit 1
     fi
@@ -603,7 +603,7 @@ set_site_package(){
     package_version=$(dpkg -s schoolbox | grep Version | awk '{print $2}')
   fi
   log "Setting 'site_package' to '$package_version'"
-  mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -e "UPDATE config SET value = '$package_version' WHERE name = 'site_package';"
+  mariadb -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -e "UPDATE config SET value = '$package_version' WHERE name = 'site_package';"
 }
 
 
@@ -677,10 +677,10 @@ function refresh_binding_cache(){
 
 # Fetch 'data_dirs_defaults' from config table, falling back to sane values if not found
 function get_data_dirs_defaults_config(){
-  data_dirs_config=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e "SELECT value from config WHERE name = 'data_dirs_defaults'")
+  data_dirs_config=$(mariadb -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e "SELECT value from config WHERE name = 'data_dirs_defaults'")
   if [[ -z $data_dirs_config ]]; then
     local sql_version;
-    sql_version=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e "SELECT value from config WHERE name = 'site_version'")
+    sql_version=$(mariadb -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e "SELECT value from config WHERE name = 'site_version'")
     local message="Data dir default config not found or empty. SQL version: $sql_version"
     if [[ "$(echo -e "20.1.7\n${sql_version}" | sort -V | head -n 1)" == "20.1.7" ]]; then
       error "$message"
@@ -703,7 +703,7 @@ set_log_dir(){
   chown -c www-data:www-data "$log_dir_value"
   log "Setting logging directory => '$log_dir_value'"
   sql_cmd="UPDATE config SET value = '$log_dir_value' WHERE name = 'logs_dir'"
-  if ! mysql -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e "$sql_cmd"; then
+  if ! mariadb -h "$sql_host" -u "$sql_user" -p"$sql_passwd" "$sql_schema" -ss -e "$sql_cmd"; then
     error "Unable to set 'logs_dir' to '$log_dir_value'"
     exit 1
   fi

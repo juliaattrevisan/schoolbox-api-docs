@@ -60,7 +60,7 @@ $app = new class extends CliTool\App {
             } catch (\Alaress\Database\Exception $e) {
                 throw new PDOException("Database is not connected", 0, $e);
             }
-            $d->notice('MySQL is online', array('char' => '+'));
+            $d->notice('MariaDB is online', array('char' => '+'));
 
             try {
                 // test redis cache is online
@@ -98,13 +98,13 @@ $app = new class extends CliTool\App {
             if (!$d instanceof Logger && class_exists(Logger::class)) {
                 $d = $this->getLogger();
             }
-            $msg = 'MySQL is offline: cannot read Redis or RabbitMQ config';
+            $msg = 'MariaDB is offline: cannot read Redis or RabbitMQ config';
             if ($d instanceof Logger) {
                 $d->alert($msg);
             } else {
                 fwrite(STDERR, $msg);
             }
-            $errors = array('MySQL', 'Redis', 'RabbitMQ');
+            $errors = array('MariaDB', 'Redis', 'RabbitMQ');
             $mail = false;
         }
 

@@ -227,7 +227,7 @@ function upgrade_instances(){
       sql_host=$(INSTANCE_ID="$i" schoolbox-read-instances --option SQL_host);
       sql_schema=$(INSTANCE_ID="$i" schoolbox-read-instances --option SQL_db);
 
-      if ! saml_public_cert=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -BNe "SELECT value FROM config WHERE name='saml_public_cert'"); then
+      if ! saml_public_cert=$(mariadb -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -BNe "SELECT value FROM config WHERE name='saml_public_cert'"); then
         error "Unable to fetch 'saml_public_cert' from database" >> "$instance_log_file" 2>&1
       else
         saml_check=$(echo "$saml_public_cert" | sed "s/\\\\n/\n/g" | openssl x509 -noout >/dev/null 2>&1);

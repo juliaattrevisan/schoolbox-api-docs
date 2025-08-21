@@ -205,7 +205,7 @@ function check_script_overlap() {
     log "Bypassing lock: concurrent executions of this script will not be prevented.";
     return;
   fi
-  stream_dir=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -ss -e "SELECT value from config WHERE name = 'stream_dir'");
+  stream_dir=$(mariadb -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -ss -e "SELECT value from config WHERE name = 'stream_dir'");
   lock_file=$stream_dir/config-data-dirs.lock;
   if ! $LOCKFILE_INSPECTOR --lockfile "$lock_file" --include-args; then
     if ! type mail &> /dev/null; then
@@ -222,7 +222,7 @@ function check_script_overlap() {
 function parse_available_data_dirs(){
   local data_dirs_config;
 
-  data_dirs_config=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -ss -e "SELECT value from config WHERE name = 'data_dirs_defaults'")
+  data_dirs_config=$(mariadb -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -ss -e "SELECT value from config WHERE name = 'data_dirs_defaults'")
   debug "Data dir defaults: '$data_dirs_config'"
   IFS=';' read -r -a array <<< "$data_dirs_config"
   for element in "${array[@]}"; do
@@ -304,8 +304,8 @@ function derive_data_dirs() {
 function update_directories(){
   for data_dir in ${data_dirs[*]}; do
     local dir_path;
-    if ! dir_path=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -ss -e "SELECT value from config WHERE name = '$data_dir'"); then
-      error "Unable to execute mysql command to fetch path for data dir '$data_dir'"
+    if ! dir_path=$(mariadb -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -ss -e "SELECT value from config WHERE name = '$data_dir'"); then
+      error "Unable to execute mariadb command to fetch path for data dir '$data_dir'"
     elif [[ -z $dir_path ]]; then
       warn "No path set for data dir '$data_dir'. Either config name does not exist, or config value is empty. Skipping."
     else

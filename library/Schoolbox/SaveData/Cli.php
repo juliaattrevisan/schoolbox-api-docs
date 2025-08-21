@@ -256,7 +256,7 @@ HELP;
         }
         $this->getLogger()->info("dumping db to $directory/$filename");
         $dumpcmd = sprintf(
-            "mysqldump --single-transaction -f --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -h %s -u %s -p%s %s > %s/%s",
+            "mariadb-dump --single-transaction -f --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -h %s -u %s -p%s %s > %s/%s",
             SQL_host,
             SQL_user,
             SQL_passwd,
@@ -266,7 +266,7 @@ HELP;
         );
         exec($dumpcmd, $output, $code);
         if ($code !== 0) {
-            throw new RuntimeException("mysqldump failed");
+            throw new RuntimeException("mariadb-dump failed");
         }
     }
 
