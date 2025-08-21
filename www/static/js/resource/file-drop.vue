@@ -19,6 +19,11 @@ interface Props {
      */
     inputName?: string;
     /**
+     * Should the input field be required?
+     * This is only useful if inputName is specified and this is being used as a HTML form input
+     */
+    required?: boolean;
+    /**
      * The disabled state is intended to be used only when currentFile has a meaningful value
      * It prevents removing of files to let us show a preview as if it were uploaded
      * Currently this will not visually affect the file drop zone if currentFile is null
@@ -37,6 +42,7 @@ const props = withDefaults(defineProps<Props>(), {
     accept: "*/*",
     class: "l-mar-s--bottom",
     inputName: undefined,
+    required: false,
     disabled: false,
     fileHandler: () => true,
 });
@@ -185,7 +191,14 @@ function handleDrop(event: DragEvent): void {
         </label>
 
         <!-- Always render this hidden input so that forms can access it for validation -->
-        <input :id="props.id" ref="inputRef" type="file" :accept="props.accept" :name="props.inputName" required />
+        <input
+            :id="props.id"
+            ref="inputRef"
+            type="file"
+            :accept="props.accept"
+            :name="props.inputName"
+            :required="props.required || undefined"
+        />
     </div>
 </template>
 
