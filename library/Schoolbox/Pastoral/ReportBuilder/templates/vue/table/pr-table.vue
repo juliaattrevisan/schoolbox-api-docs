@@ -156,7 +156,7 @@ window.Vue.onMounted(() => {
                     @sort="onSort"
                 />
                 <!-- Skeleton loading state when switching between records/rows and sorting -->
-                <loading-table v-if="isMoreLoading" :rows="10" :only-body="true" row-height="4rem" />
+                <loading-table v-if="isMoreLoading" :only-body="true" />
                 <tbody v-else>
                     <!-- Total row -->
                     <pr-table-total-row
