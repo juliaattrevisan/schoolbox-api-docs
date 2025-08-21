@@ -22,10 +22,14 @@ export function getRowKeys(rowData: { [key: string]: RowOptions }): RowKeys {
     // otherwise, check for 'type_subtype' and return its ids if it exists
     const typeSubtype = rowData.type_subtype as TypeSubType;
     if (typeSubtype) {
-        return {
+        const result: RowKeys = {
             "[type][type_id]": typeSubtype.typeId || 0,
-            "[type][subtype_id]": typeSubtype.subtypeId || 0,
         };
+        // Only add subtypeId if it exists
+        if (typeSubtype.subtypeId !== null) {
+            result["[type][subtype_id]"] = typeSubtype.subtypeId;
+        }
+        return result;
     }
     return {};
 }
