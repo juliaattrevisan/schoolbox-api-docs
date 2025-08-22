@@ -111,11 +111,11 @@ class Model implements ISoftDeletable
             'tooltip' => 'This table will display a maximum of 12 weeks of past data, counting back from the most recent record\'s date',
             'type' => 'table',
         ],
-//        Factory::STUDENT_BY_MONTH => [
-//            'label' => 'Student by Month',
-//            'tooltip' => 'This table will display a maximum of 12 months of past data, counting back from the most recent record\'s date',
-//            'type' => 'table',
-//        ],
+        Factory::STUDENT_BY_MONTH => [
+            'label' => 'Student by Month',
+            'tooltip' => 'This table will display a maximum of 12 months of past data, counting back from the most recent record\'s date',
+            'type' => 'table',
+        ],
 //        Factory::STUDENT_BY_WEEK => [
 //            'label' => 'Student by Week',
 //            'tooltip' => 'This table will display a maximum of 12 weeks of past data, counting back from the most recent record\'s date',
