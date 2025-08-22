@@ -423,6 +423,17 @@ class Controller extends Base
             $momentCollection->add($momentModel);
         }
 
+        /* This is a bit brutal and maybe you can mess around more with a diff,
+         * but this is guaranteed to be correct without all the kerfuffle...for now
+         */
+        $folders = $this->folderMapper->findByColumn('id', $requestBody['folders']);
+
+        /* Save the set of $newFolders to each person's learning moment
+         */
+        foreach ($momentCollection as $moment) {
+            $moment->setFolders($folders);
+        }
+
         $this->mapper->save($momentCollection);
 
         /* For some reason this is necessary. The MutableFieldsOnly translator spawns a new Moment instance,
