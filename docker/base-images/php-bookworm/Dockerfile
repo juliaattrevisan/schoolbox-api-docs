@@ -23,11 +23,16 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
 # Copy configuration files
 RUN <<EOF
 case "$ENV" in
-  prod | production)
+  prod)
     ln -s /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
     ;;
-  *)
+  dev)
+    install-php-extensions xdebug
     ln -s /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini
+    ;;
+  *)
+    echo "Invalid value of ENV build arg: if provided, must be one of (dev, prod)"
+    exit 1
     ;;
 esac
 EOF
