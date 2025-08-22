@@ -139,6 +139,12 @@ class Model implements ISoftDeletable, IThreadLocation
 
 
     /**
+     * @var GenericCollection|null
+     */
+    private ?\Schoolbox\GenericCollection $folders = null;
+
+
+    /**
      * @return string|null
      */
     public function getBody(): ?string
@@ -643,6 +649,26 @@ class Model implements ISoftDeletable, IThreadLocation
     public function setEvidence(?GenericCollection $evidence): self
     {
         $this->evidence = $evidence;
+        return $this;
+    }
+
+
+    /**
+     * @return GenericCollection|null
+     */
+    public function getFolders(): ?GenericCollection
+    {
+        return $this->folders;
+    }
+
+
+    /**
+     * @param GenericCollection|null $folders
+     * @return $this
+     */
+    public function setFolders(?GenericCollection $folders): self
+    {
+        $this->folders = $folders;
         return $this;
     }
 }

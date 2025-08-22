@@ -422,6 +422,7 @@ class Controller extends Base
             }
 
             $this->mapper->saveEvidence($moment);
+            $this->mapper->saveFolders($moment);
         }
 
         /**
@@ -488,10 +489,14 @@ class Controller extends Base
          * Note that a staff member might edit a student's learning moment, so you have to use
          * the recipient's user instance, not the viewer's
          */
-        $folders = $this->userAccessMapper->findAllForUser($moment->getRecipient());
+        $folders = null;
 
-        new \Alaress_Probe($folders);
+        $userAccesses = $this->userAccessMapper->findAllForUser($moment->getRecipient());
 
+        if ($userAccesses->count()) {
+            $folders = $this->folderMapper->findByColumn('id', $userAccesses->getPropertyValues('serviceIdentifier'));
+        }
+new \Alaress_Probe($moment->getFolders());
         $params = [
             'evidence'                 => $moment,
             'users'                    => $moment->getRecipient(),
@@ -507,6 +512,7 @@ class Controller extends Base
             'hasComments'              => $this->hasComments($moment),
             'returnUrl'                => $this->requestQuery->get('returnUrl'),
             'editorTemplates'          => $this->editorTemplateHelper->getTemplatesForCategory(),
+            'folders' => $folders
         ];
 
         $this->response = $this->responseFromTemplate(
