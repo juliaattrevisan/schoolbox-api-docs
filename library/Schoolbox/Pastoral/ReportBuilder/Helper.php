@@ -12,7 +12,7 @@ use Schoolbox\Pastoral\SubType\Model as SubType;
 
 class Helper
 {
-    private array $filters = ['p.deleted_at IS NULL'];
+    private array $filters = ['pastoral.deleted_at IS NULL'];
     private array $params = [];
 
     public function __construct(
@@ -67,12 +67,12 @@ class Helper
     private function getWhereDate(): void
     {
         if ($this->report['beforeDate'] instanceof Alaress_Date_Format) {
-            $this->filters[] = "(COALESCE(`p`.`occurred_on`, `p`.`created_at`) <= :beforeDate)";
+            $this->filters[] = "(COALESCE(`pastoral`.`occurred_on`, `pastoral`.`created_at`) <= :beforeDate)";
             $this->params['beforeDate'] = $this->report['beforeDate']->endOfDay()->toIso8601String();
         }
 
         if ($this->report['afterDate'] instanceof Alaress_Date_Format) {
-            $this->filters[] = "(COALESCE(`p`.`occurred_on`, `p`.`created_at`) >= :afterDate)";
+            $this->filters[] = "(COALESCE(`pastoral`.`occurred_on`, `pastoral`.`created_at`) >= :afterDate)";
             $this->params['afterDate'] = $this->report['afterDate']->startOfDay()->toIso8601String();
         }
     }
@@ -97,7 +97,7 @@ class Helper
     private function getStudents(): void
     {
         if ($this->report['students']->count() > 0) {
-            $this->filters[] = "p.student_id IN (" .
+            $this->filters[] = "pastoral.student_id IN (" .
                 implode(
                     ',',
                     $this->report['students']->getPropertyValues('id')
@@ -113,11 +113,11 @@ class Helper
     private function getYears(): void
     {
         if ($this->report['includeStudentsWithoutYear']) {
-            $filters[] = "`u`.`year_id` IS NULL";
+            $filters[] = "`s`.`year_id` IS NULL";
         }
 
         if ($this->report['years']->count() > 0) {
-            $filters[] = '`u`.`year_id` IN (' .
+            $filters[] = '`s`.`year_id` IN (' .
                 implode(',', $this->report['years']->getPropertyValues('id')) .
                 ')';
         }
@@ -137,11 +137,11 @@ class Helper
     private function getHouses(): void
     {
         if ($this->report['includeStudentsWithoutHouse']) {
-            $filters[] = "`u`.`house` IS NULL";
+            $filters[] = "`s`.`house` IS NULL";
         }
 
         if ($this->report['houses']->count() > 0) {
-            $filters[] = '`u`.`house` IN (' .
+            $filters[] = '`s`.`house` IN (' .
                 implode(',', $this->report['houses']->getPropertyValues('id')) .
                 ')';
         }
@@ -161,7 +161,7 @@ class Helper
     private function getCampuses(): void
     {
         if ($this->report['campuses']->count() > 0) {
-            $this->filters[] = '`c`.`campus` IN (' .
+            $this->filters[] = '`v_sc`.`campus` IN (' .
                 implode(',', $this->report['campuses']->getPropertyValues('id')) .
                 ')';
         }
@@ -175,7 +175,7 @@ class Helper
     private function getAuthors(): void
     {
         if ($this->report['authors']->count() > 0) {
-            $this->filters[] = "p.author_id IN (" .
+            $this->filters[] = "pastoral.author_id IN (" .
                 implode(',', $this->report['authors']->getPropertyValues('id')) .
                 ")";
         }
@@ -252,16 +252,16 @@ class Helper
         if ($this->report['involved'] || !$this->pastoralMapper->isUserInPastoralService($user)) {
             $this->filters[] = "
                 (
-                    (SELECT COUNT(*) FROM `pastoral_access` WHERE `role_id` = :user_role_id_0 AND `pastoral_id` = `p`.`id`) > 0 OR
-                    (SELECT COUNT(*) FROM `pastoral_access` WHERE `user_id` = :user_id_0      AND `pastoral_id` = `p`.`id`) > 0 OR
+                    (SELECT COUNT(*) FROM `pastoral_access` WHERE `role_id` = :user_role_id_0 AND `pastoral_id` = `pastoral`.`id`) > 0 OR
+                    (SELECT COUNT(*) FROM `pastoral_access` WHERE `user_id` = :user_id_0      AND `pastoral_id` = `pastoral`.`id`) > 0 OR
                     (
                         SELECT COUNT(*) FROM `pastoral_access` WHERE `group_id` IN (
                             SELECT `group_id`
                             FROM `pastoral_group_member`
                             WHERE `user_id` = :user_id_1
-                        ) AND `pastoral_id` = `p`.`id`
+                        ) AND `pastoral_id` = `pastoral`.`id`
                     ) > 0 OR
-                    `p`.`owner_id` = :user_id_2
+                    `pastoral`.`owner_id` = :user_id_2
                 )
             ";
             $this->params['user_role_id_0'] = $user->getRole()->getId();
@@ -279,7 +279,7 @@ class Helper
     private function getExpired(): void
     {
         if (!$this->report['includeArchivedRecords']) {
-            $this->filters[] = "(`p`.`expires_at` >= CURDATE() OR `p`.`expires_at` IS NULL)";
+            $this->filters[] = "(`pastoral`.`expires_at` >= CURDATE() OR `pastoral`.`expires_at` IS NULL)";
         }
     }
 
@@ -326,22 +326,22 @@ class Helper
     {
 
         $fromString = "
-            FROM {$this->pastoralMapper->getTable()} p
-            INNER JOIN user u ON p.student_id = u.id AND u.deleted_at IS NULL
-            LEFT JOIN lu_pastoral_severity sv ON p.severity_id = sv.id
-            LEFT JOIN userCampus c ON u.id = c.uid
+            FROM {$this->pastoralMapper->getTable()}
+            INNER JOIN user s ON pastoral.student_id = s.id AND s.deleted_at IS NULL
+            LEFT JOIN lu_pastoral_severity sv ON pastoral.severity_id = sv.id
+            LEFT JOIN userCampus v_sc ON s.id = v_sc.uid
         ";
 
         if ($this->shouldFilterAction()) {
             $joinType = $this->report['includeRecordsWithoutAction'] ? 'LEFT' : 'INNER';
             $fromString .= "
-                {$joinType} JOIN pastoral_record_action a ON p.id = a.pastoral_id AND a.deleted_at IS NULL
+                {$joinType} JOIN pastoral_record_action a ON pastoral.id = a.pastoral_id AND a.deleted_at IS NULL
             ";
         }
 
         if ($this->report['tags']->count() > 0) {
             $fromString .= "
-                INNER JOIN pastoral_tags t on p.id = t.pastoral_id
+                INNER JOIN pastoral_tags g on pastoral.id = g.pastoral_id
             ";
         }
 
@@ -444,6 +444,8 @@ class Helper
                     break;
             }
         }
+
+        $orderParts[] = ['column' => 'pastoral.id'];
 
         return $orderParts;
     }
