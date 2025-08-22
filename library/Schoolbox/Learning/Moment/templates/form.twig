@@ -5,6 +5,7 @@
  # @param bool $hasComments         Indicates whether there is at least one comment associated with this learning moment
  # @param array $editorTemplates    Retrieve any pre-existing editor templates to insert into the 'Body' rich text editor
  # @param Collection $folders       A set of folders that -could- be associated with this learning moment based on the recipient's access
+ # @param array $selectedFolders    A set of folder ids currently associated with this learning moment (could be empty)
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 
@@ -156,8 +157,13 @@
                         <div class="small-12 columns checklist">
                             <ul class="option-list">
                                 {% for folder in folders %}
+                                    {% set checked = '' %}
+
+                                    {% if folder.id in selectedFolders %}
+                                        {% set checked = "checked='checked'" %}
+                                    {% endif %}
                                     <li>
-                                        <input id="checkbox-{{ folder.id }}" type="checkbox" value="{{ folder.id }}" />
+                                        <input id="checkbox-{{ folder.id }}" type="checkbox" value="{{ folder.id }}" {{ checked }}/>
                                         <label for="checkbox-{{ folder.id }}">{{ folder.title }}</label>
                                     </li>
                                 {% endfor %}

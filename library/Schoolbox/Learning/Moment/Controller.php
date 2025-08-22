@@ -142,6 +142,11 @@ class Controller extends Base
          */
         $folders = null;
 
+        /* This is usually empty when creating, except when you're creating by the class list;
+         * that will have a folder already chosen
+         */
+        $selectedFolders = [];
+
         /* Students get their learning moment moderation requirement tested;
          * parents and teachers bypass this check
          */
@@ -202,6 +207,7 @@ class Controller extends Base
              * Request a collection of folders for data struct synonymity
              */
             $folders = $this->folderMapper->findByColumn('id', $this->requestQuery->get('folderId'));
+            $selectedFolders = [$this->requestQuery->get('folderId')];
         }
 
         $params = [
@@ -216,9 +222,10 @@ class Controller extends Base
             'momentType'               => $momentType,
             'zone'                     => $this->buildAttachzone($momentType)->getTwigContext(),
             'editorTemplates'          => $this->editorTemplateHelper->getTemplatesForCategory(),
-            /*  Folders that can be associated with this learning moment
+            /* Folder relationships
              */
-            'folders' => $folders
+            'folders' => $folders,
+            'selectedFolders' => $selectedFolders,
         ];
 
         $this->response = $this->responseFromTemplate($template, $params);
@@ -496,7 +503,11 @@ class Controller extends Base
         if ($userAccesses->count()) {
             $folders = $this->folderMapper->findByColumn('id', $userAccesses->getPropertyValues('serviceIdentifier'));
         }
-new \Alaress_Probe($moment->getFolders());
+
+        /* These folder ids were associated with the learning moment
+         */
+        $selectedFolders = $moment->getFolders()->getPropertyValues('id');
+
         $params = [
             'evidence'                 => $moment,
             'users'                    => $moment->getRecipient(),
@@ -512,7 +523,10 @@ new \Alaress_Probe($moment->getFolders());
             'hasComments'              => $this->hasComments($moment),
             'returnUrl'                => $this->requestQuery->get('returnUrl'),
             'editorTemplates'          => $this->editorTemplateHelper->getTemplatesForCategory(),
-            'folders' => $folders
+            /* Folder relationships
+             */
+            'folders' => $folders,
+            'selectedFolders' => $selectedFolders,
         ];
 
         $this->response = $this->responseFromTemplate(
