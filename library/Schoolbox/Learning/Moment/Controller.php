@@ -138,6 +138,7 @@ class Controller extends Base
          * Note that a staff member might edit a student's learning moment, so you have to use
          * the recipient's user instance, not the viewer's
          */
+        $folders = null;
 
         /* Students get their learning moment moderation requirement tested;
          * parents and teachers bypass this check
@@ -145,6 +146,8 @@ class Controller extends Base
         $moderationRequired = false;
 
         if ($this->getUser()->getRole()->isStudent()) {
+            /* Students crafting learning moments for themselves might be subject to moderation
+             */
             $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $this->getUser()->getYear());
 
             /* These are folders that the recipient can see via their membership;
@@ -152,19 +155,31 @@ class Controller extends Base
              * the recipient's user instance, not the viewer's
              */
             $folders = $this->userAccessMapper->findAllForUser($this->getUser());
-        } elseif (1 === $users->count() && $this->getUser()->getRole()->isParent()) {
-            /* If the current user is a parent, and the list of recipients is exactly one,
-             * then the parent is creating a learning moment for one of their children via their activity feed.
-             * Spawn the Submit For Approval button for parents so their learning moments enter moderation queue.
+        } elseif (1 === $users->count()) {
+            /* Crafting a learning moment for exactly one other person
              *
-             * This forces parents into the same moderation workflow as their children. ALTERNATIVELY you could
-             * require the Learning Moment Moderation role permission on various parent roles; this could allow
-             * some Parent roles to have moderation requirements and others can Publish immediately to the world.
+             * If the current user is a staff, and the list of recipients is exactly one,
+             * it doesn't matter if you selected one fella from the class list, or
+             * tried to share a learning moment directly from the recipient's activity feed;
+             * the list of folders they can access is determinate.
              *
-             * Note:
-             * This is purely circumstantial since parents can't spawn learning moments for multiple people.
+             * Otherwise, you have a mixed bag of people who have access to different folders
+             * and that would make the ui really messy.
              */
-            $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $users->first()->getYear());
+            if ($this->getUser()->getRole()->isParent()) {
+                /* If the current user is a parent, and the list of recipients is exactly one,
+                 * then the parent is creating a learning moment for one of their children via their activity feed.
+                 * Spawn the Submit For Approval button for parents so their learning moments enter moderation queue.
+                 *
+                 * This forces parents into the same moderation workflow as their children. ALTERNATIVELY you could
+                 * require the Learning Moment Moderation role permission on various parent roles; this could allow
+                 * some Parent roles to have moderation requirements and others can Publish immediately to the world.
+                 *
+                 * Note:
+                 * This is purely circumstantial since parents can't spawn learning moments for multiple people.
+                 */
+                $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $users->first()->getYear());
+            }
 
             /* These are folders that the recipient can see via their membership;
              * Note that a staff member might edit a student's learning moment, so you have to use
@@ -172,10 +187,13 @@ class Controller extends Base
              */
             $folders = $this->userAccessMapper->findAllForUser($users->first());
         } elseif ($this->getUser()->getRole()->isStaff()) {
-            echo 'staff';
+            /* If the current user is a staff and the list of recipients is more than one,
+             * presume folder involvement to be specifically the Class List from whence you came
+             * Request a collection of folders for data struct synonymity
+             */
+            $folders = \Schoolbox\Resource\Folder\Mapper::getInstance()->findByColumn('id', $this->requestQuery->get('folderId'));
         }
 
-        new \Alaress_Probe($folders);
         $params = [
             'evidence'                 => $this->mapper->createModel(),
             'users'                    => $users,
@@ -188,6 +206,9 @@ class Controller extends Base
             'momentType'               => $momentType,
             'zone'                     => $this->buildAttachzone($momentType)->getTwigContext(),
             'editorTemplates'          => $this->editorTemplateHelper->getTemplatesForCategory(),
+            /*  Folders that can be associated with this learning moment
+             */
+            'folders' => $folders
         ];
 
         $this->response = $this->responseFromTemplate($template, $params);
