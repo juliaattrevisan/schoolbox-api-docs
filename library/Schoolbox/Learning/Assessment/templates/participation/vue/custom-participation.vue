@@ -5,6 +5,7 @@
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
+import locale from "@js/terminology/rosettaStone";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
@@ -361,13 +362,13 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                             <a :href="`${participant.customisedPlan.assessable._links.modify}?${getReturnUrl()}`">
                                 {{ participant.customisedPlan.assessable.title }}
                             </a>
-                            <span class="meta">(New Activity)</span>
+                            <span class="meta">(New {{ locale.activity.proper() }})</span>
                         </template>
                         <template v-else-if="participant.plan.name !== null">
                             <a :href="`${getAssessmentParticipation}/${participant.plan.id}/modify?${getReturnUrl()}`">
                                 {{ participant.plan.name }}
                             </a>
-                            <span class="meta">(Modified Activity)</span>
+                            <span class="meta">(Modified {{ locale.activity.proper() }})</span>
                         </template>
                         <template v-else-if="participant.excludedAt !== null">Excluded</template>
                     </td>
