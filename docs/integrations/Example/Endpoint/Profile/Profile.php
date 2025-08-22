@@ -45,6 +45,7 @@ class Profile implements IStrategy
      * @param LoggerInterface $log
      * @param bool $perform
      * @param IApi $api
+     * @param Watchlist $watcher
      * @param array $watchlist
      * @param UserProfile\Mapper $baseProfileMapper
      * @param UserProfile\Student\Mapper $studentProfileMapper
@@ -57,6 +58,7 @@ class Profile implements IStrategy
         private LoggerInterface $log,
         private bool $perform,
         private IApi $api,
+        private Watchlist $watcher,
         private array $watchlist,
         private UserProfile\Mapper $baseProfileMapper,
         private UserProfile\Student\Mapper $studentProfileMapper,
@@ -107,7 +109,7 @@ class Profile implements IStrategy
 
             /* Only import data for externalIds in $watchlist, if provided
              */
-            if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+            if (!$this->watcher->isOnWatchlist($externalId, $this->watchlist)) {
                 continue;
             }
 
@@ -619,7 +621,7 @@ class Profile implements IStrategy
 
             /* Only import data for externalIds in $watchlist, if provided
              */
-            if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+            if (!$this->watcher->isOnWatchlist($externalId, $this->watchlist)) {
                 continue;
             }
 
