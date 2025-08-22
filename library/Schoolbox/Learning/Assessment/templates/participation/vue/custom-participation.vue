@@ -361,11 +361,13 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                             <a :href="`${participant.customisedPlan.assessable._links.modify}?${getReturnUrl()}`">
                                 {{ participant.customisedPlan.assessable.title }}
                             </a>
+                            <span class="meta">(New Activity)</span>
                         </template>
                         <template v-else-if="participant.plan.name !== null">
                             <a :href="`${getAssessmentParticipation}/${participant.plan.id}/modify?${getReturnUrl()}`">
                                 {{ participant.plan.name }}
                             </a>
+                            <span class="meta">(Modified Activity)</span>
                         </template>
                         <template v-else-if="participant.excludedAt !== null">Excluded</template>
                     </td>
