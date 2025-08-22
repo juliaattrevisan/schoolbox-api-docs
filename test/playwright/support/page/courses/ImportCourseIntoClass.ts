@@ -52,6 +52,15 @@ export default class ImportCourseIntoClass {
     }
 
     /**
+     * Inserts a due date when exporting an activity
+     * @param dueDateIdNumber - The date picker id
+     * @param dueDate - The due date to insert
+     */
+    async insertExportDueDate(dueDateIdNumber: number, dueDate: Date): Promise<void> {
+        await this.page.fill(`input[data-datepicker-id="${dueDateIdNumber}"]`, Common.formatDate(dueDate, false));
+    }
+
+    /**
      * Ticks an assessment checkbox
      * @param checkboxNumber - The checkbox number to tick
      */
