@@ -455,7 +455,7 @@ class Mapper extends BaseMapper
         foreach ($momentFolderStatement as $row) {
             if ($row['f.id'] !== null) {
                 //only step into if the folder is NOT deleted
-                /** @var \Schoolbox\Resource\Folder\Model $folder */
+                /** @var \Schoolbox\Resource\Folder\Model $momentFolder */
                 $momentFolder = $this->hydrateJoin($row, 'moment_folder', 'f');
                 $collection[$row['id']]->getFolders()->setOffset($momentFolder->getId(), $momentFolder);
             }
