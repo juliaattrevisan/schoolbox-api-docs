@@ -48,6 +48,17 @@ class Photo
      */
     public function generate(): array
     {
+        /* TODO there's probably an issue here where you can't *remove* a picture via veracross
+         *  since they send you a list of people who have pictures. This means you have to assume
+         *  nobody has pictures, then restore the ones that do, to manage deletions.
+         *
+         *  To get around it:
+         *      - disable Load Photos From SIS
+         *      - manually remove the pictures via User Modify
+         *      - remove the photos from the sis
+         *      - enable Load Photos From SIS again
+         */
+
         /* If we generated this lookup previously, just recycle it
          */
         if (null === $this->lookup) {
