@@ -196,7 +196,7 @@ test.describe("Course import tests", () => {
 
         tester.isGoingTo("check the due dates for each activity type imported");
         const dueDateToBeFormated = dayjs().add(+30, "days");
-        const dateFormatted = dueDateToBeFormated.format("MMM DD, YYYY");
+        const dateFormatted = dueDateToBeFormated.format("MMM D, YYYY");
         await expect(page.getByTestId(`course-outline-number-students-Pre-unit Quiz`)).toContainText(
             `Due ${dateFormatted}`,
         );
@@ -331,7 +331,7 @@ test.describe("Course import tests", () => {
         );
         tester.isGoingTo("check the due dates for each activity type imported");
         const dueDateToBeFormated = dayjs().add(+10, "days");
-        const dateFormatted = dueDateToBeFormated.format("MMM DD, YYYY");
+        const dateFormatted = dueDateToBeFormated.format("MMM D, YYYY");
         await expect(page.getByTestId(`course-outline-number-students-${lessonPlanName}`)).toContainText(
             `Scheduled ${dateFormatted}`,
         );
