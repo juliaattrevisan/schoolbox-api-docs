@@ -930,23 +930,7 @@ class Profile implements IStrategy
             $response = $this->client->request('GET', $photoLookup[$externalId]);
             $fileContents = $response->getBody()->getContents();
 
-            /* Presume the universal default of jpg, esp. for random formats like
-             * pjpeg, jpg, jfif, etc
-             */
-            $ext = '.jpg';
-
-            /* Guess a file extension based on content-type
-             * I don't think we have a content-type to extension converter anywhere convenient?
-             */
-            if ($response->getHeader('Content-Type')[0] === 'image/png') {
-                $ext = '.png';
-            } elseif ($response->getHeader('Content-Type')[0] === 'image/gif') {
-                $ext = '.gif';
-            } elseif ($response->getHeader('Content-Type')[0] === 'image/webp') {
-                $ext = '.webp';
-            } elseif ($response->getHeader('Content-Type')[0] === 'image/bmp') {
-                $ext = '.bmp';
-            }
+            $ext = $this->guessExtension($response->getHeader('Content-Type')[0]);
 
             $portrait = $this->storageMapper->acceptStream($baseProfile->getExternalId() . $ext, $fileContents);
 
@@ -964,5 +948,40 @@ class Profile implements IStrategy
                 $e->getMessage()
             ));
         }
+    }
+
+
+    /**
+     * Guess a file extension based on content-type
+     * I don't think we have a content-type to extension converter anywhere convenient?
+     *
+     * AllowedFiles associates a mime to multiple extensions, which might not be conclusive
+     * Anyway, this should be sufficient for vast majority of file formats given the use case.
+     *
+     * @param string $contentType
+     * @return string
+     */
+    private function guessExtension(string $contentType): string
+    {
+        if ($contentType === 'image/png') {
+            return '.png';
+        }
+
+        if ($contentType === 'image/gif') {
+            return '.gif';
+        }
+
+        if ($contentType === 'image/webp') {
+            return '.webp';
+        }
+
+        if ($contentType === 'image/bmp') {
+            return '.bmp';
+        }
+
+        /* Presume the universal default of jpg, esp. for random formats like
+         * pjpeg, jpg, jfif, etc
+         */
+        return '.jpg';
     }
 }
