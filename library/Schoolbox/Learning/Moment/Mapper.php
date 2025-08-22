@@ -479,18 +479,4 @@ class Mapper extends BaseMapper
             $this->cascadeJoin('moment_evidence', ['moment_id' => $moment->getId()], $moment->getEvidence());
         }
     }
-//
-//
-//    /**
-//     * Persist folder relationships
-//     *
-//     * @param Model $moment
-//     * @return void
-//     */
-//    public function saveFolders(Model $moment): void
-//    {
-//        if (null !== $moment->getFolders()) {
-//            $this->cascadeJoin('moment_folder', ['moment_id' => $moment->getId()], $moment->getFolders());
-//        }
-//    }
 }

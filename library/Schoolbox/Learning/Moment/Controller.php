@@ -429,7 +429,6 @@ class Controller extends Base
             }
 
             $this->mapper->saveEvidence($moment);
-            $this->mapper->saveFolders($moment);
         }
 
         /**
@@ -453,9 +452,10 @@ class Controller extends Base
      */
     public function getModifyForm(Model $evidence): void
     {
-        /* Temporary rewrite of misnamed var, but this is linked to the Module implementation
-         * which is potentially going to affect api behaviour, do this gently for now. You'd
-         * have to modify preloadEvidence otherwise, which would affect way more things
+        /* TODO rename
+         *  Temporary rewrite of misnamed var, but this is linked to the Module implementation
+         *  which is potentially going to affect api behaviour, do this gently for now. You'd
+         *  have to modify preloadEvidence otherwise, which would affect way more things
          */
         $moment = $evidence;
 
@@ -545,27 +545,34 @@ class Controller extends Base
      */
     public function putEvidence(Model $evidence): void
     {
-        $requestBody       = $this->request->getParsedBody();
+        /* TODO rename
+         *  Temporary rewrite of misnamed var, but this is linked to the Module implementation
+         *  which is potentially going to affect api behaviour, do this gently for now. You'd
+         *  have to modify preloadEvidence otherwise, which would affect way more things
+         */
+        $moment = $evidence;
+
+        $requestBody  = $this->request->getParsedBody();
 
         $requestTranslator = new \Schoolbox\Learning\Moment\Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
         $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
-        $tokenReplacer     = new TokenReplacer\Student(new TokenReplacer\Simple());
-        $evidence          = $requestTranslator($requestBody, $evidence)
-            ->setBody($tokenReplacer->replace($evidence->getBody(), $evidence->getRecipient()));
+        $tokenReplacer  = new TokenReplacer\Student(new TokenReplacer\Simple());
+        $moment  = $requestTranslator($requestBody, $moment)
+            ->setBody($tokenReplacer->replace($moment->getBody(), $moment->getRecipient()));
 
         if ($requestBody['draft'] ?? false) {
             // autosave draft, save as draft
-            $evidence->draft();
+            $moment->draft();
         }
 
-        $this->mapper->save($evidence);
+        $this->mapper->save($moment);
 
         /**
          * use buildTranslatorWithComments as that contains the _links needed for draft.js
          * where the other translator had excluded _links (for historic reasons)
          */
         $responseTranslator = $this->buildTranslatorWithComments(1);
-        $this->response     = $this->responseAsJson($responseTranslator($evidence));
+        $this->response     = $this->responseAsJson($responseTranslator($moment));
     }
 
     /**
@@ -820,7 +827,7 @@ class Controller extends Base
 
 
     /**
-     * Place $evidence into the new state $state, along with any modifications made to its
+     * Place $moment into the new state $state, along with any modifications made to its
      * body, tags, curric nodes, etc. via the Modify form. This might not always be how we
      * putWithState() since you can do this directly from the CTAs on the Activity Feed.
      *
@@ -832,6 +839,13 @@ class Controller extends Base
      */
     private function putWithState(Model $evidence, string $state): array
     {
+        /* TODO rename
+         *  Temporary rewrite of misnamed var, but this is linked to the Module implementation
+         *  which is potentially going to affect api behaviour, do this gently for now. You'd
+         *  have to modify preloadEvidence otherwise, which would affect way more things
+         */
+        $moment = $evidence;
+
         $requestBody = $this->request->getParsedBody();
 
         /* This might be empty if submitting directly from the activity feed;
@@ -843,16 +857,16 @@ class Controller extends Base
             $requestTranslator = new \Schoolbox\Learning\Moment\Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
             $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
             $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
-            $evidence = $requestTranslator($requestBody, $evidence)->setBody($tokenReplacer->replace($evidence->getBody(), $evidence->getRecipient()));
+            $moment = $requestTranslator($requestBody, $moment)->setBody($tokenReplacer->replace($moment->getBody(), $moment->getRecipient()));
         }
 
         /* Shove it into the new state, $state
          */
-        $this->updateState($evidence, $state);
+        $this->updateState($moment, $state);
 
         /* Save it
          */
-        $this->mapper->save($evidence);
+        $this->mapper->save($moment);
 
         /**
          * use buildTranslatorWithComments as that contains the _links needed for draft.js
@@ -860,11 +874,11 @@ class Controller extends Base
          */
         $responseTranslator = $this->buildTranslatorWithComments(1);
 
-        $translated = $responseTranslator($evidence);
+        $translated = $responseTranslator($moment);
 
         /* A shortcut to urls for changing states in this learning moment
          */
-        $translated['_links'] = $this->getNextRoutes($evidence);
+        $translated['_links'] = $this->getNextRoutes($moment);
 
         return $translated;
     }
