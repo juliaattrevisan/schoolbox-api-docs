@@ -468,20 +468,16 @@ class NavigationSelector
      */
     private function hasMYP(): bool
     {
-        if (!isset($this->externalUser['StudentID'])) {
-            return false;
-        }
-
-        $params = [
-            'externalId' => $this->externalUser['StudentID'],
-        ];
-
-        $query = "
-            SELECT TOP 1 COUNT(*) AS 'computed'
-            FROM dbo.uvSchoolBoxMYPResults_CurrentOverview
-            WHERE ID = :externalId
-        ";
-
-        return (bool)$this->db->getOne($query, $params);
+        // We do not check whether the student has data in the MYP view here because getting data from that view is extremely slow.
+        // Checking whether data exists for the student in the MYP view here adds >10 seconds to page load times.
+        $currentYear = (int)date('Y');
+        return
+            $this->user->getYear()->getName() == 7
+            || $this->user->getYear()->getName() == 8
+            || ($this->user->getYear()->getName() == 9 && $currentYear >= 2023)
+            || ($this->user->getYear()->getName() == 10 && $currentYear >= 2024)
+            || ($this->user->getYear()->getName() == 11 && $currentYear >= 2025)
+            || ($this->user->getYear()->getName() == 12 && $currentYear >= 2026)
+            || ($this->user->getYear()->getName() == 13 && $currentYear >= 2027);
     }
 }
