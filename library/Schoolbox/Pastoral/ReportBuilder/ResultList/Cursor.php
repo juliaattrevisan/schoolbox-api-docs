@@ -205,7 +205,6 @@ class Cursor implements ICursor
 
         $limit = (null === $this->limit) ? "" : " LIMIT {$this->limit}";
 
-
         $statement = $db->executeQuery(
             "
             SELECT p.id
@@ -213,7 +212,6 @@ class Cursor implements ICursor
             WHERE {$where}
             AND {$whereFilter}
             AND ({$this->inTypeSubType})
-            ORDER BY p.id ASC
             {$limit}
         ",
             array_merge(
@@ -225,7 +223,19 @@ class Cursor implements ICursor
 
         $pastoralIds = $statement->fetchAll(\PDO::FETCH_COLUMN);
 
-        $results = $this->pastoralMapper->findByColumn('id', $pastoralIds)->reindex();
+        $order = [];
+        foreach ($this->helper->getReportOrder() as $reportOrder) {
+            $order[$reportOrder['column']] = $reportOrder['direction'] ?? 'ASC';
+        }
+
+        $results = $this->pastoralMapper
+            ->findByColumn(
+                'id',
+                $pastoralIds,
+                [
+                    'order' => $order,
+                ]
+            )->reindex();
 
         return $results;
     }
