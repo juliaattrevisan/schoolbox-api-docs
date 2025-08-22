@@ -15,6 +15,7 @@ ARG PHP_MAJOR_VERSION=8.4
 FROM --platform=linux/${ARCH} php:${PHP_MAJOR_VERSION}-cli-bookworm
 
 ARG PHP_MAJOR_VERSION
+ARG ENV
 
 # Use install-php-extensions script, and install extensions with that
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
@@ -22,16 +23,22 @@ COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr
 # Copy configuration files
 RUN <<EOF
 case "$ENV" in
-  prod | production)
+  prod)
     ln -s /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
     ;;
-  *)
+  dev)
+    install-php-extensions xdebug
     ln -s /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini
+    ;;
+  *)
+    echo "Invalid value of ENV build arg: if provided, must be one of (dev, prod)"
+    exit 1
     ;;
 esac
 EOF
-COPY ./config/php/* /usr/local/etc/php/conf.d/
-COPY ./config/php${PHP_MAJOR_VERSION}/* /usr/local/etc/php/conf.d/
+COPY ./config/php/*.ini /usr/local/etc/php/conf.d/
+COPY ./config/php/${ENV}/*.ini /usr/local/etc/php/conf.d/
+COPY ./config/php${PHP_MAJOR_VERSION}/*.ini /usr/local/etc/php/conf.d/
 
 # Copy scripts from puppet-alaress as-is for now
 COPY ./usr/bin/* /usr/bin/

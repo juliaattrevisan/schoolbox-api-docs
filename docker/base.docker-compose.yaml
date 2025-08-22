@@ -84,7 +84,10 @@ services:
   # staging or production envs.
   mariadb:
     container_name: mariadb
-    image: mariadb:10.6
+    build:
+      context: ./mariadb
+      args:
+        MARIADB_MAJOR_VERSION : ${MARIADB_MAJOR_VERSION}
     healthcheck:
       test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
       start_period: 30s
@@ -98,7 +101,10 @@ services:
 
   redis-storage:
     container_name: redis-storage
-    image: redis:6.0
+    build:
+      context: ./redis-storage
+      args:
+        REDIS_MAJOR_VERSION : ${REDIS_MAJOR_VERSION}
     healthcheck:
       test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
       start_period: 30s
@@ -106,12 +112,15 @@ services:
       timeout: 3s
       retries: 5
     volumes:
-      - redis-storage-config:/usr/local/etc/redis
+#      - redis-storage-config:/usr/local/etc/redis
       - redis-storage-data:/data
 
   redis-cache:
     container_name: redis-cache
-    image: redis:6.0
+    build:
+      context: ./redis-cache
+      args:
+        REDIS_MAJOR_VERSION : ${REDIS_MAJOR_VERSION}
     healthcheck:
       test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
       start_period: 30s
@@ -119,13 +128,15 @@ services:
       timeout: 3s
       retries: 5
     volumes:
-      - redis-cache-config:/usr/local/etc/redis
+#      - redis-cache-config:/usr/local/etc/redis
       - redis-cache-data:/data
 
   rabbitmq:
     container_name: rabbitmq
     build:
       context: ./rabbitmq
+      args:
+        RABBITMQ_MAJOR_VERSION : ${RABBITMQ_MAJOR_VERSION}
     healthcheck:
       test: [ "CMD", "rabbitmq-diagnostics", "check_port_connectivity" ]
       start_period: 30s
@@ -304,19 +315,19 @@ volumes:
       o: bind
       device: ../data/docker/ssl
 
-  redis-storage-config:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./redis-storage/config
-
-  redis-cache-config:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./redis-cache/config
+#  redis-storage-config:
+#    driver: local
+#    driver_opts:
+#      type: none
+#      o: bind
+#      device: ./redis-storage/config
+#
+#  redis-cache-config:
+#    driver: local
+#    driver_opts:
+#      type: none
+#      o: bind
+#      device: ./redis-cache/config
 
   aws-config:
     driver: local
