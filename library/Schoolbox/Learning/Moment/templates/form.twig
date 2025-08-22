@@ -151,6 +151,19 @@
                                 } %}
                         {% endif %}
                     </div>
+                    {% if folders|length %}
+                        <legend>Classes and Groups</legend>
+                        <div class="small-12 columns checklist">
+                            <ul class="option-list">
+                                {% for folder in folders %}
+                                    <li>
+                                        <input id="checkbox-{{ folder.id }}" type="checkbox" value="{{ folder.id }}" />
+                                        <label for="checkbox-{{ folder.id }}">{{ folder.title }}</label>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
                 </fieldset>
             </section>
 
