@@ -538,7 +538,7 @@ function getCustomisationMeta(plan: Plan | CustomisedPlan): string {
                         :key="customisation.id"
                         :value="customisation.id"
                     >
-                        {{ getCustomisationLabel(customisation) }}
+                        {{ getCustomisationLabel(customisation) }} {{ getCustomisationMeta(customisation) }}
                     </option>
                 </select>
             </div>
