@@ -74,12 +74,14 @@ class Replicator
         $newAssessment->setContext($destinationContext);
 
         // If copying the assessment into a spec: clear its dates
+        // also clear the connection to the original assessment if it's a customisation
         if ($destinationContext->isSpecificationContext()) {
             $newAssessment = $newAssessment
                 ->setPublishAt(null)
                 ->setOpenAt(null)
                 ->setDueAt(null)
-                ->setCloseAt(null);
+                ->setCloseAt(null)
+                ->setOriginalAssessmentId(null);
         }
 
         $destinationContext->getAssessables()->add($newAssessment);
