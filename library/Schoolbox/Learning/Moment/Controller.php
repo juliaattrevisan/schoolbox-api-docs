@@ -161,7 +161,7 @@ class Controller extends Base
              * Note that a staff member might edit a student's learning moment, so you have to use
              * the recipient's user instance, not the viewer's
              */
-            $userAccesses = $this->userAccessMapper->findAllForUser($this->getUser(), !$this->getUser()->isShowTimetable());
+            $userAccesses = $this->userAccessMapper->findAllForUser($this->getUser(), $this->getUser()->isShowTimetable());
 
             if ($userAccesses->count()) {
                 $folders = $this->folderMapper->findByColumn('id', $userAccesses->getPropertyValues('serviceIdentifier'));
