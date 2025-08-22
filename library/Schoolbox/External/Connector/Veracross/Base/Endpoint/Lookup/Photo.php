@@ -67,7 +67,7 @@ class Photo
 
             foreach ($stmt->fetchAll() as $row) {
                 $existing[$row['external_id']] = [
-                    'modifiedAt' => new \Alaress_Date_Format($row['updated_at'], \Alaress_Date_Format::DATABASE_FORMAT),
+                    'modifiedAt' => new \Alaress_Date_Format($row['uploaded_on'], \Alaress_Date_Format::DATABASE_FORMAT),
                     'portraitHash' => $row['portrait_hash'],
                 ];
             }
