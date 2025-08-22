@@ -864,6 +864,11 @@ class Controller extends Base
          */
         $this->updateState($moment, $state);
 
+        /* This is a bit brutal and maybe you can mess around more with a diff,
+         * but this is guaranteed to be correct without all the kerfuffle...for now
+         */
+        $moment->setFolders($this->folderMapper->findByColumn('id', $requestBody['folders']));
+
         /* Save it
          */
         $this->mapper->save($moment);
