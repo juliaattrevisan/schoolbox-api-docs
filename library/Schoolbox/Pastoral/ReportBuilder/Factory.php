@@ -16,7 +16,7 @@ class Factory
     public const TYPE_BY_MONTH    = 'typeByMonth';
     public const TYPE_BY_WEEK     = 'typeByWeek';
     public const STUDENT_BY_MONTH = 'studentByMonth';
-//    public const STUDENT_BY_WEEK  = 'studentByWeek';
+    public const STUDENT_BY_WEEK  = 'studentByWeek';
 
     public function __construct(
         private ModelToArray $userTranslator,
