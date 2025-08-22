@@ -267,6 +267,18 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
     }
     return plan.name || "";
 }
+
+/**
+ * Generates the meta for a given customisation plan.
+ * @param plan - The customisation plan to generate the meta for.
+ * @returns The meta for the customisation plan.
+ */
+function getCustomisationMeta(plan: Plan | CustomisedPlan): string {
+    if ("assessable" in plan && plan.assessable !== null) {
+        return `(New ${locale.activity.proper()})` || "";
+    }
+    return `(Modified ${locale.activity.proper()})` || "";
+}
 </script>
 
 <template>
@@ -362,13 +374,13 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                             <a :href="`${participant.customisedPlan.assessable._links.modify}?${getReturnUrl()}`">
                                 {{ participant.customisedPlan.assessable.title }}
                             </a>
-                            <span class="meta">(New {{ locale.activity.proper() }})</span>
+                            <span class="meta">{{ getCustomisationMeta(participant.customisedPlan) }}</span>
                         </template>
                         <template v-else-if="participant.plan.name !== null">
                             <a :href="`${getAssessmentParticipation}/${participant.plan.id}/modify?${getReturnUrl()}`">
                                 {{ participant.plan.name }}
                             </a>
-                            <span class="meta">(Modified {{ locale.activity.proper() }})</span>
+                            <span class="meta">{{ getCustomisationMeta(participant.plan) }}</span>
                         </template>
                         <template v-else-if="participant.excludedAt !== null">Excluded</template>
                     </td>
