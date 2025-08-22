@@ -156,7 +156,11 @@ class Controller extends Base
              * Note that a staff member might edit a student's learning moment, so you have to use
              * the recipient's user instance, not the viewer's
              */
-            $folders = $this->userAccessMapper->findAllForUser($this->getUser());
+            $userAccesses = $this->userAccessMapper->findAllForUser($this->getUser());
+
+            if ($userAccesses->count()) {
+                $folders = $this->folderMapper->findByColumn('id', $userAccesses->getPropertyValues('serviceIdentifier'));
+            }
         } elseif (1 === $users->count()) {
             /* Crafting a learning moment for exactly one other person
              *
@@ -187,7 +191,11 @@ class Controller extends Base
              * Note that a staff member might edit a student's learning moment, so you have to use
              * the recipient's user instance, not the viewer's
              */
-            $folders = $this->userAccessMapper->findAllForUser($users->first());
+            $userAccesses = $this->userAccessMapper->findAllForUser($users->first());
+
+            if ($userAccesses->count()) {
+                $folders = $this->folderMapper->findByColumn('id', $userAccesses->getPropertyValues('serviceIdentifier'));
+            }
         } elseif ($this->getUser()->getRole()->isStaff()) {
             /* If the current user is a staff and the list of recipients is more than one,
              * presume folder involvement to be specifically the Class List from whence you came
