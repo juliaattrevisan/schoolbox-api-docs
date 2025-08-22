@@ -145,6 +145,7 @@ function build_docker_compose_env() {
     PHP_MAJOR_VERSION=\"${PHP_MAJOR_VERSION}\"
     MARIADB_MAJOR_VERSION=\"${MARIADB_MAJOR_VERSION}\"
     REDIS_MAJOR_VERSION=\"${REDIS_MAJOR_VERSION}\"
+    RABBITMQ_MAJOR_VERSION=\"${RABBITMQ_MAJOR_VERSION}\"
     PRIVATE_CONTAINER_REGISTRY=\"${private_container_registry}\"
     INSTANCE_ID=\"${DEFAULT_INSTANCE_ID}\"
     ${aws_credentials}" > .docker-compose.env
