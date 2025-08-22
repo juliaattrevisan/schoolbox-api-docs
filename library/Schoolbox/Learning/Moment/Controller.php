@@ -73,7 +73,12 @@ class Controller extends Base
     /**
      * Redirect to the create form.
      *
-     * This takes a list of user IDs in the 'userId' query string parameter.
+     * This takes a list of user IDs in the 'userId' query string parameter and forcibly
+     * crafts an aura route using them, fitting the pattern "/user/{userIds}/create" which
+     * isn't convenient to do in the javascript world.
+     *
+     * The rest of the querystring params need to be manually whitelisted so they can be
+     * appended to this generated url
      *
      * @api   GET /learning/evidence/user/create
      * @since 20.2
@@ -84,9 +89,18 @@ class Controller extends Base
             $this->addQueryStringParamsToPath(
                 $this->routeGenerator->generate(
                     'learningMomentEvidence.getCreateForm',
-                    ['userIds' => $this->requestQuery->get('userIds')]
+                    [
+                        'userIds' => $this->requestQuery->get('userIds'),
+                    ]
                 ),
-                [Redirect::RETURN_URL, 'momentType']
+                /* Whitelist the querystring params from whence you came
+                 * You can't just shove them onto the end: you have to add to this whitelist
+                 */
+                [
+                    Redirect::RETURN_URL,
+                    'momentType',
+                    'folderId'
+                ]
             )
         );
     }
@@ -120,6 +134,11 @@ class Controller extends Base
         $momentType = $this->requestQuery->get('momentType') ?: Evidence\Model::MOMENT_TYPE_TEXT;
         $template   = $this->getTemplateFromType($momentType);
 
+        /* These are folders that the recipient can see via their membership;
+         * Note that a staff member might edit a student's learning moment, so you have to use
+         * the recipient's user instance, not the viewer's
+         */
+
         /* Students get their learning moment moderation requirement tested;
          * parents and teachers bypass this check
          */
@@ -127,6 +146,12 @@ class Controller extends Base
 
         if ($this->getUser()->getRole()->isStudent()) {
             $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $this->getUser()->getYear());
+
+            /* These are folders that the recipient can see via their membership;
+             * Note that a staff member might edit a student's learning moment, so you have to use
+             * the recipient's user instance, not the viewer's
+             */
+            $folders = $this->userAccessMapper->findAllForUser($this->getUser());
         } elseif (1 === $users->count() && $this->getUser()->getRole()->isParent()) {
             /* If the current user is a parent, and the list of recipients is exactly one,
              * then the parent is creating a learning moment for one of their children via their activity feed.
@@ -140,8 +165,17 @@ class Controller extends Base
              * This is purely circumstantial since parents can't spawn learning moments for multiple people.
              */
             $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $users->first()->getYear());
+
+            /* These are folders that the recipient can see via their membership;
+             * Note that a staff member might edit a student's learning moment, so you have to use
+             * the recipient's user instance, not the viewer's
+             */
+            $folders = $this->userAccessMapper->findAllForUser($users->first());
+        } elseif ($this->getUser()->getRole()->isStaff()) {
+            echo 'staff';
         }
 
+        new \Alaress_Probe($folders);
         $params = [
             'evidence'                 => $this->mapper->createModel(),
             'users'                    => $users,
@@ -380,6 +414,12 @@ class Controller extends Base
      */
     public function getModifyForm(Model $evidence): void
     {
+        /* Temporary rewrite of misnamed var, but this is linked to the Module implementation
+         * which is potentially going to affect api behaviour, do this gently for now. You'd
+         * have to modify preloadEvidence otherwise, which would affect way more things
+         */
+        $moment = $evidence;
+
         /* TODO massive assumption atm
          *  This was predicated on moments having exactly one file associated with it,
          *  but now there can be many files associated with it. Display the first
@@ -392,14 +432,14 @@ class Controller extends Base
          * type which are defined in Evidence\Model. These can be photo/video/audio/upload for now.
          * In the absence of any evidence, we presume text-only, which is MOMENT_TYPE_TEXT.
          */
-        $momentType = $evidence->getEvidence()->first()?->getType() ?? Evidence\Model::MOMENT_TYPE_TEXT;
+        $momentType = $moment->getEvidence()->first()?->getType() ?? Evidence\Model::MOMENT_TYPE_TEXT;
         $template   = $this->getTemplateFromType($momentType);
 
         /* Attachzone stuff for existing attachments
          */
         $zone = $this->buildAttachzone($momentType);
-        if ($evidence->getEvidence()->first()?->getStorage()) {
-            $zone->attachFiles([$evidence->getEvidence()->first()->getStorage()->getHash()]);
+        if ($moment->getEvidence()->first()?->getStorage()) {
+            $zone->attachFiles([$moment->getEvidence()->first()->getStorage()->getHash()]);
         }
 
         /* Students get their learning moment moderation requirement tested;
@@ -413,19 +453,27 @@ class Controller extends Base
             $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $evidence->getRecipient()->getYear());
         }
 
+        /* These are folders that the recipient can see via their membership;
+         * Note that a staff member might edit a student's learning moment, so you have to use
+         * the recipient's user instance, not the viewer's
+         */
+        $folders = $this->userAccessMapper->findAllForUser($moment->getRecipient());
+
+        new \Alaress_Probe($folders);
+
         $params = [
-            'evidence'                 => $evidence,
-            'users'                    => $evidence->getRecipient(),
-            'userIds'                  => $evidence->getRecipient()->getId(),
+            'evidence'                 => $moment,
+            'users'                    => $moment->getRecipient(),
+            'userIds'                  => $moment->getRecipient()->getId(),
             'otherUsers'               => [],
-            'sharingForSelf'           => $this->getUser() === $evidence->getRecipient(),
+            'sharingForSelf'           => $this->getUser() === $moment->getRecipient(),
             'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
             'moderationRequired'       => $moderationRequired,
             'isCreate'                 => false,
             'momentType'               => $momentType,
-            'curriculumCodes'          => $evidence->getViewableCurriculumNodes()?->reindex(),
+            'curriculumCodes'          => $moment->getViewableCurriculumNodes()?->reindex(),
             'zone'                     => $zone->getTwigContext(),
-            'hasComments'              => $this->hasComments($evidence),
+            'hasComments'              => $this->hasComments($moment),
             'returnUrl'                => $this->requestQuery->get('returnUrl'),
             'editorTemplates'          => $this->editorTemplateHelper->getTemplatesForCategory(),
         ];

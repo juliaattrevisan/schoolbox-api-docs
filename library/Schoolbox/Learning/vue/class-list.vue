@@ -371,6 +371,10 @@ export default {
                 let url = new URL(this.href);
                 url.pathname = self.getCreateLearningMomentFormEndpoint;
                 url.searchParams.append("userIds", self.selectedStudentLearningMomentsEnabledIds.join(","));
+                /* This is going to preset associated Classes And Groups when creating for multiple people,
+                 * creating a moment_folder relationship between this folder and all the recipients
+                 */
+                url.searchParams.append('folderId', self.folderId);
                 this.href = url.href;
             });
 
