@@ -84,7 +84,10 @@ services:
   # staging or production envs.
   mariadb:
     container_name: mariadb
-    image: mariadb:10.6
+    build:
+      context: ./mariadb
+      args:
+        MARIADB_MAJOR_VERSION : ${MARIADB_MAJOR_VERSION}
     healthcheck:
       test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
       start_period: 30s
