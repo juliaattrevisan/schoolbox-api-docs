@@ -472,12 +472,12 @@ class NavigationSelector
         // Checking whether data exists for the student in the MYP view here adds >10 seconds to page load times.
         $currentYear = (int)date('Y');
         return
-            $this->user->getYear()->getName() == 7
-            || $this->user->getYear()->getName() == 8
-            || ($this->user->getYear()->getName() == 9 && $currentYear >= 2023)
-            || ($this->user->getYear()->getName() == 10 && $currentYear >= 2024)
-            || ($this->user->getYear()->getName() == 11 && $currentYear >= 2025)
-            || ($this->user->getYear()->getName() == 12 && $currentYear >= 2026)
-            || ($this->user->getYear()->getName() == 13 && $currentYear >= 2027);
+            $this->user->getYear()->getName() === '7'
+            || $this->user->getYear()->getName() === '8'
+            || ($this->user->getYear()->getName() === '9' && $currentYear >= 2023)
+            || ($this->user->getYear()->getName() === '10' && $currentYear >= 2024)
+            || ($this->user->getYear()->getName() === '11' && $currentYear >= 2025)
+            || ($this->user->getYear()->getName() === '12' && $currentYear >= 2026)
+            || ($this->user->getYear()->getName() === '13' && $currentYear >= 2027);
     }
 }
