@@ -101,7 +101,10 @@ services:
 
   redis-storage:
     container_name: redis-storage
-    image: redis:6.0
+    build:
+      context: ./redis-storage
+      args:
+        REDIS_MAJOR_VERSION : ${REDIS_MAJOR_VERSION}
     healthcheck:
       test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
       start_period: 30s
@@ -109,12 +112,15 @@ services:
       timeout: 3s
       retries: 5
     volumes:
-      - redis-storage-config:/usr/local/etc/redis
+#      - redis-storage-config:/usr/local/etc/redis
       - redis-storage-data:/data
 
   redis-cache:
     container_name: redis-cache
-    image: redis:6.0
+    build:
+      context: ./redis-cache
+      args:
+        REDIS_MAJOR_VERSION : ${REDIS_MAJOR_VERSION}
     healthcheck:
       test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
       start_period: 30s
@@ -122,7 +128,7 @@ services:
       timeout: 3s
       retries: 5
     volumes:
-      - redis-cache-config:/usr/local/etc/redis
+#      - redis-cache-config:/usr/local/etc/redis
       - redis-cache-data:/data
 
   rabbitmq:
