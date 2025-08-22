@@ -328,32 +328,22 @@ function getCustomisationMeta(plan: Plan | CustomisedPlan): string {
                     <td>
                         <img
                             :src="`/portrait.php?id=${participant.user.id}&size=square64`"
-                            :alt="participant.user.lastname + ', ' + participant.user.firstname"
+                            :alt="`${participant.user.lastname}, ${participant.user.firstname}`"
                         />
                     </td>
                     <td>
                         <div class="l-flex-col l-gap-s">
                             <div v-if="participant.user.id">
                                 <a :href="`/search/user/${participant.user.id}`">
-                                    {{ participant.user.lastname + ", " + participant.user.firstname }}
-                                    {{
-                                        participant.user.preferredName &&
-                                        participant.user.preferredName !== participant.user.firstname
-                                            ? "‘" + participant.user.preferredName + "’"
-                                            : ""
-                                    }}
-                                    {{ participant.user.pronoun }}
+                                    {{ participant.user.lastname }},
+                                    {{ participant.user.preferredName || participant.user.firstname }}
+                                    {{ participant.user.pronoun || "" }}
                                 </a>
                             </div>
                             <template v-else>
-                                {{ participant.user.lastname + ", " + participant.user.firstname }}
-                                {{
-                                    participant.user.preferredName &&
-                                    participant.user.preferredName !== participant.user.firstname
-                                        ? "‘" + participant.user.preferredName + "’"
-                                        : ""
-                                }}
-                                {{ participant.user.pronoun }}
+                                {{ participant.user.lastname }},
+                                {{ participant.user.preferredName || participant.user.firstname }}
+                                {{ participant.user.pronoun || "" }}
                             </template>
                             <div class="l-flex l-gap-xs">
                                 <sbx-label
