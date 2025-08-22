@@ -11,6 +11,7 @@ const defaultProps = {
     getLearningPlanNewUrl: "",
     getAssessmentParticipation: "",
     getAssessmentParticipationNewActivity: "",
+    getAssessmentParticipationCopyActivity: "",
     assessmentId: 0,
     customisations: [],
     includeInExistingCustomisation: "",
