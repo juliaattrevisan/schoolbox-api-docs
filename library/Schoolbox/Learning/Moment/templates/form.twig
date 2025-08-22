@@ -163,7 +163,7 @@
                                         {% set checked = "checked='checked'" %}
                                     {% endif %}
                                     <li>
-                                        <input id="checkbox-{{ folder.id }}" type="checkbox" value="{{ folder.id }}" {{ checked }}/>
+                                        <input id="checkbox-{{ folder.id }}" name='folders[]' type="checkbox" value="{{ folder.id }}" {{ checked }}/>
                                         <label for="checkbox-{{ folder.id }}">{{ folder.title }}</label>
                                     </li>
                                 {% endfor %}
@@ -428,6 +428,9 @@
                      # For when someone chose "Delete and continue"
                      #}
                     deleteComments: formData.get('delete-comments'),
+                    {# Associate multiple folders with this learning moment (optional)
+                     #}
+                    folders: formData.getAll('folders[]')
                 };
 
             let tags = form.querySelector('#evidence-tags').selectize.items;
