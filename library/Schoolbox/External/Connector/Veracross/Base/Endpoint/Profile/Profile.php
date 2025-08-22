@@ -163,7 +163,7 @@ class Profile implements IStrategy
         /* Students might have profile pics;
          * Staff might have profile pics
          */
-        $this->photoLookup = (new Photo($this->baseProfileMapper, $this->api, $this->watchlist));
+        $this->photoLookup = (new Photo($this->baseProfileMapper, $this->api, $this->watcher, $this->watchlist));
 
         /* A random guzzle client with no special configuration,
          * used purely to access a url Veracross has generated for us.

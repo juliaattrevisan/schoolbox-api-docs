@@ -33,6 +33,7 @@ class Photo
     public function __construct(
         private UserProfile\Mapper $baseProfileMapper,
         private IApi $api,
+        private Watchlist $watcher,
         private array $watchlist
     ) {
     }
@@ -55,8 +56,11 @@ class Photo
             /* Generate a mega lookup of modified times to save requesting this iteratively
              */
             $stmt = $this->baseProfileMapper->getDatabase()->executeQuery("
-                SELECT external_id, updated_at, portrait_hash
-                FROM {$this->baseProfileMapper->getBaseTableName()}
+                SELECT 
+                    sup.external_id, sup.portrait_hash,
+                    s.uploaded_on
+                FROM {$this->baseProfileMapper->getBaseTableName()} sup
+                INNER JOIN storage s ON s.hash = sup.portrait_hash
             ");
 
             foreach ($stmt->fetchAll() as $row) {
@@ -80,7 +84,7 @@ class Photo
 
                     /* Only import for specific users
                      */
-                    if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                    if (!$this->watcher->isOnWatchlist($externalId, $this->watchlist)) {
                         continue;
                     }
 
