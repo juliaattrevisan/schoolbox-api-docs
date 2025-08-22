@@ -178,6 +178,11 @@ abstract class AbstractAssessment implements IAssessable
      */
     private $plans;
 
+    /**
+     * @var IAssessable[]|GenericCollection
+     */
+    private $customisedAssessments;
+
 
     /**
      * Assessable constructor.
@@ -186,6 +191,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         $this->curriculumNodes = new GenericCollection(Node\Model::class);
         $this->plans           = new GenericCollection(Plan::class);
+        $this->customisedAssessments           = new GenericCollection(IAssessable::class);
     }
 
 
@@ -1365,6 +1371,17 @@ abstract class AbstractAssessment implements IAssessable
     {
         $this->plans->replaceWith($plans);
         return $this;
+    }
+
+    public function setCustomisedAssessments(GenericCollection $customisedAssessments): IAssessable
+    {
+        $this->customisedAssessments->replaceWith($customisedAssessments);
+        return $this;
+    }
+
+    public function getCustomisedAssessments(): GenericCollection
+    {
+        return $this->customisedAssessments;
     }
 
 
