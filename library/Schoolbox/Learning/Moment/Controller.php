@@ -59,6 +59,7 @@ class Controller extends Base
      * @param EditorTemplateHelper    $editorTemplateHelper
      * @param \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper
      * @param Storage\Translator\ModelToArray $storageTranslator
+     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
      */
     public function __construct(
         private \Schoolbox\Learning\Moment\Mapper $mapper,
@@ -66,6 +67,7 @@ class Controller extends Base
         private EditorTemplateHelper $editorTemplateHelper,
         private \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper,
         private Storage\Translator\ModelToArray $storageTranslator,
+        private \Schoolbox\Resource\Folder\Mapper $folderMapper
     ) {
     }
 
@@ -191,7 +193,7 @@ class Controller extends Base
              * presume folder involvement to be specifically the Class List from whence you came
              * Request a collection of folders for data struct synonymity
              */
-            $folders = \Schoolbox\Resource\Folder\Mapper::getInstance()->findByColumn('id', $this->requestQuery->get('folderId'));
+            $folders = $this->folderMapper->findByColumn('id', $this->requestQuery->get('folderId'));
         }
 
         $params = [
