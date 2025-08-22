@@ -188,7 +188,6 @@ class Profile implements IStrategy
 
             $this->importStudents();
         }
-
         /* Import staff profile data
          */
         if ($this->validStrats->isStaffStratEnabled()) {
@@ -931,7 +930,25 @@ class Profile implements IStrategy
             $response = $this->client->request('GET', $photoLookup[$externalId]);
             $fileContents = $response->getBody()->getContents();
 
-            $portrait = $this->storageMapper->acceptStream($baseProfile->getExternalId() . '.jpg', $fileContents);
+            /* Presume the universal default of jpg, esp. for random formats like
+             * pjpeg, jpg, jfif, etc
+             */
+            $ext = '.jpg';
+
+            /* Guess a file extension based on content-type
+             * I don't think we have a content-type to extension converter anywhere convenient?
+             */
+            if ($response->getHeader('Content-Type')[0] === 'image/png') {
+                $ext = '.png';
+            } elseif ($response->getHeader('Content-Type')[0] === 'image/gif') {
+                $ext = '.gif';
+            } elseif ($response->getHeader('Content-Type')[0] === 'image/webp') {
+                $ext = '.webp';
+            } elseif ($response->getHeader('Content-Type')[0] === 'image/bmp') {
+                $ext = '.bmp';
+            }
+
+            $portrait = $this->storageMapper->acceptStream($baseProfile->getExternalId() . $ext, $fileContents);
 
             /* You get a picture if any of the following occur:
              *     - you don't have a portrait yet; you can get one added
