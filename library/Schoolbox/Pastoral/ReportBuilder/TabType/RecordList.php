@@ -140,8 +140,7 @@ class RecordList extends Base implements TabTypeInterface, ICursor
             {$this->helper->getFromString()}
             WHERE {$where}
             AND ({$this->inTypeSubType})
-            ORDER BY p.id ASC
-            {$this->limit}
+            LIMIT {$this->limit}
         ",
             array_merge(
                 $this->helper->getParams(),
@@ -164,7 +163,6 @@ class RecordList extends Base implements TabTypeInterface, ICursor
                     'order' => $order
                 ]
             )->reindex();
-
 
         return $records;
     }
