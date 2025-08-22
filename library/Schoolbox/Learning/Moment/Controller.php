@@ -190,16 +190,22 @@ class Controller extends Base
                  * This is purely circumstantial since parents can't spawn learning moments for multiple people.
                  */
                 $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $users->first()->getYear());
+
+                /* Parents don't get to associate folders with a learning moment
+                 */
             }
 
-            /* These are folders that the recipient can see via their membership;
-             * Note that a staff member might edit a student's learning moment, so you have to use
-             * the recipient's user instance, not the viewer's
-             */
-            $userAccesses = $this->userAccessMapper->findAllForUser($users->first(), $users->first()->isShowTimetable());
+            if ($this->getUser()->getRole()->isStaff()) {
+                /* These are folders that the recipient can see via their membership;
+                 * Note that a staff member might edit a student's learning moment, so you have to use
+                 * the recipient's user instance, not the viewer's
+                 */
+                $userAccesses = $this->userAccessMapper->findAllForUser($users->first(), $users->first()->isShowTimetable());
 
-            if ($userAccesses->count()) {
-                $folders = $this->folderMapper->findByColumn('id', $userAccesses->getPropertyValues('serviceIdentifier'));
+                if ($userAccesses->count()) {
+                    $folders = $this->folderMapper->findByColumn('id', $userAccesses->getPropertyValues('serviceIdentifier'));
+                    $selectedFolders = [$this->requestQuery->get('folderId')];
+                }
             }
         } elseif ($this->getUser()->getRole()->isStaff()) {
             /* If the current user is a staff and the list of recipients is more than one,
