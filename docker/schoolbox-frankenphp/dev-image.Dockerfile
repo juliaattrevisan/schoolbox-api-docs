@@ -66,8 +66,9 @@ esac
 EOF
 
 # Copy configuration files
-COPY ./config/php/* /usr/local/etc/php/conf.d/
-COPY ./config/php${PHP_MAJOR_VERSION}/* /usr/local/etc/php/conf.d/
+COPY ./config/php/*.ini /usr/local/etc/php/conf.d/
+COPY ./config/php/${ENV}/*.ini /usr/local/etc/php/conf.d/
+COPY ./config/php${PHP_MAJOR_VERSION}/*.ini /usr/local/etc/php/conf.d/
 COPY ./config/imagemagick/* /etc/ImageMagick-6/
 COPY ./config/frankenphp/* /etc/frankenphp/
 
