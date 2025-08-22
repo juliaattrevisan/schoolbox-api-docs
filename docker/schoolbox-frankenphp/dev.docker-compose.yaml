@@ -11,6 +11,7 @@ services:
       context: ./schoolbox-frankenphp
       dockerfile: dev-image.Dockerfile
       args:
+        ENV: ${ENV:-dev}
         PHP_MAJOR_VERSION: ${PHP_MAJOR_VERSION}
     scale: 2
     deploy:
