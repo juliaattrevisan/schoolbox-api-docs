@@ -120,6 +120,7 @@ class Profile implements IStrategy
      * @param LoggerInterface $log
      * @param bool $perform
      * @param IApi $api
+     * @param Watchlist $watcher
      * @param array $watchlist
      * @param bool $includePhoto
      * @param Mapper $baseProfileMapper
@@ -134,6 +135,7 @@ class Profile implements IStrategy
         private LoggerInterface $log,
         private bool $perform,
         private IApi $api,
+        private Watchlist $watcher,
         private array $watchlist,
         private bool $includePhoto,
         private UserProfile\Mapper $baseProfileMapper,
@@ -266,7 +268,7 @@ class Profile implements IStrategy
 
                 /* Only import for specific users
                  */
-                if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                if (!($this->watcher)->isOnWatchlist($externalId, $this->watchlist)) {
                     continue;
                 }
 
@@ -783,7 +785,7 @@ class Profile implements IStrategy
 
                 /* Only import for specific users
                  */
-                if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                if (!($this->watcher)->isOnWatchlist($externalId, $this->watchlist)) {
                     continue;
                 }
 

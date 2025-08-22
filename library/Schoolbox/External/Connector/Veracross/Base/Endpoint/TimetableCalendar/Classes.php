@@ -67,22 +67,24 @@ class Classes implements IStrategy
     /**
      * Constructor.
      *
-     * @param LoggerInterface                            $log
-     * @param bool                                       $perform
-     * @param IApi                                       $api
-     * @param array                                      $watchlist
-     * @param Mapper                                     $eventMapper
+     * @param LoggerInterface $log
+     * @param bool $perform
+     * @param IApi $api
+     * @param Watchlist $watcher
+     * @param array $watchlist
+     * @param Mapper $eventMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
-     * @param ClassEntryMapper                           $classEntryMapper
-     * @param ClassInvolvementMapper                     $classInvolvementMapper
-     * @param \DateTimeZone                              $timezone
-     * @param \Alaress_Date_Format                       $fromDate
-     * @param \Alaress_Date_Format                       $toDate
+     * @param ClassEntryMapper $classEntryMapper
+     * @param ClassInvolvementMapper $classInvolvementMapper
+     * @param \DateTimeZone $timezone
+     * @param \Alaress_Date_Format $fromDate
+     * @param \Alaress_Date_Format $toDate
      */
     public function __construct(
         private LoggerInterface $log,
         private bool $perform,
         private IApi $api,
+        private Watchlist $watcher,
         private array $watchlist,
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
@@ -132,7 +134,7 @@ class Classes implements IStrategy
         foreach ($userLookup as $externalId => $user) {
             /* Only import for specific users
              */
-            if (!(new Watchlist())->isOnWatchlist((string)$externalId, $this->watchlist)) {
+            if (!$this->watcher->isOnWatchlist((string)$externalId, $this->watchlist)) {
                 continue;
             }
 
@@ -154,10 +156,10 @@ class Classes implements IStrategy
                  * appear again in the classes index. You can use the numeric
                  * class id instead if that helps
                  */
-//                if (!(new Watchlist())->isOnWatchlist((string)$enrolment['internal_class_id']['id'], $this->watchlist)) {
+//                if (!$this->watcher->isOnWatchlist((string)$enrolment['internal_class_id']['id'], $this->watchlist)) {
 //                    continue;
 //                }
-//                if (!(new Watchlist())->isOnWatchlist((string)$enrolment['internal_class_id']['class_id'], $this->watchlist)) {
+//                if (!$this->watcher->isOnWatchlist((string)$enrolment['internal_class_id']['class_id'], $this->watchlist)) {
 //                    continue;
 //                }
 

@@ -261,7 +261,7 @@ class ProfileHandler
         /* Some part of $newObject is different to $oldObject somehow
          *
          * Avoid nuking every column via mapper save by piecing it together manually
-         * just like we used to do in the previous millenium
+         * just like we used to do in the previous millennium
          */
         $pieces = [];
 
