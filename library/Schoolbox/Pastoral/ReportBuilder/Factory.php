@@ -3,6 +3,8 @@
 namespace Schoolbox\Pastoral\ReportBuilder;
 
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\ReportBuilder\Translator\ModelToArray as PastoralTranslator;
+use Schoolbox\Pastoral\ReportBuilder\TabType\RecordList;
 use Schoolbox\Pastoral\ReportBuilder\TabType\StudentByMonth;
 use Schoolbox\Pastoral\ReportBuilder\TabType\StudentByType;
 use Schoolbox\Pastoral\ReportBuilder\TabType\StudentByWeek;
@@ -18,11 +20,13 @@ class Factory
     public const TYPE_BY_WEEK     = 'typeByWeek';
     public const STUDENT_BY_MONTH = 'studentByMonth';
     public const STUDENT_BY_WEEK  = 'studentByWeek';
+    public const RECORD_LIST = 'list';
 
     public function __construct(
         private ModelToArray $userTranslator,
         private UserMapper $userMapper,
         private PastoralMapper $pastoralMapper,
+        private PastoralTranslator $pastoralTranslator,
         private string $resultType,
         private ?string $orderBy,
         private ?string $order,
@@ -83,6 +87,15 @@ class Factory
                 $this->resultType,
                 $this->orderBy ?? Base::SORT_BY_TYPE_DEFAULT,
                 $this->order,
+                $this->limit,
+            ),
+            self::RECORD_LIST => new RecordList(
+                $helper,
+                $this->userTranslator,
+                $this->userMapper,
+                $this->pastoralMapper,
+                $this->pastoralTranslator,
+                $this->resultType,
                 $this->limit,
             ),
             default => null

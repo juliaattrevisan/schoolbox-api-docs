@@ -388,7 +388,14 @@ class Controller extends Base
                 'type' => 'list',
                 'key' => 'list',
                 '_links' => [
-                    'view' => 'list',
+                    'view' => $this->getRouteIfAuthorized(
+                        'pastoralReportBuilder.getReportByTabType',
+                        [
+                            'reportId' => $report->getId(),
+                            'report' => $report,
+                            'tabType' => 'list',
+                        ]
+                    ),
                     'export' => $this->getRouteIfAuthorized(
                         'pastoralReportBuilder.getReportResultsExport',
                         [
@@ -486,6 +493,7 @@ class Controller extends Base
                 $this->userTranslator,
                 $this->userMapper,
                 $this->pastoralMapper,
+                $this->pastoralTranslator,
                 $resultType,
                 $sortBy,
                 $order,

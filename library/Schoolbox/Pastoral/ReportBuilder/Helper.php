@@ -7,6 +7,7 @@ use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\Report\Model as Report;
 use Schoolbox\Pastoral\SubType\Model as SubType;
 
 class Helper
@@ -365,6 +366,86 @@ class Helper
     public function getParams(): array
     {
         return $this->params;
+    }
+
+    /**
+     * Get the order preference set in the report setting
+     *
+     * @return array
+     */
+    public function getReportOrder(): array
+    {
+        $orderParts = [];
+        foreach ($this->report['orders'] as $orderCurrent) {
+            switch ($orderCurrent) {
+                case Report::ORDER_STUDENT:
+                    $orderParts[] = [
+                        'column' => "s.lastname"
+                    ];
+                    $orderParts[] = [
+                        'column' => "s.chosen_name"
+                    ];
+                    break;
+                case Report::ORDER_SEVERITY:
+                    $orderParts[] = [
+                        'column' => "sv.sequence"
+                    ];
+                    break;
+                case Report::ORDER_CREATED_AT:
+                    $orderParts[] = [
+                        'column' => "pastoral.created_at",
+                        'direction' => 'DESC'
+                    ];
+                    break;
+                case Report::ORDER_OCCURRED_ON:
+                    $orderParts[] = [
+                        'column' => "pastoral.occurred_on",
+                        'direction' => 'DESC'
+                    ];
+                    break;
+                case Report::ORDER_TYPE:
+                    $orderParts[] = [
+                        'column' => "t.name"
+                    ];
+                    break;
+                case Report::ORDER_SUBTYPE:
+                    $orderParts[] = [
+                        'column' => "c.name"
+                    ];
+                    break;
+                case Report::ORDER_POINTS:
+                    $orderParts[] = [
+                        'column' => "pastoral.points"
+                    ];
+                    break;
+                case Report::ORDER_YEAR:
+                    $orderParts[] = [
+                        'column' => "sy.sequence",
+                        'direction' => 'ASC'
+                    ];
+                    break;
+                case Report::ORDER_AUTHOR:
+                    $orderParts[] = [
+                        'column' => "o.lastname"
+                    ];
+                    $orderParts[] = [
+                        'column' => "o.chosen_name"
+                    ];
+                    break;
+                case Report::ORDER_HOUSE:
+                    $orderParts[] = [
+                        'column' => "s.house"
+                    ];
+                    break;
+                case Report::ORDER_CAMPUS:
+                    $orderParts[] = [
+                        'column' => "sc.name"
+                    ];
+                    break;
+            }
+        }
+
+        return $orderParts;
     }
 
     public function getStartDate(): ?Alaress_Date_Format
