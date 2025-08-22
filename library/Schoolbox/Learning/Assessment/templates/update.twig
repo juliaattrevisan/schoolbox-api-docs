@@ -117,23 +117,23 @@
             event.preventDefault();
 
             $(this).confirmDialog({
-                header: 'Are you sure you wish to delete this activity?',
+                header: 'Are you sure you wish to delete this {{ locale.activity }}?',
                 text: {{ assessment.isSpecification ? '\'\'' : '\'<span class=\"alert alert-box\"><b>WARNING</b> All student responses, feedback and marks will also be deleted.</span>\'' }},
                 format: 'html',
                 confirmLabel: 'Yes, permanently delete',
                 cancelLabel: 'No, keep it',
                 confirmEvent: function() {
                     const toast = $('#toast');
-                    toast.toastActivate({text: 'Deleting activity...'});
+                    toast.toastActivate({text: 'Deleting {{ locale.activity }}...'});
 
                     $.post('{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id, assessment: assessment}) }}')
                         .done(function(result) {
                             // Remove from list after AJAX returns
                             window.location.href = result.returnUrl;
-                            toast.toastTimeout({text: 'Activity deleted.', css: 'success'});
+                            toast.toastTimeout({text: '{{ locale.activity.proper }} deleted.', css: 'success'});
                         })
                         .fail(function() {
-                            toast.toastTimeout({text: 'Could not delete this activity.', css: 'alert'});
+                            toast.toastTimeout({text: 'Could not delete this {{ locale.activity }}.', css: 'alert'});
                         });
                 }
             });
