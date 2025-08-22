@@ -313,19 +313,19 @@ volumes:
       o: bind
       device: ../data/docker/ssl
 
-  redis-storage-config:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./redis-storage/config
-
-  redis-cache-config:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ./redis-cache/config
+#  redis-storage-config:
+#    driver: local
+#    driver_opts:
+#      type: none
+#      o: bind
+#      device: ./redis-storage/config
+#
+#  redis-cache-config:
+#    driver: local
+#    driver_opts:
+#      type: none
+#      o: bind
+#      device: ./redis-cache/config
 
   aws-config:
     driver: local
