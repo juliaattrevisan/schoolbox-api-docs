@@ -275,9 +275,9 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
  */
 function getCustomisationMeta(plan: Plan | CustomisedPlan): string {
     if ("assessable" in plan && plan.assessable !== null) {
-        return `(New ${locale.activity.proper()})` || "";
+        return `(New ${locale.activity.singular()})` || "";
     }
-    return `(Modified ${locale.activity.proper()})` || "";
+    return `(Modified ${locale.activity.singular()})` || "";
 }
 </script>
 
