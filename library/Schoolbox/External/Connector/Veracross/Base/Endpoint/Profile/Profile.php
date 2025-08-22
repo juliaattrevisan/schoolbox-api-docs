@@ -944,6 +944,11 @@ class Profile implements IStrategy
                 return;
             }
 
+            /* TODO Maybe implement a retry system here, even though this seems to be a static resource?
+             *  Not sure how reliable this part of veracross is, but pics aren't exactly supercritical
+             *  unlike the rest of their user data. Let's add it if they're not reliable enough
+             */
+
             $fileContents = $response->getBody()->getContents();
 
             $ext = $this->guessExtension($response->getHeader('Content-Type')[0]);
