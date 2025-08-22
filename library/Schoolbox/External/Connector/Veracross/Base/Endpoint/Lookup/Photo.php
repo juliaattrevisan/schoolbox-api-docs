@@ -12,6 +12,7 @@ use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Profile\Profile;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Profile as UserProfile;
+use Schoolbox\External\Profile\Mapper;
 
 class Photo
 {
@@ -26,8 +27,9 @@ class Photo
     /**
      * Constructor
      *
-     * @param UserProfile\Mapper $baseProfileMapper
+     * @param Mapper $baseProfileMapper
      * @param IApi $api
+     * @param Watchlist $watcher
      * @param array $watchlist
      */
     public function __construct(
