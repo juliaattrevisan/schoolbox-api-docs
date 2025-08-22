@@ -445,18 +445,18 @@ class Mapper extends BaseMapper
         $query     = "
             SELECT
                 {$this->getColumnString()},
-                {$this->getJoinColumnString('moment_folder', 'mf')}
+                {$this->getJoinColumnString('moment_folder', 'f')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
-            INNER JOIN {$this->getJoinSql('moment_folder', '', 'mf')}
+            INNER JOIN {$this->getJoinSql('moment_folder', '', 'f')}
             WHERE {$pb->getWhereIntersect()}
         ";
 
         $momentFolderStatement = $this->database->query($query, $pb->getParams());
         foreach ($momentFolderStatement as $row) {
-            if ($row['mf.id'] !== null) {
+            if ($row['f.id'] !== null) {
                 //only step into if the folder is NOT deleted
                 /** @var \Schoolbox\Resource\Folder\Model $folder */
-                $momentFolder = $this->hydrateJoin($row, 'moment_folder', 'mf');
+                $momentFolder = $this->hydrateJoin($row, 'moment_folder', 'f');
                 $collection[$row['id']]->getFolders()->setOffset($momentFolder->getId(), $momentFolder);
             }
         }
@@ -479,18 +479,18 @@ class Mapper extends BaseMapper
             $this->cascadeJoin('moment_evidence', ['moment_id' => $moment->getId()], $moment->getEvidence());
         }
     }
-
-
-    /**
-     * Persist folder relationships
-     *
-     * @param Model $moment
-     * @return void
-     */
-    public function saveFolders(Model $moment): void
-    {
-        if (null !== $moment->getEvidence()) {
-            $this->cascadeJoin('moment_folder', ['moment_id' => $moment->getId()], $moment->getFolders());
-        }
-    }
+//
+//
+//    /**
+//     * Persist folder relationships
+//     *
+//     * @param Model $moment
+//     * @return void
+//     */
+//    public function saveFolders(Model $moment): void
+//    {
+//        if (null !== $moment->getFolders()) {
+//            $this->cascadeJoin('moment_folder', ['moment_id' => $moment->getId()], $moment->getFolders());
+//        }
+//    }
 }
