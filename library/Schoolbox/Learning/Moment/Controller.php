@@ -166,6 +166,13 @@ class Controller extends Base
             if ($userAccesses->count()) {
                 $folders = $this->folderMapper->findByColumn('id', $userAccesses->getPropertyValues('serviceIdentifier'));
             }
+
+            /* If folderId exists in the querystring params, use that to preselect
+             * (you probably came here via the homepage component)
+             */
+            if ($this->requestQuery->get('folderId') ?? false) {
+                $selectedFolders = [$this->requestQuery->get('folderId')];
+            }
         } elseif (1 === $users->count()) {
             /* Crafting a learning moment for exactly one other person
              *
