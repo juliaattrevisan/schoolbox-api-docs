@@ -13,8 +13,6 @@ use Schoolbox\Pastoral\ReportBuilder\Helper;
 use Schoolbox\Pastoral\ReportBuilder\TabType\StudentByType;
 use Schoolbox\Pastoral\ReportBuilder\TabType\TypeByMonth;
 use Schoolbox\Pastoral\ReportBuilder\TabType\TypeByWeek;
-use Schoolbox\Pastoral\SubType\Model as SubType;
-use Schoolbox\Pastoral\Type\Model as Type;
 use ValueError;
 
 class Cursor implements ICursor
@@ -36,6 +34,7 @@ class Cursor implements ICursor
      * IMO the maximum is a sensible default.
      */
     public const LIMIT_DEFAULT = self::LIMIT_MAX;
+    public const BAD_REQUEST_ERROR_CODE = 400;
 
     public function __construct(
         private Helper $helper,
@@ -52,13 +51,19 @@ class Cursor implements ICursor
          */
         if (null !== $this->limit) {
             if ($this->limit > self::LIMIT_MAX) {
-                throw new ValueError(sprintf('Limit must be at most %d: %d provided', self::LIMIT_MAX, $this->limit));
+                throw new ValueError(
+                    sprintf('Limit must be at most %d: %d provided', self::LIMIT_MAX, $this->limit),
+                    self::BAD_REQUEST_ERROR_CODE
+                );
             }
 
             /* Set a minimum number of results should be returned otherwise reject
              */
             if ($this->limit < self::LIMIT_MIN) {
-                throw new ValueError(sprintf('Limit must be at least %d: %d provided', self::LIMIT_MIN, $this->limit));
+                throw new ValueError(
+                    sprintf('Limit must be at least %d: %d provided', self::LIMIT_MIN, $this->limit),
+                    self::BAD_REQUEST_ERROR_CODE
+                );
             }
         }
 
@@ -236,7 +241,7 @@ class Cursor implements ICursor
             case Factory::STUDENT_BY_TYPE:
                 $query[] = "p.student_id = :student_id";
                 if (!isset($this->rowKey['student_id'])) {
-                    throw new ValueError('Student ID is required');
+                    throw new ValueError('Student ID is required', self::BAD_REQUEST_ERROR_CODE);
                 }
                 $param['student_id'] = $this->rowKey['student_id'];
                 break;
@@ -250,7 +255,7 @@ class Cursor implements ICursor
                 $param['subtype_id'] = $this->rowKey['type']['subtype_id'] ?? null;
                 break;
             default:
-                throw new ValueError(sprintf('Unknown tab type: %s', $this->tabType));
+                throw new ValueError(sprintf('Unknown tab type: %s', $this->tabType), self::BAD_REQUEST_ERROR_CODE);
         }
 
         return [$query, $param];
@@ -265,14 +270,14 @@ class Cursor implements ICursor
         switch ($this->tabType) {
             case Factory::STUDENT_BY_TYPE:
                 if (!preg_match(StudentByType::COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
-                    throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey));
+                    throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey), self::BAD_REQUEST_ERROR_CODE);
                 }
                 $query[] = "p.{$matches['type']}_id = :type_id";
                 $param['type_id'] = $matches['id'];
                 break;
             case Factory::TYPE_BY_MONTH:
                 if (!preg_match(TypeByMonth::COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
-                    throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey));
+                    throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey), self::BAD_REQUEST_ERROR_CODE);
                 }
                 $monthFormat = TypeByMonth::COLUMN_QUERY_MONTH_FORMAT;
                 $query[] = "DATE_FORMAT(COALESCE(p.occurred_on, p.created_at), '{$monthFormat}') = :monthKey";
@@ -280,7 +285,7 @@ class Cursor implements ICursor
                 break;
             case Factory::TYPE_BY_WEEK:
                 if (!preg_match(TypeByWeek::COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
-                    throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey));
+                    throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey), self::BAD_REQUEST_ERROR_CODE);
                 }
                 $weeks = $this->helper->getWeeksInRange(
                     $this->helper->getStartDate(),
@@ -290,7 +295,7 @@ class Cursor implements ICursor
                     TypeByWeek::MAX_COLUMN_COUNT,
                 );
                 if (!$weeks->offsetExists($matches['index'])) {
-                    throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey));
+                    throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey), self::BAD_REQUEST_ERROR_CODE);
                 }
                 $query[] = "COALESCE(p.occurred_on, p.created_at) BETWEEN :start AND :end";
                 $week = array_reverse($weeks->getAll())[$matches['index']];
@@ -298,7 +303,7 @@ class Cursor implements ICursor
                 $param['end'] = $week['end']->toIso8601String();
                 break;
             default:
-                throw new ValueError(sprintf('Unknown tab type: %s', $this->tabType));
+                throw new ValueError(sprintf('Unknown tab type: %s', $this->tabType), self::BAD_REQUEST_ERROR_CODE);
         }
         return [$query, $param];
     }
