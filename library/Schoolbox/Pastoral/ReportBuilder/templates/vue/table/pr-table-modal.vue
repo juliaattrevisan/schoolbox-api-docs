@@ -89,7 +89,7 @@ window.Vue.watch(bottom, (isAtBottom) => {
         <data-load-error v-else-if="isNewLoad && loadError" data-title="record" :further-info="loadError" />
         <template v-else-if="selectedHeader !== null">
             <div class="l-flex-col l-gap-m">
-                <div class="l-flex-row l-flex--justify-space l-gap-s">
+                <div class="l-flex-row l-flex--justify-space l-flex--no-wrap l-gap-m">
                     <div class="l-flex-col l-gap-s f-no-margins">
                         <h2>{{ store.title }}</h2>
                         <p v-if="props.selectedCell" class="meta">

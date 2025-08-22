@@ -4,6 +4,7 @@
  */
 
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
+import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import type { TablePayload, TableHeader, SelectedCell, RowKeys } from "../../js/types/pastoralReportTypes";
 import { TabType, ViewUrlParam } from "../../js/types/pastoralReportTypes";
 import { useLoadPrTable } from "../composable/useLoadPrTable";
@@ -155,11 +156,7 @@ window.Vue.onMounted(() => {
                     @sort="onSort"
                 />
                 <!-- Skeleton loading state when switching between records/rows and sorting -->
-                <tbody v-if="isMoreLoading" class="skeleton">
-                    <tr v-for="(row, index) in 5" :key="index">
-                        <td colspan="100%"></td>
-                    </tr>
-                </tbody>
+                <loading-table v-if="isMoreLoading" :only-body="true" />
                 <tbody v-else>
                     <!-- Total row -->
                     <pr-table-total-row

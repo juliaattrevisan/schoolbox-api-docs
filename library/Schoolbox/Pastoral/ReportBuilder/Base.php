@@ -39,6 +39,7 @@ class Base
      * A sane value used for comparison of NULL value in the points when querying db
      */
     public const MIN_SORT_BY_VALUE = -99999999;
+    public const BAD_REQUEST_ERROR_CODE = 400;
 
     public function __construct(
         protected Helper $helper,
@@ -56,13 +57,19 @@ class Base
         /* Set a maximum number of results should be returned otherwise reject
          */
         if ($this->limit > self::LIMIT_MAX) {
-            throw new ValueError(sprintf('Limit must be at most %d: %d provided', self::LIMIT_MAX, $this->limit));
+            throw new ValueError(
+                sprintf('Limit must be at most %d: %d provided', self::LIMIT_MAX, $this->limit),
+                self::BAD_REQUEST_ERROR_CODE
+            );
         }
 
         /* Set a minimum number of results should be returned otherwise reject
          */
         if ($this->limit < self::LIMIT_MIN) {
-            throw new ValueError(sprintf('Limit must be at least %d: %d provided', self::LIMIT_MIN, $this->limit));
+            throw new ValueError(
+                sprintf('Limit must be at least %d: %d provided', self::LIMIT_MIN, $this->limit),
+                self::BAD_REQUEST_ERROR_CODE
+            );
         }
 
         /* If not set or it is assigned to other values should set back to default direction

@@ -170,6 +170,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
 }
 
 .trend-column {
+    min-width: 220px;
     width: 220px;
 }
 

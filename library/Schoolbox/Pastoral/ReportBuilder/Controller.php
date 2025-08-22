@@ -509,11 +509,11 @@ class Controller extends Base
         } catch (\PDOException | DatabaseException $e) {
             $problem = (new ApiProblem('Something has gone wrong, please contact your support if the problem persists'))
                 ->setStatus(500);
-            $this->response = $this->responseAsJson($problem->asArray());
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus(500);
         } catch (\Exception | \ValueError $e) {
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($e->getCode());
-            $this->response = $this->responseAsJson($problem->asArray());
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus($e->getCode());
         }
     }
 
@@ -566,11 +566,11 @@ class Controller extends Base
         } catch (\PDOException | DatabaseException $e) {
             $problem = (new ApiProblem('Something has gone wrong, please contact your support if the problem persists'))
                 ->setStatus(500);
-            $this->response = $this->responseAsJson($problem->asArray());
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus(500);
         } catch (\Exception | \ValueError $e) {
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($e->getCode());
-            $this->response = $this->responseAsJson($problem->asArray());
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus($e->getCode());
         }
     }
 
@@ -649,11 +649,11 @@ class Controller extends Base
         } catch (\PDOException | DatabaseException $e) {
             $problem = (new ApiProblem('Something has gone wrong, please contact your support if the problem persists'))
                 ->setStatus(500);
-            $this->response = $this->responseAsJson($problem->asArray());
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus(500);
         } catch (\Exception | \ValueError $e) {
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($e->getCode());
-            $this->response = $this->responseAsJson($problem->asArray());
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus($e->getCode());
         }
     }
 
