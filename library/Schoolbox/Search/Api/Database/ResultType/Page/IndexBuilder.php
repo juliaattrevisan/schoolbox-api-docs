@@ -198,13 +198,13 @@ class IndexBuilder extends BaseBuilder
         // Required so that if, e.g. a homepage template is added to a folder,
         // the folder's previous "page.folder" index is deleted whilst
         // preserving its "page.homepage" index.
+        // Note the HAVING clause added below after the date range checks.
         $queryString = '
             SELECT si.identifier AS id, si.type AS typeFromIndex, ' . $this->buildTypeExpression() . ' AS typeFromFolder
             FROM search_index si
             JOIN folder f ON si.identifier = f.id
             ' . $this->getJoinsFromFolderForTypeExpression() . '
             WHERE si.type like "' . Hydrator::BASE_TYPE . '%"
-            HAVING typeFromIndex <> typeFromFolder
         ';
 
         $params = [];
@@ -219,6 +219,9 @@ class IndexBuilder extends BaseBuilder
         if ($subject) {
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::DELETE, $queryString, $params);
         }
+
+        $queryString .= ' HAVING typeFromIndex <> typeFromFolder';
+
         $query = $this->connector->prepareQuery($queryString);
         $query->execute($params);
         $this->logger->info(sprintf('Deleting search indices for %d pages/folders (mismatched types)', $query->rowCount()));
