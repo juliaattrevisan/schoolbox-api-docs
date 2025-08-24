@@ -9,8 +9,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\API\Token\JwtParser\Test;
 
-use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\NullLogger;
 use Schoolbox\API\Token\JwtParser\IParser;
@@ -21,21 +22,20 @@ use Schoolbox\UserMapper;
 use Symfony\Component\Cache\Adapter\ArrayAdapter;
 use Symfony\Component\Cache\Psr16Cache;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\API\Token\JwtParser\OauthProviderIssued::class)]
+#[CoversClass(OauthProviderIssued::class)]
 class OauthProviderIssuedTest extends TestCase
 {
+    use CreateJwt;
+
     /**
      * @param array $config
      * @param array $claims
      * @param bool  $expected
      * @return void
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('getTestAcceptsData')]
-    public function testAccepts(
-        array $config,
-        array $claims,
-        bool $expected,
-    ): void {
+    #[DataProvider('getTestAcceptsData')]
+    public function testAccepts(array $config, array $claims, bool $expected): void
+    {
         $this->assertSame($expected, $this->createParser($config)->accepts($this->createJwt($claims)));
     }
 
@@ -199,20 +199,5 @@ class OauthProviderIssuedTest extends TestCase
             $this->createMock(Client::class),
             new Psr16Cache(new ArrayAdapter()),
         );
-    }
-
-    /**
-     * Create a mock JWT, with the provided payload.
-     *
-     * (This test doesn't care about the header or signature: only the payload.)
-     *
-     * @param array $payload
-     * @return string
-     */
-    private function createJwt(array $payload): string
-    {
-        // Just use the JWT library's encode methods:
-        // for this test we don't care about signing or anything
-        return sprintf('.%s.', JWT::urlsafeB64Encode(JWT::jsonEncode($payload)));
     }
 }
