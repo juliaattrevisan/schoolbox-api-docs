@@ -13,7 +13,6 @@ use GuzzleHttp\Client;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
 use Schoolbox\API\Token\JwtParser\IParser;
 use Schoolbox\API\Token\JwtParser\OauthProviderIssued;
 use Schoolbox\Config\ConfigMapper;
@@ -26,6 +25,7 @@ use Symfony\Component\Cache\Psr16Cache;
 class OauthProviderIssuedTest extends TestCase
 {
     use CreateJwt;
+    use CreateLogger;
 
     /**
      * @param array $config
@@ -195,7 +195,7 @@ class OauthProviderIssuedTest extends TestCase
         return new OauthProviderIssued(
             $this->createMock(UserMapper::class),
             new ArrayLoader($config),
-            new NullLogger(),
+            $this->createLogger(self::class),
             $this->createMock(Client::class),
             new Psr16Cache(new ArrayAdapter()),
         );

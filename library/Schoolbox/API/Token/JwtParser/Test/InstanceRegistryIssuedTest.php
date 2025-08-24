@@ -15,7 +15,6 @@ use Monolog\Logger;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\NullLogger;
 use Schoolbox\API\Token\JwtParser\InstanceRegistryIssued;
 use Schoolbox\API\Token\JwtParser\IParser;
 use Schoolbox\Config\ArrayLoader;
@@ -26,6 +25,7 @@ use Schoolbox\UserMapper;
 class InstanceRegistryIssuedTest extends TestCase
 {
     use CreateJwt;
+    use CreateLogger;
 
     #[DataProvider('getTestAcceptsData')]
     public function testAccepts(array $config, string $instanceId, array $claims, bool $expected): void
@@ -68,10 +68,7 @@ class InstanceRegistryIssuedTest extends TestCase
         return new InstanceRegistryIssued(
             $this->createMock(UserMapper::class),
             new ArrayLoader($config),
-            new Logger(
-                'InstanceRegistryIssuedTest',
-                [new StreamHandler(STDOUT, Level::Debug),],
-            ),
+            $this->createLogger(self::class),
             $instanceId,
         );
     }
