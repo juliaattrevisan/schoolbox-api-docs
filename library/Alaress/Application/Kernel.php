@@ -2075,7 +2075,7 @@ abstract class Kernel
                         new JwtParser\OtherInstanceIssued($userMapper, $config, $logger),
                         new JwtParser\SelfIssued($userMapper, $config, $logger, $tokenMapper),
                         new JwtParser\OauthProviderIssued($userMapper, $config, $logger, $httpClient, $oidcCache),
-                        new JwtParser\InstanceRegistryIssued($userMapper, $config, $logger),
+                        new JwtParser\InstanceRegistryIssued($userMapper, $config, $logger, (string)INSTANCE_ID),
                         new JwtParser\OauthClientHeld($userMapper, $config, $logger, $relyingPartyMapper),
                     );
                 }

@@ -12,7 +12,9 @@ namespace Schoolbox\API\Token\JwtParser;
 use Firebase\JWT\JWK;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use SensitiveParameter;
@@ -22,6 +24,23 @@ use SensitiveParameter;
  */
 class InstanceRegistryIssued extends Base
 {
+    /**
+     * Constructor
+     *
+     * @param UserMapper      $userMapper
+     * @param IConfigLoader   $config
+     * @param LoggerInterface $log
+     * @param string          $instanceId This instance's ID
+     */
+    public function __construct(
+        UserMapper $userMapper,
+        IConfigLoader $config,
+        LoggerInterface $log,
+        private string $instanceId,
+    ) {
+        parent::__construct($userMapper, $config, $log);
+    }
+
     /**
      * Key for the instance ID custom JWT claim.
      *
@@ -71,10 +90,10 @@ class InstanceRegistryIssued extends Base
                 'Checking JWT %s "%s" against instance ID %s',
                 self::CLAIM_INSTANCE_ID,
                 $claimInstanceId,
-                INSTANCE_ID,
+                $this->instanceId,
             )
         );
-        return $claimInstanceId === (string)INSTANCE_ID;
+        return $claimInstanceId === $this->instanceId;
     }
 
     /**
