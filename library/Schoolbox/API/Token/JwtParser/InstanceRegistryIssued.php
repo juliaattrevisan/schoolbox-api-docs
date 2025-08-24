@@ -76,7 +76,7 @@ class InstanceRegistryIssued extends Base
         );
         if (
             !(
-                isset($claimIssuer) &&
+                isset($claimIssuer, $irUrl) &&
                 parse_url($claimIssuer, PHP_URL_HOST) === parse_url($irUrl, PHP_URL_HOST)
             )
         ) {
