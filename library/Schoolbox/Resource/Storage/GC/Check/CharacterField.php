@@ -38,16 +38,13 @@ class CharacterField extends Base
         'menu_top'                     => [['columns' => ['url']]],
         'profile_button'               => [['columns' => ['url']]],
         'rubric_descriptor'            => [['columns' => ['description']]],
-        'sis_user_profile'             => [['columns' => ['portrait_hash']]],
         'socialstream_post'            => [['columns' => ['thumbnail', 'url']]],
         'sportsfixtures_division'      => [['columns' => ['url']]],
-        'sportsfixtures_import_errors' => [['columns' => ['hash']]],
         'sportsfixtures_sport'         => [['columns' => ['url']]],
         'sportsfixtures_team'          => [['columns' => ['url']]],
         'summative_report'             => [['columns' => ['footer']]],
         'task'                         => [['columns' => ['link']]],
         'tile'                         => [['columns' => ['link']]],
-        'ups_log'                      => [['columns' => ['hash']]],
     ];
 
     /**
