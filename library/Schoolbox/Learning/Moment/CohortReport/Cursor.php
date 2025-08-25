@@ -9,10 +9,12 @@ use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Moment;
+use Schoolbox\Learning\Moment\Mapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Model;
 
 /**
  * Cursor for the cohort report payload
@@ -35,13 +37,14 @@ class Cursor implements ICursor
     /**
      * Constructor
      *
-     * @param Moment\Mapper $mapper
+     * @param Mapper $mapper
      * @param UserAccessMapper $userAccessMapper
-     * @param Folder\Model $folder
+     * @param Model $folder
      * @param array|null $userIds
      * @param string|null $fromDate
      * @param string|null $toDate
      * @param array|null $authorIds
+     * @param array|null $folderIds
      * @param array|null $tagIds
      * @param array|null $states
      */
@@ -53,6 +56,7 @@ class Cursor implements ICursor
         private ?string $fromDate = null,
         private ?string $toDate = null,
         private ?array $authorIds = null,
+        private ?array $folderIds = null,
         private ?array $tagIds = null,
         private ?array $states = null,
     ) {
@@ -288,7 +292,7 @@ class Cursor implements ICursor
             $params['to'] = $to->getDatabase();
         }
 
-        /* TODO Add "Filter by classes and groups"
+        /*  Add "Filter by classes and groups"
          *  Homepage components allow students to create learning moments from a homepage
          *  that isn't necessarily the one whose Cohort Overview you're currently looking at.
          *  If you're in 9ENGA Cohort Overview, you can still see the learning moments that
@@ -306,6 +310,25 @@ class Cursor implements ICursor
          *     > If you're in 3RED Cohort Overview, you can still see the learning moments that
          *     > a student experienced -in some other folder elsewhere-, not just your 3RED class.
          */
+        /* TODO remove this testing diagnostic once the ui actually exists
+         */
+        $this->folderIds = [
+            78, // 9spanisha
+            80, // 9enga
+        ];
+
+        if ($this->folderIds && count($this->folderIds)) {
+            $placeholders = Builder::getArrayPlaceholders($this->folderIds, 'folderIds');
+            $params = array_merge($params, Builder::getArrayParameters($this->folderIds, 'folderIds'));
+
+            $query .= "
+                INNER JOIN moment_folder mf ON mf.moment_id = id
+            ";
+
+            $wherePieces[] = "
+                AND mf.folder_id IN {$placeholders}
+            ";
+        }
 
         /* TODO Add curriculum node filtering
          */

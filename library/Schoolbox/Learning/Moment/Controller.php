@@ -1000,6 +1000,7 @@ class Controller extends Base
     {
         $userIds = $this->requestQuery->get('userIds') ?? [];
         $authorIds = $this->requestQuery->get('authorIds') ?? [];
+        $folderIds = $this->requestQuery->get('folderIds') ?? [];
         $tagIds = $this->requestQuery->get('tagIds') ?? [];
         $states = $this->requestQuery->get('states') ?? [];
 
@@ -1011,6 +1012,7 @@ class Controller extends Base
             $this->requestQuery->get('from') ?? null,
             $this->requestQuery->get('to') ?? null,
             is_array($authorIds) ? $authorIds : explode(',', $authorIds),
+            is_array($folderIds) ? $folderIds : explode(',', $folderIds),
             is_array($tagIds) ? $tagIds : explode(',', $tagIds),
             is_array($states) ? $states : explode(',', $states),
         );
