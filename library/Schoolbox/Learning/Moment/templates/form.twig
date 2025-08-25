@@ -157,21 +157,21 @@
              # Staff and students share this area, but their buttons are differently described
              #}
             <ul class="flex-list buttons">
-                <li><button id="draft">Save for later</button></li>
-
-                <script>
-                    $(function() {
-                        $('#draft').on('click', function(event) {
-                            event.preventDefault();
-
-                            $('#evidence-form').attr('action', $('#evidence-form').data('action-draft'));
-
-                            $('#evidence-persist').trigger('click');
-                        });
-                    });
-                </script>
-
                 {% if USER.role.isStudent %}
+                    <li><button id="draft">Save for later</button></li>
+
+                    <script>
+                        $(function() {
+                            $('#draft').on('click', function(event) {
+                                event.preventDefault();
+
+                                $('#evidence-form').attr('action', $('#evidence-form').data('action-draft'));
+
+                                $('#evidence-persist').trigger('click');
+                            });
+                        });
+                    </script>
+
                     {% set action = 'submit' %}
                     {% if moderationRequired and (evidence.isDraft or evidence.isRejected) %}
                         <li><button id="submit" class="submit">Submit for approval</button></li>
@@ -198,6 +198,20 @@
                         });
                     </script>
                 {% elseif USER.role.isParent and config.evidence_parent_create %}
+                    <li><button id="draft">Save for later</button></li>
+
+                    <script>
+                        $(function() {
+                            $('#draft').on('click', function(event) {
+                                event.preventDefault();
+
+                                $('#evidence-form').attr('action', $('#evidence-form').data('action-draft'));
+
+                                $('#evidence-persist').trigger('click');
+                            });
+                        });
+                    </script>
+
                     {# Parents bypass moderation entirely #}
                     <li><button id="submit" class="submit">Publish</button></li>
 
@@ -216,11 +230,47 @@
                     {# Used to decide if comments should be deleted upon publish #}
                     <input type="hidden" name="delete-comments" id="delete-comments" value="0" />
 
-                    {% if evidence.isDraft or evidence.isSubmitted or evidence.isRejected %}
-                        {# This triggers an async request to Reject+reason
-                         # For the implementation, scroll down to the modal
+                    {% if isCreate %}
+                        <li><button id="draft">Save for later</button></li>
+
+                        <script>
+                            $(function() {
+                                $('#draft').on('click', function(event) {
+                                    event.preventDefault();
+
+                                    $('#evidence-form').attr('action', $('#evidence-form').data('action-draft'));
+
+                                    $('#evidence-persist').trigger('click');
+                                });
+                            });
+                        </script>
+
+                        {# "Share a Learning Moment" via the Class List #}
+                        <li><button id="publish" class="submit">Publish</button></li>
+                    {% else %}
+                        {% if not evidence.isPublished %}
+                            <li><button id="draft">Save for later</button></li>
+
+                            <script>
+                                $(function() {
+                                    $('#draft').on('click', function(event) {
+                                        event.preventDefault();
+
+                                        $('#evidence-form').attr('action', $('#evidence-form').data('action-draft'));
+
+                                        $('#evidence-persist').trigger('click');
+                                    });
+                                });
+                            </script>
+                        {% endif %}
+
+                        {# You can reject from any non-published state:
+                         # Once published, a learning moment stays published unless it's deleted.
                          #}
-                        {% if evidence.id %}
+                        {% if evidence.id and evidence.isDraft or evidence.isSubmitted or evidence.isRejected %}
+                            {# This triggers an async request to Reject+reason
+                             # For the implementation, scroll down to the modal
+                             #}
                             <li><button id="request-update" data-test="learning-moment-evidence-form-reject">Request update</button></li>
                         {% endif %}
 
@@ -263,9 +313,6 @@
                                 })
                             });
                         </script>
-                    {% elseif isCreate %}
-                        {# "Share a Learning Moment" via the Class List #}
-                        <li><button id="publish" class="submit">Publish</button></li>
                     {% endif %}
                 {% endif %}
             </ul>
@@ -352,7 +399,7 @@
                  # the updated text. To dodge this ckeditor hankypanky we just simulate a user click
                  #}
                 $('#evidence-persist').trigger('click');
-            });
+            %});
         });
     </script>
 {% endif %}
