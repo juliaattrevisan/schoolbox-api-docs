@@ -108,7 +108,9 @@
                          #}
                         {% if canWrite %}
                             <p class="meta" data-test="course-outline-number-students-{{ assessment.title }}">
-                                {{ dueDate.forAssessment(assessment) }}&nbsp;{% if assessment is not lessonPlan %}|&nbsp;<span class="{{ urgency.marks(completionGradient ?? '') }}">{{ completionCount }}/{{ studentCount }} students completed</span>{% endif %}
+                                {{ dueDate.forAssessment(assessment) }}&nbsp;{% if assessment is not lessonPlan %}
+                                |&nbsp;<span class="{{ urgency.marks(completionGradient ?? '') }}">{{ completionCount }}/{{ studentCount }} students completed</span>{% endif %}
+                                {% if assessment.customisedAssessments is not empty %}&nbsp;|&nbsp;Customised Student Participation{% endif %}
                             </p>
                         {% else %}
                             <p class="meta">
