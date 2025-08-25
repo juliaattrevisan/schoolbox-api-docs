@@ -66,7 +66,7 @@ class Controller extends Base
                 // Ensure we have a boolean value for reliable filtering
                 // Treat null, false, 0, empty string, empty array as false
                 // Everything else as true
-                return !empty($configValue) && $configValue !== false;
+                return !empty($configValue) && $configValue != false;
             }
 
             // Categories without config requirements are always included
