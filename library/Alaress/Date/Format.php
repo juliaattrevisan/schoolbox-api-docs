@@ -16,10 +16,8 @@ use Alaress\Date\IClock;
 use Alaress\Json\SerializeTrait;
 use Carbon\Carbon;
 
-class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, IComparable, \Alaress\Json\Serializable
+class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, IComparable, JsonSerializable
 {
-    use SerializeTrait;
-
     /**
      * Cached instance of the current date.
      */
@@ -1190,16 +1188,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
     }
 
     /**
-     * Transform the datetime into a JSON schema date-time (RFC3339) string.
-     *
-     * @return string
-     */
-    public function getJson(): string
-    {
-        return $this->toRfc3339String();
-    }
-
-    /**
      * Transform the datetime into a unix timestamp
      *
      * @return int
@@ -2017,20 +2005,6 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
         $this->datetime = clone $this->datetime;
     }
 
-
-    /**
-     * @return array
-     */
-    public function getDefaultJsonMap(): array
-    {
-        return [
-            'database',
-            'unixTimestamp',
-            'local',
-            'json',
-        ];
-    }
-
     /**
      * Attempts to change time to the specified time (expecting H:i format)
      * @param string|null $timeString
@@ -2051,5 +2025,15 @@ class Alaress_Date_Format implements Alaress_Validator_ValidatableInterface, ICo
             // noop
         }
         return $this;
+    }
+
+    /**
+     * Always serialize dates as RFC3339 strings.
+     *
+     * @return string|null Only `Alaress_Date_NullDate` serializes as null.
+     */
+    public function jsonSerialize(): ?string
+    {
+        return $this->toRfc3339String();
     }
 }

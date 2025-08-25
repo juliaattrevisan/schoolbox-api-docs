@@ -108,4 +108,14 @@ class Alaress_Date_NullDate extends Alaress_Date_Format
     public function __clone()
     {
     }
+
+    /**
+     * Null objects always serialize as null.
+     *
+     * @return string|null
+     */
+    public function jsonSerialize(): ?string
+    {
+        return null;
+    }
 }

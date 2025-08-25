@@ -262,33 +262,33 @@ class Controller extends Base
         switch ($this->getConfigLoader()->get('date_range_search_filter')) {
             case 0: // School year
                 $startDate =
-                    \Alaress_Date_Format::now()->getStartOfSchoolYear()->startOfDay()->getJson();
+                    \Alaress_Date_Format::now()->getStartOfSchoolYear()->startOfDay()->toRfc3339String();
                 $endDate =
-                    \Alaress_Date_Format::now()->endOfSchoolYear()->endOfDay()->getJson();
+                    \Alaress_Date_Format::now()->endOfSchoolYear()->endOfDay()->toRfc3339String();
                 break;
             case 1: // 1 year (6 months in the past, 6 months in the future)
                 $startDate =
-                    \Alaress_Date_Format::now()->addMonths(-6)->startOfDay()->getJson();
+                    \Alaress_Date_Format::now()->addMonths(-6)->startOfDay()->toRfc3339String();
                 $endDate =
-                    \Alaress_Date_Format::now()->addMonths(6)->endOfDay()->getJson();
+                    \Alaress_Date_Format::now()->addMonths(6)->endOfDay()->toRfc3339String();
                 break;
             case 2: // 2 years (1 year in the past, 1 year in the future)
                 $startDate =
-                    \Alaress_Date_Format::now()->addYears(-1)->startOfDay()->getJson();
+                    \Alaress_Date_Format::now()->addYears(-1)->startOfDay()->toRfc3339String();
                 $endDate =
-                    \Alaress_Date_Format::now()->addYears(1)->endOfDay()->getJson();
+                    \Alaress_Date_Format::now()->addYears(1)->endOfDay()->toRfc3339String();
                 break;
             case 3: // 5 years (4 years in the past, 1 year in the future)
                 $startDate =
-                    \Alaress_Date_Format::now()->addYears(-4)->startOfDay()->getJson();
+                    \Alaress_Date_Format::now()->addYears(-4)->startOfDay()->toRfc3339String();
                 $endDate =
-                    \Alaress_Date_Format::now()->addYears(1)->endOfDay()->getJson();
+                    \Alaress_Date_Format::now()->addYears(1)->endOfDay()->toRfc3339String();
                 break;
             default: // default to School year
                 $startDate =
-                    \Alaress_Date_Format::now()->getStartOfSchoolYear()->startOfDay()->getJson();
+                    \Alaress_Date_Format::now()->getStartOfSchoolYear()->startOfDay()->toRfc3339String();
                 $endDate =
-                    \Alaress_Date_Format::now()->endOfSchoolYear()->endOfDay()->getJson();
+                    \Alaress_Date_Format::now()->endOfSchoolYear()->endOfDay()->toRfc3339String();
                 break;
         }
         return [
