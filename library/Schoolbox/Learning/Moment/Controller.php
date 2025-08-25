@@ -1235,17 +1235,18 @@ class Controller extends Base
      * Get a list of folders specifically for the cohort report
      * This might be better off in \Schoolbox\Resource\Folder\Controller instead, maybe
      *
-     * @return array
+     * @return void
      */
-    public function getFolderList(): array
+    public function getFolderList(): void
     {
-        $keyword = $this->requestQuery->get('keyword') ?? '';
+        $keyword = $this->requestQuery->get('query') ?? '';
         $stack = [];
 
         /* No keyword? No trabajo
          */
         if ('' === trim((string)$keyword)) {
-            return $stack;
+            $this->response = $this->responseEmpty(400);
+            return;
         }
 
         /* This currently returns rando non-group/non-class folders too. hmm
@@ -1269,6 +1270,6 @@ class Controller extends Base
             ];
         }
 
-        return $stack;
+        $this->response = $this->responseAsJson($stack);
     }
 }

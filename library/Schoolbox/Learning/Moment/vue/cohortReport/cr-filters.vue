@@ -153,9 +153,9 @@ window.Vue.watch(
                         v-model:selected="crfStore.folderFilter"
                         label="Filter by classes and groups"
                         label-id="folder"
-                        endpoint="/ajax/user.php?groupID=0&"
+                        endpoint="/learning/evidence/folders?"
                         :is-single-select="false"
-                        placeholder="Search for classes an groups..."
+                        placeholder="Search for classes and groups..."
                     />
 
                     <date-range
