@@ -190,6 +190,7 @@ class ConfigMapper extends Mapper
     public const NAME_SITE_PLAN = 'site_plan';
     public const NAME_SITE_VERSION = 'site_version';
     public const NAME_SITE_PACKAGE = 'site_package';
+    public const NAME_SITE_HOSTNAME = 'site_hostname';
     public const NAME_SITE_DOMAIN = 'site_domain';
     public const NAME_SITE_SCHOOL_CODE = 'site_school_code';
     public const NAME_SITE_STATIC_ASSET_SERVE_FROM_CDN = 'site_static_asset_serve_from_cdn';
