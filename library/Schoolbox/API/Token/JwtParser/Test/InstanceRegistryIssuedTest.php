@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\API\Token\JwtParser\Test;
 
+use Monolog\Handler\HandlerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -28,9 +29,10 @@ class InstanceRegistryIssuedTest extends TestCase
     #[DataProvider('getTestAcceptsData')]
     public function testAccepts(array $config, string $instanceId, array $claims, bool $expected): void
     {
+        $handler = $this->createHandler();
         $this->assertSame(
             $expected,
-            $this->createParser($config, $instanceId)->accepts($this->createJwt($claims)),
+            $this->createParser($handler, $config, $instanceId)->accepts($this->createJwt($claims)),
         );
     }
 
@@ -151,16 +153,17 @@ class InstanceRegistryIssuedTest extends TestCase
     /**
      * Create a parser, with the provided config variables and instance ID.
      *
-     * @param array  $config
-     * @param string $instanceId
+     * @param HandlerInterface $handler
+     * @param array            $config
+     * @param string           $instanceId
      * @return InstanceRegistryIssued
      */
-    private function createParser(array $config, string $instanceId): InstanceRegistryIssued
+    private function createParser(HandlerInterface $handler, array $config, string $instanceId): InstanceRegistryIssued
     {
         return new InstanceRegistryIssued(
             $this->createMock(UserMapper::class),
             new ArrayLoader($config),
-            $this->createLogger(),
+            $this->createLogger($handler),
             $instanceId,
         );
     }

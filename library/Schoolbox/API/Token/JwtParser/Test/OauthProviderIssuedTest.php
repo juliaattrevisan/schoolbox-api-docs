@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\API\Token\JwtParser\Test;
 
 use GuzzleHttp\Client;
+use Monolog\Handler\HandlerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -36,7 +37,8 @@ class OauthProviderIssuedTest extends TestCase
     #[DataProvider('getTestAcceptsData')]
     public function testAccepts(array $config, array $claims, bool $expected): void
     {
-        $this->assertSame($expected, $this->createParser($config)->accepts($this->createJwt($claims)));
+        $handler = $this->createHandler();
+        $this->assertSame($expected, $this->createParser($handler, $config)->accepts($this->createJwt($claims)));
     }
 
     /**
@@ -187,15 +189,16 @@ class OauthProviderIssuedTest extends TestCase
     /**
      * Create a parser, with the provided config variables.
      *
-     * @param array $config
+     * @param HandlerInterface $handler
+     * @param array            $config
      * @return OauthProviderIssued
      */
-    private function createParser(array $config): OauthProviderIssued
+    private function createParser(HandlerInterface $handler, array $config): OauthProviderIssued
     {
         return new OauthProviderIssued(
             $this->createMock(UserMapper::class),
             new ArrayLoader($config),
-            $this->createLogger(),
+            $this->createLogger($handler),
             $this->createMock(Client::class),
             new Psr16Cache(new ArrayAdapter()),
         );

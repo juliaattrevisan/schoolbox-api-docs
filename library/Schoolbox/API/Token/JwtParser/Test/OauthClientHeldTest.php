@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\API\Token\JwtParser\Test;
 
+use Monolog\Handler\HandlerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -33,7 +34,8 @@ class OauthClientHeldTest extends TestCase
     #[DataProvider('getTestAcceptsData')]
     public function testAccepts(array $claims, bool $expected): void
     {
-        $this->assertSame($expected, $this->createParser()->accepts($this->createJwt($claims)));
+        $handler = $this->createHandler();
+        $this->assertSame($expected, $this->createParser($handler)->accepts($this->createJwt($claims)));
     }
 
     /**
@@ -87,9 +89,10 @@ class OauthClientHeldTest extends TestCase
     /**
      * Create the parser.
      *
+     * @param HandlerInterface $handler
      * @return OauthClientHeld
      */
-    private function createParser(): OauthClientHeld
+    private function createParser(HandlerInterface $handler): OauthClientHeld
     {
         $mockRelyingPartyMapper = $this->createMock(RelyingParty\Mapper::class);
         $mockRelyingPartyMapper
@@ -98,7 +101,7 @@ class OauthClientHeldTest extends TestCase
         return new OauthClientHeld(
             $this->createMock(UserMapper::class),
             new ArrayLoader([]),
-            $this->createLogger(),
+            $this->createLogger($handler),
             $mockRelyingPartyMapper,
         );
     }

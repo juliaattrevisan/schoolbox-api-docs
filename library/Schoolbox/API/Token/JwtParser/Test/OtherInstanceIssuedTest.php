@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\API\Token\JwtParser\Test;
 
+use Monolog\Handler\HandlerInterface;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
@@ -25,7 +26,8 @@ class OtherInstanceIssuedTest extends TestCase
     #[DataProvider('getTestAcceptsData')]
     public function testAccepts(array $claims, bool $expected): void
     {
-        $this->assertSame($expected, $this->createParser()->accepts($this->createJwt($claims)));
+        $handler = $this->createHandler();
+        $this->assertSame($expected, $this->createParser($handler)->accepts($this->createJwt($claims)));
     }
 
     /**
@@ -58,14 +60,15 @@ class OtherInstanceIssuedTest extends TestCase
     /**
      * Create the parser.
      *
+     * @param HandlerInterface $handler
      * @return OtherInstanceIssued
      */
-    private function createParser(): OtherInstanceIssued
+    private function createParser(HandlerInterface $handler): OtherInstanceIssued
     {
         return new OtherInstanceIssued(
             $this->createMock(UserMapper::class),
             new ArrayLoader([]),
-            $this->createLogger(),
+            $this->createLogger($handler),
         );
     }
 }
