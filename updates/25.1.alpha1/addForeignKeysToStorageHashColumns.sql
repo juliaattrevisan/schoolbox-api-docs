@@ -18,7 +18,7 @@ ALTER TABLE sis_user_profile ADD CONSTRAINT sis_user_profile_storage_hash_fk FOR
 
 UPDATE sportsfixtures_import_errors
 SET hash = NULL
-WHERE has IS NOT NULL
+WHERE hash IS NOT NULL
 AND NOT EXISTS (
     SELECT *
     FROM storage
