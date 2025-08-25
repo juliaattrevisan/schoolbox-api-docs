@@ -9,10 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\API\Token\JwtParser\Test;
 
-use Monolog\Handler\StreamHandler;
-use Monolog\Level;
-use Monolog\Logger;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 
 /**
  * Trait for creating a logger for testing this JWT.
@@ -29,9 +27,12 @@ trait CreateLogger
      */
     protected function createLogger(): LoggerInterface
     {
-        return new Logger(
-            get_class($this),
-            [new StreamHandler(STDOUT, Level::Debug),],
-        );
+        // To view debug logs in JWT parsers, uncomment the below:
+//        return new \Monolog\Logger(
+//            get_class($this),
+//            [new \Monolog\Handler\StreamHandler(STDOUT, \Monolog\Level::Debug),],
+//        );
+
+        return new NullLogger();
     }
 }
