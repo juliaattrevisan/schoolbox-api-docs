@@ -14,6 +14,7 @@ use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Cdn\PrefixGenerator;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Discussion\Comment;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Moment\Mapper;
@@ -292,17 +293,17 @@ class Controller extends Base
      */
     private function getNextRoutes(Model $moment): array
     {
-        $links = (new NextRoutes())->generate($moment);
+        $links = (new NextRoutes())->generate($moment, $this->getUser(), $this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED));
 
         /* Only get the routes you need
          */
-        //        if ($links['submit']) {
-        //            $links['submit'] = $this->getRouteIfAuthorized('learningMomentEvidence.putSubmit', [
-        //                'evidenceId' => $moment->getId(),
-        //                'creatorId' => $moment->getCreator()->getId(),
-        //                'userId' => $moment->getRecipient()->getId(),
-        //            ]);
-        //        }
+        if ($links['submit']) {
+            $links['submit'] = $this->getRouteIfAuthorized('learningMomentEvidence.putSubmit', [
+                'evidenceId' => $moment->getId(),
+                'creatorId' => $moment->getCreator()->getId(),
+                'userId' => $moment->getRecipient()->getId(),
+            ]);
+        }
 
         if ($links['publish']) {
             $links['publish'] = $this->getRouteIfAuthorized('learningMomentEvidence.putPublish', [
