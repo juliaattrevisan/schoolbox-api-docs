@@ -770,12 +770,12 @@ span.lrn-author-list-view-empty-label {
 }
 
 /* fixed search button in the drop down */
-button.lrn-btn.lrn-author-btn-sec.lrn-author-btn-search.lrn-author-i-search.lrn-author-col-xs-2:after {
+button.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-author-btn-sec.lrn-author-btn-sec-legacy.lrn-author-btn-search.lrn-author-i-search.lrn-author-col-xs-2:after {
     content: "Search";
     visibility: visible;
     margin-left: 0.5em;
 }
-button.lrn-btn.lrn-author-btn-sec.lrn-author-btn-search.lrn-author-i-search.lrn-author-col-xs-2:before {
+button.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-author-btn-sec.lrn-author-btn-sec-legacy.lrn-author-btn-search.lrn-author-i-search.lrn-author-col-xs-2:before {
     float: none !important;
 }
 .lrn.lrn-author .lrn-author-tool-panel-search .lrn-author-btn-search {
@@ -1009,9 +1009,6 @@ ul.lrn-author-list-view.lrn-author-list-unstyled.lrn-author-list-divider.lrn-aut
 .lrn-author .lrn-author-ui .lrn-author-activity-edit [data-tab-content="items"] .lrn-author-list-divider > li {
     margin-bottom: 1px;
     border-bottom: 1px solid var(--body-background) !important;
-}
-button.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-author-pagination-btn {
-    display: none;
 }
 .lrn-author.lrn-author
     .lrn-author-item-for-activity-list
