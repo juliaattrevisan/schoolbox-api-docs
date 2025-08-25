@@ -78,7 +78,8 @@
                     <div class="grip compact"></div>
                 {% endif %}
                 {% if assessment.customisedAssessments is not empty %}
-                <a class="expand-link icon-up-arrow l-pad-s--left" data-interaction="toggle-expanded" data-interaction-state="collapsed"></a>
+                {# <a class="expand-link icon-up-arrow l-pad-s--left" data-interaction="toggle-expanded" data-interaction-state="collapsed" data-interaction-has-customised></a> #}
+                <a class="expand-link icon-down-arrow l-pad-s--left" data-interaction-has-customised></a>
                 {% endif %}
                 <div class="list-item">
                     <div class="small-12 compact card wrap-down">
@@ -132,7 +133,8 @@
 
             </div>
             {% if assessment.customisedAssessments is not empty %}
-            <ul class="information-list threaded">
+            <!-- customised assessments are hidden by default, jquery relies on the style="display: none" to animate properly on first click -->
+            <ul class="information-list threaded hide" style="display: none" data-customised-assessments>
                 {% for customisedAssessment in assessment.customisedAssessments %}
                     {% set customisedAssessmentCompletionCount    = 0 %}
                     {% set customisedAssessmentStudentCount       = 0 %}
@@ -233,7 +235,6 @@
                             deleteRoute: deleteCustomisedRoute,
                             similarityReportRoute: similarityReportCustomisedRoute,
                         } %}
-
                     </div>
                 </li>
                 {% endfor %}

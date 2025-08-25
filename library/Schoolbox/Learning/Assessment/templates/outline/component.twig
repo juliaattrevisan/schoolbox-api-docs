@@ -17,10 +17,25 @@
              */
             $component.on('click', 'a[data-interaction="toggle-expanded"]', function(event){
                 event.preventDefault();
-
                 $(this).closest('li').find('[data-task-list]').removeClass('hide');
                 $(this).toggleClass('icon-down-arrow icon-up-arrow');
                 $(this).closest('li').toggleClass('expanded');
+            });
+
+            /**
+             * Toggle customised assessments visibility
+             */
+            $component.on('click', 'a[data-interaction-has-customised]', function(event){
+                event.preventDefault();
+                const $customisedAssessments = $(this).closest('li').find('[data-customised-assessments]');
+                if ($customisedAssessments.hasClass('hide')) {
+                    $customisedAssessments.removeClass("hide").slideDown();
+                } else {
+                    $customisedAssessments.slideUp(400, function() {
+                        $(this).addClass("hide");
+                    });
+                }
+                $(this).toggleClass('icon-down-arrow icon-up-arrow'); // switch icon to indicate next state
             });
 
             // Save form for task completion
