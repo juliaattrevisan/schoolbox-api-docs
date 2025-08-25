@@ -33,18 +33,26 @@ class NextRoutes
      */
     public function generate(\Schoolbox\Learning\Moment\Model $moment, User $user, bool $moderationRequired): array
     {
-        /**  states of a learning moment
+        /** states of a learning moment
          * draft
          * submitted
          * published
          * rejected
          */
 
-        $isModerationRequired = false;
+
+        $modRequired = new ModerationRequired();
 
         //if user is student (and has mod)
+        $studentModerated = false;
         if ($user->getRole()->isStudent()) {
-            $isModerationRequired = (new ModerationRequired())->isSatisfiedBy($moderationRequired, $user->getYear());
+            $studentModerated = $modRequired->isSatisfiedBy($moderationRequired, $user->getYear());
+        }
+
+        // staff can only moderate Learning Moments for students who are being moderated
+        $isStaffMod = false;
+        if ($user->getRole()->isStaff() && $modRequired->isSatisfiedBy($moderationRequired, $moment->getCreator()->getYear())) {
+            $isStaffMod = true;
         }
 
         switch ($moment->getCurrentState()) {
@@ -54,33 +62,32 @@ class NextRoutes
                 return [
                     'submit' => null,
                     'publish' => null,
-                    'reject' => $isModerationRequired ? null : true, // if you are being moderated, you can't reject your work
+                    'reject' => $isStaffMod ? true : null, // only reject if the lm you are looking at was created by a student who is being moderated, else continue as you are
                 ];
             case \Schoolbox\Learning\Moment\Model::STATUS_SUBMITTED:
                 /* Next mutable states: published, rejected
                  */
                 return [
                     'submit' => null,
-                    'publish' => $isModerationRequired ? null : true, // if you are being moderated, you can't publish
-                    'reject' => $isModerationRequired ? null : true, // if you are being moderated, you can't reject
+                    'publish' => $isStaffMod ? true : null, // only publish if the lm you are looking at was created by a student who is being moderated, else continue as you are
+                    'reject' => $isStaffMod ? true : null, // only reject if the lm you are looking at was created by a student who is being moderated, else continue as you are
                 ];
             case \Schoolbox\Learning\Moment\Model::STATUS_REJECTED:
                 /* Next mutable states: published
                  */
                 return [
                     'submit' => null,
-                    'publish' => $isModerationRequired ? null : true, // if you are being moderated, you can't publish / approve your work
+                    'publish' => $isStaffMod ? true : null, // only publish if the lm you are looking at was created by a student who is being moderated, else continue as you are
                     'reject' => null,
                 ];
             case \Schoolbox\Learning\Moment\Model::STATUS_DRAFT:
             default:
-                /**
-                 * students who require moderation, can only submit, and NOT publish
+                /* students who require moderation, can only submit, and NOT publish
                  * all other users (staff, parents, and students (who are not being moderated)) can ship straight to publish and skip the submit route
                  */
                 return [
-                    'submit' => $isModerationRequired ? true : null,
-                    'publish' => $isModerationRequired ? null : true,
+                    'submit' => $studentModerated ? true : null,
+                    'publish' => $studentModerated ? null : true,
                     'reject' => null,
                 ];
         }
