@@ -61,7 +61,7 @@ class SelfIssued extends Base
             sprintf(
                 'Checking JWT %s "%s" against this instance "%s"',
                 self::CLAIM_ISS,
-                $claims[self::CLAIM_ISS],
+                $claims[self::CLAIM_ISS] ?? '',
                 $thisInstanceIssuer,
             ),
         );
