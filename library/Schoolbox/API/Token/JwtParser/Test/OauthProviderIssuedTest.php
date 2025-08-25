@@ -195,7 +195,7 @@ class OauthProviderIssuedTest extends TestCase
         return new OauthProviderIssued(
             $this->createMock(UserMapper::class),
             new ArrayLoader($config),
-            $this->createLogger(self::class),
+            $this->createLogger(),
             $this->createMock(Client::class),
             new Psr16Cache(new ArrayAdapter()),
         );

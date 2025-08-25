@@ -74,7 +74,7 @@ class SelfIssuedTest extends TestCase
                 ConfigMapper::NAME_SITE_HOSTNAME => 'test',
                 ConfigMapper::NAME_SITE_DOMAIN   => 'schoolbox.cloud',
             ]),
-            $this->createLogger(self::class),
+            $this->createLogger(),
             $this->createMock(Token\Mapper::class)
         );
     }

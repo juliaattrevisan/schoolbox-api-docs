@@ -65,7 +65,7 @@ class OtherInstanceIssuedTest extends TestCase
         return new OtherInstanceIssued(
             $this->createMock(UserMapper::class),
             new ArrayLoader([]),
-            $this->createLogger(self::class),
+            $this->createLogger(),
         );
     }
 }

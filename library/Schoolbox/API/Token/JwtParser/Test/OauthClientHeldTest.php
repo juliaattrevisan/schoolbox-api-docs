@@ -98,7 +98,7 @@ class OauthClientHeldTest extends TestCase
         return new OauthClientHeld(
             $this->createMock(UserMapper::class),
             new ArrayLoader([]),
-            $this->createLogger(self::class),
+            $this->createLogger(),
             $mockRelyingPartyMapper,
         );
     }

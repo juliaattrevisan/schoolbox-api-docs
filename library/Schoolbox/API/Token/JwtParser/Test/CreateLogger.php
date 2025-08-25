@@ -25,13 +25,12 @@ trait CreateLogger
     /**
      * Create the logger.
      *
-     * @param string $className Used as the logger's name.
      * @return LoggerInterface
      */
-    protected function createLogger(string $className): LoggerInterface
+    protected function createLogger(): LoggerInterface
     {
         return new Logger(
-            $className,
+            get_class($this),
             [new StreamHandler(STDOUT, Level::Debug),],
         );
     }

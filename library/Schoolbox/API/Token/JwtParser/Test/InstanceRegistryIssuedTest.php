@@ -160,7 +160,7 @@ class InstanceRegistryIssuedTest extends TestCase
         return new InstanceRegistryIssued(
             $this->createMock(UserMapper::class),
             new ArrayLoader($config),
-            $this->createLogger(self::class),
+            $this->createLogger(),
             $instanceId,
         );
     }
