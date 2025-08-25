@@ -166,7 +166,7 @@ class Controller extends Base
                 $this->response = $this->responseFromTemplate(
                     '@achievementreport/Error.twig',
                     [
-                        'errorMessage' => $report['error']
+                        'errorMessage' => $report['error'] ?? ''
                     ]
                 );
                 break;
