@@ -51,7 +51,7 @@ export function getMeta(
     /**
      * For example: "Academic (Academic Honesty)" or "Joffrey Buckner | Wellbeing (Behaviour)"
      */
-    if (selectedTab?.title === TabTitle.STUDENT_BY_TYPE) {
+    if (selectedTab?.title === TabTitle.STUDENT_BY_TYPE || selectedTab?.title === TabTitle.STUDENT_BY_MONTH) {
         const user = rowData?.user as User;
         meta.push(
             `${user ? `${user.firstName} ${user.lastName} | ` : ""} ${header.title} ${header.subTitle ? `(${header.subTitle})` : ""}`,
