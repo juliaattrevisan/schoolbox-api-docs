@@ -305,6 +305,19 @@ class Module extends BaseModule
             Closure::fromCallable([$this, 'preloadFolder']),
         );
 
+        /* Learning Moment Cohort Report folder filter
+         * Obtains a list of folders for a staff member to filter upon.
+         *
+         * This might be better served in the \Schoolbox\Resource\Folder module instead of here,
+         * but this is the first usage afaict
+         */
+        $this->register(
+            self::METHOD_GET,
+            '/folders',
+            'getFolderList',
+            $viewCohortReportRule,
+        );
+
         /* Bulk Delete a set of learning moments (typically from Cohort Overview)
          */
         $this->register(
