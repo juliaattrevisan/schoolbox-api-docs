@@ -41,6 +41,7 @@ export type CohortReportApiPayload = {
     from?: string;
     to?: string;
     authorIds?: number[];
+    folderIds?: number[];
     tagIds?: number[];
     states?: EvidenceStatus[];
 };

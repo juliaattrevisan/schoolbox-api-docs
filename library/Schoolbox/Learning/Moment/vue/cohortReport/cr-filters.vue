@@ -149,6 +149,14 @@ window.Vue.watch(
 
                     <!-- TODO: filter by classes/groups [SA-20735] -->
                     <!-- <label> Filter by {{ locale.class.properPlural() }} and Groups </label> -->
+                    <search-select
+                        v-model:selected="crfStore.folderFilter"
+                        label="Filter by classes and groups"
+                        label-id="folder"
+                        endpoint="/ajax/user.php?groupID=0&"
+                        :is-single-select="false"
+                        placeholder="Search for classes an groups..."
+                    />
 
                     <date-range
                         ref="dateRangeRef"

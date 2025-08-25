@@ -40,6 +40,7 @@ export const useCohortReportFiltersStore = defineStore("cohortReportFilters", ()
         crStore.activeFilters = {
             userIds: Object.values(studentFilter.value).map((s) => s.id),
             authorIds: Object.values(authorFilter.value).map((a) => a.id),
+            folderIds: Object.values(folderFilter.value).map((f) => f.id),
             tagIds: [...evidenceTagsFilter.value],
             states: [...stateFilter.value],
             from: startDateFilter.value ? window.dayjs(startDateFilter.value).format("YYYY-MM-DD") : undefined,
