@@ -45,6 +45,9 @@ class EntriesAndResults extends Base
             /* Teachers
              * Trim empty teachers out for course teachers
              */
+            if (!isset($finalStack[$courseName]['allTeachers'])) {
+                $finalStack[$courseName]['allTeachers'] = [];
+            }
             foreach ([1, 2, 3] as $currentTeacherIndex) {
                 $key = "ClassTeacher{$currentTeacherIndex}";
                 $emailKey = "ClassTeacher{$currentTeacherIndex}Email";
