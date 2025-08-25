@@ -192,7 +192,7 @@
                 <div class="small-12 column">
                     <dl>
                         <dt>Tutor Comment</dt>
-                        <dd>{{ report.tutorGroupReport.namedGrades.tutorComment.comment|e('html')|nl2br }}</dd>
+                        <dd>{{ report.tutorGroupReport.namedGrades.tutorComment.comment|purify }}</dd>
                     </dl>
                 </div>
             </div>
