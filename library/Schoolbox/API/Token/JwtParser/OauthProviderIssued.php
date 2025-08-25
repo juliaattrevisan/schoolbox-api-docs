@@ -23,6 +23,10 @@ use SensitiveParameter;
 
 /**
  * Parser for configured oAuth provider-issued JWTs.
+ *
+ * These JWTs are issued by an external oAuth provider, such as Cloudwork or
+ * Google: usually, they will be requested by a third-party application, such as
+ * Digistorm's app, and then forwarded to Schoolbox.
  */
 class OauthProviderIssued extends Base
 {

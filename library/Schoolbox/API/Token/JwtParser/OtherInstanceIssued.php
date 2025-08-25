@@ -22,6 +22,9 @@ use SensitiveParameter;
  *
  * It's expected that the other instance's JWKS URL will be provided by the
  * instance registry.
+ *
+ * These JWTs are usually issued by following a school's "Visit Help" link: the
+ * JWT will be accepted by the Help instance.
  */
 class OtherInstanceIssued extends Base
 {

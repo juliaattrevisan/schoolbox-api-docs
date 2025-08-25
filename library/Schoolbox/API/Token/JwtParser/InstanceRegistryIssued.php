@@ -21,6 +21,9 @@ use SensitiveParameter;
 
 /**
  * Parser for JWTs issued by the instance registry.
+ *
+ * These JWTs are issued by the Schoolbox instance registry's web interface when
+ * Schoolbox staff request a login to a given instance.
  */
 class InstanceRegistryIssued extends Base
 {

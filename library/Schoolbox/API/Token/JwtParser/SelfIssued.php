@@ -22,6 +22,12 @@ use SensitiveParameter;
 
 /**
  * Parser for JWTs issued by this instance.
+ *
+ * These JWTs may be issued by:
+ * * calls to the task daemon, as taskd will need to make calls back to the
+ *   Schoolbox instance
+ * * creating a token for a user within the admin system
+ * * creating a login QR code
  */
 class SelfIssued extends Base
 {
