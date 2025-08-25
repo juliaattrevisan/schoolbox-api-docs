@@ -1248,20 +1248,26 @@ class Controller extends Base
             return $stack;
         }
 
-        /* TODO This currently returns rando non-group/non-class folders too. hmm
+        /* This currently returns rando non-group/non-class folders too. hmm
          */
         $folders = $this->folderMapper->searchByName($keyword);
 
         /** @var \Schoolbox\Resource\Folder\Model $folder */
         foreach ($folders as $folder) {
+            /* Neither a group nor a class: skip it
+             *
+             * You maybe could deeply hack searchByName but you need a hydrated instance
+             * to do these isGroup() and isClass() chacks anyways
+             */
+            if (!$folder->isGroup() && !$folder->isClass()) {
+                continue;
+            }
+
             $stack[] = [
                 'id' => $folder->getId(),
                 'name' => $folder->getNameWithCodes()
             ];
         }
-
-
-        new \Alaress_Probe($stack);
 
         return $stack;
     }
