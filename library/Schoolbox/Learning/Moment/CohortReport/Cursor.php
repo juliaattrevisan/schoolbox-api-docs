@@ -308,13 +308,6 @@ class Cursor implements ICursor
          *     > If you're in 3RED Cohort Overview, you can still see the learning moments that
          *     > a student experienced -in some other folder elsewhere-, not just your 3RED class.
          */
-        /* TODO remove this testing diagnostic once the ui actually exists
-         */
-        $this->folderIds = [
-            78, // 9spanisha
-            80, // 9enga
-        ];
-
         if ($this->folderIds && count($this->folderIds)) {
             $placeholders = Builder::getArrayPlaceholders($this->folderIds, 'folderIds');
             $params = array_merge($params, Builder::getArrayParameters($this->folderIds, 'folderIds'));
