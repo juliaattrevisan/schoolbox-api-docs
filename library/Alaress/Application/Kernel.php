@@ -2090,7 +2090,7 @@ abstract class Kernel
                 [
                     STDOUT,
                     STDOUT,
-                    $config->get(ConfigMapper::NAME_DEBUG_MODE) ? Level::Debug : Level::Info,
+                    $config->get(ConfigMapper::NAME_OAUTH_DEBUG_MODE) ? Level::Debug : Level::Info,
                     [],
                     true,
                     'jwtParser',

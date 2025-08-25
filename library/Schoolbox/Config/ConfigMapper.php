@@ -133,6 +133,7 @@ class ConfigMapper extends Mapper
     public const NAME_OAUTH_ENABLE_SSO                   = 'oauth_enable_sso';
     public const NAME_OAUTH_RESPONSE_TYPE                = 'oauth_response_type';
     public const NAME_OAUTH_SCOPES                       = 'oauth_scopes';
+    public const NAME_OAUTH_DEBUG_MODE                   = 'oauth_debug_mode';
 
     public const _CANVAS_DATA_API_KEY    = 'canvas_data_api_key';
     public const _CANVAS_DATA_API_SECRET = 'canvas_data_api_secret';
