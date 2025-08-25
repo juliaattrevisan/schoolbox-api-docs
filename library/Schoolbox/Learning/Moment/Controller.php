@@ -992,8 +992,6 @@ class Controller extends Base
      * @api GET /learning/evidence/cohort/{folderId}
      * @param Folder\Model $folder
      * @return void
-     * @throws MapperException
-     * @throws NotFound
      * @throws RouteNotFound
      */
     public function getCohortReportPayload(Folder\Model $folder): void

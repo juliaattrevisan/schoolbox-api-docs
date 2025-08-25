@@ -142,7 +142,7 @@ class Cursor implements ICursor
     /**
      * @inheritdoc
      */
-    public function retrieveResults(?string $encodedCursor): Collection
+    public function retrieveResults(?string $encodedCursor): GenericCollection
     {
         try {
             // All the moment IDs that match the filters
@@ -276,7 +276,6 @@ class Cursor implements ICursor
 
         /* Filter to a date range, if specified (either FROM, TO, neither, or both)
          */
-        $from = null;
         if ($this->fromDate) {
             $from = (new \Alaress_Date_Format($this->fromDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT))->startOfDay();
 
@@ -284,7 +283,6 @@ class Cursor implements ICursor
             $params['from'] = $from->getDatabase();
         }
 
-        $to = null;
         if ($this->toDate) {
             $to = (new \Alaress_Date_Format($this->toDate, \Alaress_Date_Format::DATABASE_DATE_FORMAT))->endOfDay();
 
