@@ -9,14 +9,17 @@ declare(strict_types=1);
 
 namespace Schoolbox\API\Token\JwtParser\Test;
 
+use Monolog\Handler\StreamHandler;
+use Monolog\Level;
+use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 
 /**
  * Trait for creating a logger for testing this JWT.
  *
- * This logger should output all debug information when run in a test
- * environment, but not when run in CI.
+ * This logger outputs all debug information when the runner is run with the
+ * `OUTPUT_JWT_LOG` env var set.
  */
 trait CreateLogger
 {
@@ -27,11 +30,12 @@ trait CreateLogger
      */
     protected function createLogger(): LoggerInterface
     {
-        // To view debug logs in JWT parsers, uncomment the below:
-//        return new \Monolog\Logger(
-//            get_class($this),
-//            [new \Monolog\Handler\StreamHandler(STDOUT, \Monolog\Level::Debug),],
-//        );
+        if (getenv('OUTPUT_JWT_LOG')) {
+            return new Logger(
+                get_class($this),
+                [new StreamHandler(STDOUT, Level::Debug)],
+            );
+        }
 
         return new NullLogger();
     }
