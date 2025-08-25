@@ -18,7 +18,7 @@ use Schoolbox\Admin\Editor\Templates\Category\Mapper as CategoryMapper;
 use Schoolbox\Editor\Templates\Model as TemplateModel;
 use Schoolbox\Editor\Templates\Mapper as TemplateMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\GenericCollection;
+use Schoolbox\Collection;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Config\ConfigMapper;
 
@@ -42,9 +42,9 @@ class Controller extends Base
 
     /**
      * Only get the categories available on the current plan
-     * @return GenericCollection
+     * @return Collection
      */
-    public function getPlanCategories(): GenericCollection
+    public function getPlanCategories(): Collection
     {
         $categories = $this->categoryMapper->findAll()->sortNaturally('name');
 
