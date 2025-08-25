@@ -77,10 +77,6 @@
                 {% if canWrite %}
                     <div class="grip compact"></div>
                 {% endif %}
-                {% if assessment.customisedAssessments is not empty %}
-                {# <a class="expand-link icon-up-arrow l-pad-s--left" data-interaction="toggle-expanded" data-interaction-state="collapsed" data-interaction-has-customised></a> #}
-                <a class="expand-link icon-down-arrow l-pad-s--left" data-interaction-has-customised></a>
-                {% endif %}
                 <div class="list-item">
                     <div class="small-12 compact card wrap-down">
                         {% set title = attribute(locale, assessment.typeName|lower) is defined ? attribute(locale, assessment.typeName|lower).proper : assessment.typeName %}
@@ -110,7 +106,7 @@
                             <p class="meta" data-test="course-outline-number-students-{{ assessment.title }}">
                                 {{ dueDate.forAssessment(assessment) }}&nbsp;{% if assessment is not lessonPlan %}
                                 |&nbsp;<span class="{{ urgency.marks(completionGradient ?? '') }}">{{ completionCount }}/{{ studentCount }} students completed</span>{% endif %}
-                                {% if assessment.customisedAssessments is not empty %}&nbsp;|&nbsp;Customised Student Participation{% endif %}
+                                {% if assessment.customisedAssessments is not empty %}&nbsp;|&nbsp;Includes customisation{% endif %}
                             </p>
                         {% else %}
                             <p class="meta">
@@ -131,6 +127,7 @@
                     modifyRoute: modifyRoute,
                     deleteRoute: deleteRoute,
                     similarityReportRoute: similarityReportRoute,
+                    customisedAssessments: assessment.customisedAssessments
                 } %}
 
             </div>
@@ -198,7 +195,7 @@
                     {% endif %}
 
                     <li class="child"  {% if filterList and customisedAssessment.getFamilyName not in filterList %}data-sortable-hidden="true"{% endif %} data-unit-assessment="{{ customisedAssessment.id }}">
-                    <div class="actions-small-1">
+                    <div class="actions-small-1 l-pad-l--left">
                         <div class="list-item">
                             <div class="small-12 compact card wrap-down">
                                 {% set customTitle = attribute(locale, customisedAssessment.typeName|lower) is defined ? attribute(locale, customisedAssessment.typeName|lower).proper : customisedAssessment.typeName %}
@@ -236,6 +233,7 @@
                             modifyRoute: modifyCustomisedRoute,
                             deleteRoute: deleteCustomisedRoute,
                             similarityReportRoute: similarityReportCustomisedRoute,
+                            customisedAssessments: [],
                         } %}
                     </div>
                 </li>

@@ -65,6 +65,7 @@
             var $element = $(this);
             var $assessmentRow = $element.closest("[data-unit-assessment]");
             var $taskList = $assessmentRow.closest("[data-task-list]");
+            // const data-customised-assessments
 
             $element.confirmDialog({
                 header: `Are you sure you wish to delete this ${window.sbProps.l10n.dictionary.activity.singular()}?`,
