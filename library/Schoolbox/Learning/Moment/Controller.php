@@ -1277,6 +1277,7 @@ class Controller extends Base
         /* Find the folder ids where your cohort made a learning moment folder relationship
          */
         $pb = $this->folderMapper->getPredicateBuilder()
+            ->isNull('m.deleted_at')
             ->in('user_id', $cohortIds);
 
         $whereClause = $pb->getWhere()[0];
@@ -1286,16 +1287,11 @@ class Controller extends Base
             FROM moment_folder mf
             INNER JOIN moment m ON mf.moment_id = m.id
             WHERE {$whereClause}
-            AND m.deletedAt IS NULL
         ";
 
-        $result = $this->folderMapper->getDatabase()->executeQuery($query);
+        $result = $this->folderMapper->getDatabase()->executeQuery($query)->fetchAll();
 
-        $folderIds = [];
-
-        while ($row = $result->fetch()) {
-            $folderIds[] = $row['folder_id'];
-        }
+        $folderIds = array_column($result, 'folder_id');
 
         /* Find those folder instances, only include Groups and Classes in the stack
          */
