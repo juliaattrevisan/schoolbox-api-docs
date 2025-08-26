@@ -1,17 +1,4 @@
 SELECT @type := id FROM lu_config_type WHERE type = 'External DB';
-
-/**
- * Reasoning behind config settings:
- * * amqp_heartbeat:     this simply makes the old hardcoded value configurable
- * * amqp_read_timeout:  this is set to double the old hardcoded value: doubling
- *                       the heartbeat value is a recommendation from
- *                       https://stackoverflow.com/questions/79440541/why-is-there-no-heartbeat-on-rabbitmq-php-connection.
- *                       Also see https://runebook.dev/en/articles/spring_boot/application-properties/application-properties.integration.spring.rabbitmq.template.receive-timeout
- * * amqp_write_timeout: like amqp_read_timeout, set to double the hardcoded
- *                       value.
- *                       See https://runebook.dev/en/articles/spring_boot/application-properties/application-properties.integration.spring.rabbitmq.template.reply-timeout
- * * amqp_keepalive:     this is set to true, so that connections are kept alive
- */
 INSERT INTO `config`(
     `name`,
     `value`,
