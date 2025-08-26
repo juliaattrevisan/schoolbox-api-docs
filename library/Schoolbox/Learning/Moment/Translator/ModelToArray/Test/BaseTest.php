@@ -80,8 +80,7 @@ class BaseTest extends TestCase
                             ->setName('English')
                             ->setCodes((new GenericCollection(\Schoolbox\Resource\Folder\Code\Model::class))
                                 ->add((new \Schoolbox\Resource\Folder\Code\Model())->setCode('9ENGA'))
-                                ->add((new \Schoolbox\Resource\Folder\Code\Model())->setCode('ENGAAAAAA'))
-                            )
+                                ->add((new \Schoolbox\Resource\Folder\Code\Model())->setCode('ENGAAAAAA')))
                     )
                 )
                 ->setCurriculumNodes(

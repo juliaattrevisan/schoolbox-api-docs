@@ -101,7 +101,8 @@ class Base
                         'name' => $folder->getName(),
                         'code' => $folder->getCodeString()
                     ];
-                })->reindex(),
+                }
+            )->reindex(),
             'currentState' => $model->getCurrentState(),
             'curriculumNodes' => $model->getViewableCurriculumNodes()
                 ? $model->getViewableCurriculumNodes()
