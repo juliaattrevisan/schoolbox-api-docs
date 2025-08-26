@@ -27,6 +27,7 @@ use Schoolbox\Learning\Moment\NextRoutes;
 use Schoolbox\Learning\Moment\Translator\ModelToArray\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Exception;
@@ -518,7 +519,14 @@ class Controller extends Base
          */
         $folders = null;
 
-        $userAccesses = $this->userAccessMapper->findAllForUser($moment->getRecipient());
+        /* findAllForUser() disregards the SERVICE_HOMEPAGE filter when combining internal folders
+         * with external folders via the sis, allowing for some folders to potentially be revealed
+         * that should otherwise have been precluded.
+         */
+        $userAccesses = $this->userAccessMapper->findAllForUser($moment->getRecipient())
+            ->filter(function (UserAccess $access) {
+                return UserAccess::SERVICE_HOMEPAGE === $access->getService();
+            });
 
         if ($userAccesses->count()) {
             $folders = $this->folderMapper->findByColumn('id', $userAccesses->getPropertyValues('serviceIdentifier'));
