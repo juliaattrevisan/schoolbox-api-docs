@@ -238,6 +238,8 @@ class AllFields extends Base
 
                 /** @var \Schoolbox\Resource\Folder\Model $folder */
                 foreach ($model->getFolders() as $folder) {
+                    $folder->setName($lookup[$folder->getId()]['name']);
+
                     /* Init folder code collection for each folder instance
                      */
                     if (null === $folder->getCodes()) {
