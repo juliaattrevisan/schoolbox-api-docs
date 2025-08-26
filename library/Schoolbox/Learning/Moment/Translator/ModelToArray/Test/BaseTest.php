@@ -73,15 +73,13 @@ class BaseTest extends TestCase
                 ->setCreator((new User())->setId(55))
                 ->setRecipient((new User())->setId(193))
                 ->setDiscussionThread((new DiscussionThread())->setId(14))
-                ->setFolders((new GenericCollection(\Schoolbox\Resource\Folder\Model::class))
-                    ->add(
-                        (new \Schoolbox\Resource\Folder\Model())
-                            ->setId(80)
-                            ->setName('English')
-                            ->setCodes((new GenericCollection(\Schoolbox\Resource\Folder\Code\Model::class))
-                                ->add((new \Schoolbox\Resource\Folder\Code\Model())->setCode('9ENGA'))
-                                ->add((new \Schoolbox\Resource\Folder\Code\Model())->setCode('ENGAAAAAA'))))
-                )
+                ->setFolders((new GenericCollection(\Schoolbox\Resource\Folder\Model::class))->add(
+                    (new \Schoolbox\Resource\Folder\Model())
+                        ->setId(80)
+                        ->setName('English')
+                        ->setCodes((new GenericCollection(\Schoolbox\Resource\Folder\Code\Model::class))
+                            ->add((new \Schoolbox\Resource\Folder\Code\Model())->setCode('9ENGA'))
+                            ->add((new \Schoolbox\Resource\Folder\Code\Model())->setCode('ENGAAAAAA')))))
                 ->setCurriculumNodes(
                     (new GenericCollection(new CurriculumNode()))->add((new CurriculumNode())->setId(500)->setName('Test Curriculum')->setCode(trim('TEST500 ')))
                 )
