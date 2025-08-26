@@ -143,7 +143,14 @@ class UserAccessMapper extends Mapper
     }
 
     /**
-     * Returns all the UserAccess associated with the given user
+     * Returns all the UserAccess associated with the given user. This includes UserAccess instances across
+     * all the services such as news, lms, pastoral, cms, etc. so it's very inclusive across all contexts
+     * of the schoolbox app.
+     *
+     * To limit this to a particular service identifier (such as all folders, or all news moderators, etc.)
+     * you currently have to postprocess the result set of findAllForUser()
+     *
+     * TODO add third param $serviceIdentifier to natively do this
      *
      * @param User $user
      * @param bool $includeSynergy
