@@ -146,24 +146,20 @@ class RecordList extends Base implements TabTypeInterface, ICursor
      */
     public function retrieveResults(?string $encodedCursor): Collection
     {
-        $db = $this->pastoralMapper->getDatabase();
-
         $where = implode(' AND ', $this->helper->getFilters());
         $param = [];
+        $order = [];
+
+        foreach ($this->helper->getReportOrder() as $reportOrder) {
+            $order[$reportOrder['column']] = $reportOrder['direction'] ?? 'ASC';
+        }
+
         if (null !== $encodedCursor) {
             $cursor = $this->codec->decode($encodedCursor);
-
-            // Build compound cursor condition based on sort order
-            $cursorConditions = [];
-            $order = [];
-            foreach ($this->helper->getReportOrder() as $reportOrder) {
-                $order[$reportOrder['column']] = $reportOrder['direction'] ?? 'ASC';
-            }
-
             $where .= " AND ({$this->inTypeSubType})";
 
             // Create lexicographic comparison for multiple sort fields
-            $this->buildCursorConditions($cursorConditions, $cursor, $order);
+            $cursorConditions = $this->buildCursorConditions();
 
             if (!empty($cursorConditions)) {
                 $where .= " AND (" . implode(' OR ', $cursorConditions) . ")";
@@ -184,11 +180,6 @@ class RecordList extends Base implements TabTypeInterface, ICursor
                 'cursor_author_chosen_name' => $cursor['author']['chosen'],
                 'cursor_id' => $cursor['id'],
             ];
-        }
-
-        $order = [];
-        foreach ($this->helper->getReportOrder() as $reportOrder) {
-            $order[$reportOrder['column']] = $reportOrder['direction'] ?? 'ASC';
         }
 
         $pb = $this->pastoralMapper->getPredicateBuilder();
@@ -215,8 +206,10 @@ class RecordList extends Base implements TabTypeInterface, ICursor
     /**
      * Build cursor conditions for lexicographic comparison
      */
-    private function buildCursorConditions(array &$conditions, array $cursor, array $order): void
+    private function buildCursorConditions(): array
     {
+        $conditions = [];
+        $minValue = self::MIN_SORT_BY_VALUE;
         $fieldMap = [
             'created' => 'COALESCE(pastoral.occurred_on, pastoral.created_at)',
             'student_last_name' => 's.lastname',
@@ -225,7 +218,7 @@ class RecordList extends Base implements TabTypeInterface, ICursor
             'subtype' => 'c.name',
             'author_last_name' => 'o.lastname',
             'author_chosen_name' => 'o.chosen_name',
-            'points' => 'COALESCE(pastoral.points, -9999999)',
+            'points' => "COALESCE(pastoral.points, {$minValue})",
             'yearLevel' => 'sy.sequence',
             'house' => 's.house',
             'campus' => 'sc.name',
@@ -254,6 +247,7 @@ class RecordList extends Base implements TabTypeInterface, ICursor
 
             $conditions[] = '(' . implode(' AND ', $condition) . ')';
         }
+        return $conditions;
     }
 
     /**
