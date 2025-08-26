@@ -113,8 +113,7 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
     }
 
     /**
-     * Helper function for building params and placeholders for a set of query
-     * parameters.
+     * Helper function for building params and placeholders for a class code.
      *
      * @param string $classCode
      * @return array
