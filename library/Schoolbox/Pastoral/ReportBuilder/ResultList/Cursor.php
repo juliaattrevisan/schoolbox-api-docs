@@ -8,6 +8,7 @@ use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as PastoralModel;
+use Schoolbox\Pastoral\ReportBuilder\Base;
 use Schoolbox\Pastoral\ReportBuilder\Factory;
 use Schoolbox\Pastoral\ReportBuilder\Helper;
 use Schoolbox\Pastoral\ReportBuilder\TabType\StudentByType;
@@ -114,6 +115,28 @@ class Cursor implements ICursor
         return $this->codec->encode(
             [
                 'id' => $last->getId(),
+                'created' => $last->getOccurredOn()?->toIso8601String() ?? $last->getCreatedAt()->toIso8601String(),
+                'student' => [
+                    'chosen' =>
+                        ((string)$last->getStudent()->getPreferredName()) !== '' ?
+                            $last->getStudent()->getPreferredName() :
+                            $last->getStudent()->getFirstName(),
+                    'last' => $last->getStudent()->getLastName(),
+                ],
+                'type' => $last->getType()->getName(),
+                'subtype' => $last->getSubType()->getName(),
+                'author' => [
+                    'chosen' =>
+                        ((string)$last->getOwner()->getPreferredName()) !== '' ?
+                            $last->getOwner()->getPreferredName() :
+                            $last->getOwner()->getFirstName(),
+                    'last' => $last->getOwner()->getLastName(),
+                ],
+                'points' => $last->getPoints(),
+                'yearLevel' => $last->getStudent()->getYear()->getSequence(),
+                'house' => $last->getStudent()->getSchoolHouse()->getHouse(),
+                'campus' => $last->getStudent()->getCampusCollection()->first()->getName(),
+                'severity' => $last->getSeverity()->getSequence(),
             ]
         );
     }
@@ -163,7 +186,6 @@ class Cursor implements ICursor
         $filter = $this->filterByCell();
         $whereFilter = $filter['where'];
 
-
         $statement = $db->executeQuery(
             "
             SELECT COUNT(*) as count
@@ -190,30 +212,33 @@ class Cursor implements ICursor
      */
     public function retrieveResults(?string $encodedCursor): Collection
     {
-        $db = $this->pastoralMapper->getDatabase();
-
         $where = implode(' AND ', $this->helper->getFilters());
         $param = [];
+        $order = [];
+
+        foreach ($this->helper->getReportOrder() as $reportOrder) {
+            $order[$reportOrder['column']] = $reportOrder['direction'] ?? 'ASC';
+        }
+
         if (null !== $encodedCursor) {
             $cursor = $this->codec->decode($encodedCursor);
-            $where .= " AND pastoral.id > :cursor_id";
-            $param['cursor_id'] = $cursor['id'];
+
+            // Create lexicographic comparison for multiple sort fields
+            $cursorConditions = $this->helper->buildCursorConditions($cursor, Base::MIN_SORT_BY_VALUE);
+
+            if (!empty($cursorConditions)) {
+                $where .= " AND (" . implode(' OR ', $cursorConditions['conditions']) . ")";
+                $param = $cursorConditions['params'];
+            }
         }
 
         $filter = $this->filterByCell();
         $whereFilter = $filter['where'];
 
-        $limit = (null === $this->limit) ? "" : " LIMIT {$this->limit}";
+        $pb = $this->pastoralMapper->getPredicateBuilder();
 
-        $statement = $db->executeQuery(
-            "
-            SELECT pastoral.id
-            {$this->helper->getFromString()}
-            WHERE {$where}
-            AND {$whereFilter}
-            AND ({$this->inTypeSubType})
-            {$limit}
-        ",
+        $pb->rawWhere(
+            $where . " AND {$whereFilter} AND ({$this->inTypeSubType})",
             array_merge(
                 $this->helper->getParams(),
                 $filter['param'],
@@ -221,25 +246,15 @@ class Cursor implements ICursor
             )
         );
 
-        $pastoralIds = $statement->fetchAll(\PDO::FETCH_COLUMN);
+        $records = $this->pastoralMapper
+            ->findByPredicates($pb, [
+                'order' => $order,
+            ])
+            ->limit($this->limit)
+            ->reindex();
 
-        $order = [];
-        foreach ($this->helper->getReportOrder() as $reportOrder) {
-            $order[$reportOrder['column']] = $reportOrder['direction'] ?? 'ASC';
-        }
-
-        $results = $this->pastoralMapper
-            ->findByColumn(
-                'id',
-                $pastoralIds,
-                [
-                    'order' => $order,
-                ]
-            )->reindex();
-
-        return $results;
+        return $records;
     }
-
 
     /**
      * @return array
