@@ -28,6 +28,9 @@
                 targetElements: ['#body'],
                 toolbar: "simple",
                 baseHref: "{{ baseHref }}",
+                {% if editorTemplates is defined %}
+                    templates: {{ editorTemplates|json_encode|raw }},
+                {% endif %}
             }
         }));
 
