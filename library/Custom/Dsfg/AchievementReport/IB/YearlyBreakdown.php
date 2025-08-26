@@ -12,7 +12,6 @@ use Custom\Dsfg\AchievementReport\NormaliseTeachers;
 
 class YearlyBreakdown extends Base
 {
-
     /**
      * Returns data for twig rendering
      *
