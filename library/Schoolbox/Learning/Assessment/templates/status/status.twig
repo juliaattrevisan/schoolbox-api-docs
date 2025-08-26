@@ -148,7 +148,7 @@
         {% set assessment = aImpl.assessment %}
         {% set includedParticipants = assessment.allParticipants | filter(participant => not participant.isExcluded) %}
         {% if includedParticipants | length %}
-            <div class="row" {% if isSpecification %}data-collapse-state="uncollapsed" data-collapsable="collap-{{ assessment.id }}" {% endif %} data-participant-group>
+            <div class="row" {% if isSpecification %}data-collapse-state="uncollapsed" data-collapsable="collap-{{ aImpl.assessment.id }}" {% endif %} data-participant-group>
                 <div class="small-12 island">
                     <div class="empty-state hide" data-empty-filter>
                         <i class="icon-staff-students"></i>
@@ -211,6 +211,9 @@
 <script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}'></script>
 <script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/activityStatusPage.js?v={{ config.site_version }}'></script>
 <script type="text/javascript">
+    $(function () {
+        $('[data-collapser]').collapsable();
+    });
     document.dispatchEvent(new CustomEvent('ACTIVITY_STATUS_PAGE_INIT', {
         detail: {
             pageItemLimit: 25,
