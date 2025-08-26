@@ -28,7 +28,7 @@ export function getAISettings(model: string | undefined): SbxAIAssistantConfig {
             openAI: {
                 apiUrl: "/openai",
                 requestParameters: {
-                    max_tokens: 2000,
+                    max_tokens: 10000,
                     temperature: 1,
                     top_p: 1,
                     stream: true,
