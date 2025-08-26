@@ -6,6 +6,7 @@ import EvidenceTags from "@schoolboxLearningMomentEvidence/evidence-tags.vue";
 import MfActions from "./mf-actions.vue";
 import MfEvidence from "./mf-evidence.vue";
 import MfSources from "./mf-sources.vue";
+import MfModal from "./mf-modal.vue";
 import { useMomentFormStore } from "./store/momentFormStore";
 
 interface Props {
@@ -89,6 +90,7 @@ window.Vue.onMounted(() => {
             <mf-actions />
         </div>
     </div>
+    <mf-modal />
 </template>
 
 <style scoped></style>

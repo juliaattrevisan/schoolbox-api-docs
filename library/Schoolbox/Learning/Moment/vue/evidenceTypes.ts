@@ -25,8 +25,10 @@ export type LearningMoment = {
     currentState: EvidenceStatus;
     curriculumNodes: Pick<Node, "id" | "name" | "code">[] | null;
     discussionThread: null | {
-        data: unknown; // we don't use this property here yet
-        metadata: Metadata;
+        children: {
+            data: unknown; // we don't use this property here yet
+            metadata: Metadata;
+        };
     };
     tags: SelectizeSelectorItem[] | null;
     _links: {

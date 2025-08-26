@@ -34,6 +34,8 @@ export const useMomentFormStore = defineStore("momentForm", () => {
     const selectedFolders = window.Vue.ref<number[]>([]);
 
     const modalType = window.Vue.ref<MomentFormModalType | null>(null);
+    const isModalOpen = window.Vue.ref<boolean>(false);
+    const rejectionReason = window.Vue.ref<string>("");
 
     const selectedNodesStore = useSelectedNodesStore();
 
@@ -63,13 +65,11 @@ export const useMomentFormStore = defineStore("momentForm", () => {
      * This is either a POST or PUT depending on if we're creating or editing
      * @param isAutosave whether this is an autosave or a manual save
      * @param action the action to perform
-     * @param rejectionReason the reason for rejection, only relevant for reject
      * @param deleteComments whether to delete comments, only relevant for publish
      */
     async function submitForm(
         isAutosave: boolean,
         action: "draft" | "publish" | "reject" | "submit",
-        rejectionReason?: string,
         deleteComments?: boolean,
     ): Promise<void> {
         const payload: SubmitFormApiPayload | null = formPayload.value ? { ...formPayload.value } : null;
@@ -82,7 +82,7 @@ export const useMomentFormStore = defineStore("momentForm", () => {
         }
 
         if (action === "reject") {
-            payload.rejectionReason = rejectionReason;
+            payload.rejectionReason = rejectionReason.value;
         }
 
         const apiRequestInfo = createRoutes.value
@@ -146,6 +146,93 @@ export const useMomentFormStore = defineStore("momentForm", () => {
         if (moment.value._links.modifyForm) {
             window.history.pushState({}, "", moment.value._links.modifyForm);
         }
+    }
+
+    /**
+     * Reject this moment
+     * @param skipModal - If true, skip showing the modal (for submitting from the modal)
+     */
+    async function reject(skipModal: boolean = false): Promise<void> {
+        isModalOpen.value = false;
+
+        if (!skipModal) {
+            // Prompt the user for a rejection reason
+            rejectionReason.value = "";
+            modalType.value = MomentFormModalType.CONFIRM_REJECT;
+            isModalOpen.value = true;
+            return;
+        }
+
+        await submitForm(false, "reject");
+    }
+
+    /**
+     * Publish this moment
+     * @param deleteComments whether to delete comments, if undefined the user will be prompted
+     */
+    async function publish(deleteComments?: boolean): Promise<void> {
+        if (!moment.value) return;
+        isModalOpen.value = false;
+
+        // If you're not a staff, you can't delete comments, so just publish
+        if (!window.schoolboxUser.role.staff) {
+            await submitForm(false, "publish", false);
+            return;
+        }
+
+        // TODO: we might be only ever recieving LearningMomentEvidence.putPublish here
+        // but there's a duped learningMomentModeration.putPublish route that allows deleteComments to work...
+
+        if (
+            deleteComments === undefined &&
+            moment.value.discussionThread !== null &&
+            moment.value.discussionThread.children.metadata.count > 0
+        ) {
+            // If there are comments, open the confirmation modal to ask if they want to delete them
+            modalType.value = MomentFormModalType.CONFIRM_PUBLISH;
+            isModalOpen.value = true;
+            return;
+        }
+
+        await submitForm(false, "publish", true);
+    }
+
+    /**
+     * Delete this moment
+     * @param skipModal - If true, skip showing the modal (for submitting from the modal)
+     */
+    async function deleteMoment(skipModal: boolean = false): Promise<void> {
+        if (!moment.value || !moment.value._links.delete) return;
+        isModalOpen.value = false;
+
+        if (!skipModal) {
+            // Prompt the user to confirm deletion
+            modalType.value = MomentFormModalType.CONFIRM_DELETE;
+            isModalOpen.value = true;
+            return;
+        }
+
+        const toast = window.sbProps.toastActivate("Deleting Learning Moment...");
+        isSaving.value = true;
+        saveError.value = null;
+
+        const response = await apiRequest({
+            method: "DELETE",
+            url: moment.value._links.delete,
+        });
+
+        isSaving.value = false;
+
+        if (!response.success) {
+            saveError.value = response.message;
+            toast.timeout({ text: "Delete failed", isSuccess: false });
+            return;
+        }
+
+        toast.timeout({ text: "Learning Moment deleted", isSuccess: true });
+
+        // Redirect to the return URL
+        window.location.href = returnUrl.value;
     }
 
     /**
@@ -218,7 +305,13 @@ export const useMomentFormStore = defineStore("momentForm", () => {
         folders,
         selectedFolders,
         modalType,
+        isModalOpen,
+        rejectionReason,
         isSaving,
+        submitForm,
+        reject,
+        publish,
+        deleteMoment,
         toggleFolderSelection,
     };
 });
