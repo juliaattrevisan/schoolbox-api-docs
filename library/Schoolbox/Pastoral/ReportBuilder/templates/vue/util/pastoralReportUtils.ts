@@ -47,30 +47,27 @@ export function getMeta(
     header: TableHeader,
     rowData?: { [key: string]: RowOptions },
 ): string[] {
-    const meta = [];
+    const tabTitle = selectedTab?.title;
+    if (!tabTitle) return [];
     /**
      * For example: "Academic (Academic Honesty)" or "Joffrey Buckner | Wellbeing (Behaviour)"
      */
-    if (
-        selectedTab?.title === TabTitle.STUDENT_BY_TYPE ||
-        selectedTab?.title === TabTitle.STUDENT_BY_MONTH ||
-        selectedTab?.title === TabTitle.STUDENT_BY_WEEK
-    ) {
+    const studentTabs = [TabTitle.STUDENT_BY_TYPE, TabTitle.STUDENT_BY_MONTH, TabTitle.STUDENT_BY_WEEK];
+    if (studentTabs.includes(tabTitle)) {
         const user = rowData?.user as User;
-        meta.push(
+        return [
             `${user ? `${user.firstName} ${user.lastName} | ` : ""} ${header.title} ${header.subTitle ? `(${header.subTitle})` : ""}`,
-        );
-        return meta;
+        ];
     }
     /**
      * For example: "Apr 2025" or "Aug 2025 | Type: Academic (Behaviour)"
      */
-    if (selectedTab?.title === TabTitle.TYPE_BY_MONTH || selectedTab?.title === TabTitle.TYPE_BY_WEEK) {
+    const typeTabs = [TabTitle.TYPE_BY_MONTH, TabTitle.TYPE_BY_WEEK];
+    if (typeTabs.includes(tabTitle)) {
         const typeSubtype = rowData?.type_subtype as TypeSubType;
-        meta.push(
+        return [
             `${header.title} ${typeSubtype ? `| ${typeSubtype.type} ${typeSubtype && typeSubtype.subtype ? `(${typeSubtype.subtype})` : ""}` : ""}`,
-        );
-        return meta;
+        ];
     }
     return [];
 }
