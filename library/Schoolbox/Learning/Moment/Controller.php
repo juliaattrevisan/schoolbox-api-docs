@@ -218,7 +218,10 @@ class Controller extends Base
 
                 if ($userAccesses->count()) {
                     $folders = $this->folderMapper->findByColumn('id', $userAccesses->getPropertyValues('serviceIdentifier'));
-                    $selectedFolders = [$this->requestQuery->get('folderId')];
+
+                    if ($this->requestQuery->get('folderId') ?? false) {
+                        $selectedFolders = [$this->requestQuery->get('folderId')];
+                    }
                 }
             }
         } elseif ($this->getUser()->getRole()->isStaff()) {
@@ -227,7 +230,10 @@ class Controller extends Base
              * Request a collection of folders for data struct synonymity
              */
             $folders = $this->folderMapper->findByColumn('id', $this->requestQuery->get('folderId'));
-            $selectedFolders = [$this->requestQuery->get('folderId')];
+
+            if ($this->requestQuery->get('folderId') ?? false) {
+                $selectedFolders = [$this->requestQuery->get('folderId')];
+            }
         }
 
         $params = [
