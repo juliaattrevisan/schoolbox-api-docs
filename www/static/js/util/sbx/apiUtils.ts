@@ -212,7 +212,8 @@ function parseResponse<TResponseData>(
     }
 
     /* Is this not a successful response? If so, it theoretically should be following RFC 9457 "API Problem" */
-    if (status !== 200 || eventName === "error") {
+    const validStatus = status >= 200 && status < 300;
+    if (!validStatus || eventName === "error") {
         const failureResponse: ApiBaseResponseFailure = {
             success: false,
             message: "An unexpected error occurred",
