@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { apiRequest } from "@js/util/sbx/apiUtils";
-// import locale from "@js/terminology/rosettaStone";
+import locale from "@js/terminology/rosettaStone";
 import type { SelectizeSelectorItem } from "@js/vendors/selectize/selectizeSelectorTypes";
 import DateRange from "@schoolboxVue/components/dateTimePicker/date-range.vue";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
@@ -149,7 +149,7 @@ window.Vue.watch(
 
                     <search-select
                         v-model:selected="crfStore.folderFilter"
-                        label="Filter by classes and groups"
+                        label="Filter by {{ locale.class.properPlural() }} and Groups"
                         label-id="folder"
                         endpoint="/learning/evidence/folders?"
                         :is-single-select="false"
