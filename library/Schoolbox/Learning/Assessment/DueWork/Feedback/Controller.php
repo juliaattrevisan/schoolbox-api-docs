@@ -180,7 +180,11 @@ class Controller extends Base
         $results = [];
         $projectCache = (new Project\ResultCache\ResultCache($this->projectResultCacheMapper));
 
-        // Fetch assessments, if this is a specification then fetch all implementations
+        /* if this is a spec assessment, we want all implementation children assessments,
+         * with hydrated participants so we can publish all the users quickly and easily.
+         *
+         * we should be using filters, so we aren't hydrating all participation for all time....
+        */
         $aImpls = new GenericCollection(DueWork\Model::class);
         if ($assessment->isSpecification()) {
             $aImpls = $this->assessmentDataSource
