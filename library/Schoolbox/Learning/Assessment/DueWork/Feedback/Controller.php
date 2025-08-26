@@ -198,7 +198,7 @@ class Controller extends Base
             $submissionReturn = $this->returnedWorkMapper->findById($draftFeedbackId);
             $publishSuccess   = false;
 
-            // grab the actual assessment
+            // hydrate the duework assessment, not just the feedback joined assessment minimal modal.
             /** @var \Schoolbox\Learning\Assessment\DueWork\Model $assessment */
             $aImpl = $aImpls->getBy('id', $submissionReturn->getSubmissionBox()->getAssessmentModel()->getId());
 
@@ -244,7 +244,7 @@ class Controller extends Base
                 }
 
                 /* Update project result cache when Publish All is used
-                    */
+                 */
                 $projectCache->refresh($this->assessmentDataSource, $aImpl, $submissionReturn->getOwner());
             } catch (PDOException | \DomainException | \InvalidArgumentException | \LogicException | \UnexpectedValueException $e) {
                 $publishSuccess = false;
