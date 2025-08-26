@@ -123,6 +123,8 @@
 
 <div id="learning-moment-form-container">
     <moment-form
+        :has-autosave="{{ payload.hasAutosave ? 'true' : 'false' }}"
+        return-url="{{ RETURN_URL.previous.decoded ?? '/' }}"
         :create-routes="{{ payload.createRoutes|json_encode }}"
         :moment="{{ payload.evidence|json_encode }}"
         endpoint-get-evidence-tags="{{ routeLookup('learningMomentEvidence.getTags') }}"

@@ -262,6 +262,7 @@ class Controller extends Base
         $params = [
             // TODO: Just swap these out of payload once we're done with the twig file...
             'payload' => [
+                'hasAutosave'              => $users->count() === 1, // only autosave on create if there's one target user
                 'evidence' => $translator($moment),
                 'createRoutes'         => $createRoutes,
                 'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
@@ -588,6 +589,7 @@ class Controller extends Base
         $params = [
             // TODO: Just swap these out of payload once we're done with the twig file...
             'payload' => [
+                'hasAutosave'              => true, // can always autosave on the modify form (assuming you have draft perms handled by routes)
                 'evidence'                 => $translator($moment),
                 'createRoutes'             => null,
                 'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
@@ -972,7 +974,7 @@ class Controller extends Base
 
         /* A shortcut to urls for changing states in this learning moment
          */
-        $translated['_links'] = $this->getNextRoutes($moment);
+        // $translated['_links'] = $this->getNextRoutes($moment);
 
         return $translated;
     }

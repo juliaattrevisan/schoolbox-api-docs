@@ -110,7 +110,7 @@ class Controller extends Base
 
         /* A shortcut to urls for changing states in this learning moment
          */
-        $translated['_links'] = $this->getNextRoutes($evidence);
+        // $translated['_links'] = $this->getNextRoutes($evidence);
 
         return $translated;
     }
@@ -268,7 +268,7 @@ class Controller extends Base
 
         /* A shortcut to urls for changing states in this learning moment
          */
-        $translated['_links'] = $this->getNextRoutes($evidence);
+        // $translated['_links'] = $this->getNextRoutes($evidence);
 
         return $translated;
     }

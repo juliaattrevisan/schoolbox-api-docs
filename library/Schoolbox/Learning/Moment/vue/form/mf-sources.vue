@@ -11,7 +11,12 @@ const mfStore = useMomentFormStore();
         <div class="small-12 columns checklist">
             <ul class="option-list">
                 <li v-for="folder in mfStore.folders" :key="folder.id">
-                    <input :id="`mf-checkbox-${folder.id}`" type="checkbox" />
+                    <input
+                        :id="`mf-checkbox-${folder.id}`"
+                        type="checkbox"
+                        :checked="mfStore.selectedFolders.includes(folder.id)"
+                        @change="mfStore.toggleFolderSelection(folder.id)"
+                    />
                     <label :for="`mf-checkbox-${folder.id}`">{{ folder.title }}</label>
                 </li>
             </ul>

@@ -12,7 +12,7 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const selectedTags = defineModel<SelectizeSelectorItem[]>("tags", { required: true });
+const selectedTags = defineModel<SelectizeSelectorItem[] | null>("tags", { required: true });
 const evidenceTagsEl = window.Vue.useTemplateRef<HTMLSelectElement>("evidenceTagsRef");
 
 const tagsSelectLoaded = window.Vue.ref(false);
@@ -66,7 +66,7 @@ window.Vue.onMounted(async () => {
                 isChangingTags.value = false;
             },
         },
-        value: selectedTags.value,
+        value: selectedTags.value ?? [],
         multiple: true,
     });
 });
@@ -79,6 +79,11 @@ window.Vue.watch(
     (newValue) => {
         if (!evidenceTagsEl.value) return;
         if (isChangingTags.value) return; // internal change, no need to update
+
+        if (newValue === null) {
+            evidenceTagsEl.value.selectize.clear(true);
+            return;
+        }
 
         evidenceTagsEl.value.selectize.setValue(
             newValue.map((tag) => tag.id),

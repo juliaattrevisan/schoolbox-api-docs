@@ -1,3 +1,4 @@
+import type { Metadata } from "@js/util/sbx/apiUtils";
 import type { SelectizeSelectorItem } from "@js/vendors/selectize/selectizeSelectorTypes";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 
@@ -20,10 +21,14 @@ export const evidenceStatusLabels: Record<EvidenceStatus, string> = {
 export type LearningMoment = {
     // NOTE: this doesn't have all properties yet, see library/Schoolbox/Learning/Moment/Translator/ModelToArray/Base.php
     id: number;
-    body: string;
+    body: string | null;
     currentState: EvidenceStatus;
-    curriculumNodes: Pick<Node, "id" | "name" | "code">[];
-    tags: SelectizeSelectorItem[];
+    curriculumNodes: Pick<Node, "id" | "name" | "code">[] | null;
+    discussionThread: null | {
+        data: unknown; // we don't use this property here yet
+        metadata: Metadata;
+    };
+    tags: SelectizeSelectorItem[] | null;
     _links: {
         createThread?: string | null;
         detail?: string | null;

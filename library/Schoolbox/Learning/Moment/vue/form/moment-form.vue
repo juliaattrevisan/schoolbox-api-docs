@@ -10,6 +10,15 @@ import { useMomentFormStore } from "./store/momentFormStore";
 
 interface Props {
     /**
+     * Autosave is available if there's a draft route
+     * and this isn't a create form for multiple dudes at the same time
+     *
+     * After the initial POST, we end up choosing what to do based on the response we get,
+     * either sending the user somewhere else, or updating the form to be an edit form
+     */
+    hasAutosave: boolean;
+    returnUrl: string;
+    /**
      * If this is a create form, it's populated with the post routes to use
      * as props.moment will be an empty object and will not reflect
      * the correct routes (doesn't support multiple users, those are puts, etc)
@@ -35,7 +44,14 @@ const props = defineProps<Props>();
 const mfStore = useMomentFormStore();
 
 window.Vue.onMounted(() => {
-    mfStore.init(props.createRoutes, props.moment, props.folders, props.selectedFolders);
+    mfStore.init(
+        props.hasAutosave,
+        props.returnUrl,
+        props.createRoutes,
+        props.moment,
+        props.folders,
+        props.selectedFolders,
+    );
 });
 </script>
 
@@ -70,7 +86,7 @@ window.Vue.onMounted(() => {
                     <mf-sources />
                 </fieldset>
             </section>
-            <mf-actions :moment="moment" />
+            <mf-actions />
         </div>
     </div>
 </template>

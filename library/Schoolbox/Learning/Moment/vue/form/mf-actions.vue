@@ -25,16 +25,16 @@ const relevantRoutes = window.Vue.computed(() => {
     <!-- TODO: Make sure the route checks determine what we can actually do, this currently assumes they determine the button visibility and nothing else -->
     <ul class="flex-list buttons">
         <li v-if="relevantRoutes.draft">
-            <button>Save for later</button>
+            <button :disabled="mfStore.isSaving">Save for later</button>
         </li>
         <li v-if="relevantRoutes.reject">
-            <button>Request update</button>
+            <button :disabled="mfStore.isSaving">Request update</button>
         </li>
         <li v-if="relevantRoutes.submit">
-            <button class="submit">Submit for approval</button>
+            <button :disabled="mfStore.isSaving" class="submit">Submit for approval</button>
         </li>
         <li v-if="relevantRoutes.publish">
-            <button class="submit">Publish</button>
+            <button :disabled="mfStore.isSaving" class="submit">Publish</button>
         </li>
     </ul>
 </template>
