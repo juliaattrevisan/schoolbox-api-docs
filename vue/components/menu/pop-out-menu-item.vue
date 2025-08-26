@@ -94,7 +94,6 @@ button.c-menu-item {
     color: var(--content-ui-foreground);
     &:hover:not(.is-disabled) {
         background-color: var(--content-ui-background);
-        // cursor: pointer;
     }
 }
 </style>
