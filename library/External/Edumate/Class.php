@@ -17,10 +17,7 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
     public function getStudents(string $classCode): array
     {
         // Setup handling multiple codes
-        $codes = explode(',', $classCode);
-        array_walk($codes, function (&$n): void {
-            $n = "'" . $this->quote($n) . "'";
-        });
+        [$params, $placeholders] = $this->buildClassCodeParamsAndPlaceholders($classCode);
 
         // prepare
         $stmt = $this->getConnection()->prepareQuery("
@@ -37,12 +34,12 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
                 '' AS STUDENTTUTORDESCRIPTION
             FROM  SCHOOLBOX_STUDENTCLASS
             LEFT JOIN SCHOOLBOX_STUDENTS ON SCHOOLBOX_STUDENTCLASS.STUDENT_NUMBER = SCHOOLBOX_STUDENTS.STUDENT_NUMBER
-            WHERE SCHOOLBOX_STUDENTCLASS.CLASS_CODE IN (" . implode(',', $codes) . ")
+            WHERE SCHOOLBOX_STUDENTCLASS.CLASS_CODE IN (" . implode(',', $placeholders) . ")
             ORDER BY SURNAME ASC
         ");
 
         // retrieve
-        $stmt->execute();
+        $stmt->execute($params);
 
         // manipulate
         $students = [];
@@ -74,23 +71,18 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
      */
     public function getTeachers(string $classCode, ?Alaress_Date_Format $date = null): array
     {
-
         // Setup handling multiple codes
-        $codes = explode(',', $classCode);
-        array_walk($codes, function (&$n): void {
-            $n = "'" . $this->quote($n) . "'";
-        });
-
+        [$params, $placeholders] = $this->buildClassCodeParamsAndPlaceholders($classCode);
 
         // prepare
         $stmt = $this->getConnection()->prepareQuery("
             SELECT STAFF_NUMBER AS STAFFID
                 FROM SCHOOLBOX_TEACHERCLASS
-                WHERE CLASS_CODE IN (" . implode(',', $codes) . ")
+                WHERE CLASS_CODE IN (" . implode(',', $placeholders) . ")
         ");
 
         // retrieve
-        $stmt->execute();
+        $stmt->execute($params);
 
         // manipulate
         $teachers = array();
@@ -118,5 +110,25 @@ class External_Edumate_Class extends External_Edumate_Connection implements Exte
     public function findClassesByType(string $filetype, array $timetableCode): array
     {
         return [];
+    }
+
+    /**
+     * Helper function for building params and placeholders for a set of query
+     * parameters.
+     *
+     * @param string $classCode
+     * @return array
+     */
+    private function buildClassCodeParamsAndPlaceholders(string $classCode): array
+    {
+        $codes        = explode(',', $classCode);
+        $params       = [];
+        $placeholders = [];
+        foreach ($codes as $i => $code) {
+            $param          = 'code' . $i;
+            $params[$param] = $code;
+            $placeholders[] = ':' . $param;
+        }
+        return [$params, $placeholders];
     }
 }
