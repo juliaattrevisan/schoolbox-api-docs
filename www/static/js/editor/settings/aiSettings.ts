@@ -28,7 +28,7 @@ export function getAISettings(model: string | undefined): SbxAIAssistantConfig {
             openAI: {
                 apiUrl: "/openai",
                 requestParameters: {
-                    max_tokens: 2000,
+                    max_tokens: 10000,
                     temperature: 1,
                     top_p: 1,
                     stream: true,
@@ -46,8 +46,9 @@ export function getAISettings(model: string | undefined): SbxAIAssistantConfig {
                                 id: "improveWriting",
                                 label: "Improve writing",
                                 prompt:
-                                    "Rewrite this content with no spelling mistakes, proper grammar, " +
-                                    "and with more descriptive language, using best writing practices without losing the original meaning.",
+                                    "Proofread and rewrite the following content to correct spelling and grammar errors, " +
+                                    "and enhance clarity, flow, and descriptiveness. " +
+                                    "Maintain the original meaning. Use a clear, concise, and engaging writing style.",
                             },
                             {
                                 id: "makeShorter",
@@ -60,8 +61,11 @@ export function getAISettings(model: string | undefined): SbxAIAssistantConfig {
                                 id: "makeLonger",
                                 label: "Make longer",
                                 prompt:
-                                    "Expand upon this content with descriptive language and more detailed explanations, " +
-                                    "to make the writing easier to understand and increase the length of the content.",
+                                    "Expand the following content by using more descriptive language, elaborating on key ideas, " +
+                                    "and adding relevant context or examples. " +
+                                    "Ensure all additions are logically derived from the original text. " +
+                                    "The goal is to make the writing clearer, more engaging, and longer, " +
+                                    "without introducing new or unrelated information.",
                             },
                             {
                                 id: "simplifyLanguage",
@@ -79,12 +83,19 @@ export function getAISettings(model: string | undefined): SbxAIAssistantConfig {
                             {
                                 id: "junior",
                                 label: "For Junior Students",
-                                prompt: "Rewrite this content using age appropriate language that a junior school student could easily understand.",
+                                prompt:
+                                    "Rewrite the following content for students aged 6–11 (Grades 1–5). " +
+                                    "Use simple, age-appropriate vocabulary, short and clear sentences, " +
+                                    "and a supportive, instructional tone. " +
+                                    "Keep all information accurate and easy to understand.",
                             },
                             {
                                 id: "senior",
                                 label: "For Senior Students",
-                                prompt: "Rewrite this content using age appropriate language that a senior school student could easily understand.",
+                                prompt:
+                                    "Rewrite the following content for a senior school audience (ages 13–18, Grades 7–12). " +
+                                    "Use more advanced vocabulary, varied sentence structures, and a formal, academic tone. " +
+                                    "Ensure the meaning remains clear and the information accurate.",
                             },
                             {
                                 id: "teachers",
@@ -105,7 +116,9 @@ export function getAISettings(model: string | undefined): SbxAIAssistantConfig {
                             {
                                 id: "continue",
                                 label: "Continue",
-                                prompt: "Continue this text.",
+                                prompt:
+                                    "Continue the following text by extending its ideas in a way that matches the existing tone, " +
+                                    "style, and subject matter. Maintain coherence and flow with what has already been written.",
                             },
                         ],
                     },
