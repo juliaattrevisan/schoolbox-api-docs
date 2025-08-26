@@ -406,10 +406,10 @@ EOL;
                     return (new ConnectorFactory($conf))->build(
                         [],
                         [
-                            Connector::AMQP_CONNECTION_OPTION_HEARTBEAT     => 15,
-                            Connector::AMQP_CONNECTION_OPTION_READ_TIMEOUT  => 30,
-                            Connector::AMQP_CONNECTION_OPTION_WRITE_TIMEOUT => 30,
-                            Connector::AMQP_CONNECTION_OPTION_KEEPALIVE     => true,
+                            Connector::AMQP_CONNECTION_OPTION_HEARTBEAT     => (int)$conf->get('amqp_heartbeat'),
+                            Connector::AMQP_CONNECTION_OPTION_READ_TIMEOUT  => (int)$conf->get('amqp_read_timeout'),
+                            Connector::AMQP_CONNECTION_OPTION_WRITE_TIMEOUT => (int)$conf->get('amqp_write_timeout'),
+                            Connector::AMQP_CONNECTION_OPTION_KEEPALIVE     => (bool)$conf->get('amqp_keepalive'),
                         ],
                     );
                 }
