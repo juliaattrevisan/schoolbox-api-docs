@@ -147,8 +147,6 @@ window.Vue.watch(
                         placeholder="Search for users..."
                     />
 
-                    <!-- TODO: filter by classes/groups [SA-20735] -->
-                    <!-- <label> Filter by {{ locale.class.properPlural() }} and Groups </label> -->
                     <search-select
                         v-model:selected="crfStore.folderFilter"
                         label="Filter by classes and groups"
