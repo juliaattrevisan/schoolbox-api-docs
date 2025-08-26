@@ -6,6 +6,7 @@ use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as PastoralModel;
+use Schoolbox\Pastoral\Report\Model as Report;
 use Schoolbox\Pastoral\ReportBuilder\Base;
 use Schoolbox\Pastoral\ReportBuilder\Helper;
 use Schoolbox\Pastoral\ReportBuilder\Translator\ModelToArray as PastoralTranslator;
@@ -159,27 +160,12 @@ class RecordList extends Base implements TabTypeInterface, ICursor
             $where .= " AND ({$this->inTypeSubType})";
 
             // Create lexicographic comparison for multiple sort fields
-            $cursorConditions = $this->buildCursorConditions();
+            $cursorConditions = $this->helper->buildCursorConditions($cursor, self::MIN_SORT_BY_VALUE);
 
             if (!empty($cursorConditions)) {
-                $where .= " AND (" . implode(' OR ', $cursorConditions) . ")";
+                $where .= " AND (" . implode(' OR ', $cursorConditions['conditions']) . ")";
+                $param = $cursorConditions['params'];
             }
-
-            $param = [
-                'cursor_student_last_name' => $cursor['student']['last'],
-                'cursor_student_chosen_name' => $cursor['student']['chosen'],
-                'cursor_severity' => $cursor['severity'],
-                'cursor_created' => $cursor['created'],
-                'cursor_type' => $cursor['type'],
-                'cursor_subtype' => $cursor['subtype'],
-                'cursor_points' => $cursor['points'],
-                'cursor_yearLevel' => $cursor['yearLevel'],
-                'cursor_house' => $cursor['house'],
-                'cursor_campus' => $cursor['campus'],
-                'cursor_author_last_name' => $cursor['author']['last'],
-                'cursor_author_chosen_name' => $cursor['author']['chosen'],
-                'cursor_id' => $cursor['id'],
-            ];
         }
 
         $pb = $this->pastoralMapper->getPredicateBuilder();
@@ -200,54 +186,6 @@ class RecordList extends Base implements TabTypeInterface, ICursor
             ->reindex();
 
         return $records;
-    }
-
-
-    /**
-     * Build cursor conditions for lexicographic comparison
-     */
-    private function buildCursorConditions(): array
-    {
-        $conditions = [];
-        $minValue = self::MIN_SORT_BY_VALUE;
-        $fieldMap = [
-            'created' => 'COALESCE(pastoral.occurred_on, pastoral.created_at)',
-            'student_last_name' => 's.lastname',
-            'student_chosen_name' => 's.chosen_name',
-            'type' => 't.name',
-            'subtype' => 'c.name',
-            'author_last_name' => 'o.lastname',
-            'author_chosen_name' => 'o.chosen_name',
-            'points' => "COALESCE(pastoral.points, {$minValue})",
-            'yearLevel' => 'sy.sequence',
-            'house' => 's.house',
-            'campus' => 'sc.name',
-            'severity' => 'sv.sequence',
-            'id' => 'pastoral.id',
-        ];
-
-        $sortFields = array_keys($fieldMap);
-
-        // Build lexicographic comparison conditions
-        for ($i = 0; $i < count($sortFields); $i++) {
-            $condition = [];
-
-            // Add equality conditions for all previous fields
-            for ($j = 0; $j < $i; $j++) {
-                $field = $sortFields[$j];
-                $dbField = $fieldMap[$field] ?? $field;
-                $condition[] = "{$dbField} = :cursor_{$field}";
-            }
-
-            // Add comparison for current field
-            $field = $sortFields[$i];
-            $dbField = $fieldMap[$field] ?? $field;
-            $operator = $field == 'created' ? '<' : '>';
-            $condition[] = "{$dbField} {$operator} :cursor_{$field}";
-
-            $conditions[] = '(' . implode(' AND ', $condition) . ')';
-        }
-        return $conditions;
     }
 
     /**

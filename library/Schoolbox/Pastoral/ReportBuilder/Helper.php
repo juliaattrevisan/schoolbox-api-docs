@@ -543,4 +543,95 @@ class Helper
         }
         return new Collection($weeks);
     }
+
+    /**
+     * Build cursor conditions for lexicographic comparison
+     */
+    public function buildCursorConditions(array $cursor, int $minValue): array
+    {
+        $conditions = [];
+        $params = [];
+
+        $fieldMap = [
+            Report::ORDER_OCCURRED_ON => [
+                'condition' => 'COALESCE(pastoral.occurred_on, pastoral.created_at)',
+                'param' => $cursor['created']
+            ],
+            Report::ORDER_STUDENT_LASTNAME => [
+                'condition' => 's.lastname',
+                'param' => $cursor['student']['last']
+            ],
+            Report::ORDER_STUDENT_CHOSEN_NAME => [
+                'condition' => 's.chosen_name',
+                'param' => $cursor['student']['chosen']
+            ],
+            Report::ORDER_TYPE => [
+                'condition' => 't.name',
+                'param' => $cursor['type']
+            ],
+            Report::ORDER_SUBTYPE => [
+                'condition' => 'c.name',
+                'param' => $cursor['subtype']
+            ],
+            Report::ORDER_AUTHOR_LASTNAME => [
+                'condition' => 'o.lastname',
+                'param' => $cursor['author']['last']
+            ],
+            Report::ORDER_AUTHOR_CHOSEN_NAME => [
+                'condition' => 'o.chosen_name',
+                'param' => $cursor['author']['chosen']
+            ],
+            Report::ORDER_POINTS => [
+                'condition' => "COALESCE(pastoral.points, {$minValue})",
+                'param' => $cursor['points']
+            ],
+            Report::ORDER_YEAR => [
+                'condition' => 'sy.sequence',
+                'param' => $cursor['yearLevel']
+            ],
+            Report::ORDER_HOUSE => [
+                'condition' => 's.house',
+                'param' => $cursor['house']
+            ],
+            Report::ORDER_CAMPUS => [
+                'condition' => 'sc.name',
+                'param' => $cursor['campus']
+            ],
+            Report::ORDER_SEVERITY => [
+                'condition' => 'sv.sequence',
+                'param' => $cursor['severity']
+            ],
+            Report::ORDER_PASTORAL_ID => [
+                'condition' => 'pastoral.id',
+                'param' => $cursor['id']
+            ],
+        ];
+
+        $sortFields = array_keys($fieldMap);
+
+        // Build lexicographic comparison conditions
+        for ($i = 0; $i < count($sortFields); $i++) {
+            $condition = [];
+
+            // Add equality conditions for all previous fields
+            for ($j = 0; $j < $i; $j++) {
+                $field = $sortFields[$j];
+                $dbField = $fieldMap[$field]['condition'] ?? $field;
+                $condition[] = "{$dbField} = :cursor_{$field}";
+            }
+
+            // Add comparison for current field
+            $field = $sortFields[$i];
+            $dbField = $fieldMap[$field]['condition'] ?? $field;
+            $operator = $field == Report::ORDER_OCCURRED_ON ? '<' : '>';
+            $condition[] = "{$dbField} {$operator} :cursor_{$field}";
+
+            $conditions[] = '(' . implode(' AND ', $condition) . ')';
+            $params["cursor_{$field}"] = $fieldMap[$field]['param'] ?? null;
+        }
+        return !empty($conditions) ? [
+            'conditions' => $conditions,
+            'params' => $params
+        ] : [];
+    }
 }
