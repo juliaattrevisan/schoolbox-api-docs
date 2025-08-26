@@ -1249,26 +1249,36 @@ class Controller extends Base
             return;
         }
 
-        /* This currently returns rando non-group/non-class folders too. hmm
+        /* Find members of your cohort
          */
-        $folders = $this->folderMapper->searchByName($keyword);
 
-        /** @var \Schoolbox\Resource\Folder\Model $folder */
-        foreach ($folders as $folder) {
-            /* Neither a group nor a class: skip it
-             *
-             * You maybe could deeply hack searchByName but you need a hydrated instance
-             * to do these isGroup() and isClass() chacks anyways
-             */
-            if (!$folder->isGroup() && !$folder->isClass()) {
-                continue;
-            }
+        /* Find the folder ids where your cohort made a learning moment folder relationship
+         */
 
-            $stack[] = [
-                'id' => $folder->getId(),
-                'name' => $folder->getNameWithCodes()
-            ];
-        }
+        /* Find those folder instances, only include Groups and Classes in the stack
+         * /
+
+
+//        /* This currently returns rando non-group/non-class folders too. hmm
+//         */
+//        $folders = $this->folderMapper->searchByName($keyword);
+//
+//        /** @var \Schoolbox\Resource\Folder\Model $folder */
+//        foreach ($folders as $folder) {
+//            /* Neither a group nor a class: skip it
+//             *
+//             * You maybe could deeply hack searchByName but you need a hydrated instance
+//             * to do these isGroup() and isClass() chacks anyways
+//             */
+//            if (!$folder->isGroup() && !$folder->isClass()) {
+//                continue;
+//            }
+//
+//            $stack[] = [
+//                'id' => $folder->getId(),
+//                'name' => $folder->getNameWithCodes()
+//            ];
+//        }
 
         $this->response = $this->responseAsJson($stack);
     }
