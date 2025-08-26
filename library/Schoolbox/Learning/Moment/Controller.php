@@ -1251,34 +1251,77 @@ class Controller extends Base
 
         /* Find members of your cohort
          */
+        $cohortFolderId = $this->requestQuery->get('cohortFolderId') ?? '';
+
+        /* No cohort folder? No trabajo
+         */
+        if ('' === trim((string)$cohortFolderId)) {
+            $this->response = $this->responseEmpty(400);
+            return;
+        }
+
+        /* Find a set of users who are somehow enrolled in $folder as students,
+         * and/or involved in $folder as group members
+         *
+         * Note that a folder can be both a group and a class-coded folder which derives its
+         * members from the Externals
+         */
+        try {
+            $cohortFolder = $this->folderMapper->findById($cohortFolderId);
+            $cohortIds = $this->userAccessMapper->findUsersInCategory($cohortFolder, \Schoolbox\Role::STUDENT)->indexBy('id')->keys();
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $this->response = $this->responseEmpty(400);
+            return;
+        }
 
         /* Find the folder ids where your cohort made a learning moment folder relationship
          */
+        $pb = $this->folderMapper->getPredicateBuilder()
+            ->in('user_id', $cohortIds);
+
+        $whereClause = $pb->getWhere()[0];
+
+        $query = "
+            SELECT folder_id
+            FROM moment_folder mf
+            INNER JOIN moment m ON mf.moment_id = m.id
+            WHERE {$whereClause}
+            AND m.deletedAt IS NULL
+        ";
+
+        $result = $this->folderMapper->getDatabase()->executeQuery($query);
+
+        $folderIds = [];
+
+        while ($row = $result->fetch()) {
+            $folderIds[] = $row['folder_id'];
+        }
 
         /* Find those folder instances, only include Groups and Classes in the stack
-         * /
+         */
+        if (!\count($folderIds)) {
+            $this->response = $this->responseEmpty(400);
+            return;
+        }
 
+        $folders = $this->folderMapper->findByColumn('id', $folderIds);
 
-//        /* This currently returns rando non-group/non-class folders too. hmm
-//         */
-//        $folders = $this->folderMapper->searchByName($keyword);
-//
-//        /** @var \Schoolbox\Resource\Folder\Model $folder */
-//        foreach ($folders as $folder) {
-//            /* Neither a group nor a class: skip it
-//             *
-//             * You maybe could deeply hack searchByName but you need a hydrated instance
-//             * to do these isGroup() and isClass() chacks anyways
-//             */
-//            if (!$folder->isGroup() && !$folder->isClass()) {
-//                continue;
-//            }
-//
-//            $stack[] = [
-//                'id' => $folder->getId(),
-//                'name' => $folder->getNameWithCodes()
-//            ];
-//        }
+        /** @var \Schoolbox\Resource\Folder\Model $folder */
+        foreach ($folders as $folder) {
+            /* Neither a group nor a class: skip it
+             *
+             * You maybe could deeply hack searchByName but you need a hydrated instance
+             * to do these isGroup() and isClass() chacks anyways
+             */
+            if (!$folder->isGroup() && !$folder->isClass()) {
+                continue;
+            }
+
+            $stack[] = [
+                'id' => $folder->getId(),
+                'name' => $folder->getNameWithCodes()
+            ];
+        }
 
         $this->response = $this->responseAsJson($stack);
     }
