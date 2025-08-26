@@ -200,7 +200,7 @@ class NavigationSelector
 
         /* Conditionally add Year 11 option
          */
-        if ($userYear !== '11' && $this->hasYear11()) {
+        if ($userYear === '11' && $this->hasYear11()) {
             $availableNavigation[self::YEAR11_KEY] = [
                 'url' => $this->routeGenerator->generate('achievementreport.getYear11', [
                     'externalUserId' => $this->externalUser['StudentID'],
