@@ -10,12 +10,16 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment\Moderation;
 
+use Alaress\Authorizer\Failure\Forbidden;
+use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Closure;
-use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
+use Schoolbox\User;
 use Schoolbox\Role;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 
 class Module extends BaseModule
 {
@@ -48,11 +52,15 @@ class Module extends BaseModule
             self::METHOD_PUT,
             '/{evidenceId:\d+}/publish',
             'putPublish',
-            $staffOnlyRule,
+            new Rule\All(
+                $staffOnlyRule,
+                $this->buildRuleCanProgressToState('publish'),
+            ),
             Closure::fromCallable([$this, 'preloadEvidence']),
         );
 
         /* Bulk Publish a set of learning moments (typically from Cohort Overview)
+         * TODO - check that this is okay to bypass buildRuleCanProgressToState()
          */
         $this->register(
             self::METHOD_PUT,
@@ -67,11 +75,15 @@ class Module extends BaseModule
             self::METHOD_PUT,
             '/{evidenceId:\d+}/reject',
             'putReject',
-            $staffOnlyRule,
+            new Rule\All(
+                $staffOnlyRule,
+                $this->buildRuleCanProgressToState('reject'),
+            ),
             Closure::fromCallable([$this, 'preloadEvidence']),
         );
 
         /* Bulk reject a set of learning moments (typically from Cohort Overview)
+         * TODO - check that this is okay to bypass buildRuleCanProgressToState()
          */
         $this->register(
             self::METHOD_PUT,
@@ -124,4 +136,37 @@ class Module extends BaseModule
 //    {
 //        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
 //    }
+
+
+    /**
+     * Authorizes that a particular evidence can be progressed to a given state
+     * TODO dedupe this with the same thing in library/Schoolbox/Learning/Moment/Module.php, we have two spots for moderation...
+     *
+     * @param string $state
+     */
+    private function buildRuleCanProgressToState(string $state): Rule\IAuthorizationRule
+    {
+        return new Rule\LazyCallback(
+            fn() => new Rule\Callback(function (array $params, User $user) use ($state): void {
+                // Because preload exceptions are not handled immediately, we can't fatal if the preload failed.
+                if (!($params['evidence'] ?? null) instanceof \Schoolbox\Learning\Moment\Model) {
+                    throw new InvalidPath("No evidence found in route params");
+                }
+
+                /** @var \Schoolbox\Learning\Moment\Model $evidence */
+                $evidence = $params['evidence'];
+
+                // NextRoutes is the source of truth of what the next possible states are
+                $nextRoutes = (new \Schoolbox\Learning\Moment\NextRoutes())->generate(
+                    $evidence,
+                    $user,
+                    $this->getConfig()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED)
+                );
+
+                if (empty($nextRoutes[$state])) {
+                    throw new Forbidden("Cannot progress to state '$state'");
+                }
+            }),
+        );
+    }
 }
