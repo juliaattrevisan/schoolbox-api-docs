@@ -12,6 +12,7 @@ namespace Schoolbox\API\Token\JwtParser;
 use DomainException;
 use Firebase\JWT as JwtLibrary;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
@@ -45,12 +46,14 @@ abstract class Base implements IParser
     /**
      * Constructor
      *
-     * @param UserMapper    $userMapper Mapper for retrieving users once the user in the JWT is identified.
-     * @param IConfigLoader $config     Standard configuration store.
+     * @param UserMapper      $userMapper Mapper for retrieving users once the user in the JWT is identified.
+     * @param IConfigLoader   $config     Standard configuration store.
+     * @param LoggerInterface $log        Logger
      */
     public function __construct(
         protected UserMapper $userMapper,
         protected IConfigLoader $config,
+        protected LoggerInterface $log,
     ) {
     }
 
@@ -96,14 +99,14 @@ abstract class Base implements IParser
         if (!isset($this->decodeWithoutVerificationResults[$jwt])) {
             $parts = explode('.', $jwt);
             if (count($parts) !== 3) {
-                throw new Exception\Unparseable('JWT must contain a header, payload and signature');
+                throw new Exception\Unparseable('Could not parse JWT: must contain a header, payload and signature');
             }
             [, $payload,] = $parts;
             try {
                 $this->decodeWithoutVerificationResults[$jwt]
                     = (array)JwtLibrary\JWT::jsonDecode(JwtLibrary\JWT::urlsafeB64Decode($payload));
             } catch (DomainException $e) {
-                throw new Exception\Unparseable('JWT could not be parsed: ' . $e->getMessage(), $e->getCode(), $e);
+                throw new Exception\Unparseable(sprintf('Could not parse JWT payload (message: %s)', $e->getMessage()), $e->getCode(), $e);
             }
         }
         return $this->decodeWithoutVerificationResults[$jwt];
@@ -124,14 +127,14 @@ abstract class Base implements IParser
         if (!isset($this->decodeHeadersResults[$jwt])) {
             $parts = explode('.', $jwt);
             if (count($parts) !== 3) {
-                throw new Exception\Unparseable('JWT must contain a header, payload and signature');
+                throw new Exception\Unparseable('Could not parse JWT: must contain a header, payload and signature');
             }
             [$header,] = $parts;
             try {
                 $this->decodeHeadersResults[$jwt]
                     = (array)JwtLibrary\JWT::jsonDecode(JwtLibrary\JWT::urlsafeB64Decode($header));
             } catch (DomainException $e) {
-                throw new Exception\Unparseable('JWT could not be parsed: ' . $e->getMessage(), $e->getCode(), $e);
+                throw new Exception\Unparseable(sprintf('Could not parse JWT header (message: %s)', $e->getMessage()), $e->getCode(), $e);
             }
         }
         return $this->decodeHeadersResults[$jwt];
@@ -159,8 +162,10 @@ abstract class Base implements IParser
      */
     protected function findUser(string $username, ?string $sourceClaim): User
     {
+        $this->log->debug(sprintf('Searching for user with username "%s"', $username));
         $user = $this->userMapper->findByUsername($username);
         if (!$user && $this->config->get(ConfigMapper::NAME_AUTH_EMAIL_ENABLED)) {
+            $this->log->debug(sprintf('No user found: searching for user with alt_email "%s"', $username));
             $user = $this->userMapper->findByColumnList(['alt_email' => $username], ['deleted' => false])->first();
         }
 
@@ -170,6 +175,7 @@ abstract class Base implements IParser
                 : sprintf('No user with username "%s" found', $username);
             throw new Exception\InvalidIdentity($message);
         }
+
         if (!$user->getEnabled()) {
             $message = isset($sourceClaim)
                 ? sprintf('JWT "%s" claim matches a deactivated user', $sourceClaim)

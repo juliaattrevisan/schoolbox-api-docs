@@ -133,6 +133,7 @@ class ConfigMapper extends Mapper
     public const NAME_OAUTH_ENABLE_SSO                   = 'oauth_enable_sso';
     public const NAME_OAUTH_RESPONSE_TYPE                = 'oauth_response_type';
     public const NAME_OAUTH_SCOPES                       = 'oauth_scopes';
+    public const NAME_OAUTH_DEBUG_MODE                   = 'oauth_debug_mode';
 
     public const _CANVAS_DATA_API_KEY    = 'canvas_data_api_key';
     public const _CANVAS_DATA_API_SECRET = 'canvas_data_api_secret';
@@ -190,6 +191,7 @@ class ConfigMapper extends Mapper
     public const NAME_SITE_PLAN = 'site_plan';
     public const NAME_SITE_VERSION = 'site_version';
     public const NAME_SITE_PACKAGE = 'site_package';
+    public const NAME_SITE_HOSTNAME = 'site_hostname';
     public const NAME_SITE_DOMAIN = 'site_domain';
     public const NAME_SITE_SCHOOL_CODE = 'site_school_code';
     public const NAME_SITE_STATIC_ASSET_SERVE_FROM_CDN = 'site_static_asset_serve_from_cdn';
@@ -412,6 +414,8 @@ class ConfigMapper extends Mapper
     public const NAME_CLAMD_PORT          = 'clamd_port';
     public const NAME_CLAMD_MAX_FILE_SIZE = 'clamd_max_file_size';
 
+    // Debug settings
+    public const NAME_DEBUG_MODE = 'debug_mode';
 
     /**
      * Config settings which may affect the behaviour of the router daemon.

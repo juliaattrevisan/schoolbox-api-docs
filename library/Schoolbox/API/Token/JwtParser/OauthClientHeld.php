@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\API\Token\JwtParser;
 
 use Firebase\JWT\Key;
+use Psr\Log\LoggerInterface;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
@@ -39,6 +40,7 @@ class OauthClientHeld extends Base
      *
      * @param UserMapper          $userMapper         User mapper: required for fetching users based on their username.
      * @param IConfigLoader       $config             Configuration store.
+     * @param LoggerInterface     $log                Logger
      * @param RelyingParty\Mapper $relyingPartyMapper Relying party mapper: required for verifying that the client is
      *                                                known to this instance, and also for determining the user if the
      *                                                access token contains no subject.
@@ -46,9 +48,10 @@ class OauthClientHeld extends Base
     public function __construct(
         UserMapper $userMapper,
         IConfigLoader $config,
+        LoggerInterface $log,
         private RelyingParty\Mapper $relyingPartyMapper
     ) {
-        parent::__construct($userMapper, $config);
+        parent::__construct($userMapper, $config, $log);
     }
 
     /**
@@ -61,6 +64,14 @@ class OauthClientHeld extends Base
     {
         $claims    = $this->decodeWithoutVerification($jwt);
         $audiences = (array)($claims[self::CLAIM_AUD] ?? []);
+        $this->log->debug(
+            sprintf(
+                'Checking JWT %s "%s" against %s.client_id values',
+                self::CLAIM_AUD,
+                implode(',', $audiences),
+                $this->relyingPartyMapper->getTable(),
+            )
+        );
         if (empty($audiences)) {
             return false;
         }
@@ -89,9 +100,17 @@ class OauthClientHeld extends Base
         // TODO validate JTI?
         // TODO perform other validation from SelfIssued here
         if ($claims[self::CLAIM_SUB]) {
+            $this->log->info(sprintf('JWT contains claim "%s": searching for users which match', self::CLAIM_SUB));
             return $this->findUser($claims[self::CLAIM_SUB], self::CLAIM_SUB);
         }
 
+        $this->log->info(
+            sprintf(
+                'JWT does not contain claim "%s": finding relying party for claim "%s", and then returning its client credentials user',
+                self::CLAIM_SUB,
+                self::CLAIM_AUD,
+            ),
+        );
         $audiences = (array)($claims[self::CLAIM_AUD] ?? []);
         foreach ($audiences as $audience) {
             $relyingParty = $this->relyingPartyMapper->findByClientId($audience);
@@ -99,6 +118,7 @@ class OauthClientHeld extends Base
                 return $relyingParty->getClientCredentialsUser();
             }
         }
+
         throw new Exception\InvalidIdentity(
             sprintf(
                 'JWT "%s" claim does not exist, and "%s" contains no audience with a client credentials user',

@@ -20,8 +20,11 @@ use SensitiveParameter;
 /**
  * Parser for JWTs issued by another instance.
  *
- * It's expected that the other instance's JWT public key be stored in the
- * instance registry mapper's table.
+ * It's expected that the other instance's JWKS URL will be provided by the
+ * instance registry.
+ *
+ * These JWTs are usually issued by following a school's "Visit Help" link: the
+ * JWT will be accepted by the Help instance.
  */
 class OtherInstanceIssued extends Base
 {
@@ -38,8 +41,10 @@ class OtherInstanceIssued extends Base
      */
     public function accepts(#[SensitiveParameter] string $jwt): bool
     {
-        $claims = $this->decodeWithoutVerification($jwt);
-        return isset($claims[self::CLAIM_INSTANCE_ID]);
+        $claims     = $this->decodeWithoutVerification($jwt);
+        $instanceId = $claims[self::CLAIM_INSTANCE_ID] ?? null;
+        $this->log->debug(sprintf('Checking JWT %s "%s" is set', self::CLAIM_INSTANCE_ID, $instanceId));
+        return isset($instanceId);
     }
 
     /**
@@ -65,9 +70,17 @@ class OtherInstanceIssued extends Base
                 JSON_THROW_ON_ERROR
             );
             $jwks = json_decode($client->get($response['url'])->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
-        } catch (GuzzleException | \JsonException $e) {
+        } catch (GuzzleException $e) {
             throw new Exception\Rejected(
-                sprintf('Unable to retrieve instance details for instance ID "%s"', $instanceId),
+                sprintf('Unable to retrieve instance details for instance "%s"', $instanceId),
+                $e->getCode(),
+                $e,
+            );
+        } catch (\JsonException $e) {
+            throw new Exception\Rejected(
+                sprintf('Unable to parse instance details for instance "%s"', $instanceId),
+                $e->getCode(),
+                $e,
             );
         }
 
@@ -75,7 +88,7 @@ class OtherInstanceIssued extends Base
         if (!isset($headers['kid'])) {
             if (count($keySet) !== 1) {
                 throw new Exception\Rejected(
-                    sprintf('Instance "%s" has %d keys in its JWKS, but the JWT does not specify a "kid" claim', $instanceId, count($keySet)),
+                    sprintf('Instance has %d keys in its JWKS, but the JWT does not specify a "kid" claim', count($keySet)),
                 );
             }
             $keySet = $keySet[Jwt::KEY_ID];
@@ -91,6 +104,13 @@ class OtherInstanceIssued extends Base
         // Now the JWT is decoded and verified:
         // create a session for the user matching the email address in the JWT
         $email = $claims[self::CLAIM_EMAIL] ?? null;
+        $this->log->debug(
+            sprintf(
+                'Verifying JWT claim %s "%s" exists and matches a user',
+                self::CLAIM_EMAIL,
+                $email,
+            )
+        );
         if (!isset($email)) {
             throw new Exception\InvalidIdentity(sprintf('JWT must contain an "%s" claim', self::CLAIM_EMAIL));
         }

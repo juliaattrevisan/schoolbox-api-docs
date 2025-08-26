@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\API\Token\JwtParser;
 
 use Firebase\JWT\Key;
+use Psr\Log\LoggerInterface;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
@@ -21,6 +22,12 @@ use SensitiveParameter;
 
 /**
  * Parser for JWTs issued by this instance.
+ *
+ * These JWTs may be issued by:
+ * * calls to the task daemon, as taskd will need to make calls back to the
+ *   Schoolbox instance
+ * * creating a token for a user within the admin system
+ * * creating a login QR code
  */
 class SelfIssued extends Base
 {
@@ -31,14 +38,16 @@ class SelfIssued extends Base
      *
      * @param UserMapper        $userMapper  Mapper for retrieving users once the user in the JWT is identified.
      * @param IConfigLoader     $config      Standard configuration store.
+     * @param LoggerInterface   $log         Logger
      * @param User\Token\Mapper $tokenMapper Mapper for retrieving user tokens.
      */
     public function __construct(
         UserMapper $userMapper,
         IConfigLoader $config,
+        LoggerInterface $log,
         private User\Token\Mapper $tokenMapper,
     ) {
-        parent::__construct($userMapper, $config);
+        parent::__construct($userMapper, $config, $log);
     }
 
     /**
@@ -46,8 +55,18 @@ class SelfIssued extends Base
      */
     public function accepts(#[SensitiveParameter] string $jwt): bool
     {
-        $claims = $this->decodeWithoutVerification($jwt);
-        return isset($claims[self::CLAIM_ISS]) && $claims[self::CLAIM_ISS] === $this->determineThisInstanceIssuer();
+        $claims             = $this->decodeWithoutVerification($jwt);
+        $thisInstanceIssuer = $this->determineThisInstanceIssuer();
+        $this->log->debug(
+            sprintf(
+                'Checking JWT %s "%s" against this instance "%s"',
+                self::CLAIM_ISS,
+                $claims[self::CLAIM_ISS] ?? '',
+                $thisInstanceIssuer,
+            ),
+        );
+
+        return isset($claims[self::CLAIM_ISS]) && $claims[self::CLAIM_ISS] === $thisInstanceIssuer;
     }
 
     /**
@@ -61,15 +80,11 @@ class SelfIssued extends Base
             (int)$this->config->get(ConfigMapper::NAME_JWT_LEEWAY),
         );
         if (!isset($claims[self::CLAIM_SUB])) {
-            throw new Exception\InvalidIdentity(
-                sprintf('JWT must contain a "%s"', self::CLAIM_SUB)
-            );
+            throw new Exception\InvalidIdentity(sprintf('JWT must contain a "%s" claim', self::CLAIM_SUB));
         }
         $username = $claims[self::CLAIM_SUB];
         if (trim($username) === '') {
-            throw new Exception\InvalidIdentity(
-                sprintf('JWT "%s" claim must not be empty', self::CLAIM_SUB)
-            );
+            throw new Exception\InvalidIdentity(sprintf('JWT "%s" claim must not be empty', self::CLAIM_SUB));
         }
         $user = $this->findUser($claims[self::CLAIM_SUB], self::CLAIM_SUB);
         if (isset($claims[self::CLAIM_JTI])) {
@@ -87,10 +102,15 @@ class SelfIssued extends Base
                 }
             } catch (MapperException $e) {
                 // could not find a token with user id and jwt id
-                throw new Exception\Rejected('The JWT ID provided does not match a token for the given user', 0, $e);
+                throw new Exception\Rejected(
+                    'The JWT ID provided does not match a token for the given user',
+                    $e->getCode(),
+                    $e,
+                );
             }
         }
         if (isset($claims[self::CUSTOM_CLAIM_TASKD]) && $claims[self::CUSTOM_CLAIM_TASKD] === 1) {
+            $this->log->info(sprintf('Claim "%s" is set: bypassing IP tracking', self::CUSTOM_CLAIM_TASKD));
             $this->bypassIpTracking = true;
         }
 

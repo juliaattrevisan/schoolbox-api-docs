@@ -16,6 +16,7 @@ use Alaress\Database\Connector\NullConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Image\ProcessorFactory;
+use Alaress\Lumberjack\Logger;
 use Alaress\Module\Cache as ModuleCache;
 use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Module\Registry;
@@ -53,11 +54,13 @@ use Http\Discovery\Psr17Factory;
 use InvalidArgumentException;
 use League\Flysystem\Filesystem;
 use LogicException;
+use Monolog\Level;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ClientRepository;
 use Predis;
 use Proxy\Server as ProxyServer;
+use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Psr\SimpleCache\CacheInterface;
 use RuntimeException;
@@ -2059,21 +2062,40 @@ abstract class Kernel
             $di->lazy(
                 function () use ($di, $config, $mapperFactory) {
                     /** @var GuzzleHttp\Client $httpClient */
-                    $httpClient             = $di->get('httpClient');
+                    $httpClient         = $di->get('httpClient');
                     /** @var CacheInterface $oidcCache */
-                    $oidcCache              = $di->get('oidc.cache');
-                    $userMapper             = $mapperFactory->get(UserMapper::class);
-                    $tokenMapper            = $mapperFactory->get(TokenMapper::class);
-                    $relyingPartyMapper     = $mapperFactory->get(RelyingPartyMapper::class);
+                    $oidcCache          = $di->get('oidc.cache');
+                    /** @var LoggerInterface $logger */
+                    $logger             = $di->get('user.jwtParser.logger');
+                    $userMapper         = $mapperFactory->get(UserMapper::class);
+                    $tokenMapper        = $mapperFactory->get(TokenMapper::class);
+                    $relyingPartyMapper = $mapperFactory->get(RelyingPartyMapper::class);
                     return new JwtParser\Composite(
-                        new JwtParser\OtherInstanceIssued($userMapper, $config),
-                        new JwtParser\SelfIssued($userMapper, $config, $tokenMapper),
-                        new JwtParser\OauthProviderIssued($userMapper, $config, $httpClient, $oidcCache),
-                        new JwtParser\InstanceRegistryIssued($userMapper, $config),
-                        new JwtParser\OauthClientHeld($userMapper, $config, $relyingPartyMapper),
+                        $logger,
+                        new JwtParser\OtherInstanceIssued($userMapper, $config, $logger),
+                        new JwtParser\SelfIssued($userMapper, $config, $logger, $tokenMapper),
+                        new JwtParser\OauthProviderIssued($userMapper, $config, $logger, $httpClient, $oidcCache),
+                        new JwtParser\InstanceRegistryIssued($userMapper, $config, $logger, (string)INSTANCE_ID),
+                        new JwtParser\OauthClientHeld($userMapper, $config, $logger, $relyingPartyMapper),
                     );
                 }
             )
+        );
+
+        // Logger for JWT parsing
+        $di->set(
+            'user.jwtParser.logger',
+            $di->lazyNew(
+                Logger::class,
+                [
+                    STDOUT,
+                    STDOUT,
+                    $config->get(ConfigMapper::NAME_OAUTH_DEBUG_MODE) ? Level::Debug : Level::Info,
+                    [],
+                    true,
+                    'jwtParser',
+                ],
+            ),
         );
 
         // Lock factory
