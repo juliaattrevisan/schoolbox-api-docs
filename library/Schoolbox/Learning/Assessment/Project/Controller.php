@@ -189,6 +189,7 @@ class Controller extends Assessment\Controller
             'baseContext'      => $assessment->getBaseContext(),
             'assessment'       => $assessment,
             'assessmentStats'  => $assessmentStats,
+            'aImpls'           => [],
             'returnUrl'        =>
                 $this->requestQuery->get(Redirect::RETURN_URL)
                     ? Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL))
