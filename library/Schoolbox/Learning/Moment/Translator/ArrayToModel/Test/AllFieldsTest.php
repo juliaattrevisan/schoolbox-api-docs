@@ -144,18 +144,15 @@ class AllFieldsTest extends TestCase
                         ->setName('English')
                         ->setCodes((new \Schoolbox\GenericCollection(\Schoolbox\Resource\Folder\Code\Model::class))
                             ->add((new \Schoolbox\Resource\Folder\Code\Model())->setCode('9ENGA'))
-                            ->add((new \Schoolbox\Resource\Folder\Code\Model())->setCode('ENGAAAAAA'))
-                    ),
+                            ->add((new \Schoolbox\Resource\Folder\Code\Model())->setCode('ENGAAAAAA')))
                 )
                 ->add(
                     (new \Schoolbox\Resource\Folder\Model())
                         ->setId(123)
                         ->setName('Maximus')
                         ->setCodes((new \Schoolbox\GenericCollection(\Schoolbox\Resource\Folder\Code\Model::class))
-                            ->add((new \Schoolbox\Resource\Folder\Code\Model())->setCode('MAAAAXIMUS'))
-                        ),
-                )
-            );
+                            ->add((new \Schoolbox\Resource\Folder\Code\Model())->setCode('MAAAAXIMUS')))
+                ));
 
         yield 'related folders' => [
             [
