@@ -7,9 +7,8 @@ import type { Tab, TableHeader, RowOptions, TypeSubType, RowKeys } from "../../j
 import { TabTitle } from "../../js/types/pastoralReportTypes";
 
 /**
- * Returns the row id, currently if there's a 'user' key in rowData,
- * it'll return the user's id, otherwise it defaults to 0.
- * @returns - The id of the row, or 0 if not defined.
+ * Returns the row parameters to send to the /scope url
+ * @returns - The row parameters for the /scope url.
  */
 export function getRowKeys(rowData: { [key: string]: RowOptions }): RowKeys {
     // check if there's a 'user' key in rowData and return its id if it exists
