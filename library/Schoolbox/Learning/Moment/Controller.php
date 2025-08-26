@@ -237,8 +237,13 @@ class Controller extends Base
             }
         }
 
+        $translator = $this->buildTranslatorWithComments(1);
+        $moment = $this->mapper->createModel();
+
         $params = [
-            'evidence'                 => $this->mapper->createModel(),
+            // TODO: Just swap this with 'evidence' once we're done with that...
+            'evidencePayload'          => $translator($moment),
+            'evidence'                 => $moment,
             'users'                    => $users,
             'userIds'                  => $users->getPropertyValues('id'),
             'otherUsers'               => $otherUsers,
@@ -549,7 +554,11 @@ class Controller extends Base
          */
         $selectedFolders = $moment->getFolders()->getPropertyValues('id');
 
+        $translator = $this->buildTranslatorWithComments(1);
+
         $params = [
+            // TODO: Just swap this with 'evidence' once we're done with that...
+            'evidencePayload'          => $translator($moment),
             'evidence'                 => $moment,
             'users'                    => $moment->getRecipient(),
             'userIds'                  => $moment->getRecipient()->getId(),

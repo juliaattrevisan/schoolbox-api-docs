@@ -121,6 +121,19 @@
     {% endif %}
 {% endif %}
 
+<div id="learning-moment-form-container">
+    <moment-form
+        :is-create="{{ isCreate ? 'true' : 'false' }}"
+        :moment="{{ evidencePayload|json_encode }}"
+    />
+</div>
+
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/learningMomentForm.js?v={{ config.site_version }}"></script>
+
+
 <div class="row">
     <div class="small-12 island">
         {# form action is intentionally controlled via javascript now #}

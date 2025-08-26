@@ -19,7 +19,6 @@ use Schoolbox\Discussion\Comment;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Moment\Mapper;
 use Schoolbox\Learning\Moment\Model;
-use Schoolbox\Learning\Moment\Evidence\Translator;
 use Schoolbox\Learning\Moment\NextRoutes;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
