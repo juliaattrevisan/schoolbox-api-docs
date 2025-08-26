@@ -166,6 +166,7 @@ abstract class Base implements ITranslator
                 $model = $model->$modelFieldSetter(null);
             }
         }
+
         return $model;
     }
 
