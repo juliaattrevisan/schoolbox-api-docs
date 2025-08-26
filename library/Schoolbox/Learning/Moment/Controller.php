@@ -162,7 +162,10 @@ class Controller extends Base
              * Note that a staff member might edit a student's learning moment, so you have to use
              * the recipient's user instance, not the viewer's
              */
-            $userAccesses = $this->userAccessMapper->findAllForUser($this->getUser(), $this->getUser()->isShowTimetable());
+            $userAccesses = $this->userAccessMapper->findAllForUser($this->getUser(), $this->getUser()->isShowTimetable())
+                ->filter(function (UserAccess $access) {
+                    return UserAccess::SERVICE_HOMEPAGE === $access->getService();
+                });
 
             if ($userAccesses->count()) {
                 $folders = $this->folderMapper->findByColumn('id', $userAccesses->getPropertyValues('serviceIdentifier'));
@@ -208,7 +211,10 @@ class Controller extends Base
                  * Note that a staff member might edit a student's learning moment, so you have to use
                  * the recipient's user instance, not the viewer's
                  */
-                $userAccesses = $this->userAccessMapper->findAllForUser($users->first(), $users->first()->isShowTimetable());
+                $userAccesses = $this->userAccessMapper->findAllForUser($users->first(), $users->first()->isShowTimetable())
+                    ->filter(function (UserAccess $access) {
+                        return UserAccess::SERVICE_HOMEPAGE === $access->getService();
+                    });
 
                 if ($userAccesses->count()) {
                     $folders = $this->folderMapper->findByColumn('id', $userAccesses->getPropertyValues('serviceIdentifier'));
