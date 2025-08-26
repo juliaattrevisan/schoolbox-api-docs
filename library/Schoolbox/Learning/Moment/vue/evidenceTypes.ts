@@ -15,14 +15,19 @@ export const evidenceStatusLabels: Record<EvidenceStatus, string> = {
 };
 
 export type LearningMoment = {
-    // NOTE: this doesn't have all properties yet, see library/Schoolbox/Learning/Moment/Evidence/Translator/ModelToArray/Base.php
+    // NOTE: this doesn't have all properties yet, see library/Schoolbox/Learning/Moment/Translator/ModelToArray/Base.php
     id: number;
     body: string;
     currentState: EvidenceStatus;
     _links: {
-        // these are injected by certain endpoints...
+        createThread?: string | null;
+        detail?: string | null;
+        modifyForm?: string | null;
+        put?: string | null;
+        draft?: string | null;
         publish?: string | null;
         reject?: string | null;
         submit?: string | null;
+        delete?: string | null;
     };
 };
