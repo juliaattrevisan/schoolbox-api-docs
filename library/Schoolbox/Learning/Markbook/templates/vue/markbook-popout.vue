@@ -566,7 +566,11 @@ function onToggleSelected(): void {
             <div class="pop-out-menu__options">
                 <template v-if="cellInfo.activity.assessmentType !== ACTIVITY_TYPE_PROJECT">
                     <pop-out-menu-item
-                        :class="{ 'is-disabled': isExpansionDisabled || isActivityEmpty }"
+                        :just-text="
+                            isExpansionDisabled || isActivityEmpty || routes.getAssessmentParticipationForm !== null
+                                ? true
+                                : undefined
+                        "
                         @selected="onToggleSelected()"
                     >
                         <!-- eslint-disable-next-line vue/no-v-html | This is safe because viewAllText is controlled in this component -->
