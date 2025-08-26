@@ -569,7 +569,8 @@ function onToggleSelected(): void {
                         :class="{ 'is-disabled': isExpansionDisabled || isActivityEmpty }"
                         @selected="onToggleSelected()"
                     >
-                        {{ viewAllText }}
+                        <!-- eslint-disable-next-line vue/no-v-html | This is safe because viewAllText is controlled in this component -->
+                        <span v-html="viewAllText"></span>
                     </pop-out-menu-item>
                 </template>
                 <pop-out-menu-divider />
