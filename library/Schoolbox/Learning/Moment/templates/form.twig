@@ -123,16 +123,18 @@
 
 <div id="learning-moment-form-container">
     <moment-form
-        :is-create="{{ isCreate ? 'true' : 'false' }}"
-        :moment="{{ evidencePayload|json_encode }}"
+        :is-create="{{ payload.isCreate ? 'true' : 'false' }}"
+        :moment="{{ payload.evidence|json_encode }}"
         endpoint-get-evidence-tags="{{ routeLookup('learningMomentEvidence.getTags') }}"
-        {% if curriculumTaggingEnabled %}
-        :curriculum-nodes="{{ (curriculumCodes ?? [])|json_encode }}"
+        {% if payload.curriculumTaggingEnabled %}
+        :curriculum-nodes="{{ payload.curriculumNodes|json_encode }}"
         endpoint-curriculum-nodes="{{ routeLookup('curriculumApi.searchNode') }}"
         {% else %}
         :curriculum-nodes="[]"
         :endpoint-curriculum-nodes="null"
         {% endif %}
+        :folders="{{ payload.folders|json_encode }}"
+        :selected-folders="{{ payload.selectedFolders|json_encode }}"
     />
 </div>
 

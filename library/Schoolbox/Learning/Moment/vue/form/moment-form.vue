@@ -19,18 +19,21 @@ interface Props {
     /** Curriculum Nodes */
     curriculumNodes: Node[];
     endpointCurriculumNodes: string;
+    /** Classes and Groups */
+    folders: { id: number; title: string }[];
+    selectedFolders: number[];
 }
 
 const props = defineProps<Props>();
 const mfStore = useMomentFormStore();
 
 window.Vue.onMounted(() => {
-    mfStore.init(props.isCreate, props.moment);
+    mfStore.init(props.isCreate, props.moment, props.folders, props.selectedFolders);
 });
 </script>
 
 <template>
-    <div v-if="mfStore.moment" class="row">
+    <div v-if="mfStore.moment !== null" class="row">
         <div class="small-12 island">
             <section>
                 <fieldset class="content">
@@ -56,9 +59,10 @@ window.Vue.onMounted(() => {
                             />
                         </label>
                     </div>
+
+                    <mf-sources />
                 </fieldset>
             </section>
-            <mf-sources />
             <mf-actions :moment="moment" />
         </div>
     </div>

@@ -241,8 +241,18 @@ class Controller extends Base
         $moment = $this->mapper->createModel();
 
         $params = [
-            // TODO: Just swap this with 'evidence' once we're done with that...
-            'evidencePayload'          => $translator($moment),
+            // TODO: Just swap these out of payload once we're done with the twig file...
+            'payload' => [
+                'evidence' => $translator($moment),
+                'isCreate'                 => true,
+                'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
+                'curriculumNodes'          => [],
+                'folders'  => $folders ? $folders->map(fn(Folder\Model $f) => [
+                    'id' => $f->getId(),
+                    'title' => $f->getTitle(),
+                ])->reindex() : [],
+                'selectedFolders' => $selectedFolders,
+            ],
             'evidence'                 => $moment,
             'users'                    => $users,
             'userIds'                  => $users->getPropertyValues('id'),
@@ -557,8 +567,18 @@ class Controller extends Base
         $translator = $this->buildTranslatorWithComments(1);
 
         $params = [
-            // TODO: Just swap this with 'evidence' once we're done with that...
-            'evidencePayload'          => $translator($moment),
+            // TODO: Just swap these out of payload once we're done with the twig file...
+            'payload' => [
+                'evidence'                 => $translator($moment),
+                'isCreate'                 => false,
+                'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
+                'curriculumNodes'          => $moment->getViewableCurriculumNodes()?->reindex(),
+                'folders'  => $folders ? $folders->map(fn(Folder\Model $f) => [
+                    'id' => $f->getId(),
+                    'title' => $f->getTitle(),
+                ])->reindex() : [],
+                'selectedFolders' => $selectedFolders,
+            ],
             'evidence'                 => $moment,
             'users'                    => $moment->getRecipient(),
             'userIds'                  => $moment->getRecipient()->getId(),
