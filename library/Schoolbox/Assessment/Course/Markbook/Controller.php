@@ -246,7 +246,7 @@ class Controller extends WebController\Base
 
             $data = [
                 'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $courseMarkbook->getRanking() : null,
-                'assessments' => $courseMarkbook->getCollapsedAssessments()->reindex()->map(function (IAssessable $assessment, $sequence) use ($courseMarkbook, $unitSpecs, $courseSpec) {
+                'assessments' => $courseMarkbook->getCollapsedAssessments()->reindex()->map(function (IAssessable $assessment, $sequence) use ($courseMarkbook, $unitSpecs) {
                     $unitAssessmentsTranslator = new UnitAssessments(
                         $this->routeGenerator,
                         $this->getAuthorizer(),
