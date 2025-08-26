@@ -184,13 +184,13 @@ const viewAllText = window.Vue.computed(() => {
         if (getAssessmentParticipationRoute === null) {
             return "The student has been excluded. You may include this student in this activity";
         }
-        return "The student has been excluded. Visit the participation page of the original learning activity to customise their status";
+        return `The student has been excluded. Visit the <a href="${getAssessmentParticipationRoute}">participation page</a> of the original learning activity to customise their status`;
     }
     if (isActivityEmpty.value) {
         if (getAssessmentParticipationRoute === null) {
             return "There has been no activity yet, you may create feedback or exclude this student from this activity";
         }
-        return "There has been no activity yet, you may create feedback or visit the participation page of the original learning activity to customise their status";
+        return `There has been no activity yet, you may create feedback or visit the <a href="${getAssessmentParticipationRoute}">participation page</a> of the original learning activity to customise their status`;
     }
     if (isExpansionDisabled.value) {
         return "No additional recent activity";
