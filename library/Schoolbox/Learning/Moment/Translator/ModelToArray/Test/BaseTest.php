@@ -45,6 +45,7 @@ class BaseTest extends TestCase
                 'createdAt'        => null,
                 'updatedAt'        => null,
                 'evidence'         => [],
+                'folders'          => null,
                 'creator'          => null,
                 'recipient'        => null,
                 'discussionThread' => null,
@@ -72,6 +73,17 @@ class BaseTest extends TestCase
                 ->setCreator((new User())->setId(55))
                 ->setRecipient((new User())->setId(193))
                 ->setDiscussionThread((new DiscussionThread())->setId(14))
+                ->setFolders((new GenericCollection(\Schoolbox\Resource\Folder\Model::class))
+                    ->add(
+                        (new \Schoolbox\Resource\Folder\Model())
+                            ->setId(80)
+                            ->setName('English')
+                            ->setCodes((new GenericCollection(\Schoolbox\Resource\Folder\Code\Model::class))
+                                ->add((new \Schoolbox\Resource\Folder\Code\Model())->setCode('9ENGA'))
+                                ->add((new \Schoolbox\Resource\Folder\Code\Model())->setCode('ENGAAAAAA'))
+                            )
+                    )
+                )
                 ->setCurriculumNodes(
                     (new GenericCollection(new CurriculumNode()))->add((new CurriculumNode())->setId(500)->setName('Test Curriculum')->setCode(trim('TEST500 ')))
                 )
@@ -90,6 +102,11 @@ class BaseTest extends TestCase
                         'filename'         => 'test.gif',
                     ]
                 ],
+                'folders'          => new Collection([[
+                    'id' => 80,
+                    'name' => 'English',
+                    'code' => '9ENGA,ENGAAAAAA'
+                ]]),
                 'creator'          => ['id' => 55],
                 'recipient'        => ['id' => 193],
                 'discussionThread' => ['id' => 14],

@@ -94,6 +94,14 @@ class Base
                 : null,
             'recipient'        => $recipient,
             'evidence'         => [],
+            'folders'          => $model->getFolders()?->map(
+                static function (\Schoolbox\Resource\Folder\Model $folder) {
+                    return [
+                        'id' => $folder->getId(),
+                        'name' => $folder->getName(),
+                        'code' => $folder->getCodeString()
+                    ];
+                })->reindex(),
             'currentState' => $model->getCurrentState(),
             'curriculumNodes' => $model->getViewableCurriculumNodes()
                 ? $model->getViewableCurriculumNodes()
