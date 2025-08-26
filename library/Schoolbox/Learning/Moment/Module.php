@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Moment;
 
 use Alaress\Authorizer\Failure\Forbidden;
+use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -17,6 +18,7 @@ use Alaress\Web\Controller\Base;
 use Closure;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -221,7 +223,10 @@ class Module extends BaseModule
             self::METHOD_PUT,
             '/{evidenceId:\d+}/draft',
             'putDraft',
-            $modifyEvidenceRule,
+            new Rule\All(
+                $modifyEvidenceRule,
+                $this->buildRuleCanProgressToState('draft'),
+            ),
             Closure::fromCallable([$this, 'preloadEvidence']),
         );
 
@@ -242,7 +247,10 @@ class Module extends BaseModule
             self::METHOD_PUT,
             '/{evidenceId:\d+}/submit',
             'putSubmit',
-            $modifyEvidenceRule,
+            new Rule\All(
+                $modifyEvidenceRule,
+                $this->buildRuleCanProgressToState('submit'),
+            ),
             Closure::fromCallable([$this, 'preloadEvidence']),
         );
 
@@ -253,7 +261,10 @@ class Module extends BaseModule
             self::METHOD_PUT,
             '/{evidenceId:\d+}/publish',
             'putPublish',
-            $modifyEvidenceRule,
+            new Rule\All(
+                $modifyEvidenceRule,
+                $this->buildRuleCanProgressToState('publish'),
+            ),
             Closure::fromCallable([$this, 'preloadEvidence']),
         );
 
@@ -402,9 +413,11 @@ class Module extends BaseModule
      */
     private function preloadEvidence(array $params): array
     {
-        $evidence = $this->getMapperFactory()
-             ->get(Mapper::class)
-             ->findById($params['evidenceId']);
+        $evidence = array_key_exists('evidence', $params)
+            ? $params['evidence']
+            : $this->getMapperFactory()
+                ->get(Mapper::class)
+                ->findById($params['evidenceId']);
 
         return [
             'userId' => $evidence->getRecipient()->getId(),
@@ -485,5 +498,37 @@ class Module extends BaseModule
             }
             throw new Forbidden();
         }
+    }
+
+
+    /**
+     * Authorizes that a particular evidence can be progressed to a given state
+     *
+     * @param string $state
+     */
+    private function buildRuleCanProgressToState(string $state): Rule\IAuthorizationRule
+    {
+        return new Rule\LazyCallback(
+            fn() => new Rule\Callback(function (array $params, User $user) use ($state): void {
+                // Because preload exceptions are not handled immediately, we can't fatal if the preload failed.
+                if (!($params['evidence'] ?? null) instanceof Model) {
+                    throw new InvalidPath("No evidence found in route params");
+                }
+
+                /** @var Model $evidence */
+                $evidence = $params['evidence'];
+
+                // NextRoutes is the source of truth of what the next possible states are
+                $nextRoutes = (new \Schoolbox\Learning\Moment\NextRoutes())->generate(
+                    $evidence,
+                    $user,
+                    $this->getConfig()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED)
+                );
+
+                if (empty($nextRoutes[$state])) {
+                    throw new Forbidden("Cannot progress to state '$state'");
+                }
+            }),
+        );
     }
 }

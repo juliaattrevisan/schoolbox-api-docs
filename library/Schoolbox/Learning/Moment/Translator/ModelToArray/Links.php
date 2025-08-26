@@ -72,6 +72,7 @@ class Links extends AbstractLinks
         $translation['_links']['submit'] = $this->getRouteIfAuthorized(
             'learningMomentEvidence.putSubmit',
             [
+                'evidence'   => $moment,
                 'evidenceId' => $moment->getId(),
                 'creatorId'  => $moment->getCreator()->getId(),
                 'userId'     => $moment->getRecipient()->getId(),
@@ -81,6 +82,7 @@ class Links extends AbstractLinks
         $translation['_links']['publish'] = $this->getRouteIfAuthorized(
             'learningMomentEvidence.putPublish',
             [
+                'evidence'   => $moment,
                 'evidenceId' => $moment->getId(),
                 'creatorId'  => $moment->getCreator()->getId(),
                 'userId'     => $moment->getRecipient()->getId(),
