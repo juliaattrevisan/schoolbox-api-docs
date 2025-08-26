@@ -26,12 +26,12 @@ class Controller extends Component_Dashboard_ControllerAbstract
     /**
      * @var string
      */
-    private string $url;
+    private string $url = null;
 
     /**
      * @var int|null
      */
-    private ?int $height;
+    private ?int $height = null;
 
 
     /**
