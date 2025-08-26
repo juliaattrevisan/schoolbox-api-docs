@@ -30,6 +30,8 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
 
     if (config.toolbar === EditorToolbar.SIMPLE) {
         items = [
+            // if there are templates defined in the config, add the insertTemplate button
+            ...(config.templates && config.templates.length > 0 ? ["insertTemplate", "|"] : []),
             "bold",
             "italic",
             "underline",

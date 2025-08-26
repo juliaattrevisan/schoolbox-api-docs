@@ -33,6 +33,7 @@ use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Exception\LogicException;
 use Symfony\Component\Mime\Exception\RfcComplianceException;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 /**
  * Class Controller
@@ -55,7 +56,8 @@ class Controller extends Base
         private FilesystemProxy $filesystemProxy,
         private EmailFactory $emailFactory,
         private FolderMapper $folderMapper,
-        private UserAccessMapper $userAccessMapper
+        private UserAccessMapper $userAccessMapper,
+        private EditorTemplateHelper $editorTemplateHelper,
     ) {
     }
 
@@ -204,6 +206,7 @@ class Controller extends Base
                 'folder'        => $folder,
                 'student'       => $student,
                 'title'         => $params->get('title'),
+                'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(), // Added line
             ],
             'Webmail',
         );
