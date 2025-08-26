@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment;
 
+use Alaress\Database\Predicate\Builder;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
@@ -1274,22 +1275,22 @@ class Controller extends Base
             return;
         }
 
+        $dbInternal = $this->folderMapper->getDatabase();
+
         /* Find the folder ids where your cohort made a learning moment folder relationship
          */
-        $pb = $this->folderMapper->getPredicateBuilder()
-            ->isNull('m.deleted_at')
-            ->in('user_id', $cohortIds);
-
-        $whereClause = $pb->getWhere()[0];
+        $cohortPlaceholders = Builder::getArrayPlaceholders($cohortIds, 'cohortIds');
+        $params = array_merge(Builder::getArrayParameters($cohortIds, 'cohortIds'));
 
         $query = "
-            SELECT folder_id
+            SELECT mf.folder_id
             FROM moment_folder mf
             INNER JOIN moment m ON mf.moment_id = m.id
-            WHERE {$whereClause}
+            WHERE m.deleted_at IS NULL
+            AND m.user_id IN {$cohortPlaceholders}
         ";
 
-        $result = $this->folderMapper->getDatabase()->executeQuery($query)->fetchAll();
+        $result = $this->folderMapper->getDatabase()->executeQuery($query, $params)->fetchAll();
 
         $folderIds = array_column($result, 'folder_id');
 
@@ -1300,14 +1301,22 @@ class Controller extends Base
             return;
         }
 
-        $folders = $this->folderMapper->findByColumn('id', $folderIds);
+        $pb = $this->folderMapper->getPredicateBuilder()
+            ->in('id', $folderIds)
+            ->any(
+                $this->folderMapper->getPredicateBuilder()
+                    ->like("folder.name", "%{$dbInternal->getQuoter()->escapeForLike($keyword)}%")
+                    ->like('cc.code', "%{$dbInternal->getQuoter()->escapeForLike($keyword)}%")
+            );
+
+        $folders = $this->folderMapper->findByPredicates($pb);
 
         /** @var \Schoolbox\Resource\Folder\Model $folder */
         foreach ($folders as $folder) {
             /* Neither a group nor a class: skip it
              *
-             * You maybe could deeply hack searchByName but you need a hydrated instance
-             * to do these isGroup() and isClass() chacks anyways
+             * You can't tell if a folder -stopped being- a group/class at some point
+             * after the learning moment was created: keep filtering these out
              */
             if (!$folder->isGroup() && !$folder->isClass()) {
                 continue;
