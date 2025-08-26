@@ -29,7 +29,7 @@ class NextRoutes
      * @param Model $moment
      * @param User $user
      * @param bool $moderationRequired
-     * @return array
+     * @return array{draft:true|null,submit:true|null,publish:true|null,reject:true|null}
      */
     public function generate(\Schoolbox\Learning\Moment\Model $moment, User $user, bool $moderationRequired): array
     {
@@ -60,6 +60,7 @@ class NextRoutes
                 /* Next mutable states: rejected
                  */
                 return [
+                    'draft' => $user->getRole()->isStaff() ? null : true, // staff cannot turn it back into a draft, parents/students fall back to the route check
                     'submit' => null,
                     'publish' => null,
                     'reject' => $isStaffMod ? true : null, // only reject if the lm you are looking at was created by a student who is being moderated, else continue as you are
@@ -68,6 +69,7 @@ class NextRoutes
                 /* Next mutable states: published, rejected
                  */
                 return [
+                    'draft' => $user->getRole()->isStaff() ? null : true, // staff cannot turn it back into a draft, parents/students fall back to the route check
                     'submit' => null,
                     'publish' => $isStaffMod ? true : null, // only publish if the lm you are looking at was created by a student who is being moderated, else continue as you are
                     'reject' => $isStaffMod ? true : null, // only reject if the lm you are looking at was created by a student who is being moderated, else continue as you are
@@ -76,6 +78,7 @@ class NextRoutes
                 /* Next mutable states: published
                  */
                 return [
+                    'draft' => $user->getRole()->isStaff() ? null : true, // staff cannot turn it back into a draft, parents/students fall back to the route check
                     'submit' => null,
                     'publish' => $isStaffMod ? true : null, // only publish if the lm you are looking at was created by a student who is being moderated, else continue as you are
                     'reject' => null,
@@ -86,6 +89,7 @@ class NextRoutes
                  * all other users (staff, parents, and students (who are not being moderated)) can ship straight to publish and skip the submit route
                  */
                 return [
+                    'draft' => true, // already a draft, can keep it as a draft
                     'submit' => $studentModerated ? true : null,
                     'publish' => $studentModerated ? null : true,
                     'reject' => null,
