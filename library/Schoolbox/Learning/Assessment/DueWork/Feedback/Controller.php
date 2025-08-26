@@ -246,7 +246,7 @@ class Controller extends Base
                 /* Update project result cache when Publish All is used
                     */
                 $projectCache->refresh($this->assessmentDataSource, $aImpl, $submissionReturn->getOwner());
-            } catch (PDOException | \DomainException | \InvalidArgumentException | \LogicException | \UnexpectedValueException$e) {
+            } catch (PDOException | \DomainException | \InvalidArgumentException | \LogicException | \UnexpectedValueException $e) {
                 $publishSuccess = false;
             }
 
