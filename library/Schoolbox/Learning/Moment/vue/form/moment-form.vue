@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import CurriculumSelector from "@schoolboxCurriculum/vue/curriculumSelector/curriculum-selector.vue";
+import type { Node } from "@schoolboxCurriculum/types/Node";
 import type { LearningMoment } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 import EvidenceTags from "@schoolboxLearningMomentEvidence/evidence-tags.vue";
 import MfActions from "./mf-actions.vue";
@@ -14,6 +16,9 @@ interface Props {
      */
     moment: LearningMoment;
     endpointGetEvidenceTags: string;
+    /** Curriculum Nodes */
+    curriculumNodes: Node[];
+    endpointCurriculumNodes: string;
 }
 
 const props = defineProps<Props>();
@@ -32,12 +37,24 @@ window.Vue.onMounted(() => {
                     <div class="small-12 columns">
                         <mf-evidence />
 
-                        <evidence-tags
-                            v-model:tags="mfStore.moment.tags"
-                            :endpoint-get-evidence-tags="props.endpointGetEvidenceTags"
-                        />
+                        <label>
+                            Tags
+                            <evidence-tags
+                                v-model:tags="mfStore.moment.tags"
+                                :endpoint-get-evidence-tags="props.endpointGetEvidenceTags"
+                            />
+                        </label>
 
-                        <!-- CLASSES/GROUPS -->
+                        <label>
+                            Curriculum Codes
+                            <curriculum-selector
+                                :is-read-only="false"
+                                :selected-nodes="props.curriculumNodes"
+                                :data-endpoint="props.endpointCurriculumNodes"
+                                :include-children="true"
+                                :has-tabs="false"
+                            />
+                        </label>
                     </div>
                 </fieldset>
             </section>

@@ -126,6 +126,13 @@
         :is-create="{{ isCreate ? 'true' : 'false' }}"
         :moment="{{ evidencePayload|json_encode }}"
         endpoint-get-evidence-tags="{{ routeLookup('learningMomentEvidence.getTags') }}"
+        {% if curriculumTaggingEnabled %}
+        :curriculum-nodes="{{ (curriculumCodes ?? [])|json_encode }}"
+        endpoint-curriculum-nodes="{{ routeLookup('curriculumApi.searchNode') }}"
+        {% else %}
+        :curriculum-nodes="[]"
+        :endpoint-curriculum-nodes="null"
+        {% endif %}
     />
 </div>
 
@@ -159,11 +166,12 @@
                             <label for="curriculum-code-select">
                                 Curriculum Codes
                             </label>
-                            {% include 'sub/curriculumCodeSelector.twig' with
+                            {# {% include 'sub/curriculumCodeSelector.twig' with
                                 {
                                     codeList: curriculumCodes ?? [],
                                     renderButton: true
                                 } %}
+                            #}
                         {% endif %}
                     </div>
                     {% if folders|length %}
@@ -440,9 +448,9 @@
 
 
 {# Set up CKEditor #}
-<script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
+{# <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script> #}
+{# <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script> #}
 {# only autosave draft when:
  * there is either only sharing for yourself, or 1 other person
     * the evidence already exists (an evidence entry can only be for 1 user)

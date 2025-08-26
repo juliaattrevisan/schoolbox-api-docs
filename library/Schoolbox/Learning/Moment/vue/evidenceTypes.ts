@@ -1,4 +1,5 @@
 import type { SelectizeSelectorItem } from "@js/vendors/selectize/selectizeSelectorTypes";
+import type { Node } from "@schoolboxCurriculum/types/Node";
 
 /** The current state of a learning moment, see /library/Schoolbox/Learning/Moment/Evidence/Model.php */
 export enum EvidenceStatus {
@@ -21,6 +22,7 @@ export type LearningMoment = {
     id: number;
     body: string;
     currentState: EvidenceStatus;
+    curriculumNodes: Pick<Node, "id" | "name" | "code">[];
     tags: SelectizeSelectorItem[];
     _links: {
         createThread?: string | null;
