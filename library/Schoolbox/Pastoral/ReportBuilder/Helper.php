@@ -555,7 +555,8 @@ class Helper
         $fieldMap = [
             Report::ORDER_OCCURRED_ON => [
                 'condition' => 'COALESCE(pastoral.occurred_on, pastoral.created_at)',
-                'param' => $cursor['created']
+                'param' => $cursor['created'],
+                'direction' => 'DESC',
             ],
             Report::ORDER_STUDENT_LASTNAME => [
                 'condition' => 's.lastname',
@@ -623,7 +624,9 @@ class Helper
             // Add comparison for current field
             $field = $sortFields[$i];
             $dbField = $fieldMap[$field]['condition'] ?? $field;
-            $operator = $field == Report::ORDER_OCCURRED_ON ? '<' : '>';
+            $operator = (Base::ORDER_DIRECTION_DESC === ($fieldMap[$field]['direction'] ?? Base::ORDER_DIRECTION_ASC)) ?
+                '<' :
+                '>';
             $condition[] = "{$dbField} {$operator} :cursor_{$field}";
 
             $conditions[] = '(' . implode(' AND ', $condition) . ')';
