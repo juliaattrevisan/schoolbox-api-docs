@@ -195,10 +195,8 @@ class RecordList extends Base implements TabTypeInterface, ICursor
      * @param string|null $encodedCursor
      * @return array[]
      */
-    public function process(Collection $records, ?string $encodedCursor = null)
+    public function process(Collection $records, ?string $encodedCursor = null): array
     {
-        $records = $this->retrieveResults($encodedCursor);
-
         return [
             'data' => [
                 'results' => $records->map($this->pastoralTranslator),
