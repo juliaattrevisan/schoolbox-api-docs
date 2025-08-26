@@ -9,7 +9,14 @@ import MfSources from "./mf-sources.vue";
 import { useMomentFormStore } from "./store/momentFormStore";
 
 interface Props {
-    isCreate: boolean;
+    /**
+     * If this is a create form, it's populated with the post routes to use
+     * as props.moment will be an empty object and will not reflect
+     * the correct routes (doesn't support multiple users, those are puts, etc)
+     *
+     * null if editing an existing moment
+     */
+    createRoutes: null | LearningMoment["_links"];
     /**
      * The current learning moment that is being edited
      * It may not have a meaningful ID yet if props.isCreate is true
@@ -28,7 +35,7 @@ const props = defineProps<Props>();
 const mfStore = useMomentFormStore();
 
 window.Vue.onMounted(() => {
-    mfStore.init(props.isCreate, props.moment, props.folders, props.selectedFolders);
+    mfStore.init(props.createRoutes, props.moment, props.folders, props.selectedFolders);
 });
 </script>
 

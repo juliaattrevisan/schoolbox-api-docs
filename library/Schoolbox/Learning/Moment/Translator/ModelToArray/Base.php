@@ -130,11 +130,13 @@ class Base
 
         /* Process storage instances separately, if any exist
          */
-        foreach ($model->getEvidence() as $evidence) {
-            $moment['evidence'][] = [
-                'storage' => call_user_func($this->storageTranslator, $evidence->getStorage()),
-                'filename' => $evidence->getFilename(),
-            ];
+        if ($model->getEvidence() !== null) {
+            foreach ($model->getEvidence() as $evidence) {
+                $moment['evidence'][] = [
+                    'storage' => call_user_func($this->storageTranslator, $evidence->getStorage()),
+                    'filename' => $evidence->getFilename(),
+                ];
+            }
         }
 
         return $moment;

@@ -123,7 +123,7 @@
 
 <div id="learning-moment-form-container">
     <moment-form
-        :is-create="{{ payload.isCreate ? 'true' : 'false' }}"
+        :create-routes="{{ payload.createRoutes|json_encode }}"
         :moment="{{ payload.evidence|json_encode }}"
         endpoint-get-evidence-tags="{{ routeLookup('learningMomentEvidence.getTags') }}"
         {% if payload.curriculumTaggingEnabled %}

@@ -238,13 +238,32 @@ class Controller extends Base
         }
 
         $translator = $this->buildTranslatorWithComments(1);
-        $moment = $this->mapper->createModel();
+        $moment = $this->mapper->createModel()
+            ->setRecipient(new User())
+            ->setCreator($this->getUser());
+
+        // This should follow the same structure as a moment's _links, but it's for creating stuff instead
+        $usersString = implode(',', $users->getPropertyValues('id'));
+        $createRoutes = [
+            'publish' => $this->getRouteIfAuthorized(
+                'learningMomentEvidence.postPublish',
+                [ 'userIds' => $usersString, ],
+            ),
+            'draft'   => $this->getRouteIfAuthorized(
+                'learningMomentEvidence.postDraft',
+                [ 'userIds' => $usersString, ],
+            ),
+            'submit'  => $this->getRouteIfAuthorized(
+                'learningMomentEvidence.postSubmit',
+                [ 'userIds' => $usersString, ],
+            ),
+        ];
 
         $params = [
             // TODO: Just swap these out of payload once we're done with the twig file...
             'payload' => [
                 'evidence' => $translator($moment),
-                'isCreate'                 => true,
+                'createRoutes'         => $createRoutes,
                 'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
                 'curriculumNodes'          => [],
                 'folders'  => $folders ? $folders->map(fn(Folder\Model $f) => [
@@ -570,7 +589,7 @@ class Controller extends Base
             // TODO: Just swap these out of payload once we're done with the twig file...
             'payload' => [
                 'evidence'                 => $translator($moment),
-                'isCreate'                 => false,
+                'createRoutes'             => null,
                 'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
                 'curriculumNodes'          => $moment->getViewableCurriculumNodes()?->reindex(),
                 'folders'  => $folders ? $folders->map(fn(Folder\Model $f) => [
