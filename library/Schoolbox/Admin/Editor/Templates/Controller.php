@@ -18,21 +18,60 @@ use Schoolbox\Admin\Editor\Templates\Category\Mapper as CategoryMapper;
 use Schoolbox\Editor\Templates\Model as TemplateModel;
 use Schoolbox\Editor\Templates\Mapper as TemplateMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Collection;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Config\ConfigMapper;
 
 class Controller extends Base
 {
     /**
      * Controller constructor.
      *
+     * @param IConfigLoader $config
      * @param ErrorMapper $errorMapper
      * @param CategoryMapper $categoryMapper
      * @param TemplateMapper $templateMapper
      */
     public function __construct(
+        private IConfigLoader $config,
         private ErrorMapper $errorMapper,
         private CategoryMapper $categoryMapper,
         private TemplateMapper $templateMapper,
     ) {
+    }
+
+    /**
+     * Only get the categories available on the current plan
+     * @return Collection
+     */
+    public function getPlanCategories(): Collection
+    {
+        $categories = $this->categoryMapper->findAll()->sortNaturally('name');
+
+        // Define which categories require which config settings to be enabled
+        $categoryConfigMap = [
+            'badge-evidence' => ConfigMapper::NAME_BADGES_ENABLED,
+            'feedback' => ConfigMapper::NAME_LMS_ENABLED,
+            'learning-activity' => ConfigMapper::NAME_LMS_ENABLED,
+            'learning-moments' => ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED,
+        ];
+
+        // Filter out categories where the feature is disabled
+        return $categories->filter(function (CategoryModel $category) use ($categoryConfigMap) {
+            $categoryName = $category->getName();
+
+            // If this category has a config requirement, check if it's enabled
+            if (isset($categoryConfigMap[$categoryName])) {
+                $configValue = $this->config->get($categoryConfigMap[$categoryName]);
+                // Ensure we have a boolean value for reliable filtering
+                // Treat null, false, 0, empty string, empty array as false
+                // Everything else as true
+                return !empty($configValue) && $configValue != false;
+            }
+
+            // Categories without config requirements are always included
+            return true;
+        })->reindex();
     }
 
     /**
@@ -41,7 +80,7 @@ class Controller extends Base
     public function getList(): void
     {
         // Get the categories from the mapper and transform each category into an array
-        $categories = $this->categoryMapper->findAll()->sortNaturally('name');
+        $categories = $this->getPlanCategories();
         $translator = new ModelToArray();
 
         $this->response = $this->responseFromTemplate(
