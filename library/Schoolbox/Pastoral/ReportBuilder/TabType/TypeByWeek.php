@@ -21,7 +21,6 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
                 $this->helper->getStartDate(),
                 $this->helper->getEndDate(),
                 self::COLUMN_QUERY_KEY,
-                $this->helper->getConfigLoader()->get('date_short'),
                 self::MAX_COLUMN_COUNT,
             );
         }
