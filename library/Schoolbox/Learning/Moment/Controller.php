@@ -378,6 +378,11 @@ class Controller extends Base
 
         $requestBody = $this->request->getParsedBody();
 
+        /* This is a bit brutal and maybe you can mess around more with a diff,
+         * but this is guaranteed to be correct without all the kerfuffle...for now
+         */
+        $folders = $this->folderMapper->findByColumn('id', $requestBody['folders']);
+
         //unless there are mapper errors (and those will change it to 500 as required
         //set the return code to 201 (Created)
 
@@ -404,6 +409,12 @@ class Controller extends Base
                 foreach ($baseModel->getEvidence() as $evidence) {
                     $newEvidence = clone $evidence;
 
+                    /* For some reason this is necessary. The MutableFieldsOnly translator spawns a new Moment instance,
+                     * disconnecting it from the relationship contained inside each Evidence instance. This means we have
+                     * to map the ids manually, which seems a bit counter-intuitive.
+                     */
+                    $newEvidence->setMoment($momentModel);
+
                     $momentModel->getEvidence()->add($newEvidence);
                 }
             }
@@ -427,31 +438,16 @@ class Controller extends Base
                 }
             }
 
+            /* Save the set of $folders to each person's learning moment
+             */
+            $momentModel->setFolders($folders);
+
             $momentCollection->add($momentModel);
-        }
-
-        /* This is a bit brutal and maybe you can mess around more with a diff,
-         * but this is guaranteed to be correct without all the kerfuffle...for now
-         */
-        $folders = $this->folderMapper->findByColumn('id', $requestBody['folders']);
-
-        /* Save the set of $newFolders to each person's learning moment
-         */
-        foreach ($momentCollection as $moment) {
-            $moment->setFolders($folders);
         }
 
         $this->mapper->save($momentCollection);
 
-        /* For some reason this is necessary. The MutableFieldsOnly translator spawns a new Moment instance,
-         * disconnecting it from the relationship contained inside each Evidence instance. This means we have
-         * to map the ids manually, which seems a bit counter-intuitive.
-         */
         foreach ($momentCollection as $moment) {
-            foreach ($moment->getEvidence() as $evidence) {
-                $evidence->setMoment($moment);
-            }
-
             $this->mapper->saveEvidence($moment);
         }
 
