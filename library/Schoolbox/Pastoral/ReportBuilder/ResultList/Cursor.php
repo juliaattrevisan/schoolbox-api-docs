@@ -80,11 +80,11 @@ class Cursor implements ICursor
         $whereInTypeSubTypeQuery = [];
         if ($this->helper->getType()->count() > 0) {
             $whereTypeIds = implode(',', $this->helper->getType()->getPropertyValues('id'));
-            $whereInTypeSubTypeQuery[] = "p.type_id IN ({$whereTypeIds})";
+            $whereInTypeSubTypeQuery[] = "pastoral.type_id IN ({$whereTypeIds})";
         }
         if ($this->helper->getSubTypes()->count() > 0) {
             $whereSubTypeIds = implode(',', $this->helper->getSubTypes()->getPropertyValues('id'));
-            $whereInTypeSubTypeQuery[] = "p.subtype_id IN ({$whereSubTypeIds})";
+            $whereInTypeSubTypeQuery[] = "pastoral.subtype_id IN ({$whereSubTypeIds})";
         }
 
         $this->inTypeSubType = implode(' OR ', array_filter($whereInTypeSubTypeQuery));
@@ -196,7 +196,7 @@ class Cursor implements ICursor
         $param = [];
         if (null !== $encodedCursor) {
             $cursor = $this->codec->decode($encodedCursor);
-            $where .= " AND p.id > :cursor_id";
+            $where .= " AND pastoral.id > :cursor_id";
             $param['cursor_id'] = $cursor['id'];
         }
 
@@ -207,7 +207,7 @@ class Cursor implements ICursor
 
         $statement = $db->executeQuery(
             "
-            SELECT p.id
+            SELECT pastoral.id
             {$this->helper->getFromString()}
             WHERE {$where}
             AND {$whereFilter}
@@ -251,7 +251,7 @@ class Cursor implements ICursor
             case Factory::STUDENT_BY_TYPE:
             case Factory::STUDENT_BY_MONTH:
             case Factory::STUDENT_BY_WEEK:
-                $query[] = "p.student_id = :student_id";
+                $query[] = "pastoral.student_id = :student_id";
                 if (!isset($this->rowKey['student_id'])) {
                     throw new ValueError('Student ID is required', self::BAD_REQUEST_ERROR_CODE);
                 }
@@ -259,7 +259,7 @@ class Cursor implements ICursor
                 break;
             case Factory::TYPE_BY_WEEK:
             case Factory::TYPE_BY_MONTH:
-                $query[] = "p.type_id = :type_id AND COALESCE(p.subtype_id, '') = COALESCE(:subtype_id, '')";
+                $query[] = "pastoral.type_id = :type_id AND COALESCE(pastoral.subtype_id, '') = COALESCE(:subtype_id, '')";
                 if (!isset($this->rowKey['type']['type_id'])) {
                     throw new ValueError('Type ID is required');
                 }
@@ -284,7 +284,7 @@ class Cursor implements ICursor
                 if (!preg_match(StudentByType::COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
                     throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey), self::BAD_REQUEST_ERROR_CODE);
                 }
-                $query[] = "p.{$matches['type']}_id = :type_id";
+                $query[] = "pastoral.{$matches['type']}_id = :type_id";
                 $param['type_id'] = $matches['id'];
                 break;
             case Factory::TYPE_BY_MONTH:
@@ -293,7 +293,7 @@ class Cursor implements ICursor
                     throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey), self::BAD_REQUEST_ERROR_CODE);
                 }
                 $monthFormat = TypeByMonth::COLUMN_QUERY_MONTH_FORMAT;
-                $query[] = "DATE_FORMAT(COALESCE(p.occurred_on, p.created_at), '{$monthFormat}') = :monthKey";
+                $query[] = "DATE_FORMAT(COALESCE(pastoral.occurred_on, pastoral.created_at), '{$monthFormat}') = :monthKey";
                 $param['monthKey'] = $this->columnKey;
                 break;
             case Factory::TYPE_BY_WEEK:
@@ -310,7 +310,7 @@ class Cursor implements ICursor
                 if (!$weeks->offsetExists($matches['index'])) {
                     throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey), self::BAD_REQUEST_ERROR_CODE);
                 }
-                $query[] = "COALESCE(p.occurred_on, p.created_at) BETWEEN :start AND :end";
+                $query[] = "COALESCE(pastoral.occurred_on, pastoral.created_at) BETWEEN :start AND :end";
                 $week = array_reverse($weeks->getAll())[$matches['index']];
                 $param['start'] = $week['start']->toIso8601String();
                 $param['end'] = $week['end']->toIso8601String();
