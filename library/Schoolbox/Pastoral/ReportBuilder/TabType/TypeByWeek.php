@@ -85,15 +85,15 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
           LEFT JOIN lu_pastoral_subtype subtype ON subtype.pastoral_type_id = type.id
           LEFT JOIN (
                 SELECT
-                     p.type_id,
-                     p.subtype_id,
-                     p.points AS points,
-                     COALESCE(p.occurred_on, p.created_at) AS reportDate
+                     pastoral.type_id,
+                     pastoral.subtype_id,
+                     pastoral.points AS points,
+                     COALESCE(pastoral.occurred_on, pastoral.created_at) AS reportDate
                 FROM (
-                    SELECT DISTINCT p.*
+                    SELECT DISTINCT pastoral.*
                     {$this->helper->getFromString()}
                     WHERE {$whereQuery}
-                ) p
+                ) pastoral
             ) weekData
             ON weekData.type_id = type.id AND (weekData.subtype_id = subtype.id OR weekData.subtype_id IS NULL)
             WHERE {$whereInTypeQuery}
