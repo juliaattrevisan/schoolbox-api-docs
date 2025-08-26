@@ -149,7 +149,7 @@ window.Vue.watch(
 
                     <search-select
                         v-model:selected="crfStore.folderFilter"
-                        label="Filter by {{ locale.class.properPlural() }} and Groups"
+                        :label="`Filter by ${locale.class.plural()} and groups`"
                         label-id="folder"
                         endpoint="/learning/evidence/folders?"
                         :is-single-select="false"
