@@ -1,9 +1,8 @@
 <script lang="ts" setup>
-import { apiRequest } from "@js/util/sbx/apiUtils";
 import locale from "@js/terminology/rosettaStone";
-import type { SelectizeSelectorItem } from "@js/vendors/selectize/selectizeSelectorTypes";
 import DateRange from "@schoolboxVue/components/dateTimePicker/date-range.vue";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
+import EvidenceTags from "@schoolboxLearningMomentEvidence/evidence-tags.vue";
 import { evidenceStatusLabels } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 import { useCohortReportFiltersStore } from "./store/cohortReportFiltersStore";
 
@@ -16,7 +15,6 @@ const props = defineProps<Props>();
 const crfStore = useCohortReportFiltersStore();
 
 const dateRangeEl = window.Vue.useTemplateRef<InstanceType<typeof DateRange>>("dateRangeRef");
-const evidenceTagsEl = window.Vue.useTemplateRef<HTMLSelectElement>("evidenceTagsRef");
 
 const isOpen = window.Vue.ref(true); // whether the filters are shown
 
@@ -53,67 +51,6 @@ async function applyFilters(): Promise<void> {
 
     await crfStore.applyFilters();
 }
-
-const tagsSelectLoaded = window.Vue.ref(false);
-const isChangingTags = window.Vue.ref(false);
-
-/**
- * Initialise the selectize for evidence tags
- */
-window.Vue.onMounted(async () => {
-    // We only need to fetch this once, it won't change and there's no filtering
-    const response = await apiRequest<SelectizeSelectorItem[]>({
-        url: props.endpointGetEvidenceTags,
-        method: "GET",
-    });
-
-    if (!response.success) {
-        console.warn("Failed to load evidence tags filter", response);
-        return;
-    }
-
-    // only show the real select once we're ready to initialise it
-    tagsSelectLoaded.value = true;
-    await window.Vue.nextTick();
-    if (!evidenceTagsEl.value) {
-        throw new Error("Evidence tags select element not found");
-    }
-
-    const evidenceTags = response.data;
-    $(evidenceTagsEl.value).selectizeSelector({
-        selectize: {
-            placeholder: "Select tags",
-            preload: true,
-            persist: true,
-            hideSelected: true,
-            load: (query: string, callback: (results: SelectizeSelectorItem[]) => void): void => {
-                callback(evidenceTags);
-            },
-            async onChange(value: string[]): Promise<void> {
-                isChangingTags.value = true;
-                crfStore.evidenceTagsFilter = value.map((v) => parseInt(v, 10));
-
-                await window.Vue.nextTick();
-                isChangingTags.value = false;
-            },
-        },
-        value: [],
-        multiple: true,
-    });
-});
-
-/**
- * Persist changes to the evidence tags back to the selectize
- */
-window.Vue.watch(
-    () => crfStore.evidenceTagsFilter,
-    (newValue) => {
-        if (!evidenceTagsEl.value) return;
-        if (isChangingTags.value) return; // internal change, no need to update
-
-        evidenceTagsEl.value.selectize.setValue(newValue, true);
-    },
-);
 </script>
 
 <template>
@@ -167,14 +104,10 @@ window.Vue.watch(
 
                     <label class="cr-selectize-label">
                         Filter by tags
-                        <input
-                            v-if="!tagsSelectLoaded"
-                            type="text"
-                            class="search-input f-no-margins"
-                            placeholder="Select tags"
-                            disabled
+                        <evidence-tags
+                            v-model:tags="crfStore.evidenceTagsFilter"
+                            :endpoint-get-evidence-tags="props.endpointGetEvidenceTags"
                         />
-                        <select v-else ref="evidenceTagsRef" name="tags[]" multiple></select>
                     </label>
 
                     <div>

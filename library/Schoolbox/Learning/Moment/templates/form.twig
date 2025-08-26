@@ -125,6 +125,7 @@
     <moment-form
         :is-create="{{ isCreate ? 'true' : 'false' }}"
         :moment="{{ evidencePayload|json_encode }}"
+        endpoint-get-evidence-tags="{{ routeLookup('learningMomentEvidence.getTags') }}"
     />
 </div>
 

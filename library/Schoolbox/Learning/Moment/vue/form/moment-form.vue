@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { LearningMoment } from "@schoolboxLearningMomentEvidence/evidenceTypes";
+import EvidenceTags from "@schoolboxLearningMomentEvidence/evidence-tags.vue";
 import MfActions from "./mf-actions.vue";
 import MfEvidence from "./mf-evidence.vue";
 import MfSources from "./mf-sources.vue";
@@ -12,6 +13,7 @@ interface Props {
      * It may not have a meaningful ID yet if props.isCreate is true
      */
     moment: LearningMoment;
+    endpointGetEvidenceTags: string;
 }
 
 const props = defineProps<Props>();
@@ -30,7 +32,10 @@ window.Vue.onMounted(() => {
                     <div class="small-12 columns">
                         <mf-evidence />
 
-                        <!-- TAGS -->
+                        <evidence-tags
+                            v-model:tags="mfStore.moment.tags"
+                            :endpoint-get-evidence-tags="props.endpointGetEvidenceTags"
+                        />
 
                         <!-- CLASSES/GROUPS -->
                     </div>
