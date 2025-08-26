@@ -62,7 +62,7 @@ class Controller extends Base
 
             // If this category has a config requirement, check if it's enabled
             if (isset($categoryConfigMap[$categoryName])) {
-               $configValue = $this->config->get($categoryConfigMap[$categoryName]);
+                $configValue = $this->config->get($categoryConfigMap[$categoryName]);
                 // Ensure we have a boolean value for reliable filtering
                 // Treat null, false, 0, empty string, empty array as false
                 // Everything else as true
