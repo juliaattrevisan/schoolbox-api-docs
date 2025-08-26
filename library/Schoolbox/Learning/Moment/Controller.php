@@ -918,6 +918,35 @@ class Controller extends Base
 
 
     /**
+     * Bulk publish a set of $moments
+     *
+     * @return void
+     * @throws Exception
+     * @throws MapperException
+     * @throws RouteNotFound
+     */
+    public function putBulkPublish(): void
+    {
+        $stack = [];
+
+        /* Find all the learning moments to bulk publish
+         */
+        $requestBody = $this->request->getParsedBody();
+
+        $moments = $this->mapper->findByColumn('id', $requestBody['momentIds']);
+
+        /* Process each moment into the next state individually, collecting a $stack
+         * of translated moments in their new state
+         */
+        foreach ($moments as $moment) {
+            $stack[$moment->getId()] = $this->responseAsJson($this->putWithState($moment, Model::STATUS_PUBLISHED));
+        }
+
+        $this->response = $this->responseAsJson($stack);
+    }
+
+
+    /**
      * Place $moment into the new state $state, along with any modifications made to its
      * body, tags, curric nodes, etc. via the Modify form. This might not always be how we
      * putWithState() since you can do this directly from the CTAs on the Activity Feed.
@@ -959,6 +988,15 @@ class Controller extends Base
          * but this is guaranteed to be correct without all the kerfuffle...for now
          */
         $moment->setFolders($this->folderMapper->findByColumn('id', $requestBody['folders']));
+
+        /* Publish only, Staff only, soft-delete all the comments associated with
+         * this learning moment if the user asked to do so
+         */
+        if (Model::STATUS_PUBLISHED === $state && $this->getUser()->getRole()->isStaff()) {
+            if ($requestBody['deleteComments'] ?? false) {
+                $this->commentMapper->deleteByColumn('discussion_thread_id', $moment->getDiscussionThread()->getId());
+            }
+        }
 
         /* Save it
          */

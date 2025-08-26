@@ -268,6 +268,16 @@ class Module extends BaseModule
             Closure::fromCallable([$this, 'preloadEvidence']),
         );
 
+        /* Bulk Publish a set of learning moments (typically from Cohort Overview)
+         * TODO - check that this is okay to bypass buildRuleCanProgressToState()
+         */
+        $this->register(
+            self::METHOD_PUT,
+            '/bulk/publish',
+            'putBulkPublish',
+            $viewCohortReportRule,
+        );
+
         // Evidence modify form
         $this->register(
             self::METHOD_PUT,

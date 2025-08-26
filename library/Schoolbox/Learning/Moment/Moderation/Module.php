@@ -46,29 +46,6 @@ class Module extends BaseModule
             );
         });
 
-        /* Publish a Learning Moment
-         */
-        $this->register(
-            self::METHOD_PUT,
-            '/{evidenceId:\d+}/publish',
-            'putPublish',
-            new Rule\All(
-                $staffOnlyRule,
-                $this->buildRuleCanProgressToState('publish'),
-            ),
-            Closure::fromCallable([$this, 'preloadEvidence']),
-        );
-
-        /* Bulk Publish a set of learning moments (typically from Cohort Overview)
-         * TODO - check that this is okay to bypass buildRuleCanProgressToState()
-         */
-        $this->register(
-            self::METHOD_PUT,
-            '/bulk/publish',
-            'putBulkPublish',
-            $staffOnlyRule,
-        );
-
         /* Reject a Learning Moment
          */
         $this->register(
