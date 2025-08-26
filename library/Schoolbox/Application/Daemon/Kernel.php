@@ -395,7 +395,8 @@ EOL;
     {
         parent::installDependencies($di);
 
-        // Override AMQP connection with one with a heartbeat
+        // Override AMQP connection with one with a heartbeat, and read/write
+        // timeouts
         $di->set(
             'amqp',
             $di->lazy(
@@ -404,7 +405,12 @@ EOL;
                     $conf = $di->get('config');
                     return (new ConnectorFactory($conf))->build(
                         [],
-                        [Connector::AMQP_CONNECTION_OPTION_HEARTBEAT => 15,],
+                        [
+                            Connector::AMQP_CONNECTION_OPTION_HEARTBEAT     => 15,
+                            Connector::AMQP_CONNECTION_OPTION_READ_TIMEOUT  => 30,
+                            Connector::AMQP_CONNECTION_OPTION_WRITE_TIMEOUT => 30,
+                            Connector::AMQP_CONNECTION_OPTION_KEEPALIVE     => true,
+                        ],
                     );
                 }
             ),
