@@ -404,7 +404,6 @@ class Helper
      * @param Alaress_Date_Format|null $startDate
      * @param Alaress_Date_Format|null $endDate
      * @param string                   $format
-     * @param string                   $labelFormat
      * @param int                      $maxStack
      * @return Collection
      */
@@ -412,7 +411,6 @@ class Helper
         ?Alaress_Date_Format $startDate,
         ?Alaress_Date_Format $endDate,
         string $format,
-        string $labelFormat,
         int $maxStack
     ): Collection {
         /* Return empty collection if either date is null.
@@ -450,8 +448,12 @@ class Helper
                     'start' => $actualStart->startOfDay(),
                     'end' => $actualEnd->endOfDay(),
                     'key' => $key,
-                    'label' => $actualStart->getUsingFormat($labelFormat) . ' - ' .
-                        $actualEnd->getUsingFormat($labelFormat),
+                    /* We are hardcoding the format here as it is going to be a nightmare trying to shorten the
+                     * format by removing the first year, as it's hard to predict what the format is going to be.
+                     * This will make things a lot easier.
+                     */
+                    'label' => $actualStart->getUsingFormat('j M') . ' - ' .
+                        $actualEnd->getUsingFormat('j M, Y'),
                 ]
             );
             $current->addWeeks(-1);

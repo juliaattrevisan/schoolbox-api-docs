@@ -240,6 +240,7 @@ class Cursor implements ICursor
         switch ($this->tabType) {
             case Factory::STUDENT_BY_TYPE:
             case Factory::STUDENT_BY_MONTH:
+            case Factory::STUDENT_BY_WEEK:
                 $query[] = "p.student_id = :student_id";
                 if (!isset($this->rowKey['student_id'])) {
                     throw new ValueError('Student ID is required', self::BAD_REQUEST_ERROR_CODE);
@@ -286,6 +287,7 @@ class Cursor implements ICursor
                 $param['monthKey'] = $this->columnKey;
                 break;
             case Factory::TYPE_BY_WEEK:
+            case Factory::STUDENT_BY_WEEK:
                 if (!preg_match(TypeByWeek::COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
                     throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey), self::BAD_REQUEST_ERROR_CODE);
                 }
@@ -293,7 +295,6 @@ class Cursor implements ICursor
                     $this->helper->getStartDate(),
                     $this->helper->getEndDate(),
                     TypeByWeek::COLUMN_QUERY_KEY,
-                    $this->helper->getConfigLoader()->get('date_short'),
                     TypeByWeek::MAX_COLUMN_COUNT,
                 );
                 if (!$weeks->offsetExists($matches['index'])) {
