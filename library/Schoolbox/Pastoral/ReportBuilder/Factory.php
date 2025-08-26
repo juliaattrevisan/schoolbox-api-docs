@@ -3,6 +3,7 @@
 namespace Schoolbox\Pastoral\ReportBuilder;
 
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\ReportBuilder\TabType\StudentByMonth;
 use Schoolbox\Pastoral\ReportBuilder\TabType\StudentByType;
 use Schoolbox\Pastoral\ReportBuilder\TabType\TypeByMonth;
 use Schoolbox\Pastoral\ReportBuilder\TabType\TypeByWeek;
@@ -14,7 +15,7 @@ class Factory
     public const STUDENT_BY_TYPE  = 'studentByType';
     public const TYPE_BY_MONTH    = 'typeByMonth';
     public const TYPE_BY_WEEK     = 'typeByWeek';
-//    public const STUDENT_BY_MONTH = 'studentByMonth';
+    public const STUDENT_BY_MONTH = 'studentByMonth';
 //    public const STUDENT_BY_WEEK  = 'studentByWeek';
 
     public function __construct(
@@ -54,6 +55,16 @@ class Factory
                 $this->limit,
             ),
             self::TYPE_BY_WEEK => new TypeByWeek(
+                $helper,
+                $this->userTranslator,
+                $this->userMapper,
+                $this->pastoralMapper,
+                $this->resultType,
+                $this->orderBy ?? Base::SORT_BY_TYPE_DEFAULT,
+                $this->order,
+                $this->limit,
+            ),
+            self::STUDENT_BY_MONTH => new StudentByMonth(
                 $helper,
                 $this->userTranslator,
                 $this->userMapper,

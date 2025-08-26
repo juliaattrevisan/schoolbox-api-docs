@@ -239,6 +239,7 @@ class Cursor implements ICursor
         $query = $param = [];
         switch ($this->tabType) {
             case Factory::STUDENT_BY_TYPE:
+            case Factory::STUDENT_BY_MONTH:
                 $query[] = "p.student_id = :student_id";
                 if (!isset($this->rowKey['student_id'])) {
                     throw new ValueError('Student ID is required', self::BAD_REQUEST_ERROR_CODE);
@@ -276,6 +277,7 @@ class Cursor implements ICursor
                 $param['type_id'] = $matches['id'];
                 break;
             case Factory::TYPE_BY_MONTH:
+            case Factory::STUDENT_BY_MONTH:
                 if (!preg_match(TypeByMonth::COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
                     throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey), self::BAD_REQUEST_ERROR_CODE);
                 }

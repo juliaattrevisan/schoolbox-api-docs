@@ -254,7 +254,7 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
 
         if (
             in_array($this->sortBy, array_column($this->getWeeks()->getAll(), 'key')) ||
-            strcasecmp('total', $this->sortBy) == 0
+            strcasecmp('total', $this->sortBy) === 0
         ) {
             $discriminator['count'] = $last[$this->sortBy];
         }
