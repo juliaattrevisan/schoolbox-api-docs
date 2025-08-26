@@ -47,16 +47,4 @@ class External_Edumate_Connection
         /** @noinspection PhpDeprecationInspection */
         return DatabaseFactory::getInstanceExternal();
     }
-
-
-    /**
-     * Quote input for safety
-     *
-     * @param string $value
-     * @return string
-     */
-    public function quote($value)
-    {
-        return db2_escape_string($value);
-    }
 }
