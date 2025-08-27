@@ -81,6 +81,7 @@ function deleteEvidence(index: number): void {
 }
 
 // TODO: on submit of the overall form (not autosave), need to ensure any current media is uploaded first
+// TODO: on submit of the overall form (not autosave), need to validate that there's at least one evidence OR text - although you could just bypass that due to autosave I guess, lol
 
 /**
  * TODO: for the CK editor, need the following settings:
@@ -89,6 +90,30 @@ function deleteEvidence(index: number): void {
         templates: {{ editorTemplates|json_encode|raw }},
     {% endif %}
  */
+
+/**
+ * When a file is uploaded, force it to fully upload and add it to the evidence list
+ * TODO: this probably shouldn't be the way we do this, but speeeeeeeeed
+ */
+window.Vue.watch(
+    () => currentFileDropFile.value?.storageHash,
+    async () => {
+        if (!mfStore.moment) {
+            return;
+        }
+
+        if (!currentFileDropFile.value?.storageHash || !currentFileDropFile.value.storageFile) {
+            return; // not yet uploaded
+        }
+
+        mfStore.moment.evidence.push({
+            storage: currentFileDropFile.value.storageFile,
+            filename: currentFileDropFile.value.file.name,
+        });
+
+        currentFileDropFile.value = null;
+    },
+);
 </script>
 
 <template>
@@ -110,7 +135,11 @@ function deleteEvidence(index: number): void {
             <div v-else-if="mediaType === MediaType.UPLOAD">
                 <label class="required" for="mf-evidence-file-drop"> Upload File </label>
                 <!-- TODO for speed reasons i've used this, but it should be a proper file input... that's a bit more complex atm -->
-                <file-drop id="mf-evidence-file-drop" v-model:current-file="currentFileDropFile" />
+                <file-drop
+                    id="mf-evidence-file-drop"
+                    v-model:current-file="currentFileDropFile"
+                    auto-upload-to-storage
+                />
             </div>
         </div>
         <div class="large-6 medium-4 small-12">
