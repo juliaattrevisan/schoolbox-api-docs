@@ -1,7 +1,8 @@
 import { defineStore } from "pinia";
 import { watchDebounced } from "@vueuse/core";
 import { apiRequest } from "@js/util/sbx/apiUtils";
-import type { StorageFile } from "@js/resource/resourceUtils";
+import { getFileFormValue } from "@js/resource/resourceUtils";
+import type { StorageFileFormValue } from "@js/resource/resourceUtils";
 import type { SelectizeSelectorItem } from "@js/vendors/selectize/selectizeSelectorTypes";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
@@ -17,7 +18,7 @@ export enum MomentFormModalType {
 type SubmitFormApiResponse = LearningMoment | LearningMoment[];
 type SubmitFormApiPayload = {
     body: string;
-    evidence: Pick<StorageFile, "hash">[];
+    evidence: { file: StorageFileFormValue }[];
     curriculumNodes: Node["code"][];
     tags: Pick<SelectizeSelectorItem, "id">[];
     rejectionReason?: string; // only for reject
@@ -52,7 +53,7 @@ export const useMomentFormStore = defineStore("momentForm", () => {
 
         return {
             body: moment.value.body ?? "",
-            evidence: moment.value.evidence.map((e) => ({ hash: e.storage.hash })),
+            evidence: moment.value.evidence.map((e) => ({ file: getFileFormValue(e.storage) })),
             curriculumNodes: selectedNodesStore.nodesIds.map(String),
             tags: (moment.value.tags ?? []).map((tag) => ({ id: tag.id })),
             folders: selectedFolders.value,

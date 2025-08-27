@@ -19,6 +19,8 @@ export type StorageFile = {
     };
 };
 
+export type StorageFileFormValue = `store:${StorageFile["hash"]}:${StorageFile["name"]}`;
+
 export interface AsyncUploadResponseError {
     success: false;
     error: number;
@@ -87,6 +89,16 @@ export async function uploadFileToStorage(
         success: true,
         data: response.data,
     };
+}
+
+/**
+ * Get the form value to use for a given StorageFile
+ * We sometimes need this instead of just the hash for forms
+ * @param file - the storage file
+ * @returns - store:[hash]:[name]
+ */
+export function getFileFormValue(file: StorageFile): StorageFileFormValue {
+    return `store:${file.hash}:${file.name}`;
 }
 
 /**
