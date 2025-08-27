@@ -36,8 +36,8 @@ export function usePagination(
     const cursorIndex = window.Vue.ref(0); // to track the current cursor index
     const currentCursor = window.Vue.computed(() => cursorList.value[cursorIndex.value] || "");
     const hasPaginate = window.Vue.ref<boolean>(false);
-    const hasPrevious = window.Vue.computed(() => metadata.value.cursor.current !== "");
-    const hasNext = window.Vue.computed(() => metadata.value.cursor.next !== null);
+    const hasPrevious = window.Vue.computed(() => cursorIndex.value > 0);
+    const hasNext = window.Vue.computed(() => pageCount.value > 0 && cursorIndex.value < pageCount.value - 1);
     const pageCount = window.Vue.ref(0);
 
     /**
