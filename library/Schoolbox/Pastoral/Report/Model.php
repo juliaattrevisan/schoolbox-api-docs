@@ -97,28 +97,24 @@ class Model implements ISoftDeletable
     // Mapping for the summary table options
     public const SUMMARY_TABLES_OPTIONS = [
         Factory::STUDENT_BY_TYPE => [
-            'label' => 'Student by Type/Sub-Type',
+            'label' => 'Student by Type',
             'type' => 'table',
         ],
         //TODO: future updates for SA-19333
         Factory::TYPE_BY_MONTH => [
-            'label' => 'Type/Sub-Type by Month',
-            'tooltip' => 'This table will display a maximum of 12 months of past data, counting back from the most recent record\'s date',
+            'label' => 'Type by Month',
             'type' => 'table',
         ],
         Factory::TYPE_BY_WEEK => [
-            'label' => 'Type/Sub-Type by Week',
-            'tooltip' => 'This table will display a maximum of 12 weeks of past data, counting back from the most recent record\'s date',
+            'label' => 'Type by Week',
             'type' => 'table',
         ],
         Factory::STUDENT_BY_MONTH => [
             'label' => 'Student by Month',
-            'tooltip' => 'This table will display a maximum of 12 months of past data, counting back from the most recent record\'s date',
             'type' => 'table',
         ],
         Factory::STUDENT_BY_WEEK => [
             'label' => 'Student by Week',
-            'tooltip' => 'This table will display a maximum of 12 weeks of past data, counting back from the most recent record\'s date',
             'type' => 'table',
         ],
     ];
