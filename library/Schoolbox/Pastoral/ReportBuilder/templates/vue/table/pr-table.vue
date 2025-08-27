@@ -190,10 +190,6 @@ window.Vue.onMounted(() => {
 </template>
 
 <style lang="scss">
-.scrollable {
-    overflow-y: auto;
-}
-
 .pr-table {
     width: 100%;
     /* fix the head to stay at the top when scrolling */
