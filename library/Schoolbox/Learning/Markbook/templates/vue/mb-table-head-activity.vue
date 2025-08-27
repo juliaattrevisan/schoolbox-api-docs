@@ -29,7 +29,7 @@ async function onTitleClick(): Promise<void> {
     }
 
     // You must have access to the pop-out menu
-    if (!mbStore.data.canAccessPopOut) {
+    if (!mbStore.data || !mbStore.data.canAccessPopOut) {
         return; // exit early
     }
 
