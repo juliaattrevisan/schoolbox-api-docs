@@ -18,14 +18,17 @@ enum MediaType {
 const mediaRecordingTypes = [MediaType.VIDEO, MediaType.AUDIO, MediaType.PHOTO];
 const mediaRecordingEl = window.Vue.useTemplateRef<InstanceType<typeof EvidenceMediaRecording>>("mediaRecordingRef");
 
+const mediaType = window.Vue.ref<MediaType | null>(null);
 const currentFileDropFile = window.Vue.ref<FileDropFile | null>(null);
 
+/** Unlike the other types, you can only ever have one text field */
+const showTextEditor = window.Vue.ref(false);
 
 /**
- * Upload the current media,
+ * Upload the current media recording,
  * either occurs when the user switches media types or if the user tries to submit the form
  */
-async function uploadMedia(): Promise<void> {
+async function uploadMediaRecording(): Promise<void> {
     if (!mediaRecordingEl.value) {
         throw new Error("Media recording component not found");
     }
@@ -61,8 +64,8 @@ async function uploadMedia(): Promise<void> {
  */
 async function changeMediaType(type: MediaType): Promise<void> {
     // If the current media type is a recording type, and there's recorded data, upload it first
-    if (mediaRecordingTypes.includes(mediaType.value)) {
-        await uploadMedia();
+    if (mediaType.value && mediaRecordingTypes.includes(mediaType.value)) {
+        await uploadMediaRecording();
     }
 
     mediaType.value = type;
@@ -90,6 +93,26 @@ function deleteEvidence(index: number): void {
         templates: {{ editorTemplates|json_encode|raw }},
     {% endif %}
  */
+
+window.Vue.onMounted(() => {
+    if (mfStore.moment === null) {
+        console.warn("no moment found, cannot add evidence");
+        return;
+    }
+
+    // derive the initial media type from the URL param "momentType"
+    const urlParams = new URLSearchParams(window.location.search);
+    const momentTypeParam = (urlParams.get("momentType")?.toLowerCase() as MediaType | null) ?? null;
+
+    if (momentTypeParam && Object.values(MediaType).includes(momentTypeParam)) {
+        mediaType.value = momentTypeParam;
+    } else {
+        mediaType.value = null; // no media type selected
+    }
+
+    // if there's already text in the body, show the text editor
+    showTextEditor.value = (mfStore.moment.body ?? "").trim().length > 0;
+});
 
 /**
  * When a file is uploaded, force it to fully upload and add it to the evidence list
@@ -124,7 +147,7 @@ window.Vue.watch(
             <input id="mf-evidence-storage" type="hidden" />
 
             <evidence-media-recording
-                v-if="mediaRecordingTypes.includes(mediaType)"
+                v-if="mediaType && mediaRecordingTypes.includes(mediaType)"
                 ref="mediaRecordingRef"
                 :key="`${mediaType}-${mfStore.moment?.evidence.length}`"
                 :moment-type="mediaType"
