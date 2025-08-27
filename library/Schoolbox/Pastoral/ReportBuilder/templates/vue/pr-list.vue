@@ -3,16 +3,23 @@
  * To display a list of pastoral records in a list format
  */
 
+import { toRef } from "vue";
 import type { PastoralRecord } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
 import PrRecord from "./pr-record.vue";
 import PrEmpty from "./pr-empty.vue";
+import { useStore } from "./store/pastoralReportStore";
 import { useMaxScrollableHeight } from "./composable/useMaxScrollableHeight";
+import { useLoadRecords } from "./composable/useLoadRecords";
 
 const props = defineProps<{
     results: PastoralRecord[];
 }>();
 
+const store = useStore();
 const { maxScrollableHeight } = useMaxScrollableHeight();
+const { isNewLoad, isNewLoading, isMoreLoading, payload, loadError } = useLoadRecords(
+    toRef(() => store.selectedTab?._links.view || ""),
+);
 </script>
 
 <template>
