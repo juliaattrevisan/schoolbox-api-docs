@@ -67,12 +67,7 @@ export default {
      * the meaning of "this" in a way you don't expect.
      */
     data() {
-        return {
-            formattedDate: {
-                absolute: "",
-                relative: "",
-            },
-        };
+        return {};
     },
 
     /**
@@ -80,9 +75,7 @@ export default {
      * Basically, when vue has done all its inits and is ready to go
      * kind of like window.onload
      */
-    mounted: function () {
-        this.formattedDate = this.renderFormattedDatetimes(this.datetime);
-    },
+    mounted: function () {},
 
     /**
      * Computed properties.
@@ -90,6 +83,44 @@ export default {
      */
     computed: {
         dateDisplayFormats: () => window.dateDisplayFormats,
+        dayjsDatetime() {
+            return dayjs(this.datetime);
+        },
+        absoluteDateFormat() {
+            return this.dateOnly ? this.dateDisplayFormats.dayjs : this.dateDisplayFormats.dayjsDatetime;
+        },
+        absoluteDate() {
+            return this.dayjsDatetime.format(this.absoluteDateFormat);
+        },
+        relativeDate() {
+            let now = dayjs();
+
+            // Full diff format (e.g. hours, minutes, seconds):
+            // just output whatever the dayJS diff would output, which is the
+            // most significant component of the diff.
+            if (this.fullDiff) {
+                return dayjs.duration(this.dayjsDatetime.diff(now)).humanize(true);
+            }
+
+            // Standard diff format:
+            // Just output days, with "today", "yesterday" or "tomorrow" if
+            // appropriate.
+            let dayDiff = this.dayjsDatetime.diff(now.startOf("d"), "d");
+
+            /* We determine a relative time equivalence based on how different
+             * $datetime was, compared to today. Anything outside the (-1, 1) range
+             * gets a non-relative format
+             */
+            if (dayDiff === 0) {
+                return "today";
+            } else if (dayDiff === -1) {
+                return "yesterday";
+            } else if (dayDiff === 1) {
+                return "tomorrow";
+            } else {
+                return dayjs.duration(dayDiff, "d").humanize(true);
+            }
+        },
     },
 
     /**
@@ -97,55 +128,9 @@ export default {
      * Arbitrary javascript functions which operate on the args provided, just like any
      * other ordinary javascript that you might have written before.
      */
-    methods: {
-        /**
-         * Renders the given datetime as a string.
-         *
-         * @param {*} datetime Any date-like thing MomentJS accepts in its
-         *                     constructor.
-         */
-        renderFormattedDatetimes(datetime) {
-            let now = dayjs(),
-                date = dayjs(datetime),
-                dateFormat = this.dateOnly ? this.dateDisplayFormats.dayjs : this.dateDisplayFormats.dayjsDatetime;
-
-            let struct = {
-                absolute: date.format(dateFormat),
-                relative: "",
-            };
-
-            // Full diff format (e.g. hours, minutes, seconds):
-            // just output whatever the dayJS diff would output, which is the
-            // most significant component of the diff.
-            if (this.fullDiff) {
-                struct.relative = dayjs.duration(date.diff(now)).humanize(true);
-                return struct;
-            }
-
-            // Standard diff format:
-            // Just output days, with "today", "yesterday" or "tomorrow" if
-            // appropriate.
-            let dayDiff = date.diff(now.startOf("d"), "d");
-
-            /* We determine a relative time equivalence based on how different
-             * $datetime was, compared to today. Anything outside the (-1, 1) range
-             * gets a non-relative format
-             */
-            if (dayDiff === 0) {
-                struct.relative = "today";
-            } else if (dayDiff === -1) {
-                struct.relative = "yesterday";
-            } else if (dayDiff === 1) {
-                struct.relative = "tomorrow";
-            } else {
-                struct.relative = dayjs.duration(dayDiff, "d").humanize(true);
-            }
-
-            return struct;
-        },
-    },
+    methods: {},
 };
 </script>
 <template>
-    <time :title="this.formattedDate.absolute">{{ this.formattedDate.relative }}</time>
+    <time :title="this.absoluteDate">{{ this.relativeDate }}</time>
 </template>
