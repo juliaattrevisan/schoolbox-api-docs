@@ -8,6 +8,9 @@
         },
         "imangazaliev/didom": {
             "PHP 8.4 deprecation fix": "./patches/imangazaliev/didom/php84.patch"
+        },
+        "ssnepenthe/color-utils": {
+            "PHP 8.4 deprecation fix": "./patches/ssnepenthe/color-utils/php84-deprecation-fix.patch"
         }
     }
 }
