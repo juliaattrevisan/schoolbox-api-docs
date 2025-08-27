@@ -31,7 +31,7 @@ const { bottom } = toRefs(arrivedState);
 window.Vue.watch(bottom, (isAtBottom) => {
     if (isAtBottom && payload.value && payload.value.metadata.cursor.next !== null) {
         urlParams.set(ViewUrlParam.CURSOR as string, payload.value.metadata.cursor.next);
-        url.value = `${store.selectedTab?._links.scope}?${urlParams.toString()}`;
+        url.value = `${store.selectedTab?._links.view}?${urlParams.toString()}`;
     }
 });
 </script>
@@ -45,7 +45,7 @@ window.Vue.watch(bottom, (isAtBottom) => {
             <data-load-error data-title="record" :further-info="loadError" />
         </div>
         <template v-else-if="payload">
-            <div v-if="payload && payload.data.results.length > 0" class="l-flex-col l-gap-s">
+            <div v-if="payload.data.results.length > 0" class="l-flex-col l-gap-s">
                 <div v-for="record in payload.data.results" :key="record.id" class="c-island">
                     <ul class="information-list threaded">
                         <pr-record :record="record" />
@@ -53,6 +53,10 @@ window.Vue.watch(bottom, (isAtBottom) => {
                 </div>
             </div>
             <pr-empty v-else />
+            <div v-if="isMoreLoading" class="c-island l-pad-s">
+                <div class="loader"></div>
+            </div>
+            <data-load-error v-else-if="!isNewLoad && loadError" data-title="record" :further-info="loadError" />
         </template>
     </div>
 </template>
