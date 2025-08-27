@@ -19,7 +19,7 @@ concurrency:
 jobs:
   build:
     timeout-minutes: 15
-    runs-on: onprem-k3s
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         node-version: [18.x]
@@ -38,7 +38,7 @@ jobs:
 
   typecheck:
     timeout-minutes: 15
-    runs-on: onprem-k3s
+    runs-on: ubuntu-22.04
 
     strategy:
       matrix:
