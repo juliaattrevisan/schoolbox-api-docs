@@ -5,6 +5,9 @@
         },
         "steverhoades/oauth2-openid-connect-client": {
           "Update-to-PHP8-3-and-lcobucci-jwt-5": "./patches/steverhoades/oauth2-openid-connect-client/Update-to-PHP8-3-and-lcobucci-jwt-5.patch"
+        },
+        "imangazaliev/didom": {
+            "PHP 8.4 deprecation fix": "./patches/imangazaliev/didom/php84.patch"
         }
     }
 }
