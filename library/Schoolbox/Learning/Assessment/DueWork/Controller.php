@@ -495,8 +495,6 @@ class Controller extends Assessment\Controller
             /* External Url for third party apps which might have generated this assessment
              */
             'externalRedirectUrl' => $externalRedirectUrl,
-            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
-
         ];
 
         $routeArgs = [

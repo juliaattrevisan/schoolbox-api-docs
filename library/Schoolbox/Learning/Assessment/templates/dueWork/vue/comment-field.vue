@@ -65,7 +65,7 @@ async function initEditor(): Promise<void> {
                 maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                 toolbar: props.selfAssessment ? EditorToolbar.COMMENT : EditorToolbar.COMMENT_AI,
                 hasTokens: !props.selfAssessment,
-                templates: props.templates ?? [],
+                templates: props.templates,
             },
             true,
             resolve,

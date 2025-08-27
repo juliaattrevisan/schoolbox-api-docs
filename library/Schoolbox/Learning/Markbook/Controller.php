@@ -451,7 +451,6 @@ class Controller extends Base
                     'normaliseAs' => $state->getNormaliseAs(),
                 ])->reindex(),
                 'filtersQueryArgs' => $codec->convertSelectionsToQueryString($selectionsPerFilter),
-                'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
             ];
 
             $this->response = $this->responseAsJson([
