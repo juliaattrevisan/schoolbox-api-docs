@@ -141,12 +141,7 @@ window.Vue.onMounted(() => {
     </div>
     <pr-empty v-else-if="isEmpty" />
     <template v-else-if="hasRows">
-        <div
-            ref="scrollableRef"
-            class="table-container scrollable"
-            :style="{ maxHeight: maxScrollableHeight }"
-            data-test="pr-table"
-        >
+        <div class="table-container scrollable" :style="{ maxHeight: maxScrollableHeight }" data-test="pr-table">
             <table class="pr-table">
                 <pr-table-header
                     v-model:records-or-points="recordsOrPoints"
