@@ -181,6 +181,8 @@ window.Vue.onMounted(() => {
             />
         </div>
     </template>
+    <!-- fall back to just an empty state if all else fails -->
+    <pr-empty v-else />
     <pr-table-modal :selected-cell="selectedCell" />
 </template>
 
