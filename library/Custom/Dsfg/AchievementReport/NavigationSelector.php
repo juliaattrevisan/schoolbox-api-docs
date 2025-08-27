@@ -28,7 +28,6 @@ class NavigationSelector
     public const COMMENTS_KEY = 'comments';
     public const COCURRICULAR_KEY = 'coCurricular';
     public const MYP_KEY = 'myp';
-    public const DBVIEWTESTS_KEY = 'dbViewTests';
 
     /**
      * MSSQL db handler
@@ -270,14 +269,17 @@ class NavigationSelector
             ];
         }
 
-        if (in_array($_SESSION['username'], ['alaress', 'psingh', 'swalker'])) {
-            $availableNavigation[self::DBVIEWTESTS_KEY] = [
-                'url' => $this->routeGenerator->generate('achievementreport.getDbViewTests', [
-                    'externalUserId' => $this->externalUser['StudentID'],
-                ]),
-                'label' => 'DB View Tests'
-            ];
-        }
+        // This page is useful during testing and when communicating with school contacts about data-related issues.
+        // Enable when needed (here and in Module.php).
+        // $DBVIEWTESTS_KEY = 'dbViewTests';
+        //if (in_array($_SESSION['username'], ['alaress', 'psingh', 'swalker'])) { // Note psingh and swalker are DSFG admins.
+        //    $availableNavigation[$DBVIEWTESTS_KEY] = [
+        //        'url' => $this->routeGenerator->generate('achievementreport.getDbViewTests', [
+        //            'externalUserId' => $this->externalUser['StudentID'],
+        //        ]),
+        //        'label' => 'DB View Tests'
+        //    ];
+        //}
 
         $this->availableNavigation = $availableNavigation;
     }
