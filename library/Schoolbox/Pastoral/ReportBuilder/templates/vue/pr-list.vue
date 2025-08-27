@@ -20,8 +20,12 @@ const { isNewLoad, isNewLoading, isMoreLoading, payload, loadError } = useLoadRe
 
 <template>
     <div class="scrollable" :style="{ maxHeight: maxScrollableHeight }" data-test="pr-list">
-        <div v-if="isNewLoad && isNewLoading" class="loader"></div>
-        <data-load-error v-else-if="isNewLoad && loadError" data-title="record" :further-info="loadError" />
+        <div v-if="isNewLoad && isNewLoading" class="c-island l-pad-m" data-test="pr-list-loading">
+            <div class="loader"></div>
+        </div>
+        <div v-else-if="isNewLoad && loadError" class="c-island l-pad-m">
+            <data-load-error data-title="record" :further-info="loadError" />
+        </div>
         <template v-else-if="payload">
             <div v-if="payload && payload.data.results.length > 0" class="l-flex-col l-gap-s">
                 <div v-for="record in payload.data.results" :key="record.id" class="c-island">
