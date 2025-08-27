@@ -2089,7 +2089,7 @@ abstract class Kernel
                 Logger::class,
                 [
                     STDOUT,
-                    STDOUT,
+                    null,
                     $config->get(ConfigMapper::NAME_OAUTH_DEBUG_MODE) ? Level::Debug : Level::Info,
                     [],
                     true,
