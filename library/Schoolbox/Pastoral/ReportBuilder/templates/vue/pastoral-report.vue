@@ -3,7 +3,6 @@
  * Pastoral Report Tabs Component
  */
 
-import type { PastoralRecord } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
 import { TabType } from "../js/types/pastoralReportTypes";
 import type { Tab, Config, Routes, SeverityColors } from "../js/types/pastoralReportTypes";
 import { useStore } from "./store/pastoralReportStore";
@@ -15,7 +14,6 @@ const props = defineProps<{
     export: boolean;
     reportId: number;
     tabs: Tab[];
-    results: PastoralRecord[];
     config: Config;
     routes: Routes;
     localePastoral: string;
@@ -77,7 +75,7 @@ window.Vue.onMounted((): void => {
     <div class="l-flex-col l-gap-m">
         <div class="l-flex-row l-flex--justify-space l-flex--align-end f-no-margins">
             <h1>{{ props.title }}</h1>
-            <nav v-if="props.results.length">
+            <!-- <nav v-if="props.results.length">
                 <a
                     v-if="store.selectedTab?._links.export"
                     :href="store.selectedTab._links.export"
@@ -85,9 +83,9 @@ window.Vue.onMounted((): void => {
                     title="Download Report as CSV"
                 >
                     <sbx-icon name="download" />
-                </a>
-                <!-- <a href="#" class="icon-print" title="Print Report Results" @click.prevent="onPrintSelected"></a> -->
-            </nav>
+                </a> -->
+            <!-- <a href="#" class="icon-print" title="Print Report Results" @click.prevent="onPrintSelected"></a> -->
+            <!-- </nav> -->
         </div>
         <div>
             <dl v-if="props.tabs.length > 1" class="tabs">
@@ -100,7 +98,7 @@ window.Vue.onMounted((): void => {
                     <a>{{ tab.title }}</a>
                 </dd>
             </dl>
-            <pr-list v-if="store.selectedTab?.type === TabType.LIST" :results="props.results" />
+            <pr-list v-if="store.selectedTab?.type === TabType.LIST" />
             <pr-table v-else v-model:records-or-points="recordsOrPoints" />
         </div>
     </div>

@@ -4,17 +4,12 @@
  */
 
 import { toRef } from "vue";
-import type { PastoralRecord } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import PrRecord from "./pr-record.vue";
 import PrEmpty from "./pr-empty.vue";
 import { useStore } from "./store/pastoralReportStore";
 import { useMaxScrollableHeight } from "./composable/useMaxScrollableHeight";
 import { useLoadRecords } from "./composable/useLoadRecords";
-
-const props = defineProps<{
-    results: PastoralRecord[];
-}>();
 
 const store = useStore();
 const { maxScrollableHeight } = useMaxScrollableHeight();
