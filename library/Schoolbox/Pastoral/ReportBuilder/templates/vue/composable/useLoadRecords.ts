@@ -101,6 +101,7 @@ export function useLoadRecords(url: Ref<string>): {
      */
     window.Vue.onMounted(() => {
         if (url.value !== "") {
+            isNewLoad.value = true;
             void load();
         }
     });
