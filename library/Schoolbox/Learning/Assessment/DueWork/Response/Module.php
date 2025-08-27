@@ -45,6 +45,7 @@ use Schoolbox\User;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\Editor\Templates\Mapper as EditorTemplateMapper;
 use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
+
 class Module extends BaseModule
 {
     /**
