@@ -17,6 +17,10 @@ import { humanFileSize } from "@js/util/fileUtils";
 import { hasDeviceCapture } from "@js/util/featureDetectionUtils";
 import { isOfFileType, convertFilenameExtension } from "@js/util/fileUtils";
 
+/**
+ * @typedef {import('@js/resource/resourceUtils').AsyncUploadResponseSuccess} AsyncUploadResponseSuccess
+ */
+
 export default {
     components: {
         RecordPhoto,
@@ -100,6 +104,14 @@ export default {
                 photo: recordMediaTypes.PHOTO,
             };
             return momentTypes[this.momentType];
+        },
+
+        /**
+         * Is there currently recorded data available?
+         * @returns { Boolean }
+         */
+        hasRecordedData() {
+            return this.recordedData !== null;
         },
 
         /**
@@ -206,7 +218,7 @@ export default {
 
         /**
          * the form button has been pressed, so start uploading the file
-         *
+         * @returns { Promise<boolean> } whether the upload was successful or not
          */
         async onFormSubmit() {
             this.storageElement.removeEventListener("draft__onDraftSave", this.onAutoSave); // no need to respond to draft save when submitting
@@ -267,7 +279,7 @@ export default {
 
         /**
          * the media is ready, so upload it up to SchoolBox and return response
-         *
+         * @returns { Promise<AsyncUploadResponseSuccess | undefined> }
          */
         async uploadMediaAndReturnResponse() {
             try {
@@ -414,6 +426,7 @@ export default {
             this.updateCurrentRatio(this.deviceWidth, this.deviceHeight); //revert to original device size as has resize to ensure over-media-modal is fully visible
         },
     },
+    expose: ["uploadMediaAndReturnResponse", "hasRecordedData", "checkRecording"],
 };
 </script>
 

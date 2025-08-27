@@ -1,3 +1,4 @@
+import type { StorageFile } from "@js/resource/resourceUtils";
 import type { Metadata } from "@js/util/sbx/apiUtils";
 import type { SelectizeSelectorItem } from "@js/vendors/selectize/selectizeSelectorTypes";
 import type { Node } from "@schoolboxCurriculum/types/Node";
@@ -30,6 +31,10 @@ export type LearningMoment = {
             metadata: Metadata;
         };
     };
+    evidence: {
+        storage: StorageFile;
+        filename: string;
+    }[];
     tags: SelectizeSelectorItem[] | null;
     _links: {
         createThread?: string | null;
