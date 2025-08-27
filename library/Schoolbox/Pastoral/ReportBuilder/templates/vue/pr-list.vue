@@ -14,8 +14,10 @@ import { useLoadRecords } from "./composable/useLoadRecords";
 import { ViewUrlParam } from "../js/types/pastoralReportTypes";
 
 const store = useStore();
-const url = window.Vue.ref(store.selectedTab?._links.view || "");
+const url = window.Vue.ref("");
 const urlParams = new URLSearchParams();
+urlParams.set("limit", "20");
+url.value = `${store.selectedTab?._links.view}?${urlParams.toString()}`;
 const { isNewLoad, isNewLoading, isMoreLoading, payload, loadError } = useLoadRecords(url);
 const { maxScrollableHeight } = useMaxScrollableHeight();
 
