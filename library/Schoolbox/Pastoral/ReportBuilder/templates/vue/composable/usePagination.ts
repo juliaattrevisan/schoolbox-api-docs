@@ -37,7 +37,7 @@ export function usePagination(
     const currentCursor = window.Vue.computed(() => cursorList.value[cursorIndex.value] || "");
     const hasPaginate = window.Vue.ref<boolean>(false);
     const hasPrevious = window.Vue.computed(() => cursorIndex.value > 0);
-    const hasNext = window.Vue.computed(() => cursorIndex.value < pageCount.value - 1);
+    const hasNext = window.Vue.computed(() => pageCount.value > 0 && cursorIndex.value < pageCount.value - 1);
     const pageCount = window.Vue.ref(0);
 
     /**

@@ -46,8 +46,10 @@ export function getMeta(
     header: TableHeader,
     rowData?: { [key: string]: RowOptions },
 ): string[] {
-    const tabTitle = selectedTab?.title;
-    if (!tabTitle) return [];
+    if (selectedTab === null) {
+        return [];
+    }
+    const tabTitle = selectedTab.title;
     /**
      * For example: "Academic (Academic Honesty)" or "Joffrey Buckner | Wellbeing (Behaviour)"
      */
