@@ -130,7 +130,7 @@ function handleFiles(files: FileList | null): void {
     const file = { file: files[0], error: false } as const;
 
     // Is the file the right type?
-    if (!window.Dropzone.isValidFile(file.file, props.accept)) {
+    if (props.accept !== "*/*" && !window.Dropzone.isValidFile(file.file, props.accept)) {
         currentFile.value = {
             ...file,
             error: "You can't upload files of this type.",
@@ -190,11 +190,24 @@ window.Vue.watch(currentFile, async (file) => {
     isUploading.value = false;
 
     if (resource.success === false) {
-        file.error = resource.message || "Failed to upload file";
+        let errorMessage = resource.message || "Failed to upload file";
+
+        // Try to pull the message from the response if available
+        if (
+            typeof resource.data === "object" &&
+            resource.data !== null &&
+            "message" in resource.data &&
+            typeof resource.data.message === "string"
+        ) {
+            errorMessage = resource.data.message || errorMessage;
+        }
+
+        file.error = errorMessage;
         return;
     }
 
     file.storageHash = resource.data.hash;
+    file.storageFile = resource.data.meta.file;
 });
 </script>
 
