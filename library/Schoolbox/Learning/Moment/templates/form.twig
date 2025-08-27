@@ -35,46 +35,6 @@
     {% endif %}
 {% endif %}
 
-<div class="actions-small-1 row">
-    <div class="list-item">
-        <div class="small-12 column">
-            <h1>{{ heading }} Learning Moment</h1>
-            {##
-             # How does the "sharing on behalf of" metadata show?
-             # That depends on who the learning moment is being created for:
-             # * Only for myself: don't show at all
-             # * Only for others: "sharing on behalf of ..."
-             # * For both myself and others: "Sharing for myself, and also on behalf of ..."
-             # * For neither myself nor others: how did you even get here?
-             #}
-            {% if otherUsers is not empty %}
-                <ul class="meta">
-                    <li>
-                        {% include 'sub/userListMetadata.twig'
-                            with {
-                                users:   otherUsers,
-                                message: sharingForSelf ? 'Sharing for myself, and also on behalf of' : 'Sharing on behalf of'
-                            } only
-                        %}
-                    </li>
-                </ul>
-            {% endif %}
-        </div>
-    </div>
-
-    {% if evidence is defined and evidence.id %}
-        {% set deleteRoute = routeLookupIfAuthorized('learningMomentEvidence.deleteEvidence', {evidenceId: evidence.id, creatorId: evidence.creator.id}) %}
-
-        {% if deleteRoute %}
-            <nav>
-                <sbx-pop-out content-id="overflow"></sbx-pop-out>
-            </nav>
-            <ul class="f-dropdown" data-dropdown-content id="overflow">
-                <li><a data-delete href="{{ deleteRoute }}" class="icon-delete">Delete</a></li>
-            </ul>
-        {% endif %}
-    {% endif %}
-</div>
 {% if isCreate %}
     {# Share a Learning Moment from the Class List #}
     {% set routePublish = routeLookupIfAuthorized('learningMomentEvidence.postPublish', {userIds: userIds|join(',')}) %}
@@ -137,7 +97,31 @@
         {% endif %}
         :folders="{{ payload.folders|json_encode }}"
         :selected-folders="{{ payload.selectedFolders|json_encode }}"
-    />
+    >
+        <template v-slot:heading>
+            <h1>{{ heading }} Learning Moment</h1>
+            {##
+             # How does the "sharing on behalf of" metadata show?
+             # That depends on who the learning moment is being created for:
+             # * Only for myself: don't show at all
+             # * Only for others: "sharing on behalf of ..."
+             # * For both myself and others: "Sharing for myself, and also on behalf of ..."
+             # * For neither myself nor others: how did you even get here?
+             #}
+            {% if otherUsers is not empty %}
+                <ul class="meta">
+                    <li>
+                        {% include 'sub/userListMetadata.twig'
+                            with {
+                                users:   otherUsers,
+                                message: sharingForSelf ? 'Sharing for myself, and also on behalf of' : 'Sharing on behalf of'
+                            } only
+                        %}
+                    </li>
+                </ul>
+            {% endif %}
+        </template>
+    </moment-form>
 </div>
 
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>

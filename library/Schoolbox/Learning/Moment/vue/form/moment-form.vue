@@ -57,6 +57,31 @@ window.Vue.onMounted(() => {
 </script>
 
 <template>
+    <div class="actions-small-1 row">
+        <div class="list-item">
+            <div class="small-12 column">
+                <slot name="heading"></slot>
+            </div>
+        </div>
+
+        <template v-if="mfStore.moment && mfStore.moment._links.delete">
+            <nav>
+                <sbx-pop-out content-id="mf-pop-out"></sbx-pop-out>
+            </nav>
+            <ul id="mf-pop-out" class="f-dropdown" data-dropdown-content>
+                <li>
+                    <a
+                        class="icon-delete"
+                        :href="mfStore.moment._links.delete"
+                        @click.prevent="() => mfStore.deleteMoment()"
+                    >
+                        Delete
+                    </a>
+                </li>
+            </ul>
+        </template>
+    </div>
+
     <div v-if="mfStore.moment !== null" class="row">
         <div class="small-12 island">
             <section>
