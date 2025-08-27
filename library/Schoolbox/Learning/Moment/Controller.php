@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment;
 
+use Alaress\Database\Predicate\Builder;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
@@ -992,14 +993,13 @@ class Controller extends Base
      * @api GET /learning/evidence/cohort/{folderId}
      * @param Folder\Model $folder
      * @return void
-     * @throws MapperException
-     * @throws NotFound
      * @throws RouteNotFound
      */
     public function getCohortReportPayload(Folder\Model $folder): void
     {
         $userIds = $this->requestQuery->get('userIds') ?? [];
         $authorIds = $this->requestQuery->get('authorIds') ?? [];
+        $folderIds = $this->requestQuery->get('folderIds') ?? [];
         $tagIds = $this->requestQuery->get('tagIds') ?? [];
         $states = $this->requestQuery->get('states') ?? [];
 
@@ -1011,6 +1011,7 @@ class Controller extends Base
             $this->requestQuery->get('from') ?? null,
             $this->requestQuery->get('to') ?? null,
             is_array($authorIds) ? $authorIds : explode(',', $authorIds),
+            is_array($folderIds) ? $folderIds : explode(',', $folderIds),
             is_array($tagIds) ? $tagIds : explode(',', $tagIds),
             is_array($states) ? $states : explode(',', $states),
         );
@@ -1228,5 +1229,105 @@ class Controller extends Base
         $this->mapper->deleteByColumn('id', $requestBody['momentIds']);
 
         $this->response = $this->responseEmpty(204);
+    }
+
+
+    /**
+     * Get a list of folders specifically for the cohort report
+     * This might be better off in \Schoolbox\Resource\Folder\Controller instead, maybe
+     *
+     * @return void
+     */
+    public function getFolderList(): void
+    {
+        $keyword = $this->requestQuery->get('query') ?? '';
+        $stack = [];
+
+        /* No keyword? No trabajo
+         */
+        if ('' === trim((string)$keyword)) {
+            $this->response = $this->responseEmpty(400);
+            return;
+        }
+
+        /* Find members of your cohort
+         */
+        $cohortFolderId = $this->requestQuery->get('cohortFolderId') ?? '';
+
+        /* No cohort folder? No trabajo
+         */
+        if ('' === trim((string)$cohortFolderId)) {
+            $this->response = $this->responseEmpty(400);
+            return;
+        }
+
+        /* Find a set of users who are somehow enrolled in $folder as students,
+         * and/or involved in $folder as group members
+         *
+         * Note that a folder can be both a group and a class-coded folder which derives its
+         * members from the Externals
+         */
+        try {
+            $cohortFolder = $this->folderMapper->findById($cohortFolderId);
+            $cohortIds = $this->userAccessMapper->findUsersInCategory($cohortFolder, \Schoolbox\Role::STUDENT)->indexBy('id')->keys();
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $this->response = $this->responseEmpty(400);
+            return;
+        }
+
+        $dbInternal = $this->folderMapper->getDatabase();
+
+        /* Find the folder ids where your cohort made a learning moment folder relationship
+         */
+        $cohortPlaceholders = Builder::getArrayPlaceholders($cohortIds, 'cohortIds');
+        $params = array_merge(Builder::getArrayParameters($cohortIds, 'cohortIds'));
+
+        $query = "
+            SELECT mf.folder_id
+            FROM moment_folder mf
+            INNER JOIN moment m ON mf.moment_id = m.id
+            WHERE m.deleted_at IS NULL
+            AND m.user_id IN {$cohortPlaceholders}
+        ";
+
+        $result = $this->folderMapper->getDatabase()->executeQuery($query, $params)->fetchAll();
+
+        $folderIds = array_column($result, 'folder_id');
+
+        /* Find those folder instances, only include Groups and Classes in the stack
+         */
+        if (!\count($folderIds)) {
+            $this->response = $this->responseEmpty(400);
+            return;
+        }
+
+        $pb = $this->folderMapper->getPredicateBuilder()
+            ->in('id', $folderIds)
+            ->any(
+                $this->folderMapper->getPredicateBuilder()
+                    ->like("folder.name", "%{$dbInternal->getQuoter()->escapeForLike($keyword)}%")
+                    ->like('cc.code', "%{$dbInternal->getQuoter()->escapeForLike($keyword)}%")
+            );
+
+        $folders = $this->folderMapper->findByPredicates($pb);
+
+        /** @var \Schoolbox\Resource\Folder\Model $folder */
+        foreach ($folders as $folder) {
+            /* Neither a group nor a class: skip it
+             *
+             * You can't tell if a folder -stopped being- a group/class at some point
+             * after the learning moment was created: keep filtering these out
+             */
+            if (!$folder->isGroup() && !$folder->isClass()) {
+                continue;
+            }
+
+            $stack[] = [
+                'id' => $folder->getId(),
+                'name' => $folder->getNameWithCodes()
+            ];
+        }
+
+        $this->response = $this->responseAsJson($stack);
     }
 }

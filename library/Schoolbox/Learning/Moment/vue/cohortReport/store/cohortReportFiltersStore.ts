@@ -12,6 +12,7 @@ export const useCohortReportFiltersStore = defineStore("cohortReportFilters", ()
 
     const studentFilter = window.Vue.ref<SearchSelectItem[]>([]);
     const authorFilter = window.Vue.ref<SearchSelectItem[]>([]);
+    const folderFilter = window.Vue.ref<SearchSelectItem[]>([]);
     const stateFilter = window.Vue.ref<EvidenceStatus[]>(keysOf(evidenceStatusLabels));
     const evidenceTagsFilter = window.Vue.ref<SelectizeSelectorItem["id"][]>([]);
     const startDateFilter = window.Vue.ref<string>(EMPTY_DATE);
@@ -23,6 +24,7 @@ export const useCohortReportFiltersStore = defineStore("cohortReportFilters", ()
     function resetFilters(): void {
         studentFilter.value = [];
         authorFilter.value = [];
+        folderFilter.value = [];
         stateFilter.value = keysOf(evidenceStatusLabels);
         evidenceTagsFilter.value = [];
         startDateFilter.value = EMPTY_DATE;
@@ -40,6 +42,7 @@ export const useCohortReportFiltersStore = defineStore("cohortReportFilters", ()
         crStore.activeFilters = {
             userIds: Object.values(studentFilter.value).map((s) => s.id),
             authorIds: Object.values(authorFilter.value).map((a) => a.id),
+            folderIds: Object.values(folderFilter.value).map((f) => f.id),
             tagIds: [...evidenceTagsFilter.value],
             states: [...stateFilter.value],
             from: startDateFilter.value ? window.dayjs(startDateFilter.value).format("YYYY-MM-DD") : undefined,
@@ -54,6 +57,7 @@ export const useCohortReportFiltersStore = defineStore("cohortReportFilters", ()
         applyFilters,
         studentFilter,
         authorFilter,
+        folderFilter,
         stateFilter,
         evidenceTagsFilter,
         startDateFilter,
