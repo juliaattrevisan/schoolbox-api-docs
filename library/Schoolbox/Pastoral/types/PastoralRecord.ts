@@ -57,7 +57,7 @@ export type PastoralRecord = {
     isArchived: boolean;
     expiresAt?: string;
     severity?: Severity;
-    points?: number;
+    points?: number | null;
     type: PastoralType;
     subType?: PastoralSubtype;
     owner: User;

@@ -48,7 +48,11 @@ const store = useStore();
                         :title="`Record archived - ${props.record.expiresAt}`"
                     ></sbx-icon>
                     <sbx-label-pastoral-points
-                        v-if="store.config.pastoralPointEnabled && props.record.points"
+                        v-if="
+                            store.config.pastoralPointEnabled &&
+                            props.record.points !== undefined &&
+                            props.record.points !== null
+                        "
                         :points="props.record.points"
                         class="l-flex__item--none"
                     ></sbx-label-pastoral-points>
