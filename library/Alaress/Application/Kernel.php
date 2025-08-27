@@ -2093,7 +2093,7 @@ abstract class Kernel
                     $config->get(ConfigMapper::NAME_OAUTH_DEBUG_MODE) ? Level::Debug : Level::Info,
                     [],
                     true,
-                    'jwtParser',
+                    'jwtParser.' . INSTANCE_ID,
                 ],
             ),
         );
