@@ -148,5 +148,6 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
     return {
         items,
         removeItems,
+        shouldNotGroupWhenFull: true, // the toolbar will stop grouping items and let them wrap to the next line when there is not enough space to display them in a single row.
     };
 }
