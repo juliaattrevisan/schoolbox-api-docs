@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import FileDrop from "@js/resource/file-drop.vue";
+import type { FileDropFile } from "@js/resource/fileDropTypes";
 import type { AsyncUploadResponseSuccess } from "@js/resource/resourceUtils";
 import EvidenceMediaRecording from "@schoolboxLearningMomentEvidence/evidence-media-recording.vue";
 import { useMomentFormStore } from "./store/momentFormStore";
@@ -16,7 +18,8 @@ enum MediaType {
 const mediaRecordingTypes = [MediaType.VIDEO, MediaType.AUDIO, MediaType.PHOTO];
 const mediaRecordingEl = window.Vue.useTemplateRef<InstanceType<typeof EvidenceMediaRecording>>("mediaRecordingRef");
 
-const mediaType = window.Vue.ref<MediaType>(MediaType.AUDIO);
+const currentFileDropFile = window.Vue.ref<FileDropFile | null>(null);
+
 
 /**
  * Upload the current media,
@@ -103,6 +106,12 @@ function deleteEvidence(index: number): void {
                 filename-id="mf-evidence-filename"
                 storage-id="mf-evidence-storage"
             />
+
+            <div v-else-if="mediaType === MediaType.UPLOAD">
+                <label class="required" for="mf-evidence-file-drop"> Upload File </label>
+                <!-- TODO for speed reasons i've used this, but it should be a proper file input... that's a bit more complex atm -->
+                <file-drop id="mf-evidence-file-drop" v-model:current-file="currentFileDropFile" />
+            </div>
         </div>
         <div class="large-6 medium-4 small-12">
             <div class="share-work-buttons">
