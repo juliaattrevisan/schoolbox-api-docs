@@ -197,6 +197,68 @@ class AllFields extends Base
             }
         }
 
+        // Set folders
+        if (array_key_exists('folders', $json)) {
+            /* Only try to compile if there are actual values in here, not just an empty set
+             */
+            if (is_array($json['folders']) && isset($json['folders'][0])) {
+                /* The first element could potentially be a csv (and the only element) which actually represents
+                 * multiple folders. Curric nodes have this behaviour but not sure when/why, but stands to reason
+                 * folders are susceptible to the same phenomenon.
+                 *
+                 * Somehow this ws related to https://schoolbox.atlassian.net/browse/SA-14113 but no details exist.
+                 */
+                if (is_string($json['folders'][0]) && str_contains(',', $json['folders'][0])) {
+                    /* If it's a csv, snap it apart; otherwise, it's some other string of some kind; can't process it.
+                     * Don't do anything in that case.
+                     */
+                    $json['folders'] = explode(',', $json['folders'][0]);
+                }
+
+                /* This only ever sets one level of hydration, but curric nodes and tags depends on it
+                 */
+                $this->setCollection(
+                    $json,
+                    'folders',
+                    'id',
+                    $model,
+                    'setFolders',
+                    new GenericCollection(\Schoolbox\Resource\Folder\Model::class),
+                    new \Schoolbox\Resource\Folder\Model(),
+                    'setId'
+                );
+
+                /* Kind of repair this after the fact
+                 */
+                $lookup = [];
+
+                foreach ($json['folders'] as $row) {
+                    $lookup[$row['id']] = $row;
+                }
+
+                /** @var \Schoolbox\Resource\Folder\Model $folder */
+                foreach ($model->getFolders() as $folder) {
+                    $folder->setName($lookup[$folder->getId()]['name']);
+
+                    /* Init folder code collection for each folder instance
+                     */
+                    if (null === $folder->getCodes()) {
+                        $folder->setCodes(
+                            (new \Schoolbox\GenericCollection(\Schoolbox\Resource\Folder\Code\Model::class))
+                        );
+                    }
+
+                    $codes = explode(',', $lookup[$folder->getId()]['code']);
+
+                    foreach ($codes as $code) {
+                        $folder->getCodes()->add(
+                            (new \Schoolbox\Resource\Folder\Code\Model())
+                                ->setCode($code)
+                        );
+                    }
+                }
+            }
+        }
 
         // Set curriculum nodes
         if (array_key_exists('curriculumNodes', $json)) {

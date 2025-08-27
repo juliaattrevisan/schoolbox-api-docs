@@ -27,6 +27,7 @@ use Schoolbox\Learning\Moment\NextRoutes;
 use Schoolbox\Learning\Moment\Translator\ModelToArray\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Exception;
@@ -59,6 +60,7 @@ class Controller extends Base
      * @param EditorTemplateHelper    $editorTemplateHelper
      * @param \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper
      * @param Storage\Translator\ModelToArray $storageTranslator
+     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
      */
     public function __construct(
         private \Schoolbox\Learning\Moment\Mapper $mapper,
@@ -66,6 +68,7 @@ class Controller extends Base
         private EditorTemplateHelper $editorTemplateHelper,
         private \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper,
         private Storage\Translator\ModelToArray $storageTranslator,
+        private \Schoolbox\Resource\Folder\Mapper $folderMapper
     ) {
     }
 
@@ -73,7 +76,12 @@ class Controller extends Base
     /**
      * Redirect to the create form.
      *
-     * This takes a list of user IDs in the 'userId' query string parameter.
+     * This takes a list of user IDs in the 'userId' query string parameter and forcibly
+     * crafts an aura route using them, fitting the pattern "/user/{userIds}/create" which
+     * isn't convenient to do in the javascript world.
+     *
+     * The rest of the querystring params need to be manually whitelisted so they can be
+     * appended to this generated url
      *
      * @api   GET /learning/evidence/user/create
      * @since 20.2
@@ -84,9 +92,18 @@ class Controller extends Base
             $this->addQueryStringParamsToPath(
                 $this->routeGenerator->generate(
                     'learningMomentEvidence.getCreateForm',
-                    ['userIds' => $this->requestQuery->get('userIds')]
+                    [
+                        'userIds' => $this->requestQuery->get('userIds'),
+                    ]
                 ),
-                [Redirect::RETURN_URL, 'momentType']
+                /* Whitelist the querystring params from whence you came
+                 * You can't just shove them onto the end: you have to add to this whitelist
+                 */
+                [
+                    Redirect::RETURN_URL,
+                    'momentType',
+                    'folderId'
+                ]
             )
         );
     }
@@ -120,26 +137,103 @@ class Controller extends Base
         $momentType = $this->requestQuery->get('momentType') ?: Evidence\Model::MOMENT_TYPE_TEXT;
         $template   = $this->getTemplateFromType($momentType);
 
+        /* These are folders that the recipient can see via their membership;
+         * Note that a staff member might edit a student's learning moment, so you have to use
+         * the recipient's user instance, not the viewer's
+         */
+        $folders = null;
+
+        /* This is usually empty when creating, except when you're creating by the class list;
+         * that will have a folder already chosen
+         */
+        $selectedFolders = [];
+
         /* Students get their learning moment moderation requirement tested;
          * parents and teachers bypass this check
          */
         $moderationRequired = false;
 
         if ($this->getUser()->getRole()->isStudent()) {
-            $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $this->getUser()->getYear());
-        } elseif (1 === $users->count() && $this->getUser()->getRole()->isParent()) {
-            /* If the current user is a parent, and the list of recipients is exactly one,
-             * then the parent is creating a learning moment for one of their children via their activity feed.
-             * Spawn the Submit For Approval button for parents so their learning moments enter moderation queue.
-             *
-             * This forces parents into the same moderation workflow as their children. ALTERNATIVELY you could
-             * require the Learning Moment Moderation role permission on various parent roles; this could allow
-             * some Parent roles to have moderation requirements and others can Publish immediately to the world.
-             *
-             * Note:
-             * This is purely circumstantial since parents can't spawn learning moments for multiple people.
+            /* Students crafting learning moments for themselves might be subject to moderation
              */
-            $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $users->first()->getYear());
+            $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $this->getUser()->getYear());
+
+            /* These are folders that the recipient can see via their membership;
+             * Note that a staff member might edit a student's learning moment, so you have to use
+             * the recipient's user instance, not the viewer's
+             */
+            $userAccesses = $this->userAccessMapper->findAllForUser($this->getUser(), $this->getUser()->isShowTimetable())
+                ->filter(function (UserAccess $access) {
+                    return UserAccess::SERVICE_HOMEPAGE === $access->getService();
+                });
+
+            if ($userAccesses->count()) {
+                $folders = $this->folderMapper->findByColumn('id', $userAccesses->getPropertyValues('serviceIdentifier'));
+            }
+
+            /* If folderId exists in the querystring params, use that to preselect
+             * (you probably came here via the homepage component)
+             */
+            if ($this->requestQuery->get('folderId') ?? false) {
+                $selectedFolders = [$this->requestQuery->get('folderId')];
+            }
+        } elseif (1 === $users->count()) {
+            /* Crafting a learning moment for exactly one other person
+             *
+             * If the current user is a staff, and the list of recipients is exactly one,
+             * it doesn't matter if you selected one fella from the class list, or
+             * tried to share a learning moment directly from the recipient's activity feed;
+             * the list of folders they can access is determinate.
+             *
+             * Otherwise, you have a mixed bag of people who have access to different folders
+             * and that would make the ui really messy.
+             */
+            if ($this->getUser()->getRole()->isParent()) {
+                /* If the current user is a parent, and the list of recipients is exactly one,
+                 * then the parent is creating a learning moment for one of their children via their activity feed.
+                 * Spawn the Submit For Approval button for parents so their learning moments enter moderation queue.
+                 *
+                 * This forces parents into the same moderation workflow as their children. ALTERNATIVELY you could
+                 * require the Learning Moment Moderation role permission on various parent roles; this could allow
+                 * some Parent roles to have moderation requirements and others can Publish immediately to the world.
+                 *
+                 * Note:
+                 * This is purely circumstantial since parents can't spawn learning moments for multiple people.
+                 */
+                $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $users->first()->getYear());
+
+                /* Parents don't get to associate folders with a learning moment
+                 */
+            }
+
+            if ($this->getUser()->getRole()->isStaff()) {
+                /* These are folders that the recipient can see via their membership;
+                 * Note that a staff member might edit a student's learning moment, so you have to use
+                 * the recipient's user instance, not the viewer's
+                 */
+                $userAccesses = $this->userAccessMapper->findAllForUser($users->first(), $users->first()->isShowTimetable())
+                    ->filter(function (UserAccess $access) {
+                        return UserAccess::SERVICE_HOMEPAGE === $access->getService();
+                    });
+
+                if ($userAccesses->count()) {
+                    $folders = $this->folderMapper->findByColumn('id', $userAccesses->getPropertyValues('serviceIdentifier'));
+
+                    if ($this->requestQuery->get('folderId') ?? false) {
+                        $selectedFolders = [$this->requestQuery->get('folderId')];
+                    }
+                }
+            }
+        } elseif ($this->getUser()->getRole()->isStaff()) {
+            /* If the current user is a staff and the list of recipients is more than one,
+             * presume folder involvement to be specifically the Class List from whence you came
+             * Request a collection of folders for data struct synonymity
+             */
+            $folders = $this->folderMapper->findByColumn('id', $this->requestQuery->get('folderId'));
+
+            if ($this->requestQuery->get('folderId') ?? false) {
+                $selectedFolders = [$this->requestQuery->get('folderId')];
+            }
         }
 
         $params = [
@@ -154,6 +248,10 @@ class Controller extends Base
             'momentType'               => $momentType,
             'zone'                     => $this->buildAttachzone($momentType)->getTwigContext(),
             'editorTemplates'          => $this->editorTemplateHelper->getTemplatesForCategory(),
+            /* Folder relationships
+             */
+            'folders' => $folders,
+            'selectedFolders' => $selectedFolders,
         ];
 
         $this->response = $this->responseFromTemplate($template, $params);
@@ -293,6 +391,11 @@ class Controller extends Base
 
         $requestBody = $this->request->getParsedBody();
 
+        /* This is a bit brutal and maybe you can mess around more with a diff,
+         * but this is guaranteed to be correct without all the kerfuffle...for now
+         */
+        $folders = $this->folderMapper->findByColumn('id', $requestBody['folders']);
+
         //unless there are mapper errors (and those will change it to 500 as required
         //set the return code to 201 (Created)
 
@@ -319,6 +422,12 @@ class Controller extends Base
                 foreach ($baseModel->getEvidence() as $evidence) {
                     $newEvidence = clone $evidence;
 
+                    /* For some reason this is necessary. The MutableFieldsOnly translator spawns a new Moment instance,
+                     * disconnecting it from the relationship contained inside each Evidence instance. This means we have
+                     * to map the ids manually, which seems a bit counter-intuitive.
+                     */
+                    $newEvidence->setMoment($momentModel);
+
                     $momentModel->getEvidence()->add($newEvidence);
                 }
             }
@@ -342,20 +451,16 @@ class Controller extends Base
                 }
             }
 
+            /* Save the set of $folders to each person's learning moment
+             */
+            $momentModel->setFolders($folders);
+
             $momentCollection->add($momentModel);
         }
 
         $this->mapper->save($momentCollection);
 
-        /* For some reason this is necessary. The MutableFieldsOnly translator spawns a new Moment instance,
-         * disconnecting it from the relationship contained inside each Evidence instance. This means we have
-         * to map the ids manually, which seems a bit counter-intuitive.
-         */
         foreach ($momentCollection as $moment) {
-            foreach ($moment->getEvidence() as $evidence) {
-                $evidence->setMoment($moment);
-            }
-
             $this->mapper->saveEvidence($moment);
         }
 
@@ -380,6 +485,13 @@ class Controller extends Base
      */
     public function getModifyForm(Model $evidence): void
     {
+        /* TODO rename
+         *  Temporary rewrite of misnamed var, but this is linked to the Module implementation
+         *  which is potentially going to affect api behaviour, do this gently for now. You'd
+         *  have to modify preloadEvidence otherwise, which would affect way more things
+         */
+        $moment = $evidence;
+
         /* TODO massive assumption atm
          *  This was predicated on moments having exactly one file associated with it,
          *  but now there can be many files associated with it. Display the first
@@ -392,14 +504,14 @@ class Controller extends Base
          * type which are defined in Evidence\Model. These can be photo/video/audio/upload for now.
          * In the absence of any evidence, we presume text-only, which is MOMENT_TYPE_TEXT.
          */
-        $momentType = $evidence->getEvidence()->first()?->getType() ?? Evidence\Model::MOMENT_TYPE_TEXT;
+        $momentType = $moment->getEvidence()->first()?->getType() ?? Evidence\Model::MOMENT_TYPE_TEXT;
         $template   = $this->getTemplateFromType($momentType);
 
         /* Attachzone stuff for existing attachments
          */
         $zone = $this->buildAttachzone($momentType);
-        if ($evidence->getEvidence()->first()?->getStorage()) {
-            $zone->attachFiles([$evidence->getEvidence()->first()->getStorage()->getHash()]);
+        if ($moment->getEvidence()->first()?->getStorage()) {
+            $zone->attachFiles([$moment->getEvidence()->first()->getStorage()->getHash()]);
         }
 
         /* Students get their learning moment moderation requirement tested;
@@ -413,21 +525,48 @@ class Controller extends Base
             $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $evidence->getRecipient()->getYear());
         }
 
+        /* These are folders that the recipient can see via their membership;
+         * Note that a staff member might edit a student's learning moment, so you have to use
+         * the recipient's user instance, not the viewer's
+         */
+        $folders = null;
+
+        /* findAllForUser() disregards the SERVICE_HOMEPAGE filter when combining internal folders
+         * with external folders via the sis, allowing for some folders to potentially be revealed
+         * that should otherwise have been precluded.
+         */
+        $userAccesses = $this->userAccessMapper->findAllForUser($moment->getRecipient())
+            ->filter(function (UserAccess $access) {
+                return UserAccess::SERVICE_HOMEPAGE === $access->getService();
+            });
+
+        if ($userAccesses->count()) {
+            $folders = $this->folderMapper->findByColumn('id', $userAccesses->getPropertyValues('serviceIdentifier'));
+        }
+
+        /* These folder ids were associated with the learning moment
+         */
+        $selectedFolders = $moment->getFolders()->getPropertyValues('id');
+
         $params = [
-            'evidence'                 => $evidence,
-            'users'                    => $evidence->getRecipient(),
-            'userIds'                  => $evidence->getRecipient()->getId(),
+            'evidence'                 => $moment,
+            'users'                    => $moment->getRecipient(),
+            'userIds'                  => $moment->getRecipient()->getId(),
             'otherUsers'               => [],
-            'sharingForSelf'           => $this->getUser() === $evidence->getRecipient(),
+            'sharingForSelf'           => $this->getUser() === $moment->getRecipient(),
             'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
             'moderationRequired'       => $moderationRequired,
             'isCreate'                 => false,
             'momentType'               => $momentType,
-            'curriculumCodes'          => $evidence->getViewableCurriculumNodes()?->reindex(),
+            'curriculumCodes'          => $moment->getViewableCurriculumNodes()?->reindex(),
             'zone'                     => $zone->getTwigContext(),
-            'hasComments'              => $this->hasComments($evidence),
+            'hasComments'              => $this->hasComments($moment),
             'returnUrl'                => $this->requestQuery->get('returnUrl'),
             'editorTemplates'          => $this->editorTemplateHelper->getTemplatesForCategory(),
+            /* Folder relationships
+             */
+            'folders' => $folders,
+            'selectedFolders' => $selectedFolders,
         ];
 
         $this->response = $this->responseFromTemplate(
@@ -446,27 +585,34 @@ class Controller extends Base
      */
     public function putEvidence(Model $evidence): void
     {
-        $requestBody       = $this->request->getParsedBody();
+        /* TODO rename
+         *  Temporary rewrite of misnamed var, but this is linked to the Module implementation
+         *  which is potentially going to affect api behaviour, do this gently for now. You'd
+         *  have to modify preloadEvidence otherwise, which would affect way more things
+         */
+        $moment = $evidence;
+
+        $requestBody  = $this->request->getParsedBody();
 
         $requestTranslator = new \Schoolbox\Learning\Moment\Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
         $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
-        $tokenReplacer     = new TokenReplacer\Student(new TokenReplacer\Simple());
-        $evidence          = $requestTranslator($requestBody, $evidence)
-            ->setBody($tokenReplacer->replace($evidence->getBody(), $evidence->getRecipient()));
+        $tokenReplacer  = new TokenReplacer\Student(new TokenReplacer\Simple());
+        $moment  = $requestTranslator($requestBody, $moment)
+            ->setBody($tokenReplacer->replace($moment->getBody(), $moment->getRecipient()));
 
         if ($requestBody['draft'] ?? false) {
             // autosave draft, save as draft
-            $evidence->draft();
+            $moment->draft();
         }
 
-        $this->mapper->save($evidence);
+        $this->mapper->save($moment);
 
         /**
          * use buildTranslatorWithComments as that contains the _links needed for draft.js
          * where the other translator had excluded _links (for historic reasons)
          */
         $responseTranslator = $this->buildTranslatorWithComments(1);
-        $this->response     = $this->responseAsJson($responseTranslator($evidence));
+        $this->response     = $this->responseAsJson($responseTranslator($moment));
     }
 
     /**
@@ -721,7 +867,7 @@ class Controller extends Base
 
 
     /**
-     * Place $evidence into the new state $state, along with any modifications made to its
+     * Place $moment into the new state $state, along with any modifications made to its
      * body, tags, curric nodes, etc. via the Modify form. This might not always be how we
      * putWithState() since you can do this directly from the CTAs on the Activity Feed.
      *
@@ -733,6 +879,13 @@ class Controller extends Base
      */
     private function putWithState(Model $evidence, string $state): array
     {
+        /* TODO rename
+         *  Temporary rewrite of misnamed var, but this is linked to the Module implementation
+         *  which is potentially going to affect api behaviour, do this gently for now. You'd
+         *  have to modify preloadEvidence otherwise, which would affect way more things
+         */
+        $moment = $evidence;
+
         $requestBody = $this->request->getParsedBody();
 
         /* This might be empty if submitting directly from the activity feed;
@@ -744,16 +897,21 @@ class Controller extends Base
             $requestTranslator = new \Schoolbox\Learning\Moment\Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
             $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
             $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
-            $evidence = $requestTranslator($requestBody, $evidence)->setBody($tokenReplacer->replace($evidence->getBody(), $evidence->getRecipient()));
+            $moment = $requestTranslator($requestBody, $moment)->setBody($tokenReplacer->replace($moment->getBody(), $moment->getRecipient()));
         }
 
         /* Shove it into the new state, $state
          */
-        $this->updateState($evidence, $state);
+        $this->updateState($moment, $state);
+
+        /* This is a bit brutal and maybe you can mess around more with a diff,
+         * but this is guaranteed to be correct without all the kerfuffle...for now
+         */
+        $moment->setFolders($this->folderMapper->findByColumn('id', $requestBody['folders']));
 
         /* Save it
          */
-        $this->mapper->save($evidence);
+        $this->mapper->save($moment);
 
         /**
          * use buildTranslatorWithComments as that contains the _links needed for draft.js
@@ -761,11 +919,11 @@ class Controller extends Base
          */
         $responseTranslator = $this->buildTranslatorWithComments(1);
 
-        $translated = $responseTranslator($evidence);
+        $translated = $responseTranslator($moment);
 
         /* A shortcut to urls for changing states in this learning moment
          */
-        $translated['_links'] = $this->getNextRoutes($evidence);
+        $translated['_links'] = $this->getNextRoutes($moment);
 
         return $translated;
     }

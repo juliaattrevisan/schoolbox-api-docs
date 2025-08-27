@@ -133,6 +133,44 @@ class AllFieldsTest extends TestCase
             $moment,
             $storage
         ];
+
+        /* Folder assignation
+         */
+        $moment = (new Model())
+            ->setFolders((new \Schoolbox\GenericCollection(\Schoolbox\Resource\Folder\Model::class))
+                ->add(
+                    (new \Schoolbox\Resource\Folder\Model())
+                        ->setId(80)
+                        ->setName('English')
+                        ->setCodes((new \Schoolbox\GenericCollection(\Schoolbox\Resource\Folder\Code\Model::class))
+                            ->add((new \Schoolbox\Resource\Folder\Code\Model())->setCode('9ENGA'))
+                            ->add((new \Schoolbox\Resource\Folder\Code\Model())->setCode('ENGAAAAAA')))
+                )
+                ->add(
+                    (new \Schoolbox\Resource\Folder\Model())
+                        ->setId(123)
+                        ->setName('Maximus')
+                        ->setCodes((new \Schoolbox\GenericCollection(\Schoolbox\Resource\Folder\Code\Model::class))
+                            ->add((new \Schoolbox\Resource\Folder\Code\Model())->setCode('MAAAAXIMUS')))
+                ));
+
+        yield 'related folders' => [
+            [
+                'folders' => [
+                    [
+                        'id' => 80,
+                        'name' => 'English',
+                        'code' => '9ENGA,ENGAAAAAA',
+                    ],
+                    [
+                        'id' => 123,
+                        'name' => 'Maximus',
+                        'code' => 'MAAAAXIMUS',
+                    ]
+                ],
+            ],
+            $moment
+        ];
     }
 
 

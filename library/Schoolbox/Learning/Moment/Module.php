@@ -331,6 +331,7 @@ class Module extends BaseModule
             ),
             $this->getMapperFactory()->get(\Schoolbox\Permission\Access\UserAccessMapper::class),
             new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfig())),
+            $this->getMapperFactory()->get(\Schoolbox\Resource\Folder\Mapper::class)
         );
     }
 

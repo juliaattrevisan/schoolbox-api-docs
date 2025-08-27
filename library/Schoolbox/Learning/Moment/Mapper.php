@@ -93,6 +93,18 @@ class Mapper extends BaseMapper
                 'other_key' => 'moment_id',
             ]
         );
+
+        $this->joinsVia(
+            'moment_folder',
+            \Schoolbox\Resource\Folder\Mapper::class,
+            'id',
+            'folder_id',
+            'moment_id',
+            null,
+            null,
+            null,
+            'folders'
+        );
     }
 
 
@@ -212,6 +224,10 @@ class Mapper extends BaseMapper
              */
             $model->setEvidence($this->getJoinMapper('moment_evidence')->createCollection());
 
+            /* Initialise folder relationship stack
+             */
+            $model->setFolders($this->getJoinMapper('moment_folder')->createCollection());
+
             /* Set submitter/publisher/rejecter
              */
             /** @var \Schoolbox\User $submitter */
@@ -242,6 +258,7 @@ class Mapper extends BaseMapper
          */
         $collection = $this->hydrateTagsIntoCollection($collection);
         $collection = $this->hydrateEvidenceIntoCollection($collection);
+        $collection = $this->hydrateFoldersIntoCollection($collection);
 
         if ($this->getConfigLoader()->get('curriculum_tagging_enabled')) {
             $collection = $this->hydrateCurriculumNodesIntoCollection($collection);
@@ -411,6 +428,39 @@ class Mapper extends BaseMapper
         }
 
         return $nodes;
+    }
+
+
+    /**
+     * Helper method for hydrating folder relationships into the collection of
+     * moments retrieved by `hydrateSelect`.
+     *
+     * @param GenericCollection $collection
+     * @return GenericCollection
+     */
+    private function hydrateFoldersIntoCollection(GenericCollection $collection): GenericCollection
+    {
+        $momentIds = $collection->keys();
+        $pb        = $this->getPredicateBuilder()->in('id', $momentIds);
+        $query     = "
+            SELECT
+                {$this->getColumnString()},
+                {$this->getJoinColumnString('moment_folder', 'f')}
+            FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
+            INNER JOIN {$this->getJoinSql('moment_folder', '', 'f')}
+            WHERE {$pb->getWhereIntersect()}
+        ";
+
+        $momentFolderStatement = $this->database->query($query, $pb->getParams());
+        foreach ($momentFolderStatement as $row) {
+            if ($row['f.id'] !== null) {
+                //only step into if the folder is NOT deleted
+                /** @var \Schoolbox\Resource\Folder\Model $momentFolder */
+                $momentFolder = $this->hydrateJoin($row, 'moment_folder', 'f');
+                $collection[$row['id']]->getFolders()->setOffset($momentFolder->getId(), $momentFolder);
+            }
+        }
+        return $collection;
     }
 
 
