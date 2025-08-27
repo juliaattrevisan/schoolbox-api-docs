@@ -246,7 +246,7 @@ class Controller extends WebController\Base
 
             $data = [
                 'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $courseMarkbook->getRanking() : null,
-                'assessments' => $courseMarkbook->getCollapsedAssessments()->reindex()->map(function (IAssessable $assessment, $sequence) use ($courseMarkbook, $unitSpecs, $courseSpec) {
+                'assessments' => $courseMarkbook->getCollapsedAssessments()->reindex()->map(function (IAssessable $assessment, $sequence) use ($courseMarkbook, $unitSpecs) {
                     $unitAssessmentsTranslator = new UnitAssessments(
                         $this->routeGenerator,
                         $this->getAuthorizer(),
@@ -280,12 +280,10 @@ class Controller extends WebController\Base
                         '_routes'         => [
                             'postFeedbacks' => $assessment->isSpecification()
                                 ? $this->getRouteIfAuthorized(
-                                    'courseStatus.postPublishFeedback',
+                                    'learningDueWorkFeedback.postParticipantFeedbacks',
                                     [
                                         'assessment'   => $assessment,
                                         'assessmentId' => $assessment->getId(),
-                                        'courseSpec'   => $courseSpec,
-                                        'courseSpecId' => $courseSpec->getId(),
                                     ]
                                 )
                                 : null,

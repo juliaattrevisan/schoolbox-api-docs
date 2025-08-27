@@ -28,7 +28,7 @@
 
 {% block headerOptions %}
     {% set kamiWorksheetRoute = routeLookupIfAuthorized('learningAssessment.getWorksheet', {assessmentId: assessment.id, assessment: assessment}) %}
-    {% if assessment.enableWorksheet and assessment.kamiWorksheetTemplate and kamiWorksheetRoute %}
+    {% if assessment.enableWorksheet and assessment.kamiWorksheetTemplate and kamiWorksheetRoute and assessment.isImplementation%}
         <li>
             <a id="kamiWorksheet" class="icon-surveys" href="{{ kamiWorksheetRoute }}">Class View</a>
         </li>
@@ -37,35 +37,37 @@
         <a id="import-feedback" data-reveal-id="importFeedbackModal" class="icon-upload">Import Feedback</a>
     </li>
 
-    {% if blindReviewUrl %}
-    <li>
-        <a href="{{ blindReviewUrl }}" class="icon-task">Blind Review</a>
-    </li>
-    {% endif %}
-
-    {% if download %}
-        <li><a class="icon-download" data-mass="publish" data-reveal-id="mass-download">Download All</a></li>
-    {% endif %}
-
-    {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessment.id, assessment: assessment}) %}
-    {% if similarityReportRoute %}
-        <li><a href="{{ similarityReportRoute }}" class="icon-due-work">Similarity Report</a></li>
-    {% endif %}
-
-    {% if assessment.useRubric %}
+    {% if assessment.isImplementation %}
+        {% if blindReviewUrl %}
         <li>
-            <a href="{{ routeLookup('learningAssessment.getOverview', { assessmentId: assessment.id }) }}"
-               class="icon-criteria">Rubric Report</a>
+            <a href="{{ blindReviewUrl }}" class="icon-task">Blind Review</a>
         </li>
-    {% endif %}
-    {% if not readonly %}
-        <li class="separator">Bulk Actions</li>
-        <li><a class="icon-approve" data-mass="submit" data-reveal-id="manage-submissions">Manage submissions</a></li>
-        <li><a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish">Publish grades & feedback</a></li>
+        {% endif %}
 
-        {% set rescoreRoute = routeLookupIfAuthorized('learningAssessment.getRescore', {assessment: assessment, assessmentId: assessment.id}) %}
-        {% if rescoreRoute %}
-            <li><a class="icon-due-work" href="{{ rescoreRoute }}">Rescore {{ locale.grades.plural }}</a></li>
+        {% if download %}
+            <li><a class="icon-download" data-mass="publish" data-reveal-id="mass-download">Download All</a></li>
+        {% endif %}
+
+        {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessment.id, assessment: assessment}) %}
+        {% if similarityReportRoute %}
+            <li><a href="{{ similarityReportRoute }}" class="icon-due-work">Similarity Report</a></li>
+        {% endif %}
+
+        {% if assessment.useRubric %}
+            <li>
+                <a href="{{ routeLookup('learningAssessment.getOverview', { assessmentId: assessment.id }) }}"
+                   class="icon-criteria">Rubric Report</a>
+            </li>
+        {% endif %}
+        {% if not readonly %}
+            <li class="separator">Bulk Actions</li>
+            <li><a class="icon-approve" data-mass="submit" data-reveal-id="manage-submissions">Manage submissions</a></li>
+            <li><a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish">Publish grades & feedback</a></li>
+
+            {% set rescoreRoute = routeLookupIfAuthorized('learningAssessment.getRescore', {assessment: assessment, assessmentId: assessment.id}) %}
+            {% if rescoreRoute %}
+                <li><a class="icon-due-work" href="{{ rescoreRoute }}">Rescore {{ locale.grades.plural }}</a></li>
+            {% endif %}
         {% endif %}
     {% endif %}
 {% endblock %}

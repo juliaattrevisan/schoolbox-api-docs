@@ -144,11 +144,9 @@
             </div>
         </div>
         {% endif %}
-        {# each class assessment may have different mark scheme / other settings, use that assessment, not the spec #}
-        {% set assessment = aImpl.assessment %}
-        {% set includedParticipants = assessment.allParticipants | filter(participant => not participant.isExcluded) %}
+        {% set includedParticipants = aImpl.assessment.allParticipants | filter(participant => not participant.isExcluded) %}
         {% if includedParticipants | length %}
-            <div class="row" {% if isSpecification %}data-collapse-state="uncollapsed" data-collapsable="collap-{{ assessment.id }}" {% endif %} data-participant-group>
+            <div class="row" {% if isSpecification %}data-collapse-state="uncollapsed" data-collapsable="collap-{{ aImpl.assessment.id }}" {% endif %} data-participant-group>
                 <div class="small-12 island">
                     <div class="empty-state hide" data-empty-filter>
                         <i class="icon-staff-students"></i>
@@ -157,22 +155,29 @@
                             Add another filter or <a data-filter-show-all>show everything</a>.
                         </p>
                     </div>
-                    <section class="content" data-participant-loader data-assessment="{{ assessment.id }}">
+                    <section class="content" data-participant-loader data-assessment="{{ aImpl.assessment.id }}">
                         <div class="loader"></div>
                     </section>
-                    <section data-assessment-status data-assessment="{{ assessment.id }}" class="hide">
+                    <section data-assessment-status data-assessment="{{ aImpl.assessment.id }}" class="hide">
                         <ul class="information-list {{ listClass }}">
                             {% for participant in includedParticipants %}
 
                                 {# Construct that represents a participant #}
                                 {% set routeArgs = {
                                     viewee: participant.user,
-                                    assessmentId: assessment.id,
-                                    assessment: assessment,
+                                    assessmentId: aImpl.assessment.id,
+                                    assessment: aImpl.assessment,
                                     student: participant.user,
                                     studentId: participant.user.id
                                 } %}
+
+                                {# each class assessment may have different mark scheme / other settings, use that assessment, not the spec #}
+                                {% set specAssessment = assessment %}
+                                {% set assessment = aImpl.assessment %}
                                 {% block participant %}{% endblock %}
+                                {# reset back to the spec #}
+                                {% set assessment = specAssessment %}
+
                             {% endfor %}
                         </ul>
                     </section>
@@ -211,6 +216,9 @@
 <script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}'></script>
 <script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/activityStatusPage.js?v={{ config.site_version }}'></script>
 <script type="text/javascript">
+    $(function () {
+        $('[data-collapser]').collapsable();
+    });
     document.dispatchEvent(new CustomEvent('ACTIVITY_STATUS_PAGE_INIT', {
         detail: {
             pageItemLimit: 25,

@@ -18,6 +18,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as 
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
@@ -177,55 +178,80 @@ class Controller extends Base
         $draftFeedbackIds = $this->requestPost->get('drafts', []);
         $now              = Alaress_Date_Format::now();
         $results = [];
+        $projectCache = (new Project\ResultCache\ResultCache($this->projectResultCacheMapper));
+
+        /* if this is a spec assessment, we want all implementation children assessments,
+         * with hydrated participants so we can publish all the users quickly and easily.
+         *
+         * we should be using filters, so we aren't hydrating all participation for all time....
+        */
+        $aImpls = new GenericCollection(DueWork\Model::class);
+        if ($assessment->isSpecification()) {
+            $aImpls = $this->assessmentDataSource
+                ->findAllImplementationsBySpecificationId($assessment->getId())
+                ->indexBy('id');
+
+            // hydrate participants
+            $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($aImpls, null, true);
+        } else {
+            $aImpls->add($assessment)->indexBy('id');
+        }
 
         foreach ($draftFeedbackIds as $draftFeedbackId) {
             // Verify that this return is for this assessment
             $submissionReturn = $this->returnedWorkMapper->findById($draftFeedbackId);
             $publishSuccess   = false;
 
-            if ($submissionReturn->getSubmissionBox()->getAssessmentModel()->getId() === $assessment->getId()) {
-                $submissionReturn->setPublishedAt($now);
+            // hydrate the duework assessment, not just the feedback joined assessment minimal modal.
+            /** @var \Schoolbox\Learning\Assessment\DueWork\Model $assessment */
+            $aImpl = $aImpls->getBy('id', $submissionReturn->getSubmissionBox()->getAssessmentModel()->getId());
 
-                try {
-                    $this->returnedWorkMapper->save($submissionReturn);
-                    $publishSuccess = true;
+            if (!$aImpl) {
+                $results[$draftFeedbackId] = ['publishSuccess' => false, 'error' => 'Assessment not found'];
+                continue;
+            }
 
-                    // Find the Kami worksheet (if it exists)
-                    if ($submissionReturn->getSubmission()) {
-                        $responses = $this->responseDataSource->findForAssessment($assessment, $submissionReturn->getSubmission()->getOwner());
-                        if (0 !== $responses->count()) {
-                            $response = null;
-                            foreach ($responses as $responseCurrent) {
-                                if ($responseCurrent->getId() == $submissionReturn->getSubmission()->getId()) {
-                                    $response = $responseCurrent;
-                                    break;
-                                }
-                            }
+            $submissionReturn->setPublishedAt($now);
 
-                            // attempt to clean as we go
-                            unset($responses);
+            try {
+                $this->returnedWorkMapper->save($submissionReturn);
+                $publishSuccess = true;
 
-                            /** @var ?DueWork\Response\Model $response */
-                            $kamiModel = $response?->getAllFiles()->filter(function (SubmissionFile $file) {
-                                return $file->getIsWorksheet();
-                            })->first()?->getKami();
-                            if ($kamiModel) {
-                                // Save the kami doc to the feedback object
-                                $this->kamiConnector->initiatePollingForKamiDownload(
-                                    $kamiModel,
-                                    'feedback',
-                                    $this->getUser(),
-                                );
+                // Find the Kami worksheet (if it exists)
+                if ($submissionReturn->getSubmission()) {
+                    $responses = $this->responseDataSource->findForAssessment($aImpl, $submissionReturn->getSubmission()->getOwner());
+                    if (0 !== $responses->count()) {
+                        $response = null;
+                        foreach ($responses as $responseCurrent) {
+                            if ($responseCurrent->getId() == $submissionReturn->getSubmission()->getId()) {
+                                $response = $responseCurrent;
+                                break;
                             }
                         }
-                    }
 
-                    /* Update project result cache when Publish All is used
-                     */
-                    (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $submissionReturn->getOwner());
-                } catch (PDOException | \DomainException | \InvalidArgumentException | \LogicException | \UnexpectedValueException$e) {
-                    $publishSuccess = false;
+                        // attempt to clean as we go
+                        unset($responses);
+
+                        /** @var ?DueWork\Response\Model $response */
+                        $kamiModel = $response?->getAllFiles()->filter(function (SubmissionFile $file) {
+                            return $file->getIsWorksheet();
+                        })->first()?->getKami();
+                        if ($kamiModel) {
+                            // Save the kami doc to the feedback object
+                            $this->kamiConnector->initiatePollingForKamiDownload(
+                                $kamiModel,
+                                'feedback',
+                                $this->getUser(),
+                            );
+                        }
+                    }
                 }
+
+                /* Update project result cache when Publish All is used
+                 */
+                $projectCache->refresh($this->assessmentDataSource, $aImpl, $submissionReturn->getOwner());
+            } catch (PDOException | \DomainException | \InvalidArgumentException | \LogicException | \UnexpectedValueException $e) {
+                $publishSuccess = false;
             }
 
             $results[$draftFeedbackId] = ['publishSuccess'   => $publishSuccess];
