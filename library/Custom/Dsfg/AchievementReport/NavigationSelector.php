@@ -163,6 +163,7 @@ class NavigationSelector
 
         $availableNavigation = [];
 
+        // For year 11 students only, the MYP tab changes position from its regular place here, to its new place below.
         if ($userYear !== '11' && $this->hasMYP()) {
             $availableNavigation[self::MYP_KEY] = [
                 'url' => $this->routeGenerator->generate('achievementreport.getMyp', [
@@ -219,6 +220,7 @@ class NavigationSelector
             ];
         }
 
+        // For year 11 students only, the MYP tab changes position from its regular place above, to its new place here.
         if ($userYear === '11' && $this->hasMYP()) {
             $availableNavigation[self::MYP_KEY] = [
                 'url' => $this->routeGenerator->generate('achievementreport.getMyp', [
