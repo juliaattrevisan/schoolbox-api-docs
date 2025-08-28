@@ -199,8 +199,20 @@ class Controller extends Base
         }
 
         $translator = $this->buildTranslatorWithComments(1);
+
+        /* If there's exactly one recipient, use that User instance as the recipient
+         * Otherwise, fall back to default global moderation requirement to determine what call to action is here
+         */
+        if (1 === $users->count()) {
+            $recipient = $this->getUser();
+        } else {
+            /* Multiple people: just have the publish button I guess?
+             */
+            $recipient= new User();
+        }
+
         $moment = $this->mapper->createModel()
-            ->setRecipient(new User())
+            ->setRecipient($recipient)
             ->setCreator($this->getUser())
             ->draft();
 
