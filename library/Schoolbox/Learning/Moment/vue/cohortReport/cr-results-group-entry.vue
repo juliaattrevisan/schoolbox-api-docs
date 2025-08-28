@@ -135,7 +135,6 @@ function spawnLightbox(file: StorageFile): void {
                     <storage-object
                         :key="selectedEvidence.hash"
                         :storage="selectedEvidence"
-                        :filename="selectedEvidence.name"
                         style="max-height: 10rem"
                         maintain-dims
                         data-test="learning-moment-evidence-media"

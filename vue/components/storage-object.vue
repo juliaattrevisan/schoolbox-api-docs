@@ -14,7 +14,6 @@ import { ResourceType, type StorageFile } from "@js/resource/resourceUtils";
 
 interface Props {
     storage: StorageFile;
-    filename: string;
     /**
      * Whether to force the width/height of the parent element to be the same
      * as the video element so that mejs doesn't try to resize it
@@ -155,9 +154,9 @@ function filesize(size: number | null): string {
     >
         <source type="audio/mpeg" :src="storage._links.stream" />
     </audio>
-    <img v-else-if="storage.type === 'image'" ref="playerRef" :src="storage._links.image" :alt="filename" />
+    <img v-else-if="storage.type === 'image'" ref="playerRef" :src="storage._links.image" :alt="storage.name" />
     <a v-else ref="playerRef" :href="storage._links.fetch">
-        <img :src="storage._links.icon" :alt="filename" /> {{ filename }}
+        <img :src="storage._links.icon" :alt="storage.name" /> {{ storage.name }}
         <span class="meta">({{ filesize(storage.size) }})</span>
     </a>
 </template>

@@ -67,19 +67,15 @@ class MutableFieldsOnlyTest extends TestCase
 
         $evidence = (new \Schoolbox\Learning\Moment\Evidence\Model())
             ->setMoment($moment)
-            ->setStorage($storage)
-            ->setFilename('test.gif');
+            ->setStorage($storage);
 
         $moment->getEvidence()->add($evidence);
 
         yield 'storage' => [
             [
-                'evidence'  => [
-                    [
-                        'hash' => '1234567890123456789012345678901234567890',
-                        'filename' => 'test.gif',
-                    ]
-                ],
+                [
+                    'hash' => '1234567890123456789012345678901234567890',
+                ]
             ],
             $moment
         ];
@@ -110,8 +106,7 @@ class MutableFieldsOnlyTest extends TestCase
 
         $evidence = (new \Schoolbox\Learning\Moment\Evidence\Model())
             ->setMoment($moment)
-            ->setStorage($storage)
-            ->setFilename('test.gif');
+            ->setStorage($storage);
 
         $moment->getEvidence()->add($evidence);
 
@@ -153,9 +148,7 @@ class MutableFieldsOnlyTest extends TestCase
             ->setEvidence(new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class));
 
         $baseModel->getEvidence()->add((new \Schoolbox\Learning\Moment\Evidence\Model())
-            ->setType(\Schoolbox\Learning\Moment\Evidence\Model::MOMENT_TYPE_UPLOAD)
-            ->setStorage((new Storage())->setHash('1234567890123456789012345678901234567890'))
-            ->setFilename('test.gif'));
+            ->setStorage((new Storage())->setHash('1234567890123456789012345678901234567890')));
 
         // ID is not mutable
         yield 'update id' => [

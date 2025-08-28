@@ -31,10 +31,7 @@ export type LearningMoment = {
             metadata: Metadata;
         };
     };
-    evidence: {
-        storage: StorageFile;
-        filename: string;
-    }[];
+    evidence: StorageFile[];
     tags: SelectizeSelectorItem[] | null;
     _links: {
         createThread?: string | null;

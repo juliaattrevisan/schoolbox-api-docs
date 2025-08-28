@@ -165,12 +165,10 @@ export default {
                             <section class="banner content">
                                 <!-- Is there an attachment? Display it appropriately -->
                                 <!-- The wrapping div is expected by mepUtils.fixVideoPlayerDimensions(). -->
-                                <div v-if="evidence.filename && evidence.storage" class="feed-body small-12 columns">
+                                <!-- TODO: this is totally wrong -->
+                                <div v-if="evidence.storage" class="feed-body small-12 columns">
                                     <article>
-                                        <storage-object
-                                            :storage="evidence.storage"
-                                            :filename="evidence.filename"
-                                        ></storage-object>
+                                        <storage-object :storage="evidence.storage" />
                                     </article>
                                 </div>
                             </section>

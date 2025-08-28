@@ -132,12 +132,6 @@ class Controller extends Base
             }
         }
 
-        // Which variant is being shown?
-        // * text
-        // * upload
-        $momentType = $this->requestQuery->get('momentType') ?: Evidence\Model::MOMENT_TYPE_TEXT;
-        $template   = $this->getTemplateFromType($momentType);
-
         /* These are folders that the recipient can see via their membership;
          * Note that a staff member might edit a student's learning moment, so you have to use
          * the recipient's user instance, not the viewer's
@@ -282,8 +276,7 @@ class Controller extends Base
             'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
             'moderationRequired'       => $moderationRequired,
             'isCreate'                 => true,
-            'momentType'               => $momentType,
-            'zone'                     => $this->buildAttachzone($momentType)->getTwigContext(),
+            // 'zone'                     => $this->buildAttachzone($momentType)->getTwigContext(),
             'editorTemplates'          => $this->editorTemplateHelper->getTemplatesForCategory(),
             /* Folder relationships
              */
@@ -291,7 +284,7 @@ class Controller extends Base
             'selectedFolders' => $selectedFolders,
         ];
 
-        $this->response = $this->responseFromTemplate($template, $params);
+        $this->response = $this->responseFromTemplate('@learningMomentEvidence/form.twig', $params);
     }
 
 
@@ -529,27 +522,12 @@ class Controller extends Base
          */
         $moment = $evidence;
 
-        /* TODO massive assumption atm
-         *  This was predicated on moments having exactly one file associated with it,
-         *  but now there can be many files associated with it. Display the first
-         *  evidence by default until a user changes it, I guess?
-         */
-
-        /* Each moment has a body of text that always exists. The default usage here is MOMENT_TYPE_TEXT.
-         *
-         * Additionally, a learning moment comes with an optional piece(s) of evidence with a particular
-         * type which are defined in Evidence\Model. These can be photo/video/audio/upload for now.
-         * In the absence of any evidence, we presume text-only, which is MOMENT_TYPE_TEXT.
-         */
-        $momentType = $moment->getEvidence()->first()?->getType() ?? Evidence\Model::MOMENT_TYPE_TEXT;
-        $template   = $this->getTemplateFromType($momentType);
-
         /* Attachzone stuff for existing attachments
          */
-        $zone = $this->buildAttachzone($momentType);
-        if ($moment->getEvidence()->first()?->getStorage()) {
-            $zone->attachFiles([$moment->getEvidence()->first()->getStorage()->getHash()]);
-        }
+        // $zone = $this->buildAttachzone($momentType);
+        // if ($moment->getEvidence()->first()?->getStorage()) {
+        //     $zone->attachFiles([$moment->getEvidence()->first()->getStorage()->getHash()]);
+        // }
 
         /* Students get their learning moment moderation requirement tested;
          * parents and teachers bypass this check
@@ -610,9 +588,8 @@ class Controller extends Base
             'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
             'moderationRequired'       => $moderationRequired,
             'isCreate'                 => false,
-            'momentType'               => $momentType,
             'curriculumCodes'          => $moment->getViewableCurriculumNodes()?->reindex(),
-            'zone'                     => $zone->getTwigContext(),
+            // 'zone'                     => $zone->getTwigContext(),
             'hasComments'              => $this->hasComments($moment),
             'returnUrl'                => $this->requestQuery->get('returnUrl'),
             'editorTemplates'          => $this->editorTemplateHelper->getTemplatesForCategory(),
@@ -622,10 +599,7 @@ class Controller extends Base
             'selectedFolders' => $selectedFolders,
         ];
 
-        $this->response = $this->responseFromTemplate(
-            $template,
-            $params
-        );
+        $this->response = $this->responseFromTemplate('@learningMomentEvidence/form.twig', $params);
     }
 
 
@@ -751,29 +725,6 @@ class Controller extends Base
                 break;
         }
         return $zone;
-    }
-
-
-    /**
-     * Finds template name from moment type
-     * @param string $momentType
-     * @return string
-     */
-    private function getTemplateFromType(string $momentType): string
-    {
-        switch ($momentType) {
-            case Evidence\Model::MOMENT_TYPE_PHOTO:
-                return '@learningMomentEvidence/form/photo.twig';
-            case Evidence\Model::MOMENT_TYPE_AUDIO:
-                return '@learningMomentEvidence/form/audio.twig';
-            case Evidence\Model::MOMENT_TYPE_VIDEO:
-                return '@learningMomentEvidence/form/video.twig';
-            case Evidence\Model::MOMENT_TYPE_UPLOAD:
-                return '@learningMomentEvidence/form/upload.twig';
-            case Evidence\Model::MOMENT_TYPE_TEXT:
-            default:
-                return '@learningMomentEvidence/form/text.twig';
-        }
     }
 
 

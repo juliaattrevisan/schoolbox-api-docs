@@ -760,16 +760,13 @@ export default {
                                     <div class="feed-body small-12 columns">
                                         <!-- Is there an attachment? Display it appropriately -->
                                         <article
-                                            v-if="
-                                                evidence.object.evidence[0]?.filename &&
-                                                evidence.object.evidence[0]?.storage
-                                            "
+                                            v-for="storageFile in evidence.object.evidence"
+                                            :key="storageFile.hash"
                                         >
                                             <storage-object
-                                                :storage="evidence.object.evidence[0].storage"
-                                                :filename="evidence.object.evidence[0].filename"
+                                                :storage="storageFile"
                                                 data-test="learning-moment-evidence-media"
-                                            ></storage-object>
+                                            />
                                         </article>
 
                                         <!-- Display evidence body, with media players initialised -->

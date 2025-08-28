@@ -77,8 +77,6 @@ class BaseTest extends TestCase
                 ->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class))->add(
                     (new \Schoolbox\Learning\Moment\Evidence\Model())
                         ->setStorage((new Storage())->setHash('1234567890123456789012345678901234567890'))
-                        ->setFilename('test.gif')
-                        ->setType(\Schoolbox\Learning\Moment\Evidence\Model::MOMENT_TYPE_UPLOAD)
                 ))
                 ->setCreator((new User())->setId(55))
                 ->setRecipient((new User())->setId(193))

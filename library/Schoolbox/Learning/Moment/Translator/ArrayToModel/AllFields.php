@@ -155,10 +155,7 @@ class AllFields extends Base
                             if ($file) {
                                 $evidence = new \Schoolbox\Learning\Moment\Evidence\Model();
 
-                                $evidence->setMoment($model)
-                                    ->setStorage($file)
-                                    ->setFilename($file->getBasename())
-                                    ->setType($json['type']);
+                                $evidence->setMoment($model)->setStorage($file);
 
                                 if (null === $model->getEvidence()) {
                                     $model->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class)));

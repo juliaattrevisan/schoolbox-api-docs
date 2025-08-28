@@ -35,15 +35,6 @@ class Model implements IFile
      */
     private ?\Schoolbox\Learning\Moment\Model $moment = null;
 
-
-    /**
-     * The type of evidence: photo/text/upload/video/audio
-     *
-     * @var string|null
-     */
-    private ?string $type = null;
-
-
     /**
      * @return User
      */
@@ -69,26 +60,6 @@ class Model implements IFile
     public function setMoment(?\Schoolbox\Learning\Moment\Model $moment): self
     {
         $this->moment = $moment;
-        return $this;
-    }
-
-
-    /**
-     * @return string|null
-     */
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
-
-
-    /**
-     * @param string|null $type
-     * @return $this
-     */
-    public function setType(?string $type): self
-    {
-        $this->type = $type;
         return $this;
     }
 }
