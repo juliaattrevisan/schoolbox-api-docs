@@ -113,10 +113,15 @@ class NextRoutes
                     $publish = true;
                 }
             } elseif ($moment->isSubmitted()) {
+                /* Draft is a possibility for repeated edits
+                 */
+                $draft = true;
+
                 if ((new ModerationRequired())->isSatisfiedBy($globalModerationRequired, $moment->getRecipient()->getYear())) {
                     /* noop: you need to wait for a staff to progress your learning moment.
                      * Students can't self-publish when moderation is required.
                      */
+                    $submit = true;
                 } else {
                     /* This occurs when a learning moment was in a submitted state and moderation was required,
                      * but then moderation requirement was removed: your content is now in this limbo area where
@@ -132,6 +137,16 @@ class NextRoutes
                  * in draft state
                  */
                 $publish = true;
+            } elseif ($moment->isPublished()) {
+                if ((new ModerationRequired())->isSatisfiedBy($globalModerationRequired, $moment->getRecipient()->getYear())) {
+                    /* If moderation is required; you can't do anything here except send it back to draft
+                     */
+                    $draft = true;
+                } else {
+                    /* Moderation wasn't required: student can just republish whenever they want
+                     */
+                    $publish = true;
+                }
             }
         }
 
