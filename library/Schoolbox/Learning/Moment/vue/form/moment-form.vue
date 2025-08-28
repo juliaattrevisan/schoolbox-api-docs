@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Template } from "@js/editor/types/editorTypes";
 import CurriculumSelector from "@schoolboxCurriculum/vue/curriculumSelector/curriculum-selector.vue";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import type { LearningMoment } from "@schoolboxLearningMomentEvidence/evidenceTypes";
@@ -32,6 +33,7 @@ interface Props {
      * It may not have a meaningful ID yet if props.isCreate is true
      */
     moment: LearningMoment;
+    editorTemplates: Template[];
     endpointGetEvidenceTags: string;
     /** Curriculum Nodes */
     curriculumNodes: Node[];
@@ -87,7 +89,7 @@ window.Vue.onMounted(() => {
             <section>
                 <fieldset class="content">
                     <div class="small-12 columns">
-                        <mf-evidence />
+                        <mf-evidence :editor-templates="props.editorTemplates" />
 
                         <label>
                             Tags

@@ -264,6 +264,7 @@ class Controller extends Base
             'payload' => [
                 'hasAutosave'              => $users->count() === 1, // only autosave on create if there's one target user
                 'evidence' => $translator($moment),
+                'editorTemplates'          => $this->editorTemplateHelper->getTemplatesForCategory(),
                 'createRoutes'         => $createRoutes,
                 'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
                 'curriculumNodes'          => [],
@@ -591,6 +592,7 @@ class Controller extends Base
             'payload' => [
                 'hasAutosave'              => true, // can always autosave on the modify form (assuming you have draft perms handled by routes)
                 'evidence'                 => $translator($moment),
+                'editorTemplates'          => $this->editorTemplateHelper->getTemplatesForCategory(),
                 'createRoutes'             => null,
                 'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
                 'curriculumNodes'          => $moment->getViewableCurriculumNodes()?->reindex(),

@@ -1,10 +1,18 @@
 <script setup lang="ts">
 import FileDrop from "@js/resource/file-drop.vue";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
+import { ResourceType } from "@js/resource/resourceUtils";
 import type { AsyncUploadResponseSuccess } from "@js/resource/resourceUtils";
+import type { Template } from "@js/editor/types/editorTypes";
+import TextEditor from "@schoolboxVue/components/ckeditor/text-editor.vue";
 import EvidenceMediaRecording from "@schoolboxLearningMomentEvidence/evidence-media-recording.vue";
 import { useMomentFormStore } from "./store/momentFormStore";
 
+interface Props {
+    editorTemplates: Template[];
+}
+
+const props = defineProps<Props>();
 const mfStore = useMomentFormStore();
 
 enum MediaType {
@@ -15,14 +23,13 @@ enum MediaType {
     TEXT = "text",
 }
 
+// TODO: add limit (10)
+
 const mediaRecordingTypes = [MediaType.VIDEO, MediaType.AUDIO, MediaType.PHOTO];
 const mediaRecordingEl = window.Vue.useTemplateRef<InstanceType<typeof EvidenceMediaRecording>>("mediaRecordingRef");
 
 const mediaType = window.Vue.ref<MediaType | null>(null);
 const currentFileDropFile = window.Vue.ref<FileDropFile | null>(null);
-
-/** Unlike the other types, you can only ever have one text field */
-const showTextEditor = window.Vue.ref(false);
 
 /**
  * Upload the current media recording,
@@ -63,9 +70,15 @@ async function uploadMediaRecording(): Promise<void> {
  * @param type The new media type
  */
 async function changeMediaType(type: MediaType): Promise<void> {
+    if (!mfStore.moment) return;
+
     // If the current media type is a recording type, and there's recorded data, upload it first
     if (mediaType.value && mediaRecordingTypes.includes(mediaType.value)) {
         await uploadMediaRecording();
+    }
+
+    if (type === MediaType.TEXT && mfStore.moment.body === null) {
+        mfStore.moment.body = ""; // ensure body is a string if switching to text so that the editor shows up
     }
 
     mediaType.value = type;
@@ -94,6 +107,11 @@ function deleteEvidence(index: number): void {
     {% endif %}
  */
 
+const editorSettings = window.Vue.computed(() => ({
+    hasTokens: window.schoolboxUser.role.staff,
+    templates: props.editorTemplates,
+}));
+
 window.Vue.onMounted(() => {
     if (mfStore.moment === null) {
         console.warn("no moment found, cannot add evidence");
@@ -103,15 +121,36 @@ window.Vue.onMounted(() => {
     // derive the initial media type from the URL param "momentType"
     const urlParams = new URLSearchParams(window.location.search);
     const momentTypeParam = (urlParams.get("momentType")?.toLowerCase() as MediaType | null) ?? null;
+    const firstEvidenceType = mfStore.moment.evidence[0]?.storage.type ?? null;
 
     if (momentTypeParam && Object.values(MediaType).includes(momentTypeParam)) {
         mediaType.value = momentTypeParam;
+    } else if (firstEvidenceType === ResourceType.VIDEO) {
+        mediaType.value = MediaType.VIDEO;
+    } else if (firstEvidenceType === ResourceType.AUDIO) {
+        mediaType.value = MediaType.AUDIO;
+    } else if (firstEvidenceType === ResourceType.IMAGE) {
+        mediaType.value = MediaType.PHOTO;
+    } else if (firstEvidenceType !== null) {
+        mediaType.value = MediaType.UPLOAD; // some other file type, default to upload
     } else {
-        mediaType.value = null; // no media type selected
+        mediaType.value = MediaType.TEXT; // default back to text
     }
+});
 
-    // if there's already text in the body, show the text editor
-    showTextEditor.value = (mfStore.moment.body ?? "").trim().length > 0;
+/**
+ * Unlike the other media types, you can only ever have one text field
+ * It either shows up the top if you have text selected as the media type,
+ * or it shows up as a "Description" field if you have another media type selected and there's already text in the body
+ */
+const showDescriptionEditor = window.Vue.computed(() => {
+    if (!mfStore.moment) return false;
+
+    // if the media type is text, don't show the description editor (as it's redundant)
+    if (mediaType.value === MediaType.TEXT) return false;
+
+    // otherwise, show it if there's already text in the body (someone has added text previously)
+    return (mfStore.moment.body ?? "").trim().length > 0;
 });
 
 /**
@@ -120,7 +159,7 @@ window.Vue.onMounted(() => {
  */
 window.Vue.watch(
     () => currentFileDropFile.value?.storageHash,
-    async () => {
+    () => {
         if (!mfStore.moment) {
             return;
         }
@@ -156,12 +195,26 @@ window.Vue.watch(
             />
 
             <div v-else-if="mediaType === MediaType.UPLOAD">
-                <label class="required" for="mf-evidence-file-drop"> Upload File </label>
+                <label for="mf-evidence-file-drop" class="required"> Upload File </label>
                 <!-- TODO for speed reasons i've used this, but it should be a proper file input... that's a bit more complex atm -->
                 <file-drop
                     id="mf-evidence-file-drop"
                     v-model:current-file="currentFileDropFile"
                     auto-upload-to-storage
+                />
+            </div>
+
+            <div v-else-if="mediaType === MediaType.TEXT && !showDescriptionEditor">
+                <label for="mf-evidence-textarea" class="required"> Write something </label>
+                <p class="meta">
+                    Student detail tokens can be viewed when you press [. Tokens will be substituted with the students
+                    details on creation.
+                </p>
+                <text-editor
+                    v-if="mfStore.moment && typeof mfStore.moment.body === 'string'"
+                    id="mf-evidence-textarea"
+                    v-model:body="mfStore.moment.body"
+                    :config="editorSettings"
                 />
             </div>
         </div>
@@ -198,6 +251,7 @@ window.Vue.watch(
                 <a
                     class="icon-textbox share-text"
                     title="Write something"
+                    :disabled="showDescriptionEditor || MediaType.TEXT === mediaType"
                     @click.prevent="changeMediaType(MediaType.TEXT)"
                 >
                     Write something
@@ -225,6 +279,21 @@ window.Vue.watch(
                 </nav>
             </div>
         </div>
+    </div>
+
+    <!-- TODO: also spawn this textarea up in the other area when it's the selected type -->
+    <div v-if="mfStore.moment && showDescriptionEditor">
+        <label for="mf-evidence-textarea"> Description </label>
+        <p class="meta">
+            Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details
+            on creation.
+        </p>
+        <text-editor
+            v-if="typeof mfStore.moment.body === 'string'"
+            id="mf-evidence-textarea"
+            v-model:body="mfStore.moment.body"
+            :config="editorSettings"
+        />
     </div>
 </template>
 

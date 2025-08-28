@@ -42,6 +42,7 @@
         return-url="{{ RETURN_URL.previous.decoded ?? '/' }}"
         :create-routes="{{ payload.createRoutes|json_encode }}"
         :moment="{{ payload.evidence|json_encode }}"
+        :editor-templates="{{ payload.editorTemplates|json_encode }}"
         endpoint-get-evidence-tags="{{ routeLookup('learningMomentEvidence.getTags') }}"
         {% if payload.curriculumTaggingEnabled %}
         :curriculum-nodes="{{ payload.curriculumNodes|json_encode }}"
