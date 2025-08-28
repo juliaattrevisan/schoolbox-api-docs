@@ -930,7 +930,37 @@ class Controller extends Base
             $requestTranslator = new \Schoolbox\Learning\Moment\Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory());
             $requestTranslator->setCurriculumTaggingEnabled($this->curriculumTaggingEnabled());
             $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
-            $moment = $requestTranslator($requestBody, $moment)->setBody($tokenReplacer->replace($moment->getBody(), $moment->getRecipient()));
+
+            /* This is a pretty convoluted way of doing things just to decide on a subset of nodes
+             * Anyway, this $baseModel contains any curriculum nodes/tags/evidence you might have altered
+             */
+            $baseModel = (new \Schoolbox\Learning\Moment\Translator\ArrayToModel\MutableFieldsOnly(new CollectorFactory()))($requestBody)
+                ->setCreator($this->getUser());
+
+            $moment = $requestTranslator($requestBody, $moment)
+                ->setBody($tokenReplacer->replace($baseModel->getBody() ?? $moment->getBody(), $moment->getRecipient()))
+                ->setTags($baseModel->getTags() ?? $moment->getTags())
+                ->setCurriculumNodes($baseModel->getCurriculumNodes() ?? $moment->getCurriculumNodes());
+
+            // only clone evidence if it exists...
+            $moment->setEvidence(new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class));
+            if (null !== $baseModel->getEvidence()) {
+                /* Deep Clone
+                 *
+                 * This is super painfully extravagant. Surely there's a better way than this.
+                 * TODO Maybe implement a magic __clone method inside $baseModel's instance?
+                 */
+                foreach ($baseModel->getEvidence() as $evidence) {
+                    $newEvidence = clone $evidence;
+
+                    /* For some reason this is necessary. The MutableFieldsOnly translator spawns a new Moment instance,
+                     * disconnecting it from the relationship contained inside each Evidence instance. This means we have
+                     * to map the ids manually, which seems a bit counter-intuitive.
+                     */
+                    $newEvidence->setMoment($moment);
+                    $moment->getEvidence()->add($newEvidence);
+                }
+            }
         }
 
         /* Shove it into the new state, $state
@@ -954,6 +984,7 @@ class Controller extends Base
         /* Save it
          */
         $this->mapper->save($moment);
+        $this->mapper->saveEvidence($moment);
 
         /**
          * use buildTranslatorWithComments as that contains the _links needed for draft.js
