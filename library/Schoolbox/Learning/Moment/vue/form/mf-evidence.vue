@@ -112,7 +112,7 @@ const editorSettings = window.Vue.computed(() => ({
     templates: props.editorTemplates,
 }));
 
-window.Vue.onMounted(() => {
+window.Vue.onMounted(async () => {
     if (mfStore.moment === null) {
         console.warn("no moment found, cannot add evidence");
         return;
@@ -124,17 +124,17 @@ window.Vue.onMounted(() => {
     const firstEvidenceType = mfStore.moment.evidence[0]?.storage.type ?? null;
 
     if (momentTypeParam && Object.values(MediaType).includes(momentTypeParam)) {
-        mediaType.value = momentTypeParam;
+        await changeMediaType(momentTypeParam);
     } else if (firstEvidenceType === ResourceType.VIDEO) {
-        mediaType.value = MediaType.VIDEO;
+        await changeMediaType(MediaType.VIDEO);
     } else if (firstEvidenceType === ResourceType.AUDIO) {
-        mediaType.value = MediaType.AUDIO;
+        await changeMediaType(MediaType.AUDIO);
     } else if (firstEvidenceType === ResourceType.IMAGE) {
-        mediaType.value = MediaType.PHOTO;
+        await changeMediaType(MediaType.PHOTO);
     } else if (firstEvidenceType !== null) {
-        mediaType.value = MediaType.UPLOAD; // some other file type, default to upload
+        await changeMediaType(MediaType.UPLOAD); // some other file type, default to upload
     } else {
-        mediaType.value = MediaType.TEXT; // default back to text
+        await changeMediaType(MediaType.TEXT); // default back to text
     }
 });
 
