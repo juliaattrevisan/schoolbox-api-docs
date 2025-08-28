@@ -37,7 +37,7 @@ interface Props {
     endpointGetEvidenceTags: string;
     /** Curriculum Nodes */
     curriculumNodes: Node[];
-    endpointCurriculumNodes: string;
+    endpointCurriculumNodes: string | null;
     /** Classes and Groups */
     folders: { id: number; title: string }[];
     selectedFolders: number[];
@@ -99,7 +99,7 @@ window.Vue.onMounted(() => {
                             />
                         </label>
 
-                        <label>
+                        <label v-if="props.endpointCurriculumNodes">
                             Curriculum Codes
                             <curriculum-selector
                                 :is-read-only="false"
