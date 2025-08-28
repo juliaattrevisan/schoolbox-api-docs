@@ -15,14 +15,20 @@ import { ViewUrlParam } from "../js/types/pastoralReportTypes";
 
 const store = useStore();
 
+/**
+ * Keep the container the below the height of the viewport
+ */
+const scrollableEl = window.Vue.useTemplateRef<HTMLDivElement>("scrollableRef");
+const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl);
+
+/**
+ * Load the initial records
+ */
 const url = window.Vue.ref("");
 const urlParams = new URLSearchParams();
 urlParams.set("limit", "20");
 url.value = `${store.selectedTab?._links.view}?${urlParams.toString()}`;
 const { isNewLoad, isNewLoading, isMoreLoading, payload, loadError } = useLoadRecords(url);
-
-const scrollableEl = window.Vue.useTemplateRef<HTMLDivElement>("scrollableRef");
-const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl);
 
 /**
  * To display more results when there's lots to display and the user has scrolled to the bottom
