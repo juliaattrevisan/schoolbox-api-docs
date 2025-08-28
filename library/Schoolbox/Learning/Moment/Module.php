@@ -544,8 +544,6 @@ class Module extends BaseModule
     {
         return new Rule\LazyCallback(
             fn() => new Rule\Callback(function (array $params, User $user) use ($state): void {
-                return; // tmp bypass
-
                 // Because preload exceptions are not handled immediately, we can't fatal if the preload failed.
                 if (!($params['evidence'] ?? null) instanceof Model) {
                     throw new InvalidPath("No evidence found in route params");

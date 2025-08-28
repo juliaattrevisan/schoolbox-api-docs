@@ -53,6 +53,11 @@ class NextRoutes
                  */
                 $draft = true;
 
+                /* Staff can always publish on behalf of a student in case they forget,
+                 * because they're like 2 years old and don't hit the publish button themselves
+                 */
+                $publish = true;
+
                 /* If moderation was needed, rejected state becomes a possibility
                  */
                 if ((new ModerationRequired())->isSatisfiedBy($globalModerationRequired, $moment->getRecipient()->getYear())) {
@@ -74,7 +79,7 @@ class NextRoutes
                 }
             } elseif ($moment->isRejected()) {
                 /* You can't continually/repeatedly reject an already-rejected learning moment
-                 * ...but you cNan change your mind and send it into published state
+                 * ...but you can change your mind and send it into published state
                  *
                  * Anything else is prohibited and you are forced back to the start of the workflow
                  * in draft state
