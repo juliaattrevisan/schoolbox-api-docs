@@ -74,15 +74,15 @@ HELP;
         /* We're going be doing this more than a few times: prepare it only once, for speed
          */
         $evidenceStatement = $db->prepareQuery("
-            INSERT INTO moment_evidence (moment_id, hash)
-            VALUES (:momentId, :hash);
+            INSERT INTO moment_evidence (moment_id, hash, filename, created_at)
+            VALUES (:momentId, :hash, :filename, :createdAt);
         ");
 
         /* Find all the moments we need to update including all the soft-deleted ones
          * You never know when they're going to respawn
          */
         $query = "
-            SELECT id, hash
+            SELECT id, hash, filename, created_at
             FROM moment
             WHERE hash IS NOT NULL
             AND filename IS NOT NULL
@@ -97,6 +97,8 @@ HELP;
                 $evidence = [
                     'momentId' => $moment['id'],
                     'hash' => $moment['hash'],
+                    'filename' => $moment['filename'],
+                    'createdAt' => $moment['created_at'],
                 ];
 
                 $this->getLogger()->debug(sprintf(

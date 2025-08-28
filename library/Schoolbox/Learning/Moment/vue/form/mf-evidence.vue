@@ -59,7 +59,10 @@ async function uploadMediaRecording(): Promise<void> {
         return; // failed but already handled by evidence-media-recording.vue
     }
 
-    mfStore.moment.evidence.push(response.meta.file);
+    mfStore.moment.evidence.push({
+        storage: response.meta.file,
+        filename: response.meta.name,
+    });
 }
 
 /**
@@ -118,7 +121,7 @@ window.Vue.onMounted(() => {
     // derive the initial media type from the URL param "momentType"
     const urlParams = new URLSearchParams(window.location.search);
     const momentTypeParam = (urlParams.get("momentType")?.toLowerCase() as MediaType | null) ?? null;
-    const firstEvidenceType = mfStore.moment.evidence[0]?.type ?? null;
+    const firstEvidenceType = mfStore.moment.evidence[0]?.storage.type ?? null;
 
     if (momentTypeParam && Object.values(MediaType).includes(momentTypeParam)) {
         mediaType.value = momentTypeParam;
@@ -165,7 +168,10 @@ window.Vue.watch(
             return; // not yet uploaded
         }
 
-        mfStore.moment.evidence.push(currentFileDropFile.value.storageFile);
+        mfStore.moment.evidence.push({
+            storage: currentFileDropFile.value.storageFile,
+            filename: currentFileDropFile.value.file.name,
+        });
 
         currentFileDropFile.value = null;
     },
@@ -258,10 +264,10 @@ window.Vue.watch(
         <div v-for="(evidence, index) in mfStore.moment.evidence" :key="index" class="v-card">
             <div class="l-flex-row l-flex--align-center l-gap-m l-pad-m">
                 <div class="l-flex-col">
-                    <img :src="`/ajax/mime/${evidence.mime}`" />
+                    <img :src="`/ajax/mime/${evidence.storage.mime}`" />
                 </div>
                 <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
-                    <h3 class="">{{ evidence.name }}</h3>
+                    <h3 class="">{{ evidence.filename }}</h3>
                 </div>
                 <nav class="c-nav-actions l-flex-row">
                     <a

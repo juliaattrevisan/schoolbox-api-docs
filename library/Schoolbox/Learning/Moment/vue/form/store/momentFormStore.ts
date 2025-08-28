@@ -53,7 +53,7 @@ export const useMomentFormStore = defineStore("momentForm", () => {
 
         return {
             body: moment.value.body ?? "",
-            evidence: moment.value.evidence.map((e) => ({ file: getFileFormValue(e) })),
+            evidence: moment.value.evidence.map((e) => ({ file: getFileFormValue(e.storage) })),
             curriculumNodes: selectedNodesStore.nodesIds.map(String),
             tags: (moment.value.tags ?? []).map((tag) => ({ id: tag.id })),
             folders: selectedFolders.value,

@@ -760,11 +760,12 @@ export default {
                                     <div class="feed-body small-12 columns">
                                         <!-- Is there an attachment? Display it appropriately -->
                                         <article
-                                            v-for="storageFile in evidence.object.evidence"
-                                            :key="storageFile.hash"
+                                            v-for="evidence in evidence.object.evidence"
+                                            :key="evidence.storage.hash"
                                         >
                                             <storage-object
-                                                :storage="storageFile"
+                                                :storage="evidence.storage"
+                                                :filename="evidence.filename"
                                                 data-test="learning-moment-evidence-media"
                                             />
                                         </article>

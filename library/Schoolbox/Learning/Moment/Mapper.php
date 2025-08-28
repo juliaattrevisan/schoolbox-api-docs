@@ -84,16 +84,14 @@ class Mapper extends BaseMapper
             'tags'
         );
 
-        $this->joinsVia(
+        $this->hasJoin(
             'moment_evidence',
-            \Schoolbox\Resource\Storage\Mapper::class,
-            'hash',
-            'hash',
-            'moment_id',
-            null,
-            null,
-            null,
-            'evidence'
+            [
+                'multiple'  => true,
+                'mapper'    => Evidence\Mapper::class,
+                'this_key'  => 'id',
+                'other_key' => 'moment_id',
+            ]
         );
 
         $this->joinsVia(
@@ -282,39 +280,46 @@ class Mapper extends BaseMapper
 
         $pb = $this->getPredicateBuilder()->in('id', $momentIds);
 
-        $storageMapper = $this->getJoinMapper('moment_evidence');
+        /** @var \Schoolbox\Learning\Moment\Evidence\Mapper $evidenceMapper */
+        $evidenceMapper = $this->getJoinMapper('moment_evidence');
 
         $query = "
             SELECT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('moment_evidence', 'me')},
-                {$storageMapper->getJoinColumnString('allowedFileExtension', 'm')}
+                {$evidenceMapper->getJoinColumnString('storage', 'storage')},
+                {$evidenceMapper->getJoinColumnString('storage.allowedFileExtension', 'm')}
             FROM {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())}
             INNER JOIN {$this->getJoinSql('moment_evidence', '', 'me')}
-            LEFT JOIN {$storageMapper->getJoinSql('allowedFileExtension', 'me', 'm', true)}
+            INNER JOIN {$evidenceMapper->getJoinSql('storage', 'me', 'storage')}
+            LEFT JOIN {$evidenceMapper->getJoinSql('storage.allowedFileExtension', 'storage', 'm', true)}
             WHERE {$pb->getWhereIntersect()}
         ";
 
         $momentEvidenceStatement = $this->database->query($query, $pb->getParams());
 
         foreach ($momentEvidenceStatement as $row) {
-            if ($row['me.hash'] !== null) {
+            if ($row['me.id'] !== null) {
+                /** @var \Schoolbox\Learning\Moment\Evidence\Model $evidence */
+                $evidence = $this->hydrateJoin($row, 'moment_evidence', 'me');
+
                 /** @var \Schoolbox\Resource\Storage\Model $storage */
-                $storage = $this->hydrateJoin($row, 'moment_evidence', 'me');
+                $storage = $evidenceMapper->hydrateJoin($row, 'storage', 'storage');
 
                 /** @var \Schoolbox\File\Mimetype $mime */
-                $mime = $storageMapper->hydrateJoin($row, 'allowedFileExtension', 'm');
+                $mime = $evidenceMapper->hydrateJoin($row, 'storage.allowedFileExtension', 'm');
 
                 if ($mime) {
                     $storage->setMimeType($mime);
                 }
 
-                $collection[$row['id']]->getEvidence()->setOffset($storage->getHash(), $storage);
+                $evidence->setStorage($storage);
+
+                $collection[$row['id']]->getEvidence()->setOffset($evidence->getId(), $evidence);
             }
 
             $collection[$row['id']]->getEvidence()->sortBy('createdAt', 'asc');
         }
-
 
         return $collection;
     }

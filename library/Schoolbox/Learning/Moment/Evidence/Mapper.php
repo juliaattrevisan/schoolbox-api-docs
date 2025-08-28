@@ -36,6 +36,8 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('moment_id', \Schoolbox\Learning\Moment\Mapper::class, 'id', null, null, 'moment', 'moment');
         $this->joins('hash', \Schoolbox\Resource\Storage\Mapper::class, 'hash', null, null, 'storage', 'storage');
+        $this->uses('filename', self::TYPE_STRING, null, 'filename');
+        $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
     }
 
     /**
