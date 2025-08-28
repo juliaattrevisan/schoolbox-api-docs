@@ -891,7 +891,7 @@ class Controller extends Base
          * this learning moment if the user asked to do so
          */
         if (Model::STATUS_PUBLISHED === $state && $this->getUser()->getRole()->isStaff()) {
-            if ($requestBody['deleteComments'] ?? false) {
+            if (null !== $moment->getDiscussionThread() && ($requestBody['deleteComments'] ?? false)) {
                 $this->commentMapper->deleteByColumn('discussion_thread_id', $moment->getDiscussionThread()->getId());
             }
         }
