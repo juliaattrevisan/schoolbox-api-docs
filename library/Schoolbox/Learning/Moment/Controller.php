@@ -62,6 +62,7 @@ class Controller extends Base
      * @param \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper
      * @param Storage\Translator\ModelToArray $storageTranslator
      * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
+     * @param \Schoolbox\Discussion\Thread\Mapper $discussionThreadMapper
      */
     public function __construct(
         private \Schoolbox\Learning\Moment\Mapper $mapper,
@@ -69,7 +70,8 @@ class Controller extends Base
         private EditorTemplateHelper $editorTemplateHelper,
         private \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper,
         private Storage\Translator\ModelToArray $storageTranslator,
-        private \Schoolbox\Resource\Folder\Mapper $folderMapper
+        private \Schoolbox\Resource\Folder\Mapper $folderMapper,
+        private \Schoolbox\Discussion\Thread\Mapper $discussionThreadMapper,
     ) {
     }
 
@@ -892,7 +894,51 @@ class Controller extends Base
          * of translated moments in their new state
          */
         foreach ($moments as $moment) {
-            $stack[$moment->getId()] = $this->responseAsJson($this->putWithState($moment, Model::STATUS_PUBLISHED));
+            $stack[$moment->getId()] = $this->putWithState($moment, Model::STATUS_PUBLISHED);
+        }
+
+        $this->response = $this->responseAsJson($stack);
+    }
+
+
+    /**
+     * Reject a Moment, along with a reason which goes int the Moment's comment thread.
+     *
+     * @param Model $evidence
+     * @return void
+     * @throws Exception
+     * @throws MapperException
+     * @throws RouteNotFound
+     */
+    public function putReject(Model $evidence): void
+    {
+        $this->response = $this->responseAsJson($this->putWithState($evidence, Model::STATUS_REJECTED));
+    }
+
+
+    /**
+     * Bulk reject a set of $moments
+     *
+     * @return void
+     * @throws Exception
+     * @throws MapperException
+     * @throws RouteNotFound
+     */
+    public function putBulkReject(): void
+    {
+        $stack = [];
+
+        /* Find all the learning moments to bulk reject
+         */
+        $requestBody = $this->request->getParsedBody();
+
+        $moments = $this->mapper->findByColumn('id', $requestBody['momentIds']);
+
+        /* Process each moment into the next state individually, collecting a $stack
+         * of translated moments in their new state
+         */
+        foreach ($moments as $moment) {
+            $stack[$moment->getId()] = $this->putWithState($moment, Model::STATUS_REJECTED);
         }
 
         $this->response = $this->responseAsJson($stack);
@@ -980,6 +1026,34 @@ class Controller extends Base
                 $this->commentMapper->deleteByColumn('discussion_thread_id', $moment->getDiscussionThread()->getId());
             }
         }
+
+        /* Reject only, handle adding a rejection reason
+         */
+        if (Model::STATUS_REJECTED === $state) {
+            /* If a discussion thread never existed, spawn one
+             */
+            $discussionThread = $moment->getDiscussionThread();
+
+            if (null === $discussionThread) {
+                $discussionThread = $this->discussionThreadMapper->createModel()
+                    ->setOpen(true);
+
+                $this->discussionThreadMapper->save($discussionThread);
+
+                $moment->setDiscussionThread($discussionThread);
+            }
+
+            /* Spawn a comment
+             * Save it to $moment's discussion thread somehow
+             */
+            $comment = $this->commentMapper->createModel()
+                ->setContent($requestBody['rejectionReason'] ?? '')
+                ->setAuthor($this->getUser())
+                ->setThread($moment->getDiscussionThread());
+
+            $this->commentMapper->save($comment);
+        }
+
 
         /* Save it
          */
@@ -1266,7 +1340,7 @@ class Controller extends Base
         }
 
         if ($links['reject']) {
-            $links['reject'] = $this->getRouteIfAuthorized('learningMomentModeration.putReject', [
+            $links['reject'] = $this->getRouteIfAuthorized('learningMomentEvidence.putReject', [
                 'evidenceId' => $moment->getId(),
             ]);
         }

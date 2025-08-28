@@ -100,7 +100,7 @@ class Links extends AbstractLinks
         );
 
         $translation['_links']['reject'] = $this->getRouteIfAuthorized(
-            'learningMomentModeration.putReject',
+            'learningMomentEvidence.putReject',
             [
                 'evidence'   => $moment,
                 'evidenceId' => $moment->getId(),

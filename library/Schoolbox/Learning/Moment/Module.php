@@ -278,6 +278,29 @@ class Module extends BaseModule
             $viewCohortReportRule,
         );
 
+        /* Reject a Learning Moment
+         */
+        $this->register(
+            self::METHOD_PUT,
+            '/{evidenceId:\d+}/reject',
+            'putReject',
+            new Rule\All(
+                $modifyEvidenceRule,
+                $this->buildRuleCanProgressToState('reject'),
+            ),
+            Closure::fromCallable([$this, 'preloadEvidence']),
+        );
+
+        /* Bulk reject a set of learning moments (typically from Cohort Overview)
+         * TODO - check that this is okay to bypass buildRuleCanProgressToState()
+         */
+        $this->register(
+            self::METHOD_PUT,
+            '/bulk/reject',
+            'putBulkReject',
+            $viewCohortReportRule,
+        );
+
         // Evidence modify form
         $this->register(
             self::METHOD_PUT,
@@ -365,7 +388,8 @@ class Module extends BaseModule
             ),
             $this->getMapperFactory()->get(\Schoolbox\Permission\Access\UserAccessMapper::class),
             new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfig())),
-            $this->getMapperFactory()->get(\Schoolbox\Resource\Folder\Mapper::class)
+            $this->getMapperFactory()->get(\Schoolbox\Resource\Folder\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Discussion\Thread\Mapper::class),
         );
     }
 

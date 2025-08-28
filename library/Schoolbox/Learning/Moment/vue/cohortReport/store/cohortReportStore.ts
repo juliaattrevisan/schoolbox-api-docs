@@ -3,7 +3,7 @@ import { apiRequest } from "@js/util/sbx/apiUtils";
 import {
     bulkPublishLearningMoments,
     bulkRejectLearningMoments,
-} from "@schoolboxLearningMomentEvidence/learningMomentModerationPayload";
+} from "@schoolboxLearningMomentEvidence/learningMomentPayload";
 import type { LearningMoment } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 import { getCohortReport } from "./cohortReportPayload";
 import type { CohortReportEntry, CohortReportApiPayload } from "./cohortReportPayload";
@@ -79,8 +79,8 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
     /**
      * Initialise the store
      * @param $getCohortReportEndpoint - getCohortReportPayload
-     * @param $putBulkRejectEndpoint - learningMomentModeration.putBulkReject
-     * @param $putBulkPublishEndpoint - learningMomentModeration.putBulkPublish
+     * @param $putBulkRejectEndpoint - learningMomentEvidence.putBulkReject
+     * @param $putBulkPublishEndpoint - learningMomentEvidence.putBulkPublish
      * @param $deleteBulkEvidenceEndpoint - learningMomentEvidence.deleteBulkDelete
      */
     async function init(

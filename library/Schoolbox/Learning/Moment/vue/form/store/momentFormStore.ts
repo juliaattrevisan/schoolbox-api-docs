@@ -180,9 +180,6 @@ export const useMomentFormStore = defineStore("momentForm", () => {
             return;
         }
 
-        // TODO: we might be only ever recieving LearningMomentEvidence.putPublish here
-        // but there's a duped learningMomentModeration.putPublish route that allows deleteComments to work...
-
         if (
             deleteComments === undefined &&
             moment.value.discussionThread !== null &&
