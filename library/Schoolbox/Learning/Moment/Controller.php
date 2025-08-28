@@ -1102,6 +1102,11 @@ class Controller extends Base
              */
             $userTranslator = new \Schoolbox\User\Translator\ModelToArray();
 
+            // We'll steal the links from here
+            // TODO: Let's see how much of this can be refactored to just use the translator directly... I expect most if not all of it
+            $translator = $this->buildTranslatorWithComments(1);
+            $momentTranslated = $translator($moment);
+
             $payload[] = [
                 'id' => $moment->getId(),
                 'body' => \Scrub::html($moment->getBody()),
@@ -1151,7 +1156,7 @@ class Controller extends Base
                  * Note that a controller method must fulfil this node after the fact, for aura reasons
                  * (not easy to dedupe that implementation, sadly)
                  */
-                '_links' => $this->getNextRoutes($moment),
+                '_links' => $momentTranslated['_links']
             ];
         }
 
@@ -1177,56 +1182,6 @@ class Controller extends Base
         }
 
         return $stack;
-    }
-
-
-    /**
-     * For a particular learning moment, decide what actions could happen next.
-     *
-     * @param Model $moment
-     * @return array
-     * @throws RouteNotFound
-     */
-    private function getNextRoutes(Model $moment): array
-    {
-        $links = (new NextRoutes())->generate($moment, $this->getUser(), $this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED));
-
-        /* Only get the routes you need
-         */
-        if ($links['submit']) {
-            $links['submit'] = $this->getRouteIfAuthorized('learningMomentEvidence.putSubmit', [
-                'evidenceId' => $moment->getId(),
-                'creatorId' => $moment->getCreator()->getId(),
-                'userId' => $moment->getRecipient()->getId(),
-            ]);
-        }
-
-        if ($links['publish']) {
-            $links['publish'] = $this->getRouteIfAuthorized('learningMomentEvidence.putPublish', [
-                'evidenceId' => $moment->getId(),
-                'creatorId' => $moment->getCreator()->getId(),
-            ]);
-        }
-
-        if ($links['reject']) {
-            $links['reject'] = $this->getRouteIfAuthorized('learningMomentEvidence.putReject', [
-                'evidenceId' => $moment->getId(),
-            ]);
-        }
-
-        /* non-state dependent actions */
-        $links['modifyForm'] = $this->getRouteIfAuthorized('learningMomentEvidence.getModifyForm', [
-            'evidenceId' => $moment->getId(),
-            'creatorId'  => $moment->getCreator()->getId(),
-            'userId'     => $moment->getRecipient()->getId(),
-        ]);
-
-        $links['delete'] = $this->getRouteIfAuthorized('learningMomentEvidence.deleteEvidence', [
-            'evidenceId' => $moment->getId(),
-            'creatorId'  => $moment->getCreator()->getId(),
-        ]);
-
-        return $links;
     }
 
 
