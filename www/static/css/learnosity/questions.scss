@@ -615,7 +615,7 @@ button.lrn-author-widget-button.lrn-author-widget-button-more:hover {
 }
 
 /* Added space to the right of questions in the item authoring */
-.lrn-widget-drag-wrapper {
+.lrn-author-widget-drag-wrapper {
     padding-right: 50px;
 }
 
@@ -745,4 +745,7 @@ button.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-author-btn-default.lrn-a
     text-align: center !important;
     vertical-align: middle !important;
     width: 99% !important;
+}
+.lrn-author.lrn-author .lrn-author-row-old > .lrn-author-col-xs-12-old {
+    background-color: #fff;
 }
