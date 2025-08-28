@@ -127,6 +127,13 @@ class CreditSummary extends Base
                 $internalExternal = 'IN';
             }
 
+            if ($current['EnteredCredits'] == 0 && $current['ResultCredits'] == 0) {
+                // Avoid creating the data structure for $finalStack[$level] if it will contain only zeros.
+                // This prevents an extra row with a blank value for 'Level' and zeroes for all other columns being
+                // displayed in the Credit Summary table on the Year 11 report.
+                continue;
+            }
+
             if (!isset($finalStack[$level])) {
                 $finalStack[$level] = [
                     'totalEnteredCredits' => 0,
