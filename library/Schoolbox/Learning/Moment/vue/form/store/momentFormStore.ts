@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { watchDebounced } from "@vueuse/core";
+import { until, watchDebounced } from "@vueuse/core";
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import { getFileFormValue } from "@js/resource/resourceUtils";
 import type { StorageFileFormValue } from "@js/resource/resourceUtils";
@@ -72,6 +72,8 @@ export const useMomentFormStore = defineStore("momentForm", () => {
         action: "draft" | "publish" | "reject" | "submit",
         deleteComments?: boolean,
     ): Promise<void> {
+        await until(isSaving).toBe(false); // wait for any existing save to finish
+
         const payload: SubmitFormApiPayload | null = formPayload.value ? { ...formPayload.value } : null;
         if (!moment.value || payload === null) return;
 
