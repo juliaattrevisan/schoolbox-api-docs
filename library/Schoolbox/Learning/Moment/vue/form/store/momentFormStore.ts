@@ -105,9 +105,8 @@ export const useMomentFormStore = defineStore("momentForm", () => {
             body: payload,
         });
 
-        isSaving.value = false;
-
         if (!response.success) {
+            isSaving.value = false;
             saveError.value = response.message;
             toast.timeout({ text: "Save failed!", isSuccess: false });
             return;
@@ -132,6 +131,11 @@ export const useMomentFormStore = defineStore("momentForm", () => {
             window.location.href = returnUrl.value;
             return;
         }
+
+        /**
+         * Only change this back to false if it failed earlier, or if we're not going to redirect somewhere
+         */
+        isSaving.value = false;
 
         /**
          * otherwise, update the moment in the store to reflect any changes
