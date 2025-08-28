@@ -85,6 +85,10 @@ class NextRoutes
                  * in draft state
                  */
                 $publish = true;
+            } elseif ($moment->isPublished()) {
+                /* Once published, always published, even if you change the content as a staff
+                 */
+                $publish = true;
             }
         } elseif ($user->getRole()->isParent()) {
             /* When parents author their own content, they skip the whole moderation workflow
