@@ -191,7 +191,7 @@ export const useMomentFormStore = defineStore("momentForm", () => {
             return;
         }
 
-        await submitForm(false, "publish", true);
+        await submitForm(false, "publish", deleteComments);
     }
 
     /**
