@@ -111,6 +111,7 @@ export default class Homepage {
 
         // Click to add the component
         const componentSectionEl = this.page.locator(componentSection);
+        await expect(componentSectionEl.getByText(componentName)).toBeVisible();
         await componentSectionEl.getByText(componentName).click();
 
         // Wait for it to load
