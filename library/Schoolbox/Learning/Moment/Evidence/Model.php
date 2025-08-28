@@ -21,16 +21,6 @@ class Model implements IFile
     use ModelTrait\CreatedAtDate;
 
     /**
-     * The types of evidence
-     */
-    public const MOMENT_TYPE_TEXT   = 'text';
-    public const MOMENT_TYPE_UPLOAD = 'upload';
-    public const MOMENT_TYPE_PHOTO  = 'photo';
-    public const MOMENT_TYPE_AUDIO  = 'audio';
-    public const MOMENT_TYPE_VIDEO  = 'video';
-
-
-    /**
      * @var \Schoolbox\Learning\Moment\Model|null
      */
     private ?\Schoolbox\Learning\Moment\Model $moment = null;
