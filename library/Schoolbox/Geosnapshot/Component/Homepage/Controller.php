@@ -27,12 +27,12 @@ class Controller extends Component_Homepage_ControllerAbstract
     /**
      * @var string|null
      */
-    private ?string $url;
+    private ?string $url = null;
 
     /**
      * @var int|null
      */
-    private ?int $height;
+    private ?int $height = null;
 
     /**
      * Only render this component if Geosnapshot has been set up
@@ -44,8 +44,6 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function execute(): bool
     {
-        $this->url = null;
-
         /* If the component has a search term, ask Geosnapshot for an answer
          */
         if (
