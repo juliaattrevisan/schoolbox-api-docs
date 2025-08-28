@@ -49,10 +49,8 @@ jobs:
             platform: linux
             arch: arm64
         phpVersion:
-          - long: '8.2'
-            short: '82'
-          - long: '8.4'
-            short: '84'
+          - 8.2
+          - 8.4
     runs-on: ${{ matrix.build.runs-on }}
     steps:
       - name: Checkout
@@ -100,7 +98,7 @@ jobs:
           name: schoolbox-npm
           path: www/static/js/bundle/
 
-      - name: Build and push schoolbox-frankenphp:latest-php${{ matrix.phpVersion.long }} deployment image
+      - name: Build and push schoolbox-frankenphp:latest-php${{ matrix.phpVersion }} deployment image
         id: build-and-push-latest
         uses: docker/build-push-action@v6
         with:
@@ -115,12 +113,12 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             ENV=prod
-            TAG=latest-php${{ matrix.phpVersion.long }}-${{ github.event.release.target_commitish }}
-            PHP_MAJOR_VERSION=${{ matrix.phpVersion.long }}
+            TAG=latest-php${{ matrix.phpVersion }}-${{ github.event.release.target_commitish }}
+            PHP_MAJOR_VERSION=${{ matrix.phpVersion }}
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            alaress/schoolbox-frankenphp:latest-php${{ matrix.phpVersion.long }}
-            ${{ vars.SCHOOLBOX_ECR_REPO }}:latest-php${{ matrix.phpVersion.long }}
+            alaress/schoolbox-frankenphp:latest-php${{ matrix.phpVersion }}
+            ${{ vars.SCHOOLBOX_ECR_REPO }}:latest-php${{ matrix.phpVersion }}
 
       - name: Export digest
         run: |
@@ -175,8 +173,8 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            alaress/schoolbox-frankenphp:latest-php${{ matrix.phpVersion.long }}
-            ${{ vars.SCHOOLBOX_ECR_REPO }}:latest-php${{ matrix.phpVersion.long }}
+            alaress/schoolbox-frankenphp:latest-php${{ matrix.phpVersion }}
+            ${{ vars.SCHOOLBOX_ECR_REPO }}:latest-php${{ matrix.phpVersion }}
           tags: |
             type=ref,event=tag,prefix=
 
