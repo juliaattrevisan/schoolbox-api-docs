@@ -88,7 +88,7 @@ function onSelected(e: Event): void {
     }
 }
 
-/* We don't want these styles applying to the div v-if="props.justText, just the <a> and <button> elements */
+/* We don't want these styles applying to the div v-if="props.justText", just the <a> and <button> elements */
 a.c-menu-item,
 button.c-menu-item {
     color: var(--content-ui-foreground);
