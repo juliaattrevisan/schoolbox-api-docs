@@ -88,17 +88,17 @@ jobs:
           build-args: |
             ENV=prod
             ARCH=${{ matrix.build.arch }}
-            TAG=latest-${{ github.base_ref }}-${{ matrix.phpVersion }}
+            TAG=latest-php${{ matrix.phpVersion }}-${{ github.base_ref }}
             PHP_MAJOR_VERSION=${{ matrix.phpVersion }}
           tags: |
-            schoolbox-frankenphp-${{ matrix.build.arch }}-php${{ matrix.phpVersion }}
+            schoolbox-frankenphp-${{ matrix.build.arch }}:latest-php${{ matrix.phpVersion }}
 
       # Smoke test for box:
       # could attempt to run PHPUnit within the box as well?
       - name: Test schoolbox-frankenphp
         run: |
           docker image ls
-          image="$(docker image ls -q schoolbox-frankenphp-${{ matrix.build.arch }})-php${{ matrix.phpVersion }}"
+          image="$(docker image ls -q schoolbox-frankenphp-${{ matrix.build.arch }}:latest-php${{ matrix.phpVersion }}"
           docker run -i "$image" ls -al /etc/
           docker run -i "$image" ls -al /etc/caddy
           docker run -i "$image" ls -al /usr/local/lib/php/extensions/no-debug-zts-20220829/
