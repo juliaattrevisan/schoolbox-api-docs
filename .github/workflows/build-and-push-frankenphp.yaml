@@ -58,7 +58,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            alaress/php-frankenphp:latest-php${{ matrix.phpVersion }}
+            alaress/frankenphp-base:latest-php${{ matrix.phpVersion }}
             ${{ vars.FRANKENPHP_ECR_REPO }}:latest-php${{ matrix.phpVersion }}
 
       - name: Login to Docker Hub
@@ -67,11 +67,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push php-frankenphp:latest-php${{ matrix.phpVersion }}
+      - name: Build and push frankenphp-base:latest-php${{ matrix.phpVersion }}
         id: build-and-push
         uses: docker/build-push-action@v6
         with:
-          context: docker/base-images/php-frankenphp
+          context: docker/base-images/frankenphp-base
           load: true
           provenance: false
           sbom: false
@@ -82,7 +82,7 @@ jobs:
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           labels: ${{ steps.meta.outputs.labels }}
           tags: |
-            alaress/php-frankenphp:latest-php${{ matrix.phpVersion }}
+            alaress/frankenphp-base:latest-php${{ matrix.phpVersion }}
             ${{ vars.FRANKENPHP_ECR_REPO }}:latest-php${{ matrix.phpVersion }}
 
       - name: Export digest
@@ -91,7 +91,7 @@ jobs:
           digest="${{ steps.build-and-push.outputs.digest }}"
           touch "${{ runner.temp }}/digests/${digest#sha256:}"
 
-      - name: Upload php-frankenphp:latest-php${{ matrix.phpVersion }} artifact
+      - name: Upload frankenphp-base:latest-php${{ matrix.phpVersion }} artifact
         uses: actions/upload-artifact@v4
         with:
           name: digest-${{ matrix.build.arch }}
@@ -111,7 +111,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            alaress/php-frankenphp:latest-php${{ matrix.phpVersion }}
+            alaress/frankenphp-base:latest-php${{ matrix.phpVersion }}
             ${{ vars.FRANKENPHP_ECR_REPO }}:latest-php${{ matrix.phpVersion }}
           tags: |
             type=ref,event=branch,prefix=latest-
@@ -135,16 +135,16 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Download php-frankenphp:latest-php${{ matrix.phpVersion }} artifacts
+      - name: Download frankenphp-base:latest-php${{ matrix.phpVersion }} artifacts
         uses: actions/download-artifact@v4
         with:
           path: ${{ runner.temp }}/digests
           pattern: digest-*
           merge-multiple: 'true'
 
-      - name: Join php-frankenphp:latest-php${{ matrix.phpVersion }} images
+      - name: Join frankenphp-base:latest-php${{ matrix.phpVersion }} images
         working-directory: ${{ runner.temp }}/digests
         run: |
           docker buildx imagetools create $(jq -cr '.tags | map ("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf 'alaress/php-frankenphp@sha256:%s ' *) \
+            $(printf 'alaress/frankenphp-base@sha256:%s ' *) \
             $(printf '${{ vars.FRANKENPHP_ECR_REPO }}@sha256:%s ' *)
