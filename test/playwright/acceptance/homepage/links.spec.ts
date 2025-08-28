@@ -29,8 +29,6 @@ test.describe("Links Component Tests", () => {
     test("Verify Add Link", async ({ tester, page }) => {
         tester.isGoingTo("Homepage, open tab panel, click components tab");
         await homepage.goto(83);
-        await homepage.openTabPanel(Homepage.ELEMENT_ADD_COMPONENT_TAB);
-        await homepage.clickComponentsTab(Homepage.ELEMENT_COMPONENT_SECTION_RESOURCES);
         tester.isGoingTo("Add Links component");
         await homepage.addComponent(Homepage.ELEMENT_ADD_COMPONENT_SECTION_RESOURCES, "Links");
         linksComponent = page.locator(Homepage.locateComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1));
@@ -148,8 +146,6 @@ test.describe("Links Component Tests", () => {
     // test("Verify adding link component to another page", async ({ tester, page }) => {
     //     tester.isGoingTo("Navigate to 3RW homepage and alt-source the Links component");
     //     await homepage.goto(188);
-    //     await homepage.openTabPanel(Homepage.ELEMENT_ADD_COMPONENT_TAB);
-    //     await homepage.clickComponentsTab(Homepage.ELEMENT_COMPONENT_SECTION_RESOURCES);
     //     tester.isGoingTo("Add Links component");
     //     await homepage.addComponent(Homepage.ELEMENT_ADD_COMPONENT_SECTION_RESOURCES, "Links");
     //     linksComponent = page.locator(Homepage.locateComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1));
@@ -157,7 +153,7 @@ test.describe("Links Component Tests", () => {
     //     componentId = Number(componentIdStr?.match(/\d+/)?.[0]);
 
     //     await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
-    //     await homepage.clickComponentSettings(linksComponent);
+    //     await Homepage.clickComponentSettings(linksComponent);
     //     await links.addExistingLink(linksComponent, "English", "9A English");
     //     const sortedLinks = await Links.getAllLinks(linksComponent);
     //     tester.isGoingTo(sortedLinks.toString());
