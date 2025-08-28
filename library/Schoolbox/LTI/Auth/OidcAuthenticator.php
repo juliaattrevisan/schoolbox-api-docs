@@ -16,7 +16,7 @@ use OAT\Library\Lti1p3Core\Message\LtiMessage;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilder;
 use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilderInterface;
-use OAT\Library\Lti1p3Core\Message\Payload\LtiMessagePayloadInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\Parser\Parser;
@@ -36,33 +36,16 @@ use Throwable;
  */
 class OidcAuthenticator
 {
-    /** @var RegistrationRepositoryInterface */
-    private $repository;
-
-    /** @var UserAuthenticatorInterface */
-    private $authenticator;
-
-    /** @var MessagePayloadBuilderInterface */
-    private $builder;
-
-    /** @var ValidatorInterface */
-    private $validator;
-
-    /** @var ParserInterface */
-    private $parser;
-
     public function __construct(
-        RegistrationRepositoryInterface $repository,
-        UserAuthenticatorInterface $authenticator,
-        ?MessagePayloadBuilderInterface $builder = null,
-        ?ValidatorInterface $validator = null,
-        ?ParserInterface $parser = null
+        private RegistrationRepositoryInterface $repository,
+        private UserAuthenticatorInterface $authenticator,
+        private ?MessagePayloadBuilderInterface $builder = null,
+        private ?ValidatorInterface $validator = null,
+        private ?ParserInterface $parser = null
     ) {
-        $this->repository    = $repository;
-        $this->authenticator = $authenticator;
-        $this->builder       = $builder ?? new MessagePayloadBuilder();
-        $this->validator     = $validator ?? new Validator();
-        $this->parser        = $parser ?? new Parser();
+        $this->builder   ??= new MessagePayloadBuilder();
+        $this->validator ??= new Validator();
+        $this->parser    ??= new Parser();
     }
 
     /**
@@ -80,7 +63,7 @@ class OidcAuthenticator
             $originalToken = $this->parser->parse($oidcRequest->getParameters()->getMandatory('lti_message_hint'));
 
             $registration = $this->repository->find(
-                $originalToken->getClaims()->getMandatory(LtiMessagePayloadInterface::CLAIM_REGISTRATION_ID)
+                $originalToken->getClaims()->getMandatory(MessagePayloadInterface::CLAIM_REGISTRATION_ID)
             );
 
             if (null === $registration) {
@@ -104,13 +87,13 @@ class OidcAuthenticator
 
             $this->builder
                 ->withClaims($this->sanitizeClaims($originalToken->getClaims()->all()))
-                ->withClaim(LtiMessagePayloadInterface::CLAIM_ISS, $registration->getPlatform()->getAudience())
-                ->withClaim(LtiMessagePayloadInterface::CLAIM_AUD, $registration->getClientId());
+                ->withClaim(MessagePayloadInterface::CLAIM_ISS, $registration->getPlatform()->getAudience())
+                ->withClaim(MessagePayloadInterface::CLAIM_AUD, $registration->getClientId());
 
             // If the original request contained a nonce, add it to the payload (fixes #154)
             $nonce = $oidcRequest->getParameters()->get('nonce');
             if ($nonce) {
-                $this->builder->withClaim(LtiMessagePayloadInterface::CLAIM_NONCE, $nonce);
+                $this->builder->withClaim(MessagePayloadInterface::CLAIM_NONCE, $nonce);
             }
 
             if (!$authenticationResult->isAnonymous()) {
@@ -141,7 +124,7 @@ class OidcAuthenticator
 
     private function sanitizeClaims(array $claims): array
     {
-        foreach (LtiMessagePayloadInterface::RESERVED_USER_CLAIMS as $reservedClaim) {
+        foreach (MessagePayloadInterface::RESERVED_USER_CLAIMS as $reservedClaim) {
             unset($claims[$reservedClaim]);
         }
 
