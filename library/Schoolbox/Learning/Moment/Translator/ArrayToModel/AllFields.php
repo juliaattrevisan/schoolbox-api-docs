@@ -153,15 +153,15 @@ class AllFields extends Base
                         if (isset($evidenceStruct['file']) && '' !== $evidenceStruct['file']) {
                             $file = $this->collectorFactory->build([$evidenceStruct['file']])->getFirst();
                             if ($file) {
-                                $evidence = new \Schoolbox\Learning\Moment\Evidence\Model();
+                                // $evidence = new \Schoolbox\Learning\Moment\Evidence\Model();
 
-                                $evidence->setMoment($model)->setStorage($file);
+                                // $evidence->setMoment($model)->setStorage($file);
 
                                 if (null === $model->getEvidence()) {
-                                    $model->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class)));
+                                    $model->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Resource\Storage\Model::class)));
                                 }
 
-                                $model->getEvidence()->add($evidence);
+                                $model->getEvidence()->add($file);
                             }
                         } else {
                             /* No hash? No trabajo

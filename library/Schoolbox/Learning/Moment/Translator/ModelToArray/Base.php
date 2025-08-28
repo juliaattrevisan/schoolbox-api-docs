@@ -132,7 +132,7 @@ class Base
          */
         if ($model->getEvidence() !== null) {
             foreach ($model->getEvidence() as $evidence) {
-                $moment['evidence'][] = call_user_func($this->storageTranslator, $evidence->getStorage());
+                $moment['evidence'][] = call_user_func($this->storageTranslator, $evidence);
             }
         }
 
