@@ -201,12 +201,16 @@ class Controller extends Base
         $translator = $this->buildTranslatorWithComments(1);
         $moment = $this->mapper->createModel()
             ->setRecipient(new User())
-            ->setCreator($this->getUser());
+            ->setCreator($this->getUser())
+            ->draft();
 
         // This should follow the same structure as a moment's _links, but it's for creating stuff instead
         $usersString = implode(',', $users->getPropertyValues('id'));
+        $globalConfig = (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED);
+        $nextRoutes = (new NextRoutes())->generate($moment, $this->getUser(), $globalConfig);
+
         $createRoutes = [
-            'publish' => $this->getRouteIfAuthorized(
+            'publish' => $nextRoutes['publish'] && $this->getRouteIfAuthorized(
                 'learningMomentEvidence.postPublish',
                 [ 'userIds' => $usersString, ],
             ),
