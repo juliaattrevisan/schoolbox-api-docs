@@ -14,17 +14,19 @@ import { useLoadRecords } from "./composable/useLoadRecords";
 import { ViewUrlParam } from "../js/types/pastoralReportTypes";
 
 const store = useStore();
+
 const url = window.Vue.ref("");
 const urlParams = new URLSearchParams();
 urlParams.set("limit", "20");
 url.value = `${store.selectedTab?._links.view}?${urlParams.toString()}`;
 const { isNewLoad, isNewLoading, isMoreLoading, payload, loadError } = useLoadRecords(url);
-const { maxScrollableHeight } = useMaxScrollableHeight();
+
+const scrollableEl = window.Vue.useTemplateRef<HTMLDivElement>("scrollableRef");
+const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl);
 
 /**
  * To display more results when there's lots to display and the user has scrolled to the bottom
  */
-const scrollableEl = window.Vue.useTemplateRef<HTMLDivElement>("scrollableRef");
 const { arrivedState } = useScroll(scrollableEl, {
     offset: { bottom: 30 },
 });

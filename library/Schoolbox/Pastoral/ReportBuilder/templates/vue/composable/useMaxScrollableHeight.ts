@@ -1,5 +1,5 @@
 /**
- * Manages the maximum scrollable height for table containers to fit within the browser window.
+ * Manages the maximum scrollable height for containers to fit within the browser window.
  * Automatically adjusts when the window resizes or container size changes.
  */
 
@@ -7,9 +7,10 @@ import type { Ref } from "vue";
 
 /**
  * Provides reactive maximum scrollable height calculation for table containers.
+ * @param scrollableEl - Ref to the scrollable HTML element
  * @returns maxScrollableHeight - reactive ref containing the calculated max height as a CSS string
  */
-export function useMaxScrollableHeight(): {
+export function useMaxScrollableHeight(scrollableEl: Ref<HTMLElement | null>): {
     maxScrollableHeight: Ref<string>;
 } {
     const resizeObserver = window.Vue.ref<ResizeObserver | null>(null);
@@ -19,13 +20,13 @@ export function useMaxScrollableHeight(): {
      * Set the max height to allow the table to sit within the browser window
      */
     function setScrollableHeight(): void {
-        const tabsBottomY = document.querySelector("dl")?.getBoundingClientRect().bottom || 0;
+        const scrollableTop = scrollableEl.value?.getBoundingClientRect().top || 0;
         const footerHeight = document.getElementById("footer")?.getBoundingClientRect().height || 0;
         const mainSBContainerEl = document.getElementById("container");
         const mainSBContainerPaddingBtm = mainSBContainerEl
             ? parseInt(window.getComputedStyle(mainSBContainerEl).paddingBottom, 10)
             : 0;
-        const newHeight = window.innerHeight - tabsBottomY - footerHeight - mainSBContainerPaddingBtm - 1;
+        const newHeight = window.innerHeight - scrollableTop - footerHeight - mainSBContainerPaddingBtm - 1;
         maxScrollableHeight.value = `${newHeight}px`;
     }
 

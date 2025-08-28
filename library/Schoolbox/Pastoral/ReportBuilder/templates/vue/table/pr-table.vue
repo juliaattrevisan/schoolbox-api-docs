@@ -122,7 +122,8 @@ function onRowCellSelect(header: TableHeader, rowKeys: RowKeys, meta: string[]):
 
 // #endregion
 
-const { maxScrollableHeight } = useMaxScrollableHeight();
+const scrollableEl = window.Vue.useTemplateRef<HTMLDivElement>("scrollableRef");
+const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl);
 
 /**
  * Reset the table load to ensure the correct endpoint is set
@@ -141,7 +142,12 @@ window.Vue.onMounted(() => {
     </div>
     <pr-empty v-else-if="isEmpty" />
     <template v-else-if="hasRows">
-        <div class="table-container scrollable" :style="{ maxHeight: maxScrollableHeight }" data-test="pr-table">
+        <div
+            ref="scrollableRef"
+            class="table-container scrollable"
+            :style="{ maxHeight: maxScrollableHeight }"
+            data-test="pr-table"
+        >
             <table class="pr-table">
                 <pr-table-header
                     v-model:records-or-points="recordsOrPoints"
