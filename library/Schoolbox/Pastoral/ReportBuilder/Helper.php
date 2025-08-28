@@ -381,7 +381,6 @@ class Helper
         ?Alaress_Date_Format $startDate,
         ?Alaress_Date_Format $endDate,
         string $format,
-        int $maxStack
     ): Collection {
         /* Return empty collection if either date is null.
          */
@@ -390,12 +389,14 @@ class Helper
         }
 
         $start = (clone $startDate)->startOfMonth();
-        $end = (clone $endDate)->startOfMonth();
+        $current = (clone $endDate)->startOfMonth();
 
         $months = [];
-        while ($end->gte($start) && count($months) < $maxStack) {
-            array_unshift($months, strtolower($end->getUsingFormat($format)));
-            $end->addMonths(-1);
+        while ($current->gte($start)) {
+            if ((Alaress_Date_Format::now())->endOfMonth() >= (clone $current)->endOfMonth()) {
+                array_unshift($months, strtolower($current->getUsingFormat($format)));
+            }
+            $current->addMonths(-1);
         }
         return new Collection($months);
     }
