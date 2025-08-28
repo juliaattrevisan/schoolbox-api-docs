@@ -55,16 +55,23 @@ class NextRoutes
 
                 /* Staff can always publish on behalf of a student in case they forget,
                  * because they're like 2 years old and don't hit the publish button themselves
+                 * Remember that we might be dealing with super-junior students in this space.
                  */
                 $publish = true;
 
                 /* If moderation was needed, rejected state becomes a possibility
                  */
                 if ((new ModerationRequired())->isSatisfiedBy($globalModerationRequired, $moment->getRecipient()->getYear())) {
-                    /* TODO If a staff member is creating the learning moment, they don't need to reject it
-                     *  If a student creates a learning moment, the staff can reject it.
-                     */
-                    $reject = true;
+                    if (!$moment->getCreator()->getRole()->isStaff()) {
+                        /* If any non-staff creates a learning moment, staff can reject it. Parent-authored learning
+                         * moments shouldn't end up here because they bypass the whole moderation workflow so this is
+                         * mainly going to be student-authored learning moments.
+                         *
+                         * If a staff member created the learning moment, they don't need to reject it; they'd be
+                         * rejecting their own work, which seems to be a strange way to live
+                         */
+                        $reject = true;
+                    }
                 }
             } elseif ($moment->isSubmitted()) {
                 /* Draft is a possibility for repeated edits
@@ -75,21 +82,18 @@ class NextRoutes
                  */
                 $publish = true;
 
-                /* If moderation was needed, rejected state becomes a possibility
-                 */
                 if ((new ModerationRequired())->isSatisfiedBy($globalModerationRequired, $moment->getRecipient()->getYear())) {
+                    /* If moderation was needed, rejected state becomes a possibility
+                     */
                     $reject = true;
                 }
             } elseif ($moment->isRejected()) {
-                /* You can't continually/repeatedly reject an already-rejected learning moment
-                 * ...but you can change your mind and send it into published state
-                 *
-                 * Anything else is prohibited and you are forced back to the start of the workflow
-                 * in draft state
+                /* You can change your mind about a rejection and send the learning moment into published state
                  */
                 $publish = true;
 
-                /* Staff can repeatedly reject a learning moment
+                /* Staff can repeatedly reject a learning moment in case they forget to say something in their
+                 * rejection reason. They can do this ad infinitum; all it does is pile on comments in the thread
                  */
                 $reject = true;
             } elseif ($moment->isPublished()) {
@@ -142,11 +146,7 @@ class NextRoutes
                     $publish = true;
                 }
             } elseif ($moment->isRejected()) {
-                /* You can't continually/repeatedly reject an already-rejected learning moment
-                 * ...but you can change your mind and send it into published state
-                 *
-                 * Anything else is prohibited and you are forced back to the start of the workflow
-                 * in draft state
+                /* Draft is a possibility for repeated edits
                  */
                 $draft = true;
 
@@ -155,15 +155,16 @@ class NextRoutes
                  * so that students can push it into Submit For Approval, requiring a staff to come along and push
                  * it into Publish, EVEN IF that is not required according to the current admin config.
                  *
-                 * We know a student can change this to Draft then Publish via Save for Later, and kind of circumvent
+                 * We know a student can change this to Draft then Publish via Save for Later and kind of circumvent
                  * this whole workflow, but they could do that anyway if moderation wasn't required.
                  */
                 $submit = true;
 
-                if ((new ModerationRequired())->isSatisfiedBy($globalModerationRequired, $moment->getRecipient()->getYear())) {
-                    /* noop
+                if (!(new ModerationRequired())->isSatisfiedBy($globalModerationRequired, $moment->getRecipient()->getYear())) {
+                    /* If moderation is no longer required, but the learning moment was rejected at a time when
+                     * moderation *was* required, provide the publish button so students can progress a learning
+                     * moment into published state of their own accord.
                      */
-                } else {
                     $publish = true;
                 }
             } elseif ($moment->isPublished()) {
