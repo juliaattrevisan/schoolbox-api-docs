@@ -175,7 +175,8 @@ test.describe("Textbox Tests", () => {
         await page.goto(`https://vagrant.dev.schoolbox.cloud/homepage/${homepageId}`);
         tester.isGoingTo("Unlock the components and edit the textbox settings");
         await homepage.clickLockToggle();
-        await homepage.clickComponentSettings();
+        const component = page.locator(Homepage.locateComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1));
+        await Homepage.clickComponentSettings(component);
         await homepage.typeTextBoxHeading("Jana to be hidden");
         tester.isGoingTo("Hide the textbox title from read only users");
         const componentId = (await db.grabFromDatabase("component_instance", "id", {

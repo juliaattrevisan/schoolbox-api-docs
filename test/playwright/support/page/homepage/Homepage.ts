@@ -183,8 +183,19 @@ export default class Homepage {
      * @param position - The position of the component (1-indexed)
      */
     async clickComponentActionBarButton(button: string, layout: string, position: number): Promise<void> {
+        await this.componentActionBarButton(button, layout, position).click();
+    }
+
+    /**
+     * Returns a component action bar button
+     * @param button - The button to click (as a queryselector)
+     * @param layout - The layout of the component
+     * @param position - The position of the component (1-indexed)
+     * @returns - Locator of the button
+     */
+    componentActionBarButton(button: string, layout: string, position: number): Locator {
         const componentLocator = Homepage.locateComponent(layout, position);
-        await this.page.locator(`${componentLocator} ${Homepage.ELEMENT_COMPONENT_ACTION_BAR}`).locator(button).click();
+        return this.page.locator(`${componentLocator} ${Homepage.ELEMENT_COMPONENT_ACTION_BAR}`).locator(button);
     }
 
     /**
@@ -200,7 +211,7 @@ export default class Homepage {
      * @param tab - The tab to click
      */
     async clickComponentsTab(tab: string): Promise<void> {
-        await this.page.click(tab);
+        await this.page.locator(tab).click();
     }
 
     /**
@@ -219,10 +230,10 @@ export default class Homepage {
     }
 
     /**
-     * Click the component settings
+     * @param component - The locator of the component to check
      */
-    async clickComponentSettings(): Promise<void> {
-        await this.page.click(Homepage.ELEMENT_COMPONENT_SETTINGS);
+    public static async clickComponentSettings(component: Locator): Promise<void> {
+        await component.locator(Homepage.ELEMENT_COMPONENT_SETTINGS).click();
     }
 
     /**
