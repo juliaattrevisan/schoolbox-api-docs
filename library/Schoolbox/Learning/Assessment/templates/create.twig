@@ -17,24 +17,33 @@
 
         /**
          * Check if the participation prompt should be shown based on hidden input field values
+         * We only want to show the prompt when the assessment in within a class, and is not a customised assessment
          * @returns {boolean}
          */
         function showParticipationPrompt() {
             // Check if assessmentType is either 'dueWork' or 'task'
-            const assessmentTypeInput = document.querySelector('input[name="assessmentType"]');
+            const assessmentTypeInput = document.querySelector("input[name='assessmentType']");
             const assessmentType = assessmentTypeInput ? assessmentTypeInput.value : null;
-            const validAssessmentType = assessmentType && (assessmentType === 'dueWork' || assessmentType === 'task');
+            const validAssessmentTypes = ["dueWork", "task"];
+            const isValidAssessmentType = assessmentType && validAssessmentTypes.includes(assessmentType);
 
-            // Check if contextType is either 'units' or 'projects'
-            const contextTypeInput = document.querySelector('input[name="contextType"]');
+            // Check if contextType is either 'units' or 'projects' - will be 'unitspecs' when activity is under a unit specification
+            const contextTypeInput = document.querySelector("input[name='contextType']");
             const contextType = contextTypeInput ? contextTypeInput.value : null;
-            const validContextType = contextType && (contextType === 'units' || contextType === 'projects');
+            const validContextTypes = ["units", "projects"];
+            const isValidContextType = contextType && validContextTypes.includes(contextType);
 
-            // Check that customisedFor hidden input field doesn't exist
-            const customisedForInput = document.querySelector('input[name="customisedFor"]');
+            // Check if baseContextType is 'units' - to avoid showing the prompt in a project within a 'unitspecs'
+            const baseContextTypeInput = document.querySelector("input[name='baseContextType']");
+            const baseContextType = baseContextTypeInput ? baseContextTypeInput.value : null;
+            const validBaseContextTypes = ["units"];
+            const isValidBaseContextType = baseContextType && validBaseContextTypes.includes(baseContextType);
+
+            // Check that customisedFor hidden input field doesn't exist - which would indicate a customised assessment
+            const customisedForInput = document.querySelector("input[name='customisedFor']");
             const isNotCustomised = !customisedForInput;
 
-            return validAssessmentType && validContextType && isNotCustomised;
+            return isValidAssessmentType && isValidContextType && isValidBaseContextType && isNotCustomised;
         }
 
         /**
@@ -282,8 +291,10 @@
                         <input type="hidden" name="returnUrl" value="{{ returnUrl }}" />
                     {% endif %}
                     <input type="hidden" name="contextType" value="{{ contextType }}" />
+                    <input type="hidden" name="baseContextType" value="{{ baseContextType }}" />
                     <input type="hidden" name="contextId" value="{{ context.id }}" />
                     <input type="hidden" name="folderId" value="{{ context.folder.id }}" />
+
                     {% if (customisedFor ?? '') | length %}
                         <input type="hidden" name="customisedFor" value="{{ customisedFor }}" />
                     {% endif %}

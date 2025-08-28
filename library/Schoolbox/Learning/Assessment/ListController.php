@@ -617,6 +617,7 @@ class ListController extends Web\Controller\Base
         }
 
         $data['contextType'] = AssessmentContextType::objectToString($context) . 's';
+        $data['baseContextType'] = AssessmentContextType::objectToString($context->getBaseContext()) . 's';
         $data['context']     = $context;
         $data['breadcrumbs'] = [
             ['Learning', $this->routeGenerator->generate('learning.getClasses')],
