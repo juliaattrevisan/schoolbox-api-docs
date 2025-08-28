@@ -89,7 +89,24 @@ class PayloadFactory
      */
     public function produceTitle(string $title): string
     {
-        return trim(html_entity_decode(mb_substr(trim(strip_tags($title)), 0, self::LEARNOSITY_MAX_TITLE_LENGTH)));
+        /* Aggressively truncate because learnosity doesn't support multibyte characters properly (still)
+         * This is how emojis destroyed imports in 2023
+         *
+         * First, try to safely truncate with mb_substr
+         */
+        $newTitle = trim(html_entity_decode(mb_substr(trim(strip_tags($title)), 0, self::LEARNOSITY_MAX_TITLE_LENGTH)));
+
+        /* If it's -still- too long, use regular substr to snip off the last couple of chars
+         * I know this means we might cut off a multibyte char that exists right at the end.
+         * The alternative would be to arbitrarily make the maxlength 100 instead of 150,
+         * but then all you need is 50 hiragana characters and you're back here again trying
+         * to solve this issue
+         */
+        if (self::LEARNOSITY_MAX_TITLE_LENGTH < strlen($newTitle)) {
+            $newTitle = substr($newTitle, 0, self::LEARNOSITY_MAX_TITLE_LENGTH);
+        }
+
+        return $newTitle;
     }
 
 
