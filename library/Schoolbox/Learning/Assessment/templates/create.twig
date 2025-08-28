@@ -17,7 +17,7 @@
 
         /**
          * Check if the participation prompt should be shown based on hidden input field values
-         * We only want to show the prompt when the assessment in within a class, and is not a customised assessment
+         * We only want to show the prompt when the assessment(activity) is within a class, and is not a customised assessment
          * @returns {boolean}
          */
         function showParticipationPrompt() {
@@ -27,13 +27,13 @@
             const validAssessmentTypes = ["dueWork", "task"];
             const isValidAssessmentType = assessmentType && validAssessmentTypes.includes(assessmentType);
 
-            // Check if contextType is either 'units' or 'projects' - will be 'unitspecs' when activity is under a unit specification
+            // Check if contextType is either 'units' or 'projects' - will be 'unitspecs' when assessment is under a unit and not a class
             const contextTypeInput = document.querySelector("input[name='contextType']");
             const contextType = contextTypeInput ? contextTypeInput.value : null;
             const validContextTypes = ["units", "projects"];
             const isValidContextType = contextType && validContextTypes.includes(contextType);
 
-            // Check if baseContextType is 'units' - to avoid showing the prompt in a project within a 'unitspecs'
+            // Check if baseContextType is 'units' - to avoid showing the prompt in a project under a unit
             const baseContextTypeInput = document.querySelector("input[name='baseContextType']");
             const baseContextType = baseContextTypeInput ? baseContextTypeInput.value : null;
             const validBaseContextTypes = ["units"];
@@ -294,7 +294,6 @@
                     <input type="hidden" name="baseContextType" value="{{ baseContextType }}" />
                     <input type="hidden" name="contextId" value="{{ context.id }}" />
                     <input type="hidden" name="folderId" value="{{ context.folder.id }}" />
-
                     {% if (customisedFor ?? '') | length %}
                         <input type="hidden" name="customisedFor" value="{{ customisedFor }}" />
                     {% endif %}
