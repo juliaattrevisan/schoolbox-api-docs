@@ -42,6 +42,9 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
+use Schoolbox\Editor\Templates\Mapper as EditorTemplateMapper;
+use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
 
 class Module extends BaseModule
 {
@@ -563,6 +566,12 @@ class Module extends BaseModule
             );
         }
 
+        $editorTemplateHelper = new EditorTemplateHelper(
+            $this->getMapperFactory()->get(EditorTemplateMapper::class),
+            EditorTemplatesCategoryModel::FEEDBACK,
+            $this->injector->get('user')
+        );
+
         return new Controller(
             $this->getMapperFactory()->get(Error\Mapper::class),
             $this->injector->get('responseDataSource'),
@@ -575,6 +584,7 @@ class Module extends BaseModule
             $turnitinFileApi,
             $this->injector->get('filesystem.receiver'),
             $this->injector->get('returnDataSource'),
+            $editorTemplateHelper
         );
     }
 

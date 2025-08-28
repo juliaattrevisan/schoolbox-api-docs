@@ -58,6 +58,7 @@ use Schoolbox\User;
 use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserMapper;
 use Twig\Error\Error;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 class Controller extends Base
 {
@@ -209,6 +210,7 @@ class Controller extends Base
      * @param MessageFactory $messageFactory for creating messages to send to taskd
      * @param Producer $messageProducer for sending messages to taskd
      * @param DownloadPagesMessageFactory $downloadMessageFactory for creating download page messages to send to taskd
+     * @param EditorTemplateHelper $editorTemplateHelper
      */
     public function __construct(
         \Schoolbox\Url\Factory $urlFactory,
@@ -230,6 +232,7 @@ class Controller extends Base
         private MessageFactory $messageFactory,
         private Producer $messageProducer,
         private DownloadPagesMessageFactory $downloadMessageFactory,
+        private EditorTemplateHelper $editorTemplateHelper,
     ) {
         /* Probably inject this one day, but for now,
          * I want to avoid dumping Yet Another Thing into the kernel
@@ -1118,7 +1121,8 @@ class Controller extends Base
                 $this->stateMapper->findAll(),
                 $assessment->getMarkType(),
                 $assessment->getGradeGroup()
-            ))->convert()
+            ))->convert(),
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ], sprintf(
             'Feedback for %s in %s',
             $student->getFullName(),
@@ -1441,6 +1445,7 @@ class Controller extends Base
             /* This list of learnosity references is used for the finalisation step
              */
             'sessions' => json_encode($learnositySessions, JSON_THROW_ON_ERROR),
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ], sprintf(
             'Horizontal Marking for %s',
             $assessment->getTitle()

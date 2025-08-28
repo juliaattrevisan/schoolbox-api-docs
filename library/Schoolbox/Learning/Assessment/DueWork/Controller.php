@@ -94,6 +94,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 use Url;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 use function count;
 
@@ -205,7 +206,8 @@ class Controller extends Assessment\Controller
         protected Filter\Mapper $filterMapper,
         protected Filter\Selection\Mapper $filterSelectionMapper,
         protected CourseImplementationMapper $courseImplementationMapper,
-        protected UnitImplementationMapper $unitImplementationMapper
+        protected UnitImplementationMapper $unitImplementationMapper,
+        private EditorTemplateHelper $editorTemplateHelper
     ) {
         parent::__construct(
             $userMapper,
@@ -345,7 +347,8 @@ class Controller extends Assessment\Controller
             ))->getFirstUrl(),
             /* Draft Responses made by each guy
              */
-            'draftResponses' => $draftResponses
+            'draftResponses' => $draftResponses,
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ];
 
         $this->response = $this->responseFromTemplate(
@@ -491,7 +494,7 @@ class Controller extends Assessment\Controller
 
             /* External Url for third party apps which might have generated this assessment
              */
-            'externalRedirectUrl' => $externalRedirectUrl
+            'externalRedirectUrl' => $externalRedirectUrl,
         ];
 
         $routeArgs = [

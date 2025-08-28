@@ -1,6 +1,7 @@
 /**
  * The different events that can be dispatched for the activity status page
  */
+import type { Template } from "@js/editor/types/editorTypes";
 
 export const ACTIVITY_STATUS_PAGE_INIT = "ACTIVITY_STATUS_PAGE_INIT";
 
@@ -44,6 +45,7 @@ export type ActivityStatusPageInitEventDetail = {
             rowCommentTextarea: string;
         };
     };
+    templates?: Template[]; // templates to use for the editor if available
 };
 
 export interface ActivityStatusPageDocumentEventHandlerMap {

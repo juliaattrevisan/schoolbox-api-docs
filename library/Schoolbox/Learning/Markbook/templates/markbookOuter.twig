@@ -4,6 +4,7 @@
     Usage:
         folder        \Schoolbox\Resource\Folder\Model - what folder is this markbook for?
         filterPanel   \Schoolbox\Filter\Panel          - which assessments are writable? indexed by assessment.id
+        editorTemplates array Retrieve any pre-existing editor templates to insert into the 'Body' rich text editor
 #}
 
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -29,7 +30,11 @@
 } only %}
 
 <div id="markbook-outer-container" class="marksheet-wrapper row">
-    <markbook-outer type='class' filter-event-key="{{ filterEventKey }}" />
+    <markbook-outer type='class' filter-event-key="{{ filterEventKey }}"
+        {% if editorTemplates is defined %}
+            :editor-templates="{{ editorTemplates|json_encode }}"
+        {% endif %}
+    />
 </div>
 <script src="{{ CDN_PREFIX }}/js/submissions/jquery.combobox.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/bundle/markbookOuter.js?v={{ config.site_version }}"></script>

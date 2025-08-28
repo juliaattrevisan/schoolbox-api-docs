@@ -38,6 +38,7 @@
             :mark-data="{{ markData|json_encode }}"
             :urls="{{ urls|json_encode }}"
             status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"
+            :editor-templates="{{ editorTemplates|json_encode }}"
         />
     </div>
 </div>

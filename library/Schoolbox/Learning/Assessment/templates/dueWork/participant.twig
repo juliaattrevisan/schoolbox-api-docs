@@ -119,6 +119,7 @@
                         blindMode:      false,
                         isRichText:     false,
                         prefix:         assessment.id,
+                        editorTemplates: editorTemplates ?? [],
                     } only %}
                     {% set inputNo = inputNo + 1 %}
                     {% if '' == assessment.instructorMarkScheme.template %}

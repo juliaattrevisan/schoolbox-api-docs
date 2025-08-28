@@ -318,6 +318,7 @@ async function onFeedbackPublish(): Promise<void> {
                         v-model:comment="cellInfo.feedback.data.comment"
                         :participant="{ user: cellInfo.student }"
                         :is-rich-text="true"
+                        :templates="mbStore.editorTemplates"
                     />
 
                     <resubmission-required

@@ -48,6 +48,7 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
         ];
     } else if (config.toolbar === EditorToolbar.COMMENT || config.toolbar === EditorToolbar.COMMENT_AI) {
         items = [
+            ...(config.templates && config.templates.length > 0 ? ["insertTemplate", "|"] : []),
             "bold",
             "italic",
             "underline",

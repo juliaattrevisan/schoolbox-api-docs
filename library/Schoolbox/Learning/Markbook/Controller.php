@@ -34,6 +34,7 @@ use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 use function func_get_args;
 
@@ -56,6 +57,7 @@ class Controller extends Base
         private Filter\IFactoryFactory $filterFactoryFactory,
         private StateMapper $stateMapper,
         private IPurifier $purifier,
+        private EditorTemplateHelper $editorTemplateHelper
     ) {
     }
 
@@ -93,6 +95,7 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate('@learningMarkbook/markbookOuter.twig', [
                 'folder'      => $folder,
                 'filterPanel' => $filterPanel,
+                'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
             ], $pageTitle, 'submission');
     }
 

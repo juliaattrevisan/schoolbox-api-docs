@@ -106,7 +106,7 @@
                 saveButton:            '[data-action="save"]',
                 editorInstance:        '[data-content]',
                 fileBrowserCategoryId: Number("{{ context.id }}"),
-                {% if editorTemplates %}
+                {% if editorTemplates is defined %}
                 editorTemplates:       {{ editorTemplates | json_encode | raw }},
                 {% endif %}
             });

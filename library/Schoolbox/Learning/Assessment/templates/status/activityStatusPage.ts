@@ -8,7 +8,7 @@ import { slideDown, slideUp } from "@js/util/animateUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 import type { EditorCreateEventInfo } from "@js/editor/event/editorEvent";
 import { EditorToolbar } from "@js/editor/types/editorTypes";
-import type { SbxEditor } from "@js/editor/types/editorTypes";
+import type { SbxEditor, Template } from "@js/editor/types/editorTypes";
 import { ACTIVITY_STATUS_PAGE_INIT } from "./activityStatusPageEvent";
 
 type ParticipantRow = {
@@ -48,6 +48,7 @@ let pageConfig: {
             } | null; // null if no pagination
         }[];
     };
+    templates?: Template[]; // templates to use for the editor if available
 };
 
 /**
@@ -93,6 +94,7 @@ async function createEditorForParticipants(participants: ParticipantRow[]): Prom
                 maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                 toolbar: EditorToolbar.COMMENT_AI,
                 mirrorChangeEvents: true, // To keep jquery.dynamic-feedback.js in sync
+                templates: pageConfig.templates,
             },
         }),
     );
@@ -417,6 +419,7 @@ document.addEventListener(ACTIVITY_STATUS_PAGE_INIT, (event) => {
                 document.querySelectorAll<HTMLInputElement>(event.detail.selectors.participantFilters),
             ),
         },
+        templates: event.detail.templates || [],
     };
 
     pageConfig.elements.participantGroups.forEach((group, i) => {

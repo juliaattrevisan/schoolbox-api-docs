@@ -1,3 +1,5 @@
+{#    editorTemplates       array            Retrieve any pre-existing editor templates to insert into the 'Body' rich text editor
+#}
 {% import 'sub/breadcrumbs.twig' as bread %}
 {% import '@learningAssessment/project/macro/icon.twig' as icon %}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
@@ -237,7 +239,10 @@
                     rowName: '[data-participant-name]',
                     rowCommentTextarea: '[data-feedback-comment]',
                 },
-            }
+            },
+            {% if editorTemplates is defined %}
+                templates: {{ editorTemplates|json_encode|raw }},
+            {% endif %}
         }
     }));
 </script>

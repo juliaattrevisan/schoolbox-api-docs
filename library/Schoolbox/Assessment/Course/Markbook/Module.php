@@ -24,6 +24,9 @@ use Schoolbox\Filter;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
 use Schoolbox\Permission\Access\Access;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
+use Schoolbox\Editor\Templates\Mapper as EditorTemplateMapper;
+use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
 
 class Module extends \Alaress\Module\Module
 {
@@ -98,6 +101,11 @@ class Module extends \Alaress\Module\Module
             $this->getMapperFactory()->get(Access::class),
             $this->getMapperFactory()->get(StateMapper::class),
             new ScrubAdapter(),
+            new EditorTemplateHelper(
+                $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                EditorTemplatesCategoryModel::FEEDBACK,
+                $this->injector->get('user')
+            ),
         );
     }
 
