@@ -93,6 +93,8 @@ class NextRoutes
         } elseif ($user->getRole()->isParent()) {
             /* When parents author their own content, they skip the whole moderation workflow
              * but they can't progress anyone else's learning moments to another state.
+             *
+             * They can never return to draft state once it's changed.
              */
             if ($moment->getCreator()->getId() === $user->getId()) {
                 $publish = true;
@@ -139,9 +141,8 @@ class NextRoutes
                 $publish = true;
             } elseif ($moment->isPublished()) {
                 if ((new ModerationRequired())->isSatisfiedBy($globalModerationRequired, $moment->getRecipient()->getYear())) {
-                    /* If moderation is required; you can't do anything here except send it back to draft
+                    /* noop: You can't unpublish a thing that's been published, I think?
                      */
-                    $draft = true;
                 } else {
                     /* Moderation wasn't required: student can just republish whenever they want
                      */
