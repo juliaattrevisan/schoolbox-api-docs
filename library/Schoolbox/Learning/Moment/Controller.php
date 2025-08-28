@@ -27,14 +27,11 @@ use Schoolbox\Learning\Moment\Moderation\ModerationRequired;
 use Schoolbox\Learning\Moment\NextRoutes;
 use Schoolbox\Learning\Moment\Translator\ModelToArray\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
-use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
-use Schoolbox\Resource\Attachment\GenericZone;
 use Schoolbox\Resource\Exception;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Storage;
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\TokenReplacer;
 use Schoolbox\User;
 
@@ -140,21 +137,10 @@ class Controller extends Base
          */
         $folders = null;
 
-        /* This is usually empty when creating, except when you're creating by the class list;
-         * that will have a folder already chosen
-         */
-        $selectedFolders = [];
-
         /* Students get their learning moment moderation requirement tested;
          * parents and teachers bypass this check
          */
-        $moderationRequired = false;
-
         if ($this->getUser()->getRole()->isStudent()) {
-            /* Students crafting learning moments for themselves might be subject to moderation
-             */
-            $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $this->getUser()->getYear());
-
             /* These are folders that the recipient can see via their membership;
              * Note that a staff member might edit a student's learning moment, so you have to use
              * the recipient's user instance, not the viewer's
@@ -167,13 +153,6 @@ class Controller extends Base
             if ($userAccesses->count()) {
                 $folders = $this->folderMapper->findByColumn('id', $userAccesses->getPropertyValues('serviceIdentifier'));
             }
-
-            /* If folderId exists in the querystring params, use that to preselect
-             * (you probably came here via the homepage component)
-             */
-            if ($this->requestQuery->get('folderId') ?? false) {
-                $selectedFolders = [$this->requestQuery->get('folderId')];
-            }
         } elseif (1 === $users->count()) {
             /* Crafting a learning moment for exactly one other person
              *
@@ -185,24 +164,6 @@ class Controller extends Base
              * Otherwise, you have a mixed bag of people who have access to different folders
              * and that would make the ui really messy.
              */
-            if ($this->getUser()->getRole()->isParent()) {
-                /* If the current user is a parent, and the list of recipients is exactly one,
-                 * then the parent is creating a learning moment for one of their children via their activity feed.
-                 * Spawn the Submit For Approval button for parents so their learning moments enter moderation queue.
-                 *
-                 * This forces parents into the same moderation workflow as their children. ALTERNATIVELY you could
-                 * require the Learning Moment Moderation role permission on various parent roles; this could allow
-                 * some Parent roles to have moderation requirements and others can Publish immediately to the world.
-                 *
-                 * Note:
-                 * This is purely circumstantial since parents can't spawn learning moments for multiple people.
-                 */
-                $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $users->first()->getYear());
-
-                /* Parents don't get to associate folders with a learning moment
-                 */
-            }
-
             if ($this->getUser()->getRole()->isStaff()) {
                 /* These are folders that the recipient can see via their membership;
                  * Note that a staff member might edit a student's learning moment, so you have to use
@@ -215,10 +176,6 @@ class Controller extends Base
 
                 if ($userAccesses->count()) {
                     $folders = $this->folderMapper->findByColumn('id', $userAccesses->getPropertyValues('serviceIdentifier'));
-
-                    if ($this->requestQuery->get('folderId') ?? false) {
-                        $selectedFolders = [$this->requestQuery->get('folderId')];
-                    }
                 }
             }
         } elseif ($this->getUser()->getRole()->isStaff()) {
@@ -227,10 +184,18 @@ class Controller extends Base
              * Request a collection of folders for data struct synonymity
              */
             $folders = $this->folderMapper->findByColumn('id', $this->requestQuery->get('folderId'));
+        }
 
-            if ($this->requestQuery->get('folderId') ?? false) {
-                $selectedFolders = [$this->requestQuery->get('folderId')];
-            }
+        /* This is usually empty when creating, except when you're creating by the class list;
+         * that will have a folder already chosen
+         */
+        $selectedFolders = [];
+
+        /* If folderId exists in the querystring params, use that to preselect
+            * (you probably came here via the homepage component)
+            */
+        if ($this->requestQuery->get('folderId') ?? false) {
+            $selectedFolders = [$this->requestQuery->get('folderId')];
         }
 
         $translator = $this->buildTranslatorWithComments(1);
@@ -256,34 +221,20 @@ class Controller extends Base
         ];
 
         $params = [
-            // TODO: Just swap these out of payload once we're done with the twig file...
-            'payload' => [
-                'hasAutosave'              => $users->count() === 1, // only autosave on create if there's one target user
-                'evidence' => $translator($moment),
-                'editorTemplates'          => $this->editorTemplateHelper->getTemplatesForCategory(),
-                'createRoutes'         => $createRoutes,
-                'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
-                'curriculumNodes'          => [],
-                'folders'  => $folders ? $folders->map(fn(Folder\Model $f) => [
-                    'id' => $f->getId(),
-                    'title' => $f->getTitle(),
-                ])->reindex() : [],
-                'selectedFolders' => $selectedFolders,
-            ],
-            'evidence'                 => $moment,
-            'users'                    => $users,
-            'userIds'                  => $users->getPropertyValues('id'),
+            'hasAutosave'              => $users->count() === 1, // only autosave on create if there's one target user
+            'moment'                   => $moment,
+            'momentTranslated'         => $translator($moment),
+            'editorTemplates'          => $this->editorTemplateHelper->getTemplatesForCategory(),
+            'createRoutes'             => $createRoutes,
+            'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
+            'curriculumNodes'          => [],
+            'folders'  => $folders ? $folders->map(fn(Folder\Model $f) => [
+                'id' => $f->getId(),
+                'title' => $f->getTitle(),
+            ])->reindex() : [],
+            'selectedFolders'          => $selectedFolders,
             'otherUsers'               => $otherUsers,
             'sharingForSelf'           => $sharingForSelf,
-            'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
-            'moderationRequired'       => $moderationRequired,
-            'isCreate'                 => true,
-            // 'zone'                     => $this->buildAttachzone($momentType)->getTwigContext(),
-            'editorTemplates'          => $this->editorTemplateHelper->getTemplatesForCategory(),
-            /* Folder relationships
-             */
-            'folders' => $folders,
-            'selectedFolders' => $selectedFolders,
         ];
 
         $this->response = $this->responseFromTemplate('@learningMomentEvidence/form.twig', $params);
@@ -524,24 +475,6 @@ class Controller extends Base
          */
         $moment = $evidence;
 
-        /* Attachzone stuff for existing attachments
-         */
-        // $zone = $this->buildAttachzone($momentType);
-        // if ($moment->getEvidence()->first()?->getStorage()) {
-        //     $zone->attachFiles([$moment->getEvidence()->first()->getStorage()->getHash()]);
-        // }
-
-        /* Students get their learning moment moderation requirement tested;
-         * parents and teachers bypass this check
-         */
-        $moderationRequired = false;
-
-        if ($this->getUser()->getRole()->isStudent()) {
-            $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $this->getUser()->getYear());
-        } elseif ($this->getUser()->getRole()->isParent()) {
-            $moderationRequired = (new ModerationRequired())->isSatisfiedBy($this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $evidence->getRecipient()->getYear());
-        }
-
         /* These are folders that the recipient can see via their membership;
          * Note that a staff member might edit a student's learning moment, so you have to use
          * the recipient's user instance, not the viewer's
@@ -568,37 +501,20 @@ class Controller extends Base
         $translator = $this->buildTranslatorWithComments(1);
 
         $params = [
-            // TODO: Just swap these out of payload once we're done with the twig file...
-            'payload' => [
-                'hasAutosave'              => true, // can always autosave on the modify form (assuming you have draft perms handled by routes)
-                'evidence'                 => $translator($moment),
-                'editorTemplates'          => $this->editorTemplateHelper->getTemplatesForCategory(),
-                'createRoutes'             => null,
-                'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
-                'curriculumNodes'          => $moment->getViewableCurriculumNodes()?->reindex(),
-                'folders'  => $folders ? $folders->map(fn(Folder\Model $f) => [
-                    'id' => $f->getId(),
-                    'title' => $f->getTitle(),
-                ])->reindex() : [],
-                'selectedFolders' => $selectedFolders,
-            ],
-            'evidence'                 => $moment,
-            'users'                    => $moment->getRecipient(),
-            'userIds'                  => $moment->getRecipient()->getId(),
+            'hasAutosave'              => true, // can always autosave on the modify form (assuming you have draft perms handled by routes)
+            'moment'                   => $moment,
+            'momentTranslated'         => $translator($moment),
+            'editorTemplates'          => $this->editorTemplateHelper->getTemplatesForCategory(),
+            'createRoutes'             => null,
+            'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
+            'curriculumNodes'          => $moment->getViewableCurriculumNodes()?->reindex(),
+            'folders'  => $folders ? $folders->map(fn(Folder\Model $f) => [
+                'id' => $f->getId(),
+                'title' => $f->getTitle(),
+            ])->reindex() : [],
+            'selectedFolders'          => $selectedFolders,
             'otherUsers'               => [],
             'sharingForSelf'           => $this->getUser() === $moment->getRecipient(),
-            'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
-            'moderationRequired'       => $moderationRequired,
-            'isCreate'                 => false,
-            'curriculumCodes'          => $moment->getViewableCurriculumNodes()?->reindex(),
-            // 'zone'                     => $zone->getTwigContext(),
-            'hasComments'              => $this->hasComments($moment),
-            'returnUrl'                => $this->requestQuery->get('returnUrl'),
-            'editorTemplates'          => $this->editorTemplateHelper->getTemplatesForCategory(),
-            /* Folder relationships
-             */
-            'folders' => $folders,
-            'selectedFolders' => $selectedFolders,
         ];
 
         $this->response = $this->responseFromTemplate('@learningMomentEvidence/form.twig', $params);
@@ -680,53 +596,6 @@ class Controller extends Base
             ];
         }
         $this->response = $this->responseAsJson($output);
-    }
-
-
-    /**
-     * Helper for building an attachzone for this controller.
-     *
-     * @param string $momentType
-     * @return GenericZone
-     */
-    private function buildAttachzone(string $momentType): GenericZone
-    {
-        $zone = new GenericZone('storage', StorageMapper::getInstance());
-        $zone->setAttachmentsLabel('')
-             ->setAttachPrompt('upload files to this location')
-             ->setMimeFilter('*/*')
-             ->setFileVar('file')
-             ->setMulti(false)
-             ->setThumbnailSize(64)
-             ->setModalTitle('Select file');
-        switch ($momentType) {
-            case Evidence\Model::MOMENT_TYPE_PHOTO:
-                $zone->setAttachPrompt('take a picture')
-                     ->setIconClass('icon-camera')
-                     ->setUseModal(false)
-                     ->setCapture(true)
-                     ->setMimeFilter('image/*');
-                break;
-            case Evidence\Model::MOMENT_TYPE_AUDIO:
-                $zone->setAttachPrompt('record audio')
-                     ->setIconClass('icon-audio')
-                     ->setUseModal(false)
-                     ->setCapture(true)
-                     ->setMimeFilter('audio/*');
-                break;
-            case Evidence\Model::MOMENT_TYPE_VIDEO:
-                $zone->setAttachPrompt('record video')
-                     ->setIconClass('icon-video')
-                     ->setUseModal(false)
-                     ->setCapture(true)
-                     ->setMimeFilter('video/*');
-                break;
-            case Evidence\Model::MOMENT_TYPE_UPLOAD:
-            case Evidence\Model::MOMENT_TYPE_TEXT:
-            default:
-                break;
-        }
-        return $zone;
     }
 
 

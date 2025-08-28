@@ -10,6 +10,8 @@
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 
+{% set isCreate = createRoutes is defined and createRoutes is not empty %}
+
 {% if isCreate %}
     {{ bread.crumbs(
         [ 'Share Learning' ]
@@ -17,8 +19,8 @@
     {% set heading = 'Share a' %}
 {% else %}
     {{ bread.crumbs(
-        [evidence.recipient.fullName, '/search/user/' ~ evidence.recipient.id],
-        ['Learning Moment', routeLookupIfAuthorized('@learningMomentEvidence.getEvidenceDetail', {evidenceId: evidence.id})],
+        [moment.recipient.fullName, '/search/user/' ~ moment.recipient.id],
+        ['Learning Moment', routeLookupIfAuthorized('@learningMomentEvidence.getEvidenceDetail', {evidenceId: moment.id})],
         ['Modify']
     ) }}
 
@@ -29,7 +31,7 @@
      #
      # Otherwise, presume updating the Moment's contents as a student
      #}
-    {% if USER.role.isStaff and USER.role.accessEvidence and evidence.isSubmitted %}
+    {% if USER.role.isStaff and USER.role.accessEvidence and moment.isSubmitted %}
         {% set heading = 'Publish a' %}
     {% else %}
         {% set heading = 'Modify' %}
@@ -38,21 +40,21 @@
 
 <div id="learning-moment-form-container">
     <moment-form
-        :has-autosave="{{ payload.hasAutosave ? 'true' : 'false' }}"
+        :has-autosave="{{ hasAutosave ? 'true' : 'false' }}"
         return-url="{{ RETURN_URL.previous.decoded ?? '/' }}"
-        :create-routes="{{ payload.createRoutes|json_encode }}"
-        :moment="{{ payload.evidence|json_encode }}"
-        :editor-templates="{{ payload.editorTemplates|json_encode }}"
+        :create-routes="{{ createRoutes|json_encode }}"
+        :moment="{{ momentTranslated|json_encode }}"
+        :editor-templates="{{ editorTemplates|json_encode }}"
         endpoint-get-evidence-tags="{{ routeLookup('learningMomentEvidence.getTags') }}"
-        {% if payload.curriculumTaggingEnabled %}
-        :curriculum-nodes="{{ payload.curriculumNodes|json_encode }}"
+        {% if curriculumTaggingEnabled %}
+        :curriculum-nodes="{{ curriculumNodes|json_encode }}"
         endpoint-curriculum-nodes="{{ routeLookup('curriculumApi.searchNode') }}"
         {% else %}
         :curriculum-nodes="[]"
         :endpoint-curriculum-nodes="null"
         {% endif %}
-        :folders="{{ payload.folders|json_encode }}"
-        :selected-folders="{{ payload.selectedFolders|json_encode }}"
+        :folders="{{ folders|json_encode }}"
+        :selected-folders="{{ selectedFolders|json_encode }}"
     >
         <template v-slot:heading>
             <h1>{{ heading }} Learning Moment</h1>
@@ -84,27 +86,3 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/learningMomentForm.js?v={{ config.site_version }}"></script>
-
-
-<div class="row">
-    <div class="small-12 island">
-        {# form action is intentionally controlled via javascript now #}
-            <section>
-                <fieldset class="content">
-                    <div class="small-12 columns">
-                        {% block formInputFile %}
-                        {% endblock formInputFile %}
-                        {% block formInputBody %}
-                            {% block formInputBodyMeta %}
-                                {% if USER.role.staff %}
-                                    <p class="meta">
-                                        Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details on creation.
-                                    </p>
-                                {% endif %}
-                            {% endblock formInputBodyMeta %}
-                        {% endblock formInputBody %}
-                    </div>
-                </fieldset>
-            </section>
-    </div>
-</div>
