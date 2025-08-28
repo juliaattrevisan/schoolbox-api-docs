@@ -27,73 +27,110 @@ class NextRoutes
      * There doesn't seem to be a convenient way to compartmentalise getRouteIfAuthorized()
      *
      * @param Model $moment
-     * @param User $user
-     * @param bool $moderationRequired
+     * @param User $user The user currently logged in
+     * @param bool $globalModerationRequired
      * @return array{draft:true|null,submit:true|null,publish:true|null,reject:true|null}
      */
-    public function generate(\Schoolbox\Learning\Moment\Model $moment, User $user, bool $moderationRequired): array
+    public function generate(\Schoolbox\Learning\Moment\Model $moment, User $user, bool $globalModerationRequired): array
     {
-        /** states of a learning moment
-         * draft
-         * submitted
-         * published
-         * rejected
+        /* Each roletype has a somewhat-unique workflow of states into which a learning moment can transition.
+         * For example:
+         *
+         *     Students are beholden to the Learning Moment Moderation requirement on the roles;
+         *     Parents skip the moderation process entirely,
+         *     Staff have the ability to reject.
          */
+        $draft = null;
+        $submit = null;
+        $publish = null;
+        $reject = null;
 
+        /* Start with staff
+         */
+        if ($user->getRole()->isStaff()) {
+            if ($moment->isDraft()) {
+                /* Draft is a possibility for repeated edits
+                 */
+                $draft = true;
 
-        $modRequired = new ModerationRequired();
+                /* If moderation was needed, rejected state becomes a possibility
+                 */
+                if ((new ModerationRequired())->isSatisfiedBy($globalModerationRequired, $moment->getRecipient()->getYear())) {
+                    $reject = true;
+                }
+            } elseif ($moment->isSubmitted()) {
+                /* Draft is a possibility for repeated edits
+                 */
+                $draft = true;
 
-        //if user is student (and has mod)
-        $studentModerated = false;
-        if ($user->getRole()->isStudent()) {
-            $studentModerated = $modRequired->isSatisfiedBy($moderationRequired, $user->getYear());
+                /* submitted can move to published
+                 */
+                $publish = true;
+
+                /* If moderation was needed, rejected state becomes a possibility
+                 */
+                if ((new ModerationRequired())->isSatisfiedBy($globalModerationRequired, $moment->getRecipient()->getYear())) {
+                    $reject = true;
+                }
+            } elseif ($moment->isRejected()) {
+                /* You can't continually/repeatedly reject an already-rejected learning moment
+                 * ...but you cNan change your mind and send it into published state
+                 *
+                 * Anything else is prohibited and you are forced back to the start of the workflow
+                 * in draft state
+                 */
+                $publish = true;
+            }
+        } elseif ($user->getRole()->isParent()) {
+            /* When parents author their own content, they skip the whole moderation workflow
+             * but they can't progress anyone else's learning moments to another state.
+             */
+            if ($moment->getCreator()->getId() === $user->getId()) {
+                $publish = true;
+            }
+        } elseif ($user->getRole()->isStudent()) {
+            if ($moment->isDraft()) {
+                /* Draft is a possibility for repeated edits
+                 */
+                $draft = true;
+
+                if ((new ModerationRequired())->isSatisfiedBy($globalModerationRequired, $moment->getRecipient()->getYear())) {
+                    /* If moderation was needed, submitted state becomes a possibility
+                     */
+                    $submit = true;
+                } else {
+                    /* Otherwise students can immediately self-publish their own content
+                     */
+                    $publish = true;
+                }
+            } elseif ($moment->isSubmitted()) {
+                if ((new ModerationRequired())->isSatisfiedBy($globalModerationRequired, $moment->getRecipient()->getYear())) {
+                    /* noop: you need to wait for a staff to progress your learning moment.
+                     * Students can't self-publish when moderation is required.
+                     */
+                } else {
+                    /* This occurs when a learning moment was in a submitted state and moderation was required,
+                     * but then moderation requirement was removed: your content is now in this limbo area where
+                     * you need to progress it further by yourself, as if you had authored it without moderation
+                     */
+                    $publish = true;
+                }
+            } elseif ($moment->isRejected()) {
+                /* You can't continually/repeatedly reject an already-rejected learning moment
+                 * ...but you can change your mind and send it into published state
+                 *
+                 * Anything else is prohibited and you are forced back to the start of the workflow
+                 * in draft state
+                 */
+                $publish = true;
+            }
         }
 
-        // staff can only moderate Learning Moments for students who are being moderated
-        $isStaffMod = false;
-        if ($user->getRole()->isStaff() && $modRequired->isSatisfiedBy($moderationRequired, $moment->getCreator()->getYear())) {
-            $isStaffMod = true;
-        }
-
-        switch ($moment->getCurrentState()) {
-            case \Schoolbox\Learning\Moment\Model::STATUS_PUBLISHED:
-                /* Next mutable states: rejected
-                 */
-                return [
-                    'draft' => $user->getRole()->isStaff() ? null : true, // staff cannot turn it back into a draft, parents/students fall back to the route check
-                    'submit' => null,
-                    'publish' => null,
-                    'reject' => $isStaffMod ? true : null, // only reject if the lm you are looking at was created by a student who is being moderated, else continue as you are
-                ];
-            case \Schoolbox\Learning\Moment\Model::STATUS_SUBMITTED:
-                /* Next mutable states: published, rejected
-                 */
-                return [
-                    'draft' => $user->getRole()->isStaff() ? null : true, // staff cannot turn it back into a draft, parents/students fall back to the route check
-                    'submit' => null,
-                    'publish' => $isStaffMod ? true : null, // only publish if the lm you are looking at was created by a student who is being moderated, else continue as you are
-                    'reject' => $isStaffMod ? true : null, // only reject if the lm you are looking at was created by a student who is being moderated, else continue as you are
-                ];
-            case \Schoolbox\Learning\Moment\Model::STATUS_REJECTED:
-                /* Next mutable states: published
-                 */
-                return [
-                    'draft' => $user->getRole()->isStaff() ? null : true, // staff cannot turn it back into a draft, parents/students fall back to the route check
-                    'submit' => null,
-                    'publish' => $isStaffMod ? true : null, // only publish if the lm you are looking at was created by a student who is being moderated, else continue as you are
-                    'reject' => null,
-                ];
-            case \Schoolbox\Learning\Moment\Model::STATUS_DRAFT:
-            default:
-                /* students who require moderation, can only submit, and NOT publish
-                 * all other users (staff, parents, and students (who are not being moderated)) can ship straight to publish and skip the submit route
-                 */
-                return [
-                    'draft' => true, // already a draft, can keep it as a draft
-                    'submit' => $studentModerated ? true : null,
-                    'publish' => $studentModerated ? null : true,
-                    'reject' => null,
-                ];
-        }
+        return [
+            'draft' => $draft,
+            'submit' => $submit,
+            'publish' => $publish,
+            'reject' => $reject,
+        ];
     }
 }
