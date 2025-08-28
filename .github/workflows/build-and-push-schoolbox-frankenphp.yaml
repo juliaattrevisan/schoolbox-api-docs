@@ -98,7 +98,7 @@ jobs:
           name: schoolbox-npm
           path: www/static/js/bundle/
 
-      - name: Build and push schoolbox-frankenphp:latest-php${{ matrix.phpVersion }} deployment image
+      - name: Build and push ${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }} deployment image
         id: build-and-push-latest
         uses: docker/build-push-action@v6
         with:
@@ -117,8 +117,8 @@ jobs:
             PHP_MAJOR_VERSION=${{ matrix.phpVersion }}
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            alaress/schoolbox-frankenphp:latest-php${{ matrix.phpVersion }}
-            ${{ vars.SCHOOLBOX_ECR_REPO }}:latest-php${{ matrix.phpVersion }}
+            ${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}
+            ${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}
 
       - name: Export digest
         run: |
@@ -173,8 +173,8 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            alaress/schoolbox-frankenphp:latest-php${{ matrix.phpVersion }}
-            ${{ vars.SCHOOLBOX_ECR_REPO }}:latest-php${{ matrix.phpVersion }}
+            ${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}
+            ${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}
           tags: |
             type=ref,event=tag,prefix=
 
@@ -182,5 +182,5 @@ jobs:
         working-directory: ${{ runner.temp }}/digests
         run: |
           docker buildx imagetools create $(jq -cr '.tags | map ("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf 'alaress/schoolbox-frankenphp@sha256:%s ' *) \
-            $(printf '${{ vars.SCHOOLBOX_ECR_REPO }}@sha256:%s ' *)
+            $(printf '${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}@sha256:%s ' *) \
+            $(printf '${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}@sha256:%s ' *)
