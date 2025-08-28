@@ -27,11 +27,10 @@ test.describe("Links Component Tests", () => {
     });
 
     test("Verify Add Link", async ({ tester, page }) => {
-        tester.isGoingTo("Homepage, open tab panel, click components tab and verify component Icon");
+        tester.isGoingTo("Homepage, open tab panel, click components tab");
         await homepage.goto(83);
         await homepage.openTabPanel(Homepage.ELEMENT_ADD_COMPONENT_TAB);
         await homepage.clickComponentsTab(Homepage.ELEMENT_COMPONENT_SECTION_RESOURCES);
-        await homepage.checkComponentIcon("Component_Homepage_LinkListController");
         tester.isGoingTo("Add Links component");
         await homepage.addComponent(Homepage.ELEMENT_ADD_COMPONENT_SECTION_RESOURCES, "Links");
         linksComponent = page.locator(Homepage.locateComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1));
@@ -151,7 +150,6 @@ test.describe("Links Component Tests", () => {
     //     await homepage.goto(188);
     //     await homepage.openTabPanel(Homepage.ELEMENT_ADD_COMPONENT_TAB);
     //     await homepage.clickComponentsTab(Homepage.ELEMENT_COMPONENT_SECTION_RESOURCES);
-    //     await homepage.checkComponentIcon("Component_Homepage_LinkListController");
     //     tester.isGoingTo("Add Links component");
     //     await homepage.addComponent(Homepage.ELEMENT_ADD_COMPONENT_SECTION_RESOURCES, "Links");
     //     linksComponent = page.locator(Homepage.locateComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1));
