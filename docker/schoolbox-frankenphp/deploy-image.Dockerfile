@@ -6,8 +6,8 @@
 ARG ENV=dev
 ARG PHP_MAJOR_VERSION=8.4
 ARG PRIVATE_CONTAINER_REGISTRY=476058706527.dkr.ecr.ap-southeast-2.amazonaws.com
-ARG IMAGE=${PRIVATE_CONTAINER_REGISTRY}/frankenphp-base-php${PHP_MAJOR_VERSION}
-ARG TAG=latest
+ARG IMAGE=${PRIVATE_CONTAINER_REGISTRY}/frankenphp-base
+ARG TAG=latest-php${PHP_MAJOR_VERSION}
 FROM ${IMAGE}:${TAG}
 # code from code context to image.
 COPY --from=code ./vendor    /usr/share/schoolbox/vendor
