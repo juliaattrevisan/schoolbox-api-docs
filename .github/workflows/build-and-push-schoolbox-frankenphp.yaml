@@ -100,7 +100,7 @@ jobs:
           name: schoolbox-npm
           path: www/static/js/bundle/
 
-      - name: Build and push schoolbox-frankenphp deployment image
+      - name: Build and push schoolbox-frankenphp:latest-php${{ matrix.phpVersion.long }} deployment image
         id: build-and-push-latest
         uses: docker/build-push-action@v6
         with:
@@ -115,12 +115,12 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             ENV=prod
-            TAG=latest-${{ github.event.release.target_commitish }}
+            TAG=latest-php${{ matrix.phpVersion.long }}-${{ github.event.release.target_commitish }}
             PHP_MAJOR_VERSION=${{ matrix.phpVersion.long }}
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            alaress/php${{ matrix.phpVersion.short }}-schoolbox-frankenphp
-            ${{ vars.SCHOOLBOX_ECR_REPO }}-php${{ matrix.phpVersion.long }}
+            alaress/schoolbox-frankenphp:latest-php${{ matrix.phpVersion.long }}
+            ${{ vars.SCHOOLBOX_ECR_REPO }}:latest-php${{ matrix.phpVersion.long }}
 
       - name: Export digest
         run: |
@@ -175,8 +175,8 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            alaress/php${{ matrix.phpVersion.short }}-schoolbox-frankenphp
-            ${{ vars.SCHOOLBOX_ECR_REPO }}-php${{ matrix.phpVersion.long }}
+            alaress/schoolbox-frankenphp:latest-php${{ matrix.phpVersion.long }}
+            ${{ vars.SCHOOLBOX_ECR_REPO }}:latest-php${{ matrix.phpVersion.long }}
           tags: |
             type=ref,event=tag,prefix=
 
@@ -184,5 +184,5 @@ jobs:
         working-directory: ${{ runner.temp }}/digests
         run: |
           docker buildx imagetools create $(jq -cr '.tags | map ("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf 'alaress/php${{ matrix.phpVersion.short }}-schoolbox-frankenphpz@sha256:%s ' *) \
-            $(printf '${{ vars.SCHOOLBOX_ECR_REPO }}-php${{ matrix.phpVersion.long }}@sha256:%s ' *)
+            $(printf 'alaress/schoolbox-frankenphp@sha256:%s ' *) \
+            $(printf '${{ vars.SCHOOLBOX_ECR_REPO }}@sha256:%s ' *)
