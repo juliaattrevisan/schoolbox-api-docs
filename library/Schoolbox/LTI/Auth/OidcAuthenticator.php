@@ -41,17 +41,22 @@ class OidcAuthenticator
     /**
      * Constructor
      *
-     * @param RegistrationRepositoryInterface     $repository
-     * @param UserAuthenticatorInterface          $authenticator
-     * @param Provider\Mapper                     $providerMapper
-     * @param MessagePayloadBuilderInterface|null $builder
-     * @param ValidatorInterface|null             $validator
-     * @param ParserInterface|null                $parser
+     * @param RegistrationRepositoryInterface     $repository    Repository of LTI registrations.
+     * @param UserAuthenticatorInterface          $authenticator Authenticates the user, based on the login hint in the
+     *                                                           request.
+     * @param Provider\Mapper                     $toolMapper    Mapper for LTI tool registrations: required for
+     *                                                           fetching the tool's redirect URLs.
+     * @param MessagePayloadBuilderInterface|null $builder       LTI message payload builder: if not provided, use a
+     *                                                           default implementation.
+     * @param ValidatorInterface|null             $validator     JWT validator: if not provided, use a default
+     *                                                           implementation.
+     * @param ParserInterface|null                $parser        JWT parser: if not provided, use a default
+     *                                                           implementation.
      */
     public function __construct(
         private RegistrationRepositoryInterface $repository,
         private UserAuthenticatorInterface $authenticator,
-        private Provider\Mapper $providerMapper,
+        private Provider\Mapper $toolMapper,
         private ?MessagePayloadBuilderInterface $builder = null,
         private ?ValidatorInterface $validator = null,
         private ?ParserInterface $parser = null
@@ -64,8 +69,8 @@ class OidcAuthenticator
     /**
      * Authenticate the OIDC request, and return a response message.
      *
-     * @param ServerRequestInterface $request
-     * @return LtiMessageInterface
+     * @param ServerRequestInterface $request Incoming HTTP request.
+     * @return LtiMessageInterface The message to send back to the tool.
      * @throws LtiExceptionInterface if the request is invalid for some reason
      */
     public function authenticate(ServerRequestInterface $request): LtiMessageInterface
@@ -139,6 +144,13 @@ class OidcAuthenticator
         }
     }
 
+    /**
+     * Unset all reserved user claims from the payload of the LTI message to
+     * return on authentication.
+     *
+     * @param array $claims List of claims from the incoming request.
+     * @return array
+     */
     private function sanitizeClaims(array $claims): array
     {
         foreach (MessagePayloadInterface::RESERVED_USER_CLAIMS as $reservedClaim) {
@@ -169,7 +181,7 @@ class OidcAuthenticator
     ): string {
         // Fetch the LTI tool model for this registration
         try {
-            $ltiTool = $this->providerMapper->findOneByClientId($registration->getClientId());
+            $tool = $this->toolMapper->findOneByClientId($registration->getClientId());
         } catch (Exception $e) {
             throw new LtiBadRequestException('Registration ID does not match a configured LTI tool', 0, $e);
         }
@@ -178,12 +190,12 @@ class OidcAuthenticator
         $redirectUri = $oidcRequest->getParameters()->getMandatory('redirect_uri');
 
         // Direct match for tool launch URL: it's valid
-        if ($redirectUri === $ltiTool->getLaunchUrl()) {
+        if ($redirectUri === $tool->getLaunchUrl()) {
             return $redirectUri;
         }
 
         // Otherwise, match against tool's redirect URLs
-        foreach ($ltiTool->getRedirectUrls() as $redirectUrlModel) {
+        foreach ($tool->getRedirectUrls() as $redirectUrlModel) {
             /** @var Provider\RedirectUrl\Model $redirectUrlModel */
             if ($redirectUrlModel->getRedirectUrl() === $redirectUri) {
                 return $redirectUri;
