@@ -16,6 +16,7 @@ const mfStore = useMomentFormStore();
                         type="checkbox"
                         :checked="mfStore.selectedFolders.includes(folder.id)"
                         @change="mfStore.toggleFolderSelection(folder.id)"
+                        todo add more stuff here
                     />
                     <label :for="`mf-checkbox-${folder.id}`">{{ folder.title }}</label>
                 </li>
