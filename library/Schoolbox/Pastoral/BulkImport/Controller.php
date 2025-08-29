@@ -11,7 +11,7 @@ namespace Schoolbox\Pastoral\BulkImport;
 
 use Alaress\Paginator;
 use Alaress\Web\Controller\Base;
-use Alaress\Web\Controller\Exception as WebControllerException;;
+use Alaress\Web\Controller\Exception as WebControllerException;
 use Alaress_Date_Format;
 use League\Flysystem\FilesystemException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
