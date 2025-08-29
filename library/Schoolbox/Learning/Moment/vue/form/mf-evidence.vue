@@ -99,14 +99,6 @@ function deleteEvidence(index: number): void {
 // TODO: on submit of the overall form (not autosave), need to ensure any current media is uploaded first
 // TODO: on submit of the overall form (not autosave), need to validate that there's at least one evidence OR text - although you could just bypass that due to autosave I guess, lol
 
-/**
- * TODO: for the CK editor, need the following settings:
-    {% if USER.role.staff %}hasTokens: true,{% endif %}
-    {% if editorTemplates is defined %}
-        templates: {{ editorTemplates|json_encode|raw }},
-    {% endif %}
- */
-
 const editorSettings = window.Vue.computed(() => ({
     hasTokens: window.schoolboxUser.role.staff,
     templates: props.editorTemplates,

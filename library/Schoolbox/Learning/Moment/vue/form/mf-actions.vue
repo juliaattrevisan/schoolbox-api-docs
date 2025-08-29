@@ -22,7 +22,6 @@ const relevantRoutes = window.Vue.computed(() => {
 </script>
 
 <template>
-    <!-- TODO: Make sure the route checks determine what we can actually do, this currently assumes they determine the button visibility and nothing else -->
     <ul class="flex-list buttons">
         <li v-if="relevantRoutes.draft">
             <button :disabled="mfStore.isSaving" @click="() => mfStore.submitForm(false, 'draft')">
