@@ -221,16 +221,8 @@ class Controller extends Component_Homepage_ControllerAbstract
 
             // And then add them to the displayed course impl
             $assessments = $assessments
-                ->map(function (IAssessable $assessment) {
-                    if (null === $assessment->getOriginalAssessmentId()) {
-                        $customisedAssessments = $this->assessmentMapperProxy->findAllCustomisedAssessment($assessment);
-                        if ($customisedAssessments->count() > 0) {
-                            $assessment
-                                ->setCustomisedAssessments(new GenericCollection(IAssessable::class, $customisedAssessments->getAll()));
-                        }
-                    }
-                    return $assessment;
-                })
+                ->map(fn(IAssessable $assessment) => $this->getAssessmentMapperProxy()
+                                                          ->loadCustomisationsIntoAssessment($assessment))
                 ->groupByCallback(function (IAssessable $assessment) {
                     return $assessment->getContext()->getId();
                 });

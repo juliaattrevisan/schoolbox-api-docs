@@ -1745,7 +1745,9 @@ class MapperProxy
     {
         $customisedAssessments = $this->findAllCustomisedAssessment($assessable);
         if (count($customisedAssessments) > 0) {
-            $assessable->setCustomisedAssessments(new GenericCollection(IAssessable::class, $customisedAssessments->getAll()));
+            $assessable->setCustomisedAssessments(
+                new GenericCollection(IAssessable::class, $customisedAssessments->getAll())
+            );
         }
         return $assessable;
     }
