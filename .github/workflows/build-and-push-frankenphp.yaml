@@ -138,12 +138,13 @@ jobs:
       - name: Identify image names
         id: images
         run: |
-          echo 'names="\' > "$GITHUB_OUTPUT"
+          echo 'names="' > "$GITHUB_OUTPUT"
           for file in $(ls -1 ${{ runner.temp }}/digests/${{ matrix.phpVersion }}); do
-            echo "${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:${file} \" >> "$GITHUB_OUTPUT"
-            echo "${{ vars.ECR_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:${file} \" >> "$GITHUB_OUTPUT"
+            echo "${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:${file}" >> "$GITHUB_OUTPUT"
+            echo "${{ vars.ECR_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:${file}" >> "$GITHUB_OUTPUT"
           done
           echo '"' >> "$GITHUB_OUTPUT"
+          cat $GITHUB_OUTPUT
 
       - name: Tag ${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }} images
         id: meta
