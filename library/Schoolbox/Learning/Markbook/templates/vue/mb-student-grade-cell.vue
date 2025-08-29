@@ -217,7 +217,7 @@ const plaintextComments = window.Vue.computed(() => {
             <progress-tick
                 :progress-tick="participant.progressTick"
                 :is-self-assessable="false"
-                can-modify
+                :can-modify="mbStore.data && mbStore.data.canAccessPopOut"
                 no-margin
                 @update:class="(newClass) => (participant!.progressTick!.progressClass = newClass)"
             />
