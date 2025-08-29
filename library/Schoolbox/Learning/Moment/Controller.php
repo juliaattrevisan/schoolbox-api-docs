@@ -50,6 +50,14 @@ class Controller extends Base
      */
     private const COHORT_REPORT_BLURB_LENGTH_EXTENDED = 400;
 
+
+    /**
+     * Any folder without a colour just gets white for now
+     * Note that # gets prefixed in the vue
+     */
+    private const DEFAULT_FOLDER_COLOUR = 'fff';
+
+
     /**
      * Constructor
      *
@@ -241,7 +249,12 @@ class Controller extends Base
             'curriculumNodes'          => [],
             'folders'  => $folders ? $folders->map(fn(Folder\Model $f) => [
                 'id' => $f->getId(),
-                'title' => $f->getTitle(),
+                'name' => $f->getName(),
+                'colour' => $f->getColour()?->getAsHex() ?? self::DEFAULT_FOLDER_COLOUR,
+                'codeString' => $f->getCodeString(),
+                'coverImage' => $f->getCoverImage() ? [
+                    'hash' => $f->getCoverImage()->getHash()
+                ] : null,
             ])->reindex() : [],
             'selectedFolders'          => $selectedFolders,
             'otherUsers'               => $otherUsers,
@@ -524,7 +537,12 @@ class Controller extends Base
             'curriculumNodes'          => $moment->getViewableCurriculumNodes()?->reindex(),
             'folders'  => $folders ? $folders->map(fn(Folder\Model $f) => [
                 'id' => $f->getId(),
-                'title' => $f->getTitle(),
+                'name' => $f->getName(),
+                'colour' => $f->getColour()?->getAsHex() ?? self::DEFAULT_FOLDER_COLOUR,
+                'codeString' => $f->getCodeString(),
+                'coverImage' => $f->getCoverImage() ? [
+                    'hash' => $f->getCoverImage()->getHash()
+                ] : null,
             ])->reindex() : [],
             'selectedFolders'          => $selectedFolders,
             'otherUsers'               => [],

@@ -14,6 +14,14 @@ export enum MomentFormModalType {
     CONFIRM_DELETE,
 }
 
+export type MomentFormFolder = {
+    id: number;
+    name: string;
+    coverImage: { hash: string | null } | null;
+    codeString: string | null;
+    colour: string | null;
+};
+
 // TODO: move these elsewhere and do it properly (per each endpoint that exists)
 type SubmitFormApiResponse = LearningMoment | LearningMoment[];
 type SubmitFormApiPayload = {
@@ -31,7 +39,7 @@ export const useMomentFormStore = defineStore("momentForm", () => {
     const returnUrl = window.Vue.ref<string>("/");
     const createRoutes = window.Vue.ref<null | LearningMoment["_links"]>(null);
     const moment = window.Vue.ref<LearningMoment | null>(null);
-    const folders = window.Vue.ref<{ id: number; title: string }[]>([]);
+    const folders = window.Vue.ref<MomentFormFolder[]>([]);
     const selectedFolders = window.Vue.ref<number[]>([]);
 
     const modalType = window.Vue.ref<MomentFormModalType | null>(null);
@@ -265,7 +273,7 @@ export const useMomentFormStore = defineStore("momentForm", () => {
         $returnUrl: string,
         $createRoutes: null | LearningMoment["_links"],
         $moment: LearningMoment,
-        $folders: { id: number; title: string }[],
+        $folders: MomentFormFolder[],
         $selectedFolders: number[],
     ): void {
         hasAutosave.value = $hasAutosave;
