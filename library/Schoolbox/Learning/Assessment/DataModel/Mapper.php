@@ -188,6 +188,7 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'createDynamicPlanIfNew']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'validateDatePresence']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateAssessmentRelationView']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'reorderSequenceIfCustomised']);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteQuiz']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteTask']);
@@ -283,6 +284,11 @@ class Mapper extends BaseMapper
             return false;
         }
 
+        return true;
+    }
+
+    protected function reorderSequenceIfCustomised(Model $assessment): bool
+    {
         return true;
     }
 
@@ -2031,24 +2037,63 @@ class Mapper extends BaseMapper
         $thisKey   = $multiJoin['this_key'];
         $otherKey  = $multiJoin['other_key'];
 
-        $pb = new Builder($this->database->getQuoter(), $this->table);
-        $query = "
+        $pb    = new Builder($this->database->getQuoter(), $this->table);
+        if (null === $assessment->getOriginalAssessmentId()) {
+            $query = "
             SELECT COALESCE(max(`a`.`sequence`), 0) + 1
             FROM `{$this->getTable()}` `a`
             JOIN `{$joinTable}` `o` ON `o`.`{$thisKey}` = `a`.`id`
         ";
 
-        // Ignore this model's db sequence if it exists.
-        // This enables us to clear a model's sequence, and save it again to place it at the end
-        if ($assessment->getId()) {
-            $pb->notEquals("a.id", $assessment->getId());
+            // Ignore this model's db sequence if it exists.
+            // This enables us to clear a model's sequence, and save it again to place it at the end
+            if ($assessment->getId()) {
+                $pb->notEquals("a.id", $assessment->getId());
+            }
+            $pb->equals("o.{$otherKey}", $assessment->getAssessmentContext()->getId());
+            $pb->isNull('a.deleted_at');
+            $query     .= 'WHERE ' . implode(' AND ', $pb->getWhere());
+            $statement = $this->database->prepare($query);
+            $statement->execute($pb->getParams());
+            $newSequence = $statement->fetch(\PDO::FETCH_COLUMN);
+        } else {
+            /* If the assessment is a customisation of another assessment, we should insert the assessment right after
+             * the original assessment instead
+             */
+            $query = "
+                SELECT COALESCE(`sequence`, 0) + 1
+                FROM `{$this->getTable()}` `a`
+                JOIN `{$joinTable}` `o` ON `o`.`{$thisKey}` = `a`.`id`
+            ";
+            /* Insert it after the original assessment, or else after the last customisation of that assessment
+             */
+            $pb->any(
+                (new Builder($this->database->getQuoter(), $this->table))
+                    ->equals("a.id", $assessment->getOriginalAssessmentId())
+                    ->equals('a.original_assessment_id', $assessment->getOriginalAssessmentId())
+            );
+            $pb->equals("o.{$otherKey}", $assessment->getAssessmentContext()->getId());
+            $pb->isNull('a.deleted_at');
+            $query     .= 'WHERE ' . implode(' AND ', $pb->getWhere());
+            $query     .= ' ORDER BY a.sequence DESC LIMIT 1';
+            $statement = $this->database->executeQuery($query, $pb->getParams());
+            $newSequence = $statement->fetch(\PDO::FETCH_COLUMN);
+            /* Reorder the other assessments to make space for this assessment
+             */
+            $updateQuery = "
+                UPDATE `{$this->getTable()}` `a`
+                JOIN `{$joinTable}` `o` ON `o`.`{$thisKey}` = `a`.`id`
+                SET `a`.`sequence` = `a`.`sequence` + 1
+            ";
+            $pb    = new Builder($this->database->getQuoter(), $this->table);
+            $pb->greaterThanOrEqualTo("a.sequence", $newSequence);
+            $pb->equals("o.{$otherKey}", $assessment->getAssessmentContext()->getId());
+            $pb->isNull('a.deleted_at');
+            $updateQuery .= 'WHERE ' . implode(' AND ', $pb->getWhere());
+            $statement = $this->database->executeQuery($updateQuery, $pb->getParams());
+            $statement->fetch(\PDO::FETCH_COLUMN);
         }
-        $pb->equals("o.{$otherKey}", $assessment->getAssessmentContext()->getId());
-        $pb->isNull('a.deleted_at');
-        $query .= 'WHERE ' . implode(' AND ', $pb->getWhere());
-        $statement = $this->database->prepare($query);
-        $statement->execute($pb->getParams());
-        $assessment->setSequence($statement->fetch(\PDO::FETCH_COLUMN));
+        $assessment->setSequence($newSequence);
     }
 
     /**
