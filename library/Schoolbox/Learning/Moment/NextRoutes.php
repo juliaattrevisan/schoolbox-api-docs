@@ -120,7 +120,7 @@ class NextRoutes
                 $draft = true;
 
                 if ((new ModerationRequired())->isSatisfiedBy($globalModerationRequired, $moment->getRecipient()->getYear())) {
-                    /* If moderation was needed, submitted state becomes a possibility
+                    /* If moderation is needed, submitted state becomes a possibility
                      */
                     $submit = true;
                 } else {
@@ -150,20 +150,12 @@ class NextRoutes
                  */
                 $draft = true;
 
-                /* If you're in rejected state, then presumably you were part of the moderation workflow even if
-                 * that is no longer the case according to the current admin configuration. Give the submit button
-                 * so that students can push it into Submit For Approval, requiring a staff to come along and push
-                 * it into Publish, EVEN IF that is not required according to the current admin config.
-                 *
-                 * We know a student can change this to Draft then Publish via Save for Later and kind of circumvent
-                 * this whole workflow, but they could do that anyway if moderation wasn't required.
-                 */
-                $submit = true;
-
-                if (!(new ModerationRequired())->isSatisfiedBy($globalModerationRequired, $moment->getRecipient()->getYear())) {
-                    /* If moderation is no longer required, but the learning moment was rejected at a time when
-                     * moderation *was* required, provide the publish button so students can progress a learning
-                     * moment into published state of their own accord.
+                if ((new ModerationRequired())->isSatisfiedBy($globalModerationRequired, $moment->getRecipient()->getYear())) {
+                    /* If moderation is needed, submitted state becomes a possibility
+                     */
+                    $submit = true;
+                } else {
+                    /* Otherwise students can immediately self-publish their own content
                      */
                     $publish = true;
                 }
