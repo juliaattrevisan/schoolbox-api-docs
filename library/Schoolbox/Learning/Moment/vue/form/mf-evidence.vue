@@ -141,6 +141,34 @@ window.Vue.onMounted(async () => {
 });
 
 /**
+ * The "required" icon on the evidence inputs are only necessary if
+ * there isn't already evidence or text attached to the moment
+ */
+const isEvidenceRequired = window.Vue.computed(() => {
+    if (!mfStore.moment) return true;
+
+    // TODO: I expect this is gonna change logic when the first evidence is shown pre-selected at the top when it can be
+
+    const hasEvidence = mfStore.moment.evidence.length > 0;
+    const hasText = (mfStore.moment.body ?? "").trim().length > 0;
+
+    if (mediaType.value === MediaType.TEXT) {
+        /**
+         * If you have the TEXT mode selected, it's probably because you don't have any evidence
+         * In case you do for some reason, check anyways
+         *
+         * This field is required if there's not already attached evidence
+         */
+        return !hasEvidence;
+    }
+
+    /**
+     * For all other media types, the field is required if there's existing evidence or text
+     */
+    return !(hasEvidence || hasText);
+});
+
+/**
  * Unlike the other media types, you can only ever have one text field
  * It either shows up the top if you have text selected as the media type,
  * or it shows up as a "Description" field if you have another media type selected and there's already text in the body
@@ -189,7 +217,7 @@ window.Vue.watch(
 
             <div v-if="mediaType && mediaRecordingTypes.includes(mediaType)">
                 <!-- TODO shouldn't be required sometimes depending on existing evidence -->
-                <label for="mf-evidence-storage" class="required">
+                <label for="mf-evidence-storage" :class="{ required: isEvidenceRequired }">
                     <template v-if="mediaType === MediaType.PHOTO"> Take a picture </template>
                     <template v-else-if="mediaType === MediaType.VIDEO"> Record something </template>
                     <template v-else-if="mediaType === MediaType.AUDIO"> Say something </template>
@@ -204,7 +232,7 @@ window.Vue.watch(
             </div>
 
             <div v-else-if="mediaType === MediaType.UPLOAD">
-                <label for="mf-evidence-file-drop" class="required"> Upload File </label>
+                <label for="mf-evidence-file-drop" :class="{ required: isEvidenceRequired }"> Upload File </label>
                 <!-- TODO for speed reasons i've used this, but it should be a proper file input... that's a bit more complex atm -->
                 <file-drop
                     id="mf-evidence-file-drop"
@@ -214,7 +242,7 @@ window.Vue.watch(
             </div>
 
             <div v-else-if="mediaType === MediaType.TEXT && !showDescriptionEditor">
-                <label for="mf-evidence-textarea" class="required"> Write something </label>
+                <label for="mf-evidence-textarea" :class="{ required: isEvidenceRequired }"> Write something </label>
                 <p class="meta">
                     Student detail tokens can be viewed when you press [. Tokens will be substituted with the students
                     details on creation.
@@ -297,7 +325,8 @@ window.Vue.watch(
 
     <!-- TODO: also spawn this textarea up in the other area when it's the selected type -->
     <div v-if="mfStore.moment && showDescriptionEditor">
-        <label for="mf-evidence-textarea"> Description </label>
+        <!-- The description is required as long as there isn't other evidence -->
+        <label for="mf-evidence-textarea" :class="{ required: isEvidenceRequired }"> Description </label>
         <p class="meta">
             Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details
             on creation.
