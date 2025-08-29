@@ -19,19 +19,20 @@ const isExpanded = window.Vue.ref(false);
                     <div v-for="folder in mfStore.folders" :key="folder.id">
                         <section class="checklist">
                             <div class="v-card small-12">
-                                <div class="card-class-image"
-                                   :style="
-                                       {
-                                           backgroundColor: `#${folder.colour}`,
-                                           borderBottom: `10px solid #${folder.colour}`,
-                                           /* Cover image is optional */
-                                           backgroundImage: folder.coverImage ? `url('/storage/image.php?hash=${folder.coverImage.hash}&size=cardImageLarge')` : undefined,
-                                           backgroundSize: folder.coverImage ? 'cover' : undefined,
-                                           backgroundRepeat: folder.coverImage ? 'no-repeat' : undefined,
-                                           backgroundPosition: folder.coverImage ? 'center' : undefined
-                                       }
-                                   "
-                                   @click="mfStore.toggleFolderSelection(folder.id)"
+                                <div
+                                    class="card-class-image"
+                                    :style="{
+                                        backgroundColor: `#${folder.colour}`,
+                                        borderBottom: `10px solid #${folder.colour}`,
+                                        /* Cover image is optional */
+                                        backgroundImage: folder.coverImage
+                                            ? `url('/storage/image.php?hash=${folder.coverImage.hash}&size=cardImageLarge')`
+                                            : undefined,
+                                        backgroundSize: folder.coverImage ? 'cover' : undefined,
+                                        backgroundRepeat: folder.coverImage ? 'no-repeat' : undefined,
+                                        backgroundPosition: folder.coverImage ? 'center' : undefined,
+                                    }"
+                                    @click="mfStore.toggleFolderSelection(folder.id)"
                                 >
                                     <div class="mf-source-checkbox">
                                         <input
@@ -45,7 +46,11 @@ const isExpanded = window.Vue.ref(false);
                                 </div>
                                 <div class="card-content classes actions-small-1">
                                     <div class="list-item">
-                                        <h3><a :href="`/homepage/${folder.id}`" :title="`${folder.name}`">{{ folder.name }}</a></h3>
+                                        <h3>
+                                            <a :href="`/homepage/${folder.id}`" :title="`${folder.name}`">{{
+                                                folder.name
+                                            }}</a>
+                                        </h3>
                                         <p class="meta">{{ folder.codeString }}</p>
                                     </div>
                                 </div>
@@ -60,12 +65,12 @@ const isExpanded = window.Vue.ref(false);
 
 <style scoped>
 .mf-source-checkbox {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
 }
 
 .card-class-image {
-  cursor: pointer;
+    cursor: pointer;
 }
 </style>

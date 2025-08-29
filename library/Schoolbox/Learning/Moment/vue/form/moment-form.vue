@@ -39,7 +39,13 @@ interface Props {
     curriculumNodes: Node[];
     endpointCurriculumNodes: string | null;
     /** Classes and Groups */
-    folders: { id: number; title: string }[];   // todo add more stuff here
+    folders: {
+        id: number;
+        name: string;
+        coverImage: { hash: string | null } | null;
+        codeString: string | null;
+        colour: string | null;
+    }[];
     selectedFolders: number[];
 }
 
