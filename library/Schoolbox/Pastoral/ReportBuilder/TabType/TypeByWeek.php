@@ -12,7 +12,6 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
     private $weeks = [];
     public const COLUMN_QUERY_KEY = 'week_%d';
     public const COLUMN_KEY_REGEX = '/(week)_(?<index>\d+)/';
-    public const MAX_COLUMN_COUNT = 12; // Maximum number of weeks to display
 
     private function getWeeks(): Collection
     {
@@ -21,7 +20,6 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
                 $this->helper->getStartDate(),
                 $this->helper->getEndDate(),
                 self::COLUMN_QUERY_KEY,
-                self::MAX_COLUMN_COUNT,
             );
         }
         return $this->weeks;

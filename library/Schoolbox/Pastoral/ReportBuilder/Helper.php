@@ -412,7 +412,6 @@ class Helper
         ?Alaress_Date_Format $startDate,
         ?Alaress_Date_Format $endDate,
         string $format,
-        int $maxStack
     ): Collection {
         /* Return empty collection if either date is null.
          */
@@ -427,7 +426,13 @@ class Helper
         $weeks = [];
         $current = (clone $end);
         $index = 0;
-        while ($current->gte($start) && count($weeks) < $maxStack) {
+        while ($current->gte($start)) {
+            /* If the current week is in the future, skip it to the current date
+             * This is to avoid showing future weeks in the report
+             */
+            if ((clone $current)->endOfDay()->gt((Alaress_Date_Format::now())->endOfDay())) {
+                $current = (Alaress_Date_Format::now());
+            }
             if ($current->getWeekDayNumber() !== $weekStartDayOfWeek) {
                 // Adjust current to the start of the week
                 $weekStart = (clone $current)->previous((int)$weekStartDayOfWeek);
