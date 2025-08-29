@@ -32,6 +32,15 @@ const mediaType = window.Vue.ref<MediaType | null>(null);
 const currentFileDropFile = window.Vue.ref<FileDropFile | null>(null);
 
 /**
+ * Whether there is recorded data in the media recording component
+ * Used to determine if we need to upload it or if the user can switch to the same media type
+ */
+const hasRecordedData = window.Vue.computed(() => {
+    if (!mediaRecordingEl.value) return false;
+    return !!mediaRecordingEl.value.hasRecordedData();
+});
+
+/**
  * Upload the current media recording,
  * either occurs when the user switches media types or if the user tries to submit the form
  */
@@ -44,7 +53,7 @@ async function uploadMediaRecording(): Promise<void> {
         throw new Error("moment not found");
     }
 
-    if (!mediaRecordingEl.value.hasRecordedData()) {
+    if (!hasRecordedData.value) {
         return; // nothing to upload
     }
 
@@ -269,6 +278,7 @@ window.Vue.watch(
                 <a
                     class="icon-camera share-photo"
                     title="Take a photo"
+                    :disabled="(MediaType.PHOTO === mediaType && !hasRecordedData) || undefined"
                     @click.prevent="changeMediaType(MediaType.PHOTO)"
                 >
                     Take a photo
@@ -276,6 +286,7 @@ window.Vue.watch(
                 <a
                     class="icon-video share-video"
                     title="Record a video"
+                    :disabled="(MediaType.VIDEO === mediaType && !hasRecordedData) || undefined"
                     @click.prevent="changeMediaType(MediaType.VIDEO)"
                 >
                     Record a video
@@ -283,6 +294,7 @@ window.Vue.watch(
                 <a
                     class="icon-audio share-audio"
                     title="Record audio"
+                    :disabled="(MediaType.AUDIO === mediaType && !hasRecordedData) || undefined"
                     @click.prevent="changeMediaType(MediaType.AUDIO)"
                 >
                     Record audio
@@ -290,6 +302,7 @@ window.Vue.watch(
                 <a
                     class="icon-upload share-file"
                     title="Upload file"
+                    :disabled="MediaType.UPLOAD === mediaType || undefined"
                     @click.prevent="changeMediaType(MediaType.UPLOAD)"
                 >
                     Upload file
@@ -297,7 +310,7 @@ window.Vue.watch(
                 <a
                     class="icon-textbox share-text"
                     title="Write something"
-                    :disabled="showDescriptionEditor || MediaType.TEXT === mediaType"
+                    :disabled="!!(showDescriptionEditor || MediaType.TEXT === mediaType) || undefined"
                     @click.prevent="changeMediaType(MediaType.TEXT)"
                 >
                     Write something
