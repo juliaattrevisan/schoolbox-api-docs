@@ -204,9 +204,15 @@ class Controller extends Base
                             ? $aImpl->getInstructorMarkScheme()
                             : $aImpl->getMarkScheme();
 
+                        if ($aImpl->getOriginalAssessmentId() === null) {
+                            $aImpl = $this->assessmentMapperProxy->loadCustomisationsIntoAssessment($aImpl);
+                        }
                         $originalUrl = null;
-                        if (null !== $aImpl->getOriginalAssessmentId()) {
-                            $originalAssessment = $this->assessmentMapperProxy->findById($aImpl->getOriginalAssessmentId());
+                        if (null !== $aImpl->getOriginalAssessmentId() || $aImpl->getCustomisedAssessments()->count() > 0) {
+                            $originalAssessmentId = (null !== $aImpl->getOriginalAssessmentId()) ?
+                                $aImpl->getOriginalAssessmentId() :
+                                $aImpl->getId();
+                            $originalAssessment = $this->assessmentMapperProxy->findById($originalAssessmentId);
                             if ($originalAssessment instanceof IAssessable) {
                                 $originalUrl = $this->getRouteIfAuthorized(
                                     'learningAssessment.getAssessmentParticipationForm',
