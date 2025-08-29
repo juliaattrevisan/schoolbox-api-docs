@@ -9,26 +9,17 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Auth;
 
-use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiBadRequestException;
-use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
-use OAT\Library\Lti1p3Core\Message\LtiMessage;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
-use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilder;
 use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilderInterface;
-use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
-use OAT\Library\Lti1p3Core\Security\Jwt\Parser\Parser;
 use OAT\Library\Lti1p3Core\Security\Jwt\Parser\ParserInterface;
-use OAT\Library\Lti1p3Core\Security\Jwt\Validator\Validator;
 use OAT\Library\Lti1p3Core\Security\Jwt\Validator\ValidatorInterface;
 use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator as BaseOidcAuthenticator;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Schoolbox\LTI\Provider;
 use Schoolbox\Mapper\Exception;
-use Throwable;
 
 /**
  * Extension of `\OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator`,
