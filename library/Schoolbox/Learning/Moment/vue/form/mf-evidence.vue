@@ -208,7 +208,6 @@ window.Vue.watch(
             <input id="mf-evidence-storage" type="hidden" />
 
             <div v-if="mediaType && mediaRecordingTypes.includes(mediaType)">
-                <!-- TODO shouldn't be required sometimes depending on existing evidence -->
                 <label for="mf-evidence-storage" :class="{ required: isEvidenceRequired }">
                     <template v-if="mediaType === MediaType.PHOTO"> Take a picture </template>
                     <template v-else-if="mediaType === MediaType.VIDEO"> Record something </template>
@@ -315,7 +314,6 @@ window.Vue.watch(
         </div>
     </div>
 
-    <!-- TODO: also spawn this textarea up in the other area when it's the selected type -->
     <div v-if="mfStore.moment && showDescriptionEditor">
         <!-- The description is required as long as there isn't other evidence -->
         <label for="mf-evidence-textarea" :class="{ required: isEvidenceRequired }"> Description </label>
