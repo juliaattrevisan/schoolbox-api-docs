@@ -38,6 +38,16 @@ use Throwable;
  */
 class OidcAuthenticator
 {
+    /**
+     * Constructor
+     *
+     * @param RegistrationRepositoryInterface     $repository
+     * @param UserAuthenticatorInterface          $authenticator
+     * @param Provider\Mapper                     $providerMapper
+     * @param MessagePayloadBuilderInterface|null $builder
+     * @param ValidatorInterface|null             $validator
+     * @param ParserInterface|null                $parser
+     */
     public function __construct(
         private RegistrationRepositoryInterface $repository,
         private UserAuthenticatorInterface $authenticator,
@@ -52,7 +62,11 @@ class OidcAuthenticator
     }
 
     /**
-     * @throws LtiExceptionInterface
+     * Authenticate the OIDC request, and return a response message.
+     *
+     * @param ServerRequestInterface $request
+     * @return LtiMessageInterface
+     * @throws LtiExceptionInterface if the request is invalid for some reason
      */
     public function authenticate(ServerRequestInterface $request): LtiMessageInterface
     {
@@ -176,6 +190,6 @@ class OidcAuthenticator
             }
         }
 
-        throw new LtiBadRequestException('Invalid redirect_uri');
+        throw new LtiBadRequestException('Invalid redirect_uri: must match the tool\'s launch URL or one of its redirect URLs');
     }
 }
