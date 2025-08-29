@@ -77,6 +77,7 @@ const orderedClassImplStudents = window.Vue.computed(() => {
     <template v-if="mbStore.data !== null && classImpl !== null">
         <tr v-if="props.type === 'course'" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
             <th class="class-row class-row-heading fixed-left">
+                <!-- you may not have access to this folder... and will get hit with an error page... so we may need to look at routes or perms for this... -->
                 <a :href="`/homepage/${classImpl.folder.id}`">{{ classImpl.folder.title }}</a>
             </th>
             <th class="class-row fixed-left"></th>
