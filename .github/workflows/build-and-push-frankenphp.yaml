@@ -82,6 +82,8 @@ jobs:
           tags: |
             ${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}
             ${{ vars.ECR_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}
+          cache-from: type=gha
+          cache-to: type=gha
 
       - name: Export digest
         run: |
@@ -137,6 +139,7 @@ jobs:
         id: images
         run: |
           echo 'names="\' > "$GITHUB_OUTPUT"
+          ls -al ${{ runner.temp }}/digests/${{ matrix.phpVersion }}
           for file in $(ls -1 ${{ runner.temp }}/digests/${{ matrix.phpVersion }}/digest-*); do
             echo "${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:${file} \" >> "$GITHUB_OUTPUT"
             echo "${{ vars.ECR_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:${file} \" >> "$GITHUB_OUTPUT"
