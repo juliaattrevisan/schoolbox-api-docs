@@ -138,19 +138,19 @@ jobs:
       - name: Identify image names
         id: images
         run: |
-          echo 'names="' > "$GITHUB_OUTPUT"
+          echo 'IMAGE_NAMES<<EOF' >> $GITHUB_ENV
           for file in $(ls -1 ${{ runner.temp }}/digests/${{ matrix.phpVersion }}); do
-            echo "${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:${file}" >> "$GITHUB_OUTPUT"
-            echo "${{ vars.ECR_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:${file}" >> "$GITHUB_OUTPUT"
+            echo "${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:${file}" >> $GITHUB_ENV
+            echo "${{ vars.ECR_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:${file}" >> $GITHUB_ENV
           done
-          echo '"' >> "$GITHUB_OUTPUT"
-          cat $GITHUB_OUTPUT
+          echo '"' >> $GITHUB_ENV
+          cat $GITHUB_ENV
 
       - name: Tag ${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }} images
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: ${{ steps.images.outputs.names }}
+          images: ${{ env.IMAGE_NAMES }}
           tags: |
             type=ref,event=branch,prefix=latest-php${{ matrix.phpVersion }}-
             type=raw,value=latest-php${{ matrix.phpVersion }}-${{ github.ref_name }}
