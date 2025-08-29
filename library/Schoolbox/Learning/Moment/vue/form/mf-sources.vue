@@ -26,7 +26,9 @@ const mfStore = useMomentFormStore();
                                        backgroundRepeat: folder.coverImage ? 'no-repeat' : undefined,
                                        backgroundPosition: folder.coverImage ? 'center' : undefined
                                    }
-                            ">
+                               "
+                               @click="mfStore.toggleFolderSelection(folder.id)"
+                            >
                                 <div class="mf-source-checkbox">
                                     <input
                                         :id="`mf-checkbox-${folder.id}`"
@@ -57,5 +59,9 @@ const mfStore = useMomentFormStore();
   position: absolute;
   top: 1rem;
   left: 1rem;
+}
+
+.card-class-image {
+  cursor: pointer;
 }
 </style>
