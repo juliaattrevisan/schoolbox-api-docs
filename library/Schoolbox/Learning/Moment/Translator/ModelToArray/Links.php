@@ -17,10 +17,10 @@ use Schoolbox\API\Translator\AbstractLinks;
 class Links extends AbstractLinks
 {
     /**
-     * @param \Schoolbox\Learning\Moment\Model $evidence
+     * @param \Schoolbox\Learning\Moment\Model $moment
      * @return array
      */
-    public function __invoke(\Schoolbox\Learning\Moment\Model $evidence): array
+    public function __invoke(\Schoolbox\Learning\Moment\Model $moment): array
     {
         $translation = [
             '_links' => [],
@@ -29,7 +29,7 @@ class Links extends AbstractLinks
         // Does this evidence have a discussion thread?
         // If so: load and translate it, and inject it into the evidence
         // If not: create a link to create a thread.
-        if (!$evidence->getDiscussionThread()) {
+        if (!$moment->getDiscussionThread()) {
             // Output the create thread link.
             // TBD: is it output as a simple link, or a href/auth object?
             // The old Aura link outputs the object, newer links are output
@@ -37,62 +37,84 @@ class Links extends AbstractLinks
             $translation['_links']['createThread'] = $this->getRouteIfAuthorized(
                 'evidenceDiscussionThreads.createThread',
                 [
-                    'context'   => $evidence,
-                    'contextId' => $evidence->getId(),
+                    'context'   => $moment,
+                    'contextId' => $moment->getId(),
                 ]
             );
         }
 
-
         $translation['_links']['detail'] = $this->getRouteIfAuthorized(
             'learningMomentEvidence.getEvidenceDetail',
             [
-                'evidenceId' => $evidence->getId(),
-                'userId'     => $evidence->getRecipient()->getId(),
+                'evidenceId' => $moment->getId(),
+                'userId'     => $moment->getRecipient()->getId(),
             ]
         );
 
         $translation['_links']['modifyForm'] = $this->getRouteIfAuthorized(
             'learningMomentEvidence.getModifyForm',
             [
-                'evidenceId' => $evidence->getId(),
-                'creatorId'  => $evidence->getCreator()->getId(),
-                'userId'     => $evidence->getRecipient()->getId(),
+                'evidenceId' => $moment->getId(),
+                'creatorId'  => $moment->getCreator()->getId(),
+                'userId'     => $moment->getRecipient()->getId(),
             ]
         );
 
+        // TODO - deprecate this route, we don't use it anywhere afaik
         $translation['_links']['put'] = $this->getRouteIfAuthorized(
             'learningMomentEvidence.putEvidence',
             [
-                'evidenceId' => $evidence->getId(),
-                'creatorId'  => $evidence->getCreator()->getId(),
-                'userId'     => $evidence->getRecipient()->getId(),
+                'evidenceId' => $moment->getId(),
+                'creatorId'  => $moment->getCreator()->getId(),
+                'userId'     => $moment->getRecipient()->getId(),
+            ]
+        );
+
+        $translation['_links']['draft'] = $this->getRouteIfAuthorized(
+            'learningMomentEvidence.putDraft',
+            [
+                'evidence'   => $moment,
+                'evidenceId' => $moment->getId(),
+                'creatorId' => $moment->getCreator()->getId(),
+                'userId'    => $moment->getRecipient()->getId(),
             ]
         );
 
         $translation['_links']['submit'] = $this->getRouteIfAuthorized(
             'learningMomentEvidence.putSubmit',
             [
-                'evidenceId' => $evidence->getId(),
-                'creatorId'  => $evidence->getCreator()->getId(),
-                'userId'     => $evidence->getRecipient()->getId(),
+                'evidence'   => $moment,
+                'evidenceId' => $moment->getId(),
+                'creatorId'  => $moment->getCreator()->getId(),
+                'userId'     => $moment->getRecipient()->getId(),
             ]
         );
 
         $translation['_links']['publish'] = $this->getRouteIfAuthorized(
             'learningMomentEvidence.putPublish',
             [
-                'evidenceId' => $evidence->getId(),
-                'creatorId'  => $evidence->getCreator()->getId(),
-                'userId'     => $evidence->getRecipient()->getId(),
+                'evidence'   => $moment,
+                'evidenceId' => $moment->getId(),
+                'creatorId'  => $moment->getCreator()->getId(),
+                'userId'     => $moment->getRecipient()->getId(),
+            ]
+        );
+
+        $translation['_links']['reject'] = $this->getRouteIfAuthorized(
+            'learningMomentEvidence.putReject',
+            [
+                'evidence'   => $moment,
+                'evidenceId' => $moment->getId(),
+                'creatorId'  => $moment->getCreator()->getId(),
+                'userId'     => $moment->getRecipient()->getId(),
             ]
         );
 
         $translation['_links']['delete'] = $this->getRouteIfAuthorized(
             'learningMomentEvidence.deleteEvidence',
             [
-                'evidenceId' => $evidence->getId(),
-                'creatorId'  => $evidence->getCreator()->getId(),
+                'evidenceId' => $moment->getId(),
+                'creatorId'  => $moment->getCreator()->getId(),
             ]
         );
 

@@ -2,7 +2,7 @@ import { apiRequest } from "@js/util/sbx/apiUtils";
 import type { ApiBaseResponse } from "@js/util/sbx/apiUtils";
 import type { LearningMoment } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 
-// PUT learningMomentModeration.putPublish
+// PUT learningMomentEvidence.putPublish
 
 type LearningMomentPublishApiPayload = {
     /** Soft-delete all the comments associated with this learning moment */
@@ -13,7 +13,7 @@ type LearningMomentPublishApiResponse = unknown; // always redirects to the prof
 
 /**
  * Publish a learning moment
- * @param putPublishUrl learningMomentModeration.putPublish
+ * @param putPublishUrl learningMomentEvidence.putPublish
  * @param body the request body
  * @returns response
  */
@@ -28,7 +28,7 @@ export function publishLearningMoment(
     });
 }
 
-// PUT learningMomentModeration.putBulkPublish
+// PUT learningMomentEvidence.putBulkPublish
 
 type LearningMomentBulkPublishApiPayload = LearningMomentPublishApiPayload & {
     momentIds: LearningMoment["id"][];
@@ -38,7 +38,7 @@ type LearningMomentBulkPublishApiResponse = Record<LearningMoment["id"], Learnin
 
 /**
  * Bulk publish multiple learning moments
- * @param putBulkPublishUrl learningMomentModeration.putBulkPublish
+ * @param putBulkPublishUrl learningMomentEvidence.putBulkPublish
  * @param body the request body
  * @returns response
  */
@@ -53,7 +53,7 @@ export function bulkPublishLearningMoments(
     });
 }
 
-// PUT learningMomentModeration.putReject
+// PUT learningMomentEvidence.putReject
 
 type LearningMomentRejectApiPayload = {
     rejectionReason: string;
@@ -63,7 +63,7 @@ type LearningMomentRejectApiResponse = unknown; // always redirects to the profi
 
 /**
  * Reject a learning moment
- * @param putRejectUrl learningMomentModeration.putReject
+ * @param putRejectUrl learningMomentEvidence.putReject
  * @param body the request body
  * @returns response
  */
@@ -78,7 +78,7 @@ export function rejectLearningMoment(
     });
 }
 
-// PUT learningMomentModeration.putBulkReject
+// PUT learningMomentEvidence.putBulkReject
 
 type LearningMomentBulkRejectApiPayload = LearningMomentRejectApiPayload & {
     momentIds: LearningMoment["id"][];
@@ -88,7 +88,7 @@ type LearningMomentBulkRejectApiResponse = Record<LearningMoment["id"], Learning
 
 /**
  * Bulk reject multiple learning moments
- * @param putBulkRejectUrl learningMomentModeration.putBulkReject
+ * @param putBulkRejectUrl learningMomentEvidence.putBulkReject
  * @param body the request body
  * @returns response
  */

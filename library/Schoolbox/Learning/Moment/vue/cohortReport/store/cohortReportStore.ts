@@ -3,7 +3,7 @@ import { apiRequest } from "@js/util/sbx/apiUtils";
 import {
     bulkPublishLearningMoments,
     bulkRejectLearningMoments,
-} from "@schoolboxLearningMomentEvidence/learningMomentModerationPayload";
+} from "@schoolboxLearningMomentEvidence/learningMomentPayload";
 import type { LearningMoment } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 import { getCohortReport } from "./cohortReportPayload";
 import type { CohortReportEntry, CohortReportApiPayload } from "./cohortReportPayload";
@@ -79,8 +79,8 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
     /**
      * Initialise the store
      * @param $getCohortReportEndpoint - getCohortReportPayload
-     * @param $putBulkRejectEndpoint - learningMomentModeration.putBulkReject
-     * @param $putBulkPublishEndpoint - learningMomentModeration.putBulkPublish
+     * @param $putBulkRejectEndpoint - learningMomentEvidence.putBulkReject
+     * @param $putBulkPublishEndpoint - learningMomentEvidence.putBulkPublish
      * @param $deleteBulkEvidenceEndpoint - learningMomentEvidence.deleteBulkDelete
      */
     async function init(
@@ -175,6 +175,7 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         // Figure out the new state from the response
         entries.forEach((entry) => {
             updateEntryState(entry, response.data);
+            delete selectedResults.value[entry.id];
 
             if (deleteComments) {
                 entry.hasComments = false; // assume comments are deleted
@@ -221,6 +222,7 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         // Figure out the new state from the response
         entries.forEach((entry) => {
             updateEntryState(entry, response.data);
+            delete selectedResults.value[entry.id];
 
             entry.hasComments = true; // assume this generated a comment, blank comments seem to count
         });
@@ -262,6 +264,10 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
             toast.timeout({ isSuccess: false, text: response.message });
             return;
         }
+
+        entries.forEach((entry) => {
+            delete selectedResults.value[entry.id];
+        });
 
         toast.timeout({ isSuccess: true, text: "Deleted." });
         results.value = results.value.filter((e) => !entries.includes(e));

@@ -33,7 +33,6 @@ use Schoolbox\Learning\Moment\Discussion\Comment\Module as EvidenceCommentModule
 use Schoolbox\Learning\Moment\Discussion\Thread\Module as EvidenceThreadModule;
 use Schoolbox\Learning\Moment\Module as EvidenceModule;
 use Schoolbox\Learning\Moment\Feed\Module as FeedModule;
-use Schoolbox\Learning\Moment\Moderation\Module as LearningMomentModerationModule;
 use Schoolbox\Learning\Moment\StudentToolkit\Module as StudentToolkitModule;
 use Schoolbox\Learning\Quiz\Attempt\Module as QuizAttemptModule;
 use Schoolbox\Learning\Quiz\Module as QuizModule;
@@ -80,7 +79,6 @@ class Learning extends ModuleLoader
         // Learning moment evidence: behind a feature flag
         if ($config->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED)) {
             $this->loadModule($di, EvidenceModule::class, "/{$namespace}/evidence");
-            $this->loadModule($di, LearningMomentModerationModule::class, "/{$namespace}/evidence/moderation");
 
             // Discussion threads and comments for learning moment evidence:
             // also behind the same feature flag

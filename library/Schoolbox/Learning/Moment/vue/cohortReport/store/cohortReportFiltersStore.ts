@@ -14,7 +14,7 @@ export const useCohortReportFiltersStore = defineStore("cohortReportFilters", ()
     const authorFilter = window.Vue.ref<SearchSelectItem[]>([]);
     const folderFilter = window.Vue.ref<SearchSelectItem[]>([]);
     const stateFilter = window.Vue.ref<EvidenceStatus[]>(keysOf(evidenceStatusLabels));
-    const evidenceTagsFilter = window.Vue.ref<SelectizeSelectorItem["id"][]>([]);
+    const evidenceTagsFilter = window.Vue.ref<SelectizeSelectorItem[]>([]);
     const startDateFilter = window.Vue.ref<string>(EMPTY_DATE);
     const endDateFilter = window.Vue.ref<string>(EMPTY_DATE);
 
@@ -43,7 +43,7 @@ export const useCohortReportFiltersStore = defineStore("cohortReportFilters", ()
             userIds: Object.values(studentFilter.value).map((s) => s.id),
             authorIds: Object.values(authorFilter.value).map((a) => a.id),
             folderIds: Object.values(folderFilter.value).map((f) => f.id),
-            tagIds: [...evidenceTagsFilter.value],
+            tagIds: evidenceTagsFilter.value.map((t) => t.id),
             states: [...stateFilter.value],
             from: startDateFilter.value ? window.dayjs(startDateFilter.value).format("YYYY-MM-DD") : undefined,
             to: endDateFilter.value ? window.dayjs(endDateFilter.value).format("YYYY-MM-DD") : undefined,

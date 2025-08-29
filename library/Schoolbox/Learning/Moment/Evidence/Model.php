@@ -21,28 +21,9 @@ class Model implements IFile
     use ModelTrait\CreatedAtDate;
 
     /**
-     * The types of evidence
-     */
-    public const MOMENT_TYPE_TEXT   = 'text';
-    public const MOMENT_TYPE_UPLOAD = 'upload';
-    public const MOMENT_TYPE_PHOTO  = 'photo';
-    public const MOMENT_TYPE_AUDIO  = 'audio';
-    public const MOMENT_TYPE_VIDEO  = 'video';
-
-
-    /**
      * @var \Schoolbox\Learning\Moment\Model|null
      */
     private ?\Schoolbox\Learning\Moment\Model $moment = null;
-
-
-    /**
-     * The type of evidence: photo/text/upload/video/audio
-     *
-     * @var string|null
-     */
-    private ?string $type = null;
-
 
     /**
      * @return User
@@ -69,26 +50,6 @@ class Model implements IFile
     public function setMoment(?\Schoolbox\Learning\Moment\Model $moment): self
     {
         $this->moment = $moment;
-        return $this;
-    }
-
-
-    /**
-     * @return string|null
-     */
-    public function getType(): ?string
-    {
-        return $this->type;
-    }
-
-
-    /**
-     * @param string|null $type
-     * @return $this
-     */
-    public function setType(?string $type): self
-    {
-        $this->type = $type;
         return $this;
     }
 }

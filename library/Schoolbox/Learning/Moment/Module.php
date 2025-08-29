@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Moment;
 
 use Alaress\Authorizer\Failure\Forbidden;
+use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -17,6 +18,7 @@ use Alaress\Web\Controller\Base;
 use Closure;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -137,7 +139,11 @@ class Module extends BaseModule
             $viewCreateFormPreloader
         );
 
-        // Post evidence to users
+        /**
+         * Post evidence to users
+         * I think always starts as a draft if moderation is required, otherwise published
+         * @deprecated as an api, use the particular post endpoints for each state instead
+         */
         $this->register(
             self::METHOD_POST,
             '/user/{userIds}/create',
@@ -199,7 +205,10 @@ class Module extends BaseModule
             self::METHOD_POST,
             '/user/{userIds}/publish',
             'postPublish',
-            $viewCreateFormRule,
+            new Rule\All(
+                $viewCreateFormRule,
+                $this->buildRuleCanStartWithState('publish'),
+            ),
             $viewCreateFormPreloader
         );
 
@@ -210,7 +219,10 @@ class Module extends BaseModule
             self::METHOD_POST,
             '/user/{userIds}/draft',
             'postDraft',
-            $viewCreateFormRule,
+            new Rule\All(
+                $viewCreateFormRule,
+                $this->buildRuleCanStartWithState('draft'),
+            ),
             $viewCreateFormPreloader
         );
 
@@ -221,7 +233,10 @@ class Module extends BaseModule
             self::METHOD_PUT,
             '/{evidenceId:\d+}/draft',
             'putDraft',
-            $modifyEvidenceRule,
+            new Rule\All(
+                $modifyEvidenceRule,
+                $this->buildRuleCanProgressToState('draft'),
+            ),
             Closure::fromCallable([$this, 'preloadEvidence']),
         );
 
@@ -231,7 +246,10 @@ class Module extends BaseModule
             self::METHOD_POST,
             '/user/{userIds}/submit',
             'postSubmit',
-            $viewCreateFormRule,
+            new Rule\All(
+                $viewCreateFormRule,
+                $this->buildRuleCanStartWithState('submit'),
+            ),
             $viewCreateFormPreloader,
         );
 
@@ -242,7 +260,10 @@ class Module extends BaseModule
             self::METHOD_PUT,
             '/{evidenceId:\d+}/submit',
             'putSubmit',
-            $modifyEvidenceRule,
+            new Rule\All(
+                $modifyEvidenceRule,
+                $this->buildRuleCanProgressToState('submit'),
+            ),
             Closure::fromCallable([$this, 'preloadEvidence']),
         );
 
@@ -253,11 +274,54 @@ class Module extends BaseModule
             self::METHOD_PUT,
             '/{evidenceId:\d+}/publish',
             'putPublish',
-            $modifyEvidenceRule,
+            new Rule\All(
+                $modifyEvidenceRule,
+                $this->buildRuleCanProgressToState('publish'),
+            ),
             Closure::fromCallable([$this, 'preloadEvidence']),
         );
 
-        // Evidence modify form
+        /* Bulk Publish a set of learning moments (typically from Cohort Overview)
+         * NOTE: This skips buildRuleCanProgressToState() as it's multiple items,
+         * the progression check is done within the controller instead
+         */
+        $this->register(
+            self::METHOD_PUT,
+            '/bulk/publish',
+            'putBulkPublish',
+            $viewCohortReportRule,
+        );
+
+        /* Reject a Learning Moment
+         */
+        $this->register(
+            self::METHOD_PUT,
+            '/{evidenceId:\d+}/reject',
+            'putReject',
+            new Rule\All(
+                $modifyEvidenceRule,
+                $this->buildRuleCanProgressToState('reject'),
+            ),
+            Closure::fromCallable([$this, 'preloadEvidence']),
+        );
+
+        /* Bulk reject a set of learning moments (typically from Cohort Overview)
+         * NOTE: This skips buildRuleCanProgressToState() as it's multiple items,
+         * the progression check is done within the controller instead
+         */
+        $this->register(
+            self::METHOD_PUT,
+            '/bulk/reject',
+            'putBulkReject',
+            $viewCohortReportRule,
+        );
+
+        /**
+         * Evidence modify form
+         * NOTE: a logic change in 25.1 was done here, this now always makes it a draft
+         * TODO: delete the next release after 25.1
+         * @deprecated use the particular put endpoints for each state instead
+         */
         $this->register(
             self::METHOD_PUT,
             '/{evidenceId:\d+}',
@@ -345,7 +409,8 @@ class Module extends BaseModule
             ),
             $this->getMapperFactory()->get(\Schoolbox\Permission\Access\UserAccessMapper::class),
             new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfig())),
-            $this->getMapperFactory()->get(\Schoolbox\Resource\Folder\Mapper::class)
+            $this->getMapperFactory()->get(\Schoolbox\Resource\Folder\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Discussion\Thread\Mapper::class),
         );
     }
 
@@ -403,9 +468,11 @@ class Module extends BaseModule
      */
     private function preloadEvidence(array $params): array
     {
-        $evidence = $this->getMapperFactory()
-             ->get(Mapper::class)
-             ->findById($params['evidenceId']);
+        $evidence = array_key_exists('evidence', $params)
+            ? $params['evidence']
+            : $this->getMapperFactory()
+                ->get(Mapper::class)
+                ->findById($params['evidenceId']);
 
         return [
             'userId' => $evidence->getRecipient()->getId(),
@@ -486,5 +553,78 @@ class Module extends BaseModule
             }
             throw new Forbidden();
         }
+    }
+
+
+    /**
+     * Authorizes that a particular moment can be progressed to a given state
+     *
+     * @param string $state
+     */
+    private function buildRuleCanProgressToState(string $state): Rule\IAuthorizationRule
+    {
+        return new Rule\LazyCallback(
+            fn() => new Rule\Callback(function (array $params, User $user) use ($state): void {
+                // Because preload exceptions are not handled immediately, we can't fatal if the preload failed.
+                $moment = $params['evidence'] ?? null;
+                if (!($moment instanceof Model)) {
+                    throw new InvalidPath("No moment found in route params");
+                }
+
+                // NextRoutes is the source of truth of what the next possible states are
+                $nextRoutes = (new \Schoolbox\Learning\Moment\NextRoutes())->generate(
+                    $moment,
+                    $user,
+                    $this->getConfig()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED)
+                );
+
+                if (empty($nextRoutes[$state])) {
+                    throw new Forbidden("Cannot progress to state '$state'");
+                }
+            }),
+        );
+    }
+
+
+    /**
+     * Authorizes that a particular moment can be created with a given state
+     *
+     * @param string $state
+     */
+    private function buildRuleCanStartWithState(string $state): Rule\IAuthorizationRule
+    {
+        return new Rule\LazyCallback(
+            fn() => new Rule\Callback(function (array $params, User $user) use ($state): void {
+                $users = $params['users'] ?? null;
+                if (!($users instanceof \Schoolbox\Collection)) {
+                    throw new InvalidPath("No users found in route params");
+                }
+
+                /* If there's exactly one recipient, use that User instance as the recipient
+                 * Otherwise, fall back to default global moderation requirement to determine what call to action is here
+                 *
+                 * Multiple people: just have the publish button I guess?
+                 * This same logic exists in the controller's getCreateForm method
+                 */
+                $recipient = 1 === $users->count() ? $users->first() : new User();
+
+                /** there's no evidence here as it hasn't been created yet */
+                $moment = (new Model())
+                    ->setRecipient($recipient)
+                    ->setCreator($user)
+                    ->draft();
+
+                // NextRoutes is the source of truth of what the next possible states are
+                $nextRoutes = (new \Schoolbox\Learning\Moment\NextRoutes())->generate(
+                    $moment,
+                    $user,
+                    $this->getConfig()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED)
+                );
+
+                if (empty($nextRoutes[$state])) {
+                    throw new Forbidden("Cannot progress to state '$state'");
+                }
+            }),
+        );
     }
 }

@@ -129,11 +129,12 @@ function spawnLightbox(file: StorageFile): void {
             <div class="small-12" :class="{ 'medium-8': selectableEvidence.length > 0 }">
                 <article
                     v-if="selectedEvidence !== null && selectedEvidence.hash"
+                    :key="selectedEvidence.hash"
                     style="width: fit-content"
                     @click="spawnLightbox(selectedEvidence)"
                 >
+                    <!-- TODO: this doesn't use the file name from the model, rather the base storage name... -->
                     <storage-object
-                        :key="selectedEvidence.hash"
                         :storage="selectedEvidence"
                         :filename="selectedEvidence.name"
                         style="max-height: 10rem"
@@ -155,14 +156,15 @@ function spawnLightbox(file: StorageFile): void {
 
             <div v-if="selectableEvidence.length > 0" class="small-12 medium-4 l-flex-col l-gap-s">
                 <div
-                    v-for="storage in selectableEvidence"
+                    v-for="storage in props.entry.files"
                     :key="storage.hash"
                     class="cr-evidence-button l-flex--no-wrap l-flex-row l-gap-xs l-pad-xs"
-                    :title="`${storage.name}.${storage.type}`"
+                    :class="{ 'cr-evidence-button-selected': storage.hash === selectedEvidenceHash }"
+                    :title="storage.name"
                     @click="selectedEvidenceHash = storage.hash"
                 >
                     <img :src="`/ajax/mime/${storage.mime}`" />
-                    <span>{{ storage.name }}.{{ storage.type }}</span>
+                    <span>{{ storage.name }}</span>
                 </div>
             </div>
         </div>
@@ -189,7 +191,11 @@ function spawnLightbox(file: StorageFile): void {
         white-space: nowrap;
     }
 
-    &:hover {
+    &.cr-evidence-button-selected {
+        opacity: 0.5;
+    }
+
+    &:not(.cr-evidence-button-selected):hover {
         cursor: pointer;
         background-color: var(--content-ui-background);
     }

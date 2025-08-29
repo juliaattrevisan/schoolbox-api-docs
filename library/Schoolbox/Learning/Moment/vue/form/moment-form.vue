@@ -1,0 +1,123 @@
+<script setup lang="ts">
+import type { Template } from "@js/editor/types/editorTypes";
+import CurriculumSelector from "@schoolboxCurriculum/vue/curriculumSelector/curriculum-selector.vue";
+import type { Node } from "@schoolboxCurriculum/types/Node";
+import type { LearningMoment } from "@schoolboxLearningMomentEvidence/evidenceTypes";
+import EvidenceTags from "@schoolboxLearningMomentEvidence/evidence-tags.vue";
+import MfActions from "./mf-actions.vue";
+import MfEvidence from "./mf-evidence.vue";
+import MfSources from "./mf-sources.vue";
+import MfModal from "./mf-modal.vue";
+import { useMomentFormStore } from "./store/momentFormStore";
+
+interface Props {
+    /**
+     * Autosave is available if there's a draft route
+     * and this isn't a create form for multiple dudes at the same time
+     *
+     * After the initial POST, we end up choosing what to do based on the response we get,
+     * either sending the user somewhere else, or updating the form to be an edit form
+     */
+    hasAutosave: boolean;
+    returnUrl: string;
+    /**
+     * If this is a create form, it's populated with the post routes to use
+     * as props.moment will be an empty object and will not reflect
+     * the correct routes (doesn't support multiple users, those are puts, etc)
+     *
+     * null if editing an existing moment
+     */
+    createRoutes: null | LearningMoment["_links"];
+    /**
+     * The current learning moment that is being edited
+     * It may not have a meaningful ID yet if props.isCreate is true
+     */
+    moment: LearningMoment;
+    editorTemplates: Template[];
+    endpointGetEvidenceTags: string;
+    /** Curriculum Nodes */
+    curriculumNodes: Node[];
+    endpointCurriculumNodes: string | null;
+    /** Classes and Groups */
+    folders: { id: number; title: string }[];
+    selectedFolders: number[];
+}
+
+const props = defineProps<Props>();
+const mfStore = useMomentFormStore();
+
+window.Vue.onMounted(() => {
+    mfStore.init(
+        props.hasAutosave,
+        props.returnUrl,
+        props.createRoutes,
+        props.moment,
+        props.folders,
+        props.selectedFolders,
+    );
+});
+</script>
+
+<template>
+    <div class="actions-small-1 row">
+        <div class="list-item">
+            <div class="small-12 column">
+                <slot name="heading"></slot>
+            </div>
+        </div>
+
+        <template v-if="mfStore.moment && mfStore.moment._links.delete">
+            <nav>
+                <sbx-pop-out content-id="mf-pop-out"></sbx-pop-out>
+            </nav>
+            <ul id="mf-pop-out" class="f-dropdown" data-dropdown-content>
+                <li>
+                    <a
+                        class="icon-delete"
+                        :href="mfStore.moment._links.delete"
+                        @click.prevent="() => mfStore.deleteMoment()"
+                    >
+                        Delete
+                    </a>
+                </li>
+            </ul>
+        </template>
+    </div>
+
+    <div v-if="mfStore.moment !== null" class="row">
+        <div class="small-12 island">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <mf-evidence :editor-templates="props.editorTemplates" />
+
+                        <label>
+                            Tags
+                            <evidence-tags
+                                v-model:tags="mfStore.moment.tags"
+                                :endpoint-get-evidence-tags="props.endpointGetEvidenceTags"
+                            />
+                        </label>
+
+                        <label v-if="props.endpointCurriculumNodes">
+                            Curriculum Codes
+                            <curriculum-selector
+                                :is-read-only="false"
+                                :selected-nodes="props.curriculumNodes"
+                                :data-endpoint="props.endpointCurriculumNodes"
+                                :include-children="true"
+                                :has-tabs="false"
+                            />
+                        </label>
+                    </div>
+
+                    <mf-sources />
+                </fieldset>
+            </section>
+            <mf-actions />
+        </div>
+    </div>
+    <mf-modal />
+</template>
+
+<style scoped></style>

@@ -7,6 +7,7 @@
 import { useFileDialog } from "@vueuse/core";
 import FileDropPreview from "./file-drop-preview.vue";
 import type { FileDropFile } from "./fileDropTypes";
+import { uploadFileToStorage } from "./resourceUtils";
 
 interface Props {
     id: string;
@@ -30,6 +31,10 @@ interface Props {
      */
     disabled?: boolean;
     /**
+     * Should the file be automatically uploaded to storage when selected?
+     */
+    autoUploadToStorage?: boolean;
+    /**
      * Handler for the File object when a file is selected
      * @param file - The file object
      * @returns Whether the file should be considered as valid or not, return a string to specify an error message
@@ -44,6 +49,7 @@ const props = withDefaults(defineProps<Props>(), {
     inputName: undefined,
     required: false,
     disabled: false,
+    autoUploadToStorage: false,
     fileHandler: () => true,
 });
 
@@ -124,7 +130,7 @@ function handleFiles(files: FileList | null): void {
     const file = { file: files[0], error: false } as const;
 
     // Is the file the right type?
-    if (!window.Dropzone.isValidFile(file.file, props.accept)) {
+    if (props.accept !== "*/*" && !window.Dropzone.isValidFile(file.file, props.accept)) {
         currentFile.value = {
             ...file,
             error: "You can't upload files of this type.",
@@ -163,13 +169,58 @@ function handleDrop(event: DragEvent): void {
     if (!event.dataTransfer) return;
     handleFiles(event.dataTransfer.files);
 }
+
+const isUploading = window.Vue.ref(false);
+
+/**
+ * Automatically upload a file to storage when it is uploaded successfully
+ */
+window.Vue.watch(currentFile, async (file) => {
+    if (file === null || file.error !== false) {
+        return;
+    }
+
+    if (props.autoUploadToStorage === false || file.storageHash) {
+        return; // don't auto upload, or file is already uploaded - nothing to do
+    }
+
+    // If the file is valid, we can upload it
+    isUploading.value = true;
+    const resource = await uploadFileToStorage(file.file);
+    isUploading.value = false;
+
+    if (resource.success === false) {
+        let errorMessage = resource.message || "Failed to upload file";
+
+        // Try to pull the message from the response if available
+        if (
+            typeof resource.data === "object" &&
+            resource.data !== null &&
+            "message" in resource.data &&
+            typeof resource.data.message === "string"
+        ) {
+            errorMessage = resource.data.message || errorMessage;
+        }
+
+        file.error = errorMessage;
+        return;
+    }
+
+    file.storageHash = resource.data.hash;
+    file.storageFile = resource.data.meta.file;
+});
 </script>
 
 <template>
     <div>
         <div v-if="currentFile" class="ab-upload ab-upload-panel" :class="props.class">
             <div class="dzone dz-clickable dz-started" style="border: 0">
-                <file-drop-preview :file="currentFile" :disabled="props.disabled" @remove="handleCancel" />
+                <file-drop-preview
+                    :file="currentFile"
+                    :disabled="props.disabled"
+                    :is-uploading="isUploading"
+                    @remove="currentFile = null"
+                />
             </div>
         </div>
 

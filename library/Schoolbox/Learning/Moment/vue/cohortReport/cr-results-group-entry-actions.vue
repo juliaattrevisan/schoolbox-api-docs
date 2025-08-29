@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
+import { EvidenceStatus } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 import { useCohortReportStore } from "./store/cohortReportStore";
 import { CohortReportModalType, useCohortReportModalStore } from "./store/cohortReportModalStore";
 import type { CohortReportEntry } from "./store/cohortReportPayload";
@@ -28,7 +29,9 @@ async function onApprove(): Promise<void> {
 </script>
 
 <template>
-    <li v-if="props.entry._links.publish">
+    <!-- Approve on the cohort report is special, if it's already approved then you'll still technically have access
+      -- to re-approve it, but showing this button may be confusing in the workflow. So hide it if it's already published -->
+    <li v-if="props.entry._links.publish && props.entry.currentState !== EvidenceStatus.PUBLISHED">
         <a class="icon-approve" @click.prevent="onApprove"> Approve </a>
     </li>
     <li v-if="props.entry._links.reject">

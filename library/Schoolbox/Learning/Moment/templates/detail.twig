@@ -13,10 +13,11 @@
     ['Learning Moment']
 ) }}
 
+{# TODO this thing makes some really bad assumptions about what an evidence is #}
 <div id="evidence-detail-container">
     <evidence-detail
-        :evidence="{{ evidence|json_encode }}" 
-        :return-url="{{ RETURN_URL|json_encode }}" 
+        :evidence="{{ evidence|json_encode }}"
+        :return-url="{{ RETURN_URL|json_encode }}"
         :can-comment="{{ learningMomentCanComment ? 'true' : 'false' }}"
         site-version="{{ config.site_version }}"
         cdn-prefix="{{ CDN_PREFIX }}"

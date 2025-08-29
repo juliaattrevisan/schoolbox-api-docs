@@ -313,12 +313,12 @@ class Mapper extends BaseMapper
                     $storage->setMimeType($mime);
                 }
 
-                if ($storage) {
-                    $evidence->setStorage($storage);
-                }
+                $evidence->setStorage($storage);
 
                 $collection[$row['id']]->getEvidence()->setOffset($evidence->getId(), $evidence);
             }
+
+            $collection[$row['id']]->getEvidence()->sortBy('createdAt', 'asc');
         }
 
         return $collection;

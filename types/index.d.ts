@@ -75,6 +75,15 @@ declare global {
             externalId: string | null;
             name: string;
             impersonated: boolean;
+            role: {
+                id: number;
+                name: string;
+                guest: boolean;
+                parent: boolean;
+                staff: boolean;
+                student: boolean;
+                type: "staff" | "student" | "parent" | "guest";
+            };
         };
         siteVersion: string;
         STORYBOOK_ENV: string;
