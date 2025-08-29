@@ -27,13 +27,15 @@ const mfStore = useMomentFormStore();
                                        backgroundPosition: folder.coverImage ? 'center' : undefined
                                    }
                             ">
-                                <input
-                                    :id="`mf-checkbox-${folder.id}`"
-                                    type="checkbox"
-                                    :checked="mfStore.selectedFolders.includes(folder.id)"
-                                    @change="mfStore.toggleFolderSelection(folder.id)"
-                                />
-                                <label :for="`mf-checkbox-${folder.id}`" class="mf-source-checkbox"></label>
+                                <div class="mf-source-checkbox">
+                                    <input
+                                        :id="`mf-checkbox-${folder.id}`"
+                                        type="checkbox"
+                                        :checked="mfStore.selectedFolders.includes(folder.id)"
+                                        @change="mfStore.toggleFolderSelection(folder.id)"
+                                    />
+                                    <label :for="`mf-checkbox-${folder.id}`"></label>
+                                </div>
                             </div>
                             <div class="card-content classes actions-small-1">
                                 <div class="list-item">
