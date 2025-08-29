@@ -92,7 +92,7 @@ jobs:
       - name: Upload ${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }} artifact
         uses: actions/upload-artifact@v4
         with:
-          name: digest-${{ matrix.build.arch }}
+          name: digest-${{ matrix.build.arch }}-php${{ matrix.phpVersion }}
           path: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}/*
           if-no-files-found: 'error'
           retention-days: 1
