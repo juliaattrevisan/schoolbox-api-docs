@@ -1007,10 +1007,6 @@ class Controller extends Base
 
         $translated = $responseTranslator($moment);
 
-        /* A shortcut to urls for changing states in this learning moment
-         */
-        // $translated['_links'] = $this->getNextRoutes($moment);
-
         return $translated;
     }
 
