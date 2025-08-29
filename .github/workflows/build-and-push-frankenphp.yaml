@@ -82,6 +82,8 @@ jobs:
           tags: |
             ${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}
             ${{ vars.ECR_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}
+          cache-from: type=gha
+          cache-to: type=gha
 
       - name: Export digest
         run: |
