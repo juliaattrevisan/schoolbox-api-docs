@@ -23,6 +23,7 @@
         margin: {{ layout.getGridPadding|e('css') }}px;
         {% set paddingBottom = gridWidth * aspectRatio ~ "px" %}
     {% else %}
+        {# Assume layout isColumnLayoutType since there are only two types (and guard against bad data in tile_layout.layout_type). #}
         {% set baseColumnWidth   = (100 / columnCount) %}
         {% set paddingPercentage = (layout.columnPadding / 100) %}
         {% set tilePadding       = baseColumnWidth * paddingPercentage %}
