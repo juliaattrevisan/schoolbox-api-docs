@@ -11,6 +11,7 @@ namespace Schoolbox\Pastoral\BulkImport;
 
 use Alaress\Paginator;
 use Alaress\Web\Controller\Base;
+use Alaress\Web\Controller\Exception as WebControllerException;;
 use Alaress_Date_Format;
 use League\Flysystem\FilesystemException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -487,18 +488,20 @@ class Controller extends Base
             return;
         }
 
-        // Save imported by/at immediately,
-        // so that mashing the import button doesn't create multiple imports.
-        $import = $import
-            ->setImportedBy($this->getUser())
-            ->setImportedAt(Alaress_Date_Format::now());
-        $this->pastoralBulkImportMapper->save($import);
-
-        // Load the Zip file's contents, cleaning up only once all files have
-        // been extracted from the ZIP.
-        $zipArchive       = null;
-        $localZipFilename = null;
         try {
+            // Save imported by/at immediately,
+            // so that mashing the import button doesn't create multiple imports.
+            $import = $import
+                ->setImportedBy($this->getUser())
+                ->setImportedAt(Alaress_Date_Format::now());
+            $this->pastoralBulkImportMapper->save($import);
+        } catch (MapperException $e) {
+            throw new SchoolboxException('Could not create pastoral bulk import.  Error: ' . $e->getMessage());
+        }
+
+        try {
+            // Load the Zip file's contents, cleaning up only once all files have
+            // been extracted from the ZIP.
             $zipStorage = $import->getZip();
             if (!$zipStorage) {
                 $this->sendError(
@@ -511,7 +514,11 @@ class Controller extends Base
             $localZipFilename = $this->createLocalZipFile($zipStorage);
             $zipArchive       = $this->createZipArchive($localZipFilename);
             $importLog        = $this->generateImportLog($zipArchive, $import->getFilePathTemplate());
+        } catch (FilesystemException | WebControllerException $e) {
+            throw new SchoolboxException('Could not create log for pastoral bulk import.  Error: ' . $e->getMessage());
+        }
 
+        try {
             // Create the records
             $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
             foreach ($importLog['known'] as $i => $pastoralRecord) {
@@ -572,6 +579,8 @@ class Controller extends Base
                     $this->pastoralTagMapper->assignToRecord($record, $tag);
                 }
             }
+        } catch (\Exception $e) {
+            $importLog['error'] = $e->getMessage();
         } finally {
             $this->cleanup($zipArchive, $localZipFilename);
         }
