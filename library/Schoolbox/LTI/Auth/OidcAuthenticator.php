@@ -25,6 +25,8 @@ use OAT\Library\Lti1p3Core\Security\Jwt\Validator\Validator;
 use OAT\Library\Lti1p3Core\Security\Jwt\Validator\ValidatorInterface;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Schoolbox\LTI\Provider;
+use Schoolbox\Mapper\Exception;
 use Throwable;
 
 /**
@@ -39,6 +41,7 @@ class OidcAuthenticator
     public function __construct(
         private RegistrationRepositoryInterface $repository,
         private UserAuthenticatorInterface $authenticator,
+        private Provider\Mapper $providerMapper,
         private ?MessagePayloadBuilderInterface $builder = null,
         private ?ValidatorInterface $validator = null,
         private ?ParserInterface $parser = null
@@ -131,24 +134,48 @@ class OidcAuthenticator
         return $claims;
     }
 
+    /**
+     * Extract and validate the tool redirect URL from the OIDC request.
+     *
+     * The LTI library doesn't natively support redirect URLs within its
+     * objects, so the redirect URLs must be fetched from the database
+     * representation of the LTI tool.
+     *
+     * @param RegistrationInterface $registration The LTI tool registration.
+     * @param LtiMessageInterface   $oidcRequest  The request to validate.
+     * @return string                 The validated redirect URL.
+     * @throws LtiBadRequestException if the request's redirect URL did not
+     *                                match either:
+     *                                * the tool launch URL
+     *                                * one of the tool's redirect URLs
+     */
     private function createToolRedirectUrl(
         RegistrationInterface $registration,
         LtiMessageInterface $oidcRequest
     ): string {
-        $uri  = $oidcRequest->getParameters()->getMandatory('redirect_uri');
-        $host = parse_url($uri, PHP_URL_HOST);
-        /**
-         * redirect_uri must match one of the values associated with the tool's registration
-         * however, the library does not support multiple redirect_uris per registration,
-         * and relies on the launch URL to represent the tool's redirect_uri
-         *
-         * in order to support multiple redirect_uris, while still keeping the authentication
-         * relatively safe, the redirect_uri's host is compared against the pre-registered launch URL's host
-         */
-        if (!$host || $host !== parse_url($registration->getTool()->getLaunchUrl() ?? '', PHP_URL_HOST)) {
-            throw new LtiBadRequestException('Invalid redirect_uri');
+        // Fetch the LTI tool model for this registration
+        try {
+            $ltiTool = $this->providerMapper->findOneByClientId($registration->getClientId());
+        } catch (Exception $e) {
+            throw new LtiBadRequestException('Registration ID does not match a configured LTI tool', 0, $e);
         }
 
-        return $uri;
+        // Extract and validate the request's redirect_uri
+        $redirectUri = $oidcRequest->getParameters()->getMandatory('redirect_uri');
+
+        // Direct match for tool launch URL: it's valid
+        if ($redirectUri === $ltiTool->getLaunchUrl()) {
+            return $redirectUri;
+        }
+
+        // Otherwise, match against tool's redirect URLs
+        foreach ($ltiTool->getRedirectUrls() as $redirectUrlModel) {
+            /** @var Provider\RedirectUrl\Model $redirectUrlModel */
+            if ($redirectUrlModel->getRedirectUrl() === $redirectUri) {
+                return $redirectUri;
+            }
+        }
+
+        throw new LtiBadRequestException('Invalid redirect_uri');
     }
 }
