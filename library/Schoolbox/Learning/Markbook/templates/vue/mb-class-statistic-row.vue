@@ -108,8 +108,8 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
                     v-if="props.input.selectOptions && assessment.assessmentType !== ACTIVITY_TYPE_TASK"
                     v-model="aImpl[props.input.key]"
                     :name="props.statsKey"
-                    @change="onValueChange(assessment.id, aImpl)"
                     :disabled="!mbStore.data || !mbStore.data.canAccessPopOut"
+                    @change="onValueChange(assessment.id, aImpl)"
                 >
                     <!-- eslint-disable vue/no-v-html -- we can't use <sbx-icon> in a select since html spec
                     -- doesn't allow elements in options, so the whole thing is v-html'd instead... -->
