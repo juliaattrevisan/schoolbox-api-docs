@@ -94,7 +94,7 @@ jobs:
       - name: Upload ${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }} artifact
         uses: actions/upload-artifact@v4
         with:
-          name: digest-${{ matrix.build.arch }}-php${{ matrix.phpVersion }}
+          name: digest-php${{ matrix.phpVersion }}-${{ matrix.build.arch }}
           path: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}/*
           if-no-files-found: 'error'
           retention-days: 1
@@ -132,15 +132,14 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           path: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}
-          pattern: digest-*
+          pattern: digest-php${{ matrix.phpVersion }}-*
           merge-multiple: 'true'
 
       - name: Identify image names
         id: images
         run: |
           echo 'names="\' > "$GITHUB_OUTPUT"
-          ls -al ${{ runner.temp }}/digests/${{ matrix.phpVersion }}
-          for file in $(ls -1 ${{ runner.temp }}/digests/${{ matrix.phpVersion }}/digest-*); do
+          for file in $(ls -1 ${{ runner.temp }}/digests/${{ matrix.phpVersion }}); do
             echo "${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:${file} \" >> "$GITHUB_OUTPUT"
             echo "${{ vars.ECR_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:${file} \" >> "$GITHUB_OUTPUT"
           done
