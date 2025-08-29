@@ -1139,8 +1139,10 @@ class Controller extends Base
              */
             $files = [];
 
-            if (null !== $moment->getEvidence()->first()?->getStorage()) {
-                $files[] = call_user_func($this->storageTranslator, $moment->getEvidence()->first()->getStorage());
+            foreach ($moment->getEvidence() as $evidence) {
+                if (null !== $evidence->getStorage()) {
+                    $files[] = call_user_func($this->storageTranslator, $evidence->getStorage());
+                }
             }
 
             /* The actual body may be too long or contain too much HTML (i.e. images/videos)
