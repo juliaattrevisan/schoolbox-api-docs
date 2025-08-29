@@ -5,6 +5,7 @@
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
+import locale from "@js/terminology/rosettaStone";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
@@ -266,6 +267,18 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
     }
     return plan.name || "";
 }
+
+/**
+ * Generates the meta for a given customisation plan.
+ * @param plan - The customisation plan to generate the meta for.
+ * @returns The meta for the customisation plan.
+ */
+function getCustomisationMeta(plan: Plan | CustomisedPlan): string {
+    if ("assessable" in plan && plan.assessable !== null) {
+        return `(New ${locale.activity?.singular()})`;
+    }
+    return `(Modified ${locale.activity?.singular()})`;
+}
 </script>
 
 <template>
@@ -315,32 +328,22 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                     <td>
                         <img
                             :src="`/portrait.php?id=${participant.user.id}&size=square64`"
-                            :alt="participant.user.lastname + ', ' + participant.user.firstname"
+                            :alt="`${participant.user.lastname}, ${participant.user.firstname}`"
                         />
                     </td>
                     <td>
                         <div class="l-flex-col l-gap-s">
                             <div v-if="participant.user.id">
                                 <a :href="`/search/user/${participant.user.id}`">
-                                    {{ participant.user.lastname + ", " + participant.user.firstname }}
-                                    {{
-                                        participant.user.preferredName &&
-                                        participant.user.preferredName !== participant.user.firstname
-                                            ? "‘" + participant.user.preferredName + "’"
-                                            : ""
-                                    }}
-                                    {{ participant.user.pronoun }}
+                                    {{ participant.user.lastname }},
+                                    {{ participant.user.preferredName || participant.user.firstname }}
+                                    {{ participant.user.pronoun || "" }}
                                 </a>
                             </div>
                             <template v-else>
-                                {{ participant.user.lastname + ", " + participant.user.firstname }}
-                                {{
-                                    participant.user.preferredName &&
-                                    participant.user.preferredName !== participant.user.firstname
-                                        ? "‘" + participant.user.preferredName + "’"
-                                        : ""
-                                }}
-                                {{ participant.user.pronoun }}
+                                {{ participant.user.lastname }},
+                                {{ participant.user.preferredName || participant.user.firstname }}
+                                {{ participant.user.pronoun || "" }}
                             </template>
                             <div class="l-flex l-gap-xs">
                                 <sbx-label
@@ -361,11 +364,13 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                             <a :href="`${participant.customisedPlan.assessable._links.modify}?${getReturnUrl()}`">
                                 {{ participant.customisedPlan.assessable.title }}
                             </a>
+                            <span class="meta">{{ getCustomisationMeta(participant.customisedPlan) }}</span>
                         </template>
                         <template v-else-if="participant.plan.name !== null">
                             <a :href="`${getAssessmentParticipation}/${participant.plan.id}/modify?${getReturnUrl()}`">
                                 {{ participant.plan.name }}
                             </a>
+                            <span class="meta">{{ getCustomisationMeta(participant.plan) }}</span>
                         </template>
                         <template v-else-if="participant.excludedAt !== null">Excluded</template>
                     </td>
@@ -523,7 +528,7 @@ function getCustomisationLabel(plan: Plan | CustomisedPlan): string {
                         :key="customisation.id"
                         :value="customisation.id"
                     >
-                        {{ getCustomisationLabel(customisation) }}
+                        {{ getCustomisationLabel(customisation) }} {{ getCustomisationMeta(customisation) }}
                     </option>
                 </select>
             </div>

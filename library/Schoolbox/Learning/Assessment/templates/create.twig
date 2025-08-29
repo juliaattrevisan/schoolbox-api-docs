@@ -49,8 +49,8 @@
             return new Promise(function(resolve, reject) {
                 if (showParticipationPrompt()) {
                     $("body").confirmDialog({
-                        header: "Activity created",
-                        text: "Would you like to edit the student participation for this activity now?",
+                        header: "{{ locale.activity.proper }} created",
+                        text: "Would you like to edit the student participation for this {{ locale.activity }}?",
                         flipButtons: true,
                         cancelLabel: "Later",
                         cancelEvent: () => {
