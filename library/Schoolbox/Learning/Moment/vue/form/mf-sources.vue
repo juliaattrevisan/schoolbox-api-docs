@@ -15,7 +15,7 @@ const isExpanded = window.Vue.ref(false);
 
         <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
             <div v-show="isExpanded">
-                <div class="l-grid l-grid--4-col l-gap-m l-pad-m">
+                <div class="l-grid l-gap-m l-pad-m">
                     <div v-for="folder in mfStore.folders" :key="folder.id">
                         <section class="checklist">
                             <div class="v-card small-12">
