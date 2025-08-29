@@ -202,14 +202,10 @@ class Controller extends Base
 
         /* If there's exactly one recipient, use that User instance as the recipient
          * Otherwise, fall back to default global moderation requirement to determine what call to action is here
+         *
+         * Multiple people: just have the publish button I guess?
          */
-        if (1 === $users->count()) {
-            $recipient = $this->getUser();
-        } else {
-            /* Multiple people: just have the publish button I guess?
-             */
-            $recipient = new User();
-        }
+        $recipient = 1 === $users->count() ? $users->first() : new User();
 
         $moment = $this->mapper->createModel()
             ->setRecipient($recipient)
