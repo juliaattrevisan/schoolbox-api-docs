@@ -313,9 +313,10 @@ class Module extends BaseModule
          */
         $this->register(
             self::METHOD_GET,
-            '/folders',
-            'getFolderList',
+            '/folders/{folderId}',
+            'getCohortFolderList',
             $viewCohortReportRule,
+            Closure::fromCallable([$this, 'preloadFolder']),
         );
 
         /* Bulk Delete a set of learning moments (typically from Cohort Overview)

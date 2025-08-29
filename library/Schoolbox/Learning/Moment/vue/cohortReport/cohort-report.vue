@@ -13,6 +13,7 @@ interface Props {
     endpointPutBulkReject: string;
     endpointPutBulkPublish: string;
     endpointGetEvidenceTags: string;
+    endpointGetCohortFolderList: string;
     endpointDeleteBulkEvidence: string;
 }
 
@@ -50,6 +51,7 @@ const isSingleColumn = window.Vue.computed(() => containerWidth.value < SINGLE_C
                 class="cohort-report--filters"
                 :is-single-column="isSingleColumn"
                 :endpoint-get-evidence-tags="props.endpointGetEvidenceTags"
+                :endpoint-get-cohort-folder-list="props.endpointGetCohortFolderList"
             />
             <cr-results class="cohort-report--results" />
         </div>

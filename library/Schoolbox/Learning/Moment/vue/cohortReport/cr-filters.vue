@@ -9,6 +9,7 @@ import { useCohortReportFiltersStore } from "./store/cohortReportFiltersStore";
 
 interface Props {
     endpointGetEvidenceTags: string;
+    endpointGetCohortFolderList: string;
     isSingleColumn: boolean;
 }
 
@@ -151,7 +152,7 @@ window.Vue.watch(
                         v-model:selected="crfStore.folderFilter"
                         :label="`Filter by ${locale.class.plural()} and groups`"
                         label-id="folder"
-                        endpoint="/learning/evidence/folders?"
+                        :endpoint="props.endpointGetCohortFolderList"
                         :is-single-select="false"
                         placeholder="Search for classes and groups..."
                     />

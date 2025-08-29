@@ -13,6 +13,7 @@
         endpoint-put-bulk-reject="{{ routeLookup('learningMomentModeration.putBulkReject') }}"
         endpoint-put-bulk-publish="{{ routeLookup('learningMomentModeration.putBulkPublish') }}"
         endpoint-get-evidence-tags="{{ routeLookup('learningMomentEvidence.getTags') }}"
+        endpoint-get-cohort-folder-list="{{ routeLookup('learningMomentEvidence.getCohortFolderList', { folderId: folder.id, folder: folder }) }}"
         endpoint-delete-bulk-evidence="{{ routeLookup('learningMomentEvidence.deleteBulkDelete') }}"
     />
 </div>
