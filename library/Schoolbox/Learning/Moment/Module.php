@@ -604,9 +604,6 @@ class Module extends BaseModule
                     ->setCreator($user)
                     ->draft();
 
-                /** @var Model $moment */
-                $moment = $params['evidence'];
-
                 // NextRoutes is the source of truth of what the next possible states are
                 $nextRoutes = (new \Schoolbox\Learning\Moment\NextRoutes())->generate(
                     $moment,
