@@ -161,6 +161,13 @@ const isEvidenceRequired = window.Vue.computed(() => {
 });
 
 /**
+ * Track if the description editor has ever been shown
+ * This is to avoid it being removed from existence if the user removes all text in it
+ * and hasn't got the media type set to text
+ */
+const hasEverShownDescriptionEditor = window.Vue.ref(false);
+
+/**
  * Unlike the other media types, you can only ever have one text field
  * It either shows up the top if you have text selected as the media type,
  * or it shows up as a "Description" field if you have another media type selected and there's already text in the body
@@ -172,7 +179,14 @@ const showDescriptionEditor = window.Vue.computed(() => {
     if (mediaType.value === MediaType.TEXT) return false;
 
     // otherwise, show it if there's already text in the body (someone has added text previously)
-    return (mfStore.moment.body ?? "").trim().length > 0;
+    const shouldShow = (mfStore.moment.body ?? "").trim().length > 0;
+
+    if (shouldShow) {
+        // yikes, side effect - i guess it's fine for now
+        hasEverShownDescriptionEditor.value = true;
+    }
+
+    return shouldShow || hasEverShownDescriptionEditor.value;
 });
 
 /**
