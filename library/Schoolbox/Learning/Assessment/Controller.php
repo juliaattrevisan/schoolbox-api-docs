@@ -109,6 +109,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param null|string $learnosityConsumerKey
      * @param null|string $learnosityConsumerSecret
      * @param MimetypeMapper|null $mimetypeMapper
+     * @param RubricDataSource $rubricDataSource
      */
     public function __construct(
         UserMapper $userMapper,
@@ -139,6 +140,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         #[\SensitiveParameter] ?string $learnosityConsumerKey = null,
         #[\SensitiveParameter] ?string $learnosityConsumerSecret = null,
         protected ?MimetypeMapper $mimetypeMapper = null,
+        protected RubricDataSource $rubricDataSource,
     ) {
         parent::__construct(
             $userMapper,
@@ -562,7 +564,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             /* Retrieves the grid with assessment id reset to empty so it can be applied to the new assessment
              */
             if ($assessment instanceof DueWork\Model) {
-                $data['rubricGrid'] = (RubricDataSource::getInstance())->retrieveGrid($assessment, true, true);
+                $data['rubricGrid'] = $this->rubricDataSource->retrieveGrid($assessment, true, true);
             }
         }
 

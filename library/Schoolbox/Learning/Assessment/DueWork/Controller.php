@@ -167,6 +167,7 @@ class Controller extends Assessment\Controller
      * @param Filter\Selection\Mapper $filterSelectionMapper
      * @param CourseImplementationMapper $courseImplementationMapper
      * @param UnitImplementationMapper $unitImplementationMapper
+     * @param RubricDataSource $rubricDataSource
      */
     public function __construct(
         UserMapper $userMapper,
@@ -207,7 +208,8 @@ class Controller extends Assessment\Controller
         protected Filter\Selection\Mapper $filterSelectionMapper,
         protected CourseImplementationMapper $courseImplementationMapper,
         protected UnitImplementationMapper $unitImplementationMapper,
-        private EditorTemplateHelper $editorTemplateHelper
+        protected RubricDataSource $rubricDataSource,
+        private EditorTemplateHelper $editorTemplateHelper,
     ) {
         parent::__construct(
             $userMapper,
@@ -238,6 +240,7 @@ class Controller extends Assessment\Controller
             null,
             null,
             $mimeTypeMapper,
+            $this->rubricDataSource,
         );
     }
 

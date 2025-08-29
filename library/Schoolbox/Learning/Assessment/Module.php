@@ -756,6 +756,7 @@ class Module extends BaseModule
                     $filterSelectionMapper,
                     $courseImplementationMapper,
                     $unitImplementationMapper,
+                    $this->getMapperFactory()->get(RubricDataSource::class),
                     $editorTemplateHelper,
                 );
 
