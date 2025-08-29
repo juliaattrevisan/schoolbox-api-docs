@@ -40,7 +40,7 @@ class OidcAuthenticator extends BaseOidcAuthenticator
      *                                                           implementation.
      * @param ParserInterface|null                $parser        JWT parser: if not provided, use a default
      *                                                           implementation.
-     * @param Provider\Mapper $toolMapper                        Mapper for LTI tool registrations: required for
+     * @param Provider\Mapper                     $toolMapper    Mapper for LTI tool registrations: required for
      *                                                           fetching the tool's redirect URLs.
      */
     public function __construct(
