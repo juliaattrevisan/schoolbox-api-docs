@@ -241,7 +241,9 @@ class Controller extends Base
             'curriculumNodes'          => [],
             'folders'  => $folders ? $folders->map(fn(Folder\Model $f) => [
                 'id' => $f->getId(),
-                'title' => $f->getTitle(),
+                'name' => $f->getName(),
+                'codeString' => $f->getCodeString(),
+
             ])->reindex() : [],
             'selectedFolders'          => $selectedFolders,
             'otherUsers'               => $otherUsers,
