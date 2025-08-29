@@ -16,9 +16,9 @@ use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
 use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilder;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Jwt\Builder\Builder as JwtBuilder;
-use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Schoolbox\LTI\Auth\OidcAuthenticator;
 use Schoolbox\LTI\Platform\Context\ConfigurationFactory;
 use Schoolbox\LTI\Provider;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -73,6 +73,7 @@ class OidcAuthenticationRequestFactory
         $baseMessage = (new OidcAuthenticator(
             $this->registrationRepository,
             $this->userAuthenticator,
+            $this->toolMapper,
             $messagePayloadBuilder,
         ))->authenticate($request);
 
