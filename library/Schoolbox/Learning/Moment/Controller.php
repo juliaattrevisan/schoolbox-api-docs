@@ -848,6 +848,9 @@ class Controller extends Base
      * body, tags, curric nodes, etc. via the Modify form. This might not always be how we
      * putWithState() since you can do this directly from the CTAs on the Activity Feed.
      *
+     * Note that this is called via bulk actions as well as single actions, so it must
+     * handle sometimes not having any request body to process or varying items missing in the body
+     *
      * @param Model $evidence
      * @param string $state
      * @return array
@@ -887,22 +890,24 @@ class Controller extends Base
                 ->setCurriculumNodes($baseModel->getCurriculumNodes() ?? $moment->getCurriculumNodes());
 
             // only clone evidence if it exists...
-            $moment->setEvidence(new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class));
-            if (null !== $baseModel->getEvidence()) {
-                /* Deep Clone
-                 *
-                 * This is super painfully extravagant. Surely there's a better way than this.
-                 * TODO Maybe implement a magic __clone method inside $baseModel's instance?
-                 */
-                foreach ($baseModel->getEvidence() as $evidence) {
-                    $newEvidence = clone $evidence;
-
-                    /* For some reason this is necessary. The MutableFieldsOnly translator spawns a new Moment instance,
-                     * disconnecting it from the relationship contained inside each Evidence instance. This means we have
-                     * to map the ids manually, which seems a bit counter-intuitive.
+            if (isset($requestBody['evidence'])) {
+                $moment->setEvidence(new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class));
+                if (null !== $baseModel->getEvidence()) {
+                    /* Deep Clone
+                     *
+                     * This is super painfully extravagant. Surely there's a better way than this.
+                     * TODO Maybe implement a magic __clone method inside $baseModel's instance?
                      */
-                    $newEvidence->setMoment($moment);
-                    $moment->getEvidence()->add($newEvidence);
+                    foreach ($baseModel->getEvidence() as $evidence) {
+                        $newEvidence = clone $evidence;
+
+                        /* For some reason this is necessary. The MutableFieldsOnly translator spawns a new Moment instance,
+                         * disconnecting it from the relationship contained inside each Evidence instance. This means we have
+                         * to map the ids manually, which seems a bit counter-intuitive.
+                         */
+                        $newEvidence->setMoment($moment);
+                        $moment->getEvidence()->add($newEvidence);
+                    }
                 }
             }
         }
@@ -914,7 +919,9 @@ class Controller extends Base
         /* This is a bit brutal and maybe you can mess around more with a diff,
          * but this is guaranteed to be correct without all the kerfuffle...for now
          */
-        $moment->setFolders($this->folderMapper->findByColumn('id', $requestBody['folders']));
+        if (isset($requestBody['folders'])) {
+            $moment->setFolders($this->folderMapper->findByColumn('id', $requestBody['folders']));
+        }
 
         /* Publish only, Staff only, soft-delete all the comments associated with
          * this learning moment if the user asked to do so
