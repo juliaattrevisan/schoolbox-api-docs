@@ -208,7 +208,7 @@ class Controller extends Base
         } else {
             /* Multiple people: just have the publish button I guess?
              */
-            $recipient= new User();
+            $recipient = new User();
         }
 
         $moment = $this->mapper->createModel()
@@ -222,18 +222,18 @@ class Controller extends Base
         $nextRoutes = (new NextRoutes())->generate($moment, $this->getUser(), $globalConfig);
 
         $createRoutes = [
-            'publish' => $nextRoutes['publish'] && $this->getRouteIfAuthorized(
+            'publish' => $nextRoutes['publish'] ? $this->getRouteIfAuthorized(
                 'learningMomentEvidence.postPublish',
                 [ 'userIds' => $usersString, ],
-            ),
-            'draft'   => $this->getRouteIfAuthorized(
+            ) : null,
+            'draft'   => $nextRoutes['draft'] ? $this->getRouteIfAuthorized(
                 'learningMomentEvidence.postDraft',
                 [ 'userIds' => $usersString, ],
-            ),
-            'submit'  => $this->getRouteIfAuthorized(
+            ) : null,
+            'submit'  => $nextRoutes['submit'] ? $this->getRouteIfAuthorized(
                 'learningMomentEvidence.postSubmit',
                 [ 'userIds' => $usersString, ],
-            ),
+            ) : null,
         ];
 
         $params = [
