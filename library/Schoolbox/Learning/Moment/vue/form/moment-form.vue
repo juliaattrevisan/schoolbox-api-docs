@@ -110,9 +110,9 @@ window.Vue.onMounted(() => {
                             />
                         </label>
                     </div>
-
-                    <mf-sources />
                 </fieldset>
+
+                <mf-sources />
             </section>
             <mf-actions />
         </div>
