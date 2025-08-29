@@ -1236,9 +1236,10 @@ class Controller extends Base
      * Get a list of folders specifically for the cohort report
      * This might be better off in \Schoolbox\Resource\Folder\Controller instead, maybe
      *
+     * @param Folder\Model $folder The cohort folder to find members of
      * @return void
      */
-    public function getFolderList(): void
+    public function getCohortFolderList(Folder\Model $folder): void
     {
         $keyword = $this->requestQuery->get('query') ?? '';
         $stack = [];
@@ -1250,17 +1251,6 @@ class Controller extends Base
             return;
         }
 
-        /* Find members of your cohort
-         */
-        $cohortFolderId = $this->requestQuery->get('cohortFolderId') ?? '';
-
-        /* No cohort folder? No trabajo
-         */
-        if ('' === trim((string)$cohortFolderId)) {
-            $this->response = $this->responseEmpty(400);
-            return;
-        }
-
         /* Find a set of users who are somehow enrolled in $folder as students,
          * and/or involved in $folder as group members
          *
@@ -1268,8 +1258,7 @@ class Controller extends Base
          * members from the Externals
          */
         try {
-            $cohortFolder = $this->folderMapper->findById($cohortFolderId);
-            $cohortIds = $this->userAccessMapper->findUsersInCategory($cohortFolder, \Schoolbox\Role::STUDENT)->indexBy('id')->keys();
+            $cohortIds = $this->userAccessMapper->findUsersInCategory($folder, \Schoolbox\Role::STUDENT)->indexBy('id')->keys();
         } catch (\Schoolbox\Mapper\Exception $e) {
             $this->response = $this->responseEmpty(400);
             return;
@@ -1309,22 +1298,22 @@ class Controller extends Base
                     ->like('cc.code', "%{$dbInternal->getQuoter()->escapeForLike($keyword)}%")
             );
 
-        $folders = $this->folderMapper->findByPredicates($pb);
+        $currentFolders = $this->folderMapper->findByPredicates($pb);
 
-        /** @var \Schoolbox\Resource\Folder\Model $folder */
-        foreach ($folders as $folder) {
+        /** @var \Schoolbox\Resource\Folder\Model $current */
+        foreach ($currentFolders as $current) {
             /* Neither a group nor a class: skip it
              *
              * You can't tell if a folder -stopped being- a group/class at some point
              * after the learning moment was created: keep filtering these out
              */
-            if (!$folder->isGroup() && !$folder->isClass()) {
+            if (!$current->isGroup() && !$current->isClass()) {
                 continue;
             }
 
             $stack[] = [
-                'id' => $folder->getId(),
-                'name' => $folder->getNameWithCodes()
+                'id' => $current->getId(),
+                'name' => $current->getNameWithCodes()
             ];
         }
 
