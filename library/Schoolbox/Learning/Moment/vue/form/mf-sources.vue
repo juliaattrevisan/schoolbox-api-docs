@@ -18,8 +18,8 @@ const mfStore = useMomentFormStore();
                             <div class="card-class-image"
                                :style="
                                    {
-                                       backgroundColor: folder.colour,
-                                       borderBottom: `10px solid ${folder.colour}`,
+                                       backgroundColor: `#${folder.colour}`,
+                                       borderBottom: `10px solid #${folder.colour}`,
                                        /* Cover image is optional */
                                        backgroundImage: folder.coverImage ? `url('/storage/image.php?hash=${folder.coverImage.hash}&size=cardImageLarge')` : undefined,
                                        backgroundSize: folder.coverImage ? 'cover' : undefined,
