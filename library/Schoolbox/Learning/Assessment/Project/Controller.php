@@ -222,6 +222,16 @@ class Controller extends Assessment\Controller
             }
         }
 
+        /**
+         * somehow there is a hydration inside
+         * getUnitAssessments
+         * $assessments = $this->getAssessmentMapper()->findAllByIds($assessmentIds);
+         *
+         * which is causing deleted sub-assessments to appear in $assessment->getAssessables()
+         * lets just filter them out here
+         */
+        $twigData['assessment']->setAssessables($twigData['assessment']->getAssessables()->filterBy('deletedAt', null));
+
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/project/status/staff.twig',
             $twigData
