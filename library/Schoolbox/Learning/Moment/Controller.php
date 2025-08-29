@@ -369,6 +369,8 @@ class Controller extends Base
      *
      * @api   POST /learning/evidence/user/{userIds}/create
      * @since 20.2
+     * @deprecated as an api, use the particular post endpoints for each state instead
+     * TODO: We still use this as an internal method, so it'll change to private the next release after 25.1
      *
      * @param Collection|User[] $users
      * @throws MapperException
@@ -427,6 +429,7 @@ class Controller extends Base
             }
 
             if ($this->requestPost->get('draft', false)) {
+                // TODO: this param isn't ever used by us at the moment, we go via postDraft instead, I guess deprecate it?
                 // autosave draft, save as draft
                 $momentModel->draft();
             } else {
@@ -535,8 +538,11 @@ class Controller extends Base
     /**
      * Updates a single moment.
      *
+     * TODO: delete the next release after 25.1
+     *
      * @api   PUT /learning/evidence/{id}/modify
      * @since 20.2
+     * @deprecated use the particular put endpoints for each state instead
      * @param Model $evidence
      */
     public function putEvidence(Model $evidence): void
@@ -556,10 +562,22 @@ class Controller extends Base
         $moment  = $requestTranslator($requestBody, $moment)
             ->setBody($tokenReplacer->replace($moment->getBody(), $moment->getRecipient()));
 
-        if ($requestBody['draft'] ?? false) {
-            // autosave draft, save as draft
-            $moment->draft();
-        }
+        // if ($requestBody['draft'] ?? false) {
+        //     // autosave draft, save as draft
+        //     $moment->draft();
+        // }
+
+        /**
+         * Due to the new moderation rules, this now always gets shoved back to draft state as you
+         * should be using the other endpoints instead to change state
+         *
+         * This avoids students bypassing the moderation workflow and updating a published moment
+         * directly without them having permission to do so...
+         *
+         * TODO: potentially respect NextRoutes here and do it based on "can you progress back to the current state",
+         * and if not, go to draft instead
+         */
+        $moment->draft();
 
         $this->mapper->save($moment);
 

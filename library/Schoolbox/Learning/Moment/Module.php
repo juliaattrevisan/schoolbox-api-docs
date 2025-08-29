@@ -139,8 +139,11 @@ class Module extends BaseModule
             $viewCreateFormPreloader
         );
 
-        // Post evidence to users
-        // TODO: does this respect the state rules correctly?
+        /**
+         * Post evidence to users
+         * I think always starts as a draft if moderation is required, otherwise published
+         * @deprecated as an api, use the particular post endpoints for each state instead
+         */
         $this->register(
             self::METHOD_POST,
             '/user/{userIds}/create',
@@ -311,8 +314,12 @@ class Module extends BaseModule
             $viewCohortReportRule,
         );
 
-        // Evidence modify form
-        // TODO: does this respect the state rules correctly?
+        /**
+         * Evidence modify form
+         * NOTE: a logic change in 25.1 was done here, this now always makes it a draft
+         * TODO: delete the next release after 25.1
+         * @deprecated use the particular put endpoints for each state instead
+         */
         $this->register(
             self::METHOD_PUT,
             '/{evidenceId:\d+}',
