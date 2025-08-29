@@ -123,6 +123,8 @@ window.Vue.onMounted(async () => {
     const momentTypeParam = (urlParams.get("momentType")?.toLowerCase() as MediaType | null) ?? null;
     const firstEvidenceType = mfStore.moment.evidence[0]?.storage.type ?? null;
 
+    // TODO: should actually select the first evidence and make it properly visible again...
+
     if (momentTypeParam && Object.values(MediaType).includes(momentTypeParam)) {
         await changeMediaType(momentTypeParam);
     } else if (firstEvidenceType === ResourceType.VIDEO) {
@@ -185,14 +187,21 @@ window.Vue.watch(
             <input id="mf-evidence-filename" type="hidden" />
             <input id="mf-evidence-storage" type="hidden" />
 
-            <evidence-media-recording
-                v-if="mediaType && mediaRecordingTypes.includes(mediaType)"
-                ref="mediaRecordingRef"
-                :key="`${mediaType}-${mfStore.moment?.evidence.length}`"
-                :moment-type="mediaType"
-                filename-id="mf-evidence-filename"
-                storage-id="mf-evidence-storage"
-            />
+            <div v-if="mediaType && mediaRecordingTypes.includes(mediaType)">
+                <!-- TODO shouldn't be required sometimes depending on existing evidence -->
+                <label for="mf-evidence-storage" class="required">
+                    <template v-if="mediaType === MediaType.PHOTO"> Take a picture </template>
+                    <template v-else-if="mediaType === MediaType.VIDEO"> Record something </template>
+                    <template v-else-if="mediaType === MediaType.AUDIO"> Say something </template>
+                </label>
+                <evidence-media-recording
+                    ref="mediaRecordingRef"
+                    :key="`${mediaType}-${mfStore.moment?.evidence.length}`"
+                    :moment-type="mediaType"
+                    filename-id="mf-evidence-filename"
+                    storage-id="mf-evidence-storage"
+                />
+            </div>
 
             <div v-else-if="mediaType === MediaType.UPLOAD">
                 <label for="mf-evidence-file-drop" class="required"> Upload File </label>
@@ -219,6 +228,10 @@ window.Vue.watch(
             </div>
         </div>
         <div class="large-6 medium-4 small-12">
+            <label>
+                &nbsp;
+                <!-- literally just a spacer to align with the other side -->
+            </label>
             <div class="share-work-buttons">
                 <a
                     class="icon-camera share-photo"
@@ -263,6 +276,7 @@ window.Vue.watch(
     <div v-if="mfStore.moment !== null" class="l-flex-col l-gap-m l-mar-m--bottom">
         <div v-for="(evidence, index) in mfStore.moment.evidence" :key="index" class="v-card">
             <div class="l-flex-row l-flex--align-center l-gap-m l-pad-m">
+                <!-- TODO: we probably need a real preview of this, or at least a way to download it to see what it actually is -->
                 <div class="l-flex-col">
                     <img :src="`/ajax/mime/${evidence.storage.mime}`" />
                 </div>
