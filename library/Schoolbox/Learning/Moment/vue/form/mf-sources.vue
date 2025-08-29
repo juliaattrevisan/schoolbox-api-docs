@@ -42,7 +42,7 @@ const mfStore = useMomentFormStore();
                             <div class="card-content classes actions-small-1">
                                 <div class="list-item">
                                     <h3><a :href="`/homepage/${folder.id}`" title="{{ folder.title }}">{{ folder.name }}</a></h3>
-                                    <p class="meta">{{ folder.codeString }}<br>{{ classType ?? null }}</p>
+                                    <p class="meta">{{ folder.codeString }}</p>
                                 </div>
                             </div>
                         </div>
