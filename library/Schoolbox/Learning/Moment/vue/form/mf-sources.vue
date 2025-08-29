@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import locale from "@js/terminology/rosettaStone";
-import { useMomentFormStore } from "./store/momentFormStore";
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
+import { useMomentFormStore } from "./store/momentFormStore";
 
 const mfStore = useMomentFormStore();
 const isExpanded = window.Vue.ref(false);
