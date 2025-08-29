@@ -140,7 +140,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         #[\SensitiveParameter] ?string $learnosityConsumerKey = null,
         #[\SensitiveParameter] ?string $learnosityConsumerSecret = null,
         protected ?MimetypeMapper $mimetypeMapper = null,
-        protected RubricDataSource $rubricDataSource,
+        protected ?RubricDataSource $rubricDataSource = null,
     ) {
         parent::__construct(
             $userMapper,
