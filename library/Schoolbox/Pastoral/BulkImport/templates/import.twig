@@ -123,6 +123,14 @@
         } only %}
     {% endif %}
 
+    <section>
+        <fieldset class="content">
+            <div class="small-12 columns">
+                <p class="meta">If not all pastoral records have been created, you may wish to check the import log in bulk_pastoral_import.import_log.</p>
+            </div>
+        </fieldset>
+    </section>
+
     <ul class="flex-list buttons">
         {% set runRoute = routeLookupIfAuthorized('pastoralBulkImport.postRunImport', {id: import.id, import: import}) %}
         {% if runRoute %}
