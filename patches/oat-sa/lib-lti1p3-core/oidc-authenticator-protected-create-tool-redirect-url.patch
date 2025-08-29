@@ -1,0 +1,13 @@
+diff --git a/src/Security/Oidc/OidcAuthenticator.php b/src/Security/Oidc/OidcAuthenticator.php
+index 8461875bc745c..858285b52bd39 100644
+--- a/src/Security/Oidc/OidcAuthenticator.php
++++ b/src/Security/Oidc/OidcAuthenticator.php
+@@ -157,7 +157,7 @@ class OidcAuthenticator
+         return $claims;
+     }
+ 
+-    private function createToolRedirectUrl(
++    protected function createToolRedirectUrl(
+         RegistrationInterface $registration,
+         LtiMessageInterface $oidcRequest
+     ): string {
