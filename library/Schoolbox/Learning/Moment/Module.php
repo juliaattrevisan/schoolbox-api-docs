@@ -567,7 +567,7 @@ class Module extends BaseModule
                 // Because preload exceptions are not handled immediately, we can't fatal if the preload failed.
                 $moment = $params['evidence'] ?? null;
                 if (!($moment instanceof Model)) {
-                    throw new InvalidPath("No evidence found in route params");
+                    throw new InvalidPath("No moment found in route params");
                 }
 
                 // NextRoutes is the source of truth of what the next possible states are
