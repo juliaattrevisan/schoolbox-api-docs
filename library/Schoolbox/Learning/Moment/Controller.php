@@ -204,6 +204,7 @@ class Controller extends Base
          * Otherwise, fall back to default global moderation requirement to determine what call to action is here
          *
          * Multiple people: just have the publish button I guess?
+         * This same logic exists in the module's buildRuleCanStartWithState method
          */
         $recipient = 1 === $users->count() ? $users->first() : new User();
 
@@ -214,22 +215,20 @@ class Controller extends Base
 
         // This should follow the same structure as a moment's _links, but it's for creating stuff instead
         $usersString = implode(',', $users->getPropertyValues('id'));
-        $globalConfig = (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED);
-        $nextRoutes = (new NextRoutes())->generate($moment, $this->getUser(), $globalConfig);
 
         $createRoutes = [
-            'publish' => $nextRoutes['publish'] ? $this->getRouteIfAuthorized(
+            'publish' => $this->getRouteIfAuthorized(
                 'learningMomentEvidence.postPublish',
-                [ 'userIds' => $usersString, ],
-            ) : null,
-            'draft'   => $nextRoutes['draft'] ? $this->getRouteIfAuthorized(
+                [ 'userIds' => $usersString, 'users' => $users ],
+            ),
+            'draft'   => $this->getRouteIfAuthorized(
                 'learningMomentEvidence.postDraft',
-                [ 'userIds' => $usersString, ],
-            ) : null,
-            'submit'  => $nextRoutes['submit'] ? $this->getRouteIfAuthorized(
+                [ 'userIds' => $usersString, 'users' => $users ],
+            ),
+            'submit'  => $this->getRouteIfAuthorized(
                 'learningMomentEvidence.postSubmit',
-                [ 'userIds' => $usersString, ],
-            ) : null,
+                [ 'userIds' => $usersString, 'users' => $users ],
+            ),
         ];
 
         $params = [

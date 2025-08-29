@@ -140,6 +140,7 @@ class Module extends BaseModule
         );
 
         // Post evidence to users
+        // TODO: does this respect the state rules correctly?
         $this->register(
             self::METHOD_POST,
             '/user/{userIds}/create',
@@ -201,7 +202,10 @@ class Module extends BaseModule
             self::METHOD_POST,
             '/user/{userIds}/publish',
             'postPublish',
-            $viewCreateFormRule,
+            new Rule\All(
+                $viewCreateFormRule,
+                $this->buildRuleCanStartWithState('publish'),
+            ),
             $viewCreateFormPreloader
         );
 
@@ -212,7 +216,10 @@ class Module extends BaseModule
             self::METHOD_POST,
             '/user/{userIds}/draft',
             'postDraft',
-            $viewCreateFormRule,
+            new Rule\All(
+                $viewCreateFormRule,
+                $this->buildRuleCanStartWithState('draft'),
+            ),
             $viewCreateFormPreloader
         );
 
@@ -236,7 +243,10 @@ class Module extends BaseModule
             self::METHOD_POST,
             '/user/{userIds}/submit',
             'postSubmit',
-            $viewCreateFormRule,
+            new Rule\All(
+                $viewCreateFormRule,
+                $this->buildRuleCanStartWithState('submit'),
+            ),
             $viewCreateFormPreloader,
         );
 
@@ -302,6 +312,7 @@ class Module extends BaseModule
         );
 
         // Evidence modify form
+        // TODO: does this respect the state rules correctly?
         $this->register(
             self::METHOD_PUT,
             '/{evidenceId:\d+}',
@@ -536,7 +547,7 @@ class Module extends BaseModule
 
 
     /**
-     * Authorizes that a particular evidence can be progressed to a given state
+     * Authorizes that a particular moment can be progressed to a given state
      *
      * @param string $state
      */
@@ -545,16 +556,60 @@ class Module extends BaseModule
         return new Rule\LazyCallback(
             fn() => new Rule\Callback(function (array $params, User $user) use ($state): void {
                 // Because preload exceptions are not handled immediately, we can't fatal if the preload failed.
-                if (!($params['evidence'] ?? null) instanceof Model) {
+                $moment = $params['evidence'] ?? null;
+                if (!($moment instanceof Model)) {
                     throw new InvalidPath("No evidence found in route params");
                 }
 
-                /** @var Model $evidence */
-                $evidence = $params['evidence'];
+                // NextRoutes is the source of truth of what the next possible states are
+                $nextRoutes = (new \Schoolbox\Learning\Moment\NextRoutes())->generate(
+                    $moment,
+                    $user,
+                    $this->getConfig()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED)
+                );
+
+                if (empty($nextRoutes[$state])) {
+                    throw new Forbidden("Cannot progress to state '$state'");
+                }
+            }),
+        );
+    }
+
+
+    /**
+     * Authorizes that a particular moment can be created with a given state
+     *
+     * @param string $state
+     */
+    private function buildRuleCanStartWithState(string $state): Rule\IAuthorizationRule
+    {
+        return new Rule\LazyCallback(
+            fn() => new Rule\Callback(function (array $params, User $user) use ($state): void {
+                $users = $params['users'] ?? null;
+                if (!($users instanceof \Schoolbox\Collection)) {
+                    throw new InvalidPath("No users found in route params");
+                }
+
+                /* If there's exactly one recipient, use that User instance as the recipient
+                 * Otherwise, fall back to default global moderation requirement to determine what call to action is here
+                 *
+                 * Multiple people: just have the publish button I guess?
+                 * This same logic exists in the controller's getCreateForm method
+                 */
+                $recipient = 1 === $users->count() ? $users->first() : new User();
+
+                /** there's no evidence here as it hasn't been created yet */
+                $moment = (new Model())
+                    ->setRecipient($recipient)
+                    ->setCreator($user)
+                    ->draft();
+
+                /** @var Model $moment */
+                $moment = $params['evidence'];
 
                 // NextRoutes is the source of truth of what the next possible states are
                 $nextRoutes = (new \Schoolbox\Learning\Moment\NextRoutes())->generate(
-                    $evidence,
+                    $moment,
                     $user,
                     $this->getConfig()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED)
                 );
