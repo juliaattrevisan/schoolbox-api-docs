@@ -172,7 +172,8 @@ class OidcAuthenticator
      * @return string                 The validated redirect URL.
      * @throws LtiBadRequestException if the request's redirect URL did not
      *                                match either:
-     *                                * the tool launch URL
+     *                                * the tool's launch URL
+     *                                * the tool's deep linking URL
      *                                * one of the tool's redirect URLs
      */
     private function createToolRedirectUrl(
@@ -186,22 +187,41 @@ class OidcAuthenticator
             throw new LtiBadRequestException('Registration ID does not match a configured LTI tool', 0, $e);
         }
 
-        // Extract and validate the request's redirect_uri
-        $redirectUri = $oidcRequest->getParameters()->getMandatory('redirect_uri');
-
-        // Direct match for tool launch URL: it's valid
-        if ($redirectUri === $tool->getLaunchUrl()) {
-            return $redirectUri;
-        }
-
-        // Otherwise, match against tool's redirect URLs
+        // Validate the redirect URI against the tool's launch URL.
+        // According to https://www.imsglobal.org/spec/security/v1p0/#step-3-authentication-response,
+        // the redirect URI must be validated against one of the tool's redirect
+        // URIs: however, the LTI library doesn't provide an official method for
+        // exposing redirect URIs.
+        // I'm just going to assume the launch and deep linking URLs are valid
+        // redirects.
+        $validUrls = array_filter([$tool->getLaunchUrl(), $tool->getDeepLinkingUrl()]);
         foreach ($tool->getRedirectUrls() as $redirectUrlModel) {
             /** @var Provider\RedirectUrl\Model $redirectUrlModel */
-            if ($redirectUrlModel->getRedirectUrl() === $redirectUri) {
+            $validUrls[] = $redirectUrlModel->getRedirectUrl();
+        }
+
+        // Extract and validate the request's redirect_uri
+        $redirectUri = $this->normalizeUri($oidcRequest->getParameters()->getMandatory('redirect_uri'));
+        foreach ($validUrls as $validUrl) {
+            $validUrl = $this->normalizeUri($validUrl);
+            if ($validUrl === $redirectUri) {
                 return $redirectUri;
             }
         }
 
-        throw new LtiBadRequestException('Invalid redirect_uri: must match the tool\'s launch URL or one of its redirect URLs');
+        throw new LtiBadRequestException(
+            'Invalid redirect_uri: does not match the tool\'s launch or deep linking URL, nor any of its redirect URLs'
+        );
+    }
+
+    /**
+     * Normalize a URI string, trimming space and / characters.
+     *
+     * @param string $uri
+     * @return string
+     */
+    private function normalizeUri(string $uri): string
+    {
+        return rtrim(trim($uri), '/');
     }
 }
