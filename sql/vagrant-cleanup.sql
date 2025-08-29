@@ -46,4 +46,4 @@ UPDATE user SET password='$2y$10$LhHqvE7IZpPQfIpZ21wtmeK5TUBgFzJCa1NejhuMYcc225j
 ## clear all passwords (other than paperly)
 UPDATE user
 SET password = null
-WHERE username != 'paperly';
+WHERE username NOT IN ('paperly', 'rwhite', 'trialuser');
