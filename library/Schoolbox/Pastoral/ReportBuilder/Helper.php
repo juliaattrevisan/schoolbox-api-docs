@@ -389,13 +389,19 @@ class Helper
         }
 
         $start = (clone $startDate)->startOfMonth();
-        $current = (clone $endDate)->startOfMonth();
+
+        /* If the current month is in the future, skip it to the current month
+         * This is to avoid showing future months in the report
+         */
+        if ((clone $endDate)->startOfMonth()->gt((Alaress_Date_Format::now())->startOfMonth())) {
+            $current = (Alaress_Date_Format::now())->startOfMonth();
+        } else {
+            $current = (clone $endDate)->startOfMonth();
+        }
 
         $months = [];
         while ($current->gte($start)) {
-            if ((Alaress_Date_Format::now())->endOfMonth() >= (clone $current)->endOfMonth()) {
-                array_unshift($months, strtolower($current->getUsingFormat($format)));
-            }
+            array_unshift($months, strtolower($current->getUsingFormat($format)));
             $current->addMonths(-1);
         }
         return new Collection($months);
@@ -405,7 +411,6 @@ class Helper
      * @param Alaress_Date_Format|null $startDate
      * @param Alaress_Date_Format|null $endDate
      * @param string                   $format
-     * @param int                      $maxStack
      * @return Collection
      */
     public function getWeeksInRange(
