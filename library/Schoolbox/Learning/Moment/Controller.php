@@ -1286,7 +1286,7 @@ class Controller extends Base
         /* Find those folder instances, only include Groups and Classes in the stack
          */
         if (!\count($folderIds)) {
-            $this->response = $this->responseEmpty(400);
+            $this->response = $this->responseAsJson([]);
             return;
         }
 
