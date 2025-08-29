@@ -9,6 +9,7 @@ import MfEvidence from "./mf-evidence.vue";
 import MfSources from "./mf-sources.vue";
 import MfModal from "./mf-modal.vue";
 import { useMomentFormStore } from "./store/momentFormStore";
+import type { MomentFormFolder } from "./store/momentFormStore";
 
 interface Props {
     /**
@@ -39,13 +40,7 @@ interface Props {
     curriculumNodes: Node[];
     endpointCurriculumNodes: string | null;
     /** Classes and Groups */
-    folders: {
-        id: number;
-        name: string;
-        coverImage: { hash: string | null } | null;
-        codeString: string | null;
-        colour: string | null;
-    }[];
+    folders: MomentFormFolder[];
     selectedFolders: number[];
 }
 
