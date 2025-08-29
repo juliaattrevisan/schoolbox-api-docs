@@ -76,7 +76,9 @@ class BaseTest extends TestCase
                 ->setDeletedAt(new Alaress_Date_Format('2020-03-01T00:00:00+00:00', DATE_ATOM, $timezone))
                 ->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class))->add(
                     (new \Schoolbox\Learning\Moment\Evidence\Model())
-                        ->setStorage((new Storage())->setHash('1234567890123456789012345678901234567890'))
+                        ->setStorage((new Storage())
+                            ->setHash('1234567890123456789012345678901234567890'))
+                            ->setFilename('test.gif')
                 ))
                 ->setCreator((new User())->setId(55))
                 ->setRecipient((new User())->setId(193))
