@@ -32,14 +32,13 @@ const relevantRoutes = window.Vue.computed(() => {
         <li v-if="relevantRoutes.reject">
             <button :disabled="mfStore.isSaving" @click="() => mfStore.reject()">Request update</button>
         </li>
-        <li v-if="relevantRoutes.publish">
-            <button :disabled="mfStore.isSaving" class="submit" @click="() => mfStore.publish()">Publish</button>
-        </li>
-        <!-- publish button takes precedence over submit if it exists for now, once route checks work correctly this may change to just an if -->
-        <li v-else-if="relevantRoutes.submit">
+        <li v-if="relevantRoutes.submit">
             <button :disabled="mfStore.isSaving" class="submit" @click="() => mfStore.submitForm(false, 'submit')">
                 Submit for approval
             </button>
+        </li>
+        <li v-if="relevantRoutes.publish">
+            <button :disabled="mfStore.isSaving" class="submit" @click="() => mfStore.publish()">Publish</button>
         </li>
     </ul>
 </template>
