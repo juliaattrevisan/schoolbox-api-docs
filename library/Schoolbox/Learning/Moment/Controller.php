@@ -242,8 +242,11 @@ class Controller extends Base
             'folders'  => $folders ? $folders->map(fn(Folder\Model $f) => [
                 'id' => $f->getId(),
                 'name' => $f->getName(),
+                'colour' => $f->getColour(),
                 'codeString' => $f->getCodeString(),
-
+                'coverImage' => $f->getCoverImage() ? [
+                    'hash' => $f->getCoverImage()->getHash()
+                ] : null,
             ])->reindex() : [],
             'selectedFolders'          => $selectedFolders,
             'otherUsers'               => $otherUsers,
