@@ -282,7 +282,8 @@ class Module extends BaseModule
         );
 
         /* Bulk Publish a set of learning moments (typically from Cohort Overview)
-         * TODO - check that this is okay to bypass buildRuleCanProgressToState()
+         * NOTE: This skips buildRuleCanProgressToState() as it's multiple items,
+         * the progression check is done within the controller instead
          */
         $this->register(
             self::METHOD_PUT,
@@ -305,7 +306,8 @@ class Module extends BaseModule
         );
 
         /* Bulk reject a set of learning moments (typically from Cohort Overview)
-         * TODO - check that this is okay to bypass buildRuleCanProgressToState()
+         * NOTE: This skips buildRuleCanProgressToState() as it's multiple items,
+         * the progression check is done within the controller instead
          */
         $this->register(
             self::METHOD_PUT,

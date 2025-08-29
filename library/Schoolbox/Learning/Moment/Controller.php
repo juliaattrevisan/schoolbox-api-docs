@@ -788,6 +788,23 @@ class Controller extends Base
 
         $moments = $this->mapper->findByColumn('id', $requestBody['momentIds']);
 
+        /* Check that you can actually publish ALL of these moments
+         * If not, a 403 will be thrown I guess
+         */
+        foreach ($moments as $moment) {
+            // NextRoutes is the source of truth of what the next possible states are
+            $nextRoutes = (new NextRoutes())->generate(
+                $moment,
+                $this->getUser(),
+                $this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED)
+            );
+
+            if (!$nextRoutes['publish']) {
+                $this->response = $this->responseEmpty(403);
+                return;
+            }
+        }
+
         /* Process each moment into the next state individually, collecting a $stack
          * of translated moments in their new state
          */
@@ -831,6 +848,23 @@ class Controller extends Base
         $requestBody = $this->request->getParsedBody();
 
         $moments = $this->mapper->findByColumn('id', $requestBody['momentIds']);
+
+        /* Check that you can actually reject ALL of these moments
+         * If not, a 403 will be thrown I guess
+         */
+        foreach ($moments as $moment) {
+            // NextRoutes is the source of truth of what the next possible states are
+            $nextRoutes = (new NextRoutes())->generate(
+                $moment,
+                $this->getUser(),
+                $this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED)
+            );
+
+            if (!$nextRoutes['reject']) {
+                $this->response = $this->responseEmpty(403);
+                return;
+            }
+        }
 
         /* Process each moment into the next state individually, collecting a $stack
          * of translated moments in their new state
