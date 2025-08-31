@@ -194,7 +194,10 @@ class OidcAuthenticator
         // exposing redirect URIs.
         // I'm just going to assume the launch and deep linking URLs are valid
         // redirects.
-        $validUrls = array_filter([$tool->getLaunchUrl(), $tool->getDeepLinkingUrl()]);
+        $validUrls = array_filter([
+            $registration->getTool()->getLaunchUrl(),
+            $registration->getTool()->getDeepLinkingUrl(),
+        ]);
         foreach ($tool->getRedirectUrls() as $redirectUrlModel) {
             /** @var Provider\RedirectUrl\Model $redirectUrlModel */
             $validUrls[] = $redirectUrlModel->getRedirectUrl();
