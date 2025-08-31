@@ -155,9 +155,13 @@ jobs:
             type=ref,event=branch,prefix=latest-php${{ matrix.phpVersion }}-
             type=raw,value=latest-php${{ matrix.phpVersion }}-${{ github.ref_name }}
 
+      # Need to join ECR and Dockerhub images separately
       - name: Join ${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }} images
         working-directory: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}
         run: |
-          docker buildx imagetools create $(jq -cr '.tags | map ("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf '${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}@sha256:%s ' *) \
-            $(printf '${{ vars.ECR_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}@sha256:%s ' *)
+          DOCKERHUB_IMAGES=$($DOCKERHUB_METADATA_OUTPUT_TAGS | grep "${{ vars.DOCKERHUB_NAMESPACE }}")
+          ECR_IMAGES=$($DOCKERHUB_METADATA_OUTPUT_TAGS | grep "${{ vars.ECR_NAMESPACE }}")
+          echo docker buildx imagetools create -t '${{ vars.DOCKERHUB_NAMESPACE }}:latest-php${{ matrix.phpVersion}}' "${DOCKERHUB_IMAGES}"
+          echo docker buildx imagetools create -t '${{ vars.ECR_NAMESPACE }}:latest-php${{ matrix.phpVersion}}' "${ECR_IMAGES}"
+          docker buildx imagetools create -t '${{ vars.DOCKERHUB_NAMESPACE }}:latest-php${{ matrix.phpVersion}}' "${DOCKERHUB_IMAGES}"
+          docker buildx imagetools create -t '${{ vars.ECR_NAMESPACE }}:latest-php${{ matrix.phpVersion}}' "${ECR_IMAGES}"
