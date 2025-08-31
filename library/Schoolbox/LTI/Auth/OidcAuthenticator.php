@@ -9,24 +9,34 @@ declare(strict_types=1);
 
 namespace Schoolbox\LTI\Auth;
 
+use OAT\Library\Lti1p3Core\Exception\LtiException;
 use OAT\Library\Lti1p3Core\Exception\LtiBadRequestException;
+use OAT\Library\Lti1p3Core\Exception\LtiExceptionInterface;
+use OAT\Library\Lti1p3Core\Message\LtiMessage;
 use OAT\Library\Lti1p3Core\Message\LtiMessageInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilder;
 use OAT\Library\Lti1p3Core\Message\Payload\Builder\MessagePayloadBuilderInterface;
+use OAT\Library\Lti1p3Core\Message\Payload\MessagePayloadInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationInterface;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\Parser\Parser;
 use OAT\Library\Lti1p3Core\Security\Jwt\Parser\ParserInterface;
+use OAT\Library\Lti1p3Core\Security\Jwt\Validator\Validator;
 use OAT\Library\Lti1p3Core\Security\Jwt\Validator\ValidatorInterface;
-use OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator as BaseOidcAuthenticator;
 use OAT\Library\Lti1p3Core\Security\User\UserAuthenticatorInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Schoolbox\LTI\Provider;
 use Schoolbox\Mapper\Exception;
+use Throwable;
 
 /**
- * Extension of `\OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator`,
+ * Re-implementation of `\OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator`,
  * which allows for the redirect URI to have a different host component to that
  * of the tool's launch URL.
+ *
+ * @see \OAT\Library\Lti1p3Core\Security\Oidc\OidcAuthenticator
  */
-class OidcAuthenticator extends BaseOidcAuthenticator
+class OidcAuthenticator
 {
     /**
      * Constructor
@@ -34,24 +44,120 @@ class OidcAuthenticator extends BaseOidcAuthenticator
      * @param RegistrationRepositoryInterface     $repository    Repository of LTI registrations.
      * @param UserAuthenticatorInterface          $authenticator Authenticates the user, based on the login hint in the
      *                                                           request.
+     * @param Provider\Mapper                     $toolMapper    Mapper for LTI tool registrations: required for
+     *                                                           fetching the tool's redirect URLs.
      * @param MessagePayloadBuilderInterface|null $builder       LTI message payload builder: if not provided, use a
      *                                                           default implementation.
      * @param ValidatorInterface|null             $validator     JWT validator: if not provided, use a default
      *                                                           implementation.
      * @param ParserInterface|null                $parser        JWT parser: if not provided, use a default
      *                                                           implementation.
-     * @param Provider\Mapper                     $toolMapper    Mapper for LTI tool registrations: required for
-     *                                                           fetching the tool's redirect URLs.
      */
     public function __construct(
-        RegistrationRepositoryInterface $repository,
-        UserAuthenticatorInterface $authenticator,
-        ?MessagePayloadBuilderInterface $builder,
-        ?ValidatorInterface $validator,
-        ?ParserInterface $parser,
+        private RegistrationRepositoryInterface $repository,
+        private UserAuthenticatorInterface $authenticator,
         private Provider\Mapper $toolMapper,
+        private ?MessagePayloadBuilderInterface $builder = null,
+        private ?ValidatorInterface $validator = null,
+        private ?ParserInterface $parser = null
     ) {
-        parent::__construct($repository, $authenticator, $builder, $validator, $parser);
+        $this->builder   ??= new MessagePayloadBuilder();
+        $this->validator ??= new Validator();
+        $this->parser    ??= new Parser();
+    }
+
+    /**
+     * Authenticate the OIDC request, and return a response message.
+     *
+     * @param ServerRequestInterface $request Incoming HTTP request.
+     * @return LtiMessageInterface The message to send back to the tool.
+     * @throws LtiExceptionInterface if the request is invalid for some reason
+     */
+    public function authenticate(ServerRequestInterface $request): LtiMessageInterface
+    {
+        try {
+            $oidcRequest = LtiMessage::fromServerRequest($request);
+
+            if (!$oidcRequest->getParameters()->has('lti_message_hint')) {
+                throw new LtiBadRequestException('Missing LTI message hint in request');
+            }
+
+            $originalToken = $this->parser->parse($oidcRequest->getParameters()->getMandatory('lti_message_hint'));
+
+            $registration = $this->repository->find(
+                $originalToken->getClaims()->getMandatory(MessagePayloadInterface::CLAIM_REGISTRATION_ID)
+            );
+
+            if (null === $registration) {
+                throw new LtiBadRequestException('Invalid message hint registration id claim');
+            }
+
+            if (!$this->validator->validate($originalToken, $registration->getPlatformKeyChain()->getPublicKey())) {
+                throw new LtiBadRequestException('Invalid message hint');
+            }
+
+            $redirectUri = $this->createToolRedirectUrl($registration, $oidcRequest);
+
+            $authenticationResult = $this->authenticator->authenticate(
+                $registration,
+                $oidcRequest->getParameters()->getMandatory('login_hint')
+            );
+
+            if (!$authenticationResult->isSuccess()) {
+                throw new LtiException('User authentication failure');
+            }
+
+            $this->builder
+                ->withClaims($this->sanitizeClaims($originalToken->getClaims()->all()))
+                ->withClaim(MessagePayloadInterface::CLAIM_ISS, $registration->getPlatform()->getAudience())
+                ->withClaim(MessagePayloadInterface::CLAIM_AUD, $registration->getClientId());
+
+            // If the original request contained a nonce, add it to the payload (fixes #154)
+            $nonce = $oidcRequest->getParameters()->get('nonce');
+            if ($nonce) {
+                $this->builder->withClaim(MessagePayloadInterface::CLAIM_NONCE, $nonce);
+            }
+
+            if (!$authenticationResult->isAnonymous()) {
+                foreach ($authenticationResult->getUserIdentity()->normalize() as $claimName => $claimValue) {
+                    $this->builder->withClaim($claimName, $claimValue);
+                }
+            }
+
+            $payload = $this->builder->buildMessagePayload($registration->getPlatformKeyChain());
+
+            return new LtiMessage(
+                $redirectUri,
+                [
+                    'id_token' => $payload->getToken()->toString(),
+                    'state'    => $oidcRequest->getParameters()->getMandatory('state')
+                ]
+            );
+        } catch (LtiExceptionInterface $exception) {
+            throw $exception;
+        } catch (Throwable $exception) {
+            throw new LtiException(
+                sprintf('OIDC authentication failed: %s', $exception->getMessage()),
+                $exception->getCode(),
+                $exception
+            );
+        }
+    }
+
+    /**
+     * Unset all reserved user claims from the payload of the LTI message to
+     * return on authentication.
+     *
+     * @param array $claims List of claims from the incoming request.
+     * @return array
+     */
+    private function sanitizeClaims(array $claims): array
+    {
+        foreach (MessagePayloadInterface::RESERVED_USER_CLAIMS as $reservedClaim) {
+            unset($claims[$reservedClaim]);
+        }
+
+        return $claims;
     }
 
     /**
@@ -70,7 +176,7 @@ class OidcAuthenticator extends BaseOidcAuthenticator
      *                                * the tool's deep linking URL
      *                                * one of the tool's redirect URLs
      */
-    protected function createToolRedirectUrl(
+    private function createToolRedirectUrl(
         RegistrationInterface $registration,
         LtiMessageInterface $oidcRequest
     ): string {

@@ -5,9 +5,6 @@
         },
         "steverhoades/oauth2-openid-connect-client": {
           "Update-to-PHP8-3-and-lcobucci-jwt-5": "./patches/steverhoades/oauth2-openid-connect-client/Update-to-PHP8-3-and-lcobucci-jwt-5.patch"
-        },
-        "oat-sa/lib-lti1p3-core": {
-          "Make OidcAuthenticator extensible": "./patches/oat-sa/lib-lti1p3-core/oidc-authenticator-protected-create-tool-redirect-url.patch"
         }
     }
 }

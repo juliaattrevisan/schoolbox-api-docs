@@ -66,10 +66,8 @@ class OidcAuthenticationRequestFactory
         return (new OidcAuthenticator(
             $this->registrationRepository,
             $this->userAuthenticator,
-            $messagePayloadBuilder,
-            null,
-            null,
             $this->toolMapper,
+            $messagePayloadBuilder,
         ))->authenticate($request);
     }
 }
