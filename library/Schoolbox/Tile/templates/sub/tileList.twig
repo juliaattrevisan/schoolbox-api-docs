@@ -15,8 +15,8 @@
 <style>
 #tileList-{{ layout.id }}.tileList .tile {
     {# Guard against these variables not being set correctly in the database #}
-    {% set gridWidth = layout.gridWidth > 0 ? layout.gridWidth : 100 %} {# 100 is the default value in Tile\Layout\Model #}
-    {% set columnCount = layout.columnCount > 0 ? layout.columnCount : 1 %} {# 1 is the default value in Tile\Layout\Model #}
+    {% set gridWidth = layout.gridWidth > 0 ? layout.gridWidth : layout.DEFAULT_GRID_WIDTH %}
+    {% set columnCount = layout.columnCount > 0 ? layout.columnCount : layout.DEFAULT_COLUMN_COUNT %}
 
     {% if layout.isGridLayoutType %}
         width: {{ gridWidth|e('css') }}px;
