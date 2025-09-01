@@ -192,6 +192,7 @@ class Component_Homepage_ManageClassController extends Component_Homepage_Contro
         // Cohort Report
         if (
             ($isClassPage || $isGroupPage)
+            && $this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED)
             && $authorizer->isPathAuthorizedForUser('learningMomentEvidence.getCohortReport', $folderParams, $this->getUser())
         ) {
             $this->setVar(
