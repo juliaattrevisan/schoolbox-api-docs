@@ -139,12 +139,13 @@ class ImageGeneration
             );
         }
 
-        if ('' !== $systemPrompt) {
-            $payload['input'][] = [
-                'role' => 'system',
-                'content' => $systemPrompt,
-            ];
-        }
+        /* Ensure the AI responds with plain text only, no markdown formatting */
+        $systemPrompt .= "\n\nRespond only with plain text. Do not use markdown formatting, HTML tags, or any special text formatting in your responses.";
+
+        $payload['input'][] = [
+            'role' => 'system',
+            'content' => $systemPrompt,
+        ];
 
         $userPrompt = [
             ['type' => 'input_text', 'text' => trim($userPrompt), ],
