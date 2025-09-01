@@ -7,6 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use External\Synergetic\Utils as SynergeticUtils;
 use Html2Text\Html2Text;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
@@ -1209,7 +1210,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         $commentText = $this->htmlConverter->getText();
 
         // Synergetic will ignore Unix-style line endings, so must convert to Dos-style before exporting.
-        $commentText = $this->convertLineEndingsUnixToDos($commentText);
+        $commentText = SynergeticUtils::convertLineEndingsUnixToDos($commentText);
 
         return [
             'mark'             => $markValue,
@@ -1273,19 +1274,5 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $this->roles[$getId] = \Schoolbox\RoleMapper::getInstance()->findById($getId);
         }
         return $this->roles[$getId];
-    }
-
-    /**
-     * Convert a string containing a mixture of Unix and Dos style line endings (LF or CRLF) to Dos style only (CRLF).
-     * @param string $string
-     * @return string
-     */
-    private function convertLineEndingsUnixToDos(string $string): string
-    {
-        // First convert all CRLF and CR to LF.
-        $string = str_replace(["\r\n", "\r"], "\n", $string);
-
-        // Then convert all LF to CRLF.
-        return str_replace("\n", "\r\n", $string);
     }
 }

@@ -8,6 +8,7 @@
 
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
+use External\Synergetic\Utils as SynergeticUtils;
 use Html2Text\Html2Text;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Exception as ExternalException;
@@ -1024,7 +1025,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $commentText = $this->htmlConverter->getText();
 
         // Synergetic will ignore Unix-style line endings, so must convert to Dos-style before exporting.
-        $commentText = $this->convertLineEndingsUnixToDos($commentText);
+        $commentText = SynergeticUtils::convertLineEndingsUnixToDos($commentText);
 
         $query =
             "
@@ -1761,19 +1762,5 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             ];
         }
         return $exDocClassLookup;
-    }
-
-    /**
-     * Convert a string containing a mixture of Unix and Dos style line endings (LF or CRLF) to Dos style only (CRLF).
-     * @param string $string
-     * @return string
-     */
-    private function convertLineEndingsUnixToDos(string $string): string
-    {
-        // First convert all CRLF and CR to LF.
-        $string = str_replace(["\r\n", "\r"], "\n", $string);
-
-        // Then convert all LF to CRLF.
-        return str_replace("\n", "\r\n", $string);
     }
 }
