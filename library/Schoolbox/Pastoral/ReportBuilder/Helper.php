@@ -18,11 +18,15 @@ class Helper
     private array $filters = ['pastoral.deleted_at IS NULL'];
     private array $params = [];
 
+    /**
+     * @param array          $report
+     * @param PastoralMapper $pastoralMapper
+     * @param IConfigLoader  $configLoader
+     */
     public function __construct(
         private array $report,
         private PastoralMapper $pastoralMapper,
         private IConfigLoader $configLoader,
-        private User $viewer,
     ) {
         $this->setFilters();
     }
@@ -303,9 +307,10 @@ class Helper
 
     private function getPermission(): void
     {
+        $viewer = $this->report['user'];
         /* Should not filter records if the viewer is the Pastoral Moderator
          */
-        if (null !== $this->viewer->getAccessList()->getBy('service', UserAccess::SERVICE_PASTORAL)) {
+        if (null !== $viewer->getAccessList()->getBy('service', UserAccess::SERVICE_PASTORAL)) {
             return;
         }
         $filters = [];
@@ -317,7 +322,9 @@ class Helper
          */
         $filters[] = "(`pa`.`user_id` = :viewerId AND `pa`.`access` > :accessDeny)";
 
-        if ($this->viewer->getRole()->isStaff()) {
+        /* Checking for role-based permission
+         */
+        if ($viewer->getRole()->isStaff()) {
             /* If the viewer is staff then return the records they have access to
              */
             $filters[] = "
@@ -325,7 +332,7 @@ class Helper
                 (`pa`.`role_id` = :viewerRoleId OR `pa`.`role_type` = :viewerRoleType) AND
                 `pa`.`access` > :accessDeny
              )";
-        } else if ($this->viewer->getRole()->isStudent()) {
+        } else if ($viewer->getRole()->isStudent()) {
             /* If the viewer is student, then return the records about them and have access to
              */
             $filters[] = "
@@ -338,10 +345,10 @@ class Helper
             /* If the viewer is parent then only return the records of their children and
              * only the ones they have access to
              */
-            (new \Schoolbox\External\User())->loadChildren([$this->viewer]);
+            (new \Schoolbox\External\User())->loadChildren([$viewer]);
             $childrenIds = implode(
                 ',',
-                $this->viewer->getChildren()->getPropertyValues('id')
+                $viewer->getChildren()->getPropertyValues('id')
             );
             $filters[] = "
             (
@@ -352,10 +359,12 @@ class Helper
         }
 
 
-        $this->params['viewerId'] = $this->viewer->getId();
+
+
+        $this->params['viewerId'] = $viewer->getId();
         $this->params['accessDeny'] = PastoralAccessMapper::ACCESS_DENY;
-        $this->params['viewerRoleId'] = $this->viewer->getRole()->getId();
-        $this->params['viewerRoleType'] = $this->viewer->getRole()->getType();
+        $this->params['viewerRoleId'] = $viewer->getRole()->getId();
+        $this->params['viewerRoleType'] = $viewer->getRole()->getType();
         $this->filters[] = '(' . implode(' OR ', $filters) . ')';
     }
 

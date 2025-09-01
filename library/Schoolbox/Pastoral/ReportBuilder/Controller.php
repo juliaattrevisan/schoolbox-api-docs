@@ -503,7 +503,6 @@ class Controller extends Base
                     $this->prepareReportData($report),
                     $this->pastoralMapper,
                     $this->getConfigLoader(),
-                    $this->getUser(),
                 ),
                 $tabType
             );
@@ -546,7 +545,6 @@ class Controller extends Base
                     $this->prepareReportData($report),
                     $this->pastoralMapper,
                     $this->getConfigLoader(),
-                    $this->getUser(),
                 ),
                 $this->pastoralMapper,
                 $tabType,
@@ -646,7 +644,6 @@ class Controller extends Base
                     $this->prepareReportData($report),
                     $this->pastoralMapper,
                     $this->getConfigLoader(),
-                    $this->getUser(),
                 ),
                 $this->pastoralMapper,
                 $tabType,
