@@ -1554,8 +1554,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $bodyPrivateText = $this->htmlConverter->getText();
 
         // Synergetic will ignore Unix-style line endings, so must convert to Dos-style before exporting.
-        $bodyPublicText = $this->convertLineEndingsUnixToDos($bodyPublicText);
-        $bodyPrivateText = $this->convertLineEndingsUnixToDos($bodyPrivateText);
+        $bodyPublicText = SynergeticUtils::convertLineEndingsUnixToDos($bodyPublicText);
+        $bodyPrivateText = SynergeticUtils::convertLineEndingsUnixToDos($bodyPrivateText);
 
         // Return an array containing the parameters for the insert/update query
 
