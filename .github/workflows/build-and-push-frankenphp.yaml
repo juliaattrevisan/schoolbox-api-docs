@@ -162,10 +162,13 @@ jobs:
           declare DOCKERHUB_IMAGES
           declare ECR_IMAGES
           for image in $DOCKERHUB_METADATA_OUTPUT_TAGS; do
+            echo $image;
             if [[ $image == *"${{ vars.DOCKERHUB_NAMESPACE }}"* ]]; then
+              echo "$image: Dockerhub image"
               DOCKERHUB_IMAGES="$DOCKERHUB_IMAGES $image"
             fi
             if [[ $image == *"${{ vars.ECR_NAMESPACE }}"* ]]; then
+              echo "$image: ECR image"
               ECR_IMAGES="$ECR_IMAGES $image"
             fi
           done
