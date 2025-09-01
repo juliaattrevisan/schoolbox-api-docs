@@ -121,7 +121,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     const CHARACTER_ENCODING = 'UTF-8';
 
     /** @var Html2Text $htmlConverter */
-    protected $htmlConverter;
+    protected Html2Text $htmlConverter;
 
     /**
      * Constructor
