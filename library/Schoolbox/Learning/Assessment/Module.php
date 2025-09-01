@@ -827,7 +827,11 @@ class Module extends BaseModule
                     $filterSelectionMapper,
                     $courseImplementationMapper,
                     $unitImplementationMapper,
-                    $editorTemplateHelper,
+                    new EditorTemplateHelper(
+                        $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                        EditorTemplatesCategoryModel::LEARNING_ACTIVITY,
+                        $this->injector->get('user')
+                    ),
                 );
 
             case Assessment\Task\Controller::class:
