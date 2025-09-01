@@ -1536,7 +1536,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
          * some schools aren't; hence, a per-school configuration as per SA-16383
          */
         if ($prependTitle) {
-            $bodyPublicText = $pastoral->getHeading() . "\r\n" . $this->htmlConverter->getText();
+            // Add double line break to separate title from body.
+            // Note we are converting Unix line endings to Dow below, so "\n" is fine here.
+            $bodyPublicText = $pastoral->getHeading() . "\n\n" . $this->htmlConverter->getText();
         } else {
             $bodyPublicText = $this->htmlConverter->getText();
         }
