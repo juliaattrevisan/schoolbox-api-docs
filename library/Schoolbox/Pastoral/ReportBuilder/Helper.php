@@ -5,6 +5,9 @@ namespace Schoolbox\Pastoral\ReportBuilder;
 use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
+use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\User;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Report\Model as Report;
@@ -19,6 +22,7 @@ class Helper
         private array $report,
         private PastoralMapper $pastoralMapper,
         private IConfigLoader $configLoader,
+        private User $viewer,
     ) {
         $this->setFilters();
     }
@@ -297,6 +301,64 @@ class Helper
         }
     }
 
+    private function getPermission(): void
+    {
+        /* Should not filter records if the viewer is the Pastoral Moderator
+         */
+        if (null !== $this->viewer->getAccessList()->getBy('service', UserAccess::SERVICE_PASTORAL)) {
+            return;
+        }
+        $filters = [];
+        /* The viewer should be able to see the records they've created
+         */
+        $filters[] = "(`pastoral`.`owner_id` = :viewerId)";
+
+        /* If the pastoral access is set to the specific user
+         */
+        $filters[] = "(`pa`.`user_id` = :viewerId AND `pa`.`access` > :accessDeny)";
+
+        if ($this->viewer->getRole()->isStaff()) {
+            /* If the viewer is staff then return the records they have access to
+             */
+            $filters[] = "
+            (
+                (`pa`.`role_id` = :viewerRoleId OR `pa`.`role_type` = :viewerRoleType) AND
+                `pa`.`access` > :accessDeny
+             )";
+        } else if ($this->viewer->getRole()->isStudent()) {
+            /* If the viewer is student, then return the records about them and have access to
+             */
+            $filters[] = "
+            (
+                (`pa`.`role_id` = :viewerRoleId OR `pa`.`role_type` = :viewerRoleType) AND
+                `pastoral`.`student_id` = :viewerRoleId AND
+                `pa`.`access` > :accessDeny
+             )";
+        } else {
+            /* If the viewer is parent then only return the records of their children and
+             * only the ones they have access to
+             */
+            (new \Schoolbox\External\User())->loadChildren([$this->viewer]);
+            $childrenIds = implode(
+                ',',
+                $this->viewer->getChildren()->getPropertyValues('id')
+            );
+            $filters[] = "
+            (
+                (`pa`.`role_id` = :viewerRoleId OR `pa`.`role_type` = :viewerRoleType) AND
+                `pastoral`.`student_id` IN ($childrenIds) AND
+                `pa`.`access` > :accessDeny
+            )";
+        }
+
+
+        $this->params['viewerId'] = $this->viewer->getId();
+        $this->params['accessDeny'] = PastoralAccessMapper::ACCESS_DENY;
+        $this->params['viewerRoleId'] = $this->viewer->getRole()->getId();
+        $this->params['viewerRoleType'] = $this->viewer->getRole()->getType();
+        $this->filters[] = '(' . implode(' OR ', $filters) . ')';
+    }
+
     /**
      * Initiates all the filters
      *
@@ -315,6 +377,7 @@ class Helper
         $this->getAccess();
         $this->getExpired();
         $this->getTags();
+        $this->getPermission();
     }
 
     /**
@@ -328,6 +391,7 @@ class Helper
         $fromString = "
             FROM {$this->pastoralMapper->getTable()}
             INNER JOIN user s ON pastoral.student_id = s.id AND s.deleted_at IS NULL
+            INNER JOIN pastoral_access pa ON pastoral.id = pa.pastoral_id AND pa.deleted_at IS NULL
             LEFT JOIN lu_pastoral_severity sv ON pastoral.severity_id = sv.id
             LEFT JOIN userCampus v_sc ON s.id = v_sc.uid
         ";
