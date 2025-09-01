@@ -159,20 +159,20 @@ jobs:
       - name: Join ${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }} images
         working-directory: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}
         run: |
-          declare DOCKERHUB_IMAGES
-          declare ECR_IMAGES
-          for image in $DOCKERHUB_METADATA_OUTPUT_TAGS; do
+          declare -a DOCKERHUB_IMAGES
+          declare -a ECR_IMAGES
+          for image in ${{ steps.meta.outputs.tags }; do
             echo $image;
             if [[ $image == *"${{ vars.DOCKERHUB_NAMESPACE }}"* ]]; then
               echo "$image: Dockerhub image"
-              DOCKERHUB_IMAGES="$DOCKERHUB_IMAGES $image"
+              DOCKERHUB_IMAGES+=("$image")
             fi
             if [[ $image == *"${{ vars.ECR_NAMESPACE }}"* ]]; then
               echo "$image: ECR image"
-              ECR_IMAGES="$ECR_IMAGES $image"
+              ECR_IMAGES+=("$image")
             fi
           done
-          echo docker buildx imagetools create -t '${{ vars.DOCKERHUB_NAMESPACE }}:latest-php${{ matrix.phpVersion}}' ${DOCKERHUB_IMAGES[@]}
-          echo docker buildx imagetools create -t '${{ vars.ECR_NAMESPACE }}:latest-php${{ matrix.phpVersion}}' ${ECR_IMAGES[@]}
-          docker buildx imagetools create -t '${{ vars.DOCKERHUB_NAMESPACE }}:latest-php${{ matrix.phpVersion}}' ${DOCKERHUB_IMAGES[@]}
-          docker buildx imagetools create -t '${{ vars.ECR_NAMESPACE }}:latest-php${{ matrix.phpVersion}}' ${ECR_IMAGES[@]}
+          echo "docker buildx imagetools create -t '${{ vars.DOCKERHUB_NAMESPACE }}:latest-php${{ matrix.phpVersion }}' ${DOCKERHUB_IMAGES[*]}"
+          echo "docker buildx imagetools create -t '${{ vars.ECR_NAMESPACE }}:latest-php${{ matrix.phpVersion }}' ${ECR_IMAGES[*]}"
+          docker buildx imagetools create -t '${{ vars.DOCKERHUB_NAMESPACE }}:latest-php${{ matrix.phpVersion }}' "${DOCKERHUB_IMAGES[@]}"
+          docker buildx imagetools create -t '${{ vars.ECR_NAMESPACE }}:latest-php${{ matrix.phpVersion }}' "${ECR_IMAGES[@]}"
