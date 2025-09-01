@@ -161,7 +161,7 @@ jobs:
         run: |
           declare -a DOCKERHUB_IMAGES
           declare -a ECR_IMAGES
-          for image in ${{ steps.meta.outputs.tags }; do
+          for image in ${{ steps.meta.outputs.tags }}; do
             echo $image;
             if [[ $image == *"${{ vars.DOCKERHUB_NAMESPACE }}"* ]]; then
               echo "$image: Dockerhub image"
