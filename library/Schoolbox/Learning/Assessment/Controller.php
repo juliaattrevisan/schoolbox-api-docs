@@ -604,6 +604,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
     public function getUpdateAssessmentForm(IAssessable $assessment): void
     {
         $data = $this->getAssessmentAsTwigArray($assessment->getContext(), $assessment);
+        $data['editorTemplates'] = $this->editorTemplateHelper->getTemplatesForCategory();
 
         $breadcrumbs = $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
 
