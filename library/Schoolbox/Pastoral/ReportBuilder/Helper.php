@@ -307,6 +307,7 @@ class Helper
 
     private function getPermission(): void
     {
+        /** @var User $viewer */
         $viewer = $this->report['user'];
         /* Should not filter records if the viewer is the Pastoral Moderator
          */
@@ -358,14 +359,24 @@ class Helper
             )";
         }
 
-
-
+        $campusIds = $viewer->getCampusCollection()->getPropertyValues('id');
+        $sameCampus = "(
+            `pa`.`match_campus` = 0 OR
+            (
+            `pa`.`match_campus` = 1 AND
+            `pastoral`.`student_id` IN (
+                SELECT `userCampus`.`uid`
+                FROM `userCampus`
+                WHERE `userCampus`.`campus` IN (" . implode(',', $campusIds) . ")
+                )
+            )
+        )";
 
         $this->params['viewerId'] = $viewer->getId();
         $this->params['accessDeny'] = PastoralAccessMapper::ACCESS_DENY;
         $this->params['viewerRoleId'] = $viewer->getRole()->getId();
         $this->params['viewerRoleType'] = $viewer->getRole()->getType();
-        $this->filters[] = '(' . implode(' OR ', $filters) . ')';
+        $this->filters[] = "(" . implode(' OR ', $filters) . " AND {$sameCampus} )";
     }
 
     /**
