@@ -359,6 +359,23 @@ class Helper
             )";
         }
 
+        /* Checking group-based permission
+         */
+        $filters[] = "
+            (
+                `pa`.`group_id` IN (
+                    SELECT `pgm`.`group_id`
+                    FROM pastoral_group pg
+                    LEFT JOIN `pastoral_group_member` pgm ON `pgm`.`group_id` = `pg`.`id`
+                    WHERE `pgm`.`user_id` = :viewerId
+                    AND `pgm`.`deleted_at` IS NULL
+                    AND `pg`.`deleted_at` IS NULL
+                )
+                AND `pa`.`access` > :accessDeny
+            )";
+
+        /* Same campus validation
+         */
         $campusIds = $viewer->getCampusCollection()->getPropertyValues('id');
         $sameCampus = "(
             `pa`.`match_campus` = 0 OR
