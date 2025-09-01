@@ -1020,6 +1020,12 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             return false;
         }
 
+        $this->htmlConverter->setHtml($comment->getBody());
+        $commentText = $this->htmlConverter->getText();
+
+        // Synergetic will ignore Unix-style line endings, so must convert to Dos-style before exporting.
+        $commentText = $this->convertLineEndingsUnixToDos($commentText);
+
         $query =
             "
             INSERT INTO PastoralCareComments
@@ -1047,7 +1053,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             $this->connector->executeQuery($query, [
                 'externalId' => $pastoral->getExternalId(),
                 'externalId2' => $pastoral->getExternalId(),
-                'comment' => $comment->getBody(),
+                'comment' => $commentText,
                 'createdDate' => $comment->getCreatedAt()->getDatabase(),
                 'createdOwnerId' => $comment->getOwner()->getExternalId(),
                 'modifiedDate' => $comment->getCreatedAt()->getDatabase(),
