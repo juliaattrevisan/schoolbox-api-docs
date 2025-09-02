@@ -1010,13 +1010,16 @@ class Controller extends Base
 
     /**
      * Gather and display information about the database views used by various reports.
+     * This function is useful during development and testing since it shows what data is available for particular
+     * reports and highlights any problems with the database permissions.
+     * Uncomment to use.  Note you will also have to uncomment code in the Module and NavigationSelector files.
      *
      * @param IConnector $db
      * @param User       $user
      * @param array      $externalUser
      * @param int|null   $year
      * @return void
-     */
+     *
     public function getDbViewTests(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
         if (!in_array($_SESSION['username'], ['alaress', 'psingh', 'swalker'])) {
@@ -1121,4 +1124,5 @@ class Controller extends Base
             echo "</table>\n";
         }
     }
+     */
 }
