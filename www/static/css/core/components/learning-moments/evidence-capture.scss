@@ -20,6 +20,7 @@
     }
     .share-photo {
         border: 1px solid $icon-color-image;
+        background-color: rgba($icon-color-image, 0.03);
         &:before {
             color: $icon-color-image;
         }
@@ -29,6 +30,7 @@
     }
     .share-video {
         border: 1px solid $icon-color-video-player;
+        background-color: rgba($icon-color-video-player, 0.03);
         &:before {
             color: $icon-color-video-player;
         }
@@ -38,6 +40,7 @@
     }
     .share-audio {
         border: 1px solid $icon-color-audio;
+        background-color: rgba($icon-color-audio, 0.03);
         &:before {
             color: $icon-color-audio;
         }
@@ -47,6 +50,7 @@
     }
     .share-file {
         border: 1px solid $icon-color-files;
+        background-color: rgba($icon-color-files, 0.03);
         &:before {
             color: $icon-color-files;
         }
@@ -56,6 +60,7 @@
     }
     .share-text {
         border: 1px solid $emotion;
+        background-color: rgba($emotion, 0.03);
         &:before {
             color: $emotion;
         }

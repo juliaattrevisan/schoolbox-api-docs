@@ -122,22 +122,13 @@ window.Vue.onMounted(async () => {
     // derive the initial media type from the URL param "momentType"
     const urlParams = new URLSearchParams(window.location.search);
     const momentTypeParam = (urlParams.get("momentType")?.toLowerCase() as MediaType | null) ?? null;
-    const firstEvidenceType = mfStore.moment.evidence[0]?.storage.type ?? null;
-
-    // TODO: should actually select the first evidence and make it properly visible again...
 
     if (momentTypeParam && Object.values(MediaType).includes(momentTypeParam)) {
         await changeMediaType(momentTypeParam);
-    } else if (firstEvidenceType === ResourceType.VIDEO) {
-        await changeMediaType(MediaType.VIDEO);
-    } else if (firstEvidenceType === ResourceType.AUDIO) {
-        await changeMediaType(MediaType.AUDIO);
-    } else if (firstEvidenceType === ResourceType.IMAGE) {
-        await changeMediaType(MediaType.PHOTO);
-    } else if (firstEvidenceType !== null) {
-        await changeMediaType(MediaType.UPLOAD); // some other file type, default to upload
+    } else if (mfStore.moment.evidence.length > 0) {
+        mediaType.value = null; // already has evidence, don't show any media type
     } else {
-        await changeMediaType(MediaType.TEXT); // default back to text
+        await changeMediaType(MediaType.TEXT); // no valid selection, default back to text
     }
 });
 
@@ -185,7 +176,7 @@ const showDescriptionEditor = window.Vue.computed(() => {
     if (!mfStore.moment) return false;
 
     // if the media type is text, don't show the description editor (as it's redundant)
-    if (mediaType.value === MediaType.TEXT) return false;
+    if (mediaType.value === MediaType.TEXT) return true;
 
     // otherwise, show it if there's already text in the body (someone has added text previously)
     const shouldShow = (mfStore.moment.body ?? "").trim().length > 0;
@@ -224,13 +215,36 @@ window.Vue.watch(
 </script>
 
 <template>
-    <div class="l-grid l-grid--12 l-gap-m">
-        <div class="large-6 medium-8 small-12">
+    <div class="l-flex-col l-gap-m">
+        <div class="share-work-buttons l-grid l-gap-m">
+            <a class="icon-camera share-photo" title="Take a photo" @click.prevent="changeMediaType(MediaType.PHOTO)">
+                Take a photo
+            </a>
+            <a class="icon-video share-video" title="Record a video" @click.prevent="changeMediaType(MediaType.VIDEO)">
+                Record a video
+            </a>
+            <a class="icon-audio share-audio" title="Record audio" @click.prevent="changeMediaType(MediaType.AUDIO)">
+                Record audio
+            </a>
+            <a class="icon-upload share-file" title="Upload file" @click.prevent="changeMediaType(MediaType.UPLOAD)">
+                Upload file
+            </a>
+            <a
+                v-if="!(showDescriptionEditor || MediaType.TEXT === mediaType)"
+                class="icon-textbox share-text"
+                title="Write something"
+                @click.prevent="changeMediaType(MediaType.TEXT)"
+            >
+                Write something
+            </a>
+        </div>
+
+        <div v-if="mediaType !== null && mediaType !== MediaType.TEXT">
             <!-- These inputs are just to satisfy evidence-media-recording, they don't do anything meaningful here -->
             <input id="mf-evidence-filename" type="hidden" />
             <input id="mf-evidence-storage" type="hidden" />
 
-            <div v-if="mediaType && mediaRecordingTypes.includes(mediaType)">
+            <div v-if="mediaRecordingTypes.includes(mediaType)">
                 <label for="mf-evidence-storage" :class="{ required: isEvidenceRequired }">
                     <template v-if="mediaType === MediaType.PHOTO"> Take a picture </template>
                     <template v-else-if="mediaType === MediaType.VIDEO"> Record something </template>
@@ -254,71 +268,8 @@ window.Vue.watch(
                     auto-upload-to-storage
                 />
             </div>
-
-            <div v-else-if="mediaType === MediaType.TEXT && !showDescriptionEditor">
-                <label for="mf-evidence-textarea" :class="{ required: isEvidenceRequired }"> Write something </label>
-                <p class="meta">
-                    Student detail tokens can be viewed when you press [. Tokens will be substituted with the students
-                    details on creation.
-                </p>
-                <text-editor
-                    v-if="mfStore.moment && typeof mfStore.moment.body === 'string'"
-                    id="mf-evidence-textarea"
-                    v-model:body="mfStore.moment.body"
-                    :config="editorSettings"
-                />
-            </div>
         </div>
-        <div class="large-6 medium-4 small-12">
-            <label>
-                &nbsp;
-                <!-- literally just a spacer to align with the other side -->
-            </label>
-            <div class="share-work-buttons">
-                <a
-                    class="icon-camera share-photo"
-                    title="Take a photo"
-                    :disabled="(MediaType.PHOTO === mediaType && !hasRecordedData) || undefined"
-                    @click.prevent="changeMediaType(MediaType.PHOTO)"
-                >
-                    Take a photo
-                </a>
-                <a
-                    class="icon-video share-video"
-                    title="Record a video"
-                    :disabled="(MediaType.VIDEO === mediaType && !hasRecordedData) || undefined"
-                    @click.prevent="changeMediaType(MediaType.VIDEO)"
-                >
-                    Record a video
-                </a>
-                <a
-                    class="icon-audio share-audio"
-                    title="Record audio"
-                    :disabled="(MediaType.AUDIO === mediaType && !hasRecordedData) || undefined"
-                    @click.prevent="changeMediaType(MediaType.AUDIO)"
-                >
-                    Record audio
-                </a>
-                <a
-                    class="icon-upload share-file"
-                    title="Upload file"
-                    :disabled="MediaType.UPLOAD === mediaType || undefined"
-                    @click.prevent="changeMediaType(MediaType.UPLOAD)"
-                >
-                    Upload file
-                </a>
-                <a
-                    class="icon-textbox share-text"
-                    title="Write something"
-                    :disabled="!!(showDescriptionEditor || MediaType.TEXT === mediaType) || undefined"
-                    @click.prevent="changeMediaType(MediaType.TEXT)"
-                >
-                    Write something
-                </a>
-            </div>
-        </div>
-    </div>
-
+        
     <div v-if="mfStore.moment !== null" class="l-flex-col l-gap-m l-mar-m--bottom">
         <div v-for="(evidence, index) in mfStore.moment.evidence" :key="index" class="v-card">
             <div class="l-flex-row l-flex--align-center l-gap-m l-pad-m">
@@ -341,19 +292,20 @@ window.Vue.watch(
         </div>
     </div>
 
-    <div v-if="mfStore.moment && showDescriptionEditor">
-        <!-- The description is required as long as there isn't other evidence -->
-        <label for="mf-evidence-textarea" :class="{ required: isEvidenceRequired }"> Description </label>
-        <p class="meta">
-            Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details
-            on creation.
-        </p>
-        <text-editor
-            v-if="typeof mfStore.moment.body === 'string'"
-            id="mf-evidence-textarea"
-            v-model:body="mfStore.moment.body"
-            :config="editorSettings"
-        />
+        <div v-if="mfStore.moment && showDescriptionEditor">
+            <!-- The description is required as long as there isn't other evidence -->
+            <label for="mf-evidence-textarea" :class="{ required: isEvidenceRequired }"> Write something </label>
+            <p class="meta">
+                Student detail tokens can be viewed when you press [. Tokens will be substituted with the students
+                details on creation.
+            </p>
+            <text-editor
+                v-if="typeof mfStore.moment.body === 'string'"
+                id="mf-evidence-textarea"
+                v-model:body="mfStore.moment.body"
+                :config="editorSettings"
+            />
+        </div>
     </div>
 </template>
 
@@ -361,5 +313,9 @@ window.Vue.watch(
 /* force the box shadow to have some top shadow too here, TODO: find a more sbx way... */
 .v-card {
     box-shadow: 0px 2px 3px 2px rgba(0, 0, 0, 0.1);
+}
+
+.share-work-buttons a {
+    margin-bottom: 0; /* override this from the global styles for now */
 }
 </style>
