@@ -111,7 +111,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param null|string $learnosityConsumerSecret
      * @param MimetypeMapper|null $mimetypeMapper
      * @param RubricDataSource $rubricDataSource
-     * @param EditorTemplateHelper|null $EditorTemplateHelper
+     * @param EditorTemplateHelper|null $editorTemplateHelper
      */
     public function __construct(
         UserMapper $userMapper,
