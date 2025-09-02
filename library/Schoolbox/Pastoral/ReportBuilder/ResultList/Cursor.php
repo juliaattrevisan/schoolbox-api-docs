@@ -215,9 +215,16 @@ class Cursor implements ICursor
         $where = implode(' AND ', $this->helper->getFilters());
         $param = [];
         $order = [];
+        $orderSql = '';
 
-        foreach ($this->helper->getReportOrder() as $reportOrder) {
-            $order[$reportOrder['column']] = $reportOrder['direction'] ?? 'ASC';
+        $reportOrder = $this->helper->getReportOrder();
+        for ($i = 0; $i < count($reportOrder); $i++) {
+            $orderBy = $reportOrder[$i];
+            $order[$orderBy['column']] = $orderBy['direction'] ?? 'ASC';
+            $orderSql .= "{$orderBy['column']} " . ($orderBy['direction'] ?? 'ASC');
+            if ($i < count($reportOrder) - 1) {
+                $orderSql .= ', ';
+            }
         }
 
         if (null !== $encodedCursor) {
@@ -235,10 +242,24 @@ class Cursor implements ICursor
         $filter = $this->filterByCell();
         $whereFilter = $filter['where'];
 
-        $pb = $this->pastoralMapper->getPredicateBuilder();
+        $db = $this->pastoralMapper->getDatabase();
+        $limit = (null === $this->limit) ? '' : "LIMIT {$this->limit}";
 
-        $pb->rawWhere(
-            $where . " AND {$whereFilter} AND ({$this->inTypeSubType})",
+        $statement = $db->executeQuery(
+            "
+            SELECT pastoral.id
+            {$this->helper->getFromString()}
+            LEFT JOIN lu_year_level AS sy ON s.year_id = sy.id
+            INNER JOIN luCampus AS sc ON sc.id = v_sc.campus
+            INNER JOIN lu_pastoral_type AS t ON pastoral.type_id = t.id
+            LEFT JOIN lu_pastoral_subtype AS c ON pastoral.subtype_id = c.id
+            INNER JOIN user AS o on pastoral.owner_id = o.id
+            WHERE {$where}
+            AND {$whereFilter}
+            AND ({$this->inTypeSubType})
+            ORDER BY {$orderSql}
+            {$limit}
+        ",
             array_merge(
                 $this->helper->getParams(),
                 $filter['param'],
@@ -246,11 +267,14 @@ class Cursor implements ICursor
             )
         );
 
+        $pastoralIds = $statement->fetchAll(\PDO::FETCH_COLUMN);
+
         $records = $this->pastoralMapper
-            ->findByPredicates($pb, [
-                'order' => $order,
-            ])
-            ->limit($this->limit)
+            ->findByColumn(
+                'id',
+                $pastoralIds,
+                ['order' => $order]
+            )
             ->reindex();
 
         return $records;
