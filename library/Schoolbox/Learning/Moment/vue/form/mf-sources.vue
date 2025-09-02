@@ -15,8 +15,8 @@ const isExpanded = window.Vue.ref(false);
 
         <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
             <div v-show="isExpanded">
-                <div class="l-grid l-gap-m l-pad-m">
-                    <div v-for="folder in mfStore.folders" :key="folder.id">
+                <div class="l-grid l-grid--auto-fill l-gap-m l-pad-m">
+                    <div v-for="folder in mfStore.folders" :key="folder.id" class="mf-source">
                         <section class="checklist">
                             <div class="v-card small-12">
                                 <div
@@ -68,6 +68,10 @@ const isExpanded = window.Vue.ref(false);
     position: absolute;
     top: 1rem;
     left: 1rem;
+}
+
+.mf-source {
+    max-width: 20rem;
 }
 
 .card-class-image {
