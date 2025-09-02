@@ -23,7 +23,7 @@ enum MediaType {
     TEXT = "text",
 }
 
-// TODO: add limit (10)
+const MOMENT_MAX_EVIDENCE = 10;
 
 const textareaEl = window.Vue.useTemplateRef<HTMLElement>("textareaRef");
 
@@ -37,6 +37,11 @@ const mediaRecordingEl = window.Vue.useTemplateRef<InstanceType<typeof EvidenceM
 
 const mediaType = window.Vue.ref<MediaType | null>(null);
 const currentFileDropFile = window.Vue.ref<FileDropFile | null>(null);
+
+const canAddEvidence = window.Vue.computed(() => {
+    if (!mfStore.moment) return false;
+    return mfStore.moment.evidence.length < MOMENT_MAX_EVIDENCE;
+});
 
 /**
  * Whether there is recorded data in the media recording component
@@ -265,7 +270,7 @@ window.Vue.watch(
         <a
             class="icon-camera share-photo"
             title="Take a photo"
-            :disabled="(MediaType.PHOTO === mediaType && !hasRecordedData) || undefined"
+            :disabled="(MediaType.PHOTO === mediaType && !hasRecordedData) || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.PHOTO)"
         >
             Take a photo
@@ -273,7 +278,7 @@ window.Vue.watch(
         <a
             class="icon-video share-video"
             title="Record a video"
-            :disabled="(MediaType.VIDEO === mediaType && !hasRecordedData) || undefined"
+            :disabled="(MediaType.VIDEO === mediaType && !hasRecordedData) || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.VIDEO)"
         >
             Record a video
@@ -281,7 +286,7 @@ window.Vue.watch(
         <a
             class="icon-audio share-audio"
             title="Record audio"
-            :disabled="(MediaType.AUDIO === mediaType && !hasRecordedData) || undefined"
+            :disabled="(MediaType.AUDIO === mediaType && !hasRecordedData) || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.AUDIO)"
         >
             Record audio
@@ -289,7 +294,7 @@ window.Vue.watch(
         <a
             class="icon-upload share-file"
             title="Upload file"
-            :disabled="MediaType.UPLOAD === mediaType || undefined"
+            :disabled="MediaType.UPLOAD === mediaType || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.UPLOAD)"
         >
             Upload file

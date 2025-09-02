@@ -59,6 +59,12 @@ class Controller extends Base
 
 
     /**
+     * The max number of evidence you can attach to a learning moment
+     */
+    public const MOMENT_MAX_EVIDENCE = 10;
+
+
+    /**
      * Constructor
      *
      * @param \Schoolbox\Learning\Moment\Mapper $mapper

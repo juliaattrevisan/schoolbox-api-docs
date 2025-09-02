@@ -146,6 +146,8 @@ class AllFields extends Base
             if (isset($json['evidence'])) {
                 if (is_array($json['evidence'])) {
                     foreach ($json['evidence'] as $evidenceStruct) {
+                        $evidence = null;
+
                         // File upload may be either:
                         // * an extant storage hash
                         // * a triplet passed from a resource attacher, to be transformed into a
@@ -162,8 +164,6 @@ class AllFields extends Base
                                 if (null === $model->getEvidence()) {
                                     $model->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class)));
                                 }
-
-                                $model->getEvidence()->add($evidence);
                             }
                         } else {
                             /* No hash? No trabajo
@@ -188,7 +188,10 @@ class AllFields extends Base
                             if (null === $model->getEvidence()) {
                                 $model->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class)));
                             }
+                        }
 
+                        // You can only have up to 10 evidence
+                        if ($evidence && $model->getEvidence()->count() < \Schoolbox\Learning\Moment\Controller::MOMENT_MAX_EVIDENCE) {
                             $model->getEvidence()->add($evidence);
                         }
                     }
