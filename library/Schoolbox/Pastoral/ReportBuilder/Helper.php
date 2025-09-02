@@ -314,6 +314,26 @@ class Helper
         if (null !== $viewer->getAccessList()->getBy('service', UserAccess::SERVICE_PASTORAL)) {
             return;
         }
+
+        /* If any of the pastoral access is set to deny for the viewer, then the record should not
+         * be included
+         */
+        $this->filters[] = "
+        NOT EXISTS (
+            SELECT 1 FROM `pastoral_access` pa_deny
+            WHERE pa_deny.`pastoral_id` = `pastoral`.`id`
+            AND pa_deny.`access` = :accessDeny
+            AND (
+                pa_deny.`user_id` = :viewerId OR
+                pa_deny.`role_id` = :viewerRoleId OR
+                pa_deny.`group_id` IN (
+                    SELECT `group_id`
+                    FROM `pastoral_group_member`
+                    WHERE `user_id` = :viewerId
+                )
+            )
+        )";
+
         $filters = [];
         /* The viewer should be able to see the records they've created
          */
