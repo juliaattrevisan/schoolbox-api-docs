@@ -278,28 +278,42 @@ window.Vue.watch(
                 />
             </div>
         </div>
-        
-    <div v-if="mfStore.moment !== null" class="l-flex-col l-gap-m l-mar-m--bottom">
-        <div v-for="(evidence, index) in mfStore.moment.evidence" :key="index" class="v-card">
-            <div class="l-flex-row l-flex--align-center l-gap-m l-pad-m">
-                <!-- TODO: we probably need a real preview of this, or at least a way to download it to see what it actually is -->
-                <div class="l-flex-col">
-                    <img :src="`/ajax/mime/${evidence.storage.mime}`" />
-                </div>
-                <div class="l-flex-col l-flex--justify-center l-flex__item--1 f-no-margins">
-                    <h3 class="">{{ evidence.filename }}</h3>
-                </div>
-                <nav class="c-nav-actions l-flex-row">
-                    <a
-                        class="icon-delete no-text"
-                        href="#"
-                        title="Delete Evidence"
-                        @click.prevent="deleteEvidence(index)"
-                    ></a>
-                </nav>
-            </div>
+
+        <div v-if="mfStore.moment !== null && mfStore.moment.evidence.length">
+            <label :class="{ required: isEvidenceRequired }"> Attachments </label>
+            <ul class="grid small-block-grid-1 medium-block-grid-2">
+                <li
+                    v-for="(evidence, index) in mfStore.moment.evidence"
+                    :key="index"
+                    class="actions-small-2 inline-grader-file"
+                >
+                    <div class="list-item">
+                        <div class="card small-12">
+                            <!-- TODO: we probably need a real preview of this, or at least a way to download it to see what it actually is -->
+                            <a :href="evidence.storage._links.fetch" :title="evidence.filename" download>
+                                <img :src="`/ajax/mime/${evidence.storage.mime}`" class="mime" />
+                                <p>{{ evidence.filename }}</p>
+                            </a>
+                        </div>
+                    </div>
+                    <nav>
+                        <a
+                            v-if="evidence.storage._links.fetch"
+                            class="icon-download no-text"
+                            :href="evidence.storage._links.fetch"
+                            title="Download"
+                            download
+                        ></a>
+                        <a
+                            class="icon-delete no-text"
+                            href="#"
+                            title="Delete Evidence"
+                            @click.prevent="deleteEvidence(index)"
+                        ></a>
+                    </nav>
+                </li>
+            </ul>
         </div>
-    </div>
 
         <div v-if="mfStore.moment && showDescriptionEditor">
             <!-- The description is required as long as there isn't other evidence -->
@@ -319,11 +333,6 @@ window.Vue.watch(
 </template>
 
 <style scoped>
-/* force the box shadow to have some top shadow too here, TODO: find a more sbx way... */
-.v-card {
-    box-shadow: 0px 2px 3px 2px rgba(0, 0, 0, 0.1);
-}
-
 .share-work-buttons a {
     margin-bottom: 0; /* override this from the global styles for now */
 }
