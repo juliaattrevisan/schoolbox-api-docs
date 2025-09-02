@@ -460,8 +460,16 @@ class NavigationSelector
      */
     private function hasMYP(): bool
     {
-        // We do not check whether the student has data in the MYP view here because getting data from that view is extremely slow.
-        // Checking whether data exists for the student in the MYP view here adds >10 seconds to page load times.
+        // We do not check whether the student has data in the MYP view here because getting data from that view is
+        // extremely slow.  Checking whether data exists for the student in the MYP view here (using the same method as
+        // is used for other functions in this file) added about 10 seconds to page load times when testing on the
+        // staging server.
+        //
+        // Note there are some edge cases where this function will return true, but the student is not expected to have
+        // any data in the MYP view.  For example, if the student started at the school at a senior year level, they
+        // will have missed the MYP (Middle Years Program), and so will not have any data in the MYP view.  In that
+        // situation, this function will say that the student has MYP data, but when the MYP page is loaded no data will
+        // be found.  DSFG are aware of this edge case and are okay with it.
         $currentYear = (int)date('Y');
         return
             $this->user->getYear()?->getName() === '7'
