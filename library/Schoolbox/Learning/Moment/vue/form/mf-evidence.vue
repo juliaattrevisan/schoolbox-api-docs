@@ -72,7 +72,16 @@ async function uploadMediaRecording(): Promise<void> {
         storage: response.meta.file,
         filename: response.meta.name,
     });
+
+    mediaType.value = null;
 }
+
+window.Vue.watch(hasRecordedData, async () => {
+    // if there's recorded data, auto submit it
+    if (hasRecordedData.value) {
+        await uploadMediaRecording();
+    }
+});
 
 /**
  * Change the selected media type
