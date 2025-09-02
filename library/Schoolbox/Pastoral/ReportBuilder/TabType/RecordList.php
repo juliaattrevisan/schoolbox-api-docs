@@ -150,12 +150,19 @@ class RecordList extends Base implements TabTypeInterface, ICursor
         $where = implode(' AND ', $this->helper->getFilters());
         $param = [];
         $order = [];
+        $orderSql = '';
 
-        foreach ($this->helper->getReportOrder() as $reportOrder) {
-            $order[$reportOrder['column']] = $reportOrder['direction'] ?? 'ASC';
+        $reportOrder = $this->helper->getReportOrder();
+        for ($i = 0; $i < count($reportOrder); $i++) {
+            $orderBy = $reportOrder[$i];
+            $order[$orderBy['column']] = $orderBy['direction'] ?? 'ASC';
+            $orderSql .= "{$orderBy['column']} " . ($orderBy['direction'] ?? 'ASC');
+            if ($i < count($reportOrder) - 1) {
+                $orderSql .= ', ';
+            }
         }
 
-        if (null !== $encodedCursor) {
+        if ('' !== (string)$encodedCursor) {
             $cursor = $this->codec->decode($encodedCursor);
             $where .= " AND ({$this->inTypeSubType})";
 
@@ -168,21 +175,36 @@ class RecordList extends Base implements TabTypeInterface, ICursor
             }
         }
 
-        $pb = $this->pastoralMapper->getPredicateBuilder();
+        $db = $this->pastoralMapper->getDatabase();
 
-        $pb->rawWhere(
-            $where,
+        $statement = $db->executeQuery(
+            "
+            SELECT pastoral.id
+            {$this->helper->getFromString()}
+            LEFT JOIN lu_year_level AS sy ON s.year_id = sy.id
+            INNER JOIN luCampus AS sc ON sc.id = v_sc.campus
+            INNER JOIN lu_pastoral_type AS t ON pastoral.type_id = t.id
+            LEFT JOIN lu_pastoral_subtype AS c ON pastoral.subtype_id = c.id
+            INNER JOIN user AS o on pastoral.owner_id = o.id
+            WHERE {$where}
+            AND ({$this->inTypeSubType})
+            ORDER BY {$orderSql}
+            LIMIT {$this->limit}
+        ",
             array_merge(
                 $this->helper->getParams(),
                 $param,
             )
         );
 
+        $pastoralIds = $statement->fetchAll(\PDO::FETCH_COLUMN);
+
         $records = $this->pastoralMapper
-            ->findByPredicates($pb, [
-                'order' => $order,
-            ])
-            ->limit($this->limit)
+            ->findByColumn(
+                'id',
+                $pastoralIds,
+                ['order' => $order]
+            )
             ->reindex();
 
         return $records;

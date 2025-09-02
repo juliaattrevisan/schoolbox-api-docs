@@ -227,7 +227,7 @@ class Cursor implements ICursor
             }
         }
 
-        if (null !== $encodedCursor) {
+        if ('' !== (string)$encodedCursor) {
             $cursor = $this->codec->decode($encodedCursor);
 
             // Create lexicographic comparison for multiple sort fields
