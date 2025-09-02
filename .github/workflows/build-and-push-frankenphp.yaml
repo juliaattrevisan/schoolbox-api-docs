@@ -162,10 +162,8 @@ jobs:
           declare -a DOCKERHUB_IMAGES
           declare -a ECR_IMAGES
 
-          # Convert multiline string to array
-          IFS=$'\n' read -d '' -r -a ALL_IMAGES <<< "${{ steps.meta.outputs.tags }}"
-          for image in "${ALL_IMAGES[@]}"; do
-            echo "$image"
+          for image in "${{ steps.meta.outputs.tags }}"; do
+            echo $image;
             if [[ $image == *"${{ vars.DOCKERHUB_NAMESPACE }}"* ]]; then
               echo "$image: Dockerhub image"
               DOCKERHUB_IMAGES+=("$image")
