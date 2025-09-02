@@ -3,6 +3,7 @@ import FileDrop from "@js/resource/file-drop.vue";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
 import type { AsyncUploadResponseSuccess } from "@js/resource/resourceUtils";
 import type { Template } from "@js/editor/types/editorTypes";
+import StorageObject from "@schoolboxVue/components/storage-object.vue";
 import TextEditor from "@schoolboxVue/components/ckeditor/text-editor.vue";
 import EvidenceMediaRecording from "@schoolboxLearningMomentEvidence/evidence-media-recording.vue";
 import { useMomentFormStore } from "./store/momentFormStore";
@@ -24,6 +25,11 @@ enum MediaType {
 
 // TODO: add limit (10)
 
+const selectedEvidenceId = window.Vue.ref<number>(0);
+const selectedEvidence = window.Vue.computed(() => {
+    return mfStore.moment?.evidence[selectedEvidenceId.value] || null;
+});
+
 const mediaRecordingTypes = [MediaType.VIDEO, MediaType.AUDIO, MediaType.PHOTO];
 const mediaRecordingEl = window.Vue.useTemplateRef<InstanceType<typeof EvidenceMediaRecording>>("mediaRecordingRef");
 
@@ -38,6 +44,16 @@ const hasRecordedData = window.Vue.computed(() => {
     if (!mediaRecordingEl.value) return false;
     return !!mediaRecordingEl.value.hasRecordedData();
 });
+
+/**
+ * After evidence is uploaded
+ */
+function onEvidenceUploaded(): void {
+    if (!mfStore.moment) return;
+
+    mediaType.value = null;
+    selectedEvidenceId.value = mfStore.moment.evidence.length - 1; // select the newly added evidence
+}
 
 /**
  * Upload the current media recording,
@@ -72,7 +88,7 @@ async function uploadMediaRecording(): Promise<void> {
         filename: response.meta.name,
     });
 
-    mediaType.value = null;
+    onEvidenceUploaded();
 }
 
 window.Vue.watch(hasRecordedData, async () => {
@@ -116,6 +132,10 @@ async function deleteEvidence(index: number): Promise<void> {
         // if there's no evidence left, default back to text mode
         await changeMediaType(MediaType.TEXT);
     }
+
+    if (selectedEvidenceId.value >= mfStore.moment.evidence.length) {
+        selectedEvidenceId.value = mfStore.moment.evidence.length - 1; // select the last evidence if the current one was deleted I guess
+    }
 }
 
 // TODO: on submit of the overall form (not autosave), need to ensure any current media is uploaded first
@@ -143,6 +163,9 @@ window.Vue.onMounted(async () => {
     } else {
         await changeMediaType(MediaType.TEXT); // no valid selection, default back to text
     }
+
+    // select the latest evidence if there's any
+    selectedEvidenceId.value = mfStore.moment.evidence.length - 1;
 });
 
 /**
@@ -223,6 +246,7 @@ window.Vue.watch(
         });
 
         currentFileDropFile.value = null;
+        onEvidenceUploaded();
     },
 );
 </script>
@@ -279,39 +303,65 @@ window.Vue.watch(
     </div>
 
     <div v-if="mfStore.moment !== null && mfStore.moment.evidence.length">
-        <label :class="{ required: isEvidenceRequired }"> Attachments </label>
-        <ul class="grid small-block-grid-1 medium-block-grid-2">
-            <li
-                v-for="(evidence, index) in mfStore.moment.evidence"
-                :key="index"
-                class="actions-small-2 inline-grader-file"
-            >
-                <div class="list-item">
-                    <div class="card small-12">
-                        <!-- TODO: we probably need a real preview of this, or at least a way to download it to see what it actually is -->
-                        <a :href="evidence.storage._links.fetch" :title="evidence.filename" download>
-                            <img :src="`/ajax/mime/${evidence.storage.mime}`" class="mime" />
-                            <p>{{ evidence.filename }}</p>
-                        </a>
-                    </div>
-                </div>
-                <nav>
-                    <a
-                        v-if="evidence.storage._links.fetch"
-                        class="icon-download no-text"
-                        :href="evidence.storage._links.fetch"
-                        title="Download"
-                        download
-                    ></a>
-                    <a
-                        class="icon-delete no-text"
-                        href="#"
-                        title="Delete Evidence"
-                        @click.prevent="deleteEvidence(index)"
-                    ></a>
-                </nav>
-            </li>
-        </ul>
+        <label> Attachments </label>
+        <div class="l-grid l-grid--12 l-gap-m">
+            <div class="large-6 small-12">
+                <article
+                    v-if="selectedEvidence !== null && selectedEvidence.storage.hash"
+                    :key="selectedEvidence.storage.hash"
+                >
+                    <storage-object
+                        :storage="selectedEvidence.storage"
+                        :filename="selectedEvidence.filename"
+                        data-test="learning-moment-evidence-media"
+                    ></storage-object>
+                </article>
+            </div>
+
+            <div class="large-6 small-12">
+                <ul class="grid small-block-grid-1">
+                    <li
+                        v-for="evidence in [...mfStore.moment.evidence].reverse()"
+                        :key="evidence.storage.hash"
+                        class="actions-small-2"
+                        :class="{ 'mf-evidence-file-selected': selectedEvidence === evidence }"
+                    >
+                        <div class="list-item">
+                            <div class="card small-12">
+                                <!-- TODO: we probably need a real preview of this, or at least a way to download it to see what it actually is -->
+                                <a
+                                    :href="evidence.storage._links.fetch"
+                                    :title="evidence.filename"
+                                    @click.prevent="
+                                        selectedEvidenceId = mfStore.moment.evidence.findIndex((e) => e === evidence)
+                                    "
+                                >
+                                    <img :src="`/ajax/mime/${evidence.storage.mime}`" class="mime" />
+                                    <p>{{ evidence.filename }}</p>
+                                </a>
+                            </div>
+                        </div>
+                        <nav>
+                            <a
+                                v-if="evidence.storage._links.fetch"
+                                class="icon-download no-text"
+                                :href="evidence.storage._links.fetch"
+                                title="Download"
+                                download
+                            ></a>
+                            <a
+                                class="icon-delete no-text"
+                                href="#"
+                                title="Delete Evidence"
+                                @click.prevent="
+                                    deleteEvidence(mfStore.moment.evidence.findIndex((e) => e === evidence))
+                                "
+                            ></a>
+                        </nav>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
 
     <div v-if="mfStore.moment && showDescriptionEditor">
@@ -333,5 +383,9 @@ window.Vue.watch(
 <style scoped>
 .share-work-buttons a {
     margin-bottom: 0; /* override this from the global styles for now */
+}
+
+.mf-evidence-file-selected {
+    background-color: var(--accent-background);
 }
 </style>
