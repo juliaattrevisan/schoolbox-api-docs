@@ -105,12 +105,17 @@ async function changeMediaType(type: MediaType): Promise<void> {
  * Delete evidence from the moment
  * @param index The index of the evidence to delete
  */
-function deleteEvidence(index: number): void {
+async function deleteEvidence(index: number): Promise<void> {
     if (!mfStore.moment) {
         throw new Error("moment not found");
     }
 
     mfStore.moment.evidence.splice(index, 1);
+
+    if (mfStore.moment.evidence.length === 0 && mediaType.value !== MediaType.TEXT) {
+        // if there's no evidence left, default back to text mode
+        await changeMediaType(MediaType.TEXT);
+    }
 }
 
 // TODO: on submit of the overall form (not autosave), need to ensure any current media is uploaded first
