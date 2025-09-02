@@ -326,11 +326,12 @@ class Helper
             AND (
                 pa_deny.`user_id` = :viewerId OR
                 pa_deny.`role_id` = :viewerRoleId OR
-                pa_deny.`group_id` IN (
-                    SELECT `group_id`
-                    FROM `pastoral_group_member`
-                    WHERE `user_id` = :viewerId
-                )
+                (pa_deny.`group_id` IN (
+                    SELECT `pgm`.`group_id`
+                    FROM `pastoral_group` pg
+                    LEFT JOIN `pastoral_group_member` pgm ON `pgm`.`group_id` = `pg`.`id` AND `pgm`.`deleted_at` IS NULL
+                    WHERE `pgm`.`user_id` = :viewerId AND `pg`.`deleted_at` IS NULL
+                ))
             )
         )";
 
