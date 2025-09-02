@@ -951,7 +951,7 @@ class Subnav
             'https://my.schoolbox.education' => [
                 'name'        => 'My Schoolbox',
                 'visible'     => $userIsSuperuser,
-                'description' => 'My schoolbox login URL',
+                'description' => 'My Schoolbox login',
                 'children'    => [],
             ],
         ];
