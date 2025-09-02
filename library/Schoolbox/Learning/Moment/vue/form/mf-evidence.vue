@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import FileDrop from "@js/resource/file-drop.vue";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
-import { ResourceType } from "@js/resource/resourceUtils";
 import type { AsyncUploadResponseSuccess } from "@js/resource/resourceUtils";
 import type { Template } from "@js/editor/types/editorTypes";
 import TextEditor from "@schoolboxVue/components/ckeditor/text-editor.vue";
@@ -224,111 +223,105 @@ window.Vue.watch(
 </script>
 
 <template>
-    <div class="l-flex-col l-gap-m">
-        <div class="share-work-buttons l-grid l-gap-m">
-            <a class="icon-camera share-photo" title="Take a photo" @click.prevent="changeMediaType(MediaType.PHOTO)">
-                Take a photo
-            </a>
-            <a class="icon-video share-video" title="Record a video" @click.prevent="changeMediaType(MediaType.VIDEO)">
-                Record a video
-            </a>
-            <a class="icon-audio share-audio" title="Record audio" @click.prevent="changeMediaType(MediaType.AUDIO)">
-                Record audio
-            </a>
-            <a class="icon-upload share-file" title="Upload file" @click.prevent="changeMediaType(MediaType.UPLOAD)">
-                Upload file
-            </a>
-            <a
-                v-if="!(showDescriptionEditor || MediaType.TEXT === mediaType)"
-                class="icon-textbox share-text"
-                title="Write something"
-                @click.prevent="changeMediaType(MediaType.TEXT)"
-            >
-                Write something
-            </a>
-        </div>
+    <div class="share-work-buttons l-grid l-gap-m">
+        <a class="icon-camera share-photo" title="Take a photo" @click.prevent="changeMediaType(MediaType.PHOTO)">
+            Take a photo
+        </a>
+        <a class="icon-video share-video" title="Record a video" @click.prevent="changeMediaType(MediaType.VIDEO)">
+            Record a video
+        </a>
+        <a class="icon-audio share-audio" title="Record audio" @click.prevent="changeMediaType(MediaType.AUDIO)">
+            Record audio
+        </a>
+        <a class="icon-upload share-file" title="Upload file" @click.prevent="changeMediaType(MediaType.UPLOAD)">
+            Upload file
+        </a>
+        <a
+            v-if="!(showDescriptionEditor || MediaType.TEXT === mediaType)"
+            class="icon-textbox share-text"
+            title="Write something"
+            @click.prevent="changeMediaType(MediaType.TEXT)"
+        >
+            Write something
+        </a>
+    </div>
 
-        <div v-if="mediaType !== null && mediaType !== MediaType.TEXT">
-            <!-- These inputs are just to satisfy evidence-media-recording, they don't do anything meaningful here -->
-            <input id="mf-evidence-filename" type="hidden" />
-            <input id="mf-evidence-storage" type="hidden" />
+    <div v-if="mediaType !== null && mediaType !== MediaType.TEXT">
+        <!-- These inputs are just to satisfy evidence-media-recording, they don't do anything meaningful here -->
+        <input id="mf-evidence-filename" type="hidden" />
+        <input id="mf-evidence-storage" type="hidden" />
 
-            <div v-if="mediaRecordingTypes.includes(mediaType)">
-                <label for="mf-evidence-storage" :class="{ required: isEvidenceRequired }">
-                    <template v-if="mediaType === MediaType.PHOTO"> Take a picture </template>
-                    <template v-else-if="mediaType === MediaType.VIDEO"> Record something </template>
-                    <template v-else-if="mediaType === MediaType.AUDIO"> Say something </template>
-                </label>
-                <evidence-media-recording
-                    ref="mediaRecordingRef"
-                    :key="`${mediaType}-${mfStore.moment?.evidence.length}`"
-                    :moment-type="mediaType"
-                    filename-id="mf-evidence-filename"
-                    storage-id="mf-evidence-storage"
-                />
-            </div>
-
-            <div v-else-if="mediaType === MediaType.UPLOAD">
-                <label for="mf-evidence-file-drop" :class="{ required: isEvidenceRequired }"> Upload File </label>
-                <!-- TODO for speed reasons i've used this, but it should be a proper file input... that's a bit more complex atm -->
-                <file-drop
-                    id="mf-evidence-file-drop"
-                    v-model:current-file="currentFileDropFile"
-                    auto-upload-to-storage
-                />
-            </div>
-        </div>
-
-        <div v-if="mfStore.moment !== null && mfStore.moment.evidence.length">
-            <label :class="{ required: isEvidenceRequired }"> Attachments </label>
-            <ul class="grid small-block-grid-1 medium-block-grid-2">
-                <li
-                    v-for="(evidence, index) in mfStore.moment.evidence"
-                    :key="index"
-                    class="actions-small-2 inline-grader-file"
-                >
-                    <div class="list-item">
-                        <div class="card small-12">
-                            <!-- TODO: we probably need a real preview of this, or at least a way to download it to see what it actually is -->
-                            <a :href="evidence.storage._links.fetch" :title="evidence.filename" download>
-                                <img :src="`/ajax/mime/${evidence.storage.mime}`" class="mime" />
-                                <p>{{ evidence.filename }}</p>
-                            </a>
-                        </div>
-                    </div>
-                    <nav>
-                        <a
-                            v-if="evidence.storage._links.fetch"
-                            class="icon-download no-text"
-                            :href="evidence.storage._links.fetch"
-                            title="Download"
-                            download
-                        ></a>
-                        <a
-                            class="icon-delete no-text"
-                            href="#"
-                            title="Delete Evidence"
-                            @click.prevent="deleteEvidence(index)"
-                        ></a>
-                    </nav>
-                </li>
-            </ul>
-        </div>
-
-        <div v-if="mfStore.moment && showDescriptionEditor">
-            <!-- The description is required as long as there isn't other evidence -->
-            <label for="mf-evidence-textarea" :class="{ required: isEvidenceRequired }"> Write something </label>
-            <p class="meta">
-                Student detail tokens can be viewed when you press [. Tokens will be substituted with the students
-                details on creation.
-            </p>
-            <text-editor
-                v-if="typeof mfStore.moment.body === 'string'"
-                id="mf-evidence-textarea"
-                v-model:body="mfStore.moment.body"
-                :config="editorSettings"
+        <div v-if="mediaRecordingTypes.includes(mediaType)">
+            <label for="mf-evidence-storage" :class="{ required: isEvidenceRequired }">
+                <template v-if="mediaType === MediaType.PHOTO"> Take a picture </template>
+                <template v-else-if="mediaType === MediaType.VIDEO"> Record something </template>
+                <template v-else-if="mediaType === MediaType.AUDIO"> Say something </template>
+            </label>
+            <evidence-media-recording
+                ref="mediaRecordingRef"
+                :key="`${mediaType}-${mfStore.moment?.evidence.length}`"
+                :moment-type="mediaType"
+                filename-id="mf-evidence-filename"
+                storage-id="mf-evidence-storage"
             />
         </div>
+
+        <div v-else-if="mediaType === MediaType.UPLOAD">
+            <label for="mf-evidence-file-drop" :class="{ required: isEvidenceRequired }"> Upload File </label>
+            <!-- TODO for speed reasons i've used this, but it should be a proper file input... that's a bit more complex atm -->
+            <file-drop id="mf-evidence-file-drop" v-model:current-file="currentFileDropFile" auto-upload-to-storage />
+        </div>
+    </div>
+
+    <div v-if="mfStore.moment !== null && mfStore.moment.evidence.length">
+        <label :class="{ required: isEvidenceRequired }"> Attachments </label>
+        <ul class="grid small-block-grid-1 medium-block-grid-2">
+            <li
+                v-for="(evidence, index) in mfStore.moment.evidence"
+                :key="index"
+                class="actions-small-2 inline-grader-file"
+            >
+                <div class="list-item">
+                    <div class="card small-12">
+                        <!-- TODO: we probably need a real preview of this, or at least a way to download it to see what it actually is -->
+                        <a :href="evidence.storage._links.fetch" :title="evidence.filename" download>
+                            <img :src="`/ajax/mime/${evidence.storage.mime}`" class="mime" />
+                            <p>{{ evidence.filename }}</p>
+                        </a>
+                    </div>
+                </div>
+                <nav>
+                    <a
+                        v-if="evidence.storage._links.fetch"
+                        class="icon-download no-text"
+                        :href="evidence.storage._links.fetch"
+                        title="Download"
+                        download
+                    ></a>
+                    <a
+                        class="icon-delete no-text"
+                        href="#"
+                        title="Delete Evidence"
+                        @click.prevent="deleteEvidence(index)"
+                    ></a>
+                </nav>
+            </li>
+        </ul>
+    </div>
+
+    <div v-if="mfStore.moment && showDescriptionEditor">
+        <!-- The description is required as long as there isn't other evidence -->
+        <label for="mf-evidence-textarea" :class="{ required: isEvidenceRequired }"> Write something </label>
+        <p class="meta">
+            Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details
+            on creation.
+        </p>
+        <text-editor
+            v-if="typeof mfStore.moment.body === 'string'"
+            id="mf-evidence-textarea"
+            v-model:body="mfStore.moment.body"
+            :config="editorSettings"
+        />
     </div>
 </template>
 
