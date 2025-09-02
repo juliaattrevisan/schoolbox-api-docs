@@ -252,17 +252,37 @@ window.Vue.watch(
 </script>
 
 <template>
-    <div v-if="mediaType === null || mediaType === MediaType.TEXT" class="share-work-buttons l-grid l-gap-m">
-        <a class="icon-camera share-photo" title="Take a photo" @click.prevent="changeMediaType(MediaType.PHOTO)">
+    <div class="share-work-buttons l-grid l-gap-m">
+        <a
+            class="icon-camera share-photo"
+            title="Take a photo"
+            :disabled="(MediaType.PHOTO === mediaType && !hasRecordedData) || undefined"
+            @click.prevent="changeMediaType(MediaType.PHOTO)"
+        >
             Take a photo
         </a>
-        <a class="icon-video share-video" title="Record a video" @click.prevent="changeMediaType(MediaType.VIDEO)">
+        <a
+            class="icon-video share-video"
+            title="Record a video"
+            :disabled="(MediaType.VIDEO === mediaType && !hasRecordedData) || undefined"
+            @click.prevent="changeMediaType(MediaType.VIDEO)"
+        >
             Record a video
         </a>
-        <a class="icon-audio share-audio" title="Record audio" @click.prevent="changeMediaType(MediaType.AUDIO)">
+        <a
+            class="icon-audio share-audio"
+            title="Record audio"
+            :disabled="(MediaType.AUDIO === mediaType && !hasRecordedData) || undefined"
+            @click.prevent="changeMediaType(MediaType.AUDIO)"
+        >
             Record audio
         </a>
-        <a class="icon-upload share-file" title="Upload file" @click.prevent="changeMediaType(MediaType.UPLOAD)">
+        <a
+            class="icon-upload share-file"
+            title="Upload file"
+            :disabled="MediaType.UPLOAD === mediaType || undefined"
+            @click.prevent="changeMediaType(MediaType.UPLOAD)"
+        >
             Upload file
         </a>
         <a
