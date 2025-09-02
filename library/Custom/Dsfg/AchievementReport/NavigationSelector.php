@@ -271,18 +271,6 @@ class NavigationSelector
             ];
         }
 
-        // This page is useful during testing and when communicating with school contacts about data-related issues.
-        // Enable when needed (here and in Module.php).
-        // $DBVIEWTESTS_KEY = 'dbViewTests';
-        //if (in_array($_SESSION['username'], ['alaress', 'psingh', 'swalker'])) { // Note psingh and swalker are DSFG admins.
-        //    $availableNavigation[$DBVIEWTESTS_KEY] = [
-        //        'url' => $this->routeGenerator->generate('achievementreport.getDbViewTests', [
-        //            'externalUserId' => $this->externalUser['StudentID'],
-        //        ]),
-        //        'label' => 'DB View Tests'
-        //    ];
-        //}
-
         $this->availableNavigation = $availableNavigation;
     }
 
