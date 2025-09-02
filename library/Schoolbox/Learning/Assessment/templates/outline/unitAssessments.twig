@@ -165,7 +165,7 @@
                         {% set deleteCustomisedRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: customisedAssessment.id, assessment: customisedAssessment}) %}
                         {% set similarityReportCustomisedRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: customisedAssessment.id, assessment: customisedAssessment}) %}
                         {% set kamiWorksheetCustomisedRoute = routeLookupIfAuthorized('learningAssessment.getWorksheet', {assessmentId: customisedAssessment.id, assessment: customisedAssessment}) %}
-                        {% set hasAssessmentCustomisedRoutes = statusRoute or modifyRoute or deleteRoute or similarityReportRoute or kamiWorksheetRoute%}
+                        {% set hasAssessmentCustomisedRoutes = statusCustomisedRoute or modifyCustomisedRoute or deleteCustomisedRoute or similarityReportCustomisedRoute or kamiWorksheetCustomisedRoute %}
 
                         {# Save to course: if spec assessment exists, this is a PUT: otherwise a POST #}
                         {% if specCustomisedAssessment %}
@@ -200,7 +200,7 @@
                             <div class="small-12 compact card wrap-down">
                                 {% set customTitle = attribute(locale, customisedAssessment.typeName|lower) is defined ? attribute(locale, customisedAssessment.typeName|lower).proper : customisedAssessment.typeName %}
                                 {% set customRoute = viewRoute.viewRoute(customisedAssessment, USER) %}
-                                {% if route %}
+                                {% if customRoute %}
                                     <a title="{{ customTitle }}" href="{{ customRoute }}">
                                         <span class="{{ icon.renderClass(customisedAssessment) }}"></span>
                                         <p>{{ customisedAssessment.title }}</p>
