@@ -215,7 +215,19 @@ class ParticipationHelper
         $customisation = $this->mapperProxy->findAllCustomisedAssessment($this->mapperProxy->translateToDomainModel($this->assessment));
         /* Find the customised plan that the user is part of and return it
          */
-        $customisedPlan = $customisation->filter(fn(IAssessable $customised) => $customised->getParticipantIfExtant($user))->first()?->getParticipantIfExtant($user);
-        return $customisedPlan;
+        $plan = null;
+        foreach ($customisation as $customisedAssessment) {
+            if ($customisedAssessment instanceof IAssessable === false) {
+                continue;
+            }
+            $plan = $customisedAssessment->getParticipantIfExtant($user);
+            /* Exit early after it found the first plan that contains the student
+             * as the student should only be included in one of the plan from either original or customised
+             */
+            if (null !== $plan) {
+                break;
+            }
+        }
+        return $plan;
     }
 }
