@@ -119,13 +119,7 @@ class CreditSummary extends Base
         foreach ($allResults as $current) {
             $level = $current['Level'];
             $letter = $current['StrippedResult'];
-            $internalExternal = $current['InternalorExternalAssessment'];
-
-            // Note $internalExternal is expected to always be 'IN' or 'EX'.
-            // Some data does not meet this requirement, so if it ain't 'EX', assume it's 'IN'.
-            if ($internalExternal !== 'EX') {
-                $internalExternal = 'IN';
-            }
+            $internalExternal = self::getExOrIn($current['InternalorExternalAssessment']);
 
             if ($level == '' && $current['EnteredCredits'] == 0 && $current['ResultCredits'] == 0) {
                 // Avoid creating the data structure for $finalStack[$level] if it will contain only zeros and a blank level.
@@ -212,13 +206,7 @@ class CreditSummary extends Base
          */
         foreach ($allResults as $current) {
             $level = $current['Level'];
-            $internalExternal = $current['InternalorExternalAssessment'];
-
-            // Note $internalExternal is expected to always be 'IN' or 'EX'.
-            // Some data does not meet this requirement, so if it ain't 'EX', assume it's 'IN'.
-            if ($internalExternal !== 'EX') {
-                $internalExternal = 'IN';
-            }
+            $internalExternal = self::getExOrIn($current['InternalorExternalAssessment']);
 
             if (!isset($finalStack[$level])) {
                 $finalStack[$level] = [
@@ -276,13 +264,7 @@ class CreditSummary extends Base
 
         foreach ($allResults as $current) {
             $level = $current['Level'];
-            $internalExternal = $current['InternalorExternalAssessment'];
-
-            // Note $internalExternal is expected to always be 'IN' or 'EX'.
-            // Some data does not meet this requirement, so if it ain't 'EX', assume it's 'IN'.
-            if ($internalExternal !== 'EX') {
-                $internalExternal = 'IN';
-            }
+            $internalExternal = self::getExOrIn($current['InternalorExternalAssessment']);
 
             if (!isset($finalStack[$level])) {
                 $finalStack[$level] = [
@@ -342,13 +324,7 @@ class CreditSummary extends Base
 
         foreach ($allResults as $current) {
             $level = $current['Level'];
-            $internalExternal = $current['InternalorExternalAssessment'];
-
-            // Note $internalExternal is expected to always be 'IN' or 'EX'.
-            // Some data does not meet this requirement, so if it ain't 'EX', assume it's 'IN'.
-            if ($internalExternal !== 'EX') {
-                $internalExternal = 'IN';
-            }
+            $internalExternal = self::getExOrIn($current['InternalorExternalAssessment']);
 
             if (!isset($finalStack[$level])) {
                 $finalStack[$level] = [
@@ -404,13 +380,7 @@ class CreditSummary extends Base
 
         foreach ($allResults as $current) {
             $level = $current['Level'];
-            $internalExternal = $current['InternalorExternalAssessment'];
-
-            // Note $internalExternal is expected to always be 'IN' or 'EX'.
-            // Some data does not meet this requirement, so if it ain't 'EX', assume it's 'IN'.
-            if ($internalExternal !== 'EX') {
-                $internalExternal = 'IN';
-            }
+            $internalExternal = self::getExOrIn($current['InternalorExternalAssessment']);
 
             if (!isset($finalStack[$level])) {
                 $finalStack[$level] = array_fill_keys($this->achievementLetterRegistry, 0);
