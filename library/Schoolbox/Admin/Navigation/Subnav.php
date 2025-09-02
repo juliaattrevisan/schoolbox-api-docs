@@ -948,6 +948,12 @@ class Subnav
                     ],
                 ],
             ],
+            'https://my.schoolbox.education' => [
+                'name'        => 'My Schoolbox',
+                'visible'     => $userIsSuperuser,
+                'description' => 'My Schoolbox subscription management portal login',
+                'children'    => [],
+            ],
         ];
     }
 
