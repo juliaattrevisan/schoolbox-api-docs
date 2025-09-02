@@ -252,7 +252,7 @@ window.Vue.watch(
 </script>
 
 <template>
-    <div class="share-work-buttons l-grid l-gap-m">
+    <div v-if="mediaType === null || mediaType === MediaType.TEXT" class="share-work-buttons l-grid l-gap-m">
         <a class="icon-camera share-photo" title="Take a photo" @click.prevent="changeMediaType(MediaType.PHOTO)">
             Take a photo
         </a>
