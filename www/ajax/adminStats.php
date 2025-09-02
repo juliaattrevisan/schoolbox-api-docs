@@ -8,14 +8,19 @@
  * @link        https://schoolbox.com.au/
  */
 
+use GuzzleHttp\Client;
+use Proxy\Server;
+use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Engagement\Login;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\InstanceRegistry\Credentials\Config;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Admin\Home\SamlCertHelper;
 use Schoolbox\Resource\Storage\Virus\IScanner;
+use Psr\Log\NullLogger;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
@@ -446,9 +451,39 @@ switch ($_POST['module']) {
                 $output['virus_light'] = 'warning';
         }
         break;
+    case 'cluster_info':
+        $client = new Client(['curl' => Server::getInstance()->buildCurlOptions()]);
+        $client = new \Schoolbox\InstanceRegistry\ApiClient($config, $kernel->get('httpClient.cache'));
+        $irApiKey = exec('/usr/local/bin/schoolbox-instance-registry --api-key');
+        $irUrl = exec('/usr/local/bin/schoolbox-instance-registry --url');
+
+        $endpoint = rtrim($irUrl, '/') . '/api/instance/cluster/';
+
+        // Send API Request to IR to fetch the region for the instance.
+        $response = $client->post($endpoint, [
+            'headers' => [
+                'Authorization' => "Bearer {$irApiKey}",
+                'Content-Type'  => 'application/json',
+            ],
+            'json' => [
+                'instance_id' => INSTANCE_ID,
+            ],
+        ]);
+
+        if ($response->getStatusCode() == 200) {
+            $output['cluster_info_status'] = json_decode($response->getBody()->getContents())->cluster_name;
+            $output['cluster_info_light'] = 'success';
+        } else {
+            $output['cluster_info_status'] = 'Unknown';
+            $output['cluster_info_light'] = 'warning';
+        }
+
+        break;
     default:
         break;
 }
+
+
 
 // to test how it looks with delay
 // sleep(2);
