@@ -65,6 +65,8 @@
             var $element = $(this);
             var $assessmentRow = $element.closest("[data-unit-assessment]");
             var $taskList = $assessmentRow.closest("[data-task-list]");
+            const $customisedAssessments = $element.closest("[data-customised-assessments]");
+            const customisationCount = $customisedAssessments.find("[data-unit-assessment]").length;
 
             $element.confirmDialog({
                 header: `Are you sure you wish to delete this ${window.sbProps.l10n.dictionary.activity.singular()}?`,
@@ -95,6 +97,18 @@
                                             component.find(settings.emptySelector).removeAttr("hidden");
                                             component.find(settings.contentSelector).attr("hidden", true);
                                         }
+                                    }
+
+                                    /**
+                                     * if the activity being removed is a customisation,
+                                     * and it's the last customisation within the parent activity
+                                     */
+                                    if ($customisedAssessments.length !== 0 && customisationCount === 1) {
+                                        // remove the expand/collapse as there's nothing left
+                                        $customisedAssessments
+                                            .parent()
+                                            .find("[data-interaction-has-customised]")
+                                            .remove();
                                     }
                                 },
                             });

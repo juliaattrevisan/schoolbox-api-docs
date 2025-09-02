@@ -1735,6 +1735,22 @@ class MapperProxy
         return $assessments->map(fn($assessment) => $this->participantDataSource->loadParticipationIntoAssessment($assessment));
     }
 
+    /**
+     * Load all customised assessments based on this assessment into it.
+     *
+     * @param IAssessable $assessable
+     * @return IAssessable
+     */
+    public function loadCustomisationsIntoAssessment(IAssessable $assessable): IAssessable
+    {
+        $customisedAssessments = $this->findAllCustomisedAssessment($assessable);
+        if (count($customisedAssessments) > 0) {
+            $assessable->setCustomisedAssessments(
+                new GenericCollection(IAssessable::class, $customisedAssessments->getAll())
+            );
+        }
+        return $assessable;
+    }
 
     /**
      * Helper function for converting a list of options into a predicate builder.

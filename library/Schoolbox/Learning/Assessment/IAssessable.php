@@ -874,6 +874,8 @@ interface IAssessable extends ISoftDeletable
      */
     public function getDynamicPlan(): ?Plan;
 
+    public function setCustomisedAssessments(GenericCollection $customisedAssessments): self;
+    public function getCustomisedAssessments(): GenericCollection;
 
     /**
      * Returns whether this assessment has a dynamic plan

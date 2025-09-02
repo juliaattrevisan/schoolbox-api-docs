@@ -66,7 +66,6 @@
         $(function () {
             $('#component{{ component_id }}').on('click', '[data-action="delete"]', function (event) {
                 event.preventDefault();
-
                 var assessmentList = $('#assessment-list-{{ component_id }}'),
                         assessmentId = $(this).data('id'),
                         assessmentListItem = $('#component-assessment-' + assessmentId),

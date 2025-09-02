@@ -4,7 +4,8 @@
 {% import '@learning/macro/viewRoute.twig' as viewRoute %}
 <ul class="action-list sortable-card ui-sortable task-list {% if expanded==false %}hide{% endif %}" data-task-list>
     {% for assessment in unit.assessables %}
-
+        {# student should only see their own assessment and not the nested assessments #}
+        {% if (assessment.originalAssessmentId is not null and not canWrite) or assessment.originalAssessmentId is null %}
         {# TODO hook these vars up to data once available #}
         {% set taskClass   = 'incomplete' %}
         {% set taskTooltip = 'Incomplete, click to mark completed' %}
@@ -103,7 +104,9 @@
                          #}
                         {% if canWrite %}
                             <p class="meta" data-test="course-outline-number-students-{{ assessment.title }}">
-                                {{ dueDate.forAssessment(assessment) }}&nbsp;{% if assessment is not lessonPlan %}|&nbsp;<span class="{{ urgency.marks(completionGradient ?? '') }}">{{ completionCount }}/{{ studentCount }} students completed</span>{% endif %}
+                                {{ dueDate.forAssessment(assessment) }}&nbsp;{% if assessment is not lessonPlan %}
+                                |&nbsp;<span class="{{ urgency.marks(completionGradient ?? '') }}">{{ completionCount }}/{{ studentCount }} students completed</span>{% endif %}
+                                {% if assessment.customisedAssessments is not empty %}&nbsp;|&nbsp;Includes customisation{% endif %}
                             </p>
                         {% else %}
                             <p class="meta">
@@ -113,92 +116,131 @@
                     </div>
                 </div>
 
-                {% if hasAssessmentRoutes or hasCourseRoutes or isParticipant %}
-                    <nav>
-                        {% if hasAssessmentRoutes or hasCourseRoutes %}
-                            <sbx-pop-out content-id="component{{ componentInstance.id }}-options-task{{ assessment.id }}"></sbx-pop-out>
-                        {% elseif isParticipant %}
-                            {% include '@learningAssessment/fragments/progressTick.twig' with {
-                                assessment: assessment,
-                                student: USER
-                            } only %}
-                        {% endif %}
+                {% include '@learningAssessment/outline/partial.twig' with {
+                    assessment: assessment,
+                    hasAssessmentRoutes: hasAssessmentRoutes,
+                    hasCourseRoutes: hasCourseRoutes,
+                    saveToCourseRoute: saveToCourseRoute,
+                    saveToCourseMethod: saveToCourseMethod,
+                    kamiWorksheetRoute: kamiWorksheetRoute,
+                    statusRoute: statusRoute,
+                    modifyRoute: modifyRoute,
+                    deleteRoute: deleteRoute,
+                    similarityReportRoute: similarityReportRoute,
+                    customisedAssessments: assessment.customisedAssessments
+                } %}
 
-                    </nav>
-                {% endif %}
-
-                {% if hasAssessmentRoutes or hasCourseRoutes %}
-                    <ul data-dropdown-content class="f-dropdown" id="component{{ componentInstance.id }}-options-task{{ assessment.id }}">
-                        {% if hasAssessmentRoutes %}
-                            <li class="separator">{{ locale.translate('activity', false, true) }}</li>
-                            {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
-                            {% if assessment is dueWork %}
-                                {% set viewGradeRoute = routeLookupIfAuthorized('learningDueWorkResponse.getFirstParticipantResponse', {
-                                    assessmentId: assessment.id,
-                                    assessment: assessment,
-                                }) %}
-                                {% if viewGradeRoute %}
-                                <li><a class="icon-task" href="{{ viewGradeRoute }}" >View and {{ locale.grades }} submissions</a></li>
-                                {% endif %}
-                            {% endif %}
-                            {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
-                                assessmentId: assessment.id,
-                                assessment: assessment
-                            }) %}
-                            {% if viewCustomParticipationRoute and assessment is not project and assessment is not lessonPlan %}
-                                <li><a class="icon-group" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
-                            {% endif %}
-                            {% if assessment is dueWork and assessment.enableWorksheet and kamiWorksheetRoute %}
-                                <li>
-                                    <a id="kamiWorksheet" class="icon-surveys" href="{{ kamiWorksheetRoute }}">Class View</a>
-                                </li>
-                            {% endif %}
-                            {% if similarityReportRoute %}<li><a href="{{ similarityReportRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-due-work" title="View Similarity Report">Similarity Report</a></li>{% endif %}
-                            {%  if assessment is dueWork and assessment.useRubric %}
-                                <li>
-                                    <a href="{{ routeLookup('learningAssessment.getOverview', { assessmentId: assessment.id }) }}"
-                                       class="icon-criteria">Rubric Report</a>
-                                </li>
-                            {% endif %}
-
-                            {# Learnosity Quiz has two parts: Modify Quiz and Modify Contents #}
-                            {% if modifyRoute %}
-                                {% if assessment is quiz %}
-                                    {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessment: assessment, assessmentId: assessment.id}) %}
-                                    <li><a class="icon-class-list" href="{{ routeLookup('learnosity.getHorizontalMarking', { assessmentId: assessment.id }) }}">Review horizontally</a></li>
-                                    <li><a class="icon-modify" href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="Modify this {{ locale.assessment }}">Modify Settings</a></li>
-                                    <li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="Modify this {{ locale.assessment }} contents">Modify Contents</a></li>
-                                {% else %}
-                                    <li><a class="icon-modify" href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="Modify this {{ locale.assessment }}">Modify</a></li>
-                                {% endif %}
-                            {% endif %}
-
-                            {% if deleteRoute %}<li><a href="{{ deleteRoute }}" class="icon-delete" data-action="delete" title="Delete this {{ locale.assessment }}">Delete</a></li>{% endif %}
-                        {% endif %}
-                        {% if hasCourseRoutes %}
-                            <li class="separator">Course</li>
-                            {% if saveToCourseRoute %}
-                                <li>
-                                    <a href="{{ saveToCourseRoute }}"
-                                       class="icon-export"
-                                       data-reveal-id="component{{ componentInstance.id }}-save-to-course-modal-{{ assessment.id }}"
-                                       data-method="{{ saveToCourseMethod }}"
-                                       data-spec-assessment-id="{{ specAssessment.id ?? null }}"
-                                       data-spec-assessment-title="{{ specAssessment.title ?? null }}"
-                                    >Save to Course...</a>
-                                    {% include '@learningAssessment/outline/saveToCourseModal.twig' with {
-                                        assessment: assessment,
-                                        specAssessment: specAssessment ?? null,
-                                        saveToCourseRoute: saveToCourseRoute,
-                                        saveToCourseMethod: saveToCourseMethod,
-                                        componentInstance: componentInstance,
-                                    } only %}
-                                </li>
-                            {% endif %}
-                        {% endif %}
-                    </ul>
-                {% endif %}
             </div>
+            {% if assessment.customisedAssessments is not empty %}
+            <!-- customised assessments are hidden by default, jquery relies on the style="display: none" to animate properly on first click -->
+            <ul class="information-list threaded hide" style="display: none" data-customised-assessments>
+                {% for customisedAssessment in assessment.customisedAssessments %}
+                    {% set customisedAssessmentCompletionCount    = 0 %}
+                    {% set customisedAssessmentStudentCount       = 0 %}
+
+                    {# TODO skip this if not displaying counts, eg to teacher #}
+                    {# count students which have completed this #}
+                    {% for customisedAssessmentParticipant in customisedAssessment.allParticipants|filter(customisedAssessmentParticipant => customisedAssessmentParticipant.isExcluded == false)  %}
+                        {% if not customisedAssessmentParticipant.responseRequired %}
+                            {% set customisedAssessmentCompletionCount = customisedAssessmentCompletionCount + 1 %}
+                        {% endif %}
+                        {% set customisedAssessmentStudentCount = customisedAssessmentStudentCount + 1 %}
+                    {% endfor %}
+
+                    {% if customisedAssessmentStudentCount %}
+                        {% set customisedAssessmentCompletionGradient = (customisedAssessmentCompletionCount / customisedAssessmentStudentCount) * 100 %}
+                    {% endif %}
+
+                    {% set specCustomisedAssessment = customisedAssessment.specificationAssessment ?? null %}
+
+                    {# What action-tot routes are available to this user? #}
+                    {% if readOnly %}
+                        {# If readonly mode: show no tot #}
+                        {% set hasAssessmentCustomisedRoutes = false %}
+                        {% set hasCourseCustomisedRoutes = false %}
+                    {% else %}
+                        {# If write mode: show tot only if there's at least one action #}
+                        {% set statusCustomisedRoute = routeLookupIfAuthorized('learningAssessment.getStatus', {assessmentId: customisedAssessment.id, assessment: customisedAssessment}) %}
+                        {% set modifyCustomisedRoute = routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: customisedAssessment.id, assessment: customisedAssessment}) %}
+                        {% set deleteCustomisedRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: customisedAssessment.id, assessment: customisedAssessment}) %}
+                        {% set similarityReportCustomisedRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: customisedAssessment.id, assessment: customisedAssessment}) %}
+                        {% set kamiWorksheetCustomisedRoute = routeLookupIfAuthorized('learningAssessment.getWorksheet', {assessmentId: customisedAssessment.id, assessment: customisedAssessment}) %}
+                        {% set hasAssessmentCustomisedRoutes = statusCustomisedRoute or modifyCustomisedRoute or deleteCustomisedRoute or similarityReportCustomisedRoute or kamiWorksheetCustomisedRoute %}
+
+                        {# Save to course: if spec assessment exists, this is a PUT: otherwise a POST #}
+                        {% if specCustomisedAssessment %}
+                            {% set saveToCourseCustomisedRoute = routeLookupIfAuthorized(
+                                'courseExport.putAssessmentIntoUnit',
+                                {
+                                    assessmentId: customisedAssessment.id,
+                                    assessment: customisedAssessment,
+                                    unitSpecId: unit.specification.id,
+                                    unitSpec: unit.specification,
+                                }
+                            ) %}
+                            {% set saveToCourseCustomisedMethod = 'PUT' %}
+                        {% else %}
+                            {% set saveToCourseCustomisedRoute = routeLookupIfAuthorized(
+                                'courseExport.postAssessmentIntoUnit',
+                                {
+                                    assessmentId: customisedAssessment.id,
+                                    assessment: customisedAssessment,
+                                    unitSpecId: unit.specification.id,
+                                    unitSpec: unit.specification,
+                                }
+                            ) %}
+                            {% set saveToCourseCustomisedMethod = 'POST' %}
+                        {% endif %}
+                        {% set hasCourseCustomisedRoutes = saveToCourseCustomisedRoute is not empty %}
+                    {% endif %}
+
+                    <li class="child"  {% if filterList and customisedAssessment.getFamilyName not in filterList %}data-sortable-hidden="true"{% endif %} data-unit-assessment="{{ customisedAssessment.id }}">
+                    <div class="actions-small-1 l-pad-l--left">
+                        <div class="list-item">
+                            <div class="small-12 compact card wrap-down">
+                                {% set customTitle = attribute(locale, customisedAssessment.typeName|lower) is defined ? attribute(locale, customisedAssessment.typeName|lower).proper : customisedAssessment.typeName %}
+                                {% set customRoute = viewRoute.viewRoute(customisedAssessment, USER) %}
+                                {% if customRoute %}
+                                    <a title="{{ customTitle }}" href="{{ customRoute }}">
+                                        <span class="{{ icon.renderClass(customisedAssessment) }}"></span>
+                                        <p>{{ customisedAssessment.title }}</p>
+                                    </a>
+                                {% else %}
+                                    <div title="{{ customTitle }}">
+                                        <span class="{{ icon.renderClass(customisedAssessment) }}"></span>
+                                        <p>{{ customisedAssessment.title }}</p>
+                                    </div>
+                                {% endif %}
+                                {% if canWrite %}
+                                    <p class="meta">
+                                        {{ dueDate.forAssessment(customisedAssessment) }}&nbsp;{% if customisedAssessment is not lessonPlan %}|&nbsp;<span class="{{ urgency.marks(customisedAssessmentCompletionGradient ?? '') }}">{{ customisedAssessmentCompletionCount }}/{{ customisedAssessmentStudentCount }} students completed</span>{% endif %}
+                                    </p>
+                                {% else %}
+                                    <p class="meta">
+                                        <span class="unit-task-due-date">{{ dueDate.dueDate(customisedAssessment, USER) }}</span>
+                                    </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% include '@learningAssessment/outline/partial.twig' with {
+                            assessment: customisedAssessment,
+                            hasAssessmentRoutes: hasAssessmentCustomisedRoutes,
+                            hasCourseRoutes: hasCourseCustomisedRoutes,
+                            saveToCourseRoute: saveToCourseCustomisedRoute,
+                            saveToCourseMethod: saveToCourseCustomisedMethod,
+                            kamiWorksheetCustomisedRoute: kamiWorksheetCustomisedRoute,
+                            statusRoute: statusCustomisedRoute,
+                            modifyRoute: modifyCustomisedRoute,
+                            deleteRoute: deleteCustomisedRoute,
+                            similarityReportRoute: similarityReportCustomisedRoute,
+                            customisedAssessments: [],
+                        } %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
         </li>
+        {% endif %}
     {% endfor %}
 </ul>

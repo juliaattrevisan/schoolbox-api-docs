@@ -221,6 +221,33 @@ const viewStatusText = window.Vue.computed(() => {
 });
 
 /**
+ * Check if any menu items below the divider will be visible
+ */
+const hasVisibleMenuItems = window.Vue.computed(() => {
+    if (cellInfo.value === null) {
+        return false;
+    }
+
+    const { participant, activity } = cellInfo.value;
+
+    // Check if any of the conditional menu items will be shown
+    const hasParticipantMenuItems =
+        participant &&
+        !participant.isExcluded &&
+        (activity.assessmentType === ACTIVITY_TYPE_DUE_WORK || activity.assessmentType === ACTIVITY_TYPE_QUIZ);
+
+    const hasIncludeMenuItem =
+        participant && participant.isExcluded && routes.value.getAssessmentParticipationForm === null;
+
+    const hasExcludeMenuItem =
+        participant && !participant.isExcluded && activity.assessmentType !== ACTIVITY_TYPE_PROJECT;
+
+    const hasHistoryMenuItem = participant && !participant.isExcluded;
+
+    return hasParticipantMenuItems || hasIncludeMenuItem || hasExcludeMenuItem || hasHistoryMenuItem;
+});
+
+/**
  * To update the extraInfo and marks for a given activity
  * @param infoRoute - The route to fetch the extra info from
  * @param participant - The participant to update the extra info for
@@ -577,7 +604,7 @@ function onToggleSelected(): void {
                         <span v-html="viewAllText"></span>
                     </pop-out-menu-item>
                 </template>
-                <pop-out-menu-divider />
+                <pop-out-menu-divider v-if="hasVisibleMenuItems" />
                 <template v-if="cellInfo.participant && !cellInfo.participant.isExcluded">
                     <template v-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK">
                         <pop-out-menu-item
@@ -677,7 +704,6 @@ function onToggleSelected(): void {
     border-radius: 0.25rem;
     box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.2);
     min-width: 16rem;
-    min-height: 8rem;
     padding: 0.5rem 0;
     position: absolute;
     z-index: var(--sbx-depth-pop-over);

@@ -1,0 +1,88 @@
+{% if hasAssessmentRoutes or hasCourseRoutes or isParticipant %}
+    <nav>
+        {% if customisedAssessments is not empty %}
+        <a class="expand-link icon-down-arrow" data-interaction-has-customised></a>
+        {% endif %}
+        {% if hasAssessmentRoutes or hasCourseRoutes %}
+            <sbx-pop-out content-id="component{{ componentInstance.id }}-options-task{{ assessment.id }}"></sbx-pop-out>
+        {% elseif isParticipant %}
+            {% include '@learningAssessment/fragments/progressTick.twig' with {
+                assessment: assessment,
+                student: USER
+            } only %}
+        {% endif %}
+
+    </nav>
+{% endif %}
+
+{% if hasAssessmentRoutes or hasCourseRoutes %}
+    <ul data-dropdown-content class="f-dropdown" id="component{{ componentInstance.id }}-options-task{{ assessment.id }}">
+        {% if hasAssessmentRoutes %}
+            <li class="separator">{{ locale.translate('activity', false, true) }}</li>
+            {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
+            {% if assessment is dueWork %}
+                {% set viewGradeRoute = routeLookupIfAuthorized('learningDueWorkResponse.getFirstParticipantResponse', {
+                    assessmentId: assessment.id,
+                    assessment: assessment,
+                }) %}
+                {% if viewGradeRoute %}
+                    <li><a class="icon-task" href="{{ viewGradeRoute }}" >View and {{ locale.grades }} submissions</a></li>
+                {% endif %}
+            {% endif %}
+            {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
+                assessmentId: assessment.id,
+                assessment: assessment
+            }) %}
+            {% if viewCustomParticipationRoute and assessment is not project and assessment is not lessonPlan %}
+                <li><a class="icon-group" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
+            {% endif %}
+            {% if assessment is dueWork and assessment.enableWorksheet and kamiWorksheetRoute %}
+                <li>
+                    <a id="kamiWorksheet" class="icon-surveys" href="{{ kamiWorksheetRoute }}">Class View</a>
+                </li>
+            {% endif %}
+            {% if similarityReportRoute %}<li><a href="{{ similarityReportRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-due-work" title="View Similarity Report">Similarity Report</a></li>{% endif %}
+            {%  if assessment is dueWork and assessment.useRubric %}
+                <li>
+                    <a href="{{ routeLookup('learningAssessment.getOverview', { assessmentId: assessment.id }) }}"
+                       class="icon-criteria">Rubric Report</a>
+                </li>
+            {% endif %}
+
+            {# Learnosity Quiz has two parts: Modify Quiz and Modify Contents #}
+            {% if modifyRoute %}
+                {% if assessment is quiz %}
+                    {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessment: assessment, assessmentId: assessment.id}) %}
+                    <li><a class="icon-class-list" href="{{ routeLookup('learnosity.getHorizontalMarking', { assessmentId: assessment.id }) }}">Review horizontally</a></li>
+                    <li><a class="icon-modify" href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="Modify this {{ locale.assessment }}">Modify Settings</a></li>
+                    <li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="Modify this {{ locale.assessment }} contents">Modify Contents</a></li>
+                {% else %}
+                    <li><a class="icon-modify" href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="Modify this {{ locale.assessment }}">Modify</a></li>
+                {% endif %}
+            {% endif %}
+
+            {% if deleteRoute %}<li><a href="{{ deleteRoute }}" class="icon-delete" data-action="delete" title="Delete this {{ locale.assessment }}">Delete</a></li>{% endif %}
+        {% endif %}
+        {% if hasCourseRoutes %}
+            <li class="separator">Course</li>
+            {% if saveToCourseRoute %}
+                <li>
+                    <a href="{{ saveToCourseRoute }}"
+                       class="icon-export"
+                       data-reveal-id="component{{ componentInstance.id }}-save-to-course-modal-{{ assessment.id }}"
+                       data-method="{{ saveToCourseMethod }}"
+                       data-spec-assessment-id="{{ specAssessment.id ?? null }}"
+                       data-spec-assessment-title="{{ specAssessment.title ?? null }}"
+                    >Save to Course...</a>
+                    {% include '@learningAssessment/outline/saveToCourseModal.twig' with {
+                        assessment: assessment,
+                        specAssessment: specAssessment ?? null,
+                        saveToCourseRoute: saveToCourseRoute,
+                        saveToCourseMethod: saveToCourseMethod,
+                        componentInstance: componentInstance,
+                    } only %}
+                </li>
+            {% endif %}
+        {% endif %}
+    </ul>
+{% endif %}
