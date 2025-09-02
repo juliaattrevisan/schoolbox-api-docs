@@ -111,6 +111,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param null|string $learnosityConsumerSecret
      * @param MimetypeMapper|null $mimetypeMapper
      * @param RubricDataSource $rubricDataSource
+     * @param EditorTemplateHelper|null $EditorTemplateHelper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -142,7 +143,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         #[\SensitiveParameter] ?string $learnosityConsumerSecret = null,
         protected ?MimetypeMapper $mimetypeMapper = null,
         protected ?RubricDataSource $rubricDataSource = null,
-        private EditorTemplateHelper $editorTemplateHelper,
+        private ?EditorTemplateHelper $editorTemplateHelper = null,
     ) {
         parent::__construct(
             $userMapper,
