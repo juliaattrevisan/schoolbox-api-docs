@@ -25,6 +25,8 @@ enum MediaType {
 
 // TODO: add limit (10)
 
+const textareaEl = window.Vue.useTemplateRef<HTMLElement>("textareaRef");
+
 const selectedEvidenceId = window.Vue.ref<number>(0);
 const selectedEvidence = window.Vue.computed(() => {
     return mfStore.moment?.evidence[selectedEvidenceId.value] || null;
@@ -101,8 +103,9 @@ window.Vue.watch(hasRecordedData, async () => {
 /**
  * Change the selected media type
  * @param type The new media type
+ * @param scrollIntoView whether to scroll the element into view (only works for TEXT at the moment)
  */
-async function changeMediaType(type: MediaType): Promise<void> {
+async function changeMediaType(type: MediaType, scrollIntoView: boolean = false): Promise<void> {
     if (!mfStore.moment) return;
 
     // If the current media type is a recording type, and there's recorded data, upload it first
@@ -115,6 +118,12 @@ async function changeMediaType(type: MediaType): Promise<void> {
     }
 
     mediaType.value = type;
+
+    // If switching to text, then scroll the text editor into view (as it's possibly quite far down the page if theres evidence)
+    if (scrollIntoView && type === MediaType.TEXT && mfStore.moment.evidence.length > 0) {
+        await window.Vue.nextTick(); // wait for the DOM to update
+        textareaEl.value?.scrollIntoView({ behavior: "smooth" });
+    }
 }
 
 /**
@@ -289,7 +298,7 @@ window.Vue.watch(
             v-if="!(showDescriptionEditor || MediaType.TEXT === mediaType)"
             class="icon-textbox share-text"
             title="Write something"
-            @click.prevent="changeMediaType(MediaType.TEXT)"
+            @click.prevent="changeMediaType(MediaType.TEXT, true)"
         >
             Write something
         </a>
@@ -384,7 +393,7 @@ window.Vue.watch(
         </div>
     </div>
 
-    <div v-if="mfStore.moment && showDescriptionEditor">
+    <div v-if="mfStore.moment && showDescriptionEditor" ref="textareaRef">
         <!-- The description is required as long as there isn't other evidence -->
         <label for="mf-evidence-textarea" :class="{ required: isEvidenceRequired }"> Write something </label>
         <p class="meta">
