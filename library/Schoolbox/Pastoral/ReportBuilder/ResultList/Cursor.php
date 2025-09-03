@@ -269,13 +269,15 @@ class Cursor implements ICursor
 
         $pastoralIds = $statement->fetchAll(\PDO::FETCH_COLUMN);
 
-        $records = $this->pastoralMapper
-            ->findByColumn(
-                'id',
-                $pastoralIds,
-                ['order' => $order]
-            )
-            ->reindex();
+        $records = $this->helper->filterRecordsForUser(
+            $this->pastoralMapper
+                ->findByColumn(
+                    'id',
+                    $pastoralIds,
+                    ['order' => $order]
+                )
+                ->reindex()
+        );
 
         return $records;
     }

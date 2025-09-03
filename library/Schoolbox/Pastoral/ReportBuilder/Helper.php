@@ -6,6 +6,7 @@ use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
+use Schoolbox\Pastoral\AccessLevelCensor;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\IConfigLoader;
@@ -19,14 +20,18 @@ class Helper
     private array $params = [];
 
     /**
-     * @param array          $report
-     * @param PastoralMapper $pastoralMapper
-     * @param IConfigLoader  $configLoader
+     * @param array             $report
+     * @param PastoralMapper    $pastoralMapper
+     * @param IConfigLoader     $configLoader
+     * @param User              $user
+     * @param AccessLevelCensor $accessLevelCensor
      */
     public function __construct(
         private array $report,
         private PastoralMapper $pastoralMapper,
         private IConfigLoader $configLoader,
+        private User $user,
+        private AccessLevelCensor $accessLevelCensor,
     ) {
         $this->setFilters();
     }
@@ -758,5 +763,16 @@ class Helper
             'conditions' => $conditions,
             'params' => $params
         ] : [];
+    }
+
+    /**
+     * Help filtering the records according to the user's access
+     *
+     * @param Collection $records
+     * @return Collection
+     */
+    public function filterRecordsForUser(Collection $records): Collection
+    {
+        return $this->accessLevelCensor->filterRecordsForUser($records, $this->user);
     }
 }
