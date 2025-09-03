@@ -562,8 +562,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $data['attachzoneWorksheet'] = $zone->getTwigContext();
 
             /* Retrieves the grid with assessment id reset to empty so it can be applied to the new assessment
+             * and only apply it when the rubric is being used in the original assessment
              */
-            if ($assessment instanceof DueWork\Model) {
+            if ($assessment instanceof DueWork\Model && $assessment->getUseRubric()) {
                 $data['rubricGrid'] = $this->rubricDataSource->retrieveGrid($assessment, true, true);
             }
         }
