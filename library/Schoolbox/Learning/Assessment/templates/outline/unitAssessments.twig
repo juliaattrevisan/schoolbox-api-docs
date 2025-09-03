@@ -119,19 +119,20 @@
                 {% include '@learningAssessment/outline/partial.twig' with {
                     assessment: assessment,
                     hasAssessmentRoutes: hasAssessmentRoutes,
-                    hasCourseRoutes: hasCourseRoutes,
-                    saveToCourseRoute: saveToCourseRoute,
-                    saveToCourseMethod: saveToCourseMethod,
-                    kamiWorksheetRoute: kamiWorksheetRoute,
-                    statusRoute: statusRoute,
-                    modifyRoute: modifyRoute,
-                    deleteRoute: deleteRoute,
-                    similarityReportRoute: similarityReportRoute,
-                    customisedAssessments: assessment.customisedAssessments
+                    hasCourseRoutes: hasCourseRoutes ?? false,
+                    saveToCourseRoute: saveToCourseRoute ?? false,
+                    saveToCourseMethod: saveToCourseMethod ?? false,
+                    kamiWorksheetRoute: kamiWorksheetRoute ?? false,
+                    statusRoute: statusRoute ?? false,
+                    modifyRoute: modifyRoute ?? false,
+                    deleteRoute: deleteRoute ?? false,
+                    similarityReportRoute: similarityReportRoute ?? false,
+                    customisedAssessments: assessment.customisedAssessments ?? [],
+                    canWrite: canWrite,
                 } %}
 
             </div>
-            {% if assessment.customisedAssessments is not empty %}
+            {% if assessment.customisedAssessments is not empty and canWrite %}
             <!-- customised assessments are hidden by default, jquery relies on the style="display: none" to animate properly on first click -->
             <ul class="information-list threaded hide" style="display: none" data-customised-assessments>
                 {% for customisedAssessment in assessment.customisedAssessments %}
@@ -224,16 +225,17 @@
                         </div>
                         {% include '@learningAssessment/outline/partial.twig' with {
                             assessment: customisedAssessment,
-                            hasAssessmentRoutes: hasAssessmentCustomisedRoutes,
-                            hasCourseRoutes: hasCourseCustomisedRoutes,
-                            saveToCourseRoute: saveToCourseCustomisedRoute,
-                            saveToCourseMethod: saveToCourseCustomisedMethod,
-                            kamiWorksheetCustomisedRoute: kamiWorksheetCustomisedRoute,
-                            statusRoute: statusCustomisedRoute,
-                            modifyRoute: modifyCustomisedRoute,
-                            deleteRoute: deleteCustomisedRoute,
-                            similarityReportRoute: similarityReportCustomisedRoute,
+                            hasAssessmentRoutes: hasAssessmentCustomisedRoutes ?? false,
+                            hasCourseRoutes: hasCourseCustomisedRoutes ?? false,
+                            saveToCourseRoute: saveToCourseCustomisedRoute ?? false,
+                            saveToCourseMethod: saveToCourseCustomisedMethod ?? false,
+                            kamiWorksheetCustomisedRoute: kamiWorksheetCustomisedRoute ?? false,
+                            statusRoute: statusCustomisedRoute ?? false,
+                            modifyRoute: modifyCustomisedRoute ?? false,
+                            deleteRoute: deleteCustomisedRoute ?? false,
+                            similarityReportRoute: similarityReportCustomisedRoute ?? false,
                             customisedAssessments: [],
+                            canWrite: canWrite,
                         } %}
                     </div>
                 </li>
