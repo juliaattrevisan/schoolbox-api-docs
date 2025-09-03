@@ -51,8 +51,6 @@ type ActivityItem = {
 const popOutElement = window.Vue.ref<HTMLDivElement | null>(null);
 const referenceElement = window.Vue.ref<HTMLDivElement | null>(null);
 
-const isLoading = window.Vue.ref(false);
-const hasLoadError = window.Vue.ref(false);
 const isExpanded = window.Vue.ref(false); // is recent activity expanded
 const activityItems: Ref<ActivityItem[]> = window.Vue.ref([]); // list of recent activity items to display
 // has an event of type 'response' and response.submitted === true;
@@ -285,8 +283,8 @@ async function getActivity(): Promise<void> {
     const timelineRoute = routes.value.timelineEndpoint;
     const infoRoute = routes.value.infoEndpoint;
 
-    hasLoadError.value = false;
-    isLoading.value = true;
+    mbStore.popoutLoadError = false;
+    mbStore.isPopoutLoading = true;
 
     try {
         if (timelineRoute === null || infoRoute === null) {
@@ -318,9 +316,9 @@ async function getActivity(): Promise<void> {
         }
     } catch (error) {
         console.error("Error fetching activity items:", error);
-        hasLoadError.value = true;
+        mbStore.popoutLoadError = true;
     } finally {
-        isLoading.value = false;
+        mbStore.isPopoutLoading = false;
     }
 }
 
@@ -366,7 +364,7 @@ function toggleExclusion(participant: MarkbookClassImplActivityParticipant): voi
 async function onMenuItemSelected(target: string | null, action: string | null = null): Promise<void> {
     // No target was specified, the user likely doesn't have access to the route
     if (target === null) {
-        hasLoadError.value = true;
+        mbStore.popoutLoadError = true;
         console.warn("No target specified for menu item selection");
         return;
     }
@@ -386,7 +384,7 @@ async function onMenuItemSelected(target: string | null, action: string | null =
 
     // Not as basic redirect, js fetch things...
     try {
-        isLoading.value = true;
+        mbStore.isPopoutLoading = true;
         const response = await fetch(target, {
             method: "POST",
             headers: {
@@ -395,7 +393,7 @@ async function onMenuItemSelected(target: string | null, action: string | null =
             },
         });
         if (response.ok) {
-            hasLoadError.value = false;
+            mbStore.popoutLoadError = false;
 
             // if action is exclude then toggle the exclusion UI
             if (action === "exclude" && participant !== null) {
@@ -411,13 +409,13 @@ async function onMenuItemSelected(target: string | null, action: string | null =
             // close once changed (this is also to avoid a bug where the pop out doesn't close onClickOutside any more)
             close();
         } else {
-            hasLoadError.value = true;
+            mbStore.popoutLoadError = true;
         }
     } catch (error) {
-        hasLoadError.value = true;
+        mbStore.popoutLoadError = true;
         console.error(error);
     } finally {
-        isLoading.value = false;
+        mbStore.isPopoutLoading = false;
 
         // trigger a markbook reload for actions that can't just apply reactively
         if (action !== "exclude") {
@@ -437,20 +435,11 @@ function onUpdateFeedbackSelected(): void {
     // Close the popout
     close();
 
-    // If this is already selected, then close it instead I guess
-    // TODO: Maybe when a cell is selected, any other popout click just immediately opens that relevant feedback... hmm
-    const newCell = {
+    mbStore.setFeedbackSelectedCell({
         classImplId: cellInfo.value.classImplId,
         activityId: cellInfo.value.activityId,
         studentId: cellInfo.value.studentId,
-    };
-
-    if (JSON.stringify(newCell) === JSON.stringify(mbStore.feedbackSelectedCell)) {
-        mbStore.feedbackSelectedCell = null;
-        return;
-    }
-
-    mbStore.feedbackSelectedCell = newCell;
+    });
 }
 
 /**
@@ -502,12 +491,13 @@ window.Vue.watch(
         if (newValue === null) {
             // The popout was closed by something else
             referenceElement.value = null;
+            close();
             return;
         }
 
         // To avoid accidentally opening the popout for the wrong cell, or closing the popout unexpectedly
         // if a user clicks on another cell while one is saving or loading already
-        await until(isLoading).toBe(false);
+        await until(() => mbStore.isPopoutLoading).toBe(false);
 
         // A linked button has been selected so populate the pop out
         selectedCell.value = newValue;
@@ -519,8 +509,8 @@ window.Vue.watch(
         isExpanded.value = false;
 
         if ([ACTIVITY_TYPE_TASK, ACTIVITY_TYPE_PROJECT].includes(cellInfo.value.activity.assessmentType)) {
-            hasLoadError.value = false;
-            isLoading.value = false;
+            mbStore.popoutLoadError = false;
+            mbStore.isPopoutLoading = false;
             activityItems.value = [];
             return;
         }
@@ -568,7 +558,7 @@ function onToggleSelected(): void {
 
 <template>
     <div ref="popOutElement" class="pop-out" style="display: none">
-        <div v-if="hasLoadError">
+        <div v-if="mbStore.popoutLoadError">
             <pop-out-menu-item class="is-disabled">
                 <div class="warning-message">
                     There was an error during data retrieval. Please
@@ -577,7 +567,7 @@ function onToggleSelected(): void {
                 </div>
             </pop-out-menu-item>
         </div>
-        <div v-else-if="isLoading || cellInfo === null" class="pop-out-menu__loader">
+        <div v-else-if="mbStore.isPopoutLoading || cellInfo === null" class="pop-out-menu__loader">
             <div class="loader"></div>
         </div>
         <div v-else ref="markbookElement" class="pop-out-menu" :class="{ 'is-expanded': isExpanded }">

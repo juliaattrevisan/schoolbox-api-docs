@@ -265,7 +265,7 @@ async function onFeedbackPublish(): Promise<void> {
 
     const result = await cellInfo.value.feedback.publishFeedback();
     if (result) {
-        mbStore.feedbackSelectedCell = null;
+        mbStore.setFeedbackSelectedCell(null);
     }
 }
 </script>
@@ -286,6 +286,9 @@ async function onFeedbackPublish(): Promise<void> {
             <form
                 ref="feedbackRef"
                 class="fixed-feedback-cell row"
+                :class="{
+                    'fixed-feedback-cell--loading': mbStore.isFeedbackUILoading,
+                }"
                 :style="{
                     left: `${feedbackCellOffsets.left}px`,
                     top: `${feedbackCellOffsets.top}px`,
@@ -343,7 +346,11 @@ async function onFeedbackPublish(): Promise<void> {
                             </div>
 
                             <div>
-                                <button class="button" type="button" @click="mbStore.feedbackSelectedCell = null">
+                                <button
+                                    class="button mb-feedback-close"
+                                    type="button"
+                                    @click="mbStore.setFeedbackSelectedCell(null)"
+                                >
                                     Close
                                 </button>
                                 <button
@@ -387,13 +394,22 @@ async function onFeedbackPublish(): Promise<void> {
     </tr>
 </template>
 
-<style scoped>
+<style scoped lang="scss">
 .fixed-feedback-cell {
     margin: 0;
     position: fixed;
     text-wrap: wrap;
     width: 100%;
     z-index: 1;
+
+    &--loading {
+        opacity: 0.5;
+        pointer-events: none;
+
+        .mb-feedback-close {
+            pointer-events: all; // in case the user wants to abandon it still (or it gets stuck from an error or something...)
+        }
+    }
 }
 
 /* need to move the padding into the inner div so that the component actions are flush */

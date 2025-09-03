@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import sanitizeHtml from "sanitize-html";
+import { until } from "@vueuse/core";
 import { keysOf } from "@js/util/arrayUtils";
 import { getGradient } from "@js/util/cssUtils";
 import ProgressTick from "@schoolboxLibrary/Learning/Assessment/templates/fragments/vue/progress-tick.vue";
@@ -136,10 +137,37 @@ function formatMark(mark: NonNullable<typeof participant.value>["marks"]["publis
 
 const cellEl = window.Vue.useTemplateRef<HTMLTableCellElement>("cellRef");
 
+const DOUBLE_CLICK_INTERVAL = 500; // ms
+const lastClick = window.Vue.ref<number>(0);
+
 /**
  * When the user clicks the cell, open the pop-out menu if available, otherwise do nothing
  */
-function onClickCell(): void {
+async function onClickCell(): Promise<void> {
+    const canAccessUpdateFeedback = participant.value && !participant.value.isExcluded;
+    if (Date.now() - lastClick.value < DOUBLE_CLICK_INTERVAL && canAccessUpdateFeedback) {
+        /**
+         * The popout is responsible for loading some extra feedback data,
+         * as we are skipping the popout buttons, we need to make sure that extra data
+         * has finished loading for the current feedback UI to be shown correctly
+         */
+        mbStore.isFeedbackUILoading = true;
+        await until(() => mbStore.isPopoutLoading).toBe(false);
+        mbStore.isFeedbackUILoading = false;
+
+        if (mbStore.popoutLoadError) {
+            return; // something went wrong, abort
+        }
+
+        mbStore.popoutSelectedCell = null;
+        mbStore.setFeedbackSelectedCell({
+            classImplId: props.classImplId,
+            studentId: props.studentId,
+            activityId: props.assessmentId,
+        });
+        return;
+    }
+
     if (hasPopOutMenu.value && cellEl.value) {
         mbStore.popoutSelectedCell = {
             classImplId: props.classImplId,
@@ -148,6 +176,8 @@ function onClickCell(): void {
             referenceElement: cellEl.value,
         };
     }
+
+    lastClick.value = Date.now();
 }
 
 const isSelectedPopout = window.Vue.computed(

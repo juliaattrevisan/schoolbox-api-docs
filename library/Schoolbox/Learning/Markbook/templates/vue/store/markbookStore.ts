@@ -17,6 +17,9 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
     const showDrafts = window.Vue.ref(false);
     const showAverages = window.Vue.ref(false);
 
+    const isPopoutLoading = window.Vue.ref(false);
+    const popoutLoadError = window.Vue.ref(false);
+    const isFeedbackUILoading = window.Vue.ref(false);
     const popoutSelectedCell = window.Vue.ref<MarkbookPopoutSelectedCellInfo | null>(null);
     const feedbackSelectedCell = window.Vue.ref<MarkbookFeedbackSelectedCellInfo | null>(null);
 
@@ -171,6 +174,19 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         );
     }
 
+    /**
+     * Set the selected feedback cell
+     * If it's already set to this value, clear it
+     * @param cellInfo - The cell info to set
+     */
+    function setFeedbackSelectedCell(cellInfo: MarkbookFeedbackSelectedCellInfo | null): void {
+        if (cellInfo === null || JSON.stringify(feedbackSelectedCell.value) === JSON.stringify(cellInfo)) {
+            feedbackSelectedCell.value = null;
+        } else {
+            feedbackSelectedCell.value = cellInfo;
+        }
+    }
+
     return {
         init,
         data,
@@ -182,10 +198,14 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         orderedActivities,
         orderedClassImplActivities,
         orderedClassImplStudents,
+        isPopoutLoading,
+        popoutLoadError,
+        isFeedbackUILoading,
         popoutSelectedCell,
         feedbackSelectedCell,
         editorTemplates,
         aImplHasDraftMarks,
         hasDraftMarks,
+        setFeedbackSelectedCell,
     };
 });
