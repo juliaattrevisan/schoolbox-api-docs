@@ -49,34 +49,6 @@ use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
  */
 class Controller extends Assessment\Controller
 {
-    /**
-     * Controller constructor.
-     *
-     * @param UserMapper $userMapper
-     * @param ErrorMapper $errorMapper
-     * @param DataModel\MapperProxy $assessmentMapper
-     * @param WorkTypeMapper $workTypeMapper
-     * @param Access $access
-     * @param Transactor $transactor
-     * @param BreadcrumbFactory $bakery
-     * @param Term\Mapper $termMapper
-     * @param Participant\DataSource $participantDataSource
-     * @param CourseSpecificationMapper $courseSpecificationMapper
-     * @param UnitSpecificationMapper $unitSpecificationMapper
-     * @param RosettaStone $rosettaStone
-     * @param Replicator $replicator
-     * @param LatestViewMapper $latestViewMapper
-     * @param Project\ResultCache\Mapper $projectResultCacheMapper
-     * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
-     * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
-     * @param Filter\Filters\Assessment\IdFinder|null $filtersAssessmentIdFinder
-     * @param Filter\CompositeFactoryFactory|null $filtersFactoryFactory
-     * @param Filter\Mapper|null $filterMapper
-     * @param Filter\Selection\Mapper|null $filterSelectionMapper
-     * @param CourseImplementationMapper|null $courseImplementationMapper
-     * @param UnitImplementationMapper|null $unitImplementationMapper
-     * @param EditorTemplateHelper|null $editorTemplateHelper
-     */
     public function __construct(
         UserMapper $userMapper,
         ErrorMapper $errorMapper,
