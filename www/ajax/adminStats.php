@@ -463,6 +463,16 @@ switch ($_POST['module']) {
             $client = new Client(['curl' => Server::getInstance()->buildCurlOptions()]);
             $irApiKey = exec('/usr/local/bin/schoolbox-instance-registry --api-key 2>/dev/null');
             $irUrl = exec('/usr/local/bin/schoolbox-instance-registry --url 2>/dev/null');
+            // Sanitize and validate API key
+            $irApiKey = trim($irApiKey);
+            if (!preg_match('/^[A-Za-z0-9\-_.]+$/', $irApiKey)) {
+                throw new \RuntimeException('Invalid API key format');
+            }
+            // Sanitize and validate URL
+            $irUrl = trim($irUrl);
+            if (!filter_var($irUrl, FILTER_VALIDATE_URL)) {
+                throw new \RuntimeException('Invalid URL format');
+            }
 
             $endpoint = rtrim($irUrl, '/') . '/api/instance/cluster/';
 
@@ -478,20 +488,22 @@ switch ($_POST['module']) {
                 ]);
 
                 if ($response->getStatusCode() == 200) {
-                    $clusterName = json_decode($response->getBody()->getContents())->cluster_name;
-                    $output['cluster_info_status'] = $clusterName;
-                    $output['cluster_info_light'] = 'success';
-
-                    // Cache the successful result
-                    $cacheData = [
-                        'cluster_name' => $clusterName,
-                        'light' => 'success'
-                    ];
-                    file_put_contents($cacheFile, json_encode($cacheData), LOCK_EX);
-                } else {
-                    $output['cluster_info_status'] = 'Unknown';
-                    $output['cluster_info_light'] = 'warning';
-                    // Don't cache error responses
+                    $json = json_decode($response->getBody()->getContents());
+                    if ($json !== null && json_last_error() === JSON_ERROR_NONE && isset($json->cluster_name)) {
+                        $clusterName = $json->cluster_name;
+                        $output['cluster_info_status'] = $clusterName;
+                        $output['cluster_info_light'] = 'success';
+                        // Cache the successful result
+                        $cacheData = [
+                            'cluster_name' => $clusterName,
+                            'light' => 'success'
+                        ];
+                        file_put_contents($cacheFile, json_encode($cacheData), LOCK_EX);
+                    } else {
+                        $output['cluster_info_status'] = 'Unknown';
+                        $output['cluster_info_light'] = 'warning';
+                        // Don't cache error responses
+                    }
                 }
             } catch (Exception $e) {
                 $output['cluster_info_status'] = 'Unknown';
