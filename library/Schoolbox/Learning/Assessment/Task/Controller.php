@@ -193,7 +193,7 @@ class Controller extends Assessment\Controller
             'assessment'  => $assessment,
             'aImpls'      => $aImpls,
             'writable'    => Access::getInstance()->isInstructor($this->getUser(), $assessment->getContext()->getFolder()),
-            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
+            'editorTemplates' => $this->editorTemplateHelper !== null ? $this->editorTemplateHelper->getTemplatesForCategory() : [],
         ];
 
         $this->response = $this->responseFromTemplate(
