@@ -51,7 +51,6 @@ type ActivityItem = {
 const popOutElement = window.Vue.ref<HTMLDivElement | null>(null);
 const referenceElement = window.Vue.ref<HTMLDivElement | null>(null);
 
-const isLoading = window.Vue.ref(false);
 const hasLoadError = window.Vue.ref(false);
 const isExpanded = window.Vue.ref(false); // is recent activity expanded
 const activityItems: Ref<ActivityItem[]> = window.Vue.ref([]); // list of recent activity items to display
@@ -259,7 +258,7 @@ async function getActivity(): Promise<void> {
     const infoRoute = routes.value.infoEndpoint;
 
     hasLoadError.value = false;
-    isLoading.value = true;
+    mbStore.isPopoutLoading = true;
 
     try {
         if (timelineRoute === null || infoRoute === null) {
@@ -293,7 +292,7 @@ async function getActivity(): Promise<void> {
         console.error("Error fetching activity items:", error);
         hasLoadError.value = true;
     } finally {
-        isLoading.value = false;
+        mbStore.isPopoutLoading = false;
     }
 }
 
@@ -359,7 +358,7 @@ async function onMenuItemSelected(target: string | null, action: string | null =
 
     // Not as basic redirect, js fetch things...
     try {
-        isLoading.value = true;
+        mbStore.isPopoutLoading = true;
         const response = await fetch(target, {
             method: "POST",
             headers: {
@@ -390,7 +389,7 @@ async function onMenuItemSelected(target: string | null, action: string | null =
         hasLoadError.value = true;
         console.error(error);
     } finally {
-        isLoading.value = false;
+        mbStore.isPopoutLoading = false;
 
         // trigger a markbook reload for actions that can't just apply reactively
         if (action !== "exclude") {
@@ -472,7 +471,7 @@ window.Vue.watch(
 
         // To avoid accidentally opening the popout for the wrong cell, or closing the popout unexpectedly
         // if a user clicks on another cell while one is saving or loading already
-        await until(isLoading).toBe(false);
+        await until(() => mbStore.isPopoutLoading).toBe(false);
 
         // A linked button has been selected so populate the pop out
         selectedCell.value = newValue;
@@ -485,7 +484,7 @@ window.Vue.watch(
 
         if ([ACTIVITY_TYPE_TASK, ACTIVITY_TYPE_PROJECT].includes(cellInfo.value.activity.assessmentType)) {
             hasLoadError.value = false;
-            isLoading.value = false;
+            mbStore.isPopoutLoading = false;
             activityItems.value = [];
             return;
         }
@@ -542,7 +541,7 @@ function onToggleSelected(): void {
                 </div>
             </pop-out-menu-item>
         </div>
-        <div v-else-if="isLoading || cellInfo === null" class="pop-out-menu__loader">
+        <div v-else-if="mbStore.isPopoutLoading || cellInfo === null" class="pop-out-menu__loader">
             <div class="loader"></div>
         </div>
         <div v-else ref="markbookElement" class="pop-out-menu" :class="{ 'is-expanded': isExpanded }">
