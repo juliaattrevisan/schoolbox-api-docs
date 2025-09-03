@@ -102,12 +102,13 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
             class="student-grade-cell"
             :data-assessment="assessment.id"
         >
-            <template v-if="stat === null || aImpl === null || aImpl.writable === false"></template>
-            <template v-else-if="props.input && (props.input.allowCourseManaged || !aImpl.courseManaged)">
+            <template v-if="stat === null || aImpl === null"></template>
+            <template v-else-if="props.input && (props.input.allowCourseManaged || !aImpl.courseManaged) || aImpl.writable === false">
                 <select
                     v-if="props.input.selectOptions && assessment.assessmentType !== ACTIVITY_TYPE_TASK"
                     v-model="aImpl[props.input.key]"
                     :name="props.statsKey"
+                    :disabled="!mbStore.data || !mbStore.data.canAccessPopOut"
                     @change="onValueChange(assessment.id, aImpl)"
                 >
                     <!-- eslint-disable vue/no-v-html -- we can't use <sbx-icon> in a select since html spec
