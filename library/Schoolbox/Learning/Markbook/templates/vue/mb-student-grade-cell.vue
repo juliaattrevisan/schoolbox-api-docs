@@ -144,7 +144,8 @@ const lastClick = window.Vue.ref<number>(0);
  * When the user clicks the cell, open the pop-out menu if available, otherwise do nothing
  */
 async function onClickCell(): Promise<void> {
-    if (Date.now() - lastClick.value < DOUBLE_CLICK_INTERVAL) {
+    const canAccessUpdateFeedback = participant.value && !participant.value.isExcluded;
+    if (Date.now() - lastClick.value < DOUBLE_CLICK_INTERVAL && canAccessUpdateFeedback) {
         /**
          * The popout is responsible for loading some extra feedback data,
          * as we are skipping the popout buttons, we need to make sure that extra data
