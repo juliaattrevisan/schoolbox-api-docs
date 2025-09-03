@@ -117,8 +117,8 @@ jobs:
             PHP_MAJOR_VERSION=${{ matrix.phpVersion }}
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            ${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}
-            ${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}
+            ${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}
+            ${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}
 
       - name: Export digest
         run: |
