@@ -141,12 +141,15 @@ async function onPublishAll(): Promise<void> {
             const dataPublished = participant.participant.marks.published;
             const dataDraft = participant.participant.marks.draft;
 
+            participant.participant.hasPublishedFeedback = true;
+
             /* persist the published data */
             dataPublished.comment = dataDraft.comment;
             dataPublished.hr = dataDraft.hr;
             dataPublished.hrInstructor = dataDraft.hrInstructor;
             dataPublished.norm = dataDraft.norm;
             dataPublished.responseId = dataDraft.responseId;
+            dataPublished.resubmissionRequired = dataDraft.resubmissionRequired;
 
             /* and reset the draft data to defaults */
             dataDraft.comment = null;
@@ -154,6 +157,7 @@ async function onPublishAll(): Promise<void> {
             dataDraft.hrInstructor = null;
             dataDraft.norm = null;
             dataDraft.responseId = null;
+            dataDraft.resubmissionRequired = false;
         });
 
         // TODO: handle partial updates (not all participants selected)
