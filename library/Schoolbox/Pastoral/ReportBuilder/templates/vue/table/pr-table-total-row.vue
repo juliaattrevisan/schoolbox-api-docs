@@ -7,9 +7,8 @@
 import { Chart } from "highcharts-vue";
 import { capitalizeFirstLetter } from "@js/util/stringUtils";
 import { TableHeaderType } from "../../js/types/pastoralReportTypes";
-import type { TableHeader, RowOptions, RecordsAndPoints } from "../../js/types/pastoralReportTypes";
+import type { TableHeader, RowOptions, RecordsAndPoints, Tab } from "../../js/types/pastoralReportTypes";
 import { getChartOptions } from "./config/chartOptions";
-import { useStore } from "../store/pastoralReportStore";
 import { getMeta } from "../util/pastoralReportUtils";
 
 const props = defineProps<{
@@ -22,12 +21,14 @@ const emit = defineEmits<{
     cellSelect: [header: TableHeader, meta: string[]];
 }>();
 
+const selectedTab = window.Vue.inject<Tab>("selectedTab");
+
 /**
  * Handles the cell click
  * @param header - the header of the cell that was clicked
  */
 function onCellSelected(header: TableHeader): void {
-    emit("cellSelect", header, getMeta(useStore().selectedTab, header));
+    emit("cellSelect", header, getMeta(selectedTab as Tab, header));
 }
 </script>
 

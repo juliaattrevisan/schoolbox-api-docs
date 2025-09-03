@@ -8,15 +8,14 @@ import { useScroll } from "@vueuse/core";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import PrRecord from "./pr-record.vue";
 import PrEmpty from "./pr-empty.vue";
-import { useStore } from "./store/pastoralReportStore";
 import { useMaxScrollableHeight } from "./composable/useMaxScrollableHeight";
 import { useLoadRecords } from "./composable/useLoadRecords";
-import { ViewUrlParam } from "../js/types/pastoralReportTypes";
+import { ViewUrlParam, type Tab } from "../js/types/pastoralReportTypes";
 
-const store = useStore();
+const selectedTab = window.Vue.inject<Tab | null>("selectedTab");
 
 /**
- * Keep the container the below the height of the viewport
+ * Keep the container below the height of the viewport
  */
 const scrollableEl = window.Vue.useTemplateRef<HTMLDivElement>("scrollableRef");
 const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl);
@@ -26,8 +25,8 @@ const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl);
  */
 const url = window.Vue.ref("");
 const urlParams = new URLSearchParams();
-urlParams.set("limit", "20");
-url.value = `${store.selectedTab?._links.view}?${urlParams.toString()}`;
+urlParams.set("limit", "50");
+url.value = `${selectedTab?._links.view}?${urlParams.toString()}`;
 const { isNewLoad, isNewLoading, isMoreLoading, payload, loadError } = useLoadRecords(url);
 
 /**
@@ -41,7 +40,7 @@ const { bottom } = toRefs(arrivedState);
 window.Vue.watch(bottom, (isAtBottom) => {
     if (isAtBottom && payload.value && payload.value.metadata.cursor.next !== null) {
         urlParams.set(ViewUrlParam.CURSOR as string, payload.value.metadata.cursor.next);
-        url.value = `${store.selectedTab?._links.view}?${urlParams.toString()}`;
+        url.value = `${selectedTab?._links.view}?${urlParams.toString()}`;
     }
 });
 </script>

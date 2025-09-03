@@ -15,9 +15,9 @@ import type {
     RecordsAndPoints,
     TypeSubType,
     RowKeys,
+    Tab,
 } from "../../js/types/pastoralReportTypes";
 import { getChartOptions } from "./config/chartOptions";
-import { useStore } from "../store/pastoralReportStore";
 import { getRowKeys, getMeta } from "../util/pastoralReportUtils";
 
 const props = defineProps<{
@@ -30,12 +30,14 @@ const emit = defineEmits<{
     cellSelect: [header: TableHeader, rowKeys: RowKeys, meta: string[]];
 }>();
 
+const selectedTab = window.Vue.inject<Tab>("selectedTab");
+
 /**
  * Handles the cell click
  * @param header - the header of the cell that was clicked
  */
 function onCellSelected(header: TableHeader): void {
-    emit("cellSelect", header, getRowKeys(props.rowData), getMeta(useStore().selectedTab, header, props.rowData));
+    emit("cellSelect", header, getRowKeys(props.rowData), getMeta(selectedTab as Tab, header, props.rowData));
 }
 </script>
 

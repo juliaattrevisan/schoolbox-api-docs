@@ -5,7 +5,6 @@
 
 import { TabType } from "../js/types/pastoralReportTypes";
 import type { Tab, Config, Routes, SeverityColors } from "../js/types/pastoralReportTypes";
-import { useStore } from "./store/pastoralReportStore";
 import PrList from "./pr-list.vue";
 import PrTable from "./table/pr-table.vue";
 
@@ -21,37 +20,33 @@ const props = defineProps<{
     severityColors: SeverityColors;
 }>();
 
-const store = useStore();
+// Create reactive state
+const selectedTab = window.Vue.ref<Tab | null>(null);
 const recordsOrPoints = window.Vue.ref<"records" | "points">("records"); // the current records/points selection
 const tabParamName = "tab"; // URL parameter name for the selected tab
+
+// Provide the state and props to child components
+window.Vue.provide("selectedTab", selectedTab);
+window.Vue.provide("title", window.Vue.toRef(props, "title"));
+window.Vue.provide("export", window.Vue.toRef(props, "export"));
+window.Vue.provide("reportId", window.Vue.toRef(props, "reportId"));
+window.Vue.provide("tabs", window.Vue.toRef(props, "tabs"));
+window.Vue.provide("config", window.Vue.toRef(props, "config"));
+window.Vue.provide("routes", window.Vue.toRef(props, "routes"));
+window.Vue.provide("localePastoral", window.Vue.toRef(props, "localePastoral"));
+window.Vue.provide("showSeverity", window.Vue.toRef(props, "showSeverity"));
+window.Vue.provide("severityColors", window.Vue.toRef(props, "severityColors"));
 
 /**
  * Handle tab selection and update URL without adding to browser history
  * @param tab - the tab that has been selected
  */
 function onTabSelected(tab: Tab): void {
-    store.selectedTab = tab;
+    selectedTab.value = tab;
     const url = new URL(window.location.href);
     url.searchParams.set(tabParamName, tab.key);
     window.history.replaceState(null, "", url.toString());
 }
-
-/**
- * Initialize the store with the provided parameters.
- */
-window.Vue.onBeforeMount((): void => {
-    store.init({
-        title: props.title,
-        export: props.export,
-        reportId: props.reportId,
-        tabs: props.tabs,
-        config: props.config,
-        routes: props.routes,
-        localePastoral: props.localePastoral,
-        showSeverity: props.showSeverity,
-        severityColors: props.severityColors,
-    });
-});
 
 /**
  * Load the first tab when the component is mounted,
@@ -65,8 +60,13 @@ window.Vue.onMounted((): void => {
     if (tabParam) {
         const foundTab = props.tabs.find((tab) => tab.key === tabParam);
         if (foundTab) {
-            store.selectedTab = foundTab;
+            selectedTab.value = foundTab;
         }
+    }
+    // Set the first tab as default if no tab is selected
+    if (!selectedTab.value && props.tabs.length > 0) {
+        const [firstTab] = props.tabs;
+        selectedTab.value = firstTab;
     }
 });
 </script>
@@ -92,13 +92,13 @@ window.Vue.onMounted((): void => {
                 <dd
                     v-for="tab in props.tabs"
                     :key="tab.type"
-                    :class="{ active: store.selectedTab?.title === tab.title }"
+                    :class="{ active: selectedTab?.title === tab.title }"
                     @click="onTabSelected(tab)"
                 >
                     <a>{{ tab.title }}</a>
                 </dd>
             </dl>
-            <pr-list v-if="store.selectedTab?.type === TabType.LIST" />
+            <pr-list v-if="selectedTab?.type === TabType.LIST" />
             <pr-table v-else v-model:records-or-points="recordsOrPoints" />
         </div>
     </div>

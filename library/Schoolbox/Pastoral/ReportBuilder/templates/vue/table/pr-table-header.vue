@@ -5,8 +5,7 @@
  */
 
 import { capitalizeFirstLetter } from "@js/util/stringUtils";
-import { useStore } from "../store/pastoralReportStore";
-import type { TableHeader } from "../../js/types/pastoralReportTypes";
+import type { TableHeader, Config } from "../../js/types/pastoralReportTypes";
 
 const props = defineProps<{
     headers: TableHeader[];
@@ -14,7 +13,7 @@ const props = defineProps<{
     order: "ASC" | "DESC";
 }>();
 
-const store = useStore();
+const config = window.Vue.inject<Config>("config");
 const recordsAndPoints = window.Vue.ref(["records", "points"]); // to toggle the tables between records and points
 
 const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
@@ -88,7 +87,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
     <thead class="pr-table-header">
         <tr>
             <th class="u-border-right u-sticky-left">
-                <div v-if="store.config.pastoralPointEnabled" class="checklist">
+                <div v-if="config?.pastoralPointEnabled" class="checklist">
                     <ul class="option-list l-flex l-gap-m f-no-margins">
                         <li v-for="(option, index) in recordsAndPoints" :key="`option-${index}`">
                             <input
