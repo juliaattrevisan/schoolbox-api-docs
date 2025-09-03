@@ -1,6 +1,6 @@
 {% if hasAssessmentRoutes or hasCourseRoutes or isParticipant %}
     <nav>
-        {% if customisedAssessments is not empty %}
+        {% if customisedAssessments is not empty and canWrite %}
         <a class="expand-link icon-down-arrow" data-interaction-has-customised></a>
         {% endif %}
         {% if hasAssessmentRoutes or hasCourseRoutes %}
