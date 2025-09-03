@@ -88,6 +88,7 @@ class Controller extends Assessment\Controller
      * @param Filter\Selection\Mapper $filterSelectionMapper
      * @param CourseImplementationMapper $courseImplementationMapper
      * @param UnitImplementationMapper $unitImplementationMapper
+     * @param EditorTemplateHelper|null $editorTemplateHelper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -114,7 +115,7 @@ class Controller extends Assessment\Controller
         protected Filter\Selection\Mapper $filterSelectionMapper,
         protected CourseImplementationMapper $courseImplementationMapper,
         protected UnitImplementationMapper $unitImplementationMapper,
-        private EditorTemplateHelper $editorTemplateHelper,
+        private ?EditorTemplateHelper $editorTemplateHelper,
     ) {
         parent::__construct(
             $userMapper,
