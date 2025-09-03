@@ -78,15 +78,14 @@ function onPaginate(cursor: string): void {
 
 /**
  * when the endpoint changes trigger a new load
+ * we can assert the type of the new tab as pr-table wont exist
+ * without selectedTab being set
  */
-window.Vue.watch(
-    () => selectedTab,
-    (newTab) => {
-        if (newTab?.value.type === TabType.TABLE) {
-            resetTableLoad();
-        }
-    },
-);
+window.Vue.watch(selectedTab as Ref<Tab>, (newTab) => {
+    if (newTab.type === TabType.TABLE) {
+        resetTableLoad();
+    }
+});
 
 // #endregion
 

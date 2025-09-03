@@ -38,7 +38,10 @@ const selectedTab = window.Vue.inject<Ref<Tab>>("selectedTab");
  * @param header - the header of the cell that was clicked
  */
 function onCellSelected(header: TableHeader): void {
-    emit("cellSelect", header, getRowKeys(props.rowData), getMeta(selectedTab.value as Tab, header, props.rowData));
+    if (selectedTab === undefined) {
+        return;
+    }
+    emit("cellSelect", header, getRowKeys(props.rowData), getMeta(selectedTab.value, header, props.rowData));
 }
 </script>
 
