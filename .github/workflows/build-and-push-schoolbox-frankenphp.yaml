@@ -190,9 +190,18 @@ jobs:
             type=ref,event=branch,prefix=latest-php${{ matrix.phpVersion }}-
             type=raw,value=latest-php${{ matrix.phpVersion }}-${{ github.ref_name }}
 
-      - name: Join schoolbox-frankenphp images (latest)
-        working-directory: ${{ runner.temp }}/digests
+      - name: Join ${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }} images
+        working-directory: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}
         run: |
-          docker buildx imagetools create $(jq -cr '.tags | map ("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf '${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}@sha256:%s ' *) \
-            $(printf '${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}@sha256:%s ' *)
+          declare -a DOCKERHUB_IMAGES
+          declare -a ECR_IMAGES
+
+          # All I need is the hashes, which are a part of the /digests/version/ folder
+          # the hashes are the same between both Dockerhub and CLI
+          for file in $(ls -1 ${{ runner.temp }}/digests/${{ matrix.phpVersion }}); do
+              DOCKERHUB_IMAGES+=("${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}@sha256:$file")
+              ECR_IMAGES+=("${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}@sha256:$file")
+          done
+
+          docker buildx imagetools create -t '${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}' "${DOCKERHUB_IMAGES[@]}"
+          docker buildx imagetools create -t '${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}' "${ECR_IMAGES[@]}"
