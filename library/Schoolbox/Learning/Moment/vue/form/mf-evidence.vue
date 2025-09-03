@@ -337,7 +337,7 @@ window.Vue.watch(
     </div>
 
     <div v-if="mfStore.moment !== null && mfStore.moment.evidence.length">
-        <label> Attachments </label>
+        <label> Attachments ({{ mfStore.moment.evidence.length }} out of {{ MOMENT_MAX_EVIDENCE }}) </label>
         <div class="l-grid l-grid--12 l-gap-m">
             <div class="large-6 small-12">
                 <article
