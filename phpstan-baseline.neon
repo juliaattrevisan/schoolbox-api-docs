@@ -4659,7 +4659,7 @@ parameters:
 		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:getAssessables\(\)\.$#'
 			identifier: method.notFound
-			count: 2
+			count: 3
 			path: library/Schoolbox/Learning/Assessment/Project/Controller.php
 
 		-
@@ -4671,7 +4671,7 @@ parameters:
 		-
 			message: '#^Call to an undefined method Schoolbox\\Learning\\Assessment\\IAssessable\:\:setAssessables\(\)\.$#'
 			identifier: method.notFound
-			count: 1
+			count: 2
 			path: library/Schoolbox/Learning/Assessment/Project/Controller.php
 
 		-
