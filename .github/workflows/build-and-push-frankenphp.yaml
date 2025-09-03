@@ -169,7 +169,5 @@ jobs:
               ECR_IMAGES+=("${{ vars.ECR_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}@sha256:$file")
           done
 
-          echo "docker buildx imagetools create -t '${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}' ${DOCKERHUB_IMAGES[*]}"
-          echo "docker buildx imagetools create -t '${{ vars.ECR_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}' ${ECR_IMAGES[*]}"
           docker buildx imagetools create -t '${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}' "${DOCKERHUB_IMAGES[@]}"
           docker buildx imagetools create -t '${{ vars.ECR_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}' "${ECR_IMAGES[@]}"
