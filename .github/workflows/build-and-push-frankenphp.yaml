@@ -162,17 +162,11 @@ jobs:
           declare -a DOCKERHUB_IMAGES
           declare -a ECR_IMAGES
 
-          echo "All tags: ${DOCKER_METADATA_OUTPUT_TAGS[*]}"
-          for image in ${DOCKER_METADATA_OUTPUT_TAGS}; do
-            echo "Tag: $image";
-            if [[ $image == *"${{ vars.DOCKERHUB_NAMESPACE }}"* ]]; then
-              echo "$image: Dockerhub tag"
-              DOCKERHUB_IMAGES+=("$image")
-            fi
-            if [[ $image == *"${{ vars.ECR_NAMESPACE }}"* ]]; then
-              echo "$image: ECR tag"
-              ECR_IMAGES+=("$image")
-            fi
+          # All I need is the hashes, which are a part of the /digests/version/ folder
+          # the hashes are the same between both Dockerhub and CLI
+          for file in $(ls -1 ${{ runner.temp }}/digests/${{ matrix.phpVersion }}); do
+              DOCKERHUB_IMAGES+=("${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}@sha256:$file")
+              ECR_IMAGES+=("${{ vars.ECR_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}@sha256:$file")
           done
 
           echo "docker buildx imagetools create -t '${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}' ${DOCKERHUB_IMAGES[*]}"
