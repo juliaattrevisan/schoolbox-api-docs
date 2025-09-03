@@ -789,6 +789,11 @@ class Module extends BaseModule
                     $filterSelectionMapper,
                     $courseImplementationMapper,
                     $unitImplementationMapper,
+                    new EditorTemplateHelper(
+                        $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                        EditorTemplatesCategoryModel::LEARNING_ACTIVITY,
+                        $this->injector->get('user')
+                    ),
                 );
 
             case Assessment\Quiz\Controller::class:

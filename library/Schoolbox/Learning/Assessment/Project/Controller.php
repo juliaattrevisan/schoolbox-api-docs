@@ -41,11 +41,12 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
-
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 /**
  * Class Controller
  *
  * @package Schoolbox\Learning\Assessment\Project
+ * @param EditorTemplateHelper|null $editorTemplateHelper
  */
 class Controller extends Assessment\Controller
 {
@@ -72,7 +73,8 @@ class Controller extends Assessment\Controller
         protected ?Filter\Mapper $filterMapper = null,
         protected ?Filter\Selection\Mapper $filterSelectionMapper = null,
         protected ?CourseImplementationMapper $courseImplementationMapper = null,
-        protected ?UnitImplementationMapper $unitImplementationMapper = null
+        protected ?UnitImplementationMapper $unitImplementationMapper = null,
+        private ?EditorTemplateHelper $editorTemplateHelper,
     ) {
         parent::__construct(
             $userMapper,
@@ -98,6 +100,13 @@ class Controller extends Assessment\Controller
             $filterSelectionMapper,
             $courseImplementationMapper,
             $unitImplementationMapper,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            $editorTemplateHelper
         );
     }
 

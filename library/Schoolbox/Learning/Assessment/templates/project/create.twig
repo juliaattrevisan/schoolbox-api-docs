@@ -11,6 +11,9 @@
                 maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                 targetElements: ['textarea[name="description"]'],
                 fileBrowserCategoryId: {{ context.baseContext.folder.id ?? 0 }},
+                {% if editorTemplates is defined %}
+                    templates: {{ editorTemplates|json_encode|raw }},
+                {% endif %}
             }
         }));
     });
