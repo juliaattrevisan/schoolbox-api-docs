@@ -4,7 +4,7 @@ tour:
   roles:
     - staff
   trigger:
-    urlRegex: '^/learning/courseMarkbook/.*$'
+    urlRegex: '^/learning/courseMarkbook/[0-9]+$' # Match e.g. /learning/courseMarkbook/83.
     selector: body
     event: tourReady
   steps:

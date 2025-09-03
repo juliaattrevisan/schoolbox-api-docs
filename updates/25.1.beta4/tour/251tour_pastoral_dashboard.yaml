@@ -4,7 +4,7 @@ tour:
   roles:
     - staff
   trigger:
-    urlRegex: '^/pastoral'
+    urlRegex: '^\/pastoral\/?$' # Match /pastoral and /pastoral/.  Do not match e.g. /pastoral/student/6.
     selector: body
     event: tourReady
   steps:
