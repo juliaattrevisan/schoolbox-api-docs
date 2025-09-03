@@ -43,7 +43,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    placeholder: "Click or drag here to attach files",
+    placeholder: "Click or drag here to attach a file",
     accept: "*/*",
     class: "l-mar-s--bottom",
     inputName: undefined,

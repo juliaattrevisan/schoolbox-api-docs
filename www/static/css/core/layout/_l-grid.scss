@@ -62,6 +62,10 @@ $foundation-size-array: map.keys($foundation-breakpoint-map);
     grid-template-columns: repeat(auto-fit, minmax($minColWidth, 1fr));
     width: 100%;
 
+    &--auto-fill {
+        grid-template-columns: repeat(auto-fill, minmax($minColWidth, 1fr));
+    }
+
     // If you need explicit column sizes... here;
     &--2-col {
         grid-template-columns: repeat(2, 1fr);

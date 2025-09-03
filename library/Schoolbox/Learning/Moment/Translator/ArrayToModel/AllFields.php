@@ -162,8 +162,6 @@ class AllFields extends Base
                                 if (null === $model->getEvidence()) {
                                     $model->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class)));
                                 }
-
-                                $model->getEvidence()->add($evidence);
                             }
                         } else {
                             /* No hash? No trabajo
@@ -188,7 +186,10 @@ class AllFields extends Base
                             if (null === $model->getEvidence()) {
                                 $model->setEvidence((new \Schoolbox\GenericCollection(\Schoolbox\Learning\Moment\Evidence\Model::class)));
                             }
+                        }
 
+                        // You can only have up to 10 evidence
+                        if ($model->getEvidence()->count() < \Schoolbox\Learning\Moment\Controller::MOMENT_MAX_EVIDENCE) {
                             $model->getEvidence()->add($evidence);
                         }
                     }
