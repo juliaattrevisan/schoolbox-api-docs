@@ -4,7 +4,7 @@ tour:
   roles:
     - staff
   trigger:
-    urlRegex: '^/homepage/.*$' # Match e.g. /homepage/83, /homepage/code/9ENGA.
+    urlRegex: '^/homepage' # Match URLs starting with /homepage.  E.g. /homepage/83, /homepage/code/9ENGA.
     selector: body
     event: tourReady
   steps:
