@@ -11,7 +11,6 @@ namespace Schoolbox\Group;
 
 use Alaress\Color\ColorFactory;
 use Alaress\Authorizer\Authorizer;
-use Alaress\Twig\Method\RouteLookupIfAuthorized;
 use Aura\Router\Generator;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -40,8 +39,6 @@ class GroupsHelper
 
     private Generator $routeGenerator;
 
-    private RouteLookupIfAuthorized $routeLookupIfAuthorized;
-
     private GroupMapper $groupMapper;
 
     private UserAccessMapper $userAccessMapper;
@@ -58,7 +55,6 @@ class GroupsHelper
     public function __construct(
         Authorizer $authorizer,
         Generator $routeGenerator,
-        RouteLookupIfAuthorized $routeLookupIfAuthorized,
         GroupMapper $groupMapper,
         UserAccessMapper $userAccessMapper,
         FolderMapper $folderMapper,
@@ -67,12 +63,38 @@ class GroupsHelper
     ) {
         $this->authorizer                = $authorizer;
         $this->routeGenerator            = $routeGenerator;
-        $this->routeLookupIfAuthorized   = $routeLookupIfAuthorized;
         $this->groupMapper               = $groupMapper;
         $this->userAccessMapper          = $userAccessMapper;
         $this->folderMapper              = $folderMapper;
         $this->timetableColourMapper     = $timetableColourMapper;
         $this->reRouteOverrideMapper     = $reRouteOverrideMapper;
+    }
+
+    /**
+     * Helper function for outputting a route URL, only if it is authorized.
+     * Returns false if the route doesn't exist or the user is not authorized.
+     * This safely handles cases where modules are disabled and routes don't exist.
+     *
+     * @param string    $name   Route name
+     * @param array     $params Route parameters  
+     * @param User|null $user   User to check authorization for
+     * @return string|false     The URL if authorized, false otherwise
+     */
+    private function getRouteIfAuthorized(string $name, array $params = [], ?User $user = null)
+    {
+        if (!$user instanceof User) {
+            throw new \InvalidArgumentException('User must be provided for GroupsHelper::getRouteIfAuthorized');
+        }
+        
+        try {
+            if ($this->authorizer->isPathAuthorizedForUser($name, $params, $user)) {
+                return $this->routeGenerator->generate($name, $params);
+            }
+        } catch (\Throwable $e) {
+            // Route doesn't exist or authorization check failed (e.g., module disabled)
+            return false;
+        }
+        return false;
     }
 
     /**
@@ -272,7 +294,7 @@ class GroupsHelper
             } else {
                 $modifyLink = false;
             }
-            $cohortReportLink = $this->routeLookupIfAuthorized->__invoke(
+            $cohortReportLink = $this->getRouteIfAuthorized(
                 'learningMomentEvidence.getCohortReport',
                 ['folder' => $folder, 'folderId' => $folder->getId()],
                 $user

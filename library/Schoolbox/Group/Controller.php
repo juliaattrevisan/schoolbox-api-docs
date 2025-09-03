@@ -47,7 +47,6 @@ class Controller extends BaseController
         $this->groupsHelper     = new GroupsHelper(
             $authorizer,
             $routeGenerator,
-            $this->getDi()->get('templateEngine:routeLookupIfAuthorized'),
             $groupMapper,
             $userAccessMapper,
             $folderMapper,
