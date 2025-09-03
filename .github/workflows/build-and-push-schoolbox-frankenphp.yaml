@@ -98,7 +98,7 @@ jobs:
           name: schoolbox-npm
           path: www/static/js/bundle/
 
-      - name: Build and push ${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }} deployment image
+      - name: Build and push ${{ vars.SCHOOLBOX_IMAGE_NAME }}
         id: build-and-push-latest
         uses: docker/build-push-action@v6
         with:
@@ -113,24 +113,26 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             ENV=prod
-            TAG=latest-php${{ matrix.phpVersion }}-${{ github.event.release.target_commitish }}
+            TAG=${{ github.event.release.target_commitish }}-php${{ matrix.phpVersion }}
             PHP_MAJOR_VERSION=${{ matrix.phpVersion }}
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
-            ${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}
-            ${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}
+            ${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}
+            ${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}
+          cache-from: type=gha
+          cache-to: type=gha
 
       - name: Export digest
         run: |
-          mkdir -p ${{ runner.temp }}/digests
-          digest="${{ steps.build-and-push-latest.outputs.digest }}"
-          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+          mkdir -p ${{ runner.temp }}/digests/${{ matrix.phpVersion }}
+          digest="${{ steps.build-and-push.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${{ matrix.phpVersion }}/${digest#sha256:}"
 
-      - name: Upload schoolbox-frankenphp artifact
+      - name: Upload ${{ vars.SCHOOLBOX_IMAGE_NAME }} artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: digest-${{ matrix.build.arch }}
-          path: ${{ runner.temp }}/digests/*
+          name: digest-php${{ matrix.phpVersion }}-${{ matrix.build.arch }}
+          path: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}/*
           if-no-files-found: 'error'
           retention-days: 1
 
@@ -161,26 +163,45 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Download schoolbox-frankenphp artifacts
+      - name: Download ${{ vars.SCHOOLBOX_IMAGE_NAME }} artifacts
         uses: actions/download-artifact@v4
         with:
-          path: ${{ runner.temp }}/digests
-          pattern: digest-*
+          path: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}
+          pattern: digest-php${{ matrix.phpVersion }}-*
           merge-multiple: 'true'
 
-      - name: Meta
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: |
-            ${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}
-            ${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}
-          tags: |
-            type=ref,event=tag,prefix=
+#      - name: Identify image names
+#        id: images
+#        run: |
+#          echo 'IMAGE_NAMES<<EOF' >> $GITHUB_ENV
+#          for file in $(ls -1 ${{ runner.temp }}/digests/${{ matrix.phpVersion }}); do
+#            echo "${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:${file}" >> $GITHUB_ENV
+#            echo "${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:${file}" >> $GITHUB_ENV
+#          done
+#          echo 'EOF' >> $GITHUB_ENV
+#          cat $GITHUB_ENV
+#
+#      - name: Tag ${{ vars.SCHOOLBOX_IMAGE_NAME }} images
+#        id: meta
+#        uses: docker/metadata-action@v5
+#        with:
+#          images: ${{ env.IMAGE_NAMES }}
+#          tags: |
+#            type=ref,event=branch,prefix=latest-php${{ matrix.phpVersion }}-
+#            type=raw,value=latest-php${{ matrix.phpVersion }}-${{ github.ref_name }}
 
-      - name: Join schoolbox-frankenphp images (latest)
-        working-directory: ${{ runner.temp }}/digests
+      - name: Join ${{ vars.SCHOOLBOX_IMAGE_NAME }} images
+        working-directory: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}
         run: |
-          docker buildx imagetools create $(jq -cr '.tags | map ("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
-            $(printf '${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}@sha256:%s ' *) \
-            $(printf '${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}@sha256:%s ' *)
+          declare -a DOCKERHUB_IMAGES
+          declare -a ECR_IMAGES
+
+          # All I need is the hashes, which are a part of the /digests/version/ folder
+          # the hashes are the same between both Dockerhub and CLI
+          for file in $(ls -1 ${{ runner.temp }}/digests/${{ matrix.phpVersion }}); do
+              DOCKERHUB_IMAGES+=("${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}@sha256:$file")
+              ECR_IMAGES+=("${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}@sha256:$file")
+          done
+
+          docker buildx imagetools create -t '${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:${{ github.event.release.target_commitish }}-php${{ matrix.phpVersion }}' "${DOCKERHUB_IMAGES[@]}"
+          docker buildx imagetools create -t '${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:${{ github.event.release.target_commitish }}-php${{ matrix.phpVersion }}' "${ECR_IMAGES[@]}"
