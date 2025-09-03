@@ -170,17 +170,17 @@ jobs:
           pattern: digest-php${{ matrix.phpVersion }}-*
           merge-multiple: 'true'
 
-      - name: Identify image names
-        id: images
-        run: |
-          echo 'IMAGE_NAMES<<EOF' >> $GITHUB_ENV
-          for file in $(ls -1 ${{ runner.temp }}/digests/${{ matrix.phpVersion }}); do
-            echo "${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:${file}" >> $GITHUB_ENV
-            echo "${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:${file}" >> $GITHUB_ENV
-          done
-          echo 'EOF' >> $GITHUB_ENV
-          cat $GITHUB_ENV
-
+#      - name: Identify image names
+#        id: images
+#        run: |
+#          echo 'IMAGE_NAMES<<EOF' >> $GITHUB_ENV
+#          for file in $(ls -1 ${{ runner.temp }}/digests/${{ matrix.phpVersion }}); do
+#            echo "${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:${file}" >> $GITHUB_ENV
+#            echo "${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:${file}" >> $GITHUB_ENV
+#          done
+#          echo 'EOF' >> $GITHUB_ENV
+#          cat $GITHUB_ENV
+#
 #      - name: Tag ${{ vars.SCHOOLBOX_IMAGE_NAME }} images
 #        id: meta
 #        uses: docker/metadata-action@v5
