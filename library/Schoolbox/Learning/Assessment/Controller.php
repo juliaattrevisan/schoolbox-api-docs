@@ -66,6 +66,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementatio
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Assessment\Participant\Plan\Model as PlanModel;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 /**
  * Class Controller
@@ -141,6 +142,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         #[\SensitiveParameter] ?string $learnosityConsumerSecret = null,
         protected ?MimetypeMapper $mimetypeMapper = null,
         protected ?RubricDataSource $rubricDataSource = null,
+        private EditorTemplateHelper $editorTemplateHelper,
     ) {
         parent::__construct(
             $userMapper,
@@ -343,6 +345,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'isMutable' => $courseManagedFields->isMutable(),
             'isReadonly' => $courseManagedFields->isReadonly(),
         ];
+        $data['editorTemplates']= $this->editorTemplateHelper->getTemplatesForCategory();
 
         if (AssessmentType::TYPE_DUE_WORK === $type) {
             // To be able to view the current student policy if enabling within the submission type

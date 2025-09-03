@@ -242,6 +242,7 @@ class Controller extends Assessment\Controller
             null,
             $mimeTypeMapper,
             $this->rubricDataSource,
+            $editorTemplateHelper,
         );
     }
 
@@ -1216,6 +1217,7 @@ class Controller extends Assessment\Controller
             'returnUrl'      => $returnUrl,
             'kamiSession'    => $kamiSession,
             'kamiFileId'     => $kamiFile,
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
 
             /* Only show these things if the assessment is self-gradable */
             'showDescriptorValue' => $selfAssess,

@@ -758,6 +758,11 @@ class Module extends BaseModule
                     $unitImplementationMapper,
                     $this->getMapperFactory()->get(RubricDataSource::class),
                     $editorTemplateHelper,
+                    new EditorTemplateHelper(
+                        $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                        EditorTemplatesCategoryModel::LEARNING_ACTIVITY,
+                        $this->injector->get('user')
+                    ),
                 );
 
             case Assessment\Project\Controller::class:
@@ -851,6 +856,7 @@ class Module extends BaseModule
                     $filterSelectionMapper,
                     $courseImplementationMapper,
                     $unitImplementationMapper,
+                    $editorTemplateHelper,
                 );
 
             case Assessment\Lti\Controller::class:
