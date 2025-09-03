@@ -504,8 +504,6 @@ switch ($_POST['module']) {
         break;
 }
 
-
-
 // to test how it looks with delay
 // sleep(2);
 
