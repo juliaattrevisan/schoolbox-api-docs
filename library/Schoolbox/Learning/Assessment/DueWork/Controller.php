@@ -209,12 +209,8 @@ class Controller extends Assessment\Controller
         protected Filter\Selection\Mapper $filterSelectionMapper,
         protected CourseImplementationMapper $courseImplementationMapper,
         protected UnitImplementationMapper $unitImplementationMapper,
-<<<<<<< HEAD
         protected ?RubricDataSource $rubricDataSource,
-        private EditorTemplateHelper $editorTemplateHelper,
-=======
         private ?EditorTemplateHelper $editorTemplateHelper
->>>>>>> f56a8f09397 (Added null to task/quiz/duework controller[SA-20202])
     ) {
         parent::__construct(
             $userMapper,
