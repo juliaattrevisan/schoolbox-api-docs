@@ -92,7 +92,7 @@ class Controller extends Base
                 [[$breadcrumbTitle, null]]
             ),
             'category' => $category,
-            'hasTokens' => in_array($category->getName(), ['badge-evidence', 'feedback', 'learning-moments']),
+            'hasTokens' => in_array($category->getId(), [CategoryModel::BADGE_EVIDENCE, CategoryModel::FEEDBACK, CategoryModel::LEARNING_MOMENTS]),
             'template' => $template,
         ];
     }
