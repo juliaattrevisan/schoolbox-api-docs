@@ -16,6 +16,7 @@ use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentDataModel;
+use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\Mapper\DefinitionException;
@@ -210,8 +211,23 @@ class ParticipationHelper
      */
     private function getCustomisedParticipation(int $userId): ?Participant
     {
+        $user = $this->userMapper->createModel($userId);
         $customisation = $this->mapperProxy->findAllCustomisedAssessment($this->mapperProxy->translateToDomainModel($this->assessment));
-        $customisedPlan = $customisation->first()?->getParticipantIfExtant($this->userMapper->createModel($userId));
-        return $customisedPlan;
+        /* Find the customised plan that the user is part of and return it
+         */
+        $plan = null;
+        foreach ($customisation as $customisedAssessment) {
+            if ($customisedAssessment instanceof IAssessable === false) {
+                continue;
+            }
+            $plan = $customisedAssessment->getParticipantIfExtant($user);
+            /* Exit early after it found the first plan that contains the student
+             * as the student should only be included in one of the plan from either original or customised
+             */
+            if (null !== $plan) {
+                break;
+            }
+        }
+        return $plan;
     }
 }
