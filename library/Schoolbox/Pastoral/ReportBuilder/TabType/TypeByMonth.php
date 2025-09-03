@@ -13,7 +13,6 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
     public const COLUMN_QUERY_MONTH_FORMAT = '%b_%Y';
     public const COLUMN_DATE_FORMAT = "M_Y";
     public const COLUMN_KEY_REGEX = "/(?<month>(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec))_(?<year>[0-9]{4})/i";
-    public const MAX_COLUMN_COUNT = 12; // Maximum number of months to display
     private function getMonths(): Collection
     {
         if (empty($this->months)) {
@@ -21,7 +20,6 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
                 $this->helper->getStartDate(),
                 $this->helper->getEndDate(),
                 self::COLUMN_DATE_FORMAT,
-                self::MAX_COLUMN_COUNT,
             );
         }
         return $this->months;

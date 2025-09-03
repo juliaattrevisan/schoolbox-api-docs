@@ -381,7 +381,6 @@ class Helper
         ?Alaress_Date_Format $startDate,
         ?Alaress_Date_Format $endDate,
         string $format,
-        int $maxStack
     ): Collection {
         /* Return empty collection if either date is null.
          */
@@ -390,12 +389,20 @@ class Helper
         }
 
         $start = (clone $startDate)->startOfMonth();
-        $end = (clone $endDate)->startOfMonth();
+
+        /* If the current month is in the future, skip it to the current month
+         * This is to avoid showing future months in the report
+         */
+        if ($endDate->startOfMonth()->gt((Alaress_Date_Format::now())->startOfMonth())) {
+            $current = (Alaress_Date_Format::now())->startOfMonth();
+        } else {
+            $current = $endDate->startOfMonth();
+        }
 
         $months = [];
-        while ($end->gte($start) && count($months) < $maxStack) {
-            array_unshift($months, strtolower($end->getUsingFormat($format)));
-            $end->addMonths(-1);
+        while ($current->gte($start)) {
+            array_unshift($months, strtolower($current->getUsingFormat($format)));
+            $current->addMonths(-1);
         }
         return new Collection($months);
     }
@@ -404,14 +411,12 @@ class Helper
      * @param Alaress_Date_Format|null $startDate
      * @param Alaress_Date_Format|null $endDate
      * @param string                   $format
-     * @param int                      $maxStack
      * @return Collection
      */
     public function getWeeksInRange(
         ?Alaress_Date_Format $startDate,
         ?Alaress_Date_Format $endDate,
         string $format,
-        int $maxStack
     ): Collection {
         /* Return empty collection if either date is null.
          */
@@ -424,9 +429,16 @@ class Helper
         $end = clone $endDate;
 
         $weeks = [];
-        $current = (clone $end);
+        /* If the current week is in the future, skip it to the current date
+         * This is to avoid showing future weeks in the report
+         */
+        if ($end->endOfDay()->gt((Alaress_Date_Format::now())->endOfDay())) {
+            $current = Alaress_Date_Format::now();
+        } else {
+            $current = $end;
+        }
         $index = 0;
-        while ($current->gte($start) && count($weeks) < $maxStack) {
+        while ($current->gte($start)) {
             if ($current->getWeekDayNumber() !== $weekStartDayOfWeek) {
                 // Adjust current to the start of the week
                 $weekStart = (clone $current)->previous((int)$weekStartDayOfWeek);

@@ -295,7 +295,6 @@ class Cursor implements ICursor
                     $this->helper->getStartDate(),
                     $this->helper->getEndDate(),
                     TypeByWeek::COLUMN_QUERY_KEY,
-                    TypeByWeek::MAX_COLUMN_COUNT,
                 );
                 if (!$weeks->offsetExists($matches['index'])) {
                     throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey), self::BAD_REQUEST_ERROR_CODE);
