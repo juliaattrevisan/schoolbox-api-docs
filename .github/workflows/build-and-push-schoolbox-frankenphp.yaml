@@ -128,11 +128,11 @@ jobs:
           digest="${{ steps.build-and-push.outputs.digest }}"
           touch "${{ runner.temp }}/digests/${{ matrix.phpVersion }}/${digest#sha256:}"
 
-      - name: Upload schoolbox-frankenphp artifact
+      - name: Upload ${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }} artifact
         uses: actions/upload-artifact@v4
         with:
-          name: digest-${{ matrix.build.arch }}
-          path: ${{ runner.temp }}/digests/*
+          name: digest-php${{ matrix.phpVersion }}-${{ matrix.build.arch }}
+          path: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}/*
           if-no-files-found: 'error'
           retention-days: 1
 
@@ -163,11 +163,11 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Download schoolbox-frankenphp artifacts
+      - name: Download ${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }} artifacts
         uses: actions/download-artifact@v4
         with:
-          path: ${{ runner.temp }}/digests
-          pattern: digest-*
+          path: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}
+          pattern: digest-php${{ matrix.phpVersion }}-*
           merge-multiple: 'true'
 
       - name: Meta
