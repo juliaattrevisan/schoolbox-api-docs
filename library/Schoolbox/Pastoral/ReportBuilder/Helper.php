@@ -393,10 +393,10 @@ class Helper
         /* If the current month is in the future, skip it to the current month
          * This is to avoid showing future months in the report
          */
-        if ((clone $endDate)->startOfMonth()->gt((Alaress_Date_Format::now())->startOfMonth())) {
+        if ($endDate->startOfMonth()->gt((Alaress_Date_Format::now())->startOfMonth())) {
             $current = (Alaress_Date_Format::now())->startOfMonth();
         } else {
-            $current = (clone $endDate)->startOfMonth();
+            $current = $endDate->startOfMonth();
         }
 
         $months = [];
@@ -432,10 +432,10 @@ class Helper
         /* If the current week is in the future, skip it to the current date
          * This is to avoid showing future weeks in the report
          */
-        if ((clone $end)->endOfDay()->gt((Alaress_Date_Format::now())->endOfDay())) {
-            $current = (Alaress_Date_Format::now());
+        if ($end->endOfDay()->gt((Alaress_Date_Format::now())->endOfDay())) {
+            $current = Alaress_Date_Format::now();
         } else {
-            $current = (clone $end);
+            $current = $end;
         }
         $index = 0;
         while ($current->gte($start)) {
