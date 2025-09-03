@@ -1230,7 +1230,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             })->reindex();
 
         $assessmentData = $this->getAssessmentTwigData($assessment);
-        $data['editorTemplates'] = $this->editorTemplateHelper->getTemplatesForCategory();
+        $data['editorTemplates'] = $this->editorTemplateHelper?->getTemplatesForCategory() ?? [];
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/participation/learningPlan/learningPlan.twig',
             [
