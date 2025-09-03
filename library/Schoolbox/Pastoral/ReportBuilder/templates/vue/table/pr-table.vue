@@ -3,6 +3,7 @@
  * Displays a pastoral report in a table format.
  */
 
+import type { Ref } from "vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import type { TablePayload, TableHeader, SelectedCell, RowKeys, Tab } from "../../js/types/pastoralReportTypes";
@@ -18,7 +19,7 @@ import PrTableModal from "./pr-table-modal.vue";
 
 // #region table load / sorting / pagination
 
-const selectedTab = window.Vue.inject<Tab>("selectedTab");
+const selectedTab = window.Vue.inject<Ref<Tab>>("selectedTab");
 const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
 const viewUrl = window.Vue.ref("");
 const viewUrlParams = new URLSearchParams();
@@ -35,7 +36,7 @@ function resetTableLoad(): void {
     viewUrlParams.set(ViewUrlParam.LIMIT as string, LIMIT.toString());
     viewUrlParams.set(ViewUrlParam.SORT_BY as string, sortBy.value);
     viewUrlParams.set(ViewUrlParam.ORDER as string, order.value);
-    viewUrl.value = `${selectedTab?._links.view}?${viewUrlParams.toString()}`;
+    viewUrl.value = `${selectedTab?.value._links.view}?${viewUrlParams.toString()}`;
 }
 
 /**
@@ -44,7 +45,7 @@ function resetTableLoad(): void {
 window.Vue.watch(recordsOrPoints, () => {
     viewUrlParams.set(ViewUrlParam.SELECTED as string, recordsOrPoints.value);
     viewUrlParams.set(ViewUrlParam.CURSOR as string, ""); // Reset cursor on records/points change
-    viewUrl.value = `${selectedTab?._links.view}?${viewUrlParams.toString()}`;
+    viewUrl.value = `${selectedTab?.value._links.view}?${viewUrlParams.toString()}`;
 });
 
 /**
@@ -63,7 +64,7 @@ function onSort(headerKey: string): void {
     viewUrlParams.set(ViewUrlParam.SORT_BY as string, sortBy.value);
     viewUrlParams.set(ViewUrlParam.ORDER as string, order.value);
     viewUrlParams.set(ViewUrlParam.CURSOR as string, ""); // Reset cursor on sort change
-    viewUrl.value = `${selectedTab?._links.view}?${viewUrlParams.toString()}`;
+    viewUrl.value = `${selectedTab?.value._links.view}?${viewUrlParams.toString()}`;
 }
 
 /**
@@ -72,7 +73,7 @@ function onSort(headerKey: string): void {
  */
 function onPaginate(cursor: string): void {
     viewUrlParams.set(ViewUrlParam.CURSOR as string, cursor);
-    viewUrl.value = `${selectedTab?._links.view}?${viewUrlParams.toString()}`;
+    viewUrl.value = `${selectedTab?.value._links.view}?${viewUrlParams.toString()}`;
 }
 
 /**
@@ -81,7 +82,7 @@ function onPaginate(cursor: string): void {
 window.Vue.watch(
     () => selectedTab,
     (newTab) => {
-        if (newTab?.type === TabType.TABLE) {
+        if (newTab?.value.type === TabType.TABLE) {
             resetTableLoad();
         }
     },

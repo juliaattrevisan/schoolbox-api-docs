@@ -3,7 +3,7 @@
  * To display a list of pastoral records in a list format
  */
 
-import { toRefs } from "vue";
+import { toRefs, type Ref } from "vue";
 import { useScroll } from "@vueuse/core";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import PrRecord from "./pr-record.vue";
@@ -12,7 +12,7 @@ import { useMaxScrollableHeight } from "./composable/useMaxScrollableHeight";
 import { useLoadRecords } from "./composable/useLoadRecords";
 import { ViewUrlParam, type Tab } from "../js/types/pastoralReportTypes";
 
-const selectedTab = window.Vue.inject<Tab | null>("selectedTab");
+const selectedTab = window.Vue.inject<Ref<Tab>>("selectedTab");
 
 /**
  * Keep the container below the height of the viewport
@@ -26,7 +26,7 @@ const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl);
 const url = window.Vue.ref("");
 const urlParams = new URLSearchParams();
 urlParams.set("limit", "50");
-url.value = `${selectedTab?._links.view}?${urlParams.toString()}`;
+url.value = `${selectedTab?.value._links.view}?${urlParams.toString()}`;
 const { isNewLoad, isNewLoading, isMoreLoading, payload, loadError } = useLoadRecords(url);
 
 /**
@@ -40,7 +40,7 @@ const { bottom } = toRefs(arrivedState);
 window.Vue.watch(bottom, (isAtBottom) => {
     if (isAtBottom && payload.value && payload.value.metadata.cursor.next !== null) {
         urlParams.set(ViewUrlParam.CURSOR as string, payload.value.metadata.cursor.next);
-        url.value = `${selectedTab?._links.view}?${urlParams.toString()}`;
+        url.value = `${selectedTab?.value._links.view}?${urlParams.toString()}`;
     }
 });
 </script>

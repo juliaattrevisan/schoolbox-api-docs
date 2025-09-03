@@ -3,7 +3,7 @@
  * To display the records linked to a particular cell when selected
  */
 
-import { useTemplateRef, toRefs } from "vue";
+import { useTemplateRef, toRefs, type Ref } from "vue";
 import { useScroll } from "@vueuse/core";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
@@ -16,7 +16,7 @@ const props = defineProps<{
     selectedCell: SelectedCell | null;
 }>();
 
-const selectedTab = window.Vue.inject<Tab>("selectedTab");
+const selectedTab = window.Vue.inject<Ref<Tab>>("selectedTab");
 const title = window.Vue.inject<string>("title");
 const isOpen = window.Vue.ref(false);
 const selectedHeader = window.Vue.ref<TableHeader | null>(null);
@@ -29,7 +29,9 @@ const { isNewLoad, isNewLoading, isMoreLoading, payload, loadError } = useLoadRe
  * @returns - the current scope export URL
  */
 function scopeExportUrl(): string {
-    return selectedTab?._links.scopeExport ? `${selectedTab?._links.scopeExport}?${scopeUrlParams.toString()}` : "";
+    return selectedTab?.value._links.scopeExport
+        ? `${selectedTab?.value._links.scopeExport}?${scopeUrlParams.toString()}`
+        : "";
 }
 
 /**

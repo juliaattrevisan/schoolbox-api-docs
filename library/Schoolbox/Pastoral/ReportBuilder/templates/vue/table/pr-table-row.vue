@@ -4,6 +4,7 @@
  * Renders a single row with cells based on column types.
  */
 
+import type { Ref } from "vue";
 import { Chart } from "highcharts-vue";
 import "highcharts/modules/accessibility";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
@@ -30,7 +31,7 @@ const emit = defineEmits<{
     cellSelect: [header: TableHeader, rowKeys: RowKeys, meta: string[]];
 }>();
 
-const selectedTab = window.Vue.inject<Tab>("selectedTab");
+const selectedTab = window.Vue.inject<Ref<Tab>>("selectedTab");
 
 /**
  * Handles the cell click

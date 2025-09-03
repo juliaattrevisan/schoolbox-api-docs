@@ -4,6 +4,7 @@
  * Renders a single total row with cells based on column types.
  */
 
+import type { Ref } from "vue";
 import { Chart } from "highcharts-vue";
 import { capitalizeFirstLetter } from "@js/util/stringUtils";
 import { TableHeaderType } from "../../js/types/pastoralReportTypes";
@@ -21,7 +22,7 @@ const emit = defineEmits<{
     cellSelect: [header: TableHeader, meta: string[]];
 }>();
 
-const selectedTab = window.Vue.inject<Tab>("selectedTab");
+const selectedTab = window.Vue.inject<Ref<Tab>>("selectedTab");
 
 /**
  * Handles the cell click

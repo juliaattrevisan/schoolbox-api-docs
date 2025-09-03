@@ -27,15 +27,15 @@ const tabParamName = "tab"; // URL parameter name for the selected tab
 
 // Provide the state and props to child components
 window.Vue.provide("selectedTab", selectedTab);
-window.Vue.provide("title", window.Vue.toRef(props, "title"));
-window.Vue.provide("export", window.Vue.toRef(props, "export"));
-window.Vue.provide("reportId", window.Vue.toRef(props, "reportId"));
-window.Vue.provide("tabs", window.Vue.toRef(props, "tabs"));
-window.Vue.provide("config", window.Vue.toRef(props, "config"));
-window.Vue.provide("routes", window.Vue.toRef(props, "routes"));
-window.Vue.provide("localePastoral", window.Vue.toRef(props, "localePastoral"));
-window.Vue.provide("showSeverity", window.Vue.toRef(props, "showSeverity"));
-window.Vue.provide("severityColors", window.Vue.toRef(props, "severityColors"));
+window.Vue.provide("title", props.title);
+window.Vue.provide("export", props.export);
+window.Vue.provide("reportId", props.reportId);
+window.Vue.provide("tabs", props.tabs);
+window.Vue.provide("config", props.config);
+window.Vue.provide("routes", props.routes);
+window.Vue.provide("localePastoral", props.localePastoral);
+window.Vue.provide("showSeverity", props.showSeverity);
+window.Vue.provide("severityColors", props.severityColors);
 
 /**
  * Handle tab selection and update URL without adding to browser history
