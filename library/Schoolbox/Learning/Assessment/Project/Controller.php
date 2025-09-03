@@ -208,6 +208,7 @@ class Controller extends Assessment\Controller
                 $this->requestQuery->get(Redirect::RETURN_URL)
                     ? Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL))
                     : $this->getSession()->getHistory(),
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ];
 
         // impl assessments we can just grab the details, spec we need to get the unit assessments first
@@ -320,6 +321,7 @@ class Controller extends Assessment\Controller
             'assessment'      => $assessment,
             'transitions'     => $tickTransitions,
             'returnUrlSuffix' => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($this->request->getUri()->getPath()),
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ];
 
         $this->response = $this->responseFromTemplate(
