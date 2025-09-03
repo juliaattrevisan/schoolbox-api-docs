@@ -757,7 +757,6 @@ class Module extends BaseModule
                     $courseImplementationMapper,
                     $unitImplementationMapper,
                     $this->getMapperFactory()->get(RubricDataSource::class),
-                    $editorTemplateHelper,
                     new EditorTemplateHelper(
                         $this->getMapperFactory()->get(EditorTemplateMapper::class),
                         EditorTemplatesCategoryModel::LEARNING_ACTIVITY,
