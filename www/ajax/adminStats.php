@@ -10,17 +10,14 @@
 
 use GuzzleHttp\Client;
 use Proxy\Server;
-use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Engagement\Login;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
-use Schoolbox\InstanceRegistry\Credentials\Config;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Admin\Home\SamlCertHelper;
 use Schoolbox\Resource\Storage\Virus\IScanner;
-use Psr\Log\NullLogger;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
