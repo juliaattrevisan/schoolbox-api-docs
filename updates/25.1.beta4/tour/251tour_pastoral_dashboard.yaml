@@ -1,6 +1,6 @@
 tour:
-  title: '25.1 Release'
-  description: 'Introduce staff users to the new features of the 25.1 release'
+  title: '25.1 Release Pastoral Enhancements'
+  description: 'Introduce staff users to new features of the 25.1 release when they visit the pastoral dashboard'
   roles:
     - staff
   trigger:
