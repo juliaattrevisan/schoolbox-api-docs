@@ -50,6 +50,11 @@ use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
  */
 class Controller extends Assessment\Controller
 {
+    /**
+     * Controller constructor.
+     *
+     * @param EditorTemplateHelper|null $editorTemplateHelper
+     */
     public function __construct(
         UserMapper $userMapper,
         ErrorMapper $errorMapper,
