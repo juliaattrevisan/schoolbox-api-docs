@@ -11,6 +11,7 @@ namespace Schoolbox\Group;
 
 use Alaress\Color\ColorFactory;
 use Alaress\Authorizer\Authorizer;
+use Alaress\Twig\Method\RouteLookupIfAuthorized;
 use Aura\Router\Generator;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
@@ -39,6 +40,8 @@ class GroupsHelper
 
     private Generator $routeGenerator;
 
+    private RouteLookupIfAuthorized $routeLookupIfAuthorized;
+
     private GroupMapper $groupMapper;
 
     private UserAccessMapper $userAccessMapper;
@@ -55,19 +58,21 @@ class GroupsHelper
     public function __construct(
         Authorizer $authorizer,
         Generator $routeGenerator,
+        RouteLookupIfAuthorized $routeLookupIfAuthorized,
         GroupMapper $groupMapper,
         UserAccessMapper $userAccessMapper,
         FolderMapper $folderMapper,
         Timetable_ColourMapper $timetableColourMapper,
         RerouteOverrideMapper $reRouteOverrideMapper
     ) {
-        $this->authorizer            = $authorizer;
-        $this->routeGenerator        = $routeGenerator;
-        $this->groupMapper           = $groupMapper;
-        $this->userAccessMapper      = $userAccessMapper;
-        $this->folderMapper          = $folderMapper;
-        $this->timetableColourMapper = $timetableColourMapper;
-        $this->reRouteOverrideMapper = $reRouteOverrideMapper;
+        $this->authorizer                = $authorizer;
+        $this->routeGenerator            = $routeGenerator;
+        $this->routeLookupIfAuthorized   = $routeLookupIfAuthorized;
+        $this->groupMapper               = $groupMapper;
+        $this->userAccessMapper          = $userAccessMapper;
+        $this->folderMapper              = $folderMapper;
+        $this->timetableColourMapper     = $timetableColourMapper;
+        $this->reRouteOverrideMapper     = $reRouteOverrideMapper;
     }
 
     /**
@@ -267,15 +272,11 @@ class GroupsHelper
             } else {
                 $modifyLink = false;
             }
-            $canAccessCohortReport = $this->authorizer->isPathAuthorizedForUser(
+            $cohortReportLink = $this->routeLookupIfAuthorized->__invoke(
                 'learningMomentEvidence.getCohortReport',
                 ['folder' => $folder, 'folderId' => $folder->getId()],
                 $user
-            );
-            $cohortReportLink = $canAccessCohortReport ? $this->routeGenerator->generate(
-                'learningMomentEvidence.getCohortReport',
-                [ 'folder' => $folder, 'folderId' => $folder->getId() ]
-            ) : false;
+            ) ?: false;
             $possibleGroups[] = [
                 'id'                => $folder->getId(),
                 'name'              => $folder->getName(),
