@@ -452,32 +452,56 @@ switch ($_POST['module']) {
         }
         break;
     case 'cluster_info':
-        $client = new Client(['curl' => Server::getInstance()->buildCurlOptions()]);
-        $client = new \Schoolbox\InstanceRegistry\ApiClient($config, $kernel->get('httpClient.cache'));
-        $irApiKey = exec('/usr/local/bin/schoolbox-instance-registry --api-key');
-        $irUrl = exec('/usr/local/bin/schoolbox-instance-registry --url');
+        $cacheDir = $config->get('stream_dir');
+        $cacheFile = $cacheDir . '/cluster_info_cache_' . md5(INSTANCE_ID) . '.json';
+        $cacheExpiry = 86400; // 1 day cache
 
-        $endpoint = rtrim($irUrl, '/') . '/api/instance/cluster/';
-
-        // Send API Request to IR to fetch the region for the instance.
-        $response = $client->post($endpoint, [
-            'headers' => [
-                'Authorization' => "Bearer {$irApiKey}",
-                'Content-Type'  => 'application/json',
-            ],
-            'json' => [
-                'instance_id' => INSTANCE_ID,
-            ],
-        ]);
-
-        if ($response->getStatusCode() == 200) {
-            $output['cluster_info_status'] = json_decode($response->getBody()->getContents())->cluster_name;
-            $output['cluster_info_light'] = 'success';
+        // Check if cache exists and is still valid
+        if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < $cacheExpiry) {
+            $cachedData = json_decode(file_get_contents($cacheFile), true);
+            $output['cluster_info_status'] = $cachedData['cluster_name'];
+            $output['cluster_info_light'] = $cachedData['light'];
         } else {
-            $output['cluster_info_status'] = 'Unknown';
-            $output['cluster_info_light'] = 'warning';
-        }
+            // Cache miss or expired - fetch from API
+            $client = new Client(['curl' => Server::getInstance()->buildCurlOptions()]);
+            $irApiKey = exec('/usr/local/bin/schoolbox-instance-registry --api-key 2>/dev/null');
+            $irUrl = exec('/usr/local/bin/schoolbox-instance-registry --url 2>/dev/null');
 
+            $endpoint = rtrim($irUrl, '/') . '/api/instance/cluster/';
+
+            try {
+                $response = $client->post($endpoint, [
+                    'headers' => [
+                        'Authorization' => "Bearer {$irApiKey}",
+                        'Content-Type'  => 'application/json',
+                    ],
+                    'json' => [
+                        'instance_id' => INSTANCE_ID,
+                    ],
+                ]);
+
+                if ($response->getStatusCode() == 200) {
+                    $clusterName = json_decode($response->getBody()->getContents())->cluster_name;
+                    $output['cluster_info_status'] = $clusterName;
+                    $output['cluster_info_light'] = 'success';
+
+                    // Cache the successful result
+                    $cacheData = [
+                        'cluster_name' => $clusterName,
+                        'light' => 'success'
+                    ];
+                    file_put_contents($cacheFile, json_encode($cacheData), LOCK_EX);
+                } else {
+                    $output['cluster_info_status'] = 'Unknown';
+                    $output['cluster_info_light'] = 'warning';
+                    // Don't cache error responses
+                }
+            } catch (Exception $e) {
+                $output['cluster_info_status'] = 'Unknown';
+                $output['cluster_info_light'] = 'warning';
+                // Don't cache error responses
+            }
+        }
         break;
     default:
         break;
