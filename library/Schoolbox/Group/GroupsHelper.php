@@ -61,13 +61,40 @@ class GroupsHelper
         Timetable_ColourMapper $timetableColourMapper,
         RerouteOverrideMapper $reRouteOverrideMapper
     ) {
-        $this->authorizer            = $authorizer;
-        $this->routeGenerator        = $routeGenerator;
-        $this->groupMapper           = $groupMapper;
-        $this->userAccessMapper      = $userAccessMapper;
-        $this->folderMapper          = $folderMapper;
-        $this->timetableColourMapper = $timetableColourMapper;
-        $this->reRouteOverrideMapper = $reRouteOverrideMapper;
+        $this->authorizer                = $authorizer;
+        $this->routeGenerator            = $routeGenerator;
+        $this->groupMapper               = $groupMapper;
+        $this->userAccessMapper          = $userAccessMapper;
+        $this->folderMapper              = $folderMapper;
+        $this->timetableColourMapper     = $timetableColourMapper;
+        $this->reRouteOverrideMapper     = $reRouteOverrideMapper;
+    }
+
+    /**
+     * Helper function for outputting a route URL, only if it is authorized.
+     * Returns false if the route doesn't exist or the user is not authorized.
+     * This safely handles cases where modules are disabled and routes don't exist.
+     *
+     * @param string    $name   Route name
+     * @param array     $params Route parameters
+     * @param User|null $user   User to check authorization for
+     * @return string|false     The URL if authorized, false otherwise
+     */
+    private function getRouteIfAuthorized(string $name, array $params = [], ?User $user = null)
+    {
+        if (!$user instanceof User) {
+            throw new \InvalidArgumentException('User must be provided for GroupsHelper::getRouteIfAuthorized');
+        }
+
+        try {
+            if ($this->authorizer->isPathAuthorizedForUser($name, $params, $user)) {
+                return $this->routeGenerator->generate($name, $params);
+            }
+        } catch (\Throwable $e) {
+            // Route doesn't exist or authorization check failed (e.g., module disabled)
+            return false;
+        }
+        return false;
     }
 
     /**
@@ -267,15 +294,11 @@ class GroupsHelper
             } else {
                 $modifyLink = false;
             }
-            $canAccessCohortReport = $this->authorizer->isPathAuthorizedForUser(
+            $cohortReportLink = $this->getRouteIfAuthorized(
                 'learningMomentEvidence.getCohortReport',
                 ['folder' => $folder, 'folderId' => $folder->getId()],
                 $user
             );
-            $cohortReportLink = $canAccessCohortReport ? $this->routeGenerator->generate(
-                'learningMomentEvidence.getCohortReport',
-                [ 'folder' => $folder, 'folderId' => $folder->getId() ]
-            ) : false;
             $possibleGroups[] = [
                 'id'                => $folder->getId(),
                 'name'              => $folder->getName(),
