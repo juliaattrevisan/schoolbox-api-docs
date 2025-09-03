@@ -76,7 +76,7 @@ class GroupsHelper
      * This safely handles cases where modules are disabled and routes don't exist.
      *
      * @param string    $name   Route name
-     * @param array     $params Route parameters  
+     * @param array     $params Route parameters
      * @param User|null $user   User to check authorization for
      * @return string|false     The URL if authorized, false otherwise
      */
@@ -85,7 +85,7 @@ class GroupsHelper
         if (!$user instanceof User) {
             throw new \InvalidArgumentException('User must be provided for GroupsHelper::getRouteIfAuthorized');
         }
-        
+
         try {
             if ($this->authorizer->isPathAuthorizedForUser($name, $params, $user)) {
                 return $this->routeGenerator->generate($name, $params);
