@@ -298,7 +298,7 @@ class GroupsHelper
                 'learningMomentEvidence.getCohortReport',
                 ['folder' => $folder, 'folderId' => $folder->getId()],
                 $user
-            ) ?: false;
+            );
             $possibleGroups[] = [
                 'id'                => $folder->getId(),
                 'name'              => $folder->getName(),
