@@ -1180,7 +1180,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
          */
         $customisationPlans = $customisedAssessments->map(fn(IAssessable $customised) => call_user_func($planTranslator, $customised->getPlans()->first()));
         $data['customisations'] = $customisationPlans->merge($assessment->getPlans()->filter(fn(Plan $plan) => !$plan->getIsDynamic())->map($planTranslator));
-        $data['editorTemplates'] = $this->editorTemplateHelper->getTemplatesForCategory();
+        $data['editorTemplates'] = $this->editorTemplateHelper !== null
+            ? $this->editorTemplateHelper->getTemplatesForCategory()
+            : [];
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/participation/update.twig',
             $data
