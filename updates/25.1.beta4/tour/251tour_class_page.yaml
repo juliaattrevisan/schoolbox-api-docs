@@ -1,0 +1,17 @@
+tour:
+  title: '25.1 Release'
+  description: 'Introduce staff users to the new features of the 25.1 release'
+  roles:
+    - staff
+  trigger:
+    urlRegex: '^/adminv2/home$'
+    selector: body
+    event: tourReady
+  steps:
+    - step:
+        title: What's New
+        type: modal
+        content: "<img src='{CDN_PREFIX}/images/tour/25.1/.png' style='width:100%;margin-bottom:16px;'>
+                  <h3>Improved Assessment Differentiation</h3>
+                  <p>See pastoral flags inline and create adjusted assessments faster by copying or customising from the original.</p>"
+        class: introjs-whatsnewmodal
