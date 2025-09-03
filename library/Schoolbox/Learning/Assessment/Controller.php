@@ -542,7 +542,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $data['selfAssessmentEnabled'] = $this->getConfigLoader()->get('self_assessment_enabled');
         $data['defaultGradeGroup'] = $this->getConfigLoader()->get('default_grade_group');
         $data['custom_assessment_participation'] = $this->getConfigLoader()->get('custom_assessment_participation');
-        $data['editorTemplates'] = $this->editorTemplateHelper->getTemplatesForCategory();
+        $data['editorTemplates'] = $this->editorTemplateHelper !== null
+            ? $this->editorTemplateHelper->getTemplatesForCategory()
+            : [];
 
         if ($clonedAssessment instanceof DueWork\Model) {
             // To be able to view the current student policy if enabling within the submission type
