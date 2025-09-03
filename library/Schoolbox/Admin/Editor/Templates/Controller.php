@@ -75,6 +75,29 @@ class Controller extends Base
     }
 
     /**
+     * Generate template data for create/update forms
+     *
+     * @param CategoryModel $category
+     * @param TemplateModel|null $template
+     * @param string $breadcrumbTitle
+     * @return array
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    private function getTemplateFormData(CategoryModel $category, ?TemplateModel $template, string $breadcrumbTitle): array
+    {
+        return [
+            'pageCurrent' => $this->routeGenerator->generate('adminEditorTemplates.getList'),
+            'allBreadcrumbs' => array_merge(
+                (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminEditorTemplates.getList')),
+                [[$breadcrumbTitle, null]]
+            ),
+            'category' => $category,
+            'hasTokens' => in_array($category->getName(), ['badge-evidence', 'feedback', 'learning-moments']),
+            'template' => $template,
+        ];
+    }
+
+    /**
      * Display list of editor template categories
      */
     public function getList(): void
@@ -104,15 +127,11 @@ class Controller extends Base
     {
         $this->response = $this->responseFromTemplate(
             '@adminEditorTemplates/create.twig',
-            [
-                'pageCurrent' => $this->routeGenerator->generate('adminEditorTemplates.getList'),
-                'allBreadcrumbs' => array_merge(
-                    (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminEditorTemplates.getList')),
-                    [['Create ' . ucwords(str_replace('-', ' ', $category->getName())) . ' Template', null]]
-                ),
-                'category' => $category,
-                'template' => null,
-            ]
+            $this->getTemplateFormData(
+                $category,
+                null,
+                'Create ' . ucwords(str_replace('-', ' ', $category->getName())) . ' Template'
+            )
         );
     }
 
@@ -171,15 +190,11 @@ class Controller extends Base
 
         $this->response = $this->responseFromTemplate(
             '@adminEditorTemplates/create.twig',
-            [
-                'pageCurrent' => $this->routeGenerator->generate('adminEditorTemplates.getList'),
-                'allBreadcrumbs' => array_merge(
-                    (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminEditorTemplates.getList')),
-                    [['Update ' . $template->getTitle(), null]]
-                ),
-                'category' => $category,
-                'template' => $template,
-            ]
+            $this->getTemplateFormData(
+                $category,
+                $template,
+                'Update ' . $template->getTitle()
+            )
         );
     }
 
