@@ -42,6 +42,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
+
 /**
  * Class Controller
  *
