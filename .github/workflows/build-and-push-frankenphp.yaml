@@ -22,6 +22,7 @@ jobs:
   build-and-push-frankenphp-to-dockerhub:
     env:
       AWS_REGION: ap-southeast-2
+    timeout-minutes: 60
     strategy:
       matrix:
         build:
@@ -102,6 +103,7 @@ jobs:
   join-frankenphp:
     env:
       AWS_REGION: ap-southeast-2
+    timeout-minutes: 15
     strategy:
       matrix:
         phpVersion:
