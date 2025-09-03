@@ -137,27 +137,6 @@ jobs:
           pattern: digest-php${{ matrix.phpVersion }}-*
           merge-multiple: 'true'
 
-#      - name: Identify image names
-#        id: images
-#        run: |
-#          echo 'IMAGE_NAMES<<EOF' >> $GITHUB_ENV
-#          for file in $(ls -1 ${{ runner.temp }}/digests/${{ matrix.phpVersion }}); do
-#            echo "${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:${file}" >> $GITHUB_ENV
-#            echo "${{ vars.ECR_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:${file}" >> $GITHUB_ENV
-#          done
-#          echo 'EOF' >> $GITHUB_ENV
-#          cat $GITHUB_ENV
-#
-#      - name: Tag ${{ vars.FRANKENPHP_IMAGE_NAME }} images
-#        id: meta
-#        uses: docker/metadata-action@v5
-#        with:
-#          images: ${{ env.IMAGE_NAMES }}
-#          tags: |
-#            type=ref,event=branch,prefix=latest-php${{ matrix.phpVersion }}-
-#            type=raw,value=latest-php${{ matrix.phpVersion }}-${{ github.ref_name }}
-
-      # Need to join ECR and Dockerhub images separately
       - name: Join ${{ vars.FRANKENPHP_IMAGE_NAME }} images
         working-directory: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}
         run: |
