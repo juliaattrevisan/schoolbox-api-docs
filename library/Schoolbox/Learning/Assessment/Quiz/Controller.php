@@ -180,6 +180,7 @@ class Controller extends Assessment\Controller
             $learnosityConsumerKey,
             $learnosityConsumerSecret,
             null,
+            null,
             $editorTemplateHelper
         );
     }

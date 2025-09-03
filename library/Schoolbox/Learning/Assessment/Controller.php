@@ -346,7 +346,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'isMutable' => $courseManagedFields->isMutable(),
             'isReadonly' => $courseManagedFields->isReadonly(),
         ];
-        $data['editorTemplates'] = $this->editorTemplateHelper->getTemplatesForCategory();
+
+        if ($this->editorTemplateHelper !== null) {
+            $data['editorTemplates'] = $this->editorTemplateHelper->getTemplatesForCategory();
+        }
 
         if (AssessmentType::TYPE_DUE_WORK === $type) {
             // To be able to view the current student policy if enabling within the submission type
