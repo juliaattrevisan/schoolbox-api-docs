@@ -1217,7 +1217,7 @@ class Controller extends Assessment\Controller
             'returnUrl'      => $returnUrl,
             'kamiSession'    => $kamiSession,
             'kamiFileId'     => $kamiFile,
-            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
+            'editorTemplates' => $this->editorTemplateHelper !== null ? $this->editorTemplateHelper->getTemplatesForCategory() : [],
 
             /* Only show these things if the assessment is self-gradable */
             'showDescriptorValue' => $selfAssess,
