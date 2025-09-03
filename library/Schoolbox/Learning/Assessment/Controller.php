@@ -1283,7 +1283,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 'participants' => $participant,
                 'plan' => $plan,
                 'acceptingResponses' => $assessmentData['acceptingResponses'] ?? false,
-                'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
+                'editorTemplates' => $this->editorTemplateHelper !== null ? $this->editorTemplateHelper->getTemplatesForCategory() : [],
             ]
         );
     }
