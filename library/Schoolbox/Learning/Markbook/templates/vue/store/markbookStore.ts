@@ -18,6 +18,8 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
     const showAverages = window.Vue.ref(false);
 
     const isPopoutLoading = window.Vue.ref(false);
+    const popoutLoadError = window.Vue.ref(false);
+    const isFeedbackUILoading = window.Vue.ref(false);
     const popoutSelectedCell = window.Vue.ref<MarkbookPopoutSelectedCellInfo | null>(null);
     const feedbackSelectedCell = window.Vue.ref<MarkbookFeedbackSelectedCellInfo | null>(null);
 
@@ -197,6 +199,8 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         orderedClassImplActivities,
         orderedClassImplStudents,
         isPopoutLoading,
+        popoutLoadError,
+        isFeedbackUILoading,
         popoutSelectedCell,
         feedbackSelectedCell,
         editorTemplates,

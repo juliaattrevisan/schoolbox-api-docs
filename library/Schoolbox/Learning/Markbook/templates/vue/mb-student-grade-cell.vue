@@ -150,7 +150,13 @@ async function onClickCell(): Promise<void> {
          * as we are skipping the popout buttons, we need to make sure that extra data
          * has finished loading for the current feedback UI to be shown correctly
          */
+        mbStore.isFeedbackUILoading = true;
         await until(() => mbStore.isPopoutLoading).toBe(false);
+        mbStore.isFeedbackUILoading = false;
+
+        if (mbStore.popoutLoadError) {
+            return; // something went wrong, abort
+        }
 
         mbStore.popoutSelectedCell = null;
         mbStore.setFeedbackSelectedCell({

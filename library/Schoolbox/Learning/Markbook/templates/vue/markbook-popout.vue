@@ -51,7 +51,6 @@ type ActivityItem = {
 const popOutElement = window.Vue.ref<HTMLDivElement | null>(null);
 const referenceElement = window.Vue.ref<HTMLDivElement | null>(null);
 
-const hasLoadError = window.Vue.ref(false);
 const isExpanded = window.Vue.ref(false); // is recent activity expanded
 const activityItems: Ref<ActivityItem[]> = window.Vue.ref([]); // list of recent activity items to display
 // has an event of type 'response' and response.submitted === true;
@@ -257,7 +256,7 @@ async function getActivity(): Promise<void> {
     const timelineRoute = routes.value.timelineEndpoint;
     const infoRoute = routes.value.infoEndpoint;
 
-    hasLoadError.value = false;
+    mbStore.popoutLoadError = false;
     mbStore.isPopoutLoading = true;
 
     try {
@@ -290,7 +289,7 @@ async function getActivity(): Promise<void> {
         }
     } catch (error) {
         console.error("Error fetching activity items:", error);
-        hasLoadError.value = true;
+        mbStore.popoutLoadError = true;
     } finally {
         mbStore.isPopoutLoading = false;
     }
@@ -338,7 +337,7 @@ function toggleExclusion(participant: MarkbookClassImplActivityParticipant): voi
 async function onMenuItemSelected(target: string | null, action: string | null = null): Promise<void> {
     // No target was specified, the user likely doesn't have access to the route
     if (target === null) {
-        hasLoadError.value = true;
+        mbStore.popoutLoadError = true;
         console.warn("No target specified for menu item selection");
         return;
     }
@@ -367,7 +366,7 @@ async function onMenuItemSelected(target: string | null, action: string | null =
             },
         });
         if (response.ok) {
-            hasLoadError.value = false;
+            mbStore.popoutLoadError = false;
 
             // if action is exclude then toggle the exclusion UI
             if (action === "exclude" && participant !== null) {
@@ -383,10 +382,10 @@ async function onMenuItemSelected(target: string | null, action: string | null =
             // close once changed (this is also to avoid a bug where the pop out doesn't close onClickOutside any more)
             close();
         } else {
-            hasLoadError.value = true;
+            mbStore.popoutLoadError = true;
         }
     } catch (error) {
-        hasLoadError.value = true;
+        mbStore.popoutLoadError = true;
         console.error(error);
     } finally {
         mbStore.isPopoutLoading = false;
@@ -483,7 +482,7 @@ window.Vue.watch(
         isExpanded.value = false;
 
         if ([ACTIVITY_TYPE_TASK, ACTIVITY_TYPE_PROJECT].includes(cellInfo.value.activity.assessmentType)) {
-            hasLoadError.value = false;
+            mbStore.popoutLoadError = false;
             mbStore.isPopoutLoading = false;
             activityItems.value = [];
             return;
@@ -532,7 +531,7 @@ function onToggleSelected(): void {
 
 <template>
     <div ref="popOutElement" class="pop-out" style="display: none">
-        <div v-if="hasLoadError">
+        <div v-if="mbStore.popoutLoadError">
             <pop-out-menu-item class="is-disabled">
                 <div class="warning-message">
                     There was an error during data retrieval. Please
