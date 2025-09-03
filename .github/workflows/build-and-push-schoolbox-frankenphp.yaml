@@ -124,9 +124,9 @@ jobs:
 
       - name: Export digest
         run: |
-          mkdir -p ${{ runner.temp }}/digests
-          digest="${{ steps.build-and-push-latest.outputs.digest }}"
-          touch "${{ runner.temp }}/digests/${digest#sha256:}"
+          mkdir -p ${{ runner.temp }}/digests/${{ matrix.phpVersion }}
+          digest="${{ steps.build-and-push.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${{ matrix.phpVersion }}/${digest#sha256:}"
 
       - name: Upload schoolbox-frankenphp artifact
         uses: actions/upload-artifact@v4
