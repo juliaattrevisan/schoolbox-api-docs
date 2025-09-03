@@ -41,6 +41,7 @@ class Cursor implements ICursor
         private Helper $helper,
         private PastoralMapper $pastoralMapper,
         private string $tabType,
+        private string $resultType,
         private ?string $columnKey,
         private ?array $rowKey = null,
         private ?int $limit = self::LIMIT_DEFAULT,
@@ -89,6 +90,18 @@ class Cursor implements ICursor
         }
 
         $this->inTypeSubType = implode(' OR ', array_filter($whereInTypeSubTypeQuery));
+    }
+
+    /**
+     * Get the SQL snippet to filter out null points if the result type is points
+     *
+     * @return string
+     */
+    private function getWhereResultType(): string
+    {
+        return ($this->resultType === Base::RESULT_TYPE_POINTS) ?
+            "AND (pastoral.points IS NOT NULL)" :
+            '';
     }
 
     /**
@@ -186,11 +199,14 @@ class Cursor implements ICursor
         $filter = $this->filterByCell();
         $whereFilter = $filter['where'];
 
+        $hideNullPoints = $this->getWhereResultType();
+
         $statement = $db->executeQuery(
             "
             SELECT COUNT(DISTINCT pastoral.id) as count
             {$this->helper->getFromString()}
             WHERE {$where}
+            {$hideNullPoints}
             AND {$whereFilter}
             AND ({$this->inTypeSubType})
         ",
@@ -245,6 +261,8 @@ class Cursor implements ICursor
         $db = $this->pastoralMapper->getDatabase();
         $limit = (null === $this->limit) ? '' : "LIMIT {$this->limit}";
 
+        $hideNullPoints = $this->getWhereResultType();
+
         $statement = $db->executeQuery(
             "
             SELECT DISTINCT pastoral.id
@@ -255,6 +273,7 @@ class Cursor implements ICursor
             LEFT JOIN lu_pastoral_subtype AS c ON pastoral.subtype_id = c.id
             INNER JOIN user AS o on pastoral.owner_id = o.id
             WHERE {$where}
+            {$hideNullPoints}
             AND {$whereFilter}
             AND ({$this->inTypeSubType})
             ORDER BY {$orderSql}
