@@ -3,6 +3,7 @@ import type { Template } from "@js/editor/types/editorTypes";
 import CurriculumSelector from "@schoolboxCurriculum/vue/curriculumSelector/curriculum-selector.vue";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import type { LearningMoment } from "@schoolboxLearningMomentEvidence/evidenceTypes";
+import CommentThread from "@schoolboxLearningMomentEvidence/comment-thread.vue";
 import EvidenceTags from "@schoolboxLearningMomentEvidence/evidence-tags.vue";
 import MfActions from "./mf-actions.vue";
 import MfEvidence from "./mf-evidence.vue";
@@ -116,6 +117,17 @@ window.Vue.onMounted(() => {
                 <mf-sources />
             </section>
             <mf-actions />
+
+          <div class="row"></div>
+            <div v-if="mfStore.moment.discussionThread !== null" class="feed-comments small-12 columns">
+                <comment-thread
+                    :thread="mfStore.moment.discussionThread"
+                    :create-thread-endpoint="mfStore.moment._links.createThread"
+                    :can-comment="false"
+                    :cdn-prefix="cdnPrefix"
+                    :site-version="siteVersion"
+                />
+            </div>
         </div>
     </div>
     <mf-modal />
