@@ -98,7 +98,7 @@ jobs:
           name: schoolbox-npm
           path: www/static/js/bundle/
 
-      - name: Build and push ${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }} deployment image
+      - name: Build and push ${{ vars.SCHOOLBOX_IMAGE_NAME }} deployment image
         id: build-and-push-latest
         uses: docker/build-push-action@v6
         with:
@@ -113,7 +113,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             ENV=prod
-            TAG=latest-php${{ matrix.phpVersion }}-${{ github.event.release.target_commitish }}
+            TAG=${{ github.event.release.target_commitish }}-php${{ matrix.phpVersion }}
             PHP_MAJOR_VERSION=${{ matrix.phpVersion }}
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           tags: |
@@ -128,7 +128,7 @@ jobs:
           digest="${{ steps.build-and-push.outputs.digest }}"
           touch "${{ runner.temp }}/digests/${{ matrix.phpVersion }}/${digest#sha256:}"
 
-      - name: Upload ${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }} artifact
+      - name: Upload ${{ vars.SCHOOLBOX_IMAGE_NAME }} artifacts
         uses: actions/upload-artifact@v4
         with:
           name: digest-php${{ matrix.phpVersion }}-${{ matrix.build.arch }}
@@ -163,7 +163,7 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Download ${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }} artifacts
+      - name: Download ${{ vars.SCHOOLBOX_IMAGE_NAME }} artifacts
         uses: actions/download-artifact@v4
         with:
           path: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}
@@ -181,16 +181,16 @@ jobs:
           echo 'EOF' >> $GITHUB_ENV
           cat $GITHUB_ENV
 
-      - name: Tag ${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }} images
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ${{ env.IMAGE_NAMES }}
-          tags: |
-            type=ref,event=branch,prefix=latest-php${{ matrix.phpVersion }}-
-            type=raw,value=latest-php${{ matrix.phpVersion }}-${{ github.ref_name }}
+#      - name: Tag ${{ vars.SCHOOLBOX_IMAGE_NAME }} images
+#        id: meta
+#        uses: docker/metadata-action@v5
+#        with:
+#          images: ${{ env.IMAGE_NAMES }}
+#          tags: |
+#            type=ref,event=branch,prefix=latest-php${{ matrix.phpVersion }}-
+#            type=raw,value=latest-php${{ matrix.phpVersion }}-${{ github.ref_name }}
 
-      - name: Join ${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }} images
+      - name: Join ${{ vars.SCHOOLBOX_IMAGE_NAME }} images
         working-directory: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}
         run: |
           declare -a DOCKERHUB_IMAGES
@@ -203,5 +203,5 @@ jobs:
               ECR_IMAGES+=("${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}@sha256:$file")
           done
 
-          docker buildx imagetools create -t '${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}' "${DOCKERHUB_IMAGES[@]}"
-          docker buildx imagetools create -t '${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}' "${ECR_IMAGES[@]}"
+          docker buildx imagetools create -t '${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:${{ github.event.release.target_commitish }}-php${{ matrix.phpVersion }}' "${DOCKERHUB_IMAGES[@]}"
+          docker buildx imagetools create -t '${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:${{ github.event.release.target_commitish }}-php${{ matrix.phpVersion }}' "${ECR_IMAGES[@]}"
