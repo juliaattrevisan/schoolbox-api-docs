@@ -265,7 +265,7 @@ async function onFeedbackPublish(): Promise<void> {
 
     const result = await cellInfo.value.feedback.publishFeedback();
     if (result) {
-        mbStore.feedbackSelectedCell = null;
+        mbStore.setFeedbackSelectedCell(null);
     }
 }
 </script>
@@ -343,7 +343,7 @@ async function onFeedbackPublish(): Promise<void> {
                             </div>
 
                             <div>
-                                <button class="button" type="button" @click="mbStore.feedbackSelectedCell = null">
+                                <button class="button" type="button" @click="mbStore.setFeedbackSelectedCell(null)">
                                     Close
                                 </button>
                                 <button

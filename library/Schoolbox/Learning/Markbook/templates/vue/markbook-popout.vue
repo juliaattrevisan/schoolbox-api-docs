@@ -410,20 +410,11 @@ function onUpdateFeedbackSelected(): void {
     // Close the popout
     close();
 
-    // If this is already selected, then close it instead I guess
-    // TODO: Maybe when a cell is selected, any other popout click just immediately opens that relevant feedback... hmm
-    const newCell = {
+    mbStore.setFeedbackSelectedCell({
         classImplId: cellInfo.value.classImplId,
         activityId: cellInfo.value.activityId,
         studentId: cellInfo.value.studentId,
-    };
-
-    if (JSON.stringify(newCell) === JSON.stringify(mbStore.feedbackSelectedCell)) {
-        mbStore.feedbackSelectedCell = null;
-        return;
-    }
-
-    mbStore.feedbackSelectedCell = newCell;
+    });
 }
 
 /**
@@ -475,6 +466,7 @@ window.Vue.watch(
         if (newValue === null) {
             // The popout was closed by something else
             referenceElement.value = null;
+            close();
             return;
         }
 

@@ -171,6 +171,19 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         );
     }
 
+    /**
+     * Set the selected feedback cell
+     * If it's already set to this value, clear it
+     * @param cellInfo - The cell info to set
+     */
+    function setFeedbackSelectedCell(cellInfo: MarkbookFeedbackSelectedCellInfo | null): void {
+        if (cellInfo === null || JSON.stringify(feedbackSelectedCell.value) === JSON.stringify(cellInfo)) {
+            feedbackSelectedCell.value = null;
+        } else {
+            feedbackSelectedCell.value = cellInfo;
+        }
+    }
+
     return {
         init,
         data,
@@ -187,5 +200,6 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         editorTemplates,
         aImplHasDraftMarks,
         hasDraftMarks,
+        setFeedbackSelectedCell,
     };
 });

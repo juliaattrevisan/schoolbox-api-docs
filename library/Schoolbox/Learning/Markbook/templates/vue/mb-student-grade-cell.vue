@@ -136,10 +136,23 @@ function formatMark(mark: NonNullable<typeof participant.value>["marks"]["publis
 
 const cellEl = window.Vue.useTemplateRef<HTMLTableCellElement>("cellRef");
 
+const DOUBLE_CLICK_INTERVAL = 500; // ms
+const lastClick = window.Vue.ref<number>(0);
+
 /**
  * When the user clicks the cell, open the pop-out menu if available, otherwise do nothing
  */
 function onClickCell(): void {
+    if (Date.now() - lastClick.value < DOUBLE_CLICK_INTERVAL) {
+        mbStore.popoutSelectedCell = null;
+        mbStore.setFeedbackSelectedCell({
+            classImplId: props.classImplId,
+            studentId: props.studentId,
+            activityId: props.assessmentId,
+        });
+        return;
+    }
+
     if (hasPopOutMenu.value && cellEl.value) {
         mbStore.popoutSelectedCell = {
             classImplId: props.classImplId,
@@ -148,6 +161,8 @@ function onClickCell(): void {
             referenceElement: cellEl.value,
         };
     }
+
+    lastClick.value = Date.now();
 }
 
 const isSelectedPopout = window.Vue.computed(
