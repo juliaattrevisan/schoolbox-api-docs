@@ -41,6 +41,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 /**
  * Class Controller
@@ -49,6 +50,11 @@ use UnexpectedValueException;
  */
 class Controller extends Assessment\Controller
 {
+    /**
+     * Controller constructor.
+     *
+     * @param EditorTemplateHelper|null $editorTemplateHelper
+     */
     public function __construct(
         UserMapper $userMapper,
         ErrorMapper $errorMapper,
@@ -72,7 +78,8 @@ class Controller extends Assessment\Controller
         protected ?Filter\Mapper $filterMapper = null,
         protected ?Filter\Selection\Mapper $filterSelectionMapper = null,
         protected ?CourseImplementationMapper $courseImplementationMapper = null,
-        protected ?UnitImplementationMapper $unitImplementationMapper = null
+        protected ?UnitImplementationMapper $unitImplementationMapper = null,
+        private ?EditorTemplateHelper $editorTemplateHelper = null,
     ) {
         parent::__construct(
             $userMapper,
@@ -98,6 +105,13 @@ class Controller extends Assessment\Controller
             $filterSelectionMapper,
             $courseImplementationMapper,
             $unitImplementationMapper,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            $editorTemplateHelper
         );
     }
 
@@ -194,6 +208,7 @@ class Controller extends Assessment\Controller
                 $this->requestQuery->get(Redirect::RETURN_URL)
                     ? Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL))
                     : $this->getSession()->getHistory(),
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ];
 
         // impl assessments we can just grab the details, spec we need to get the unit assessments first
@@ -306,6 +321,7 @@ class Controller extends Assessment\Controller
             'assessment'      => $assessment,
             'transitions'     => $tickTransitions,
             'returnUrlSuffix' => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($this->request->getUri()->getPath()),
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ];
 
         $this->response = $this->responseFromTemplate(

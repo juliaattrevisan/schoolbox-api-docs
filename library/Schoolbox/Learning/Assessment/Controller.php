@@ -66,6 +66,7 @@ use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementatio
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Assessment\Participant\Plan\Model as PlanModel;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 /**
  * Class Controller
@@ -110,6 +111,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param null|string $learnosityConsumerSecret
      * @param MimetypeMapper|null $mimetypeMapper
      * @param RubricDataSource $rubricDataSource
+     * @param EditorTemplateHelper|null $editorTemplateHelper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -141,6 +143,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         #[\SensitiveParameter] ?string $learnosityConsumerSecret = null,
         protected ?MimetypeMapper $mimetypeMapper = null,
         protected ?RubricDataSource $rubricDataSource = null,
+        private ?EditorTemplateHelper $editorTemplateHelper = null,
     ) {
         parent::__construct(
             $userMapper,
@@ -344,6 +347,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'isReadonly' => $courseManagedFields->isReadonly(),
         ];
 
+        if ($this->editorTemplateHelper !== null) {
+            $data['editorTemplates'] = $this->editorTemplateHelper->getTemplatesForCategory();
+        }
+
         if (AssessmentType::TYPE_DUE_WORK === $type) {
             // To be able to view the current student policy if enabling within the submission type
             $data['lmsStudentPolicy'] = $this->getConfigLoader()->get('lms_student_policy');
@@ -535,6 +542,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $data['selfAssessmentEnabled'] = $this->getConfigLoader()->get('self_assessment_enabled');
         $data['defaultGradeGroup'] = $this->getConfigLoader()->get('default_grade_group');
         $data['custom_assessment_participation'] = $this->getConfigLoader()->get('custom_assessment_participation');
+        $data['editorTemplates'] = $this->editorTemplateHelper !== null
+            ? $this->editorTemplateHelper->getTemplatesForCategory()
+            : [];
 
         if ($clonedAssessment instanceof DueWork\Model) {
             // To be able to view the current student policy if enabling within the submission type
@@ -602,6 +612,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
     public function getUpdateAssessmentForm(IAssessable $assessment): void
     {
         $data = $this->getAssessmentAsTwigArray($assessment->getContext(), $assessment);
+        $data['editorTemplates'] = $this->editorTemplateHelper !== null
+            ? $this->editorTemplateHelper->getTemplatesForCategory()
+            : [];
 
         $breadcrumbs = $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
 
@@ -1172,7 +1185,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
          */
         $customisationPlans = $customisedAssessments->map(fn(IAssessable $customised) => call_user_func($planTranslator, $customised->getPlans()->first()));
         $data['customisations'] = $customisationPlans->merge($assessment->getPlans()->filter(fn(Plan $plan) => !$plan->getIsDynamic())->map($planTranslator));
-
+        $data['editorTemplates'] = $this->editorTemplateHelper !== null
+            ? $this->editorTemplateHelper->getTemplatesForCategory()
+            : [];
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/participation/update.twig',
             $data
@@ -1223,6 +1238,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 'assessment' => $assessment,
                 'participants' => $participant,
                 'acceptingResponses' => $assessmentData['acceptingResponses'] ?? false,
+                'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
             ]
         );
     }
@@ -1273,6 +1289,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 'participants' => $participant,
                 'plan' => $plan,
                 'acceptingResponses' => $assessmentData['acceptingResponses'] ?? false,
+                'editorTemplates' => $this->editorTemplateHelper !== null ? $this->editorTemplateHelper->getTemplatesForCategory() : [],
             ]
         );
     }

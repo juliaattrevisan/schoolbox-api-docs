@@ -757,7 +757,11 @@ class Module extends BaseModule
                     $courseImplementationMapper,
                     $unitImplementationMapper,
                     $this->getMapperFactory()->get(RubricDataSource::class),
-                    $editorTemplateHelper,
+                    new EditorTemplateHelper(
+                        $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                        EditorTemplatesCategoryModel::LEARNING_ACTIVITY,
+                        $this->injector->get('user')
+                    ),
                 );
 
             case Assessment\Project\Controller::class:
@@ -785,6 +789,11 @@ class Module extends BaseModule
                     $filterSelectionMapper,
                     $courseImplementationMapper,
                     $unitImplementationMapper,
+                    new EditorTemplateHelper(
+                        $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                        EditorTemplatesCategoryModel::LEARNING_ACTIVITY,
+                        $this->injector->get('user')
+                    ),
                 );
 
             case Assessment\Quiz\Controller::class:
@@ -822,7 +831,11 @@ class Module extends BaseModule
                     $filterSelectionMapper,
                     $courseImplementationMapper,
                     $unitImplementationMapper,
-                    $editorTemplateHelper,
+                    new EditorTemplateHelper(
+                        $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                        EditorTemplatesCategoryModel::LEARNING_ACTIVITY,
+                        $this->injector->get('user')
+                    ),
                 );
 
             case Assessment\Task\Controller::class:
@@ -851,6 +864,11 @@ class Module extends BaseModule
                     $filterSelectionMapper,
                     $courseImplementationMapper,
                     $unitImplementationMapper,
+                    new EditorTemplateHelper(
+                        $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                        EditorTemplatesCategoryModel::LEARNING_ACTIVITY,
+                        $this->injector->get('user')
+                    ),
                 );
 
             case Assessment\Lti\Controller::class:

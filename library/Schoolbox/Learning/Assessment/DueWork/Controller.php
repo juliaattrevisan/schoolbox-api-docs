@@ -168,7 +168,7 @@ class Controller extends Assessment\Controller
      * @param CourseImplementationMapper $courseImplementationMapper
      * @param UnitImplementationMapper $unitImplementationMapper
      * @param ?RubricDataSource $rubricDataSource
-     * @param EditorTemplateHelper $editorTemplateHelper
+     * @param EditorTemplateHelper|null $editorTemplateHelper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -210,7 +210,7 @@ class Controller extends Assessment\Controller
         protected CourseImplementationMapper $courseImplementationMapper,
         protected UnitImplementationMapper $unitImplementationMapper,
         protected ?RubricDataSource $rubricDataSource,
-        private EditorTemplateHelper $editorTemplateHelper,
+        private ?EditorTemplateHelper $editorTemplateHelper
     ) {
         parent::__construct(
             $userMapper,
@@ -242,6 +242,7 @@ class Controller extends Assessment\Controller
             null,
             $mimeTypeMapper,
             $this->rubricDataSource,
+            $editorTemplateHelper,
         );
     }
 
@@ -1216,6 +1217,7 @@ class Controller extends Assessment\Controller
             'returnUrl'      => $returnUrl,
             'kamiSession'    => $kamiSession,
             'kamiFileId'     => $kamiFile,
+            'editorTemplates' => $this->editorTemplateHelper !== null ? $this->editorTemplateHelper->getTemplatesForCategory() : [],
 
             /* Only show these things if the assessment is self-gradable */
             'showDescriptorValue' => $selfAssess,

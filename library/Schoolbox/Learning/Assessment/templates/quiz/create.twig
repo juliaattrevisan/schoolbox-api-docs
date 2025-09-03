@@ -250,6 +250,9 @@
             detail: {
                 targetElements: ['textarea[name=description]', 'textarea[name=completion_message]'],
                 fileBrowserCategoryId: {{ context.baseContext.folder.id ?? 0 }},
+                {% if editorTemplates is defined %}
+                    templates: {{ editorTemplates|json_encode|raw }},
+                {% endif %}
             }
         }));
 

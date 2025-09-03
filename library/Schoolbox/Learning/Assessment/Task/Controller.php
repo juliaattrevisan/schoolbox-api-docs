@@ -46,6 +46,7 @@ use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\Task\Exception\ConcurrentModificationException;
 use Schoolbox\Learning\Assessment\Task\Exception\InvalidTaskResponseException;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 /**
  * Class Controller
@@ -87,6 +88,7 @@ class Controller extends Assessment\Controller
      * @param Filter\Selection\Mapper $filterSelectionMapper
      * @param CourseImplementationMapper $courseImplementationMapper
      * @param UnitImplementationMapper $unitImplementationMapper
+     * @param EditorTemplateHelper|null $editorTemplateHelper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -112,7 +114,8 @@ class Controller extends Assessment\Controller
         protected Filter\Mapper $filterMapper,
         protected Filter\Selection\Mapper $filterSelectionMapper,
         protected CourseImplementationMapper $courseImplementationMapper,
-        protected UnitImplementationMapper $unitImplementationMapper
+        protected UnitImplementationMapper $unitImplementationMapper,
+        private ?EditorTemplateHelper $editorTemplateHelper,
     ) {
         parent::__construct(
             $userMapper,
@@ -138,6 +141,13 @@ class Controller extends Assessment\Controller
             $filterSelectionMapper,
             $courseImplementationMapper,
             $unitImplementationMapper,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            $editorTemplateHelper
         );
         $this->taskResponseDataSource = $taskResponseDataSource;
     }
@@ -183,6 +193,7 @@ class Controller extends Assessment\Controller
             'assessment'  => $assessment,
             'aImpls'      => $aImpls,
             'writable'    => Access::getInstance()->isInstructor($this->getUser(), $assessment->getContext()->getFolder()),
+            'editorTemplates' => $this->editorTemplateHelper !== null ? $this->editorTemplateHelper->getTemplatesForCategory() : [],
         ];
 
         $this->response = $this->responseFromTemplate(
