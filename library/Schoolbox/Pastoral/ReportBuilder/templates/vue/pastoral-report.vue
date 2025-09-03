@@ -99,7 +99,7 @@ window.Vue.onMounted((): void => {
                 </dd>
             </dl>
             <pr-list v-if="selectedTab?.type === TabType.LIST" />
-            <pr-table v-else v-model:records-or-points="recordsOrPoints" />
+            <!-- <pr-table v-else v-model:records-or-points="recordsOrPoints" /> -->
         </div>
     </div>
 </template>

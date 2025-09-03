@@ -58,7 +58,7 @@ window.Vue.watch(
                     }
                 });
             }
-            scopeUrl.value = `${selectedTab?._links.scope}?${scopeUrlParams.toString()}`;
+            scopeUrl.value = `${selectedTab?.value._links.scope}?${scopeUrlParams.toString()}`;
             isOpen.value = true; // Open the modal to show related records
         } else {
             isOpen.value = false; // Close the modal when no cell is selected
@@ -78,7 +78,7 @@ const { bottom } = toRefs(arrivedState);
 window.Vue.watch(bottom, (isAtBottom) => {
     if (isAtBottom && payload.value && payload.value.metadata.cursor.next !== null) {
         scopeUrlParams.set(ScopeUrlParam.CURSOR as string, payload.value.metadata.cursor.next);
-        scopeUrl.value = `${selectedTab?._links.scope}?${scopeUrlParams.toString()}`;
+        scopeUrl.value = `${selectedTab?.value._links.scope}?${scopeUrlParams.toString()}`;
     }
 });
 </script>
