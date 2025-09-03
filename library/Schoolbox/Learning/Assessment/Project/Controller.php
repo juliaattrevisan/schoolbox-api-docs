@@ -79,7 +79,7 @@ class Controller extends Assessment\Controller
         protected ?Filter\Selection\Mapper $filterSelectionMapper = null,
         protected ?CourseImplementationMapper $courseImplementationMapper = null,
         protected ?UnitImplementationMapper $unitImplementationMapper = null,
-        private ?EditorTemplateHelper $editorTemplateHelper,
+        private ?EditorTemplateHelper $editorTemplateHelper = null,
     ) {
         parent::__construct(
             $userMapper,
