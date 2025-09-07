@@ -53,6 +53,11 @@ class Model implements ISoftDeletable
     public const ORDER_AUTHOR      = 'author';
     public const ORDER_HOUSE       = 'house';
     public const ORDER_CAMPUS      = 'campus';
+    public const ORDER_STUDENT_LASTNAME = self::ORDER_STUDENT . 'LastName';
+    public const ORDER_STUDENT_CHOSEN_NAME = self::ORDER_STUDENT . 'ChosenName';
+    public const ORDER_AUTHOR_LASTNAME = self::ORDER_AUTHOR . 'LastName';
+    public const ORDER_AUTHOR_CHOSEN_NAME = self::ORDER_AUTHOR . 'ChosenName';
+    public const ORDER_PASTORAL_ID  = 'id';
 
     public const ORDER_FIELDS = [
         self::ORDER_CREATED_AT  => 'Created Date',

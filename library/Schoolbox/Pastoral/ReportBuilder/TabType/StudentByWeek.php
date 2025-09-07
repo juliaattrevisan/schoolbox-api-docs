@@ -116,13 +116,13 @@ class StudentByWeek extends Base implements TabTypeInterface, ICursor
         $whereTypes = $this->helper->getType();
         if ($whereTypes->count() > 0) {
             $whereTypeIds = implode(',', $whereTypes->getPropertyValues('id'));
-            $whereInTypeSubTypeQuery[] = "p.type_id IN ({$whereTypeIds})";
+            $whereInTypeSubTypeQuery[] = "pastoral.type_id IN ({$whereTypeIds})";
         }
 
         $whereSubTypes = $this->helper->getSubTypes();
         if ($whereSubTypes->count() > 0) {
             $whereSubTypeIds = implode(',', $whereSubTypes->getPropertyValues('id'));
-            $whereInTypeSubTypeQuery[] = "p.subtype_id IN ({$whereSubTypeIds})";
+            $whereInTypeSubTypeQuery[] = "pastoral.subtype_id IN ({$whereSubTypeIds})";
         }
 
         $whereTypeSubTypeQuery = implode(" OR ", $whereInTypeSubTypeQuery);
@@ -140,7 +140,7 @@ class StudentByWeek extends Base implements TabTypeInterface, ICursor
         );
 
         $distinctRecordsQuery = "
-            SELECT DISTINCT p.*, COALESCE(p.occurred_on, p.created_at) AS reportDate
+            SELECT DISTINCT pastoral.*, COALESCE(pastoral.occurred_on, pastoral.created_at) AS reportDate
             {$this->helper->getFromString()}
             WHERE
                 ({$whereTypeSubTypeQuery}) AND
@@ -249,23 +249,23 @@ class StudentByWeek extends Base implements TabTypeInterface, ICursor
         $whereInTypeSubTypeQuery = [];
         if ($this->helper->getType()->count() > 0) {
             $whereTypeIds = implode(',', $this->helper->getType()->getPropertyValues('id'));
-            $whereInTypeSubTypeQuery[] = "p.type_id IN ({$whereTypeIds})";
+            $whereInTypeSubTypeQuery[] = "pastoral.type_id IN ({$whereTypeIds})";
         }
         if ($this->helper->getSubTypes()->count() > 0) {
             $whereSubTypeIds = implode(',', $this->helper->getSubTypes()->getPropertyValues('id'));
-            $whereInTypeSubTypeQuery[] = "p.subtype_id IN ({$whereSubTypeIds})";
+            $whereInTypeSubTypeQuery[] = "pastoral.subtype_id IN ({$whereSubTypeIds})";
         }
 
         $whereQuery = implode(" OR ", array_filter($whereInTypeSubTypeQuery));
         $whereFilterQuery = implode(" AND ", $this->helper->getFilters());
 
         $query = "
-            SELECT p.student_id
+            SELECT pastoral.student_id
             {$this->helper->getFromString()}
             WHERE
                 {$whereQuery}
                 AND {$whereFilterQuery}
-            GROUP BY p.student_id
+            GROUP BY pastoral.student_id
         ;";
 
         $result = $this->pastoralMapper->getDatabase()->executeQuery(

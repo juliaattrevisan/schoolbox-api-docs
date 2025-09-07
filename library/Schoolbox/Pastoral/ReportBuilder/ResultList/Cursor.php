@@ -8,6 +8,7 @@ use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as PastoralModel;
+use Schoolbox\Pastoral\ReportBuilder\Base;
 use Schoolbox\Pastoral\ReportBuilder\Factory;
 use Schoolbox\Pastoral\ReportBuilder\Helper;
 use Schoolbox\Pastoral\ReportBuilder\TabType\StudentByType;
@@ -80,11 +81,11 @@ class Cursor implements ICursor
         $whereInTypeSubTypeQuery = [];
         if ($this->helper->getType()->count() > 0) {
             $whereTypeIds = implode(',', $this->helper->getType()->getPropertyValues('id'));
-            $whereInTypeSubTypeQuery[] = "p.type_id IN ({$whereTypeIds})";
+            $whereInTypeSubTypeQuery[] = "pastoral.type_id IN ({$whereTypeIds})";
         }
         if ($this->helper->getSubTypes()->count() > 0) {
             $whereSubTypeIds = implode(',', $this->helper->getSubTypes()->getPropertyValues('id'));
-            $whereInTypeSubTypeQuery[] = "p.subtype_id IN ({$whereSubTypeIds})";
+            $whereInTypeSubTypeQuery[] = "pastoral.subtype_id IN ({$whereSubTypeIds})";
         }
 
         $this->inTypeSubType = implode(' OR ', array_filter($whereInTypeSubTypeQuery));
@@ -114,6 +115,28 @@ class Cursor implements ICursor
         return $this->codec->encode(
             [
                 'id' => $last->getId(),
+                'created' => $last->getOccurredOn()?->toIso8601String() ?? $last->getCreatedAt()->toIso8601String(),
+                'student' => [
+                    'chosen' =>
+                        ((string)$last->getStudent()->getPreferredName()) !== '' ?
+                            $last->getStudent()->getPreferredName() :
+                            $last->getStudent()->getFirstName(),
+                    'last' => $last->getStudent()->getLastName(),
+                ],
+                'type' => $last->getType()->getName(),
+                'subtype' => $last->getSubType()->getName(),
+                'author' => [
+                    'chosen' =>
+                        ((string)$last->getOwner()->getPreferredName()) !== '' ?
+                            $last->getOwner()->getPreferredName() :
+                            $last->getOwner()->getFirstName(),
+                    'last' => $last->getOwner()->getLastName(),
+                ],
+                'points' => $last->getPoints(),
+                'yearLevel' => $last->getStudent()->getYear()->getSequence(),
+                'house' => $last->getStudent()->getSchoolHouse()->getHouse(),
+                'campus' => $last->getStudent()->getCampusCollection()->first()->getName(),
+                'severity' => $last->getSeverity()->getSequence(),
             ]
         );
     }
@@ -163,7 +186,6 @@ class Cursor implements ICursor
         $filter = $this->filterByCell();
         $whereFilter = $filter['where'];
 
-
         $statement = $db->executeQuery(
             "
             SELECT COUNT(*) as count
@@ -190,30 +212,52 @@ class Cursor implements ICursor
      */
     public function retrieveResults(?string $encodedCursor): Collection
     {
-        $db = $this->pastoralMapper->getDatabase();
-
         $where = implode(' AND ', $this->helper->getFilters());
         $param = [];
-        if (null !== $encodedCursor) {
+        $order = [];
+        $orderSql = '';
+
+        $reportOrder = $this->helper->getReportOrder();
+        for ($i = 0; $i < count($reportOrder); $i++) {
+            $orderBy = $reportOrder[$i];
+            $order[$orderBy['column']] = $orderBy['direction'] ?? 'ASC';
+            $orderSql .= "{$orderBy['column']} " . ($orderBy['direction'] ?? 'ASC');
+            if ($i < count($reportOrder) - 1) {
+                $orderSql .= ', ';
+            }
+        }
+
+        if ('' !== (string)$encodedCursor) {
             $cursor = $this->codec->decode($encodedCursor);
-            $where .= " AND p.id > :cursor_id";
-            $param['cursor_id'] = $cursor['id'];
+
+            // Create lexicographic comparison for multiple sort fields
+            $cursorConditions = $this->helper->buildCursorConditions($cursor, Base::MIN_SORT_BY_VALUE);
+
+            if (!empty($cursorConditions)) {
+                $where .= " AND (" . implode(' OR ', $cursorConditions['conditions']) . ")";
+                $param = $cursorConditions['params'];
+            }
         }
 
         $filter = $this->filterByCell();
         $whereFilter = $filter['where'];
 
-        $limit = (null === $this->limit) ? "" : " LIMIT {$this->limit}";
-
+        $db = $this->pastoralMapper->getDatabase();
+        $limit = (null === $this->limit) ? '' : "LIMIT {$this->limit}";
 
         $statement = $db->executeQuery(
             "
-            SELECT p.id
+            SELECT pastoral.id
             {$this->helper->getFromString()}
+            LEFT JOIN lu_year_level AS sy ON s.year_id = sy.id
+            INNER JOIN luCampus AS sc ON sc.id = v_sc.campus
+            INNER JOIN lu_pastoral_type AS t ON pastoral.type_id = t.id
+            LEFT JOIN lu_pastoral_subtype AS c ON pastoral.subtype_id = c.id
+            INNER JOIN user AS o on pastoral.owner_id = o.id
             WHERE {$where}
             AND {$whereFilter}
             AND ({$this->inTypeSubType})
-            ORDER BY p.id ASC
+            ORDER BY {$orderSql}
             {$limit}
         ",
             array_merge(
@@ -225,11 +269,18 @@ class Cursor implements ICursor
 
         $pastoralIds = $statement->fetchAll(\PDO::FETCH_COLUMN);
 
-        $results = $this->pastoralMapper->findByColumn('id', $pastoralIds)->reindex();
+        $records = $this->helper->filterRecordsForUser(
+            $this->pastoralMapper
+                ->findByColumn(
+                    'id',
+                    $pastoralIds,
+                    ['order' => $order]
+                )
+                ->reindex()
+        );
 
-        return $results;
+        return $records;
     }
-
 
     /**
      * @return array
@@ -241,7 +292,7 @@ class Cursor implements ICursor
             case Factory::STUDENT_BY_TYPE:
             case Factory::STUDENT_BY_MONTH:
             case Factory::STUDENT_BY_WEEK:
-                $query[] = "p.student_id = :student_id";
+                $query[] = "pastoral.student_id = :student_id";
                 if (!isset($this->rowKey['student_id'])) {
                     throw new ValueError('Student ID is required', self::BAD_REQUEST_ERROR_CODE);
                 }
@@ -249,7 +300,7 @@ class Cursor implements ICursor
                 break;
             case Factory::TYPE_BY_WEEK:
             case Factory::TYPE_BY_MONTH:
-                $query[] = "p.type_id = :type_id AND COALESCE(p.subtype_id, '') = COALESCE(:subtype_id, '')";
+                $query[] = "pastoral.type_id = :type_id AND COALESCE(pastoral.subtype_id, '') = COALESCE(:subtype_id, '')";
                 if (!isset($this->rowKey['type']['type_id'])) {
                     throw new ValueError('Type ID is required');
                 }
@@ -274,7 +325,7 @@ class Cursor implements ICursor
                 if (!preg_match(StudentByType::COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
                     throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey), self::BAD_REQUEST_ERROR_CODE);
                 }
-                $query[] = "p.{$matches['type']}_id = :type_id";
+                $query[] = "pastoral.{$matches['type']}_id = :type_id";
                 $param['type_id'] = $matches['id'];
                 break;
             case Factory::TYPE_BY_MONTH:
@@ -283,7 +334,7 @@ class Cursor implements ICursor
                     throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey), self::BAD_REQUEST_ERROR_CODE);
                 }
                 $monthFormat = TypeByMonth::COLUMN_QUERY_MONTH_FORMAT;
-                $query[] = "DATE_FORMAT(COALESCE(p.occurred_on, p.created_at), '{$monthFormat}') = :monthKey";
+                $query[] = "DATE_FORMAT(COALESCE(pastoral.occurred_on, pastoral.created_at), '{$monthFormat}') = :monthKey";
                 $param['monthKey'] = $this->columnKey;
                 break;
             case Factory::TYPE_BY_WEEK:
@@ -299,7 +350,7 @@ class Cursor implements ICursor
                 if (!$weeks->offsetExists($matches['index'])) {
                     throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey), self::BAD_REQUEST_ERROR_CODE);
                 }
-                $query[] = "COALESCE(p.occurred_on, p.created_at) BETWEEN :start AND :end";
+                $query[] = "COALESCE(pastoral.occurred_on, pastoral.created_at) BETWEEN :start AND :end";
                 $week = array_reverse($weeks->getAll())[$matches['index']];
                 $param['start'] = $week['start']->toIso8601String();
                 $param['end'] = $week['end']->toIso8601String();

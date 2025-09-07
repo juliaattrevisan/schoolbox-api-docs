@@ -23,6 +23,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral\AccessLevelCensor;
 use Schoolbox\Pastoral\Audience\ColorHelper;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
@@ -106,6 +107,7 @@ class Controller extends Base
         private ModelToArray $pastoralTranslator,
         private UserTranslator $userTranslator,
         private PastoralMapper $pastoralMapper,
+        private AccessLevelCensor $accessLevelCensor,
     ) {
     }
 
@@ -388,7 +390,14 @@ class Controller extends Base
                 'type' => 'list',
                 'key' => 'list',
                 '_links' => [
-                    'view' => 'list',
+                    'view' => $this->getRouteIfAuthorized(
+                        'pastoralReportBuilder.getReportByTabType',
+                        [
+                            'reportId' => $report->getId(),
+                            'report' => $report,
+                            'tabType' => 'list',
+                        ]
+                    ),
                     'export' => $this->getRouteIfAuthorized(
                         'pastoralReportBuilder.getReportResultsExport',
                         [
@@ -486,6 +495,7 @@ class Controller extends Base
                 $this->userTranslator,
                 $this->userMapper,
                 $this->pastoralMapper,
+                $this->pastoralTranslator,
                 $resultType,
                 $sortBy,
                 $order,
@@ -495,6 +505,8 @@ class Controller extends Base
                     $this->prepareReportData($report),
                     $this->pastoralMapper,
                     $this->getConfigLoader(),
+                    $this->getUser(),
+                    $this->accessLevelCensor
                 ),
                 $tabType
             );
@@ -537,6 +549,8 @@ class Controller extends Base
                     $this->prepareReportData($report),
                     $this->pastoralMapper,
                     $this->getConfigLoader(),
+                    $this->getUser(),
+                    $this->accessLevelCensor,
                 ),
                 $this->pastoralMapper,
                 $tabType,
@@ -546,7 +560,6 @@ class Controller extends Base
             );
 
             $result = $cursor->retrieveResults($encodedCursor);
-
             $this->response = $this->responseAsJson(
                 [
                     'data'     => [
@@ -636,6 +649,8 @@ class Controller extends Base
                     $this->prepareReportData($report),
                     $this->pastoralMapper,
                     $this->getConfigLoader(),
+                    $this->getUser(),
+                    $this->accessLevelCensor,
                 ),
                 $this->pastoralMapper,
                 $tabType,

@@ -249,7 +249,8 @@ class AccessLevelCensor
                 // The access rule didn't apply to this user, continue to the next one
                 continue;
             }
-
+            /* Exit early if one of the access rule is DENY, ignoring all other access rules
+             */
             if ($accessLevelCurrent === PastoralAccessMapper::ACCESS_DENY) {
                 return PastoralAccessMapper::ACCESS_DENY;
             }

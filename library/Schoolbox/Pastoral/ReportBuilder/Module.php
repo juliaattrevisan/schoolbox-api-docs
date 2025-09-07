@@ -23,6 +23,8 @@ use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral\AccessLevelCensor;
+use Schoolbox\Pastoral\Group\Member\Mapper as PastoralGroupMemberMapper;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Report\Access\Model as ReportAccess;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
@@ -159,6 +161,7 @@ class Module extends BaseModule
             ),
             new User\Translator\Author\ModelToArray(),
             $this->getMapperFactory()->get(PastoralMapper::class),
+            new AccessLevelCensor($this->getMapperFactory()->get(PastoralGroupMemberMapper::class))
         );
     }
 

@@ -56,18 +56,18 @@ class Base
 
         /* Set a maximum number of results should be returned otherwise reject
          */
-        if ($this->limit > self::LIMIT_MAX) {
+        if ($this->limit > static::LIMIT_MAX) {
             throw new ValueError(
-                sprintf('Limit must be at most %d: %d provided', self::LIMIT_MAX, $this->limit),
+                sprintf('Limit must be at most %d: %d provided', static::LIMIT_MAX, $this->limit),
                 self::BAD_REQUEST_ERROR_CODE
             );
         }
 
         /* Set a minimum number of results should be returned otherwise reject
          */
-        if ($this->limit < self::LIMIT_MIN) {
+        if ($this->limit < static::LIMIT_MIN) {
             throw new ValueError(
-                sprintf('Limit must be at least %d: %d provided', self::LIMIT_MIN, $this->limit),
+                sprintf('Limit must be at least %d: %d provided', static::LIMIT_MIN, $this->limit),
                 self::BAD_REQUEST_ERROR_CODE
             );
         }
@@ -77,11 +77,11 @@ class Base
         if (
             null === $this->order ||
             (
-                strcasecmp($this->order, self::ORDER_DIRECTION_ASC) &&
-                strcasecmp($this->order, self::ORDER_DIRECTION_DESC)
+                strcasecmp($this->order, static::ORDER_DIRECTION_ASC) &&
+                strcasecmp($this->order, static::ORDER_DIRECTION_DESC)
             )
         ) {
-            $this->order = self::ORDER_DIRECTION_DEFAULT;
+            $this->order = static::ORDER_DIRECTION_DEFAULT;
         }
     }
 }
