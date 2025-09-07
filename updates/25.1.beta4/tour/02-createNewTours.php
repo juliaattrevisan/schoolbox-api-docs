@@ -19,7 +19,12 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 $app = new class extends CliTool\App {
     public function run(): void
     {
-        passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_dashboard.yaml');
+        if ($this->getConfig()->get('learning_moments_enabled')) {
+            passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_dashboardIncLearningMoments.yaml');
+        } else {
+            passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_dashboardNotIncLearningMoments.yaml');
+        }
+
         passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_pastoral_dashboard.yaml');
         passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_course_markbook.yaml');
         passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_class_page.yaml');
