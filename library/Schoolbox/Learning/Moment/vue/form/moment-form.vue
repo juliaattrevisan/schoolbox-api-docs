@@ -86,7 +86,14 @@ window.Vue.onMounted(() => {
         </template>
     </div>
 
-    <div v-if="mfStore.moment !== null && mfStore.moment.discussionThread !== null && mfStore.moment.discussionThread.children.metadata.count" class="row">
+    <div
+        v-if="
+            mfStore.moment !== null &&
+            mfStore.moment.discussionThread !== null &&
+            mfStore.moment.discussionThread.children.metadata.count
+        "
+        class="row"
+    >
         <div class="small-12 island l-mar-s--top">
             <section class="moment-comments">
                 <comment-thread
