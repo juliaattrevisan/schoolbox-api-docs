@@ -88,7 +88,7 @@ window.Vue.onMounted(() => {
 
     <div v-if="mfStore.moment !== null && mfStore.moment.discussionThread !== null && mfStore.moment.discussionThread.children.metadata.count" class="row">
         <div class="small-12 island l-mar-s--top">
-            <section>
+            <section class="moment-comments">
                 <comment-thread
                     :thread="mfStore.moment.discussionThread"
                     :create-thread-endpoint="mfStore.moment._links.createThread"

@@ -156,7 +156,7 @@
     }
 }
 
-.feed-comments {
+.feed-comments, .moment-comments {
     padding-bottom: 1rem;
 
     .island {
@@ -181,6 +181,17 @@
     .information-list {
         margin-top: 1rem;
     }
+}
+
+// Specifically on the moments' modify screens we put the comment thread at the top
+// necessitating this weird styling duping and special modifications - I think this
+// is because comments were always presumed to be at the bottom of stuff, not top
+.moment-comments {
+    padding: 0 0 0 1rem;
+}
+
+.moment-comments .island {
+    border-top: 0;
 }
 
 .evidence-detail {
