@@ -43,25 +43,25 @@ $app = new class extends CliTool\App
 
 
     /**
+     * --server
+     */
+    private const OPT_LONG_SERVER = 'server:';
+
+
+    /**
      * --schoolcode
-     *
-     * An example arg that has an actual value, denoted by the colon
      */
     private const OPT_LONG_SCHOOLCODE = 'schoolcode:';
 
 
     /**
      * --user
-     *
-     * An example arg that has an actual value, denoted by the colon
      */
     private const OPT_LONG_USER = 'user:';
 
 
     /**
      * --assessment
-     *
-     * An example arg that has an actual value, denoted by the colon
      */
     private const OPT_LONG_ASSESSMENT = 'assessment:';
 
@@ -73,6 +73,7 @@ $app = new class extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
+            self::OPT_LONG_SERVER,
             self::OPT_LONG_SCHOOLCODE,
             self::OPT_LONG_USER,
             self::OPT_LONG_ASSESSMENT,
@@ -117,10 +118,9 @@ HELP;
         $this->getLogger()->info('Learnosity Attempt Finder.');
         $this->getLogger()->info('');
 
-        /* Don't have access to $_SERVER superglobal here
-         * TODO Maybe make this into a cli arg if you use this outside of vagrant
+        /* Don't have access to $_SERVER superglobal here: you need to specify it manually
          */
-        $serverName = self::DEFAULT_SERVER_NAME;
+        $serverName = trim((string)$this->getOpt(self::OPT_LONG_SERVER));
 
         /* Find all the sessions in learnosity pertaining to a user id
          * You need to know that correctly and in advance as a cli arg
@@ -129,8 +129,13 @@ HELP;
         $userId = trim((string)$this->getOpt(self::OPT_LONG_USER));
         $assessmentId = trim((string)$this->getOpt(self::OPT_LONG_ASSESSMENT));
 
-        /* All three are required
+        /* All four are required
          */
+        if ('' === $serverName) {
+            $this->getLogger()->info('Please provide the server name for this instance.');
+            return;
+        }
+
         if ('' === $schoolCode) {
             $this->getLogger()->info('Please provide school code.');
             return;
