@@ -86,6 +86,20 @@ window.Vue.onMounted(() => {
         </template>
     </div>
 
+    <div v-if="mfStore.moment !== null && mfStore.moment.discussionThread !== null && mfStore.moment.discussionThread.children.metadata.count" class="row">
+        <div class="small-12 island l-mar-s--top">
+            <section>
+                <comment-thread
+                    :thread="mfStore.moment.discussionThread"
+                    :create-thread-endpoint="mfStore.moment._links.createThread"
+                    :can-comment="false"
+                    :cdn-prefix="cdnPrefix"
+                    :site-version="siteVersion"
+                />
+            </section>
+        </div>
+    </div>
+
     <div v-if="mfStore.moment !== null" class="row">
         <div class="small-12 island">
             <section>
@@ -117,17 +131,6 @@ window.Vue.onMounted(() => {
                 <mf-sources />
             </section>
             <mf-actions />
-
-          <div class="row"></div>
-            <div v-if="mfStore.moment.discussionThread !== null" class="feed-comments small-12 columns">
-                <comment-thread
-                    :thread="mfStore.moment.discussionThread"
-                    :create-thread-endpoint="mfStore.moment._links.createThread"
-                    :can-comment="false"
-                    :cdn-prefix="cdnPrefix"
-                    :site-version="siteVersion"
-                />
-            </div>
         </div>
     </div>
     <mf-modal />
