@@ -50,6 +50,7 @@ jobs:
             arch: arm64
         phpVersion:
           - 8.4
+        # Note there's no env matrix var: only prod builds for releases
     runs-on: ${{ matrix.build.runs-on }}
     steps:
       - name: Checkout
@@ -176,8 +177,8 @@ jobs:
           declare -a DOCKERHUB_IMAGES
           declare -a ECR_IMAGES
 
-          # All I need is the hashes, which are a part of the /digests/version/ folder
-          # the hashes are the same between both Dockerhub and CLI
+          # All I need is the hashes, which are in /digests/version:
+          # the hashes are the same between both Dockerhub and ECR
           for file in $(ls -1 ${{ runner.temp }}/digests/${{ matrix.phpVersion }}); do
               DOCKERHUB_IMAGES+=("${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}@sha256:$file")
               ECR_IMAGES+=("${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}@sha256:$file")
