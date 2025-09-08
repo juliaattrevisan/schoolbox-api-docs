@@ -145,6 +145,11 @@ HELP;
          */
         $serverName = trim((string)$this->getOpt(self::OPT_LONG_SERVER));
 
+        if ('' === $serverName) {
+            $this->getLogger()->info('Please provide the server name for this instance.');
+            return;
+        }
+
         /* Find all the sessions in learnosity pertaining to a user id
          * You need to know that correctly and in advance as a cli arg
          */
@@ -169,7 +174,7 @@ HELP;
         } else {
             /* Look for a particular record, or subset of records, for a particular person
              */
-            $this->surgical($api, $serverName, $schoolCode, $userId, $assessmentId);
+            $this->surgical($api, $schoolCode, $userId, $assessmentId);
         }
 
         /* Announce conclusion
@@ -199,7 +204,6 @@ HELP;
      * the details of what you're interrogating, such as user/assessment/attempt
      *
      * @param Api $api
-     * @param string $serverName
      * @param string $schoolCode
      * @param string $userId
      * @param string $assessmentId
@@ -207,18 +211,12 @@ HELP;
      */
     private function surgical(
         Api $api,
-        string $serverName,
         string $schoolCode,
         string $userId,
         string $assessmentId
     ): void {
-        /* All four are required
+        /* All four are required incl. server name
          */
-        if ('' === $serverName) {
-            $this->getLogger()->info('Please provide the server name for this instance.');
-            return;
-        }
-
         if ('' === $schoolCode) {
             $this->getLogger()->info('Please provide school code.');
             return;
