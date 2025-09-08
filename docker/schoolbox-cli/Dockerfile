@@ -109,10 +109,6 @@ RUN <<EOF
 useradd -m -U -G adm,sudo,www-data -s /bin/bash schoolboxsuper
 EOF
 
-# For now, copy the scripts from another image
-COPY ./usr/bin/* /usr/bin/
-COPY ./usr/local/bin/* /usr/local/bin/
-
 # For some reason this causes a message: schoolbox-cli hook exited with status 1
 # The container starts without issue though.
 USER schoolboxsuper
