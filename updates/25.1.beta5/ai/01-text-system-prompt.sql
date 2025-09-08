@@ -25,7 +25,7 @@ VALUES (
             SELECT id
             FROM lu_config_type
             WHERE
-                type = 'AI'
+                type = 'openai-text'
         ),
         'true',
         'false',
