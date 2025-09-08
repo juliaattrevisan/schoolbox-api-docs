@@ -7,17 +7,6 @@
 # * schoolbox-taskd
 
 services:
-  # Base image: only needs to be built, not started
-  # By default, build with ENV=dev
-  php-bookworm:
-    image: php-bookworm
-    build:
-      context: ./base-images/php-bookworm
-      args:
-        ENV: ${ENV:-dev}
-        PHP_MAJOR_VERSION: ${PHP_MAJOR_VERSION}
-    restart: no
-
   # Frontend web server, mimicking a load balancer and SSL termination endpoint.
   # In the dev environment, forwards requests to one of these containers:
   # * schoolbox-frankenphp-1
@@ -47,8 +36,6 @@ services:
   # Basically, anything which we haven't yet figured out how to migrate into its
   # own container will go here for now.
   schoolbox-cli:
-    depends_on:
-      - php-bookworm
     container_name: schoolbox-cli
     pull_policy: never
     restart: always
@@ -162,8 +149,6 @@ services:
         condition: service_healthy
       redis-storage:
         condition: service_healthy
-      php-bookworm:
-        condition: service_started
     build:
       context: ./schoolbox-digestd
       args:
@@ -186,8 +171,6 @@ services:
         condition: service_healthy
       redis-storage:
         condition: service_healthy
-      php-bookworm:
-        condition: service_started
     build:
       context: ./schoolbox-scheduled
       args:
@@ -210,8 +193,6 @@ services:
         condition: service_healthy
       redis-storage:
         condition: service_healthy
-      php-bookworm:
-        condition: service_started
     build:
       context: ./schoolbox-mobiled
       args:
@@ -234,8 +215,6 @@ services:
         condition: service_healthy
       redis-storage:
         condition: service_healthy
-      php-bookworm:
-        condition: service_started
     build:
       context: ./schoolbox-socketd
       args:
