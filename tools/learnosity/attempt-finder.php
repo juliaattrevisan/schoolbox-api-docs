@@ -10,6 +10,8 @@ declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
+use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
+use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -111,7 +113,9 @@ HELP;
             return;
         }
 
+        $this->getLogger()->info('');
         $this->getLogger()->info('Learnosity Attempt Finder.');
+        $this->getLogger()->info('');
 
         /* Don't have access to $_SERVER superglobal here
          * TODO Maybe make this into a cli arg if you use this outside of vagrant
@@ -145,7 +149,7 @@ HELP;
         /* Some identifying info
          */
         try {
-            $user = \Schoolbox\UserMapper::getInstance()->findById($userId);
+            $user = UserMapper::getInstance()->findById($userId);
         } catch (\Schoolbox\Mapper\Exception $e) {
             $this->getLogger()->warning(sprintf(
                 'schoolbox user %s not found.',
@@ -165,7 +169,7 @@ HELP;
             $this->getLogger()
         );
 
-        $userIdentifier = (new \Schoolbox\Learning\Learnosity\Codec\UserIdentifier())->generate($schoolCode, $userId);
+        $userIdentifier = (new UserIdentifier())->generate($schoolCode, $userId);
 
         /* Note: activity_id is where were stored our internal quiz identifier. Nice.
          * We had it after all! For example, the url below has 1576 as the activity_id:
