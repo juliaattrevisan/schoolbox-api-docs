@@ -678,7 +678,7 @@ class Subnav
                     ],
                     '/adminv2/restore' => [
                         'name'        => 'Restore',
-                        'visible'     => true,
+                        'visible'     => $userIsSuperuser,
                         'description' => 'Undelete pages, folders and assessments that were accidentally deleted recently.',
                     ],
                     '/adminv2/setting/cms/Resources' => [
