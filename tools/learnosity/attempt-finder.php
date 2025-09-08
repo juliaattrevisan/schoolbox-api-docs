@@ -389,15 +389,21 @@ HELP;
 
         /* Format the output nicely somewhat
          */
-        foreach ($stack as $learnosityReference => $brokenRecord) {
-            $this->getLogger()->info(sprintf(
-                'Attempt for learnosity reference %s by %s %s (%s) is not in learnosity.',
-                $learnosityReference,
-                $brokenRecord['firstname'],
-                $brokenRecord['lastname'],
-                $brokenRecord['user_id']
-            ));
+        if (\count($stack)) {
+            foreach ($stack as $learnosityReference => $brokenRecord) {
+                $this->getLogger()->info(sprintf(
+                    'Attempt for learnosity reference %s by %s %s (%s) is not in learnosity.',
+                    $learnosityReference,
+                    $brokenRecord['firstname'],
+                    $brokenRecord['lastname'],
+                    $brokenRecord['user_id']
+                ));
+            }
+        } else {
+            $this->getLogger()->info('All references located in learnosity; nothing to do.');
         }
+
+        $this->getLogger()->info('');
     }
 };
 
