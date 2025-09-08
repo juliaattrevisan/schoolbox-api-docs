@@ -94,7 +94,7 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
 <template>
     <tr v-if="mbStore.data !== null" class="sub-row" :class="{ 'markbook-faded': mbStore.feedbackSelectedCell }">
         <th class="fixed-left">{{ label }}</th>
-        <th class="fixed-left">&nbsp;</th>
+        <td class="fixed-left">&nbsp;</td>
         <td v-if="mbStore.data.rank !== null"></td>
         <td
             v-for="{ assessment, aImpl, stat } in activities"
@@ -103,9 +103,14 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
             :data-assessment="assessment.id"
         >
             <template v-if="stat === null || aImpl === null"></template>
-            <template v-else-if="props.input && (props.input.allowCourseManaged || !aImpl.courseManaged) || aImpl.writable === false">
+            <template
+                v-else-if="
+                    (props.input && (props.input.allowCourseManaged || !aImpl.courseManaged)) ||
+                    aImpl.writable === false
+                "
+            >
                 <select
-                    v-if="props.input.selectOptions && assessment.assessmentType !== ACTIVITY_TYPE_TASK"
+                    v-if="props.input?.selectOptions && assessment.assessmentType !== ACTIVITY_TYPE_TASK"
                     v-model="aImpl[props.input.key]"
                     :name="props.statsKey"
                     :disabled="!mbStore.data || !mbStore.data.canAccessPopOut"
@@ -122,7 +127,7 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
                     <!-- eslint-enable vue/no-v-html -->
                 </select>
                 <input
-                    v-else-if="assessment.assessmentType !== ACTIVITY_TYPE_TASK"
+                    v-else-if="assessment.assessmentType !== ACTIVITY_TYPE_TASK && props.input"
                     v-model="aImpl[props.input.key]"
                     type="number"
                     inputmode="numeric"
