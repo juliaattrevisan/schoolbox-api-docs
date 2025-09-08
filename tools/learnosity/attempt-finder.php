@@ -152,13 +152,24 @@ HELP;
         $userId = trim((string)$this->getOpt(self::OPT_LONG_USER));
         $assessmentId = trim((string)$this->getOpt(self::OPT_LONG_ASSESSMENT));
 
+        /* Initialise dependencies
+         */
+        $api = new Api(
+            $serverName,
+            $this->getConfig()->get('learnosity_version'),
+            $this->getConfig()->get('learnosity_consumer_key'),
+            $this->getConfig()->get('learnosity_consumer_secret'),
+            $this->getLogger()
+        );
+
         if ($this->getOpt(self::OPT_LONG_RECON)) {
             /* Look at all learnosity references chunks of 1000
              */
+            $this->recon($api);
         } else {
             /* Look for a particular record, or subset of records, for a particular person
              */
-            $this->surgical($serverName, $schoolCode, $userId, $assessmentId);
+            $this->surgical($api, $serverName, $schoolCode, $userId, $assessmentId);
         }
 
         /* Announce conclusion
@@ -187,6 +198,7 @@ HELP;
      * Using the cli args, find the learnosity sessions that correspond. This is used when you know
      * the details of what you're interrogating, such as user/assessment/attempt
      *
+     * @param Api $api
      * @param string $serverName
      * @param string $schoolCode
      * @param string $userId
@@ -194,6 +206,7 @@ HELP;
      * @return void
      */
     private function surgical(
+        Api $api,
         string $serverName,
         string $schoolCode,
         string $userId,
@@ -237,16 +250,6 @@ HELP;
 
             return;
         }
-
-        /* Initialise dependencies
-         */
-        $api = new Api(
-            $serverName,
-            $this->getConfig()->get('learnosity_version'),
-            $this->getConfig()->get('learnosity_consumer_key'),
-            $this->getConfig()->get('learnosity_consumer_secret'),
-            $this->getLogger()
-        );
 
         $userIdentifier = (new UserIdentifier())->generate($schoolCode, $userId);
 
@@ -326,11 +329,75 @@ HELP;
     /**
      * Scan all learnosity references
      *
+     * @param Api $api
      * @return void
      */
-    private function recon(): void
+    private function recon(Api $api): void
     {
+        $db = $this->getDatabaseInternal();
 
+        $attempts = $db->executeQuery("
+            SELECT 
+                aa.learnosity_reference, aa.user_id,
+                u.firstname, u.lastname 
+            FROM assess_attempt aa
+            INNER JOIN `user` u ON u.id = aa.user_id 
+            WHERE aa.deleted_at IS NULL
+            AND aa.learnosity_reference IS NOT NULL
+            AND aa.learnosity_reference != ''
+            ORDER BY aa.start
+        ");
+
+        $rows = $attempts->fetchAll();
+
+        /* Bust down into 1000-element chunks to minmise learnosity api requests
+         */
+        $maxPerChunk = 3; // TODO unlock to 1000
+        $chunks = array_chunk($rows, $maxPerChunk);
+
+        $stack = [];
+
+        foreach ($chunks as $chunk) {
+            $substack = [];
+
+            foreach ($chunk as $row) {
+                $substack[$row['learnosity_reference']] = $row;
+            }
+
+            /* Compile learnosity references for a batch request to learnosity
+             */
+            $learnosityReferences = array_keys($substack);
+
+            $payload = [
+                'session_id' => $learnosityReferences,
+            ];
+
+            $result = $api->dataGetRequest('/sessions/responses', $payload);
+
+            foreach (($result['data'] ?? []) as $record) {
+                /* Unset substack if we found a learnosity reference
+                 */
+                unset($substack[$record['session_id']]);
+            }
+
+            /* Merge anything that remains
+             */
+            if (!empty($substack)) {
+                $stack = array_merge($stack, $substack);
+            }
+        }
+
+        /* Format the output nicely somewhat
+         */
+        foreach ($stack as $learnosityReference => $brokenRecord) {
+            $this->getLogger()->info(sprintf(
+                'Attempt for learnosity reference %s by %s %s (%s) is not in learnosity.',
+                $learnosityReference,
+                $brokenRecord['firstname'],
+                $brokenRecord['lastname'],
+                $brokenRecord['user_id']
+            ));
+        }
     }
 };
 
