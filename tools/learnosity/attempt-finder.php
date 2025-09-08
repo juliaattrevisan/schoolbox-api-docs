@@ -173,7 +173,8 @@ HELP;
         );
 
         if ($this->getOpt(self::OPT_LONG_RECON)) {
-            /* Look at all learnosity references chunks of 1000
+            /* Look at all learnosity references in chunks of 1000
+             * TODO maybe make that configurable, but who cares
              */
             $this->recon($api);
         } else {
