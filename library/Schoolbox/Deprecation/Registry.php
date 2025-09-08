@@ -39,9 +39,7 @@ class Registry
      */
     public const PATH_BLACKLIST = [
         SITE_root . '/vendor/cboden/ratchet/',
-        SITE_root . '/vendor/imangazaliev/didom/',
         SITE_root . '/vendor/ratchet/rfc6455/',
-        SITE_root . '/vendor/ssnepenthe/color-utils/',
     ];
 
     /**
