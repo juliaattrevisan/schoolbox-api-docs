@@ -51,7 +51,7 @@ window.Vue.watch(
             scopeUrlParams.delete(ScopeUrlParam.CURSOR as string); // Clear the cursor to start fresh
             // now start setting the new ones
             scopeUrlParams.set(ScopeUrlParam.COLUMN as string, selectedHeader.value.key);
-            scopeUrlParams.set(ScopeUrlParam.SELECTED as string, props.recordsOrPoints);
+            scopeUrlParams.set(ScopeUrlParam.SELECTED as string, props.recordsOrPoints); // to only show records with points when points toggled
             if (newCell.rowKeys !== undefined) {
                 // loop through the RowKeys object and set any any params that are provided
                 Object.entries(newCell.rowKeys as Record<string, number>).forEach(([key, value]) => {
