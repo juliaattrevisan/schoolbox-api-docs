@@ -134,6 +134,46 @@ HELP;
         $userId = trim((string)$this->getOpt(self::OPT_LONG_USER));
         $assessmentId = trim((string)$this->getOpt(self::OPT_LONG_ASSESSMENT));
 
+        $this->surgical($serverName, $schoolCode, $userId, $assessmentId);
+
+        /* Announce conclusion
+         */
+        if (!$this->perform()) {
+            $this->getLogger()->info('Planning finished.');
+        }
+    }
+
+
+    /**
+     * FIXME Decide whether this script must be run as root
+     *  By default, this returns false (see CliTool\App) but if you're using methods that require
+     *  access to special folders (such as when you're creating files) you need to run this as root.
+     *  Otherwise it'll fail with a generic error that might mislead you
+     *
+     * @return bool|null
+     */
+    public function runAsRoot(): ?bool
+    {
+        return parent::runAsRoot();
+    }
+
+
+    /**
+     * Using the cli args, find the learnosity sessions that correspond. This is used when you know
+     * the details of what you're interrogating, such as user/assessment/attempt
+     *
+     * @param string $serverName
+     * @param string $schoolCode
+     * @param string $userId
+     * @param string $assessmentId
+     * @return void
+     */
+    private function surgical(
+        string $serverName,
+        string $schoolCode,
+        string $userId,
+        string $assessmentId
+    ): void {
         /* All four are required
          */
         if ('' === $serverName) {
@@ -255,26 +295,6 @@ HELP;
             print_r(array_intersect_key($row, $fields));
             echo "\n\n";
         }
-
-        /* Announce conclusion
-         */
-        if (!$this->perform()) {
-            $this->getLogger()->info('Planning finished.');
-        }
-    }
-
-
-    /**
-     * FIXME Decide whether this script must be run as root
-     *  By default, this returns false (see CliTool\App) but if you're using methods that require
-     *  access to special folders (such as when you're creating files) you need to run this as root.
-     *  Otherwise it'll fail with a generic error that might mislead you
-     *
-     * @return bool|null
-     */
-    public function runAsRoot(): ?bool
-    {
-        return parent::runAsRoot();
     }
 };
 
