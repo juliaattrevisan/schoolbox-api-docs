@@ -3,4 +3,4 @@
 
 UPDATE config 
 SET title = 'Allow specification of severity on pastoral records'
-WHERE title = 'Allow specification of severity on pastoral records.';
+WHERE name = 'pastoral_severity';
