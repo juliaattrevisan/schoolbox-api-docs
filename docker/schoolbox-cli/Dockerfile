@@ -1,6 +1,10 @@
 ARG ARCH=amd64
-
-FROM --platform=linux/${ARCH} php-bookworm
+ARG ENV=dev
+ARG PHP_MAJOR_VERSION=8.4
+ARG PRIVATE_CONTAINER_REGISTRY=476058706527.dkr.ecr.ap-southeast-2.amazonaws.com
+ARG IMAGE=${PRIVATE_CONTAINER_REGISTRY}/frankenphp-base
+ARG TAG=latest-php${PHP_MAJOR_VERSION}
+FROM ${IMAGE}:${TAG}
 
 ARG ARCH
 ARG NVM_VERSION='0.40.3'
