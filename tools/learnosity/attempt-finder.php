@@ -115,12 +115,43 @@ HELP;
         /* Find all the sessions in learnosity pertaining to a user id
          * You need to know that correctly and in advance as a cli arg
          */
-        // $api->dataGetRequest()
+        $instanceId = 'vagrant';
+        $userId = 13;
+
+        $userIdentifier = (new \Schoolbox\Learning\Learnosity\Codec\UserIdentifier())->generate($instanceId, $userId);
+
+        $payload = [
+            'user_id' => [
+                $userIdentifier
+            ]
+        ];
+
+        $result = $api->dataGetRequest('/sessions/responses', $payload);
 
         /* Iterate through each of the records found and hope to match the title provided
          * (if provided at all...) to find one that corresponds to a particular schoolbox assessment
          * because we didn't store assessment ids anywhere in the attempt payload.
          */
+        $fields = array_fill_keys([
+            'user_id',
+            'activity_id',
+            'num_attempted',
+            'num_questions',
+            'session_id',
+            'score',
+            'max_score',
+            'dt_event',
+            'dt_saved',
+            'dt_started',
+            'dt_completed',
+            'responses',
+            'metadata',
+        ], null);
+
+        foreach ($result['data'] as $row) {
+            print_r(array_intersect_key($row, $fields));
+
+        }
 
         /* Print any low-level info about the attempt if it happens to match the cli args enough
          */
