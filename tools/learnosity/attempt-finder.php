@@ -352,7 +352,8 @@ HELP;
 
         /* Bust down into 1000-element chunks to minmise learnosity api requests
          */
-        $maxPerChunk = 3; // TODO unlock to 1000
+        $maxPerChunk = 1000;
+
         $chunks = array_chunk($rows, $maxPerChunk);
 
         $stack = [];
