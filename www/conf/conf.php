@@ -63,19 +63,23 @@ if (PHP_SAPI === 'cli') {
 } else {
     // Web request: allow a singular fallback instance
     define('STDOUT', fopen('php://stdout', 'w'));
-    $hostname           = ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? '') ?: $_SERVER['HTTP_HOST'];
-    $hostname           = explode(':', $hostname)[0];
-    $fallbackInstanceId = null;
+    $hostname = ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? '') ?: $_SERVER['HTTP_HOST'];
+    $hostname = explode(':', $hostname)[0];
     foreach ($instances as $instanceIdKey => $instance) {
+        // Is this a fallback instance?
+        // If so, use it but only if no actual hostnames match
         if (!empty($instance['fallback'])) {
             $instanceId = $instanceIdKey;
         }
+
+        // Is there an actual hostname match?
+        // If so, use it and ignore any fallback instance
         if (is_array($instance['hostnames'] ?? null) && in_array($hostname, $instance['hostnames'], true)) {
             $instanceId = $instanceIdKey;
+            break;
         }
     }
 
-    // Fall back to the fallback instance, if there was one and there's no match
     if (isset($instanceId)) {
         $instance  = $instances[$instanceId];
         $dbHost    = $instance['db_host'] ?? null;
