@@ -185,5 +185,11 @@ jobs:
               ECR_IMAGES+=("${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}@sha256:$file")
           done
 
-          docker buildx imagetools create -t '${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:${{ github.event.release.target_commitish }}-php${{ matrix.phpVersion }}' "${DOCKERHUB_IMAGES[@]}"
-          docker buildx imagetools create -t '${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:${{ github.event.release.target_commitish }}-php${{ matrix.phpVersion }}' "${ECR_IMAGES[@]}"
+          docker buildx imagetools create \
+            -t '${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:${{ github.ref_name }}-php${{ matrix.phpVersion }}' \
+            -t '${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:${{ github.event.release.target_commitish }}-php${{ matrix.phpVersion }}' \
+            "${DOCKERHUB_IMAGES[@]}"
+          docker buildx imagetools create \
+            -t '${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:${{ github.ref_name }}-php${{ matrix.phpVersion }}' \
+            -t '${{ vars.ECR_NAMESPACE }}/${{ vars.SCHOOLBOX_IMAGE_NAME }}:${{ github.event.release.target_commitish }}-php${{ matrix.phpVersion }}' \
+            "${ECR_IMAGES[@]}"
