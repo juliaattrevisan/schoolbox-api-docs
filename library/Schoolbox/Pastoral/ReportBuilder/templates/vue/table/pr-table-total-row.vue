@@ -4,12 +4,12 @@
  * Renders a single total row with cells based on column types.
  */
 
+import type { Ref } from "vue";
 import { Chart } from "highcharts-vue";
 import { capitalizeFirstLetter } from "@js/util/stringUtils";
 import { TableHeaderType } from "../../js/types/pastoralReportTypes";
-import type { TableHeader, RowOptions, RecordsAndPoints } from "../../js/types/pastoralReportTypes";
+import type { TableHeader, RowOptions, RecordsAndPoints, Tab } from "../../js/types/pastoralReportTypes";
 import { getChartOptions } from "./config/chartOptions";
-import { useStore } from "../store/pastoralReportStore";
 import { getMeta } from "../util/pastoralReportUtils";
 
 const props = defineProps<{
@@ -22,12 +22,17 @@ const emit = defineEmits<{
     cellSelect: [header: TableHeader, meta: string[]];
 }>();
 
+const selectedTab = window.Vue.inject<Ref<Tab>>("selectedTab");
+
 /**
  * Handles the cell click
  * @param header - the header of the cell that was clicked
  */
 function onCellSelected(header: TableHeader): void {
-    emit("cellSelect", header, getMeta(useStore().selectedTab, header));
+    if (selectedTab === undefined) {
+        return;
+    }
+    emit("cellSelect", header, getMeta(selectedTab.value, header));
 }
 </script>
 

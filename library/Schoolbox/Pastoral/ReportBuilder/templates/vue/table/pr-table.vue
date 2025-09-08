@@ -3,13 +3,13 @@
  * Displays a pastoral report in a table format.
  */
 
+import type { Ref } from "vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
-import type { TablePayload, TableHeader, SelectedCell, RowKeys } from "../../js/types/pastoralReportTypes";
+import type { TablePayload, TableHeader, SelectedCell, RowKeys, Tab } from "../../js/types/pastoralReportTypes";
 import { TabType, ViewUrlParam } from "../../js/types/pastoralReportTypes";
 import { useLoadPrTable } from "../composable/useLoadPrTable";
 import { useMaxScrollableHeight } from "../composable/useMaxScrollableHeight";
-import { useStore } from "../store/pastoralReportStore";
 import PrEmpty from "../pr-empty.vue";
 import PrTableHeader from "./pr-table-header.vue";
 import PrTableTotalRow from "./pr-table-total-row.vue";
@@ -19,7 +19,7 @@ import PrTableModal from "./pr-table-modal.vue";
 
 // #region table load / sorting / pagination
 
-const store = useStore();
+const selectedTab = window.Vue.inject<Ref<Tab>>("selectedTab");
 const recordsOrPoints = defineModel<"records" | "points">("records-or-points", { default: "records" });
 const viewUrl = window.Vue.ref("");
 const viewUrlParams = new URLSearchParams();
@@ -36,7 +36,7 @@ function resetTableLoad(): void {
     viewUrlParams.set(ViewUrlParam.LIMIT as string, LIMIT.toString());
     viewUrlParams.set(ViewUrlParam.SORT_BY as string, sortBy.value);
     viewUrlParams.set(ViewUrlParam.ORDER as string, order.value);
-    viewUrl.value = `${store.selectedTab?._links.view}?${viewUrlParams.toString()}`;
+    viewUrl.value = `${selectedTab?.value._links.view}?${viewUrlParams.toString()}`;
 }
 
 /**
@@ -45,7 +45,7 @@ function resetTableLoad(): void {
 window.Vue.watch(recordsOrPoints, () => {
     viewUrlParams.set(ViewUrlParam.SELECTED as string, recordsOrPoints.value);
     viewUrlParams.set(ViewUrlParam.CURSOR as string, ""); // Reset cursor on records/points change
-    viewUrl.value = `${store.selectedTab?._links.view}?${viewUrlParams.toString()}`;
+    viewUrl.value = `${selectedTab?.value._links.view}?${viewUrlParams.toString()}`;
 });
 
 /**
@@ -64,7 +64,7 @@ function onSort(headerKey: string): void {
     viewUrlParams.set(ViewUrlParam.SORT_BY as string, sortBy.value);
     viewUrlParams.set(ViewUrlParam.ORDER as string, order.value);
     viewUrlParams.set(ViewUrlParam.CURSOR as string, ""); // Reset cursor on sort change
-    viewUrl.value = `${store.selectedTab?._links.view}?${viewUrlParams.toString()}`;
+    viewUrl.value = `${selectedTab?.value._links.view}?${viewUrlParams.toString()}`;
 }
 
 /**
@@ -73,20 +73,19 @@ function onSort(headerKey: string): void {
  */
 function onPaginate(cursor: string): void {
     viewUrlParams.set(ViewUrlParam.CURSOR as string, cursor);
-    viewUrl.value = `${store.selectedTab?._links.view}?${viewUrlParams.toString()}`;
+    viewUrl.value = `${selectedTab?.value._links.view}?${viewUrlParams.toString()}`;
 }
 
 /**
  * when the endpoint changes trigger a new load
+ * we can assert the type of the new tab as pr-table wont exist
+ * without selectedTab being set
  */
-window.Vue.watch(
-    () => store.selectedTab,
-    (newTab) => {
-        if (newTab?.type === TabType.TABLE) {
-            resetTableLoad();
-        }
-    },
-);
+window.Vue.watch(selectedTab as Ref<Tab>, (newTab) => {
+    if (newTab.type === TabType.TABLE) {
+        resetTableLoad();
+    }
+});
 
 // #endregion
 
@@ -122,7 +121,8 @@ function onRowCellSelect(header: TableHeader, rowKeys: RowKeys, meta: string[]):
 
 // #endregion
 
-const { maxScrollableHeight } = useMaxScrollableHeight();
+const scrollableEl = window.Vue.useTemplateRef<HTMLDivElement>("scrollableRef");
+const { maxScrollableHeight } = useMaxScrollableHeight(scrollableEl);
 
 /**
  * Reset the table load to ensure the correct endpoint is set
@@ -186,14 +186,12 @@ window.Vue.onMounted(() => {
             />
         </div>
     </template>
+    <!-- fall back to just an empty state if all else fails -->
+    <pr-empty v-else />
     <pr-table-modal :selected-cell="selectedCell" />
 </template>
 
 <style lang="scss">
-.scrollable {
-    overflow-y: auto;
-}
-
 .pr-table {
     width: 100%;
     /* fix the head to stay at the top when scrolling */

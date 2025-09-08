@@ -6,13 +6,16 @@
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import { getDayjsDatetime } from "@js/util/dateUtils";
 import type { PastoralRecord } from "@schoolboxLibrary/Pastoral/types/PastoralRecord";
-import { useStore } from "./store/pastoralReportStore";
+import type { Routes, Config, SeverityColors } from "../js/types/pastoralReportTypes";
 
 const props = defineProps<{
     record: PastoralRecord;
 }>();
 
-const store = useStore();
+const routes = window.Vue.inject<Routes>("routes");
+const config = window.Vue.inject<Config>("config");
+const showSeverity = window.Vue.inject<boolean>("showSeverity");
+const severityColors = window.Vue.inject<SeverityColors>("severityColors");
 </script>
 
 <template>
@@ -24,7 +27,7 @@ const store = useStore();
             <img v-else :src="props.record.student._links?.avatar" :alt="props.record.student.fullName" />
             <a
                 :href="
-                    store.routes.getStudentRecord
+                    routes?.getStudentRecord
                         .replace('{studentId}', props.record.student.id.toString())
                         .replace('{recordId}', props.record.id.toString())
                 "
@@ -33,12 +36,13 @@ const store = useStore();
                     {{ props.record.student.fullName }}: {{ props.record.heading }}
                     <span
                         v-if="
-                            store.showSeverity &&
+                            showSeverity &&
                             props.record.severity &&
-                            store.severityColors[props.record.severity.id]
+                            severityColors &&
+                            severityColors[props.record.severity.id]
                         "
                         class="circle l-mar--0"
-                        :style="`background-color:${store.severityColors[props.record.severity.id].back}`"
+                        :style="`background-color:${severityColors[props.record.severity.id].back}`"
                         :title="props.record.severity.name"
                     ></span>
                     <sbx-icon
@@ -48,7 +52,11 @@ const store = useStore();
                         :title="`Record archived - ${props.record.expiresAt}`"
                     ></sbx-icon>
                     <sbx-label-pastoral-points
-                        v-if="store.config.pastoralPointEnabled && props.record.points"
+                        v-if="
+                            config?.pastoralPointEnabled &&
+                            props.record.points !== undefined &&
+                            props.record.points !== null
+                        "
                         :points="props.record.points"
                         class="l-flex__item--none"
                     ></sbx-label-pastoral-points>
@@ -60,7 +68,7 @@ const store = useStore();
                 | Created by
                 <a :href="`/search/user/${props.record.owner.id}`">{{ props.record.owner.fullName }}</a>
                 {{ props.record.createdAt.short }}
-                <span v-if="store.config.pastoralActionEnable && props.record.uncompletedActionCount > 0">
+                <span v-if="config?.pastoralActionEnable && props.record.uncompletedActionCount > 0">
                     | {{ props.record.uncompletedActionCount }} follow up action{{
                         props.record.uncompletedActionCount === 1 ? "" : "s"
                     }}
@@ -75,7 +83,7 @@ const store = useStore();
                     <template v-for="tag in props.record.tags" :key="tag.id">
                         <a
                             class="neutral label hide-on-print"
-                            :href="store.routes.getReportTags.replace('{tagId}', tag.id.toString())"
+                            :href="routes?.getReportTags.replace('{tagId}', tag.id.toString())"
                         >
                             {{ tag.name }}
                         </a>

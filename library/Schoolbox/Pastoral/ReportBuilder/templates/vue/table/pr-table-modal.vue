@@ -3,12 +3,11 @@
  * To display the records linked to a particular cell when selected
  */
 
-import { useTemplateRef, toRefs } from "vue";
+import { useTemplateRef, toRefs, type Ref } from "vue";
 import { useScroll } from "@vueuse/core";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
-import { useStore } from "../store/pastoralReportStore";
-import type { TableHeader, SelectedCell } from "../../js/types/pastoralReportTypes";
+import type { TableHeader, SelectedCell, Tab } from "../../js/types/pastoralReportTypes";
 import { ScopeUrlParam } from "../../js/types/pastoralReportTypes";
 import { useLoadRecords } from "../composable/useLoadRecords";
 import PrRecord from "../pr-record.vue";
@@ -17,7 +16,8 @@ const props = defineProps<{
     selectedCell: SelectedCell | null;
 }>();
 
-const store = useStore();
+const selectedTab = window.Vue.inject<Ref<Tab>>("selectedTab");
+const title = window.Vue.inject<string>("title");
 const isOpen = window.Vue.ref(false);
 const selectedHeader = window.Vue.ref<TableHeader | null>(null);
 const scopeUrl = window.Vue.ref("");
@@ -29,8 +29,8 @@ const { isNewLoad, isNewLoading, isMoreLoading, payload, loadError } = useLoadRe
  * @returns - the current scope export URL
  */
 function scopeExportUrl(): string {
-    return store.selectedTab?._links.scopeExport
-        ? `${store.selectedTab?._links.scopeExport}?${scopeUrlParams.toString()}`
+    return selectedTab?.value._links.scopeExport
+        ? `${selectedTab?.value._links.scopeExport}?${scopeUrlParams.toString()}`
         : "";
 }
 
@@ -58,7 +58,7 @@ window.Vue.watch(
                     }
                 });
             }
-            scopeUrl.value = `${store.selectedTab?._links.scope}?${scopeUrlParams.toString()}`;
+            scopeUrl.value = `${selectedTab?.value._links.scope}?${scopeUrlParams.toString()}`;
             isOpen.value = true; // Open the modal to show related records
         } else {
             isOpen.value = false; // Close the modal when no cell is selected
@@ -78,7 +78,7 @@ const { bottom } = toRefs(arrivedState);
 window.Vue.watch(bottom, (isAtBottom) => {
     if (isAtBottom && payload.value && payload.value.metadata.cursor.next !== null) {
         scopeUrlParams.set(ScopeUrlParam.CURSOR as string, payload.value.metadata.cursor.next);
-        scopeUrl.value = `${store.selectedTab?._links.scope}?${scopeUrlParams.toString()}`;
+        scopeUrl.value = `${selectedTab?.value._links.scope}?${scopeUrlParams.toString()}`;
     }
 });
 </script>
@@ -91,7 +91,7 @@ window.Vue.watch(bottom, (isAtBottom) => {
             <div class="l-flex-col l-gap-m">
                 <div class="l-flex-row l-flex--justify-space l-flex--no-wrap l-gap-m">
                     <div class="l-flex-col l-gap-s f-no-margins">
-                        <h2>{{ store.title }}</h2>
+                        <h2>{{ title }}</h2>
                         <p v-if="props.selectedCell" class="meta">
                             <template v-for="(meta, index) in props.selectedCell.meta" :key="index">
                                 {{ meta }}<br />
@@ -99,7 +99,7 @@ window.Vue.watch(bottom, (isAtBottom) => {
                         </p>
                     </div>
                     <a
-                        v-if="store.selectedTab?._links.scopeExport"
+                        v-if="selectedTab?._links.scopeExport"
                         :href="scopeExportUrl()"
                         aria-label="Download related records as CSV"
                         title="Download related records as CSV"

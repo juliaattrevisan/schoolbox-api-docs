@@ -4,16 +4,17 @@
  * when no records are available.
  */
 
-import { useStore } from "./store/pastoralReportStore";
+import type { Routes } from "../js/types/pastoralReportTypes";
 
-const store = useStore();
+const localePastoral = window.Vue.inject<string>("localePastoral");
+const routes = window.Vue.inject<Routes>("routes");
 </script>
 
 <template>
     <div class="empty-state-flex-centered f-no-margins">
         <i class="icon-pastoral"></i>
-        <p>No {{ store.localePastoral }} records matched your report criteria.</p>
-        <a :href="store.routes.getIndex"> Select Another Report </a>
+        <p>No {{ localePastoral }} records matched your report criteria.</p>
+        <a :href="routes?.getIndex"> Select Another Report </a>
     </div>
 </template>
 

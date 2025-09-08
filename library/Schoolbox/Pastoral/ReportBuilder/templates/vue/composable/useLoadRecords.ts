@@ -96,6 +96,16 @@ export function useLoadRecords(url: Ref<string>): {
         }
     });
 
+    /**
+     * Load on mount if there's already a URL set
+     */
+    window.Vue.onMounted(() => {
+        if (url.value !== "") {
+            isNewLoad.value = true;
+            void load();
+        }
+    });
+
     return {
         isNewLoad,
         isNewLoading,

@@ -4,6 +4,7 @@
  * Renders a single row with cells based on column types.
  */
 
+import type { Ref } from "vue";
 import { Chart } from "highcharts-vue";
 import "highcharts/modules/accessibility";
 import type { UserCC as User } from "@schoolboxLibrary/types/User";
@@ -15,9 +16,9 @@ import type {
     RecordsAndPoints,
     TypeSubType,
     RowKeys,
+    Tab,
 } from "../../js/types/pastoralReportTypes";
 import { getChartOptions } from "./config/chartOptions";
-import { useStore } from "../store/pastoralReportStore";
 import { getRowKeys, getMeta } from "../util/pastoralReportUtils";
 
 const props = defineProps<{
@@ -30,12 +31,17 @@ const emit = defineEmits<{
     cellSelect: [header: TableHeader, rowKeys: RowKeys, meta: string[]];
 }>();
 
+const selectedTab = window.Vue.inject<Ref<Tab>>("selectedTab");
+
 /**
  * Handles the cell click
  * @param header - the header of the cell that was clicked
  */
 function onCellSelected(header: TableHeader): void {
-    emit("cellSelect", header, getRowKeys(props.rowData), getMeta(useStore().selectedTab, header, props.rowData));
+    if (selectedTab === undefined) {
+        return;
+    }
+    emit("cellSelect", header, getRowKeys(props.rowData), getMeta(selectedTab.value, header, props.rowData));
 }
 </script>
 
