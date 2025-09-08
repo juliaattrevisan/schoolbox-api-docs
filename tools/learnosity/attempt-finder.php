@@ -332,7 +332,7 @@ HELP;
     /**
      * Scan all learnosity references
      *
-     * Bust down into 1000-element chunks to minmise learnosity api requests or you can specify
+     * Bust down into 1000-element chunks to minimise learnosity api requests or you can specify
      * your own chunk size.
      *
      * @param Api $api
