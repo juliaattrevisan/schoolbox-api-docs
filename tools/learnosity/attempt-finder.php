@@ -101,6 +101,9 @@ $app = new class extends CliTool\App
 
 Learnosity Attempt Finder
 
+
+Primary usage: Surgical Mode
+----------------------------
 Whenever we encounter "Session ID Not Found" error it means we've lost the only bridge that connects
 our assess_attempt record to a learnosity record. We can't query their db so we have to look at their
 entire set of Learnosity Sessions (syn. "attempts") and try to find an attempt that matches at least:
@@ -124,14 +127,16 @@ Usage: attempt-finder.php --server=... --schoolcode=... --user=... --assessment=
 
 
 Alternative usage: Recon Mode
-
+-----------------------------
 Sometimes you just want to see how many quiz attempts have a broken learnosity reference because you
 don't have any first-hand information/reports from schools about which ones are broken. This mode
 interrogates every learnosity reference known to schoolbox to see if there's a corresponding record(s)
 in learnosity itself; anything broken will be announced.
 
-Alt usage: attempt-finder.php --recon
-
+Alt usage: attempt-finder.php --server=... --recon
+        --server         Server name; default is vagrant.dev.schoolbox.cloud
+        
+        
 HELP;
             return;
         }
