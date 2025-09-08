@@ -320,6 +320,17 @@
                 $('[data-light="virus"]').html(data.virus_status).removeClass('neutral').addClass(data.virus_light);
             }
         });
+        // get cluster region info
+        $.ajax({
+            url: "/ajax/adminStats.php",
+            method: "POST",
+            data: {
+                "module": "cluster_info"
+            },
+            success:function(data) {
+                $('[data-light="cluster_info"]').html(data.cluster_info_status).removeClass('neutral').addClass(data.cluster_info_light);
+            }
+        });
     });
     function openLetsDebug() {
         $.ajax({
@@ -519,6 +530,12 @@
                                 <div class="small-5 columns content">Virus Scanner</div>
                                 <div class="small-7 columns content">
                                     <span class="full-width neutral label" data-light="virus">Testing...</span>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="small-5 columns content">Cluster Region</div>
+                                <div class="small-7 columns content">
+                                    <span class="full-width neutral label" data-light="cluster_info">Testing...</span>
                                 </div>
                             </li>
 
