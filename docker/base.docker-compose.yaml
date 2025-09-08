@@ -53,6 +53,7 @@ services:
     pull_policy: never
     restart: always
     environment:
+      PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN}
@@ -162,6 +163,8 @@ services:
         condition: service_healthy
       php-bookworm:
         condition: service_started
+    environment:
+      PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
     build:
       context: ./schoolbox-digestd
     env_file: ./schoolbox/default-instance.env
@@ -184,6 +187,8 @@ services:
         condition: service_healthy
       php-bookworm:
         condition: service_started
+    environment:
+      PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
     build:
       context: ./schoolbox-scheduled
     env_file: ./schoolbox/default-instance.env
@@ -206,6 +211,8 @@ services:
         condition: service_healthy
       php-bookworm:
         condition: service_started
+    environment:
+      PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
     build:
       context: ./schoolbox-mobiled
     env_file: ./schoolbox/default-instance.env
@@ -228,6 +235,8 @@ services:
         condition: service_healthy
       php-bookworm:
         condition: service_started
+    environment:
+      PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
     build:
       context: ./schoolbox-socketd
     env_file: ./schoolbox/default-instance.env
