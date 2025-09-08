@@ -132,7 +132,7 @@ class RecordList extends Base implements TabTypeInterface, ICursor
 
         $statement = $db->executeQuery(
             "
-            SELECT COUNT(*) as count
+            SELECT COUNT(DISTINCT pastoral.id) as count
             {$this->helper->getFromString()}
             WHERE {$where}
             AND ({$this->inTypeSubType})
@@ -181,7 +181,7 @@ class RecordList extends Base implements TabTypeInterface, ICursor
 
         $statement = $db->executeQuery(
             "
-            SELECT pastoral.id
+            SELECT DISTINCT pastoral.id
             {$this->helper->getFromString()}
             LEFT JOIN lu_year_level AS sy ON s.year_id = sy.id
             INNER JOIN luCampus AS sc ON sc.id = v_sc.campus
