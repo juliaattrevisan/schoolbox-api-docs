@@ -95,13 +95,14 @@ Whenever we encounter "Session ID Not Found" error it means we've lost the only 
 our assess_attempt record to a learnosity record. We can't query their db so we have to look at their
 entire set of Learnosity Sessions (syn. "attempts") and try to find an attempt that matches at least:
 
-* user_id and instance_id concatenated string
+* user_id and school code as a concatenated string
 * assessment id
 
-Note that for the url https://vagrant.dev.schoolbox.cloud/learning/quiz/1576/attempt/13/89fb1a57....
-the assessment id is 1576.
+...in an effort to track down whether an attempt actually exists or not.
 
-...in an effort to track down whether an attempt actually exists or not. 
+(Note that for the url https://vagrant.dev.schoolbox.cloud/learning/quiz/1576/attempt/13/89fb1a57....
+the assessment id is 1576.)
+ 
 
 Usage: attempt-finder.php --server=... --schoolcode=... --user=... --assessment=...
         --server         Server name; default is vagrant.dev.schoolbox.cloud
