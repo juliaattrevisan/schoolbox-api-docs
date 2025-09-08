@@ -188,7 +188,7 @@ window.Vue.onMounted(() => {
     </template>
     <!-- fall back to just an empty state if all else fails -->
     <pr-empty v-else />
-    <pr-table-modal :selected-cell="selectedCell" />
+    <pr-table-modal :selected-cell="selectedCell" :records-or-points="recordsOrPoints" />
 </template>
 
 <style lang="scss">

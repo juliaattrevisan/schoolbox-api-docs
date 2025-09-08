@@ -155,6 +155,7 @@ export enum ScopeUrlParam {
     COLUMN = "column",
     ROW = "row",
     CURSOR = "cursor",
+    SELECTED = "selected",
 }
 
 /**

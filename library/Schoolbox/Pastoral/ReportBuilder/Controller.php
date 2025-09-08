@@ -542,6 +542,7 @@ class Controller extends Base
             $encodedCursor = $this->requestQuery->get('cursor');
             $columnKey     = $this->requestQuery->get('column');
             $rowKey        = $this->requestQuery->get('row');
+            $resultType    = $this->requestQuery->get('selected', Cursor::RESULT_TYPE_RECORDS);
             $limit         = $this->requestQuery->getInt('limit', Cursor::LIMIT_DEFAULT);
 
             $cursor = new \Schoolbox\Pastoral\ReportBuilder\ResultList\Cursor(
@@ -554,6 +555,7 @@ class Controller extends Base
                 ),
                 $this->pastoralMapper,
                 $tabType,
+                $resultType,
                 $columnKey,
                 $rowKey,
                 $limit,
@@ -643,6 +645,8 @@ class Controller extends Base
         try {
             $columnKey     = $this->requestQuery->get('column');
             $rowKey        = $this->requestQuery->get('row');
+            $resultType    = $this->requestQuery->get('selected', Cursor::RESULT_TYPE_RECORDS);
+
 
             $cursor = new \Schoolbox\Pastoral\ReportBuilder\ResultList\Cursor(
                 new Helper(
@@ -654,6 +658,7 @@ class Controller extends Base
                 ),
                 $this->pastoralMapper,
                 $tabType,
+                $resultType,
                 $columnKey,
                 $rowKey,
                 null,
