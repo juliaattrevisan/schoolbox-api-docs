@@ -35,13 +35,14 @@
                 const textModel = $('#openai_text_model-field').parent('div');
                 const textAzureResourceName = $('#openai_text_azure_resource_name-field').parent('div');
                 const textAzureDeploymentId = $('#openai_text_azure_deployment_id-field').parent('div');
+                const textSystemPrompt = $('#text_generation_system_prompt-field').parent('div');
 
                 textProvider.on('change', function(event) {
                     event.preventDefault();
-                    init(textContainer, textProvider, textKey, textModel, textAzureResourceName, textAzureDeploymentId, null, null);
+                    init(textContainer, textProvider, textKey, textModel, textAzureResourceName, textAzureDeploymentId, null, textSystemPrompt;
                 });
 
-                init(textContainer, textProvider, textKey, textModel, textAzureResourceName, textAzureDeploymentId, null, null);
+                init(textContainer, textProvider, textKey, textModel, textAzureResourceName, textAzureDeploymentId, null, textSystemPrompt);
 
                 /* Image credentials
                  */
@@ -76,9 +77,7 @@
                             outputQuality.hide();
                         }
 
-                        if (null !== systemPrompt) {
-                            systemPrompt.hide();
-                        }
+                        systemPrompt.hide();
                     } else if (PROVIDER_OPENAI === provider.val()) {
                         key.show();
                         model.show();
@@ -89,9 +88,7 @@
                             outputQuality.show();
                         }
 
-                        if (null !== systemPrompt) {
-                            systemPrompt.show();
-                        }
+                        systemPrompt.show();
                     } else if (PROVIDER_AZURE === provider.val()) {
                         key.show();
                         model.hide();
@@ -102,9 +99,7 @@
                             outputQuality.show();
                         }
 
-                        if (null !== systemPrompt) {
-                            systemPrompt.show();
-                        }
+                        systemPrompt.show();
                     }
 
                     $('[data-subheader]').show();
