@@ -67,6 +67,14 @@ $app = new class extends CliTool\App
 
 
     /**
+     * --recon
+     *
+     * Enable recon mode which investigates all learnosity references
+     */
+    private const OPT_LONG_RECON = 'recon';
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -77,7 +85,8 @@ $app = new class extends CliTool\App
             self::OPT_LONG_SCHOOLCODE,
             self::OPT_LONG_USER,
             self::OPT_LONG_ASSESSMENT,
-            self::OPT_LONG_ATTEMPT_LEARNOSITY_REFERENCE
+            self::OPT_LONG_ATTEMPT_LEARNOSITY_REFERENCE,
+            self::OPT_LONG_RECON
         ];
     }
 
@@ -106,13 +115,22 @@ the assessment id is 1576.)
  
 
 Usage: attempt-finder.php --server=... --schoolcode=... --user=... --assessment=... [--attempt=...]
-
         --server         Server name; default is vagrant.dev.schoolbox.cloud
         --schoolcode     School code of the instance that spawned the quiz
         --user           Schoolbox user id who did the attempt
         --assessment     Schoolbox assessment id as per the url for an attempt
         --attempt        If specified, look for this particular learnosity reference
 
+
+
+Alternative usage: Recon Mode
+
+Sometimes you just want to see how many quiz attempts have a broken learnosity reference because you
+don't have any first-hand information/reports from schools about which ones are broken. This mode
+interrogates every learnosity reference known to schoolbox to see if there's a corresponding record(s)
+in learnosity itself; anything broken will be announced.
+
+Alt usage: attempt-finder.php --recon
 
 HELP;
             return;
@@ -134,7 +152,14 @@ HELP;
         $userId = trim((string)$this->getOpt(self::OPT_LONG_USER));
         $assessmentId = trim((string)$this->getOpt(self::OPT_LONG_ASSESSMENT));
 
-        $this->surgical($serverName, $schoolCode, $userId, $assessmentId);
+        if ($this->getOpt(self::OPT_LONG_RECON)) {
+            /* Look at all learnosity references chunks of 1000
+             */
+        } else {
+            /* Look for a particular record, or subset of records, for a particular person
+             */
+            $this->surgical($serverName, $schoolCode, $userId, $assessmentId);
+        }
 
         /* Announce conclusion
          */
@@ -295,6 +320,17 @@ HELP;
             print_r(array_intersect_key($row, $fields));
             echo "\n\n";
         }
+    }
+
+
+    /**
+     * Scan all learnosity references
+     *
+     * @return void
+     */
+    private function recon(): void
+    {
+
     }
 };
 
