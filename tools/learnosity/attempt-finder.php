@@ -211,8 +211,10 @@ HELP;
          */
         $result = $api->dataGetRequest('/sessions/responses', $payload);
 
-        /* Iterate through each of the records found and hope to match the title provided
-         * (if provided at all...) to find one that corresponds to a particular schoolbox assessment
+        /* Iterate through each of the records found and show some abbreviated details for attempts
+         * that match the provided cli args, including the optional attempt learnosity reference if
+         * it was provided and meaningful. This is pretty low-level details, exactly as is, for the
+         * most part. You might need a dev to help decipher what might have happened.
          */
         $fields = array_fill_keys([
             'user_id',
