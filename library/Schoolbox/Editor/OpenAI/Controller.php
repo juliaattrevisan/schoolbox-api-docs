@@ -222,6 +222,7 @@ class Controller extends Base
             $payloadGenerator = (new Payload\ImageGeneration(
                 $helper->getModel(),
                 trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_SYSTEM_PROMPT)),
+                trim((string)($this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_OUTPUT_QUALITY) ?? 'low')),
             ));
 
             $payload = $payloadGenerator->generate(
