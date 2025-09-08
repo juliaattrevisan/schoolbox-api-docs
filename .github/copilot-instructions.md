@@ -62,6 +62,7 @@ Schoolbox is a comprehensive Learning Management System (LMS) built in PHP with 
 
 ### Core Directories
 ```
+/docs/                  - Charter code standards and help info
 /library/Schoolbox/     - Main modules (Learning, Assessment, etc.)
 /library/Alaress/       - Framework (Database, Auth, etc.)
 /www/static/js/css/     - Frontend assets
@@ -126,6 +127,12 @@ Vue 3 + TypeScript, Webpack build, Jest tests, SCSS with BEM naming
 5. `vendor/bin/phpcs`
 6. `vendor/bin/paratest`
 7. `npm run build` (for UI changes)
+
+## Commits and PR's
+- all commits should append the jira ticket number in the first line
+  `this is a commit message [ticket number]`
+  eg. `double click to open feedback UI [SA-20827]`
+- all PR's title's should append the  jira ticket number
 
 ## Trust These Instructions
 These are comprehensive and tested. Only search further if commands fail unexpectedly or working with unlisted modules. The build process is reliable when followed exactly - most failures are environment setup or sequence issues.
