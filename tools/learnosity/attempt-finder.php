@@ -61,6 +61,12 @@ $app = new class extends CliTool\App
 
 
     /**
+     * --attempt
+     */
+    private const OPT_LONG_ATTEMPT_LEARNOSITY_REFERENCE = 'attempt:';
+
+
+    /**
      * @inheritdoc
      */
     public function getLongOpts(): array
@@ -71,6 +77,7 @@ $app = new class extends CliTool\App
             self::OPT_LONG_SCHOOLCODE,
             self::OPT_LONG_USER,
             self::OPT_LONG_ASSESSMENT,
+            self::OPT_LONG_ATTEMPT_LEARNOSITY_REFERENCE
         ];
     }
 
@@ -98,11 +105,13 @@ entire set of Learnosity Sessions (syn. "attempts") and try to find an attempt t
 the assessment id is 1576.)
  
 
-Usage: attempt-finder.php --server=... --schoolcode=... --user=... --assessment=...
+Usage: attempt-finder.php --server=... --schoolcode=... --user=... --assessment=... [--attempt=...]
+
         --server         Server name; default is vagrant.dev.schoolbox.cloud
         --schoolcode     School code of the instance that spawned the quiz
         --user           Schoolbox user id who did the attempt
         --assessment     Schoolbox assessment id as per the url for an attempt
+        --attempt        If specified, look for this particular learnosity reference
 
 
 HELP;
@@ -147,6 +156,10 @@ HELP;
             return;
         }
 
+        /* This is an optional constraint
+         */
+        $attemptReference = trim((string)$this->getOpt(self::OPT_LONG_ATTEMPT_LEARNOSITY_REFERENCE));
+
         /* Some identifying info
          */
         try {
@@ -185,6 +198,14 @@ HELP;
                 $userIdentifier
             ]
         ];
+
+        /* Optional constraint
+         */
+        if ('' !== $attemptReference) {
+            $payload['session_id'] = [
+                $attemptReference
+            ];
+        }
 
         /* Perform non-mutating get request
          */
