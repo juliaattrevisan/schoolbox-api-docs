@@ -130,7 +130,13 @@ HELP;
 
         /* Iterate through each of the records found and hope to match the title provided
          * (if provided at all...) to find one that corresponds to a particular schoolbox assessment
-         * because we didn't store assessment ids anywhere in the attempt payload.
+         *
+         * Note: activity_id is where were stored our internal quiz identifier. Nice.
+         * We had it after all! For example, the url:
+         *
+         * https://vagrant.dev.schoolbox.cloud/learning/quiz/1576/attempt/13/89fb1a57
+         *
+         * ...will have 1576 as the activity_id
          */
         $fields = array_fill_keys([
             'user_id',
@@ -150,7 +156,6 @@ HELP;
 
         foreach ($result['data'] as $row) {
             print_r(array_intersect_key($row, $fields));
-
         }
 
         /* Print any low-level info about the attempt if it happens to match the cli args enough
