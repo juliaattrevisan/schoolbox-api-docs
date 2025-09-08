@@ -105,7 +105,6 @@ class Model implements ISoftDeletable
             'label' => 'Student by Type',
             'type' => 'table',
         ],
-        //TODO: future updates for SA-19333
         Factory::TYPE_BY_MONTH => [
             'label' => 'Type by Month',
             'type' => 'table',
@@ -302,6 +301,9 @@ class Model implements ISoftDeletable
 
         // This is a collection of groups that have access to this report
         $this->access = new GenericCollection(Access\Model::class);
+
+        // Turn all the frequency tables on by default
+        $this->summaryTables = implode(',', array_keys(self::SUMMARY_TABLES_OPTIONS));
     }
 
     /**
