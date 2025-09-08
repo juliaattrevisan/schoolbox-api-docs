@@ -61,26 +61,39 @@ if (PHP_SAPI === 'cli') {
         }
     }
 } else {
-    // Web request
+    // Web request: allow a singular fallback instance
     define('STDOUT', fopen('php://stdout', 'w'));
     $hostname = ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? '') ?: $_SERVER['HTTP_HOST'];
     $hostname = explode(':', $hostname)[0];
     foreach ($instances as $instanceIdKey => $instance) {
+        // Is this a fallback instance?
+        // If so, use it but only if no actual hostnames match
+        if (!empty($instance['fallback'])) {
+            $instanceId = $instanceIdKey;
+        }
+
+        // Is there an actual hostname match?
+        // If so, use it and ignore any fallback instance
         if (is_array($instance['hostnames'] ?? null) && in_array($hostname, $instance['hostnames'], true)) {
             $instanceId = $instanceIdKey;
-            $dbHost     = $instance['db_host'] ?? null;
-            $dbSchema   = $instance['db_schema'] ?? null;
-            $dbUser     = $instance['db_user'] ?? null;
-            $dbPass     = $instance['db_pass'] ?? null;
-            // Read only DB, with fallback if needed
-            $dbHostRead = $instance['db_host_read'] ?? $dbHost;
-            $dbSchemaRead = $instance['db_schema_read'] ?? $dbSchema;
-            $dbUserRead = $instance['db_user_read'] ?? $dbUser;
-            $dbPassRead = $instance['db_pass_read'] ?? $dbPass;
             break;
         }
     }
+
+    if (isset($instanceId)) {
+        $instance  = $instances[$instanceId];
+        $dbHost    = $instance['db_host'] ?? null;
+        $dbSchema  = $instance['db_schema'] ?? null;
+        $dbUser    = $instance['db_user'] ?? null;
+        $dbPass    = $instance['db_pass'] ?? null;
+        // Read only DB, with fallback if needed
+        $dbHostRead   = $instance['db_host_read'] ?? $dbHost;
+        $dbSchemaRead = $instance['db_schema_read'] ?? $dbSchema;
+        $dbUserRead   = $instance['db_user_read'] ?? $dbUser;
+        $dbPassRead   = $instance['db_pass_read'] ?? $dbPass;
+    }
 }
+
 define('INSTANCE_ID_LIST', array_keys($instances));
 define('INSTANCE_ID', $instanceId);
 define('SQL_host', $dbHost);

@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 # Always run within root folder
 cd "$(dirname "$0")/.." || exit 1
@@ -10,3 +10,27 @@ docker exec -it -u root schoolbox-cli tools/docker-provision.sh
 
 # restart the caddy container to pick up any changes
 docker restart caddy
+
+# Output the URLs/IPs which this instance may be accessed from:
+echo "Access the Schoolbox development instance via the following local URLs:"
+echo "This machine only:"
+echo "- https://docker.dev.schoolbox.cloud/"
+echo "Other machines on this network:"
+for device in $(ip -4 -o a | cut -d ' ' -f 2); do
+    # Skip loopback device
+    if [ "$device" = 'lo' ]; then
+        continue
+    fi
+
+    # Output all IPv4 addresses for this device:
+    # most likely, someone will want to access from a wireless IP:
+    # just assume that's one whose device name starts with 'w'
+    for ip in $(ip -4 -o a show dev "$device" | cut -d ' ' -f 7| cut -d '/' -f 1); do
+        note=''
+        if [[ "$device" == wl* ]]; then
+            note="(wireless: try this first)"
+        fi
+        echo -n '- '
+        printf "https://%-16s %s\n" "$ip/" "$note"
+    done
+done
