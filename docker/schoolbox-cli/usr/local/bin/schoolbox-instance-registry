@@ -1,0 +1,100 @@
+#!/bin/bash
+# Helper script for fetching this host's IR's url, puppet-cert + api_key
+# Usage:
+#   ./schoolbox-instance-registry --url
+#   ./schoolbox-instance-registry --api-key
+#   ./schoolbox-instance-registry --puppet-cert
+
+readonly IR_API_URL_DEFAULT='https://manage.schoolbox.cloud'
+readonly LOG=/usr/bin/alaress-logger
+readonly L_ERROR=400;
+
+function error(){
+  $LOG $L_ERROR "$1"
+}
+
+# Derive this host's puppet certname
+function derive_puppet_certname(){
+  # This should work for all on-prem + cloud hosts (but not vagrant)
+  puppet_certname=$(grep certname /etc/puppetlabs/puppet/puppet.conf | awk -F '=' '{ print $2 }' | sed 's/^ *//g');
+  # Fallback for vagrant
+  if [[ -z "$puppet_certname" ]]; then
+    puppet_certname="$(/opt/puppetlabs/puppet/bin/ruby /opt/puppetlabs/puppet/bin/puppet config print certname)"
+  fi
+  if [[ -z "$puppet_certname" ]]; then
+    error "Unable to derive puppet certname for this host"
+    exit 1
+  fi
+  echo "$puppet_certname"
+}
+
+
+# Fetch this host's IR api key
+function derive_ir_api_key(){
+  ir_api_key=$(jq .instance_registry_api_token /etc/schoolbox/instance-registry.json | sed 's/"//g')
+  if [[ -z "$ir_api_key" ]] || [[ "$ir_api_key" == 'null' ]]; then
+    error "Unable to derive IR api_key for this host"
+    exit 1
+  fi
+  echo "$ir_api_key"
+}
+
+
+# Check if this host has an IR URL override (eg vagrant can be configured to point at a local development IR environment)
+function derive_ir_api_url(){
+  local ir_api_url=$IR_API_URL_DEFAULT
+  local ir_api_url_override;
+  ir_api_url_override=$(jq .instance_registry_url_override /etc/schoolbox/instance-registry.json | sed 's/"//g')
+  if [[ -n "$ir_api_url_override" ]] && [[ "$ir_api_url_override" != 'null' ]]; then
+    ir_api_url="$ir_api_url_override"
+  fi
+  echo "$ir_api_url"
+}
+
+function main(){
+  if [[ $# != 1 ]]; then
+    error "You must specify a single arg from [--url, --api-key, --puppet-cert]"
+    print_help "$@"
+    exit 1;
+  fi
+
+  local errors=0
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      --url)
+        derive_ir_api_url; shift;
+        ;;
+      --api-key)
+        derive_ir_api_key; shift;
+        ;;
+      --puppet-cert)
+        derive_puppet_certname; shift;
+        ;;
+      *)
+        error "Unrecognised option: '$1'"
+        shift # past argument
+        errors="1"
+        ;;
+    esac
+  done
+
+  if [[ $errors == 1 ]]; then
+    exit 1;
+  fi
+}
+
+
+function print_help(){
+  echo "Helper script for sending authenticated requests to the Instance Registry from this host"
+  echo ""
+  echo "Usage: $0 --[OPTION]"
+  echo ""
+  echo "Options:"
+  echo "  --url           The Instance Registry's URL"
+  echo "  --puppet-cert   This host's identifier"
+  echo "  --api-key       This host's API key"
+  echo ""
+  echo "eg: $0 --url"
+}
+
+main "$@"
