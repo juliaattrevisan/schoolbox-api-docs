@@ -152,6 +152,7 @@ HELP;
             $this->getLogger()
         );
 
+        $user = \Schoolbox\UserMapper::getInstance()->findById($userId);
         $userIdentifier = (new \Schoolbox\Learning\Learnosity\Codec\UserIdentifier())->generate($schoolCode, $userId);
 
         /* Note: activity_id is where were stored our internal quiz identifier. Nice.
@@ -174,7 +175,6 @@ HELP;
 
         /* Iterate through each of the records found and hope to match the title provided
          * (if provided at all...) to find one that corresponds to a particular schoolbox assessment
-         *
          */
         $fields = array_fill_keys([
             'user_id',
@@ -194,15 +194,27 @@ HELP;
 
         /* Only show a subset of array nodes, for brevity
          */
-        $i = 0;
+        $i = 1;
         $n = \count($result['data']);
 
-        foreach ($result['data'] as $row) {
-            print_r(array_intersect_key($row, $fields));
-        }
-
-        /* Print any low-level info about the attempt if it happens to match the cli args enough
+        /* For some reason this is in reverse chronological order
          */
+        $results = array_reverse($result['data']);
+
+        foreach ($results as $row) {
+            $this->getLogger()->info(sprintf(
+                '[%s/%s] attempt by %s saved at %s in learnosity',
+                $i++,
+                $n,
+                $user->getFullName(),
+                \Alaress_Date_Format::newFromTimestamp(strtotime($row['dt_saved']))->getDatabase()
+            ));
+
+            /* Print any low-level info about the attempt if it happens to match the cli args enough
+             */
+            print_r(array_intersect_key($row, $fields));
+            echo "\n\n";
+        }
 
         /* Announce conclusion
          */
