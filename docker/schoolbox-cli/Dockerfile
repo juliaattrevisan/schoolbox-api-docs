@@ -1,6 +1,10 @@
 ARG ARCH=amd64
-
-FROM --platform=linux/${ARCH} php-bookworm
+ARG ENV=dev
+ARG PHP_MAJOR_VERSION=8.4
+ARG PRIVATE_CONTAINER_REGISTRY=476058706527.dkr.ecr.ap-southeast-2.amazonaws.com
+ARG IMAGE=${PRIVATE_CONTAINER_REGISTRY}/frankenphp-base
+ARG TAG=latest-php${PHP_MAJOR_VERSION}
+FROM ${IMAGE}:${TAG}
 
 ARG ARCH
 ARG NVM_VERSION='0.40.3'
@@ -104,6 +108,10 @@ WORKDIR /usr/share/schoolbox
 RUN <<EOF
 useradd -m -U -G adm,sudo,www-data -s /bin/bash schoolboxsuper
 EOF
+
+# For now, copy the scripts from another image
+COPY ./usr/bin/* /usr/bin/
+COPY ./usr/local/bin/* /usr/local/bin/
 
 # For some reason this causes a message: schoolbox-cli hook exited with status 1
 # The container starts without issue though.

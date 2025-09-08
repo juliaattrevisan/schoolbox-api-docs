@@ -12,6 +12,7 @@ services:
       dockerfile: dev-image.Dockerfile
       args:
         ENV: ${ENV:-dev}
+        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
         PHP_MAJOR_VERSION: ${PHP_MAJOR_VERSION}
     scale: 2
     deploy:
