@@ -20,7 +20,20 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 $app = new class extends CliTool\App {
     public function run(): void
     {
-        if ($this->getConfig()->get('learning_moments_enabled')) {
+        if (
+            in_array(
+                $this->getConfig()->get(ConfigMapper::NAME_SITE_PLAN),
+                [
+                    // These plans have config 'learning_moments_enabled' = 1.
+                    'canvas-elite',
+                    'canvas-enhanced',
+                    'community-elite',
+                    'community-enhanced',
+                    'learning-enhanced',
+                    'learning-essentials',
+                ]
+            )
+        ) {
             passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_dashboardIncLearningMoments.yaml');
         } else {
             passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_dashboardNotIncLearningMoments.yaml');
