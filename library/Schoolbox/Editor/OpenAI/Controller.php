@@ -129,7 +129,7 @@ class Controller extends Base
                  *
                  * https://community.openai.com/t/json-returning-with-json/584818/6
                  */
-                $data = $helper->request($this->getUser(), $payload);
+                $data = $helper->request($this->getUser(), $payload, Helper::FEATURE_RESPONSE);
             } catch (SchoolboxException $e) {
                 $problem = (new ApiProblem($e->getMessage()))
                     ->setStatus($e->getCode())
@@ -232,7 +232,7 @@ class Controller extends Base
             );
 
             try {
-                $helper->request($this->getUser(), $payload);
+                $helper->request($this->getUser(), $payload, Helper::FEATURE_IMAGE);
             } catch (SchoolboxException $e) {
                 $problem = (new ApiProblem($e->getMessage()))
                     ->setStatus($e->getCode())

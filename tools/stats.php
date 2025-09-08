@@ -343,6 +343,9 @@ $app = new class extends CliTool\App {
                 not (model like 'gpt-4.1%') AND
                 not (model like 'gpt-4o-mini%') AND
                 not (model like 'gpt-4.1-mini%')",
+            'openai_feature_chat' => "SELECT COUNT(*) FROM openai_log WHERE feature = 'chat'",
+            'openai_feature_response' => "SELECT COUNT(*) FROM openai_log WHERE feature = 'response'",
+            'openai_feature_image' => "SELECT COUNT(*) FROM openai_log WHERE feature = 'image'",
 
             //Packages
             'package_installed' => 'SELECT COUNT(*) FROM package WHERE installed = 1',

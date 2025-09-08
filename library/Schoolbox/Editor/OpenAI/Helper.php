@@ -72,6 +72,13 @@ class Helper
      */
     private const CHAT = 'chat';
 
+    /**
+     * Feature types for logging
+     */
+    public const FEATURE_CHAT = 'chat';
+    public const FEATURE_RESPONSE = 'response';
+    public const FEATURE_IMAGE = 'image';
+
 
     /**
      * When an image is omitted from the request/response, we replace the base64 data with this const
@@ -280,11 +287,12 @@ class Helper
      *
      * @param User $user // user to log the request against
      * @param string $payload // use this payload instead of generating one
+     * @param string|null $feature // feature type for logging (response, image, etc.)
      * @return array
      * @throws ClientExceptionInterface
      * @throws Exception
      */
-    public function request(User $user, string $payload): array
+    public function request(User $user, string $payload, ?string $feature = self::FEATURE_RESPONSE): array
     {
         /* Check that we have activated this endpoint
          */
@@ -308,7 +316,9 @@ class Helper
          */
         $log = $this->logMapper->createModel()
             ->setUser($user)
-            ->setPrompt($payload);
+            ->setPrompt($payload)
+            ->setFeature($feature)
+            ->setEndpoint($this->getEndpoint());
 
         /* Minimum requirements met: let's send it and see what AI overlords think of our payload
          */
@@ -486,7 +496,9 @@ class Helper
             $log = $this->logMapper->createModel()
                 ->setUser($user)
                 ->setPrompt($payload)
-                ->setModel($this->openAiModel);
+                ->setModel($this->openAiModel)
+                ->setFeature(self::FEATURE_CHAT)
+                ->setEndpoint($this->getEndpoint(self::CHAT));
 
             $promise = $this->client->sendAsync($openAiRequest, ['stream' => true]);
 
