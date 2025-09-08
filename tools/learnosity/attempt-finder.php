@@ -41,11 +41,27 @@ $app = new class extends CliTool\App
 
 
     /**
-     * --input
+     * --schoolcode
      *
      * An example arg that has an actual value, denoted by the colon
      */
-    private const OPT_LONG_INPUT = 'input:';
+    private const OPT_LONG_SCHOOLCODE = 'schoolcode:';
+
+
+    /**
+     * --user
+     *
+     * An example arg that has an actual value, denoted by the colon
+     */
+    private const OPT_LONG_USER = 'user:';
+
+
+    /**
+     * --assessment
+     *
+     * An example arg that has an actual value, denoted by the colon
+     */
+    private const OPT_LONG_ASSESSMENT = 'assessment:';
 
 
     /**
@@ -55,7 +71,9 @@ $app = new class extends CliTool\App
     {
         return [
             self::OPT_LONG_HELP,
-            self::OPT_LONG_INPUT
+            self::OPT_LONG_SCHOOLCODE,
+            self::OPT_LONG_USER,
+            self::OPT_LONG_ASSESSMENT,
         ];
     }
 
@@ -75,32 +93,54 @@ our assess_attempt record to a learnosity record. We can't query their db so we 
 entire set of Learnosity Sessions (syn. "attempts") and try to find an attempt that matches at least:
 
 * user_id and instance_id concatenated string
+* assessment id
 
-...and ideally, this:
+Note that for the url https://vagrant.dev.schoolbox.cloud/learning/quiz/1576/attempt/13/89fb1a57....
+the assessment id is 1576.
 
-* assessment title
+...in an effort to track down whether an attempt actually exists or not. 
 
-...in an effort to track down whether an attempt actually exists or not. We didn't store assessment ids
-which is unfortunate in retrospect, so we have to soft-match as best we can.
-
-Usage: attempt-finder.php --server=... --identifier=... --title=...
+Usage: attempt-finder.php --server=... --schoolcode=... --user=... --assessment=...
         --server         Server name; default is vagrant.dev.schoolbox.cloud
-        --identifier     A concatenation of instance_id and user_id
-        --title          Assessment title as per the schoolbox assessment
+        --schoolcode     School code of the instance that spawned the quiz
+        --user           Schoolbox user id who did the attempt
+        --assessment     Schoolbox assessment id as per the url for an attempt
 
 
 HELP;
             return;
         }
 
-        /* FIXME Main algorithm goes here
-         */
-        $this->getLogger()->info('Script commencing.');
+        $this->getLogger()->info('Learnosity Attempt Finder.');
 
         /* Don't have access to $_SERVER superglobal here
          * TODO Maybe make this into a cli arg if you use this outside of vagrant
          */
         $serverName = self::DEFAULT_SERVER_NAME;
+
+        /* Find all the sessions in learnosity pertaining to a user id
+         * You need to know that correctly and in advance as a cli arg
+         */
+        $schoolCode = trim((string)$this->getOpt(self::OPT_LONG_SCHOOLCODE));
+        $userId = trim((string)$this->getOpt(self::OPT_LONG_USER));
+        $assessmentId = trim((string)$this->getOpt(self::OPT_LONG_ASSESSMENT));
+
+        /* All three are required
+         */
+        if ('' === $schoolCode) {
+            $this->getLogger()->info('Please provide school code.');
+            return;
+        }
+
+        if ('' === $userId) {
+            $this->getLogger()->info('Please provide user id of the person who did the attempt.');
+            return;
+        }
+
+        if ('' === $assessmentId) {
+            $this->getLogger()->info('Please provide assessment id for the attempt.');
+            return;
+        }
 
         /* Initialise dependencies
          */
@@ -112,31 +152,29 @@ HELP;
             $this->getLogger()
         );
 
-        /* Find all the sessions in learnosity pertaining to a user id
-         * You need to know that correctly and in advance as a cli arg
+        $userIdentifier = (new \Schoolbox\Learning\Learnosity\Codec\UserIdentifier())->generate($schoolCode, $userId);
+
+        /* Note: activity_id is where were stored our internal quiz identifier. Nice.
+         * We had it after all! For example, the url below has 1576 as the activity_id:
+         *
+         * https://vagrant.dev.schoolbox.cloud/learning/quiz/1576/attempt/13/89fb1a57.........
          */
-        $instanceId = 'vagrant';
-        $userId = 13;
-
-        $userIdentifier = (new \Schoolbox\Learning\Learnosity\Codec\UserIdentifier())->generate($instanceId, $userId);
-
         $payload = [
+            'activity_id' => [
+                $assessmentId
+            ],
             'user_id' => [
                 $userIdentifier
             ]
         ];
 
+        /* Perform non-mutating get request
+         */
         $result = $api->dataGetRequest('/sessions/responses', $payload);
 
         /* Iterate through each of the records found and hope to match the title provided
          * (if provided at all...) to find one that corresponds to a particular schoolbox assessment
          *
-         * Note: activity_id is where were stored our internal quiz identifier. Nice.
-         * We had it after all! For example, the url:
-         *
-         * https://vagrant.dev.schoolbox.cloud/learning/quiz/1576/attempt/13/89fb1a57
-         *
-         * ...will have 1576 as the activity_id
          */
         $fields = array_fill_keys([
             'user_id',
@@ -153,6 +191,11 @@ HELP;
             'responses',
             'metadata',
         ], null);
+
+        /* Only show a subset of array nodes, for brevity
+         */
+        $i = 0;
+        $n = \count($result['data']);
 
         foreach ($result['data'] as $row) {
             print_r(array_intersect_key($row, $fields));
