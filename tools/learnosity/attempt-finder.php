@@ -332,10 +332,14 @@ HELP;
     /**
      * Scan all learnosity references
      *
+     * Bust down into 1000-element chunks to minmise learnosity api requests or you can specify
+     * your own chunk size.
+     *
      * @param Api $api
+     * @param int $maxPerChunk
      * @return void
      */
-    private function recon(Api $api): void
+    private function recon(Api $api, int $maxPerChunk = 1000): void
     {
         $db = $this->getDatabaseInternal();
 
@@ -353,15 +357,18 @@ HELP;
 
         $rows = $attempts->fetchAll();
 
-        /* Bust down into 1000-element chunks to minmise learnosity api requests
-         */
-        $maxPerChunk = 1000;
-
         $chunks = array_chunk($rows, $maxPerChunk);
 
         $stack = [];
 
+        $i = 0;
+
         foreach ($chunks as $chunk) {
+            $this->getLogger()->debug(sprintf(
+                'Inspecting chunk %s of size %s...',
+                ++$i, $maxPerChunk
+            ));
+
             $substack = [];
 
             foreach ($chunk as $row) {
@@ -416,7 +423,7 @@ HELP;
  * You should generally try to fix those, even though in some special cases php will throw notices
  * for its own expected behaviours which will inadvertently cause this to fail
  */
-$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::DEBUG, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
+$options = [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL,];
 
 /** @noinspection PhpUnhandledExceptionInspection */
 (new Schoolbox\Application\CliTool\Kernel($app, $options))->runApp();
