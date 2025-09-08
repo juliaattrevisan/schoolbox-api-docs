@@ -61,26 +61,35 @@ if (PHP_SAPI === 'cli') {
         }
     }
 } else {
-    // Web request
+    // Web request: allow a singular fallback instance
     define('STDOUT', fopen('php://stdout', 'w'));
-    $hostname = ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? '') ?: $_SERVER['HTTP_HOST'];
-    $hostname = explode(':', $hostname)[0];
+    $hostname           = ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? '') ?: $_SERVER['HTTP_HOST'];
+    $hostname           = explode(':', $hostname)[0];
+    $fallbackInstanceId = null;
     foreach ($instances as $instanceIdKey => $instance) {
+        if (!empty($instance['fallback'])) {
+            $instanceId = $instanceIdKey;
+        }
         if (is_array($instance['hostnames'] ?? null) && in_array($hostname, $instance['hostnames'], true)) {
             $instanceId = $instanceIdKey;
-            $dbHost     = $instance['db_host'] ?? null;
-            $dbSchema   = $instance['db_schema'] ?? null;
-            $dbUser     = $instance['db_user'] ?? null;
-            $dbPass     = $instance['db_pass'] ?? null;
-            // Read only DB, with fallback if needed
-            $dbHostRead = $instance['db_host_read'] ?? $dbHost;
-            $dbSchemaRead = $instance['db_schema_read'] ?? $dbSchema;
-            $dbUserRead = $instance['db_user_read'] ?? $dbUser;
-            $dbPassRead = $instance['db_pass_read'] ?? $dbPass;
-            break;
         }
     }
+
+    // Fall back to the fallback instance, if there was one and there's no match
+    if (isset($instanceId)) {
+        $instance  = $instances[$instanceId];
+        $dbHost    = $instance['db_host'] ?? null;
+        $dbSchema  = $instance['db_schema'] ?? null;
+        $dbUser    = $instance['db_user'] ?? null;
+        $dbPass    = $instance['db_pass'] ?? null;
+        // Read only DB, with fallback if needed
+        $dbHostRead   = $instance['db_host_read'] ?? $dbHost;
+        $dbSchemaRead = $instance['db_schema_read'] ?? $dbSchema;
+        $dbUserRead   = $instance['db_user_read'] ?? $dbUser;
+        $dbPassRead   = $instance['db_pass_read'] ?? $dbPass;
+    }
 }
+
 define('INSTANCE_ID_LIST', array_keys($instances));
 define('INSTANCE_ID', $instanceId);
 define('SQL_host', $dbHost);
