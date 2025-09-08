@@ -39,7 +39,20 @@ $app = new class extends CliTool\App {
             passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_dashboardNotIncLearningMoments.yaml');
         }
 
-        passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_pastoral_dashboard.yaml');
+        if (
+            in_array(
+                $this->getConfig()->get(ConfigMapper::NAME_SITE_PLAN),
+                [
+                    // These plans have config 'pastoral_enabled' = 1.
+                    'canvas-elite',
+                    'community-elite',
+                    'learning-enhanced',
+                ]
+            )
+        ) {
+            passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_pastoral_dashboard.yaml');
+        }
+
         passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_course_markbook.yaml');
 
 
