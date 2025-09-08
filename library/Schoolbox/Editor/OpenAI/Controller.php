@@ -207,6 +207,9 @@ class Controller extends Base
         // No BTTF in this space
         $this->setAllowBackToTheFuture(false);
 
+        // some images may take quite some time, avoid the request stopping early
+        $this->extendExecutionTime();
+
         try {
             $helper = new Helper(
                 trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_ENDPOINT)),
