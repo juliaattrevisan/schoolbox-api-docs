@@ -152,6 +152,10 @@ window.Vue.onUnmounted(async () => {
         </div>
         <template v-else>
             <label :for="editorId">Comment</label>
+            <p class="meta">
+                Student detail tokens can be viewed when you press [. Tokens will be substituted with the students
+                details on creation.
+            </p>
             <textarea :id="editorId" v-model="comment" rows="3" class="comment-input f-no-margins"></textarea>
             <div class="save-container l-grid">
                 <div class="save-container__inner-container">
