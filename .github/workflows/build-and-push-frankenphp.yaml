@@ -35,6 +35,9 @@ jobs:
         phpVersion:
           - 8.2
           - 8.4
+        env:
+          - prod
+          - dev
     runs-on: ${{ matrix.build.runs-on }}
     steps:
       - name: Checkout
@@ -76,7 +79,7 @@ jobs:
           sbom: false
           outputs: type=image,push-by-digest=true,name-canonical=true,push=true
           build-args: |
-            ENV=prod
+            ENV=${{ matrix.env }}
             PHP_MAJOR_VERSION=${{ matrix.phpVersion }}
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -88,15 +91,15 @@ jobs:
 
       - name: Export digest
         run: |
-          mkdir -p ${{ runner.temp }}/digests/${{ matrix.phpVersion }}
+          mkdir -p ${{ runner.temp }}/digests/${{ matrix.phpVersion }}/${{ matrix.env }}
           digest="${{ steps.build-and-push.outputs.digest }}"
-          touch "${{ runner.temp }}/digests/${{ matrix.phpVersion }}/${digest#sha256:}"
+          touch "${{ runner.temp }}/digests/${{ matrix.phpVersion }}/${{ matrix.env }}/${digest#sha256:}"
 
       - name: Upload ${{ vars.FRANKENPHP_IMAGE_NAME }} artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: digest-php${{ matrix.phpVersion }}-${{ matrix.build.arch }}
-          path: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}/*
+          name: digest-php${{ matrix.phpVersion }}-${{ matrix.env }}-${{ matrix.build.arch }}
+          path: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}/${{ matrix.env }}/*
           if-no-files-found: 'error'
           retention-days: 1
 
@@ -109,6 +112,9 @@ jobs:
         phpVersion:
           - 8.2
           - 8.4
+        env:
+          - prod
+          - dev
     needs:
       - build-and-push-frankenphp-to-dockerhub
     runs-on: onprem-k3s
@@ -133,12 +139,12 @@ jobs:
       - name: Download ${{ vars.FRANKENPHP_IMAGE_NAME }} artifacts
         uses: actions/download-artifact@v4
         with:
-          path: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}
-          pattern: digest-php${{ matrix.phpVersion }}-*
+          path: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}/${{ matrix.env }}
+          pattern: digest-php${{ matrix.phpVersion }}-${{ matrix.env }}-*
           merge-multiple: 'true'
 
       - name: Join ${{ vars.FRANKENPHP_IMAGE_NAME }} images
-        working-directory: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}
+        working-directory: ${{ runner.temp }}/digests/${{ matrix.phpVersion }}/${{ matrix.env }}
         run: |
           declare -a DOCKERHUB_IMAGES
           declare -a ECR_IMAGES
@@ -150,5 +156,5 @@ jobs:
               ECR_IMAGES+=("${{ vars.ECR_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}@sha256:$file")
           done
 
-          docker buildx imagetools create -t '${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}' "${DOCKERHUB_IMAGES[@]}"
-          docker buildx imagetools create -t '${{ vars.ECR_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}' "${ECR_IMAGES[@]}"
+          docker buildx imagetools create -t '${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}-${{ matrix.env }}' "${DOCKERHUB_IMAGES[@]}"
+          docker buildx imagetools create -t '${{ vars.ECR_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}-${{ matrix.env }}' "${ECR_IMAGES[@]}"
