@@ -33,7 +33,6 @@ jobs:
             platform: linux
             arch: arm64
         phpVersion:
-          - 8.2
           - 8.4
         env:
           - prod
@@ -110,7 +109,6 @@ jobs:
     strategy:
       matrix:
         phpVersion:
-          - 8.2
           - 8.4
         env:
           - prod
