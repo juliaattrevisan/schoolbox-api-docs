@@ -142,6 +142,19 @@ HELP;
             return;
         }
 
+        /* Some identifying info
+         */
+        try {
+            $user = \Schoolbox\UserMapper::getInstance()->findById($userId);
+        } catch (\Schoolbox\Mapper\Exception $e) {
+            $this->getLogger()->warning(sprintf(
+                'schoolbox user %s not found.',
+                $userId
+            ));
+
+            return;
+        }
+
         /* Initialise dependencies
          */
         $api = new Api(
@@ -152,7 +165,6 @@ HELP;
             $this->getLogger()
         );
 
-        $user = \Schoolbox\UserMapper::getInstance()->findById($userId);
         $userIdentifier = (new \Schoolbox\Learning\Learnosity\Codec\UserIdentifier())->generate($schoolCode, $userId);
 
         /* Note: activity_id is where were stored our internal quiz identifier. Nice.
