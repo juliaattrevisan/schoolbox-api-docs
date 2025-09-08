@@ -292,21 +292,6 @@ class Controller extends Base
         $this->setAllowBackToTheFuture(false);
 
         try {
-
-            /* Add in the overarching text system prompt if available
-             */
-            $textSystemPrompt = trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_SYSTEM_PROMPT));
-            if ('' !== $textSystemPrompt) {
-                $payload = json_decode($this->request->getBody()->getContents(), true, 512, JSON_THROW_ON_ERROR);
-                $payload['messages'][] = [
-                    'role' => 'system',
-                    'content' => $textSystemPrompt,
-                ];
-                $payload = json_encode($payload, JSON_THROW_ON_ERROR);
-            } else {
-                $payload = $this->request->getBody()->getContents();
-            }
-
             (new Helper(
                 trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)),
                 trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_KEY)),
@@ -316,7 +301,7 @@ class Controller extends Base
                 $this->client,
                 $this->errorMapper,
                 $this->logMapper,
-            ))->aiAssistantChat($this->getUser(), $payload);
+            ))->aiAssistantChat($this->getUser(), $this->request->getBody()->getContents(), trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_SYSTEM_PROMPT)));
         } catch (\DomainException $e) {
             /* Not configured? Not found
              */
