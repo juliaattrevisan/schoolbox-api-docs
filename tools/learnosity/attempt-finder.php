@@ -9,6 +9,7 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\Learning\Learnosity\Api;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -25,6 +26,12 @@ require_once __DIR__ . '/../../conf/core/require.php';
  */
 $app = new class extends CliTool\App
 {
+    /**
+     * Learnosity has some strict requirements about where api requests originate
+     */
+    private const DEFAULT_SERVER_NAME = 'vagrant.dev.schoolbox.cloud';
+
+
     /**
      * --help
      *
@@ -76,7 +83,8 @@ entire set of Learnosity Sessions (syn. "attempts") and try to find an attempt t
 ...in an effort to track down whether an attempt actually exists or not. We didn't store assessment ids
 which is unfortunate in retrospect, so we have to soft-match as best we can.
 
-Usage: attempt-finder.php --identifier=... --title=...
+Usage: attempt-finder.php --server=... --identifier=... --title=...
+        --server         Server name; default is vagrant.dev.schoolbox.cloud
         --identifier     A concatenation of instance_id and user_id
         --title          Assessment title as per the schoolbox assessment
 
@@ -89,11 +97,33 @@ HELP;
          */
         $this->getLogger()->info('Script commencing.');
 
-        for ($i = 0; $i < 10; $i++) {
+        /* Don't have access to $_SERVER superglobal here
+         * TODO Maybe make this into a cli arg if you use this outside of vagrant
+         */
+        $serverName = self::DEFAULT_SERVER_NAME;
 
-            /* Your logic goes here
-             */
-        }
+        /* Initialise dependencies
+         */
+        $api = new Api(
+            $serverName,
+            $this->getConfig()->get('learnosity_version'),
+            $this->getConfig()->get('learnosity_consumer_key'),
+            $this->getConfig()->get('learnosity_consumer_secret'),
+            $this->getLogger()
+        );
+
+        /* Find all the sessions in learnosity pertaining to a user id
+         * You need to know that correctly and in advance as a cli arg
+         */
+        // $api->dataGetRequest()
+
+        /* Iterate through each of the records found and hope to match the title provided
+         * (if provided at all...) to find one that corresponds to a particular schoolbox assessment
+         * because we didn't store assessment ids anywhere in the attempt payload.
+         */
+
+        /* Print any low-level info about the attempt if it happens to match the cli args enough
+         */
 
         /* Announce conclusion
          */
