@@ -401,10 +401,23 @@ HELP;
 
         /* Format the output nicely somewhat
          */
-        if (\count($stack)) {
+        $n = \count($stack);
+
+        if ($n) {
+            $this->getLogger()->info(sprintf(
+                'Found %s broken record(s) in learnosity.',
+                $n
+            ));
+
+            $this->getLogger()->info('');
+
+            /* TODO can probably merge this logging instead of repeatedly array_merging
+             *  into $stack and announce $n at the end for a tiny improvement, but I don't
+             *  really intend to use this tool on a regular basis
+             */
             foreach ($stack as $learnosityReference => $brokenRecord) {
                 $this->getLogger()->info(sprintf(
-                    'Attempt for learnosity reference %s by %s %s (%s) is not in learnosity.',
+                    '    Attempt for learnosity reference %s by %s %s (%s) is not in learnosity.',
                     $learnosityReference,
                     $brokenRecord['firstname'],
                     $brokenRecord['lastname'],
