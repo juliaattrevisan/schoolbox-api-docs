@@ -53,7 +53,6 @@ services:
     pull_policy: never
     restart: always
     environment:
-      PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
       AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN}
@@ -63,6 +62,8 @@ services:
       XDEBUG_CONFIG: "idekey=PHPSTORM"
     build:
       context: ./schoolbox-cli
+      args:
+        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
     tty: true
     volumes:
       - code:/usr/share/schoolbox
@@ -163,10 +164,10 @@ services:
         condition: service_healthy
       php-bookworm:
         condition: service_started
-    environment:
-      PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
     build:
       context: ./schoolbox-digestd
+      args:
+        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
     env_file: ./schoolbox/default-instance.env
     volumes:
       - code:/usr/share/schoolbox
@@ -187,10 +188,10 @@ services:
         condition: service_healthy
       php-bookworm:
         condition: service_started
-    environment:
-      PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
     build:
       context: ./schoolbox-scheduled
+      args:
+        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
     env_file: ./schoolbox/default-instance.env
     volumes:
       - code:/usr/share/schoolbox
@@ -211,10 +212,10 @@ services:
         condition: service_healthy
       php-bookworm:
         condition: service_started
-    environment:
-      PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
     build:
       context: ./schoolbox-mobiled
+      args:
+        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
     env_file: ./schoolbox/default-instance.env
     volumes:
       - code:/usr/share/schoolbox
@@ -235,10 +236,10 @@ services:
         condition: service_healthy
       php-bookworm:
         condition: service_started
-    environment:
-      PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
     build:
       context: ./schoolbox-socketd
+      args:
+        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
     env_file: ./schoolbox/default-instance.env
     volumes:
       - code:/usr/share/schoolbox
