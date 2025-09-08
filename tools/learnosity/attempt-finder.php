@@ -29,12 +29,6 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $app = new class extends CliTool\App
 {
     /**
-     * Learnosity has some strict requirements about where api requests originate
-     */
-    private const DEFAULT_SERVER_NAME = 'vagrant.dev.schoolbox.cloud';
-
-
-    /**
      * --help
      *
      * Print help text for those who don't know how to use this tool
@@ -120,6 +114,7 @@ HELP;
         $this->getLogger()->info('');
 
         /* Don't have access to $_SERVER superglobal here: you need to specify it manually
+         * Learnosity has some strict requirements about where api requests originate
          */
         $serverName = trim((string)$this->getOpt(self::OPT_LONG_SERVER));
 
