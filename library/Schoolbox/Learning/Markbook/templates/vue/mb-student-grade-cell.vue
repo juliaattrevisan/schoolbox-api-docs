@@ -58,18 +58,13 @@ const hasPopOutMenu = window.Vue.computed(() => {
         return false;
     }
 
-    // You must be a participant (or excluded)
+    // There must be a participant (or excluded)
     if (participant.value === null) {
         return false;
     }
 
-    // You must have access to the pop-out menu
-    /**
-     * TODO: this really should be able to derive based on whether there's anything to show in the popout
-     * alas, the route permissions are not exactly correct at the moment and cloning out the rendering logic
-     * is a bit much for now so we'll just use the old canAccessPopOut flag for the time being
-     */
-    if (!mbStore.data.canAccessPopOut) {
+    // You must have write access to the activity to be able to open the pop-out
+    if (aImpl.value === null || !aImpl.value.writable) {
         return false;
     }
 

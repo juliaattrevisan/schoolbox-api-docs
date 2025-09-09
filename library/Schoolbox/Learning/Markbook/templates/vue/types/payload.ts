@@ -160,8 +160,6 @@ export interface Markbook {
         exportReport: string | null;
         "courseImport.getImport": string | null;
     };
-    /** Whether the user can access the markbook pop out */
-    canAccessPopOut: boolean;
     /** A list of available visibilities, currently only used on the class markbook */
     availableVisibilities: number[];
     submissionErrorStates: SubmissionErrorStates;

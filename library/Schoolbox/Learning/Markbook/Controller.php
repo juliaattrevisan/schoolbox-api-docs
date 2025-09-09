@@ -435,7 +435,6 @@ class Controller extends Base
                     ),
                     'courseImport.getImport' => null, /* not relevant on the class markbook */
                 ],
-                'canAccessPopOut' => true, /* can always access the pop-out on the class markbook, I suppose */
                 'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get(ConfigMapper::NAME_SUBMISSION_VISIBILITY_MAX)),
                 'submissionErrorStates' => $this->stateMapper->findAll()->map(fn(State $state) => [
                     'id' => $state->getId(),

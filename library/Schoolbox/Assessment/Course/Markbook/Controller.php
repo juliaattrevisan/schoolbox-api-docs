@@ -160,7 +160,6 @@ class Controller extends WebController\Base
                 'courseSpec'  => $courseSpec,
                 'viewee'      => $this->getUser(),
                 'filterPanel' => $filterPanel,
-                'canAccessPopOut' => $this->getCanAccessPopOut($courseSpec),
                 'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
             ],
             "Course Markbook: {$courseSpec->getTitle()}",
@@ -556,7 +555,6 @@ class Controller extends WebController\Base
                         ]
                     ),
                 ],
-                'canAccessPopOut' => $this->getCanAccessPopOut($courseSpec),
                 'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get(ConfigMapper::NAME_SUBMISSION_VISIBILITY_MAX)),
                 'submissionErrorStates' => $this->stateMapper->findAll()->map(fn(State $state) => [
                     'id' => $state->getId(),
@@ -703,36 +701,6 @@ class Controller extends WebController\Base
             ]);
         }
         $this->response = $this->responseAsJson($data);
-    }
-
-    /**
-     * Helper method to check if current user can access the pop out
-     *
-     * @param CourseSpec\Model $courseSpec
-     * @return boolean
-     * @throws \Schoolbox\Mapper\Exception
-     */
-    private function getCanAccessPopOut(CourseSpec\Model $courseSpec): bool
-    {
-        // first check if the user has write access to the course
-        $hasCourseWriteAccess = $this->access->getFolderAccess(
-            $this->getUser(),
-            $courseSpec->getFolder()->getId(),
-        ) >= UserAccess::ACCESS_WRITE;
-        if (!$hasCourseWriteAccess) {
-            return false;
-        }
-        // then check if the user has write access to all the course implementations
-        foreach ($courseSpec->getCourseImplementations() as $classImplementation) {
-            $hasAccess = $this->access->getFolderAccess(
-                $this->getUser(),
-                $classImplementation->getFolder()->getId()
-            ) >= UserAccess::ACCESS_WRITE;
-            if (!$hasAccess) {
-                return false;
-            }
-        }
-        return true;
     }
 
 
