@@ -64,6 +64,11 @@ const hasPopOutMenu = window.Vue.computed(() => {
     }
 
     // You must have access to the pop-out menu
+    /**
+     * TODO: this really should be able to derive based on whether there's anything to show in the popout
+     * alas, the route permissions are not exactly correct at the moment and cloning out the rendering logic
+     * is a bit much for now so we'll just use the old canAccessPopOut flag for the time being
+     */
     if (!mbStore.data.canAccessPopOut) {
         return false;
     }
@@ -144,7 +149,17 @@ const lastClick = window.Vue.ref<number>(0);
  * When the user clicks the cell, open the pop-out menu if available, otherwise do nothing
  */
 async function onClickCell(): Promise<void> {
-    const canAccessUpdateFeedback = participant.value && !participant.value.isExcluded;
+    if (!hasPopOutMenu.value || !cellEl.value) {
+        return; // must have access to the pop-out and a mounted cell element
+    }
+
+    // You can access the update feedback UI for this if the participant isn't excluded and you have postFeedback access
+    const canAccessUpdateFeedback =
+        student.value &&
+        participant.value &&
+        !participant.value.isExcluded &&
+        aImpl.value?._routes.student[student.value.id].postFeedback;
+
     if (Date.now() - lastClick.value < DOUBLE_CLICK_INTERVAL && canAccessUpdateFeedback) {
         /**
          * The popout is responsible for loading some extra feedback data,
@@ -168,14 +183,12 @@ async function onClickCell(): Promise<void> {
         return;
     }
 
-    if (hasPopOutMenu.value && cellEl.value) {
-        mbStore.popoutSelectedCell = {
-            classImplId: props.classImplId,
-            studentId: props.studentId,
-            activityId: props.assessmentId,
-            referenceElement: cellEl.value,
-        };
-    }
+    mbStore.popoutSelectedCell = {
+        classImplId: props.classImplId,
+        studentId: props.studentId,
+        activityId: props.assessmentId,
+        referenceElement: cellEl.value,
+    };
 
     lastClick.value = Date.now();
 }
