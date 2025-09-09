@@ -3,6 +3,7 @@ import type { Template } from "@js/editor/types/editorTypes";
 import CurriculumSelector from "@schoolboxCurriculum/vue/curriculumSelector/curriculum-selector.vue";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 import type { LearningMoment } from "@schoolboxLearningMomentEvidence/evidenceTypes";
+import CommentThread from "@schoolboxLearningMomentEvidence/comment-thread.vue";
 import EvidenceTags from "@schoolboxLearningMomentEvidence/evidence-tags.vue";
 import MfActions from "./mf-actions.vue";
 import MfEvidence from "./mf-evidence.vue";
@@ -83,6 +84,25 @@ window.Vue.onMounted(() => {
                 </li>
             </ul>
         </template>
+    </div>
+
+    <div
+        v-if="
+            mfStore.moment !== null &&
+            mfStore.moment.discussionThread !== null &&
+            mfStore.moment.discussionThread.children.metadata.count
+        "
+        class="row"
+    >
+        <div class="small-12 island">
+            <section class="moment-comments">
+                <comment-thread
+                    :thread="mfStore.moment.discussionThread"
+                    :create-thread-endpoint="mfStore.moment._links.createThread || undefined"
+                    :can-comment="false"
+                />
+            </section>
+        </div>
     </div>
 
     <div v-if="mfStore.moment !== null" class="row">

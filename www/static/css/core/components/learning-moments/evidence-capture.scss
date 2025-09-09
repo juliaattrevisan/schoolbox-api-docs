@@ -163,6 +163,22 @@
         border-top: 1px solid #ededed;
         padding: 1rem 0 0 0;
     }
+}
+
+// Specifically on the moments' modify screens we put the comment thread at the top
+// necessitating this weird styling duping and special modifications - I think this
+// is because comments were always presumed to be at the bottom of stuff, not top
+.moment-comments {
+    // This would have inherited a 0.8125rem proportion from being inside a ul
+    // in the activity feed, but in the Moment modify screen there isn't a ul;
+    // we have to set this proportion manually and explicitly. Wild!
+    .article-read-more {
+        font-size: 0.8125rem;
+    }
+}
+
+.feed-comments,
+.moment-comments {
     .discussion-threads {
         padding: 0;
         margin: 0;

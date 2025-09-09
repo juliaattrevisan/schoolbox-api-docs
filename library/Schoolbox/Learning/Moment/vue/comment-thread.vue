@@ -9,7 +9,6 @@ import StorageObject from "@schoolboxVue/components/storage-object";
 import Toast from "@schoolboxVue/components/toast";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import AddCommentInput from "@schoolboxVue/components/ckeditor/add-comment-input";
-import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
 
 export default {
     components: {
@@ -19,8 +18,6 @@ export default {
         RevealModal,
         AddCommentInput,
     },
-
-    mixins: [cdnPrefixMixin],
 
     props: {
         thread: {
@@ -40,10 +37,6 @@ export default {
         },
         canComment: {
             type: Boolean,
-        },
-        siteVersion: {
-            type: String,
-            required: true,
         },
     },
 
@@ -290,9 +283,7 @@ export default {
                 </p>
                 <template v-if="canComment">
                     <add-comment-input
-                        :cdn-prefix="cdnPrefix"
                         :is-processing="isProcessing"
-                        :site-version="siteVersion"
                         @on-load-error="onLoadError"
                         @on-post-comment="postComment"
                     />

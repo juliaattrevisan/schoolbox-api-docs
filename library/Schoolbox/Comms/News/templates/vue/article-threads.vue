@@ -341,9 +341,7 @@ export default {
                     <div v-show="isThreadEnabled">
                         <template v-if="isPublished">
                             <add-comment-input
-                                :cdn-prefix="cdnPrefix"
                                 :is-processing="isProcessing"
-                                :site-version="siteVersion"
                                 @on-load-error="onLoadError"
                                 @on-post-comment="postComment"
                             />
