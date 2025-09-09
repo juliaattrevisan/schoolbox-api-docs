@@ -52,6 +52,8 @@ class Model implements ISoftDeletable, \JsonSerializable
     public const MIN_ASPECT_RATIO_X_OR_Y = 1;
     public const MAX_ASPECT_RATIO_X_OR_Y = 100;
 
+    public const DEFAULT_COLUMN_COUNT = 3;
+    public const DEFAULT_GRID_WIDTH = 100;
 
     /**
      * The primary key of this grid.
@@ -86,7 +88,7 @@ class Model implements ISoftDeletable, \JsonSerializable
      *
      * @var int
      */
-    protected $columnCount = 3;
+    protected $columnCount = self::DEFAULT_COLUMN_COUNT;
 
     /**
      * The padding for columns, as a % of the width of a column.
@@ -100,7 +102,7 @@ class Model implements ISoftDeletable, \JsonSerializable
      *
      * @var int
      */
-    protected $gridWidth = 100;
+    protected $gridWidth = self::DEFAULT_GRID_WIDTH;
 
     /**
      * The number of pixels padding for grid layout

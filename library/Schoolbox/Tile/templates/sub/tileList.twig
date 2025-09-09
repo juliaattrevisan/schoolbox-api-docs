@@ -14,14 +14,17 @@
 {% endif %}
 <style>
 #tileList-{{ layout.id }}.tileList .tile {
-    {% if layout.isGridLayoutType and layout.gridWidth > 0 %}
-        width: {{ layout.gridWidth|e('css') }}px;
-        margin: {{ layout.getGridPadding|e('css') }}px;
-        {% set paddingBottom = layout.gridWidth * aspectRatio ~ "px" %}
-    {% endif %}
+    {# Guard against these variables not being set correctly in the database #}
+    {% set gridWidth = layout.gridWidth > 0 ? layout.gridWidth : layout.DEFAULT_GRID_WIDTH %}
+    {% set columnCount = layout.columnCount > 0 ? layout.columnCount : layout.DEFAULT_COLUMN_COUNT %}
 
-    {% if layout.isColumnLayoutType and layout.columnCount > 0 %}
-        {% set baseColumnWidth   = (100 / layout.columnCount) %}
+    {% if layout.isGridLayoutType %}
+        width: {{ gridWidth|e('css') }}px;
+        margin: {{ layout.getGridPadding|e('css') }}px;
+        {% set paddingBottom = gridWidth * aspectRatio ~ "px" %}
+    {% else %}
+        {# Assume layout isColumnLayoutType since there are only two types (and guard against bad data in tile_layout.layout_type). #}
+        {% set baseColumnWidth   = (100 / columnCount) %}
         {% set paddingPercentage = (layout.columnPadding / 100) %}
         {% set tilePadding       = baseColumnWidth * paddingPercentage %}
         {% set tileWidth         = baseColumnWidth - tilePadding %}
