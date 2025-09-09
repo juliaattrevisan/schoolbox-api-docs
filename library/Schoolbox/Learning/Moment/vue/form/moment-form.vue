@@ -98,7 +98,7 @@ window.Vue.onMounted(() => {
             <section class="moment-comments">
                 <comment-thread
                     :thread="mfStore.moment.discussionThread"
-                    :create-thread-endpoint="mfStore.moment._links.createThread"
+                    :create-thread-endpoint="mfStore.moment._links.createThread || undefined"
                     :can-comment="false"
                     :cdn-prefix="cdnPrefix"
                     :site-version="siteVersion"
