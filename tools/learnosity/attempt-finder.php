@@ -106,19 +106,18 @@ Primary usage: Surgical Mode
 ----------------------------
 Whenever we encounter "Session ID Not Found" error it means we've lost the only bridge that connects
 our assess_attempt record to a learnosity record. We can't query their db so we have to look at their
-entire set of Learnosity Sessions (syn. "attempts") and try to find an attempt that matches at least:
+entire set of Learnosity Sessions (syn. "attempts") and try to find an attempt that matches at least
+the following criteria in an effort to track down whether an attempt actually exists or not.
 
 * user_id and school code as a concatenated string
-* assessment id
+* optionally, assessment id
 
-...in an effort to track down whether an attempt actually exists or not.
 
-(Note that for the url https://vagrant.dev.schoolbox.cloud/learning/quiz/1576/attempt/13/89fb1a57....
-the assessment id is 1576.)
-
-Unlike our vagrants, in schoolbox Help the user_id follows a format named after the user's school, like this:
+Notes:
+* for the url https://vagrant.dev.schoolbox.cloud/learning/quiz/1576/attempt/13/89fb1a57.... the assessment id is 1576.)
+* Unlike our vagrants, in schoolbox Help the user_id follows a format named after the user's school, like this:
     NGSL_12345
-    AGSBOT_56789
+    AGSBOT_12345
     ASAS_12345
  
 
