@@ -45,7 +45,9 @@ const relevantRoutes = window.Vue.computed(() => {
             </button>
         </li>
         <li v-if="relevantRoutes.publish">
-            <button :disabled="mfStore.isSaving" class="submit" @click="() => mfStore.publish()">{{ props.publishLabel }}</button>
+            <button :disabled="mfStore.isSaving" class="submit" @click="() => mfStore.publish()">
+                {{ props.publishLabel }}
+            </button>
         </li>
     </ul>
 </template>
