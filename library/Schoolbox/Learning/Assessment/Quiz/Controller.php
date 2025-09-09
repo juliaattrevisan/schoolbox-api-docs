@@ -113,7 +113,8 @@ class Controller extends Assessment\Controller
      * @param Filter\Selection\Mapper $filterSelectionMapper
      * @param CourseImplementationMapper $courseImplementationMapper
      * @param UnitImplementationMapper $unitImplementationMapper
-     * @param EditorTemplateHelper|null $editorTemplateHelper
+     * @param EditorTemplateHelper|null $activityTemplateHelper
+     * @param EditorTemplateHelper|null $activityTemplateHelper
      */
     public function __construct(
         UserMapper $userMapper,

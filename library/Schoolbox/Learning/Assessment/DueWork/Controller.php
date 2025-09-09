@@ -168,7 +168,8 @@ class Controller extends Assessment\Controller
      * @param CourseImplementationMapper $courseImplementationMapper
      * @param UnitImplementationMapper $unitImplementationMapper
      * @param ?RubricDataSource $rubricDataSource
-     * @param EditorTemplateHelper|null $editorTemplateHelper
+     * @param EditorTemplateHelper|null $activityTemplateHelper
+     * @param EditorTemplateHelper|null $feedbackTemplateHelper
      */
     public function __construct(
         UserMapper $userMapper,
