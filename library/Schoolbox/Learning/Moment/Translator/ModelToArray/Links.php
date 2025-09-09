@@ -10,6 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Moment\Translator\ModelToArray;
 
 use Schoolbox\API\Translator\AbstractLinks;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Config\Loader;
+use Schoolbox\Learning\Moment\PublishLabel;
 
 /**
  * Translator for loading links into the array.
@@ -22,8 +25,22 @@ class Links extends AbstractLinks
      */
     public function __invoke(\Schoolbox\Learning\Moment\Model $moment): array
     {
+        $globalModerationRequired = Loader::getInstance()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED);
+
         $translation = [
             '_links' => [],
+            /* For the express purpose of exactly one workflow, calculate a special
+             * button label. In the entire translation setup there's no convenient
+             * place to put this random tiny detail except here. I'm not gonna build
+             * a whole translation layer just for a button label that only occurs
+             * in one particularly special workflow.
+             *
+             * The labels are associated conceptually with the links anyway, making
+             * this the most natural and convenient place.
+             */
+            '_labels' => [
+                'publish' => (new PublishLabel())->generate($globalModerationRequired, $this->currentUser, $moment)
+            ],
         ];
 
         // Does this evidence have a discussion thread?
