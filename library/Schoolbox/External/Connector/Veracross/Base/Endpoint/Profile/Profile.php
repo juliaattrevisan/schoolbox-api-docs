@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\Profile;
 
+use Alaress\Image\TransformFormat;
 use Alaress_Date_Format;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -940,9 +941,26 @@ class Profile implements IStrategy
 
             $fileContents = $response->getBody()->getContents();
 
-            $ext = $this->guessExtension($response->getHeader('Content-Type')[0]);
+            /* For deciding an extension based on a mime type
+             */
+            $mime = $response->getHeader('Content-Type')[0];
 
-            $portrait = $this->storageMapper->acceptStream($baseProfile->getExternalId() . $ext, $fileContents);
+            $ext = (new TransformFormat($mime))->getFormat();
+
+            $filename = sprintf(
+                '%s.%s',
+                $baseProfile->getExternalId(),
+                $ext
+            );
+
+            $this->log->debug(sprintf(
+                'Determined image extension %s from content type %s for profile photo file %s',
+                $ext,
+                $mime,
+                $filename
+            ));
+
+            $portrait = $this->storageMapper->acceptStream($filename, $fileContents);
 
             /* You get a picture if any of the following occur:
              *     - you don't have a portrait yet; you can get one added
