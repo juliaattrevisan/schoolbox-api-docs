@@ -314,8 +314,8 @@ $app = new class extends CliTool\App {
             'myfile'            =>  'SELECT count(*) FROM myFile WHERE deleted_at IS NULL',
 
             //Learning Moments / Evidence
-            'evidence'          => 'SELECT count(*) FROM evidence WHERE deleted_at IS NULL',
-            'evidence_comments' => 'SELECT count(*) FROM evidence JOIN discussion_thread_comment dtc on evidence.discussion_thread_id = dtc.discussion_thread_id',
+            'evidence'          => 'SELECT count(*) FROM moment WHERE deleted_at IS NULL',
+            'evidence_comments' => 'SELECT count(*) FROM moment JOIN discussion_thread_comment dtc on moment.discussion_thread_id = dtc.discussion_thread_id',
 
             //Badges
             'badges'            => 'SELECT count(*) FROM badge WHERE deleted_at IS NULL',
