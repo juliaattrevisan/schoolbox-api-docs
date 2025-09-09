@@ -175,6 +175,21 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
     }
 
     /**
+     * Whether an activity is writable for all class implementations that use it
+     * @param activity - The activity to check
+     * @returns bool
+     */
+    function isActivityWritable(activity: MarkbookActivity): boolean {
+        if (data.value === null) {
+            return false;
+        }
+
+        return data.value.classImpls
+            .map((classImpl) => classImpl.assessments[activity.id])
+            .every((aImpl) => aImpl !== undefined && aImpl.writable !== false);
+    }
+
+    /**
      * Set the selected feedback cell
      * If it's already set to this value, clear it
      * @param cellInfo - The cell info to set
@@ -206,6 +221,7 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         editorTemplates,
         aImplHasDraftMarks,
         hasDraftMarks,
+        isActivityWritable,
         setFeedbackSelectedCell,
     };
 });
