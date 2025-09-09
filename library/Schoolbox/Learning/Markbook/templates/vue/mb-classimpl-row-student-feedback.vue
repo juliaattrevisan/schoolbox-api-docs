@@ -287,7 +287,7 @@ async function onFeedbackPublish(): Promise<void> {
                 ref="feedbackRef"
                 class="fixed-feedback-cell row"
                 :class="{
-                    'fixed-feedback-cell--loading': mbStore.isFeedbackUILoading,
+                    'fixed-feedback-cell--loading': mbStore.feedbackUILoadingInfo !== null,
                 }"
                 :style="{
                     left: `${feedbackCellOffsets.left}px`,
