@@ -179,7 +179,7 @@
     {% endif %}
 </div>
 
-{% if participants ?? [] is not empty %}
+{% if (customisedFor ?? '') | length and participants ?? [] is not empty %}
     <div class="row">
         <div class="small-12 column">
             <ul class="meta">
