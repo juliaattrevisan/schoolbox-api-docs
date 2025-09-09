@@ -145,6 +145,21 @@ class Helper
                         $item['partial_image_b64'] = self::IMAGE_DATA_OMITTED;
                     }
 
+                    // remove the completed image
+                    if ($itemType === 'response.output_item.done' && isset($item['item']['result'])) {
+                        $item['item']['result'] = self::IMAGE_DATA_OMITTED;
+                    }
+
+                    // apparently there is a final final image, lets remove that also
+                    if ($itemType === 'response.completed' && isset($item['response']['output']) && is_array($item['response']['output'])) {
+                        // $item['response']['output'] is apparently an array, and we need to ommit the b64 from each $item['response']['output'][]['result']
+                        foreach ($item['response']['output'] as $i => $respOutput) {
+                            if (isset($respOutput['result'])) {
+                                $item['response']['output'][$i]['result'] = self::IMAGE_DATA_OMITTED;
+                            }
+                        }
+                    }
+
                     $output .= sprintf("data: %s\n", json_encode($item, JSON_THROW_ON_ERROR));
                 } catch (\JsonException $e) {
                     // If it's not JSON, still save the raw data
