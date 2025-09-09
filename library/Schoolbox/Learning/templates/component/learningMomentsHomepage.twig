@@ -90,14 +90,18 @@
 
                 <ul class="information-list card-selectable">
                     {% for student in students %}
-                        <li>
+                        <li {% if not student.getLearningMomentsEnabled %}style="opacity: 0.5"{% endif %}>
                             <div>
                                 <div class="selector">
                                     <input
                                         id="chk-{{ revealId }}-{{ student.id }}"
                                         type="checkbox"
                                         data-user-id="{{ student.id }}"
-                                        data-checkbox="{{ revealId }}"
+                                        {% if student.getLearningMomentsEnabled %}
+                                            data-checkbox="{{ revealId }}"
+                                        {% else %}
+                                            disabled
+                                        {% endif %}
                                     >
                                     <label for="chk-{{ revealId }}-{{ student.id }}" class="checkbox-label"></label>
                                 </div>
@@ -105,7 +109,11 @@
                                     <a href="/search/user/{{ student.id }}" title="View Profile">
                                         {% include 'include/portrait.twig' with {user: student} only %}
                                         <h3>{{ student.fullName }}</h3>
-                                        <p class="meta">{{ student.preferredTitle }}</p>
+                                        <p class="meta">{{ student.preferredTitle }}
+                                            {% if not student.getLearningMomentsEnabled %}
+                                                (Learning Moments not enabled)
+                                            {% endif %}
+                                        </p>
                                     </a>
                                 </div>
                             </div>
