@@ -267,7 +267,7 @@ class Controller extends Base
             'sharingForSelf'           => $sharingForSelf,
             /* Decide a special Publish button label, if applicable
              */
-            'publishLabel'             => $this->publishLabel($moment)
+            'publishLabel'             => (new PublishLabel())->generate((bool)$this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $this->getUser(), $moment)
         ];
 
         $this->response = $this->responseFromTemplate('@learningMomentEvidence/form.twig', $params);
@@ -558,7 +558,7 @@ class Controller extends Base
             'sharingForSelf'           => $this->getUser() === $moment->getRecipient(),
             /* Decide a special Publish button label, if applicable
              */
-            'publishLabel'             => $this->publishLabel($moment)
+            'publishLabel'             => (new PublishLabel())->generate((bool)$this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $this->getUser(), $moment)
         ];
 
         $this->response = $this->responseFromTemplate('@learningMomentEvidence/form.twig', $params);
@@ -1386,40 +1386,5 @@ class Controller extends Base
         }
 
         $this->response = $this->responseAsJson($stack);
-    }
-
-
-    /**
-     * In one special workflow the Publish button gets renamed to Approve.
-     * Its behaviour is exactly the same: only its user-facing label changes.
-     *
-     * @param \Schoolbox\Learning\Moment\Model $moment
-     * @return string
-     */
-    private function publishLabel(Model $moment): string
-    {
-        $globalModerationRequired = (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED);
-
-        $label = 'Publish';
-
-        /* If you're a staff,
-         * and Learning Moment Moderation is required,
-         * and the Moment was authored by a student,
-         * and the Moment is unpublished,
-         * then the button label says "Approve"
-         *
-         * Otherwise it says "Publish"
-         */
-        if ($this->getUser()->getRole()->isStaff()) {
-            if ((new ModerationRequired())->isSatisfiedBy($globalModerationRequired, $moment->getRecipient()->getYear())) {
-                if (!$moment->isPublished()) {
-                    if ($moment->getCreator()->getRole()->isStudent()) {
-                        $label = 'Approve';
-                    }
-                }
-            }
-        }
-
-        return $label;
     }
 }
