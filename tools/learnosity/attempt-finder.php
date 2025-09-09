@@ -367,7 +367,8 @@ HELP;
         foreach ($chunks as $chunk) {
             $this->getLogger()->debug(sprintf(
                 'Inspecting chunk %s of size %s...',
-                ++$i, $maxPerChunk
+                ++$i,
+                $maxPerChunk
             ));
 
             $substack = [];
