@@ -94,7 +94,7 @@ window.Vue.onMounted(() => {
         "
         class="row"
     >
-        <div class="small-12 island l-mar-s--top">
+        <div class="small-12 island">
             <section class="moment-comments">
                 <comment-thread
                     :thread="mfStore.moment.discussionThread"
