@@ -210,7 +210,8 @@ class Controller extends Assessment\Controller
         protected CourseImplementationMapper $courseImplementationMapper,
         protected UnitImplementationMapper $unitImplementationMapper,
         protected ?RubricDataSource $rubricDataSource,
-        private ?EditorTemplateHelper $editorTemplateHelper
+        private ?EditorTemplateHelper $activityTemplateHelper,
+        private ?EditorTemplateHelper $feedbackTemplateHelper,
     ) {
         parent::__construct(
             $userMapper,
@@ -242,7 +243,8 @@ class Controller extends Assessment\Controller
             null,
             $mimeTypeMapper,
             $this->rubricDataSource,
-            $editorTemplateHelper,
+            $activityTemplateHelper,
+            $feedbackTemplateHelper
         );
     }
 
@@ -353,7 +355,7 @@ class Controller extends Assessment\Controller
             /* Draft Responses made by each guy
              */
             'draftResponses' => $draftResponses,
-            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
+            'editorTemplates' => $this->feedbackTemplateHelper->getTemplatesForCategory(),
         ];
 
         $this->response = $this->responseFromTemplate(
@@ -1217,7 +1219,7 @@ class Controller extends Assessment\Controller
             'returnUrl'      => $returnUrl,
             'kamiSession'    => $kamiSession,
             'kamiFileId'     => $kamiFile,
-            'editorTemplates' => $this->editorTemplateHelper !== null ? $this->editorTemplateHelper->getTemplatesForCategory() : [],
+            'editorTemplates' => $this->activityTemplateHelper !== null ? $this->activityTemplateHelper->getTemplatesForCategory() : [],
 
             /* Only show these things if the assessment is self-gradable */
             'showDescriptorValue' => $selfAssess,
