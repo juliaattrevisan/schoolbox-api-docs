@@ -65,7 +65,10 @@ class LearningMomentsController extends Component_Homepage_ControllerAbstract
              */
             $userAccess = $this->getMapperFactory()->get(UserAccessMapper::class);
             $students = $userAccess->findUsersInCategory($this->getSource(), \Schoolbox\Role::STUDENT);
-        }
+
+            /* we need to filter out any students that you can't actually create for, else you'll get a 403 */
+            $students = $students->filter(fn(\Schoolbox\User $student) => $student->getLearningMomentsEnabled());
+        };
 
         return $this->renderTwigTemplate(
             $templateHandle,
