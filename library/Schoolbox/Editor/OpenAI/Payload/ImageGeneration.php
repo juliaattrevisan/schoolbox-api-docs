@@ -132,9 +132,9 @@ class ImageGeneration
         ];
 
         /** add prompt inputs if they are meaningful */
-        $imageSystemPrompt = trim($this->imageSystemPrompt);
+        $systemPrompt = trim($this->systemPrompt);
         if ($attributes[self::ATTRIBUTE_KEY_STYLE] !== null) {
-            $imageSystemPrompt .= sprintf(
+            $systemPrompt .= sprintf(
                 "\nThe image must be in the style of '%s'",
                 $attributes[self::ATTRIBUTE_KEY_STYLE]
             );
@@ -147,13 +147,6 @@ class ImageGeneration
             'role' => 'system',
             'content' => $systemPrompt,
         ];
-
-        if ('' !== $this->textSystemPrompt) {
-            $payload['input'][] = [
-                'role' => 'system',
-                'content' => "Any returned text must adhere to the following guidelines: " . $this->textSystemPrompt,
-            ];
-        }
 
         $userPrompt = [
             ['type' => 'input_text', 'text' => trim($userPrompt), ],
