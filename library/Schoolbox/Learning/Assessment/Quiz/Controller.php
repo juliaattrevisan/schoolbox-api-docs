@@ -113,7 +113,8 @@ class Controller extends Assessment\Controller
      * @param Filter\Selection\Mapper $filterSelectionMapper
      * @param CourseImplementationMapper $courseImplementationMapper
      * @param UnitImplementationMapper $unitImplementationMapper
-     * @param EditorTemplateHelper|null $editorTemplateHelper
+     * @param EditorTemplateHelper|null $activityTemplateHelper
+     * @param EditorTemplateHelper|null $activityTemplateHelper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -149,7 +150,8 @@ class Controller extends Assessment\Controller
         protected Filter\Selection\Mapper $filterSelectionMapper,
         protected CourseImplementationMapper $courseImplementationMapper,
         protected UnitImplementationMapper $unitImplementationMapper,
-        private ?EditorTemplateHelper $editorTemplateHelper,
+        private ?EditorTemplateHelper $activityTemplateHelper,
+        private ?EditorTemplateHelper $feedbackTemplateHelper,
     ) {
         parent::__construct(
             $userMapper,
@@ -181,7 +183,7 @@ class Controller extends Assessment\Controller
             $learnosityConsumerSecret,
             null,
             null,
-            $editorTemplateHelper
+            $activityTemplateHelper,
         );
     }
 
@@ -333,7 +335,7 @@ class Controller extends Assessment\Controller
              */
             'returnUrl' => Redirect::encode($baseUrl),
             'returnUrlSuffix' => $returnUrlSuffix,
-            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
+            'editorTemplates' => $this->feedbackTemplateHelper->getTemplatesForCategory(),
         ];
 
         $this->response = $this->responseFromTemplate(
@@ -514,7 +516,7 @@ class Controller extends Assessment\Controller
             'participant' => $participant,
             'returnUrlName' => Redirect::RETURN_URL,
             'returnUrlEncoded' => $this->requestQuery->get(Redirect::RETURN_URL), // The returnUrl URL parameter (to be used again as a URL parameter).  (Already encoded, so encoding/decoding necessary).
-            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
+            'editorTemplates' => $this->activityTemplateHelper->getTemplatesForCategory(),
         ];
 
         $this->response = $this->responseFromTemplate(

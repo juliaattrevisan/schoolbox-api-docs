@@ -47,6 +47,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\TokenReplacer;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 class Controller extends Assessment\Controller
 {
@@ -118,6 +119,7 @@ class Controller extends Assessment\Controller
      * @param Filter\Selection\Mapper $filterSelectionMapper
      * @param CourseImplementationMapper $courseImplementationMapper
      * @param UnitImplementationMapper $unitImplementationMapper
+     * @param EditorTemplateHelper|null $editorTemplateHelper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -148,7 +150,8 @@ class Controller extends Assessment\Controller
         protected Filter\Mapper $filterMapper,
         protected Filter\Selection\Mapper $filterSelectionMapper,
         protected CourseImplementationMapper $courseImplementationMapper,
-        protected UnitImplementationMapper $unitImplementationMapper
+        protected UnitImplementationMapper $unitImplementationMapper,
+        private ?EditorTemplateHelper $editorTemplateHelper = null,
     ) {
         parent::__construct(
             $userMapper,
@@ -174,6 +177,13 @@ class Controller extends Assessment\Controller
             $filterSelectionMapper,
             $courseImplementationMapper,
             $unitImplementationMapper,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            $editorTemplateHelper,
         );
         $this->ltiToolMapper            = $ltiToolMapper;
         $this->ltiAssessmentMapper      = $ltiAssessmentMapper;
@@ -235,6 +245,7 @@ class Controller extends Assessment\Controller
                                                    ->add([ $assessment->getTitle(), '' ]),
                 'message'      => strip_tags($this->requestQuery->get('lti_msg', '')),
                 'errorMessage' => strip_tags($this->requestQuery->get('lti_errormsg', '')),
+                'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
             ],
             "Status of {$assessment->getTitle()}",
             'submission'

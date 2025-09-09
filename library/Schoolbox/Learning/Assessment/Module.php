@@ -762,6 +762,11 @@ class Module extends BaseModule
                         EditorTemplatesCategoryModel::LEARNING_ACTIVITY,
                         $this->injector->get('user')
                     ),
+                    new EditorTemplateHelper(
+                        $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                        EditorTemplatesCategoryModel::FEEDBACK,
+                        $this->injector->get('user')
+                    ),
                 );
 
             case Assessment\Project\Controller::class:
@@ -836,6 +841,11 @@ class Module extends BaseModule
                         EditorTemplatesCategoryModel::LEARNING_ACTIVITY,
                         $this->injector->get('user')
                     ),
+                    new EditorTemplateHelper(
+                        $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                        EditorTemplatesCategoryModel::FEEDBACK,
+                        $this->injector->get('user')
+                    ),
                 );
 
             case Assessment\Task\Controller::class:
@@ -902,6 +912,11 @@ class Module extends BaseModule
                     $filterSelectionMapper,
                     $courseImplementationMapper,
                     $unitImplementationMapper,
+                    new EditorTemplateHelper(
+                        $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                        EditorTemplatesCategoryModel::LEARNING_ACTIVITY,
+                        $this->injector->get('user')
+                    ),
                 );
 
             case Assessment\LessonPlan\Controller::class:
