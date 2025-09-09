@@ -184,7 +184,6 @@ class Controller extends Assessment\Controller
             null,
             null,
             $activityTemplateHelper,
-            $feedbackTemplateHelper
         );
     }
 

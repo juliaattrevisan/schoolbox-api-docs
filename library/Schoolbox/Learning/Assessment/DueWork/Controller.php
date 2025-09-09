@@ -245,7 +245,6 @@ class Controller extends Assessment\Controller
             $mimeTypeMapper,
             $this->rubricDataSource,
             $activityTemplateHelper,
-            $feedbackTemplateHelper
         );
     }
 
