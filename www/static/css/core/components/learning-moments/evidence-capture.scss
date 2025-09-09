@@ -169,12 +169,6 @@
 // necessitating this weird styling duping and special modifications - I think this
 // is because comments were always presumed to be at the bottom of stuff, not top
 .moment-comments {
-    padding: 1rem 0 0 0;
-
-    .island {
-        border-top: 0;
-    }
-
     // This would have inherited a 0.8125rem proportion from being inside a ul
     // in the activity feed, but in the Moment modify screen there isn't a ul;
     // we have to set this proportion manually and explicitly. Wild!
