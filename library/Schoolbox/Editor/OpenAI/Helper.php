@@ -76,7 +76,7 @@ class Helper
      * Feature types for logging
      */
     public const FEATURE_CHAT = 'chat';
-    public const FEATURE_RESPONSE = 'response';
+    public const FEATURE_LESSONPLAN = 'lessonplan';
     public const FEATURE_IMAGE = 'image';
 
 
@@ -302,12 +302,12 @@ class Helper
      *
      * @param User $user // user to log the request against
      * @param string $payload // use this payload instead of generating one
-     * @param string|null $feature // feature type for logging (response, image, etc.)
+     * @param string $feature // frontend schoolbox ai feature type for logging (lessonplan, image, etc.)
      * @return array
      * @throws ClientExceptionInterface
      * @throws Exception
      */
-    public function request(User $user, string $payload, ?string $feature = self::FEATURE_RESPONSE): array
+    public function request(User $user, string $payload, string $feature): array
     {
         /* Check that we have activated this endpoint
          */
