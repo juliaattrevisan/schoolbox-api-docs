@@ -136,7 +136,7 @@ window.Vue.onMounted(() => {
 
 <style scoped lang="scss">
 // We're controlling margins here, so override it from the selectize plugin styles
-> :deep(.selectize-control) {
+:deep(.selectize-control) {
     margin-bottom: 0;
 }
 </style>
