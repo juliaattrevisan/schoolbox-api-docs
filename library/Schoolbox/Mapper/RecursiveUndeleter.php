@@ -648,7 +648,6 @@ class RecursiveUndeleter
             $this->logger->debug(sprintf("Child mapper identifier column '%s'", $childModelIdentifier));
             $childModelIds = $deletedChildModels->getPropertyValues($childMapper->getIdentifierProperty());
             $this->logger->debug(sprintf('Child model IDs: %s', $this->getIdsString($childModelIds)));
-            echo sprintf('Child model IDs: %s', $this->getIdsString($childModelIds)) . "\n";
 
             if (0 === count($childModelIds)) {
                 $this->logger->debug('No children found, skipping...');
