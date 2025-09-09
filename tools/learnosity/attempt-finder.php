@@ -274,9 +274,9 @@ HELP;
          * https://vagrant.dev.schoolbox.cloud/learning/quiz/1576/attempt/13/89fb1a57.........
          */
         $payload = [
-//            'user_id' => [
-//                $userIdentifier
-//            ]
+            'user_id' => [
+                $userIdentifier
+            ]
         ];
 
         /* Optional constraints
