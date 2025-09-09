@@ -3,17 +3,16 @@
 
 {% if user.role.isStudent or showUserSelect %}
     <section>
-        {% set baseUrl = routeLookupIfAuthorized('learningMomentEvidence.getCreateForm', { userIds: user.id }) %}
-        {% if baseUrl != '' %}
+        {% set getCreateForm = routeLookupIfAuthorized('learningMomentEvidence.getCreateForm', { userIds: user.id }) %}
+        {% if getCreateForm != '' %}
+            {% set baseUrlParams = '?folderId=' ~ folder.id ~ '&' ~ RETURN_URL.name ~ '=' ~ (encodedReturnUrl ?? RETURN_URL.current) %}
             <div class="share-work-buttons l-mar-m">
                 <a
                     data-action="shareLearningMoment"
                     data-moment-type="photo"
                     data-take-photo-button
                     data-test="learning-moment-evidence-share-takeAPhoto"
-                    {% if not showUserSelect %}
-                        href="{{ baseUrl }}?momentType=photo&folderId={{ folder.id }}&{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}"
-                    {% endif %}
+                    href="{% if showUserSelect %}#{% else %}{{ getCreateForm }}{{ baseUrlParams }}&momentType=photo{% endif %}"
                     class="icon-camera share-photo"
                     title="Take a photo"
                 >
@@ -23,9 +22,7 @@
                     data-action="shareLearningMoment"
                     data-moment-type="video"
                     data-record-video-button
-                    {% if not showUserSelect %}
-                        href="{{ baseUrl }}?momentType=video&folderId={{ folder.id }}&{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}"
-                    {% endif %}
+                    href="{% if showUserSelect %}#{% else %}{{ getCreateForm }}{{ baseUrlParams }}&momentType=video{% endif %}"
                     class="icon-video share-video"
                     title="Record a video"
                 >
@@ -35,9 +32,7 @@
                     data-action="shareLearningMoment"
                     data-moment-type="audio"
                     data-record-audio-button
-                    {% if not showUserSelect %}
-                        href="{{ baseUrl }}?momentType=audio&folderId={{ folder.id }}&{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}"
-                    {% endif %}
+                    href="{% if showUserSelect %}#{% else %}{{ getCreateForm }}{{ baseUrlParams }}&momentType=audio{% endif %}"
                     class="icon-audio share-audio"
                     title="Record audio"
                 >
@@ -46,9 +41,7 @@
                 <a
                     data-action="shareLearningMoment"
                     data-moment-type="upload"
-                    {% if not showUserSelect %}
-                        href="{{ baseUrl }}?momentType=upload&folderId={{ folder.id }}&{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}"
-                    {% endif %}
+                    href="{% if showUserSelect %}#{% else %}{{ getCreateForm }}{{ baseUrlParams }}&momentType=upload{% endif %}"
                     class="icon-upload share-file"
                     title="Upload file"
                 >
@@ -58,9 +51,7 @@
                     data-action="shareLearningMoment"
                     data-moment-type="text"
                     data-test="learning-moment-evidence-share-writeSomething"
-                    {% if not showUserSelect %}
-                        href="{{ baseUrl }}?momentType=text&folderId={{ folder.id }}&{{ RETURN_URL.name }}={{ encodedReturnUrl ?? RETURN_URL.current }}"
-                    {% endif %}
+                    href="{% if showUserSelect %}#{% else %}{{ getCreateForm }}{{ baseUrlParams }}&momentType=text{% endif %}"
                     class="icon-textbox share-text"
                     title="Write something"
                 >
@@ -87,7 +78,93 @@
         <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/checkShareWorkButtons.js?v={{ config.site_version }}"></script>
 
         {% if showUserSelect %}
-            {# TODO script/modal #}
+            {% set revealId = 'learning-moments-homepage-share-work-' ~ component.instance.id %}
+            <div data-reveal id="{{ revealId }}" class="reveal-modal">
+                <h2>Share a Learning Moment</h2>
+                <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+
+                {# TODO: handle no students? #}
+
+                <input id="chk-{{ revealId }}-all" type="checkbox">
+                <label for="chk-{{ revealId }}-all" class="checkbox-label">Select All</label>
+
+                <ul class="information-list card-selectable">
+                    {% for student in students %}
+                        <li>
+                            <div>
+                                <div class="selector">
+                                    <input
+                                        id="chk-{{ revealId }}-{{ student.id }}"
+                                        type="checkbox"
+                                        data-user-id="{{ student.id }}"
+                                        data-checkbox="{{ revealId }}"
+                                    >
+                                    <label for="chk-{{ revealId }}-{{ student.id }}" class="checkbox-label"></label>
+                                </div>
+                                <div class="small-12 card">
+                                    <a href="/search/user/{{ student.id }}" title="View Profile">
+                                        {% include 'include/portrait.twig' with {user: student} only %}
+                                        <h3>{{ student.fullName }}</h3>
+                                        <p class="meta">{{ student.preferredTitle }}</p>
+                                    </a>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <ul class="flex-list buttons l-mar-m--top">
+                    <li><a class="icon-share button" data-moment-share-submit disabled>Share Learning Moment</a></li>
+                </ul>
+            </div>
+
+            <script type="text/javascript">
+                window.sbProps.injectScriptsIfNotLoaded(
+                    {
+                        srcList: ['{{ CDN_PREFIX }}/js/select-all/jquery.select-all.basic.js?v={{ config.site_version }}'],
+                        onComplete: () => {
+                            $("#chk-{{ revealId }}-all").selectAllBasic({
+                                selector: '[data-checkbox="{{ revealId }}"]',
+                                onAfterCheckboxChange: (checkbox) => {
+                                    console.warn(checkbox);
+                                    const checkedUserIds = [...document.querySelectorAll('#{{ revealId }} [data-checkbox="{{ revealId }}"]')]
+                                        .filter((el) => el.checked)
+                                        .map((el) => el.getAttribute('data-user-id'));
+
+                                    const shareButton = document.querySelector('#{{ revealId }} [data-moment-share-submit]');
+                                    shareButton.removeAttribute('disabled');
+
+                                    // build up the new URL
+                                    const params = new URLSearchParams();
+                                    params.set('folderId', '{{ folder.id }}');
+                                    params.set('{{ RETURN_URL.name }}', '{{ encodedReturnUrl ?? RETURN_URL.current }}');
+                                    params.set('momentType', shareButton.getAttribute('data-moment-type'));
+
+                                    // the route generator will leave behind a {userIds} for us to inject to
+                                    const href = `{{ routeLookupIfAuthorized('learningMomentEvidence.getCreateForm') }}`.replace('{userIds}', checkedUserIds.join(','));
+                                    shareButton.setAttribute('href', `${href}?${params.toString()}`);
+
+                                    if (checkedUserIds.length === 0) {
+                                        shareButton.setAttribute('disabled', 'true');
+                                        return;
+                                    }
+                                },
+                            });
+                        }
+                    }
+                );
+
+                document.querySelectorAll('#component{{ component.instance.id }} [data-action="shareLearningMoment"][data-moment-type]').forEach((el) => {
+                    el.addEventListener('click', (event) => {
+                        event.preventDefault();
+                        $('#{{ revealId }}').foundation('reveal', 'open');
+
+                        const baseMomentType = event.currentTarget.getAttribute('data-moment-type');
+                        const shareButton = document.querySelector('#{{ revealId }} [data-moment-share-submit]');
+                        shareButton.setAttribute('data-moment-type', baseMomentType);
+                    });
+                });
+            </script>
         {% endif %}
     </section>
 {% elseif user.role.isStaff %}

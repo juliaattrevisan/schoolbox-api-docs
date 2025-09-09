@@ -4,6 +4,7 @@ namespace Schoolbox\Learning\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Permission\Access\UserAccessMapper;
 use Twig\Error\LoaderError;
 use Twig\Error\RuntimeError;
 use Twig\Error\SyntaxError;
@@ -50,6 +51,22 @@ class LearningMomentsController extends Component_Homepage_ControllerAbstract
      */
     public function renderTemplate($templateHandle): bool
     {
+        /**
+         * If the current user is a staff member with access to create learning moments for students,
+         * then find all the students that they can create learning moments for
+         */
+        $students = null;
+        if ($this->getUser()->getRole()->isStaff() && $this->getUser()->getRole()->getAccessEvidence()) {
+            /* Find a set of users who are somehow enrolled in $folder as students,
+             * and/or involved in $folder as group members
+             *
+             * Note that a folder can be both a group and a class-coded folder which derives its
+             * members from the Externals
+             */
+            $userAccess = $this->getMapperFactory()->get(UserAccessMapper::class);
+            $students = $userAccess->findUsersInCategory($this->getSource(), \Schoolbox\Role::STUDENT);
+        }
+
         return $this->renderTwigTemplate(
             $templateHandle,
             '@learning/component/learningMomentsHomepage.twig',
@@ -57,6 +74,7 @@ class LearningMomentsController extends Component_Homepage_ControllerAbstract
                 'user' => $this->getUser(),
                 'component' => $this,
                 'folder' => $this->getSource(),
+                'students' => $students,
             ]
         );
     }
