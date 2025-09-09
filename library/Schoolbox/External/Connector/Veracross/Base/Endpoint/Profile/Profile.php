@@ -977,39 +977,4 @@ class Profile implements IStrategy
             ));
         }
     }
-
-
-    /**
-     * Guess a file extension based on content-type
-     * I don't think we have a content-type to extension converter anywhere convenient?
-     *
-     * AllowedFiles associates a mime to multiple extensions, which might not be conclusive
-     * Anyway, this should be sufficient for vast majority of file formats given the use case.
-     *
-     * @param string $contentType
-     * @return string
-     */
-    private function guessExtension(string $contentType): string
-    {
-        if ($contentType === 'image/png') {
-            return '.png';
-        }
-
-        if ($contentType === 'image/gif') {
-            return '.gif';
-        }
-
-        if ($contentType === 'image/webp') {
-            return '.webp';
-        }
-
-        if ($contentType === 'image/bmp') {
-            return '.bmp';
-        }
-
-        /* Presume the universal default of jpg, esp. for random formats like
-         * pjpeg, jpg, jfif, etc
-         */
-        return '.jpg';
-    }
 }
