@@ -125,6 +125,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('recipient.role', 'recipientRole')},
                 {$this->getJoinColumnString('creator', 'creator')},
                 {$this->getJoinColumnString('creator.pronoun', 'creatorPronoun')},
+                {$this->getJoinColumnString('creator.role', 'creatorRole')},
                 {$this->getJoinColumnString('submittedBy', 'submittedBy')},
                 {$this->getJoinColumnString('publishedBy', 'publishedBy')},
                 {$this->getJoinColumnString('rejectedBy', 'rejectedBy')}
@@ -148,6 +149,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('recipient.role', 'recipient', 'recipientRole')}
             LEFT JOIN {$this->getJoinSql('creator', '', 'creator', true)}
             LEFT JOIN {$this->getJoinSql('creator.pronoun', 'creator', 'creatorPronoun')}
+            LEFT JOIN {$this->getJoinSql('creator.role', 'creator', 'creatorRole')}
             LEFT JOIN {$this->getJoinSql('submittedBy', '', 'submittedBy', true)}
             LEFT JOIN {$this->getJoinSql('publishedBy', '', 'publishedBy', true)}
             LEFT JOIN {$this->getJoinSql('rejectedBy', '', 'rejectedBy', true)}
@@ -202,11 +204,20 @@ class Mapper extends BaseMapper
                 /** @var User\Pronoun\Model|null $recipientPronoun */
                 $recipientPronoun = $this->hydrateJoin($row, 'recipient.pronoun', 'recipientPronoun');
                 $recipient->setPronoun($recipientPronoun);
+
+                /** @var \Schoolbox\Role $recipientRole */
+                $recipientRole = $this->hydrateJoin($row, 'recipient.role', 'recipientRole');
+                $recipient->setRole($recipientRole);
             }
             $model->setRecipient($recipient);
 
             /** @var User|null $creator */
             $creator = $this->hydrateJoin($row, 'creator', 'creator');
+
+            /** @var \Schoolbox\Role $creatorRole */
+            $creatorRole = $this->hydrateJoin($row, 'creator.role', 'creatorRole');
+            $creator->setRole($creatorRole);
+
             /** @var User\Pronoun\Model|null $creatorPronoun */
             $creatorPronoun = $this->hydrateJoin($row, 'creator.pronoun', 'creatorPronoun');
             $creator->setPronoun($creatorPronoun);

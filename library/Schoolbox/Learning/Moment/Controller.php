@@ -265,6 +265,9 @@ class Controller extends Base
             'selectedFolders'          => $selectedFolders,
             'otherUsers'               => $otherUsers,
             'sharingForSelf'           => $sharingForSelf,
+            /* Decide a special Publish button label, if applicable
+             */
+            'publishButtonLabel'       => $this->publishButtonLabel($moment)
         ];
 
         $this->response = $this->responseFromTemplate('@learningMomentEvidence/form.twig', $params);
@@ -553,6 +556,9 @@ class Controller extends Base
             'selectedFolders'          => $selectedFolders,
             'otherUsers'               => [],
             'sharingForSelf'           => $this->getUser() === $moment->getRecipient(),
+            /* Decide a special Publish button label, if applicable
+             */
+            'publishButtonLabel'       => $this->publishButtonLabel($moment)
         ];
 
         $this->response = $this->responseFromTemplate('@learningMomentEvidence/form.twig', $params);
@@ -1392,6 +1398,10 @@ class Controller extends Base
      */
     private function publishButtonLabel(Model $moment): string
     {
+        $globalModerationRequired = (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED);
+
+        $label = 'Publish';
+
         /* If you're a staff,
          * and Learning Moment Moderation is required,
          * and the Moment was authored by a student,
@@ -1400,5 +1410,16 @@ class Controller extends Base
          *
          * Otherwise it says "Publish"
          */
+        if ($this->getUser()->getRole()->isStaff()) {
+            if ((new ModerationRequired())->isSatisfiedBy($globalModerationRequired, $moment->getRecipient()->getYear())) {
+                if (!$moment->isPublished()) {
+                    if ($moment->getCreator()->getRole()->isStudent()) {
+                        $label = 'Approve';
+                    }
+                }
+            }
+        }
+
+        return $label;
     }
 }
