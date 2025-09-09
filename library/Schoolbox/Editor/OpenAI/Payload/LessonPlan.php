@@ -320,7 +320,7 @@ class LessonPlan
         if ('' !== $this->textSystemPrompt) {
             $payload['input'][] = [
                 'role' => 'system',
-                'content' => $this->textSystemPrompt,
+                'content' => "Any returned text must adhere to the following guidelines: " . $this->textSystemPrompt,
             ];
         }
 

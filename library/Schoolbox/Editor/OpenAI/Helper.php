@@ -473,7 +473,7 @@ class Helper
             if ('' !== $textSystemPrompt) {
                 $payload['messages'][] = [
                     'role' => 'system',
-                    'content' => $textSystemPrompt,
+                    'content' => "Any returned text must adhere to the following guidelines: " . $textSystemPrompt,
                 ];
             }
             $payload = json_encode($payload, JSON_THROW_ON_ERROR);
