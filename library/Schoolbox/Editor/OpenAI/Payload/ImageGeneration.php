@@ -132,9 +132,9 @@ class ImageGeneration
         ];
 
         /** add prompt inputs if they are meaningful */
-        $systemPrompt = trim($this->systemPrompt);
+        $imageSystemPrompt = trim($this->imageSystemPrompt);
         if ($attributes[self::ATTRIBUTE_KEY_STYLE] !== null) {
-            $systemPrompt .= sprintf(
+            $imageSystemPrompt .= sprintf(
                 "\nThe image must be in the style of '%s'",
                 $attributes[self::ATTRIBUTE_KEY_STYLE]
             );
