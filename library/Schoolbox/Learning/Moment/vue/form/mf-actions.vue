@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { useMomentFormStore } from "./store/momentFormStore";
 
+interface Props {
+    /* A special label for the Publish button that changes to Approve
+     * in exactly one workflow
+     */
+    publishLabel: string;
+}
+
+const props = defineProps<Props>();
 const mfStore = useMomentFormStore();
 
 /**
@@ -37,7 +45,7 @@ const relevantRoutes = window.Vue.computed(() => {
             </button>
         </li>
         <li v-if="relevantRoutes.publish">
-            <button :disabled="mfStore.isSaving" class="submit" @click="() => mfStore.publish()">Publish</button>
+            <button :disabled="mfStore.isSaving" class="submit" @click="() => mfStore.publish()">{{ props.publishLabel }}</button>
         </li>
     </ul>
 </template>

@@ -43,6 +43,10 @@ interface Props {
     /** Classes and Groups */
     folders: MomentFormFolder[];
     selectedFolders: number[];
+    /* A special label for the Publish button that changes to Approve
+     * in exactly one workflow
+     */
+    publishLabel: string;
 }
 
 const props = defineProps<Props>();
@@ -135,7 +139,7 @@ window.Vue.onMounted(() => {
 
                 <mf-sources />
             </section>
-            <mf-actions />
+            <mf-actions :publish-label="props.publishLabel" />
         </div>
     </div>
     <mf-modal />

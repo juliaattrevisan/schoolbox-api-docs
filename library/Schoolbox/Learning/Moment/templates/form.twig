@@ -2,11 +2,12 @@
  # Share a Learning Moment
  #
  TODO: update these
- # @param bool $moderationRequired  Decide if the current user's post requires moderation
- # @param bool $hasComments         Indicates whether there is at least one comment associated with this learning moment
- # @param array $editorTemplates    Retrieve any pre-existing editor templates to insert into the 'Body' rich text editor
- # @param Collection $folders       A set of folders that -could- be associated with this learning moment based on the recipient's access
- # @param array $selectedFolders    A set of folder ids currently associated with this learning moment (could be empty)
+ # @param bool $moderationRequired    Decide if the current user's post requires moderation
+ # @param bool $hasComments           Indicates whether there is at least one comment associated with this learning moment
+ # @param array $editorTemplates      Retrieve any pre-existing editor templates to insert into the 'Body' rich text editor
+ # @param Collection $folders         A set of folders that -could- be associated with this learning moment based on the recipient's access
+ # @param array $selectedFolders      A set of folder ids currently associated with this learning moment (could be empty)
+ # @param string $publishButtonLabel  The label for the Publish/Approve button which changes in exactly one workflow
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 
@@ -55,6 +56,7 @@
         {% endif %}
         :folders="{{ folders|json_encode }}"
         :selected-folders="{{ selectedFolders|json_encode }}"
+        publish-label="{{ publishLabel }}"
     >
         <template v-slot:heading>
             <h1>{{ heading }} Learning Moment</h1>

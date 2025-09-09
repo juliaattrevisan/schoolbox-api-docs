@@ -267,7 +267,7 @@ class Controller extends Base
             'sharingForSelf'           => $sharingForSelf,
             /* Decide a special Publish button label, if applicable
              */
-            'publishButtonLabel'       => $this->publishButtonLabel($moment)
+            'publishLabel'             => $this->publishLabel($moment)
         ];
 
         $this->response = $this->responseFromTemplate('@learningMomentEvidence/form.twig', $params);
@@ -558,7 +558,7 @@ class Controller extends Base
             'sharingForSelf'           => $this->getUser() === $moment->getRecipient(),
             /* Decide a special Publish button label, if applicable
              */
-            'publishButtonLabel'       => $this->publishButtonLabel($moment)
+            'publishLabel'             => $this->publishLabel($moment)
         ];
 
         $this->response = $this->responseFromTemplate('@learningMomentEvidence/form.twig', $params);
@@ -1396,7 +1396,7 @@ class Controller extends Base
      * @param \Schoolbox\Learning\Moment\Model $moment
      * @return string
      */
-    private function publishButtonLabel(Model $moment): string
+    private function publishLabel(Model $moment): string
     {
         $globalModerationRequired = (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED);
 
