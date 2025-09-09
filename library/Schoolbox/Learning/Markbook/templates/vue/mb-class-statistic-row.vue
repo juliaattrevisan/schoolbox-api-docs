@@ -103,17 +103,13 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
             :data-assessment="assessment.id"
         >
             <template v-if="stat === null || aImpl === null"></template>
-            <template
-                v-else-if="
-                    (props.input && (props.input.allowCourseManaged || !aImpl.courseManaged)) ||
-                    aImpl.writable === false
-                "
-            >
+            <template v-else-if="props.input && (props.input.allowCourseManaged || !aImpl.courseManaged)">
+                <template v-if="assessment.assessmentType === ACTIVITY_TYPE_TASK"></template>
                 <select
-                    v-if="props.input?.selectOptions && assessment.assessmentType !== ACTIVITY_TYPE_TASK"
+                    v-else-if="props.input?.selectOptions"
                     v-model="aImpl[props.input.key]"
                     :name="props.statsKey"
-                    :disabled="!mbStore.data || !mbStore.data.canAccessPopOut"
+                    :disabled="aImpl.writable === false || undefined"
                     @change="onValueChange(assessment.id, aImpl)"
                 >
                     <!-- eslint-disable vue/no-v-html -- we can't use <sbx-icon> in a select since html spec
@@ -127,11 +123,12 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
                     <!-- eslint-enable vue/no-v-html -->
                 </select>
                 <input
-                    v-else-if="assessment.assessmentType !== ACTIVITY_TYPE_TASK && props.input"
+                    v-else
                     v-model="aImpl[props.input.key]"
                     type="number"
                     inputmode="numeric"
                     :name="props.statsKey"
+                    :disabled="aImpl.writable === false || undefined"
                     min="0"
                     @change="onValueChange(assessment.id, aImpl)"
                 />
