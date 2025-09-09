@@ -90,7 +90,8 @@
             {# TODO script/modal #}
         {% endif %}
     </section>
-{% else %}
+{% elseif user.role.isStaff %}
+    {# only staff that can't create learning moments should see this empty state, there's no reason to show something to parents #}
     <div class="empty-state">
         <p>
             You do not have permission to create learning moments from this component.
