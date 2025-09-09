@@ -285,17 +285,15 @@ class Controller extends WebController\Base
                             ]
                         ) : null,
                         /* only show the links for specs, for historical reasons i guess... */
-                        '_links'          => $unitAssessmentsTranslator->getLinks($assessment, false),
+                        '_links'          => $unitAssessmentsTranslator->getLinks($assessment, true),
                         '_routes'         => [
-                            'postFeedbacks' => $assessment->isSpecification()
-                                ? $this->getRouteIfAuthorized(
-                                    'learningDueWorkFeedback.postParticipantFeedbacks',
-                                    [
-                                        'assessment'   => $assessment,
-                                        'assessmentId' => $assessment->getId(),
-                                    ]
-                                )
-                                : null,
+                            'postFeedbacks' => $this->getRouteIfAuthorized(
+                                'learningDueWorkFeedback.postParticipantFeedbacks',
+                                [
+                                    'assessment'   => $assessment,
+                                    'assessmentId' => $assessment->getId(),
+                                ]
+                            ),
                         ],
                     ];
                 })->indexByCallback(fn(array $assessment) => $assessment['id']),

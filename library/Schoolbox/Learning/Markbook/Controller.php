@@ -162,7 +162,7 @@ class Controller extends Base
                         /* the class markbook doesn't need any of the below, as this is always an implementation */
                         'isSpecification' => $assessment->isSpecification(),
                         'stats'           => null,
-                        '_links'          => $unitAssessmentsTranslator->getLinks($assessment, false),
+                        '_links'          => $unitAssessmentsTranslator->getLinks($assessment, true),
                         '_routes'         => [
                             'postFeedbacks' => $this->getRouteIfAuthorized(
                                 'learningDueWorkFeedback.postParticipantFeedbacks',
