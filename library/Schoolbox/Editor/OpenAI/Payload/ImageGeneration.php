@@ -148,6 +148,13 @@ class ImageGeneration
             'content' => $systemPrompt,
         ];
 
+        if ('' !== $this->textSystemPrompt) {
+            $payload['input'][] = [
+                'role' => 'system',
+                'content' => "Any returned text must adhere to the following guidelines: " . $this->textSystemPrompt,
+            ];
+        }
+
         $userPrompt = [
             ['type' => 'input_text', 'text' => trim($userPrompt), ],
         ];
