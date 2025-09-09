@@ -1,5 +1,3 @@
-# FrankenPHP Schoolbox image
-
 ARG ENV=prod
 ARG PHP_MAJOR_VERSION=8.4
 ARG PRIVATE_CONTAINER_REGISTRY=476058706527.dkr.ecr.ap-southeast-2.amazonaws.com
@@ -17,3 +15,6 @@ COPY --from=code ./www       /usr/share/schoolbox/www
 COPY --from=code ./templates /usr/share/schoolbox/templates
 COPY --from=code ./tools     /usr/share/schoolbox/tools
 COPY --from=code ./library   /usr/share/schoolbox/library
+
+# Run as non-root user, because FrankenPHP needs to write to a shared folder
+USER www-data
