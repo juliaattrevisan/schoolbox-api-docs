@@ -56,6 +56,19 @@ window.Vue.onMounted(() => {
         props.folders,
         props.selectedFolders,
     );
+
+    // Has the user asked for folders to be selected in the URL? i.e. come from a homepage component
+    const urlParams = new URLSearchParams(window.location.search);
+    const folderIds = urlParams.get("folderId")?.split(",") ?? [];
+
+    if (folderIds.length > 0) {
+        mfStore.selectedFolders = [
+            ...new Set([
+                ...mfStore.selectedFolders,
+                ...folderIds.map((id) => parseInt(id, 10)).filter((id) => !Number.isNaN(id)),
+            ]),
+        ];
+    }
 });
 </script>
 
