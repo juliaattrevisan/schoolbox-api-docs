@@ -8,6 +8,7 @@
 
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
+use External\Synergetic\Utils as SynergeticUtils;
 use Html2Text\Html2Text;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Exception as ExternalException;
@@ -121,7 +122,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     const CHARACTER_ENCODING = 'UTF-8';
 
     /** @var Html2Text $htmlConverter */
-    protected $htmlConverter;
+    protected Html2Text $htmlConverter;
 
     /**
      * Constructor
@@ -1020,6 +1021,12 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             return false;
         }
 
+        $this->htmlConverter->setHtml($comment->getBody());
+        $commentText = $this->htmlConverter->getText();
+
+        // Synergetic will ignore Unix-style line endings, so must convert to Dos-style before exporting.
+        $commentText = SynergeticUtils::convertLineEndingsUnixToDos($commentText);
+
         $query =
             "
             INSERT INTO PastoralCareComments
@@ -1047,7 +1054,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             $this->connector->executeQuery($query, [
                 'externalId' => $pastoral->getExternalId(),
                 'externalId2' => $pastoral->getExternalId(),
-                'comment' => $comment->getBody(),
+                'comment' => $commentText,
                 'createdDate' => $comment->getCreatedAt()->getDatabase(),
                 'createdOwnerId' => $comment->getOwner()->getExternalId(),
                 'modifiedDate' => $comment->getCreatedAt()->getDatabase(),
@@ -1536,7 +1543,9 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
          * some schools aren't; hence, a per-school configuration as per SA-16383
          */
         if ($prependTitle) {
-            $bodyPublicText = $pastoral->getHeading() . "\r\n" . $this->htmlConverter->getText();
+            // Add double line break to separate title from body.
+            // Note we are converting Unix line endings to Dow below, so "\n" is fine here.
+            $bodyPublicText = $pastoral->getHeading() . "\n\n" . $this->htmlConverter->getText();
         } else {
             $bodyPublicText = $this->htmlConverter->getText();
         }
@@ -1545,8 +1554,8 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $bodyPrivateText = $this->htmlConverter->getText();
 
         // Synergetic will ignore Unix-style line endings, so must convert to Dos-style before exporting.
-        $bodyPublicText = $this->convertLineEndingsUnixToDos($bodyPublicText);
-        $bodyPrivateText = $this->convertLineEndingsUnixToDos($bodyPrivateText);
+        $bodyPublicText = SynergeticUtils::convertLineEndingsUnixToDos($bodyPublicText);
+        $bodyPrivateText = SynergeticUtils::convertLineEndingsUnixToDos($bodyPrivateText);
 
         // Return an array containing the parameters for the insert/update query
 
@@ -1753,19 +1762,5 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             ];
         }
         return $exDocClassLookup;
-    }
-
-    /**
-     * Convert a string containing a mixture of Unix and Dos style line endings (LF or CRLF) to Dos style only (CRLF).
-     * @param string $string
-     * @return string
-     */
-    private function convertLineEndingsUnixToDos(string $string): string
-    {
-        // First convert all CRLF and CR to LF.
-        $string = str_replace(["\r\n", "\r"], "\n", $string);
-
-        // Then convert all LF to CRLF.
-        return str_replace("\n", "\r\n", $string);
     }
 }

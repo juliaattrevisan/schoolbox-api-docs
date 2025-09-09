@@ -7,6 +7,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+use External\Synergetic\Utils as SynergeticUtils;
+use Html2Text\Html2Text;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Component\SubmissionBoxMapper;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
@@ -104,6 +106,9 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
      */
     private LoggerInterface $logger;
 
+    /** @var Html2Text $htmlConverter */
+    protected Html2Text $htmlConverter;
+
     /**
      * Constructor
      *
@@ -122,6 +127,7 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
         }
         // This connects to the Synergetic database and stores an IConnection in `$this->connector` variable
         $this->setupDatabase();
+        $this->htmlConverter        = new Html2Text('', ['width' => 0]); // Set width to 0 to disable line-wrapping.
         $this->externalUser         = new External_User();
         $this->externalClass        = new External_Synergetic_Class();
         $this->markType             = $markType;
@@ -1200,11 +1206,15 @@ class External_Synergetic_Markbook implements External_MarkbookInterface
             $markValue = null === $mark ? self::NO_MARK_GIVEN : round($mark, 2);
         }
 
+        $this->htmlConverter->setHtml($feedback->getComment());
+        $commentText = $this->htmlConverter->getText();
 
-        $comment   = $feedback->getComment();
+        // Synergetic will ignore Unix-style line endings, so must convert to Dos-style before exporting.
+        $commentText = SynergeticUtils::convertLineEndingsUnixToDos($commentText);
+
         return [
             'mark'             => $markValue,
-            'topicComment'     => Scrub::html2text($comment),
+            'topicComment'     => $commentText,
             'resultDate'       => $activity->getDueAt()->getDatabase(),
             'markerExternalId' => $marker->getExternalId(),
         ];
