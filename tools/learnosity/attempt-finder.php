@@ -115,17 +115,13 @@ the following criteria in an effort to track down whether an attempt actually ex
 
 Notes:
 * for the url https://vagrant.dev.schoolbox.cloud/learning/quiz/1576/attempt/13/89fb1a57.... the assessment id is 1576.)
-* Unlike our vagrants, in schoolbox Help the user_id follows a format named after the user's school, like this:
-    NGSL_12345
-    AGSBOT_12345
-    ASAS_12345
  
 
 Usage: attempt-finder.php --server=... --schoolcode=... --user=... [--assessment=...] [--attempt=...]
         --server         Server name; default is vagrant.dev.schoolbox.cloud
         --schoolcode     School code of the instance that spawned the quiz
         --user           Schoolbox user id who did the attempt
-        --assessment     Schoolbox assessment id as per the url for an attempt
+        --assessment     If specified, look for this particular Schoolbox assessment id as per the url for an attempt
         --attempt        If specified, look for this particular learnosity reference
 
 
@@ -227,7 +223,7 @@ HELP;
         string $userId,
         string $assessmentId
     ): void {
-        /* All four are required incl. server name
+        /* School Code and user identifier are both needed to track down an author of an attempt in learnosity.
          */
         if ('' === $schoolCode) {
             $this->getLogger()->info('Please provide school code.');
