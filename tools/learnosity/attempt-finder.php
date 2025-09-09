@@ -115,9 +115,14 @@ entire set of Learnosity Sessions (syn. "attempts") and try to find an attempt t
 
 (Note that for the url https://vagrant.dev.schoolbox.cloud/learning/quiz/1576/attempt/13/89fb1a57....
 the assessment id is 1576.)
+
+Unlike our vagrants, in schoolbox Help the user_id follows a format named after the user's school, like this:
+    NGSL_12345
+    AGSBOT_56789
+    ASAS_12345
  
 
-Usage: attempt-finder.php --server=... --schoolcode=... --user=... --assessment=... [--attempt=...]
+Usage: attempt-finder.php --server=... --schoolcode=... --user=... [--assessment=...] [--attempt=...]
         --server         Server name; default is vagrant.dev.schoolbox.cloud
         --schoolcode     School code of the instance that spawned the quiz
         --user           Schoolbox user id who did the attempt
@@ -235,11 +240,6 @@ HELP;
             return;
         }
 
-        if ('' === $assessmentId) {
-            $this->getLogger()->info('Please provide assessment id for the attempt.');
-            return;
-        }
-
         /* This is an optional constraint
          */
         $attemptReference = trim((string)$this->getOpt(self::OPT_LONG_ATTEMPT_LEARNOSITY_REFERENCE));
@@ -274,16 +274,19 @@ HELP;
          * https://vagrant.dev.schoolbox.cloud/learning/quiz/1576/attempt/13/89fb1a57.........
          */
         $payload = [
-            'activity_id' => [
-                $assessmentId
-            ],
-            'user_id' => [
-                $userIdentifier
-            ]
+//            'user_id' => [
+//                $userIdentifier
+//            ]
         ];
 
-        /* Optional constraint
+        /* Optional constraints
          */
+        if ('' !== $assessmentId) {
+            $payload['activity_id'] = [
+                $assessmentId
+            ];
+        }
+
         if ('' !== $attemptReference) {
             $payload['session_id'] = [
                 $attemptReference
