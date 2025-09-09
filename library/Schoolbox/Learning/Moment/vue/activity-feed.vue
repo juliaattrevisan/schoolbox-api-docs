@@ -818,8 +818,6 @@ export default {
                                             :thread="evidence.object.discussionThread"
                                             :create-thread-endpoint="evidence.object._links.createThread"
                                             :can-comment="config.canComment"
-                                            :cdn-prefix="cdnPrefix"
-                                            :site-version="siteVersion"
                                         />
                                     </div>
 

@@ -174,9 +174,7 @@ export default {
                     <p class="comment-count">{{ commentHeading }} Comments ({{ comments.length }})</p>
 
                     <add-comment-input
-                        :cdn-prefix="cdnPrefix"
                         :is-processing="isProcessing"
-                        :site-version="siteVersion"
                         :preset-unique-id="recordType"
                         @on-load-error="onLoadError"
                         @on-post-comment="postComment"

@@ -207,8 +207,6 @@ export default {
                             :thread="evidence.discussionThread"
                             :create-thread-endpoint="evidence._links.createThread"
                             :can-comment="canComment"
-                            :cdn-prefix="cdnPrefix"
-                            :site-version="siteVersion"
                         />
                     </div>
                 </section>
