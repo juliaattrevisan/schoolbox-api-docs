@@ -1381,4 +1381,24 @@ class Controller extends Base
 
         $this->response = $this->responseAsJson($stack);
     }
+
+
+    /**
+     * In one special workflow the Publish button gets renamed to Approve.
+     * Its behaviour is exactly the same: only its user-facing label changes.
+     *
+     * @param \Schoolbox\Learning\Moment\Model $moment
+     * @return string
+     */
+    private function publishButtonLabel(Model $moment): string
+    {
+        /* If you're a staff,
+         * and Learning Moment Moderation is required,
+         * and the Moment was authored by a student,
+         * and the Moment is unpublished,
+         * then the button label says "Approve"
+         *
+         * Otherwise it says "Publish"
+         */
+    }
 }
