@@ -60,12 +60,8 @@ services:
       - aws-config:/root/.aws
     # After building: create data dirs, start cron
     post_start:
-      - command : mkdir -p /var/lib/schoolbox/docker/cache/portrait
-      - command : mkdir -p /var/lib/schoolbox/docker/cache/stream
-      - command : mkdir -p /var/lib/schoolbox/docker/cache/zip
-      - command : mkdir -p /var/lib/schoolbox/docker/files
-      - command : mkdir -p /var/lib/schoolbox/docker/purifier
-      - command : mkdir -p /var/lib/schoolbox/docker/twig
+      - command: /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox/docker/
+      - command: /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox/docker/ www-data
       - command : sudo /etc/init.d/cron start
 
   # Database services:
