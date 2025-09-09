@@ -109,7 +109,7 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
                     v-else-if="props.input?.selectOptions"
                     v-model="aImpl[props.input.key]"
                     :name="props.statsKey"
-                    :disabled="aImpl.writable === false || undefined"
+                    :disabled="!aImpl.writable || undefined"
                     @change="onValueChange(assessment.id, aImpl)"
                 >
                     <!-- eslint-disable vue/no-v-html -- we can't use <sbx-icon> in a select since html spec
@@ -128,7 +128,7 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
                     type="number"
                     inputmode="numeric"
                     :name="props.statsKey"
-                    :disabled="aImpl.writable === false || undefined"
+                    :disabled="!aImpl.writable || undefined"
                     min="0"
                     @change="onValueChange(assessment.id, aImpl)"
                 />

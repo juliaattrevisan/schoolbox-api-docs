@@ -247,7 +247,7 @@ const plaintextComments = window.Vue.computed(() => {
             <progress-tick
                 :progress-tick="participant.progressTick"
                 :is-self-assessable="false"
-                :can-modify="aImpl !== null && aImpl.writable !== false"
+                :can-modify="aImpl !== null && aImpl.writable"
                 no-margin
                 @update:class="(newClass) => (participant!.progressTick!.progressClass = newClass)"
             />

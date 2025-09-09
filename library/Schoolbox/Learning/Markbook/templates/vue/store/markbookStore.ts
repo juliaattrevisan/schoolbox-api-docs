@@ -186,7 +186,7 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
 
         return data.value.classImpls
             .map((classImpl) => classImpl.assessments[activity.id])
-            .every((aImpl) => aImpl !== undefined && aImpl.writable !== false);
+            .every((aImpl) => aImpl !== undefined && aImpl.writable);
     }
 
     /**

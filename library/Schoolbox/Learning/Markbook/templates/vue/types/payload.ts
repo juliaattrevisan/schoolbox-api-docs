@@ -107,8 +107,8 @@ export type MarkbookClassImplActivity = {
     instructorMarkScheme: MarkScheme;
     markVisibility: number;
     courseManaged: boolean | null;
+    writable: boolean;
     /* currently class markbook only */
-    writable?: boolean;
     weight?: number;
 };
 

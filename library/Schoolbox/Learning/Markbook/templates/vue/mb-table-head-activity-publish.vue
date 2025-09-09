@@ -19,8 +19,7 @@ const participantsWithDrafts = window.Vue.computed(() => {
     return mbStore.data.classImpls
         .map((classImpl, classImplId) => {
             const aImpl = classImpl.assessments[props.activity.id];
-            if (!aImpl || aImpl.writable === false) {
-                // TODO: does course markbook need the writable property? this ignores undefined atm
+            if (!aImpl || !aImpl.writable) {
                 return null;
             }
 
