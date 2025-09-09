@@ -244,15 +244,19 @@ HELP;
 
         /* Some identifying info
          */
+        $userMapper = UserMapper::getInstance();
+
         try {
-            $user = UserMapper::getInstance()->findById($userId);
+            $user = $userMapper->findById($userId);
         } catch (\Schoolbox\Mapper\Exception $e) {
             $this->getLogger()->warning(sprintf(
-                'schoolbox user %s not found.',
+                "schoolbox user %s not found; if you are testing in a vagrant you probably won't have this user account - defaulting to anonymous placeholder.",
                 $userId
             ));
 
-            return;
+            $user = $userMapper->createModel()
+                ->setFirstname('anonymous')
+                ->setLastname('anonymous');
         }
 
         $userIdentifier = (new UserIdentifier())->generate($schoolCode, $userId);
@@ -313,6 +317,10 @@ HELP;
          */
         $results = array_reverse($result['data']);
 
+        if (!\count($results)) {
+            $this->getLogger()->info('No matching records found.');
+        }
+
         foreach ($results as $row) {
             $this->getLogger()->info(sprintf(
                 '[%s/%s] attempt by %s saved at %s in learnosity',
@@ -327,6 +335,8 @@ HELP;
             print_r(array_intersect_key($row, $fields));
             echo "\n\n";
         }
+
+        $this->getLogger()->info('');
     }
 
 
