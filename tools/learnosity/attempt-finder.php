@@ -185,6 +185,8 @@ HELP;
 
         /* Announce conclusion
          */
+        $this->getLogger()->info('');
+
         if (!$this->perform()) {
             $this->getLogger()->info('Planning finished.');
         }
@@ -260,6 +262,11 @@ HELP;
         }
 
         $userIdentifier = (new UserIdentifier())->generate($schoolCode, $userId);
+
+        $this->getLogger()->debug(sprintf(
+            'Searching for records pertaining to user identifier: %s',
+            $userIdentifier
+        ));
 
         /* Note: activity_id is where were stored our internal quiz identifier. Nice.
          * We had it after all! For example, the url below has 1576 as the activity_id:
