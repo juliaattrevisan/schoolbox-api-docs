@@ -83,47 +83,56 @@
                 <h2>Share a Learning Moment</h2>
                 <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 
-                {# TODO: handle no students? #}
+                {% if students|length %}
+                    <input id="chk-{{ revealId }}-all" type="checkbox">
+                    <label for="chk-{{ revealId }}-all" class="checkbox-label">Select All</label>
 
-                <input id="chk-{{ revealId }}-all" type="checkbox">
-                <label for="chk-{{ revealId }}-all" class="checkbox-label">Select All</label>
-
-                <ul class="information-list card-selectable">
-                    {% for student in students %}
-                        <li {% if not student.getLearningMomentsEnabled %}style="opacity: 0.5"{% endif %}>
-                            <div>
-                                <div class="selector">
-                                    <input
-                                        id="chk-{{ revealId }}-{{ student.id }}"
-                                        type="checkbox"
-                                        data-user-id="{{ student.id }}"
-                                        {% if student.getLearningMomentsEnabled %}
-                                            data-checkbox="{{ revealId }}"
-                                        {% else %}
-                                            disabled
-                                        {% endif %}
-                                    >
-                                    <label for="chk-{{ revealId }}-{{ student.id }}" class="checkbox-label"></label>
-                                </div>
-                                <div class="small-12 card">
-                                    <a href="/search/user/{{ student.id }}" title="View Profile">
-                                        {% include 'include/portrait.twig' with {user: student} only %}
-                                        <h3>{{ student.fullName }}</h3>
-                                        <p class="meta">{{ student.preferredTitle }}
-                                            {% if not student.getLearningMomentsEnabled %}
-                                                (Learning Moments not enabled)
+                    <ul class="information-list card-selectable">
+                        {% for student in students %}
+                            <li {% if not student.getLearningMomentsEnabled %}style="opacity: 0.5"{% endif %}>
+                                <div>
+                                    <div class="selector">
+                                        <input
+                                            id="chk-{{ revealId }}-{{ student.id }}"
+                                            type="checkbox"
+                                            data-user-id="{{ student.id }}"
+                                            {% if student.getLearningMomentsEnabled %}
+                                                data-checkbox="{{ revealId }}"
+                                            {% else %}
+                                                disabled
                                             {% endif %}
-                                        </p>
-                                    </a>
+                                        >
+                                        <label for="chk-{{ revealId }}-{{ student.id }}" class="checkbox-label"></label>
+                                    </div>
+                                    <div class="small-12 card">
+                                        <a href="/search/user/{{ student.id }}" title="View Profile">
+                                            {% include 'include/portrait.twig' with {user: student} only %}
+                                            <h3>{{ student.fullName }}</h3>
+                                            <p class="meta">{{ student.preferredTitle }}
+                                                {% if not student.getLearningMomentsEnabled %}
+                                                    (Learning Moments not enabled)
+                                                {% endif %}
+                                            </p>
+                                        </a>
+                                    </div>
                                 </div>
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
+                            </li>
+                        {% endfor %}
+                    </ul>
 
-                <ul class="flex-list buttons l-mar-m--top">
-                    <li><a class="icon-share button" data-moment-share-submit disabled>Share Learning Moment</a></li>
-                </ul>
+                    <ul class="flex-list buttons l-mar-m--top">
+                        <li><a class="icon-share button" data-moment-share-submit disabled>Share Learning Moment</a></li>
+                    </ul>
+                {% else %}
+                    <div class="empty-state">
+                        <i class="icon-share"></i>
+                        {% if folder.folder.codes|length %}
+                            <p>There are no students added to the class at this time.</p>
+                        {% else %}
+                            <p>There are no group members in this folder.</p>
+                        {% endif %}
+                    </div>
+                {% endif %}
             </div>
 
             <script type="text/javascript">
