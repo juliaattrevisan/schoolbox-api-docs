@@ -261,17 +261,42 @@ class Classes implements IStrategy
             $classInstance['end']
         ));
 
+        /* There is an omega bug in Veracross where they send us UTC timestamps
+         * but they aren't actually UTC values lol...for example, they send this:
+         *
+            [start] => 2025-09-02T14:30:00Z
+            [end] => 2025-09-02T15:25:00Z
+
+         * ...but that means it should display at 2:30pm-3:25pm in the timetable.
+         * We can glitch around this by simply str_replace T and Z out (?!!!?)
+         * until they figure out how to repair their api.
+         */
+//        $startAt = (new \Alaress_Date_Format(
+//            $classInstance['start'],
+//            \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
+//            new \DateTimeZone('UTC')
+//        ))->setTimezone($this->timezone);
+//
+//        $finishAt = (new \Alaress_Date_Format(
+//            $classInstance['end'],
+//            \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
+//            new \DateTimeZone('UTC')
+//        ))->setTimezone($this->timezone);
+
+        /* Weird hacky version for now. Revert when veracross repairs their data.
+         */
+        $tempStart = trim(str_replace(['T', 'Z'], ' ', $classInstance['start']));
+        $tempEnd = trim(str_replace(['T', 'Z'], ' ', $classInstance['end']));
+
         $startAt = (new \Alaress_Date_Format(
-            $classInstance['start'],
-            \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
-            new \DateTimeZone('UTC')
-        ))->setTimezone($this->timezone);
+            $tempStart,
+            \Alaress_Date_Format::DATABASE_DATE_FORMAT,
+        ));
 
         $finishAt = (new \Alaress_Date_Format(
-            $classInstance['end'],
-            \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
-            new \DateTimeZone('UTC')
-        ))->setTimezone($this->timezone);
+            $tempEnd,
+            \Alaress_Date_Format::DATABASE_DATE_FORMAT,
+        ));
 
         /* Try to recycle based on guid
          */
