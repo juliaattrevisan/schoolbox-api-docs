@@ -13,6 +13,7 @@ use Alaress\Paginator;
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Controller\Exception as WebControllerException;
 use Alaress_Date_Format;
+use Aura\Router\Exception\RouteNotFound;
 use League\Flysystem\FilesystemException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\ConfigMapper;
@@ -608,6 +609,9 @@ class Controller extends Base
      *
      * @param Model $import
      * @return void
+     * @throws MapperException
+     * @throws RouteNotFound
+     * @throws WebControllerException
      */
     public function postUndoImport(Model $import): void
     {
@@ -624,9 +628,14 @@ class Controller extends Base
         foreach ($import->getImportLog()['known'] as $item) {
             $recordId = $item['record']['id'] ?? null;
             if (isset($recordId)) {
-                $this->pastoralDataSource->delete(
-                    $this->pastoralDataSource->findById($this->getUser(), $recordId),
-                );
+                try {
+                    $this->pastoralDataSource->delete(
+                        $this->pastoralDataSource->findById($this->getUser(), $recordId),
+                    );
+                } catch (MapperException) {
+                    // The pastoral record was either already deleted or not found.
+                    // Since we are trying to delete it, this error can be ignored.
+                }
             }
         }
 
