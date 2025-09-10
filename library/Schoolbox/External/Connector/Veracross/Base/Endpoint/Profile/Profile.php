@@ -13,6 +13,7 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\Profile;
 use Alaress\Image\TransformFormat;
 use Alaress_Date_Format;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
 use PDOException;
 use Psr\Log\LoggerInterface;
@@ -969,10 +970,22 @@ class Profile implements IStrategy
             if (!$baseProfile->getPortrait() || ($baseProfile->getPortrait()->getHash() !== $portrait->getHash())) {
                 $baseProfile->setPortrait($portrait);
             }
+        } catch (BadResponseException $e) {
+            // HTTP 4xx/5xx errors - these have response objects with status codes
+            $statusCode = $e->getResponse()->getStatusCode();
+            $errorMessage = $e->getResponse()->getReasonPhrase();
+
+            $this->log->warning(sprintf(
+                'Failed to retrieve profile picture for user %s: HTTP error %s - %s ',
+                $baseProfile->getExternalId(),
+                $statusCode,
+                $errorMessage,
+            ));
         } catch (\Exception $e) {
             // noop, but warn the cli that something unusual has transpired
             $this->log->warning(sprintf(
-                'Profile picture: exception thrown. %s',
+                'Failed to retrieve profile picture for user %s: exception thrown. %s',
+                $baseProfile->getExternalId(),
                 $e->getMessage()
             ));
         }
