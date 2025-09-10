@@ -265,6 +265,9 @@ class Controller extends Base
             'selectedFolders'          => $selectedFolders,
             'otherUsers'               => $otherUsers,
             'sharingForSelf'           => $sharingForSelf,
+            /* Decide a special Publish button label, if applicable
+             */
+            'publishLabel'             => (new PublishLabel())->generate((bool)$this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $this->getUser(), $moment)
         ];
 
         $this->response = $this->responseFromTemplate('@learningMomentEvidence/form.twig', $params);
@@ -553,6 +556,9 @@ class Controller extends Base
             'selectedFolders'          => $selectedFolders,
             'otherUsers'               => [],
             'sharingForSelf'           => $this->getUser() === $moment->getRecipient(),
+            /* Decide a special Publish button label, if applicable
+             */
+            'publishLabel'             => (new PublishLabel())->generate((bool)$this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED), $this->getUser(), $moment)
         ];
 
         $this->response = $this->responseFromTemplate('@learningMomentEvidence/form.twig', $params);

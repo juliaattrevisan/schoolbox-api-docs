@@ -952,7 +952,7 @@ export default {
                                                             class="submit"
                                                             @click="publishEvidence(evidence.object)"
                                                         >
-                                                            Publish
+                                                            {{ evidence.object._labels.publish }}
                                                         </button>
                                                     </li>
                                                 </template>
