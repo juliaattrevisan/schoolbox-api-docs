@@ -488,6 +488,9 @@ class Controller extends Base
             return;
         }
 
+        // Pastoral imports can be long-running, so extend the execution time.
+        $this->extendExecutionTime(3600);
+
         try {
             // Save imported by/at immediately,
             // so that mashing the import button doesn't create multiple imports.
@@ -612,6 +615,9 @@ class Controller extends Base
             $this->sendError('This import has not been run, and cannot be undone.');
             return;
         }
+
+        // Pastoral import undo operations can be long-running, so extend the execution time.
+        $this->extendExecutionTime(3600);
 
         // Investigate the log to find what was created:
         // delete all of these.
