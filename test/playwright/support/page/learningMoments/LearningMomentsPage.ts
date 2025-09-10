@@ -19,13 +19,13 @@ export default class LearningMomentsPage {
     static readonly TAKE_A_PHOTO_BUTTON_EVIDENCE =
         "button.vjs-camera-button.vjs-control.vjs-button.vjs-icon-photo-camera";
 
-    static readonly DELETE_A_PHOTO = "videojs-record-delete-button";
+    static readonly DELETE_A_PHOTO = `a[title="Delete Evidence"]`;
 
     static readonly DELETE_A_PHOTO_CONFIRM_BUTTON = "videojs-record-delete-button-confirm";
 
     static readonly SUBMIT_BUTTON = "learning-moment-evidence-form-submit";
 
-    static readonly APPROVE_BUTTON = "learning-moment-evidence-form-approve";
+    static readonly APPROVE_BUTTON = `button[class="submit"]`;
 
     static readonly COMMENT_DELETE_BUTTON = "learning-moment-evidence-delete-comment";
 
@@ -45,11 +45,15 @@ export default class LearningMomentsPage {
 
     static readonly LEARNING_POST_COMMENT_TEXTAREA = "ckeditor-add-comment-textarea"; // Append "-[commentId]"
 
-    static readonly EVIDENCE_MEDIA_DESCRIPTION_TEXTAREA = "learning-moment-evidence-media-description-textarea";
+    static readonly EVIDENCE_MEDIA_DESCRIPTION_TEXTAREA = "#mf-evidence-textarea";
 
     static readonly EVIDENCE_BODY = "learning-moment-evidence-body";
 
     static readonly EVIDENCE_MEDIA = "learning-moment-evidence-media";
+
+    static readonly WRITE_SOMETHING_BUTTON = "a.icon-textbox.share-text";
+
+    static readonly CAMERA_BUTTON = "a.icon-camera.share-photo";
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -104,7 +108,7 @@ export default class LearningMomentsPage {
      * Click "delete button to remove a photo already taken
      */
     async deletePhotoEvidence(): Promise<void> {
-        await this.page.getByTestId(LearningMomentsPage.DELETE_A_PHOTO).click();
+        await this.page.locator(LearningMomentsPage.DELETE_A_PHOTO).click();
     }
 
     /**
@@ -118,7 +122,7 @@ export default class LearningMomentsPage {
      * Click evidence submit button
      */
     async clickSubmit(): Promise<void> {
-        await this.page.getByTestId(LearningMomentsPage.APPROVE_BUTTON).click();
+        await this.page.locator(LearningMomentsPage.APPROVE_BUTTON).click();
     }
 
     /**
@@ -153,7 +157,7 @@ export default class LearningMomentsPage {
      * @param description - The description to type
      */
     async typeMediaEvidenceDescription(description: string): Promise<void> {
-        const descriptionTextarea = this.page.getByTestId(LearningMomentsPage.EVIDENCE_MEDIA_DESCRIPTION_TEXTAREA);
+        const descriptionTextarea = this.page.locator(LearningMomentsPage.EVIDENCE_MEDIA_DESCRIPTION_TEXTAREA);
         await this.tester.fillCKEditorByLocator(descriptionTextarea, description);
     }
 
@@ -234,5 +238,19 @@ export default class LearningMomentsPage {
         const mediaLocator = this.page.getByTestId(LearningMomentsPage.EVIDENCE_MEDIA);
         await expect(mediaLocator).toBeVisible();
         await expect(mediaLocator).toHaveAttribute("alt", "photo.jpeg");
+    }
+
+    /**
+     * click write something button in the learning moments page
+     */
+    async clickWriteSomethingButton(): Promise<void> {
+        await this.page.locator(LearningMomentsPage.WRITE_SOMETHING_BUTTON).click();
+    }
+
+    /**
+     * click icon camera button in the learning moments page
+     */
+    async clickCameraIconButton(): Promise<void> {
+        await this.page.locator(LearningMomentsPage.CAMERA_BUTTON).click();
     }
 }

@@ -32,10 +32,11 @@ test.describe("Learning Moment Photo Tests", () => {
 
         tester.isGoingTo("ensure I am able to delete the photo and then take the photo again");
         await learningMomentsPage.deletePhotoEvidence();
-        await learningMomentsPage.confirmDeletePhoto();
+        await learningMomentsPage.clickCameraIconButton();
         await learningMomentsPage.clickTakeAPhotoEvidence();
 
         tester.isGoingTo("write a description");
+        await learningMomentsPage.clickWriteSomethingButton();
         await learningMomentsPage.typeMediaEvidenceDescription("This is a learning moments test - take a photo");
         await learningMomentsPage.clickSubmit();
 
@@ -53,9 +54,7 @@ test.describe("Learning Moment Photo Tests", () => {
         await learningMomentsPage.clickShareLearningMomentLink();
         await learningMomentsPage.clickTakeAPhoto();
         await learningMomentsPage.clickTakeAPhotoEvidence();
-        await learningMomentsPage.deletePhotoEvidence();
-        await learningMomentsPage.confirmDeletePhoto();
-        await learningMomentsPage.clickTakeAPhotoEvidence();
+        await learningMomentsPage.clickWriteSomethingButton();
         await learningMomentsPage.typeMediaEvidenceDescription("This is a learning moments test to be commented");
         await learningMomentsPage.clickSubmit();
 
@@ -77,9 +76,7 @@ test.describe("Learning Moment Photo Tests", () => {
         await learningMomentsPage.clickShareLearningMomentLink();
         await learningMomentsPage.clickTakeAPhoto();
         await learningMomentsPage.clickTakeAPhotoEvidence();
-        await learningMomentsPage.deletePhotoEvidence();
-        await learningMomentsPage.confirmDeletePhoto();
-        await learningMomentsPage.clickTakeAPhotoEvidence();
+        await learningMomentsPage.clickWriteSomethingButton();
         await learningMomentsPage.typeMediaEvidenceDescription("This is a learning moments test to be modified");
         await learningMomentsPage.clickSubmit();
 
@@ -99,7 +96,7 @@ test.describe("Learning Moment Photo Tests", () => {
             "This is a learning moments test to be modified updated",
         );
         await learningMomentsPage.deletePhotoEvidence();
-        await learningMomentsPage.confirmDeletePhoto();
+        await learningMomentsPage.clickCameraIconButton();
         await learningMomentsPage.clickTakeAPhotoEvidence();
         await learningMomentsPage.clickSubmit();
 
@@ -115,9 +112,7 @@ test.describe("Learning Moment Photo Tests", () => {
         await learningMomentsPage.clickShareLearningMomentLink();
         await learningMomentsPage.clickTakeAPhoto();
         await learningMomentsPage.clickTakeAPhotoEvidence();
-        await learningMomentsPage.deletePhotoEvidence();
-        await learningMomentsPage.confirmDeletePhoto();
-        await learningMomentsPage.clickTakeAPhotoEvidence();
+        await learningMomentsPage.clickWriteSomethingButton();
         await learningMomentsPage.typeMediaEvidenceDescription(
             "This is a learning moments test to get comments deleted",
         );
@@ -146,9 +141,7 @@ test.describe("Learning Moment Photo Tests", () => {
         await learningMomentsPage.clickShareLearningMomentLink();
         await learningMomentsPage.clickTakeAPhoto();
         await learningMomentsPage.clickTakeAPhotoEvidence();
-        await learningMomentsPage.deletePhotoEvidence();
-        await learningMomentsPage.confirmDeletePhoto();
-        await learningMomentsPage.clickTakeAPhotoEvidence();
+        await learningMomentsPage.clickWriteSomethingButton();
         await learningMomentsPage.typeMediaEvidenceDescription("This is a learning moments test to get deleted");
         await learningMomentsPage.clickSubmit();
 
