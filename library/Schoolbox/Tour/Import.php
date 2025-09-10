@@ -2,6 +2,7 @@
 
 namespace Schoolbox\Tour;
 
+use Schoolbox\Config\ConfigMapper;
 use Symfony\Component\Yaml\Yaml;
 use Schoolbox\Application\CliTool;
 
@@ -43,6 +44,8 @@ HELP
 
         $tourSource = $tourSource['tour'];
 
+        $this->getLogger()->info("Schoolbox plan is '" . $this->getConfig()->get(ConfigMapper::NAME_SITE_PLAN) . "'");
+        $this->getLogger()->info("Creating a tour from file '$file'");
         $tourID = $this->createTour($tourSource['title'], $tourSource['description']);
         $this->createAudience($tourID, $tourSource['roles']);
         $this->createTrigger($tourID, $tourSource['trigger']['urlRegex'], $tourSource['trigger']['selector'], $tourSource['trigger']['event']);
@@ -74,7 +77,6 @@ HELP
     }
 
     /**
-     *
      * @param string $title
      * @param string $description
      * @return string Tour GUID
