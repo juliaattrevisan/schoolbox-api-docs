@@ -1012,17 +1012,20 @@ class Controller extends Base
                 $moment->setDiscussionThread($discussionThread);
             }
 
-            /* Spawn a comment
+            /* Spawn a comment if there was something meaningful written
              * Save it to $moment's discussion thread somehow
              */
-            $comment = $this->commentMapper->createModel()
-                ->setContent($requestBody['rejectionReason'] ?? '')
-                ->setAuthor($this->getUser())
-                ->setThread($moment->getDiscussionThread());
+            $reason = trim((string)($requestBody['rejectionReason'] ?? ''));
 
-            $this->commentMapper->save($comment);
+            if ('' !== $reason) {
+                $comment = $this->commentMapper->createModel()
+                    ->setContent($reason)
+                    ->setAuthor($this->getUser())
+                    ->setThread($moment->getDiscussionThread());
+
+                $this->commentMapper->save($comment);
+            }
         }
-
 
         /* Save it
          */
