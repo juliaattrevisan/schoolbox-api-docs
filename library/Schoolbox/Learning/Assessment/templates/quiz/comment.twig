@@ -16,6 +16,7 @@
 {% set textareaId = 'comment-' ~ prefix ~ participant.user.id %}
 
 <label>Comment
+    <p class="meta">Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details on creation.</p>
     <textarea
         tabindex="{{ tabIndex }}"
         id="{{ textareaId }}"

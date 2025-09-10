@@ -65,7 +65,7 @@ async function initEditor(): Promise<void> {
                 maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                 toolbar: props.selfAssessment ? EditorToolbar.COMMENT : EditorToolbar.COMMENT_AI,
                 hasTokens: !props.selfAssessment,
-                templates: props.templates,
+                templates: !props.selfAssessment ? props.templates : [],
             },
             true,
             resolve,
@@ -112,6 +112,10 @@ window.Vue.onUnmounted(async () => {
 <template>
     <label>
         Comment
+        <p v-if="!props.selfAssessment" class="meta">
+            Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details
+            on creation.
+        </p>
         <textarea
             :id="textareaId"
             ref="textareaRef"

@@ -2,6 +2,7 @@
  # Create Editor Templates
  #
  # @param Category/Model $category The category to create the template in
+ # @param Boolean $hasTokens Whether the category has tokens
  # @param Editor/Templates/Model $template The current template being edited
  #}
 
@@ -35,6 +36,9 @@
                         </div>
                         <div class="small-12 columns">
                             <label for="template-body" class="required">Body</label>
+                            {% if hasTokens %}
+                            <p class="meta">Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details on creation.</p>
+                            {% endif %}
                             <textarea id="template-body" name="body" rows="5">{{ template.body ?? '' }}</textarea>
                         </div>
                     </fieldset>
@@ -53,7 +57,10 @@
  */
 document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
     detail: {
-        targetElements: ['#template-body']
+        targetElements: ['#template-body'],
+        {% if hasTokens %}
+        hasTokens: true
+        {% endif %}
     }
 }));
 

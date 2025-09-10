@@ -149,6 +149,7 @@ window.Vue.onUnmounted(async () => {
             </div>
         </template>
         <template v-else-if="!props.isReadOnly">
+            <label :for="editorId">Comment</label>
             <p class="meta">
                 Student detail tokens can be viewed when you press [. Tokens will be substituted with the students
                 details on creation.

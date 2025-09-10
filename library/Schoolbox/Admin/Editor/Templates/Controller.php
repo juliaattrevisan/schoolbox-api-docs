@@ -50,19 +50,19 @@ class Controller extends Base
 
         // Define which categories require which config settings to be enabled
         $categoryConfigMap = [
-            'badge-evidence' => ConfigMapper::NAME_BADGES_ENABLED,
-            'feedback' => ConfigMapper::NAME_LMS_ENABLED,
-            'learning-activity' => ConfigMapper::NAME_LMS_ENABLED,
-            'learning-moments' => ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED,
+            CategoryModel::BADGE_EVIDENCE => ConfigMapper::NAME_BADGES_ENABLED,
+            CategoryModel::FEEDBACK => ConfigMapper::NAME_LMS_ENABLED,
+            CategoryModel::LEARNING_ACTIVITY => ConfigMapper::NAME_LMS_ENABLED,
+            CategoryModel::LEARNING_MOMENTS => ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED,
         ];
 
         // Filter out categories where the feature is disabled
         return $categories->filter(function (CategoryModel $category) use ($categoryConfigMap) {
-            $categoryName = $category->getName();
+            $categoryId = $category->getId();
 
             // If this category has a config requirement, check if it's enabled
-            if (isset($categoryConfigMap[$categoryName])) {
-                $configValue = $this->config->get($categoryConfigMap[$categoryName]);
+            if (isset($categoryConfigMap[$categoryId])) {
+                $configValue = $this->config->get($categoryConfigMap[$categoryId]);
                 // Ensure we have a boolean value for reliable filtering
                 // Treat null, false, 0, empty string, empty array as false
                 // Everything else as true
@@ -72,6 +72,29 @@ class Controller extends Base
             // Categories without config requirements are always included
             return true;
         })->reindex();
+    }
+
+    /**
+     * Generate template data for create/update forms
+     *
+     * @param CategoryModel $category
+     * @param TemplateModel|null $template
+     * @param string $breadcrumbTitle
+     * @return array
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    private function getTemplateFormData(CategoryModel $category, ?TemplateModel $template, string $breadcrumbTitle): array
+    {
+        return [
+            'pageCurrent' => $this->routeGenerator->generate('adminEditorTemplates.getList'),
+            'allBreadcrumbs' => array_merge(
+                (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminEditorTemplates.getList')),
+                [[$breadcrumbTitle, null]]
+            ),
+            'category' => $category,
+            'hasTokens' => in_array($category->getId(), [CategoryModel::BADGE_EVIDENCE, CategoryModel::FEEDBACK, CategoryModel::LEARNING_MOMENTS]),
+            'template' => $template,
+        ];
     }
 
     /**
@@ -104,15 +127,11 @@ class Controller extends Base
     {
         $this->response = $this->responseFromTemplate(
             '@adminEditorTemplates/create.twig',
-            [
-                'pageCurrent' => $this->routeGenerator->generate('adminEditorTemplates.getList'),
-                'allBreadcrumbs' => array_merge(
-                    (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminEditorTemplates.getList')),
-                    [['Create ' . ucwords(str_replace('-', ' ', $category->getName())) . ' Template', null]]
-                ),
-                'category' => $category,
-                'template' => null,
-            ]
+            $this->getTemplateFormData(
+                $category,
+                null,
+                'Create ' . ucwords(str_replace('-', ' ', $category->getName())) . ' Template'
+            )
         );
     }
 
@@ -171,15 +190,11 @@ class Controller extends Base
 
         $this->response = $this->responseFromTemplate(
             '@adminEditorTemplates/create.twig',
-            [
-                'pageCurrent' => $this->routeGenerator->generate('adminEditorTemplates.getList'),
-                'allBreadcrumbs' => array_merge(
-                    (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminEditorTemplates.getList')),
-                    [['Update ' . $template->getTitle(), null]]
-                ),
-                'category' => $category,
-                'template' => $template,
-            ]
+            $this->getTemplateFormData(
+                $category,
+                $template,
+                'Update ' . $template->getTitle()
+            )
         );
     }
 
