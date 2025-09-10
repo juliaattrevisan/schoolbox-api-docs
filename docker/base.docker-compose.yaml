@@ -84,6 +84,8 @@ services:
       retries: 5
     volumes:
       - mariadb-data:/var/lib/mysql
+    ports:
+      - "${MARIADB_PUBLISHED_PORT}:3306"
     environment:
       MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 1
 
@@ -102,6 +104,8 @@ services:
     volumes:
 #      - redis-storage-config:/usr/local/etc/redis
       - redis-storage-data:/data
+    ports:
+      - "${REDIS_STORAGE_PUBLISHED_PORT}:6379"
 
   redis-cache:
     container_name: redis-cache
@@ -118,6 +122,8 @@ services:
     volumes:
 #      - redis-cache-config:/usr/local/etc/redis
       - redis-cache-data:/data
+    ports:
+      - "${REDIS_CACHE_PUBLISHED_PORT}:6379"
 
   rabbitmq:
     container_name: rabbitmq
