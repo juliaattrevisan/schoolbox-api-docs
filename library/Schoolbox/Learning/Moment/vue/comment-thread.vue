@@ -310,11 +310,11 @@ export default {
                                         <p>{{ comment.author.fullName }}</p>
                                         <time
                                             class="pipe meta"
-                                            :datetime="formatDate(comment.createdAt.json)"
+                                            :datetime="formatDate(comment.createdAt)"
                                             :title="
-                                                formatDate(comment.createdAt.json, dateDisplayFormats.dayjsDatetime)
+                                                formatDate(comment.createdAt, dateDisplayFormats.dayjsDatetime)
                                             "
-                                            >{{ fromNow(comment.createdAt.json) }}</time
+                                            >{{ fromNow(comment.createdAt) }}</time
                                         >
                                     </component>
                                 </div>
