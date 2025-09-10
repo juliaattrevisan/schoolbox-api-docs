@@ -128,7 +128,10 @@ class Cursor implements ICursor
         return $this->codec->encode(
             [
                 'id' => $last->getId(),
-                'created' => $last->getOccurredOn()?->toIso8601String() ?? $last->getCreatedAt()->toIso8601String(),
+                'created' => $last->getCreatedAt()->toIso8601String(),
+                /* Should default to the earliest date if null
+                 */
+                'occurred' => $last->getOccurredOn()?->toIso8601String() ?? Base::MIN_DATE_VALUE,
                 'student' => [
                     'chosen' =>
                         ((string)$last->getStudent()->getPreferredName()) !== '' ?
@@ -147,7 +150,7 @@ class Cursor implements ICursor
                 ],
                 'points' => $last->getPoints(),
                 'yearLevel' => $last->getStudent()->getYear()->getSequence(),
-                'house' => $last->getStudent()->getSchoolHouse()->getHouse(),
+                'house' => $last->getStudent()->getSchoolHouse()->getId(),
                 'campus' => $last->getStudent()->getCampusCollection()->first()->getName(),
                 'severity' => $last->getSeverity()->getSequence(),
             ]
@@ -247,7 +250,7 @@ class Cursor implements ICursor
             $cursor = $this->codec->decode($encodedCursor);
 
             // Create lexicographic comparison for multiple sort fields
-            $cursorConditions = $this->helper->buildCursorConditions($cursor, Base::MIN_SORT_BY_VALUE);
+            $cursorConditions = $this->helper->buildCursorConditions($cursor, Base::MIN_SORT_BY_VALUE, Base::MIN_DATE_VALUE);
 
             if (!empty($cursorConditions)) {
                 $where .= " AND (" . implode(' OR ', $cursorConditions['conditions']) . ")";

@@ -40,6 +40,7 @@ class Base
      */
     public const MIN_SORT_BY_VALUE = -99999999;
     public const BAD_REQUEST_ERROR_CODE = 400;
+    public const MIN_DATE_VALUE = '1970-01-01T00:00:00+11:00';
 
     public function __construct(
         protected Helper $helper,

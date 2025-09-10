@@ -684,17 +684,30 @@ class Helper
     }
 
     /**
-     * Build cursor conditions for lexicographic comparison
+     * Build cursor conditions based on the report order setting for lexicographic comparison
+     *
+     * @param array  $cursor
+     * @param int    $minNumericValue
+     * @param string $minDateValue
+     * @return array
      */
-    public function buildCursorConditions(array $cursor, int $minValue): array
+    public function buildCursorConditions(array $cursor, int $minNumericValue, string $minDateValue): array
     {
         $conditions = [];
         $params = [];
 
         $fieldMap = [
-            Report::ORDER_OCCURRED_ON => [
-                'condition' => 'COALESCE(pastoral.occurred_on, pastoral.created_at)',
+            Report::ORDER_CREATED_AT => [
+                'condition' => 'pastoral.created_at',
                 'param' => $cursor['created'],
+                'direction' => 'DESC',
+            ],
+            /* When the occurred_on is null, we should treat it as the minimum date value
+             * which should be the earliest date possible (1970-01-01)
+             */
+            Report::ORDER_OCCURRED_ON => [
+                'condition' => "COALESCE(pastoral.occurred_on, '{$minDateValue}')",
+                'param' => $cursor['occurred'],
                 'direction' => 'DESC',
             ],
             Report::ORDER_STUDENT_LASTNAME => [
@@ -722,7 +735,7 @@ class Helper
                 'param' => $cursor['author']['chosen']
             ],
             Report::ORDER_POINTS => [
-                'condition' => "COALESCE(pastoral.points, {$minValue})",
+                'condition' => "COALESCE(pastoral.points, {$minNumericValue})",
                 'param' => $cursor['points']
             ],
             Report::ORDER_YEAR => [
@@ -746,22 +759,38 @@ class Helper
                 'param' => $cursor['id']
             ],
         ];
+        /* Should organise the condition comparison based on the report's order settings
+         */
+        $sortFields = $this->report['orders']->getAll();
+        $sortFields[] = Report::ORDER_PASTORAL_ID; // Always add ID as the last sorting field
 
-        $sortFields = array_keys($fieldMap);
+        /* Flattening the fields that have sub-fields (student and author)
+         * so that we can treat them as individual fields in the lexicographic comparison
+         */
+        $flattenedFields = [];
+        foreach ($sortFields as $field) {
+            if (in_array($field, [Report::ORDER_STUDENT, Report::ORDER_AUTHOR])) {
+                // Flatten student and author into last name and chosen name
+                $flattenedFields[] = "{$field}LastName";
+                $flattenedFields[] = "{$field}ChosenName";
+            } else {
+                $flattenedFields[] = $field;
+            }
+        }
 
         // Build lexicographic comparison conditions
-        for ($i = 0; $i < count($sortFields); $i++) {
+        for ($i = 0; $i < count($flattenedFields); $i++) {
             $condition = [];
 
             // Add equality conditions for all previous fields
             for ($j = 0; $j < $i; $j++) {
-                $field = $sortFields[$j];
+                $field = $flattenedFields[$j];
                 $dbField = $fieldMap[$field]['condition'] ?? $field;
                 $condition[] = "{$dbField} = :cursor_{$field}";
             }
 
             // Add comparison for current field
-            $field = $sortFields[$i];
+            $field = $flattenedFields[$i];
             $dbField = $fieldMap[$field]['condition'] ?? $field;
             $operator = (Base::ORDER_DIRECTION_DESC === ($fieldMap[$field]['direction'] ?? Base::ORDER_DIRECTION_ASC)) ?
                 '<' :
