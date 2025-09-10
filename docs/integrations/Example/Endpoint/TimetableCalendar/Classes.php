@@ -68,22 +68,24 @@ class Classes implements IStrategy
     /**
      * Constructor.
      *
-     * @param LoggerInterface                            $log
-     * @param bool                                       $perform
-     * @param IApi                                       $api
-     * @param array                                      $watchlist
-     * @param Mapper                                     $eventMapper
+     * @param LoggerInterface $log
+     * @param bool $perform
+     * @param IApi $api
+     * @param Watchlist $watcher
+     * @param array $watchlist
+     * @param Mapper $eventMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
-     * @param ClassEntryMapper                           $classEntryMapper
-     * @param ClassInvolvementMapper                     $classInvolvementMapper
-     * @param \DateTimeZone                              $timezone
-     * @param \Alaress_Date_Format                       $fromDate
-     * @param \Alaress_Date_Format                       $toDate
+     * @param ClassEntryMapper $classEntryMapper
+     * @param ClassInvolvementMapper $classInvolvementMapper
+     * @param \DateTimeZone $timezone
+     * @param \Alaress_Date_Format $fromDate
+     * @param \Alaress_Date_Format $toDate
      */
     public function __construct(
         private LoggerInterface $log,
         private bool $perform,
         private IApi $api,
+        private Watchlist $watcher,
         private array $watchlist,
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
@@ -174,10 +176,9 @@ class Classes implements IStrategy
 //            /* If any of the candidates from this class enrolments are on the watchlist
 //             * Then process the data like we usually do; otherwise skip it
 //             */
-//            if (!(new Watchlist())->isAnyOnWatchlist($candidates, $this->watchlist)) {
+//            if (!$this->watcher->isAnyOnWatchlist($candidates, $this->watchlist)) {
 //                continue;
 //            }
-
 
 
             /* Save sis_event record

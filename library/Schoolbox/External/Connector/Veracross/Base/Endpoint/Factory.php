@@ -15,6 +15,7 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\ValidStrats;
+use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\Profile\Mapper;
@@ -57,23 +58,25 @@ class Factory
     /**
      * Factory constructor.
      *
-     * @param ValidStrats                                $validStrats
-     * @param LoggerInterface                            $log
-     * @param bool                                       $perform
-     * @param string                                     $host
-     * @param string                                     $key
-     * @param array                                      $watchlist
-     * @param string                                     $timezone
-     * @param Mapper                                     $baseProfileMapper
-     * @param UserProfile\Student\Mapper                 $studentProfileMapper
-     * @param UserProfile\Parent\Mapper                  $parentProfileMapper
-     * @param UserProfile\Staff\Mapper                   $staffProfileMapper
-     * @param UserProfile\Relationship\Mapper            $relationshipMapper
-     * @param \Schoolbox\External\Event\Mapper           $eventMapper
-     * @param ClassEntryMapper                           $classEntryMapper
-     * @param ClassInvolvementMapper                     $classInvolvementMapper
-     * @param ClassPeriodMapper                          $classPeriodMapper
-     * @param TimetablePeriodMapper                      $periodMapper
+     * @param ValidStrats $validStrats
+     * @param LoggerInterface $log
+     * @param bool $perform
+     * @param string $host
+     * @param string $key
+     * @param array $watchlist
+     * @param bool $includePhoto
+     * @param string $timezone
+     * @param Mapper $baseProfileMapper
+     * @param UserProfile\Student\Mapper $studentProfileMapper
+     * @param UserProfile\Parent\Mapper $parentProfileMapper
+     * @param UserProfile\Staff\Mapper $staffProfileMapper
+     * @param UserProfile\Relationship\Mapper $relationshipMapper
+     * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
+     * @param \Schoolbox\External\Event\Mapper $eventMapper
+     * @param ClassEntryMapper $classEntryMapper
+     * @param ClassInvolvementMapper $classInvolvementMapper
+     * @param ClassPeriodMapper $classPeriodMapper
+     * @param TimetablePeriodMapper $periodMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
      */
     public function __construct(
@@ -83,6 +86,7 @@ class Factory
         private string $host,
         #[SensitiveParameter] private string $key,
         private array $watchlist,
+        private bool $includePhoto,
         private string $timezone,
         /* Profile pieces */
         private UserProfile\Mapper $baseProfileMapper,
@@ -90,13 +94,14 @@ class Factory
         private UserProfile\Parent\Mapper $parentProfileMapper,
         private UserProfile\Staff\Mapper $staffProfileMapper,
         private UserProfile\Relationship\Mapper $relationshipMapper,
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
         /* Timetable pieces */
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private ClassEntryMapper $classEntryMapper,
         private ClassInvolvementMapper $classInvolvementMapper,
         private ClassPeriodMapper $classPeriodMapper,
         private TimetablePeriodMapper $periodMapper,
-        private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
+        private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
     ) {
     }
 
@@ -124,6 +129,10 @@ class Factory
 
         $bus = new GenericCollection(IStrategy::class);
 
+        /* A Watchlist instance that we'll reuse when diagnosing stuff
+         */
+        $watcher = new Watchlist();
+
         if ($this->validStrats->isProfileStratEnabled()) {
             $bus
                 /* Purge previously-imported profile relationships and classes
@@ -142,12 +151,15 @@ class Factory
                     $this->log,
                     $this->perform,
                     $api,
+                    $watcher,
                     $this->watchlist,
+                    $this->includePhoto,
                     $this->baseProfileMapper,
                     $this->studentProfileMapper,
                     $this->parentProfileMapper,
                     $this->staffProfileMapper,
-                    $this->relationshipMapper
+                    $this->relationshipMapper,
+                    $this->storageMapper,
                 ))
                 ->add(new Profile\Cleanup(
                     $this->log,
@@ -178,6 +190,7 @@ class Factory
                     $this->log,
                     $this->perform,
                     $api,
+                    $watcher,
                     $this->watchlist,
                     $this->eventMapper,
                     $this->overridesMapper,
