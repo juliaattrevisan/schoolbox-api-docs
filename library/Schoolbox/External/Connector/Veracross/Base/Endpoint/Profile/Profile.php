@@ -432,13 +432,6 @@ class Profile implements IStrategy
                 /* Find their profile pic and assign it, if applicable
                  */
                 if ($this->includePhoto) {
-                    $this->log->debug(sprintf(
-                        'Fetching picture for %s %s (%s)',
-                        $studentBaseProfile->getFirstname(),
-                        $studentBaseProfile->getLastname(),
-                        $studentBaseProfile->getExternalId()
-                    ));
-
                     $this->importPhoto($studentBaseProfile, $photoLookup);
                 }
 
@@ -839,13 +832,6 @@ class Profile implements IStrategy
                 /* Find their profile pic and assign it, if applicable
                  */
                 if ($this->includePhoto) {
-                    $this->log->debug(sprintf(
-                        'Fetching picture for %s %s (%s)',
-                        $staffBaseProfile->getFirstname(),
-                        $staffBaseProfile->getLastname(),
-                        $staffBaseProfile->getExternalId()
-                    ));
-
                     $this->importPhoto($staffBaseProfile, $photoLookup);
                 }
 
@@ -903,17 +889,16 @@ class Profile implements IStrategy
          */
         if (null === ($photoLookup[$externalId] ?? null)) {
             $this->log->debug(sprintf(
-                'No changes required for user %s; they already have the latest, or no pic exists',
+                'Not fetching a portrait for user %s; they already have the latest, or no pic exists',
                 $externalId
             ));
-
             return;
         }
 
         /* Start the part where we save the image
          */
-        $this->log->debug(sprintf(
-            'Importing profile picture for %s %s (%s)',
+        $this->log->info(sprintf(
+            'Downloading profile picture for %s %s (%s)',
             $baseProfile->getFirstname(),
             $baseProfile->getLastname(),
             $baseProfile->getExternalId()
