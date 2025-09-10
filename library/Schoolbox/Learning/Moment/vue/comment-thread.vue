@@ -311,9 +311,7 @@ export default {
                                         <time
                                             class="pipe meta"
                                             :datetime="formatDate(comment.createdAt)"
-                                            :title="
-                                                formatDate(comment.createdAt, dateDisplayFormats.dayjsDatetime)
-                                            "
+                                            :title="formatDate(comment.createdAt, dateDisplayFormats.dayjsDatetime)"
                                             >{{ fromNow(comment.createdAt) }}</time
                                         >
                                     </component>
