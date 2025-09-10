@@ -21,7 +21,7 @@ $app = new class extends CliTool\App {
     public function run(): void
     {
         $planHasLmsEnabled = in_array(
-            $this->getConfig()->get(ConfigMapper::NAME_SITE_PLAN),
+            strtolower($this->getConfig()->get(ConfigMapper::NAME_SITE_PLAN)),
             [
                 // These plans have config 'lms_enabled' = 1.
                 'canvas-enhanced',
@@ -32,7 +32,7 @@ $app = new class extends CliTool\App {
 
         if (
             in_array(
-                $this->getConfig()->get(ConfigMapper::NAME_SITE_PLAN),
+                strtolower($this->getConfig()->get(ConfigMapper::NAME_SITE_PLAN)),
                 [
                     // These plans have config 'learning_moments_enabled' = 1.
                     'canvas-elite',
@@ -45,7 +45,7 @@ $app = new class extends CliTool\App {
             )
         ) {
             if ($planHasLmsEnabled) {
-                passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_dashboard_yLM.yLMS.yaml');
+                passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_dashboard_yLM_yLMS.yaml');
             } else {
                 passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_dashboard_yLM_nLMS.yaml');
             }
@@ -59,7 +59,7 @@ $app = new class extends CliTool\App {
 
         if (
             in_array(
-                $this->getConfig()->get(ConfigMapper::NAME_SITE_PLAN),
+                strtolower($this->getConfig()->get(ConfigMapper::NAME_SITE_PLAN)),
                 [
                     // These plans have config 'pastoral_enabled' = 1.
                     'canvas-elite',
