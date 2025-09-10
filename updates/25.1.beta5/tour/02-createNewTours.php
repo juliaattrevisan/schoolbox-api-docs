@@ -20,6 +20,16 @@ require_once __DIR__ . '/../../../conf/core/require.php';
 $app = new class extends CliTool\App {
     public function run(): void
     {
+        $planHasLmsEnabled = in_array(
+            $this->getConfig()->get(ConfigMapper::NAME_SITE_PLAN),
+            [
+                // These plans have config 'lms_enabled' = 1.
+                'canvas-enhanced',
+                'learning-enhanced',
+                'learning-essentials',
+            ]
+        );
+
         if (
             in_array(
                 $this->getConfig()->get(ConfigMapper::NAME_SITE_PLAN),
@@ -34,9 +44,17 @@ $app = new class extends CliTool\App {
                 ]
             )
         ) {
-            passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_dashboardIncLearningMoments.yaml');
+            if ($planHasLmsEnabled) {
+                passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_dashboard_yLM.yLMS.yaml');
+            } else {
+                passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_dashboard_yLM_nLMS.yaml');
+            }
         } else {
-            passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_dashboardNotIncLearningMoments.yaml');
+            if ($planHasLmsEnabled) {
+                passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_dashboard_nLM_yLMS.yaml');
+            } else {
+                passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_dashboard_nLM_nLMS.yaml');
+            }
         }
 
         if (
@@ -53,19 +71,8 @@ $app = new class extends CliTool\App {
             passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_pastoral_dashboard.yaml');
         }
 
-        if (
-            in_array(
-                $this->getConfig()->get(ConfigMapper::NAME_SITE_PLAN),
-                [
-                    // These plans have config 'lms_enabled' = 1.
-                    'canvas-enhanced',
-                    'learning-enhanced',
-                    'learning-essentials',
-                ]
-            )
-        ) {
+        if ($planHasLmsEnabled) {
             passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_course_markbook.yaml');
-            passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_class_page.yaml');
         }
 
         passthru('php ' . __DIR__ . '/../../../tools/tour/install.php --perform ' . __DIR__ . '/251tour_admin_home.yaml');
