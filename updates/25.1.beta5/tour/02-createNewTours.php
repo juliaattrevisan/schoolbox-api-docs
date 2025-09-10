@@ -24,6 +24,7 @@ $app = new class extends CliTool\App {
             strtolower($this->getConfig()->get(ConfigMapper::NAME_SITE_PLAN)),
             [
                 // These plans have config 'lms_enabled' = 1.
+                'canvas-elite',
                 'canvas-enhanced',
                 'learning-enhanced',
                 'learning-essentials',
