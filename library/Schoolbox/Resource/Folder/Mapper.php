@@ -2483,9 +2483,10 @@ class Mapper extends AbstractFolderMapper implements ILocator
         }
 
         // fetch hydrated parent
-        $parent = $this->findById($model->getParent()->getId());
-        if ($parent->isDeleted()) {
-            throw new UnexpectedValueException('Parent folder must NOT be deleted.');
+        try {
+            $this->findById($model->getParent()?->getId());
+        } catch (MapperException\NotFound|MapperException\Deleted) {
+            throw new UnexpectedValueException('Parent folder must exist and must not be deleted.');
         }
 
         return true;
