@@ -18,7 +18,7 @@ class Model implements ISoftDeletable, Sequential, ValueLabelInterface
 
     public const SUBJECTIVE_DEFAULT = 'they';
     public const OBJECTIVE_DEFAULT = 'them';
-    public const POSSESSIVE_DEFAULT = 'their';
+    public const POSSESSIVE_DEFAULT = 'theirs';
     public const POSSESSIVE_ADJECTIVE_DEFAULT = 'their';
     public const REFLEXIVE_DEFAULT = 'themselves';
 
