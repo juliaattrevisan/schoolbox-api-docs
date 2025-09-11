@@ -21,6 +21,9 @@
          * @returns {boolean}
          */
         function showParticipationPrompt() {
+            // Check if custom participation is enabled in the admin config
+            const isCustomParticipationEnabled = {{ config.custom_assessment_participation ? 'true' : 'false' }};
+
             // Check if assessmentType is either 'dueWork' or 'task'
             const assessmentTypeInput = document.querySelector("input[name='assessmentType']");
             const assessmentType = assessmentTypeInput ? assessmentTypeInput.value : null;
@@ -49,7 +52,7 @@
             const customisedForInput = document.querySelector("input[name='customisedFor']");
             const isNotCustomised = !customisedForInput;
 
-            return isValidAssessmentType && isValidContextType && isValidBaseContextType && isNotCustomised;
+            return isCustomParticipationEnabled && isValidAssessmentType && isValidContextType && isValidBaseContextType && isNotCustomised;
         }
 
         /**
