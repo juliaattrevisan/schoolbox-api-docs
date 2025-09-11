@@ -1,3 +1,4 @@
+-- Add system prompt configuration for text generation
 INSERT INTO
     config (
         `name`,
@@ -12,7 +13,7 @@ INSERT INTO
         sequence
     )
 VALUES (
-        'text_generation_system_prompt',
+        'openai_text_generation_system_prompt',
         'Text Generation System Prompt',
         'Provide some additional instructions to shape what the AI service generates for all text generation requests.',
         (
@@ -25,11 +26,23 @@ VALUES (
             SELECT id
             FROM lu_config_type
             WHERE
-                type = 'openai-text'
+                type = 'AI'
         ),
         'true',
         'false',
         'false',
-        'settings',
-        '5'
+        'openai-text',
+        (
+            SELECT MAX(sequence) + 1
+            FROM config c
+            WHERE
+                c.module LIKE "%openai-text%"
+        )
     );
+
+-- Push down the 'openai-image' config following the text generation config
+UPDATE config
+SET
+    sequence = sequence + 1
+WHERE
+    module = 'openai-image';
