@@ -11,7 +11,9 @@ namespace Schoolbox\Pastoral\BulkImport;
 
 use Alaress\Paginator;
 use Alaress\Web\Controller\Base;
+use Alaress\Web\Controller\Exception as WebControllerException;
 use Alaress_Date_Format;
+use Aura\Router\Exception\RouteNotFound;
 use League\Flysystem\FilesystemException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\ConfigMapper;
@@ -487,18 +489,23 @@ class Controller extends Base
             return;
         }
 
-        // Save imported by/at immediately,
-        // so that mashing the import button doesn't create multiple imports.
-        $import = $import
-            ->setImportedBy($this->getUser())
-            ->setImportedAt(Alaress_Date_Format::now());
-        $this->pastoralBulkImportMapper->save($import);
+        // Pastoral imports can be long-running, so extend the execution time.
+        $this->extendExecutionTime(3600);
 
-        // Load the Zip file's contents, cleaning up only once all files have
-        // been extracted from the ZIP.
-        $zipArchive       = null;
-        $localZipFilename = null;
         try {
+            // Save imported by/at immediately,
+            // so that mashing the import button doesn't create multiple imports.
+            $import = $import
+                ->setImportedBy($this->getUser())
+                ->setImportedAt(Alaress_Date_Format::now());
+            $this->pastoralBulkImportMapper->save($import);
+        } catch (MapperException $e) {
+            throw new SchoolboxException('Could not create pastoral bulk import.  Error: ' . $e->getMessage());
+        }
+
+        try {
+            // Load the Zip file's contents, cleaning up only once all files have
+            // been extracted from the ZIP.
             $zipStorage = $import->getZip();
             if (!$zipStorage) {
                 $this->sendError(
@@ -511,7 +518,11 @@ class Controller extends Base
             $localZipFilename = $this->createLocalZipFile($zipStorage);
             $zipArchive       = $this->createZipArchive($localZipFilename);
             $importLog        = $this->generateImportLog($zipArchive, $import->getFilePathTemplate());
+        } catch (FilesystemException | WebControllerException $e) {
+            throw new SchoolboxException('Could not create log for pastoral bulk import.  Error: ' . $e->getMessage());
+        }
 
+        try {
             // Create the records
             $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
             foreach ($importLog['known'] as $i => $pastoralRecord) {
@@ -572,6 +583,8 @@ class Controller extends Base
                     $this->pastoralTagMapper->assignToRecord($record, $tag);
                 }
             }
+        } catch (\Exception $e) {
+            $importLog['error'] = $e->getMessage();
         } finally {
             $this->cleanup($zipArchive, $localZipFilename);
         }
@@ -596,6 +609,9 @@ class Controller extends Base
      *
      * @param Model $import
      * @return void
+     * @throws MapperException
+     * @throws RouteNotFound
+     * @throws WebControllerException
      */
     public function postUndoImport(Model $import): void
     {
@@ -604,14 +620,22 @@ class Controller extends Base
             return;
         }
 
+        // Pastoral import undo operations can be long-running, so extend the execution time.
+        $this->extendExecutionTime(3600);
+
         // Investigate the log to find what was created:
         // delete all of these.
         foreach ($import->getImportLog()['known'] as $item) {
             $recordId = $item['record']['id'] ?? null;
             if (isset($recordId)) {
-                $this->pastoralDataSource->delete(
-                    $this->pastoralDataSource->findById($this->getUser(), $recordId),
-                );
+                try {
+                    $this->pastoralDataSource->delete(
+                        $this->pastoralDataSource->findById($this->getUser(), $recordId),
+                    );
+                } catch (MapperException) {
+                    // The pastoral record was either already deleted or not found.
+                    // Since we are trying to delete it, this error can be ignored.
+                }
             }
         }
 
