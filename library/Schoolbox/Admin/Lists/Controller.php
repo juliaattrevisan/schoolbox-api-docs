@@ -1631,7 +1631,21 @@ class Controller extends Base
                     'maxLength' => 250,
                     'default'   => '',
                     'tooltip'    => 'The possessive pronoun used to identify something belonging to the person. For example: his, hers, theirs.',
-                ]
+                ],
+                'possessive-adjective' => [
+                    'caption'   => 'Possessive Adjective (Their)',
+                    'width'     => 3,
+                    'maxLength' => 250,
+                    'default'   => '',
+                    'tooltip'    => 'The possessive adjective used to identify something belonging to the person. For example: his, her, their.',
+                ],
+                'reflexive' => [
+                    'caption'   => 'Reflexive (Themselves)',
+                    'width'     => 3,
+                    'maxLength' => 250,
+                    'default'   => '',
+                    'tooltip'    => 'The reflexive pronoun used to identify the person. For example: himself, herself, themselves.',
+                ],
             ]
         ];
 
