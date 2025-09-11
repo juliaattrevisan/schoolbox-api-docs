@@ -27,6 +27,8 @@ services:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
+    extra_hosts:
+      - host.docker.internal:host-gateway
     # After building: create data dirs, and make mount writable by www-data
     post_start:
       - command: /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox/docker/

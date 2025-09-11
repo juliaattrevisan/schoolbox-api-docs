@@ -58,6 +58,10 @@ services:
       - schoolbox-config:/etc/schoolbox
       - caddy-ssl:/etc/nginx/certs/
       - aws-config:/root/.aws
+    # Add host.docker.internal as an alias back to the host machine, so that
+    # the host can debug
+    extra_hosts:
+      - host.docker.internal:host-gateway
     # After building: create data dirs, start cron
     post_start:
       - command: /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox/docker/
@@ -163,6 +167,8 @@ services:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   schoolbox-scheduled:
     container_name: schoolbox-scheduled
@@ -185,6 +191,8 @@ services:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   schoolbox-mobiled:
     container_name: schoolbox-mobiled
@@ -207,6 +215,8 @@ services:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   schoolbox-socketd:
     container_name: schoolbox-socketd
@@ -229,6 +239,8 @@ services:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   schoolbox-taskd:
     container_name: schoolbox-taskd
