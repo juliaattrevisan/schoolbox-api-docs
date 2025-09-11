@@ -128,10 +128,10 @@ class Cursor implements ICursor
         return $this->codec->encode(
             [
                 'id' => $last->getId(),
-                'created' => $last->getCreatedAt()->toIso8601String(),
+                'created' => $last->getCreatedAt()->getDatabase(),
                 /* Should default to the earliest date if null
                  */
-                'occurred' => $last->getOccurredOn()?->toIso8601String() ?? Base::MIN_DATE_VALUE,
+                'occurred' => $last->getOccurredOn()?->getDatabase() ?? Base::MIN_DATE_VALUE,
                 'student' => [
                     'chosen' =>
                         ((string)$last->getStudent()->getPreferredName()) !== '' ?
@@ -140,7 +140,7 @@ class Cursor implements ICursor
                     'last' => $last->getStudent()->getLastName(),
                 ],
                 'type' => $last->getType()->getName(),
-                'subtype' => $last->getSubType()->getName(),
+                'subtype' => $last->getSubType()?->getName(),
                 'author' => [
                     'chosen' =>
                         ((string)$last->getOwner()->getPreferredName()) !== '' ?

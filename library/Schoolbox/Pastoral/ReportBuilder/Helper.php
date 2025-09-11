@@ -723,8 +723,8 @@ class Helper
                 'param' => $cursor['type']
             ],
             Report::ORDER_SUBTYPE => [
-                'condition' => 'c.name',
-                'param' => $cursor['subtype']
+                'condition' => "COALESCE(c.name, '')",
+                'param' => "COALESCE({$cursor['subtype']}, '')"
             ],
             Report::ORDER_AUTHOR_LASTNAME => [
                 'condition' => 'o.lastname',
