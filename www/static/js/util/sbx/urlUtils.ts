@@ -43,6 +43,7 @@ export function isSignificantUrlChange(oldUrl: string, newUrl: string, ignorePar
         const newParams = new URLSearchParams(newUrlObj.search);
 
         // Check if the new param is missing any of the ignored parameters, which indicates a significant change
+        // eslint-disable-next-line no-restricted-syntax -- would prefer to break out early
         for (const param of ignoreParams) {
             if (!newParams.has(param)) {
                 return true;
