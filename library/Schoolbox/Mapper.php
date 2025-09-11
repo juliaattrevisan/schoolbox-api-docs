@@ -1836,18 +1836,14 @@ abstract class Mapper implements IMapper
             return false;
         }
 
-        // Folders exist in a hierarchy in which every descendent of a soft-deleted node must also be soft-deleted.
-        // So collections of Folders require special treatment.
-        if (
-            $object instanceof Collection &&
-            $object->count() > 0 &&
-            $object->first() instanceof Resource\Folder\Model // If first object is Folder, assume all objects are Folders.
-        ) {
+        // Some objects exist in a tree in which every descendent of a soft-deleted object must also be soft-deleted.
+        // So collections of objects require special treatment.
+        if ($object instanceof Collection) {
             // Update the items one at a time, in the order they were supplied.
-            // This is done so that parent folders will always be restored before child folders, and so the requirement
+            // This is done so that parent objects will always be restored before child objects, and so the requirement
             // that every folder to be restored must have a non-deleted parent will not be violated.
-            // (see Folder\Mapper->validateActiveParent())
-            // Note this works because objects are supplied in parent-first order, due to the way the folder tree is
+            // (see for example Folder\Mapper->validateActiveParent())
+            // Note this works because objects are supplied in parent-first order, due to the way the object tree is
             // traversed in RecursiveUndeleterCli->getDataStructureForAllRootModels().
             foreach ($object as $model) {
                 $success = $this->updateAll(
