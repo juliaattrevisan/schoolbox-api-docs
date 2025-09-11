@@ -1632,7 +1632,7 @@ class Controller extends Base
                     'default'   => '',
                     'tooltip'    => 'The possessive pronoun used to identify something belonging to the person. For example: his, hers, theirs.',
                 ],
-                'possessive-adjective' => [
+                'possessiveAdjective' => [
                     'caption'   => 'Possessive Adjective (Their)',
                     'width'     => 3,
                     'maxLength' => 250,
