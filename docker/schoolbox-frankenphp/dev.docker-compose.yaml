@@ -6,6 +6,7 @@ services:
   schoolbox-frankenphp:
     environment:
       DEBUG: "1"
+      PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
     restart: always
     build:
       context: ./schoolbox-frankenphp
