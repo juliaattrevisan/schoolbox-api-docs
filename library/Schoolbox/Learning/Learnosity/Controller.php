@@ -1842,6 +1842,7 @@ class Controller extends Base
      * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
+     * @throws \JsonException
      */
     public function postCopyQuizConstituents(QuizDomainObject $source, QuizDomainObject $destination): void
     {
@@ -1911,7 +1912,9 @@ class Controller extends Base
             // by this time we should have already confirmed the quiz is not published, and that learnosity does know it exists...
             // lets restore it
             $logger->info('Restoring quiz', $candidates[$learnosityQuiz['reference']]);
-            $helper->restore($learnosityQuiz['reference']);
+            if ($learnosityQuiz['reference'] !== null) {
+                $helper->restore($learnosityQuiz['reference']);
+            }
         }
 
         $lock->release();

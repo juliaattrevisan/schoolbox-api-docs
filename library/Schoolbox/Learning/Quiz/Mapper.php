@@ -343,10 +343,14 @@ class Mapper extends BaseMapper
      * @param Model $object
      * @return void
      * @throws ValidationException
+     * @throws \JsonException
      */
     public function postSoftDeleteRestoreAssessment(Model $object): void
     {
-        $this->learnosityHelper->restore($object->getLearnosityReference());
+        $learnosityReference = $object->getLearnosityReference();
+        if ($learnosityReference !== null) {
+            $this->learnosityHelper->restore($learnosityReference);
+        }
     }
 
 
