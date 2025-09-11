@@ -112,7 +112,6 @@ restore.php --reference=abcd-123-efgh-5678 --perform -vvv
 // Put abcd-123-efgh-5678 into a deleted (archived) state in Learnosity
 restore.php --reference=abcd-123-efgh-5678 --status=archived --perform -vvv
 
-
 Usage: restore.php [--reference] [--status] [--perform] -vvv
         --reference      A Learnosity activity reference to restore
         --status         Arbitrarily assign "archived" or "published" (if omitted, assumes "published")
