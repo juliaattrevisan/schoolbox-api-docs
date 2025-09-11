@@ -768,11 +768,21 @@ class Helper
          * so that we can treat them as individual fields in the lexicographic comparison
          */
         $flattenedFields = [];
+        $toBeFlattened = [
+            Report::ORDER_STUDENT => [
+                Report::ORDER_STUDENT_LASTNAME,
+                Report::ORDER_STUDENT_CHOSEN_NAME,
+            ],
+            Report::ORDER_AUTHOR => [
+                Report::ORDER_AUTHOR_LASTNAME,
+                Report::ORDER_AUTHOR_CHOSEN_NAME,
+            ]
+        ];
         foreach ($sortFields as $field) {
-            if (in_array($field, [Report::ORDER_STUDENT, Report::ORDER_AUTHOR])) {
-                // Flatten student and author into last name and chosen name
-                $flattenedFields[] = "{$field}LastName";
-                $flattenedFields[] = "{$field}ChosenName";
+            if (array_key_exists($field, $toBeFlattened)) {
+                foreach ($toBeFlattened[$field] as $flattenedField) {
+                    $flattenedFields[] = $flattenedField;
+                }
             } else {
                 $flattenedFields[] = $field;
             }
