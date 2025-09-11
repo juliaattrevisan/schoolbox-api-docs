@@ -19,7 +19,6 @@ class ImageGeneration
 
     private const PARTIAL_IMAGE_QTY = 3;
     private const IMAGE_OUTPUT_FORMAT = 'png';
-    private const IMAGE_OUTPUT_QUALITY = 'low';
     private const IMAGE_INPUT_DETAIL = 'auto';
 
 
@@ -61,10 +60,12 @@ class ImageGeneration
      *
      * @param string $textModel
      * @param string $systemPrompt
+     * @param string $imageOutputQuality
      */
     public function __construct(
         private string $textModel,
-        private string $systemPrompt
+        private string $systemPrompt,
+        private string $imageOutputQuality,
     ) {
     }
 
@@ -109,7 +110,7 @@ class ImageGeneration
                     'output_format' => self::IMAGE_OUTPUT_FORMAT,
                     'background' => 'auto',
                     'partial_images' => self::PARTIAL_IMAGE_QTY,
-                    'quality' => self::IMAGE_OUTPUT_QUALITY,
+                    'quality' => $this->imageOutputQuality,
                     'size' => $attributes[self::ATTRIBUTE_KEY_SIZE] ?? 'auto',
                 ],
             ],

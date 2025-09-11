@@ -207,6 +207,9 @@ class Controller extends Base
         // No BTTF in this space
         $this->setAllowBackToTheFuture(false);
 
+        // some images may take quite some time, avoid the request stopping early
+        $this->extendExecutionTime();
+
         try {
             $helper = new Helper(
                 trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_ENDPOINT)),
@@ -222,6 +225,7 @@ class Controller extends Base
             $payloadGenerator = (new Payload\ImageGeneration(
                 $helper->getModel(),
                 trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_SYSTEM_PROMPT)),
+                trim((string)($this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_OUTPUT_QUALITY) ?? 'low')),
             ));
 
             $payload = $payloadGenerator->generate(
