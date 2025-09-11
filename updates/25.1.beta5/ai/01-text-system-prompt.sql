@@ -36,7 +36,7 @@ VALUES (
             SELECT MAX(sequence) + 1
             FROM config c
             WHERE
-                c.module LIKE "%openai-text%"
+                c.module = "openai-text"
         )
     );
 
