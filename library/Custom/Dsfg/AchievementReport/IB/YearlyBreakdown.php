@@ -12,7 +12,6 @@ use Custom\Dsfg\AchievementReport\NormaliseTeachers;
 
 class YearlyBreakdown extends Base
 {
-
     /**
      * Returns data for twig rendering
      *
@@ -46,8 +45,15 @@ class YearlyBreakdown extends Base
             $result = $current['AssessResultsResult'];
             $term = $current['Term'];
 
+            if (!isset($finalStack[$courseName])) {
+                $finalStack[$courseName] = [];
+            }
+
             /* Assemble assessments if they have a title; otherwise disregard
              */
+            if (!isset($finalStack[$courseName]['assessments'])) {
+                $finalStack[$courseName]['assessments'] = [];
+            }
             if ($assessment) {
                 $finalStack[$courseName]['assessments'][$assessment] = $result;
             }

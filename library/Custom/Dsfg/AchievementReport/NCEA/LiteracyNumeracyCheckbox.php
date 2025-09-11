@@ -36,10 +36,11 @@ class LiteracyNumeracyCheckbox extends Base
      * @param array       $externalUser
      * @param IConnector  $db
      * @param string|null $year
+     * @param string      $dbTableName
      */
-    public function __construct(User $user, array $externalUser, IConnector $db, $year)
+    public function __construct(User $user, array $externalUser, IConnector $db, $year, string $dbTableName)
     {
-        parent::__construct($user, $externalUser, $db, $year);
+        parent::__construct($user, $externalUser, $db, $year, $dbTableName);
 
         $reportYear = (
             // The report date is the most recently passed 31st of January.
@@ -79,31 +80,31 @@ class LiteracyNumeracyCheckbox extends Base
         $query = "
             SELECT
                 (SELECT TOP 1 COUNT(*)
-                 FROM dbo.uvSchoolBoxNCEAResults
+                 FROM " . $this->getDbTableName() . "
                  WHERE id = :id1
                  AND UELiteracyMet = 'Y'
                  GROUP BY UELiteracyMet
                 ) AS 'UE Literacy',
                 (SELECT TOP 1 COUNT(*)
-                 FROM dbo.uvSchoolBoxNCEAResults
+                 FROM " . $this->getDbTableName() . "
                  WHERE id = :id2
                  AND UENumeracyMet = 'Y'
                  GROUP BY UENumeracyMet
                 ) AS 'UE Numeracy',
                 (SELECT TOP 1 COUNT(*)
-                 FROM dbo.uvSchoolBoxNCEAResults
+                 FROM " . $this->getDbTableName() . "
                  WHERE id = :id3
                  AND Level1LiteracyMet = 'Y'
                  GROUP BY Level1LiteracyMet
                 ) AS 'Level 1 Literacy',
                 (SELECT TOP 1 COUNT(*)
-                 FROM dbo.uvSchoolBoxNCEAResults
+                 FROM " . $this->getDbTableName() . "
                  WHERE id = :id4
                  AND Level1NumeracyMet = 'Y'
                  GROUP BY Level1NumeracyMet
                 ) AS 'Level 1 Numeracy'
             FROM
-                dbo.uvSchoolBoxNCEAResults
+                " . $this->getDbTableName() . "
             WHERE
                 id = :id5
         ";
