@@ -1626,7 +1626,7 @@ class Controller extends Base
                     'tooltip'    => 'The objective pronoun used to identify the person. For example: him, her, them.',
                 ],
                 'possessive' => [
-                    'caption'   => 'Possessive (Theirs)',
+                    'caption'   => 'Possessive Pronoun (Theirs)',
                     'width'     => 2,
                     'maxLength' => 250,
                     'default'   => '',
