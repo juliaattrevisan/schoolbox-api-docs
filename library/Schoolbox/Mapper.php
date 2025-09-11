@@ -1825,7 +1825,8 @@ abstract class Mapper implements IMapper
     /**
      * Restores one or more models that were soft deleted.
      *
-     * @param object|Collection $object Model or collection of models to restore
+     * @param object|Collection $object Model or collection of models to restore.
+     *                                  All models in the collection should have the same type.
      *
      * @return bool
      */
