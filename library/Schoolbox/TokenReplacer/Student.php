@@ -23,6 +23,8 @@ use Schoolbox\User;
  * * "[Them]": the student's objective pronoun, in first Char capitalised.
  * * "[theirs]": the student's possessive pronoun.
  * * "[Theirs]": the student's possessive pronoun, in first Char capitalised.
+ * * "[their]": the student's possessive adjective.
+ * * "[Their]": the student's possessive adjective, in first Char capitalised.
  * * "[surname]":   the student's surname
  * * "[fullname]":  the student's full name
  * * "[year]":      the student's year level, or an empty string if not defined

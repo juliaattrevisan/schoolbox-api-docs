@@ -19,10 +19,14 @@ class Model implements ISoftDeletable, Sequential, ValueLabelInterface
     public const SUBJECTIVE_DEFAULT = 'they';
     public const OBJECTIVE_DEFAULT = 'them';
     public const POSSESSIVE_DEFAULT = 'their';
+    public const POSSESSIVE_ADJECTIVE_DEFAULT = 'their';
+    public const REFLEXIVE_DEFAULT = 'themselves';
 
     protected ?string $subjective = null;
     protected ?string $objective = null;
     protected ?string $possessive = null;
+    protected ?string $possessiveAdjective = null;
+    protected ?string $reflexive = null;
 
     /**
      * @param ?string $subjective
@@ -78,6 +82,42 @@ class Model implements ISoftDeletable, Sequential, ValueLabelInterface
     public function getPossessive(): ?string
     {
         return $this->possessive;
+    }
+
+    /**
+     * @param ?string $possessiveAdjective
+     * @return $this
+     */
+    public function setPossessiveAdjective(?string $possessiveAdjective): self
+    {
+        $this->possessiveAdjective = $possessiveAdjective;
+        return $this;
+    }
+
+    /**
+     * @return ?string
+     */
+    public function getPossessiveAdjective(): ?string
+    {
+        return $this->possessiveAdjective;
+    }
+
+    /**
+     * @param ?string $reflexive
+     * @return $this
+     */
+    public function setReflexive(?string $reflexive): self
+    {
+        $this->reflexive = $reflexive;
+        return $this;
+    }
+
+    /**
+     * @return ?string
+     */
+    public function getReflexive(): ?string
+    {
+        return $this->reflexive;
     }
 
     /**
