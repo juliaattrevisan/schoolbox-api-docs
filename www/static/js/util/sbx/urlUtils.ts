@@ -42,6 +42,13 @@ export function isSignificantUrlChange(oldUrl: string, newUrl: string, ignorePar
         const oldParams = new URLSearchParams(oldUrlObj.search);
         const newParams = new URLSearchParams(newUrlObj.search);
 
+        // Check if the new param is missing any of the ignored parameters, which indicates a significant change
+        for (const param of ignoreParams) {
+            if (!newParams.has(param)) {
+                return true;
+            }
+        }
+
         // Remove ignored parameters from both for comparison
         ignoreParams.forEach((param) => {
             oldParams.delete(param);

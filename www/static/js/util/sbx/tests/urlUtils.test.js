@@ -66,10 +66,10 @@ describe("isSignificantUrlChange()", () => {
         expect(isSignificantUrlChange(oldUrl, newUrl, ["cursor"])).toBe(false);
     });
 
-    test("should return false when ignored parameter is removed", () => {
+    test("should return true when ignored parameter is removed", () => {
         const oldUrl = "https://example.com/path?filter=students&cursor=abc123";
         const newUrl = "https://example.com/path?filter=students";
-        expect(isSignificantUrlChange(oldUrl, newUrl, ["cursor"])).toBe(false);
+        expect(isSignificantUrlChange(oldUrl, newUrl, ["cursor"])).toBe(true);
     });
 
     test("should handle empty query strings", () => {
