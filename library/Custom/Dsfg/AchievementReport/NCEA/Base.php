@@ -96,12 +96,12 @@ abstract class Base extends AchievementReportBase
         return !$externallyAssessed || !$currentYearSelected;
     }
 
-    /*
+    /**
      * The 'InternalorExternalAssessment' column (found in a few different database views) is expected to contain
      * either 'IN' or 'EX'.  However, some data does not meet this requirement, and that has caused errors.
      * So if it ain't 'EX', assume it's 'IN'.
      *
-     * @param $internalExternal
+     * @param string $internalExternal
      * @return string
      */
     protected static function getExOrIn(string $internalExternal): string
