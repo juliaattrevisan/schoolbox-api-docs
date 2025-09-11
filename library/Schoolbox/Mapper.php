@@ -1834,14 +1834,42 @@ abstract class Mapper implements IMapper
         if (!isset($this->soft_delete_column)) {
             return false;
         }
-        return $this->updateAll(
-            $object,
-            $this->soft_delete_column,
-            $this->soft_delete_undeleted_value,
-            self::CALLBACK_PRERESTORE,
-            self::CALLBACK_POSTRESTORE,
-            self::METHOD_CREATE
-        );
+
+        if ($object instanceof Collection) {
+            // Update the items one at a time, in the order they were supplied.
+            // This is done so that parent items will always be restored before child items, and so the requirement that
+            // every item to be restored must have a non-deleted parent will not be violated.
+            // (see Folder\Mapper->validateActiveParent())
+            foreach ($object as $model) {
+                $success = $this->updateAll(
+                    $model,
+                    $this->soft_delete_column,
+                    $this->soft_delete_undeleted_value,
+                    self::CALLBACK_PRERESTORE,
+                    self::CALLBACK_POSTRESTORE,
+                    self::METHOD_CREATE
+                );
+
+                if (!$success) {
+                    return false;
+                }
+            }
+        } else {
+            $success = $this->updateAll(
+                $object,
+                $this->soft_delete_column,
+                $this->soft_delete_undeleted_value,
+                self::CALLBACK_PRERESTORE,
+                self::CALLBACK_POSTRESTORE,
+                self::METHOD_CREATE
+            );
+
+            if (!$success) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
