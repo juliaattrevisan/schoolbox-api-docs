@@ -149,10 +149,10 @@ class Cursor implements ICursor
                     'last' => $last->getOwner()->getLastName(),
                 ],
                 'points' => $last->getPoints(),
-                'yearLevel' => $last->getStudent()->getYear()->getSequence(),
-                'house' => $last->getStudent()->getSchoolHouse()->getId(),
-                'campus' => $last->getStudent()->getCampusCollection()->first()->getName(),
-                'severity' => $last->getSeverity()->getSequence(),
+                'yearLevel' => $last->getStudent()?->getYear()?->getSequence(),
+                'house' => $last->getStudent()?->getSchoolHouse()?->getId(),
+                'campus' => $last->getStudent()?->getCampusCollection()?->first()?->getName(),
+                'severity' => $last->getSeverity()?->getSequence(),
             ]
         );
     }

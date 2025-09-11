@@ -707,7 +707,7 @@ class Helper
              */
             Report::ORDER_OCCURRED_ON => [
                 'condition' => "COALESCE(pastoral.occurred_on, '{$minDateValue}')",
-                'param' => $cursor['occurred'],
+                'param' => $cursor['occurred'] ?? $minDateValue,
                 'direction' => 'DESC',
             ],
             Report::ORDER_STUDENT_LASTNAME => [
@@ -736,23 +736,23 @@ class Helper
             ],
             Report::ORDER_POINTS => [
                 'condition' => "COALESCE(pastoral.points, {$minNumericValue})",
-                'param' => $cursor['points']
+                'param' => $cursor['points'] ?? $minNumericValue,
             ],
             Report::ORDER_YEAR => [
-                'condition' => 'sy.sequence',
-                'param' => $cursor['yearLevel']
+                'condition' => "COALESCE(sy.sequence, {$minNumericValue})",
+                'param' => $cursor['yearLevel'] ?? $minNumericValue,
             ],
             Report::ORDER_HOUSE => [
-                'condition' => 's.house',
-                'param' => $cursor['house']
+                'condition' => "COALESCE(s.house, {$minNumericValue})",
+                'param' => $cursor['house'] ?? $minNumericValue,
             ],
             Report::ORDER_CAMPUS => [
-                'condition' => 'sc.name',
-                'param' => $cursor['campus']
+                'condition' => "COALESCE(sc.name, '')",
+                'param' => $cursor['campus'] ?? '',
             ],
             Report::ORDER_SEVERITY => [
-                'condition' => 'sv.sequence',
-                'param' => $cursor['severity']
+                'condition' => "COALESCE(sv.sequence, {$minNumericValue})",
+                'param' => $cursor['severity'] ?? $minNumericValue,
             ],
             Report::ORDER_PASTORAL_ID => [
                 'condition' => 'pastoral.id',
