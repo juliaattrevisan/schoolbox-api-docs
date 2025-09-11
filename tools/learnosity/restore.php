@@ -375,11 +375,11 @@ HELP;
                     ));
 
                     // Note learnosity_reference will not be null because of the WHERE clause in the SELECT query for
-                    // candidates above, so the record referred to by the reference is safe to restore.
+                    // candidates above, so the record referred to by the reference is safe to restore or archive.
                     if (Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED === $newStatus) {
                         $helper->restore($candidate['learnosity_reference']);
                     } elseif (Helper::LEARNOSITY_ITEM_STATUS_ARCHIVED === $newStatus) {
-                        $helper->restore($candidate['learnosity_reference']);
+                        $helper->archive($candidate['learnosity_reference']);
                     }
 
                     /* Log status of the ones we just changed, requesting their current state
