@@ -320,7 +320,7 @@ class LessonPlan
         if ('' !== $this->textSystemPrompt) {
             array_unshift($payload['input'], [
                 'role' => 'system',
-                'content' => "Any returned text must adhere to the following guidelines: " . $this->textSystemPrompt,
+                'content' => $this->textSystemPrompt,
             ]);
         }
 

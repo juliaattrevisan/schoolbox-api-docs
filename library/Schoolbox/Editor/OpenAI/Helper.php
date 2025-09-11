@@ -475,7 +475,7 @@ class Helper
                     $payload['messages'],
                     [
                         'role' => 'system',
-                        'content' => "Any returned text must adhere to the following guidelines: " . $textSystemPrompt,
+                        'content' => $textSystemPrompt,
                     ]
                 );
             }
