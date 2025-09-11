@@ -471,10 +471,13 @@ class Helper
             $payload['stream_options'] = ['include_usage' => true];
             // Add in the overarching text system prompt if available
             if ('' !== $textSystemPrompt) {
-                $payload['messages'][] = [
-                    'role' => 'system',
-                    'content' => "Any returned text must adhere to the following guidelines: " . $textSystemPrompt,
-                ];
+                array_unshift(
+                    $payload['messages'],
+                    [
+                        'role' => 'system',
+                        'content' => "Any returned text must adhere to the following guidelines: " . $textSystemPrompt,
+                    ]
+                );
             }
             $payload = json_encode($payload, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {

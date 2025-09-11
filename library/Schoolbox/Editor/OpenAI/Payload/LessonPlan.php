@@ -318,10 +318,10 @@ class LessonPlan
         /* Add in the overarching text system prompt if available
          */
         if ('' !== $this->textSystemPrompt) {
-            $payload['input'][] = [
+            array_unshift($payload['input'], [
                 'role' => 'system',
                 'content' => "Any returned text must adhere to the following guidelines: " . $this->textSystemPrompt,
-            ];
+            ]);
         }
 
         return json_encode($payload, JSON_THROW_ON_ERROR);
