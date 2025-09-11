@@ -1835,11 +1835,17 @@ abstract class Mapper implements IMapper
             return false;
         }
 
-        if ($object instanceof Collection) {
+        if (
+            $object instanceof Collection &&
+            $object->count() > 0 &&
+            $object->first() instanceof Resource\Folder\Model // If first object is Folder, assume all objects are Folders.
+        ) {
             // Update the items one at a time, in the order they were supplied.
             // This is done so that parent items will always be restored before child items, and so the requirement that
             // every item to be restored must have a non-deleted parent will not be violated.
             // (see Folder\Mapper->validateActiveParent())
+            // Note this works because objects are supplied in parent-first order, due to the way the folder tree is
+            // traversed in RecursiveUndeleterCli->getDataStructureForAllRootModels().
             foreach ($object as $model) {
                 $success = $this->updateAll(
                     $model,
