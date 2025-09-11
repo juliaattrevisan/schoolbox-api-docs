@@ -538,6 +538,9 @@ class Controller extends Base
                         '[Them]'  => ucfirst($this->getUser()->getPronoun()?->getObjective() ?: Model::OBJECTIVE_DEFAULT),
                         '[theirs]'       => $this->getUser()->getPronoun()?->getPossessive() ?: Model::POSSESSIVE_DEFAULT,
                         '[Theirs]' => ucfirst($this->getUser()->getPronoun()?->getPossessive() ?: Model::POSSESSIVE_DEFAULT),
+                        '[their]'        => $this->getUser()->getPronoun()?->getPossessiveAdjective() ?: Model::POSSESSIVE_ADJECTIVE_DEFAULT,
+                        '[Their]'  => ucfirst($this->getUser()->getPronoun()?->getPossessiveAdjective() ?: Model::POSSESSIVE_ADJECTIVE_DEFAULT),
+                        '[themselves]'   => $this->getUser()->getPronoun()?->getReflexive() ?: Model::REFLEXIVE_DEFAULT,
                     ]
                 );
         }
