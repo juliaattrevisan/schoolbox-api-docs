@@ -13,6 +13,7 @@ namespace Schoolbox\External\Connector\Compass\Base\Endpoint\Profile;
 use Alaress_Date_Format;
 use PDOException;
 use Psr\Log\LoggerInterface;
+use GuzzleHttp\Exception\BadResponseException;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\Helper;
 use Schoolbox\External\Connector\Compass\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
@@ -77,22 +78,6 @@ class Profile implements IStrategy
      * for 5 days a week; they go home on weekends.
      */
     private const BOARDERS = ['Full Time', 'Part Time', 'Weekday'];
-
-
-    /**
-     * Number of seconds to take a nap before retrying a failed endpoint
-     *
-     * Sometimes endpoints fail for no obvious reason and trying again seems
-     * to work - instead of doing it manually, try insisting programmatically
-     * waiting NAP_TIMEOUT seconds between each attempt
-     */
-    private const NAP_TIMEOUT = 3;
-
-
-    /**
-     * Number of attempts to retry fetching a portrait url before skipping it
-     */
-    private const NUM_RETRY = 3;
 
 
     /**
@@ -1243,103 +1228,40 @@ class Profile implements IStrategy
             return;
         }
 
-        /* Fetch data from the url specified
-         */
-        $image = null;
-        $fails = 0;
-
-        while ($fails < self::NUM_RETRY) {
-            try {
-                // Use the API's HTTP client to fetch profile images:
-                // it has the headers required for making valid requests against
-                // Compass' CDN.
-                $response = $this->api->getClient()->get($url);
-                $image    = $response->getBody()->getContents();
-
-                /* Compass denies access due to cloudflare: any html response is invalid
-                 * for image data, so we can just leave immediately upon detecting this
-                 */
-                $exit = false;
-
-                /* Not sure how strictly Compass obeys status codes, but ok
-                 */
-                if (200 != $response->getStatusCode()) {
-                    $this->log->warning(sprintf(
-                        'Invalid photo data for %s; returned http %s %s.',
-                        $baseProfile->getExternalId(),
-                        $response->getStatusCode(),
-                        $response->getReasonPhrase()
-                    ));
-
-                    $exit = true;
-                }
-
-                if (str_contains($image, 'DOCTYPE html')) {
-                    $this->log->warning(sprintf(
-                        'Invalid photo data for %s; contains html instead of image binary. Skipping',
-                        $baseProfile->getExternalId()
-                    ));
-
-                    $exit = true;
-                }
-
-                /* Exit for either of two reasons: 4xx class http status code or higher,
-                 * or the image data contains html, surfacing reasons to a more visible place.
-                 */
-                if ($exit) {
-                    return;
-                }
-
-                break;
-            } catch (\Exception $e) {
-                $this->log->warning(sprintf(
-                    'Could not obtain profile picture %s time(s): %s',
-                    $fails + 1,
-                    $e->getMessage()
-                ));
-
-                /* Take a nap
-                 */
-                sleep(self::NAP_TIMEOUT);
-            }
-
-            /* Increment counter and try again
-             */
-            $fails++;
-        }
-
-        /* Died after too many retries; log it, leave it
-         */
-        if (self::NUM_RETRY === $fails) {
-            $this->log->warning(sprintf(
-                'Profile picture: could not obtain profile picture for %s %s (%s) after multiple retries; skipping',
-                $baseProfile->getFirstname(),
-                $baseProfile->getLastname(),
-                $baseProfile->getExternalId()
-            ));
-
-            return;
-        }
-
-        if (!$image) {
-            $this->log->warning(sprintf(
-                'Profile picture: could not decode image data for %s %s (%s)',
-                $baseProfile->getFirstname(),
-                $baseProfile->getLastname(),
-                $baseProfile->getExternalId()
-            ));
-
-            return;
-        }
-
-        /* Start the part where we save the image
-         */
-        $this->log->debug(sprintf(
+        /* Start the part where we save the image */
+        $this->log->info(sprintf(
             'Importing profile picture for %s %s (%s)',
             $baseProfile->getFirstname(),
             $baseProfile->getLastname(),
             $baseProfile->getExternalId()
         ));
+
+        try {
+            // Use the API's HTTP client to fetch profile images:
+            // it has the headers required for making valid requests against
+            // Compass' CDN.
+            $response = $this->api->getClient()->get($url);
+            $image    = $response->getBody()->getContents();
+        } catch (BadResponseException $e) {
+            // HTTP 4xx/5xx errors - these have response objects with status codes
+            $statusCode = $e->getResponse()->getStatusCode();
+            $errorMessage = $e->getResponse()->getReasonPhrase();
+
+            $this->log->warning(sprintf(
+                'Failed to retrieve profile picture for user %s: HTTP error %s - %s ',
+                $baseProfile->getExternalId(),
+                $statusCode,
+                $errorMessage,
+            ));
+            return;
+        } catch (\Exception $e) {
+            $this->log->warning(sprintf(
+                'Could not obtain profile picture for use %s: %s',
+                $baseProfile->getExternalId(),
+                $e->getMessage()
+            ));
+            return;
+        }
 
         /* Only try to persist images if perform mode is activated
          */
