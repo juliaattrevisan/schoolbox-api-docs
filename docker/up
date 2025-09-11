@@ -19,6 +19,7 @@ declare PRIVATE_CONTAINER_REGISTRY_ECR_REGION
 declare DEFAULT_INSTANCE_ID
 declare AWS_REGION
 declare AWS_START_URL
+declare PHPSTORM_SERVER_NAME
 
 declare private_container_registry
 declare docker_compose_args
@@ -157,6 +158,7 @@ function build_docker_compose_env() {
     RABBITMQ_MAJOR_VERSION=\"${RABBITMQ_MAJOR_VERSION}\"
     PRIVATE_CONTAINER_REGISTRY=\"${private_container_registry}\"
     INSTANCE_ID=\"${DEFAULT_INSTANCE_ID}\"
+    PHPSTORM_SERVER_NAME=\"${PHPSTORM_SERVER_NAME}\"
     ${aws_credentials}" > .docker-compose.env
 }
 

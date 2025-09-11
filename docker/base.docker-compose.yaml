@@ -47,6 +47,7 @@ services:
       INSTANCE_ID: ${INSTANCE_ID}
       HOST_TYPE: docker
       XDEBUG_CONFIG: "idekey=PHPSTORM"
+      PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
     build:
       context: ./schoolbox-cli
       args:
@@ -58,6 +59,10 @@ services:
       - schoolbox-config:/etc/schoolbox
       - caddy-ssl:/etc/nginx/certs/
       - aws-config:/root/.aws
+    # Add host.docker.internal as an alias back to the host machine, so that
+    # the host can debug
+    extra_hosts:
+      - host.docker.internal:host-gateway
     # After building: create data dirs, start cron
     post_start:
       - command: /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox/docker/
@@ -154,6 +159,8 @@ services:
         condition: service_healthy
       redis-storage:
         condition: service_healthy
+    environment:
+      PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
     build:
       context: ./schoolbox-digestd
       args:
@@ -163,6 +170,8 @@ services:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   schoolbox-scheduled:
     container_name: schoolbox-scheduled
@@ -176,6 +185,8 @@ services:
         condition: service_healthy
       redis-storage:
         condition: service_healthy
+    environment:
+      PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
     build:
       context: ./schoolbox-scheduled
       args:
@@ -185,6 +196,8 @@ services:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   schoolbox-mobiled:
     container_name: schoolbox-mobiled
@@ -198,6 +211,8 @@ services:
         condition: service_healthy
       redis-storage:
         condition: service_healthy
+    environment:
+      PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
     build:
       context: ./schoolbox-mobiled
       args:
@@ -207,6 +222,8 @@ services:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   schoolbox-socketd:
     container_name: schoolbox-socketd
@@ -220,6 +237,8 @@ services:
         condition: service_healthy
       redis-storage:
         condition: service_healthy
+    environment:
+      PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
     build:
       context: ./schoolbox-socketd
       args:
@@ -229,6 +248,8 @@ services:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   schoolbox-taskd:
     container_name: schoolbox-taskd
