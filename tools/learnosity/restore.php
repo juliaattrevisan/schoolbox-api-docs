@@ -374,11 +374,11 @@ HELP;
                         $newStatus
                     ));
 
-                    if (
-                        Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED === $newStatus ||
-                        Helper::LEARNOSITY_ITEM_STATUS_ARCHIVED === $newStatus
-                    ) {
-                        // Note learnosity_reference will not be null because of WHERE clause in SELECT for candidates above.
+                    // Note learnosity_reference will not be null because of the WHERE clause in the SELECT query for
+                    // candidates above, so the record referred to by the reference is safe to restore.
+                    if (Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED === $newStatus) {
+                        $helper->restore($candidate['learnosity_reference']);
+                    } elseif (Helper::LEARNOSITY_ITEM_STATUS_ARCHIVED === $newStatus) {
                         $helper->restore($candidate['learnosity_reference']);
                     }
 
