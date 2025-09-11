@@ -570,7 +570,7 @@ class Controller extends Base
                     'metadata' => [
                         'count'  => $cursor->retrieveResultCount(),
                         'cursor' => [
-                            'current' => $cursor->current($result),
+                            'current' => $encodedCursor ?? $cursor->current($result),
                             'next'    => $cursor->next($result) ?? null
                         ]
                     ]

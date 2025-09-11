@@ -64,6 +64,7 @@ export function useLoadRecords(url: Ref<string>): {
                 payload.value = newPayload;
             } else {
                 payload.value?.data.results.push(...newPayload.data.results);
+                payload.value!.metadata = newPayload.metadata; // Update metadata to reflect the latest state
             }
         } catch (error) {
             // ignore abort errors, as the previous request was cancelled
