@@ -1836,8 +1836,9 @@ abstract class Mapper implements IMapper
             return false;
         }
 
-        // Some objects exist in a tree in which every descendent of a soft-deleted object must also be soft-deleted.
-        // So collections of objects require special treatment.
+        // Some objects exist have parent/child relationships that result in a tree of connected objects (e.g. folders).
+        // In a tree of connected objects, every descendent of a soft-deleted object must also be soft-deleted.
+        // We can't tell from here which objects exist in trees, so we treat all collections as potential trees.
         if ($object instanceof Collection) {
             // Update the items one at a time, in the order they were supplied.
             // This is done so that parent objects will always be restored before child objects, and so the requirement
