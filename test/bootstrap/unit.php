@@ -5,10 +5,11 @@
  * @link      https://schoolbox.education/
  */
 
-// Bypass load of config from instances.ini for unit tests.
-
+// Set up class autoloader, but not via conf/core/require:
+// that would load from instances.ini, which may not exist.
 require __DIR__ . '/../../vendor/autoload.php';
 
+// Bypass load of config from instances.ini for unit tests
 define('INSTANCE_ID', getenv('INSTANCE_ID'));
 define('INSTANCE_ID_LIST', [INSTANCE_ID]);
 define('SQL_host', '');
@@ -30,5 +31,5 @@ Alaress\Sentry\Config::init('', 0, 0, 0, '', '');
 // Global functions and constants
 require_once __DIR__ . '/../../www/include/stdfuncs.php';
 
-// sorry.
+// Set up DI container in mappers: this is unfortunately necessary in some tests
 Schoolbox\Mapper::di((new Aura\Di\ContainerBuilder())->newInstance());
