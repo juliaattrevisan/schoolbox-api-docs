@@ -87,8 +87,13 @@ class GroupsHelper
     private function getRouteIfAuthorized(string $name, array $params = [], ?User $user = null)
     {
         if (!$user instanceof User) {
-            /** @var User $user */
-            $user = $_SESSION['user'];
+            // check if the user is authenticated and use that human
+            if (isset($_SESSION['user']) && $_SESSION['user'] instanceof User) {
+                $user = $_SESSION['user'];
+            } else {
+                // No valid user in session; cannot authorize route
+                return false;
+            }
         }
 
         try {
