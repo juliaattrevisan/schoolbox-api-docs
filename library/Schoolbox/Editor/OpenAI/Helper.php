@@ -446,7 +446,7 @@ class Helper
      *
      * @param User $user // user to log the request against
      * @param string $payload // the fully build payload to send to AI
-     * @param string $textSystemPrompt // the system prompt to include in the request
+     * @param string $textSystemPrompt // the overarching system prompt to include in the request
      * @return void
      * @throws \JsonException
      * @throws Exception
