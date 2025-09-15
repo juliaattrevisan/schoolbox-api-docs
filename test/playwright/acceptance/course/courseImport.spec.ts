@@ -338,6 +338,48 @@ test.describe("Course import tests", () => {
         await expect(page.getByTestId(`course-outline-number-students-${projectName}`)).toContainText(
             `Due ${dateFormatted}`,
         );
+
+        tester.isGoingTo(
+            "as Jana Reed check they are able to view activities under the lesson plan and mark the tasks",
+        );
+        await tester.impersonate("Jana Reed");
+        await page.goto(`/homepage/${folderId.toString()}`);
+        await page.getByTestId(`course-outline-assessment-title-${lessonPlanName}`).click();
+        await page.locator("#linked-activities-container").getByText("Romeo and Juliet Key Quote Activity").isVisible();
+        await page.locator("#linked-activities-container").getByText("Present a scene of Romeo and Juliet").isVisible();
+        await page.locator('a[title="Incomplete"]').click();
+        await expect(page.locator('a[title="Self-assessed"]')).toContainClass("progress-tick pending");
+
+        tester.isGoingTo("as Jana Reed check they are able to view activities under the project");
+        await page.goto(`/homepage/${folderId.toString()}`);
+        await page.getByTestId(`course-outline-assessment-title-${projectName}`).click();
+        await page
+            .locator("#linked-activities-container")
+            .getByText("Export Activity Test Due Work Project")
+            .isVisible();
+        tester.isGoingTo("as Jana Reed check the activities in the course and able to mark a task");
+        await page.goto(`/homepage/${folderId.toString()}`);
+        await expect(page.getByTestId(`course-outline-assessment-title-${projectName}`)).toContainText(projectName);
+        await expect(page.getByTestId(`course-outline-assessment-title-${lessonPlanName}`)).toContainText(
+            lessonPlanName,
+        );
+        await expect(
+            page.getByTestId(`course-outline-assessment-title-Romeo and Juliet Key Quote Activity`),
+        ).toContainText("Romeo and Juliet Key Quote Activity");
+        await expect(page.getByTestId(`course-outline-assessment-title-Essay - Final Assessment`)).toContainText(
+            "Essay - Final Assessment",
+        );
+        await page.getByTestId(`tick-Key events sequencing task`).click();
+
+        tester.isGoingTo("as jack coles check the course outline shows 1/4 students completed the activity");
+        await tester.impersonate("Jack Coles");
+        await page.goto(`/homepage/${folderId.toString()}`);
+        await expect(
+            page.getByTestId("course-outline-number-students-Romeo and Juliet Key Quote Activity"),
+        ).toContainText("1/4 students completed");
+        await expect(page.getByTestId("course-outline-number-students-Key events sequencing task")).toContainText(
+            "1/4 students completed",
+        );
     });
 
     test.afterEach(async ({ tester }) => {
