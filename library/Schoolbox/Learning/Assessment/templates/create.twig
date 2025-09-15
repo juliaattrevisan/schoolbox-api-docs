@@ -56,7 +56,11 @@
             const customisedForInput = document.querySelector("input[name='customisedFor']");
             const isNotCustomised = !customisedForInput;
 
-            return isCustomParticipationEnabled && isValidAssessmentType && isValidContextType && isValidBaseContextType && isNotCustomised;
+            // If it's a spec folder, we don't want to show the prompt
+            const isSpecFolderInput = document.querySelector("input[name='isSpecFolder']");
+            const isSpecFolder = isSpecFolderInput && isSpecFolderInput.value === "1" ? true : false;
+
+            return isCustomParticipationEnabled && isValidAssessmentType && isValidContextType && isValidBaseContextType && isNotCustomised && !isSpecFolder;
         }
 
         /**
@@ -306,6 +310,9 @@
                     <input type="hidden" name="contextType" value="{{ contextType }}" />
                     {% if baseContextType is defined %}
                     <input type="hidden" name="baseContextType" value="{{ baseContextType }}" />
+                    {% endif %}
+                    {% if isSpecFolder is defined %}
+                    <input type="hidden" name="isSpecFolder" value="{{ isSpecFolder }}" />
                     {% endif %}
                     <input type="hidden" name="contextId" value="{{ context.id }}" />
                     <input type="hidden" name="folderId" value="{{ context.folder.id }}" />
