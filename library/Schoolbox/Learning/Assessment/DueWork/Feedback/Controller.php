@@ -193,13 +193,15 @@ class Controller extends Base
          * with hydrated participants so we can publish all the users quickly and easily.
          *
          * we should be using filters, so we aren't hydrating all participation for all current assessments
+         * but we can hydrate only students for assessments that are still active, and we have write access to.
         */
         $aImpls = new GenericCollection(DueWork\Model::class);
         if ($assessment->isSpecification()) {
-            // only hydrate students for assessments that are 'not locked' (i.e. not in archived terms)
             $lockChecker = (new LockedChecker($this->termMapper));
             $user = $this->getUser();
             $access = $this->access;
+
+            // only fetch implementation assessments that are 'not locked' (i.e. not in archived terms)
             $aImpls = $this->assessmentDataSource
                 ->findAllImplementationsBySpecificationId($assessment->getId())
                 ->filter(
@@ -213,14 +215,10 @@ class Controller extends Base
                         try {
                             $permission = $access->getFolderAccess($user, $aImpl->getBaseContext()->getFolder()->getId());
                         } catch (Exception $e) {
-                            //exit early
+                            // exit early
                             return false;
                         }
-                        if ($permission >= UserAccess::ACCESS_WRITE) {
-                            return true;
-                        }
-                        // final catch, shouldn't make it here....
-                        return false;
+                        return $permission >= UserAccess::ACCESS_WRITE;
                     }
                 )
                 ->indexBy('id');
