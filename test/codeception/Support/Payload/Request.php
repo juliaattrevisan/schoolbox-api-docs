@@ -22,11 +22,7 @@ namespace Tests\Support\Payload;
  */
 abstract class Request
 {
-    // TODO this is already logically declared in codeception.dist.yml, should re-used that value
-    private const VAGRANT_DOMAIN = 'vagrant.dev.schoolbox.cloud';
-
     private $headers = [
-        'Host'         => self::VAGRANT_DOMAIN,
         'Content-Type' => 'application/x-www-form-urlencoded',
         'Accept'       => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
     ];
@@ -53,7 +49,9 @@ abstract class Request
      */
     public function getHeaders(): array
     {
-        return $this->headers;
+        return $this->headers + [
+            'Host' => parse_url(getenv('BASE_URL'), PHP_URL_HOST),
+        ];
     }
 
     /**
@@ -68,7 +66,7 @@ abstract class Request
         if ($path !== '' && substr($path, 0, 1) !== '/') {
             $path = '/' . $path;
         }
-        $this->setHeader('Referer', 'https://' . self::VAGRANT_DOMAIN . $path);
+        $this->setHeader('Referer', getenv('BASE_URL') . $path);
         return $this;
     }
 

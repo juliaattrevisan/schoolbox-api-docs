@@ -265,7 +265,7 @@ class CalendarCest
         $i->sendRequest($RSVP_Remove_Payload);
 
         #THEN
-        $i->sendGET('https://vagrant.dev.schoolbox.cloud/calendar/event/' . $event->getId());
+        $i->sendGET('/calendar/event/' . $event->getId());
         $i->seeResponseCodeIs(200);
     }
 }
