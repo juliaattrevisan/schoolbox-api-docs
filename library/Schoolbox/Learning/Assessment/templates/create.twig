@@ -31,21 +31,25 @@
             const isValidAssessmentType = assessmentType && validAssessmentTypes.includes(assessmentType);
 
             /**
-             * Check if contextType is either 'units' (duework/task in a class) or 'projects' (duework/task in a project in a class)
+             * Check if contextType is either 'units' (duework/task in a class course outline component)
+             * or 'projects' (duework/task in a project in a class)
+             * or 'folders' (duework/task in a class duework/task component)
              * will be 'unitspecs' when assessment is under a unit and not a class
              */
             const contextTypeInput = document.querySelector("input[name='contextType']");
             const contextType = contextTypeInput ? contextTypeInput.value : null;
-            const validContextTypes = ["units", "projects"];
+            const validContextTypes = ["units", "projects", "folders"];
             const isValidContextType = contextType && validContextTypes.includes(contextType);
 
             /**
-             * Check if baseContextType is either 'units' (project in a class) or 'unit' (duework/task in a project in a class)
+             * Check if baseContextType is either 'units' (project in a class)
+             * or 'unit' (duework/task in a project in a class)
+             * or 'folder' (duework/task in a class duework/task component)
              * will be 'unitspecs' when is under a unit and not a class - used to ensure the duework/task is not within a project in a unit
              */
             const baseContextTypeInput = document.querySelector("input[name='baseContextType']");
             const baseContextType = baseContextTypeInput ? baseContextTypeInput.value : null;
-            const validBaseContextTypes = ["units", "unit"];
+            const validBaseContextTypes = ["units", "unit", "folder"];
             const isValidBaseContextType = baseContextType && validBaseContextTypes.includes(baseContextType);
 
             // Check that customisedFor hidden input field doesn't exist - which would indicate a customised assessment
