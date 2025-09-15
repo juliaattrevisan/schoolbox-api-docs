@@ -12,18 +12,18 @@ SET
     possessive_adjective = 'his',
     reflexive = 'himself'
 WHERE
-    id = 1;
+    subjective = 'he';
 
 UPDATE pronoun
 SET
     possessive_adjective = 'her',
     reflexive = 'herself'
 WHERE
-    id = 2;
+    subjective = 'she';
 
 UPDATE pronoun
 SET
     possessive_adjective = 'their',
     reflexive = 'themselves'
 WHERE
-    id = 3;
+    subjective = 'they';
