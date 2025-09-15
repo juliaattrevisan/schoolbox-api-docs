@@ -127,6 +127,7 @@ class LessonPlan
      * @param string $openAiEndpoint
      * @param string $openAiModel
      * @param string $openAiDeploymentId
+     * @param string $textSystemPrompt
      * @param string $language
      * @param Mapper $curriculumNodeMapper
      */
@@ -134,6 +135,7 @@ class LessonPlan
         private string $openAiEndpoint,
         private string $openAiModel,
         private string $openAiDeploymentId,
+        private string $textSystemPrompt,
         private string $language,
         private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper
     ) {
@@ -312,6 +314,15 @@ class LessonPlan
                 'format' => $responseFormat
             ]
         ];
+
+        /* Add in the overarching text system prompt if available
+         */
+        if ('' !== $this->textSystemPrompt) {
+            array_unshift($payload['input'], [
+                'role' => 'system',
+                'content' => $this->textSystemPrompt,
+            ]);
+        }
 
         return json_encode($payload, JSON_THROW_ON_ERROR);
     }

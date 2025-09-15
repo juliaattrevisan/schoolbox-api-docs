@@ -446,11 +446,12 @@ class Helper
      *
      * @param User $user // user to log the request against
      * @param string $payload // the fully build payload to send to AI
+     * @param string $textSystemPrompt // the overarching system prompt to include in the request
      * @return void
      * @throws \JsonException
      * @throws Exception
      */
-    public function aiAssistantChat(User $user, string $payload): void
+    public function aiAssistantChat(User $user, string $payload, string $textSystemPrompt): void
     {
         /* Check that we have activated this endpoint
          */
@@ -464,10 +465,20 @@ class Helper
             throw new \DomainException('OpenAI API key is unavailable');
         }
 
-        // capture tokens for logging
+        // capture tokens for logging and add text system prompt if available
         try {
             $payload = json_decode($payload, true, 512, JSON_THROW_ON_ERROR);
             $payload['stream_options'] = ['include_usage' => true];
+            // Add in the overarching text system prompt if available
+            if ('' !== $textSystemPrompt) {
+                array_unshift(
+                    $payload['messages'],
+                    [
+                        'role' => 'system',
+                        'content' => $textSystemPrompt,
+                    ]
+                );
+            }
             $payload = json_encode($payload, JSON_THROW_ON_ERROR);
         } catch (\JsonException $e) {
             // noop
