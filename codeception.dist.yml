@@ -10,6 +10,7 @@ actor_suffix: Tester
 
 params:
     - env
+    - test/codeception/env.php
 
 gherkin: []
 settings:
