@@ -75,15 +75,20 @@ class GroupsHelper
      * Returns false if the route doesn't exist or the user is not authorized.
      * This safely handles cases where modules are disabled and routes don't exist.
      *
+     * used logic from:
+     * @see \Alaress\Web\Controller\Base::getRouteIfAuthorized
+     *
      * @param string    $name   Route name
      * @param array     $params Route parameters
-     * @param User|null $user   User to check authorization for
+     * @param User|null $user The user to authorize the route for. Defaults to
+     *                         currently authenticated user.
      * @return string|false     The URL if authorized, false otherwise
      */
     private function getRouteIfAuthorized(string $name, array $params = [], ?User $user = null)
     {
         if (!$user instanceof User) {
-            throw new \InvalidArgumentException('User must be provided for GroupsHelper::getRouteIfAuthorized');
+            /** @var User $user */
+            $user = $_SESSION['user'];
         }
 
         try {
