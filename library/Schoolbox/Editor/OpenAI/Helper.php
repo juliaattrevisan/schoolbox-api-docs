@@ -68,12 +68,7 @@ class Helper
 
 
     /**
-     * Use the conversational chatgippity variant
-     */
-    private const CHAT = 'chat';
-
-    /**
-     * Feature types for logging
+     * Feature types (both for logging and identifying in schoolbox code)
      */
     public const FEATURE_CHAT = 'chat';
     public const FEATURE_LESSONPLAN = 'lessonplan';
@@ -192,7 +187,7 @@ class Helper
             $inputTokens = null;
             $outputTokens = null;
 
-            if ($type === self::CHAT) {
+            if ($type === self::FEATURE_CHAT) {
                 $model = $item['model'] ?? null;
                 $inputTokens = $item['usage']['prompt_tokens'] ?? null;
                 $outputTokens = $item['usage']['completion_tokens'] ?? null;
@@ -254,7 +249,7 @@ class Helper
                 $this->appendChunkToLog($event, $log, $type);
 
                 // Don't echo an 'error' chunk if this isn't going to ckeditor as it won't follow the format of an ApiProblem
-                if ($type === self::CHAT || $event['type'] !== 'error') {
+                if ($type === self::FEATURE_CHAT || $event['type'] !== 'error') {
                     echo "{$chunk}\n\n";
                 }
 
@@ -500,7 +495,7 @@ class Helper
         }
 
         try {
-            $openAiRequest = new Request('POST', $this->getEndpoint(self::CHAT), array_merge(
+            $openAiRequest = new Request('POST', $this->getEndpoint(self::FEATURE_CHAT), array_merge(
                 $this->getAuthorization(),
                 ['Content-Type' => 'application/json'],
             ), $payload);
@@ -513,7 +508,7 @@ class Helper
                 ->setPrompt($payload)
                 ->setModel($this->openAiModel)
                 ->setFeature(self::FEATURE_CHAT)
-                ->setEndpoint($this->getEndpoint(self::CHAT));
+                ->setEndpoint($this->getEndpoint(self::FEATURE_CHAT));
 
             $promise = $this->client->sendAsync($openAiRequest, ['stream' => true]);
 
@@ -539,7 +534,7 @@ class Helper
                     ob_end_flush();
 
                     $stream = $response->getBody();
-                    $this->readStream($stream, $log, self::CHAT);
+                    $this->readStream($stream, $log, self::FEATURE_CHAT);
                 },
                 function ($reason) use ($log): void {
                     $returnCode = $reason->getCode();
@@ -585,7 +580,7 @@ class Helper
             case self::ENDPOINT_TYPE_OPENAI:
                 /* Little Robot Dude
                  */
-                if (self::CHAT === $type) {
+                if (self::FEATURE_CHAT === $type) {
                     return self::ENDPOINT_HOST_OPENAI_CHAT;
                 }
 
@@ -599,7 +594,7 @@ class Helper
 
                 /* Little Robot Dude
                  */
-                if (self::CHAT === $type) {
+                if (self::FEATURE_CHAT === $type) {
                     return sprintf(
                         self::ENDPOINT_HOST_AZURE_CHAT,
                         $this->openAiAzureResourceName,
