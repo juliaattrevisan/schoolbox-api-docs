@@ -224,7 +224,8 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(ReturnedWorkMapper::class),
             $this->getMapperFactory()->get(Assessment\Project\ResultCache\Mapper::class),
             $this->injector->get('kamiConnector'),
-            $this->getMapperFactory()->get(TermMapper::class)
+            $this->getMapperFactory()->get(TermMapper::class),
+            $this->getAccess(),
         );
     }
 

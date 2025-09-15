@@ -34,7 +34,10 @@ use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Learning\InlineGrader\Kami\Connector;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\TokenReplacer;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
@@ -77,6 +80,7 @@ class Controller extends Base
      * @param Mapper $projectResultCacheMapper
      * @param Connector $kamiConnector
      * @param TermMapper $termMapper
+     * @param Access $access
      */
     public function __construct(
         IFeedbackDataSource $feedbackDataSource,
@@ -88,7 +92,8 @@ class Controller extends Base
         ReturnedWorkMapper $returnedWorkMapper,
         private Project\ResultCache\Mapper $projectResultCacheMapper,
         private Connector $kamiConnector,
-        private TermMapper $termMapper
+        private TermMapper $termMapper,
+        private Access $access,
     ) {
         $this->feedbackDataSource    = $feedbackDataSource;
         $this->participantDataSource = $participantDataSource;
@@ -193,11 +198,29 @@ class Controller extends Base
         if ($assessment->isSpecification()) {
             // only hydrate students for assessments that are 'not locked' (i.e. not in archived terms)
             $lockChecker = (new LockedChecker($this->termMapper));
+            $user = $this->getUser();
+            $access = $this->access;
             $aImpls = $this->assessmentDataSource
                 ->findAllImplementationsBySpecificationId($assessment->getId())
                 ->filter(
-                    function (DueWork\Model $aImpl) use ($lockChecker) {
-                        return !$lockChecker->isLockedForInteractions($aImpl);
+                    function (DueWork\Model $aImpl) use ($lockChecker, $access, $user) {
+                        if ($lockChecker->isLockedForInteractions($aImpl)) {
+                            // exit early if the assessment is locked
+                            return false;
+                        }
+
+                        // ensure the current user has write+ access to the homepage (See Rule\HasHomepageAccess)
+                        try {
+                            $permission = $access->getFolderAccess($user, $aImpl->getBaseContext()->getFolder()->getId());
+                        } catch (Exception $e) {
+                            //exit early
+                            return false;
+                        }
+                        if ($permission >= UserAccess::ACCESS_WRITE) {
+                            return true;
+                        }
+                        // final catch, shouldn't make it here....
+                        return false;
                     }
                 )
                 ->indexBy('id');
