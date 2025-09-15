@@ -9,9 +9,7 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
 use Alaress\Authorizer\Failure\Forbidden;
-use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule;
-use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
@@ -391,78 +389,5 @@ class Module extends BaseModule
     public function getFeedbackDataSource()
     {
         return $this->injector->get('feedbackDataSource');
-    }
-
-    /**
-     * Only access with the following:
-     * markbook is enabled
-     * you are logged in
-     * you are a staff member (who can view student grades) or superuser
-     * if you have write access to all course implementations
-     * have write access to the course folder
-     *
-     * route perm of `\Schoolbox\Assessment\Course\Markbook\Controller::getCanAccessPopOut`
-     * @see \Schoolbox\Assessment\Course\Markbook\Controller::getCanAccessPopOut
-     *
-     * @return IAuthorizationRule
-     */
-    private function getCanAccessPopOut(): Rule\IAuthorizationRule
-    {
-        return new Rule\All(
-            new Rule\Callback(function (): void {
-                if (!$this->getConfig()->get('course_markbook_enable')) {
-                    /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-                    throw new InvalidPath('Course markbook module is disabled');
-                }
-            }),
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\HasRolePermission(Role::PERMISSION_VIEW_STUDENT_GRADES, Role::STAFF),
-                new Rule\IsSuperuser()
-            ),
-            new Rule\Callback(function ($params, ?User $user): void {
-                if (null === $user) {
-                    /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-                    throw new InvalidPath('You must be logged in to access this page');
-                }
-                /** @var IAssessable|null $assessment */
-                $assessment = $params['assessment'] ?? null;
-                // first check if the user has write access to the course
-                $hasCourseWriteAccess = $this->getAccess()->getFolderAccess(
-                    $user,
-                    $assessment->getBaseContext()->getFolder()->getId(),
-                ) >= UserAccess::ACCESS_WRITE;
-                if (!$hasCourseWriteAccess) {
-                    /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-                    throw new InvalidPath('You do not have permission to access this course');
-                }
-
-                $courseSpec = null;
-                // if we are a spec assessment we need to fetch the course spec
-                // otherwise we need to get the spec from the assessment, then get the course spec
-                if ($assessment->getBasecontext() instanceof  \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model) {
-                    $courseSpec = $assessment->getBasecontext()->getCourse();
-                } elseif ($assessment->getBasecontext() instanceof  \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model) {
-                    $courseSpec = $assessment->getBasecontext()->getSpecification()->getCourse();
-                }
-
-                if (null === $courseSpec) {
-                    // class level, assume they have access... (mostly on class markbook, and assessments created outside of a course)
-                    return;
-                }
-
-                // then check if the user has write access to all the course implementations
-                foreach ($courseSpec->getCourseImplementations() as $classImplementation) {
-                    $hasAccess = $this->getAccess()->getFolderAccess(
-                        $user,
-                        $classImplementation->getFolder()->getId()
-                    ) >= UserAccess::ACCESS_WRITE;
-                    if (!$hasAccess) {
-                        /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-                        throw new InvalidPath('You do not have permission to access this course implementation');
-                    }
-                }
-            })
-        );
     }
 }
