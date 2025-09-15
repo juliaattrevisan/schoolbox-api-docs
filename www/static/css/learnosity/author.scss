@@ -492,7 +492,7 @@ span.lrn-qe-i-trash {
     .lrn-author-list-view-col-first {
     border-right: 1px solid var(--body-background);
 }
-.lrn.lrn-author .lrn-item-for-activity-list .lrn-check-box-wrapper .lrn-check-box-span {
+.lrn.lrn-author .lrn-author-item-for-activity-list .lrn-author-check-box-wrapper .lrn-author-check-box-span {
     background: none;
     border: 1px solid var(--form-border-color);
     border-radius: 0px;
@@ -1026,11 +1026,15 @@ button.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-author-btn-sec.lrn-autho
     width: 230px;
     padding: 0.5rem !important;
 }
+.lrn-author .lrn-author-ui .lrn-author-list-view-col:not(.lrn-author-list-view-select-col):first-child {
+    padding-left: 1.9em;
+}
+.lrn-author .lrn-author-ui .lrn-author-btn-old-legacy:focus,
+.lrn-author .lrn-author-ui a.lrn-author-btn-old-legacy:focus {
+    outline: none;
+}
 /* Fixed the mobile version for the search page */
 @media #{$small-only} {
-    .lrn .lrn-author-ui .lrn-author-list-view-col:not(.lrn-author-list-view-select-col):first-child {
-        padding-left: 0.25rem !important;
-    }
     .lrn .lrn-author-ui .lrn-author-list-view-heading-wrapper {
         margin-right: 3rem !important;
     }
