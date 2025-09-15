@@ -26,7 +26,9 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
+use Schoolbox\Learning\Authorizer\Rule\IsImplementation;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
+use Schoolbox\Learning\Authorizer\Rule\IsSpecification;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -65,17 +67,25 @@ class Module extends BaseModule
 
         $canGiveFeedbackForAssessment = new Rule\Any(
             new Rule\IsSuperuser(),
-            new Rule\All(
-            // User must have write access to the folder the assessment is in
-                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function ($params) {
-                    /** @var IAssessable $assessable */
-                    $assessable = $params['assessment'];
-                    if ($assessable instanceof IAssessable) {
-                        return $assessable->getContext()->getFolder()->getId();
-                    }
-                    throw new Forbidden('User does not have homepage access');
-                }, $this->getAccess()),
-                new IsInteractionUnLocked(new Assessment\LockedChecker($this->getTermMapper()))
+            // feedback route is accessible for both spec and impl assessments
+            new Rule\Any(
+                // Implementation assessment use the old logic, user must have write access homepage, and the assessment is not locked (due in an archived term)
+                new Rule\All(
+                    new IsImplementation(),
+                    // User must have write access to the folder the assessment is in
+                    new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function ($params) {
+                        /** @var IAssessable $assessable */
+                        $assessable = $params['assessment'];
+                        if ($assessable instanceof IAssessable) {
+                            return $assessable->getContext()->getFolder()->getId();
+                        }
+                        throw new Forbidden('User does not have homepage access');
+                    }, $this->getAccess()),
+                    new IsInteractionUnLocked(new Assessment\LockedChecker($this->getTermMapper()))
+                ),
+                // Specification assessments, you need to have write access to all homepages using the spec (but more complex than can be done here)
+                new IsSpecification(),
+                // offload the perm check for spec assessments to the controller... we should be hitting the filters
             )
         );
 
@@ -176,7 +186,7 @@ class Module extends BaseModule
             'POST',
             "/{$assessmentRoute}/feedbacks",
             'postParticipantFeedbacks',
-            $this->getCanAccessPopOut(),
+            $canGiveFeedbackForAssessment,
             $preloadAssessable
         );
 
@@ -215,7 +225,8 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(RubricDataSource::class),
             $this->getMapperFactory()->get(ReturnedWorkMapper::class),
             $this->getMapperFactory()->get(Assessment\Project\ResultCache\Mapper::class),
-            $this->injector->get('kamiConnector')
+            $this->injector->get('kamiConnector'),
+            $this->getMapperFactory()->get(TermMapper::class)
         );
     }
 

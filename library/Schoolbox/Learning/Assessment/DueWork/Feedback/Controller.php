@@ -18,6 +18,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as 
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork;
@@ -26,6 +27,7 @@ use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfGradable;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\IResponse;
+use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Project;
@@ -74,6 +76,7 @@ class Controller extends Base
      * @param ReturnedWorkMapper $returnedWorkMapper
      * @param Mapper $projectResultCacheMapper
      * @param Connector $kamiConnector
+     * @param TermMapper $termMapper
      */
     public function __construct(
         IFeedbackDataSource $feedbackDataSource,
@@ -85,6 +88,7 @@ class Controller extends Base
         ReturnedWorkMapper $returnedWorkMapper,
         private Project\ResultCache\Mapper $projectResultCacheMapper,
         private Connector $kamiConnector,
+        private TermMapper $termMapper
     ) {
         $this->feedbackDataSource    = $feedbackDataSource;
         $this->participantDataSource = $participantDataSource;
@@ -183,12 +187,19 @@ class Controller extends Base
         /* if this is a spec assessment, we want all implementation children assessments,
          * with hydrated participants so we can publish all the users quickly and easily.
          *
-         * we should be using filters, so we aren't hydrating all participation for all time....
+         * we should be using filters, so we aren't hydrating all participation for all current assessments
         */
         $aImpls = new GenericCollection(DueWork\Model::class);
         if ($assessment->isSpecification()) {
+            // only hydrate students for assessments that are 'not locked' (i.e. not in archived terms)
+            $lockChecker = (new LockedChecker($this->termMapper));
             $aImpls = $this->assessmentDataSource
                 ->findAllImplementationsBySpecificationId($assessment->getId())
+                ->filter(
+                    function (DueWork\Model $aImpl) use ($lockChecker) {
+                        return !$lockChecker->isLockedForInteractions($aImpl);
+                    }
+                )
                 ->indexBy('id');
 
             // hydrate participants
