@@ -142,12 +142,13 @@ export default class AssessmentForm {
     }
 
     /**
-     * Submits this form to create a duework
+     * Submits this form to create a duework - by default it skips the participation prompt by clicking Later
+     * if you want to navifate to the participation plan page, set toParticipation to true eg: create(true, true);
      * Verifies that the homepage is visible after submission
      * @param hasParticipationPrompt - Whether the participation prompt is expected to be shown (should be when creating a new class/project duework/task)
      * @param toParticipation - Whether to navigate to the participation page
      */
-    async create(hasParticipationPrompt: boolean = false, toParticipation: boolean = false): Promise<void> {
+    async create(hasParticipationPrompt: boolean = true, toParticipation: boolean = false): Promise<void> {
         await this.page.getByTestId(AssessmentForm.SELECTOR_BUTTON_CREATE).click();
 
         if (hasParticipationPrompt && toParticipation) {
