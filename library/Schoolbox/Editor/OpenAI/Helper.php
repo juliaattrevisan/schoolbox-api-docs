@@ -56,13 +56,7 @@ class Helper
 //            'gpt-4-turbo' => false
         ],
         self::ENDPOINT_TYPE_AZURE => [
-//            'gpt-3.5-turbo' => false,
-//            'gpt-4' => false,
-            'gpt-4o' => true,
-            'gpt-4o-mini' => true,
-            'gpt-4.1' => true,
-            'gpt-4.1-mini' => true,
-//            'gpt-4-turbo' => false
+            // we have no clue or control over what model the school picks with azure
         ],
     ];
 
@@ -433,6 +427,9 @@ class Helper
      */
     private function canUseStructuredOutputs(): bool
     {
+        if ($this->openAiEndpoint === self::ENDPOINT_TYPE_AZURE) {
+            return true; // assume azure can, we have no way of knowing what they chose
+        }
         return self::SUPPORTED_STRUCTURED_OUTPUT_MODELS[$this->openAiEndpoint][$this->openAiModel] ?? false;
     }
 
