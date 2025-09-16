@@ -86,7 +86,6 @@ jobs:
           sbom: false
           build-args: |
             ENV=prod
-            ARCH=${{ matrix.build.arch }}
             TAG=latest-php${{ matrix.phpVersion }}-${{ github.base_ref }}
             PHP_MAJOR_VERSION=${{ matrix.phpVersion }}
           tags: |
