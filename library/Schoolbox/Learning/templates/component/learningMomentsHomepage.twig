@@ -136,36 +136,41 @@
             </div>
 
             <script type="text/javascript">
+            (() => {
+                /**
+                 * When a given checkbox is changed, update the share button link and disabled state
+                 */
+                function onUserSelectChange() {
+                    const checkedUserIds = [...document.querySelectorAll('#{{ revealId }} [data-checkbox="{{ revealId }}"]')]
+                        .filter((el) => el.checked)
+                        .map((el) => el.getAttribute('data-user-id'));
+
+                    const shareButton = document.querySelector('#{{ revealId }} [data-moment-share-submit]');
+                    shareButton.removeAttribute('disabled');
+
+                    // build up the new URL
+                    const params = new URLSearchParams();
+                    params.set('folderId', '{{ folder.id }}');
+                    params.set('{{ RETURN_URL.name }}', '{{ encodedReturnUrl ?? RETURN_URL.current }}');
+                    params.set('momentType', shareButton.getAttribute('data-moment-type'));
+
+                    // the route generator will leave behind a {userIds} for us to inject to
+                    const href = `{{ routeLookupIfAuthorized('learningMomentEvidence.getCreateForm') }}`.replace('{userIds}', checkedUserIds.join(','));
+                    shareButton.setAttribute('href', `${href}?${params.toString()}`);
+
+                    if (checkedUserIds.length === 0) {
+                        shareButton.setAttribute('disabled', 'true');
+                        return;
+                    }
+                }
+
                 window.sbProps.injectScriptsIfNotLoaded(
                     {
                         srcList: ['{{ CDN_PREFIX }}/js/select-all/jquery.select-all.basic.js?v={{ config.site_version }}'],
                         onComplete: () => {
                             $("#chk-{{ revealId }}-all").selectAllBasic({
                                 selector: '[data-checkbox="{{ revealId }}"]',
-                                onAfterCheckboxChange: (checkbox) => {
-                                    console.warn(checkbox);
-                                    const checkedUserIds = [...document.querySelectorAll('#{{ revealId }} [data-checkbox="{{ revealId }}"]')]
-                                        .filter((el) => el.checked)
-                                        .map((el) => el.getAttribute('data-user-id'));
-
-                                    const shareButton = document.querySelector('#{{ revealId }} [data-moment-share-submit]');
-                                    shareButton.removeAttribute('disabled');
-
-                                    // build up the new URL
-                                    const params = new URLSearchParams();
-                                    params.set('folderId', '{{ folder.id }}');
-                                    params.set('{{ RETURN_URL.name }}', '{{ encodedReturnUrl ?? RETURN_URL.current }}');
-                                    params.set('momentType', shareButton.getAttribute('data-moment-type'));
-
-                                    // the route generator will leave behind a {userIds} for us to inject to
-                                    const href = `{{ routeLookupIfAuthorized('learningMomentEvidence.getCreateForm') }}`.replace('{userIds}', checkedUserIds.join(','));
-                                    shareButton.setAttribute('href', `${href}?${params.toString()}`);
-
-                                    if (checkedUserIds.length === 0) {
-                                        shareButton.setAttribute('disabled', 'true');
-                                        return;
-                                    }
-                                },
+                                onAfterCheckboxChange: onUserSelectChange
                             });
                         }
                     }
@@ -179,8 +184,11 @@
                         const baseMomentType = event.currentTarget.getAttribute('data-moment-type');
                         const shareButton = document.querySelector('#{{ revealId }} [data-moment-share-submit]');
                         shareButton.setAttribute('data-moment-type', baseMomentType);
+
+                        onUserSelectChange(); // initialise the button state on load
                     });
                 });
+            })();
             </script>
         {% endif %}
     </section>
