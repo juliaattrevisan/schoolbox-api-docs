@@ -788,15 +788,29 @@ class Controller extends Base
      * Its express purpose is to put the existing $evidence into Published along with any alterations
      * to its content such as body, tags, curric nodes, etc.
      *
-     * @api   PUT /learning/evidence/{id}/publish
      * @param Model $evidence
      * @return void
      * @throws Exception
      * @throws MapperException|RouteNotFound
+     * @throws \Alaress\Web\Controller\Exception
+     * @api PUT /learning/evidence/{id}/publish
      */
     public function putPublish(Model $evidence): void
     {
-        $this->response = $this->responseAsJson($this->putWithState($evidence, Model::STATUS_PUBLISHED));
+        /* TODO rename
+         * (soft rename inside function body for the moment, as has been done at the top of $this->putWithState().)
+         */
+        $moment = $evidence;
+        $momentEvidence = $moment->getEvidence();
+
+        // Validate here because learning moments are only publishable if they have text or at least one evidence.
+        if (empty($moment->getBody()) && ($momentEvidence === null || $momentEvidence->count() === 0)) {
+            // Moment is not publishable, so reject the request.
+            $this->sendError('Learning moment must contain text or evidence');
+        } else {
+            // Moment is publishable, so update the state and send a success response.
+            $this->response = $this->responseAsJson($this->putWithState($moment, Model::STATUS_PUBLISHED));
+        }
     }
 
 
