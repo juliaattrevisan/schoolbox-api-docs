@@ -46,6 +46,7 @@ class ModerateBooking extends Payload\Request
             case $this::ACTION_APPROVE:
                 $this->actionString = 'approve';
                 $this->setEfficacy('false');
+                break;
             default:
                 $this->actionString = 'approve';
         }
