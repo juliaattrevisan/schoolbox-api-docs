@@ -23,14 +23,7 @@ ARG GROUP_ID
 # * cron itself, git, mariadb client, ffmpeg, imagemagick, sudo, jq
 RUN \
   apt-get update && \
-  apt-get install -y gnupg && \
-  echo "deb https://cli.intellischool.net/channels/stable/apt/ /" > /etc/apt/sources.list.d/intelliscl.list && \
-  apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 88C06AD00AA2BB47 && \
-  rm /etc/apt/trusted.gpg.d/intellischool.gpg 2> /dev/null || echo > /dev/null && \
-  apt-key export 0AA2BB47 | gpg --dearmour -o /etc/apt/trusted.gpg.d/intellischool.gpg && \
-  apt-get update && \
   apt-get install -y \
-    intelliscl \
     cron \
     git \
     mariadb-client \
