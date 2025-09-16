@@ -145,7 +145,7 @@ async function deleteEvidence(index: number): Promise<void> {
 
     if (mfStore.moment.evidence.length === 0 && mediaType.value !== MediaType.TEXT) {
         // if there's no evidence left, default back to text mode
-        mfStore.showInvalidEvidenceError = true;
+        mfStore.showInvalidEvidenceError = mfStore.moment.body === "";
         await changeMediaType(MediaType.TEXT);
     }
 
