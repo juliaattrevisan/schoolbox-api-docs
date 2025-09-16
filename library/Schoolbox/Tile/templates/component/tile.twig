@@ -36,8 +36,8 @@
         {% if addTileUrl or modifyUrl %}
         <div class="component-action">
             <section>
-                {% if addTileUrl %}<a href="{{ addTileUrl }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="button">Add Tile</a>{% endif %}
-                {% if modifyUrl %}<a href="{{ modifyUrl }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" class="button">Modify</a>{% endif %}
+                {% if addTileUrl %}<a href="{{ addTileUrl }}?{{ RETURN_URL.name }}={{ returnUrl ?? RETURN_URL.current }}" class="button">Add Tile</a>{% endif %}
+                {% if modifyUrl %}<a href="{{ modifyUrl }}?{{ RETURN_URL.name }}={{ returnUrl ?? RETURN_URL.current }}" class="button">Modify</a>{% endif %}
             </section>
         </div>
         {% endif %}
