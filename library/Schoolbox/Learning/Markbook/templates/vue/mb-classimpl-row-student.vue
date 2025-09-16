@@ -4,7 +4,6 @@ import { getGradient } from "@js/util/cssUtils";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { useMarkbookStore } from "./store/markbookStore";
 import MbStudentGradeCell from "./mb-student-grade-cell.vue";
-import MbClassimplRowStudentFeedback from "./mb-classimpl-row-student-feedback.vue";
 import type { MarkbookClassImplStudent } from "./types/payload";
 
 interface Props {
@@ -95,18 +94,6 @@ const isFaded = window.Vue.computed(() => {
             :student-id="student.id"
         />
     </tr>
-
-    <mb-classimpl-row-student-feedback
-        v-if="
-            mbStore.feedbackSelectedCell &&
-            mbStore.feedbackSelectedCell.classImplId === props.classImplId &&
-            mbStore.feedbackSelectedCell.studentId === student.id
-        "
-        :key="Object.values(mbStore.feedbackSelectedCell).join('-')"
-        :activity-id="mbStore.feedbackSelectedCell.activityId"
-        :class-impl-id="mbStore.feedbackSelectedCell.classImplId"
-        :student-id="mbStore.feedbackSelectedCell.studentId"
-    />
 </template>
 
 <style scoped></style>

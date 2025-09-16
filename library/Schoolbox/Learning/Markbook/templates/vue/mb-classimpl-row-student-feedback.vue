@@ -5,8 +5,6 @@
  */
 
 import { cloneDeep } from "lodash";
-import type { Ref } from "vue";
-import { useTemplateRefsList, useElementBounding } from "@vueuse/core";
 import locale from "@js/terminology/rosettaStone";
 import CommentField from "@schoolboxLibrary/Learning/Assessment/templates/dueWork/vue/comment-field.vue";
 import ResubmissionRequired from "@schoolboxLibrary/Learning/Assessment/templates/dueWork/vue/resubmission-required.vue";
@@ -158,104 +156,6 @@ function getCellInfo() {
 const cellInfo = window.Vue.ref<ReturnType<typeof getCellInfo> | null>(getCellInfo());
 
 /**
- * I can't figure out a way to force one particular table cell to be arbitrarily sticky
- * in the middle of the table, so force it to exist in the right spot instead
- *
- * The alternative will likely involve rewriting the markbook table as a css grid, like the unit planner...
- */
-
-const resizeObserver = window.Vue.ref<ResizeObserver | null>(null);
-const tableRowEl = window.Vue.useTemplateRef<HTMLTableRowElement>("tableRowRef");
-const feedbackEl = window.Vue.useTemplateRef<HTMLElement>("feedbackRef");
-const placeholderEl = window.Vue.useTemplateRef<HTMLDivElement>("placeholderRef");
-const leftEls = useTemplateRefsList<HTMLTableCellElement>();
-
-// tableContainerEl is the element that contains the markbook table,
-// it gives us the actual bounds we are restricted to, rather than the table's bounds
-const tableContainerEl = window.Vue.inject<Ref<HTMLElement>>("markbookTableContainerEl");
-if (tableContainerEl === undefined) {
-    throw new Error("markbookTableContainerEl is not provided");
-}
-
-const targetLeftEl = window.Vue.computed(() => leftEls.value[leftEls.value.length - 1]);
-
-const tableContainerElBounds = useElementBounding(tableContainerEl);
-const tableRowElBounds = useElementBounding(tableRowEl);
-const feedbackElBounds = useElementBounding(feedbackEl);
-const leftElBounds = useElementBounding(targetLeftEl);
-
-const feedbackCellOffsets = window.Vue.computed(() => {
-    const tableScrollbarOffsetX = tableContainerEl.value
-        ? tableContainerElBounds.width.value - tableContainerEl.value.clientWidth
-        : 0;
-    const tableScrollbarOffsetY = tableContainerEl.value
-        ? tableContainerElBounds.height.value - tableContainerEl.value.clientHeight
-        : 0;
-
-    // The maximum width that the feedback cell can take up, ensuring that it's fully visible on the screen
-    const maxWidth =
-        // The available width, excluding the extra room introduced by the rotated headers
-        tableRowElBounds.width.value +
-        tableRowElBounds.left.value -
-        // To account for the left column, which can end up off the screen if you are on a small screen
-        Math.max(leftElBounds.right.value, tableScrollbarOffsetX) -
-        // The offset to account for the rotated headers and scrollbar
-        Math.max(tableRowElBounds.right.value - tableContainerElBounds.right.value + tableScrollbarOffsetX, 0);
-
-    const elementLeft = Math.max(leftElBounds.right.value, tableContainerElBounds.left.value);
-    const elementTop = leftElBounds.top.value;
-
-    // Since the feedback cell is fixed, it will show up outside the table bounds, so clip it instead
-    const clipTop = Math.max(0, tableContainerElBounds.top.value - elementTop);
-    const clipBottom = Math.max(
-        0,
-        elementTop + feedbackElBounds.height.value - tableContainerElBounds.bottom.value + tableScrollbarOffsetY + 10, // the 10 is somewhat arbitrary... i can't find a calculation that works without it yet
-    );
-
-    const clipPath = `inset(${clipTop}px 0px ${clipBottom}px 0px)`;
-
-    return {
-        left: elementLeft,
-        top: elementTop,
-        height: feedbackElBounds.height.value,
-        maxWidth,
-        clipPath,
-    };
-});
-
-/**
- * Trigger a re-evaluation of the feedback cell position
- */
-function updateFeedbackCellPosition(): void {
-    tableContainerElBounds.update();
-    feedbackElBounds.update();
-    leftElBounds.update();
-}
-
-window.Vue.onMounted(async () => {
-    // Initialize the ResizeObserver
-    resizeObserver.value = new ResizeObserver(updateFeedbackCellPosition);
-    resizeObserver.value.observe(document.querySelector("#container")!);
-    resizeObserver.value.observe(document.querySelector("#markbook-outer-container")!);
-
-    // Set the initial position, and update it again when the DOM is fully loaded to ensure the footer is included
-    updateFeedbackCellPosition();
-    window.addEventListener("DOMContentLoaded", updateFeedbackCellPosition, { once: true });
-
-    if (placeholderEl.value) {
-        await window.Vue.nextTick();
-        // Ensure the table row is always in the center of the visible table area
-        placeholderEl.value.scrollIntoView({ block: "center", behavior: "smooth" });
-    }
-});
-
-window.Vue.onUnmounted(() => {
-    if (resizeObserver.value) {
-        resizeObserver.value.disconnect();
-    }
-});
-
-/**
  * When the feedback is published, if it's successful - close the cell
  */
 async function onFeedbackPublish(): Promise<void> {
@@ -271,136 +171,114 @@ async function onFeedbackPublish(): Promise<void> {
 </script>
 
 <template>
-    <tr v-if="mbStore.data !== null" ref="placeholderRef">
-        <th class="fixed-left is-selected"></th>
-        <th class="fixed-left is-selected"></th>
-        <th v-if="mbStore.data.rank !== null" class="is-selected"></th>
-        <td :colspan="mbStore.orderedActivities.length" class="is-selected"></td>
-    </tr>
-    <tr v-if="mbStore.data !== null && cellInfo !== null" ref="tableRowRef">
-        <th :ref="leftEls.set" class="fixed-left white"></th>
-        <th :ref="leftEls.set" class="fixed-left white"></th>
-        <th v-if="mbStore.data.rank !== null" class="white"></th>
-
-        <td :colspan="mbStore.orderedActivities.length">
-            <form
-                ref="feedbackRef"
-                class="fixed-feedback-cell row"
-                :class="{
-                    'fixed-feedback-cell--loading': mbStore.feedbackUILoadingInfo !== null,
-                }"
-                :style="{
-                    left: `${feedbackCellOffsets.left}px`,
-                    top: `${feedbackCellOffsets.top}px`,
-                    maxWidth: `${feedbackCellOffsets.maxWidth}px`,
-                    clipPath: feedbackCellOffsets.clipPath,
-                }"
-            >
-                <div v-if="cellInfo.instructorMarkScheme.template.length" class="small-12 medium-3 column">
-                    <label>
-                        {{ locale.grades.proper() }}
-                        <mark-scheme
-                            v-model:mark="cellInfo.feedback.data.hrMarkInstructor"
-                            :participant="{ user: cellInfo.student }"
-                            :mark-scheme="cellInfo.instructorMarkScheme"
-                            :submission-error-states="mbStore.data.submissionErrorStates"
-                            :limit="
-                                cellInfo.participant.extraInfo?.maxMarks ?? undefined /** special quiz max mark chaos */
-                            "
-                        />
-                    </label>
-                    <resubmission-required
-                        v-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK"
-                        v-model:resubmission-required="cellInfo.feedback.data.resubmissionRequired"
-                        :identifier="cellInfo.student.id"
-                        style="margin-top: 0.5rem"
-                    />
-                </div>
-                <div class="small-12 column" :class="{ 'medium-9': cellInfo.instructorMarkScheme.template.length }">
-                    <comment-field
-                        v-model:comment="cellInfo.feedback.data.comment"
+    <template v-if="mbStore.data !== null && cellInfo !== null">
+        <form
+            ref="feedbackRef"
+            class="fixed-feedback-cell row"
+            :class="{
+                'fixed-feedback-cell--loading': mbStore.feedbackUILoadingInfo !== null,
+            }"
+        >
+            <div v-if="cellInfo.instructorMarkScheme.template.length" class="small-12 medium-3 column">
+                <label>
+                    {{ locale.grades.proper() }}
+                    <mark-scheme
+                        v-model:mark="cellInfo.feedback.data.hrMarkInstructor"
                         :participant="{ user: cellInfo.student }"
-                        :is-rich-text="true"
-                        :templates="mbStore.editorTemplates"
-                    />
-
-                    <resubmission-required
-                        v-if="
-                            cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK &&
-                            cellInfo.instructorMarkScheme.template.length === 0
+                        :mark-scheme="cellInfo.instructorMarkScheme"
+                        :submission-error-states="mbStore.data.submissionErrorStates"
+                        :limit="
+                            cellInfo.participant.extraInfo?.maxMarks ?? undefined /** special quiz max mark chaos */
                         "
-                        v-model:resubmission-required="resubmissionRequiredRef"
-                        :identifier="cellInfo.student.id"
-                        style="margin-top: 0.5rem"
                     />
-                </div>
-                <div class="small-12 column no-pad">
-                    <div class="component-action" data-action-bar="60" data-mass-publish>
-                        <section>
-                            <div v-if="cellInfo.feedbackIncludes.length" class="component-action-info">
-                                Feedback also includes
-                                <a v-if="cellInfo.feedbackIncludesLink" :href="cellInfo.feedbackIncludesLink">
-                                    {{ cellInfo.feedbackIncludes.join(", ") }}
-                                </a>
-                                <span v-else>{{ cellInfo.feedbackIncludes.join(", ") }}</span>
-                            </div>
+                </label>
+                <resubmission-required
+                    v-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK"
+                    v-model:resubmission-required="cellInfo.feedback.data.resubmissionRequired"
+                    :identifier="cellInfo.student.id"
+                    style="margin-top: 0.5rem"
+                />
+            </div>
+            <div class="small-12 column" :class="{ 'medium-9': cellInfo.instructorMarkScheme.template.length }">
+                <comment-field
+                    v-model:comment="cellInfo.feedback.data.comment"
+                    :participant="{ user: cellInfo.student }"
+                    :is-rich-text="true"
+                    :templates="mbStore.editorTemplates"
+                />
 
-                            <div>
-                                <button
-                                    class="button mb-feedback-close"
-                                    type="button"
-                                    @click="mbStore.setFeedbackSelectedCell(null)"
-                                >
-                                    Close
-                                </button>
-                                <button
-                                    v-if="
-                                        cellInfo.feedback.dataDraft.responseId !== null ||
-                                        cellInfo.feedback.showDraftDialogue
-                                    "
-                                    class="button disabled"
-                                    :class="{ 'saving-error': cellInfo.feedback.hasAutoSaveError }"
-                                    title="You can discard this draft from the Grading Overview screen"
-                                    data-test="assessment-response-info-saved-as-draft"
-                                    disabled
-                                >
-                                    <template v-if="cellInfo.feedback.isAutoSaveInProgress">Saving...</template>
-                                    <template v-else-if="cellInfo.feedback.hasAutoSaveError">Saving failed</template>
-                                    <template v-else>Saved as Draft</template>
-                                </button>
-                                <button
-                                    v-if="
-                                        cellInfo.feedback.dataDraft.responseId !== null ||
-                                        cellInfo.feedback.showDraftDialogue ||
-                                        cellInfo.feedback.isPublishedDirty
-                                    "
-                                    class="button"
-                                    type="submit"
-                                    @click.prevent="onFeedbackPublish"
-                                >
-                                    <template v-if="cellInfo.feedback.isPublishInProgress">Publishing...</template>
-                                    <template v-else-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_QUIZ">
-                                        Save and Publish
-                                    </template>
-                                    <template v-else>Publish</template>
-                                </button>
-                            </div>
-                        </section>
-                    </div>
+                <resubmission-required
+                    v-if="
+                        cellInfo.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK &&
+                        cellInfo.instructorMarkScheme.template.length === 0
+                    "
+                    v-model:resubmission-required="resubmissionRequiredRef"
+                    :identifier="cellInfo.student.id"
+                    style="margin-top: 0.5rem"
+                />
+            </div>
+            <div class="small-12 column no-pad">
+                <div class="component-action" data-action-bar="60" data-mass-publish>
+                    <section>
+                        <div v-if="cellInfo.feedbackIncludes.length" class="component-action-info">
+                            Feedback also includes
+                            <a v-if="cellInfo.feedbackIncludesLink" :href="cellInfo.feedbackIncludesLink">
+                                {{ cellInfo.feedbackIncludes.join(", ") }}
+                            </a>
+                            <span v-else>{{ cellInfo.feedbackIncludes.join(", ") }}</span>
+                        </div>
+
+                        <div>
+                            <button
+                                class="button mb-feedback-close"
+                                type="button"
+                                @click="mbStore.setFeedbackSelectedCell(null)"
+                            >
+                                Close
+                            </button>
+                            <button
+                                v-if="
+                                    cellInfo.feedback.dataDraft.responseId !== null ||
+                                    cellInfo.feedback.showDraftDialogue
+                                "
+                                class="button disabled"
+                                :class="{ 'saving-error': cellInfo.feedback.hasAutoSaveError }"
+                                title="You can discard this draft from the Grading Overview screen"
+                                data-test="assessment-response-info-saved-as-draft"
+                                disabled
+                            >
+                                <template v-if="cellInfo.feedback.isAutoSaveInProgress">Saving...</template>
+                                <template v-else-if="cellInfo.feedback.hasAutoSaveError">Saving failed</template>
+                                <template v-else>Saved as Draft</template>
+                            </button>
+                            <button
+                                v-if="
+                                    cellInfo.feedback.dataDraft.responseId !== null ||
+                                    cellInfo.feedback.showDraftDialogue ||
+                                    cellInfo.feedback.isPublishedDirty
+                                "
+                                class="button"
+                                type="submit"
+                                @click.prevent="onFeedbackPublish"
+                            >
+                                <template v-if="cellInfo.feedback.isPublishInProgress">Publishing...</template>
+                                <template v-else-if="cellInfo.activity.assessmentType === ACTIVITY_TYPE_QUIZ">
+                                    Save and Publish
+                                </template>
+                                <template v-else>Publish</template>
+                            </button>
+                        </div>
+                    </section>
                 </div>
-            </form>
-            <div :style="{ height: `${feedbackCellOffsets.height}px` }"></div>
-        </td>
-    </tr>
+            </div>
+        </form>
+    </template>
 </template>
 
 <style scoped lang="scss">
 .fixed-feedback-cell {
-    margin: 0;
-    position: fixed;
     text-wrap: wrap;
     width: 100%;
-    z-index: 1;
 
     &--loading {
         opacity: 0.5;
