@@ -286,6 +286,9 @@ function init_composer_dependencies() {
           "$SITE_ROOT"/tools/composer.sh
       fi
   fi
+
+  # Change ownership to schoolboxsuper for Composer dependencies
+  chown -R schoolboxsuper:schoolboxsuper vendor/
 }
 
 function init_npm_dependencies() {
@@ -323,6 +326,9 @@ function init_npm_dependencies() {
 
   log "Building JS/CSS files";
   "$SITE_ROOT"/tools/pkg-build-css-js.sh
+
+  # Change ownership to schoolboxsuper for NPM's dependencies
+  chown -R schoolboxsuper:schoolboxsuper node_modules/ www/static/js/bundle/
 }
 
 function install_instance() {

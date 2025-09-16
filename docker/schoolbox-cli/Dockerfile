@@ -4,12 +4,17 @@ ARG PHP_MAJOR_VERSION=8.4
 ARG PRIVATE_CONTAINER_REGISTRY=476058706527.dkr.ecr.ap-southeast-2.amazonaws.com
 ARG IMAGE=${PRIVATE_CONTAINER_REGISTRY}/frankenphp-base
 ARG TAG=latest-php${PHP_MAJOR_VERSION}-${ENV}
+ARG USER_ID
+ARG GROUP_ID
+
 FROM ${IMAGE}:${TAG}
 
 ARG ARCH
 ARG NVM_VERSION='0.40.3'
 ARG AWS_CLI_VERSION='2.27.55'
 ARG NODE_VERSION=20
+ARG USER_ID
+ARG GROUP_ID
 
 # Install Intellischool CLI client, as per instructions on
 # https://docs.intellischool.co/guides/cli-quickstart#install-debian-ubuntu:
@@ -106,9 +111,8 @@ WORKDIR /usr/share/schoolbox
 
 # Create users and groups, and set default user
 RUN <<EOF
-useradd -m -U -G adm,sudo,www-data -s /bin/bash schoolboxsuper
+addgroup --gid ${GROUP_ID} schoolboxsuper
+useradd -m -g schoolboxsuper -G adm,sudo,www-data -s /bin/bash -u ${USER_ID} schoolboxsuper
 EOF
 
-# For some reason this causes a message: schoolbox-cli hook exited with status 1
-# The container starts without issue though.
 USER schoolboxsuper

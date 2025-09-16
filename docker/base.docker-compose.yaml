@@ -52,6 +52,8 @@ services:
       context: ./schoolbox-cli
       args:
         PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
+        USER_ID: ${USER_ID}
+        GROUP_ID: ${GROUP_ID}
     tty: true
     volumes:
       - code:/usr/share/schoolbox

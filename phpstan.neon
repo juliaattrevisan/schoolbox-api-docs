@@ -1,6 +1,6 @@
 parameters:
     bootstrapFiles:
-        - %rootDir%/../../../conf/core/require.php
+        - %rootDir%/../../../test/bootstrap/unit.php
     level: 4
     parallel:
         processTimeout: 300.0
