@@ -30,7 +30,6 @@ class ModerateBooking extends Payload\Request
         $this->resourceID = $Booking->getResource()->getId();
         $this->setHeader('Accept', 'application/json, text/javascript, */*; q=0.01');
         $this->setHeader('Accept-Encoding', 'gzip, deflate, br');
-        $this->setHeader('Origin', getenv('BASE_URL'));
         $this->setHeader('Content-Type', 'application/x-www-form-urlencoded');
         $this->setHeader('Pragma', 'no-cache');
         $this->setHeader('TE', 'Trailers');

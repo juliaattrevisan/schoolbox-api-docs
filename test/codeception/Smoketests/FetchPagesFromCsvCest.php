@@ -161,6 +161,8 @@ class FetchPagesFromCsvCest
         $url          = $example[3];
         $expected_result = $example[4];
 
+        // For the URL: override the host
+
         /*
          * Due to the data from example url being so huge, override the feature to include an extra
          * line with the details that can be huge. What user is doing, Persona, URL
