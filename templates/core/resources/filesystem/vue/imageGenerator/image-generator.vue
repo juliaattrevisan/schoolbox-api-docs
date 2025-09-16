@@ -36,8 +36,7 @@ window.Vue.onMounted(() => {
         <p>
             A good prompt will contain information on the format, style, subject, mood, light, colours, artistic style,
             and framing. See more information on these on
-            <!-- TODO: Add help link -->
-            <a href="/help/sso/send?returnUrl=TBC" target="_blank">Schoolbox Help</a>
+            <a href="/help/sso/send?returnUrl=/homepage/5438" target="_blank">Schoolbox Help</a>
         </p>
         <ig-feed />
         <ig-prompt :prompt-attributes="props.promptAttributes" />
