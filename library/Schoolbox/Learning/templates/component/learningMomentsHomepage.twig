@@ -1,3 +1,16 @@
+{##
+ Learning moments homepage component
+ # For students, this just shows buttons to a create learning moment directly
+ # For staff, the buttons open up a modal to select which student(s) to create for
+
+Usage:
+    user:        User              - current user viewing the component
+    component:   Schoolbox\Learning\Component\Homepage\LearningMomentsController
+    folder:      Folder\Model      - class or group page the component is on
+    students:    User[]|null       - when a user select is needed, the students in the class/group that can be selected
+
+ #}
+
 {% set getStudentListsEndpoint = routeLookupIfAuthorized('learning.getStudentListByClassId', { folderId: folder.id, folder: folder }) %}
 {% set showUserSelect = user.role.isStaff and user.role.accessEvidence and getStudentListsEndpoint %}
 
