@@ -103,7 +103,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
                     </ul>
                 </div>
             </th>
-            <td :class="`u-border-right ${props.isTotalSticky ? 'u-sticky-left' : ''}`">&nbsp;</td>
+            <td :class="`u-border-right ${props.isTotalSticky ? 'total-column u-sticky-left' : ''}`">&nbsp;</td>
             <template v-if="hasSubTitles">
                 <th
                     v-for="(headerCell, index) in getFirstRowHeaders()"
@@ -159,14 +159,14 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
 }
 
 .first-column {
-    min-width: 250px;
-    width: 250px;
+    min-width: var(--sbx-pr-table-first-column-width);
+    width: var(--sbx-pr-table-first-column-width);
 }
 
 .total-column {
-    background: var(--sbx-pr-table-total-column-colour);
-    min-width: 110px; // so points/records change doesn't trigger a reflow
-    width: 110px;
+    left: var(--sbx-pr-table-first-column-width); // will only be used when sticky
+    min-width: var(--sbx-pr-table-total-column-width); // so points/records change doesn't trigger a reflow
+    width: var(--sbx-pr-table-total-column-width);
 }
 
 .trend-column {

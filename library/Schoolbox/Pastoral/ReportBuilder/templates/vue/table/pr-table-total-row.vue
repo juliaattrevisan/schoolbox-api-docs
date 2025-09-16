@@ -42,7 +42,7 @@ function onCellSelected(header: TableHeader): void {
         <td
             v-for="(header, index) in props.headers"
             :key="header.key"
-            :class="`u-border-right ${index === 0 ? 'u-sticky-left u-sticky-left--row' : ''} ${header.key === 'total' && props.isTotalSticky ? 'u-sticky-left u-sticky-left--row' : ''}`"
+            :class="`u-border-right ${index === 0 ? 'u-sticky-left u-sticky-left--row' : ''} ${header.key === 'total' ? 'total-cell' : ''}  ${header.key === 'total' && props.isTotalSticky ? 'u-sticky-left u-sticky-left--row' : ''}`"
         >
             <!-- The first cell is always just 'Total Records/Points' text -->
             <template v-if="header.key === props.headers[0].key">
@@ -106,6 +106,7 @@ function onCellSelected(header: TableHeader): void {
 </template>
 
 <style lang="scss">
+/* to make the totals more prominent in comparison to the rows below */
 tr.total-row {
     background: var(--sbx-pr-table-total-cell-colour);
     td.u-sticky-left {
@@ -117,5 +118,9 @@ tr.total-row {
     .highcharts-background {
         fill: var(--sbx-pr-table-total-cell-colour);
     }
+}
+
+.total-cell {
+    left: var(--sbx-pr-table-first-column-width); // will only be used when sticky
 }
 </style>

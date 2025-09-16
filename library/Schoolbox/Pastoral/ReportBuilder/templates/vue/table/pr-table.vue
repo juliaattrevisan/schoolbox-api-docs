@@ -22,7 +22,7 @@ import PrTableModal from "./pr-table-modal.vue";
 
 const tableEl = window.Vue.useTemplateRef<HTMLDivElement>("tableRef");
 const { width: tableWidth } = useElementSize(tableEl);
-const isTotalSticky = window.Vue.computed(() => tableWidth.value > 800);
+const isTotalSticky = window.Vue.computed(() => tableWidth.value > 1200);
 
 // #endregion
 

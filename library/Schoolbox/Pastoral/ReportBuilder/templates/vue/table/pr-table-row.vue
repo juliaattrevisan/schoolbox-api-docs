@@ -130,5 +130,6 @@ tr:hover {
 
 .total-cell {
     background: var(--sbx-pr-table-total-cell-colour);
+    left: var(--sbx-pr-table-first-column-width); // will only be used when sticky
 }
 </style>
