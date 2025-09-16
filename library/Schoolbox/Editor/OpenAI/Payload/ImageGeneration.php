@@ -21,6 +21,23 @@ class ImageGeneration
     private const IMAGE_OUTPUT_FORMAT = 'png';
     private const IMAGE_INPUT_DETAIL = 'auto';
 
+    /**
+     * Hardcoded system prompt for the image style to be embedded to PROMPT_SYSTEM_PERSONA via [IMAGE_STYLE]
+     * Use %s as the placeholder for the style name
+     */
+    private const PROMPT_SYSTEM_IMAGE_STYLE = "The image must be in the style of '%s'.";
+
+    /**
+     * Hardcoded system prompt to set the behaviour of the AI, possible placeholders are:
+     * [CONFIG_OPENAI_IMAGE_SYSTEM_PROMPT] - replaced with the configured system prompt from admin configs
+     * [IMAGE_STYLE] - replaced with the selected image style, if any
+     */
+    private const PROMPT_SYSTEM_PERSONA = "
+        Respond only with plain text. Do not use markdown formatting, HTML tags, or any special text formatting in your responses.
+        [CONFIG_OPENAI_IMAGE_SYSTEM_PROMPT]
+        [IMAGE_STYLE]
+    ";
+
 
     /**
      * Constants to determine available sizes
@@ -132,16 +149,11 @@ class ImageGeneration
         ];
 
         /** add prompt inputs if they are meaningful */
-        $systemPrompt = trim($this->systemPrompt);
-        if ($attributes[self::ATTRIBUTE_KEY_STYLE] !== null) {
-            $systemPrompt .= sprintf(
-                "\nThe image must be in the style of '%s'",
-                $attributes[self::ATTRIBUTE_KEY_STYLE]
-            );
-        }
-
-        /* Ensure the AI responds with plain text only, no markdown formatting */
-        $systemPrompt .= "\n\nRespond only with plain text. Do not use markdown formatting, HTML tags, or any special text formatting in your responses.";
+        $imageStyle = $attributes[self::ATTRIBUTE_KEY_STYLE];
+        $systemPrompt = strtr(self::PROMPT_SYSTEM_PERSONA, [
+            '[CONFIG_OPENAI_IMAGE_SYSTEM_PROMPT]' => trim($this->systemPrompt),
+            '[IMAGE_STYLE]' => $imageStyle !== null ? sprintf(self::PROMPT_SYSTEM_IMAGE_STYLE, $imageStyle) : '',
+        ]);
 
         $payload['input'][] = [
             'role' => 'system',
