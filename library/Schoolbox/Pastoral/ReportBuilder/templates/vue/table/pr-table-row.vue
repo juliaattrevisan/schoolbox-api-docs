@@ -131,7 +131,7 @@ tr:hover {
 .total-cell {
     background: var(--sbx-pr-table-total-cell-colour);
     &--sticky {
-        left: var(--sbx-pr-table-first-column-width); // override the default left of 0 from u-sticky-left
+        left: var(--sbx-pr-table-first-header-width); // override the default left of 0 from u-sticky-left
     }
 }
 </style>

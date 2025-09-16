@@ -110,7 +110,7 @@ window.Vue.onMounted((): void => {
 :root {
     --sbx-pr-table-total-cell-colour: #eee;
     --sbx-pr-table-row-hover-colour: #f4f3f3;
-    --sbx-pr-table-first-column-width: 250px;
-    --sbx-pr-table-total-column-width: 110px;
+    --sbx-pr-table-first-header-width: 250px;
+    --sbx-pr-table-total-header-width: 110px;
 }
 </style>

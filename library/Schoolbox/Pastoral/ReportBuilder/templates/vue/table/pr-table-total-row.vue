@@ -121,6 +121,6 @@ tr.total-row {
 }
 
 .total-cell--sticky {
-    left: var(--sbx-pr-table-first-column-width); // will only be used when sticky
+    left: var(--sbx-pr-table-first-header-width); // will only be used when sticky
 }
 </style>
