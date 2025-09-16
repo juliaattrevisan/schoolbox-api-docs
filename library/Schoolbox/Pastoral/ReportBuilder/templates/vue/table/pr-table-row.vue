@@ -51,7 +51,7 @@ function onCellSelected(header: TableHeader): void {
         <td
             v-for="(header, index) in props.headers"
             :key="header.key"
-            :class="`u-border-right ${index === 0 ? 'u-sticky-left u-sticky-left--row ' : ''} ${header.key === 'user' ? 'l-pad--0' : ''} ${header.key === 'total' ? 'total-cell' : ''} ${header.key === 'total' && props.isTotalSticky ? 'u-sticky-left u-sticky-left--row' : ''}`"
+            :class="`u-border-right ${index === 0 ? 'u-sticky-left u-sticky-left--row ' : ''} ${header.key === 'user' ? 'l-pad--0' : ''} ${header.key === 'total' && props.isTotalSticky ? 'u-sticky-left u-sticky-left--row total-cell--sticky' : ''}`"
         >
             <template v-if="header.type == TableHeaderType.USER">
                 <div class="l-flex-row l-flex--no-wrap l-gap-m">
@@ -130,6 +130,8 @@ tr:hover {
 
 .total-cell {
     background: var(--sbx-pr-table-total-cell-colour);
-    left: var(--sbx-pr-table-first-column-width); // will only be used when sticky
+    &--sticky {
+        left: var(--sbx-pr-table-first-column-width); // override the default left of 0 from u-sticky-left
+    }
 }
 </style>

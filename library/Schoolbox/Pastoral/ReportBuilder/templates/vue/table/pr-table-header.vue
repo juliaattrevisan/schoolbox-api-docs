@@ -103,7 +103,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
                     </ul>
                 </div>
             </th>
-            <td :class="`u-border-right ${props.isTotalSticky ? 'total-column u-sticky-left' : ''}`">&nbsp;</td>
+            <td :class="`u-border-right ${props.isTotalSticky ? 'u-sticky-left total-column--sticky' : ''}`">&nbsp;</td>
             <template v-if="hasSubTitles">
                 <th
                     v-for="(headerCell, index) in getFirstRowHeaders()"
@@ -120,7 +120,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
             <th
                 v-for="(header, index) in props.headers"
                 :key="header.key"
-                :class="`u-border-right title-column ${index === 0 ? 'u-sticky-left first-column' : ''} ${header.key === 'total' ? 'total-column' : ''} ${header.key === 'total' && props.isTotalSticky ? 'u-sticky-left' : ''} ${header.key === 'trend' ? 'trend-column' : ''}`"
+                :class="`u-border-right title-column ${index === 0 ? 'u-sticky-left first-column' : ''} ${header.key === 'total' ? 'total-column' : ''} ${header.key === 'total' && props.isTotalSticky ? 'u-sticky-left total-column--sticky' : ''} ${header.key === 'trend' ? 'trend-column' : ''}`"
             >
                 <button
                     v-if="header.isSortable"
@@ -164,9 +164,11 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
 }
 
 .total-column {
-    left: var(--sbx-pr-table-first-column-width); // will only be used when sticky
     min-width: var(--sbx-pr-table-total-column-width); // so points/records change doesn't trigger a reflow
     width: var(--sbx-pr-table-total-column-width);
+    &--sticky {
+        left: var(--sbx-pr-table-first-column-width); // override the default left of 0 from u-sticky-left
+    }
 }
 
 .trend-column {
