@@ -133,13 +133,10 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
             return false;
         }
 
-        const outputImage = response.data.response.output.filter((item) => item.type === "image_generation_call")[0];
-        const outputMessage = response.data.response.output.filter((item) => item.type === "message")[0];
+        const outputImage =
+            response.data.response.output.filter((item) => item.type === "image_generation_call")[0] ?? null;
+        const outputMessage = response.data.response.output.filter((item) => item.type === "message")[0] ?? null;
         const outputContent = outputMessage?.content[0] ?? null;
-
-        if (outputImage === null) {
-            throw new Error("No output image found in response");
-        }
 
         if (outputContent === null) {
             throw new Error("No output content found in response");
@@ -156,18 +153,28 @@ export const useImageGeneratorStore = defineStore("imageGenerator", () => {
             return false;
         }
 
+        if (outputImage === null || outputImage.result === null) {
+            // No output image? probably a refusal in the form of text
+            feed.value.push({
+                type: "response",
+                status: "error",
+                entryKey: getNextEntryKey(),
+                responseId: response.data.response.id,
+                message: outputContent.text,
+            });
+            return false;
+        }
+
         feed.value.push({
             type: "response",
             status: "success",
             entryKey: getNextEntryKey(),
             responseId: response.data.response.id,
-            image: outputImage.result
-                ? {
-                      b64: outputImage.result,
-                      name: "image.png",
-                      mime: "image/png",
-                  }
-                : null,
+            image: {
+                b64: outputImage.result,
+                name: "image.png",
+                mime: "image/png",
+            },
             message: outputContent.text,
         });
 

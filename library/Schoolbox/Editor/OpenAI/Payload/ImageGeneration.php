@@ -122,10 +122,11 @@ class ImageGeneration
              */
             'model' => $this->textModel,
             /* Make the image generation tool available and force it to be used
+             * since we're asking the AI to reject non-image requests, sometimes it shouldn't be forced - hence this is removed for now
              */
-            'tool_choice' => [
-                'type' => 'image_generation',
-            ],
+            // 'tool_choice' => [
+            //     'type' => 'image_generation',
+            // ],
             'tools' => [
                 [
                     'type' => 'image_generation',
