@@ -2,9 +2,9 @@
 import { useMarkbookStore } from "./store/markbookStore";
 import type { MarkbookActivity } from "./types/payload";
 import MbTableHead from "./mb-table-head.vue";
+import MbFeedback from "./mb-feedback.vue";
 import MbClassimplRows from "./mb-classimpl-rows.vue";
 import MbTableHeadActivityDropdown from "./mb-table-head-activity-dropdown.vue";
-import MbClassimplRowStudentFeedback from "./mb-classimpl-row-student-feedback.vue";
 
 interface Props {
     type: "course" | "class";
@@ -183,7 +183,7 @@ const exportReportRoute = window.Vue.computed(() => {
         <mb-table-head-activity-dropdown v-if="activityHeaderSelection" :activity="activityHeaderSelection" />
     </ul>
 
-    <mb-classimpl-row-student-feedback :max-height="FEEDBACK_DRAWER_HEIGHT" />
+    <mb-feedback :max-height="FEEDBACK_DRAWER_HEIGHT" />
 </template>
 
 <style scoped>
