@@ -15,6 +15,7 @@ services:
         ENV: ${ENV:-dev}
         PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
         PHP_MAJOR_VERSION: ${PHP_MAJOR_VERSION}
+        BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
     scale: 2
     deploy:
       mode: replicated

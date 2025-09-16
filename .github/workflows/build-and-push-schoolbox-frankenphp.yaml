@@ -111,6 +111,7 @@ jobs:
           build-args: |
             ENV=prod
             PHP_MAJOR_VERSION=${{ matrix.phpVersion }}
+            BASE_PHP_IMAGE=${{ vars.ECR_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}-prod
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           labels: ${{ steps.meta.outputs.labels }}
           tags: |
