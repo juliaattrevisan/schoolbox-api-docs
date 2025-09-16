@@ -112,9 +112,6 @@ tr.total-row {
     background: var(--sbx-pr-table-total-cell-colour);
     td.u-sticky-left {
         background: var(--sbx-pr-table-total-cell-colour);
-        &:hover {
-            background-color: var(--sbx-pr-table-row-hover-colour);
-        }
     }
 }
 

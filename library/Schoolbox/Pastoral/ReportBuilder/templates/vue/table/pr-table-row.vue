@@ -124,6 +124,9 @@ function onCellSelected(header: TableHeader): void {
 tr:hover {
     /* to help legibility, keeping the row in focus */
     background-color: var(--sbx-pr-table-row-hover-colour);
+    td {
+        background-color: var(--sbx-pr-table-row-hover-colour);
+    }
 }
 
 .total-cell {
@@ -142,7 +145,7 @@ tr:hover {
 
 <style lang="scss">
 /* to target the highcharts background specifically outside the scoped styles */
-tr:hover {
+tr:not(.total-row):hover {
     .highcharts-background {
         fill: var(--sbx-pr-table-row-hover-colour);
     }
