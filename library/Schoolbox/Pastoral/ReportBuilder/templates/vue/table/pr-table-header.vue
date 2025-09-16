@@ -154,9 +154,6 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
     &:has(.title-button) {
         padding: 0; // padding is handled by the button instead
     }
-    &.sorted {
-        background-color: var(--accent-background-light, #f0f0f0);
-    }
 }
 
 .first-header {

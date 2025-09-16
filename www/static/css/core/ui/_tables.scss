@@ -507,7 +507,7 @@ td:has(.u-td-button) {
     padding: 0; // padding is handled by the button instead
 }
 
-/* if sticky position is already set, so don't want to override to add relative */
+/* if position: sticky is already set we don't need to add position: relative */
 td:has(.u-td-button):not(.u-sticky-left) {
     position: relative;
 }

@@ -18,7 +18,7 @@ import PrTableRow from "./pr-table-row.vue";
 import PrTableFooter from "./pr-table-footer.vue";
 import PrTableModal from "./pr-table-modal.vue";
 
-// #region sticky table columns for bigger screens
+// #region sticky total/trend table columns for bigger screens
 
 const containerEl = window.Vue.useTemplateRef<HTMLDivElement>("containerRef");
 const { width: containerWidth } = useElementSize(containerEl);

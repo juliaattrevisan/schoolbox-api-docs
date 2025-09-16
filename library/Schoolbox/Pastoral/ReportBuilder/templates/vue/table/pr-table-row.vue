@@ -48,7 +48,7 @@ function onCellSelected(header: TableHeader): void {
 </script>
 
 <template>
-    <tr>
+    <tr class="pr-table-row">
         <td
             v-for="(header, index) in props.headers"
             :key="header.key"
@@ -121,7 +121,7 @@ function onCellSelected(header: TableHeader): void {
 </template>
 
 <style scoped lang="scss">
-tr:hover {
+.pr-table-row:hover {
     /* to help legibility, keeping the row in focus */
     background-color: var(--sbx-pr-table-row-hover-colour);
     td {
@@ -132,20 +132,20 @@ tr:hover {
 .total-cell {
     background: var(--sbx-pr-table-total-cell-colour);
     &--sticky {
-        left: var(--sbx-pr-table-first-header-width); // override the default left of 0 from u-sticky-left
+        left: var(--sbx-pr-table-first-header-width); // override the default left: 0 from u-sticky-left
     }
 }
 
 .trend-cell--sticky {
     left: calc(
         var(--sbx-pr-table-first-header-width) + var(--sbx-pr-table-total-header-width)
-    ); // override the default left of 0 from u-sticky-left
+    ); // override the default left: 0 from u-sticky-left
 }
 </style>
 
 <style lang="scss">
 /* to target the highcharts background specifically outside the scoped styles */
-tr:not(.total-row):hover {
+.pr-table-row:hover {
     .highcharts-background {
         fill: var(--sbx-pr-table-row-hover-colour);
     }

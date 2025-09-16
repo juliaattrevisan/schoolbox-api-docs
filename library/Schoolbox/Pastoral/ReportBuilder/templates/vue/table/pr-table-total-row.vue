@@ -39,7 +39,7 @@ function onCellSelected(header: TableHeader): void {
 </script>
 
 <template>
-    <tr class="total-row">
+    <tr class="pr-table-total-row">
         <td
             v-for="(header, index) in props.headers"
             :key="header.key"
@@ -108,7 +108,7 @@ function onCellSelected(header: TableHeader): void {
 
 <style scoped lang="scss">
 /* to make the totals more prominent in comparison to the rows below */
-tr.total-row {
+.pr-table-total-row {
     background: var(--sbx-pr-table-total-cell-colour);
     td.u-sticky-left {
         background: var(--sbx-pr-table-total-cell-colour);
@@ -116,19 +116,19 @@ tr.total-row {
 }
 
 .total-cell--sticky {
-    left: var(--sbx-pr-table-first-header-width); // will only be used when sticky
+    left: var(--sbx-pr-table-first-header-width); // override the default left: 0 from u-sticky-left
 }
 
 .trend-cell--sticky {
     left: calc(
         var(--sbx-pr-table-first-header-width) + var(--sbx-pr-table-total-header-width)
-    ); // override the default left of 0 from u-sticky-left
+    ); // override the default left: 0 from u-sticky-left
 }
 </style>
 
 <style lang="scss">
 /* to target the highcharts background specifically outside the scoped styles */
-tr.total-row {
+.pr-table-total-row {
     .highcharts-background {
         fill: var(--sbx-pr-table-total-cell-colour);
     }
