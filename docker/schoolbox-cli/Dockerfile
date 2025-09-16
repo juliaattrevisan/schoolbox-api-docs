@@ -63,7 +63,7 @@ case "$ENV" in
     ;;
   *)
     # AWS CLI install for current system architecture
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m)-${AWS_CLI_VERSION}.zip" -o "awscliv2.zip"
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m)-${AWS_CLI_VERSION}.zip" -f -o "awscliv2.zip" || exit 1
     unzip awscliv2.zip
     ./aws/install
     rm awscliv2.zip
