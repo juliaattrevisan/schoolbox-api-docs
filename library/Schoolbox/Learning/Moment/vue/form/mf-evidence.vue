@@ -426,6 +426,9 @@ window.Vue.watch(
             v-model:body="mfStore.moment.body"
             :config="editorSettings"
         />
+        <label v-if="mfStore.showInvalidEvidenceError" class="error" for="mf-evidence-textarea">
+            Evidence must be added to the learning moment before the form can be submitted
+        </label>
     </div>
 </template>
 

@@ -152,9 +152,6 @@ window.Vue.onMounted(() => {
 
                 <mf-sources />
             </section>
-            <div v-if="mfStore.showInvalidEvidenceError">
-                Evidence must be added to the learning moment before the form can be submitted
-            </div>
             <mf-actions :publish-label="props.publishLabel" />
         </div>
     </div>
