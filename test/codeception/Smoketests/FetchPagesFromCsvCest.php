@@ -165,7 +165,7 @@ class FetchPagesFromCsvCest
         $expected_result = $example[4];
 
         // For the URL: override the host if it's vagrant.dev.schoolbox.cloud
-        $baseUrl   = (new Factory(new Loader()))->buildFullyQualified();
+        $baseUrl   = new Uri($i->grabBaseUrl());
         $parsedUrl = new Uri($url);
         if ($parsedUrl->getHost() === 'vagrant.dev.schoolbox.cloud') {
             $parsedUrl = $parsedUrl->withHost($baseUrl->getHost());
