@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import { useMarkbookStore } from "./store/markbookStore";
 import type { MarkbookActivity } from "./types/payload";
 import MbTableHead from "./mb-table-head.vue";
@@ -175,19 +174,11 @@ const exportReportRoute = window.Vue.computed(() => {
         </table>
     </div>
 
-    <bottom-drawer :show-drawer="mbStore.feedbackSelectedCell !== null" :has-padding="false">
-        <mb-classimpl-row-student-feedback
-            v-if="mbStore.feedbackSelectedCell !== null"
-            :key="Object.values(mbStore.feedbackSelectedCell).join('-')"
-            :activity-id="mbStore.feedbackSelectedCell.activityId"
-            :class-impl-id="mbStore.feedbackSelectedCell.classImplId"
-            :student-id="mbStore.feedbackSelectedCell.studentId"
-        />
-    </bottom-drawer>
-
     <ul ref="activityHeaderDropdownEl" class="f-dropdown">
         <mb-table-head-activity-dropdown v-if="activityHeaderSelection" :activity="activityHeaderSelection" />
     </ul>
+
+    <mb-classimpl-row-student-feedback />
 </template>
 
 <style scoped>

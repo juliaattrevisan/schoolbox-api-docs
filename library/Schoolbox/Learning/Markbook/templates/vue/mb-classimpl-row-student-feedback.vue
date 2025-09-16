@@ -1,26 +1,14 @@
 <script setup lang="ts">
-/**
- * Please note, this component is NOT compatible with its props changing, use a :key to force a re-render
- * This is primarily caused by some dependencies down the chain of some of our jquery plugins, which makes it difficult to keep things in the right state
- */
-
 import { cloneDeep } from "lodash";
 import locale from "@js/terminology/rosettaStone";
+import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import CommentField from "@schoolboxLibrary/Learning/Assessment/templates/dueWork/vue/comment-field.vue";
 import ResubmissionRequired from "@schoolboxLibrary/Learning/Assessment/templates/dueWork/vue/resubmission-required.vue";
 import MarkScheme from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/mark-scheme.vue";
 import { ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useMarkbookStore } from "./store/markbookStore";
-import type { MarkbookClassImplStudent } from "./types/payload";
 import { useDynamicFeedback } from "./store/useDynamicFeedback";
 
-interface Props {
-    classImplId: number;
-    activityId: number;
-    studentId: MarkbookClassImplStudent["id"];
-}
-
-const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
 
 const commentRef = window.Vue.ref<string | null>("");
@@ -34,41 +22,43 @@ const resubmissionRequiredRef = window.Vue.ref<boolean>(false);
  */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- we want this more complex type to be inferred
 function getCellInfo() {
-    if (mbStore.data === null) {
+    if (mbStore.data === null || mbStore.feedbackSelectedCell === null) {
         return null;
     }
 
-    const activity = mbStore.data.assessments[props.activityId];
+    const { classImplId, activityId, studentId } = mbStore.feedbackSelectedCell;
+
+    const activity = mbStore.data.assessments[activityId];
     if (activity === undefined) {
         console.warn("Activity not found");
         return null;
     }
 
-    const classImpl = mbStore.data.classImpls[props.classImplId];
+    const classImpl = mbStore.data.classImpls[classImplId];
     if (activity === undefined) {
         console.warn("Class implementation not found");
         return null;
     }
 
-    const aImpl = classImpl.assessments[props.activityId];
+    const aImpl = classImpl.assessments[activityId];
     if (aImpl === undefined) {
         console.warn("aImpl not found");
         return null;
     }
 
-    const student = classImpl.students[props.studentId];
+    const student = classImpl.students[studentId];
     if (student === undefined) {
         console.warn("Student not found");
         return null;
     }
 
-    const participant = aImpl.participants[props.studentId];
+    const participant = aImpl.participants[studentId];
     if (participant === undefined) {
         console.warn("Participant not found");
         return null;
     }
 
-    const { postFeedback } = aImpl._routes.student[props.studentId];
+    const { postFeedback } = aImpl._routes.student[studentId];
     if (postFeedback === null) {
         console.warn("Post feedback route not found");
         return null;
@@ -141,6 +131,8 @@ function getCellInfo() {
     }
 
     return {
+        /** We need to key the whole form to ensure some of the jquery libraries down the chain attach properly each time it changes */
+        key: Object.values(mbStore.feedbackSelectedCell).join("-"),
         student,
         activity,
         classImpl,
@@ -153,7 +145,24 @@ function getCellInfo() {
     };
 }
 
-const cellInfo = window.Vue.ref<ReturnType<typeof getCellInfo> | null>(getCellInfo());
+const cellInfo = window.Vue.ref<ReturnType<typeof getCellInfo> | null>(null);
+
+window.Vue.watch(
+    () => mbStore.feedbackSelectedCell,
+    () => {
+        // Must clean up any existing feedback instance first, otherwise watchers build up and remain active...
+        if (cellInfo.value !== null) {
+            cellInfo.value.feedback.cleanup();
+        }
+
+        if (mbStore.feedbackSelectedCell !== null) {
+            cellInfo.value = getCellInfo();
+        }
+
+        // If it's now null, leave cellInfo set to whatever it was so the user sees the drawer content slide down correctly
+    },
+    { immediate: true },
+);
 
 /**
  * When the feedback is published, if it's successful - close the cell
@@ -171,8 +180,10 @@ async function onFeedbackPublish(): Promise<void> {
 </script>
 
 <template>
-    <template v-if="mbStore.data !== null && cellInfo !== null">
+    <bottom-drawer :show-drawer="mbStore.feedbackSelectedCell !== null" :has-padding="false">
         <form
+            v-if="mbStore.data !== null && cellInfo !== null"
+            :key="cellInfo.key"
             ref="feedbackRef"
             class="l-pad-s--top"
             :class="{ 'mb-feedback-loading': mbStore.feedbackUILoadingInfo !== null }"
@@ -270,7 +281,7 @@ async function onFeedbackPublish(): Promise<void> {
                 </div>
             </div>
         </form>
-    </template>
+    </bottom-drawer>
 </template>
 
 <style scoped lang="scss">
