@@ -39,6 +39,8 @@ class Mapper extends BaseMapper
         $this->uses('input_tokens', self::TYPE_INTEGER);
         $this->uses('output_tokens', self::TYPE_INTEGER);
         $this->uses('model', self::TYPE_STRING);
+        $this->uses('endpoint', self::TYPE_STRING);
+        $this->uses('feature', self::TYPE_STRING);
         $this->uses('response', self::TYPE_STRING);
         $this->uses('return_code', self::TYPE_INTEGER);
         $this->uses('error_message', self::TYPE_STRING);

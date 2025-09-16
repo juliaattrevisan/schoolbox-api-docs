@@ -23,6 +23,8 @@ class Model
     private ?int $inputTokens = null;
     private ?int $outputTokens = null;
     private ?string $model = null;
+    private ?string $endpoint = null;
+    private ?string $feature = null;
     private ?string $response = null;
     private ?int $returnCode = null;
     private ?string $errorMessage = null;
@@ -168,6 +170,42 @@ class Model
     public function setModel(?string $model): self
     {
         $this->model = $model;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEndpoint(): ?string
+    {
+        return $this->endpoint;
+    }
+
+    /**
+     * @param string|null $endpoint
+     * @return $this
+     */
+    public function setEndpoint(?string $endpoint): self
+    {
+        $this->endpoint = $endpoint;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getFeature(): ?string
+    {
+        return $this->feature;
+    }
+
+    /**
+     * @param string|null $feature
+     * @return $this
+     */
+    public function setFeature(?string $feature): self
+    {
+        $this->feature = $feature;
         return $this;
     }
 
