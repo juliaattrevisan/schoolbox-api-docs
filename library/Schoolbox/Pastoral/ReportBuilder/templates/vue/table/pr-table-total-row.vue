@@ -17,6 +17,7 @@ const props = defineProps<{
     rowData: { [key: string]: RowOptions };
     recordsOrPoints: "records" | "points";
     isTotalSticky: boolean;
+    isTrendSticky: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -42,7 +43,7 @@ function onCellSelected(header: TableHeader): void {
         <td
             v-for="(header, index) in props.headers"
             :key="header.key"
-            :class="`u-border-right ${index === 0 ? 'u-sticky-left u-sticky-left--row' : ''} ${header.key === 'total' && props.isTotalSticky ? 'u-sticky-left u-sticky-left--row total-cell--sticky' : ''}`"
+            :class="`u-border-right ${index === 0 ? 'u-sticky-left u-sticky-left--row' : ''} ${header.key === 'total' && props.isTotalSticky ? 'u-sticky-left u-sticky-left--row total-cell--sticky' : ''} ${header.key === 'trend' && props.isTrendSticky ? 'u-sticky-left u-sticky-left--row trend-cell--sticky' : ''}`"
         >
             <!-- The first cell is always just 'Total Records/Points' text -->
             <template v-if="header.key === props.headers[0].key">
@@ -119,6 +120,12 @@ tr.total-row {
 
 .total-cell--sticky {
     left: var(--sbx-pr-table-first-header-width); // will only be used when sticky
+}
+
+.trend-cell--sticky {
+    left: calc(
+        var(--sbx-pr-table-first-header-width) + var(--sbx-pr-table-total-header-width)
+    ); // override the default left of 0 from u-sticky-left
 }
 </style>
 

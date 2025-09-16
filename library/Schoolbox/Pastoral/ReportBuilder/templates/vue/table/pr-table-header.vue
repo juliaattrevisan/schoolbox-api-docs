@@ -12,6 +12,7 @@ const props = defineProps<{
     sortBy: string;
     order: "ASC" | "DESC";
     isTotalSticky: boolean;
+    isTrendSticky: boolean;
 }>();
 
 const config = window.Vue.inject<Config>("config");
@@ -120,7 +121,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
             <th
                 v-for="(header, index) in props.headers"
                 :key="header.key"
-                :class="`u-border-right title-header ${index === 0 ? 'u-sticky-left first-header' : ''} ${header.key === 'total' ? 'total-header' : ''} ${header.key === 'total' && props.isTotalSticky ? 'u-sticky-left total-header--sticky' : ''} ${header.key === 'trend' ? 'trend-header' : ''}`"
+                :class="`u-border-right title-header ${index === 0 ? 'u-sticky-left first-header' : ''} ${header.key === 'total' ? 'total-header' : ''} ${header.key === 'total' && props.isTotalSticky ? 'u-sticky-left total-header--sticky' : ''} ${header.key === 'trend' ? 'trend-header' : ''} ${header.key === 'trend' && props.isTrendSticky ? 'u-sticky-left trend-header--sticky' : ''}`"
             >
                 <button
                     v-if="header.isSortable"
@@ -174,6 +175,11 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
 .trend-header {
     min-width: 220px;
     width: 220px;
+    &--sticky {
+        left: calc(
+            var(--sbx-pr-table-first-header-width) + var(--sbx-pr-table-total-header-width)
+        ); // override the default left of 0 from u-sticky-left
+    }
 }
 
 .title-button {
