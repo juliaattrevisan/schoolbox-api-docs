@@ -4,6 +4,7 @@
  */
 
 import type { Ref } from "vue";
+import { useElementSize } from "@vueuse/core";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import type { TablePayload, TableHeader, SelectedCell, RowKeys, Tab } from "../../js/types/pastoralReportTypes";
@@ -16,6 +17,14 @@ import PrTableTotalRow from "./pr-table-total-row.vue";
 import PrTableRow from "./pr-table-row.vue";
 import PrTableFooter from "./pr-table-footer.vue";
 import PrTableModal from "./pr-table-modal.vue";
+
+// #region sticky table columns for bigger screens
+
+const tableEl = window.Vue.useTemplateRef<HTMLDivElement>("tableRef");
+const { width: tableWidth } = useElementSize(tableEl);
+const isTotalSticky = window.Vue.computed(() => tableWidth.value < 800);
+
+// #endregion
 
 // #region table load / sorting / pagination
 
@@ -147,7 +156,7 @@ window.Vue.onMounted(() => {
             :style="{ maxHeight: maxScrollableHeight }"
             data-test="pr-table"
         >
-            <table class="pr-table">
+            <table ref="tableRef" class="pr-table">
                 <pr-table-header
                     v-model:records-or-points="recordsOrPoints"
                     :headers="(payload as TablePayload).data.tableHeaders"
