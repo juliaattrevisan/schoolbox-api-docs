@@ -176,6 +176,11 @@
                                 {# each class assessment may have different mark scheme / other settings, use that assessment, not the spec #}
                                 {% set specAssessment = assessment %}
                                 {% set assessment = aImpl.assessment %}
+
+                                {# not all assessment types have interactionLocked, this is currently just for Due Work #}
+                                {% set interactionLocked = aImpl.interactionLocked ?? false %}
+                                {% set readonly = interactionLocked and not USER.superUser %}
+
                                 {% block participant %}{% endblock %}
                                 {# reset back to the spec #}
                                 {% set assessment = specAssessment %}
