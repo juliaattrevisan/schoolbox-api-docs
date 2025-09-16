@@ -8,7 +8,7 @@
      - statusReviewed:   a string representing the 'reviewed'   state
      - errors:           string[]  Admin-configured submission states, eg 'Absent', 'Pending', 'Not Submitted' etc
      - rubricMarks:       bool[]  Whether the student's instructor-given feedback exists and has rubric marks, indexed by user.id
-     - interactionLocked: bool Is the assessment locked for interactions because it is due in an archived term?
+     - readonly: bool     Is the assessment read-only for this user?
      - selfAssess:        bool            Is this being viewed in a self assessment context?
      - selfReflect:       bool            Is this being viewed in a self reflection context?
      - blindReviewUrl:   string
@@ -24,7 +24,7 @@
 {% set labelReviewed   = 'Reviewed' %}
 {% set statusFailed    = 'failed' %}
 
-{% set readonly = interactionLocked and not USER.superUser %}
+{% set allReadonly = allInteractionsLocked and not USER.superUser %}
 
 {% block headerOptions %}
     {% set kamiWorksheetRoute = routeLookupIfAuthorized('learningAssessment.getWorksheet', {assessmentId: assessment.id, assessment: assessment}) %}
@@ -33,9 +33,12 @@
             <a id="kamiWorksheet" class="icon-surveys" href="{{ kamiWorksheetRoute }}">Class View</a>
         </li>
     {% endif %}
-    <li>
-        <a id="import-feedback" data-reveal-id="importFeedbackModal" class="icon-upload">Import Feedback</a>
-    </li>
+
+    {% if not allReadonly %}
+        <li>
+            <a id="import-feedback" data-reveal-id="importFeedbackModal" class="icon-upload">Import Feedback</a>
+        </li>
+    {% endif %}
 
     {% if assessment.isImplementation %}
         {% if blindReviewUrl %}
@@ -59,7 +62,7 @@
                    class="icon-criteria">Rubric Report</a>
             </li>
         {% endif %}
-        {% if not readonly %}
+        {% if not allReadonly %}
             <li class="separator">Bulk Actions</li>
             <li><a class="icon-approve" data-mass="submit" data-reveal-id="manage-submissions">Manage submissions</a></li>
             <li><a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish">Publish grades & feedback</a></li>
@@ -87,7 +90,7 @@
  # Massive javascript hulk
  #}
 {% block scripts %}
-    {% if not readonly %}
+    {% if not allReadonly %}
         {% if assessment.isImplementation %}
             <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/jquery.select-all.basic.js?v={{ config.site_version }}"></script>
             <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.bulky.js?v={{ config.site_version }}"></script>

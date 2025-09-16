@@ -328,6 +328,21 @@ class Controller extends Assessment\Controller
             }
         }
 
+        /**
+         * It's possible to load this page when only some of the assessments are locked for interactions
+         * In that case, the user should still be able to edit feedback for the ones that aren't locked
+         * but they shouldn't be able to import feedback or do bulk operations on the locked ones...
+         *
+         * If all interactions are locked, then don't show the import feedback button at all
+         */
+        $interactionLockedCount = 0;
+        foreach ($aImpls as $i => $aImpl) {
+            $aImpls[$i]['interactionLocked'] = (new LockedChecker($this->getTermMapper()))->isLockedForInteractions($aImpl['assessment']);
+            if ($aImpls[$i]['interactionLocked']) {
+                $interactionLockedCount += 1;
+            }
+        }
+
         $twigData = [
             'errors'            => $this->stateMapper->listDisplayValues(),
             'type'              => Assessment\AssessmentType::objectToString($assessment),
@@ -342,7 +357,7 @@ class Controller extends Assessment\Controller
             // Only display download link if there are actually files to download
             'download'          => $this->hasDownloadableSubmissionFiles($assessment),
             'rubricMarks'       => RubricIndicatorMarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
-            'interactionLocked' => (new Assessment\LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment),
+            'allInteractionsLocked' => $interactionLockedCount === count($aImpls),
             'selfReflect'       => false,
             'selfAssess'        => false,
             /* Find the first valid Blind Review url
