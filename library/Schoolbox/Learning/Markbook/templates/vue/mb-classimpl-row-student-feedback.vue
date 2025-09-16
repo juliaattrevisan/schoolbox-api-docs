@@ -18,6 +18,8 @@ const mbStore = useMarkbookStore();
 
 const feedbackEl = window.Vue.useTemplateRef<HTMLElement | null>("feedbackRef");
 
+const lazyCommentRef = window.Vue.ref<string | null>(""); // for lazy loading the editor
+
 const commentRef = window.Vue.ref<string | null>("");
 const markRef = window.Vue.ref<string | null>(null);
 const resubmissionRequiredRef = window.Vue.ref<boolean>(false);
@@ -302,6 +304,18 @@ async function onFeedbackPublish(): Promise<void> {
                 </div>
             </div>
         </form>
+        <!--
+        this is literally here just to lazy load an editor behind the scenes and make it so that the
+        first time you open up the drawer it feels MUCH faster. the ckeditor appears to take a decently
+        noticable time to load so this avoids having to deal with that and then seeing a jerk in the UI
+        -->
+        <comment-field
+            v-else
+            v-model:comment="lazyCommentRef"
+            :participant="{ user: { id: 0, givenName: '' } }"
+            :is-rich-text="true"
+            :templates="mbStore.editorTemplates"
+        />
     </bottom-drawer>
 </template>
 
