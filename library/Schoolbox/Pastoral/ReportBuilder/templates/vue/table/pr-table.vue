@@ -22,7 +22,7 @@ import PrTableModal from "./pr-table-modal.vue";
 
 const tableEl = window.Vue.useTemplateRef<HTMLDivElement>("tableRef");
 const { width: tableWidth } = useElementSize(tableEl);
-const isTotalSticky = window.Vue.computed(() => tableWidth.value < 800);
+const isTotalSticky = window.Vue.computed(() => tableWidth.value > 800);
 
 // #endregion
 
@@ -162,6 +162,7 @@ window.Vue.onMounted(() => {
                     :headers="(payload as TablePayload).data.tableHeaders"
                     :sort-by="sortBy"
                     :order="order"
+                    :is-total-sticky="isTotalSticky"
                     @sort="onSort"
                 />
                 <!-- Skeleton loading state when switching between records/rows and sorting -->
@@ -172,6 +173,7 @@ window.Vue.onMounted(() => {
                         :headers="(payload as TablePayload).data.tableHeaders"
                         :row-data="(payload as TablePayload).data.totalRow"
                         :records-or-points="recordsOrPoints"
+                        :is-total-sticky="isTotalSticky"
                         @cell-select="onTotalCellSelect"
                     />
                     <!-- All other rows -->
@@ -181,6 +183,7 @@ window.Vue.onMounted(() => {
                         :headers="(payload as TablePayload).data.tableHeaders"
                         :row-data="row"
                         :records-or-points="recordsOrPoints"
+                        :is-total-sticky="isTotalSticky"
                         @cell-select="onRowCellSelect"
                     />
                 </tbody>

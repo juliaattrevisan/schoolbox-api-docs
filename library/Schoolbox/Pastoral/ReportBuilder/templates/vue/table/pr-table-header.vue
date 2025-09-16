@@ -11,6 +11,7 @@ const props = defineProps<{
     headers: TableHeader[];
     sortBy: string;
     order: "ASC" | "DESC";
+    isTotalSticky: boolean;
 }>();
 
 const config = window.Vue.inject<Config>("config");
@@ -102,7 +103,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
                     </ul>
                 </div>
             </th>
-            <td class="u-border-right">&nbsp;</td>
+            <td :class="`u-border-right ${props.isTotalSticky ? 'u-sticky-left' : ''}`">&nbsp;</td>
             <template v-if="hasSubTitles">
                 <th
                     v-for="(headerCell, index) in getFirstRowHeaders()"
@@ -119,7 +120,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
             <th
                 v-for="(header, index) in props.headers"
                 :key="header.key"
-                :class="`u-border-right title-column ${index === 0 ? 'u-sticky-left first-column' : ''} ${header.key === 'total' ? 'total-column' : ''} ${header.key === 'trend' ? 'trend-column' : ''}`"
+                :class="`u-border-right title-column ${index === 0 ? 'u-sticky-left first-column' : ''} ${header.key === 'total' ? 'total-column' : ''} ${header.key === 'total' && props.isTotalSticky ? 'u-sticky-left' : ''} ${header.key === 'trend' ? 'trend-column' : ''}`"
             >
                 <button
                     v-if="header.isSortable"
