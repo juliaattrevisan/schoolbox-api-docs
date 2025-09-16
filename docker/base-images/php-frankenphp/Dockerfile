@@ -6,7 +6,7 @@
 ARG ENV=dev
 ARG PHP_MAJOR_VERSION=8.4
 
-FROM dunglas/frankenphp:1.8-php${PHP_MAJOR_VERSION}-bookworm
+FROM dunglas/frankenphp:1.9-php${PHP_MAJOR_VERSION}-trixie
 
 ARG PHP_MAJOR_VERSION
 
