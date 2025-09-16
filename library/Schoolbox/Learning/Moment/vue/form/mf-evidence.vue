@@ -265,6 +265,19 @@ window.Vue.watch(
         onEvidenceUploaded();
     },
 );
+
+/**
+ * Watch for changes to the moment body.
+ * If the moment body is empty and no evidence is attached, show the invalid evidence error.
+ */
+window.Vue.watch(
+    () => mfStore.moment?.body,
+    (newValue, oldValue) => {
+        if (newValue !== oldValue && mfStore.moment) {
+            mfStore.showInvalidEvidenceError = (newValue === '' && mfStore.moment.evidence.length === 0);
+        }
+    }
+);
 </script>
 
 <template>
