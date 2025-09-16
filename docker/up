@@ -11,6 +11,7 @@ declare MARIADB_PUBLISHED_PORT
 declare MARIADB_PUBLISHED_PORT
 declare REDIS_STORAGE_PUBLISHED_PORT
 declare REDIS_CACHE_PUBLISHED_PORT
+declare BASE_IMAGE_BUILD_FROM_LOCAL
 declare TASKD_BUILD_FROM_LOCAL
 declare PRIVATE_CONTAINER_REGISTRY_TYPE
 declare PRIVATE_CONTAINER_REGISTRY_DOCKERHUB_USERNAME
@@ -171,6 +172,19 @@ function build_docker_compose_args() {
 }
 
 function start_containers() {
+    # Should the base image be built locally, or downloaded from the registry?
+
+    # Pass base_image as parameter into docker-compose
+    base_image=''
+    case "${BASE_IMAGE_BUILD_FROM_LOCAL}" in
+        1 | true | yes | on)
+            base_image="php-frankenphp"
+            ;;
+        *)
+            base_image="${private_container_registry}/frankenphp-base:latest-php${PHP_MAJOR_VERSION}-dev"
+            ;;
+    esac
+
     # Which task daemon compose file is used?
     # A different one is used when using a locally built container, vs. using
     # one pulled from the private container registry.
