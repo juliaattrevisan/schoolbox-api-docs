@@ -146,9 +146,17 @@
                         .map((el) => el.getAttribute('data-user-id'));
 
                     const shareButton = document.querySelector('#{{ revealId }} [data-moment-share-submit]');
+
+                    // if no users are selected, disable the button
+                    if (checkedUserIds.length === 0) {
+                        shareButton.setAttribute('disabled', 'true');
+                        shareButton.setAttribute('href', '#'); // prevent tab navigation to the button and clicking it that way
+                        return;
+                    }
+
+                    // otherwise build up the new URL and allow the button to be clicked
                     shareButton.removeAttribute('disabled');
 
-                    // build up the new URL
                     const params = new URLSearchParams();
                     params.set('folderId', '{{ folder.id }}');
                     params.set('{{ RETURN_URL.name }}', window.btoa(window.location.pathname));
@@ -157,11 +165,6 @@
                     // the route generator will leave behind a {userIds} for us to inject to
                     const href = `{{ routeLookupIfAuthorized('learningMomentEvidence.getCreateForm') }}`.replace('{userIds}', checkedUserIds.join(','));
                     shareButton.setAttribute('href', `${href}?${params.toString()}`);
-
-                    if (checkedUserIds.length === 0) {
-                        shareButton.setAttribute('disabled', 'true');
-                        return;
-                    }
                 }
 
                 window.sbProps.injectScriptsIfNotLoaded(
