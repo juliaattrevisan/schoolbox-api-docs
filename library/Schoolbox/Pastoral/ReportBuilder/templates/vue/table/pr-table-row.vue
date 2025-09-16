@@ -118,7 +118,7 @@ function onCellSelected(header: TableHeader): void {
     </tr>
 </template>
 
-<style lang="scss">
+<style scoped lang="scss">
 tr:hover {
     /* to help legibility, keeping the row in focus */
     background-color: var(--sbx-pr-table-row-hover-colour);
