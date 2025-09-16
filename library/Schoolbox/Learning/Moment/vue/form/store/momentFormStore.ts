@@ -50,6 +50,7 @@ export const useMomentFormStore = defineStore("momentForm", () => {
 
     const isSaving = window.Vue.ref<boolean>(false);
     const saveError = window.Vue.ref<string | null>(null);
+    const showInvalidEvidenceError = window.Vue.ref<boolean>(false);
 
     /**
      * The current payload of the form
@@ -282,6 +283,7 @@ export const useMomentFormStore = defineStore("momentForm", () => {
         moment.value = $moment;
         folders.value = $folders;
         selectedFolders.value = $selectedFolders;
+        showInvalidEvidenceError.value = (moment.value.body === "" && moment.value.evidence.length === 0);
 
         /**
          * When autosave is possible, keep an eye on the form payload
@@ -324,5 +326,6 @@ export const useMomentFormStore = defineStore("momentForm", () => {
         publish,
         deleteMoment,
         toggleFolderSelection,
+        showInvalidEvidenceError,
     };
 });

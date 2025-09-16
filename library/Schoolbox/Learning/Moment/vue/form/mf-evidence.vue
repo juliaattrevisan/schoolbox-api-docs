@@ -60,6 +60,7 @@ function onEvidenceUploaded(): void {
 
     mediaType.value = null;
     selectedEvidenceId.value = mfStore.moment.evidence.length - 1; // select the newly added evidence
+    mfStore.showInvalidEvidenceError = false;
 }
 
 /**
@@ -144,6 +145,7 @@ async function deleteEvidence(index: number): Promise<void> {
 
     if (mfStore.moment.evidence.length === 0 && mediaType.value !== MediaType.TEXT) {
         // if there's no evidence left, default back to text mode
+        mfStore.showInvalidEvidenceError = true;
         await changeMediaType(MediaType.TEXT);
     }
 
