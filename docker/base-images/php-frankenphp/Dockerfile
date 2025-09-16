@@ -20,7 +20,6 @@ RUN apt-get update && apt-get upgrade -y && \
     install-php-extensions \
     imagick \
     pdo_mysql \
-    pdo_sqlsrv \
     excimer \
     curl \
     ldap \
