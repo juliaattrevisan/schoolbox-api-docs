@@ -179,6 +179,13 @@ function start_containers() {
     case "${BASE_IMAGE_BUILD_FROM_LOCAL}" in
         1 | true | yes | on)
             base_image="php-frankenphp"
+            # Build frankenphp image before starting default env,
+            # as containers now rely upon it
+            docker build --progress=plain \
+                -t "${base_image}" \
+                --build-arg "ENV=dev" \
+                --build-arg "PHP_MAJOR_VERSION=${PHP_MAJOR_VERSION}" \
+                "docker/base-images/php-frankenphp/"
             ;;
         *)
             base_image="${private_container_registry}/frankenphp-base:latest-php${PHP_MAJOR_VERSION}-dev"
