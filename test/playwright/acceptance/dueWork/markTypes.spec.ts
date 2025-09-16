@@ -132,7 +132,7 @@ test.describe("Due Work - Mark type tests", () => {
         await assessmentForm.toggleRubricIndicator(0, 446);
         await assessmentForm.fillRubricCriterionPoints(0, 446, 0, "1");
         await assessmentForm.fillRubricCriterionPoints(0, 446, 1, "2");
-        await assessmentForm.clickCreate();
+        await assessmentForm.create();
     });
 
     /**
