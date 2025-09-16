@@ -12,7 +12,6 @@ tour:
         title: What's New
         type: modal
         content: "<img src='{CDN_PREFIX}/images/tour/25.1/25_1_WhatsNewModal_Artwork_1920x1080_InteractiveCourseMarkbook.png' style='width:100%;margin-bottom:16px;'>
-                  <h3>Interactive Course Markbook</h3>
                   <p>Save hours on marking with our updated course markbook. You can now enter, moderate, and publish feedback for an entire course in one simple workflow.</p>
-                  <p>To learn more, see the <a href='/help/sso/send?returnUrl=/homepage/5460#textbox-502752-5670'>release notes</a>.</p>"
+                  <p>To learn more, see the <a href='/help/sso/send?returnUrl=/homepage/5460#textbox-502752-5670' target='_blank'>release notes</a>.</p>"
         class: introjs-whatsnewmodal
