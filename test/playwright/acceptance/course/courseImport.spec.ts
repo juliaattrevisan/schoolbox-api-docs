@@ -11,6 +11,7 @@ import TemplateList from "@schoolboxTest/playwright/support/page/lessonPlan/Temp
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
 import ManageGroup from "@schoolboxTest/playwright/support/page/group/ManageGroup";
 import dayjs from "dayjs";
+import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 
 test.describe("Course import tests", () => {
     // Run tests serially, as tests rely on prior tests to have been run
@@ -382,6 +383,102 @@ test.describe("Course import tests", () => {
         );
     });
 
+    test("Create activities via course outline, save into the course, delete activities, check students cannot view activities with open date in the future", async ({
+        tester,
+        page,
+        db,
+    }) => {
+        const homepage = new Homepage(tester, page);
+        const assessmentForm = new AssessmentForm(tester, page);
+        const unitName = "Romeo and Juliet";
+        const dueWorkName = `Due Work via Course Outline`;
+        const taskName = `Task via Course Outline`;
+
+        const folderId = (await db.grabFromDatabase("folder", "id", {
+            name: "Automation Course Import Folder1",
+            deleted_at: null,
+        })) as string;
+
+        await tester.impersonate("Jack Coles");
+
+        tester.isGoingTo("navigate to the class homepage to create a due work and a task via course outline");
+        await page.goto(`/homepage/${folderId}`);
+
+        const courseOutline = homepage.locateComponentByName("Course Outline");
+        const courseOutlineId = await courseOutline.getAttribute("id");
+        const courseOutlineUnit = courseOutline.locator("li[data-unit]").filter({ hasText: unitName });
+        const newUnitId = Number(await courseOutlineUnit.getAttribute("data-unit"));
+        await courseOutlineUnit.getByTestId(`sbx-pop-out-${courseOutlineId}-unit-options${newUnitId}-button`).click();
+        await courseOutlineUnit.locator("[data-dropdown-content] [data-add-button].icon-due-work").click();
+
+        tester.isGoingTo("Create a due work with open date in the future");
+        const dueWorkOpenDate = new Date();
+        dueWorkOpenDate.setDate(dueWorkOpenDate.getDate() + 5); // 5 days from now
+        const dueWorkDueDate = new Date();
+        dueWorkDueDate.setDate(dueWorkDueDate.getDate() + 10); // 10 days from now
+        await assessmentForm.setTitle(dueWorkName);
+        await assessmentForm.setDueDate(dueWorkDueDate);
+        await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
+        await assessmentForm.setPublishDate(dueWorkOpenDate);
+        await assessmentForm.create();
+        const dueworkId = (await db.grabFromDatabase("assessment", "id", {
+            deleted_at: null,
+            "title LIKE": dueWorkName,
+        })) as number;
+
+        tester.isGoingTo("Create a task");
+        await courseOutlineUnit.getByTestId(`sbx-pop-out-${courseOutlineId}-unit-options${newUnitId}-button`).click();
+        await courseOutlineUnit.getByTestId("course-outline-task-add-task").click();
+        await assessmentForm.setTitle(taskName);
+        await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
+        await assessmentForm.create();
+        const taskId = (await db.grabFromDatabase("assessment", "id", {
+            deleted_at: null,
+            "title LIKE": taskName,
+        })) as number;
+
+        tester.isGoingTo("as Jack Coles, check the due work and task are presented in the course outline");
+        await expect(page.getByTestId(`course-outline-assessment-title-${dueWorkName}`)).toContainText(dueWorkName);
+        await expect(page.getByTestId(`course-outline-assessment-title-${taskName}`)).toContainText(taskName);
+
+        tester.isGoingTo("save the due work and task into the course via course outline");
+        await courseOutlineUnit.getByTestId(`sbx-pop-out-${courseOutlineId}-options-task${taskId}-button`).click();
+        await courseOutlineUnit
+            .locator(`a[data-reveal-id="${courseOutlineId}-save-to-course-modal-${taskId}"]`)
+            .click();
+        await page.locator(`a[href="/course/export/unitspecs/15/assessment/${taskId}"]`).getByText("Yes").click();
+        await courseOutlineUnit.getByTestId(`sbx-pop-out-${courseOutlineId}-options-task${dueworkId}-button`).click();
+        await courseOutlineUnit
+            .locator(`a[data-reveal-id="${courseOutlineId}-save-to-course-modal-${dueworkId}"]`)
+            .click();
+        await page.locator(`a[href="/course/export/unitspecs/15/assessment/${dueworkId}"]`).getByText("Yes").click();
+
+        tester.isGoingTo("navigate to Romeo and Juliet unit page and check the assessment are presented");
+        await page.goto("/homepage/88");
+        await expect(page.getByTestId(`course-builder-assessment-title-${dueWorkName}`)).toContainText(dueWorkName);
+        await expect(page.getByTestId(`course-builder-assessment-title-${taskName}`)).toContainText(taskName);
+
+        tester.isGoingTo("as Jana Reed, check the course outline is showing the task and hides the due work ");
+        await tester.impersonate("Jana Reed");
+        await page.goto(`/homepage/${folderId}`);
+        await expect(page.getByTestId(`course-outline-assessment-title-${taskName}`)).toBeVisible();
+        await expect(page.getByTestId(`course-outline-assessment-title-${dueWorkName}`)).not.toBeVisible();
+
+        tester.isGoingTo("as Jack Coles, delete the due work and task created via course outline");
+        await tester.impersonate("Jack Coles");
+        await page.goto(`/homepage/${folderId}`);
+        await courseOutlineUnit.getByTestId(`sbx-pop-out-${courseOutlineId}-options-task${taskId}-button`).click();
+        await page.locator(`a[href="/learning/assessments/${taskId}/delete"]`).getByText("Delete").click();
+        await page.getByTestId("confirm-dialog-confirm-button").getByText("Yes, permanently delete").click();
+        await page.reload();
+        await courseOutlineUnit.getByTestId(`sbx-pop-out-${courseOutlineId}-options-task${dueworkId}-button`).click();
+        await page.locator(`a[href="/learning/assessments/${dueworkId}/delete"]`).getByText("Delete").click();
+        await page.getByTestId("confirm-dialog-confirm-button").getByText("Yes, permanently delete").click();
+        await page.reload();
+        await expect(page.getByTestId(`course-outline-assessment-title-${taskName}`)).not.toBeVisible();
+        await expect(page.getByTestId(`course-outline-assessment-title-${dueWorkName}`)).not.toBeVisible();
+    });
+
     test.afterEach(async ({ tester }) => {
         await tester.logout();
     });
@@ -393,6 +490,11 @@ test.describe("Course import tests", () => {
             "assessment",
             { deleted_at: "2022-01-15 11:22:34" },
             { "title like": "Export Activity%", deleted_at: null },
+        );
+        await db.updateInDatabase(
+            "assessment",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": "%Course Outline%", deleted_at: null },
         );
     });
 });
