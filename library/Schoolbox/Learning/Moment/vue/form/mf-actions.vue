@@ -28,7 +28,9 @@ const relevantRoutes = window.Vue.computed(() => {
     return {};
 });
 
-const isSaveSubmitPublishButtonDisabled = window.Vue.computed(() => mfStore.isSaving || mfStore.showInvalidEvidenceError);
+const isSaveSubmitPublishButtonDisabled = window.Vue.computed(
+    () => mfStore.isSaving || mfStore.showInvalidEvidenceError,
+);
 </script>
 
 <template>
