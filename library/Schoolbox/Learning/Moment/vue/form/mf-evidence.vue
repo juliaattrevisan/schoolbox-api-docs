@@ -274,9 +274,9 @@ window.Vue.watch(
     () => mfStore.moment?.body,
     (newValue, oldValue) => {
         if (newValue !== oldValue && mfStore.moment) {
-            mfStore.showInvalidEvidenceError = (newValue === '' && mfStore.moment.evidence.length === 0);
+            mfStore.showInvalidEvidenceError = newValue === "" && mfStore.moment.evidence.length === 0;
         }
-    }
+    },
 );
 </script>
 

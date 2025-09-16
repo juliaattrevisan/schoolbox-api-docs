@@ -28,9 +28,7 @@ const relevantRoutes = window.Vue.computed(() => {
     return {};
 });
 
-const isSubmitPublishButtonDisabled = window.Vue.computed(() =>
-    mfStore.isSaving || mfStore.showInvalidEvidenceError
-);
+const isSubmitPublishButtonDisabled = window.Vue.computed(() => mfStore.isSaving || mfStore.showInvalidEvidenceError);
 </script>
 
 <template>
@@ -44,7 +42,11 @@ const isSubmitPublishButtonDisabled = window.Vue.computed(() =>
             <button :disabled="mfStore.isSaving" @click="() => mfStore.reject()">Request update</button>
         </li>
         <li v-if="relevantRoutes.submit">
-            <button :disabled="isSubmitPublishButtonDisabled" class="submit" @click="() => mfStore.submitForm(false, 'submit')">
+            <button
+                :disabled="isSubmitPublishButtonDisabled"
+                class="submit"
+                @click="() => mfStore.submitForm(false, 'submit')"
+            >
                 Submit for approval
             </button>
         </li>

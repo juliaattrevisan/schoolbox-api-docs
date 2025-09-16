@@ -283,7 +283,7 @@ export const useMomentFormStore = defineStore("momentForm", () => {
         moment.value = $moment;
         folders.value = $folders;
         selectedFolders.value = $selectedFolders;
-        showInvalidEvidenceError.value = (moment.value.body === "" && moment.value.evidence.length === 0);
+        showInvalidEvidenceError.value = moment.value.body === "" && moment.value.evidence.length === 0;
 
         /**
          * When autosave is possible, keep an eye on the form payload
