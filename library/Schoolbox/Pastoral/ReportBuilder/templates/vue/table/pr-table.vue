@@ -216,7 +216,9 @@ window.Vue.onMounted(() => {
         z-index: var(--sbx-depth-ui-sticky);
     }
 }
+</style>
 
+<style lang="scss">
 .highcharts-tooltip-container {
     z-index: var(--sbx-depth-pop-over) !important;
 }

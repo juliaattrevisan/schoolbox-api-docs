@@ -115,12 +115,18 @@ tr.total-row {
             background-color: var(--sbx-pr-table-row-hover-colour);
         }
     }
-    .highcharts-background {
-        fill: var(--sbx-pr-table-total-cell-colour);
-    }
 }
 
 .total-cell--sticky {
     left: var(--sbx-pr-table-first-header-width); // will only be used when sticky
+}
+</style>
+
+<style lang="scss">
+/* to target the highcharts background specifically outside the scoped styles */
+tr.total-row {
+    .highcharts-background {
+        fill: var(--sbx-pr-table-total-cell-colour);
+    }
 }
 </style>

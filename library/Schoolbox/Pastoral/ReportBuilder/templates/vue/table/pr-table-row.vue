@@ -123,15 +123,21 @@ function onCellSelected(header: TableHeader): void {
 tr:hover {
     /* to help legibility, keeping the row in focus */
     background-color: var(--sbx-pr-table-row-hover-colour);
-    .highcharts-background {
-        fill: var(--sbx-pr-table-row-hover-colour);
-    }
 }
 
 .total-cell {
     background: var(--sbx-pr-table-total-cell-colour);
     &--sticky {
         left: var(--sbx-pr-table-first-header-width); // override the default left of 0 from u-sticky-left
+    }
+}
+</style>
+
+<style lang="scss">
+/* to target the highcharts background specifically outside the scoped styles */
+tr:hover {
+    .highcharts-background {
+        fill: var(--sbx-pr-table-row-hover-colour);
     }
 }
 </style>
