@@ -43,7 +43,19 @@ function onCellSelected(header: TableHeader): void {
         <td
             v-for="(header, index) in props.headers"
             :key="header.key"
-            :class="`u-border-right ${index === 0 ? 'u-sticky-left u-sticky-left--row' : ''} ${header.key === 'total' && props.isTotalSticky ? 'u-sticky-left u-sticky-left--row total-cell--sticky' : ''} ${header.key === 'trend' && props.isTrendSticky ? 'u-sticky-left u-sticky-left--row trend-cell--sticky' : ''}`"
+            :class="{
+                'u-border-right': true,
+                'u-sticky-left':
+                    index === 0 ||
+                    (header.key === 'total' && props.isTotalSticky) ||
+                    (header.key === 'trend' && props.isTrendSticky),
+                'u-sticky-left--row':
+                    index === 0 ||
+                    (header.key === 'total' && props.isTotalSticky) ||
+                    (header.key === 'trend' && props.isTrendSticky),
+                'total-cell--sticky': header.key === 'total' && props.isTotalSticky,
+                'trend-cell--sticky': header.key === 'trend' && props.isTrendSticky,
+            }"
         >
             <!-- The first cell is always just 'Total Records/Points' text -->
             <template v-if="header.key === props.headers[0].key">

@@ -121,7 +121,19 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
             <th
                 v-for="(header, index) in props.headers"
                 :key="header.key"
-                :class="`u-border-right title-header ${index === 0 ? 'u-sticky-left first-header' : ''} ${header.key === 'total' ? 'total-header' : ''} ${header.key === 'total' && props.isTotalSticky ? 'u-sticky-left total-header--sticky' : ''} ${header.key === 'trend' ? 'trend-header' : ''} ${header.key === 'trend' && props.isTrendSticky ? 'u-sticky-left trend-header--sticky' : ''}`"
+                :class="{
+                    'u-border-right': true,
+                    'title-header': true,
+                    'u-sticky-left':
+                        index === 0 ||
+                        (header.key === 'total' && props.isTotalSticky) ||
+                        (header.key === 'trend' && props.isTrendSticky),
+                    'first-header': index === 0,
+                    'total-header': header.key === 'total',
+                    'total-header--sticky': header.key === 'total' && props.isTotalSticky,
+                    'trend-header': header.key === 'trend',
+                    'trend-header--sticky': header.key === 'trend' && props.isTrendSticky,
+                }"
             >
                 <button
                     v-if="header.isSortable"

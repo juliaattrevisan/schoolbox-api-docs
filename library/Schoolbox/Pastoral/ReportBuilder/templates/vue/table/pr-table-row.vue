@@ -52,7 +52,21 @@ function onCellSelected(header: TableHeader): void {
         <td
             v-for="(header, index) in props.headers"
             :key="header.key"
-            :class="`u-border-right ${index === 0 ? 'u-sticky-left u-sticky-left--row ' : ''} ${header.key === 'user' ? 'l-pad--0' : ''} ${header.key === 'total' ? 'total-cell' : ''} ${header.key === 'total' && props.isTotalSticky ? 'u-sticky-left u-sticky-left--row total-cell--sticky' : ''} ${header.key === 'trend' && props.isTrendSticky ? 'u-sticky-left u-sticky-left--row trend-cell--sticky' : ''}`"
+            :class="{
+                'u-border-right': true,
+                'u-sticky-left':
+                    index === 0 ||
+                    (header.key === 'total' && props.isTotalSticky) ||
+                    (header.key === 'trend' && props.isTrendSticky),
+                'u-sticky-left--row':
+                    index === 0 ||
+                    (header.key === 'total' && props.isTotalSticky) ||
+                    (header.key === 'trend' && props.isTrendSticky),
+                'l-pad--0': header.key === 'user',
+                'total-cell': header.key === 'total',
+                'total-cell--sticky': header.key === 'total' && props.isTotalSticky,
+                'trend-cell--sticky': header.key === 'trend' && props.isTrendSticky,
+            }"
         >
             <template v-if="header.type == TableHeaderType.USER">
                 <div class="l-flex-row l-flex--no-wrap l-gap-m">
