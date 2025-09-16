@@ -16,6 +16,8 @@ interface Props {
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
 
+const feedbackEl = window.Vue.useTemplateRef<HTMLElement | null>("feedbackRef");
+
 const commentRef = window.Vue.ref<string | null>("");
 const markRef = window.Vue.ref<string | null>(null);
 const resubmissionRequiredRef = window.Vue.ref<boolean>(false);
@@ -154,7 +156,7 @@ const cellInfo = window.Vue.ref<ReturnType<typeof getCellInfo> | null>(null);
 
 window.Vue.watch(
     () => mbStore.feedbackSelectedCell,
-    () => {
+    async () => {
         // Must clean up any existing feedback instance first, otherwise watchers build up and remain active...
         if (cellInfo.value !== null) {
             cellInfo.value.feedback.cleanup();
@@ -162,6 +164,16 @@ window.Vue.watch(
 
         if (mbStore.feedbackSelectedCell !== null) {
             cellInfo.value = getCellInfo();
+
+            const DRAWER_ANIMATION_TIME_MS = 300;
+
+            await window.Vue.nextTick();
+            setTimeout(() => {
+                if (feedbackEl.value === null) return;
+                mbStore.feedbackDrawerEventBus.emit({
+                    drawerRect: feedbackEl.value.parentElement!.getBoundingClientRect(),
+                });
+            }, DRAWER_ANIMATION_TIME_MS);
         }
 
         // If it's now null, leave cellInfo set to whatever it was so the user sees the drawer content slide down correctly

@@ -1,4 +1,6 @@
 import { defineStore } from "pinia";
+import { useEventBus } from "@vueuse/core";
+import type { EventBusKey } from "@vueuse/core";
 import type { Template } from "@js/editor/types/editorTypes";
 import { listenForFilterLoad, listenForFilterLoading } from "@schoolboxLibrary/Filter/templates/ts/filterEvent";
 import type {
@@ -24,6 +26,9 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
     const feedbackSelectedCell = window.Vue.ref<MarkbookFeedbackSelectedCellInfo | null>(null);
 
     const editorTemplates = window.Vue.ref<Template[]>([]);
+
+    const feedbackDrawerEventKey: EventBusKey<{ drawerRect: DOMRect }> = Symbol("feedbackDrawerEventKey");
+    const feedbackDrawerEventBus = useEventBus(feedbackDrawerEventKey);
 
     /**
      * If the markbook has more than this number of participants,
@@ -223,5 +228,6 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         hasDraftMarks,
         isActivityWritable,
         setFeedbackSelectedCell,
+        feedbackDrawerEventBus,
     };
 });
