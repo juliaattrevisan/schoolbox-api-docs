@@ -9,6 +9,11 @@ import { ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ } from "@schoolboxAssessment
 import { useMarkbookStore } from "./store/markbookStore";
 import { useDynamicFeedback } from "./store/useDynamicFeedback";
 
+interface Props {
+    maxHeight: string;
+}
+
+const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
 
 const commentRef = window.Vue.ref<string | null>("");
@@ -185,8 +190,8 @@ async function onFeedbackPublish(): Promise<void> {
             v-if="mbStore.data !== null && cellInfo !== null"
             :key="cellInfo.key"
             ref="feedbackRef"
-            class="l-pad-s--top"
-            :class="{ 'mb-feedback-loading': mbStore.feedbackUILoadingInfo !== null }"
+            class="mb-feedback l-pad-s--top"
+            :class="{ 'mb-feedback--loading': mbStore.feedbackUILoadingInfo !== null }"
         >
             <div v-if="cellInfo.instructorMarkScheme.template.length" class="small-12 medium-3 column">
                 <label>
@@ -208,7 +213,11 @@ async function onFeedbackPublish(): Promise<void> {
                     style="margin-top: 0.5rem"
                 />
             </div>
-            <div class="small-12 column" :class="{ 'medium-9': cellInfo.instructorMarkScheme.template.length }">
+            <div
+                class="small-12 column mb-feedback-comment"
+                :class="{ 'medium-9': cellInfo.instructorMarkScheme.template.length }"
+                :style="{ maxHeight: `min(${props.maxHeight}, 90vh)` }"
+            >
                 <comment-field
                     v-model:comment="cellInfo.feedback.data.comment"
                     :participant="{ user: cellInfo.student }"
@@ -285,12 +294,20 @@ async function onFeedbackPublish(): Promise<void> {
 </template>
 
 <style scoped lang="scss">
-.mb-feedback-loading {
-    opacity: 0.5;
-    pointer-events: none;
+.mb-feedback {
+    &--loading {
+        opacity: 0.5;
+        pointer-events: none;
 
-    .mb-feedback-close {
-        pointer-events: all; // in case the user wants to abandon it still (or it gets stuck from an error or something...)
+        .mb-feedback-close {
+            pointer-events: all; // in case the user wants to abandon it still (or it gets stuck from an error or something...)
+        }
+    }
+
+    // the comment could get HUGE so we need to limit it a bit, this amount seems reasonable
+    // this creates a 3rd scrollbar on the page... but that's probably better than the drawer being too big
+    .mb-feedback-comment {
+        overflow-y: auto;
     }
 }
 </style>
