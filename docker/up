@@ -11,7 +11,7 @@ declare MARIADB_PUBLISHED_PORT
 declare MARIADB_PUBLISHED_PORT
 declare REDIS_STORAGE_PUBLISHED_PORT
 declare REDIS_CACHE_PUBLISHED_PORT
-declare BASE_IMAGE_BUILD_FROM_LOCAL
+declare BASE_PHP_IMAGE_BUILD_FROM_LOCAL
 declare TASKD_BUILD_FROM_LOCAL
 declare PRIVATE_CONTAINER_REGISTRY_TYPE
 declare PRIVATE_CONTAINER_REGISTRY_DOCKERHUB_USERNAME
@@ -146,7 +146,7 @@ function login_to_container_registry() {
     esac
 
     # Also determine base image
-    case "${BASE_IMAGE_BUILD_FROM_LOCAL}" in
+    case "${BASE_PHP_IMAGE_BUILD_FROM_LOCAL}" in
         1 | true | yes | on)
             base_php_image="php-frankenphp"
             ;;
@@ -184,7 +184,7 @@ function build_docker_compose_args() {
 
 function start_containers() {
     # Build base image locally if required
-    case "${BASE_IMAGE_BUILD_FROM_LOCAL}" in
+    case "${BASE_PHP_IMAGE_BUILD_FROM_LOCAL}" in
         1 | true | yes | on)
             # Build frankenphp image before starting default env,
             # as containers now rely upon it
