@@ -89,7 +89,7 @@
 
                     <ul class="information-list card-selectable">
                         {% for student in students %}
-                            <li {% if not student.getLearningMomentsEnabled %}style="opacity: 0.5"{% endif %}>
+                            <li>
                                 <div>
                                     <div class="selector">
                                         <input
@@ -104,7 +104,7 @@
                                         >
                                         <label for="chk-{{ revealId }}-{{ student.id }}" class="checkbox-label"></label>
                                     </div>
-                                    <div class="small-12 card">
+                                    <div class="small-12 card {% if not student.getLearningMomentsEnabled %}removed{% endif %}">
                                         <a href="/search/user/{{ student.id }}" title="View Profile">
                                             {% include 'include/portrait.twig' with {user: student} only %}
                                             <h3>{{ student.fullName }}</h3>
