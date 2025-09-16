@@ -21,7 +21,6 @@ class UpdateBooking extends Payload\Request
         $this->BookingID = $Booking->getId();
         $this->setHeader('Accept', 'application/json, text/javascript, */*; q=0.01');
         $this->setHeader('Accept-Encoding', 'gzip, deflate, br');
-        $this->setHeader('Origin', 'https://vagrant.dev.schoolbox.cloud');
         $this->setHeader('Content-Type', 'application/x-www-form-urlencoded');
         $this->setHeader('X-Requested-With', 'XMLHttpRequest');
         $this->setReferer('/resource-booking/booking/' . $this->BookingID . "/edit");

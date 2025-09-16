@@ -2,7 +2,10 @@
 
 namespace Tests\Smoketests;
 
+use Schoolbox\Config\Loader;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Url\Factory;
+use Schoolbox\Url\Uri;
 use Tests\Support\IntegrationTester;
 use Tests\Support\Payload;
 use Codeception\Scenario;
@@ -160,6 +163,14 @@ class FetchPagesFromCsvCest
         $persona      = $example[2];
         $url          = $example[3];
         $expected_result = $example[4];
+
+        // For the URL: override the host if it's vagrant.dev.schoolbox.cloud
+        $baseUrl   = new Uri($i->grabBaseUrl());
+        $parsedUrl = new Uri($url);
+        if ($parsedUrl->getHost() === 'vagrant.dev.schoolbox.cloud') {
+            $parsedUrl = $parsedUrl->withHost($baseUrl->getHost());
+            $url       = $parsedUrl->__toString();
+        }
 
         /*
          * Due to the data from example url being so huge, override the feature to include an extra

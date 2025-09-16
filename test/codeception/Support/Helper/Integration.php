@@ -112,4 +112,14 @@ class Integration extends REST
         $db = $this->getModule('Db');
         return $db;
     }
+
+    /**
+     * Grab the base URL out of this module's configuration.
+     *
+     * @return string
+     */
+    public function grabBaseUrl(): string
+    {
+        return $this->_getConfig('url');
+    }
 }

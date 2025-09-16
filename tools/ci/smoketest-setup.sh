@@ -97,6 +97,10 @@ echo 'started redis-server'
 service mariadb start
 echo 'started mariadb'
 
+# Set sandbox's site_hostname and site_domain properly:
+# in default data, it doesn't match vagrant.dev.schoolbox.cloud
+mariadb schoolbox -e "UPDATE config SET value='vagrant' WHERE name='site_hostname';"
+mariadb schoolbox -e "UPDATE config SET value='dev.schoolbox.cloud' WHERE name='site_domain';"
 
 # Sandbox has no ephemeral Redis instance; use the persistent instance.
 # This must happen both before and after updates:

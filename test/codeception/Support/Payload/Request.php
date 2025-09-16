@@ -9,6 +9,10 @@ declare(strict_types=1);
 
 namespace Tests\Support\Payload;
 
+use Psr\Http\Message\UriInterface;
+use Schoolbox\Config\Loader;
+use Schoolbox\Url\Factory;
+
 /**
  * Common implementation for all requests.
  *
@@ -22,11 +26,7 @@ namespace Tests\Support\Payload;
  */
 abstract class Request
 {
-    // TODO this is already logically declared in codeception.dist.yml, should re-used that value
-    private const VAGRANT_DOMAIN = 'vagrant.dev.schoolbox.cloud';
-
     private $headers = [
-        'Host'         => self::VAGRANT_DOMAIN,
         'Content-Type' => 'application/x-www-form-urlencoded',
         'Accept'       => 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
     ];
@@ -53,7 +53,9 @@ abstract class Request
      */
     public function getHeaders(): array
     {
-        return $this->headers;
+        return $this->headers + [
+            'Host' => $this->buildBaseUrl()->getHost(),
+        ];
     }
 
     /**
@@ -68,7 +70,7 @@ abstract class Request
         if ($path !== '' && substr($path, 0, 1) !== '/') {
             $path = '/' . $path;
         }
-        $this->setHeader('Referer', 'https://' . self::VAGRANT_DOMAIN . $path);
+        $this->setHeader('Referer', $this->buildBaseUrl()->withPath($path)->__toString());
         return $this;
     }
 
@@ -268,5 +270,16 @@ abstract class Request
     {
         unset($this->headers[$key]);
         return $this;
+    }
+
+    /**
+     * Build a base URL out of configuration settings.
+     *
+     * @return UriInterface
+     */
+    private function buildBaseUrl(): UriInterface
+    {
+        $config = new Loader();
+        return (new Factory($config))->buildFullyQualified();
     }
 }
