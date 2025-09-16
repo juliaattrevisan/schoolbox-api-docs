@@ -175,7 +175,7 @@ const exportReportRoute = window.Vue.computed(() => {
         </table>
     </div>
 
-    <bottom-drawer :show-drawer="mbStore.feedbackSelectedCell !== null">
+    <bottom-drawer :show-drawer="mbStore.feedbackSelectedCell !== null" :has-padding="false">
         <mb-classimpl-row-student-feedback
             v-if="mbStore.feedbackSelectedCell !== null"
             :key="Object.values(mbStore.feedbackSelectedCell).join('-')"

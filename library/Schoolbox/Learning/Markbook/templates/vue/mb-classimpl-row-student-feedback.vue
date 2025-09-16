@@ -174,10 +174,8 @@ async function onFeedbackPublish(): Promise<void> {
     <template v-if="mbStore.data !== null && cellInfo !== null">
         <form
             ref="feedbackRef"
-            class="fixed-feedback-cell row"
-            :class="{
-                'fixed-feedback-cell--loading': mbStore.feedbackUILoadingInfo !== null,
-            }"
+            class="l-pad-s--top"
+            :class="{ 'mb-feedback-loading': mbStore.feedbackUILoadingInfo !== null }"
         >
             <div v-if="cellInfo.instructorMarkScheme.template.length" class="small-12 medium-3 column">
                 <label>
@@ -276,27 +274,12 @@ async function onFeedbackPublish(): Promise<void> {
 </template>
 
 <style scoped lang="scss">
-.fixed-feedback-cell {
-    text-wrap: wrap;
-    width: 100%;
+.mb-feedback-loading {
+    opacity: 0.5;
+    pointer-events: none;
 
-    &--loading {
-        opacity: 0.5;
-        pointer-events: none;
-
-        .mb-feedback-close {
-            pointer-events: all; // in case the user wants to abandon it still (or it gets stuck from an error or something...)
-        }
+    .mb-feedback-close {
+        pointer-events: all; // in case the user wants to abandon it still (or it gets stuck from an error or something...)
     }
-}
-
-/* need to move the padding into the inner div so that the component actions are flush */
-td:has(.fixed-feedback-cell) {
-    padding: 0;
-}
-
-.fixed-feedback-cell > div {
-    padding-top: 0.625rem;
-    padding-bottom: 0.625rem;
 }
 </style>
