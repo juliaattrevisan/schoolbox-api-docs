@@ -9,6 +9,10 @@ declare(strict_types=1);
 
 namespace Tests\Support\Payload;
 
+use Psr\Http\Message\UriInterface;
+use Schoolbox\Config\Loader;
+use Schoolbox\Url\Factory;
+
 /**
  * Common implementation for all requests.
  *
@@ -50,7 +54,7 @@ abstract class Request
     public function getHeaders(): array
     {
         return $this->headers + [
-            'Host' => parse_url(getenv('BASE_URL'), PHP_URL_HOST),
+            'Host' => $this->buildBaseUrl()->getHost(),
         ];
     }
 
@@ -66,7 +70,7 @@ abstract class Request
         if ($path !== '' && substr($path, 0, 1) !== '/') {
             $path = '/' . $path;
         }
-        $this->setHeader('Referer', getenv('BASE_URL') . $path);
+        $this->setHeader('Referer', $this->buildBaseUrl()->withPath($path)->__toString());
         return $this;
     }
 
@@ -266,5 +270,16 @@ abstract class Request
     {
         unset($this->headers[$key]);
         return $this;
+    }
+
+    /**
+     * Build a base URL out of configuration settings.
+     *
+     * @return UriInterface
+     */
+    private function buildBaseUrl(): UriInterface
+    {
+        $config = new Loader();
+        return (new Factory($config))->buildFullyQualified();
     }
 }
