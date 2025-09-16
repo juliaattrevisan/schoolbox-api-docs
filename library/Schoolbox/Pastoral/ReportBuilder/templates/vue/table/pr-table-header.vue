@@ -103,7 +103,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
                     </ul>
                 </div>
             </th>
-            <td :class="`u-border-right ${props.isTotalSticky ? 'u-sticky-left total-column--sticky' : ''}`">&nbsp;</td>
+            <td :class="`u-border-right ${props.isTotalSticky ? 'u-sticky-left total-header--sticky' : ''}`">&nbsp;</td>
             <template v-if="hasSubTitles">
                 <th
                     v-for="(headerCell, index) in getFirstRowHeaders()"
@@ -120,7 +120,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
             <th
                 v-for="(header, index) in props.headers"
                 :key="header.key"
-                :class="`u-border-right title-column ${index === 0 ? 'u-sticky-left first-column' : ''} ${header.key === 'total' ? 'total-column' : ''} ${header.key === 'total' && props.isTotalSticky ? 'u-sticky-left total-column--sticky' : ''} ${header.key === 'trend' ? 'trend-column' : ''}`"
+                :class="`u-border-right title-header ${index === 0 ? 'u-sticky-left first-header' : ''} ${header.key === 'total' ? 'total-header' : ''} ${header.key === 'total' && props.isTotalSticky ? 'u-sticky-left total-header--sticky' : ''} ${header.key === 'trend' ? 'trend-header' : ''}`"
             >
                 <button
                     v-if="header.isSortable"
@@ -148,7 +148,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
 </template>
 
 <style scoped lang="scss">
-.title-column {
+.title-header {
     min-width: 120px; // given the titles can be long, this ensures they don't wrap too much
     &:has(.title-button) {
         padding: 0; // padding is handled by the button instead
@@ -158,20 +158,20 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
     }
 }
 
-.first-column {
-    min-width: var(--sbx-pr-table-first-column-width);
-    width: var(--sbx-pr-table-first-column-width);
+.first-header {
+    min-width: var(--sbx-pr-table-first-header-width);
+    width: var(--sbx-pr-table-first-header-width);
 }
 
-.total-column {
-    min-width: var(--sbx-pr-table-total-column-width); // so points/records change doesn't trigger a reflow
-    width: var(--sbx-pr-table-total-column-width);
+.total-header {
+    min-width: var(--sbx-pr-table-total-header-width); // so points/records change doesn't trigger a reflow
+    width: var(--sbx-pr-table-total-header-width);
     &--sticky {
-        left: var(--sbx-pr-table-first-column-width); // override the default left of 0 from u-sticky-left
+        left: var(--sbx-pr-table-first-header-width); // override the default left of 0 from u-sticky-left
     }
 }
 
-.trend-column {
+.trend-header {
     min-width: 220px;
     width: 220px;
 }
