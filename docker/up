@@ -23,6 +23,7 @@ declare AWS_START_URL
 declare PHPSTORM_SERVER_NAME
 
 declare private_container_registry
+declare base_image
 declare docker_compose_args
 
 # Log to stderr
@@ -144,6 +145,15 @@ function login_to_container_registry() {
             ;;
     esac
 
+    # Also determine base image
+    case "${BASE_IMAGE_BUILD_FROM_LOCAL}" in
+        1 | true | yes | on)
+            base_image="php-frankenphp"
+            ;;
+        *)
+            base_image="${private_container_registry}/frankenphp-base:latest-php${PHP_MAJOR_VERSION}-dev"
+            ;;
+    esac
 }
 
 function build_docker_compose_env() {
@@ -162,6 +172,7 @@ function build_docker_compose_env() {
     PHPSTORM_SERVER_NAME=\"${PHPSTORM_SERVER_NAME}\"
     USER_ID=\"$(id -u)\"
     GROUP_ID=\"$(id -g)\"
+    BASE_IMAGE=\"${base_image}\"
     ${aws_credentials}" > .docker-compose.env
 }
 
@@ -178,7 +189,6 @@ function start_containers() {
     base_image=''
     case "${BASE_IMAGE_BUILD_FROM_LOCAL}" in
         1 | true | yes | on)
-            base_image="php-frankenphp"
             # Build frankenphp image before starting default env,
             # as containers now rely upon it
             docker build --progress=plain \
@@ -188,7 +198,6 @@ function start_containers() {
                 "docker/base-images/php-frankenphp/"
             ;;
         *)
-            base_image="${private_container_registry}/frankenphp-base:latest-php${PHP_MAJOR_VERSION}-dev"
             ;;
     esac
 
