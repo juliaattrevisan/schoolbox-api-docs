@@ -303,6 +303,9 @@ export const useMomentFormStore = defineStore("momentForm", () => {
                     // no autosaving of published moments
                     if (moment.value.currentState === EvidenceStatus.PUBLISHED) return;
 
+                    // no autosaving of moments without evidence or text
+                    if (moment.value.body === "" && moment.value.evidence.length === 0) return;
+
                     await submitForm(true, "draft");
                 },
                 { debounce: 3000, deep: true },
