@@ -60,11 +60,13 @@ class Module extends BaseModule
                  *
                  * One or more misconfigurations or access controls could have caused this
                  * but all result in nothing to see for the current user
-                 *
-                 * should we also check to see if there is an oidc geo config? as this won't work without it...
-                 * how to do that check... :thinking:
                  */
-                $isGeosnapshotAvailable = (new ValidPhotosAvailable())
+
+                // find the Geo oAuth Client...
+                $oAuthClients = $this->getRelyingPartyMapper()->findByPredicates(
+                    $this->getRelyingPartyMapper()->getPredicateBuilder()->like('name', '%geosnapshot%')
+                );
+                $isGeosnapshotAvailable = $oAuthClients->count() && (new ValidPhotosAvailable())
                     ->isConfigured(
                         $this->getConfig()->get('geosnapshot_api_key'),
                         $this->getConfig()->get('geosnapshot_enabled'),
@@ -174,7 +176,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(ErrorMapper::class),
             $this->injector->get('filesystem.storageProxy'),
             $this->getMapperFactory()->get(RelyingPartyGrantMapper::class),
-            $this->getMapperFactory()->get(RelyingPartyMapper::class)
+            $this->getRelyingPartyMapper()
         );
     }
 
@@ -195,5 +197,13 @@ class Module extends BaseModule
     protected function getUserMapper()
     {
         return $this->getMapperFactory()->get(UserMapper::class);
+    }
+
+    /**
+     * @return RelyingPartyMapper
+     */
+    protected function getRelyingPartyMapper()
+    {
+        return $this->getMapperFactory()->get(RelyingPartyMapper::class);
     }
 }
