@@ -7,11 +7,10 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Learnosity\Importer;
+namespace Schoolbox\Resource\Storage;
 
 use DOMElement;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Resource\Storage\Mapper;
 
 /**
  * Converts a base64 encoded image into a storage reference with a relative url

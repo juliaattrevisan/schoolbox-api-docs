@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml;
 
-use Schoolbox\Learning\Learnosity\Importer\InlineImageConverter;
 use Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\Strategy\Factory;
 use Schoolbox\Learning\Learnosity\Importer\RemoteInlineImageConverter;
 use Schoolbox\User;
