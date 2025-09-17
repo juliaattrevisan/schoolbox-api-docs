@@ -66,7 +66,7 @@ case "$ENV" in
     ;;
   *)
     # NPM install for all users into /opt/nvm
-    curl "https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh" -o nvm-install
+    curl "https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh" -f -o nvm-install || exit 1
     chmod +x nvm-install
     mkdir -p /opt/nvm
     NVM_DIR=/opt/nvm bash -c "./nvm-install && source /opt/nvm/nvm.sh && nvm install ${NODE_VERSION}"
