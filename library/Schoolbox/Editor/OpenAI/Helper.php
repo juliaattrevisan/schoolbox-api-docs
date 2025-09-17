@@ -42,26 +42,6 @@ class Helper
     public const ENDPOINT_TYPE_OFF = 'Off';
 
     /**
-     * Structured Outputs is only supported in certain models
-     * Note that we intentionally don't support gippity 3.5
-     */
-    private const SUPPORTED_STRUCTURED_OUTPUT_MODELS = [
-        self::ENDPOINT_TYPE_OPENAI => [
-//            'gpt-3.5-turbo' => false,
-//            'gpt-4' => false,
-            'gpt-4o' => true,
-            'gpt-4o-mini' => true,
-            'gpt-4.1' => true,
-            'gpt-4.1-mini' => true,
-//            'gpt-4-turbo' => false
-        ],
-        self::ENDPOINT_TYPE_AZURE => [
-            // we have no clue or control over what model the school picks with azure
-        ],
-    ];
-
-
-    /**
      * Use the conversational chatgippity variant
      */
     private const CHAT = 'chat';
@@ -292,11 +272,6 @@ class Helper
             throw new \DomainException('OpenAI API key is unavailable');
         }
 
-        /* Requires a particular minimum set of models to continue.
-         */
-        if (!$this->canUseStructuredOutputs()) {
-            throw new \DomainException('AI endpoint/model does not support Structured Outputs');
-        }
         /* Log what the user tried to do if we made a vaguely-successful request
          * and didn't somehow die long the way
          */
@@ -418,21 +393,6 @@ class Helper
 
         return $data;
     }
-
-
-    /**
-     * Structured Outputs require a particular model
-     *
-     * @return bool
-     */
-    private function canUseStructuredOutputs(): bool
-    {
-        if ($this->openAiEndpoint === self::ENDPOINT_TYPE_AZURE) {
-            return true; // assume azure can, we have no way of knowing what they chose
-        }
-        return self::SUPPORTED_STRUCTURED_OUTPUT_MODELS[$this->openAiEndpoint][$this->openAiModel] ?? false;
-    }
-
 
     /**
      * Asynchronously sends a request to the OpenAI API Chat and returns the response to the user.
