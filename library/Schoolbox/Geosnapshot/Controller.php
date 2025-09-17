@@ -103,7 +103,7 @@ class Controller extends Base
         $session = false;
         // find the Geo oAuth Client...
         $oAuthClients = $this->partyMapper->findByPredicates(
-            $this->partyMapper->getPredicateBuilder()->like('name', '%geosnapshot%')
+            $this->partyMapper->getPredicateBuilder()->like('name', RelyingPartyMapper::GEOSNAPSHOT_LIKE)
         );
         // if there is a session for the $this->getUser() in oidc_relying_party_grant then set $session true, else set session false
         foreach ($oAuthClients as $oAuthClient) {

@@ -64,7 +64,7 @@ class Module extends BaseModule
 
                 // find the Geo oAuth Client...
                 $oAuthClients = $this->getRelyingPartyMapper()->findByPredicates(
-                    $this->getRelyingPartyMapper()->getPredicateBuilder()->like('name', '%geosnapshot%')
+                    $this->getRelyingPartyMapper()->getPredicateBuilder()->like('name', RelyingPartyMapper::GEOSNAPSHOT_LIKE)
                 );
                 $isGeosnapshotAvailable = $oAuthClients->count() && (new ValidPhotosAvailable())
                     ->isConfigured(

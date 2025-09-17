@@ -24,6 +24,9 @@ use Schoolbox\UserMapper;
  */
 class Mapper extends BaseMapper
 {
+    /** known oidc client names for use with dedicated features, ie GeoSnapShot */
+    public const GEOSNAPSHOT_LIKE = '%geosnapshot%';
+
     /**
      * @inheritdoc
      */
