@@ -18,6 +18,8 @@ use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Oidc\Server\RelyingParty\Grant\Mapper as RelyingPartyGrantMapper;
+use Schoolbox\Oidc\Server\RelyingParty\Mapper as RelyingPartyMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
@@ -151,6 +153,8 @@ class Module extends BaseModule
         return new Controller(
             $this->getMapperFactory()->get(ErrorMapper::class),
             $this->injector->get('filesystem.storageProxy'),
+            $this->getMapperFactory()->get(RelyingPartyGrantMapper::class),
+            $this->getMapperFactory()->get(RelyingPartyMapper::class)
         );
     }
 
