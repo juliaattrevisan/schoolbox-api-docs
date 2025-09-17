@@ -197,25 +197,25 @@
             }
 
             // If this is set to sync with another field, hide the dropdown if the switch is off
-            const syncSwitch = document.querySelector(config.sync.switchSelector);
+            // OFF means to sync, ON means to allow dual mark types
+            const shouldSync = !document.querySelector(config.sync.switchSelector).checked;
+
             if (config.sync.syncWith !== null) {
-                config.markTypeDropdown[0].closest(".row").style.display = syncSwitch.checked ? "" : "none";
+                config.markTypeDropdown[0].closest(".row").style.display = shouldSync ? "none" : "";
             }
 
             // Show the correct tooltip based on the switch state
-            if (syncSwitch.checked) {
-                config.markTypeTooltip.show();
-                config.markTypeSyncTooltip.hide();
-            } else {
+            if (shouldSync) {
                 config.markTypeTooltip.hide();
                 config.markTypeSyncTooltip.show();
+            } else {
+                config.markTypeTooltip.show();
+                config.markTypeSyncTooltip.hide();
             }
 
-            config.markTypeLabel.text(
-                syncSwitch.checked ? config.sync.syncMarkTypeOnLabel : config.sync.syncMarkTypeOffLabel,
-            );
+            config.markTypeLabel.text(shouldSync ? config.sync.syncMarkTypeOffLabel : config.sync.syncMarkTypeOnLabel);
 
-            if (syncSwitch.checked) {
+            if (!shouldSync) {
                 return; // the switch is enabled, so the fields shouldn't be sync'd
             }
 
