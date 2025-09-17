@@ -10,6 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Learnosity\Importer;
 
 use DOMElement;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use LearnositySdk\Exceptions\ValidationException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Learning\Learnosity\Api;
 
@@ -40,6 +43,21 @@ class RemoteInlineImageConverter
 
 
     /**
+     * Request timeout
+     */
+    private const DEFAULT_TIMEOUT = 300;
+
+
+    /**
+     * A separate guzzle instance for transferring binary data
+     * Set upon first discovering the need
+     *
+     * @var Client|null
+     */
+    private ?Client $client = null;
+
+
+    /**
      * Constructor.
      *
      * @param Api $api
@@ -57,7 +75,9 @@ class RemoteInlineImageConverter
      * @param string $html
      * @return string
      * @throws \DOMException
-     * @throws \RuntimeException
+     * @throws GuzzleException
+     * @throws \JsonException
+     * @throws ValidationException
      */
     public function convert(string $html): string
     {
@@ -93,7 +113,11 @@ class RemoteInlineImageConverter
              */
             $src = $node->getAttribute('src');
 
-            /* Shank out the parts you need
+            /* Check if this is an image and not some other random element
+             * that just so happens to have a src attribute...like an iframe
+             * See https://www.w3schools.com/tags/att_src.asp for a list of stuff
+             *
+             * Shank out the parts you need
              */
             $isInline = preg_match(self::REGEX, $src, $matches);
 
@@ -116,6 +140,33 @@ class RemoteInlineImageConverter
                     $extension
                 );
 
+                /* Anticipate the need for a guzzle instance because learnosity doesn't use their
+                 * sdk to transmit binary data apparently. That's a bit weird. Anyway, spawn one
+                 * upon first requirement: otherwise the xml doesn't contain any images
+                 */
+                if (null === $this->client) {
+                    /* Infer a mime from the regex. It's a bit roundabout
+                     */
+                    $mime = 'image/' . $extension;
+
+                    $headers = [
+                        /* Supposedly important
+                         * https://help.learnosity.com/hc/en-us/articles/26076399578397-Upload-assets-Endpoints-Data-API
+                         */
+                        'Expect' => '100-continue',
+                        'Content-Type' => (new \Alaress\Image\TransformFormat($mime))->getFormat(),
+                    ];
+
+                    $this->client = new Client([
+                        'headers' => $headers,
+                        'timeout' => self::DEFAULT_TIMEOUT,
+                        /* Loudly die, forcing devs to process exceptions thrown by guzzle, preventing you from
+                         * inspecting it via getStatusCode() the same way you would with a successful request.
+                         */
+                        'http_errors' => true,
+                    ]);
+                }
+
                 /* Obtain a pre-signed url. This is the destination url that you'll ultimately
                  * end up using in the replacement node. Use a sha1 hash for uniqueness, not user-friendliness,
                  * because learnosity gives you this url:
@@ -131,14 +182,32 @@ class RemoteInlineImageConverter
                     ]
                 ]);
 
+                /* TODO Find out how many we can transmit in one go: maybe we can do all of this
+                 *  upload in one big request at the end instead of lots of individual calls.
+                 *  Not sure it really matters in the long run though, maybe imperceptible difference
+                 */
+                $resultNode = $result['data'][0];
+
                 /* We'll use this to reference learnosity media from now on
                  */
-                $storageUrl = $result['data'][0]['public'];
+                $storageUrl = $resultNode['public'];
 
                 /* POST data into this pre-signed url. This puts binary content into learnosity
                  */
+                $destination = $resultNode['upload'];
 
+                /* This is supposed to return http 200, but not sure what *else* it could return
+                 * as the documentation is particularly sparse.
+                 *
+                    $response = $this->client->put(...);
 
+                    if ($response->getStatusCode() !== 200) {
+                        // Log it, I suppose? But what comes back?
+                    }
+                */
+                $this->client->put($destination, [
+                    'body' => $imageData
+                ]);
 
                 /* Replace the node with a relative url equivalent
                  */
