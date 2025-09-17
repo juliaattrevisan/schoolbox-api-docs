@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Moment;
 
 use Alaress\Database\Predicate\Builder;
-use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\API\Translator\ModelToArray\Composite;
@@ -21,10 +20,8 @@ use Schoolbox\Discussion\Comment;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Learning\Moment\Cursor;
 use Schoolbox\Learning\Moment\Model as MomentModel;
 use Schoolbox\Learning\Moment\Moderation\ModerationRequired;
-use Schoolbox\Learning\Moment\NextRoutes;
 use Schoolbox\Learning\Moment\Translator\ModelToArray\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\UserAccess;
