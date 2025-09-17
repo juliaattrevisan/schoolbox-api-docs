@@ -59,6 +59,33 @@ class RemoteInlineImageConverter
 
 
     /**
+     * Number of seconds to take a nap before retrying a failed endpoint
+     *
+     * Sometimes endpoints fail for no obvious reason and trying again seems
+     * to work - instead of doing it manually, try insisting programmatically
+     * waiting NAP_TIMEOUT seconds between each attempt
+     */
+    private const NAP_TIMEOUT = 3;
+
+
+    /**
+     * Number of times to retry after having NAP_TIMEOUT seconds' rest before
+     * finally giving up
+     */
+    private const NUM_RETRY = 5;
+
+
+    /**
+     * Jitter litter that gets appended to an exponential backoff
+     * to kind of randomise when a request can be retried, to prevent
+     * multiple requests inevitably occurring again at the same time
+     * to cause another rate limit
+     */
+    private const JITTER_LOWER = 0;
+    private const JITTER_UPPER = 3;
+
+
+    /**
      * Constructor.
      *
      * @param Api $api
@@ -226,21 +253,54 @@ class RemoteInlineImageConverter
                     $destination
                 ));
 
-                $response = $this->client->put($destination, [
-                    'body' => $imageData
-                ]);
+                /* Mine out an error message if you try to access a thing that doesn't exist
+                 */
+                $fails = 0;
 
-                if (200 !== $response->getStatusCode()) {
-                    $this->logger?->warning(sprintf(
-                        'Learnosity returned HTTP status %d.',
-                        $response->getStatusCode()
-                    ));
+                while ($fails < self::NUM_RETRY) {
+                    try {
+                        $response = $this->client->put($destination, [
+                            'body' => $imageData
+                        ]);
 
-                    /* TODO Now what?
-                     *  I guess we could retry N times, then log the ultimate failure,
-                     *  and leave the html untouched...or...?
-                     */
+                        /* Get out of here: we succeeded
+                         */
+                        if (200 === $response->getStatusCode()) {
+                            break;
+                        }
+
+                        /* Something died along the way: but not sure what
+                         */
+                        if (200 !== $response->getStatusCode()) {
+                            $this->logger?->warning(sprintf(
+                                'Learnosity returned HTTP status %d.',
+                                $response->getStatusCode()
+                            ));
+
+                            $jitter = $this->calculateJitter($fails);
+
+                            $this->induceNap($fails, $jitter, 'Received non-200 response while transmitting binary to presigned url on request %s: napping for %s seconds');
+
+                            $fails++;
+                        }
+                    } catch (\Exception $e) {
+                        $jitter = $this->calculateJitter($fails);
+
+                        $this->induceNap($fails, $jitter, 'Cannot transmit binary to presigned url on request %s: napping for %s seconds');
+
+                        $fails++;
+                    }
                 }
+
+                /* TODO Now what?
+                 *  I guess we could retry N times, then log the ultimate failure,
+                 *  and leave the html untouched...or...?
+                 */
+//                if ($fails === (self::NUM_RETRY - 1)) {
+//                    /* Normally this is an error message on an error screen
+//                     * but we don't have one of those.
+//                     */
+//                }
 
                 /* Replace the node with a relative url equivalent
                  */
@@ -268,5 +328,59 @@ class RemoteInlineImageConverter
         unset($dom, $xpath);
 
         return implode("\n", $bodyParts);
+    }
+
+
+    /**
+     * Calculate a random amount of jitter to sprinkle on an exponential backoff
+     *
+     * @param int $fails
+     * @return int
+     * @throws \Exception
+     */
+    private function calculateJitter(int $fails): int
+    {
+        /* To ensure the first failure's nap is 5 seconds long,
+         * as per learnosity's default setting/suggestion
+         */
+        $jitter = 1;
+
+        /* If we've failed previously, jitter litter some extra seconds
+         * to randomise a bit more so we don't all try to start again
+         * at the same time (always naps 5sec the first time we fail)
+         */
+        if ($fails) {
+            $jitter = random_int(self::JITTER_LOWER, self::JITTER_UPPER);
+        }
+
+        return $jitter;
+    }
+
+
+    /**
+     * Take a nap for a period of time
+     * "some random jitter" is randomly between 0 and 3 sec by default
+     *
+     * Sleep for 3+2 seconds
+     * then 3+4 seconds (2^2) + some random jitter,
+     * then 3+8 seconds (2^3) + some random jitter,
+     * then 3+16 seconds (2^4) + some random jitter,
+     * then 3+32 seconds (2^5) + some random jitter...
+     *
+     * ...then give up after multiple full rate limited cycles
+     */
+    private function induceNap(int $fails, int $jitter, string $logMessage): void
+    {
+        $napTime = self::NAP_TIMEOUT + pow(2, $fails) + $jitter;
+
+        $this->logger?->debug(sprintf(
+            $logMessage,
+            $fails,
+            $napTime
+        ));
+
+        /* Back to sleep Jeffrey
+         */
+        sleep($napTime);
     }
 }
