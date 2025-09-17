@@ -11,6 +11,8 @@ const props = defineProps<{
     headers: TableHeader[];
     sortBy: string;
     order: "ASC" | "DESC";
+    isTotalSticky: boolean;
+    isTrendSticky: boolean;
 }>();
 
 const config = window.Vue.inject<Config>("config");
@@ -102,7 +104,7 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
                     </ul>
                 </div>
             </th>
-            <td class="u-border-right">&nbsp;</td>
+            <td :class="`u-border-right ${props.isTotalSticky ? 'u-sticky-left total-header--sticky' : ''}`">&nbsp;</td>
             <template v-if="hasSubTitles">
                 <th
                     v-for="(headerCell, index) in getFirstRowHeaders()"
@@ -119,7 +121,19 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
             <th
                 v-for="(header, index) in props.headers"
                 :key="header.key"
-                :class="`u-border-right title-column ${index === 0 ? 'u-sticky-left first-column' : ''} ${header.key === 'total' ? 'total-column' : ''} ${header.key === 'trend' ? 'trend-column' : ''}`"
+                :class="{
+                    'u-border-right': true,
+                    'title-header': true,
+                    'u-sticky-left':
+                        index === 0 ||
+                        (header.key === 'total' && props.isTotalSticky) ||
+                        (header.key === 'trend' && props.isTrendSticky),
+                    'first-header': index === 0,
+                    'total-header': header.key === 'total',
+                    'total-header--sticky': header.key === 'total' && props.isTotalSticky,
+                    'trend-header': header.key === 'trend',
+                    'trend-header--sticky': header.key === 'trend' && props.isTrendSticky,
+                }"
             >
                 <button
                     v-if="header.isSortable"
@@ -147,30 +161,34 @@ function getFirstRowHeaders(): Array<{ title: string; colspan: number; isEmpty: 
 </template>
 
 <style scoped lang="scss">
-.title-column {
+.title-header {
     min-width: 120px; // given the titles can be long, this ensures they don't wrap too much
     &:has(.title-button) {
         padding: 0; // padding is handled by the button instead
     }
-    &.sorted {
-        background-color: var(--accent-background-light, #f0f0f0);
+}
+
+.first-header {
+    min-width: var(--sbx-pr-table-first-header-width);
+    width: var(--sbx-pr-table-first-header-width);
+}
+
+.total-header {
+    min-width: var(--sbx-pr-table-total-header-width); // so points/records change doesn't trigger a reflow
+    width: var(--sbx-pr-table-total-header-width);
+    &--sticky {
+        left: var(--sbx-pr-table-first-header-width); // override the default left of 0 from u-sticky-left
     }
 }
 
-.first-column {
-    min-width: 250px;
-    width: 250px;
-}
-
-.total-column {
-    background: var(--sbx-pr-table-total-column-colour);
-    min-width: 110px; // so points/records change doesn't trigger a reflow
-    width: 110px;
-}
-
-.trend-column {
+.trend-header {
     min-width: 220px;
     width: 220px;
+    &--sticky {
+        left: calc(
+            var(--sbx-pr-table-first-header-width) + var(--sbx-pr-table-total-header-width)
+        ); // override the default left of 0 from u-sticky-left
+    }
 }
 
 .title-button {

@@ -16,8 +16,12 @@
         {% if hasMultipleEvents %}<li>{% endif %}
         <span {% if event.periodCancelled %}class="strike" title="This period has been cancelled"{% endif %}>
             {% if event.location != '' %}
-            {{ event.location }}
-            -
+                {{ event.location }}
+                -
+            {% endif %}
+            {% if event.periodName is not empty %}
+                {{ event.periodName }}
+                -
             {% endif %}
             {{ event.title }}
             {% set hasShownStaff = false %}
@@ -34,6 +38,7 @@
                     {% set hasShownStaff = true %}
                 {% endif %}
             {% endfor %}
+            <span class="meta"> ({{ event.startTime.timeOnly }} - {{ event.endTime.timeOnly }}) </span>
         </span>
         {% if hasMultipleEvents %}</li>{% endif %}
     {% endfor %}

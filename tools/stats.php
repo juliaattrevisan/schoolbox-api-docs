@@ -314,8 +314,8 @@ $app = new class extends CliTool\App {
             'myfile'            =>  'SELECT count(*) FROM myFile WHERE deleted_at IS NULL',
 
             //Learning Moments / Evidence
-            'evidence'          => 'SELECT count(*) FROM evidence WHERE deleted_at IS NULL',
-            'evidence_comments' => 'SELECT count(*) FROM evidence JOIN discussion_thread_comment dtc on evidence.discussion_thread_id = dtc.discussion_thread_id',
+            'evidence'          => 'SELECT count(*) FROM moment WHERE deleted_at IS NULL',
+            'evidence_comments' => 'SELECT count(*) FROM moment JOIN discussion_thread_comment dtc on moment.discussion_thread_id = dtc.discussion_thread_id',
 
             //Badges
             'badges'            => 'SELECT count(*) FROM badge WHERE deleted_at IS NULL',
@@ -333,6 +333,13 @@ $app = new class extends CliTool\App {
             'openai_input_tokens' => 'SELECT SUM(input_tokens) FROM openai_log WHERE return_code = 200',
             'openai_output_tokens' => 'SELECT SUM(output_tokens) FROM openai_log WHERE return_code = 200',
             'openai_tokens' => 'SELECT SUM(output_tokens) + SUM(input_tokens) FROM openai_log WHERE return_code = 200',
+
+            //image tokens
+            'openai_input_tokens_image' => 'SELECT SUM(input_tokens) FROM openai_log WHERE return_code = 200 AND feature = "image"',
+            'openai_output_tokens_image' => 'SELECT SUM(output_tokens) FROM openai_log WHERE return_code = 200 AND feature = "image"',
+            'openai_tokens_image' => 'SELECT SUM(output_tokens) + SUM(input_tokens) FROM openai_log WHERE return_code = 200 AND feature = "image"',
+
+            // old ai metrics (not recording the ai feature (chat, lessonplan, image))
             'openai_model_gpt-4o' => "SELECT count(*) FROM openai_log WHERE (model like 'gpt-4o%' and model not like '%mini%')",
             'openai_model_gpt-4o-mini' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4o-mini%'",
             'openai_model_gpt-41' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4.1%' and model not like '%mini%'",
@@ -344,6 +351,45 @@ $app = new class extends CliTool\App {
                 not (model like 'gpt-4o-mini%') AND
                 not (model like 'gpt-4.1-mini%')",
 
+            // gpt-4o
+            'openai_model_gpt-4o_chat' => "SELECT count(*) FROM openai_log WHERE (model like 'gpt-4o%' and model not like '%mini%') AND feature = 'chat'",
+            'openai_model_gpt-4o_lessonplan' => "SELECT count(*) FROM openai_log WHERE (model like 'gpt-4o%' and model not like '%mini%') AND feature = 'lessonplan'",
+            'openai_model_gpt-4o_image' => "SELECT count(*) FROM openai_log WHERE (model like 'gpt-4o%' and model not like '%mini%') AND feature = 'image'",
+
+            // gpt-4o-mini
+            'openai_model_gpt-4o-mini_chat' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4o-mini%' AND feature = 'chat'",
+            'openai_model_gpt-4o-mini_lessonplan' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4o-mini%' AND feature = 'lessonplan'",
+            'openai_model_gpt-4o-mini_image' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4o-mini%' AND feature = 'image'",
+
+            // gpt-4.1
+            'openai_model_gpt-41_chat' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4.1%' and model not like '%mini%' AND feature = 'chat'",
+            'openai_model_gpt-41_lessonplan' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4.1%' and model not like '%mini%' AND feature = 'lessonplan'",
+            'openai_model_gpt-41_image' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4.1%' and model not like '%mini%' AND feature = 'image'",
+
+            // gpt-4.1-mini
+            'openai_model_gpt-41-mini_chat' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4.1-mini%' AND feature = 'chat'",
+            'openai_model_gpt-41-mini_lessonplan' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4.1-mini%' AND feature = 'lessonplan'",
+            'openai_model_gpt-41-mini_image' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4.1-mini%' AND feature = 'image'",
+
+            // model is not like the above (gpt-4o, gpt-4o-mini, gpt-4.1, gpt-4.1-mini) we may need to do some digging, or add these to the stats
+            'openai_model_unknown_chat' => "
+                SELECT count(*) FROM openai_log WHERE
+                not (model like 'gpt-4o%') AND
+                not (model like 'gpt-4.1%') AND
+                not (model like 'gpt-4o-mini%') AND
+                not (model like 'gpt-4.1-mini%') AND feature = 'chat'",
+            'openai_model_unknown_lessonplan' => "
+                SELECT count(*) FROM openai_log WHERE
+                not (model like 'gpt-4o%') AND
+                not (model like 'gpt-4.1%') AND
+                not (model like 'gpt-4o-mini%') AND
+                not (model like 'gpt-4.1-mini%') AND feature = 'lessonplan'",
+            'openai_model_unknown_image' => "
+                SELECT count(*) FROM openai_log WHERE
+                not (model like 'gpt-4o%') AND
+                not (model like 'gpt-4.1%') AND
+                not (model like 'gpt-4o-mini%') AND
+                not (model like 'gpt-4.1-mini%') AND feature = 'image'",
             //Packages
             'package_installed' => 'SELECT COUNT(*) FROM package WHERE installed = 1',
         ];

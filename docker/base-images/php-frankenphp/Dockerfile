@@ -6,7 +6,6 @@
 ARG ENV=dev
 ARG PHP_MAJOR_VERSION=8.4
 
-# TODO should this support ARCH as well?
 FROM dunglas/frankenphp:1.8-php${PHP_MAJOR_VERSION}-bookworm
 
 ARG PHP_MAJOR_VERSION

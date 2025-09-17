@@ -198,7 +198,7 @@ class HomePageCest
         #THEN
         $i->seeResponseCodeIs(302);
         $i->seeHttpHeader('location', "/");
-        $i->sendGET("https://vagrant.dev.schoolbox.cloud/");
+        $i->sendGET("/");
         $i->seeResponseCodeIs(200);
     }
 
@@ -355,7 +355,7 @@ class HomePageCest
         $i->sendRequest($textBoxDelete);
         $i->seeResponseCodeIs(200);
 
-        $i->sendGET("https://vagrant.dev.schoolbox.cloud/homepage/{$homePage->getId()}");
+        $i->sendGET("/homepage/{$homePage->getId()}");
         $i->seeResponseCodeIs(200);
     }
 }

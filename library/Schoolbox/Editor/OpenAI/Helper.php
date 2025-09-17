@@ -42,9 +42,11 @@ class Helper
     public const ENDPOINT_TYPE_OFF = 'Off';
 
     /**
-     * Use the conversational chatgippity variant
+     * Feature types (both for logging and identifying in schoolbox code)
      */
-    private const CHAT = 'chat';
+    public const FEATURE_CHAT = 'chat';
+    public const FEATURE_LESSONPLAN = 'lessonplan';
+    public const FEATURE_IMAGE = 'image';
 
 
     /**
@@ -112,6 +114,21 @@ class Helper
                         $item['partial_image_b64'] = self::IMAGE_DATA_OMITTED;
                     }
 
+                    // remove the completed image
+                    if ($itemType === 'response.output_item.done' && isset($item['item']['result'])) {
+                        $item['item']['result'] = self::IMAGE_DATA_OMITTED;
+                    }
+
+                    // apparently there is a final final image, lets remove that also
+                    if ($itemType === 'response.completed' && isset($item['response']['output']) && is_array($item['response']['output'])) {
+                        // $item['response']['output'] is apparently an array, and we need to ommit the b64 from each $item['response']['output'][]['result']
+                        foreach ($item['response']['output'] as $i => $respOutput) {
+                            if (isset($respOutput['result'])) {
+                                $item['response']['output'][$i]['result'] = self::IMAGE_DATA_OMITTED;
+                            }
+                        }
+                    }
+
                     $output .= sprintf("data: %s\n", json_encode($item, JSON_THROW_ON_ERROR));
                 } catch (\JsonException $e) {
                     // If it's not JSON, still save the raw data
@@ -144,7 +161,7 @@ class Helper
             $inputTokens = null;
             $outputTokens = null;
 
-            if ($type === self::CHAT) {
+            if ($type === self::FEATURE_CHAT) {
                 $model = $item['model'] ?? null;
                 $inputTokens = $item['usage']['prompt_tokens'] ?? null;
                 $outputTokens = $item['usage']['completion_tokens'] ?? null;
@@ -206,7 +223,7 @@ class Helper
                 $this->appendChunkToLog($event, $log, $type);
 
                 // Don't echo an 'error' chunk if this isn't going to ckeditor as it won't follow the format of an ApiProblem
-                if ($type === self::CHAT || $event['type'] !== 'error') {
+                if ($type === self::FEATURE_CHAT || $event['type'] !== 'error') {
                     echo "{$chunk}\n\n";
                 }
 
@@ -254,11 +271,12 @@ class Helper
      *
      * @param User $user // user to log the request against
      * @param string $payload // use this payload instead of generating one
+     * @param string $feature // frontend schoolbox ai feature type for logging (lessonplan, image, etc.)
      * @return array
      * @throws ClientExceptionInterface
      * @throws Exception
      */
-    public function request(User $user, string $payload): array
+    public function request(User $user, string $payload, string $feature): array
     {
         /* Check that we have activated this endpoint
          */
@@ -277,7 +295,9 @@ class Helper
          */
         $log = $this->logMapper->createModel()
             ->setUser($user)
-            ->setPrompt($payload);
+            ->setPrompt($payload)
+            ->setFeature($feature)
+            ->setEndpoint($this->getEndpoint());
 
         /* Minimum requirements met: let's send it and see what AI overlords think of our payload
          */
@@ -443,7 +463,7 @@ class Helper
         }
 
         try {
-            $openAiRequest = new Request('POST', $this->getEndpoint(self::CHAT), array_merge(
+            $openAiRequest = new Request('POST', $this->getEndpoint(self::FEATURE_CHAT), array_merge(
                 $this->getAuthorization(),
                 ['Content-Type' => 'application/json'],
             ), $payload);
@@ -454,7 +474,9 @@ class Helper
             $log = $this->logMapper->createModel()
                 ->setUser($user)
                 ->setPrompt($payload)
-                ->setModel($this->openAiModel);
+                ->setModel($this->openAiModel)
+                ->setFeature(self::FEATURE_CHAT)
+                ->setEndpoint($this->getEndpoint(self::FEATURE_CHAT));
 
             $promise = $this->client->sendAsync($openAiRequest, ['stream' => true]);
 
@@ -480,7 +502,7 @@ class Helper
                     ob_end_flush();
 
                     $stream = $response->getBody();
-                    $this->readStream($stream, $log, self::CHAT);
+                    $this->readStream($stream, $log, self::FEATURE_CHAT);
                 },
                 function ($reason) use ($log): void {
                     $returnCode = $reason->getCode();
@@ -526,7 +548,7 @@ class Helper
             case self::ENDPOINT_TYPE_OPENAI:
                 /* Little Robot Dude
                  */
-                if (self::CHAT === $type) {
+                if (self::FEATURE_CHAT === $type) {
                     return self::ENDPOINT_HOST_OPENAI_CHAT;
                 }
 
@@ -540,7 +562,7 @@ class Helper
 
                 /* Little Robot Dude
                  */
-                if (self::CHAT === $type) {
+                if (self::FEATURE_CHAT === $type) {
                     return sprintf(
                         self::ENDPOINT_HOST_AZURE_CHAT,
                         $this->openAiAzureResourceName,

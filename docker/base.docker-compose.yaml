@@ -51,6 +51,7 @@ services:
     build:
       context: ./schoolbox-cli
       args:
+        BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
         PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
         USER_ID: ${USER_ID}
         GROUP_ID: ${GROUP_ID}
@@ -166,6 +167,7 @@ services:
     build:
       context: ./schoolbox-digestd
       args:
+        BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
         PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
     env_file: ./schoolbox/default-instance.env
     volumes:
@@ -192,6 +194,7 @@ services:
     build:
       context: ./schoolbox-scheduled
       args:
+        BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
         PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
     env_file: ./schoolbox/default-instance.env
     volumes:
@@ -218,6 +221,7 @@ services:
     build:
       context: ./schoolbox-mobiled
       args:
+        BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
         PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
     env_file: ./schoolbox/default-instance.env
     volumes:
@@ -244,6 +248,7 @@ services:
     build:
       context: ./schoolbox-socketd
       args:
+        BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
         PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
     env_file: ./schoolbox/default-instance.env
     volumes:
