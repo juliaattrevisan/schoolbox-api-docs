@@ -321,12 +321,13 @@ class Helper
         }
 
         /* If any of the pastoral access is set to deny for the viewer, then the record should not
-         * be included
+         * be included, unless the record belongs to the user
          */
         $this->filters[] = "
         NOT EXISTS (
             SELECT 1 FROM `pastoral_access` pa_deny
             WHERE pa_deny.`pastoral_id` = `pastoral`.`id`
+            AND pa_deny.`deleted_at` IS NULL
             AND pa_deny.`access` = :accessDeny
             AND (
                 pa_deny.`user_id` = :viewerId OR
@@ -338,6 +339,7 @@ class Helper
                     WHERE `pgm`.`user_id` = :viewerId AND `pg`.`deleted_at` IS NULL
                 ))
             )
+            AND `pastoral`.`owner_id` <> :viewerId
         )";
 
         $filters = [];
@@ -454,7 +456,7 @@ class Helper
         $fromString = "
             FROM {$this->pastoralMapper->getTable()}
             INNER JOIN user s ON pastoral.student_id = s.id AND s.deleted_at IS NULL
-            INNER JOIN pastoral_access pa ON pastoral.id = pa.pastoral_id AND pa.deleted_at IS NULL
+            INNER JOIN pastoral_access pa ON pastoral.id = pa.pastoral_id
             LEFT JOIN lu_pastoral_severity sv ON pastoral.severity_id = sv.id
             LEFT JOIN userCampus v_sc ON s.id = v_sc.uid
         ";
