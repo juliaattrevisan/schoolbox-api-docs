@@ -733,6 +733,11 @@ li article ol {
     margin-bottom: $list-margin-bottom;
 }
 
+// Fix list item cut off inside feed items
+li.feed-item article ul,
+li.feed-item article ol {
+    list-style-position: inside;
+}
 // an overlay that is displayed while something is processing
 .wait-overlay {
     position: absolute;
