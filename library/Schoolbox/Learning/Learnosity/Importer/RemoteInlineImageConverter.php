@@ -177,7 +177,7 @@ class RemoteInlineImageConverter
                  * ...which maybe conflicts with anyone else uploading the same filename. Anyway, this
                  * is probably functionally better than "inline image.jpg".
                  */
-                $this->logger->debug(sprintf(
+                $this->logger?->debug(sprintf(
                     'Obtaining pre-signed url for %s...',
                     $filename
                 ));
@@ -202,7 +202,7 @@ class RemoteInlineImageConverter
                  */
                 $destination = $resultNode['upload'];
 
-                $this->logger->debug(sprintf(
+                $this->logger?->debug(sprintf(
                     'src url: %s via pre-signed url %s',
                     $filename,
                     $destination
@@ -221,7 +221,7 @@ class RemoteInlineImageConverter
                  *  to warrant it: I also don't know the manner in which Learnosity announces
                  *  its failures. I thunk about it tho
                  */
-                $this->logger->debug(sprintf(
+                $this->logger?->debug(sprintf(
                     'Transmitting image binary into %s',
                     $destination
                 ));
@@ -231,7 +231,7 @@ class RemoteInlineImageConverter
                 ]);
 
                 if (200 !== $response->getStatusCode()) {
-                    $this->logger->warning(sprintf(
+                    $this->logger?->warning(sprintf(
                         'Learnosity returned HTTP status %d.',
                         $response->getStatusCode()
                     ));
