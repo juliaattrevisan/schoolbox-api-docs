@@ -8,7 +8,6 @@
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import { kebabToTitleCase } from "@js/util/stringUtils";
-import { getFromNow } from "@js/util/dateUtils";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
