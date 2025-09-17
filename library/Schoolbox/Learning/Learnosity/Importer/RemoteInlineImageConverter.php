@@ -191,7 +191,7 @@ class RemoteInlineImageConverter
 
                 /* We'll use this to reference learnosity media from now on
                  */
-                $storageUrl = $resultNode['public'];
+                $src = $resultNode['public'];
 
                 /* POST data into this pre-signed url. This puts binary content into learnosity
                  */
@@ -206,6 +206,10 @@ class RemoteInlineImageConverter
                         // Log it, I suppose? But what comes back?
                     }
                 */
+                /* TODO Maybe ad a retry mechanism here, but I'm not sure how often this fails
+                 *  to warrant it: I also don't know the manner in which Learnosity announces
+                 *  its failures. I thunk about it tho
+                 */
                 $this->client->put($destination, [
                     'body' => $imageData
                 ]);
@@ -213,7 +217,7 @@ class RemoteInlineImageConverter
                 /* Replace the node with a relative url equivalent
                  */
                 $replacement = $dom->createElement('img');
-                $replacement->setAttribute('src', $storageUrl);
+                $replacement->setAttribute('src', $src);
                 $replacement->setAttribute('alt', $filename);
 
                 $node->parentNode->replaceChild($replacement, $node);
