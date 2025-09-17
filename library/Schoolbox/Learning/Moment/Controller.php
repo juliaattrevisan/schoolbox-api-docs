@@ -1254,7 +1254,10 @@ class Controller extends Base
                  * Note that a controller method must fulfil this node after the fact, for aura reasons
                  * (not easy to dedupe that implementation, sadly)
                  */
-                '_links' => $momentTranslated['_links']
+                '_links' => $momentTranslated['_links'],
+                /* A special Publish button label for exactly one workflow
+                 */
+                '_labels' => $momentTranslated['_labels'],
             ];
         }
 
