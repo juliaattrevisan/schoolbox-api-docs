@@ -33,14 +33,14 @@
 
                     {% if unit.isAfterDueDate == false %}
                     <li class="separator">Create</li>
-                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=project&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-project">{{ locale.project.proper }}</a></li>
-                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=dueWork&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-due-work" data-add-button data-form_class="for-due-work">{{ locale.dueWork.proper }}</a></li>
-                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=quiz&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-quiz" data-add-button data-form_class="for-assessment">Quiz</a></li>
-                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=task&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-task" data-test="course-outline-task-add-task">Task</a></li>
+                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=project&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-project" data-test="course-outline-menu-add-project">{{ locale.project.proper }}</a></li>
+                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=dueWork&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-due-work" data-test="course-outline-menu-add-due-work" data-add-button data-form_class="for-due-work">{{ locale.dueWork.proper }}</a></li>
+                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=quiz&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-quiz" data-test="course-outline-menu-add-quiz" data-add-button data-form_class="for-assessment">Quiz</a></li>
+                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=task&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-task" data-test="course-outline-menu-add-task">Task</a></li>
                     {% if config.lti_assessments_enable %}
                     <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=lti&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lti">3rd Party Assessment</a></li>
                     {% endif %}
-                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=lessonPlan&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lesson-plan">{{ locale.lessonPlan.proper }}</a></li>
+                    <li><a href="{{ routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'units', contextId: unit.id, context: unit}) }}?type=lessonPlan&{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-lesson-plan" data-test="course-outline-menu-add-lesson-plan">{{ locale.lessonPlan.proper }}</a></li>
                     {% endif %}
                     <li class="separator">Manage</li>
                     {% set courseMarkbookRoute = routeLookupIfAuthorized('courseMarkbook.getRedirect', {courseSpec: unit.specification.course, courseSpecId: unit.specification.course.id, unitSpec: unit.specification, unitSpecId: unit.specification.id, folder: unit.course.folder, folderId: unit.course.folder.id}) %}
