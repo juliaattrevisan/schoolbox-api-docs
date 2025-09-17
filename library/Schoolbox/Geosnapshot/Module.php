@@ -55,6 +55,25 @@ class Module extends BaseModule
         $isLoggedIsStaff = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\HasRole(Role::STAFF),
+            new Rule\Callback(function (array $params, \Schoolbox\User $sessionUser) {
+                /* No Geosnapshot? No trabajo
+                 *
+                 * One or more misconfigurations or access controls could have caused this
+                 * but all result in nothing to see for the current user
+                 *
+                 * should we also check to see if there is an oidc geo config? as this won't work without it...
+                 * how to do that check... :thinking:
+                 */
+                $isGeosnapshotAvailable = (new ValidPhotosAvailable())
+                    ->isConfigured(
+                        $this->getConfig()->get('geosnapshot_api_key'),
+                        $this->getConfig()->get('geosnapshot_enabled'),
+                    );
+
+                if (!$isGeosnapshotAvailable) {
+                    throw new Failure\InvalidPath();
+                }
+            })
         );
 
         $this->register('GET', '/user/{id}', 'getPhotos', $canGetPhotos, $preloadUserAndUrl);
