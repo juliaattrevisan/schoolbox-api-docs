@@ -177,6 +177,11 @@ class RemoteInlineImageConverter
                  * ...which maybe conflicts with anyone else uploading the same filename. Anyway, this
                  * is probably functionally better than "inline image.jpg".
                  */
+                $this->logger->debug(sprintf(
+                    'Obtaining pre-signed url for %s...',
+                    $filename
+                ));
+
                 $result = $this->api->dataGetRequest('/itembank/upload/assets', [
                     'subkeys' => [
                         $filename
@@ -197,6 +202,12 @@ class RemoteInlineImageConverter
                  */
                 $destination = $resultNode['upload'];
 
+                $this->logger->debug(sprintf(
+                    'src url: %s via pre-signed url %s',
+                    $filename,
+                    $destination
+                ));
+
                 /* This is supposed to return http 200, but not sure what *else* it could return
                  * as the documentation is particularly sparse.
                  *
@@ -210,6 +221,11 @@ class RemoteInlineImageConverter
                  *  to warrant it: I also don't know the manner in which Learnosity announces
                  *  its failures. I thunk about it tho
                  */
+                $this->logger->debug(sprintf(
+                    'Transmitting image binary into %s',
+                    $destination
+                ));
+
                 $this->client->put($destination, [
                     'body' => $imageData
                 ]);
