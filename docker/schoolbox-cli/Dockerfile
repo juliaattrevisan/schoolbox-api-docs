@@ -15,11 +15,7 @@ ARG NODE_VERSION=20
 ARG USER_ID
 ARG GROUP_ID
 
-# Install Intellischool CLI client, as per instructions on
-# https://docs.intellischool.co/guides/cli-quickstart#install-debian-ubuntu:
-# since keys are publicly accessible on that page, I'm not counting them as
-# private information.
-# Also, install tools required by cron tasks and CLI:
+# Install tools required by cron tasks and CLI:
 # * cron itself, git, mariadb client, ffmpeg, imagemagick, sudo, jq
 RUN \
   apt-get update && \
@@ -77,6 +73,29 @@ case "$ENV" in
     ;;
 esac
 EOF
+
+# Install Intellischool CLI client, as per instructions on
+# https://docs.intellischool.co/guides/cli-quickstart#install-debian-ubuntu:
+# need to install from a downloaded tar file, because it can't be installed
+# under Trixie yet.
+RUN <<EOF
+case "$(uname -m)" in
+  x86_64 )
+    curl https://cli.intellischool.net/channels/stable/intelliscl-linux-x64.tar.gz -f -o "intelliscl.tar.gz" || exit 1
+    ;;
+  aarch64 )
+    curl https://cli.intellischool.net/channels/stable/intelliscl-linux-arm64.tar.gz -f -o "intelliscl.tar.gz" || exit 1
+    ;;
+  * )
+    echo "Unknown architecture: not installing Intellischool CLI client"
+    exit
+    ;;
+esac
+tar -C /opt/ -xzf intelliscl.tar.gz
+EOF
+
+# Add intelliscl to path
+RUN echo 'export PATH=$PATH:/opt/intelliscl/bin' >> /etc/profile
 
 # Copy NVM profile and sudoers conf
 COPY ./config/profile.d/* /etc/profile.d/
