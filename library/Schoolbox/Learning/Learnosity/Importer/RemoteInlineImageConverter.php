@@ -104,8 +104,15 @@ class RemoteInlineImageConverter
 
                 /* FIXME Replace with a call into learnosity that processes the stuff
                  */
+
+                /* Obtain a pre-signed url. This is the destination url that you'll ultimately
+                 * end up using in the replacement node.
+                 */
                 $storageUrl = 'http://learnosity.schoolbox.com.au';
                 $filename = 'whatever this is going to be';
+
+                /* POST data into this pre-signed url. This puts binary content into learnosity
+                 */
 
 
                 /* Replace the node with a relative url equivalent
