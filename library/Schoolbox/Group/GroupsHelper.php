@@ -80,20 +80,14 @@ class GroupsHelper
      *
      * @param string    $name   Route name
      * @param array     $params Route parameters
-     * @param User|null $user The user to authorize the route for. Defaults to
-     *                         currently authenticated user.
+     * @param User|null $user The user to authorize the route for
      * @return string|false     The URL if authorized, false otherwise
      */
     private function getRouteIfAuthorized(string $name, array $params = [], ?User $user = null)
     {
         if (!$user instanceof User) {
-            // check if the user is authenticated and use that human
-            if (isset($_SESSION['user']) && $_SESSION['user'] instanceof User) {
-                $user = $_SESSION['user'];
-            } else {
-                // No valid user in session; cannot authorize route
-                return false;
-            }
+            // No valid user in session; cannot authorize route
+            return false;
         }
 
         try {
