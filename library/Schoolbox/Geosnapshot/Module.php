@@ -51,13 +51,14 @@ class Module extends BaseModule
 
         $canGetPhotos = $this->canGetPhotosUrl();
 
-        $isloggedinIsStaff = new Rule\All(
+        // only staff should be able to hit this endpoint
+        $isLoggedIsStaff = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\HasRole(Role::STAFF),
         );
 
         $this->register('GET', '/user/{id}', 'getPhotos', $canGetPhotos, $preloadUserAndUrl);
-        $this->register('GET', '/management', 'getManagement', $isloggedinIsStaff);
+        $this->register('GET', '/management', 'getManagement', $isLoggedIsStaff);
     }
 
 
