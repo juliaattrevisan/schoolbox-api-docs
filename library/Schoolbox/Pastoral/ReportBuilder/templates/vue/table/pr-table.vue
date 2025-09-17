@@ -4,6 +4,7 @@
  */
 
 import type { Ref } from "vue";
+import { useElementSize } from "@vueuse/core";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import type { TablePayload, TableHeader, SelectedCell, RowKeys, Tab } from "../../js/types/pastoralReportTypes";
@@ -16,6 +17,15 @@ import PrTableTotalRow from "./pr-table-total-row.vue";
 import PrTableRow from "./pr-table-row.vue";
 import PrTableFooter from "./pr-table-footer.vue";
 import PrTableModal from "./pr-table-modal.vue";
+
+// #region sticky total/trend table columns for bigger screens
+
+const containerEl = window.Vue.useTemplateRef<HTMLDivElement>("containerRef");
+const { width: containerWidth } = useElementSize(containerEl);
+const isTotalSticky = window.Vue.computed(() => containerWidth.value > 1000);
+const isTrendSticky = window.Vue.computed(() => containerWidth.value > 1500);
+
+// #endregion
 
 // #region table load / sorting / pagination
 
@@ -141,49 +151,57 @@ window.Vue.onMounted(() => {
     </div>
     <pr-empty v-else-if="isEmpty" />
     <template v-else-if="hasRows">
-        <div
-            ref="scrollableRef"
-            class="table-container scrollable"
-            :style="{ maxHeight: maxScrollableHeight }"
-            data-test="pr-table"
-        >
-            <table class="pr-table">
-                <pr-table-header
-                    v-model:records-or-points="recordsOrPoints"
-                    :headers="(payload as TablePayload).data.tableHeaders"
-                    :sort-by="sortBy"
-                    :order="order"
-                    @sort="onSort"
+        <div ref="containerRef">
+            <div
+                ref="scrollableRef"
+                class="table-container scrollable"
+                :style="{ maxHeight: maxScrollableHeight }"
+                data-test="pr-table"
+            >
+                <table class="pr-table">
+                    <pr-table-header
+                        v-model:records-or-points="recordsOrPoints"
+                        :headers="(payload as TablePayload).data.tableHeaders"
+                        :sort-by="sortBy"
+                        :order="order"
+                        :is-total-sticky="isTotalSticky"
+                        :is-trend-sticky="isTrendSticky"
+                        @sort="onSort"
+                    />
+                    <!-- Skeleton loading state when switching between records/rows and sorting -->
+                    <loading-table v-if="isMoreLoading" :only-body="true" />
+                    <tbody v-else>
+                        <!-- Total row -->
+                        <pr-table-total-row
+                            :headers="(payload as TablePayload).data.tableHeaders"
+                            :row-data="(payload as TablePayload).data.totalRow"
+                            :records-or-points="recordsOrPoints"
+                            :is-total-sticky="isTotalSticky"
+                            :is-trend-sticky="isTrendSticky"
+                            @cell-select="onTotalCellSelect"
+                        />
+                        <!-- All other rows -->
+                        <pr-table-row
+                            v-for="(row, index) in (payload as TablePayload).data.rows"
+                            :key="`row-${index}`"
+                            :headers="(payload as TablePayload).data.tableHeaders"
+                            :row-data="row"
+                            :records-or-points="recordsOrPoints"
+                            :is-total-sticky="isTotalSticky"
+                            :is-trend-sticky="isTrendSticky"
+                            @cell-select="onRowCellSelect"
+                        />
+                    </tbody>
+                </table>
+                <pr-table-footer
+                    :url="viewUrl"
+                    :metadata="(payload as TablePayload).metadata"
+                    :limit="LIMIT"
+                    :is-loading="isNewLoading || isMoreLoading"
+                    @previous="onPaginate"
+                    @next="onPaginate"
                 />
-                <!-- Skeleton loading state when switching between records/rows and sorting -->
-                <loading-table v-if="isMoreLoading" :only-body="true" />
-                <tbody v-else>
-                    <!-- Total row -->
-                    <pr-table-total-row
-                        :headers="(payload as TablePayload).data.tableHeaders"
-                        :row-data="(payload as TablePayload).data.totalRow"
-                        :records-or-points="recordsOrPoints"
-                        @cell-select="onTotalCellSelect"
-                    />
-                    <!-- All other rows -->
-                    <pr-table-row
-                        v-for="(row, index) in (payload as TablePayload).data.rows"
-                        :key="`row-${index}`"
-                        :headers="(payload as TablePayload).data.tableHeaders"
-                        :row-data="row"
-                        :records-or-points="recordsOrPoints"
-                        @cell-select="onRowCellSelect"
-                    />
-                </tbody>
-            </table>
-            <pr-table-footer
-                :url="viewUrl"
-                :metadata="(payload as TablePayload).metadata"
-                :limit="LIMIT"
-                :is-loading="isNewLoading || isMoreLoading"
-                @previous="onPaginate"
-                @next="onPaginate"
-            />
+            </div>
         </div>
     </template>
     <!-- fall back to just an empty state if all else fails -->
@@ -191,7 +209,7 @@ window.Vue.onMounted(() => {
     <pr-table-modal :selected-cell="selectedCell" :records-or-points="recordsOrPoints" />
 </template>
 
-<style lang="scss">
+<style scoped lang="scss">
 .pr-table {
     width: 100%;
     /* fix the head to stay at the top when scrolling */
@@ -202,7 +220,9 @@ window.Vue.onMounted(() => {
         z-index: var(--sbx-depth-ui-sticky);
     }
 }
+</style>
 
+<style lang="scss">
 .highcharts-tooltip-container {
     z-index: var(--sbx-depth-pop-over) !important;
 }

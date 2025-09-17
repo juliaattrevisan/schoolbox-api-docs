@@ -505,6 +505,10 @@ table.attempts-table {
 /* to accommodate an absolute positioned child */
 td:has(.u-td-button) {
     padding: 0; // padding is handled by the button instead
+}
+
+/* if position: sticky is already set we don't need to add position: relative */
+td:has(.u-td-button):not(.u-sticky-left) {
     position: relative;
 }
 

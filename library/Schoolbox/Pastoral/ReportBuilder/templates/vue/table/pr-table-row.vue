@@ -25,6 +25,8 @@ const props = defineProps<{
     headers: TableHeader[];
     rowData: { [key: string]: RowOptions };
     recordsOrPoints: "records" | "points";
+    isTotalSticky: boolean;
+    isTrendSticky: boolean;
 }>();
 
 const emit = defineEmits<{
@@ -46,11 +48,25 @@ function onCellSelected(header: TableHeader): void {
 </script>
 
 <template>
-    <tr>
+    <tr class="pr-table-row">
         <td
             v-for="(header, index) in props.headers"
             :key="header.key"
-            :class="`u-border-right ${index === 0 ? 'u-sticky-left u-sticky-left--row ' : ''} ${header.key === 'user' ? 'l-pad--0' : ''} ${header.key === 'total' ? 'total-cell' : ''}`"
+            :class="{
+                'u-border-right': true,
+                'u-sticky-left':
+                    index === 0 ||
+                    (header.key === 'total' && props.isTotalSticky) ||
+                    (header.key === 'trend' && props.isTrendSticky),
+                'u-sticky-left--row':
+                    index === 0 ||
+                    (header.key === 'total' && props.isTotalSticky) ||
+                    (header.key === 'trend' && props.isTrendSticky),
+                'l-pad--0': header.key === 'user',
+                'total-cell': header.key === 'total',
+                'total-cell--sticky': header.key === 'total' && props.isTotalSticky,
+                'trend-cell--sticky': header.key === 'trend' && props.isTrendSticky,
+            }"
         >
             <template v-if="header.type == TableHeaderType.USER">
                 <div class="l-flex-row l-flex--no-wrap l-gap-m">
@@ -118,16 +134,34 @@ function onCellSelected(header: TableHeader): void {
     </tr>
 </template>
 
-<style lang="scss">
-tr:hover {
+<style scoped lang="scss">
+.pr-table-row:hover {
     /* to help legibility, keeping the row in focus */
     background-color: var(--sbx-pr-table-row-hover-colour);
-    .highcharts-background {
-        fill: var(--sbx-pr-table-row-hover-colour);
+    td {
+        background-color: var(--sbx-pr-table-row-hover-colour);
     }
 }
 
 .total-cell {
     background: var(--sbx-pr-table-total-cell-colour);
+    &--sticky {
+        left: var(--sbx-pr-table-first-header-width); // override the default left: 0 from u-sticky-left
+    }
+}
+
+.trend-cell--sticky {
+    left: calc(
+        var(--sbx-pr-table-first-header-width) + var(--sbx-pr-table-total-header-width)
+    ); // override the default left: 0 from u-sticky-left
+}
+</style>
+
+<style lang="scss">
+/* to target the highcharts background specifically outside the scoped styles */
+.pr-table-row:hover {
+    .highcharts-background {
+        fill: var(--sbx-pr-table-row-hover-colour);
+    }
 }
 </style>
