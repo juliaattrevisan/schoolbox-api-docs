@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright   Copyright 2023, Schoolbox Pty Ltd
+ * @copyright   Copyright 2025, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Learnosity\Importer;
 
+use Alaress\Image\TransformFormat;
 use DOMElement;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -17,7 +18,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\Learning\Learnosity\Api;
 
 /**
- * Converts a base64 encoded image into a storage reference with a relative url
+ * Converts a base64 encoded image into a learnosity media asset with an absolute url
  */
 class RemoteInlineImageConverter
 {
@@ -154,7 +155,7 @@ class RemoteInlineImageConverter
                          * https://help.learnosity.com/hc/en-us/articles/26076399578397-Upload-assets-Endpoints-Data-API
                          */
                         'Expect' => '100-continue',
-                        'Content-Type' => (new \Alaress\Image\TransformFormat($mime))->getFormat(),
+                        'Content-Type' => (new TransformFormat($mime))->getFormat(),
                     ];
 
                     $this->client = new Client([
