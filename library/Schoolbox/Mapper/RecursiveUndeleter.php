@@ -451,7 +451,7 @@ class RecursiveUndeleter
                 return $deletedAt->between($deletedAfter, $deletedBefore);
             });
         }
-        $this->logger->info(sprintf("%d deleted child models found", $childModels->count()));
+        $this->logger->debug(sprintf("%d deleted child models found", $childModels->count()));
         return $childModels;
     }
 
@@ -621,7 +621,7 @@ class RecursiveUndeleter
 
         $childMappers = self::$softDeleteRegistry[$mapperClass];
         $parentIds    = $deletedParentModels->getPropertyValues($parentMapper->getIdentifierProperty());
-        $this->logger->info(sprintf("Finding children of mapper '%s' with ids %s", $mapperClass, $this->getIdsString($parentIds)));
+        $this->logger->debug("Finding children using mapper '$mapperClass' and parentIds " . $this->getIdsString($parentIds));
 
         // For each child entity of this parent entity
         foreach ($childMappers as $key => $val) {
@@ -631,7 +631,6 @@ class RecursiveUndeleter
              */
             [$childMapper, $foreignKeyColumn] = $this->getMapperClassAndForeignKeyFromRegistryPair($parentMapper, $key, $val);
             $mapperClass = get_class($childMapper);
-            $this->logger->info(sprintf("Fetching children from mapper '%s'", $mapperClass));
 
             $deletedChildModels = $this->findDeletedChildModels($childMapper, $foreignKeyColumn, $parentIds, $after, $before);
 
@@ -642,11 +641,11 @@ class RecursiveUndeleter
             $childModelIdentifier = $childMapper->getIdentifierColumn();
             if (!$childModelIdentifier) {
                 $this->checkNoIdentifier($val);
-                $this->logger->info(sprintf("Mapper '%s' does not have an identifier, therefore cannot have children", $val));
+                $this->logger->debug(sprintf("Mapper '%s' does not have an identifier, therefore cannot have children", $val));
                 continue;
             }
 
-            $this->logger->info(sprintf("Child mapper identifier column '%s'", $childModelIdentifier));
+            $this->logger->debug(sprintf("Child mapper identifier column '%s'", $childModelIdentifier));
             $childModelIds = $deletedChildModels->getPropertyValues($childMapper->getIdentifierProperty());
             $this->logger->debug(sprintf('Child model IDs: %s', $this->getIdsString($childModelIds)));
 

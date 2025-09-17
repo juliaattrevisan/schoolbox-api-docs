@@ -1825,7 +1825,8 @@ abstract class Mapper implements IMapper
     /**
      * Restores one or more models that were soft deleted.
      *
-     * @param object|Collection $object Model or collection of models to restore
+     * @param object|Collection $object Model or collection of models to restore.
+     *                                  All models in the collection should have the same type.
      *
      * @return bool
      */
@@ -1834,14 +1835,47 @@ abstract class Mapper implements IMapper
         if (!isset($this->soft_delete_column)) {
             return false;
         }
-        return $this->updateAll(
-            $object,
-            $this->soft_delete_column,
-            $this->soft_delete_undeleted_value,
-            self::CALLBACK_PRERESTORE,
-            self::CALLBACK_POSTRESTORE,
-            self::METHOD_CREATE
-        );
+
+        // Some objects exist have parent/child relationships that result in a tree of connected objects (e.g. folders).
+        // In a tree of connected objects, every descendent of a soft-deleted object must also be soft-deleted.
+        // We can't tell from here which objects exist in trees, so we treat all collections as potential trees.
+        if ($object instanceof Collection) {
+            // Update the items one at a time, in the order they were supplied.
+            // This is done so that parent objects will always be restored before child objects, and so the requirement
+            // that every folder to be restored must have a non-deleted parent will not be violated.
+            // (see for example Folder\Mapper->validateActiveParent())
+            // Note this works because objects are supplied in parent-first order, due to the way the object tree is
+            // traversed in RecursiveUndeleterCli->getDataStructureForAllRootModels().
+            foreach ($object as $model) {
+                $success = $this->updateAll(
+                    $model,
+                    $this->soft_delete_column,
+                    $this->soft_delete_undeleted_value,
+                    self::CALLBACK_PRERESTORE,
+                    self::CALLBACK_POSTRESTORE,
+                    self::METHOD_CREATE
+                );
+
+                if (!$success) {
+                    return false;
+                }
+            }
+        } else {
+            $success = $this->updateAll(
+                $object,
+                $this->soft_delete_column,
+                $this->soft_delete_undeleted_value,
+                self::CALLBACK_PRERESTORE,
+                self::CALLBACK_POSTRESTORE,
+                self::METHOD_CREATE
+            );
+
+            if (!$success) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

@@ -227,6 +227,7 @@ class Helper
      * @return void
      * @throws ValidationException
      * @throws \RuntimeException
+     * @throws \JsonException
      */
     public function restore(string $learnosityReference): void
     {

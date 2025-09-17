@@ -2477,15 +2477,26 @@ class Mapper extends AbstractFolderMapper implements ILocator
      */
     protected function validateActiveParent(Model $model): bool
     {
+        $parentId = $model->getParent()?->getId();
+
+        if ($parentId === null) {
+            // No parent, so validation fails.
+            // This should never happen due to folder.parent being non-nullable in the database.
+            // But AbstractFolder->getId() can return null, so this makes type checkers happy.
+            throw new UnexpectedValueException('Parent folder must exist.');
+        }
+
         // No need to check for active parent if the folder is root
-        if ($model->getParent()?->getId() === Model::ROOT_ID) {
+        if ($parentId === IFolder::ROOT_ID) {
             return true;
         }
 
-        // fetch hydrated parent
-        $parent = $this->findById($model->getParent()->getId());
-        if ($parent->isDeleted()) {
-            throw new UnexpectedValueException('Parent folder must NOT be deleted.');
+        // Check that parent exists.  If not, return reason for validation failure.
+        // See requirements for callback functions in docblock for Schoolbox\Mapper->triggerCallbacks().
+        try {
+            $this->findById($parentId);
+        } catch (MapperException\NotFound | MapperException\Deleted) {
+            throw new UnexpectedValueException('Parent folder must exist and must not be deleted.');
         }
 
         return true;

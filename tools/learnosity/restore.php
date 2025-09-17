@@ -98,7 +98,7 @@ Omitting this will cause this tool to manipulate statuses en masse for all the q
 
 --perform
 This makes a request to Learnosity to change the status of a quiz in their system. If combined with
-verbose mode -vvv you'll get a breakdown of all the items it changed as well. 
+verbose mode -vvv you'll get a breakdown of all the items it changed as well.
 
 --status
 You can arbitrarily decide which state to apply to a Learnosity quiz: "archived" or "published"
@@ -111,7 +111,6 @@ restore.php --reference=abcd-123-efgh-5678 --perform -vvv
 
 // Put abcd-123-efgh-5678 into a deleted (archived) state in Learnosity
 restore.php --reference=abcd-123-efgh-5678 --status=archived --perform -vvv
- 
 
 Usage: restore.php [--reference] [--status] [--perform] -vvv
         --reference      A Learnosity activity reference to restore
@@ -375,6 +374,8 @@ HELP;
                         $newStatus
                     ));
 
+                    // Note learnosity_reference will not be null because of the WHERE clause in the SELECT query for
+                    // candidates above, so the record referred to by the reference is safe to restore or archive.
                     if (Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED === $newStatus) {
                         $helper->restore($candidate['learnosity_reference']);
                     } elseif (Helper::LEARNOSITY_ITEM_STATUS_ARCHIVED === $newStatus) {
