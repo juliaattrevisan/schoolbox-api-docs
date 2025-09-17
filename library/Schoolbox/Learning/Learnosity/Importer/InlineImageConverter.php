@@ -93,10 +93,12 @@ class InlineImageConverter
         $xpath     = new \DOMXPath($dom);
         $nodes     = $xpath->query('//*[@src]');
         $hasInline = false;
+
         foreach ($nodes as $node) {
-            if (!$node instanceof DomElement) {
+            if (!$node instanceof DOMElement) {
                 continue;
             }
+
             /* The src tag, a mega-huge base64 string
              */
             $src = $node->getAttribute('src');
