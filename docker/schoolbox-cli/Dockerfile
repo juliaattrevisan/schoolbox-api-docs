@@ -1,4 +1,3 @@
-ARG ARCH=amd64
 ARG ENV=dev
 ARG PHP_MAJOR_VERSION=8.4
 ARG PRIVATE_CONTAINER_REGISTRY=476058706527.dkr.ecr.ap-southeast-2.amazonaws.com
@@ -6,10 +5,10 @@ ARG IMAGE=${PRIVATE_CONTAINER_REGISTRY}/frankenphp-base
 ARG TAG=latest-php${PHP_MAJOR_VERSION}-${ENV}
 ARG USER_ID
 ARG GROUP_ID
+ARG BASE_PHP_IMAGE=${IMAGE}:${TAG}
 
-FROM ${IMAGE}:${TAG}
+FROM ${BASE_PHP_IMAGE}
 
-ARG ARCH
 ARG NVM_VERSION='0.40.3'
 ARG AWS_CLI_VERSION='2.27.55'
 ARG NODE_VERSION=20
@@ -62,16 +61,8 @@ case "$ENV" in
   prod | production)
     ;;
   *)
-    # AWS CLI install
-    case "$ARCH" in
-      arm64)
-        export AWS_CLI_ARCH='aarch64'
-        ;;
-      *)
-        export AWS_CLI_ARCH='x86_64'
-        ;;
-    esac
-    curl "https://awscli.amazonaws.com/awscli-exe-linux-${AWS_CLI_ARCH}-${AWS_CLI_VERSION}.zip" -o "awscliv2.zip"
+    # AWS CLI install for current system architecture
+    curl "https://awscli.amazonaws.com/awscli-exe-linux-$(uname -m)-${AWS_CLI_VERSION}.zip" -f -o "awscliv2.zip" || exit 1
     unzip awscliv2.zip
     ./aws/install
     rm awscliv2.zip

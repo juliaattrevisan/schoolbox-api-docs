@@ -11,6 +11,7 @@ declare MARIADB_PUBLISHED_PORT
 declare MARIADB_PUBLISHED_PORT
 declare REDIS_STORAGE_PUBLISHED_PORT
 declare REDIS_CACHE_PUBLISHED_PORT
+declare BASE_PHP_IMAGE_BUILD_FROM_LOCAL
 declare TASKD_BUILD_FROM_LOCAL
 declare PRIVATE_CONTAINER_REGISTRY_TYPE
 declare PRIVATE_CONTAINER_REGISTRY_DOCKERHUB_USERNAME
@@ -22,6 +23,7 @@ declare AWS_START_URL
 declare PHPSTORM_SERVER_NAME
 
 declare private_container_registry
+declare base_php_image
 declare docker_compose_args
 
 # Log to stderr
@@ -143,6 +145,15 @@ function login_to_container_registry() {
             ;;
     esac
 
+    # Also determine base image
+    case "${BASE_PHP_IMAGE_BUILD_FROM_LOCAL}" in
+        1 | true | yes | on)
+            base_php_image="php-frankenphp"
+            ;;
+        *)
+            base_php_image="${private_container_registry}/frankenphp-base:latest-php${PHP_MAJOR_VERSION}-dev"
+            ;;
+    esac
 }
 
 function build_docker_compose_env() {
@@ -161,6 +172,7 @@ function build_docker_compose_env() {
     PHPSTORM_SERVER_NAME=\"${PHPSTORM_SERVER_NAME}\"
     USER_ID=\"$(id -u)\"
     GROUP_ID=\"$(id -g)\"
+    BASE_PHP_IMAGE=\"${base_php_image}\"
     ${aws_credentials}" > .docker-compose.env
 }
 
@@ -171,6 +183,21 @@ function build_docker_compose_args() {
 }
 
 function start_containers() {
+    # Build base image locally if required
+    case "${BASE_PHP_IMAGE_BUILD_FROM_LOCAL}" in
+        1 | true | yes | on)
+            # Build frankenphp image before starting default env,
+            # as containers now rely upon it
+            docker build --progress=plain \
+                -t "${base_php_image}" \
+                --build-arg "ENV=dev" \
+                --build-arg "PHP_MAJOR_VERSION=${PHP_MAJOR_VERSION}" \
+                "docker/base-images/php-frankenphp/"
+            ;;
+        *)
+            ;;
+    esac
+
     # Which task daemon compose file is used?
     # A different one is used when using a locally built container, vs. using
     # one pulled from the private container registry.
