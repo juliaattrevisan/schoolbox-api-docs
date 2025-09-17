@@ -22,7 +22,7 @@ use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Moment\Cursor;
-use Schoolbox\Learning\Moment\Model;
+use Schoolbox\Learning\Moment\Model as MomentModel;
 use Schoolbox\Learning\Moment\Moderation\ModerationRequired;
 use Schoolbox\Learning\Moment\NextRoutes;
 use Schoolbox\Learning\Moment\Translator\ModelToArray\Factory;
@@ -797,20 +797,7 @@ class Controller extends Base
      */
     public function putPublish(Model $evidence): void
     {
-        /* TODO rename
-         * (soft rename inside function body for the moment, as has been done at the top of $this->putWithState().)
-         */
-        $moment = $evidence;
-        $momentEvidence = $moment->getEvidence();
-
-        // Validate here because learning moments are only publishable if they have text or at least one evidence.
-        if (empty($moment->getBody()) && ($momentEvidence === null || $momentEvidence->count() === 0)) {
-            // Moment is not publishable, so reject the request.
-            $this->sendError('Learning moment must contain text or evidence');
-        } else {
-            // Moment is publishable, so update the state and send a success response.
-            $this->response = $this->responseAsJson($this->putWithState($moment, Model::STATUS_PUBLISHED));
-        }
+        $this->response = $this->responseAsJson($this->putWithState($evidence, Model::STATUS_PUBLISHED));
     }
 
 

@@ -285,7 +285,7 @@ class Mapper extends BaseMapper
      * @param GenericCollection $collection
      * @return GenericCollection
      */
-    private function hydrateEvidenceIntoCollection(GenericCollection $collection): GenericCollection
+    public function hydrateEvidenceIntoCollection(GenericCollection $collection): GenericCollection
     {
         $momentIds = $collection->keys();
 
