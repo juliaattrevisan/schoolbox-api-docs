@@ -57,10 +57,8 @@
             config.maxMarkInput.on("input", syncEntriesIfNeeded);
             config.gradingSchemeSelect.on("change", syncEntriesIfNeeded);
 
-            // If this is the first load and this isn't reliant on another field, apply the initial state
-            if (config.sync.syncWith === null) {
-                syncEntriesIfNeeded();
-            }
+            // If this is the first load then apply the initial state
+            syncEntriesIfNeeded();
         }
 
         /**
@@ -199,8 +197,7 @@
             }
 
             // If this is set to sync with another field, hide the dropdown if the switch is off
-            const sourceConfig = configEntries[config.sync.syncWith ?? config.context];
-            const syncSwitch = document.querySelector(sourceConfig.sync.switchSelector);
+            const syncSwitch = document.querySelector(config.sync.switchSelector);
             if (config.sync.syncWith !== null) {
                 config.markTypeDropdown[0].closest(".row").style.display = syncSwitch.checked ? "" : "none";
             }
@@ -223,7 +220,9 @@
             }
 
             // If this was triggered by a change in a target entry, ignore it (otherwise we'll get an infinite loop)
-            if (config.sync.syncWith !== null) {
+            // or skip it if the source config can't be found (perhaps if the fields loaded in the incorrect order?)
+            const sourceConfig = configEntries[config.sync.syncWith] ?? null;
+            if (sourceConfig === null) {
                 return;
             }
 
