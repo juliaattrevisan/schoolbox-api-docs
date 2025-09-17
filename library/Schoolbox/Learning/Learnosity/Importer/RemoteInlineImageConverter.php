@@ -77,7 +77,12 @@ class RemoteInlineImageConverter
         $dom = new \DOMDocument();
 
         try {
+            /* Suppress these obnoxious warnings from test xml file as per Gordon's reply in
+             * https://stackoverflow.com/questions/9149180/domdocumentloadhtml-error
+             */
+            libxml_use_internal_errors(true);
             $dom->loadHTML(self::META_CONTENT_TYPE_PREFIX . $html);
+            libxml_use_internal_errors(false);
         } catch (\ErrorException $e) {
             /* Could not parse document; it's been truncated due to maximum length somewhere in our db.
              * It's literally half an html...I guess we have to skip it for now?
