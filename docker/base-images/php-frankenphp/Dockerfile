@@ -14,36 +14,46 @@ ARG PHP_MAJOR_VERSION
 # otherwise, xDebug will be installed below.
 ARG ENV
 
-# Install additional extensions
+# Install pdo_sqlsrv requirements
+# (workaround from https://github.com/mlocati/docker-php-extension-installer/pull/1149#discussion_r2307219876)
+RUN apt update && \
+    apt install -qy --no-install-recommends gnupg && \
+    curl -sSLf https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor --yes --output /usr/share/keyrings/microsoft-prod.gpg && \
+    curl -sSLf https://packages.microsoft.com/config/debian/12/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
+    apt update && \
+    ACCEPT_EULA=Y apt install -qy --no-install-recommends msodbcsql18
+
+# Install additional extensions, + pdo_sqlsrv requirements
 # (not in https://github.com/shinsenter/php?tab=readme-ov-file#pre-installed-php-extensions)
-RUN apt-get update && apt-get upgrade -y && \
+RUN apt update && apt upgrade -y && \
     install-php-extensions \
-    imagick \
-    pdo_mysql \
-    excimer \
-    curl \
-    ldap \
-    dom \
-    sockets \
-    imap \
-    redis \
-    readline \
-    zip \
-    pcntl \
-    posix \
-    openssl \
-    json \
-    simplexml \
-    mbstring \
-    intl \
-    xmlreader \
-    dom \
-    exif \
-    zlib \
-    fileinfo \
-    libxml \
-    opcache && \
-    apt-get clean && \
+        imagick \
+        pdo_mysql \
+        pdo_sqlsrv \
+        excimer \
+        curl \
+        ldap \
+        dom \
+        sockets \
+        imap \
+        redis \
+        readline \
+        zip \
+        pcntl \
+        posix \
+        openssl \
+        json \
+        simplexml \
+        mbstring \
+        intl \
+        xmlreader \
+        dom \
+        exif \
+        zlib \
+        fileinfo \
+        libxml \
+        opcache && \
+    apt clean && \
     rm -rf /var/lib/apt/lists/*
 
 # Install XDebug on non-production, also copy base config
