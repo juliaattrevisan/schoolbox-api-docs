@@ -33,6 +33,9 @@ export type CohortReportEntry = {
         modifyForm: string | null;
         delete: string | null;
     };
+    _labels: {
+        publish: string;
+    }
 };
 
 export type CohortReportApiPayload = {
