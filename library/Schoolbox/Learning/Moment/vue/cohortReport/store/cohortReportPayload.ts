@@ -35,7 +35,7 @@ export type CohortReportEntry = {
     };
     _labels: {
         publish: string;
-    }
+    };
 };
 
 export type CohortReportApiPayload = {
