@@ -3,5 +3,5 @@
     <a href="https://geosnapshot.com/library" class="button submit">Access Photos and Media</a>
 {% else %}
     {# session exists, show iframe of geo #}
-    <iframe src="https://geosnapshot.com/library"></iframe>
+    {% include '@core/sub/iframe.twig' with { url: "https://geosnapshot.com/library" } %}
 {% endif %}
