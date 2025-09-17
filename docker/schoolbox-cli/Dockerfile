@@ -92,6 +92,7 @@ case "$(uname -m)" in
     ;;
 esac
 tar -C /opt/ -xzf intelliscl.tar.gz
+rm intelliscl.tar.gz
 EOF
 
 # Add intelliscl to path
