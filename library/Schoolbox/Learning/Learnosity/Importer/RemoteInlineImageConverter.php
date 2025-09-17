@@ -244,7 +244,7 @@ class RemoteInlineImageConverter
                         // Log it, I suppose? But what comes back?
                     }
                 */
-                /* TODO Maybe ad a retry mechanism here, but I'm not sure how often this fails
+                /* TODO Maybe add a retry mechanism here, but I'm not sure how often this fails
                  *  to warrant it: I also don't know the manner in which Learnosity announces
                  *  its failures. I thunk about it tho
                  */
