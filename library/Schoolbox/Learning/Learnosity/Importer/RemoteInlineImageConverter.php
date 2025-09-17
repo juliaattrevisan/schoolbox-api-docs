@@ -226,9 +226,21 @@ class RemoteInlineImageConverter
                     $destination
                 ));
 
-                $this->client->put($destination, [
+                $response = $this->client->put($destination, [
                     'body' => $imageData
                 ]);
+
+                if (200 !== $response->getStatusCode()) {
+                    $this->logger->warning(sprintf(
+                        'Learnosity returned HTTP status %d.',
+                        $response->getStatusCode()
+                    ));
+
+                    /* TODO Now what?
+                     *  I guess we could retry N times, then log the ultimate failure,
+                     *  and leave the html untouched...or...?
+                     */
+                }
 
                 /* Replace the node with a relative url equivalent
                  */
