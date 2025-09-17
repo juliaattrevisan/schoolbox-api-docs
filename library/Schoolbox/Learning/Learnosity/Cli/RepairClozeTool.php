@@ -12,8 +12,8 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\ApiException;
 use Schoolbox\Learning\Learnosity\Cli\DetectCloze\BrokenFillgap;
-use Schoolbox\Learning\Learnosity\Importer\InlineImageConverter;
 use Schoolbox\Learning\Learnosity\Importer\Legacy\Database\Strategy\Fillgap;
+use Schoolbox\Learning\Learnosity\Importer\RemoteInlineImageConverter;
 
 /**
  * Detect legacy quizzes containing cloze exercises.
@@ -54,9 +54,9 @@ class RepairClozeTool extends CliTool\App
 
 
     /**
-     * @var InlineImageConverter
+     * @var RemoteInlineImageConverter
      */
-    private InlineImageConverter $inlineImageConverter;
+    private RemoteInlineImageConverter $inlineImageConverter;
 
 
     /** @inheritdoc */
@@ -122,7 +122,7 @@ HELP;
             $this->getLogger()
         );
 
-        $this->inlineImageConverter = new InlineImageConverter(\Schoolbox\Resource\Storage\Mapper::getInstance(), $this->getLogger());
+        $this->inlineImageConverter = new RemoteInlineImageConverter($this->api, $this->getLogger());
 
         /* Find all the quizzes that contain a cloze exercise
          */

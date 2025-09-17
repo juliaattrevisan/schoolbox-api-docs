@@ -11,9 +11,8 @@ namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Database;
 
 use Alaress\Database\Connector\IConnector;
 use Psr\Log\LoggerInterface;
-use Schoolbox\Learning\Learnosity\Importer\InlineImageConverter;
 use Schoolbox\Learning\Learnosity\Importer\Legacy\Database\Strategy\Factory;
-use Schoolbox\Learning\Learnosity\Importer\Strategy;
+use Schoolbox\Learning\Learnosity\Importer\RemoteInlineImageConverter;
 
 /**
  * Takes a given schoolbox.assess_id and fetches all the sections, questions,
@@ -88,13 +87,13 @@ class Builder
      *
      * @param IConnector $db
      * @param Factory $strategyFactory
-     * @param InlineImageConverter $inlineImageConverter
+     * @param RemoteInlineImageConverter $inlineImageConverter
      * @param LoggerInterface $logger
      */
     public function __construct(
         IConnector $db,
         private \Schoolbox\Learning\Learnosity\Importer\Legacy\Database\Strategy\Factory $strategyFactory,
-        private InlineImageConverter $inlineImageConverter,
+        private RemoteInlineImageConverter $inlineImageConverter,
         private LoggerInterface $logger
     ) {
         $this->quizStatement = $db->prepare(self::QUERY_QUIZ);

@@ -15,11 +15,10 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\ApiException;
 use Schoolbox\Learning\Learnosity\Importer\BlueprintBuilder;
-use Schoolbox\Learning\Learnosity\Importer\InlineImageConverter;
 use Schoolbox\Learning\Learnosity\Importer\Legacy\Database\Builder;
 use Schoolbox\Learning\Learnosity\Importer\Legacy\Database\ContextLookup;
 use Schoolbox\Learning\Learnosity\Importer\PayloadFactory;
-use Schoolbox\Learning\Learnosity\Importer\Strategy;
+use Schoolbox\Learning\Learnosity\Importer\RemoteInlineImageConverter;
 use Schoolbox\Learning\Learnosity\TagFactory;
 use Symfony\Component\Lock\LockInterface;
 
@@ -466,7 +465,7 @@ HELP;
         $legacyQuizBuilder = new Builder(
             $this->getDatabaseInternal(),
             $strategyFactory,
-            new InlineImageConverter(\Schoolbox\Resource\Storage\Mapper::getInstance(), $this->getLogger()),
+            new RemoteInlineImageConverter($api, $this->getLogger()),
             $this->getLogger()
         );
 

@@ -20,8 +20,8 @@ use Schoolbox\Learning\Assessment\WorkType\Mapper;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Importer\BlueprintBuilder;
-use Schoolbox\Learning\Learnosity\Importer\InlineImageConverter;
 use Schoolbox\Learning\Learnosity\Importer\PayloadFactory;
+use Schoolbox\Learning\Learnosity\Importer\RemoteInlineImageConverter;
 use Schoolbox\Learning\Learnosity\TagFactory;
 use Schoolbox\Learning\Quiz\Model;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -84,7 +84,6 @@ class Importer
      * @param \Schoolbox\Learning\Quiz\Mapper    $quizMapper
      * @param Mapper                             $workTypeMapper
      * @param MarkTypeMapper                     $markTypeMapper
-     * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
      */
     public function __construct(
         private Api $api,
@@ -97,7 +96,6 @@ class Importer
         private \Schoolbox\Learning\Quiz\Mapper $quizMapper,
         private WorkType\Mapper $workTypeMapper,
         private MarkTypeMapper $markTypeMapper,
-        private \Schoolbox\Resource\Storage\Mapper $storageMapper
     ) {
         $this->associateStatement = $this->databaseInternal->prepare(self::QUERY_ASSOCIATE_LEARNOSITY);
     }
@@ -149,7 +147,7 @@ class Importer
         $quizBuilder = new Builder(
             $this->user,
             $strategyFactory,
-            new InlineImageConverter($this->storageMapper, null)
+            new RemoteInlineImageConverter($this->api, null)
         );
 
         /* Generates sets of tags for Activities' and Items' assignations

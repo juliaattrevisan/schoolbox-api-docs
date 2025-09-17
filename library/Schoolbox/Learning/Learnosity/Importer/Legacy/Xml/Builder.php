@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Learnosity\Importer\Legacy\Xml;
 
 use Schoolbox\Learning\Learnosity\Importer\InlineImageConverter;
 use Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\Strategy\Factory;
+use Schoolbox\Learning\Learnosity\Importer\RemoteInlineImageConverter;
 use Schoolbox\User;
 
 /**
@@ -45,12 +46,12 @@ class Builder
      *
      * @param User $user
      * @param Factory $strategyFactory
-     * @param InlineImageConverter $inlineImageConverter
+     * @param RemoteInlineImageConverter $inlineImageConverter
      */
     public function __construct(
         private \Schoolbox\User $user,
         private Strategy\Factory $strategyFactory,
-        private InlineImageConverter $inlineImageConverter,
+        private RemoteInlineImageConverter $inlineImageConverter,
     ) {
     }
 

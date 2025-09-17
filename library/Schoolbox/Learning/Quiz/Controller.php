@@ -324,7 +324,6 @@ class Controller extends AbstractController
                     $this->quizMapper,
                     $this->workTypeMapper,
                     $this->markTypeMapper,
-                    $this->storageMapper
                 ))->import($data);
 
                 /* Distill anything mostly non-fatal that we found during the import process
