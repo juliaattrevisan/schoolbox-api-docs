@@ -271,18 +271,16 @@ class RemoteInlineImageConverter
 
                         /* Something died along the way: but not sure what
                          */
-                        if (200 !== $response->getStatusCode()) {
-                            $this->logger?->warning(sprintf(
-                                'Learnosity returned HTTP status %d.',
-                                $response->getStatusCode()
-                            ));
+                        $this->logger?->warning(sprintf(
+                            'Learnosity returned HTTP status %d.',
+                            $response->getStatusCode()
+                        ));
 
-                            $jitter = $this->calculateJitter($fails);
+                        $jitter = $this->calculateJitter($fails);
 
-                            $this->induceNap($fails, $jitter, 'Received non-200 response while transmitting binary to presigned url on request %s: napping for %s seconds');
+                        $this->induceNap($fails, $jitter, 'Received non-200 response while transmitting binary to presigned url on request %s: napping for %s seconds');
 
-                            $fails++;
-                        }
+                        $fails++;
                     } catch (\Exception $e) {
                         $jitter = $this->calculateJitter($fails);
 
