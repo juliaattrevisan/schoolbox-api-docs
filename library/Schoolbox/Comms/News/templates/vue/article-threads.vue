@@ -299,7 +299,7 @@ export default {
          * @returns { String } ie: 2 hours ago
          */
         fromNow(date) {
-            return dayjs(date.database).fromNow();
+            return dayjs(date).fromNow();
         },
 
         /**
@@ -310,7 +310,7 @@ export default {
          * @returns { String }
          */
         fullString(date) {
-            return dayjs(date.database).format(dateDisplayFormats.dayjsDatetime);
+            return dayjs(date).format(dateDisplayFormats.dayjsDatetime);
         },
     },
 };
