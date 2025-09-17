@@ -427,7 +427,7 @@ window.Vue.watch(
             :config="editorSettings"
         />
         <label v-if="mfStore.showInvalidEvidenceError" class="error" for="mf-evidence-textarea">
-            Please add evidence or enter text before submitting the learning moment
+            Please add evidence or write something before submitting the learning moment
         </label>
     </div>
 </template>
