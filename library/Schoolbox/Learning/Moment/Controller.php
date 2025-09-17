@@ -785,12 +785,11 @@ class Controller extends Base
      * Its express purpose is to put the existing $evidence into Published along with any alterations
      * to its content such as body, tags, curric nodes, etc.
      *
+     * @api   PUT /learning/evidence/{id}/publish
      * @param Model $evidence
      * @return void
      * @throws Exception
      * @throws MapperException|RouteNotFound
-     * @throws \Alaress\Web\Controller\Exception
-     * @api PUT /learning/evidence/{id}/publish
      */
     public function putPublish(Model $evidence): void
     {
