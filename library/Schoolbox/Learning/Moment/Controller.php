@@ -996,28 +996,28 @@ class Controller extends Base
             }
         }
 
+        /* Spawn a comment (and accompanying thread if necessary) only if there was something
+         * meaningful written, avoiding spawning an empty discussion thread
+         */
+        $reason = trim((string)($requestBody['rejectionReason'] ?? ''));
+
         /* Reject only, handle adding a rejection reason
          */
         if (Model::STATUS_REJECTED === $state) {
-            /* If a discussion thread never existed, spawn one
-             */
-            $discussionThread = $moment->getDiscussionThread();
-
-            if (null === $discussionThread) {
-                $discussionThread = $this->discussionThreadMapper->createModel()
-                    ->setOpen(true);
-
-                $this->discussionThreadMapper->save($discussionThread);
-
-                $moment->setDiscussionThread($discussionThread);
-            }
-
-            /* Spawn a comment if there was something meaningful written
-             * Save it to $moment's discussion thread somehow
-             */
-            $reason = trim((string)($requestBody['rejectionReason'] ?? ''));
-
             if ('' !== $reason) {
+                /* If a discussion thread never existed, spawn one
+                 */
+                $discussionThread = $moment->getDiscussionThread();
+
+                if (null === $discussionThread) {
+                    $discussionThread = $this->discussionThreadMapper->createModel()
+                        ->setOpen(true);
+
+                    $this->discussionThreadMapper->save($discussionThread);
+
+                    $moment->setDiscussionThread($discussionThread);
+                }
+
                 $comment = $this->commentMapper->createModel()
                     ->setContent($reason)
                     ->setAuthor($this->getUser())
@@ -1038,9 +1038,7 @@ class Controller extends Base
          */
         $responseTranslator = $this->buildTranslatorWithComments(1);
 
-        $translated = $responseTranslator($moment);
-
-        return $translated;
+        return $responseTranslator($moment);
     }
 
 
