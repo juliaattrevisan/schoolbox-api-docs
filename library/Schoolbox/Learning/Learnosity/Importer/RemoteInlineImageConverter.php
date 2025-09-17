@@ -39,6 +39,19 @@ class RemoteInlineImageConverter
     private const META_CONTENT_TYPE_PREFIX = '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">';
 
 
+
+    /**
+     * An arbitrary name for an inline image.
+     */
+    private const NEW_FILENAME = '%s.%s';
+
+
+    /**
+     * Default filename if an alt/title tag didn't exist
+     */
+    private const DEFAULT_NEW_FILENAME = 'inline image';
+
+
     /**
      * Constructor.
      *
@@ -99,17 +112,22 @@ class RemoteInlineImageConverter
 
                 $this->logger?->debug('Generating storage file for inline image');
 
+                /* Some infon about the image based on its html node
+                 * There might not be much here, so we have to fill in the blanks ourselves
+                 */
                 $imageData = base64_decode($matches[2]);
+                $extension = $matches[1];
 
 
                 /* FIXME Replace with a call into learnosity that processes the stuff
                  */
+                $result = $this->api->dataGetRequest('/itembank/upload/assets');
 
                 /* Obtain a pre-signed url. This is the destination url that you'll ultimately
                  * end up using in the replacement node.
                  */
                 $storageUrl = 'http://learnosity.schoolbox.com.au';
-                $filename = 'whatever this is going to be';
+                $filename = $this->generateFilename($extension);
 
                 /* POST data into this pre-signed url. This puts binary content into learnosity
                  */
@@ -141,5 +159,21 @@ class RemoteInlineImageConverter
         unset($dom, $xpath);
 
         return implode("\n", $bodyParts);
+    }
+
+
+    /**
+     * Decide on a filename based on the attributes found in the img node
+     *
+     * @param string $extension
+     * @return string
+     */
+    private function generateFilename(string $extension): string
+    {
+        return sprintf(
+            self::NEW_FILENAME,
+            self::DEFAULT_NEW_FILENAME,
+            $extension
+        );
     }
 }
