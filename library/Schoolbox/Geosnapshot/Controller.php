@@ -87,4 +87,9 @@ class Controller extends Base
             ]
         );
     }
+
+    public function getManagement()
+    {
+        $this->response = $this->responseFromTemplate('@geosnapshotApi/management.twig', []);
+    }
 }

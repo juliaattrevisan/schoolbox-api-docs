@@ -20,6 +20,7 @@ use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
 /**
@@ -48,7 +49,13 @@ class Module extends BaseModule
 
         $canGetPhotos = $this->canGetPhotosUrl();
 
+        $isloggedinIsStaff = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\HasRole(Role::STAFF),
+        );
+
         $this->register('GET', '/user/{id}', 'getPhotos', $canGetPhotos, $preloadUserAndUrl);
+        $this->register('GET', '/management', 'getManagement', $isloggedinIsStaff);
     }
 
 

@@ -1,0 +1,10 @@
+
+{# if no go session, show login button #}
+{% set session = false %}
+
+{% if not session %}
+    <a href="#" class="button submit">Access Photos and Media</a>
+{% else %}
+    {# session exists, show iframe of geo #}
+    <iframe src="https://geosnapshot.com/library"></iframe>
+{% endif %}
