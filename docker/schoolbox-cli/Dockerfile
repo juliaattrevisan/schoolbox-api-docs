@@ -95,9 +95,6 @@ tar -C /opt/ -xzf intelliscl.tar.gz
 rm intelliscl.tar.gz
 EOF
 
-# Add intelliscl to path
-RUN echo 'export PATH=$PATH:/opt/intelliscl/bin' >> /etc/profile
-
 # Copy NVM profile and sudoers conf
 COPY ./config/profile.d/* /etc/profile.d/
 COPY ./config/sudoers.d/* /etc/sudoers.d/
