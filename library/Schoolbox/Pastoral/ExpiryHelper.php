@@ -106,6 +106,12 @@ class ExpiryHelper
             $expiryDate = (new Alaress_Date_Format($fromDate))->endOfSchoolYear();
         } else if (PastoralType::PASTORAL_EXPIRY['calendar year'] === $defaultExpiry) {
             $expiryDate = (new Alaress_Date_Format($fromDate))->endOfYear();
+        } else if (PastoralType::PASTORAL_EXPIRY['end of day'] === $defaultExpiry) {
+            /* End of day will expire on the same day
+             */
+            $expiryDate = (new Alaress_Date_Format($fromDate));
+        } else if (PastoralType::PASTORAL_EXPIRY['end of following day'] === $defaultExpiry) {
+            $expiryDate = (new Alaress_Date_Format($fromDate))->addDays(1);
         } else {
             $expiryDate = (new Alaress_Date_Format($fromDate))->modify("+{$defaultExpiry}");
         }

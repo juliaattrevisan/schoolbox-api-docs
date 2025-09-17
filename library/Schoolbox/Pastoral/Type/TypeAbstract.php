@@ -43,18 +43,19 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
      */
     public const PASTORAL_EXPIRY_DEFAULT = null;
     public const PASTORAL_EXPIRY = [
-        'never'           => self::PASTORAL_EXPIRY_DEFAULT,
-        '1 day'           => '1 day',
-        '1 week'          => '1 week',
-        '2 weeks'         => '2 weeks',
-        '1 month'         => '1 month',
-        '3 months'        => '3 months',
-        '6 months'        => '6 months',
-        '12 months'       => '12 months',
-        '24 months'       => '24 months',
-        'calendar year'   => 'calendar year',
-        'academic period' => 'academic period',
-        'academic year'   => 'academic year',
+        'never'                => self::PASTORAL_EXPIRY_DEFAULT,
+        'end of day'           => 'end of day',
+        'end of following day' => 'end of following day',
+        '1 week'               => '1 week',
+        '2 weeks'              => '2 weeks',
+        '1 month'              => '1 month',
+        '3 months'             => '3 months',
+        '6 months'             => '6 months',
+        '12 months'            => '12 months',
+        '24 months'            => '24 months',
+        'calendar year'        => 'calendar year',
+        'academic period'      => 'academic period',
+        'academic year'        => 'academic year',
     ];
 
     /** @var string|null */

@@ -95,10 +95,10 @@
          */
         if (subtypeDropdown.val() === null) {
             updateEntryTip($.trim(typesIndexEntryTip[typeDropdown.val()]));
-            updateExpiresAt($.trim(typesIndexEntryTip[typeDropdown.val()]));
+            updateExpiresAt($.trim(typesIndexDefaultExpiry[typeDropdown.val()]));
         } else {
             updateEntryTip($.trim(subtypesIndexEntryTip[subtypeDropdown.val()]));
-            updateExpiresAt($.trim(subtypesIndexEntryTip[subtypeDropdown.val()]));
+            updateExpiresAt($.trim(subtypesIndexDefaultExpiry[subtypeDropdown.val()]));
         }
         {% endif %}
 
