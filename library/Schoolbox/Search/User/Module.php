@@ -21,6 +21,9 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
 use Twig\Error\LoaderError;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
+use Schoolbox\Editor\Templates\Mapper as EditorTemplateMapper;
+use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
 
 /**
  * The module for user profile page.
@@ -73,6 +76,11 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Admin\Profile\Editor\Tab\Mapper::class),
             $this->injector->get('calendarApiFactory'),
             $this->injector->get('l10n'),
+            new EditorTemplateHelper(
+                $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                EditorTemplatesCategoryModel::LEARNING_MOMENTS,
+                $this->injector->get('user')
+            ),
         );
     }
 
