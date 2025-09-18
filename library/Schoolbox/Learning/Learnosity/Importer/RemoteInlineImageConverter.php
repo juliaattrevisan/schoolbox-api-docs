@@ -283,18 +283,38 @@ class RemoteInlineImageConverter
 
                         $fails++;
                     } catch (ConnectException $e) {
+                        /* Retry connectivity-related stuffs specifically
+                         */
                         $jitter = $this->calculateJitter($fails);
 
-                        $this->induceNap($fails, $jitter, 'Cannot transmit binary to presigned url on request %s due to network connectivity: napping for %s seconds');
+                        $this->logger?->debug(sprintf(
+                            'Network connectivity issue while uploading image assets to learnosity: %s',
+                            $e->getMessage()
+                        ));
+
+                        $this->induceNap($fails, $jitter, 'Cannot transmit binary to presigned url on request %s: napping for %s seconds');
 
                         $fails++;
                     } catch (GuzzleException $e) {
-                        /* These are mostly permanent failures
+                        /* These are mostly permanent failures and other non-retryables
                          * https://docs.guzzlephp.org/en/stable/quickstart.html
                          *
-                         * All other non-networky issues that guzzle could encounter are captured here
+                         * ...and classified as
+                         * \GuzzleHttp\Exception\ClientException // Handle 4xx client errors
+                         * \GuzzleHttp\Exception\ServerException // Handle 5xx server errors
+                         * \GuzzleHttp\Exception\RequestException // Handle other request-related exceptions (e.g., connection errors)
+                         *
+                         * All other non-networky issues that guzzle could encounter are captured here.
+                         * RequestException is the superclass of ServerException and ClientException and also
+                         * encapsulates TooManyRedirectsException and BadResponseException, so it's a catchall
+                         * for anything beyond a ConnectException. See "Exceptions" via the link above.
+                         *
                          * TODO so I suppose can we can skip retrying and just die gracefully somehow?
                          */
+                        $this->logger->warning(sprintf(
+                            'Learnosity failed uploading image asset to learnosity: %s',
+                            $e->getMessage()
+                        ));
                     }
                 }
 
