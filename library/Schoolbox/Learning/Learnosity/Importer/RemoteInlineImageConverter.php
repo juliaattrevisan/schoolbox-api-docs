@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Learnosity\Importer;
 use Alaress\Image\TransformFormat;
 use DOMElement;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\GuzzleException;
 use LearnositySdk\Exceptions\ValidationException;
 use Psr\Log\LoggerInterface;
@@ -281,12 +282,19 @@ class RemoteInlineImageConverter
                         $this->induceNap($fails, $jitter, 'Received non-200 response while transmitting binary to presigned url on request %s: napping for %s seconds');
 
                         $fails++;
-                    } catch (\Exception $e) {
+                    } catch (ConnectException $e) {
                         $jitter = $this->calculateJitter($fails);
 
-                        $this->induceNap($fails, $jitter, 'Cannot transmit binary to presigned url on request %s: napping for %s seconds');
+                        $this->induceNap($fails, $jitter, 'Cannot transmit binary to presigned url on request %s due to network connectivity: napping for %s seconds');
 
                         $fails++;
+                    } catch (GuzzleException $e) {
+                        /* These are mostly permanent failures
+                         * https://docs.guzzlephp.org/en/stable/quickstart.html
+                         *
+                         * All other non-networky issues that guzzle could encounter are captured here
+                         * TODO so I suppose can we can skip retrying and just die gracefully somehow?
+                         */
                     }
                 }
 
