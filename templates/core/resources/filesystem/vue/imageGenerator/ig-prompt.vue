@@ -73,6 +73,7 @@ async function sendRequest(): Promise<void> {
     if (isSuccess) {
         /* clear the prompt but not the other settings on success */
         prompt.value = "";
+        currentFile.value = null;
     }
 }
 
