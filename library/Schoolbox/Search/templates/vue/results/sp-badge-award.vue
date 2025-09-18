@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time.vue";
+import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vue";
 import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal.vue";
 import BadgeAward from "@schoolboxBadge/Award/vue/badgeAward.vue";
 import { useBadgeStore } from "./store/spBadgeStore";

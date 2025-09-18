@@ -12,7 +12,7 @@ import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
-import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time.vue";
+import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vue";
 import type { Category, Template } from "../js/types/editorTemplatesTypes";
 
 interface Props {
