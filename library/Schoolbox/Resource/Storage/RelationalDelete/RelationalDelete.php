@@ -17,7 +17,7 @@ use Schoolbox\Resource\Storage;
 use Psr\Log\LoggerInterface;
 
 /**
- * Delete storage files and it's relationships with other entities.
+ * Delete storage files and its relationships with other entities.
  *
  * @package Schoolbox\Resource\Storage\RelationalDelete
  */
@@ -75,6 +75,11 @@ class RelationalDelete implements IRelationalDelete
             $this->storageMapper->getDatabase()->beginTransaction();
             try {
                 foreach ($this->collectors as $collector) {
+                    $this->logger->debug(sprintf(
+                        'Collector %s running remove() method',
+                        get_class($collector)
+                    ));
+
                     $collector->remove($hash, $performDryRun);
                 }
             } catch (\Throwable $e) {
