@@ -17,6 +17,7 @@ use Schoolbox\Discussion\Thread\Context\IThreadLocator;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Scrub;
 use Schoolbox\TokenReplacer;
+use Schoolbox\Learning\Moment\Model as LearningMomentModel;
 
 /**
  * Controller for thread-related API requests.
@@ -192,10 +193,20 @@ class Controller extends BaseController
 
         $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
 
+        /**
+         * If the thread is within a Learning Moment,
+         * we want to check for recipient tokens in the comment content
+         */
+        if ($context instanceof LearningMomentModel) {
+            $content = $tokenReplacer->replace($data['content'], $context->getRecipient());
+        } else {
+            $content = $data['content'];
+        }
+
         $comment = $this->commentMapper->createModel()
             ->setThread($thread)
             ->setAuthor($this->getUser())
-            ->setContent($tokenReplacer->replace($data['content'], $context->getRecipient()));
+            ->setContent($content);
 
         $this->commentMapper->hasModuleNotifier($context->getCommentNotifier());
         $this->commentMapper->save($comment);
