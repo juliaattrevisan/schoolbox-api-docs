@@ -92,21 +92,12 @@ class PayloadFactory
         /* Aggressively truncate because learnosity doesn't support multibyte characters properly (still)
          * This is how emojis destroyed imports in 2023
          *
-         * First, try to safely truncate with mb_substr
+         * First, try to safely truncate with mb_strcut which cuts away multibyte characters instead of
+         * what mb_substr does - the latter cuts halfway through a multibyte character which generally
+         * isn't what was intended from a human perspectie. We've got widespread usage of mb_substr but
+         * probably meant mb_strcut instead.
          */
-        $newTitle = trim(html_entity_decode(mb_substr(trim(strip_tags($title)), 0, self::LEARNOSITY_MAX_TITLE_LENGTH)));
-
-        /* If it's -still- too long, use regular substr to snip off the last couple of chars
-         * I know this means we might cut off a multibyte char that exists right at the end.
-         * The alternative would be to arbitrarily make the maxlength 100 instead of 150,
-         * but then all you need is 50 hiragana characters and you're back here again trying
-         * to solve this issue
-         */
-        if (self::LEARNOSITY_MAX_TITLE_LENGTH < strlen($newTitle)) {
-            $newTitle = substr($newTitle, 0, self::LEARNOSITY_MAX_TITLE_LENGTH);
-        }
-
-        return $newTitle;
+        return trim(html_entity_decode(mb_strcut(trim(strip_tags($title)), 0, self::LEARNOSITY_MAX_TITLE_LENGTH)));
     }
 
 
