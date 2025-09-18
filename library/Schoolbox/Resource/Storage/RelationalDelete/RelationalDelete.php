@@ -333,6 +333,17 @@ class RelationalDelete implements IRelationalDelete
                 ['zip'],
                 'zip_hash'
             ),
+
+            /* UPS logs themselves
+             * Each row in ups_log has a nullable ups_log.hash column which we must clear
+             * prior to the final Deletable occurring
+             */
+            new Nullable(
+                \Schoolbox\Sync\Log\Mapper::getInstance(),
+                $this->logger,
+                ['storage'],
+                'hash'
+            )
         ];
     }
 }
