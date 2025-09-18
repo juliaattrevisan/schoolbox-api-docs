@@ -18,7 +18,8 @@
 <div id="custom-participation-container" class="f-container">
     <custom-participation
     :all-participants="{{ (allParticipants ?? []) | json_encode }}"
-    get-students-pastoral-counts-url="{{ studentsPastoralCountsUrl }}"
+    :pastoral-enabled="Boolean({{ pastoralEnabled }})"
+    get-students-pastoral-counts-url="{{ routeLookup('pastoral.getStudentsCount') }}"
     get-learning-plan-new-url="{{ learningPlanNew }}"
     get-assessment-participation="{{ routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
         assessmentId: assessment.id,

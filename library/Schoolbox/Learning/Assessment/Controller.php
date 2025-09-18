@@ -1153,8 +1153,6 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $data['pastoralEnabled'] =
             $this->getConfigLoader()->get('pastoral_enabled') && $this->getUser()->isStaffWithPastoralAccess();
 
-        $data['studentsPastoralCountsUrl'] = $data['pastoralEnabled'] ? $this->getRouteIfAuthorized('pastoral.getStudentsCount') : '';
-
         /* Load customisation to the participant
          */
         $customisedAssessments = $this->getAssessmentMapper()->findAllCustomisedAssessment($assessment);
