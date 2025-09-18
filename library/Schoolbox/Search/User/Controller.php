@@ -641,6 +641,9 @@ class Controller extends BaseController
                 /* To use learning moment editor templates in the comments
                  */
                 'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
+                /* Whether to use tokens in the comment editor
+                 */
+                'editorHasTokens' => $this->getUser()->getRole()->isStaff() ? true : false,
 
                 /* Old implementation
                  */

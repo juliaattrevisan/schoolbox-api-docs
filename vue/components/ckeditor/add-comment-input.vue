@@ -28,7 +28,7 @@ export default {
         },
     },
 
-    inject: ["editorTemplates"],
+    inject: ["editorTemplates", "editorHasTokens"],
 
     data() {
         return {
@@ -113,6 +113,7 @@ export default {
                             targetElements: [`#comment-${this.uniqueId}`],
                             toolbar: "comment",
                             templates: this.editorTemplates ?? [],
+                            hasTokens: this.editorHasTokens ?? false,
                         },
                     }),
                 );

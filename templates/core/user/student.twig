@@ -377,6 +377,7 @@
                                 {% if editorTemplates is defined %}
                                 :editor-templates="{{ editorTemplates|json_encode }}"
                                 {% endif %}
+                                :editor-has-tokens="{{ editorHasTokens ? 'true' : 'false' }}"
                         />
                     </div>
                 </div>

@@ -70,10 +70,16 @@ export default {
             type: Array,
             default: () => [],
         },
+        editorHasTokens: {
+            // Whether to use tokens in the comment editor
+            type: Boolean,
+            default: false,
+        },
     },
     provide() {
         return {
             editorTemplates: this.editorTemplates,
+            editorHasTokens: this.editorHasTokens,
         };
     },
     data() {
