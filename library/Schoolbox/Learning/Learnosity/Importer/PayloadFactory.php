@@ -92,10 +92,11 @@ class PayloadFactory
         /* Aggressively truncate because learnosity doesn't support multibyte characters properly (still)
          * This is how emojis destroyed imports in 2023
          *
-         * First, try to safely truncate with mb_strcut which cuts away multibyte characters instead of
-         * what mb_substr does - the latter cuts halfway through a multibyte character which generally
-         * isn't what was intended from a human perspectie. We've got widespread usage of mb_substr but
-         * probably meant mb_strcut instead.
+         * mb_strcut() extracts a substring from a string similarly to mb_substr(), but operates on bytes
+         * instead of characters. If the cut position happens to be between two bytes of a multi-byte
+         * character, the cut is performed starting from the first byte of that character. This is also
+         * the difference to the substr() function, which would simply cut the string between the bytes
+         * and thus result in a malformed byte sequence.
          */
         return trim(html_entity_decode(mb_strcut(trim(strip_tags($title)), 0, self::LEARNOSITY_MAX_TITLE_LENGTH)));
     }
