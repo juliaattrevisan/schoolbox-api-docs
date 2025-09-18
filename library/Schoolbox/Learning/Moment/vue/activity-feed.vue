@@ -65,6 +65,16 @@ export default {
             type: Boolean,
             required: true,
         },
+        editorTemplates: {
+            // Feedback editor templates to use in the comment field
+            type: Array,
+            default: () => [],
+        },
+    },
+    provide() {
+        return {
+            editorTemplates: this.editorTemplates,
+        };
     },
     data() {
         return {

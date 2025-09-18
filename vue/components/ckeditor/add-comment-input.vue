@@ -28,6 +28,8 @@ export default {
         },
     },
 
+    inject: ["editorTemplates"],
+
     data() {
         return {
             isOverStorageLimit: false,
@@ -110,6 +112,7 @@ export default {
                         detail: {
                             targetElements: [`#comment-${this.uniqueId}`],
                             toolbar: "comment",
+                            templates: this.editorTemplates ?? [],
                         },
                     }),
                 );
