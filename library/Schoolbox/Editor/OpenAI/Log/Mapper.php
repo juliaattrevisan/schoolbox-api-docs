@@ -35,6 +35,7 @@ class Mapper extends BaseMapper
 
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
+        $this->uses('session_id', self::TYPE_STRING);
         $this->uses('prompt', self::TYPE_STRING);
         $this->uses('input_tokens', self::TYPE_INTEGER);
         $this->uses('output_tokens', self::TYPE_INTEGER);

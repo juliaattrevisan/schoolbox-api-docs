@@ -16,6 +16,13 @@ interface Props {
      * The extra attributes to show in the prompt (dropdowns)
      */
     promptAttributes: ImagePromptAttribute[];
+    /**
+     * to keep track of the current ai conversation thread
+     * on each load of the tab (in the dropzone modal) this will regen from the backend
+     *
+     * This should be unique for a new unique conversation
+     */
+    aiSessionId: string;
 }
 
 const props = defineProps<Props>();
@@ -39,7 +46,7 @@ window.Vue.onMounted(() => {
             <a href="/help/sso/send?returnUrl=/homepage/5438" target="_blank">Schoolbox Help</a>
         </p>
         <ig-feed />
-        <ig-prompt :prompt-attributes="props.promptAttributes" />
+        <ig-prompt :prompt-attributes="props.promptAttributes" :ai-session-id="props.aiSessionId" />
         <div v-if="igStore.uploadError !== null" class="alert-box alert l-mar--0">
             <b>There was a problem uploading the image.</b>
             {{ igStore.uploadError }}

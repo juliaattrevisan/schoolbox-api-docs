@@ -28,6 +28,7 @@ class Model
     private ?string $response = null;
     private ?int $returnCode = null;
     private ?string $errorMessage = null;
+    private ?string $sessionId = null;
 
     // TEXT max length, to trim the prompt, rather than die.
     private const PROMPT_MAX_LENGTH = 65535;
@@ -228,6 +229,24 @@ class Model
             $response = mb_substr($response, 0, self::RESPONSE_MAX_LENGTH);
         }
         $this->response = $response;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSessionId(): ?string
+    {
+        return $this->sessionId;
+    }
+
+    /**
+     * @param string|null $sessionId
+     * @return $this
+     */
+    public function setSessionId(?string $sessionId): self
+    {
+        $this->sessionId = $sessionId;
         return $this;
     }
 }
