@@ -1,3 +1,3 @@
--- Add sessionId GUID field to openai_log
+-- Add session_id GUID field to openai_log
 ALTER TABLE openai_log
-    ADD COLUMN sessionId CHAR(36) NULL AFTER user_id;
+    ADD COLUMN session_id CHAR(36) NULL AFTER user_id;
