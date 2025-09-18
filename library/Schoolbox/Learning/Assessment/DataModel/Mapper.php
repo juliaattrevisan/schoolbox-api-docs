@@ -277,7 +277,8 @@ class Mapper extends BaseMapper
             $planMap->save(
                 $planMap->createModel()
                     ->setAssessment($assessment)
-                    ->setIsDynamic(PlanMapper::PLAN_TYPE_DYNAMIC)
+                    ->setIsDynamic(null === $assessment->getOriginalAssessmentId() ?
+                                       PlanMapper::PLAN_TYPE_DYNAMIC : PlanMapper::PLAN_TYPE_CUSTOM_PARTICIPATION)
             );
         } catch (\Schoolbox\Mapper\Exception $e) {
             return false;

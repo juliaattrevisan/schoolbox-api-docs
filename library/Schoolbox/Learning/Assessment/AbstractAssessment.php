@@ -1391,7 +1391,7 @@ abstract class AbstractAssessment implements IAssessable
     public function getDynamicPlan(): ?Plan
     {
         foreach ($this->plans as $plan) {
-            if ($plan->getIsDynamic()) {
+            if ($plan->isDynamic()) {
                 return $plan;
             }
         }

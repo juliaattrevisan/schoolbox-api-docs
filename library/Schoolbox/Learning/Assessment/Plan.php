@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment;
 
+use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -111,6 +112,13 @@ class Plan
         return $this;
     }
 
+    /**
+     * @return bool
+     */
+    public function isDynamic(): bool
+    {
+        return PlanMapper::PLAN_TYPE_DYNAMIC === $this->isDynamic;
+    }
 
     /**
      * @return int

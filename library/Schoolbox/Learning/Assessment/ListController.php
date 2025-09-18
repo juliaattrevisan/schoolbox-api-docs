@@ -806,7 +806,11 @@ class ListController extends Web\Controller\Base
             ->indexBy('id');
 
         // obtain this reference for later
-        $dynaPlan = $plans->filterBy('isDynamic', PlanMapper::PLAN_TYPE_DYNAMIC)->first();
+        if (null === $assessment->getOriginalAssessmentId()) {
+            $dynaPlan = $plans->filterBy('isDynamic', PlanMapper::PLAN_TYPE_DYNAMIC)->first();
+        } else {
+            $dynaPlan = $plans->filterBy('isDynamic', PlanMapper::PLAN_TYPE_CUSTOM_PARTICIPATION)->first();
+        }
         // within $postPlans, any positive index is the ID of an existing plan; any negative index is a new plan
         foreach ($postPlans as $planId => $planData) {
             // if planId == 0, it's either the dyna-plan or invalid data, but ignorable either way

@@ -63,7 +63,7 @@ class Mapper extends BaseMapper
      */
     protected function verifyNameIsSetIfNotDynamic(Model $plan): bool
     {
-        if (!$plan->isDynamic()) {
+        if ($plan->getIsDynamic() !== self::PLAN_TYPE_DYNAMIC && $plan->getIsDynamic() !== self::PLAN_TYPE_CUSTOM_PARTICIPATION) {
             $name = trim($plan->getName() ?? '');
             if ($name === '') {
                 throw new UnexpectedValueException('A plan must have a name');

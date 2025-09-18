@@ -1,12 +1,8 @@
 {% if participants is defined and customisedFor is defined and (assessment.id is null or assessment.id == customisedFor) %}
-    {% for participation in assessment.allParticipants  %}
-        {% set user = participation.user %}
-        {% set userInclude = participation.user.id in (participants | keys) and not participation.excluded %}
-        <input type="hidden" name="participant-include[{{ user.id }}]" id="participant-include-{{ user.id }}" value="{{ userInclude ? 1 : 0 }}" />
-        <input type="hidden" name="participant-plan[{{ user.id }}]" id="participant-plan-{{ user.id }}" value="0" />
-    {% endfor %}
     {% for participation in participants ?? [] %}
         {% set user = participation.user %}
+        <input type="hidden" name="participant-include[{{ user.id }}]" id="participant-include-{{ user.id }}" value="1" />
+        <input type="hidden" name="participant-plan[{{ user.id }}]" id="participant-plan-{{ user.id }}" value="0" />
         {% set plan = participation.plan %}
         <input type="hidden" name="original-participant-exclude[{{ user.id }}]" id="original-participant-exclude-{{ user.id }}" value="0" />
         <input type="hidden" name="original-participant-plan[{{ user.id }}]" id="original-participant-plan-{{ user.id }}" value="{{ plan.id ?? -1 }}" />

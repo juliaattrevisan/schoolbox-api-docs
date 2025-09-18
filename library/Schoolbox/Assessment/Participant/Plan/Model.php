@@ -101,11 +101,11 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return int
+     * @return bool
      */
-    public function isDynamic(): int
+    public function isDynamic(): bool
     {
-        return $this->isDynamic;
+        return Mapper::PLAN_TYPE_DYNAMIC === $this->isDynamic;
     }
 
 
