@@ -149,6 +149,10 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
                     ></option>
                     <!-- eslint-enable vue/no-v-html -->
                 </select>
+                <span v-else-if="!aImpl.writable">
+                    <!-- This field is an input and not writable, only show the value -->
+                    {{ aImpl[props.input.key] }}
+                </span>
                 <input
                     v-else
                     v-model="aImpl[props.input.key]"
