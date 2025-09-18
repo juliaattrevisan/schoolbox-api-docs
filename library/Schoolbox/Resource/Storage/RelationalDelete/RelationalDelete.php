@@ -247,9 +247,9 @@ class RelationalDelete implements IRelationalDelete
                 'feature_image_hash'
             ),
 
-            // evidence.hash
+            // moment_evidence.hash
             new Nullable(
-                \Schoolbox\Learning\Moment\Mapper::getInstance(),
+                \Schoolbox\Learning\Moment\Evidence\Mapper::getInstance(),
                 $this->logger,
                 ['storage'],
                 'hash'
