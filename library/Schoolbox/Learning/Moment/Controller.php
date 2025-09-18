@@ -996,14 +996,14 @@ class Controller extends Base
             }
         }
 
-        /* Spawn a comment (and accompanying thread if necessary) only if there was something
-         * meaningful written, avoiding spawning an empty discussion thread
-         */
-        $reason = trim((string)($requestBody['rejectionReason'] ?? ''));
-
         /* Reject only, handle adding a rejection reason
          */
         if (Model::STATUS_REJECTED === $state) {
+            /* Spawn a comment (and accompanying thread if necessary) only if there was something
+             * meaningful written, avoiding spawning an empty discussion thread
+             */
+            $reason = trim((string)($requestBody['rejectionReason'] ?? ''));
+
             if ('' !== $reason) {
                 /* If a discussion thread never existed, spawn one
                  */
