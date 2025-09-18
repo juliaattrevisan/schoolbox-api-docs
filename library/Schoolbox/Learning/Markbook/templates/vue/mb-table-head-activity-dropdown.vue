@@ -58,7 +58,15 @@ const viewStudentParticipationLink = window.Vue.computed(() => {
     >
         <a :href="`${viewStatusLink}&importFeedback`" class="icon-upload">Import Feedback</a>
     </li>
-    <template v-if="props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK && activity._routes.postFeedbacks">
+
+    <!-- Additional check for whether all impls are writable before opening the bulk publish -->
+    <template
+        v-if="
+            props.activity.assessmentType === ACTIVITY_TYPE_DUE_WORK &&
+            activity._routes.postFeedbacks &&
+            mbStore.isActivityWritable(props.activity)
+        "
+    >
         <li class="separator">Bulk Actions</li>
         <li :data-test="`markbook-assessment-dropdown-${props.activity.id}-publish`">
             <mb-table-head-activity-publish :activity="props.activity" />

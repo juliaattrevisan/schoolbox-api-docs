@@ -124,26 +124,12 @@ class Controller extends Base
             $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
             $markbook      = $this->buildMarkbook($assessmentIds, $folder);
 
-            $unitSpecs = $markbook->getAssessments()->map(function (IAssessable $assessment) {
-                $base = $assessment->getBaseContext();
-                if ($base instanceof \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model) {
-                    // Implementation
-                    return $base->getSpecification();
-                } elseif ($base instanceof \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model) {
-                    // Specification
-                    return $base;
-                }
-
-                // no unit spec, return null
-                return null;
-            });
-
             /**
              * need to get an list of the students by id, with their ranking
              */
             $rank = $markbook->getRanking();
 
-            $writable = $this->getAssessmentsWritability($markbook->getAssessments());
+            $terms = $this->termMapper->findAll(['order' => ['start' => 'ASC']]);
 
             $data = [
                 'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $rank : null,
@@ -176,7 +162,7 @@ class Controller extends Base
                         /* the class markbook doesn't need any of the below, as this is always an implementation */
                         'isSpecification' => $assessment->isSpecification(),
                         'stats'           => null,
-                        '_links'          => $unitAssessmentsTranslator->getLinks($assessment, false),
+                        '_links'          => $unitAssessmentsTranslator->getLinks($assessment, true),
                         '_routes'         => [
                             'postFeedbacks' => $this->getRouteIfAuthorized(
                                 'learningDueWorkFeedback.postParticipantFeedbacks',
@@ -198,7 +184,7 @@ class Controller extends Base
                         'id'    => $folder->getFolder()->getId(),
                         'title' => $folder->getFolder()->getTitle(),
                     ],
-                    'assessments' => $markbook->getAssessments()->indexBy('id')->map(function (IAssessable $aImpl) use ($markbook, $writable) {
+                    'assessments' => $markbook->getAssessments()->indexBy('id')->map(function (IAssessable $aImpl) use ($markbook, $terms) {
                         /** Only due work has the concept of "instructorMarkScheme", others just use markScheme for now */
                         $instructorMarkScheme = $aImpl instanceof DueWork\Model
                             ? $aImpl->getInstructorMarkScheme()
@@ -226,7 +212,7 @@ class Controller extends Base
                             'markVisibility' => $aImpl->getMarkVisibility(),
                             'courseManaged'  => $aImpl->getCourseManaged(),
                             'weight'         => $aImpl->getWeight(),
-                            'writable'       => $writable[$aImpl->getId()] ?? null,
+                            'writable'       => $this->isAssessmentMarkable($this->getUser(), $aImpl, $terms),
                             'instructorMarkScheme' => [
                                 'template' => $instructorMarkScheme->getTemplate(),
                                 'context'  => $instructorMarkScheme->generateContext(),
@@ -449,7 +435,6 @@ class Controller extends Base
                     ),
                     'courseImport.getImport' => null, /* not relevant on the class markbook */
                 ],
-                'canAccessPopOut' => true, /* can always access the pop-out on the class markbook, I suppose */
                 'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get(ConfigMapper::NAME_SUBMISSION_VISIBILITY_MAX)),
                 'submissionErrorStates' => $this->stateMapper->findAll()->map(fn(State $state) => [
                     'id' => $state->getId(),
@@ -675,28 +660,6 @@ class Controller extends Base
         return $markbook;
     }
 
-
-    /**
-     * @param GenericCollection|IAssessable[] $assessments
-     * @return bool[]
-     */
-    private function getAssessmentsWritability(GenericCollection $assessments): array
-    {
-        /* Determine which assessments the user should be able to mark.
-         *
-         * Can only mark an assessment if:
-         * * Assessment is/was not due in a term that is archived, and
-         * * User has write+ perm to the page
-         */
-        /** @var bool[] $writable Indexed by assessment.id */
-        $writable = [];
-
-        $terms = $this->termMapper->findAll(['order' => ['start' => 'ASC']]);
-        foreach ($assessments as $assessment) {
-            $writable[$assessment->getId()] = $this->isAssessmentMarkable($this->getUser(), $assessment, $terms);
-        }
-        return $writable;
-    }
 
     /**
      * Returns a JSON representation of an exception suitable for AJAX HTML alert divs

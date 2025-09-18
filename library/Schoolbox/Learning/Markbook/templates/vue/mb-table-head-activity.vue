@@ -28,8 +28,7 @@ async function onTitleClick(): Promise<void> {
         throw new Error("Unable to inject activityHeaderSelection");
     }
 
-    // You must have access to the pop-out menu
-    if (!mbStore.data || !mbStore.data.canAccessPopOut) {
+    if (!mbStore.data) {
         return; // exit early
     }
 

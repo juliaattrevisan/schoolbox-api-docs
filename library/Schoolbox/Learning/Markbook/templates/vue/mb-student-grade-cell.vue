@@ -58,13 +58,13 @@ const hasPopOutMenu = window.Vue.computed(() => {
         return false;
     }
 
-    // You must be a participant (or excluded)
+    // There must be a participant (or excluded)
     if (participant.value === null) {
         return false;
     }
 
-    // You must have access to the pop-out menu
-    if (!mbStore.data.canAccessPopOut) {
+    // You must have write access to the activity to be able to open the pop-out
+    if (aImpl.value === null || !aImpl.value.writable) {
         return false;
     }
 
@@ -144,38 +144,53 @@ const lastClick = window.Vue.ref<number>(0);
  * When the user clicks the cell, open the pop-out menu if available, otherwise do nothing
  */
 async function onClickCell(): Promise<void> {
-    const canAccessUpdateFeedback = participant.value && !participant.value.isExcluded;
+    if (!hasPopOutMenu.value || !cellEl.value) {
+        return; // must have access to the pop-out and a mounted cell element
+    }
+
+    // You can access the update feedback UI for this if the participant isn't excluded and you have postFeedback access
+    const canAccessUpdateFeedback =
+        student.value &&
+        participant.value &&
+        !participant.value.isExcluded &&
+        aImpl.value?._routes.student[student.value.id].postFeedback;
+
     if (Date.now() - lastClick.value < DOUBLE_CLICK_INTERVAL && canAccessUpdateFeedback) {
         /**
          * The popout is responsible for loading some extra feedback data,
          * as we are skipping the popout buttons, we need to make sure that extra data
          * has finished loading for the current feedback UI to be shown correctly
          */
-        mbStore.isFeedbackUILoading = true;
+        const selectedFeedbackInfo = {
+            classImplId: props.classImplId,
+            studentId: props.studentId,
+            activityId: props.assessmentId,
+        };
+
+        mbStore.feedbackUILoadingInfo = selectedFeedbackInfo;
         await until(() => mbStore.isPopoutLoading).toBe(false);
-        mbStore.isFeedbackUILoading = false;
+
+        if (JSON.stringify(mbStore.feedbackUILoadingInfo) !== JSON.stringify(selectedFeedbackInfo)) {
+            return; // another cell took over, abort
+        }
+
+        mbStore.feedbackUILoadingInfo = null;
 
         if (mbStore.popoutLoadError) {
             return; // something went wrong, abort
         }
 
         mbStore.popoutSelectedCell = null;
-        mbStore.setFeedbackSelectedCell({
-            classImplId: props.classImplId,
-            studentId: props.studentId,
-            activityId: props.assessmentId,
-        });
+        mbStore.setFeedbackSelectedCell(selectedFeedbackInfo);
         return;
     }
 
-    if (hasPopOutMenu.value && cellEl.value) {
-        mbStore.popoutSelectedCell = {
-            classImplId: props.classImplId,
-            studentId: props.studentId,
-            activityId: props.assessmentId,
-            referenceElement: cellEl.value,
-        };
-    }
+    mbStore.popoutSelectedCell = {
+        classImplId: props.classImplId,
+        studentId: props.studentId,
+        activityId: props.assessmentId,
+        referenceElement: cellEl.value,
+    };
 
     lastClick.value = Date.now();
 }
@@ -247,7 +262,7 @@ const plaintextComments = window.Vue.computed(() => {
             <progress-tick
                 :progress-tick="participant.progressTick"
                 :is-self-assessable="false"
-                :can-modify="mbStore.data && mbStore.data.canAccessPopOut"
+                :can-modify="aImpl !== null && aImpl.writable"
                 no-margin
                 @update:class="(newClass) => (participant!.progressTick!.progressClass = newClass)"
             />

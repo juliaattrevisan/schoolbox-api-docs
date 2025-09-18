@@ -18,6 +18,7 @@ use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
 use Schoolbox\Role;
+use Schoolbox\Assessment\Term;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Filter;
@@ -96,6 +97,7 @@ class Module extends \Alaress\Module\Module
             $this->getMapperFactory()->get(Filter\Selection\Mapper::class),
             $this->injector->get('filters.assessmentIdFinder'),
             $this->injector->get('assessmentDataSource'),
+            $this->getMapperFactory()->get(Term\Mapper::class),
             $this->getMapperFactory()->get(CourseImpl\Mapper::class),
             $this->getMapperFactory()->get(UnitImpl\Mapper::class),
             $this->getMapperFactory()->get(Access::class),

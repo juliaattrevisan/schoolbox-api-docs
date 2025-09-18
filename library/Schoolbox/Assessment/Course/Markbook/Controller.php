@@ -19,6 +19,7 @@ use Schoolbox\Filter\Codec;
 use Schoolbox\Filter\Filters\Assessment\AssessmentType\Definition as AssessmentTypeDefinition;
 use Schoolbox\GenericCollection;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Assessment\Term;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DueWork;
@@ -48,6 +49,7 @@ class Controller extends WebController\Base
      * @param Filter\Selection\Mapper            $filterSelectionMapper
      * @param Filter\Filters\Assessment\IdFinder $assessmentIdFinder
      * @param Assessment\MapperProxy             $assessmentMapperProxy
+     * @param Term\Mapper                        $termMapper
      * @param CourseImpl\Mapper                  $courseImplMapper
      * @param UnitImpl\Mapper                    $unitImplMapper
      * @param Access                             $access
@@ -61,6 +63,7 @@ class Controller extends WebController\Base
         private Filter\Selection\Mapper $filterSelectionMapper,
         private Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
         private Assessment\MapperProxy $assessmentMapperProxy,
+        private Term\Mapper $termMapper,
         private CourseImpl\Mapper $courseImplMapper,
         private UnitImpl\Mapper $unitImplMapper,
         private Access $access,
@@ -157,7 +160,6 @@ class Controller extends WebController\Base
                 'courseSpec'  => $courseSpec,
                 'viewee'      => $this->getUser(),
                 'filterPanel' => $filterPanel,
-                'canAccessPopOut' => $this->getCanAccessPopOut($courseSpec),
                 'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
             ],
             "Course Markbook: {$courseSpec->getTitle()}",
@@ -248,6 +250,8 @@ class Controller extends WebController\Base
                 return null;
             });
 
+            $terms = $this->termMapper->findAll(['order' => ['start' => 'ASC']]);
+
             $data = [
                 'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $courseMarkbook->getRanking() : null,
                 'assessments' => $courseMarkbook->getCollapsedAssessments()->reindex()->map(function (IAssessable $assessment, $sequence) use ($courseMarkbook, $unitSpecs) {
@@ -280,17 +284,15 @@ class Controller extends WebController\Base
                             ]
                         ) : null,
                         /* only show the links for specs, for historical reasons i guess... */
-                        '_links'          => $unitAssessmentsTranslator->getLinks($assessment, false),
+                        '_links'          => $unitAssessmentsTranslator->getLinks($assessment, true),
                         '_routes'         => [
-                            'postFeedbacks' => $assessment->isSpecification()
-                                ? $this->getRouteIfAuthorized(
-                                    'learningDueWorkFeedback.postParticipantFeedbacks',
-                                    [
-                                        'assessment'   => $assessment,
-                                        'assessmentId' => $assessment->getId(),
-                                    ]
-                                )
-                                : null,
+                            'postFeedbacks' => $this->getRouteIfAuthorized(
+                                'learningDueWorkFeedback.postParticipantFeedbacks',
+                                [
+                                    'assessment'   => $assessment,
+                                    'assessmentId' => $assessment->getId(),
+                                ]
+                            ),
                         ],
                     ];
                 })->indexByCallback(fn(array $assessment) => $assessment['id']),
@@ -309,7 +311,7 @@ class Controller extends WebController\Base
                             'title' => $courseImpl->getFolder()->getTitle(),
                         ],
                         'assessments' => $courseMarkbook->getCourseImportAssessments()->getOffset($courseImpl->getId())->map(
-                            function (IAssessable $aImpl, int $assessmentId) use ($courseImpl, $courseMarkbook) {
+                            function (IAssessable $aImpl, int $assessmentId) use ($courseImpl, $courseMarkbook, $terms) {
                                 /** Only due work has the concept of "instructorMarkScheme", others just use markScheme for now */
                                 $instructorMarkScheme = $aImpl instanceof DueWork\Model
                                     ? $aImpl->getInstructorMarkScheme()
@@ -339,7 +341,7 @@ class Controller extends WebController\Base
                                     'courseManaged'  => $aImpl->getCourseManaged(),
                                     /* unused on the course markbook: */
                                     // 'weight'         => ...,
-                                    // 'writable'       => ...,
+                                    'writable'       => $this->isAssessmentMarkable($this->getUser(), $aImpl, $terms),
                                     'instructorMarkScheme' => [
                                         'template' => $instructorMarkScheme->getTemplate(),
                                         'context'  => $instructorMarkScheme->generateContext(),
@@ -553,7 +555,6 @@ class Controller extends WebController\Base
                         ]
                     ),
                 ],
-                'canAccessPopOut' => $this->getCanAccessPopOut($courseSpec),
                 'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get(ConfigMapper::NAME_SUBMISSION_VISIBILITY_MAX)),
                 'submissionErrorStates' => $this->stateMapper->findAll()->map(fn(State $state) => [
                     'id' => $state->getId(),
@@ -702,33 +703,40 @@ class Controller extends WebController\Base
         $this->response = $this->responseAsJson($data);
     }
 
+
     /**
-     * Helper method to check if current user can access the pop out
+     * Can the specified user mark the specified assessment?
      *
-     * @param CourseSpec\Model $courseSpec
-     * @return boolean
-     * @throws \Schoolbox\Mapper\Exception
+     * Will be false if assessment's folder is archived, or if user lacks WRITE+ perm to folder
+     *
+     * @param User                           $user
+     * @param IAssessable                    $assessment
+     * @param GenericCollection|Term\Model[] $terms
+     * @return bool
      */
-    private function getCanAccessPopOut(CourseSpec\Model $courseSpec): bool
+    private function isAssessmentMarkable(User $user, IAssessable $assessment, GenericCollection $terms): bool
     {
-        // first check if the user has write access to the course
-        $hasCourseWriteAccess = $this->access->getFolderAccess(
-            $this->getUser(),
-            $courseSpec->getFolder()->getId(),
-        ) >= UserAccess::ACCESS_WRITE;
-        if (!$hasCourseWriteAccess) {
-            return false;
-        }
-        // then check if the user has write access to all the course implementations
-        foreach ($courseSpec->getCourseImplementations() as $classImplementation) {
-            $hasAccess = $this->access->getFolderAccess(
-                $this->getUser(),
-                $classImplementation->getFolder()->getId()
-            ) >= UserAccess::ACCESS_WRITE;
-            if (!$hasAccess) {
-                return false;
+        /* Note that this will contain Extraordinary Terms whose dates could
+         * be encompassed by another Extraordinary Term (ie. those extraordinary
+         * terms have overlapping dates)
+         *
+         * There used to be an exit-early here for an archived term, under the
+         * presumption that Academic Periods could never overlap. That's true,
+         * for ordinary terms, but not for Extraordinary Terms.
+         *
+         * This means we have to inspect the full set of $terms to potentially find
+         * one that matches, considering that overlapping dates are possible.
+         */
+        foreach ($terms as $term) {
+            /* Only care about terms that contain the assessment's due date
+             * and that the term is not archived
+             */
+            if ($term->contains($assessment->getDueAt()) && !$term->getArchived()) {
+                // Rely on access cache to catch repeated calls to same folder.
+                return $this->access->isInstructor($user, $assessment->getContext()->getFolder());
             }
         }
-        return true;
+        // Logically should never get to here. It means assessment is due before first term in system starts.
+        return false;
     }
 }
