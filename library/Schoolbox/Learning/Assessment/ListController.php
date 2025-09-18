@@ -63,6 +63,7 @@ use Schoolbox\UserMapper;
 use Traversable;
 use UnexpectedValueException;
 use Alaress_Date_Format;
+use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
 
 /**
  * Class ListController
@@ -805,7 +806,7 @@ class ListController extends Web\Controller\Base
             ->indexBy('id');
 
         // obtain this reference for later
-        $dynaPlan = $plans->filterBy('isDynamic', true)->first();
+        $dynaPlan = $plans->filterBy('isDynamic', PlanMapper::PLAN_TYPE_DYNAMIC)->first();
         // within $postPlans, any positive index is the ID of an existing plan; any negative index is a new plan
         foreach ($postPlans as $planId => $planData) {
             // if planId == 0, it's either the dyna-plan or invalid data, but ignorable either way
@@ -830,7 +831,7 @@ class ListController extends Web\Controller\Base
                 unset($planData['id']);
 
                 $planData['assessment_id'] = $assessmentId;
-                $planData['is_dynamic']    = false;
+                $planData['is_dynamic']    = PlanMapper::PLAN_TYPE_STATIC;
                 $planData['created_at']    = null;
 
                 foreach ($dateFields as $dateField) {

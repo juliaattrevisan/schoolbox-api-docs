@@ -11,6 +11,7 @@ namespace Schoolbox\Learning\Assessment\Test;
 
 use PHPUnit\Framework\TestCase;
 use Alaress_Date_Format;
+use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan;
@@ -67,7 +68,7 @@ class VisibilityTest extends TestCase
         bool $expected
     ): void {
         // Apply participation
-        $plan = (new Plan($assessable))->setIsDynamic(true);
+        $plan = (new Plan($assessable))->setIsDynamic(PlanMapper::PLAN_TYPE_DYNAMIC);
         if ($isParticipant) {
             $resultCacheMapper = ResultCache\Mapper::getInstance();
 

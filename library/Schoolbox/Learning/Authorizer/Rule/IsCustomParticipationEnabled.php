@@ -10,6 +10,8 @@ namespace Schoolbox\Learning\Authorizer\Rule;
 use Alaress\Authorizer\Failure\Unauthorized;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\AssessmentType;
+use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
+use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\User;
 
 class IsCustomParticipationEnabled extends AbstractAssessableRule
@@ -28,8 +30,8 @@ class IsCustomParticipationEnabled extends AbstractAssessableRule
          */
         $assessmentType = AssessmentType::objectToString($assessable);
         if (
-            AssessmentType::TYPE_PROJECT === $assessmentType ||
-            AssessmentType::TYPE_LESSON_PLAN === $assessmentType
+            $assessable instanceof Project ||
+            $assessable instanceof LessonPlan
         ) {
             throw new Unauthorized(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }

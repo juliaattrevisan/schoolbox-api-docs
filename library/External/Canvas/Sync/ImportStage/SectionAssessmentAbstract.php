@@ -1296,7 +1296,7 @@ abstract class SectionAssessmentAbstract
      * Create and return a participation plan
      *
      * @param Assessment\Model $assessmentImpl
-     * @param bool             $isDynamic
+     * @param int             $isDynamic
      * @param string           $planName
      * @param string|null      $publish
      * @param string|null      $open
@@ -1309,7 +1309,7 @@ abstract class SectionAssessmentAbstract
      */
     private function createPlan(
         Assessment\Model $assessmentImpl,
-        bool $isDynamic,
+        int $isDynamic,
         string $planName,
         ?string $publish,
         ?string $open,

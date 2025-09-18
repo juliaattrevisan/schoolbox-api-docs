@@ -275,7 +275,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         }
 
         // create a dynamic plan on the assessment to get started
-        $assessment->getPlans()->add((new Plan($assessment))->setIsDynamic(true));
+        $assessment->getPlans()->add((new Plan($assessment))->setIsDynamic(\Schoolbox\Assessment\Participant\Plan\Mapper::PLAN_TYPE_DYNAMIC));
 
         $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment);
 

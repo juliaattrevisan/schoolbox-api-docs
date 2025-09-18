@@ -20,6 +20,7 @@ use Schoolbox\Learning\Assessment\Project as ProjectObject;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkObject;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizObject;
 use Schoolbox\Learning\Assessment\Task\Model as TaskObject;
+use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
 use Schoolbox\User;
 
 /**
@@ -69,44 +70,44 @@ class CoalesceGettersTest extends TestCase
 
         foreach (self::getAssessables() as $assessable) {
             $assessable->setDescription(null);
-            $planObject = (new PlanObject($assessable))->setDescription(null)->setIsDynamic(false);
+            $planObject = (new PlanObject($assessable))->setDescription(null)->setIsDynamic(PlanMapper::PLAN_TYPE_STATIC);
             $data[]     = [new Participant(new User(), $planObject, $resultCacheMapper), null];
         }
 
         foreach (self::getAssessables() as $assessable) {
             $assessable->setDescription(null);
-            $planObject = (new PlanObject($assessable))->setDescription('')->setIsDynamic(false);
+            $planObject = (new PlanObject($assessable))->setDescription('')->setIsDynamic(PlanMapper::PLAN_TYPE_STATIC);
             $data[]     = [new Participant(new User(), $planObject, $resultCacheMapper), ''];
         }
 
         foreach (self::getAssessables() as $assessable) {
             $assessable->setDescription('');
-            $planObject = (new PlanObject($assessable))->setDescription(null)->setIsDynamic(false);
+            $planObject = (new PlanObject($assessable))->setDescription(null)->setIsDynamic(PlanMapper::PLAN_TYPE_STATIC);
             $data[]     = [new Participant(new User(), $planObject, $resultCacheMapper), ''];
         }
 
         foreach (self::getAssessables() as $assessable) {
             $assessable->setDescription('null');
-            $planObject = (new PlanObject($assessable))->setDescription(null)->setIsDynamic(false);
+            $planObject = (new PlanObject($assessable))->setDescription(null)->setIsDynamic(PlanMapper::PLAN_TYPE_STATIC);
             $data[]     = [new Participant(new User(), $planObject, $resultCacheMapper), 'null'];
         }
 
         foreach (self::getAssessables() as $assessable) {
             $assessable->setDescription(null);
-            $planObject = (new PlanObject($assessable))->setDescription('null')->setIsDynamic(false);
+            $planObject = (new PlanObject($assessable))->setDescription('null')->setIsDynamic(PlanMapper::PLAN_TYPE_STATIC);
             $data[]     = [new Participant(new User(), $planObject, $resultCacheMapper), 'null'];
         }
 
         foreach (self::getAssessables() as $assessable) {
             $assessable->setDescription('string2');
-            $planObject = (new PlanObject($assessable))->setDescription('string1')->setIsDynamic(false);
+            $planObject = (new PlanObject($assessable))->setDescription('string1')->setIsDynamic(PlanMapper::PLAN_TYPE_STATIC);
             $data[]     = [new Participant(new User(), $planObject, $resultCacheMapper), 'string1'];
         }
 
         // Dynamic plan: always use assessment's description
         foreach (self::getAssessables() as $assessable) {
             $assessable->setDescription('string2');
-            $planObject = (new PlanObject($assessable))->setDescription('string1')->setIsDynamic(true);
+            $planObject = (new PlanObject($assessable))->setDescription('string1')->setIsDynamic(PlanMapper::PLAN_TYPE_DYNAMIC);
             $data[]     = [new Participant(new User(), $planObject, $resultCacheMapper), 'string2'];
         }
 
@@ -138,7 +139,7 @@ class CoalesceGettersTest extends TestCase
                         ->setOpenDate(self::cloneDate($planDate))
                         ->setDueDate(self::cloneDate($planDate))
                         ->setCloseDate(self::cloneDate($planDate))
-                        ->setIsDynamic(false);
+                        ->setIsDynamic(PlanMapper::PLAN_TYPE_STATIC);
 
                     $data[] = [
                         new Participant(new User(), $planObject, $resultCacheMapper),
@@ -154,7 +155,7 @@ class CoalesceGettersTest extends TestCase
                         ->setOpenDate(self::cloneDate($planDate))
                         ->setDueDate(self::cloneDate($planDate))
                         ->setCloseDate(self::cloneDate($planDate))
-                        ->setIsDynamic(true);
+                        ->setIsDynamic(PlanMapper::PLAN_TYPE_DYNAMIC);
                     $data[] = [
                         new Participant(new User(), $dynamicPlanObject, $resultCacheMapper),
                         $assessmentDate,

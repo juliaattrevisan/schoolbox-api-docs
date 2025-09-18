@@ -14,6 +14,7 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\Learning\Assessment\Project\ResultCache;
+use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
 use Schoolbox\User;
 
 /**
@@ -43,10 +44,10 @@ class ParticipantLinker
      * Creates a plan and links it up with the IAssessable
      *
      * @param IAssessable $assessable
-     * @param bool        $isDynamic
+     * @param int        $isDynamic
      * @return Plan
      */
-    public function createAndLinkPlan(IAssessable $assessable, bool $isDynamic = true): Plan
+    public function createAndLinkPlan(IAssessable $assessable, int $isDynamic = PlanMapper::PLAN_TYPE_DYNAMIC): Plan
     {
         $plan = (new Plan($assessable))
             ->setId($assessable->getId())

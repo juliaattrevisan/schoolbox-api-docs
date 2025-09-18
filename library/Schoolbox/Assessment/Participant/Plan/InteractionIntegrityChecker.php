@@ -124,7 +124,7 @@ class InteractionIntegrityChecker
         if ($currentPlan->isDynamic()) {
             // Default plan - Create a new plan
             $newPlan = $this->planMapper->createModel()
-                                        ->setIsDynamic(false)
+                                        ->setIsDynamic(Mapper::PLAN_TYPE_STATIC)
                                         ->setAssessment($assessment)
                                         ->setName($newPlanName)
                                         ->setPublishDate($assessment->getPublishDate())

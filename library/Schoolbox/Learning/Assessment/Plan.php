@@ -37,7 +37,7 @@ class Plan
     private $assessable;
 
     /**
-     * @var bool
+     * @var int
      */
     private $isDynamic;
 
@@ -113,19 +113,19 @@ class Plan
 
 
     /**
-     * @return bool
+     * @return int
      */
-    public function getIsDynamic(): bool
+    public function getIsDynamic(): int
     {
         return $this->isDynamic;
     }
 
 
     /**
-     * @param bool $isDynamic
+     * @param int $isDynamic
      * @return $this
      */
-    public function setIsDynamic(bool $isDynamic): self
+    public function setIsDynamic(int $isDynamic): self
     {
         $this->isDynamic = $isDynamic;
         return $this;
