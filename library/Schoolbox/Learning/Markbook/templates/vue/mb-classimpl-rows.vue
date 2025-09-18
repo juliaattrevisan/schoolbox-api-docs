@@ -16,10 +16,10 @@ const mbStore = useMarkbookStore();
 
 const markVisibilityOptions = [
     // Please note; .label is output via v-html and is not escaped
-    { value: 0, label: "&#xe63e; Staff Only" },
-    { value: 1, label: "&#xe667; Staff and Students" },
-    { value: 2, label: "&#xe666; Staff, Students and their Parents" },
-] as { value: number; label: string }[];
+    { value: 0, label: "&#xe63e; Staff Only", readonlyIcon: "icon-locked" },
+    { value: 1, label: "&#xe667; Staff and Students", readonlyIcon: "icon-staff-students" },
+    { value: 2, label: "&#xe666; Staff, Students and their Parents", readonlyIcon: "icon-staff" },
+] as { value: number; label: string; readonlyIcon: string }[];
 
 const classStatisticRows: Omit<MbClassStatisticRowProps, "classImpl">[] = [
     {
