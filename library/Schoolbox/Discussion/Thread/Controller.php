@@ -16,6 +16,7 @@ use Schoolbox\Discussion\Thread\Context\IThreadLocation;
 use Schoolbox\Discussion\Thread\Context\IThreadLocator;
 use Schoolbox\Json\Decorator\LinkDecorator;
 use Scrub;
+use Schoolbox\TokenReplacer;
 
 /**
  * Controller for thread-related API requests.
@@ -189,10 +190,12 @@ class Controller extends BaseController
     {
         $data = $this->request->getParsedBody();
 
+        $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
+
         $comment = $this->commentMapper->createModel()
             ->setThread($thread)
             ->setAuthor($this->getUser())
-            ->setContent($data['content']);
+            ->setContent($tokenReplacer->replace($data['content'], $context->getRecipient()));
 
         $this->commentMapper->hasModuleNotifier($context->getCommentNotifier());
         $this->commentMapper->save($comment);

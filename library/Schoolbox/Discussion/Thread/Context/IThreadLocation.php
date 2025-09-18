@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Discussion\Thread\Context;
 
 use Schoolbox\Discussion\Thread\Model;
+use Schoolbox\User;
 
 /**
  * Interface for models that can be associated with a discussion thread.
@@ -52,4 +53,11 @@ interface IThreadLocation
      *                     no notifier.
      */
     public function getCommentNotifier(): ?string;
+
+    /**
+     * Who is the recipient for this thread context?
+     *
+     * @return User
+     */
+    public function getRecipient(): User;
 }
