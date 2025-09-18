@@ -264,24 +264,28 @@ class RemoteInlineImageConverter
                             'body' => $imageData
                         ]);
 
-                        /* Get out of here: we succeeded
+                        /* Some other non-200 response that we maybe don't expect
                          */
-                        if (200 === $response->getStatusCode()) {
-                            break;
+                        if (200 !== $response->getStatusCode()) {
+                            $this->logger?->debug(sprintf(
+                                'Learnosity returned HTTP status %d.',
+                                $response->getStatusCode()
+                            ));
+
+                            /* Not sure if learnosity ever returns 201+ http statuses
+                             * or if it even matters...
+                             *
+                                $jitter = $this->calculateJitter($fails);
+
+                                $this->induceNap($fails, $jitter, 'Received non-200 response while transmitting binary to presigned url on request %s: napping for %s seconds');
+
+                                $fails++;
+                             */
                         }
 
-                        /* Something died along the way: but not sure what
+                        /* Anyway, get out of here: we succeeded at least once
                          */
-                        $this->logger?->warning(sprintf(
-                            'Learnosity returned HTTP status %d.',
-                            $response->getStatusCode()
-                        ));
-
-                        $jitter = $this->calculateJitter($fails);
-
-                        $this->induceNap($fails, $jitter, 'Received non-200 response while transmitting binary to presigned url on request %s: napping for %s seconds');
-
-                        $fails++;
+                        break;
                     } catch (ConnectException $e) {
                         /* Retry connectivity-related stuffs specifically
                          */
