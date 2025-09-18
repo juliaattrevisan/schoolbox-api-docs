@@ -9,9 +9,7 @@
 namespace Schoolbox\Learning\Assessment\DueWork\Feedback;
 
 use Alaress\Authorizer\Failure\Forbidden;
-use Alaress\Authorizer\Failure\InvalidPath;
 use Alaress\Authorizer\Rule;
-use Alaress\Authorizer\Rule\IAuthorizationRule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
@@ -26,7 +24,9 @@ use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
+use Schoolbox\Learning\Authorizer\Rule\IsImplementation;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
+use Schoolbox\Learning\Authorizer\Rule\IsSpecification;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
@@ -65,17 +65,25 @@ class Module extends BaseModule
 
         $canGiveFeedbackForAssessment = new Rule\Any(
             new Rule\IsSuperuser(),
-            new Rule\All(
-            // User must have write access to the folder the assessment is in
-                new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function ($params) {
-                    /** @var IAssessable $assessable */
-                    $assessable = $params['assessment'];
-                    if ($assessable instanceof IAssessable) {
-                        return $assessable->getContext()->getFolder()->getId();
-                    }
-                    throw new Forbidden('User does not have homepage access');
-                }, $this->getAccess()),
-                new IsInteractionUnLocked(new Assessment\LockedChecker($this->getTermMapper()))
+            // feedback route is accessible for both spec and impl assessments
+            new Rule\Any(
+                // Implementation assessment use the old logic, user must have write access homepage, and the assessment is not locked (due in an archived term)
+                new Rule\All(
+                    new IsImplementation(),
+                    // User must have write access to the folder the assessment is in
+                    new Rule\HasHomepageAccess(UserAccess::ACCESS_WRITE, function ($params) {
+                        /** @var IAssessable $assessable */
+                        $assessable = $params['assessment'];
+                        if ($assessable instanceof IAssessable) {
+                            return $assessable->getContext()->getFolder()->getId();
+                        }
+                        throw new Forbidden('User does not have homepage access');
+                    }, $this->getAccess()),
+                    new IsInteractionUnLocked(new Assessment\LockedChecker($this->getTermMapper()))
+                ),
+                // Specification assessments, you need to have write access to all homepages using the spec (but more complex than can be done here)
+                new IsSpecification(),
+                // offload the perm check for spec assessments to the controller... we should be hitting the filters
             )
         );
 
@@ -176,7 +184,7 @@ class Module extends BaseModule
             'POST',
             "/{$assessmentRoute}/feedbacks",
             'postParticipantFeedbacks',
-            $this->getCanAccessPopOut(),
+            $canGiveFeedbackForAssessment,
             $preloadAssessable
         );
 
@@ -215,7 +223,9 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(RubricDataSource::class),
             $this->getMapperFactory()->get(ReturnedWorkMapper::class),
             $this->getMapperFactory()->get(Assessment\Project\ResultCache\Mapper::class),
-            $this->injector->get('kamiConnector')
+            $this->injector->get('kamiConnector'),
+            $this->getMapperFactory()->get(TermMapper::class),
+            $this->getAccess(),
         );
     }
 
@@ -380,78 +390,5 @@ class Module extends BaseModule
     public function getFeedbackDataSource()
     {
         return $this->injector->get('feedbackDataSource');
-    }
-
-    /**
-     * Only access with the following:
-     * markbook is enabled
-     * you are logged in
-     * you are a staff member (who can view student grades) or superuser
-     * if you have write access to all course implementations
-     * have write access to the course folder
-     *
-     * route perm of `\Schoolbox\Assessment\Course\Markbook\Controller::getCanAccessPopOut`
-     * @see \Schoolbox\Assessment\Course\Markbook\Controller::getCanAccessPopOut
-     *
-     * @return IAuthorizationRule
-     */
-    private function getCanAccessPopOut(): Rule\IAuthorizationRule
-    {
-        return new Rule\All(
-            new Rule\Callback(function (): void {
-                if (!$this->getConfig()->get('course_markbook_enable')) {
-                    /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-                    throw new InvalidPath('Course markbook module is disabled');
-                }
-            }),
-            new Rule\IsLoggedIn(),
-            new Rule\Any(
-                new Rule\HasRolePermission(Role::PERMISSION_VIEW_STUDENT_GRADES, Role::STAFF),
-                new Rule\IsSuperuser()
-            ),
-            new Rule\Callback(function ($params, ?User $user): void {
-                if (null === $user) {
-                    /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-                    throw new InvalidPath('You must be logged in to access this page');
-                }
-                /** @var IAssessable|null $assessment */
-                $assessment = $params['assessment'] ?? null;
-                // first check if the user has write access to the course
-                $hasCourseWriteAccess = $this->getAccess()->getFolderAccess(
-                    $user,
-                    $assessment->getBaseContext()->getFolder()->getId(),
-                ) >= UserAccess::ACCESS_WRITE;
-                if (!$hasCourseWriteAccess) {
-                    /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-                    throw new InvalidPath('You do not have permission to access this course');
-                }
-
-                $courseSpec = null;
-                // if we are a spec assessment we need to fetch the course spec
-                // otherwise we need to get the spec from the assessment, then get the course spec
-                if ($assessment->getBasecontext() instanceof  \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model) {
-                    $courseSpec = $assessment->getBasecontext()->getCourse();
-                } elseif ($assessment->getBasecontext() instanceof  \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model) {
-                    $courseSpec = $assessment->getBasecontext()->getSpecification()->getCourse();
-                }
-
-                if (null === $courseSpec) {
-                    // class level, assume they have access... (mostly on class markbook, and assessments created outside of a course)
-                    return;
-                }
-
-                // then check if the user has write access to all the course implementations
-                foreach ($courseSpec->getCourseImplementations() as $classImplementation) {
-                    $hasAccess = $this->getAccess()->getFolderAccess(
-                        $user,
-                        $classImplementation->getFolder()->getId()
-                    ) >= UserAccess::ACCESS_WRITE;
-                    if (!$hasAccess) {
-                        /** @noinspection ExceptionsAnnotatingAndHandlingInspection */
-                        throw new InvalidPath('You do not have permission to access this course implementation');
-                    }
-                }
-            })
-        );
     }
 }
