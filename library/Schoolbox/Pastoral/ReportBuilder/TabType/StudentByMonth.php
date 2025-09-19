@@ -132,7 +132,7 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
         $monthFormat = self::COLUMN_QUERY_MONTH_FORMAT;
 
         $distinctRecordsQuery = "
-            SELECT DISTINCT pastoral.*, DATE_FORMAT(COALESCE(pastoral.occurred_on, pastoral.created_at), '{$monthFormat}') AS month
+            SELECT DISTINCT pastoral.*, CONCAT(s.lastname, ', ', s.chosen_name) as student_name, DATE_FORMAT(COALESCE(pastoral.occurred_on, pastoral.created_at), '{$monthFormat}') AS month
             {$this->helper->getFromString()}
             WHERE
                 ({$whereTypeSubTypeQuery}) AND
@@ -140,7 +140,7 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
         ";
 
         $countQuery = "
-            SELECT distinctRecords.student_id, {$countQuery}
+            SELECT distinctRecords.student_id, distinctRecords.student_name, {$countQuery}
             FROM ({$distinctRecordsQuery}) distinctRecords
             GROUP BY distinctRecords.student_id
         ";
@@ -174,7 +174,6 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
          * Finding out where to locate the position where the cursor is pointing
          */
         $whereParts = "";
-        $params['limit'] = $this->limit;
         $groupBy = "u.lastname, COALESCE(u.preferred_name, u.firstname)";
 
         $orderBy = $this->getOrderBy();
@@ -208,6 +207,12 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
             $params['studentId'] = $cursor['id'];
         }
 
+        $limit = "";
+        if (null !== $this->limit) {
+            $limit = " LIMIT :limit ";
+            $params['limit'] = $this->limit;
+        }
+
         $totalQuery = "
             SELECT withTotal.*
             FROM (
@@ -217,7 +222,7 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
             {$whereParts}
             GROUP BY withTotal.student_id, {$groupBy}
             ORDER BY {$orderBy}, withTotal.student_id {$this->order}
-            LIMIT :limit
+            {$limit}
         ";
 
         $result = $db->executeQuery(
@@ -381,7 +386,7 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
             $rows = $records->map(
                 function (array $record) use ($students) {
                     $row['user'] = call_user_func($this->userTranslator, $students->getBy('id', $record['student_id']));
-                    unset($record['student_id']);
+                    unset($record['student_id'], $record['student_name']);
 
                     $row = array_merge($row, array_map(fn($value) => [$this->resultType => $value], $record));
 
@@ -412,5 +417,22 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
                 ]
             ]
         ];
+    }
+
+    /**
+     * Get the CSV headers for the export
+     *
+     * @return array
+     */
+    public function getCSVHeaders(): array
+    {
+        $headers = [
+            'student_name' => 'Name',
+            'total' => 'Total',
+        ];
+        foreach ($this->getMonths() as $month) {
+            $headers[$month] = ucwords(str_replace('_', ' ', $month));
+        }
+        return $headers;
     }
 }
