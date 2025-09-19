@@ -89,7 +89,16 @@ class PayloadFactory
      */
     public function produceTitle(string $title): string
     {
-        return trim(html_entity_decode(mb_substr(trim(strip_tags($title)), 0, self::LEARNOSITY_MAX_TITLE_LENGTH)));
+        /* Aggressively truncate because learnosity doesn't support multibyte characters properly (still)
+         * This is how emojis destroyed imports in 2023
+         *
+         * mb_strcut() extracts a substring from a string similarly to mb_substr(), but operates on bytes
+         * instead of characters. If the cut position happens to be between two bytes of a multi-byte
+         * character, the cut is performed starting from the first byte of that character. This is also
+         * the difference to the substr() function, which would simply cut the string between the bytes
+         * and thus result in a malformed byte sequence.
+         */
+        return trim(html_entity_decode(mb_strcut(trim(strip_tags($title)), 0, self::LEARNOSITY_MAX_TITLE_LENGTH)));
     }
 
 
