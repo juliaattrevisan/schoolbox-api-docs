@@ -2,6 +2,7 @@
 import { useMarkbookStore } from "./store/markbookStore";
 import type { MarkbookActivity } from "./types/payload";
 import MbTableHead from "./mb-table-head.vue";
+import MbFeedback from "./mb-feedback.vue";
 import MbClassimplRows from "./mb-classimpl-rows.vue";
 import MbTableHeadActivityDropdown from "./mb-table-head-activity-dropdown.vue";
 
@@ -11,6 +12,8 @@ interface Props {
 
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
+
+const FEEDBACK_DRAWER_HEIGHT = "20rem";
 
 const activityHeaderSelection = window.Vue.ref<MarkbookActivity | null>(null);
 const activityHeaderDropdownEl = window.Vue.ref<HTMLElement | null>(null);
@@ -138,7 +141,10 @@ const exportReportRoute = window.Vue.computed(() => {
         v-if="mbStore.data"
         ref="tableContainerRef"
         class="diagonal-headings-table-container small-12 island"
-        :style="{ '--markbook-height-offset': `${markbookHeightOffset}px` }"
+        :style="{
+            '--markbook-height-offset': `${markbookHeightOffset}px`,
+            marginBottom: mbStore.feedbackSelectedCell !== null ? FEEDBACK_DRAWER_HEIGHT : '0px',
+        }"
     >
         <table class="diagonal-headings-table marksheet">
             <mb-table-head :type="props.type" />
@@ -176,10 +182,13 @@ const exportReportRoute = window.Vue.computed(() => {
     <ul ref="activityHeaderDropdownEl" class="f-dropdown">
         <mb-table-head-activity-dropdown v-if="activityHeaderSelection" :activity="activityHeaderSelection" />
     </ul>
+
+    <mb-feedback :max-height="FEEDBACK_DRAWER_HEIGHT" />
 </template>
 
 <style scoped>
 .diagonal-headings-table-container {
     max-height: calc(100vh - var(--markbook-height-offset));
+    transition: margin-bottom 0.3s ease-in-out;
 }
 </style>

@@ -227,8 +227,11 @@ export function useDynamicFeedback(
      * For the mark and resubmissionRequired, save immediately
      */
     const onFeedbackChangedDebounced = debounce(onFeedbackChanged, TIMEOUT_DURATION_MS);
-    window.Vue.watch(() => data.comment.value, onFeedbackChangedDebounced);
-    window.Vue.watch(() => [data.hrMarkInstructor.value, data.resubmissionRequired.value], onFeedbackChanged);
+    const commentWatcher = window.Vue.watch(() => data.comment.value, onFeedbackChangedDebounced);
+    const feedbackWatcher = window.Vue.watch(
+        () => [data.hrMarkInstructor.value, data.resubmissionRequired.value],
+        onFeedbackChanged,
+    );
 
     /**
      * Publish the feedback
@@ -306,6 +309,17 @@ export function useDynamicFeedback(
         return true;
     }
 
+    /**
+     * cleanup function to call when this version of dynamic feedback unmounted
+     */
+    function cleanup(): void {
+        onFeedbackChangedDebounced.cancel();
+
+        // unwatch both of these so that we can't trigger any more auto-saves
+        commentWatcher();
+        feedbackWatcher();
+    }
+
     return {
         data,
         dataDraft,
@@ -319,5 +333,6 @@ export function useDynamicFeedback(
         hasAutoSaveError,
         showDraftDialogue,
         publishFeedback,
+        cleanup,
     };
 }

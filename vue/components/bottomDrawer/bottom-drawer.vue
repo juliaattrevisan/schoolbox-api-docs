@@ -36,6 +36,14 @@ export default {
             required: false,
             default: 1000,
         },
+        /**
+         * Whether there should be padding around the content in the drawer (default true)
+         */
+        hasPadding: {
+            type: Boolean,
+            required: false,
+            default: true,
+        },
     },
 
     data() {
@@ -70,7 +78,11 @@ export default {
 <template>
     <div>
         <transition name="slide">
-            <div v-show="showDrawer" class="bottom-drawer-container">
+            <div
+                v-show="showDrawer"
+                class="bottom-drawer-container"
+                :class="{ 'bottom-drawer-container--no-pad': !hasPadding }"
+            >
                 <!-- @slot Default slot, put whatever HTML markup you like in here -->
                 <slot></slot>
             </div>
@@ -78,17 +90,20 @@ export default {
     </div>
 </template>
 
-<style>
+<style lang="scss">
 .bottom-drawer-container {
     background: white;
     bottom: 0px;
     box-shadow: 0px -2px 6px 0px rgba(0, 0, 0, 0.1);
     height: auto;
     left: v-bind(left);
-    padding: 1rem;
     position: v-bind(position);
     width: v-bind(width);
     z-index: var(--sbx-depth-ui-overlay);
+
+    &:not(.bottom-drawer-container--no-pad) {
+        padding: 1rem;
+    }
 }
 
 .slide-enter-active,

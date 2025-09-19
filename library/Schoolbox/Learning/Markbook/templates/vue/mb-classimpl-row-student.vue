@@ -4,7 +4,6 @@ import { getGradient } from "@js/util/cssUtils";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { useMarkbookStore } from "./store/markbookStore";
 import MbStudentGradeCell from "./mb-student-grade-cell.vue";
-import MbClassimplRowStudentFeedback from "./mb-classimpl-row-student-feedback.vue";
 import type { MarkbookClassImplStudent } from "./types/payload";
 
 interface Props {
@@ -14,6 +13,8 @@ interface Props {
 
 const props = defineProps<Props>();
 const mbStore = useMarkbookStore();
+
+const studentRowEl = window.Vue.useTemplateRef<HTMLTableRowElement>("studentRowRef");
 
 /**
  * A markbook row is faded if the selected feedback cell exists
@@ -29,11 +30,27 @@ const isFaded = window.Vue.computed(() => {
         mbStore.feedbackSelectedCell.studentId !== props.student.id
     );
 });
+
+mbStore.feedbackDrawerEventBus.on(({ drawerRect }) => {
+    if (studentRowEl.value === null) return;
+    if (mbStore.feedbackSelectedCell === null) return;
+    if (mbStore.feedbackSelectedCell.classImplId !== props.classImplId) return;
+    if (mbStore.feedbackSelectedCell.studentId !== props.student.id) return;
+
+    // Ensure that this current row is scrolled into view just above the feedback drawer if needed
+    const rowRect = studentRowEl.value.getBoundingClientRect();
+    const drawerTarget = window.innerHeight - drawerRect.height - rowRect.height / 2;
+
+    if (rowRect.bottom > drawerTarget) {
+        window.scrollBy({ top: rowRect.bottom - drawerTarget, behavior: "smooth" });
+    }
+});
 </script>
 
 <template>
     <tr
         v-if="mbStore.data !== null"
+        ref="studentRowRef"
         :class="{
             'markbook-faded': isFaded,
         }"
@@ -95,18 +112,6 @@ const isFaded = window.Vue.computed(() => {
             :student-id="student.id"
         />
     </tr>
-
-    <mb-classimpl-row-student-feedback
-        v-if="
-            mbStore.feedbackSelectedCell &&
-            mbStore.feedbackSelectedCell.classImplId === props.classImplId &&
-            mbStore.feedbackSelectedCell.studentId === student.id
-        "
-        :key="Object.values(mbStore.feedbackSelectedCell).join('-')"
-        :activity-id="mbStore.feedbackSelectedCell.activityId"
-        :class-impl-id="mbStore.feedbackSelectedCell.classImplId"
-        :student-id="mbStore.feedbackSelectedCell.studentId"
-    />
 </template>
 
 <style scoped></style>
