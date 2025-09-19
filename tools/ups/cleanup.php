@@ -31,10 +31,9 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         $mapperFactory  = $this->getDi()->get('mapperFactory');
         $storageDeleter = new RelationalDelete($this->getLogger(), $mapperFactory->get(Storage\Mapper::class));
 
+        $loggerMessageSuffix = !$this->perform() ? '[Dry run mode]' : '[Delete mode]';
 
-        $loggerMessageSufix = !$this->perform() ? '[Dry run mode]' : '[Delete mode]';
-
-        $this->getLogger()->info('Starting UPS log cleanup on: ' . $loggerMessageSufix);
+        $this->getLogger()->info('Starting UPS log cleanup on: ' . $loggerMessageSuffix);
         $this->getLogger()->info('Removing all UPS logs older than: ' . $removeDate->getDatabase());
 
         $count = 0;
@@ -43,7 +42,6 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         $pb = $logMapper->getPredicateBuilder();
         $pb->lessThan('created_at', $removeDate->getDatabase());
         $removeLogs = $logMapper->findByPredicates($pb);
-
 
         foreach ($removeLogs as $log) {
             /** @var Schoolbox\Sync\Log\Model $log */

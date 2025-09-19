@@ -15,9 +15,10 @@ use Schoolbox\Learning\InlineGrader\Kami;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Resource\Storage;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Resource\Storage\Mapper;
 
 /**
- * Delete storage files and it's relationships with other entities.
+ * Delete storage files and its relationships with other entities.
  *
  * @package Schoolbox\Resource\Storage\RelationalDelete
  */
@@ -26,34 +27,23 @@ class RelationalDelete implements IRelationalDelete
     /**
      * @var array
      */
-    private $collectors;
+    private array $collectors;
 
-    /**
-     * @var LoggerInterface
-     */
-    private $logger;
-
-    /**
-     * @var Storage\Mapper
-     */
-    private $storageMapper;
 
     /**
      * RelationalDelete constructor.
      *
      * @param LoggerInterface $logger
+     * @param Mapper $storageMapper
      */
-    public function __construct(LoggerInterface $logger, Storage\Mapper $storageMapper)
+    public function __construct(private LoggerInterface $logger, private Storage\Mapper $storageMapper)
     {
-        $this->logger           = $logger;
-        $this->storageMapper    = $storageMapper;
-
-        $this->collectors       = array_merge(
+        $this->collectors = array_merge(
             $this->generateDeletables(),
             $this->generateNullables(),
             [
-            // Storage (Do NOT move this anywhere. Must be the last item that gets executed due to the table relationships.)
-            new Deletable(\Schoolbox\Resource\Storage\Mapper::getInstance(), $this->logger)
+                // Storage (Do NOT move this anywhere. Must be the last item that gets executed due to the table relationships.)
+                new Deletable(\Schoolbox\Resource\Storage\Mapper::getInstance(), $this->logger)
             ]
         );
     }
@@ -73,13 +63,20 @@ class RelationalDelete implements IRelationalDelete
 
         if ($this->validateIfHashExists($hash)) {
             $this->storageMapper->getDatabase()->beginTransaction();
+
             try {
                 foreach ($this->collectors as $collector) {
+                    $this->logger->debug(sprintf(
+                        'Collector %s running remove() method',
+                        get_class($collector)
+                    ));
+
                     $collector->remove($hash, $performDryRun);
                 }
             } catch (\Throwable $e) {
                 $this->logger->error("Fatal exception. Rolling back database changes");
                 $this->storageMapper->getDatabase()->rollback();
+
                 throw $e;
             }
             $this->storageMapper->getDatabase()->commit();
@@ -247,9 +244,9 @@ class RelationalDelete implements IRelationalDelete
                 'feature_image_hash'
             ),
 
-            // evidence.hash
+            // moment_evidence.hash
             new Nullable(
-                \Schoolbox\Learning\Moment\Mapper::getInstance(),
+                \Schoolbox\Learning\Moment\Evidence\Mapper::getInstance(),
                 $this->logger,
                 ['storage'],
                 'hash'
@@ -328,6 +325,17 @@ class RelationalDelete implements IRelationalDelete
                 ['zip'],
                 'zip_hash'
             ),
+
+            /* UPS logs themselves
+             * Each row in ups_log has a nullable ups_log.hash column which we must clear
+             * prior to the final Deletable occurring
+             */
+            new Nullable(
+                \Schoolbox\Sync\Log\Mapper::getInstance(),
+                $this->logger,
+                ['storage'],
+                'hash'
+            )
         ];
     }
 }
