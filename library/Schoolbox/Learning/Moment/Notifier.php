@@ -11,7 +11,7 @@ namespace Schoolbox\Learning\Moment;
 
 use Alaress\Async\Notification\Parameter\Param;
 use Psr\Container\ContainerInterface;
-use Schoolbox\Learning\Moment\Model as Evidence;
+use Schoolbox\Learning\Moment\Model as Moment;
 use Alaress\Async\Notification\Instance\Builder;
 use Monolog\Logger;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -28,7 +28,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 
 /**
- * @method Evidence buildPrevious($current, ?array $diff, int $previousKey = 1)
+ * @method Moment buildPrevious($current, ?array $diff, int $previousKey = 1)
  */
 class Notifier extends AbstractModuleNotifier
 {
@@ -38,10 +38,10 @@ class Notifier extends AbstractModuleNotifier
      */
     public const TRIGGER_SUBMITTED = 'submitted';
 
-    private const PATTERN_SOMEONE_POSTED_TITLE = ':user posted :evidence for :student';
-    private const PATTERN_STUDENT_POSTED_TITLE = ':student has posted :evidence';
+    private const PATTERN_SOMEONE_POSTED_TITLE = ':user posted :moment for :student';
+    private const PATTERN_STUDENT_POSTED_TITLE = ':student has posted :moment';
 
-    private const PATTERN_EVIDENCE_HREF = '/learning/evidence/%d';
+    private const PATTERN_MOMENT_HREF = '/learning/evidence/%d';
 
     /** @var UserMapper */
     private UserMapper $userMapper;
@@ -70,6 +70,7 @@ class Notifier extends AbstractModuleNotifier
 
     /**
      * Setter for UserMapper
+     *
      * @param UserMapper $userMapper
      */
     public function setUserMapper(UserMapper $userMapper)
@@ -78,7 +79,7 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * Attaches and detaches triggers properly depending on the Evidence status and transition
+     * Attaches and detaches triggers properly depending on the learning moment status and transition
      *
      * @param TriggerBundleInterface $bundle
      * @return void
@@ -105,70 +106,72 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * Retracts a deleted Evidence.
+     * Retracts a deleted learning moment.
      *
-     * @param Evidence $evidence
+     * @param Moment $moment
      * @return Envelope
      */
-    public function notifySystemDeleted(Evidence $evidence): Envelope
+    public function notifySystemDeleted(Moment $moment): Envelope
     {
         $envelope = new Envelope();
-        return $this->retractPosted($envelope, $evidence);
+        return $this->retractPosted($envelope, $moment);
     }
 
     /**
-     * Retracts a given Evidence.
+     * Retracts a given learning moment.
      *
      * @param Envelope $envelope
-     * @param Evidence $evidence
+     * @param Moment $moment
      * @return Envelope
      */
-    private function retractPosted(Envelope $envelope, Evidence $evidence): Envelope
+    private function retractPosted(Envelope $envelope, Moment $moment): Envelope
     {
-        return $this->retractEventObject($envelope, $evidence);
+        return $this->retractEventObject($envelope, $moment);
     }
 
     /**
-     * Notify relevant users in given role type that an evidence has been posted
+     * Notify relevant users in given role type that a learning moment has been posted
      *
-     * @param string     $roleType
-     * @param Evidence   $model
-     * @param User       $effector
+     * @param string $roleType
+     * @param Moment $model
+     * @param User $effector
      * @param array|null $diff
      * @return Envelope
      */
-    private function notifyPosted(string $roleType, Evidence $model, User $effector, ?array $diff): Envelope
+    private function notifyPosted(string $roleType, Moment $model, User $effector, ?array $diff): Envelope
     {
         $envelope = new Envelope();
 
-        // if the evidence is draft (now draft, may have just been created, may have been moved to draft, do not notify
+        // if the learning moment is draft (now draft, may have just been created, may have been moved to draft, do not notify
         if ($model->isDraft()) {
             return $envelope;
         }
 
         try {
-            /** @var Evidence $evidence */
-            $evidence = $this->mapper->findById($model->getId());
+            /** @var Moment $moment */
+            $moment = $this->mapper->findById($model->getId());
             $effector = $this->userMapper->findById($effector->getId());
             // hydrate to get teacher collection properly
-            $student = $this->userMapper->findById($evidence->getRecipient()->getId());
+            $student = $this->userMapper->findById($moment->getRecipient()->getId());
         } catch (MapperException $e) {
             return $envelope;
         }
 
-        $evidenceHref = sprintf(self::PATTERN_EVIDENCE_HREF, $evidence->getId());
+        $momentHref = sprintf(self::PATTERN_MOMENT_HREF, $moment->getId());
 
         $bob = new Builder();
         $bob->setIcon($this->getUserIcon($effector))
-            ->setHref($evidenceHref)
+            ->setHref($momentHref)
             ->setNamespace($this->getSlug())
             ->setSeverity(Logger::INFO)
-            ->addTopic("{$this->getSlug()}.{$evidence->getId()}." . self::TRIGGER_POSTED)
-            ->setTimestamp($evidence->getCreatedAt()->getUnixTimeStamp())
-            ->setStudentExternalIdMeta($evidence->getRecipient()->getExternalId())
+            ->addTopic("{$this->getSlug()}.{$moment->getId()}." . self::TRIGGER_POSTED)
+            ->setTimestamp($moment->getCreatedAt()->getUnixTimeStamp())
+            ->setStudentExternalIdMeta($moment->getRecipient()->getExternalId())
             ->addFilter(RoletypeFilter::NAME, [$roleType]);
 
-        $params = ['evidence' => new Param('a new learning moment', $evidenceHref, Param::STACKING_REPLACE_NO_DECORATION)];
+        $params = [
+            'moment' => new Param('a new learning moment', $momentHref, Param::STACKING_REPLACE_NO_DECORATION)
+        ];
 
         // a teacher or a parent posted for a student - notify the student, the teachers of the student and parents of the student
         if ($effector->getRole()->isStaff() || $effector->getRole()->isParent()) {
@@ -215,41 +218,41 @@ class Notifier extends AbstractModuleNotifier
     }
 
     /**
-     * Notify students that evidence has been posted.
+     * Notify students that a learning moment has been posted.
      *
-     * @param Evidence   $evidence
-     * @param User       $user
+     * @param Moment $moment
+     * @param User $user
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStudentPosted(Evidence $evidence, User $user, ?array $diff): Envelope
+    public function notifyStudentPosted(Moment $moment, User $user, ?array $diff): Envelope
     {
-        return $this->notifyPosted(Role::STUDENT, $evidence, $user, $diff);
+        return $this->notifyPosted(Role::STUDENT, $moment, $user, $diff);
     }
 
     /**
-     * Notify staff that evidence has been posted.
+     * Notify staff that a learning moment has been posted.
      *
-     * @param Evidence   $evidence
-     * @param User       $user
+     * @param Moment $moment
+     * @param User $user
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStaffPosted(Evidence $evidence, User $user, ?array $diff): Envelope
+    public function notifyStaffPosted(Moment $moment, User $user, ?array $diff): Envelope
     {
-        return $this->notifyPosted(Role::STAFF, $evidence, $user, $diff);
+        return $this->notifyPosted(Role::STAFF, $moment, $user, $diff);
     }
 
     /**
-     * Notify parents that evidence has been posted.
+     * Notify parents that a learning moment has been posted.
      *
-     * @param Evidence   $evidence
-     * @param User       $user
+     * @param Moment $moment
+     * @param User $user
      * @param array|null $diff
      * @return Envelope
      */
-    public function notifyParentPosted(Evidence $evidence, User $user, ?array $diff): Envelope
+    public function notifyParentPosted(Moment $moment, User $user, ?array $diff): Envelope
     {
-        return $this->notifyPosted(Role::PARENT, $evidence, $user, $diff);
+        return $this->notifyPosted(Role::PARENT, $moment, $user, $diff);
     }
 }
