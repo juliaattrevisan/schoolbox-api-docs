@@ -8,18 +8,20 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\APIConfig;
+namespace Schoolbox\Config\API;
 
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\API\Token\JwtParser\InstanceRegistryIssued;
-use Schoolbox\APIConfig\Authorizer\Rule\HasValidInstanceRegistryToken;
+use Schoolbox\Config\API\Authorizer\Rule\HasValidInstanceRegistryToken;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\UserMapper;
 
 class Module extends BaseModule
@@ -27,7 +29,7 @@ class Module extends BaseModule
     /**
      * @inheritdoc
      */
-    protected $basename = 'config';
+    protected $basename = 'apiConfig';
 
 
     /**
@@ -39,10 +41,9 @@ class Module extends BaseModule
     protected function registerRoutes(): void
     {
         /* Access to Config API is allowed either by:
-         * 1. Being a logged-in superuser (Only for testing before merge), OR
+         * 1. Being a logged-in superuser, OR
          * 2. Having a valid Instance Registry JWT token
          */
-        // Todo: Remove superuser access after testing
         $hasApiAccess = new Rule\Any(
             // superuser access for testing
             new Rule\All(
@@ -69,9 +70,9 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
-            $this->getAuthorizer(),
-            $this->getRouter()->getGenerator(),
-            $this->getMapperFactory()->get(ConfigMapper::class)
+            $this->getMapperFactory()->get(ConfigMapper::class),
+            $this->createInstanceRegistryJwtParser(),
+            $this->createFieldStrategyFactory()
         );
     }
 
@@ -126,5 +127,36 @@ class Module extends BaseModule
 
         // Return the authorization rule
         return new HasValidInstanceRegistryToken($jwtParser, $logger);
+    }
+
+    /**
+     * Creates an Instance Registry JWT parser
+     *
+     * @return InstanceRegistryIssued
+     */
+    private function createInstanceRegistryJwtParser(): InstanceRegistryIssued
+    {
+        // Get required dependencies from the injector
+        $userMapper = $this->getMapperFactory()->get(UserMapper::class);
+        $config = $this->injector->get('config');
+        $logger = $this->injector->get('user.jwtParser.logger');
+
+        // Create and return the JWT parser
+        return new InstanceRegistryIssued(
+            $userMapper,
+            $config,
+            $logger,
+            INSTANCE_ID
+        );
+    }
+
+    /**
+     * Creates a FieldStrategyFactory for config validation
+     *
+     * @return FieldStrategyFactory
+     */
+    private function createFieldStrategyFactory(): FieldStrategyFactory
+    {
+        return new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory());
     }
 }

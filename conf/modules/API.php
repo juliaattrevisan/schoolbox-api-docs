@@ -32,6 +32,6 @@ class API extends ModuleLoader
 
         $this->loadModule($di, Schoolbox\Learning\Assessment\API\Module::class, '/api/assessment');
 
-        $this->loadModule($di, Schoolbox\APIConfig\Module::class, '/api/config');
+        $this->loadModule($di, Schoolbox\Config\API\Module::class, '/api/config');
     }
 }

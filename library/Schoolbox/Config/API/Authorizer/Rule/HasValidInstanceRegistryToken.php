@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\APIConfig\Authorizer\Rule;
+namespace Schoolbox\Config\API\Authorizer\Rule;
 
 use Alaress\Authorizer\Failure\Unauthenticated;
 use Alaress\Authorizer\Rule\IAuthorizationRule;
