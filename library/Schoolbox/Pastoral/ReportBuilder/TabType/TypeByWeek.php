@@ -12,6 +12,7 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
     private $weeks = [];
     public const COLUMN_QUERY_KEY = 'week_%d';
     public const COLUMN_KEY_REGEX = '/(week)_(?<index>\d+)/';
+    public const DEFAULT_SORTING_KEY = self::SORT_BY_TYPE_DEFAULT;
 
     private function getWeeks(): Collection
     {

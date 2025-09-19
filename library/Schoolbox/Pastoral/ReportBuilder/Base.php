@@ -104,7 +104,7 @@ class Base
         /* Return null if all the values are null otherwise return the total count
          */
         return array_merge(
-            ['type_subtype' => 'Total'],
+            [static::DEFAULT_SORTING_KEY => ucwords("total {$this->resultType}")],
             $this->getTotalCount()
                  ->map(fn($count) => is_numeric($count) ? $count / 1 : null)->getAll()
         );

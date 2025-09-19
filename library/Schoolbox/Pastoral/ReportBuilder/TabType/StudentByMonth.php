@@ -13,6 +13,8 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
     public const COLUMN_QUERY_MONTH_FORMAT = '%b_%Y';
     public const COLUMN_DATE_FORMAT = "M_Y";
     public const COLUMN_KEY_REGEX = "/(?<month>(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec))_(?<year>[0-9]{4})/i";
+    public const DEFAULT_SORTING_KEY = self::SORT_BY_STUDENT_DEFAULT;
+
     /**
      * Get the months in the date range
      *
@@ -132,7 +134,7 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
         $monthFormat = self::COLUMN_QUERY_MONTH_FORMAT;
 
         $distinctRecordsQuery = "
-            SELECT DISTINCT pastoral.*, CONCAT(s.lastname, ', ', s.chosen_name) as student_name, DATE_FORMAT(COALESCE(pastoral.occurred_on, pastoral.created_at), '{$monthFormat}') AS month
+            SELECT DISTINCT pastoral.*, CONCAT(s.lastname, ', ', s.chosen_name) as `user`, DATE_FORMAT(COALESCE(pastoral.occurred_on, pastoral.created_at), '{$monthFormat}') AS month
             {$this->helper->getFromString()}
             WHERE
                 ({$whereTypeSubTypeQuery}) AND
@@ -140,7 +142,7 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
         ";
 
         $countQuery = "
-            SELECT distinctRecords.student_id, distinctRecords.student_name, {$countQuery}
+            SELECT distinctRecords.student_id, distinctRecords.`user`, {$countQuery}
             FROM ({$distinctRecordsQuery}) distinctRecords
             GROUP BY distinctRecords.student_id
         ";
@@ -386,7 +388,7 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
             $rows = $records->map(
                 function (array $record) use ($students) {
                     $row['user'] = call_user_func($this->userTranslator, $students->getBy('id', $record['student_id']));
-                    unset($record['student_id'], $record['student_name']);
+                    unset($record['student_id'], $record['user']);
 
                     $row = array_merge($row, array_map(fn($value) => [$this->resultType => $value], $record));
 
@@ -427,7 +429,7 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
     public function getCSVHeaders(): array
     {
         $headers = [
-            'student_name' => 'Name',
+            'user' => 'Name',
             'total' => 'Total',
         ];
         foreach ($this->getMonths() as $month) {

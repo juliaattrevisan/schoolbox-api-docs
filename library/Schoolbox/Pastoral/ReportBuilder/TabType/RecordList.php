@@ -253,4 +253,11 @@ class RecordList extends Base implements TabTypeInterface, ICursor
     {
         return [];
     }
+    /**
+     * @inheritdoc
+     */
+    public function getTotalCountRow(): array
+    {
+        return [];
+    }
 }

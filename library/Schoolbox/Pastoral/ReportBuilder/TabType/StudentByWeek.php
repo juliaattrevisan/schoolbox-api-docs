@@ -13,6 +13,7 @@ class StudentByWeek extends Base implements TabTypeInterface, ICursor
 
     public const COLUMN_QUERY_KEY = 'week_%d';
     public const COLUMN_KEY_REGEX = '/(week)_(?<index>\d+)/';
+    public const DEFAULT_SORTING_KEY = self::SORT_BY_STUDENT_DEFAULT;
 
     /**
      * Get the weeks in the date range
@@ -140,7 +141,7 @@ class StudentByWeek extends Base implements TabTypeInterface, ICursor
         );
 
         $distinctRecordsQuery = "
-            SELECT DISTINCT pastoral.*, CONCAT(s.lastname, ', ', s.chosen_name) as student_name, COALESCE(pastoral.occurred_on, pastoral.created_at) AS reportDate
+            SELECT DISTINCT pastoral.*, CONCAT(s.lastname, ', ', s.chosen_name) as `user`, COALESCE(pastoral.occurred_on, pastoral.created_at) AS reportDate
             {$this->helper->getFromString()}
             WHERE
                 ({$whereTypeSubTypeQuery}) AND
@@ -148,7 +149,7 @@ class StudentByWeek extends Base implements TabTypeInterface, ICursor
         ";
 
         $countQuery = "
-            SELECT distinctRecords.student_id, distinctRecords.student_name, {$countQuery}
+            SELECT distinctRecords.student_id, distinctRecords.`user`, {$countQuery}
             FROM ({$distinctRecordsQuery}) distinctRecords
             GROUP BY distinctRecords.student_id
         ";
@@ -401,7 +402,7 @@ class StudentByWeek extends Base implements TabTypeInterface, ICursor
             $rows = $records->map(
                 function (array $record) use ($students, $weeks) {
                     $row['user'] = call_user_func($this->userTranslator, $students->getBy('id', $record['student_id']));
-                    unset($record['student_id'], $record['student_name']);
+                    unset($record['student_id'], $record['user']);
 
                     $row = array_merge($row, array_map(fn($value) => [$this->resultType => $value], $record));
 
@@ -445,7 +446,7 @@ class StudentByWeek extends Base implements TabTypeInterface, ICursor
     public function getCSVHeaders(): array
     {
         $headers = [
-            'student_name' => 'Name',
+            'user' => 'Name',
             'total' => 'Total',
         ];
         foreach ($this->getWeeks() as $week) {

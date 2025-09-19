@@ -151,6 +151,15 @@ window.Vue.onMounted(() => {
     </div>
     <pr-empty v-else-if="isEmpty" />
     <template v-else-if="hasRows">
+        <div>
+            <a
+                v-if="selectedTab?._links.export"
+                :href="`${selectedTab._links.export}?selected=${recordsOrPoints}`"
+                aria-label="Download related records as CSV"
+                title="Download related records as CSV"
+            ><sbx-icon name="download"
+            /></a>
+        </div>
         <div ref="containerRef">
             <div
                 ref="scrollableRef"

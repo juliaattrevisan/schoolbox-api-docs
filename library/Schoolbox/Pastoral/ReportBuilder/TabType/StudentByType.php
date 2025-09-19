@@ -12,6 +12,7 @@ class StudentByType extends Base implements TabTypeInterface, ICursor
 {
     public const COLUMN_KEY_FORMAT = "count_%s_%d";
     public const COLUMN_KEY_REGEX = "/count_(?<type>\w+)_(?<id>\d+)/";
+    public const DEFAULT_SORTING_KEY = self::SORT_BY_STUDENT_DEFAULT;
 
     private array $params = [];
 
@@ -140,8 +141,8 @@ class StudentByType extends Base implements TabTypeInterface, ICursor
 
         $countQuery =
             "
-            SELECT distinctRecords.student_id, distinctRecords.student_name, {$countQuery}
-            FROM (SELECT DISTINCT pastoral.*, CONCAT(s.lastname, ', ', s.chosen_name) as student_name
+            SELECT distinctRecords.student_id, distinctRecords.`user`, {$countQuery}
+            FROM (SELECT DISTINCT pastoral.*, CONCAT(s.lastname, ', ', s.chosen_name) as `user`
             {$this->helper->getFromString()}
             WHERE
                 ({$whereTypeSubTypeQuery}) AND
@@ -409,7 +410,7 @@ class StudentByType extends Base implements TabTypeInterface, ICursor
             $rows = $records->map(
                 function (array $record) use ($students) {
                     $row['user'] = call_user_func($this->userTranslator, $students->getBy('id', $record['student_id']));
-                    unset($record['student_id'], $record['student_name']);
+                    unset($record['student_id'], $record['user']);
                     return array_merge($row, array_map(fn($value) => [ $this->resultType => $value], ($record)));
                 }
             );
@@ -439,7 +440,7 @@ class StudentByType extends Base implements TabTypeInterface, ICursor
     public function getCSVHeaders(): array
     {
         $headers = [
-            'student_name' => 'Name',
+            'user' => 'Name',
             'total' => 'Total'
         ];
         foreach ($this->helper->getType() as $type) {

@@ -679,7 +679,7 @@ class Controller extends Base
 
             $totalRow = new Collection([$factory->getTotalCountRow()]);
             $records = $totalRow->merge($factory->retrieveResults(null));
-            $this->exportResultTableToCSV($report, $records, $tabType, $factory->getCSVHeaders());
+            $this->exportResultTableToCSV($report, $records, $tabType, $resultType, $factory->getCSVHeaders());
         } catch (\PDOException | DatabaseException $e) {
             $problem = (new ApiProblem('Something has gone wrong, please contact your support if the problem persists'))
                 ->setStatus(500);
@@ -697,13 +697,20 @@ class Controller extends Base
      * @param PastoralReport $report
      * @param Collection     $records
      * @param string         $tabType
+     * @param string         $resultType
      * @param array          $headerRow
      * @return void
      */
-    private function exportResultTableToCSV(PastoralReport $report, Collection $records, string $tabType, array $headerRow): void
+    private function exportResultTableToCSV(
+        PastoralReport $report,
+        Collection $records,
+        string $tabType,
+        string $resultType,
+        array $headerRow
+    ): void
     {
         $label = PastoralReport::SUMMARY_TABLES_OPTIONS[$tabType]['label'] ?? $tabType;
-        $exporter = new \Report_Exporter($report->getName() . " - {$label}");
+        $exporter = new \Report_Exporter($report->getName() . " - {$label} - {$resultType}");
         $exporter->setHeadings($headerRow);
         $exporter->setData($records);
         $exporter->exportCSV();
