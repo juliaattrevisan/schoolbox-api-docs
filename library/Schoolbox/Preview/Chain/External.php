@@ -10,6 +10,7 @@ namespace Schoolbox\Preview\Chain;
 
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Preview\Chain\Strategy\External\IFrame;
+use Schoolbox\Preview\Chain\Strategy\External\PDF;
 use Schoolbox\Preview\Chain\Strategy\External\Image;
 use Schoolbox\Preview\Chain\Strategy\External\Embed;
 use Schoolbox\Preview\Chain\Strategy\External\Redirect;
@@ -34,6 +35,7 @@ class External extends Base
         $decodedUrl = urldecode($url);
 
         $this->start([
+            new PDF($decodedUrl, []),
             new Image($decodedUrl, []),
             new Embed($decodedUrl, []),
             new IFrame($decodedUrl, preg_split('/\R/', ConfigLoader::getInstance()->get('safe_iframe_source_list'))), // Explode on \R to include all types of newline chars.
