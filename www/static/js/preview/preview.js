@@ -84,6 +84,9 @@
                                                         src: response.fragment,
                                                     },
                                                 ],
+                                                mobileSettings: {
+                                                    showCloseIcon: true,
+                                                },
                                             },
                                             onCreated: function (gallery) {
                                                 gallery.openGallery();
@@ -106,6 +109,9 @@
                                                 ],
                                                 iframeWidth: "80%",
                                                 iframeHeight: "80%",
+                                                mobileSettings: {
+                                                    showCloseIcon: true,
+                                                },
                                             },
                                             onCreated: function (gallery) {
                                                 gallery.openGallery();
@@ -132,6 +138,11 @@
                                                 ],
                                                 enableDrag: false, // ensure doesn't cause any conflict with dragging in the pdf viewer
                                                 enableSwipe: false, // ensure doesn't cause any conflict with swiping in the pdf viewer
+                                                iframeWidth: "100%",
+                                                iframeHeight: "100%",
+                                                mobileSettings: {
+                                                    showCloseIcon: true,
+                                                },
                                             },
                                             onCreated: function (gallery) {
                                                 gallery.openGallery();
@@ -151,6 +162,9 @@
                                                         src: window.cdnPrefix + "/images/foundation/preloader.gif",
                                                     },
                                                 ],
+                                                mobileSettings: {
+                                                    showCloseIcon: true,
+                                                },
                                             },
                                             onCreated: function (gallery) {
                                                 // The fragment sent back can contain scripts, so it is important that we
