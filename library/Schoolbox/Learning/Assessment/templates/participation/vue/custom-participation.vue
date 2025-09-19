@@ -362,8 +362,10 @@ function getCustomisationMeta(plan: Plan | CustomisedPlan): string {
                     </td>
                     <td>
                         <template v-if="participant.customisedPlan !== null">
-                            <a :href="`${participant.customisedPlan.assessable._links.modify}?${getReturnUrl()}`">
-                                {{ participant.customisedPlan.assessable.title }}
+                            <a
+                                :href="`${participant.customisedPlan.name !== null ? participant.customisedPlan._links.modify : participant.customisedPlan.assessable._links.modify}?${getReturnUrl()}`"
+                            >
+                                {{ participant.customisedPlan.name ?? participant.customisedPlan.assessable.title }}
                             </a>
                             <span class="meta">{{ getCustomisationMeta(participant.customisedPlan) }}</span>
                         </template>

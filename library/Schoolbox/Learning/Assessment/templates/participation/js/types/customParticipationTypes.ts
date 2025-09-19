@@ -16,6 +16,9 @@ export type Plan = {
     openDate: string | null;
     publishDate: string | null;
     updatedAt: string;
+    _links: {
+        modify: string | null;
+    };
 };
 
 /**

@@ -47,6 +47,18 @@ class ParticipationPlans
             'createdAt' => $plan->getCreatedAt()?->toRfc3339String(),
             'updatedAt' => $plan->getUpdatedAt()?->toRfc3339String(),
             'deletedAt' => $plan->getDeletedAt()?->toRfc3339String(),
+            '_links' => [
+                'modify' =>
+                    $this->getRouteIfAuthorized(
+                        'learningAssessment.getUpdateAssessmentParticipationLearningPlan',
+                        [
+                            'assessmentId' => $plan->getAssessable()->getId(),
+                            'assessment' => $plan->getAssessable(),
+                            'planId' => $plan->getId(),
+                            'plan' => $plan,
+                        ]
+                    )
+            ],
         ];
 
         /* This will only be attached if the assessment is a customised assessment, we are making the assumption that
