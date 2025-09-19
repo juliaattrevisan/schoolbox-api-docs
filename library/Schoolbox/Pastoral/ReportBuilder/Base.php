@@ -50,27 +50,29 @@ class Base
         protected string $resultType,
         protected ?string $sortBy,
         protected ?string $order = self::ORDER_DIRECTION_DEFAULT,
-        protected int $limit = self::LIMIT_DEFAULT,
+        protected ?int $limit = self::LIMIT_DEFAULT,
         protected ?ICodec $codec = null,
     ) {
         $this->codec ??= new Base64();
 
-        /* Set a maximum number of results should be returned otherwise reject
-         */
-        if ($this->limit > static::LIMIT_MAX) {
-            throw new ValueError(
-                sprintf('Limit must be at most %d: %d provided', static::LIMIT_MAX, $this->limit),
-                self::BAD_REQUEST_ERROR_CODE
-            );
-        }
+        if (null !== $this->limit) {
+            /* Set a maximum number of results should be returned otherwise reject
+             */
+            if ($this->limit > static::LIMIT_MAX) {
+                throw new ValueError(
+                    sprintf('Limit must be at most %d: %d provided', static::LIMIT_MAX, $this->limit),
+                    self::BAD_REQUEST_ERROR_CODE
+                );
+            }
 
-        /* Set a minimum number of results should be returned otherwise reject
-         */
-        if ($this->limit < static::LIMIT_MIN) {
-            throw new ValueError(
-                sprintf('Limit must be at least %d: %d provided', static::LIMIT_MIN, $this->limit),
-                self::BAD_REQUEST_ERROR_CODE
-            );
+            /* Set a minimum number of results should be returned otherwise reject
+             */
+            if ($this->limit < static::LIMIT_MIN) {
+                throw new ValueError(
+                    sprintf('Limit must be at least %d: %d provided', static::LIMIT_MIN, $this->limit),
+                    self::BAD_REQUEST_ERROR_CODE
+                );
+            }
         }
 
         /* If not set or it is assigned to other values should set back to default direction
