@@ -57,10 +57,8 @@
             config.maxMarkInput.on("input", syncEntriesIfNeeded);
             config.gradingSchemeSelect.on("change", syncEntriesIfNeeded);
 
-            // If this is the first load and this isn't reliant on another field, apply the initial state
-            if (config.sync.syncWith === null) {
-                syncEntriesIfNeeded();
-            }
+            // If this is the first load then apply the initial state
+            syncEntriesIfNeeded();
         }
 
         /**
@@ -199,31 +197,32 @@
             }
 
             // If this is set to sync with another field, hide the dropdown if the switch is off
-            const sourceConfig = configEntries[config.sync.syncWith ?? config.context];
-            const syncSwitch = document.querySelector(sourceConfig.sync.switchSelector);
+            // OFF means to sync, ON means to allow dual mark types
+            const shouldSync = !document.querySelector(config.sync.switchSelector).checked;
+
             if (config.sync.syncWith !== null) {
-                config.markTypeDropdown[0].closest(".row").style.display = syncSwitch.checked ? "" : "none";
+                config.markTypeDropdown[0].closest(".row").style.display = shouldSync ? "none" : "";
             }
 
             // Show the correct tooltip based on the switch state
-            if (syncSwitch.checked) {
-                config.markTypeTooltip.show();
-                config.markTypeSyncTooltip.hide();
-            } else {
+            if (shouldSync) {
                 config.markTypeTooltip.hide();
                 config.markTypeSyncTooltip.show();
+            } else {
+                config.markTypeTooltip.show();
+                config.markTypeSyncTooltip.hide();
             }
 
-            config.markTypeLabel.text(
-                syncSwitch.checked ? config.sync.syncMarkTypeOnLabel : config.sync.syncMarkTypeOffLabel,
-            );
+            config.markTypeLabel.text(shouldSync ? config.sync.syncMarkTypeOffLabel : config.sync.syncMarkTypeOnLabel);
 
-            if (syncSwitch.checked) {
+            if (!shouldSync) {
                 return; // the switch is enabled, so the fields shouldn't be sync'd
             }
 
             // If this was triggered by a change in a target entry, ignore it (otherwise we'll get an infinite loop)
-            if (config.sync.syncWith !== null) {
+            // or skip it if the source config can't be found (perhaps if the fields loaded in the incorrect order?)
+            const sourceConfig = configEntries[config.sync.syncWith] ?? null;
+            if (sourceConfig === null) {
                 return;
             }
 
