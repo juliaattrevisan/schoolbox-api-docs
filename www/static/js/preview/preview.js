@@ -119,6 +119,9 @@
                                         detail: {
                                             targetKey: "preview-iframe",
                                             options: {
+                                                autoplay: false,
+                                                counter: false, // hide as could be confusing with the pages of the pdf conflicting with the gallery counter
+                                                download: false, // download would be of the viewer, not the actual pdf
                                                 dynamic: true,
                                                 dynamicEl: [
                                                     {
@@ -126,6 +129,8 @@
                                                         iframe: true,
                                                     },
                                                 ],
+                                                enableDrag: false, // ensure doesn't cause any conflict with dragging in the pdf viewer
+                                                enableSwipe: false, // ensure doesn't cause any conflict with swiping in the pdf viewer
                                             },
                                             onCreated: function (gallery) {
                                                 gallery.openGallery();
