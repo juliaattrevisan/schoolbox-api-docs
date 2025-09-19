@@ -140,8 +140,8 @@ class StudentByType extends Base implements TabTypeInterface, ICursor
 
         $countQuery =
             "
-            SELECT distinctRecords.student_id, {$countQuery}
-            FROM (SELECT DISTINCT pastoral.*
+            SELECT distinctRecords.student_id, distinctRecords.student_name, {$countQuery}
+            FROM (SELECT DISTINCT pastoral.*, CONCAT(s.lastname, ', ', s.chosen_name) as student_name
             {$this->helper->getFromString()}
             WHERE
                 ({$whereTypeSubTypeQuery}) AND
@@ -200,7 +200,6 @@ class StudentByType extends Base implements TabTypeInterface, ICursor
          * Finding out where to locate the position where the cursor is pointing
          */
         $whereParts = "";
-        $params['limit'] = $this->limit;
         $groupBy = "u.lastname, COALESCE(u.preferred_name, u.firstname)";
 
         $orderBy = $this->getOrderBy();
@@ -234,6 +233,12 @@ class StudentByType extends Base implements TabTypeInterface, ICursor
             $params['studentId'] = $cursor['id'];
         }
 
+        $limit = "";
+        if (null !== $this->limit) {
+            $limit = " LIMIT :limit ";
+            $params['limit'] = $this->limit;
+        }
+
         $totalQuery = "
             SELECT withTotal.*
             FROM (
@@ -243,7 +248,7 @@ class StudentByType extends Base implements TabTypeInterface, ICursor
             {$whereParts}
             GROUP BY withTotal.student_id, {$groupBy}
             ORDER BY {$orderBy}, withTotal.student_id {$this->order}
-            LIMIT :limit
+            {$limit}
         ";
 
         $result =  $db->executeQuery(
@@ -404,7 +409,7 @@ class StudentByType extends Base implements TabTypeInterface, ICursor
             $rows = $records->map(
                 function (array $record) use ($students) {
                     $row['user'] = call_user_func($this->userTranslator, $students->getBy('id', $record['student_id']));
-                    unset($record['student_id']);
+                    unset($record['student_id'], $record['student_name']);
                     return array_merge($row, array_map(fn($value) => [ $this->resultType => $value], ($record)));
                 }
             );
@@ -424,5 +429,29 @@ class StudentByType extends Base implements TabTypeInterface, ICursor
                 ]
             ]
         ];
+    }
+
+    /**
+     * Get the CSV headers for the export
+     *
+     * @return array
+     */
+    public function getCSVHeaders(): array
+    {
+        $headers = [
+            'student_name' => 'Name',
+            'total' => 'Total'
+        ];
+        foreach ($this->helper->getType() as $type) {
+            $key = sprintf(self::COLUMN_KEY_FORMAT, 'type', $type->getId());
+            $headers[$key] = $type->getName();
+        }
+        foreach ($this->helper->getSubTypes() as $subType) {
+            if ($subType instanceof SubType) {
+                $key = sprintf(self::COLUMN_KEY_FORMAT, 'subtype', $subType->getId());
+                $headers[$key] = "{$subType->getPastoralType()->getName()} ({$subType->getName()})";
+            }
+        }
+        return $headers;
     }
 }
