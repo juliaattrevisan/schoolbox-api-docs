@@ -103,6 +103,16 @@ class Notifier extends AbstractModuleNotifier
          */
         if ($crudMethod === \Schoolbox\Mapper::METHOD_CREATE) {
             $bundle->attach(self::TRIGGER_POSTED, self::IMMEDIATELY);
+
+            /* A learning moment can be created immediately into the Submitted For Approval state
+             */
+            $bundle->attach(self::TRIGGER_SUBMITTED, self::IMMEDIATELY);
+        }
+
+        /* When a learning moment gets updated to then be in Submitted For Approval
+         */
+        if (\Schoolbox\Mapper::METHOD_UPDATE === $crudMethod) {
+            $bundle->attach(self::TRIGGER_SUBMITTED, self::IMMEDIATELY);
         }
     }
 
@@ -142,6 +152,10 @@ class Notifier extends AbstractModuleNotifier
     private function notifyPosted(string $roleType, Moment $model, User $effector, ?array $diff): Envelope
     {
         $envelope = new Envelope();
+
+        /* TODO where does everything go?
+         */
+        (new \Alaress_Log_File('/tmp/notifySubmitted.log'))->log('notifyPosted method', $roleType);
 
         // if the learning moment is draft (now draft, may have just been created, may have been moved to draft, do not notify
         if ($model->isDraft()) {
@@ -232,6 +246,10 @@ class Notifier extends AbstractModuleNotifier
     private function notifySubmitted(string $roleType, Moment $model, User $effector, ?array $diff): Envelope
     {
         $envelope = new Envelope();
+
+        /* TODO where does everything go? This never fires.
+         */
+        (new \Alaress_Log_File('/tmp/notifySubmitted.log'))->log('notifySubmitted method', $roleType);
 
         /* A necessary precondition
          */
@@ -368,6 +386,6 @@ class Notifier extends AbstractModuleNotifier
      */
     public function notifyStaffSubmitted(Moment $moment, User $effector, array $diff = []): Envelope
     {
-        return $this->notifySubmitted(Role::STAFF, $moment, $effector);
+        return $this->notifySubmitted(Role::STAFF, $moment, $effector, $diff);
     }
 }
