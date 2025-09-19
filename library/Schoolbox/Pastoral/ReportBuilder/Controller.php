@@ -435,6 +435,14 @@ class Controller extends Base
                             'tabType' => $key,
                         ]
                     ),
+                    'export' => $this->getRouteIfAuthorized(
+                        'pastoralReportBuilder.getReportTableExport',
+                        [
+                            'reportId' => $report->getId(),
+                            'report' => $report,
+                            'tabType' => $key,
+                        ]
+                    ),
                     'scope' => $this->getRouteIfAuthorized(
                         'pastoralReportBuilder.getReportByTabTypeScope',
                         [
