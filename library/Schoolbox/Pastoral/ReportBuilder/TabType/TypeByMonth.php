@@ -305,7 +305,7 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
     /**
      * @inheritdoc
      */
-    public function process(Collection $records, ?string $encodedCursor = null)
+    public function process(Collection $records, ?string $encodedCursor = null): array
     {
         $totalCount = $this->getTotalCount();
         $totalCount = $totalCount->map(fn($count) => is_numeric($count) ? $count / 1 : null);

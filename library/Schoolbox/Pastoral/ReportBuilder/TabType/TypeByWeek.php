@@ -272,7 +272,10 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
         return $this->codec->encode($discriminator);
     }
 
-    public function process(Collection $records, ?string $encodedCursor = null)
+    /**
+     * @inheritdoc
+     */
+    public function process(Collection $records, ?string $encodedCursor = null): array
     {
         $totalCount = $this->getTotalCount();
         $totalCount = $totalCount->map(fn($count) => is_numeric($count) ? $count / 1 : null);

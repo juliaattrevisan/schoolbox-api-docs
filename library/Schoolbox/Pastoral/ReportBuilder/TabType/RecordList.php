@@ -251,5 +251,6 @@ class RecordList extends Base implements TabTypeInterface, ICursor
      */
     public function getCSVHeaders(): array
     {
+        return [];
     }
 }
