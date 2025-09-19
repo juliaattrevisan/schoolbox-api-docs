@@ -30,7 +30,7 @@ class Factory
         private string $resultType,
         private ?string $orderBy,
         private ?string $order,
-        private int $limit = Base::LIMIT_DEFAULT,
+        private ?int $limit = Base::LIMIT_DEFAULT,
     ) {
     }
 
