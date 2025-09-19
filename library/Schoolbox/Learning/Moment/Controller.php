@@ -999,30 +999,33 @@ class Controller extends Base
         /* Reject only, handle adding a rejection reason
          */
         if (Model::STATUS_REJECTED === $state) {
-            /* If a discussion thread never existed, spawn one
+            /* Spawn a comment (and accompanying thread if necessary) only if there was something
+             * meaningful written, avoiding spawning an empty discussion thread
              */
-            $discussionThread = $moment->getDiscussionThread();
+            $reason = trim((string)($requestBody['rejectionReason'] ?? ''));
 
-            if (null === $discussionThread) {
-                $discussionThread = $this->discussionThreadMapper->createModel()
-                    ->setOpen(true);
+            if ('' !== $reason) {
+                /* If a discussion thread never existed, spawn one
+                 */
+                $discussionThread = $moment->getDiscussionThread();
 
-                $this->discussionThreadMapper->save($discussionThread);
+                if (null === $discussionThread) {
+                    $discussionThread = $this->discussionThreadMapper->createModel()
+                        ->setOpen(true);
 
-                $moment->setDiscussionThread($discussionThread);
+                    $this->discussionThreadMapper->save($discussionThread);
+
+                    $moment->setDiscussionThread($discussionThread);
+                }
+
+                $comment = $this->commentMapper->createModel()
+                    ->setContent($reason)
+                    ->setAuthor($this->getUser())
+                    ->setThread($moment->getDiscussionThread());
+
+                $this->commentMapper->save($comment);
             }
-
-            /* Spawn a comment
-             * Save it to $moment's discussion thread somehow
-             */
-            $comment = $this->commentMapper->createModel()
-                ->setContent($requestBody['rejectionReason'] ?? '')
-                ->setAuthor($this->getUser())
-                ->setThread($moment->getDiscussionThread());
-
-            $this->commentMapper->save($comment);
         }
-
 
         /* Save it
          */
@@ -1035,9 +1038,7 @@ class Controller extends Base
          */
         $responseTranslator = $this->buildTranslatorWithComments(1);
 
-        $translated = $responseTranslator($moment);
-
-        return $translated;
+        return $responseTranslator($moment);
     }
 
 
