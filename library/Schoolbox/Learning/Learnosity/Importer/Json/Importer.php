@@ -20,8 +20,8 @@ use Schoolbox\Learning\Assessment\WorkType\Mapper;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\Learnosity\Export\Json\Exporter;
-use Schoolbox\Learning\Learnosity\Importer\InlineImageConverter;
 use Schoolbox\Learning\Learnosity\Importer\Legacy\Xml\ContextLookup;
+use Schoolbox\Learning\Learnosity\Importer\RemoteInlineImageConverter;
 use Schoolbox\Learning\Learnosity\TagFactory;
 use Schoolbox\Learning\Quiz\Model;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -275,7 +275,7 @@ class Importer
         /* Any random base64 images that just somehow happened to be here will get converted
          * into local storage instances instead, as per the Omega Import
          */
-        $inlineImageConverter = new InlineImageConverter($this->storageMapper, null);
+        $inlineImageConverter = new RemoteInlineImageConverter($this->api, null);
 
         // Create the IAssessable
         $assessment = (new \Schoolbox\Learning\Assessment\Quiz\Model())
