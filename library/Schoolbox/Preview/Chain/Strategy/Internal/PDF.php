@@ -23,7 +23,8 @@ class PDF extends Base
             $src = $this->url;
             return [
                 'type' => 'pdf',
-                'src' => 'https://vagrant.dev.schoolbox.cloud/static/js/pdf/pdfjs/web/viewer.html?file=https://vagrant.dev.schoolbox.cloud' . $src
+                'isLocal' => true, // to pass through a ?file parameter to the viewer based on local or external
+                'src' => $src
             ];
         }
         return $this->testNext();

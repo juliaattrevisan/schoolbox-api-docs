@@ -114,6 +114,7 @@
                                     }),
                                 );
                             } else if (response.type == "pdf") {
+                                const src = `${window.cdnPrefix}/js/pdf/pdfjs/web/viewer.html?file=${response.isLocal ? window.location.origin : ""}${response.fragment}`;
                                 document.dispatchEvent(
                                     new CustomEvent("IMAGE-LIGHTBOX__CREATE", {
                                         detail: {
@@ -125,7 +126,7 @@
                                                 dynamic: true,
                                                 dynamicEl: [
                                                     {
-                                                        src: response.fragment,
+                                                        src: src,
                                                         iframe: true,
                                                     },
                                                 ],

@@ -91,6 +91,7 @@ class Factory
         return [
             'type'     => $result['type'] ?? null,
             'twig'     => $result['twig'] ?? null,
+            'isLocal'  => $result['isLocal'] ?? null,
             'fragment' => $fragment,
         ];
     }
