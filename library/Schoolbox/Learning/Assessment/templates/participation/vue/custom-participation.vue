@@ -16,7 +16,6 @@ interface Props {
     pastoralEnabled: boolean;
     getStudentsPastoralCountsUrl: string;
     getLearningPlanNewUrl: string;
-    getAssessmentParticipation: string;
     getAssessmentParticipationNewActivity: string;
     getAssessmentParticipationCopyActivity: string;
     assessmentId: number;
@@ -370,7 +369,7 @@ function getCustomisationMeta(plan: Plan | CustomisedPlan): string {
                             <span class="meta">{{ getCustomisationMeta(participant.customisedPlan) }}</span>
                         </template>
                         <template v-else-if="participant.plan.name !== null">
-                            <a :href="`${getAssessmentParticipation}/${participant.plan.id}/modify?${getReturnUrl()}`">
+                            <a :href="`${participant.plan._links.modify}?${getReturnUrl()}`">
                                 {{ participant.plan.name }}
                             </a>
                             <span class="meta">{{ getCustomisationMeta(participant.plan) }}</span>
