@@ -40,6 +40,7 @@ class Notifier extends AbstractModuleNotifier
 
     private const PATTERN_SOMEONE_POSTED_TITLE = ':user posted :moment for :student';
     private const PATTERN_STUDENT_POSTED_TITLE = ':student has posted :moment';
+    private const PATTERN_SUBMITTED_TITLE = ':user posted :moment that requires approval';
 
     private const PATTERN_MOMENT_HREF = '/learning/evidence/%d';
 
@@ -217,6 +218,106 @@ class Notifier extends AbstractModuleNotifier
         return $envelope;
     }
 
+
+    /**
+     * Notify relevant users in given role type that a learning moment was put into Submitted For Approval
+     * Note that users need to have the Learning Moment role permission to receive this notif
+     *
+     * @param string $roleType
+     * @param Model $model
+     * @param User $effector
+     * @param array|null $diff
+     * @return Envelope
+     */
+    private function notifySubmitted(string $roleType, Moment $model, User $effector, ?array $diff): Envelope
+    {
+        $envelope = new Envelope();
+
+        /* A necessary precondition
+         */
+        if (!$model->isSubmitted()) {
+            return $envelope;
+        }
+
+        try {
+            $effector = $this->userMapper->findById($effector->getId());
+
+            /* Only students cause this notif: parents skip the moderation process along with staffs
+             */
+            if (!$effector->getRole()->isStudent()) {
+                return $envelope;
+            }
+
+            /** @var Moment $moment */
+            $moment = $this->mapper->findById($model->getId());
+            // hydrate to get teacher collection properly
+            $student = $this->userMapper->findById($moment->getRecipient()->getId());
+        } catch (MapperException $e) {
+            return $envelope;
+        }
+
+        /* This only matters when students post for themselves. I'm not sure if they could ever
+         * get into a place where $effector != $student, but as  precaution:
+         */
+        if ($effector->getId() !== $student->getId()) {
+            return $envelope;
+        }
+
+        /* Maybe go to its modify screen instead of this random detail screen?
+         * Or maybe even the cohort report
+         */
+        $momentHref = sprintf(self::PATTERN_MOMENT_HREF, $moment->getId());
+
+        $bob = (new Builder())
+            ->setIcon($this->getUserIcon($effector))
+            ->setHref($momentHref)
+            ->setNamespace($this->getSlug())
+            ->setSeverity(Logger::INFO)
+            ->addTopic("{$this->getSlug()}.{$moment->getId()}." . self::TRIGGER_SUBMITTED)
+            ->setTimestamp($moment->getCreatedAt()->getUnixTimeStamp())
+            ->setStudentExternalIdMeta($moment->getRecipient()->getExternalId())
+            ->addFilter(RoletypeFilter::NAME, [$roleType]);
+
+        $params = [
+            'moment' => new Param('a learning moment', $momentHref, Param::STACKING_REPLACE_NO_DECORATION)
+        ];
+
+        /* At this point:
+         *     - student is the effector and posted the learning moment for themselves
+         *     - the learning moment is in Submitted For Approval
+         *
+         * Now we can tell the staff about it
+         */
+        $bob->setTitle(self::PATTERN_SUBMITTED_TITLE);
+
+        /* Sub in the student's name
+         */
+        $params['student'] = new UserParam($effector);
+
+        $bob->setParams($params);
+
+        $instance = $bob->build();
+
+        /* Tell $effector's teachers that they've submitted a learning moment for approval
+         * Any teachers with the Learning Moment role permission will get a notif
+         */
+        (new \Schoolbox\External\User())->loadTeachers([$student]);
+
+        /** @var User $teacher */
+        foreach ($student->getTeacherCollection() as $teacher) {
+            /* Skip teachers who don't have the learning moment role permission
+             */
+            if (!$teacher->getRole()->getAccessEvidence()) {
+                continue;
+            }
+
+            $envelope->targetToUser($teacher, $instance);
+        }
+
+        return $envelope;
+    }
+
+
     /**
      * Notify students that a learning moment has been posted.
      *
@@ -254,5 +355,19 @@ class Notifier extends AbstractModuleNotifier
     public function notifyParentPosted(Moment $moment, User $user, ?array $diff): Envelope
     {
         return $this->notifyPosted(Role::PARENT, $moment, $user, $diff);
+    }
+
+
+    /**
+     * Notify a staff member that a learning moment was submitted for approval
+     *
+     * @param Model $moment
+     * @param User $effector
+     * @param array $diff
+     * @return Envelope
+     */
+    public function notifyStaffSubmitted(Moment $moment, User $effector, array $diff = []): Envelope
+    {
+        return $this->notifySubmitted(Role::STAFF, $moment, $effector);
     }
 }
