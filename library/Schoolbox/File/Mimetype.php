@@ -346,6 +346,16 @@ class Mimetype implements ISoftDeletable
         return str_starts_with($this->getMime(), 'image/');
     }
 
+    /**
+     * Determine if a file is a PDF
+     *
+     * @return bool
+     */
+    public function isPDF(): bool
+    {
+        return str_starts_with($this->getMime(), 'application/pdf');
+    }
+
 
     /**
      * Decide whether this is image, video, audio, documents or other files

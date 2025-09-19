@@ -10,6 +10,7 @@ namespace Schoolbox\Preview\Chain;
 
 use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Mapper as DueWorkResponseFileMapper;
 use Schoolbox\Mapper\Exception;
+use Schoolbox\Preview\Chain\Strategy\Internal\PDF;
 use Schoolbox\Preview\Chain\Strategy\Internal\Image;
 use Schoolbox\Preview\Chain\Strategy\Internal\Media;
 use Schoolbox\Preview\Chain\Strategy\Internal\IFrame;
@@ -154,6 +155,7 @@ class Internal extends Base
     private function processStorage(string $url, Storage\IStorage $item): void
     {
         $this->start([
+            new PDF($url, $item),
             new Image($url, $item),
             new Media($url, $item),
             new IFrame($url, $item),
