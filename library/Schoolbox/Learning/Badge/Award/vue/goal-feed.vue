@@ -9,7 +9,7 @@ import BadgeImage from "./../../vue/badge-image";
 import GoalWithdrawModal from "./award-goal-withdraw-modal";
 import foundationMixin from "@schoolboxVue/components/foundation-mixin";
 import goalMixin from "./goal-mixin";
-import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time";
+import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vue";
 import toastMixin from "@schoolboxVue/components/toast-mixin";
 import userProfileConstants from "../../../vue/user-profile/constants";
 import userProfileMixin from "../../../vue/user-profile/mixin";

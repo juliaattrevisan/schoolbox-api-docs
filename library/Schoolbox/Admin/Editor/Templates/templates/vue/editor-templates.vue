@@ -8,11 +8,11 @@
 import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import { kebabToTitleCase } from "@js/util/stringUtils";
-import { getFromNow } from "@js/util/dateUtils";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
+import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vue";
 import type { Category, Template } from "../js/types/editorTemplatesTypes";
 
 interface Props {
@@ -237,10 +237,8 @@ async function onDeleteConfirmed(): Promise<void> {
                             </span>
                             <span>
                                 —
-                                <time :title="template.createdAt.local">{{
-                                    getFromNow(template.createdAt.unixTimestamp)
-                                }}</time></span
-                            >
+                                <relative-time :datetime="template.createdAt" full-diff></relative-time>
+                            </span>
                         </p>
                     </div>
                     <div class="l-flex l-flex--align-start l-gap-xs">

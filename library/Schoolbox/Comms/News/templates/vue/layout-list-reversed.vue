@@ -5,7 +5,7 @@
 /* eslint-enable vue/no-v-html */
 import articleListMixin from "./article-list-mixin";
 import MediaArticle from "@schoolboxVue/components/media-article";
-import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time";
+import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vue";
 
 export default {
     name: "layout-list-reversed",

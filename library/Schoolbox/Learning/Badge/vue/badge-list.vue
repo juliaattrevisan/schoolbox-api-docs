@@ -11,7 +11,7 @@ import BadgeAchievementWithdrawModal from "../Award/vue/badge-achievement-withdr
 import BadgeGoalWithdrawModal from "../Award/vue/badge-goal-withdraw-modal";
 import BadgeImage from "./badge-image";
 import BadgeModal from "./badge-modal";
-import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time";
+import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vue";
 import mixinFilter from "@schoolboxVue/mixins/filter";
 import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
 

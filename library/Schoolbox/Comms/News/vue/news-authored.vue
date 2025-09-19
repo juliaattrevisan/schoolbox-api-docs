@@ -5,7 +5,7 @@
 /* eslint-enable vue/no-v-html */
 import Paginate from "vuejs-paginate-next";
 import MediaArticle from "@schoolboxVue/components/media-article";
-import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time";
+import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vue";
 import { fetchAsJson } from "@js/fetch/fetch";
 
 export default {
