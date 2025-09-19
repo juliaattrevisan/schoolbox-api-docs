@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Moment;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
+use Crell\ApiProblem\ApiProblem;
 use Schoolbox\API\Translator\ModelToArray\Composite;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
@@ -20,7 +21,6 @@ use Schoolbox\Discussion\Comment;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Learning\Moment\Model as MomentModel;
 use Schoolbox\Learning\Moment\Moderation\ModerationRequired;
 use Schoolbox\Learning\Moment\Translator\ModelToArray\Factory;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -793,7 +793,13 @@ class Controller extends Base
      */
     public function putPublish(Model $evidence): void
     {
-        $this->response = $this->responseAsJson($this->putWithState($evidence, Model::STATUS_PUBLISHED));
+        $responseArray = $this->putWithState($evidence, Model::STATUS_PUBLISHED);
+
+        $this->response = $this->responseAsJson($responseArray);
+
+        if (isset($responseArray['status']) && $responseArray['status'] === 400) {
+            $this->response = $this->response->withStatus($responseArray['status'], $responseArray['title'] ?? '');;
+        }
     }
 
 
