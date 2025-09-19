@@ -15,22 +15,11 @@ ARG NODE_VERSION=20
 ARG USER_ID
 ARG GROUP_ID
 
-# Install Intellischool CLI client, as per instructions on
-# https://docs.intellischool.co/guides/cli-quickstart#install-debian-ubuntu:
-# since keys are publicly accessible on that page, I'm not counting them as
-# private information.
-# Also, install tools required by cron tasks and CLI:
+# Install tools required by cron tasks and CLI:
 # * cron itself, git, mariadb client, ffmpeg, imagemagick, sudo, jq
 RUN \
   apt-get update && \
-  apt-get install -y gnupg && \
-  echo "deb https://cli.intellischool.net/channels/stable/apt/ /" > /etc/apt/sources.list.d/intelliscl.list && \
-  apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 88C06AD00AA2BB47 && \
-  rm /etc/apt/trusted.gpg.d/intellischool.gpg 2> /dev/null || echo > /dev/null && \
-  apt-key export 0AA2BB47 | gpg --dearmour -o /etc/apt/trusted.gpg.d/intellischool.gpg && \
-  apt-get update && \
   apt-get install -y \
-    intelliscl \
     cron \
     git \
     mariadb-client \
@@ -77,12 +66,33 @@ case "$ENV" in
     ;;
   *)
     # NPM install for all users into /opt/nvm
-    curl "https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh" -o nvm-install
+    curl "https://raw.githubusercontent.com/nvm-sh/nvm/v${NVM_VERSION}/install.sh" -f -o nvm-install || exit 1
     chmod +x nvm-install
     mkdir -p /opt/nvm
     NVM_DIR=/opt/nvm bash -c "./nvm-install && source /opt/nvm/nvm.sh && nvm install ${NODE_VERSION}"
     ;;
 esac
+EOF
+
+# Install Intellischool CLI client, as per instructions on
+# https://docs.intellischool.co/guides/cli-quickstart#install-debian-ubuntu:
+# need to install from a downloaded tar file, because it can't be installed
+# under Trixie yet.
+RUN <<EOF
+case "$(uname -m)" in
+  x86_64 )
+    curl https://cli.intellischool.net/channels/stable/intelliscl-linux-x64.tar.gz -f -o "intelliscl.tar.gz" || exit 1
+    ;;
+  aarch64 )
+    curl https://cli.intellischool.net/channels/stable/intelliscl-linux-arm64.tar.gz -f -o "intelliscl.tar.gz" || exit 1
+    ;;
+  * )
+    echo "Unknown architecture: not installing Intellischool CLI client"
+    exit
+    ;;
+esac
+tar -C /opt/ -xzf intelliscl.tar.gz
+rm intelliscl.tar.gz
 EOF
 
 # Copy NVM profile and sudoers conf

@@ -6,7 +6,7 @@
 ARG ENV=dev
 ARG PHP_MAJOR_VERSION=8.4
 
-FROM dunglas/frankenphp:1.8-php${PHP_MAJOR_VERSION}-bookworm
+FROM dunglas/frankenphp:1.9-php${PHP_MAJOR_VERSION}-trixie
 
 ARG PHP_MAJOR_VERSION
 
@@ -14,36 +14,45 @@ ARG PHP_MAJOR_VERSION
 # otherwise, xDebug will be installed below.
 ARG ENV
 
-# Install additional extensions
+# Install pdo_sqlsrv requirements
+# (workaround from https://github.com/mlocati/docker-php-extension-installer/pull/1149#discussion_r2307219876)
+RUN apt-get update && \
+    apt-get install -qy --no-install-recommends gnupg && \
+    curl -sSLf https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor --yes --output /usr/share/keyrings/microsoft-prod.gpg && \
+    curl -sSLf https://packages.microsoft.com/config/debian/12/prod.list > /etc/apt/sources.list.d/mssql-release.list && \
+    apt-get update && \
+    ACCEPT_EULA=Y apt-get install -qy --no-install-recommends msodbcsql18
+
+# Install additional extensions, + pdo_sqlsrv requirements
 # (not in https://github.com/shinsenter/php?tab=readme-ov-file#pre-installed-php-extensions)
 RUN apt-get update && apt-get upgrade -y && \
     install-php-extensions \
-    imagick \
-    pdo_mysql \
-    pdo_sqlsrv \
-    excimer \
-    curl \
-    ldap \
-    dom \
-    sockets \
-    imap \
-    redis \
-    readline \
-    zip \
-    pcntl \
-    posix \
-    openssl \
-    json \
-    simplexml \
-    mbstring \
-    intl \
-    xmlreader \
-    dom \
-    exif \
-    zlib \
-    fileinfo \
-    libxml \
-    opcache && \
+        imagick \
+        pdo_mysql \
+        pdo_sqlsrv \
+        excimer \
+        curl \
+        ldap \
+        dom \
+        sockets \
+        imap \
+        redis \
+        readline \
+        zip \
+        pcntl \
+        posix \
+        openssl \
+        json \
+        simplexml \
+        mbstring \
+        intl \
+        xmlreader \
+        dom \
+        exif \
+        zlib \
+        fileinfo \
+        libxml \
+        opcache && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
