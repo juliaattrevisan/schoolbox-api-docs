@@ -145,6 +145,17 @@
                                                 },
                                             },
                                             onCreated: function (gallery) {
+                                                gallery.el.addEventListener("lgAfterOpen", function () {
+                                                    const iframe = gallery.$inner.selector.querySelector("iframe");
+                                                    if (iframe) {
+                                                        // Hide the editor mode buttons in the PDF.js viewer
+                                                        iframe.onload = function () {
+                                                            iframe.contentWindow.document.getElementById(
+                                                                "editorModeButtons",
+                                                            ).style.display = "none";
+                                                        };
+                                                    }
+                                                });
                                                 gallery.openGallery();
                                             },
                                         },
