@@ -13,6 +13,8 @@ export interface Props {
             value: number;
             /** WARNING: This label is output as v-html to allow for icons, so ensure sanitization occurs beforehand */
             label: string;
+            /** An icon to display if the mark is readonly, if unset will show a disabled input field */
+            readonlyIcon?: string;
         }[];
         /**
          * Parameters for the fetch request to persist the change
@@ -40,6 +42,25 @@ const activities = window.Vue.computed(() =>
         };
     }),
 );
+
+/**
+ * Find the readonly icon for a given aImpl's select value, if it exists
+ * @param aImpl The relevant activity implementation
+ * @returns The icon name, or null if none exists
+ */
+function getReadonlyIcon(aImpl: MarkbookClassImplActivity): string | null {
+    if (props.input === undefined || props.input.selectOptions === undefined) {
+        return null;
+    }
+
+    const { key } = props.input;
+    const option = props.input.selectOptions.find((opt) => opt.value === aImpl[key]);
+    if (option === undefined) {
+        return null;
+    }
+
+    return option.readonlyIcon ?? null;
+}
 
 /**
  * Persist a change to an activity
@@ -105,11 +126,16 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
             <template v-if="stat === null || aImpl === null"></template>
             <template v-else-if="props.input && (props.input.allowCourseManaged || !aImpl.courseManaged)">
                 <template v-if="assessment.assessmentType === ACTIVITY_TYPE_TASK"></template>
+                <span
+                    v-else-if="props.input?.selectOptions && !aImpl.writable && getReadonlyIcon(aImpl) !== null"
+                    :class="getReadonlyIcon(aImpl)"
+                >
+                    <!-- This field is a select and not writable, but has a readonlyIcon available to use - so use it -->
+                </span>
                 <select
                     v-else-if="props.input?.selectOptions"
                     v-model="aImpl[props.input.key]"
                     :name="props.statsKey"
-                    :disabled="!aImpl.writable || undefined"
                     @change="onValueChange(assessment.id, aImpl)"
                 >
                     <!-- eslint-disable vue/no-v-html -- we can't use <sbx-icon> in a select since html spec
@@ -122,13 +148,16 @@ async function onValueChange(activityId: number, aImpl: MarkbookClassImplActivit
                     ></option>
                     <!-- eslint-enable vue/no-v-html -->
                 </select>
+                <span v-else-if="!aImpl.writable">
+                    <!-- This field is an input and not writable, only show the value -->
+                    {{ aImpl[props.input.key] }}
+                </span>
                 <input
                     v-else
                     v-model="aImpl[props.input.key]"
                     type="number"
                     inputmode="numeric"
                     :name="props.statsKey"
-                    :disabled="!aImpl.writable || undefined"
                     min="0"
                     @change="onValueChange(assessment.id, aImpl)"
                 />
