@@ -113,6 +113,26 @@
                                         },
                                     }),
                                 );
+                            } else if (response.type == "pdf") {
+                                document.dispatchEvent(
+                                    new CustomEvent("IMAGE-LIGHTBOX__CREATE", {
+                                        detail: {
+                                            targetKey: "preview-iframe",
+                                            options: {
+                                                dynamic: true,
+                                                dynamicEl: [
+                                                    {
+                                                        src: response.fragment,
+                                                        iframe: true,
+                                                    },
+                                                ],
+                                            },
+                                            onCreated: function (gallery) {
+                                                gallery.openGallery();
+                                            },
+                                        },
+                                    }),
+                                );
                             } else {
                                 document.dispatchEvent(
                                     new CustomEvent("IMAGE-LIGHTBOX__CREATE", {

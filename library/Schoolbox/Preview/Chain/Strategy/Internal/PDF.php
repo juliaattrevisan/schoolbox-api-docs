@@ -28,7 +28,7 @@ class PDF extends Base
 
             return [
                 'type' => 'pdf',
-                'src' => $src
+                'src' => 'https://vagrant.dev.schoolbox.cloud/static/js/pdf/pdfjs/web/viewer.html?file=https://vagrant.dev.schoolbox.cloud' . $src
             ];
         }
 
