@@ -73,7 +73,7 @@ async function sendRequest(): Promise<void> {
             attributes: attributes.value,
             imageUrl: currentFile.value ? await getImageUrl(currentFile.value.file) : null,
             previousResponseId: igStore.getPreviousResponseId(),
-            aiSessionId: props.aiSessionId
+            aiSessionId: props.aiSessionId,
         },
         currentFile.value,
     );
