@@ -75,9 +75,9 @@
                                     <select id="defaultExpiry" name="defaultExpiry" data-test="audiences-modify-pastoral-default-expiry-select">
                                         {% for key, expiry in defaultExpiry %}
                                             <option value="{{ expiry }}"
-                                                    label="{{ key | title }}"
+                                                    label="{{ key }}"
                                                     {% if expiry == currentDefaultExpiry %}selected{% endif %}
-                                            >{{ key | title }}</option>
+                                            >{{ key }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>

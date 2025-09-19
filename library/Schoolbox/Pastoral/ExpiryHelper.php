@@ -100,21 +100,14 @@ class ExpiryHelper
             );
         }
 
-        if (PastoralType::PASTORAL_EXPIRY['academic period'] === $defaultExpiry) {
-            $expiryDate = $this->loadAcademicPeriod($fromDate, $yearLevel)->getDisplayFinish();
-        } else if (PastoralType::PASTORAL_EXPIRY['academic year'] === $defaultExpiry) {
-            $expiryDate = (new Alaress_Date_Format($fromDate))->endOfSchoolYear();
-        } else if (PastoralType::PASTORAL_EXPIRY['calendar year'] === $defaultExpiry) {
-            $expiryDate = (new Alaress_Date_Format($fromDate))->endOfYear();
-        } else if (PastoralType::PASTORAL_EXPIRY['end of day'] === $defaultExpiry) {
+        return match ($defaultExpiry) {
+            TypeAbstract::PASTORAL_EXPIRY[TypeAbstract::PASTORAL_ACADEMIC_PERIOD] => $this->loadAcademicPeriod($fromDate, $yearLevel)->getDisplayFinish(),
+            TypeAbstract::PASTORAL_EXPIRY[TypeAbstract::PASTORAL_ACADEMIC_YEAR] => (new Alaress_Date_Format($fromDate))->endOfSchoolYear(),
+            TypeAbstract::PASTORAL_EXPIRY[TypeAbstract::PASTORAL_CALENDAR_YEAR] => (new Alaress_Date_Format($fromDate))->endOfYear(),
             /* End of day will expire on the same day
              */
-            $expiryDate = (new Alaress_Date_Format($fromDate));
-        } else if (PastoralType::PASTORAL_EXPIRY['end of following day'] === $defaultExpiry) {
-            $expiryDate = (new Alaress_Date_Format($fromDate))->addDays(1);
-        } else {
-            $expiryDate = (new Alaress_Date_Format($fromDate))->modify("+{$defaultExpiry}");
-        }
-        return $expiryDate;
+            TypeAbstract::PASTORAL_EXPIRY[TypeAbstract::PASTORAL_END_OF_DAY] => (new Alaress_Date_Format($fromDate)),
+            default => (new Alaress_Date_Format($fromDate))->modify("+{$defaultExpiry}"),
+        };
     }
 }

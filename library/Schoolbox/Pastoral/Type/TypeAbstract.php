@@ -42,20 +42,34 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
      * Pastoral Expiry
      */
     public const PASTORAL_EXPIRY_DEFAULT = null;
+    public const PASTORAL_EXPIRY_NEVER = 'Never';
+    public const PASTORAL_END_OF_DAY = 'End of Day';
+    public const PASTORAL_END_OF_FOLLOWING_DAY = 'End of Following Day';
+    public const PASTORAL_1_WEEK = '1 Week';
+    public const PASTORAL_2_WEEKS = '2 Weeks';
+    public const PASTORAL_1_MONTH = '1 Month';
+    public const PASTORAL_3_MONTHS = '3 Months';
+    public const PASTORAL_6_MONTHS = '6 Months';
+    public const PASTORAL_12_MONTHS = '12 Months';
+    public const PASTORAL_24_MONTHS = '24 Months';
+    public const PASTORAL_CALENDAR_YEAR = 'Calendar Year';
+    public const PASTORAL_ACADEMIC_PERIOD = 'Academic Period';
+    public const PASTORAL_ACADEMIC_YEAR = 'Academic Year';
+    /** @var string[] List of all the possible default expiry for the pastoral records **/
     public const PASTORAL_EXPIRY = [
-        'never'                => self::PASTORAL_EXPIRY_DEFAULT,
-        'end of day'           => 'end of day',
-        'end of following day' => 'end of following day',
-        '1 week'               => '1 week',
-        '2 weeks'              => '2 weeks',
-        '1 month'              => '1 month',
-        '3 months'             => '3 months',
-        '6 months'             => '6 months',
-        '12 months'            => '12 months',
-        '24 months'            => '24 months',
-        'calendar year'        => 'calendar year',
-        'academic period'      => 'academic period',
-        'academic year'        => 'academic year',
+        self::PASTORAL_EXPIRY_NEVER         => self::PASTORAL_EXPIRY_DEFAULT,
+        self::PASTORAL_END_OF_DAY           => 'end of day',
+        self::PASTORAL_END_OF_FOLLOWING_DAY => '1 day',
+        self::PASTORAL_1_WEEK               => '1 week',
+        self::PASTORAL_2_WEEKS              => '2 weeks',
+        self::PASTORAL_1_MONTH              => '1 month',
+        self::PASTORAL_3_MONTHS             => '3 months',
+        self::PASTORAL_6_MONTHS             => '6 months',
+        self::PASTORAL_12_MONTHS            => '12 months',
+        self::PASTORAL_24_MONTHS            => '24 months',
+        self::PASTORAL_CALENDAR_YEAR        => 'calendar year',
+        self::PASTORAL_ACADEMIC_PERIOD      => 'academic period',
+        self::PASTORAL_ACADEMIC_YEAR        => 'academic year',
     ];
 
     /** @var string|null */
