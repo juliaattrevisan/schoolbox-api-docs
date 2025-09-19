@@ -283,6 +283,7 @@ class Controller extends Base
         foreach ($data['configs'] as $configData) {
             if (!isset($configData['name']) || !isset($configData['value'])) {
                 $errors[] = "Each config must have 'name' and 'value' fields";
+                $result['error'] = "Each config must have 'name' and 'value' fields";
                 continue;
             }
 
@@ -305,6 +306,7 @@ class Controller extends Base
                     $config->setValue($serializedValue);
                 } catch (\UnexpectedValueException $e) {
                     $errors[] = "Validation error for config '{$configData['name']}': " . $e->getMessage();
+                    $result['error'] = "Validation error for config '{$configData['name']}': " . $e->getMessage();
                     continue;
                 }
 
@@ -319,6 +321,7 @@ class Controller extends Base
                 ];
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $errors[] = "Config '{$configData['name']}' not found";
+                $result['error'] = "Config '{$configData['name']}' not found";
             }
             $results[] = $result;
         }
