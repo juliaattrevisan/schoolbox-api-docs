@@ -170,8 +170,8 @@ function build_docker_compose_env() {
     PRIVATE_CONTAINER_REGISTRY=\"${private_container_registry}\"
     INSTANCE_ID=\"${DEFAULT_INSTANCE_ID}\"
     PHPSTORM_SERVER_NAME=\"${PHPSTORM_SERVER_NAME}\"
-    USER_ID=\"$(id -u)\"
-    GROUP_ID=\"$(id -g)\"
+    USER_ID=\"${SUDO_UID:-$(id -u)}\"
+    GROUP_ID=\"${SUDO_GID:-$(id -g)}\"
     BASE_PHP_IMAGE=\"${base_php_image}\"
     ${aws_credentials}" > .docker-compose.env
 }
