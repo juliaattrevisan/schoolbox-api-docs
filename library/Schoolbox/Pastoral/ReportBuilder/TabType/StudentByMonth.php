@@ -76,7 +76,7 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
      *
      * @return Collection
      */
-    private function getTotalCount(): Collection
+    protected function getTotalCount(): Collection
     {
         $db = $this->pastoralMapper->getDatabase();
 

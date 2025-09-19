@@ -244,7 +244,7 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
         return $tableHeaders;
     }
 
-    private function getTotalCount(): Collection
+    protected function getTotalCount(): Collection
     {
         $db = $this->pastoralMapper->getDatabase();
 

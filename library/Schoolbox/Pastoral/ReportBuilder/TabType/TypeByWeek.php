@@ -222,7 +222,7 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
         return $tableHeaders;
     }
 
-    private function getTotalCount(): Collection
+    protected function getTotalCount(): Collection
     {
         $db = $this->pastoralMapper->getDatabase();
         $selectSUM = implode(',', $this->getWeeks()->map(fn(array $week) => "SUM({$week['key']}) as {$week['key']}")->getAll());

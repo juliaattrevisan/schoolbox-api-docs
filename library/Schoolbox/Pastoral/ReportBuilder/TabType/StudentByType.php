@@ -80,7 +80,7 @@ class StudentByType extends Base implements TabTypeInterface, ICursor
         return "u.lastname {$this->order}, COALESCE(u.preferred_name, u.firstname) {$this->order}";
     }
 
-    private function getTotalCount(): Collection
+    protected function getTotalCount(): Collection
     {
         $db = $this->pastoralMapper->getDatabase();
 

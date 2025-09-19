@@ -669,7 +669,8 @@ class Controller extends Base
                 throw new MapperException("Invalid type: $tabType has been given.");
             }
 
-            $records = $factory->retrieveResults(null);
+            $totalRow = new Collection([$factory->getTotalCountRow()]);
+            $records = $totalRow->merge($factory->retrieveResults(null));
             $this->exportResultTableToCSV($report, $records, $tabType, $factory->getCSVHeaders());
         } catch (\PDOException | DatabaseException $e) {
             $problem = (new ApiProblem('Something has gone wrong, please contact your support if the problem persists'))

@@ -4,6 +4,7 @@ namespace Schoolbox\Pastoral\ReportBuilder;
 
 use Alaress\Codec\ICodec;
 use Alaress\Codec\Json\Base64;
+use Schoolbox\Collection;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserMapper;
@@ -86,5 +87,26 @@ class Base
         ) {
             $this->order = static::ORDER_DIRECTION_DEFAULT;
         }
+    }
+
+    protected function getTotalCount(): Collection
+    {
+        return new Collection();
+    }
+
+    /**
+     * Get the total count row for the tab type
+     *
+     * @return array
+     */
+    public function getTotalCountRow(): array
+    {
+        /* Return null if all the values are null otherwise return the total count
+         */
+        return array_merge(
+            ['type_subtype' => 'Total'],
+            $this->getTotalCount()
+                 ->map(fn($count) => is_numeric($count) ? $count / 1 : null)->getAll()
+        );
     }
 }
