@@ -634,6 +634,74 @@ class Controller extends Base
     }
 
     /**
+     * Endpoint for exporting table results to CSV
+     *
+     * @param string         $tabType
+     * @param PastoralReport $report
+     * @return void
+     */
+    public function getReportTableExport(string $tabType, PastoralReport $report): void
+    {
+        try {
+            $resultType = $this->requestQuery->get('selected', Cursor::RESULT_TYPE_RECORDS);
+
+            $factory = (new Factory(
+                $this->userTranslator,
+                $this->userMapper,
+                $this->pastoralMapper,
+                $this->pastoralTranslator,
+                $resultType,
+                null,
+                null,
+                null
+            ))->produce(
+                new Helper(
+                    $this->prepareReportData($report),
+                    $this->pastoralMapper,
+                    $this->getConfigLoader(),
+                    $this->getUser(),
+                    $this->accessLevelCensor
+                ),
+                $tabType
+            );
+
+            if (null === $factory) {
+                throw new MapperException("Invalid type: $tabType has been given.");
+            }
+
+            $records = $factory->retrieveResults(null);
+            $this->exportResultTableToCSV($report, $records, $tabType, $factory->getCSVHeaders());
+        } catch (\PDOException | DatabaseException $e) {
+            $problem = (new ApiProblem('Something has gone wrong, please contact your support if the problem persists'))
+                ->setStatus(500);
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus(500);
+        } catch (\Exception | \ValueError $e) {
+            $problem = new ApiProblem($e->getMessage());
+            $problem->setStatus($e->getCode());
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus($e->getCode());
+        }
+    }
+
+    /**
+     * Exporting table results to CSV
+     *
+     * @param PastoralReport $report
+     * @param Collection     $records
+     * @param string         $tabType
+     * @param array          $headerRow
+     * @return void
+     */
+    private function exportResultTableToCSV(PastoralReport $report, Collection $records, string $tabType, array $headerRow): void
+    {
+        $label = PastoralReport::SUMMARY_TABLES_OPTIONS[$tabType]['label'] ?? $tabType;
+        $exporter = new \Report_Exporter($report->getName() . " - {$label}");
+        $exporter->setHeadings($headerRow);
+        $exporter->setData($records);
+        $exporter->exportCSV();
+    }
+
+
+    /**
      * Exporting results that's filtered to the column and row to CSV
      *
      * @param string         $tabType
