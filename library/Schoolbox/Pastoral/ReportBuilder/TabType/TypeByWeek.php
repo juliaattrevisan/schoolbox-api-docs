@@ -78,6 +78,12 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
              subtype.id as subtypeId,
              type.name as typeName,
              subtype.name as subtypeName,
+             CONCAT(
+                type.name,
+                CASE
+                    WHEN subtype.name IS NOT NULL or subtype.name = ''
+                        THEN CONCAT(' (', subtype.name, ')') ELSE '' END
+             ) as type_subtype,
              {$selectWeeksQuery}
           FROM lu_pastoral_type type
           LEFT JOIN lu_pastoral_subtype subtype ON subtype.pastoral_type_id = type.id
@@ -112,7 +118,7 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
 
     public function retrieveResults(?string $encodedCursor): Collection
     {
-        $params = ['limit' => $this->limit];
+        $params = [];
         if (null !== $encodedCursor) {
             $cursor = $this->codec->decode($encodedCursor);
         }
@@ -149,6 +155,13 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
             $params['typeId']    = $cursor['typeId'];
             $params['subtypeId'] = $cursor['subtypeId'];
         }
+
+        $limit = "";
+        if (null !== $this->limit) {
+            $limit = " LIMIT :limit ";
+            $params['limit'] = $this->limit;
+        }
+
         $totalQuery = "
             SELECT withTotal.*
             FROM (
@@ -157,7 +170,7 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
             {$whereDiscriminator}
             GROUP BY typeId, subtypeId
             ORDER BY {$orderBy}, typeId {$this->order}, subtypeId {$this->order}
-            LIMIT :limit
+            {$limit}
         ";
         $result = $db->executeQuery(
             $totalQuery,
@@ -293,7 +306,7 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
                             'typeId' => $record['typeId'],
                             'subtypeId' => $record['subtypeId'],
                         ];
-                        unset($record['typeName'], $record['subtypeName'], $record['typeId'], $record['subtypeId']);
+                        unset($record['typeName'], $record['subtypeName'], $record['typeId'], $record['subtypeId'], $record['type_subtype']);
                         $row = array_merge($row, array_map(fn($value) => [$this->resultType => $value], $record));
                         unset($record['total']);
                         $row['trend'] = [
@@ -315,5 +328,22 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
                 ]
             ]
         ];
+    }
+
+    /**
+     * Get the CSV headers for the export
+     *
+     * @return array
+     */
+    public function getCSVHeaders(): array
+    {
+        $headers = [
+            'type_subtype' => 'Type/Sub-Type',
+            'total' => 'Total',
+        ];
+        foreach ($this->getWeeks() as $week) {
+            $headers[$week['key']] = $week['label'];
+        }
+        return $headers;
     }
 }

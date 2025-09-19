@@ -332,7 +332,7 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
                             'subtypeId' => $record['subtypeId'],
 
                         ];
-                        unset($record['typeName'], $record['subtypeName'], $record['typeId'], $record['subtypeId']);
+                        unset($record['typeName'], $record['subtypeName'], $record['typeId'], $record['subtypeId'], $record['type_subtype']);
                         $row = array_merge($row, array_map(fn($value) => [$this->resultType => $value], $record));
                         unset($record['total']);
                         $row['trend'] = [
