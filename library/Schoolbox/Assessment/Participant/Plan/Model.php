@@ -99,6 +99,15 @@ class Model implements ISoftDeletable
         return $this;
     }
 
+    /**
+     * Check if the plan is a custom participation plan
+     *
+     * @return bool
+     */
+    public function isCustomParticipation(): bool
+    {
+        return Mapper::PLAN_TYPE_CUSTOM_PARTICIPATION === $this->isDynamic;
+    }
 
     /**
      * @return bool

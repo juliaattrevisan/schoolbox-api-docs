@@ -113,6 +113,16 @@ class Plan
     }
 
     /**
+     * Check if the plan is a custom participation plan
+     *
+     * @return bool
+     */
+    public function isCustomParticipation(): bool
+    {
+        return PlanMapper::PLAN_TYPE_CUSTOM_PARTICIPATION === $this->isDynamic;
+    }
+
+    /**
      * @return bool
      */
     public function isDynamic(): bool
