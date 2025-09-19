@@ -25,7 +25,7 @@ class RecordList extends Base implements TabTypeInterface, ICursor
         protected PastoralMapper $pastoralMapper,
         protected PastoralTranslator $pastoralTranslator,
         protected string $resultType,
-        protected int $limit = self::LIMIT_DEFAULT,
+        protected ?int $limit = self::LIMIT_DEFAULT,
     ) {
         parent::__construct(
             $this->helper,
@@ -180,6 +180,12 @@ class RecordList extends Base implements TabTypeInterface, ICursor
             }
         }
 
+        $limit = "";
+        if (null !== $this->limit) {
+            $limit = " LIMIT :limit ";
+            $param['limit'] = $this->limit;
+        }
+
         $db = $this->pastoralMapper->getDatabase();
 
         $statement = $db->executeQuery(
@@ -194,7 +200,7 @@ class RecordList extends Base implements TabTypeInterface, ICursor
             WHERE {$where}
             AND ({$this->inTypeSubType})
             ORDER BY {$orderSql}
-            LIMIT {$this->limit}
+            {$limit}
         ",
             array_merge(
                 $this->helper->getParams(),
@@ -238,5 +244,12 @@ class RecordList extends Base implements TabTypeInterface, ICursor
                 ]
             ]
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCSVHeaders(): array
+    {
     }
 }
