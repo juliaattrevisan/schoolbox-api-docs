@@ -34,6 +34,10 @@ class Notifier extends AbstractModuleNotifier
 {
     public const TRIGGER_POSTED = 'posted';
 
+    /* This is when a learning moment requires approval
+     */
+    public const TRIGGER_SUBMITTED = 'submitted';
+
     private const PATTERN_SOMEONE_POSTED_TITLE = ':user posted :evidence for :student';
     private const PATTERN_STUDENT_POSTED_TITLE = ':student has posted :evidence';
 
