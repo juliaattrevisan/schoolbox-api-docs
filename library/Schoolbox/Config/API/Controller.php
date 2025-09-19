@@ -322,11 +322,15 @@ class Controller extends Base
             }
             $results[] = $result;
         }
+        $successful = array_filter($results, function ($result) {
+            return $result['status'] === 'success';
+        });
+
         $output = [
             'results' => $results,
             'errors' => $errors,
             'total_processed' => count($data['configs']),
-            'successful' => count($results),
+            'successful' => count($successful),
             'failed' => count($errors)
         ];
 
