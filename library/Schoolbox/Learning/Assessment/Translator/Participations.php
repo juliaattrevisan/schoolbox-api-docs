@@ -76,6 +76,9 @@ class Participations
             /* Plan of the customised assessment which are created from the original assessment
              */
             'customisedPlan' => $customisedPlan,
+            /* Check if the participant has any interaction with the assessment (ie responses or feedbacks)
+             */
+            'hasInteraction' => $participation->getAllResponses()->count() > 0 || $participation->getAllFeedbacks()->count() > 0,
             '_links'     => [
                 'exclude' => $this->getRouteIfAuthorized('learningAssessment.postExclude', [
                     'assessment' => $assess,
