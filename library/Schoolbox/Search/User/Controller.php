@@ -46,6 +46,7 @@ use Timetable_ColourManager;
 use Timetable_ColourMapper;
 use Twig\Environment;
 use Twig\Error\Error;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 /**
  * The controller for the mock version of the search API.
@@ -95,6 +96,7 @@ class Controller extends BaseController
         private \Schoolbox\Admin\Profile\Editor\Tab\Mapper $tabMapper,
         private Calendar_Api_Factory $calendarApiFactory,
         private RosettaStone $rosettaStone,
+        private EditorTemplateHelper $editorTemplateHelper,
     ) {
     }
 
@@ -636,6 +638,12 @@ class Controller extends BaseController
                 /* Learning Moment Moderation requirement for this student
                  */
                 'moderationRequired' => $moderationRequired,
+                /* To use learning moment editor templates in the comments
+                 */
+                'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
+                /* Whether to use tokens in the comment editor
+                 */
+                'editorHasTokens' => $this->getUser()->getRole()->isStaff(),
 
                 /* Old implementation
                  */

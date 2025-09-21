@@ -374,6 +374,10 @@
                                 :show-feedback="{{ config.activity_feed_feedback_enabled ? 'true' : 'false' }}"
                                 :moderation-required="{{ moderationRequired ? 'true' : 'false' }}"
                                 :evidence-parent-create="{{ config.evidence_parent_create ? 'true' : 'false' }}"
+                                {% if editorTemplates is defined %}
+                                :editor-templates="{{ editorTemplates|json_encode }}"
+                                {% endif %}
+                                :editor-has-tokens="{{ editorHasTokens ? 'true' : 'false' }}"
                         />
                     </div>
                 </div>
