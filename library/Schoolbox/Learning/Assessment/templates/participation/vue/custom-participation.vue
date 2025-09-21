@@ -13,6 +13,7 @@ import type { Participant, Plan, CustomisedPlan } from "../js/types/customPartic
 
 interface Props {
     allParticipants: Participant[];
+    pastoralEnabled: boolean;
     getStudentsPastoralCountsUrl: string;
     getLearningPlanNewUrl: string;
     getAssessmentParticipation: string;
@@ -60,7 +61,7 @@ const studentPastoralCounts = window.Vue.ref<Record<string, StudentPastoralCount
  * Fetch the pastoral counts for the students
  */
 async function getStudentPastoralCounts(): Promise<void> {
-    if (props.getStudentsPastoralCountsUrl === "") {
+    if (!props.pastoralEnabled || props.getStudentsPastoralCountsUrl === "") {
         return;
     }
     const url = props.getStudentsPastoralCountsUrl.replace(
