@@ -92,7 +92,7 @@ class Mapper extends BaseMapper
                 INNER JOIN profile_button_role_availability ra ON profile_button.id = ra.profile_button_id
                 WHERE ca.campus_id IN " . $this->getPredicateBuilder()->getArrayPlaceholders($vieweeCampusList, 'vieweecampus') . "
                 AND ra.role_id = :availabilityRoleId
-                AND self_enabled = 1 
+                AND self_enabled = 1
                 AND :vieweeId = :viewerId
                 AND profile_button.deleted_at IS NULL
                 AND profile_button.roletype = :roletype
@@ -139,6 +139,9 @@ class Mapper extends BaseMapper
                 '[Them]',
                 '[theirs]',
                 '[Theirs]',
+                '[their]',
+                '[Their]',
+                '[themselves]'
             ];
 
             $vieweeEmail = empty($viewee->getEmail()) ? '' : $viewee->getEmail();

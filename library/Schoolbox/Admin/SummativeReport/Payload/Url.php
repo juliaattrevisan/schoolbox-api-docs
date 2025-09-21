@@ -181,6 +181,9 @@ class Url
                             '[Them]'          => \Scrub::filename(ucfirst($student->getPronoun()?->getObjective() ?: Model::OBJECTIVE_DEFAULT)),
                             '[theirs]'        => \Scrub::filename($student->getPronoun()?->getPossessive() ?: Model::POSSESSIVE_DEFAULT),
                             '[Theirs]'        => \Scrub::filename(ucfirst($student->getPronoun()?->getPossessive() ?: Model::POSSESSIVE_DEFAULT)),
+                            '[their]'         => \Scrub::filename($student->getPronoun()?->getPossessiveAdjective() ?: Model::POSSESSIVE_ADJECTIVE_DEFAULT),
+                            '[Their]'         => \Scrub::filename(ucfirst($student->getPronoun()?->getPossessiveAdjective() ?: Model::POSSESSIVE_ADJECTIVE_DEFAULT)),
+                            '[themselves]'    => \Scrub::filename($student->getPronoun()?->getReflexive() ?: Model::REFLEXIVE_DEFAULT),
                         ]
                     );
                     //grab the filename excluding the folder paths

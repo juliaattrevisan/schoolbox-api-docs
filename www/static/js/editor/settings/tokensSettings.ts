@@ -20,6 +20,9 @@ const DEFAULT_TOKENS = [
     "[Them]",
     "[theirs]",
     "[Theirs]",
+    "[their]",
+    "[Their]",
+    "[themselves]",
 ];
 
 /**

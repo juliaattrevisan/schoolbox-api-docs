@@ -1608,30 +1608,44 @@ class Controller extends Base
             'fields'            => [
                 'id' => [
                     'caption'   => 'ID',
-                    'width'     => 3,
+                    'width'     => 2,
                     'readonly'  => true,
                 ],
                 'subjective' => [
                     'caption'   => 'Subjective (They)',
-                    'width'     => 3,
+                    'width'     => 2,
                     'maxLength' => 250,
                     'default'   => '',
                     'tooltip'    => 'The subjective pronoun used to identify the person. For example: he, she, or they.',
                 ],
                 'objective' => [
                     'caption'   => 'Objective (Them)',
-                    'width'     => 3,
+                    'width'     => 2,
                     'maxLength' => 250,
                     'default'   => '',
                     'tooltip'    => 'The objective pronoun used to identify the person. For example: him, her, them.',
                 ],
                 'possessive' => [
-                    'caption'   => 'Possessive (Theirs)',
-                    'width'     => 3,
+                    'caption'   => 'Possessive Pronoun (Theirs)',
+                    'width'     => 2,
                     'maxLength' => 250,
                     'default'   => '',
                     'tooltip'    => 'The possessive pronoun used to identify something belonging to the person. For example: his, hers, theirs.',
-                ]
+                ],
+                'possessiveAdjective' => [
+                    'caption'   => 'Possessive Adjective (Their)',
+                    'width'     => 2,
+                    'maxLength' => 250,
+                    'default'   => '',
+                    'tooltip'    => 'The possessive adjective used to identify something belonging to the person. For example: his, her, their.',
+                ],
+                'reflexive' => [
+                    'caption'   => 'Reflexive (Themselves)',
+                    'width'     => 2,
+                    'maxLength' => 250,
+                    'default'   => '',
+                    'tooltip'    => 'The reflexive pronoun used to identify the person. For example: himself, herself, themselves.',
+                ],
             ]
         ];
 

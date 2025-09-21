@@ -40,6 +40,20 @@ class Mapper extends \Schoolbox\Mapper
                 'type'     => self::TYPE_STRING,
             )
         );
+        $this->hasMap(
+            array(
+                'column'   => 'possessive_adjective',
+                'property' => 'possessiveAdjective',
+                'type'     => self::TYPE_STRING,
+            )
+        );
+        $this->hasMap(
+            array(
+                'column'   => 'reflexive',
+                'property' => 'reflexive',
+                'type'     => self::TYPE_STRING,
+            )
+        );
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);

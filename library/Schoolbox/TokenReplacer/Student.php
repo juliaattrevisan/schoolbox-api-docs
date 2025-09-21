@@ -23,6 +23,9 @@ use Schoolbox\User;
  * * "[Them]": the student's objective pronoun, in first Char capitalised.
  * * "[theirs]": the student's possessive pronoun.
  * * "[Theirs]": the student's possessive pronoun, in first Char capitalised.
+ * * "[their]": the student's possessive adjective.
+ * * "[Their]": the student's possessive adjective, in first Char capitalised.
+ * * "[themselves]": the student's reflexive pronoun.
  * * "[surname]":   the student's surname
  * * "[fullname]":  the student's full name
  * * "[year]":      the student's year level, or an empty string if not defined
@@ -70,6 +73,9 @@ class Student
                 '[Them]'                    => ucfirst($student->getPronoun()?->getObjective() ?: User\Pronoun\Model::OBJECTIVE_DEFAULT),
                 '[theirs]'                  => $student->getPronoun()?->getPossessive() ?: User\Pronoun\Model::POSSESSIVE_DEFAULT,
                 '[Theirs]'                  => ucfirst($student->getPronoun()?->getPossessive() ?: User\Pronoun\Model::POSSESSIVE_DEFAULT),
+                '[their]'                   => $student->getPronoun()?->getPossessiveAdjective() ?: User\Pronoun\Model::POSSESSIVE_ADJECTIVE_DEFAULT,
+                '[Their]'                   => ucfirst($student->getPronoun()?->getPossessiveAdjective() ?: User\Pronoun\Model::POSSESSIVE_ADJECTIVE_DEFAULT),
+                '[themselves]'              => $student->getPronoun()?->getReflexive() ?: User\Pronoun\Model::REFLEXIVE_DEFAULT,
             ]
         );
     }
