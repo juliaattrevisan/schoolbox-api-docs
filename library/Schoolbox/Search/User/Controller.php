@@ -643,7 +643,7 @@ class Controller extends BaseController
                 'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
                 /* Whether to use tokens in the comment editor
                  */
-                'editorHasTokens' => $this->getUser()->getRole()->isStaff() ? true : false,
+                'editorHasTokens' => $this->getUser()->getRole()->isStaff(),
 
                 /* Old implementation
                  */
