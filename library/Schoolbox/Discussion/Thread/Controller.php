@@ -191,13 +191,12 @@ class Controller extends BaseController
     {
         $data = $this->request->getParsedBody();
 
-        $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
-
         /**
          * If the thread is within a Learning Moment,
          * we want to check for recipient tokens in the comment content
          */
         if ($context instanceof LearningMomentModel) {
+            $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
             $content = $tokenReplacer->replace($data['content'], $context->getRecipient());
         } else {
             $content = $data['content'];
