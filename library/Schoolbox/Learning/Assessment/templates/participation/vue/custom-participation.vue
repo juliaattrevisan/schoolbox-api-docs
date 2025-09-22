@@ -251,7 +251,6 @@ async function includeParticipantInExistingPlan(): Promise<void> {
         toast.timeout({ text: "Customisation added successfully", isSuccess: true });
         isIncludeInExistingOpen.value = false;
         includeInExistingList.value = [];
-        selectedList.value = [];
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
             loadError.value = error.message;
@@ -317,9 +316,35 @@ function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string {
 // #region perform modification and check for interactions prior to action
 
 const isConfirmModifyOpen = window.Vue.ref(false);
-const currentModifyAction = window.Vue.ref<string>("");
-const modifyList = window.Vue.ref<Participant[]>([]);
+const modifyAction = window.Vue.ref<string>("");
+const modifyList = window.Vue.ref<Participant[]>([]); // array of participants to modify
 const isSingleModify = window.Vue.ref(false); // whether the current modification is for a single participant (three-dot) or multiple (bottom drawer)
+
+/**
+ * Performs the action for participants without interactions,
+ * or after confirmation when selection contains participants with interactions.
+ */
+async function performAction(): Promise<void> {
+    switch (modifyAction.value) {
+        case "removeCustomisation":
+            await includeParticipants(modifyList.value);
+            break;
+        case "exclude":
+            await excludeParticipants(modifyList.value);
+            break;
+        case "includeInExisting":
+            await includeParticipantInExistingPlan();
+            break;
+        default:
+            // redirect to the appropriate URL
+            window.location.href = modifyAction.value;
+    }
+    if (!isSingleModify.value) {
+        // only clear the selection if this is a multi-selection action
+        selectedList.value = [];
+    }
+    modifyList.value = [];
+}
 
 /**
  * Handles the modification of a selected participant(s).
@@ -329,58 +354,26 @@ const isSingleModify = window.Vue.ref(false); // whether the current modificatio
  * @param action - the action to perform (e.g., 'remove').
  * @param $isSingleModify - whether this action is for a single participant or multiple
  */
-async function onActionSelected(participants: Participant[], action: string, $isSingleModify: boolean): Promise<void> {
+function onActionSelected(participants: Participant[], action: string, $isSingleModify: boolean): void {
     modifyList.value = participants;
-    currentModifyAction.value = action;
+    modifyAction.value = action;
     isSingleModify.value = $isSingleModify;
+    // if any participant has interactions, show the confirmation modal
     if (modifyList.value.some((participant) => participant.hasInteraction)) {
         isConfirmModifyOpen.value = true;
         return;
     }
-    switch (currentModifyAction.value) {
-        case "removeCustomisation":
-            await includeParticipants(modifyList.value);
-            break;
-        case "exclude":
-            await excludeParticipants(modifyList.value);
-            break;
-        case "includeInExisting":
-            await includeParticipantInExistingPlan();
-            break;
-        default:
-            // redirect to the appropriate URL
-            window.location.href = currentModifyAction.value;
-    }
-    if (!isSingleModify.value) {
-        // only clear the selection if this is a multi-selection action
-        selectedList.value = [];
-    }
+    // otherwise, perform the action directly
+    void performAction();
 }
 
 /**
- * Confirms the action for participants with interactions,
- * then performs the action and closes the confirmation modal.
+ * Handles the confirmation of an action in the confirmation modal,
+ * closes the modal after performing the action.
  */
-async function onConfirmSelected(): Promise<void> {
-    switch (currentModifyAction.value) {
-        case "removeCustomisation":
-            await includeParticipants(modifyList.value);
-            break;
-        case "exclude":
-            await excludeParticipants(modifyList.value);
-            break;
-        case "includeInExisting":
-            await includeParticipantInExistingPlan();
-            break;
-        default:
-            // redirect to the appropriate URL
-            window.location.href = currentModifyAction.value;
-    }
+async function onConfirmActionSelected(): Promise<void> {
+    await performAction();
     isConfirmModifyOpen.value = false;
-    if (!isSingleModify.value) {
-        // only clear the selection if this is a multi-selection action
-        selectedList.value = [];
-    }
 }
 
 // #endregion
@@ -709,7 +702,7 @@ async function onConfirmSelected(): Promise<void> {
                 </p>
             </div>
             <div class="l-flex l-gap-xs f-no-margins">
-                <button class="button submit l-flex__item--1" @click.prevent="onConfirmSelected">Yes</button>
+                <button class="button submit l-flex__item--1" @click.prevent="onConfirmActionSelected">Yes</button>
                 <button class="button l-flex__item--1" @click.prevent="isConfirmModifyOpen = false">Cancel</button>
             </div>
         </div>
