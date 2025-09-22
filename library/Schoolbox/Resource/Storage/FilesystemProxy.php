@@ -294,8 +294,15 @@ class FilesystemProxy
      */
     public function delete(IStorage $storage): void
     {
+        $dirname = dirname(self::getPathFromHash($storage->getHash()));
+
+        // Create the directory if it doesn't exist:
+        // the later deletion of the directory causes R2 to sync deletion of
+        // said directory to S3. (Hopefully.)
+        $this->filesystem->createDirectory($dirname);
+
         // Deleting the parent folder of the file deletes all of its transforms
-        $this->filesystem->deleteDirectory(dirname(self::getPathFromHash($storage->getHash())));
+        $this->filesystem->deleteDirectory($dirname);
 
         // Do not delete storage record here
     }
