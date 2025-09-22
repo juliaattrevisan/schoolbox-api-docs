@@ -532,11 +532,15 @@ class Controller extends Base
             '@pastoral/modify.twig',
             $templateData + [
                 'record'                => $record,
-                'calculatedExpiresAt' => array_map(fn($expiry) => $expiryHelper->calculateExpireDate(
-                    $record->getCreatedAt() ?? Alaress_Date_Format::now(),
-                    $expiry,
-                    $record->getStudent()?->getYear()
-                )?->getUsingFormat('d/m/Y'), TypeAbstract::PASTORAL_EXPIRY),
+                'calculatedExpiresAt' => array_reduce(TypeAbstract::PASTORAL_EXPIRY, function ($calculated, $expiry) use ($expiryHelper, $record) {
+                    $calculatedDate = $expiryHelper->calculateExpireDate(
+                        $record->getCreatedAt() ?? Alaress_Date_Format::now(),
+                        $expiry,
+                        $record->getStudent()?->getYear()
+                    )?->getUsingFormat('d/m/Y');
+                    $calculated[$expiry] = $calculatedDate;
+                    return $calculated;
+                }, []),
                 'canCreate'             => $this->getConfigLoader()->get('pastoral_create_tag_enable'),
                 // only pastoral moderators with 'write' access or above can modify default expiry
                 'canModifyExpiresAt'     => $this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE),

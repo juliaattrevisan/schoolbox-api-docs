@@ -263,11 +263,15 @@ class Controller extends Base
                         UserAccess::SERVICE_PASTORAL,
                         UserAccess::ACCESS_WRITE
                     ),
-                'calculatedExpiresAt' => array_map(fn($expiry) => $expiryHelper->calculateExpireDate(
-                    Alaress_Date_Format::now(),
-                    $expiry,
-                    null
-                )?->getUsingFormat('d/m/Y'), TypeAbstract::PASTORAL_EXPIRY),
+                'calculatedExpiresAt' => array_reduce(TypeAbstract::PASTORAL_EXPIRY, function ($calculated, $expiry) use ($expiryHelper) {
+                    $calculatedDate = $expiryHelper->calculateExpireDate(
+                        Alaress_Date_Format::now(),
+                        $expiry,
+                        null
+                    )?->getUsingFormat('d/m/Y');
+                    $calculated[$expiry] = $calculatedDate;
+                    return $calculated;
+                }, []),
                 'moderator'        => $this->getUser()->hasServicePermission(
                     UserAccess::SERVICE_PASTORAL,
                     UserAccess::ACCESS_READ,
