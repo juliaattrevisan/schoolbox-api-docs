@@ -205,11 +205,6 @@ const selectedActivity = window.Vue.computed<Plan | CustomisedPlan | null>(() =>
 async function includeParticipantInExistingPlan(): Promise<void> {
     if (selectedActivity.value === null) return;
     const activity: Plan | CustomisedPlan = selectedActivity.value;
-    // if the array is empty, it means that we are including participants via the bottom drawer,
-    // otherwise the single participant is being included via the pop-out menu
-    if (includeInExistingList.value.length === 0) {
-        includeInExistingList.value = selectedList.value;
-    }
     const toast = window.sbProps.toastActivate("Adding to customisation...");
     try {
         const response = await fetch(props.includeInExistingCustomisation, {
@@ -248,14 +243,16 @@ async function includeParticipantInExistingPlan(): Promise<void> {
 
 /**
  * Opens the modal to include a participant in an existing customisation.
+ * @param isSingle - Whether this is a single participant inclusion (from pop-out) or multiple (from bottom drawer).
  * @param participant - The participant to be included.
  */
-function openIncludeModal(participant: Participant): void {
-    includeInExistingList.value = [participant];
-    selectedActivityId.value = null;
-    if (!selectedList.value.includes(participant)) {
-        selectedList.value = [participant];
+function openIncludeModal(isSingle: boolean, participant: Participant | null): void {
+    if (isSingle && participant !== null) {
+        includeInExistingList.value = [participant];
+    } else {
+        includeInExistingList.value = selectedList.value;
     }
+    selectedActivityId.value = null;
     isIncludeOpen.value = true;
 }
 
@@ -500,7 +497,7 @@ async function onConfirmSelected(): Promise<void> {
                                         <button
                                             v-if="props.customisations.length > 0"
                                             class="icon-list"
-                                            @click.prevent="openIncludeModal(participant)"
+                                            @click.prevent="openIncludeModal(true, participant)"
                                         >
                                             Include in Existing Customisation
                                         </button>
@@ -579,7 +576,7 @@ async function onConfirmSelected(): Promise<void> {
                         </button>
                     </div>
                     <div v-if="props.customisations.length > 0" class="l-flex__item--1-auto">
-                        <button class="icon-list submit" @click.prevent="isIncludeOpen = true">
+                        <button class="icon-list submit" @click.prevent="openIncludeModal(false, null)">
                             Include in Existing Customisation
                         </button>
                     </div>
@@ -620,12 +617,13 @@ async function onConfirmSelected(): Promise<void> {
                 <h2>Include in existing customisation</h2>
                 <p class="meta">
                     Modifying participation for:
-                    <template v-for="(participant, index) in selectedList" :key="participant.user.id">
+                    <template v-for="(participant, index) in includeInExistingList" :key="participant.user.id">
                         {{
                             participant.user.preferredName ? participant.user.preferredName : participant.user.firstname
                         }}
-                        {{ participant.user.lastname }}<template v-if="index < selectedList.length - 2">, </template
-                        ><template v-if="index === selectedList.length - 2"> and </template>
+                        {{ participant.user.lastname
+                        }}<template v-if="index < includeInExistingList.length - 2">, </template
+                        ><template v-if="index === includeInExistingList.length - 2"> and </template>
                     </template>
                 </p>
             </div>
