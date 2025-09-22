@@ -31,6 +31,7 @@ class Base
 
     public const RESULT_TYPE_POINTS = 'points';
     public const RESULT_TYPE_RECORDS = 'records';
+    public const DEFAULT_SORTING_KEY = null;
     public const SORT_BY_STUDENT_DEFAULT = 'user';
     public const SORT_BY_TYPE_DEFAULT = 'type_subtype';
     public const ORDER_DIRECTION_DEFAULT = self::ORDER_DIRECTION_ASC;
@@ -86,6 +87,12 @@ class Base
             )
         ) {
             $this->order = static::ORDER_DIRECTION_DEFAULT;
+        }
+
+        /* If not set should set back to default sorting key
+         */
+        if (null === $this->sortBy) {
+            $this->sortBy = static::DEFAULT_SORTING_KEY;
         }
     }
 

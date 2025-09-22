@@ -707,8 +707,7 @@ class Controller extends Base
         string $tabType,
         string $resultType,
         array $headerRow
-    ): void
-    {
+    ): void {
         $label = PastoralReport::SUMMARY_TABLES_OPTIONS[$tabType]['label'] ?? $tabType;
         $exporter = new \Report_Exporter($report->getName() . " - {$label} - {$resultType}");
         $exporter->setHeadings($headerRow);
