@@ -41,7 +41,7 @@ const relevantRoutes = window.Vue.computed(() => {
             <button class="submit" @click="() => mfStore.submitForm(false, 'submit')">Submit for approval</button>
         </li>
         <li v-if="relevantRoutes.publish">
-            <button class="submit" @click="() => mfStore.publish()">
+            <button :disabled="mfStore.isSaving" class="submit" @click="() => mfStore.publish()">
                 {{ props.publishLabel }}
             </button>
         </li>
