@@ -361,10 +361,10 @@ function onActionSelected(participants: Participant[], action: string, $isSingle
     isSingleModify.value = $isSingleModify;
     // if any participant has interactions, show the confirmation modal
     if (modifyList.value.some((participant) => participant.hasInteraction)) {
+        participantsWithInteractions.value = modifyList.value.filter((participant) => participant.hasInteraction);
         isConfirmModifyOpen.value = true;
         return;
     }
-    participantsWithInteractions.value = modifyList.value.filter((participant) => participant.hasInteraction);
     // otherwise, perform the action directly
     void performAction();
 }
@@ -697,7 +697,30 @@ async function onConfirmActionSelected(): Promise<void> {
         <div class="l-flex-col l-gap-m f-no-margins">
             <div class="l-flex-col l-gap-s f-no-margins">
                 <h2>Please confirm</h2>
-                <p>The student(s) has submissions and/or feedback for this {{ locale.assessment.singular() }}.</p>
+                <p class="f-no-margins">
+                    The following student(s) have submissions and/or feedback for this
+                    {{ locale.assessment.singular() }}.
+                </p>
+                <div class="l-flex-col l-gap-xs">
+                    <div
+                        v-for="participant in participantsWithInteractions"
+                        :key="participant.user.id"
+                        class="l-flex l-gap-s l-align-center"
+                    >
+                        <img
+                            :src="`/portrait.php?id=${participant.user.id}&size=square32`"
+                            :alt="`${participant.user.lastname}, ${participant.user.firstname}`"
+                        />
+                        <p>
+                            {{
+                                participant.user.preferredName
+                                    ? participant.user.preferredName
+                                    : participant.user.firstname
+                            }}
+                            {{ participant.user.lastname }}
+                        </p>
+                    </div>
+                </div>
                 <p>
                     Exclusion from this {{ locale.assessment.singular() }} will remove access to these submissions
                     and/or feedback. Proceed?
