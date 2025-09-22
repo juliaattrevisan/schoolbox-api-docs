@@ -319,6 +319,7 @@ const isConfirmModifyOpen = window.Vue.ref(false);
 const modifyAction = window.Vue.ref<string>("");
 const modifyList = window.Vue.ref<Participant[]>([]); // array of participants to modify
 const isSingleModify = window.Vue.ref(false); // whether the current modification is for a single participant (three-dot) or multiple (bottom drawer)
+const participantsWithInteractions = window.Vue.ref<Participant[]>([]); // participants with interactions in the current modification list
 
 /**
  * Performs the action for participants without interactions,
@@ -363,6 +364,7 @@ function onActionSelected(participants: Participant[], action: string, $isSingle
         isConfirmModifyOpen.value = true;
         return;
     }
+    participantsWithInteractions.value = modifyList.value.filter((participant) => participant.hasInteraction);
     // otherwise, perform the action directly
     void performAction();
 }
