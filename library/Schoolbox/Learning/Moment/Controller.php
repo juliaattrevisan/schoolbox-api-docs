@@ -12,8 +12,8 @@ namespace Schoolbox\Learning\Moment;
 use Alaress\Database\Predicate\Builder;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
-use Crell\ApiProblem\ApiProblem;
 use Schoolbox\API\Translator\ModelToArray\Composite;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Cdn\PrefixGenerator;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
@@ -793,13 +793,7 @@ class Controller extends Base
      */
     public function putPublish(Model $evidence): void
     {
-        $responseArray = $this->putWithState($evidence, Model::STATUS_PUBLISHED);
-
-        $this->response = $this->responseAsJson($responseArray);
-
-        if (isset($responseArray['status']) && $responseArray['status'] === 400) {
-            $this->response = $this->response->withStatus($responseArray['status'], $responseArray['title'] ?? '');;
-        }
+        $this->response = $this->responseAsJson($this->putWithState($evidence, Model::STATUS_PUBLISHED));
     }
 
 
@@ -977,6 +971,11 @@ class Controller extends Base
                     }
                 }
             }
+        }
+
+        // Validate here because learning moments may only be saved if they have text or at least one evidence.
+        if (empty($moment->getBody()) && ($moment->getEvidence() === null || $moment->getEvidence()->count() === 0)) {
+            throw new SchoolboxException('Learning moments must have text or evidence');
         }
 
         /* Shove it into the new state, $state
