@@ -298,28 +298,30 @@ function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string {
 
 const isConfirmOpen = window.Vue.ref(false);
 const currentAction = window.Vue.ref<string>("");
-const currentParticipant = window.Vue.ref<Participant | null>(null);
+const currentParticipants = window.Vue.ref<Participant[]>([]);
 
 /**
  * Handles the modification of a selected participant.
  * If the participant has interactions, it opens a confirmation modal.
  * Otherwise, it redirects to the appropriate URL.
- * @param participant - The participant to modify.
+ * @param participants - The participants to modify.
  * @param action - the action to perform (e.g., 'remove').
  */
-function onActionSelected(participant: Participant, action: string): void {
-    currentParticipant.value = participant;
+async function onActionSelected(participants: Participant[], action: string): Promise<void> {
+    currentParticipants.value = participants;
     currentAction.value = action;
-    if (participant.hasInteraction) {
+    if (currentParticipants.value.some((participant) => participant.hasInteraction)) {
         isConfirmOpen.value = true;
         return;
     }
-    if (action === "removeCustomisation") {
-        void includeParticipant(participant);
+    if (currentAction.value === "removeCustomisation") {
+        await Promise.all(currentParticipants.value.map((participant) => includeParticipant(participant)));
+        isConfirmOpen.value = false;
         return;
     }
-    if (action === "exclude") {
-        void excludeParticipant(participant);
+    if (currentAction.value === "exclude") {
+        await Promise.all(currentParticipants.value.map((participant) => excludeParticipant(participant)));
+        isConfirmOpen.value = false;
         return;
     }
     // redirect to the appropriate URL
@@ -330,23 +332,18 @@ function onActionSelected(participant: Participant, action: string): void {
  * Confirms the action for participants with interactions.
  * Redirects to the stored action URL.
  */
-function onConfirmSelected(): void {
+async function onConfirmSelected(): Promise<void> {
     if (currentAction.value === "removeCustomisation") {
-        selectedList.value =
-            selectedList.value.length > 0 ? selectedList.value : [currentParticipant.value as Participant];
-        void includeSelected();
+        await Promise.all(currentParticipants.value.map((participant) => includeParticipant(participant)));
         isConfirmOpen.value = false;
-        currentParticipant.value = null;
         return;
     }
     if (currentAction.value === "exclude") {
-        selectedList.value =
-            selectedList.value.length > 0 ? selectedList.value : [currentParticipant.value as Participant];
-        void excludeSelected();
+        await Promise.all(currentParticipants.value.map((participant) => excludeParticipant(participant)));
         isConfirmOpen.value = false;
-        currentParticipant.value = null;
         return;
     }
+    // redirect to the appropriate URL
     window.location.href = currentAction.value;
 }
 </script>
@@ -465,7 +462,7 @@ function onConfirmSelected(): void {
                                     <li>
                                         <button
                                             class="icon-close"
-                                            @click.prevent="onActionSelected(participant, 'removeCustomisation')"
+                                            @click.prevent="onActionSelected([participant], 'removeCustomisation')"
                                         >
                                             Remove Customisation
                                         </button>
@@ -478,7 +475,7 @@ function onConfirmSelected(): void {
                                             class="icon-modify"
                                             @click.prevent="
                                                 onActionSelected(
-                                                    participant,
+                                                    [participant],
                                                     `${props.getLearningPlanNewUrl}?student=${participant.user.id}&${getReturnUrl()}`,
                                                 )
                                             "
@@ -489,7 +486,7 @@ function onConfirmSelected(): void {
                                     <li>
                                         <button
                                             class="icon-staff-students"
-                                            @click.prevent="onActionSelected(participant, 'exclude')"
+                                            @click.prevent="onActionSelected([participant], 'exclude')"
                                         >
                                             Exclude
                                         </button>
@@ -509,7 +506,7 @@ function onConfirmSelected(): void {
                                             class="icon-copy"
                                             @click.prevent="
                                                 onActionSelected(
-                                                    participant,
+                                                    [participant],
                                                     `${getAssessmentParticipationCopyActivity}?student=${participant.user.id}&original=${assessmentId}&${getReturnUrl()}`,
                                                 )
                                             "
@@ -522,7 +519,7 @@ function onConfirmSelected(): void {
                                             class="icon-submissions"
                                             @click.prevent="
                                                 onActionSelected(
-                                                    participant,
+                                                    [participant],
                                                     `${getAssessmentParticipationNewActivity}?student=${participant.user.id}&original=${assessmentId}&${getReturnUrl()}`,
                                                 )
                                             "
