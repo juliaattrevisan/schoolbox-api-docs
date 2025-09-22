@@ -87,7 +87,7 @@ class FilesystemFactory
     {
         $adapter = $config->get(ConfigMapper::NAME_OTFS_ADAPTER);
         return match ($adapter) {
-            self::FILE_SYSTEM_ADAPTER_AWS_S3 => $this->buildAwsS3FileSystem($config, self::PREFIX_STORAGE),
+            self::FILE_SYSTEM_ADAPTER_AWS_S3 => $this->buildAwsS3FileSystem($config, self::PREFIX_STORAGE, true),
             default                          => null,
         };
     }
@@ -148,44 +148,46 @@ class FilesystemFactory
      *
      * @param IConfigLoader $config
      * @param string        $prefix
+     * @param bool          $ignoreAltHost If true: any alt host settings will be ignored, and the file system will
+     *                                     always point to the base host.
      * @return Filesystem
      */
-    public function buildAwsS3FileSystem(IConfigLoader $config, string $prefix = ''): Filesystem
+    public function buildAwsS3FileSystem(IConfigLoader $config, string $prefix = '', bool $ignoreAltHost = false): Filesystem
     {
-        $otfs_s3_cred_key     = trim($config->get('otfs_s3_cred_key') ?? "");
-        $otfs_s3_cred_secret  = trim($config->get('otfs_s3_cred_secret') ?? "");
-        $otfs_s3_region       = trim($config->get('otfs_s3_region') ?? "");
-        $otfs_s3_version      = trim($config->get('otfs_s3_version') ?? "");
-        $otfs_s3_bucket       = trim($config->get('otfs_s3_bucket') ?? "");
-        $otfs_s3_alt_host     = trim($config->get('otfs_s3_alt_host') ?? "");
+        $s3CredKey            = trim($config->get('otfs_s3_cred_key') ?? "");
+        $s3CredSecret         = trim($config->get('otfs_s3_cred_secret') ?? "");
+        $s3Region             = trim($config->get('otfs_s3_region') ?? "");
+        $s3Version            = trim($config->get('otfs_s3_version') ?? "");
+        $s3Bucket             = trim($config->get('otfs_s3_bucket') ?? "");
+        $s3AltHost            = trim($config->get('otfs_s3_alt_host') ?? "");
         $s3AltAccessKey       = trim($config->get('otfs_s3_alt_access_key') ?? "");
         $s3AltSecretAccessKey = trim($config->get('otfs_s3_alt_secret_key') ?? "");
-        $otfs_s3_alt_bucket   = trim($config->get('otfs_s3_alt_bucket') ?? "");
-        $s3AltRegion         = trim($config->get('otfs_s3_alt_region') ?? "");
+        $s3AltBucket          = trim($config->get('otfs_s3_alt_bucket') ?? "");
+        $s3AltRegion          = trim($config->get('otfs_s3_alt_region') ?? "");
 
         $cfg = [
             'credentials' => [
-                'key'    => $otfs_s3_cred_key,
-                'secret' => $otfs_s3_cred_secret,
+                'key'    => $s3CredKey,
+                'secret' => $s3CredSecret,
             ],
-            'region'      => $otfs_s3_region,
-            'version'     => $otfs_s3_version,
-            'http'    => [
+            'region'      => $s3Region,
+            'version'     => $s3Version,
+            'http'        => [
                 GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => self::getConnectTimeout(),
             ],
         ];
-        if (!empty($otfs_s3_alt_host)) {
-            $cfg['endpoint'] = $otfs_s3_alt_host;
-            $cfg['credentials']['key'] = $s3AltAccessKey;
+        if (!empty($s3AltHost)) {
+            $cfg['endpoint']              = $s3AltHost;
+            $cfg['credentials']['key']    = $s3AltAccessKey;
             $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
-            $cfg['region'] = $s3AltRegion;
+            $cfg['region']                = $s3AltRegion;
         }
 
         // Add chaos middleware for testing if enabled
         if (getenv('SCHOOLBOX_S3_CHAOS_TESTING') === 'true') {
-            $chaosChance = (int)(getenv('SCHOOLBOX_S3_CHAOS_CHANCE') ?: 50);
-            $chaosMinBytes = (int)(getenv('SCHOOLBOX_S3_CHAOS_MIN_BYTES') ?: 1024);
-            $cfg['http_handler'] = new \Schoolbox\Resource\Storage\S3\ChaosGuzzleMiddleware($chaosChance, $chaosMinBytes);
+            $chaosChance         = (int)(getenv('SCHOOLBOX_S3_CHAOS_CHANCE') ?: 50);
+            $chaosMinBytes       = (int)(getenv('SCHOOLBOX_S3_CHAOS_MIN_BYTES') ?: 1024);
+            $cfg['http_handler'] = new Storage\S3\ChaosGuzzleMiddleware($chaosChance, $chaosMinBytes);
         }
 
         $client = new S3Client($cfg);
@@ -195,7 +197,7 @@ class FilesystemFactory
         ResumableStreamWrapper::register($client);
 
         $visibility = self::buildDefaultVisibility(self::FILE_SYSTEM_ADAPTER_AWS_S3);
-        $bucket = !empty($otfs_s3_alt_host) && !empty($otfs_s3_alt_bucket) ? $otfs_s3_alt_bucket : $otfs_s3_bucket;
+        $bucket     = !empty($s3AltHost) && !empty($s3AltBucket) ? $s3AltBucket : $s3Bucket;
         return new Filesystem(
             new Adapter(
                 new AwsS3Adapter($client, $bucket, $prefix),
