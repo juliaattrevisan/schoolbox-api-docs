@@ -758,12 +758,11 @@ class Controller extends Base
 
         /* A partial set of fields
          */
-        $post = $this->requestPost;
+        $partial = $this->request->getParsedBody();
 
         // Grab the pastoral record we are updating
-
         try {
-            $record = $this->pastoralDataSource->findById($this->getUser(), $post->get('id'));
+            $record = $this->pastoralDataSource->findById($this->getUser(), $partial['id']);
         } catch (MapperException $e) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
         }
@@ -772,7 +771,7 @@ class Controller extends Base
          * you could directly access: recordProcessors aren't interchangeable and there's only one
          * of them that has ever existed afaict.
          */
-        $this->recordProcessor->processPartialPastoralRecords($post, $record);
+//        $this->recordProcessor->processPartialPastoralRecords($partial, $record);
 
         /* TODO Return something to api users...but what...?
          */
