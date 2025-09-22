@@ -671,9 +671,9 @@ function onToggleSelected(): void {
         </div>
         <reveal-modal ref="excludeModalEl">
             <h2>Please confirm</h2>
-            <p>The student has submissions and/or feedback for this {{ locale.assessment.singular }}.</p>
+            <p>The student has submissions and/or feedback for this {{ locale.assessment.singular() }}.</p>
             <p>
-                Exclusion from this {{ locale.assessment.singular }} will remove access to these submissions and/or
+                Exclusion from this {{ locale.assessment.singular() }} will remove access to these submissions and/or
                 feedback. Proceed?
             </p>
             <ul class="flex-list buttons">
