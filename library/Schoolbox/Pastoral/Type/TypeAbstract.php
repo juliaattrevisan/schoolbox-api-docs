@@ -55,7 +55,7 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
     public const PASTORAL_CALENDAR_YEAR = 'Calendar Year';
     public const PASTORAL_ACADEMIC_PERIOD = 'Academic Period';
     public const PASTORAL_ACADEMIC_YEAR = 'Academic Year';
-    /** @var string[] List of all the possible default expiry for the pastoral records **/
+    /** @var array<string, string|null> List of all the possible default expiry for the pastoral records **/
     public const PASTORAL_EXPIRY = [
         self::PASTORAL_EXPIRY_NEVER         => self::PASTORAL_EXPIRY_DEFAULT,
         self::PASTORAL_END_OF_DAY           => 'end of day',
