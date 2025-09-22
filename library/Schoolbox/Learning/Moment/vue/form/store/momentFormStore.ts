@@ -86,7 +86,12 @@ export const useMomentFormStore = defineStore("momentForm", () => {
         const payload: SubmitFormApiPayload | null = formPayload.value ? { ...formPayload.value } : null;
         if (!moment.value || payload === null) return;
 
-        // TODO: validation of body/evidence, need at least one of them I guess
+        // Validation of body/evidence.  At least one of them must be present.
+        showInvalidEvidenceError.value = moment.value.body === "" && moment.value.evidence.length === 0;
+
+        if (showInvalidEvidenceError.value) {
+            return;
+        }
 
         if (action === "publish") {
             payload.deleteComments = deleteComments;
@@ -283,7 +288,6 @@ export const useMomentFormStore = defineStore("momentForm", () => {
         moment.value = $moment;
         folders.value = $folders;
         selectedFolders.value = $selectedFolders;
-        showInvalidEvidenceError.value = moment.value.body === "" && moment.value.evidence.length === 0;
 
         /**
          * When autosave is possible, keep an eye on the form payload

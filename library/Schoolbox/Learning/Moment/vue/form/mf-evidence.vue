@@ -60,6 +60,8 @@ function onEvidenceUploaded(): void {
 
     mediaType.value = null;
     selectedEvidenceId.value = mfStore.moment.evidence.length - 1; // select the newly added evidence
+
+    // new evidence has been added, so remove the validation error message
     mfStore.showInvalidEvidenceError = false;
 }
 
@@ -145,7 +147,6 @@ async function deleteEvidence(index: number): Promise<void> {
 
     if (mfStore.moment.evidence.length === 0 && mediaType.value !== MediaType.TEXT) {
         // if there's no evidence left, default back to text mode
-        mfStore.showInvalidEvidenceError = mfStore.moment.body === "";
         await changeMediaType(MediaType.TEXT);
     }
 
@@ -274,7 +275,9 @@ window.Vue.watch(
     () => mfStore.moment?.body,
     (newValue, oldValue) => {
         if (newValue !== oldValue && mfStore.moment) {
-            mfStore.showInvalidEvidenceError = newValue === "" && mfStore.moment.evidence.length === 0;
+            // The moment body has changed, so the validation error message is no longer needed.
+            // Validation checks will be done again when the user attempts to submit.
+            mfStore.showInvalidEvidenceError = false;
         }
     },
 );
