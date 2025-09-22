@@ -48,14 +48,22 @@ class RecordProcessor
     /**
      * Partial Updates only accept values from the following fields
      * (a whitelist)
+     *
+     * The value indicates whether we can use a mapper method to blindly map
+     * a value to an instance's property: tags, actions, roles, groups are
+     * separately addressed from heading, typeId, et al.
      */
     private const PARTIAL_ALLOWED_FIELDS = [
-        'heading' => true, // Title
+        /* Title, in the ui
+         *
+         * Other nodes that can be directly mapped to an instance (true)
+         * or if they're dealt with separately (false)
+         */
+        'heading' => true,
         'typeId' => true,
         'subtypeId' => true,
         'severityId' => true,
         'points' => true,
-        'actions' => true,
         /* Dates
          */
         'expiresAt' => true,
@@ -66,13 +74,16 @@ class RecordProcessor
         /* General text
          */
         'body_public' => true,
+        /* Actions, Tags, Roles, Groups all sold separately
+         */
+        'actions' => false,
         /* Why would you ever want to use `tags` vs `tagNames`? The latter is way more convenient
          */
-        'tagNames' => true,
+        'tagNames' => false,
         /* Role + Group = Access (Record Visibility)
          */
-        'role' => true,
-        'group' => true,
+        'role' => false,
+        'group' => false,
     ];
 
 
@@ -126,6 +137,13 @@ class RecordProcessor
         /* Whitelist possible values to update
          */
         $data = array_intersect_key(self::PARTIAL_ALLOWED_FIELDS, $partial);
+
+        /* Somehow map array keys from $data into $record
+         * Not sure if there was a convenient way other than relying on mapper's dynamic method calcs
+         */
+
+        /* Tag names, actions, roles, groups all addressed separately
+         */
 
         print_r($data);
     }
