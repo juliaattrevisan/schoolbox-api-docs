@@ -40,7 +40,7 @@ class Notifier extends AbstractModuleNotifier
 
     private const PATTERN_SOMEONE_POSTED_TITLE = ':user posted :moment for :student';
     private const PATTERN_STUDENT_POSTED_TITLE = ':student has posted :moment';
-    private const PATTERN_SUBMITTED_TITLE = ':student posted :moment that requires approval';
+    private const PATTERN_SUBMITTED_TITLE = ':student posted :moment for approval';
 
     private const PATTERN_MOMENT_HREF = '/learning/evidence/%d';
 
