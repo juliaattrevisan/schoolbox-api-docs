@@ -166,11 +166,12 @@ async function includeParticipant(participant: Participant): Promise<void> {
 /**
  * Excludes the selected participants.
  * Clears the selection after the operation is complete.
+ * @param participants - The participants to exclude.
  * @returns A promise that resolves when all exclusions are complete.
  */
-async function excludeSelected(): Promise<void> {
+async function excludeParticipants(participants: Participant[]): Promise<void> {
     try {
-        await Promise.all(selectedList.value.map((participant) => excludeParticipant(participant)));
+        await Promise.all(participants.map((participant) => excludeParticipant(participant)));
         selectedList.value = [];
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
@@ -183,11 +184,11 @@ async function excludeSelected(): Promise<void> {
 /**
  * Includes the selected participants.
  * Clears the selection after the operation is complete.
+ * @param participants - The participants to include.
  * @returns A promise that resolves when all inclusions are complete.
  */
-async function includeSelected(): Promise<void> {
-    await Promise.all(selectedList.value.map((participant) => includeParticipant(participant)));
-    selectedList.value = [];
+async function includeParticipants(participants: Participant[]): Promise<void> {
+    await Promise.all(participants.map((participant) => includeParticipant(participant)));
 }
 
 const isIncludeOpen = window.Vue.ref(false);
@@ -316,10 +317,10 @@ async function onActionSelected(participants: Participant[], action: string): Pr
     }
     switch (currentAction.value) {
         case "removeCustomisation":
-            await Promise.all(currentParticipants.value.map((participant) => includeParticipant(participant)));
+            await includeParticipants(currentParticipants.value);
             break;
         case "exclude":
-            await Promise.all(currentParticipants.value.map((participant) => excludeParticipant(participant)));
+            await excludeParticipants(currentParticipants.value);
             break;
         case "includeInExisting":
             await includeParticipantInExistingPlan();
@@ -333,15 +334,15 @@ async function onActionSelected(participants: Participant[], action: string): Pr
 
 /**
  * Confirms the action for participants with interactions.
- * Redirects to the stored action URL.
+ * Performs the action and closes the confirmation modal.
  */
 async function onConfirmSelected(): Promise<void> {
     switch (currentAction.value) {
         case "removeCustomisation":
-            await Promise.all(currentParticipants.value.map((participant) => includeParticipant(participant)));
+            await includeParticipants(currentParticipants.value);
             break;
         case "exclude":
-            await Promise.all(currentParticipants.value.map((participant) => excludeParticipant(participant)));
+            await excludeParticipants(currentParticipants.value);
             break;
         case "includeInExisting":
             await includeParticipantInExistingPlan();
