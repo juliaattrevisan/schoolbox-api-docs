@@ -92,7 +92,33 @@ class RecordProcessor
      */
     public function processPartialPastoralRecords(array $partial, PastoralModel $record): void
     {
+        $allowedFields = [
+            'heading', // Title
+            'typeId',
+            'subtypeId',
+            'severityId',
+            'points',
+            'actions',
+            /* Dates
+             */
+            'expiresAt',
+            'occurredOn',
+            /* Confidential text
+             */
+            'body_private',
+            /* General text
+             */
+            'body_public',
+            /* Why would you ever want to use `tags` vs `tagNames`? The latter is way more convenient
+             */
+            'tagNames',
+            /* Role + Group = Access (Record Visibility)
+             */
+            'role',
+            'group',
+        ];
 
+        print_r($record);
     }
 
 
