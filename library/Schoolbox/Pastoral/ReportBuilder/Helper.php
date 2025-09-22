@@ -456,7 +456,7 @@ class Helper
         $fromString = "
             FROM {$this->pastoralMapper->getTable()}
             INNER JOIN user s ON pastoral.student_id = s.id AND s.deleted_at IS NULL
-            INNER JOIN pastoral_access pa ON pastoral.id = pa.pastoral_id
+            LEFT JOIN pastoral_access pa ON pastoral.id = pa.pastoral_id
             LEFT JOIN lu_pastoral_severity sv ON pastoral.severity_id = sv.id
             LEFT JOIN userCampus v_sc ON s.id = v_sc.uid
         ";
