@@ -53,7 +53,6 @@ use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use Http\Discovery\Psr17Factory;
 use InvalidArgumentException;
 use League\Flysystem\Filesystem;
-use League\Flysystem\Local\LocalFilesystemAdapter;
 use LogicException;
 use Monolog\Level;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
@@ -2257,17 +2256,6 @@ abstract class Kernel
             )
         );
         $di->set(
-            'filesystem.fallbackStorage',
-            $di->lazy(
-                function () use ($config) {
-                    // This must be an actual filesystem object:
-                    // DI won't store null values.
-                    return (new FilesystemFactory())->buildFallbackStorage($config)
-                        ?? new LocalFilesystemAdapter('/dev/null');
-                }
-            )
-        );
-        $di->set(
             'filesystem.storageProxy',
             $di->lazy(
                 function () use ($di, $config) {
@@ -2282,6 +2270,7 @@ abstract class Kernel
                         FilesystemFactory::buildDefaultVisibility($adapter),
                         $isLocal,
                         $isLocal ? $config->get('storage_dir') : $config->get('stream_dir'),
+                        (new FilesystemFactory())->buildFallbackStorage($config),
                     );
                 }
             )

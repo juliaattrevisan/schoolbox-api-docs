@@ -49,15 +49,18 @@ class FilesystemProxy
     /**
      * Constructor
      *
-     * @param Filesystem    $filesystem        Base filesystem this class proxies.
-     * @param HashGenerator $hashGenerator     Method for generating hashes for storage files.
-     * @param bool          $verifyPrevious    Should files uploaded via `accept` or `acceptStream` be verified?
-     * @param string        $defaultVisibility Default visibility for newly uploaded files; should be:
-     *                                         * `\League\Flysystem\Visibility::PUBLIC` for local filesystem
-     *                                         * `\League\Flysystem\Visibility::PRIVATE` for S3
-     * @param bool          $isLocal           Is the proxy storing file locally?
-     * @param ?string       $localPath         Path to the local storage folder, or if stored remotely, the folder for
-     *                                         local cache storage folder
+     * @param Filesystem    $filesystem         Base filesystem this class proxies.
+     * @param HashGenerator $hashGenerator      Method for generating hashes for storage files.
+     * @param bool          $verifyPrevious     Should files uploaded via `accept` or `acceptStream` be verified?
+     * @param string        $defaultVisibility  Default visibility for newly uploaded files; should be:
+     *                                          * `\League\Flysystem\Visibility::PUBLIC` for local filesystem
+     *                                          * `\League\Flysystem\Visibility::PRIVATE` for S3
+     * @param bool          $isLocal            Is the proxy storing file locally?
+     * @param ?string       $localPath          Path to the local storage folder, or if stored remotely, the folder for
+     *                                          local cache storage folder
+     * @param ?Filesystem   $fallbackFilesystem If provided: when deleting a storage object, delete from this location
+     *                                          as well.
+     *                                          This is provided so that deletes are manually applied to both R2 and S3.
      */
     public function __construct(
         private Filesystem $filesystem,
@@ -66,6 +69,7 @@ class FilesystemProxy
         private string $defaultVisibility,
         private bool $isLocal,
         private ?string $localPath,
+        private ?Filesystem $fallbackFilesystem,
     ) {
     }
 
@@ -296,13 +300,11 @@ class FilesystemProxy
     {
         $dirname = dirname(self::getPathFromHash($storage->getHash()));
 
-        // Create the directory if it doesn't exist:
-        // the later deletion of the directory causes R2 to sync deletion of
-        // said directory to S3. (Hopefully.)
-        $this->filesystem->createDirectory($dirname);
-
         // Deleting the parent folder of the file deletes all of its transforms
         $this->filesystem->deleteDirectory($dirname);
+
+        // Also delete from the fallback filesystem, if it's there
+        $this->fallbackFilesystem?->delete($dirname);
 
         // Do not delete storage record here
     }
