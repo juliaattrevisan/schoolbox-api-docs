@@ -283,7 +283,7 @@ window.Vue.watch(
 </script>
 
 <template>
-    <div class="share-work-buttons l-grid l-gap-m">
+    <div class="share-work-buttons l-grid l-gap-m l-mar-m--bottom">
         <a
             class="icon-camera share-photo"
             title="Take a photo"

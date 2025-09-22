@@ -126,7 +126,7 @@ window.Vue.onMounted(() => {
         <div class="small-12 island">
             <section>
                 <fieldset class="content">
-                    <div class="small-12 columns l-flex-col l-gap-m">
+                    <div class="small-12 columns l-flex-col">
                         <mf-evidence :editor-templates="props.editorTemplates" />
 
                         <label>
@@ -157,10 +157,3 @@ window.Vue.onMounted(() => {
     </div>
     <mf-modal />
 </template>
-
-<style scoped lang="scss">
-// We're controlling margins here, so override it from the selectize plugin styles
-:deep(.selectize-control) {
-    margin-bottom: 0;
-}
-</style>
