@@ -13,6 +13,8 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
     public const COLUMN_QUERY_MONTH_FORMAT = '%b_%Y';
     public const COLUMN_DATE_FORMAT = "M_Y";
     public const COLUMN_KEY_REGEX = "/(?<month>(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec))_(?<year>[0-9]{4})/i";
+    public const DEFAULT_SORTING_KEY = self::SORT_BY_STUDENT_DEFAULT;
+
     /**
      * Get the months in the date range
      *
@@ -76,7 +78,7 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
      *
      * @return Collection
      */
-    private function getTotalCount(): Collection
+    protected function getTotalCount(): Collection
     {
         $db = $this->pastoralMapper->getDatabase();
 
@@ -132,7 +134,7 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
         $monthFormat = self::COLUMN_QUERY_MONTH_FORMAT;
 
         $distinctRecordsQuery = "
-            SELECT DISTINCT pastoral.*, DATE_FORMAT(COALESCE(pastoral.occurred_on, pastoral.created_at), '{$monthFormat}') AS month
+            SELECT DISTINCT pastoral.*, CONCAT(s.lastname, ', ', s.chosen_name) as `user`, DATE_FORMAT(COALESCE(pastoral.occurred_on, pastoral.created_at), '{$monthFormat}') AS month
             {$this->helper->getFromString()}
             WHERE
                 ({$whereTypeSubTypeQuery}) AND
@@ -140,7 +142,7 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
         ";
 
         $countQuery = "
-            SELECT distinctRecords.student_id, {$countQuery}
+            SELECT distinctRecords.student_id, distinctRecords.`user`, {$countQuery}
             FROM ({$distinctRecordsQuery}) distinctRecords
             GROUP BY distinctRecords.student_id
         ";
@@ -174,7 +176,6 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
          * Finding out where to locate the position where the cursor is pointing
          */
         $whereParts = "";
-        $params['limit'] = $this->limit;
         $groupBy = "u.lastname, COALESCE(u.preferred_name, u.firstname)";
 
         $orderBy = $this->getOrderBy();
@@ -208,6 +209,12 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
             $params['studentId'] = $cursor['id'];
         }
 
+        $limit = "";
+        if (null !== $this->limit) {
+            $limit = " LIMIT :limit ";
+            $params['limit'] = $this->limit;
+        }
+
         $totalQuery = "
             SELECT withTotal.*
             FROM (
@@ -217,7 +224,7 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
             {$whereParts}
             GROUP BY withTotal.student_id, {$groupBy}
             ORDER BY {$orderBy}, withTotal.student_id {$this->order}
-            LIMIT :limit
+            {$limit}
         ";
 
         $result = $db->executeQuery(
@@ -381,7 +388,7 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
             $rows = $records->map(
                 function (array $record) use ($students) {
                     $row['user'] = call_user_func($this->userTranslator, $students->getBy('id', $record['student_id']));
-                    unset($record['student_id']);
+                    unset($record['student_id'], $record['user']);
 
                     $row = array_merge($row, array_map(fn($value) => [$this->resultType => $value], $record));
 
@@ -412,5 +419,22 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
                 ]
             ]
         ];
+    }
+
+    /**
+     * Get the CSV headers for the export
+     *
+     * @return array
+     */
+    public function getCSVHeaders(): array
+    {
+        $headers = [
+            'user' => 'Name',
+            'total' => 'Total',
+        ];
+        foreach ($this->getMonths() as $month) {
+            $headers[$month] = ucwords(str_replace('_', ' ', $month));
+        }
+        return $headers;
     }
 }

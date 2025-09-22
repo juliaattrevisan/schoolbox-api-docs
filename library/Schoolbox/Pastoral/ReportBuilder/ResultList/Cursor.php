@@ -49,9 +49,9 @@ class Cursor implements ICursor
     ) {
         $this->codec ??= new Base64();
 
-        /* Set a maximum number of results should be returned otherwise reject
-         */
         if (null !== $this->limit) {
+            /* Set a maximum number of results should be returned otherwise reject
+             */
             if ($this->limit > self::LIMIT_MAX) {
                 throw new ValueError(
                     sprintf('Limit must be at most %d: %d provided', self::LIMIT_MAX, $this->limit),
@@ -262,7 +262,11 @@ class Cursor implements ICursor
         $whereFilter = $filter['where'];
 
         $db = $this->pastoralMapper->getDatabase();
-        $limit = (null === $this->limit) ? '' : "LIMIT {$this->limit}";
+        $limit = "";
+        if (null !== $this->limit) {
+            $limit = " LIMIT :limit ";
+            $param['limit'] = $this->limit;
+        }
 
         $hideNullPoints = $this->getWhereResultType();
 

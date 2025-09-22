@@ -13,6 +13,7 @@ class StudentByWeek extends Base implements TabTypeInterface, ICursor
 
     public const COLUMN_QUERY_KEY = 'week_%d';
     public const COLUMN_KEY_REGEX = '/(week)_(?<index>\d+)/';
+    public const DEFAULT_SORTING_KEY = self::SORT_BY_STUDENT_DEFAULT;
 
     /**
      * Get the weeks in the date range
@@ -81,7 +82,7 @@ class StudentByWeek extends Base implements TabTypeInterface, ICursor
      *
      * @return Collection
      */
-    private function getTotalCount(): Collection
+    protected function getTotalCount(): Collection
     {
         $db = $this->pastoralMapper->getDatabase();
 
@@ -140,7 +141,7 @@ class StudentByWeek extends Base implements TabTypeInterface, ICursor
         );
 
         $distinctRecordsQuery = "
-            SELECT DISTINCT pastoral.*, COALESCE(pastoral.occurred_on, pastoral.created_at) AS reportDate
+            SELECT DISTINCT pastoral.*, CONCAT(s.lastname, ', ', s.chosen_name) as `user`, COALESCE(pastoral.occurred_on, pastoral.created_at) AS reportDate
             {$this->helper->getFromString()}
             WHERE
                 ({$whereTypeSubTypeQuery}) AND
@@ -148,7 +149,7 @@ class StudentByWeek extends Base implements TabTypeInterface, ICursor
         ";
 
         $countQuery = "
-            SELECT distinctRecords.student_id, {$countQuery}
+            SELECT distinctRecords.student_id, distinctRecords.`user`, {$countQuery}
             FROM ({$distinctRecordsQuery}) distinctRecords
             GROUP BY distinctRecords.student_id
         ";
@@ -182,7 +183,6 @@ class StudentByWeek extends Base implements TabTypeInterface, ICursor
          * Finding out where to locate the position where the cursor is pointing
          */
         $whereParts = "";
-        $params['limit'] = $this->limit;
         $groupBy = "u.lastname, COALESCE(u.preferred_name, u.firstname)";
 
         $orderBy = $this->getOrderBy();
@@ -216,6 +216,12 @@ class StudentByWeek extends Base implements TabTypeInterface, ICursor
             $params['studentId'] = $cursor['id'];
         }
 
+        $limit = "";
+        if (null !== $this->limit) {
+            $limit = " LIMIT :limit ";
+            $params['limit'] = $this->limit;
+        }
+
         $totalQuery = "
             SELECT withTotal.*
             FROM (
@@ -225,7 +231,7 @@ class StudentByWeek extends Base implements TabTypeInterface, ICursor
             {$whereParts}
             GROUP BY withTotal.student_id, {$groupBy}
             ORDER BY {$orderBy}, withTotal.student_id {$this->order}
-            LIMIT :limit
+            {$limit}
         ";
 
         $result = $db->executeQuery(
@@ -396,7 +402,7 @@ class StudentByWeek extends Base implements TabTypeInterface, ICursor
             $rows = $records->map(
                 function (array $record) use ($students, $weeks) {
                     $row['user'] = call_user_func($this->userTranslator, $students->getBy('id', $record['student_id']));
-                    unset($record['student_id']);
+                    unset($record['student_id'], $record['user']);
 
                     $row = array_merge($row, array_map(fn($value) => [$this->resultType => $value], $record));
 
@@ -430,5 +436,22 @@ class StudentByWeek extends Base implements TabTypeInterface, ICursor
                 ]
             ]
         ];
+    }
+
+    /**
+     * Get the CSV headers for the export
+     *
+     * @return array
+     */
+    public function getCSVHeaders(): array
+    {
+        $headers = [
+            'user' => 'Name',
+            'total' => 'Total',
+        ];
+        foreach ($this->getWeeks() as $week) {
+            $headers[$week['key']] = $week['label'];
+        }
+        return $headers;
     }
 }

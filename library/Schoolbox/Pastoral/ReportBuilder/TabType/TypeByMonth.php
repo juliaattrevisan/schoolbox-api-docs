@@ -13,6 +13,7 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
     public const COLUMN_QUERY_MONTH_FORMAT = '%b_%Y';
     public const COLUMN_DATE_FORMAT = "M_Y";
     public const COLUMN_KEY_REGEX = "/(?<month>(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec))_(?<year>[0-9]{4})/i";
+    public const DEFAULT_SORTING_KEY = self::SORT_BY_TYPE_DEFAULT;
     private function getMonths(): Collection
     {
         if (empty($this->months)) {
@@ -82,6 +83,12 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
              subtype.id as subtypeId,
              type.name as typeName,
              subtype.name as subtypeName,
+             CONCAT(
+                type.name,
+                CASE
+                    WHEN subtype.name IS NOT NULL AND subtype.name <> ''
+                        THEN CONCAT(' (', subtype.name, ')') ELSE '' END
+             ) as type_subtype,
              {$selectMonthsQuery}
           FROM lu_pastoral_type type
           LEFT JOIN lu_pastoral_subtype subtype ON subtype.pastoral_type_id = type.id
@@ -120,7 +127,7 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
      */
     public function retrieveResults(?string $encodedCursor): Collection
     {
-        $params = ['limit' => $this->limit];
+        $params = [];
         if (null !== $encodedCursor) {
             $cursor = $this->codec->decode($encodedCursor);
         }
@@ -157,6 +164,13 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
             $params['typeId']    = $cursor['typeId'];
             $params['subtypeId'] = $cursor['subtypeId'];
         }
+
+        $limit = "";
+        if (null !== $this->limit) {
+            $limit = " LIMIT :limit ";
+            $params['limit'] = $this->limit;
+        }
+
         $totalQuery = "
             SELECT withTotal.*
             FROM (
@@ -165,7 +179,7 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
             {$whereDiscriminator}
             GROUP BY typeId, subtypeId
             ORDER BY {$orderBy}, typeId {$this->order}, subtypeId {$this->order}
-            LIMIT :limit
+            {$limit}
         ";
 
         $result = $db->executeQuery(
@@ -231,7 +245,7 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
         return $tableHeaders;
     }
 
-    private function getTotalCount(): Collection
+    protected function getTotalCount(): Collection
     {
         $db = $this->pastoralMapper->getDatabase();
 
@@ -292,7 +306,7 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
     /**
      * @inheritdoc
      */
-    public function process(Collection $records, ?string $encodedCursor = null)
+    public function process(Collection $records, ?string $encodedCursor = null): array
     {
         $totalCount = $this->getTotalCount();
         $totalCount = $totalCount->map(fn($count) => is_numeric($count) ? $count / 1 : null);
@@ -319,7 +333,7 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
                             'subtypeId' => $record['subtypeId'],
 
                         ];
-                        unset($record['typeName'], $record['subtypeName'], $record['typeId'], $record['subtypeId']);
+                        unset($record['typeName'], $record['subtypeName'], $record['typeId'], $record['subtypeId'], $record['type_subtype']);
                         $row = array_merge($row, array_map(fn($value) => [$this->resultType => $value], $record));
                         unset($record['total']);
                         $row['trend'] = [
@@ -338,5 +352,22 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
                 ]
             ]
         ];
+    }
+
+    /**
+     * Get the CSV headers for the export
+     *
+     * @return array
+     */
+    public function getCSVHeaders(): array
+    {
+        $headers = [
+            'type_subtype' => 'Type/Sub-Type',
+            'total' => 'Total',
+        ];
+        foreach ($this->getMonths() as $month) {
+            $headers[$month] = ucwords(str_replace('_', ' ', $month));
+        }
+        return $headers;
     }
 }

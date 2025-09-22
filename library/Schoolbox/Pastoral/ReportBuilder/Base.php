@@ -4,6 +4,7 @@ namespace Schoolbox\Pastoral\ReportBuilder;
 
 use Alaress\Codec\ICodec;
 use Alaress\Codec\Json\Base64;
+use Schoolbox\Collection;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserMapper;
@@ -30,6 +31,7 @@ class Base
 
     public const RESULT_TYPE_POINTS = 'points';
     public const RESULT_TYPE_RECORDS = 'records';
+    public const DEFAULT_SORTING_KEY = null;
     public const SORT_BY_STUDENT_DEFAULT = 'user';
     public const SORT_BY_TYPE_DEFAULT = 'type_subtype';
     public const ORDER_DIRECTION_DEFAULT = self::ORDER_DIRECTION_ASC;
@@ -50,27 +52,29 @@ class Base
         protected string $resultType,
         protected ?string $sortBy,
         protected ?string $order = self::ORDER_DIRECTION_DEFAULT,
-        protected int $limit = self::LIMIT_DEFAULT,
+        protected ?int $limit = self::LIMIT_DEFAULT,
         protected ?ICodec $codec = null,
     ) {
         $this->codec ??= new Base64();
 
-        /* Set a maximum number of results should be returned otherwise reject
-         */
-        if ($this->limit > static::LIMIT_MAX) {
-            throw new ValueError(
-                sprintf('Limit must be at most %d: %d provided', static::LIMIT_MAX, $this->limit),
-                self::BAD_REQUEST_ERROR_CODE
-            );
-        }
+        if (null !== $this->limit) {
+            /* Set a maximum number of results should be returned otherwise reject
+             */
+            if ($this->limit > static::LIMIT_MAX) {
+                throw new ValueError(
+                    sprintf('Limit must be at most %d: %d provided', static::LIMIT_MAX, $this->limit),
+                    self::BAD_REQUEST_ERROR_CODE
+                );
+            }
 
-        /* Set a minimum number of results should be returned otherwise reject
-         */
-        if ($this->limit < static::LIMIT_MIN) {
-            throw new ValueError(
-                sprintf('Limit must be at least %d: %d provided', static::LIMIT_MIN, $this->limit),
-                self::BAD_REQUEST_ERROR_CODE
-            );
+            /* Set a minimum number of results should be returned otherwise reject
+             */
+            if ($this->limit < static::LIMIT_MIN) {
+                throw new ValueError(
+                    sprintf('Limit must be at least %d: %d provided', static::LIMIT_MIN, $this->limit),
+                    self::BAD_REQUEST_ERROR_CODE
+                );
+            }
         }
 
         /* If not set or it is assigned to other values should set back to default direction
@@ -84,5 +88,32 @@ class Base
         ) {
             $this->order = static::ORDER_DIRECTION_DEFAULT;
         }
+
+        /* If not set should set back to default sorting key
+         */
+        if (null === $this->sortBy) {
+            $this->sortBy = static::DEFAULT_SORTING_KEY;
+        }
+    }
+
+    protected function getTotalCount(): Collection
+    {
+        return new Collection();
+    }
+
+    /**
+     * Get the total count row for the tab type
+     *
+     * @return array
+     */
+    public function getTotalCountRow(): array
+    {
+        /* Return null if all the values are null otherwise return the total count
+         */
+        return array_merge(
+            [static::DEFAULT_SORTING_KEY => ucwords("total {$this->resultType}")],
+            $this->getTotalCount()
+                 ->map(fn($count) => is_numeric($count) ? $count / 1 : null)->getAll()
+        );
     }
 }

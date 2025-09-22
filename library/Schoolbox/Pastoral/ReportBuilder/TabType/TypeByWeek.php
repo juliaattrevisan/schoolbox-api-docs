@@ -12,6 +12,7 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
     private $weeks = [];
     public const COLUMN_QUERY_KEY = 'week_%d';
     public const COLUMN_KEY_REGEX = '/(week)_(?<index>\d+)/';
+    public const DEFAULT_SORTING_KEY = self::SORT_BY_TYPE_DEFAULT;
 
     private function getWeeks(): Collection
     {
@@ -78,6 +79,12 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
              subtype.id as subtypeId,
              type.name as typeName,
              subtype.name as subtypeName,
+             CONCAT(
+                type.name,
+                CASE
+                    WHEN subtype.name IS NOT NULL AND subtype.name <> ''
+                        THEN CONCAT(' (', subtype.name, ')') ELSE '' END
+             ) as type_subtype,
              {$selectWeeksQuery}
           FROM lu_pastoral_type type
           LEFT JOIN lu_pastoral_subtype subtype ON subtype.pastoral_type_id = type.id
@@ -112,7 +119,7 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
 
     public function retrieveResults(?string $encodedCursor): Collection
     {
-        $params = ['limit' => $this->limit];
+        $params = [];
         if (null !== $encodedCursor) {
             $cursor = $this->codec->decode($encodedCursor);
         }
@@ -149,6 +156,13 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
             $params['typeId']    = $cursor['typeId'];
             $params['subtypeId'] = $cursor['subtypeId'];
         }
+
+        $limit = "";
+        if (null !== $this->limit) {
+            $limit = " LIMIT :limit ";
+            $params['limit'] = $this->limit;
+        }
+
         $totalQuery = "
             SELECT withTotal.*
             FROM (
@@ -157,7 +171,7 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
             {$whereDiscriminator}
             GROUP BY typeId, subtypeId
             ORDER BY {$orderBy}, typeId {$this->order}, subtypeId {$this->order}
-            LIMIT :limit
+            {$limit}
         ";
         $result = $db->executeQuery(
             $totalQuery,
@@ -209,7 +223,7 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
         return $tableHeaders;
     }
 
-    private function getTotalCount(): Collection
+    protected function getTotalCount(): Collection
     {
         $db = $this->pastoralMapper->getDatabase();
         $selectSUM = implode(',', $this->getWeeks()->map(fn(array $week) => "SUM({$week['key']}) as {$week['key']}")->getAll());
@@ -259,7 +273,10 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
         return $this->codec->encode($discriminator);
     }
 
-    public function process(Collection $records, ?string $encodedCursor = null)
+    /**
+     * @inheritdoc
+     */
+    public function process(Collection $records, ?string $encodedCursor = null): array
     {
         $totalCount = $this->getTotalCount();
         $totalCount = $totalCount->map(fn($count) => is_numeric($count) ? $count / 1 : null);
@@ -293,7 +310,7 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
                             'typeId' => $record['typeId'],
                             'subtypeId' => $record['subtypeId'],
                         ];
-                        unset($record['typeName'], $record['subtypeName'], $record['typeId'], $record['subtypeId']);
+                        unset($record['typeName'], $record['subtypeName'], $record['typeId'], $record['subtypeId'], $record['type_subtype']);
                         $row = array_merge($row, array_map(fn($value) => [$this->resultType => $value], $record));
                         unset($record['total']);
                         $row['trend'] = [
@@ -315,5 +332,22 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
                 ]
             ]
         ];
+    }
+
+    /**
+     * Get the CSV headers for the export
+     *
+     * @return array
+     */
+    public function getCSVHeaders(): array
+    {
+        $headers = [
+            'type_subtype' => 'Type/Sub-Type',
+            'total' => 'Total',
+        ];
+        foreach ($this->getWeeks() as $week) {
+            $headers[$week['key']] = $week['label'];
+        }
+        return $headers;
     }
 }
