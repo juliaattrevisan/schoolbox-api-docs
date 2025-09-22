@@ -441,7 +441,7 @@ class StudentByType extends Base implements TabTypeInterface, ICursor
     {
         $headers = [
             'user' => 'Name',
-            'total' => 'Total'
+            'total' => 'Total',
         ];
         foreach ($this->helper->getType() as $type) {
             $key = sprintf(self::COLUMN_KEY_FORMAT, 'type', $type->getId());
