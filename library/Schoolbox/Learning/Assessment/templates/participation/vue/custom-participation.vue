@@ -292,6 +292,22 @@ function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string {
 }
 
 const isConfirmOpen = window.Vue.ref(false);
+
+/**
+ * Handles the modification of a selected participant.
+ * If the participant has interactions, it opens a confirmation modal.
+ * Otherwise, it redirects to the modification URL.
+ * @param participant - The participant to modify.
+ */
+function onModifySelected(participant: Participant): void {
+    if (participant.hasInteraction) {
+        isConfirmOpen.value = true;
+    } else {
+        // redirect to the modification URL
+        const url = `${props.getLearningPlanNewUrl}?student=${participant.user.id}&${getReturnUrl()}`;
+        window.location.href = url;
+    }
+}
 </script>
 
 <template>
@@ -414,12 +430,9 @@ const isConfirmOpen = window.Vue.ref(false);
                                 <template v-else>
                                     <li class="separator">Manage</li>
                                     <li>
-                                        <a
-                                            class="icon-modify"
-                                            :href="`${getLearningPlanNewUrl}?student=${participant.user.id}&${getReturnUrl()}`"
-                                        >
+                                        <button class="icon-modify" @click.prevent="onModifySelected(participant)">
                                             Modify
-                                        </a>
+                                        </button>
                                     </li>
                                     <li>
                                         <button
