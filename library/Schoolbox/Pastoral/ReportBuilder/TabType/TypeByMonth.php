@@ -86,7 +86,7 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
              CONCAT(
                 type.name,
                 CASE
-                    WHEN subtype.name IS NOT NULL or subtype.name = ''
+                    WHEN subtype.name IS NOT NULL AND subtype.name <> ''
                         THEN CONCAT(' (', subtype.name, ')') ELSE '' END
              ) as type_subtype,
              {$selectMonthsQuery}
