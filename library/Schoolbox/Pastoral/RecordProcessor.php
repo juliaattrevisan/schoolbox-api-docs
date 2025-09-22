@@ -58,33 +58,33 @@ class RecordProcessor
          * Other nodes that can be directly mapped to an instance (true)
          * or if they're dealt with separately (false)
          */
-        'heading' => true,
-        'points' => true,
+        'heading',
+        'points',
         /* Related objects need instances, not scalars, to map successfully to an instance
          */
-        'typeId' => false,
-        'subtypeId' => false,
-        'severityId' => false,
+        'typeId',
+        'subtypeId',
+        'severityId',
         /* Dates
          */
-        'expiresAt' => true,
-        'occurredOn' => true,
+        'expiresAt',
+        'occurredOn',
         /* Confidential text
          */
-        'body_private' => true,
+        'body_private',
         /* General text
          */
-        'body_public' => true,
+        'body_public',
         /* Actions, Tags, Roles, Groups all sold separately
          */
-        'actions' => false,
+        'actions',
         /* Why would you ever want to use `tags` vs `tagNames`? The latter is way more convenient
          */
-        'tagNames' => false,
+        'tagNames',
         /* Role + Group = Access (Record Visibility)
          */
-        'role' => false,
-        'group' => false,
+        'role',
+        'group',
     ];
 
 
@@ -137,34 +137,65 @@ class RecordProcessor
     {
         /* Whitelist possible values to update
          */
-        $data = array_intersect_key($partial, array_flip(array_keys(self::PARTIAL_ALLOWED_FIELDS)));
+        $data = array_intersect_key($partial, array_flip(self::PARTIAL_ALLOWED_FIELDS));
 
-        /* Somehow map array keys from $data into $record
-         * Not sure if there was a convenient way other than relying on mapper's dynamic method calcs
+        /* Manually map the partial array into $record, one prop at a time
+         * Not all of them can be conveniently derived: body_public maps to setBody_public() (nonexistent method)
+         * and some require actual hydrated stubs to proceed (types, subtypes, severity, etc)
+         *
+         * Do it the long way (really?)
          */
-        var_dump($partial);
-        var_dump($data);
-        foreach ($data as $field => $value) {
-            if (self::PARTIAL_ALLOWED_FIELDS[$field]) {
-                /* WHY WAS THERE NO PASTORAL MAPPER HERE
-                 */
-                $setMethod = $this->pastoralDataSource->getPastoralMapper()->getSetMethodName($field);
+        if ($partial['heading'] ?? false) {
 
-                /* Directly update a prop if it existed in the whitelist and the partial data set
-                 */
-                var_dump($setMethod);
-                var_dump($value);
-
-                $record->$setMethod($value);
-            }
         }
 
-        /* Tag names, actions, roles, groups all addressed separately
-         */
+        if ($partial['points'] ?? false) {
 
-        print_r($data);
+        }
 
-        print_r($record);
+        if ($partial['typeId'] ?? false) {
+
+        }
+
+        if ($partial['subtypeId'] ?? false) {
+
+        }
+
+        if ($partial['severityId'] ?? false) {
+
+        }
+
+        if ($partial['expiresAt'] ?? false) {
+
+        }
+
+        if ($partial['occurredOn'] ?? false) {
+
+        }
+
+        if ($partial['body_private'] ?? false) {
+
+        }
+
+        if ($partial['body_public'] ?? false) {
+
+        }
+
+        if ($partial['actions'] ?? false) {
+
+        }
+
+        if ($partial['tagNames'] ?? false) {
+
+        }
+
+        if ($partial['role'] ?? false) {
+
+        }
+
+        if ($partial['group'] ?? false) {
+
+        }
     }
 
 
