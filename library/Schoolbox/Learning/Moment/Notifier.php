@@ -153,10 +153,6 @@ class Notifier extends AbstractModuleNotifier
     {
         $envelope = new Envelope();
 
-        /* TODO where does everything go?
-         */
-        (new \Alaress_Log_File('/tmp/notifySubmitted.log'))->log('notifyPosted method', $roleType);
-
         // if the learning moment is draft (now draft, may have just been created, may have been moved to draft, do not notify
         if ($model->isDraft()) {
             return $envelope;
@@ -246,10 +242,6 @@ class Notifier extends AbstractModuleNotifier
     private function notifySubmitted(string $roleType, Moment $model, User $effector, ?array $diff): Envelope
     {
         $envelope = new Envelope();
-
-        /* TODO where does everything go? This never fires.
-         */
-        (new \Alaress_Log_File('/tmp/notifySubmitted.log'))->log('notifySubmitted method', $roleType);
 
         /* A necessary precondition
          */
