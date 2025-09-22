@@ -58,9 +58,11 @@ class FilesystemProxy
      * @param bool          $isLocal            Is the proxy storing file locally?
      * @param ?string       $localPath          Path to the local storage folder, or if stored remotely, the folder for
      *                                          local cache storage folder
-     * @param ?Filesystem   $fallbackFilesystem If provided: when deleting a storage object, delete from this location
-     *                                          as well.
-     *                                          This is provided so that deletes are manually applied to both R2 and S3.
+     * @param ?Filesystem   $fallbackFilesystem If provided: when deleting a storage object, attempt to delete from this
+     *                                          filesystem as well as `$filesystem`.
+     *                                          The R2 filesystem acts as a read and write through cache for S3, but R2
+     *                                          cannot sync deletion of files which don't exist: therefore, the files
+     *                                          must be deleted manually from both filesystems.
      */
     public function __construct(
         private Filesystem $filesystem,
@@ -303,7 +305,7 @@ class FilesystemProxy
         // Deleting the parent folder of the file deletes all of its transforms
         $this->filesystem->deleteDirectory($dirname);
 
-        // Also delete from the fallback filesystem, if it's there
+        // Also delete from the backup filesystem, if it's there
         $this->fallbackFilesystem?->deleteDirectory($dirname);
 
         // Do not delete storage record here
