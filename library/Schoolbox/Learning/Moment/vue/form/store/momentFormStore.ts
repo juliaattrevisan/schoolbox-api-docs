@@ -50,6 +50,7 @@ export const useMomentFormStore = defineStore("momentForm", () => {
 
     const isSaving = window.Vue.ref<boolean>(false);
     const saveError = window.Vue.ref<string | null>(null);
+    const showInvalidEvidenceError = window.Vue.ref<boolean>(false);
 
     /**
      * The current payload of the form
@@ -85,7 +86,13 @@ export const useMomentFormStore = defineStore("momentForm", () => {
         const payload: SubmitFormApiPayload | null = formPayload.value ? { ...formPayload.value } : null;
         if (!moment.value || payload === null) return;
 
-        // TODO: validation of body/evidence, need at least one of them I guess
+        // Validation of body/evidence.  At least one of them must be present.
+        showInvalidEvidenceError.value =
+            (moment.value.body === null || moment.value.body === "") && moment.value.evidence.length === 0;
+
+        if (showInvalidEvidenceError.value) {
+            return;
+        }
 
         if (action === "publish") {
             payload.deleteComments = deleteComments;
@@ -301,6 +308,9 @@ export const useMomentFormStore = defineStore("momentForm", () => {
                     // no autosaving of published moments
                     if (moment.value.currentState === EvidenceStatus.PUBLISHED) return;
 
+                    // no autosaving of moments without evidence or text
+                    if (moment.value.body === "" && moment.value.evidence.length === 0) return;
+
                     await submitForm(true, "draft");
                 },
                 { debounce: 3000, deep: true },
@@ -324,5 +334,6 @@ export const useMomentFormStore = defineStore("momentForm", () => {
         publish,
         deleteMoment,
         toggleFolderSelection,
+        showInvalidEvidenceError,
     };
 });

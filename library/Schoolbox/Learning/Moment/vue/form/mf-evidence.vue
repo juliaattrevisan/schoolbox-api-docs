@@ -60,6 +60,9 @@ function onEvidenceUploaded(): void {
 
     mediaType.value = null;
     selectedEvidenceId.value = mfStore.moment.evidence.length - 1; // select the newly added evidence
+
+    // new evidence has been added, so remove the validation error message
+    mfStore.showInvalidEvidenceError = false;
 }
 
 /**
@@ -263,10 +266,24 @@ window.Vue.watch(
         onEvidenceUploaded();
     },
 );
+
+/**
+ * Watch for changes to the moment body.
+ */
+window.Vue.watch(
+    () => mfStore.moment?.body,
+    (newValue, oldValue) => {
+        if (newValue !== oldValue && mfStore.moment) {
+            // The moment body has changed, so the validation error message is no longer needed.
+            // Validation checks will be done again when the user attempts to submit.
+            mfStore.showInvalidEvidenceError = false;
+        }
+    },
+);
 </script>
 
 <template>
-    <div class="share-work-buttons l-grid l-gap-m">
+    <div class="share-work-buttons l-grid l-gap-m l-mar-m--bottom">
         <a
             class="icon-camera share-photo"
             title="Take a photo"
@@ -335,6 +352,10 @@ window.Vue.watch(
             <file-drop id="mf-evidence-file-drop" v-model:current-file="currentFileDropFile" auto-upload-to-storage />
         </div>
     </div>
+
+    <label v-if="mfStore.showInvalidEvidenceError" class="error">
+        Please add evidence or write something before submitting the learning moment
+    </label>
 
     <div v-if="mfStore.moment !== null && mfStore.moment.evidence.length">
         <label> Attachments ({{ mfStore.moment.evidence.length }} out of {{ MOMENT_MAX_EVIDENCE }}) </label>
