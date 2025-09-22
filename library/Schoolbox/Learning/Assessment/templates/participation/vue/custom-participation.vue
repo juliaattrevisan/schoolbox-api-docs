@@ -310,6 +310,14 @@ function onActionSelected(participant: Participant, url: string): void {
         window.location.href = currentActionUrl.value;
     }
 }
+
+/**
+ * Confirms the action for participants with interactions.
+ * Redirects to the stored action URL.
+ */
+function onConfirmSelected(): void {
+    window.location.href = currentActionUrl.value;
+}
 </script>
 
 <template>
@@ -463,20 +471,30 @@ function onActionSelected(participant: Participant, url: string): void {
                                     </li>
                                     <li class="separator">Create</li>
                                     <li v-if="getAssessmentParticipationCopyActivity">
-                                        <a
+                                        <button
                                             class="icon-copy"
-                                            :href="`${getAssessmentParticipationCopyActivity}?student=${participant.user.id}&original=${assessmentId}&${getReturnUrl()}`"
+                                            @click.prevent="
+                                                onActionSelected(
+                                                    participant,
+                                                    `${getAssessmentParticipationCopyActivity}?student=${participant.user.id}&original=${assessmentId}&${getReturnUrl()}`,
+                                                )
+                                            "
                                         >
                                             Copy Activity
-                                        </a>
+                                        </button>
                                     </li>
                                     <li>
-                                        <a
+                                        <button
                                             class="icon-submissions"
-                                            :href="`${getAssessmentParticipationNewActivity}?student=${participant.user.id}&original=${assessmentId}&${getReturnUrl()}`"
+                                            @click.prevent="
+                                                onActionSelected(
+                                                    participant,
+                                                    `${getAssessmentParticipationNewActivity}?student=${participant.user.id}&original=${assessmentId}&${getReturnUrl()}`,
+                                                )
+                                            "
                                         >
                                             New Activity
-                                        </a>
+                                        </button>
                                     </li>
                                 </template>
                             </ul>
@@ -591,7 +609,7 @@ function onActionSelected(participant: Participant, url: string): void {
                 </p>
             </div>
             <div class="l-flex l-gap-xs f-no-margins">
-                <button class="button submit l-flex__item--1">Yes</button>
+                <button class="button submit l-flex__item--1" @click.prevent="onConfirmSelected">Yes</button>
                 <button class="button l-flex__item--1" @click.prevent="isConfirmOpen = false">Cancel</button>
             </div>
         </div>
