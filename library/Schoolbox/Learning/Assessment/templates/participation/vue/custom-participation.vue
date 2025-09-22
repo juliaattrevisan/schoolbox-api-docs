@@ -546,7 +546,7 @@ async function onConfirmSelected(): Promise<void> {
                     <button
                         class="icon-close submit"
                         data-test="custom-participation-remove-customisation"
-                        @click.prevent="includeSelected"
+                        @click.prevent="onActionSelected(selectedList, 'removeCustomisation')"
                     >
                         Remove Customisation
                     </button>
@@ -566,7 +566,12 @@ async function onConfirmSelected(): Promise<void> {
                         </button>
                     </div>
                     <div class="l-flex__item--1-auto">
-                        <button class="icon-staff-students submit" @click.prevent="excludeSelected">Exclude</button>
+                        <button
+                            class="icon-staff-students submit"
+                            @click.prevent="onActionSelected(selectedList, 'exclude')"
+                        >
+                            Exclude
+                        </button>
                     </div>
                     <div v-if="props.customisations.length > 0" class="l-flex__item--1-auto">
                         <button class="icon-list submit" @click.prevent="isIncludeOpen = true">
