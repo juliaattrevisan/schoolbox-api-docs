@@ -32,13 +32,17 @@ const relevantRoutes = window.Vue.computed(() => {
 <template>
     <ul class="flex-list buttons">
         <li v-if="relevantRoutes.draft">
-            <button @click="() => mfStore.submitForm(false, 'draft')">Save for later</button>
+            <button :disabled="mfStore.isSaving" @click="() => mfStore.submitForm(false, 'draft')">
+                Save for later
+            </button>
         </li>
         <li v-if="relevantRoutes.reject">
             <button :disabled="mfStore.isSaving" @click="() => mfStore.reject()">Request update</button>
         </li>
         <li v-if="relevantRoutes.submit">
-            <button class="submit" @click="() => mfStore.submitForm(false, 'submit')">Submit for approval</button>
+            <button :disabled="mfStore.isSaving" class="submit" @click="() => mfStore.submitForm(false, 'submit')">
+                Submit for approval
+            </button>
         </li>
         <li v-if="relevantRoutes.publish">
             <button :disabled="mfStore.isSaving" class="submit" @click="() => mfStore.publish()">
