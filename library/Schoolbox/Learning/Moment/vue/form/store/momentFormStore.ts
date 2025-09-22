@@ -87,7 +87,8 @@ export const useMomentFormStore = defineStore("momentForm", () => {
         if (!moment.value || payload === null) return;
 
         // Validation of body/evidence.  At least one of them must be present.
-        showInvalidEvidenceError.value = moment.value.body === "" && moment.value.evidence.length === 0;
+        showInvalidEvidenceError.value =
+            (moment.value.body === null || moment.value.body === "") && moment.value.evidence.length === 0;
 
         if (showInvalidEvidenceError.value) {
             return;
