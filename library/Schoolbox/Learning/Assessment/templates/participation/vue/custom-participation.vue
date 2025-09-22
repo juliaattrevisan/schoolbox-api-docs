@@ -296,15 +296,15 @@ const isConfirmOpen = window.Vue.ref(false);
 /**
  * Handles the modification of a selected participant.
  * If the participant has interactions, it opens a confirmation modal.
- * Otherwise, it redirects to the modification URL.
+ * Otherwise, it redirects to the appropriate URL.
  * @param participant - The participant to modify.
+ * @param url - The base URL for modification.
  */
-function onModifySelected(participant: Participant): void {
+function onActionSelected(participant: Participant, url: string): void {
     if (participant.hasInteraction) {
         isConfirmOpen.value = true;
     } else {
-        // redirect to the modification URL
-        const url = `${props.getLearningPlanNewUrl}?student=${participant.user.id}&${getReturnUrl()}`;
+        // redirect to the appropriate URL
         window.location.href = url;
     }
 }
@@ -430,7 +430,15 @@ function onModifySelected(participant: Participant): void {
                                 <template v-else>
                                     <li class="separator">Manage</li>
                                     <li>
-                                        <button class="icon-modify" @click.prevent="onModifySelected(participant)">
+                                        <button
+                                            class="icon-modify"
+                                            @click.prevent="
+                                                onActionSelected(
+                                                    participant,
+                                                    `${props.getLearningPlanNewUrl}?student=${participant.user.id}&${getReturnUrl()}`,
+                                                )
+                                            "
+                                        >
                                             Modify
                                         </button>
                                     </li>
