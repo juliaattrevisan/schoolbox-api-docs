@@ -396,8 +396,6 @@ class Controller extends Base
      */
     public function getReportResults(PastoralReport $report): void
     {
-        $records = $this->getReportData($report);
-
         // Keep an audit trail of any reports that are run
 
         $pastoralAuditMapper = PastoralAuditMapper::getInstance();
@@ -497,7 +495,6 @@ class Controller extends Base
             [
                 'title'          => $report->getName(),
                 'export'         => true,
-                'results'        => $records->map($this->pastoralTranslator),
                 'report'         => $report,
                 'showSeverity'   => $showSeverity,
                 'severityColors' => $severityColors,
