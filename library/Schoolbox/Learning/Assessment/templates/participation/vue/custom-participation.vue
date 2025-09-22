@@ -292,7 +292,7 @@ function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string {
 }
 
 const isConfirmOpen = window.Vue.ref(false);
-const currentActionUrl = window.Vue.ref<string>("");
+const currentAction = window.Vue.ref<string>("");
 
 /**
  * Handles the modification of a selected participant.
@@ -302,12 +302,12 @@ const currentActionUrl = window.Vue.ref<string>("");
  * @param url - The base URL for modification.
  */
 function onActionSelected(participant: Participant, url: string): void {
-    currentActionUrl.value = url;
+    currentAction.value = url;
     if (participant.hasInteraction) {
         isConfirmOpen.value = true;
     } else {
         // redirect to the appropriate URL
-        window.location.href = currentActionUrl.value;
+        window.location.href = currentAction.value;
     }
 }
 
@@ -316,7 +316,7 @@ function onActionSelected(participant: Participant, url: string): void {
  * Redirects to the stored action URL.
  */
 function onConfirmSelected(): void {
-    window.location.href = currentActionUrl.value;
+    window.location.href = currentAction.value;
 }
 </script>
 
