@@ -324,6 +324,11 @@ async function onActionSelected(participants: Participant[], action: string): Pr
         isConfirmOpen.value = false;
         return;
     }
+    if (currentAction.value === "includeInExisting") {
+        await includeParticipantInExistingPlan();
+        isConfirmOpen.value = false;
+        return;
+    }
     // redirect to the appropriate URL
     window.location.href = currentAction.value;
 }
@@ -340,6 +345,11 @@ async function onConfirmSelected(): Promise<void> {
     }
     if (currentAction.value === "exclude") {
         await Promise.all(currentParticipants.value.map((participant) => excludeParticipant(participant)));
+        isConfirmOpen.value = false;
+        return;
+    }
+    if (currentAction.value === "includeInExisting") {
+        await includeParticipantInExistingPlan();
         isConfirmOpen.value = false;
         return;
     }
@@ -642,7 +652,7 @@ async function onConfirmSelected(): Promise<void> {
                 <button
                     class="button submit l-flex__item--1"
                     :disabled="!selectedActivity"
-                    @click.prevent="includeParticipantInExistingPlan()"
+                    @click.prevent="onActionSelected(selectedList, 'includeInExisting')"
                 >
                     Confirm
                 </button>
