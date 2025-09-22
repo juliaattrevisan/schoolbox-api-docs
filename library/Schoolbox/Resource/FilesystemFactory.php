@@ -176,7 +176,7 @@ class FilesystemFactory
                 GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => self::getConnectTimeout(),
             ],
         ];
-        if (!empty($s3AltHost)) {
+        if (!$ignoreAltHost && !empty($s3AltHost)) {
             $cfg['endpoint']              = $s3AltHost;
             $cfg['credentials']['key']    = $s3AltAccessKey;
             $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
@@ -193,8 +193,11 @@ class FilesystemFactory
         $client = new S3Client($cfg);
 
         // Register the S3 stream wrapper, so that the S3 filesystem adapter
-        // may use it
-        ResumableStreamWrapper::register($client);
+        // may use it.
+        // Also need to provide a protocol name: since the alt and base hosts
+        // could be different, different protocols are required.
+        $protocol = $ignoreAltHost ? 's3fallback' : 's3';
+        ResumableStreamWrapper::register($client, $protocol);
 
         $visibility = self::buildDefaultVisibility(self::FILE_SYSTEM_ADAPTER_AWS_S3);
         $bucket     = !empty($s3AltHost) && !empty($s3AltBucket) ? $s3AltBucket : $s3Bucket;
@@ -202,6 +205,7 @@ class FilesystemFactory
             new Adapter(
                 new AwsS3Adapter($client, $bucket, $prefix),
                 $bucket,
+                $protocol,
             ),
             [
                 Config::OPTION_VISIBILITY           => $visibility,

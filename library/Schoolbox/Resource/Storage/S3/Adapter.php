@@ -43,10 +43,14 @@ class Adapter implements FilesystemAdapter
      * @param string       $bucket      The S3 bucket to read from.
      *                                  Must be passed here because `AwsS3Adapter` instance's bucket is no longer
      *                                  accessible outside the instance.
+     * @param string       $protocol    The name of the stream protocol to use when reading from S3.
+     *                                  Required when creating multiple S3 connections, because each protocol contains
+     *                                  its own client data.
      */
     public function __construct(
         private AwsS3Adapter $baseAdapter,
         private string $bucket,
+        private string $protocol,
     ) {
     }
 
@@ -63,14 +67,14 @@ class Adapter implements FilesystemAdapter
     public function readStream(string $path)
     {
         $context = stream_context_create([
-            's3' => ['seekable' => true],
+            $this->protocol => ['seekable' => true],
         ]);
 
         // Return seekable stream
         error_clear_last();
         $prefix = FilesystemFactory::PREFIX_STORAGE;
         $stream = @fopen(
-            sprintf("s3://%s/%s%s", $this->bucket, $prefix, $path),
+            sprintf("%s://%s/%s%s", $this->protocol, $this->bucket, $prefix, $path),
             "rb",
             false,
             $context,
