@@ -561,7 +561,7 @@ const isConfirmOpen = window.Vue.ref(false);
         <div class="l-flex-col l-gap-m f-no-margins">
             <div class="l-flex-col l-gap-s f-no-margins">
                 <h2>Please confirm</h2>
-                <p>The student has submissions and/or feedback for this {{ locale.assessment.singular }}.</p>
+                <p>The student(s) has submissions and/or feedback for this {{ locale.assessment.singular }}.</p>
                 <p>
                     Exclusion from this {{ locale.assessment.singular }} will remove access to these submissions and/or
                     feedback. Proceed?
