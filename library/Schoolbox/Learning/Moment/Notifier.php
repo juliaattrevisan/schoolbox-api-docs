@@ -154,7 +154,7 @@ class Notifier extends AbstractModuleNotifier
         $envelope = new Envelope();
 
         // if the learning moment is draft (now draft, may have just been created, may have been moved to draft, do not notify
-        if ($model->isDraft()) {
+        if ($model->isDraft() || $model->isSubmitted()) {
             return $envelope;
         }
 
