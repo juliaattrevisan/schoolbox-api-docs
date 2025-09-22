@@ -146,11 +146,22 @@ class RecordProcessor
          * Do it the long way (really?)
          */
         if ($partial['heading'] ?? false) {
-
+            $record->setHeading($data['heading']);
         }
 
+        /* Points must be within a range of valid values randomly hardcoded here
+         * TODO define as consts instead of magic numbers
+         */
         if ($partial['points'] ?? false) {
+            /* Assert correct value range
+             */
+            $points = (float)$partial['points'];
 
+            if (!is_numeric($partial['points']) || $points < -1000000 || $points > 1000000) {
+                throw new SchoolboxException('Points must be a float between -1000000 and 1000000');
+            }
+
+            $record->setPoints($data['points']);
         }
 
         if ($partial['typeId'] ?? false) {
@@ -173,12 +184,20 @@ class RecordProcessor
 
         }
 
+        /* Allow token replacements in Confidential
+         * TODO supply a $student instance
+         */
         if ($partial['body_private'] ?? false) {
-
+            $record->setBodyPrivate((new TokenReplacer\Student(new TokenReplacer\Simple()))
+                ->replace(trim($partial['body_private']), $student));
         }
 
+        /* Allow token replacements in General
+         * TODO supply a $student instance
+         */
         if ($partial['body_public'] ?? false) {
-
+            $record->setBodyPrivate((new TokenReplacer\Student(new TokenReplacer\Simple()))
+                ->replace(trim($partial['body_public']), $student));
         }
 
         if ($partial['actions'] ?? false) {
