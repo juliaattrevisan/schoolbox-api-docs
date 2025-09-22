@@ -313,6 +313,10 @@ function onActionSelected(participant: Participant, action: string): void {
         void includeParticipant(participant);
         return;
     }
+    if (action === "exclude") {
+        void excludeParticipant(participant);
+        return;
+    }
     // redirect to the appropriate URL
     window.location.href = currentAction.value;
 }
@@ -326,6 +330,14 @@ function onConfirmSelected(): void {
         selectedList.value =
             selectedList.value.length > 0 ? selectedList.value : [currentParticipant.value as Participant];
         void includeSelected();
+        isConfirmOpen.value = false;
+        currentParticipant.value = null;
+        return;
+    }
+    if (currentAction.value === "exclude") {
+        selectedList.value =
+            selectedList.value.length > 0 ? selectedList.value : [currentParticipant.value as Participant];
+        void excludeSelected();
         isConfirmOpen.value = false;
         currentParticipant.value = null;
         return;
@@ -472,7 +484,7 @@ function onConfirmSelected(): void {
                                     <li>
                                         <button
                                             class="icon-staff-students"
-                                            @click.prevent="excludeParticipant(participant)"
+                                            @click.prevent="onActionSelected(participant, 'exclude')"
                                         >
                                             Exclude
                                         </button>
