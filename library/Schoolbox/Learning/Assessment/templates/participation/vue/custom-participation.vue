@@ -26,13 +26,14 @@ const props = defineProps<Props>();
 
 const allParticipants = window.Vue.ref<Participant[]>(props.allParticipants);
 
-// show the checkboxes if there are more than one participant
-const showCheckboxes = window.Vue.computed(() => allParticipants.value.length > 1);
+// #region checkboxes and selection
 
-// selectedList is the items that are currently selected
-const selectedList = window.Vue.ref<Participant[]>([]);
+const showCheckboxes = window.Vue.computed(() => allParticipants.value.length > 1); // show the checkboxes if there are more than one participant
+const selectedList = window.Vue.ref<Participant[]>([]); // currently selected participants (check boxes in the table)
 
-// Computed property to check if all are selected
+/**
+ * Check if all participants are selected
+ */
 const allSelected = window.Vue.computed({
     get: () => allParticipants.value.every((participant) => selectedList.value.includes(participant)),
     set: (value) => {
@@ -40,18 +41,28 @@ const allSelected = window.Vue.computed({
     },
 });
 
-// Function to check if at least one is selected
+/**
+ * Function to check if the selection is indeterminate (some but not all selected)
+ * to set the checkbox state appropriately
+ */
 const isIndeterminate = window.Vue.computed(() => {
     return selectedList.value.length > 0 && selectedList.value.length < allParticipants.value.length;
 });
 
-// Function to check if any selected participants has and customisation, whether excluded or assigned a different activity
+/**
+ * Check if any selected participants has a customisation,
+ * whether can show the "Remove Customisation" action or not
+ */
 const hasCustomisedInSelection = window.Vue.computed(() => {
     return selectedList.value.some(
         (participant) =>
             participant.excludedAt !== null || participant.plan.name !== null || participant.customisedPlan !== null,
     );
 });
+
+// #endregion
+
+// #region pastoral counts
 
 const loadError = window.Vue.ref<string | null>(null);
 const studentPastoralCounts = window.Vue.ref<Record<string, StudentPastoralCountBadge[]>>({});
@@ -102,6 +113,10 @@ window.Vue.onMounted(() => {
     void getStudentPastoralCounts();
 });
 
+// #endregion
+
+// #region exclude/include participants
+
 /**
  * Excludes a participant.
  * @param participant - The participant to exclude.
@@ -127,6 +142,24 @@ async function excludeParticipant(participant: Participant): Promise<void> {
         }
         console.error("Error excluding participant:", error);
         toast.timeout({ text: "Error excluding student", isSuccess: false });
+    }
+}
+
+/**
+ * Excludes the selected participants.
+ * Clears the selection after the operation is complete.
+ * @param participants - The participants to exclude.
+ * @returns A promise that resolves when all exclusions are complete.
+ */
+async function excludeParticipants(participants: Participant[]): Promise<void> {
+    try {
+        await Promise.all(participants.map((participant) => excludeParticipant(participant)));
+        selectedList.value = [];
+    } catch (error) {
+        if (error instanceof Error && hasErrorMessage(error)) {
+            loadError.value = error.message;
+        }
+        console.error("Error excluding selected participants:", error);
     }
 }
 
@@ -161,24 +194,6 @@ async function includeParticipant(participant: Participant): Promise<void> {
 }
 
 /**
- * Excludes the selected participants.
- * Clears the selection after the operation is complete.
- * @param participants - The participants to exclude.
- * @returns A promise that resolves when all exclusions are complete.
- */
-async function excludeParticipants(participants: Participant[]): Promise<void> {
-    try {
-        await Promise.all(participants.map((participant) => excludeParticipant(participant)));
-        selectedList.value = [];
-    } catch (error) {
-        if (error instanceof Error && hasErrorMessage(error)) {
-            loadError.value = error.message;
-        }
-        console.error("Error excluding selected participants:", error);
-    }
-}
-
-/**
  * Includes the selected participants.
  * Clears the selection after the operation is complete.
  * @param participants - The participants to include.
@@ -188,23 +203,28 @@ async function includeParticipants(participants: Participant[]): Promise<void> {
     await Promise.all(participants.map((participant) => includeParticipant(participant)));
 }
 
-const isIncludeOpen = window.Vue.ref(false);
-const includeInExistingList = window.Vue.ref<Participant[]>([]);
-const selectedActivityId = window.Vue.ref<number | null>(null);
+// #endregion
+
+// #region include in existing customisation
+
+const isIncludeInExistingOpen = window.Vue.ref(false);
+const includeInExistingList = window.Vue.ref<Participant[]>([]); // array of participants to include in existing customisation
+const includeInExistingActivityId = window.Vue.ref<number | null>(null);
+const isSingleIncludeInExisting = window.Vue.ref(false); // whether the include is for a single participant (three-dot) or multiple (bottom drawer)
 
 /**
  * The current selected activity for inclusion.
  */
-const selectedActivity = window.Vue.computed<Plan | CustomisedPlan | null>(() => {
-    return props.customisations.find((plan) => plan.id === selectedActivityId.value) ?? null;
+const includeInExistingActivity = window.Vue.computed<Plan | CustomisedPlan | null>(() => {
+    return props.customisations.find((plan) => plan.id === includeInExistingActivityId.value) ?? null;
 });
 
 /**
  * Add all the selected participants to an existing customisation plan.
  */
 async function includeParticipantInExistingPlan(): Promise<void> {
-    if (selectedActivity.value === null) return;
-    const activity: Plan | CustomisedPlan = selectedActivity.value;
+    if (includeInExistingActivity.value === null) return;
+    const activity: Plan | CustomisedPlan = includeInExistingActivity.value;
     const toast = window.sbProps.toastActivate("Adding to customisation...");
     try {
         const response = await fetch(props.includeInExistingCustomisation, {
@@ -229,7 +249,7 @@ async function includeParticipantInExistingPlan(): Promise<void> {
             }
         });
         toast.timeout({ text: "Customisation added successfully", isSuccess: true });
-        isIncludeOpen.value = false;
+        isIncludeInExistingOpen.value = false;
         includeInExistingList.value = [];
         selectedList.value = [];
     } catch (error) {
@@ -246,14 +266,15 @@ async function includeParticipantInExistingPlan(): Promise<void> {
  * @param isSingle - Whether this is a single participant inclusion (from pop-out) or multiple (from bottom drawer).
  * @param participant - The participant to be included.
  */
-function openIncludeModal(isSingle: boolean, participant: Participant | null): void {
-    if (isSingle && participant !== null) {
+function openIncludeInExistingModal(isSingle: boolean, participant: Participant | null): void {
+    isSingleIncludeInExisting.value = isSingle;
+    if (isSingleIncludeInExisting && participant !== null) {
         includeInExistingList.value = [participant];
     } else {
         includeInExistingList.value = selectedList.value;
     }
-    selectedActivityId.value = null;
-    isIncludeOpen.value = true;
+    includeInExistingActivityId.value = null;
+    isIncludeInExistingOpen.value = true;
 }
 
 /**
@@ -291,39 +312,49 @@ function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string {
     return `${baseUrl}?${getReturnUrl()}`;
 }
 
-const isConfirmOpen = window.Vue.ref(false);
-const currentAction = window.Vue.ref<string>("");
-const currentParticipants = window.Vue.ref<Participant[]>([]);
+// #endregion
+
+// #region perform modification and check for interactions prior to action
+
+const isConfirmModifyOpen = window.Vue.ref(false);
+const currentModifyAction = window.Vue.ref<string>("");
+const modifyList = window.Vue.ref<Participant[]>([]);
+const isSingleModify = window.Vue.ref(false); // whether the current modification is for a single participant (three-dot) or multiple (bottom drawer)
 
 /**
- * Handles the modification of a selected participant.
- * If the participant has interactions, it opens a confirmation modal.
+ * Handles the modification of a selected participant(s).
+ * If the participant(s) has interactions, it opens a confirmation modal.
  * Otherwise, the appropriate action is taken directly.
  * @param participants - The participants to modify.
  * @param action - the action to perform (e.g., 'remove').
+ * @param $isSingleModify - whether this action is for a single participant or multiple
  */
-async function onActionSelected(participants: Participant[], action: string): Promise<void> {
-    currentParticipants.value = participants;
-    currentAction.value = action;
-    if (currentParticipants.value.some((participant) => participant.hasInteraction)) {
-        isConfirmOpen.value = true;
+async function onActionSelected(participants: Participant[], action: string, $isSingleModify: boolean): Promise<void> {
+    modifyList.value = participants;
+    currentModifyAction.value = action;
+    isSingleModify.value = $isSingleModify;
+    if (modifyList.value.some((participant) => participant.hasInteraction)) {
+        isConfirmModifyOpen.value = true;
         return;
     }
-    switch (currentAction.value) {
+    switch (currentModifyAction.value) {
         case "removeCustomisation":
-            await includeParticipants(currentParticipants.value);
+            await includeParticipants(modifyList.value);
             break;
         case "exclude":
-            await excludeParticipants(currentParticipants.value);
+            await excludeParticipants(modifyList.value);
             break;
         case "includeInExisting":
             await includeParticipantInExistingPlan();
             break;
         default:
             // redirect to the appropriate URL
-            window.location.href = currentAction.value;
+            window.location.href = currentModifyAction.value;
     }
-    selectedList.value = [];
+    if (!isSingleModify.value) {
+        // only clear the selection if this is a multi-selection action
+        selectedList.value = [];
+    }
 }
 
 /**
@@ -331,23 +362,28 @@ async function onActionSelected(participants: Participant[], action: string): Pr
  * then performs the action and closes the confirmation modal.
  */
 async function onConfirmSelected(): Promise<void> {
-    switch (currentAction.value) {
+    switch (currentModifyAction.value) {
         case "removeCustomisation":
-            await includeParticipants(currentParticipants.value);
+            await includeParticipants(modifyList.value);
             break;
         case "exclude":
-            await excludeParticipants(currentParticipants.value);
+            await excludeParticipants(modifyList.value);
             break;
         case "includeInExisting":
             await includeParticipantInExistingPlan();
             break;
         default:
             // redirect to the appropriate URL
-            window.location.href = currentAction.value;
+            window.location.href = currentModifyAction.value;
     }
-    isConfirmOpen.value = false;
-    selectedList.value = [];
+    isConfirmModifyOpen.value = false;
+    if (!isSingleModify.value) {
+        // only clear the selection if this is a multi-selection action
+        selectedList.value = [];
+    }
 }
+
+// #endregion
 </script>
 
 <template>
@@ -464,7 +500,9 @@ async function onConfirmSelected(): Promise<void> {
                                     <li>
                                         <button
                                             class="icon-close"
-                                            @click.prevent="onActionSelected([participant], 'removeCustomisation')"
+                                            @click.prevent="
+                                                onActionSelected([participant], 'removeCustomisation', true)
+                                            "
                                         >
                                             Remove Customisation
                                         </button>
@@ -479,6 +517,7 @@ async function onConfirmSelected(): Promise<void> {
                                                 onActionSelected(
                                                     [participant],
                                                     `${props.getLearningPlanNewUrl}?student=${participant.user.id}&${getReturnUrl()}`,
+                                                    true,
                                                 )
                                             "
                                         >
@@ -488,7 +527,7 @@ async function onConfirmSelected(): Promise<void> {
                                     <li>
                                         <button
                                             class="icon-staff-students"
-                                            @click.prevent="onActionSelected([participant], 'exclude')"
+                                            @click.prevent="onActionSelected([participant], 'exclude', true)"
                                         >
                                             Exclude
                                         </button>
@@ -497,7 +536,7 @@ async function onConfirmSelected(): Promise<void> {
                                         <button
                                             v-if="props.customisations.length > 0"
                                             class="icon-list"
-                                            @click.prevent="openIncludeModal(true, participant)"
+                                            @click.prevent="openIncludeInExistingModal(true, participant)"
                                         >
                                             Include in Existing Customisation
                                         </button>
@@ -510,6 +549,7 @@ async function onConfirmSelected(): Promise<void> {
                                                 onActionSelected(
                                                     [participant],
                                                     `${getAssessmentParticipationCopyActivity}?student=${participant.user.id}&original=${assessmentId}&${getReturnUrl()}`,
+                                                    true,
                                                 )
                                             "
                                         >
@@ -523,6 +563,7 @@ async function onConfirmSelected(): Promise<void> {
                                                 onActionSelected(
                                                     [participant],
                                                     `${getAssessmentParticipationNewActivity}?student=${participant.user.id}&original=${assessmentId}&${getReturnUrl()}`,
+                                                    true,
                                                 )
                                             "
                                         >
@@ -548,7 +589,7 @@ async function onConfirmSelected(): Promise<void> {
                     <button
                         class="icon-close submit"
                         data-test="custom-participation-remove-customisation"
-                        @click.prevent="onActionSelected(selectedList, 'removeCustomisation')"
+                        @click.prevent="onActionSelected(selectedList, 'removeCustomisation', false)"
                     >
                         Remove Customisation
                     </button>
@@ -561,6 +602,7 @@ async function onConfirmSelected(): Promise<void> {
                                 onActionSelected(
                                     selectedList,
                                     `${getLearningPlanNewUrl}?student=${selectedList.map((p) => p.user.id).join(',')}&${getReturnUrl()}`,
+                                    false,
                                 )
                             "
                         >
@@ -570,13 +612,13 @@ async function onConfirmSelected(): Promise<void> {
                     <div class="l-flex__item--1-auto">
                         <button
                             class="icon-staff-students submit"
-                            @click.prevent="onActionSelected(selectedList, 'exclude')"
+                            @click.prevent="onActionSelected(selectedList, 'exclude', false)"
                         >
                             Exclude
                         </button>
                     </div>
                     <div v-if="props.customisations.length > 0" class="l-flex__item--1-auto">
-                        <button class="icon-list submit" @click.prevent="openIncludeModal(false, null)">
+                        <button class="icon-list submit" @click.prevent="openIncludeInExistingModal(false, null)">
                             Include in Existing Customisation
                         </button>
                     </div>
@@ -588,6 +630,7 @@ async function onConfirmSelected(): Promise<void> {
                                 onActionSelected(
                                     selectedList,
                                     `${getAssessmentParticipationCopyActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${assessmentId}&${getReturnUrl()}`,
+                                    false,
                                 )
                             "
                         >
@@ -601,6 +644,7 @@ async function onConfirmSelected(): Promise<void> {
                                 onActionSelected(
                                     selectedList,
                                     `${getAssessmentParticipationNewActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${assessmentId}&${getReturnUrl()}`,
+                                    false,
                                 )
                             "
                         >
@@ -611,7 +655,7 @@ async function onConfirmSelected(): Promise<void> {
             </div>
         </bottom-drawer>
     </div>
-    <basic-modal v-model:is-open="isIncludeOpen">
+    <basic-modal v-model:is-open="isIncludeInExistingOpen">
         <div class="l-flex-col l-gap-m f-no-margins">
             <div class="l-flex-col l-gap-s f-no-margins">
                 <h2>Include in existing customisation</h2>
@@ -629,7 +673,7 @@ async function onConfirmSelected(): Promise<void> {
             </div>
             <div class="l-flex-col l-gap-s f-no-margins">
                 <label for="activitySelect">Customisation</label>
-                <select id="activitySelect" v-model="selectedActivityId" class="f-no-margins">
+                <select id="activitySelect" v-model="includeInExistingActivityId" class="f-no-margins">
                     <option value="null" disabled>Select customisation</option>
                     <option
                         v-for="customisation in props.customisations"
@@ -641,18 +685,20 @@ async function onConfirmSelected(): Promise<void> {
                 </select>
             </div>
             <div class="l-flex l-gap-xs f-no-margins">
-                <button class="button l-flex__item--1" @click.prevent="isIncludeOpen = false">Cancel</button>
+                <button class="button l-flex__item--1" @click.prevent="isIncludeInExistingOpen = false">Cancel</button>
                 <button
                     class="button submit l-flex__item--1"
-                    :disabled="!selectedActivity"
-                    @click.prevent="onActionSelected(selectedList, 'includeInExisting')"
+                    :disabled="!includeInExistingActivity"
+                    @click.prevent="
+                        onActionSelected(includeInExistingList, 'includeInExisting', isSingleIncludeInExisting)
+                    "
                 >
                     Confirm
                 </button>
             </div>
         </div>
     </basic-modal>
-    <basic-modal v-model:is-open="isConfirmOpen">
+    <basic-modal v-model:is-open="isConfirmModifyOpen">
         <div class="l-flex-col l-gap-m f-no-margins">
             <div class="l-flex-col l-gap-s f-no-margins">
                 <h2>Please confirm</h2>
@@ -664,7 +710,7 @@ async function onConfirmSelected(): Promise<void> {
             </div>
             <div class="l-flex l-gap-xs f-no-margins">
                 <button class="button submit l-flex__item--1" @click.prevent="onConfirmSelected">Yes</button>
-                <button class="button l-flex__item--1" @click.prevent="isConfirmOpen = false">Cancel</button>
+                <button class="button l-flex__item--1" @click.prevent="isConfirmModifyOpen = false">Cancel</button>
             </div>
         </div>
     </basic-modal>
