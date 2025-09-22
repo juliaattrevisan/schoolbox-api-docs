@@ -17,9 +17,9 @@ INSERT INTO `config` (
     `module`,
     `sequence`
 ) VALUES (
-    'scheduled_storage_cleanup_enabled',
+    'storage_cleanup_enabled',
     '0',
-    'Enable Scheduled Storage Cleanup',
+    'Enable Storage Cleanup',
     'If toggled to ‘ON’, the storage cleanup tool will run nightly, detecting and deleting unused uploaded files.  Otherwise, it will only be run by Schoolbox support on request.',
     @field,
     @type,

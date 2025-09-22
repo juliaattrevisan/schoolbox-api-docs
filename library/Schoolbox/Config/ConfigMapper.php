@@ -419,7 +419,7 @@ class ConfigMapper extends Mapper
 
 
     // Storage cleanup settings
-    public const NAME_SCHEDULED_STORAGE_CLEANUP_ENABLED = 'scheduled_storage_cleanup_enabled';
+    public const NAME_STORAGE_CLEANUP_ENABLED = 'storage_cleanup_enabled';
 
 
     // Debug settings
