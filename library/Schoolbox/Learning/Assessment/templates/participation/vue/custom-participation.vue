@@ -303,7 +303,7 @@ const currentParticipants = window.Vue.ref<Participant[]>([]);
 /**
  * Handles the modification of a selected participant.
  * If the participant has interactions, it opens a confirmation modal.
- * Otherwise, it redirects to the appropriate URL.
+ * Otherwise, the appropriate action is taken directly.
  * @param participants - The participants to modify.
  * @param action - the action to perform (e.g., 'remove').
  */
@@ -314,23 +314,21 @@ async function onActionSelected(participants: Participant[], action: string): Pr
         isConfirmOpen.value = true;
         return;
     }
-    if (currentAction.value === "removeCustomisation") {
-        await Promise.all(currentParticipants.value.map((participant) => includeParticipant(participant)));
-        isConfirmOpen.value = false;
-        return;
+    switch (currentAction.value) {
+        case "removeCustomisation":
+            await Promise.all(currentParticipants.value.map((participant) => includeParticipant(participant)));
+            break;
+        case "exclude":
+            await Promise.all(currentParticipants.value.map((participant) => excludeParticipant(participant)));
+            break;
+        case "includeInExisting":
+            await includeParticipantInExistingPlan();
+            break;
+        default:
+            // redirect to the appropriate URL
+            window.location.href = currentAction.value;
     }
-    if (currentAction.value === "exclude") {
-        await Promise.all(currentParticipants.value.map((participant) => excludeParticipant(participant)));
-        isConfirmOpen.value = false;
-        return;
-    }
-    if (currentAction.value === "includeInExisting") {
-        await includeParticipantInExistingPlan();
-        isConfirmOpen.value = false;
-        return;
-    }
-    // redirect to the appropriate URL
-    window.location.href = currentAction.value;
+    selectedList.value = [];
 }
 
 /**
@@ -338,23 +336,22 @@ async function onActionSelected(participants: Participant[], action: string): Pr
  * Redirects to the stored action URL.
  */
 async function onConfirmSelected(): Promise<void> {
-    if (currentAction.value === "removeCustomisation") {
-        await Promise.all(currentParticipants.value.map((participant) => includeParticipant(participant)));
-        isConfirmOpen.value = false;
-        return;
+    switch (currentAction.value) {
+        case "removeCustomisation":
+            await Promise.all(currentParticipants.value.map((participant) => includeParticipant(participant)));
+            break;
+        case "exclude":
+            await Promise.all(currentParticipants.value.map((participant) => excludeParticipant(participant)));
+            break;
+        case "includeInExisting":
+            await includeParticipantInExistingPlan();
+            break;
+        default:
+            // redirect to the appropriate URL
+            window.location.href = currentAction.value;
     }
-    if (currentAction.value === "exclude") {
-        await Promise.all(currentParticipants.value.map((participant) => excludeParticipant(participant)));
-        isConfirmOpen.value = false;
-        return;
-    }
-    if (currentAction.value === "includeInExisting") {
-        await includeParticipantInExistingPlan();
-        isConfirmOpen.value = false;
-        return;
-    }
-    // redirect to the appropriate URL
-    window.location.href = currentAction.value;
+    isConfirmOpen.value = false;
+    selectedList.value = [];
 }
 </script>
 
