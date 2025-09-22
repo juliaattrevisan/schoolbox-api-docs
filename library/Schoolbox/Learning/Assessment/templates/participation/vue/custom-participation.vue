@@ -292,6 +292,7 @@ function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string {
 }
 
 const isConfirmOpen = window.Vue.ref(false);
+const currentActionUrl = window.Vue.ref<string>("");
 
 /**
  * Handles the modification of a selected participant.
@@ -301,11 +302,12 @@ const isConfirmOpen = window.Vue.ref(false);
  * @param url - The base URL for modification.
  */
 function onActionSelected(participant: Participant, url: string): void {
+    currentActionUrl.value = url;
     if (participant.hasInteraction) {
         isConfirmOpen.value = true;
     } else {
         // redirect to the appropriate URL
-        window.location.href = url;
+        window.location.href = currentActionUrl.value;
     }
 }
 </script>
