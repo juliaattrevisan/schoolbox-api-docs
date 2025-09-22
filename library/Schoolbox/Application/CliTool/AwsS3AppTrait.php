@@ -38,16 +38,16 @@ trait AwsS3AppTrait
 
     private function buildS3Config(IConfigLoader $config, LoggerInterface $log): array
     {
-        $s3AccessKey          = trim($config->get('otfs_s3_cred_key') ?? "");
-        $s3SecretKey          = trim($config->get('otfs_s3_cred_secret') ?? "");
-        $s3Region             = trim($config->get('otfs_s3_region') ?? "");
-        $s3Version            = trim($config->get('otfs_s3_version') ?? "");
-        $s3Bucket             = trim($config->get('otfs_s3_bucket') ?? "");
-        $s3AltHost            = trim($config->get('otfs_s3_alt_host') ?? "");
-        $s3AltAccessKey       = trim($config->get('otfs_s3_alt_access_key') ?? "");
-        $s3AltSecretAccessKey = trim($config->get('otfs_s3_alt_secret_key') ?? "");
-        $s3AltBucket          = trim($config->get('otfs_s3_alt_bucket') ?? "");
-        $s3AltRegion          = trim($config->get('otfs_s3_alt_region') ?? "");
+        $s3AccessKey    = trim($config->get(ConfigMapper::NAME_OTFS_S3_CRED_KEY) ?? "");
+        $s3SecretKey    = trim($config->get(ConfigMapper::NAME_OTFS_S3_CRED_SECRET) ?? "");
+        $s3Region       = trim($config->get(ConfigMapper::NAME_OTFS_S3_REGION) ?? "");
+        $s3Version      = trim($config->get(ConfigMapper::NAME_OTFS_S3_VERSION) ?? "");
+        $s3Bucket       = trim($config->get(ConfigMapper::NAME_OTFS_S3_BUCKET) ?? "");
+        $s3AltHost      = trim($config->get(ConfigMapper::NAME_OTFS_S3_ALT_HOST) ?? "");
+        $s3AltAccessKey = trim($config->get(ConfigMapper::NAME_OTFS_S3_ALT_ACCESS_KEY) ?? "");
+        $s3AltSecretKey = trim($config->get(ConfigMapper::NAME_OTFS_S3_ALT_SECRET_KEY) ?? "");
+        $s3AltBucket    = trim($config->get(ConfigMapper::NAME_OTFS_S3_ALT_BUCKET) ?? "");
+        $s3AltRegion    = trim($config->get(ConfigMapper::NAME_OTFS_S3_ALT_REGION) ?? "");
 
         $log->debug(sprintf("OTFS Adapter: '%s'", $config->get(ConfigMapper::NAME_OTFS_ADAPTER)));
         $log->debug("S3 Access Key: '$s3AccessKey'");
@@ -76,7 +76,7 @@ trait AwsS3AppTrait
         if (!empty($s3AltHost)) {
             $cfg['endpoint'] = $s3AltHost;
             $cfg['credentials']['key'] = $s3AltAccessKey;
-            $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
+            $cfg['credentials']['secret'] = $s3AltSecretKey;
             $cfg['region'] = $s3AltRegion;
         }
 
