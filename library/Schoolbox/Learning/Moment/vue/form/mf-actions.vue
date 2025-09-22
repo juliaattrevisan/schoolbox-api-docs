@@ -27,33 +27,21 @@ const relevantRoutes = window.Vue.computed(() => {
 
     return {};
 });
-
-const isSaveSubmitPublishButtonDisabled = window.Vue.computed(
-    () => mfStore.isSaving || mfStore.showInvalidEvidenceError,
-);
 </script>
 
 <template>
     <ul class="flex-list buttons">
         <li v-if="relevantRoutes.draft">
-            <button :disabled="isSaveSubmitPublishButtonDisabled" @click="() => mfStore.submitForm(false, 'draft')">
-                Save for later
-            </button>
+            <button @click="() => mfStore.submitForm(false, 'draft')">Save for later</button>
         </li>
         <li v-if="relevantRoutes.reject">
             <button :disabled="mfStore.isSaving" @click="() => mfStore.reject()">Request update</button>
         </li>
         <li v-if="relevantRoutes.submit">
-            <button
-                :disabled="isSaveSubmitPublishButtonDisabled"
-                class="submit"
-                @click="() => mfStore.submitForm(false, 'submit')"
-            >
-                Submit for approval
-            </button>
+            <button class="submit" @click="() => mfStore.submitForm(false, 'submit')">Submit for approval</button>
         </li>
         <li v-if="relevantRoutes.publish">
-            <button :disabled="isSaveSubmitPublishButtonDisabled" class="submit" @click="() => mfStore.publish()">
+            <button class="submit" @click="() => mfStore.publish()">
                 {{ props.publishLabel }}
             </button>
         </li>
