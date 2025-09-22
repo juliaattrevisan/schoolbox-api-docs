@@ -286,9 +286,8 @@ function getCustomisationMeta(plan: Plan | CustomisedPlan): string {
  * @returns The modification URL with return URL parameter
  */
 function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string {
-    const baseUrl = customisedPlan.name !== null
-        ? customisedPlan._links.modify
-        : customisedPlan.assessable._links.modify;
+    const baseUrl =
+        customisedPlan.name !== null ? customisedPlan._links.modify : customisedPlan.assessable._links.modify;
     return `${baseUrl}?${getReturnUrl()}`;
 }
 </script>
@@ -373,9 +372,7 @@ function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string {
                     </td>
                     <td>
                         <template v-if="participant.customisedPlan !== null">
-                            <a
-                                :href="getCustomisedPlanUrl(participant.customisedPlan)"
-                            >
+                            <a :href="getCustomisedPlanUrl(participant.customisedPlan)">
                                 {{ participant.customisedPlan.name ?? participant.customisedPlan.assessable.title }}
                             </a>
                             <span class="meta">{{ getCustomisationMeta(participant.customisedPlan) }}</span>
