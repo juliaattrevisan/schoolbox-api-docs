@@ -86,10 +86,13 @@ class FilesystemFactory
     public function buildFallbackStorage(IConfigLoader $config): ?Filesystem
     {
         $adapter = $config->get(ConfigMapper::NAME_OTFS_ADAPTER);
-        return match ($adapter) {
-            self::FILE_SYSTEM_ADAPTER_AWS_S3 => $this->buildAwsS3FileSystem($config, self::PREFIX_STORAGE, true),
-            default                          => null,
-        };
+        if ($adapter === self::FILE_SYSTEM_ADAPTER_AWS_S3) {
+            $s3AltHost = trim($config->get(ConfigMapper::NAME_OTFS_S3_ALT_HOST) ?? "");
+            if (!empty($s3AltHost)) {
+                return $this->buildAwsS3FileSystem($config, self::PREFIX_STORAGE, true);
+            }
+        }
+        return null;
     }
 
     /**
