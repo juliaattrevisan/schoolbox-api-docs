@@ -75,7 +75,7 @@ window.Vue.onMounted((): void => {
     <div class="l-flex-col l-gap-m">
         <div class="l-flex-row l-flex--justify-space l-flex--align-end f-no-margins">
             <h1>{{ props.title }}</h1>
-            <nav v-if="selectedTab">
+            <nav v-if="selectedTab?._links.export">
                 <a
                     :href="`${selectedTab._links.export}?selected=${recordsOrPoints}`"
                     aria-label="Download Report as CSV"
