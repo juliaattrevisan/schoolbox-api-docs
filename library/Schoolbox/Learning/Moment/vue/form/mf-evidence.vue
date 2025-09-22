@@ -353,6 +353,10 @@ window.Vue.watch(
         </div>
     </div>
 
+    <label v-if="mfStore.showInvalidEvidenceError" class="error">
+        Please add evidence or write something before submitting the learning moment
+    </label>
+
     <div v-if="mfStore.moment !== null && mfStore.moment.evidence.length">
         <label> Attachments ({{ mfStore.moment.evidence.length }} out of {{ MOMENT_MAX_EVIDENCE }}) </label>
         <div class="l-grid l-grid--12 l-gap-m">
@@ -428,9 +432,6 @@ window.Vue.watch(
             v-model:body="mfStore.moment.body"
             :config="editorSettings"
         />
-        <label v-if="mfStore.showInvalidEvidenceError" class="error" for="mf-evidence-textarea">
-            Please add evidence or write something before submitting the learning moment
-        </label>
     </div>
 </template>
 
