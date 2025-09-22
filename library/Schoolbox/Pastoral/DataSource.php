@@ -920,4 +920,13 @@ class DataSource
         $this->mapper->getEventPropagator()->propagate($sessionUser, $verb, $object, $this->mapper, $diff);
         return true;
     }
+
+
+    /**
+     * @return Mapper
+     */
+    public function getPastoralMapper(): Mapper
+    {
+        return $this->mapper;
+    }
 }

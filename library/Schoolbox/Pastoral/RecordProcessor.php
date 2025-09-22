@@ -141,6 +141,15 @@ class RecordProcessor
         /* Somehow map array keys from $data into $record
          * Not sure if there was a convenient way other than relying on mapper's dynamic method calcs
          */
+        foreach ($data as $field => $value) {
+            if ($value) {
+                /* WHY WAS THERE NO PASTORAL MAPPER HERE
+                 */
+                $setMethod = $this->pastoralDataSource->getPastoralMapper()->getSetMethodName($field);
+
+                print_r($setMethod);
+            }
+        }
 
         /* Tag names, actions, roles, groups all addressed separately
          */
