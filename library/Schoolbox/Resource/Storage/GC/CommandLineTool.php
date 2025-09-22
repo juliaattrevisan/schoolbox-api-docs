@@ -112,19 +112,37 @@ class CommandLineTool extends CliTool\App
     {
         if ($this->getOpt(self::OPT_LONG_HELP) || $this->getOpt(self::OPT_SHORT_HELP)) {
             echo <<<HELP
-Usage: gc-storage.php [-p] [-vvv] [-n{limit}]
+NAME
+    gc-storage.php - cleans up unused files uploaded to Schoolbox storage
 
+SYNOPSIS
+    gc-storage.php [OPTION]...
+
+DESCRIPTION
+    This tool detects whether an uploaded file is still in use in any place within Schoolbox, and if it is not will
+    delete the file completely.
+
+    A file is determined to be in use if:
+    * it is directly referenced in any foreign key relation onto the `storage` table
+    * its hash value is indirectly referenced in a URL or HTML content in any table
+
+    The tool will delete:
+    * the file's reference in the `storage` table
+    * the file itself from local disk or cloud-based object storage
+    * any image transforms or audio/video transcodes for those deleted files
+
+OPTIONS
     -h, --help:              Print this help text and exit
-    -p:                      perform: *without* this flag, GC will only do a dry run
+    -p:                      perform: *without* this flag, this tool will only do a dry run, outputting what would be
+                             deleted
     -v[v[v]]:                verbosity: how much activity will be logged
     -n={limit}:              the maximum number of storage records to check.
                              Defaults to 1000: if <= 0, do not limit number of records.
     --max-time={max-time}:   process hashes in batches until the script has been running for this many seconds.
                              Defaults to no max time: if <= 0, do not limit the time the script runs for.
-    --batch={batch-size}:    process this many hashes per batch.
-                             Defaults to 10.
-    -t={threshold}:          threshold: do not attempt to garbage collect storage records last checked more recently
-                             than this date threshold, defaults to 2 months ago.
+    --batch={batch-size}:    process this many hashes per batch: defaults to 10.
+    -t={threshold}:          threshold: do not attempt to clean up storage records last checked more recently than this
+                             date threshold, defaults to 2 months ago.
                              If provided, must be supplied as one of:
                              * a "YYYY-MM-DD HH:MM:SS" date
                              * a timestamp
@@ -147,7 +165,7 @@ HELP;
             if ($this->getOpt(self::OPT_LONG_FORCE_RUN_IF_DISABLED)) {
                 $logger->notice(
                     sprintf(
-                        'Config option `%s` is off, but --%s flag is provided: running garbage collector',
+                        'Config option `%s` is off, but --%s flag is provided: running storage cleanup',
                         ConfigMapper::NAME_SCHEDULED_STORAGE_CLEANUP_ENABLED,
                         self::OPT_LONG_FORCE_RUN_IF_DISABLED,
                     ),
@@ -155,13 +173,13 @@ HELP;
             } else {
                 $logger->notice(
                     sprintf(
-                        'Config option `%s` is off: not running garbage collector.',
+                        'Config option `%s` is off: not running storage cleanup.',
                         ConfigMapper::NAME_SCHEDULED_STORAGE_CLEANUP_ENABLED,
                     ),
                 );
                 $logger->notice(
                     sprintf(
-                        'To run the garbage collector, run again with the --%s flag.',
+                        'To run the storage cleanup, run again with the --%s flag.',
                         self::OPT_LONG_FORCE_RUN_IF_DISABLED,
                     ),
                 );
@@ -200,10 +218,10 @@ HELP;
                     exit(CliKernelAbstract::EXIT_STATUS_OK);
                 }
             } else {
-                $logger->notice('Running in perform mode: this will permanently garbage collect files.');
+                $logger->notice('Running in perform mode: this will permanently delete files.');
             }
         } else {
-            $logger->notice('Running in dry-run mode: use -p flag to permanently garbage collect files.');
+            $logger->notice('Running in dry-run mode: use -p flag to permanently delete files.');
         }
 
         $batchSize = $this->getOptAsInt(self::OPT_LONG_BATCH_SIZE, self::DEFAULT_BATCH_SIZE);
