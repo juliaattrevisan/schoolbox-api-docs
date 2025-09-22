@@ -275,7 +275,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         }
 
         // create a dynamic plan on the assessment to get started
-        $assessment->getPlans()->add((new Plan($assessment))->setIsDynamic(true));
+        $assessment->getPlans()->add((new Plan($assessment))->setIsDynamic(\Schoolbox\Assessment\Participant\Plan\Mapper::PLAN_TYPE_DYNAMIC));
 
         $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment);
 
@@ -1182,7 +1182,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         /* Getting all existing customisations
          */
         $customisationPlans = $customisedAssessments->map(fn(IAssessable $customised) => call_user_func($planTranslator, $customised->getPlans()->first()));
-        $data['customisations'] = $customisationPlans->merge($assessment->getPlans()->filter(fn(Plan $plan) => !$plan->getIsDynamic())->map($planTranslator));
+        $data['customisations'] = $customisationPlans->merge($assessment->getPlans()->filter(fn(Plan $plan) => !$plan->isDynamic())->map($planTranslator));
         $data['editorTemplates'] = $this->editorTemplateHelper !== null
             ? $this->editorTemplateHelper->getTemplatesForCategory()
             : [];

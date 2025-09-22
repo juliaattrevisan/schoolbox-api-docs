@@ -16,7 +16,6 @@ interface Props {
     pastoralEnabled: boolean;
     getStudentsPastoralCountsUrl: string;
     getLearningPlanNewUrl: string;
-    getAssessmentParticipation: string;
     getAssessmentParticipationNewActivity: string;
     getAssessmentParticipationCopyActivity: string;
     assessmentId: number;
@@ -280,6 +279,17 @@ function getCustomisationMeta(plan: Plan | CustomisedPlan): string {
     }
     return `(Modified ${locale.activity?.singular()})`;
 }
+
+/**
+ * Gets the modification URL for a customised plan
+ * @param customisedPlan - The customised plan to get the URL for
+ * @returns The modification URL with return URL parameter
+ */
+function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string {
+    const baseUrl =
+        customisedPlan.name !== null ? customisedPlan._links.modify : customisedPlan.assessable._links.modify;
+    return `${baseUrl}?${getReturnUrl()}`;
+}
 </script>
 
 <template>
@@ -362,13 +372,13 @@ function getCustomisationMeta(plan: Plan | CustomisedPlan): string {
                     </td>
                     <td>
                         <template v-if="participant.customisedPlan !== null">
-                            <a :href="`${participant.customisedPlan.assessable._links.modify}?${getReturnUrl()}`">
-                                {{ participant.customisedPlan.assessable.title }}
+                            <a :href="getCustomisedPlanUrl(participant.customisedPlan)">
+                                {{ participant.customisedPlan.name ?? participant.customisedPlan.assessable.title }}
                             </a>
                             <span class="meta">{{ getCustomisationMeta(participant.customisedPlan) }}</span>
                         </template>
                         <template v-else-if="participant.plan.name !== null">
-                            <a :href="`${getAssessmentParticipation}/${participant.plan.id}/modify?${getReturnUrl()}`">
+                            <a :href="`${participant.plan._links.modify}?${getReturnUrl()}`">
                                 {{ participant.plan.name }}
                             </a>
                             <span class="meta">{{ getCustomisationMeta(participant.plan) }}</span>

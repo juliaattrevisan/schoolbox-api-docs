@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Task\Model as Task;
 use Schoolbox\Resource\Folder\Model as Folder;
+use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
 use Schoolbox\User;
 
 /**
@@ -215,15 +216,15 @@ class DehydratorTest extends TestCase
             ->setFirstname('Carl')
             ->setLastname('Carlson');
 
-        $taskPlan = $this->linker->createAndLinkPlan($task, true);
+        $taskPlan = $this->linker->createAndLinkPlan($task, PlanMapper::PLAN_TYPE_DYNAMIC);
         $this->linker->createAndLinkParticipant($userA, $taskPlan);
         $this->linker->createAndLinkParticipant($userB, $taskPlan);
 
-        $dueWorkPlan = $this->linker->createAndLinkPlan($dueWork, true);
+        $dueWorkPlan = $this->linker->createAndLinkPlan($dueWork, PlanMapper::PLAN_TYPE_DYNAMIC);
         $this->linker->createAndLinkParticipant($userA, $dueWorkPlan);
         $this->linker->createAndLinkParticipant($userC, $dueWorkPlan);
 
-        $quizPlan = $this->linker->createAndLinkPlan($quiz, true);
+        $quizPlan = $this->linker->createAndLinkPlan($quiz, PlanMapper::PLAN_TYPE_DYNAMIC);
         $this->linker->createAndLinkParticipant($userB, $quizPlan);
         $this->linker->createAndLinkParticipant($userC, $quizPlan);
 
@@ -265,7 +266,7 @@ class DehydratorTest extends TestCase
             ->setDueAt(new \Alaress_Date_Format('2018-01-03 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setCloseAt(new \Alaress_Date_Format('2018-01-04 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $dynamicPlan = $this->linker->createAndLinkPlan($dueWork, true)
+        $dynamicPlan = $this->linker->createAndLinkPlan($dueWork, PlanMapper::PLAN_TYPE_DYNAMIC)
                                     ->setName('Dynamic Plan');
         $participantA = $this->linker->createAndLinkParticipant(
             (new User())
@@ -285,7 +286,7 @@ class DehydratorTest extends TestCase
         );
         $participantB->setExcludedAt(\Alaress_Date_Format::now());
 
-        $customPlan = $this->linker->createAndLinkPlan($dueWork, false)
+        $customPlan = $this->linker->createAndLinkPlan($dueWork, PlanMapper::PLAN_TYPE_STATIC)
                                    ->setName('Custom Plan')
                                    ->setDescription('This is a custom description')
                                    ->setPublishDate(new \Alaress_Date_Format('2018-02-01 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
@@ -406,7 +407,7 @@ class DehydratorTest extends TestCase
             ->setDueAt(new \Alaress_Date_Format('2018-01-03 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setCloseAt(new \Alaress_Date_Format('2018-01-04 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $plan = $this->linker->createAndLinkPlan($dueWork, true)
+        $plan = $this->linker->createAndLinkPlan($dueWork, PlanMapper::PLAN_TYPE_DYNAMIC)
                              ->setName('Plan');
         $participantA = $this->linker->createAndLinkParticipant(
             (new User())
@@ -701,7 +702,7 @@ class DehydratorTest extends TestCase
             ->setDueAt(new \Alaress_Date_Format('2018-01-03 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT))
             ->setCloseAt(new \Alaress_Date_Format('2018-01-04 00:00:00', \Alaress_Date_Format::DATABASE_FORMAT));
 
-        $dynamicPlan = $this->linker->createAndLinkPlan($dueWork, true)
+        $dynamicPlan = $this->linker->createAndLinkPlan($dueWork, PlanMapper::PLAN_TYPE_DYNAMIC)
                                     ->setId(1)
                                     ->setName('Dynamic Plan');
         $this->linker->createAndLinkParticipant(
@@ -722,7 +723,7 @@ class DehydratorTest extends TestCase
         );
         $participantB->setExcludedAt(\Alaress_Date_Format::now());
 
-        $customPlan = $this->linker->createAndLinkPlan($dueWork, false)
+        $customPlan = $this->linker->createAndLinkPlan($dueWork, PlanMapper::PLAN_TYPE_STATIC)
                                    ->setId(2)
                                    ->setName('Custom Plan')
                                    ->setDescription('This is a custom description')

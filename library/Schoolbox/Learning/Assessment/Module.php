@@ -34,6 +34,10 @@ use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Filter;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
+use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
+use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
+use Schoolbox\Learning\Assessment\Lti\Model as LTI;
+use Schoolbox\Learning\Assessment\Quiz\Model as Quiz;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
 use Schoolbox\Learning\Assessment\Task\Response\MapperProxy as TaskResponseDataSource;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
@@ -195,6 +199,30 @@ class Module extends BaseModule
             )
         );
 
+        $canModifyLearningPlan = new Rule\All(
+        /* Should only be accessible if the custom participation config is enabled
+         */
+            new Rule\IsConfigOn(ConfigMapper::NAME_CUSTOM_ASSESSMENT_PARTICIPATION, $this->getConfig()),
+            new Rule\Callback(function (array $param): void {
+                /* No learning plan for project or lesson plan type assessments
+                 */
+                if (
+                    $param['assessment'] instanceof Project ||
+                    $param['assessment'] instanceof LessonPlan
+                ) {
+                    throw new Unauthorized(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+                }
+            }),
+            new Rule\Any(
+                $isSuper,
+                new Rule\All(
+                    $canWrite,
+                    new AssessmentNotDeleted(),
+                    new IsModifyUnLocked(new LockedChecker($this->getTermMapper())),
+                )
+            )
+        );
+
         $canCopyAssessmentCustomParticipation = new Rule\All(
             $canModifyCustomParticipation,
             new Rule\Callback(function (array $param): void {
@@ -204,8 +232,8 @@ class Module extends BaseModule
                  */
                 $assessmentType = AssessmentType::objectToString($param['assessment']);
                 if (
-                    AssessmentType::TYPE_LTI_ASSESSMENT === $assessmentType ||
-                    AssessmentType::TYPE_QUIZ === $assessmentType
+                    $param['assessment'] instanceof LTI ||
+                    $param['assessment'] instanceof Quiz
                 ) {
                     throw new Unauthorized(ErrorMapper::ERROR_PAGE_NOT_FOUND);
                 }
@@ -251,7 +279,7 @@ class Module extends BaseModule
         $this->register('GET', "$assRoute/participation", 'getAssessmentParticipationForm', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
         $this->register('GET', "$assRoute/participation/new", 'getAssessmentParticipationLearningPlan', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
         $this->register('POST', "$assRoute/participation/new", 'postCreateAssessmentParticipationLearningPlan', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
-        $this->register('GET', "$assRoute/participation/{planId:\d+}/modify", 'getUpdateAssessmentParticipationLearningPlan', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
+        $this->register('GET', "$assRoute/participation/{planId:\d+}/modify", 'getUpdateAssessmentParticipationLearningPlan', $canModifyLearningPlan, $preloadAssessmentForParticipant);
         $this->register('POST', "$assRoute/participation/{planId:\d+}/modify", 'postUpdateAssessmentParticipationLearningPlan', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
         $this->register('POST', "$assRoute/participation/customisation/include", 'postExistingCustomisationInclude', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
 

@@ -37,7 +37,7 @@ class Model implements ISoftDeletable
     private $assessment;
 
     /**
-     * @var bool
+     * @var int
      */
     private $isDynamic;
 
@@ -99,30 +99,39 @@ class Model implements ISoftDeletable
         return $this;
     }
 
+    /**
+     * Check if the plan is a custom participation plan
+     *
+     * @return bool
+     */
+    public function isCustomParticipation(): bool
+    {
+        return Mapper::PLAN_TYPE_CUSTOM_PARTICIPATION === $this->isDynamic;
+    }
 
     /**
      * @return bool
      */
     public function isDynamic(): bool
     {
-        return $this->isDynamic;
+        return Mapper::PLAN_TYPE_DYNAMIC === $this->isDynamic;
     }
 
 
     /**
-     * @return bool
+     * @return int
      */
-    public function getIsDynamic(): bool
+    public function getIsDynamic(): int
     {
         return $this->isDynamic;
     }
 
 
     /**
-     * @param bool $isDynamic
+     * @param int $isDynamic
      * @return $this
      */
-    public function setIsDynamic(bool $isDynamic): self
+    public function setIsDynamic(int $isDynamic): self
     {
         $this->isDynamic = $isDynamic;
         return $this;

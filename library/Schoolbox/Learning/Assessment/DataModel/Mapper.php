@@ -39,6 +39,7 @@ use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Folder;
 use Schoolbox\User;
 use UnderflowException;
+use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
 
 /**
  * Class Mapper
@@ -276,7 +277,8 @@ class Mapper extends BaseMapper
             $planMap->save(
                 $planMap->createModel()
                     ->setAssessment($assessment)
-                    ->setIsDynamic(true)
+                    ->setIsDynamic(null === $assessment->getOriginalAssessmentId() ?
+                                       PlanMapper::PLAN_TYPE_DYNAMIC : PlanMapper::PLAN_TYPE_CUSTOM_PARTICIPATION)
             );
         } catch (\Schoolbox\Mapper\Exception $e) {
             return false;

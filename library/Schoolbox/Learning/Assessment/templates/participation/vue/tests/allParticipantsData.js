@@ -33,6 +33,9 @@ export const allParticipants = [
         plan: {
             id: 745,
             name: "Edwin's Plan",
+            _links: {
+                modify: "/learning/assessments/38/participation/161/modify",
+            },
         },
         excludedAt: "2025-05-26T09:32:03+10:00",
         customisedPlan: null,
@@ -71,12 +74,9 @@ export const allParticipants = [
         excludedAt: "2025-05-26T09:32:03+10:00",
         customisedPlan: {
             id: 788,
-            assessable: {
-                id: 50,
-                title: "Final Assessment (Joffery)",
-                _links: {
-                    modify: "/learning/assessments/50/modify",
-                },
+            name: "Final Assessment (Joffery)",
+            _links: {
+                modify: "/learning/assessments/38/participation/161/modify",
             },
         },
     },

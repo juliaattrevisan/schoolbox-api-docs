@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\Participant;
 
+use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\Learning\Assessment\Project;
@@ -43,10 +44,10 @@ class Aggregator
     public function aggregate(Project $project): void
     {
         // Create a Project plan to hold the participants. It is dynamic if any subAssessment has a dynamic plan.
-        $isDynamic = false;
+        $isDynamic = PlanMapper::PLAN_TYPE_STATIC;
         foreach ($project->getAssessables() as $assessable) {
             if ($assessable->getDynamicPlan()) {
-                $isDynamic = true;
+                $isDynamic = PlanMapper::PLAN_TYPE_DYNAMIC;
                 break;
             }
         }

@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment;
 
+use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
@@ -37,7 +38,7 @@ class Plan
     private $assessable;
 
     /**
-     * @var bool
+     * @var int
      */
     private $isDynamic;
 
@@ -111,21 +112,38 @@ class Plan
         return $this;
     }
 
+    /**
+     * Check if the plan is a custom participation plan
+     *
+     * @return bool
+     */
+    public function isCustomParticipation(): bool
+    {
+        return PlanMapper::PLAN_TYPE_CUSTOM_PARTICIPATION === $this->isDynamic;
+    }
 
     /**
      * @return bool
      */
-    public function getIsDynamic(): bool
+    public function isDynamic(): bool
+    {
+        return PlanMapper::PLAN_TYPE_DYNAMIC === $this->isDynamic;
+    }
+
+    /**
+     * @return int
+     */
+    public function getIsDynamic(): int
     {
         return $this->isDynamic;
     }
 
 
     /**
-     * @param bool $isDynamic
+     * @param int $isDynamic
      * @return $this
      */
-    public function setIsDynamic(bool $isDynamic): self
+    public function setIsDynamic(int $isDynamic): self
     {
         $this->isDynamic = $isDynamic;
         return $this;
