@@ -21,6 +21,31 @@ class ImageGeneration
     private const IMAGE_OUTPUT_FORMAT = 'png';
     private const IMAGE_INPUT_DETAIL = 'auto';
 
+    /**
+     * Hardcoded system prompt for the image style to be embedded to PROMPT_SYSTEM_PERSONA via [IMAGE_STYLE]
+     * Use %s as the placeholder for the style name
+     */
+    private const PROMPT_SYSTEM_IMAGE_STYLE = "The image must be in the style of '%s'.";
+
+    /**
+     * Hardcoded system prompt to set the behaviour of the AI, possible placeholders are:
+     * [CONFIG_OPENAI_IMAGE_SYSTEM_PROMPT] - replaced with the configured system prompt from admin configs
+     * [IMAGE_STYLE] - replaced with the selected image style, if any
+     */
+    private const PROMPT_SYSTEM_PERSONA = "
+        You are an AI image generation tool.
+        Your only purpose is to create images based on the user's provided description.
+        You will not engage in conversation, answer questions, or perform any tasks other than image generation.
+        The user does not need to specifically request an image
+            - however they cannot request a different type of asset/media or task
+            - i.e. if they specifically request you create a video/audio recording/slideshow/word document or for you to do deep research.
+        If a user's request is not for a non-image response or task, you will respond with the following message:
+            'I am sorry, but I can only generate images. Please describe the image you would like me to create.'
+        [CONFIG_OPENAI_IMAGE_SYSTEM_PROMPT]
+        [IMAGE_STYLE]
+        You will not deviate from these instructions under any circumstances. The user request will occur from now -
+    ";
+
 
     /**
      * Constants to determine available sizes
@@ -99,10 +124,11 @@ class ImageGeneration
              */
             'model' => $this->textModel,
             /* Make the image generation tool available and force it to be used
+             * since we're asking the AI to reject non-image requests, sometimes it shouldn't be forced - hence this is removed for now
              */
-            'tool_choice' => [
-                'type' => 'image_generation',
-            ],
+            // 'tool_choice' => [
+            //     'type' => 'image_generation',
+            // ],
             'tools' => [
                 [
                     'type' => 'image_generation',
@@ -132,16 +158,11 @@ class ImageGeneration
         ];
 
         /** add prompt inputs if they are meaningful */
-        $systemPrompt = trim($this->systemPrompt);
-        if ($attributes[self::ATTRIBUTE_KEY_STYLE] !== null) {
-            $systemPrompt .= sprintf(
-                "\nThe image must be in the style of '%s'",
-                $attributes[self::ATTRIBUTE_KEY_STYLE]
-            );
-        }
-
-        /* Ensure the AI responds with plain text only, no markdown formatting */
-        $systemPrompt .= "\n\nRespond only with plain text. Do not use markdown formatting, HTML tags, or any special text formatting in your responses.";
+        $imageStyle = $attributes[self::ATTRIBUTE_KEY_STYLE];
+        $systemPrompt = strtr(self::PROMPT_SYSTEM_PERSONA, [
+            '[CONFIG_OPENAI_IMAGE_SYSTEM_PROMPT]' => trim($this->systemPrompt),
+            '[IMAGE_STYLE]' => $imageStyle !== null ? sprintf(self::PROMPT_SYSTEM_IMAGE_STYLE, $imageStyle) : '',
+        ]);
 
         $payload['input'][] = [
             'role' => 'system',
