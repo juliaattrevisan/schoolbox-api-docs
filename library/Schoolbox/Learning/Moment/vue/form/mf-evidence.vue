@@ -269,7 +269,6 @@ window.Vue.watch(
 
 /**
  * Watch for changes to the moment body.
- * If the moment body is empty and no evidence is attached, show the invalid evidence error.
  */
 window.Vue.watch(
     () => mfStore.moment?.body,
