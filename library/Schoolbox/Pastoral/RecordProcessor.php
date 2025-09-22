@@ -81,6 +81,21 @@ class RecordProcessor
     ) {
     }
 
+
+    /**
+     * Overwrites $record's props with whatever ones existed in $partial, an array of key-value tuples
+     * that partially represent a pastoral record.
+     *
+     * @param array $partial
+     * @param Model $record
+     * @return void
+     */
+    public function processPartialPastoralRecords(array $partial, PastoralModel $record): void
+    {
+
+    }
+
+
     /**
      * Create and/or update student records, based on the content of a form.
      *

@@ -771,7 +771,7 @@ class Controller extends Base
          * you could directly access: recordProcessors aren't interchangeable and there's only one
          * of them that has ever existed afaict.
          */
-//        $this->recordProcessor->processPartialPastoralRecords($partial, $record);
+        $this->recordProcessor->processPartialPastoralRecords($partial, $record);
 
         /* TODO Return something to api users...but what...?
          */
