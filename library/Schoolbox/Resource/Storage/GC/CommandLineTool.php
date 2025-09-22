@@ -11,6 +11,7 @@ namespace Schoolbox\Resource\Storage\GC;
 
 use Schoolbox\Application\CliKernelAbstract;
 use Schoolbox\Application\CliTool;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
@@ -73,6 +74,12 @@ class CommandLineTool extends CliTool\App
     private const OPT_LONG_FORCE_RUN_ON_STAGING = 'force-run-on-staging';
 
     /**
+     * --force-run-if-disabled: unless this flag is provided, do not allow this
+     * tool to run if config option `scheduled_storage_cleanup_enabled` is off.
+     */
+    private const OPT_LONG_FORCE_RUN_IF_DISABLED = 'force-run-if-disabled';
+
+    /**
      * @inheritdoc
      */
     public function getShortOpts(): array
@@ -94,6 +101,7 @@ class CommandLineTool extends CliTool\App
             self::OPT_LONG_BATCH_SIZE,
             self::OPT_LONG_MAX_TIME,
             self::OPT_LONG_FORCE_RUN_ON_STAGING,
+            self::OPT_LONG_FORCE_RUN_IF_DISABLED,
         ];
     }
 
@@ -106,31 +114,61 @@ class CommandLineTool extends CliTool\App
             echo <<<HELP
 Usage: gc-storage.php [-p] [-vvv] [-n{limit}]
 
-    -h, --help:             Print this help text and exit
-    -p:                     perform: *without* this flag, GC will only do a dry run
-    -v[v[v]]:               verbosity: how much activity will be logged
-    -n={limit}:             the maximum number of storage records to check.
-                            Defaults to 1000: if <= 0, do not limit number of records.
-    --max-time={max-time}:  process hashes in batches until the script has been running for this many seconds.
-                            Defaults to no max time: if <= 0, do not limit the time the script runs for.
-    --batch={batch-size}:   process this many hashes per batch.
-                            Defaults to 10.
-    -t={threshold}:         threshold: do not attempt to garbage collect storage records last checked more recently than
-                            this date threshold, defaults to 2 months ago.
-                            If provided, must be supplied as one of:
-                            * a "YYYY-MM-DD HH:MM:SS" date
-                            * a timestamp
-                            * a relative date value understandable by `strtotime`
-    --force-run-on-staging: unless this flag is provided, this tool will not run on a staging instance.
-                            Since staging and production instances will likely share file storage, deleting a file from
-                            staging will delete it from production as well.
-                            If this flag is provided, the run must be further confirmed by answering a prompt.
+    -h, --help:              Print this help text and exit
+    -p:                      perform: *without* this flag, GC will only do a dry run
+    -v[v[v]]:                verbosity: how much activity will be logged
+    -n={limit}:              the maximum number of storage records to check.
+                             Defaults to 1000: if <= 0, do not limit number of records.
+    --max-time={max-time}:   process hashes in batches until the script has been running for this many seconds.
+                             Defaults to no max time: if <= 0, do not limit the time the script runs for.
+    --batch={batch-size}:    process this many hashes per batch.
+                             Defaults to 10.
+    -t={threshold}:          threshold: do not attempt to garbage collect storage records last checked more recently
+                             than this date threshold, defaults to 2 months ago.
+                             If provided, must be supplied as one of:
+                             * a "YYYY-MM-DD HH:MM:SS" date
+                             * a timestamp
+                             * a relative date value understandable by `strtotime`
+    --force-run-if-disabled: unless this flag is provided, this tool will not run if config option
+                             `scheduled_storage_cleanup_enabled` (Enable Scheduled Storage Cleanup) is off.
+    --force-run-on-staging:  unless this flag is provided, this tool will not run on a staging instance.
+                             Since staging and production instances will likely share file storage, deleting a file from
+                             staging will delete it from production as well.
+                             If this flag is provided, the run must be further confirmed by answering a prompt.
 
 HELP;
             exit;
         }
 
         $logger = $this->getLogger();
+
+        // Keep running or exit, depending on whether it's enabled in config.
+        if (!$this->getConfig()->get(ConfigMapper::NAME_SCHEDULED_STORAGE_CLEANUP_ENABLED)) {
+            if ($this->getOpt(self::OPT_LONG_FORCE_RUN_IF_DISABLED)) {
+                $logger->notice(
+                    sprintf(
+                        'Config option `%s` is off, but --%s flag is provided: running garbage collector',
+                        ConfigMapper::NAME_SCHEDULED_STORAGE_CLEANUP_ENABLED,
+                        self::OPT_LONG_FORCE_RUN_IF_DISABLED,
+                    ),
+                );
+            } else {
+                $logger->notice(
+                    sprintf(
+                        'Config option `%s` is off: not running garbage collector.',
+                        ConfigMapper::NAME_SCHEDULED_STORAGE_CLEANUP_ENABLED,
+                    ),
+                );
+                $logger->notice(
+                    sprintf(
+                        'To run the garbage collector, run again with the --%s flag.',
+                        self::OPT_LONG_FORCE_RUN_IF_DISABLED,
+                    ),
+                );
+                exit(CliKernelAbstract::EXIT_STATUS_OK);
+            }
+        }
+
         $mapper = StorageMapper::getInstance();
         if ($this->perform()) {
             /** @var Instance $instance */
