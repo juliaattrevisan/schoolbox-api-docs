@@ -293,22 +293,28 @@ function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string {
 
 const isConfirmOpen = window.Vue.ref(false);
 const currentAction = window.Vue.ref<string>("");
+const currentParticipant = window.Vue.ref<Participant | null>(null);
 
 /**
  * Handles the modification of a selected participant.
  * If the participant has interactions, it opens a confirmation modal.
  * Otherwise, it redirects to the appropriate URL.
  * @param participant - The participant to modify.
- * @param url - The base URL for modification.
+ * @param action - the action to perform (e.g., 'remove').
  */
-function onActionSelected(participant: Participant, url: string): void {
-    currentAction.value = url;
+function onActionSelected(participant: Participant, action: string): void {
+    currentParticipant.value = participant;
+    currentAction.value = action;
     if (participant.hasInteraction) {
         isConfirmOpen.value = true;
-    } else {
-        // redirect to the appropriate URL
-        window.location.href = currentAction.value;
+        return;
     }
+    if (action === "removeCustomisation") {
+        void includeParticipant(participant);
+        return;
+    }
+    // redirect to the appropriate URL
+    window.location.href = currentAction.value;
 }
 
 /**
@@ -316,6 +322,14 @@ function onActionSelected(participant: Participant, url: string): void {
  * Redirects to the stored action URL.
  */
 function onConfirmSelected(): void {
+    if (currentAction.value === "removeCustomisation") {
+        selectedList.value =
+            selectedList.value.length > 0 ? selectedList.value : [currentParticipant.value as Participant];
+        void includeSelected();
+        isConfirmOpen.value = false;
+        currentParticipant.value = null;
+        return;
+    }
     window.location.href = currentAction.value;
 }
 </script>
@@ -432,7 +446,10 @@ function onConfirmSelected(): void {
                                 >
                                     <li class="separator">Manage</li>
                                     <li>
-                                        <button class="icon-close" @click.prevent="includeParticipant(participant)">
+                                        <button
+                                            class="icon-close"
+                                            @click.prevent="onActionSelected(participant, 'removeCustomisation')"
+                                        >
                                             Remove Customisation
                                         </button>
                                     </li>
