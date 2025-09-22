@@ -50,29 +50,29 @@ class RecordProcessor
      * (a whitelist)
      */
     private const PARTIAL_ALLOWED_FIELDS = [
-        'heading', // Title
-        'typeId',
-        'subtypeId',
-        'severityId',
-        'points',
-        'actions',
+        'heading' => true, // Title
+        'typeId' => true,
+        'subtypeId' => true,
+        'severityId' => true,
+        'points' => true,
+        'actions' => true,
         /* Dates
          */
-        'expiresAt',
-        'occurredOn',
+        'expiresAt' => true,
+        'occurredOn' => true,
         /* Confidential text
          */
-        'body_private',
+        'body_private' => true,
         /* General text
          */
-        'body_public',
+        'body_public' => true,
         /* Why would you ever want to use `tags` vs `tagNames`? The latter is way more convenient
          */
-        'tagNames',
+        'tagNames' => true,
         /* Role + Group = Access (Record Visibility)
          */
-        'role',
-        'group',
+        'role' => true,
+        'group' => true,
     ];
 
 
@@ -123,7 +123,11 @@ class RecordProcessor
      */
     public function processPartialPastoralRecords(array $partial, PastoralModel $record): void
     {
-        print_r($record);
+        /* Whitelist possible values to update
+         */
+        $data = array_intersect_key(self::PARTIAL_ALLOWED_FIELDS, $partial);
+
+        print_r($data);
     }
 
 
