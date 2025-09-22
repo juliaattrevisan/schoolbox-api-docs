@@ -84,8 +84,8 @@ window.Vue.onMounted((): void => {
                 >
                     <sbx-icon name="download" />
                 </a>
-<!--             <a href="#" class="icon-print" title="Print Report Results" @click.prevent="onPrintSelected"></a> -->
-             </nav>
+                <!--             <a href="#" class="icon-print" title="Print Report Results" @click.prevent="onPrintSelected"></a> -->
+            </nav>
         </div>
         <div>
             <dl v-if="props.tabs.length > 1" class="tabs">
