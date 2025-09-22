@@ -718,6 +718,7 @@ class Controller extends Base
         );
     }
 
+
     /**
      * Create/update student records
      *
@@ -733,6 +734,50 @@ class Controller extends Base
     {
         return $this->recordProcessor->processPastoralRecords($this->getUser(), $primaryStudentId, $post, $duplicateStudentIds, $parent);
     }
+
+
+    /**
+     * Update an existing pastoral record with a partial set of its fields.
+     *
+     * This subset of fields is specifically less than what the pastoral record contains:
+     * notably, attachments is disregarded and any linked pastoral records remain unchanged
+     * (and unchangeable) via this method.
+     *
+     * This is a somewhat-unique take on processPastoralRecords()
+     *
+     * @return void
+     * @throws Exception
+     */
+    public function patchRecordUpdate(): void
+    {
+        /* In admin, if pastoral synchronisation was turned on,
+         * but the currently-logged-in-user doesn't have a meaningful external id,
+         * die loudly as the external id is mandatory for synchronisation somehow
+         */
+        $this->assertSyncability();
+
+        /* A partial set of fields
+         */
+        $post = $this->requestPost;
+
+        // Grab the pastoral record we are updating
+
+        try {
+            $record = $this->pastoralDataSource->findById($this->getUser(), $post->get('id'));
+        } catch (MapperException $e) {
+            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
+        }
+
+        /* Not entirely sure why there's a processPastoralRecords() wrapper around one method that
+         * you could directly access: recordProcessors aren't interchangeable and there's only one
+         * of them that has ever existed afaict.
+         */
+        $this->recordProcessor->processPartialPastoralRecords($post, $record);
+
+        /* TODO Return something to api users...but what...?
+         */
+    }
+
 
     /**
      * Delete a pastoral care record
