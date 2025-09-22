@@ -553,12 +553,17 @@ async function onConfirmSelected(): Promise<void> {
                 </template>
                 <template v-else>
                     <div class="l-flex__item--1-auto">
-                        <a
+                        <button
                             class="icon-modify submit"
-                            :href="`${getLearningPlanNewUrl}?student=${selectedList.map((p) => p.user.id).join(',')}&${getReturnUrl()}`"
+                            @click.prevent="
+                                onActionSelected(
+                                    selectedList,
+                                    `${getLearningPlanNewUrl}?student=${selectedList.map((p) => p.user.id).join(',')}&${getReturnUrl()}`,
+                                )
+                            "
                         >
                             Modify
-                        </a>
+                        </button>
                     </div>
                     <div class="l-flex__item--1-auto">
                         <button class="icon-staff-students submit" @click.prevent="excludeSelected">Exclude</button>
@@ -569,21 +574,31 @@ async function onConfirmSelected(): Promise<void> {
                         </button>
                     </div>
                     <div v-if="getAssessmentParticipationCopyActivity" class="l-flex__item--1-auto">
-                        <a
+                        <button
                             class="icon-copy submit"
                             data-test="custom-participation-copy-activity"
-                            :href="`${getAssessmentParticipationCopyActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${assessmentId}&${getReturnUrl()}`"
+                            @click.prevent="
+                                onActionSelected(
+                                    selectedList,
+                                    `${getAssessmentParticipationCopyActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${assessmentId}&${getReturnUrl()}`,
+                                )
+                            "
                         >
                             Copy Activity
-                        </a>
+                        </button>
                     </div>
                     <div class="l-flex__item--1-auto">
-                        <a
+                        <button
                             class="icon-submissions submit"
-                            :href="`${getAssessmentParticipationNewActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${assessmentId}&${getReturnUrl()}`"
+                            @click.prevent="
+                                onActionSelected(
+                                    selectedList,
+                                    `${getAssessmentParticipationNewActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${assessmentId}&${getReturnUrl()}`,
+                                )
+                            "
                         >
                             New Activity
-                        </a>
+                        </button>
                     </div>
                 </template>
             </div>
