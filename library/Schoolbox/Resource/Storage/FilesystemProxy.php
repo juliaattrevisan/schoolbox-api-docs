@@ -304,7 +304,7 @@ class FilesystemProxy
         $this->filesystem->deleteDirectory($dirname);
 
         // Also delete from the fallback filesystem, if it's there
-        $this->fallbackFilesystem?->delete($dirname);
+        $this->fallbackFilesystem?->deleteDirectory($dirname);
 
         // Do not delete storage record here
     }
