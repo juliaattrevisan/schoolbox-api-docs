@@ -21,5 +21,5 @@ VALUES (
    (SELECT id FROM msg_namespace WHERE slug = 'moment' LIMIT 1),
    'submitted',
    'staff',
-   'someone posted a learning moment that requires approval'
+   'someone you teach posts a learning moment that requires approval'
 );
