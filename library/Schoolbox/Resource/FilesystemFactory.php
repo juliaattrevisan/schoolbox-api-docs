@@ -176,11 +176,15 @@ class FilesystemFactory
                 GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => self::getConnectTimeout(),
             ],
         ];
+        $bucket = $s3Bucket;
         if (!$ignoreAltHost && !empty($s3AltHost)) {
             $cfg['endpoint']              = $s3AltHost;
             $cfg['credentials']['key']    = $s3AltAccessKey;
             $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
             $cfg['region']                = $s3AltRegion;
+            if (!empty($s3AltBucket)) {
+                $bucket = $s3AltBucket;
+            }
         }
 
         // Add chaos middleware for testing if enabled
@@ -200,7 +204,6 @@ class FilesystemFactory
         ResumableStreamWrapper::register($client, $protocol);
 
         $visibility = self::buildDefaultVisibility(self::FILE_SYSTEM_ADAPTER_AWS_S3);
-        $bucket     = !empty($s3AltHost) && !empty($s3AltBucket) ? $s3AltBucket : $s3Bucket;
         return new Filesystem(
             new Adapter(
                 new AwsS3Adapter($client, $bucket, $prefix),
