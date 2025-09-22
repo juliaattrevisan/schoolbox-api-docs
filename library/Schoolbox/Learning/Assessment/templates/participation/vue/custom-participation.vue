@@ -53,6 +53,11 @@ const hasCustomisedInSelection = window.Vue.computed(() => {
     );
 });
 
+// Function to check if any selected participants has interactions
+const hasInteractionInSelection = window.Vue.computed(() => {
+    return selectedList.value.some((participant) => participant.hasInteraction);
+});
+
 const loadError = window.Vue.ref<string | null>(null);
 const studentPastoralCounts = window.Vue.ref<Record<string, StudentPastoralCountBadge[]>>({});
 
