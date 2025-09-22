@@ -32,7 +32,6 @@ use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTagsModel;
 use Schoolbox\Pastoral\Translator\VisibilityTranslator;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
-use Schoolbox\Pastoral\Type\TypeAbstract;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\TokenReplacer;
@@ -60,10 +59,12 @@ class RecordProcessor
          * or if they're dealt with separately (false)
          */
         'heading' => true,
-        'typeId' => true,
-        'subtypeId' => true,
-        'severityId' => true,
         'points' => true,
+        /* Related objects need instances, not scalars, to map successfully to an instance
+         */
+        'typeId' => false,
+        'subtypeId' => false,
+        'severityId' => false,
         /* Dates
          */
         'expiresAt' => true,
@@ -136,18 +137,25 @@ class RecordProcessor
     {
         /* Whitelist possible values to update
          */
-        $data = array_intersect_key(self::PARTIAL_ALLOWED_FIELDS, $partial);
+        $data = array_intersect_key($partial, array_flip(array_keys(self::PARTIAL_ALLOWED_FIELDS)));
 
         /* Somehow map array keys from $data into $record
          * Not sure if there was a convenient way other than relying on mapper's dynamic method calcs
          */
+        var_dump($partial);
+        var_dump($data);
         foreach ($data as $field => $value) {
-            if ($value) {
+            if (self::PARTIAL_ALLOWED_FIELDS[$field]) {
                 /* WHY WAS THERE NO PASTORAL MAPPER HERE
                  */
                 $setMethod = $this->pastoralDataSource->getPastoralMapper()->getSetMethodName($field);
 
-                print_r($setMethod);
+                /* Directly update a prop if it existed in the whitelist and the partial data set
+                 */
+                var_dump($setMethod);
+                var_dump($value);
+
+                $record->$setMethod($value);
             }
         }
 
@@ -155,6 +163,8 @@ class RecordProcessor
          */
 
         print_r($data);
+
+        print_r($record);
     }
 
 
