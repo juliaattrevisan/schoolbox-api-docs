@@ -561,8 +561,11 @@ const isConfirmOpen = window.Vue.ref(false);
         <div class="l-flex-col l-gap-m f-no-margins">
             <div class="l-flex-col l-gap-s f-no-margins">
                 <h2>Please confirm</h2>
-                <p>The student has submissions and/or feedback for this assessment.</p>
-                <p>Exclusion from this assessment will remove access to these submissions and/or feedback. Proceed?</p>
+                <p>The student has submissions and/or feedback for this {{ locale.assessment.singular }}.</p>
+                <p>
+                    Exclusion from this {{ locale.assessment.singular }} will remove access to these submissions and/or
+                    feedback. Proceed?
+                </p>
             </div>
             <div class="l-flex l-gap-xs f-no-margins">
                 <button class="button submit l-flex__item--1">Yes</button>
