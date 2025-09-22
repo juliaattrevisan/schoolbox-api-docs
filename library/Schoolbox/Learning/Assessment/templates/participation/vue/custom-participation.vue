@@ -290,6 +290,8 @@ function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string {
         customisedPlan.name !== null ? customisedPlan._links.modify : customisedPlan.assessable._links.modify;
     return `${baseUrl}?${getReturnUrl()}`;
 }
+
+const isConfirmOpen = window.Vue.ref(false);
 </script>
 
 <template>
@@ -552,6 +554,19 @@ function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string {
                 >
                     Confirm
                 </button>
+            </div>
+        </div>
+    </basic-modal>
+    <basic-modal v-model:is-open="isConfirmOpen">
+        <div class="l-flex-col l-gap-m f-no-margins">
+            <div class="l-flex-col l-gap-s f-no-margins">
+                <h2>Please confirm</h2>
+                <p>The student has submissions and/or feedback for this assessment.</p>
+                <p>Exclusion from this assessment will remove access to these submissions and/or feedback. Proceed?</p>
+            </div>
+            <div class="l-flex l-gap-xs f-no-margins">
+                <button class="button submit l-flex__item--1">Yes</button>
+                <button class="button l-flex__item--1" @click.prevent="isConfirmOpen = false">Cancel</button>
             </div>
         </div>
     </basic-modal>
