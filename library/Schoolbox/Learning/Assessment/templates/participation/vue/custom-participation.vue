@@ -119,6 +119,7 @@ async function excludeParticipant(participant: Participant): Promise<void> {
             throw new Error(errorMessage);
         }
         participant.excludedAt = new Date().toISOString(); // Assigning a timestamp as a string
+        participant.hasInteraction = false;
         toast.timeout({ text: "Student excluded successfully" });
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
@@ -148,6 +149,7 @@ async function includeParticipant(participant: Participant): Promise<void> {
         participant.excludedAt = null; // Resetting the exclusion timestamp
         participant.plan.name = null; // Resetting the plan
         participant.customisedPlan = null; // Resetting the customised plan
+        participant.hasInteraction = false;
         toast.timeout({ text: "Customisation removed successfully" });
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
@@ -187,7 +189,7 @@ async function includeParticipants(participants: Participant[]): Promise<void> {
 }
 
 const isIncludeOpen = window.Vue.ref(false);
-const selectedParticipants = window.Vue.ref<Participant[]>([]);
+const includeInExistingList = window.Vue.ref<Participant[]>([]);
 const selectedActivityId = window.Vue.ref<number | null>(null);
 
 /**
@@ -205,8 +207,8 @@ async function includeParticipantInExistingPlan(): Promise<void> {
     const activity: Plan | CustomisedPlan = selectedActivity.value;
     // if the array is empty, it means that we are including participants via the bottom drawer,
     // otherwise the single participant is being included via the pop-out menu
-    if (selectedParticipants.value.length === 0) {
-        selectedParticipants.value = selectedList.value;
+    if (includeInExistingList.value.length === 0) {
+        includeInExistingList.value = selectedList.value;
     }
     const toast = window.sbProps.toastActivate("Adding to customisation...");
     try {
@@ -214,7 +216,7 @@ async function includeParticipantInExistingPlan(): Promise<void> {
             method: "POST",
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             body: JSON.stringify({
-                students: selectedParticipants.value.map((p) => p.user.id),
+                students: includeInExistingList.value.map((p) => p.user.id),
                 ...("assessable" in activity ? { assessmentId: activity.assessable.id } : {}),
                 ...(activity.name !== null ? { planId: activity.id } : {}),
             }),
@@ -224,7 +226,7 @@ async function includeParticipantInExistingPlan(): Promise<void> {
             throw new Error(errorMessage);
         }
         // add the activity to each participant
-        selectedParticipants.value.forEach((participant) => {
+        includeInExistingList.value.forEach((participant) => {
             if ("assessable" in activity) {
                 participant.customisedPlan = { ...activity };
             } else {
@@ -233,7 +235,7 @@ async function includeParticipantInExistingPlan(): Promise<void> {
         });
         toast.timeout({ text: "Customisation added successfully", isSuccess: true });
         isIncludeOpen.value = false;
-        selectedParticipants.value = [];
+        includeInExistingList.value = [];
         selectedList.value = [];
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
@@ -249,7 +251,7 @@ async function includeParticipantInExistingPlan(): Promise<void> {
  * @param participant - The participant to be included.
  */
 function openIncludeModal(participant: Participant): void {
-    selectedParticipants.value = [participant];
+    includeInExistingList.value = [participant];
     selectedActivityId.value = null;
     if (!selectedList.value.includes(participant)) {
         selectedList.value = [participant];
@@ -328,8 +330,8 @@ async function onActionSelected(participants: Participant[], action: string): Pr
 }
 
 /**
- * Confirms the action for participants with interactions.
- * Performs the action and closes the confirmation modal.
+ * Confirms the action for participants with interactions,
+ * then performs the action and closes the confirmation modal.
  */
 async function onConfirmSelected(): Promise<void> {
     switch (currentAction.value) {
