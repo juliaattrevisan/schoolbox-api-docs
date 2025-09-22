@@ -381,10 +381,10 @@ class Notifier extends AbstractModuleNotifier
      *
      * @param Model $moment
      * @param User $effector
-     * @param array $diff
+     * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStaffSubmitted(Moment $moment, User $effector, array $diff = []): Envelope
+    public function notifyStaffSubmitted(Moment $moment, User $effector, ?array $diff = []): Envelope
     {
         return $this->notifySubmitted(Role::STAFF, $moment, $effector, $diff);
     }
