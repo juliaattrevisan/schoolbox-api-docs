@@ -131,6 +131,54 @@ class ApiUserCest
             ],
             'valid'  => true,
         ];
+        yield [
+            'filter' => [
+                // Year/role/campus in 'id' format.
+                'year' => [
+                    'id' => 4 // Year '9' from db table `lu_year_level`.
+                ],
+                'role' => [
+                    'id' => '6' // Role 'Middle Student' from db table `groups` (supply one as a string - it should be treated the same as an integer).
+                ],
+                'campus' => [
+                    'id' => 1 // Campus 'Secondary' from db table `luCampus`.
+                ],
+            ],
+            'valid' => true,
+        ];
+        yield [
+            'filter' => [
+                // Year/role/campus in 'name' format.
+                'year' => [
+                    'name' => '9' // From db table `lu_year_level`.
+                ],
+                'role' => [
+                    'name' => 'Middle Student' // From db table `groups`.
+                ],
+                'campus' => [
+                    'name' => 'Secondary' // From db table `luCampus`.
+                ],
+            ],
+            'valid' => true,
+        ];
+        yield [
+            'filter' => [
+                // Year/role/campus in mixed array format.
+                'year' => [
+                    ['id' => '1'], // Year '3' from db table `lu_year_level`.
+                    ['name' => '9'], // From db table `lu_year_level`.
+                ],
+                'role' => [
+                    ['id' => 5], // Role 'Junior Student' from db table `groups`.
+                    ['name' => 'Middle Student'], // From db table `groups`.
+                ],
+                'campus' => [
+                    ['id' => 2], // Campus 'Primary' from db table `luCampus`.
+                    ['name' => 'Secondary'], // From db table `luCampus`.
+                ],
+            ],
+            'valid' => true,
+        ];
     }
 
     /**
