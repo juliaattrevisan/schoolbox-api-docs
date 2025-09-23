@@ -192,7 +192,7 @@ class ApiUserCest
                     ['name' => 'Secondary'], // From db table `luCampus`.
                 ],
             ],
-            'valid' => true,
+            'valid' => false, // No support for arrays of years/roles/campuses.  Maybe in the future.
         ];
         yield [
             'filter' => [
@@ -234,7 +234,7 @@ class ApiUserCest
                     ]
                 ],
             ],
-            'valid' => true,
+            'valid' => false, // No support for arrays of years/roles/campuses.  Maybe in the future.
         ];
         yield [
             'filter' => [
@@ -332,6 +332,7 @@ class ApiUserCest
         yield [
             'filter' => [
                 // Unexpected key.
+                // Note: prior to 25.1, this would incorrectly return all results, because the filter would be ignored.
                 'unexpectedKey' => 'unexpectedValue',
             ],
             'valid' => false,

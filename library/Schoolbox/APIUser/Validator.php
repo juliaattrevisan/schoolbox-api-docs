@@ -50,14 +50,14 @@ class Validator
                         // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
                         throw new SchoolboxException("Filter 'year' must be an array of objects.");
                     }
-                    $this->validateSingleOrMultipleIdOrNameArrays('year', $value);
+                    $this->validateIdOrNameArray('year', $value);
                     break;
                 case 'role':
                     if (!is_array($value)) {
                         // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
                         throw new SchoolboxException("Filter 'role' must be an array of objects.");
                     }
-                    $this->validateSingleOrMultipleIdOrNameArrays('role', $value);
+                    $this->validateIdOrNameArray('role', $value);
                     break;
                 case 'roleType':
                     if (!in_array($value, Role::getRoleTypes(), true)) {
@@ -69,29 +69,10 @@ class Validator
                         // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
                         throw new SchoolboxException("Filter 'campus' must be an array of objects.");
                     }
-                    $this->validateSingleOrMultipleIdOrNameArrays('campus', $value);
+                    $this->validateIdOrNameArray('campus', $value);
                     break;
                 default:
                     throw new SchoolboxException("Unexpected filter key '$key'.");
-            }
-        }
-    }
-
-    /**
-     * @param string $arrayName
-     * @param array $array
-     */
-    private function validateSingleOrMultipleIdOrNameArrays(string $arrayName, array $array): void
-    {
-        if (count($array) > 0 && !is_array(array_values($array)[0])) {
-            // The array doesn't contain an array, so validate as single id/name array.
-            // Expect $array to be either ['id' => ...] or ['name' => ...].
-            $this->validateIdOrNameArray($arrayName, $array);
-        } else {
-            // The array contains an array, so validate as multiple id/name arrays.
-            // Expect $array to contain items that are either ['id' => ...] or ['name' => ...].
-            foreach ($array as $subArray) {
-                $this->validateIdOrNameArray("$arrayName item", $subArray);
             }
         }
     }
