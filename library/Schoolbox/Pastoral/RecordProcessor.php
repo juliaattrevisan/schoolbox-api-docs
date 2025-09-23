@@ -278,8 +278,21 @@ class RecordProcessor
             }
         }
 
-        if ($partial['tagNames'] ?? false) {
+        /* Such a strange mix of philosophies in this place, it does my head in
+         * The same idea is implemented in such subtly different ways everywhere here
+         */
+        if (($partial['tags'] ?? false) || ($partial['tagNames'] ?? false)) {
+            /* At least one of these had data:
+             * if you supplied both, merge and treat synonymously
+             */
+            $tags = $this->prepareTags($partial['tags'] ?? '', $partial['tagNames'] ?? '');
 
+            // Save pastoral tags
+            $this->pastoralTagMapper->deleteForRecord($record);
+            foreach ($tags as $tag) {
+                $this->pastoralTagMapper->assignToRecord($record, $tag);
+            }
+            $record->setTags($tags);
         }
 
         if ($partial['role'] ?? false) {
