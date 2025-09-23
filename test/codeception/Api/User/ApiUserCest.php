@@ -206,11 +206,56 @@ class ApiUserCest
                     'name' => 'Middle Student', // From db table `groups`.
                 ],
                 'campus' => [
-                    ['id' => 1], // Campus 'Secondary' from db table `luCampus`.
-                    ['name' => 'Secondary'], // From db table `luCampus`.
+                    'id' => 1, // Campus 'Secondary' from db table `luCampus`.
+                    'name' => 'Secondary', // From db table `luCampus`.
                 ],
             ],
             'valid' => true,
+        ];
+        yield [
+            'filter' => [
+                // Year/role/campus redundantly specified in arrays.
+                'year' => [
+                    [
+                        'id' => 4, // Year '9' from db table `lu_year_level`.
+                        'name' => '9', // From db table `lu_year_level`.
+                    ]
+                ],
+                'role' => [
+                    [
+                        'id' => 6, // Role 'Middle Student' from db table `groups`.
+                        'name' => 'Middle Student', // From db table `groups`.
+                    ]
+                ],
+                'campus' => [
+                    [
+                        'id' => 1, // Campus 'Secondary' from db table `luCampus`.
+                        'name' => 'Secondary', // From db table `luCampus`.
+                    ]
+                ],
+            ],
+            'valid' => true,
+        ];
+        yield [
+            'filter' => [
+                // Extra keys in year/role/campus arrays.
+                'year' => [
+                    'id' => 4, // Year '9' from db table `lu_year_level`.
+                    'name' => '9', // From db table `lu_year_level`.
+                    'unexpectedKey' => 'unexpectedValue',
+                ],
+                'role' => [
+                    'id' => 6, // Role 'Middle Student' from db table `groups`.
+                    'name' => 'Middle Student', // From db table `groups`.
+                    'unexpectedKey' => 'unexpectedValue',
+                ],
+                'campus' => [
+                    'id' => 1, // Campus 'Secondary' from db table `luCampus`.
+                    'name' => 'Secondary', // From db table `luCampus`.
+                    'unexpectedKey' => 'unexpectedValue',
+                ],
+            ],
+            'valid' => false,
         ];
         yield [
             'filter' => [
@@ -281,6 +326,13 @@ class ApiUserCest
                 // Non-existent roleType.
                 // Note: prior to 25.1, this would cause no validation error, but would return no results.
                 'roleType' => 'Non-existent role type',
+            ],
+            'valid' => false,
+        ];
+        yield [
+            'filter' => [
+                // Unexpected key.
+                'unexpectedKey' => 'unexpectedValue',
             ],
             'valid' => false,
         ];
