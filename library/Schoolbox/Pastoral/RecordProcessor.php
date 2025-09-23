@@ -218,12 +218,36 @@ class RecordProcessor
             }
         }
 
-        if ($partial['expiresAt'] ?? false) {
+        /* This has to be in rfc format
+         */
+        $locale = new \Alaress_Date_Locale_Config();
 
+        if ($partial['expiresAt'] ?? false) {
+            $expiresAt = new \Alaress_Date_Format(
+                $partial['expiresAt'],
+                [
+                    $locale->localFormat(),
+                    // API docs state we accept RFC3339 without qualification, so we must accept both variants.
+                    \DateTimeInterface::RFC3339,
+                    \DateTimeInterface::RFC3339_EXTENDED
+                ]
+            );
+
+            $record->setExpiresAt($expiresAt);
         }
 
         if ($partial['occurredOn'] ?? false) {
+            $occurredOn = new \Alaress_Date_Format(
+                $partial['occurredOn'],
+                [
+                    $locale->localFormat(),
+                    // API docs state we accept RFC3339 without qualification, so we must accept both variants.
+                    \DateTimeInterface::RFC3339,
+                    \DateTimeInterface::RFC3339_EXTENDED
+                ]
+            );
 
+            $record->setOccurredOn($occurredOn);
         }
 
         /* Allow token replacements in Confidential
