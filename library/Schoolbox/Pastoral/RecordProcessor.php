@@ -173,12 +173,34 @@ class RecordProcessor
             $record->setPoints($data['points']);
         }
 
+        /* If a type id was specified and it differed to what we already have,
+         * try to find it. If the type was deleted, disregard it.
+         */
         if ($partial['typeId'] ?? false) {
-
+            if ((int)$partial['typeId'] !== (int)$record->getType()->getId()) {
+                try {
+                    $record->setType($this->pastoralTypeMapper->findById($partial['typeId']));
+                } catch (MapperException $e) {
+                    /* noop: either not found, or it was deleted
+                     * Leave current setting unchanged
+                     */
+                }
+            }
         }
 
+        /* If a subtype id was specified and it differed to what we already have,
+         * try to find it. If the subtype was deleted, disregard it.
+         */
         if ($partial['subtypeId'] ?? false) {
-
+            if ((int)$partial['subtypeId'] !== (int)$record->getSubType()->getId()) {
+                try {
+                    $record->setSubType($this->pastoralSubTypeMapper->findById($partial['subtypeId']));
+                } catch (MapperException $e) {
+                    /* noop: either not found, or it was deleted
+                     * Leave current setting unchanged
+                     */
+                }
+            }
         }
 
         if ($partial['severityId'] ?? false) {
