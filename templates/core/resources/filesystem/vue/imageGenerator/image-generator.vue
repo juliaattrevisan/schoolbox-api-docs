@@ -45,7 +45,7 @@ window.Vue.onMounted(() => {
             <b>There was a problem uploading the image.</b>
             {{ igStore.uploadError }}
         </div>
-      <span class="meta">{{ sbProps.siteTitle }} allows interaction with AI. AI can make mistakes. Please check generated content.</span>
+      <span class="meta">Schoolbox allows interaction with AI. AI can make mistakes. Please check generated content.</span>
     </div>
     <ig-actions />
 </template>
