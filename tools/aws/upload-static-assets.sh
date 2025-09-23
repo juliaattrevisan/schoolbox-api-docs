@@ -72,21 +72,21 @@ function load_config() {
       log "HOST_TYPE=docker: loading config from docker.default.env + docker.env"
       source "${site_root}/docker.default.env"
       source "${site_root}/docker.env"
-      if [ ! -v cdn_host ]; then
-        error "cdn_host not defined in docker.default.env or docker.env"
+      if [ ! -v CDN_HOST ]; then
+        error "CDN_HOST not defined in docker.default.env or docker.env"
         exit 1
       fi
-      if [ ! -v cdn_bucket ]; then
-        error "cdn_bucket not defined in docker.default.env or docker.env"
+      if [ ! -v CDN_BUCKET ]; then
+        error "CDN_BUCKET not defined in docker.default.env or docker.env"
         exit 1
       fi
-      if [ ! -v cdn_bucket_prefix ]; then
-        error "cdn_bucket_prefix not defined in docker.default.env or docker.env"
+      if [ ! -v CDN_BUCKET_PREFIX ]; then
+        error "CDN_BUCKET_PREFIX not defined in docker.default.env or docker.env"
         exit 1
       fi
-      bucket_host="${cdn_host}"
-      bucket_name="${cdn_bucket}"
-      bucket_prefix="${cdn_bucket_prefix}"
+      bucket_host="${CDN_HOST}"
+      bucket_name="${CDN_BUCKET}"
+      bucket_prefix="${CDN_BUCKET_PREFIX}"
       ;;
     vagrant)
       log "HOST_TYPE=vagrant: loading config from vagrant.default.yaml + vagrant.yaml"
