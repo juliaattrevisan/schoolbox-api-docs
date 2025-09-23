@@ -51,6 +51,10 @@ class RecordProcessor
 
 
     /**
+     * FIXME remove since I can't programmatically rely on getters/setters from the mapper
+     *  in a derived manner (stupid underscores!) which means I'm already whitelisting simply
+     *  by implementing the mapping manually
+     *
      * Partial Updates only accept values from the following fields
      * (a whitelist)
      *
@@ -141,10 +145,6 @@ class RecordProcessor
      */
     public function processPartialPastoralRecords(array $partial, PastoralModel $record): void
     {
-        /* Whitelist possible values to update
-         */
-        $data = array_intersect_key($partial, array_flip(self::PARTIAL_ALLOWED_FIELDS));
-
         /* Manually map the partial array into $record, one prop at a time
          * Not all of them can be conveniently derived: body_public maps to setBody_public() (nonexistent method)
          * and some require actual hydrated stubs to proceed (types, subtypes, severity, etc)
@@ -152,7 +152,7 @@ class RecordProcessor
          * Do it the long way (really?)
          */
         if ($partial['heading'] ?? false) {
-            $record->setHeading($data['heading']);
+            $record->setHeading($partial['heading']);
         }
 
         /* Points must be within a range of valid values randomly hardcoded here
@@ -170,7 +170,7 @@ class RecordProcessor
                 ));
             }
 
-            $record->setPoints($data['points']);
+            $record->setPoints($partial['points']);
         }
 
         /* If a type id was specified and it differed to what we already have,
@@ -218,7 +218,8 @@ class RecordProcessor
             }
         }
 
-        /* This has to be in rfc format
+        /* This has to be in one of the rfc formats or the locale's format w
+         * hich might change per instance
          */
         $locale = new \Alaress_Date_Locale_Config();
 
