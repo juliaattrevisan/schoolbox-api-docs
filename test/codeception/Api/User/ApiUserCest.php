@@ -180,9 +180,7 @@ class ApiUserCest
             'isEmailDerived'   => false,
             'altEmail'         => null,
             'positionTitle'    => $i->generateText(20, false),
-//            'isBoarder'        => false,
             'flags'            => [
-//                'showWebmailTab'         => true,
                 'showContacts'           => true,
                 'enableTimetable'        => true,
                 'showSideNav'            => true,
