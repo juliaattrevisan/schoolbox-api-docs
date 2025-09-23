@@ -107,7 +107,7 @@ class Validator
                         }
                         break;
                     default:
-                        throw new SchoolboxException("Each filter '$arrayName' item must have a key of either 'id' or 'name'.");
+                        throw new SchoolboxException("Each filter '$arrayName' item must have key 'id' or 'name'.");
                 }
             }
         }
