@@ -77,13 +77,16 @@ class Payload
             'type' => 'text',
             'id' => 'iframeLink',
             'name' => 'iFrame Link',
-            'meta' => 'TODO' // TODO
+            'meta' => "
+                The URL of a webpage to embed, surround with remote_service(https://...) to integrate with the Remote Services API.
+                Valid tokens: [username], [external_id], [email]
+            ",
         ],
         [
             'type' => 'number',
             'id' => 'iframeHeight',
             'name' => 'Height',
-            'meta' => 'TODO' // TODO
+            'meta' => 'Height of the iframe in pixels',
         ],
     ];
 
