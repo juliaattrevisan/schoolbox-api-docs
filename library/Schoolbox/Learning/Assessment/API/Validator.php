@@ -154,15 +154,15 @@ class Validator
                     throw new SchoolboxException("Filter 'folder' item must not be empty.");
                 }
 
-                foreach ($subArray as $key => $value) {
+                foreach ($subArray as $key => $subValue) {
                     switch ($key) {
                         case 'id':
-                            if (!is_int($value) && !ctype_digit($value)) {
+                            if (!is_int($subValue) && !ctype_digit($subValue)) {
                                 throw new SchoolboxException("Filter 'folder' item property 'id' must have an integer value.");
                             }
                             break;
                         case 'code':
-                            if (!is_string($value)) {
+                            if (!is_string($subValue)) {
                                 throw new SchoolboxException("Filter 'folder' item property 'name' must have a string value.");
                             }
                             break;
