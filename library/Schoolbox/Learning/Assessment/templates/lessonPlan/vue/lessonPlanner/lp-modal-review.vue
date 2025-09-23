@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import locale from "@js/terminology/rosettaStone";
-import {sbProps} from "@js/util/sbx/pageUtils";
 import { useLessonPlannerStore } from "./store/lessonPlannerStore";
 import { LessonPlannerModalStep } from "./lessonPlannerTypes";
 

@@ -4,7 +4,6 @@
  * This could easily be expanded to be used in other places when we inevitably need that
  */
 
-import { sbProps } from "@js/util/sbx/pageUtils";
 import { useImageGeneratorStore } from "./store/imageGeneratorStore";
 import type { ImagePromptAttribute } from "./imageGeneratorTypes";
 import IgPrompt from "./ig-prompt.vue";
