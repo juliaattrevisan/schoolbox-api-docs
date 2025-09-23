@@ -27,5 +27,5 @@ INSERT INTO `config` (
     'true',
     'true',
     'settings',
-    @sequence
+    @sequence + 1
 );
