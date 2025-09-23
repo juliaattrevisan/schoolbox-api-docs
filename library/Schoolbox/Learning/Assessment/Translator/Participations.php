@@ -53,6 +53,7 @@ class Participations
         $participant = $participation->getUser();
 
         $customisedPlan = null;
+        $customisation = null;
         /* If the student is excluded from the original assessment, is she/he part of a customised assessment?
          */
         if (null !== $participation->getExcludedAt()) {
@@ -76,6 +77,12 @@ class Participations
             /* Plan of the customised assessment which are created from the original assessment
              */
             'customisedPlan' => $customisedPlan,
+            /* Check if the participant has any interaction with the assessment (ie responses or feedbacks)
+             */
+            'hasInteraction' =>
+                null !== $customisation ?
+                    ($customisation->getParticipant($participant)->getAllResponses()->count() > 0 || $customisation->getParticipant($participant)->getAllFeedbacks()->count() > 0) :
+                    ($participation->getAllResponses()->count() > 0 || $participation->getAllFeedbacks()->count() > 0),
             '_links'     => [
                 'exclude' => $this->getRouteIfAuthorized('learningAssessment.postExclude', [
                     'assessment' => $assess,

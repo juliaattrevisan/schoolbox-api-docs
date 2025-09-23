@@ -7,6 +7,7 @@
 import { until } from "@vueuse/core";
 import type { Ref } from "vue";
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
+import locale from "@js/terminology/rosettaStone";
 import {
     ACTIVITY_TYPE_TASK,
     ACTIVITY_TYPE_PROJECT,
@@ -670,8 +671,11 @@ function onToggleSelected(): void {
         </div>
         <reveal-modal ref="excludeModalEl">
             <h2>Please confirm</h2>
-            <p>The student has submissions and/or feedback for this assessment.</p>
-            <p>Exclusion from this assessment will remove access to these submissions and/or feedback. Proceed?</p>
+            <p>The student has submissions and/or feedback for this {{ locale.assessment.singular() }}.</p>
+            <p>
+                Exclusion from this {{ locale.assessment.singular() }} will remove access to these submissions and/or
+                feedback. Proceed?
+            </p>
             <ul class="flex-list buttons">
                 <li>
                     <button id="excludeStudent-exclude-button" class="button submit" @click.prevent="exclude()">

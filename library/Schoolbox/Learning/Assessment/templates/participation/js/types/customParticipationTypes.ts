@@ -52,6 +52,7 @@ export type Participant = {
     updatedAt: string;
     user: User;
     customisedPlan: CustomisedPlan | null;
+    hasInteraction: boolean;
     _links: {
         exclude: string;
         include: string;

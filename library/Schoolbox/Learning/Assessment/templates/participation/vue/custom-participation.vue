@@ -26,13 +26,14 @@ const props = defineProps<Props>();
 
 const allParticipants = window.Vue.ref<Participant[]>(props.allParticipants);
 
-// show the checkboxes if there are more than one participant
-const showCheckboxes = window.Vue.computed(() => allParticipants.value.length > 1);
+// #region checkboxes and selection
 
-// selectedList is the items that are currently selected
-const selectedList = window.Vue.ref<Participant[]>([]);
+const showCheckboxes = window.Vue.computed(() => allParticipants.value.length > 1); // show the checkboxes if there are more than one participant
+const selectedList = window.Vue.ref<Participant[]>([]); // currently selected participants (check boxes in the table)
 
-// Computed property to check if all are selected
+/**
+ * Check if all participants are selected
+ */
 const allSelected = window.Vue.computed({
     get: () => allParticipants.value.every((participant) => selectedList.value.includes(participant)),
     set: (value) => {
@@ -40,18 +41,28 @@ const allSelected = window.Vue.computed({
     },
 });
 
-// Function to check if at least one is selected
+/**
+ * Function to check if the selection is indeterminate (some but not all selected)
+ * to set the checkbox state appropriately
+ */
 const isIndeterminate = window.Vue.computed(() => {
     return selectedList.value.length > 0 && selectedList.value.length < allParticipants.value.length;
 });
 
-// Function to check if any selected participants has and customisation, whether excluded or assigned a different activity
+/**
+ * Check if any selected participants has a customisation,
+ * whether can show the "Remove Customisation" action or not
+ */
 const hasCustomisedInSelection = window.Vue.computed(() => {
     return selectedList.value.some(
         (participant) =>
             participant.excludedAt !== null || participant.plan.name !== null || participant.customisedPlan !== null,
     );
 });
+
+// #endregion
+
+// #region pastoral counts
 
 const loadError = window.Vue.ref<string | null>(null);
 const studentPastoralCounts = window.Vue.ref<Record<string, StudentPastoralCountBadge[]>>({});
@@ -102,6 +113,10 @@ window.Vue.onMounted(() => {
     void getStudentPastoralCounts();
 });
 
+// #endregion
+
+// #region exclude/include participants
+
 /**
  * Excludes a participant.
  * @param participant - The participant to exclude.
@@ -119,6 +134,7 @@ async function excludeParticipant(participant: Participant): Promise<void> {
             throw new Error(errorMessage);
         }
         participant.excludedAt = new Date().toISOString(); // Assigning a timestamp as a string
+        participant.hasInteraction = false;
         toast.timeout({ text: "Student excluded successfully" });
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
@@ -126,6 +142,24 @@ async function excludeParticipant(participant: Participant): Promise<void> {
         }
         console.error("Error excluding participant:", error);
         toast.timeout({ text: "Error excluding student", isSuccess: false });
+    }
+}
+
+/**
+ * Excludes the selected participants.
+ * Clears the selection after the operation is complete.
+ * @param participants - The participants to exclude.
+ * @returns A promise that resolves when all exclusions are complete.
+ */
+async function excludeParticipants(participants: Participant[]): Promise<void> {
+    try {
+        await Promise.all(participants.map((participant) => excludeParticipant(participant)));
+        selectedList.value = [];
+    } catch (error) {
+        if (error instanceof Error && hasErrorMessage(error)) {
+            loadError.value = error.message;
+        }
+        console.error("Error excluding selected participants:", error);
     }
 }
 
@@ -148,6 +182,7 @@ async function includeParticipant(participant: Participant): Promise<void> {
         participant.excludedAt = null; // Resetting the exclusion timestamp
         participant.plan.name = null; // Resetting the plan
         participant.customisedPlan = null; // Resetting the customised plan
+        participant.hasInteraction = false;
         toast.timeout({ text: "Customisation removed successfully" });
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
@@ -159,61 +194,44 @@ async function includeParticipant(participant: Participant): Promise<void> {
 }
 
 /**
- * Excludes the selected participants.
- * Clears the selection after the operation is complete.
- * @returns A promise that resolves when all exclusions are complete.
- */
-async function excludeSelected(): Promise<void> {
-    try {
-        await Promise.all(selectedList.value.map((participant) => excludeParticipant(participant)));
-        selectedList.value = [];
-    } catch (error) {
-        if (error instanceof Error && hasErrorMessage(error)) {
-            loadError.value = error.message;
-        }
-        console.error("Error excluding selected participants:", error);
-    }
-}
-
-/**
  * Includes the selected participants.
  * Clears the selection after the operation is complete.
+ * @param participants - The participants to include.
  * @returns A promise that resolves when all inclusions are complete.
  */
-async function includeSelected(): Promise<void> {
-    await Promise.all(selectedList.value.map((participant) => includeParticipant(participant)));
-    selectedList.value = [];
+async function includeParticipants(participants: Participant[]): Promise<void> {
+    await Promise.all(participants.map((participant) => includeParticipant(participant)));
 }
 
-const isIncludeOpen = window.Vue.ref(false);
-const selectedParticipants = window.Vue.ref<Participant[]>([]);
-const selectedActivityId = window.Vue.ref<number | null>(null);
+// #endregion
+
+// #region include in existing customisation
+
+const isIncludeInExistingOpen = window.Vue.ref(false);
+const includeInExistingList = window.Vue.ref<Participant[]>([]); // array of participants to include in existing customisation
+const includeInExistingActivityId = window.Vue.ref<number | null>(null);
+const isSingleIncludeInExisting = window.Vue.ref(false); // whether the include is for a single participant (three-dot) or multiple (bottom drawer)
 
 /**
  * The current selected activity for inclusion.
  */
-const selectedActivity = window.Vue.computed<Plan | CustomisedPlan | null>(() => {
-    return props.customisations.find((plan) => plan.id === selectedActivityId.value) ?? null;
+const includeInExistingActivity = window.Vue.computed<Plan | CustomisedPlan | null>(() => {
+    return props.customisations.find((plan) => plan.id === includeInExistingActivityId.value) ?? null;
 });
 
 /**
  * Add all the selected participants to an existing customisation plan.
  */
 async function includeParticipantInExistingPlan(): Promise<void> {
-    if (selectedActivity.value === null) return;
-    const activity: Plan | CustomisedPlan = selectedActivity.value;
-    // if the array is empty, it means that we are including participants via the bottom drawer,
-    // otherwise the single participant is being included via the pop-out menu
-    if (selectedParticipants.value.length === 0) {
-        selectedParticipants.value = selectedList.value;
-    }
+    if (includeInExistingActivity.value === null) return;
+    const activity: Plan | CustomisedPlan = includeInExistingActivity.value;
     const toast = window.sbProps.toastActivate("Adding to customisation...");
     try {
         const response = await fetch(props.includeInExistingCustomisation, {
             method: "POST",
             headers: { Accept: "application/json", "Content-Type": "application/json" },
             body: JSON.stringify({
-                students: selectedParticipants.value.map((p) => p.user.id),
+                students: includeInExistingList.value.map((p) => p.user.id),
                 ...("assessable" in activity ? { assessmentId: activity.assessable.id } : {}),
                 ...(activity.name !== null ? { planId: activity.id } : {}),
             }),
@@ -223,7 +241,7 @@ async function includeParticipantInExistingPlan(): Promise<void> {
             throw new Error(errorMessage);
         }
         // add the activity to each participant
-        selectedParticipants.value.forEach((participant) => {
+        includeInExistingList.value.forEach((participant) => {
             if ("assessable" in activity) {
                 participant.customisedPlan = { ...activity };
             } else {
@@ -231,9 +249,8 @@ async function includeParticipantInExistingPlan(): Promise<void> {
             }
         });
         toast.timeout({ text: "Customisation added successfully", isSuccess: true });
-        isIncludeOpen.value = false;
-        selectedParticipants.value = [];
-        selectedList.value = [];
+        isIncludeInExistingOpen.value = false;
+        includeInExistingList.value = [];
     } catch (error) {
         if (error instanceof Error && hasErrorMessage(error)) {
             loadError.value = error.message;
@@ -245,15 +262,18 @@ async function includeParticipantInExistingPlan(): Promise<void> {
 
 /**
  * Opens the modal to include a participant in an existing customisation.
+ * @param isSingle - Whether this is a single participant inclusion (from pop-out) or multiple (from bottom drawer).
  * @param participant - The participant to be included.
  */
-function openIncludeModal(participant: Participant): void {
-    selectedParticipants.value = [participant];
-    selectedActivityId.value = null;
-    if (!selectedList.value.includes(participant)) {
-        selectedList.value = [participant];
+function openIncludeInExistingModal(isSingle: boolean, participant: Participant | null): void {
+    isSingleIncludeInExisting.value = isSingle;
+    if (isSingleIncludeInExisting && participant !== null) {
+        includeInExistingList.value = [participant];
+    } else {
+        includeInExistingList.value = selectedList.value;
     }
-    isIncludeOpen.value = true;
+    includeInExistingActivityId.value = null;
+    isIncludeInExistingOpen.value = true;
 }
 
 /**
@@ -290,6 +310,75 @@ function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string {
         customisedPlan.name !== null ? customisedPlan._links.modify : customisedPlan.assessable._links.modify;
     return `${baseUrl}?${getReturnUrl()}`;
 }
+
+// #endregion
+
+// #region perform modification and check for interactions prior to action
+
+const isConfirmModifyOpen = window.Vue.ref(false);
+const modifyAction = window.Vue.ref<string>("");
+const modifyList = window.Vue.ref<Participant[]>([]); // array of participants to modify
+const isSingleModify = window.Vue.ref(false); // whether the current modification is for a single participant (three-dot) or multiple (bottom drawer)
+const participantsWithInteractions = window.Vue.ref<Participant[]>([]); // participants with interactions in the current modification list
+
+/**
+ * Performs the action for participants without interactions,
+ * or after confirmation when selection contains participants with interactions.
+ */
+async function performAction(): Promise<void> {
+    switch (modifyAction.value) {
+        case "removeCustomisation":
+            await includeParticipants(modifyList.value);
+            break;
+        case "exclude":
+            await excludeParticipants(modifyList.value);
+            break;
+        case "includeInExisting":
+            await includeParticipantInExistingPlan();
+            break;
+        default:
+            // redirect to the appropriate URL
+            window.location.href = modifyAction.value;
+    }
+    if (!isSingleModify.value) {
+        // only clear the selection if this is a multi-selection action
+        selectedList.value = [];
+    }
+    modifyList.value = [];
+}
+
+/**
+ * Handles the modification of a selected participant(s).
+ * If the participant(s) has interactions, it opens a confirmation modal.
+ * Otherwise, the appropriate action is taken directly.
+ * @param participants - The participants to modify.
+ * @param action - the action to perform (e.g., 'remove').
+ * @param $isSingleModify - whether this action is for a single participant or multiple
+ */
+function onActionSelected(participants: Participant[], action: string, $isSingleModify: boolean): void {
+    modifyList.value = participants;
+    modifyAction.value = action;
+    isSingleModify.value = $isSingleModify;
+    // if any participant has interactions, show the confirmation modal
+    if (modifyList.value.some((participant) => participant.hasInteraction)) {
+        participantsWithInteractions.value = modifyList.value.filter((participant) => participant.hasInteraction);
+        isConfirmModifyOpen.value = true;
+        return;
+    }
+    // otherwise, perform the action directly
+    void performAction();
+}
+
+/**
+ * Handles the confirmation of an action in the confirmation modal,
+ * closes the modal after performing the action.
+ */
+async function onConfirmActionSelected(): Promise<void> {
+    await performAction();
+    isConfirmModifyOpen.value = false;
+}
+
+// #endregion
 </script>
 
 <template>
@@ -404,7 +493,12 @@ function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string {
                                 >
                                     <li class="separator">Manage</li>
                                     <li>
-                                        <button class="icon-close" @click.prevent="includeParticipant(participant)">
+                                        <button
+                                            class="icon-close"
+                                            @click.prevent="
+                                                onActionSelected([participant], 'removeCustomisation', true)
+                                            "
+                                        >
                                             Remove Customisation
                                         </button>
                                     </li>
@@ -412,17 +506,23 @@ function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string {
                                 <template v-else>
                                     <li class="separator">Manage</li>
                                     <li>
-                                        <a
+                                        <button
                                             class="icon-modify"
-                                            :href="`${getLearningPlanNewUrl}?student=${participant.user.id}&${getReturnUrl()}`"
+                                            @click.prevent="
+                                                onActionSelected(
+                                                    [participant],
+                                                    `${props.getLearningPlanNewUrl}?student=${participant.user.id}&${getReturnUrl()}`,
+                                                    true,
+                                                )
+                                            "
                                         >
                                             Modify
-                                        </a>
+                                        </button>
                                     </li>
                                     <li>
                                         <button
                                             class="icon-staff-students"
-                                            @click.prevent="excludeParticipant(participant)"
+                                            @click.prevent="onActionSelected([participant], 'exclude', true)"
                                         >
                                             Exclude
                                         </button>
@@ -431,27 +531,39 @@ function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string {
                                         <button
                                             v-if="props.customisations.length > 0"
                                             class="icon-list"
-                                            @click.prevent="openIncludeModal(participant)"
+                                            @click.prevent="openIncludeInExistingModal(true, participant)"
                                         >
                                             Include in Existing Customisation
                                         </button>
                                     </li>
                                     <li class="separator">Create</li>
                                     <li v-if="getAssessmentParticipationCopyActivity">
-                                        <a
+                                        <button
                                             class="icon-copy"
-                                            :href="`${getAssessmentParticipationCopyActivity}?student=${participant.user.id}&original=${assessmentId}&${getReturnUrl()}`"
+                                            @click.prevent="
+                                                onActionSelected(
+                                                    [participant],
+                                                    `${getAssessmentParticipationCopyActivity}?student=${participant.user.id}&original=${assessmentId}&${getReturnUrl()}`,
+                                                    true,
+                                                )
+                                            "
                                         >
                                             Copy Activity
-                                        </a>
+                                        </button>
                                     </li>
                                     <li>
-                                        <a
+                                        <button
                                             class="icon-submissions"
-                                            :href="`${getAssessmentParticipationNewActivity}?student=${participant.user.id}&original=${assessmentId}&${getReturnUrl()}`"
+                                            @click.prevent="
+                                                onActionSelected(
+                                                    [participant],
+                                                    `${getAssessmentParticipationNewActivity}?student=${participant.user.id}&original=${assessmentId}&${getReturnUrl()}`,
+                                                    true,
+                                                )
+                                            "
                                         >
                                             New Activity
-                                        </a>
+                                        </button>
                                     </li>
                                 </template>
                             </ul>
@@ -472,67 +584,91 @@ function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string {
                     <button
                         class="icon-close submit"
                         data-test="custom-participation-remove-customisation"
-                        @click.prevent="includeSelected"
+                        @click.prevent="onActionSelected(selectedList, 'removeCustomisation', false)"
                     >
                         Remove Customisation
                     </button>
                 </template>
                 <template v-else>
                     <div class="l-flex__item--1-auto">
-                        <a
+                        <button
                             class="icon-modify submit"
-                            :href="`${getLearningPlanNewUrl}?student=${selectedList.map((p) => p.user.id).join(',')}&${getReturnUrl()}`"
+                            @click.prevent="
+                                onActionSelected(
+                                    selectedList,
+                                    `${getLearningPlanNewUrl}?student=${selectedList.map((p) => p.user.id).join(',')}&${getReturnUrl()}`,
+                                    false,
+                                )
+                            "
                         >
                             Modify
-                        </a>
+                        </button>
                     </div>
                     <div class="l-flex__item--1-auto">
-                        <button class="icon-staff-students submit" @click.prevent="excludeSelected">Exclude</button>
+                        <button
+                            class="icon-staff-students submit"
+                            @click.prevent="onActionSelected(selectedList, 'exclude', false)"
+                        >
+                            Exclude
+                        </button>
                     </div>
                     <div v-if="props.customisations.length > 0" class="l-flex__item--1-auto">
-                        <button class="icon-list submit" @click.prevent="isIncludeOpen = true">
+                        <button class="icon-list submit" @click.prevent="openIncludeInExistingModal(false, null)">
                             Include in Existing Customisation
                         </button>
                     </div>
                     <div v-if="getAssessmentParticipationCopyActivity" class="l-flex__item--1-auto">
-                        <a
+                        <button
                             class="icon-copy submit"
                             data-test="custom-participation-copy-activity"
-                            :href="`${getAssessmentParticipationCopyActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${assessmentId}&${getReturnUrl()}`"
+                            @click.prevent="
+                                onActionSelected(
+                                    selectedList,
+                                    `${getAssessmentParticipationCopyActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${assessmentId}&${getReturnUrl()}`,
+                                    false,
+                                )
+                            "
                         >
                             Copy Activity
-                        </a>
+                        </button>
                     </div>
                     <div class="l-flex__item--1-auto">
-                        <a
+                        <button
                             class="icon-submissions submit"
-                            :href="`${getAssessmentParticipationNewActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${assessmentId}&${getReturnUrl()}`"
+                            @click.prevent="
+                                onActionSelected(
+                                    selectedList,
+                                    `${getAssessmentParticipationNewActivity}?student=${selectedList.map((p) => p.user.id).join(',')}&original=${assessmentId}&${getReturnUrl()}`,
+                                    false,
+                                )
+                            "
                         >
                             New Activity
-                        </a>
+                        </button>
                     </div>
                 </template>
             </div>
         </bottom-drawer>
     </div>
-    <basic-modal v-model:is-open="isIncludeOpen">
+    <basic-modal v-model:is-open="isIncludeInExistingOpen">
         <div class="l-flex-col l-gap-m f-no-margins">
             <div class="l-flex-col l-gap-s f-no-margins">
                 <h2>Include in existing customisation</h2>
                 <p class="meta">
                     Modifying participation for:
-                    <template v-for="(participant, index) in selectedList" :key="participant.user.id">
+                    <template v-for="(participant, index) in includeInExistingList" :key="participant.user.id">
                         {{
                             participant.user.preferredName ? participant.user.preferredName : participant.user.firstname
                         }}
-                        {{ participant.user.lastname }}<template v-if="index < selectedList.length - 2">, </template
-                        ><template v-if="index === selectedList.length - 2"> and </template>
+                        {{ participant.user.lastname
+                        }}<template v-if="index < includeInExistingList.length - 2">, </template
+                        ><template v-if="index === includeInExistingList.length - 2"> and </template>
                     </template>
                 </p>
             </div>
             <div class="l-flex-col l-gap-s f-no-margins">
                 <label for="activitySelect">Customisation</label>
-                <select id="activitySelect" v-model="selectedActivityId" class="f-no-margins">
+                <select id="activitySelect" v-model="includeInExistingActivityId" class="f-no-margins">
                     <option value="null" disabled>Select customisation</option>
                     <option
                         v-for="customisation in props.customisations"
@@ -544,14 +680,55 @@ function getCustomisedPlanUrl(customisedPlan: CustomisedPlan): string {
                 </select>
             </div>
             <div class="l-flex l-gap-xs f-no-margins">
-                <button class="button l-flex__item--1" @click.prevent="isIncludeOpen = false">Cancel</button>
+                <button class="button l-flex__item--1" @click.prevent="isIncludeInExistingOpen = false">Cancel</button>
                 <button
                     class="button submit l-flex__item--1"
-                    :disabled="!selectedActivity"
-                    @click.prevent="includeParticipantInExistingPlan()"
+                    :disabled="!includeInExistingActivity"
+                    @click.prevent="
+                        onActionSelected(includeInExistingList, 'includeInExisting', isSingleIncludeInExisting)
+                    "
                 >
                     Confirm
                 </button>
+            </div>
+        </div>
+    </basic-modal>
+    <basic-modal v-model:is-open="isConfirmModifyOpen">
+        <div class="l-flex-col l-gap-m f-no-margins">
+            <div class="l-flex-col l-gap-s f-no-margins">
+                <h2>Please confirm</h2>
+                <p class="f-no-margins">
+                    The following student(s) have submissions and/or feedback for this
+                    {{ locale.assessment.singular() }}.
+                </p>
+                <div class="l-flex-col l-gap-xs">
+                    <div
+                        v-for="participant in participantsWithInteractions"
+                        :key="participant.user.id"
+                        class="l-flex l-gap-s l-align-center"
+                    >
+                        <img
+                            :src="`/portrait.php?id=${participant.user.id}&size=square32`"
+                            :alt="`${participant.user.lastname}, ${participant.user.firstname}`"
+                        />
+                        <p>
+                            {{
+                                participant.user.preferredName
+                                    ? participant.user.preferredName
+                                    : participant.user.firstname
+                            }}
+                            {{ participant.user.lastname }}
+                        </p>
+                    </div>
+                </div>
+                <p>
+                    Exclusion from this {{ locale.assessment.singular() }} will remove access to these submissions
+                    and/or feedback. Proceed?
+                </p>
+            </div>
+            <div class="l-flex l-gap-xs f-no-margins">
+                <button class="button submit l-flex__item--1" @click.prevent="onConfirmActionSelected">Yes</button>
+                <button class="button l-flex__item--1" @click.prevent="isConfirmModifyOpen = false">Cancel</button>
             </div>
         </div>
     </basic-modal>
