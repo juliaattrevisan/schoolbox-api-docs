@@ -118,7 +118,7 @@
 
             $(this).confirmDialog({
                 header: 'Are you sure you wish to delete this {{ locale.activity }}?',
-                text: {{ assessment.isSpecification ? '\'\'' : '\'<span class=\"alert alert-box\"><b>WARNING</b> All student responses, feedback and marks will also be deleted.</span>\'' }},
+                text: {{ assessment.isSpecification ? '\'\'' : '\'<span class=\"alert alert-box\"><b>WARNING:</b> All customisations, student responses, feedback and marks will also be deleted.</span>\'' }},
                 format: 'html',
                 confirmLabel: 'Yes, permanently delete',
                 cancelLabel: 'No, keep it',
@@ -150,10 +150,15 @@
     <div class="small-12 columns">
         <h1>Update {{ assessment.title }}</h1>
     </div>
-    {% if routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id, assessment: assessment}) %}
         <nav>
             <sbx-pop-out content-id="header-options"></sbx-pop-out>
         </nav>
+        {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
+            assessmentId: assessment.id,
+            assessment: assessment
+        }) %}
+        {% set deleteRoute = routeLookupIfAuthorized('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id, assessment: assessment}) %}
+        {% if (deleteRoute or viewCustomParticipationRoute or assessment is quiz) %}
         <ul id="header-options" class="f-dropdown" data-dropdown-content="" aria-hidden="true">
             {% if assessment is quiz %}
                 {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessment: assessment, assessmentId: assessment.id}) %}
@@ -165,18 +170,16 @@
                     <a href="{{ exportRoute }}{% if RETURN_URL.previous.encoded %}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}{% endif %}" class="icon-download" title="Download a file to reuse this quiz elsewhere">Export quiz as file</a>
                 </li>
             {% endif %}
-            {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
-                assessmentId: assessment.id,
-                assessment: assessment
-            }) %}
             {% if viewCustomParticipationRoute and assessment.isImplementation and (assessment is dueWork or assessment is quiz or assessment is task) %}
                 <li><a class="icon-group" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
             {% endif %}
-            <li>
-                <a class="icon-delete" title="Delete" data-delete>Delete {{ locale.activity }}</a>
-            </li>
+            {% if deleteRoute %}
+                <li>
+                    <a class="icon-delete" title="Delete" data-delete>Delete {{ locale.activity }}</a>
+                </li>
+            {% endif %}
         </ul>
-    {% endif %}
+        {% endif %}
 </div>
 
 {% if (customisedFor ?? '') | length and participants ?? [] is not empty %}

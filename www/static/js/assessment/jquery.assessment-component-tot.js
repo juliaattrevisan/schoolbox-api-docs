@@ -70,7 +70,7 @@
 
             $element.confirmDialog({
                 header: `Are you sure you wish to delete this ${window.sbProps.l10n.dictionary.activity.singular()}?`,
-                text: '<span class="alert alert-box"><b>WARNING</b> All student responses, feedback and marks will also be deleted.</span>',
+                text: '<span class="alert alert-box"><b>WARNING:</b> All customisations, student responses, feedback and marks will also be deleted.</span>',
                 format: "html",
                 confirmLabel: "Yes, permanently delete",
                 cancelLabel: "No, keep it",
