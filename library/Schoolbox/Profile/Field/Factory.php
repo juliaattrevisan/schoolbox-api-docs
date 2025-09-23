@@ -174,7 +174,7 @@ class Factory
          * Override the iframe field's value with the parsed and sanitised URL and height
          */
         if (!isset($mutatorIndex['iframe'])) {
-            $mutatorIndex['iframe'] = function (\Schoolbox\Admin\Profile\Editor\Field\Model $field) {
+            $mutatorIndex['iframe'] = function (\Schoolbox\Admin\Profile\Editor\Field\Model $field) use ($viewee) {
                 $height = (int)($field->getOptions()['iframeHeight'] ?? 0);
                 if ($height < 1) {
                     $height = $field->getOptionsDefault()['iframeHeight'] ?? 1;
@@ -187,6 +187,14 @@ class Factory
                  * so we can skip scrubbing it there
                  */
                 $url = $field->getOptions()['iframeLink'] ?? $field->getOptionsDefault()['iframeLink'] ?? '';
+
+                /* Possible tokens that will be replaced in the URL before it is parsed */
+                $url = strtr($url, [
+                    // TODO: should these be escaped in any way..?
+                    '[username]' => $viewee->getUsername(),
+                    '[external_id]' => $viewee->getExternalId() ?? '',
+                    '[email]' => $viewee->getEmail() ?? '',
+                ]);
 
                 if (preg_match('/remote_service\(([^)]+)\)/', $url, $matches)) {
                     $encodedUrl = base64_encode($matches[1]);
