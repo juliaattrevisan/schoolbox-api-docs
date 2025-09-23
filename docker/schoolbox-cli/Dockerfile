@@ -95,9 +95,10 @@ tar -C /opt/ -xzf intelliscl.tar.gz
 rm intelliscl.tar.gz
 EOF
 
-# Copy NVM profile and sudoers conf
+# Copy various configs
 COPY ./config/profile.d/* /etc/profile.d/
 COPY ./config/sudoers.d/* /etc/sudoers.d/
+COPY ./config/mariadb.conf.d/* /etc/mysql/mariadb.conf.d/
 
 # Install Composer (dev only?)
 COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
