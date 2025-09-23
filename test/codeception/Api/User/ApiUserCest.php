@@ -254,6 +254,33 @@ class ApiUserCest
             ],
             'valid' => false,
         ];
+        yield [
+            'filter' => [
+                // String fields incorrectly specified as ints.
+                'externalId' => 12345,
+                'username' => 12345,
+                'email' => 12345,
+                'roleType' => 12345,
+            ],
+            'valid' => false,
+        ];
+        yield [
+            'filter' => [
+                // String fields incorrectly specified as null.
+                'externalId' => null,
+                'username' => null,
+                'email' => null,
+                'roleType' => null,
+            ],
+            'valid' => false,
+        ];
+        yield [
+            'filter' => [
+                // Non-existent roleType.
+                'roleType' => 'Non-existent role type',
+            ],
+            'valid' => false,
+        ];
     }
 
     /**
