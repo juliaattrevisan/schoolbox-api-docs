@@ -260,7 +260,7 @@ Admin,"Import a calendar calendar/import",Student,/adminv2/calendar/import,400
 Admin,"Import a calendar calendar/import",Parent,/adminv2/calendar/import,400
 Admin,"Import School Events",Superuser,/adminv2/calendar/import/school-events,200
 Admin,"Import School Events","Badges Moderator",/adminv2/calendar/import/school-events,403
-Admin,"Import School Events","CMS Moderator",/adminv2/calendar/import/school-events,404
+Admin,"Import School Events","CMS Moderator",/adminv2/calendar/import/school-events,403
 Admin,"Import School Events","Calendar Moderator",/adminv2/calendar/import/school-events,200
 Admin,"Import School Events","Design Moderator",/adminv2/calendar/import/school-events,403
 Admin,"Import School Events","LMS Moderator",/adminv2/calendar/import/school-events,403
@@ -272,7 +272,7 @@ Admin,"Import School Events",Student,/adminv2/calendar/Import/school-events,400
 Admin,"Import School Events",Parent,/adminv2/calendar/Import/school-events,400
 Admin,"Import Group Events",Superuser,/adminv2/calendar/import/group-events,200
 Admin,"Import Group Events","Badges Moderator",/adminv2/calendar/import/group-events,403
-Admin,"Import Group Events","CMS Moderator",/adminv2/calendar/import/group-events,404
+Admin,"Import Group Events","CMS Moderator",/adminv2/calendar/import/group-events,403
 Admin,"Import Group Events","Calendar Moderator",/adminv2/calendar/import/group-events,200
 Admin,"Import Group Events","Design Moderator",/adminv2/calendar/import/group-events,403
 Admin,"Import Group Events","LMS Moderator",/adminv2/calendar/import/group-events,403
@@ -284,7 +284,7 @@ Admin,"Import Group Events",Student,/adminv2/calendar/Import/group-events,400
 Admin,"Import Group Events",Parent,/adminv2/calendar/Import/group-events,400
 Admin,"Import iCalendar Events",Superuser,/adminv2/calendar/import/icalendar-events,200
 Admin,"Import iCalendar Events","Badges Moderator",/adminv2/calendar/import/icalendar-events,403
-Admin,"Import iCalendar Events","CMS Moderator",/adminv2/calendar/import/icalendar-events,404
+Admin,"Import iCalendar Events","CMS Moderator",/adminv2/calendar/import/icalendar-events,403
 Admin,"Import iCalendar Events","Calendar Moderator",/adminv2/calendar/import/icalendar-events,200
 Admin,"Import iCalendar Events","Design Moderator",/adminv2/calendar/import/icalendar-events,403
 Admin,"Import iCalendar Events","LMS Moderator",/adminv2/calendar/import/icalendar-events,403
