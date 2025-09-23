@@ -51,54 +51,6 @@ class RecordProcessor
 
 
     /**
-     * FIXME remove since I can't programmatically rely on getters/setters from the mapper
-     *  in a derived manner (stupid underscores!) which means I'm already whitelisting simply
-     *  by implementing the mapping manually
-     *
-     * Partial Updates only accept values from the following fields
-     * (a whitelist)
-     *
-     * The value indicates whether we can use a mapper method to blindly map
-     * a value to an instance's property: tags, actions, roles, groups are
-     * separately addressed from heading, typeId, et al.
-     */
-    private const PARTIAL_ALLOWED_FIELDS = [
-        /* Title, in the ui
-         *
-         * Other nodes that can be directly mapped to an instance (true)
-         * or if they're dealt with separately (false)
-         */
-        'heading',
-        'points',
-        /* Related objects need instances, not scalars, to map successfully to an instance
-         */
-        'typeId',
-        'subtypeId',
-        'severityId',
-        /* Dates
-         */
-        'expiresAt',
-        'occurredOn',
-        /* Confidential text
-         */
-        'body_private',
-        /* General text
-         */
-        'body_public',
-        /* Actions, Tags, Roles, Groups all sold separately
-         */
-        'actions',
-        /* Why would you ever want to use `tags` vs `tagNames`? The latter is way more convenient
-         */
-        'tagNames',
-        /* Role + Group = Access (Record Visibility)
-         */
-        'role',
-        'group',
-    ];
-
-
-    /**
      * Constructor
      *
      * @param IConfigLoader              $config
