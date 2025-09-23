@@ -83,11 +83,6 @@ class Validator
      */
     private function validateArrayOfIdOrNameArrays(string $arrayName, array $array): void
     {
-        if (count($array) === 0) {
-            // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
-            throw new SchoolboxException("Filter '$arrayName' must not be empty.");
-        }
-
         foreach ($array as $subArray) {
             if (count($subArray) === 0) {
                 // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
