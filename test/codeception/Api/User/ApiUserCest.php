@@ -137,13 +137,18 @@ class ApiUserCest
             'valid'  => true,
         ];
         yield [
-            // Null filter.
-            'filter' => null,
-            'valid'  => true,
-        ];
-        yield [
             // Blank string filter.
             'filter' => '',
+            'valid'  => false,
+        ];
+        yield [
+            // Null filter.
+            'filter' => null,
+            'valid'  => false,
+        ];
+        yield [
+            // Null string filter.
+            'filter' => 'null',
             'valid'  => false,
         ];
         yield [

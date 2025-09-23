@@ -439,31 +439,35 @@ class Controller extends Base
      * Searches for a user based on a filter list
      * param: {search: search basic term (optional)} {filter: extra parameters for determining how to filter the search results}
      *
-     * @api /api/user
      * @link http://api.schoolbox.com.au/#operation/userSearch
+     * @api  /api/user
      */
-    public function apiUserSearch()
+    public function apiUserSearch(): void
     {
         $search = $this->requestQuery->get('search', '');
         $cursor = (int)$this->requestQuery->get('cursor', null);
         $limit = (int)$this->requestQuery->get('limit', 5);
-        /**
-         * check if filter is an array or string and use it like that
-         */
+        $filterJson = $this->requestQuery->get('filter', '');
         $filter = null;
-        $getFilter = $this->requestQuery->get('filter', '');
-        if (is_string($getFilter)) {
-            $filter = json_decode($this->requestQuery->get('filter', ''), true) ?? null;
-        } elseif (is_array($getFilter)) {
-            $filter = $getFilter;
+
+        if ($filterJson === '') {
+            $filter = [];
+        } elseif (is_string($filterJson)) {
+            try {
+                $filter = json_decode($filterJson, true, flags: JSON_THROW_ON_ERROR);
+            } catch (\JsonException $e) {
+                $filter = null;
+            }
+        }
+
+        if (!is_array($filter)) {
+            throw new SchoolboxException('JSON filter could not be decoded.');
         }
 
         $userHelper = new Helper($this->userMapper);
 
         try {
-            if ($filter !== null) {
-                $this->validator->validateFilter($filter);
-            }
+            $this->validator->validateFilter($filter);
             $ajaxSearch = $userHelper->ajaxSearch($search, $filter, $limit, $cursor);
         } catch (SchoolboxException $e) {
             $this->sendJsonError('Failed to get assessments: ' . $e->getMessage(), 400);

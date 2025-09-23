@@ -44,15 +44,14 @@ class Helper
      * @param array|null $filter
      * @param int|null   $limit
      * @param int|null   $cursor
-     * @return array|bool
-     * @throws \Exception
+     * @return array
      */
     public function ajaxSearch(
         ?string $keyword,
         ?array $filter,
         ?int $limit = null,
         ?int $cursor = null
-    ) {
+    ): array {
         [$query, $params] = $this->buildSearch($keyword, $filter);
 
         if (0 !== $cursor) {
