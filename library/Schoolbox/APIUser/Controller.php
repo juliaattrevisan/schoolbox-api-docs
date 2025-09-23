@@ -43,6 +43,7 @@ class Controller extends Base
     protected CampusMapper $campusMapper;
     protected YearLevelMapper $yearLevelMapper;
     protected RoleMapper $roleMapper;
+    private Validator $validator;
 
     /**
      * Controller constructor.
@@ -72,7 +73,8 @@ class Controller extends Base
         HouseMapper $houseMapper,
         CampusMapper $campusMapper,
         YearLevelMapper $yearLevelMapper,
-        RoleMapper $roleMapper
+        RoleMapper $roleMapper,
+        Validator $validator,
     ) {
         $this->userMapper = $userMapper;
         $this->houseMapper = $houseMapper;
@@ -88,6 +90,7 @@ class Controller extends Base
             $timetableColourMapper,
             $reRouteOverrideMapper,
         );
+        $this->validator = $validator;
     }
 
     /**
@@ -456,8 +459,15 @@ class Controller extends Base
         }
 
         $userHelper = new Helper($this->userMapper);
-        $output = [];
-        $ajaxSearch = $userHelper->ajaxSearch($search, $filter, $limit, $cursor);
+
+        try {
+            $this->validator->validateFilter($filter);
+            $ajaxSearch = $userHelper->ajaxSearch($search, $filter, $limit, $cursor);
+        } catch (SchoolboxException $e) {
+            $this->sendJsonError('Failed to get assessments: ' . $e->getMessage(), 400);
+            return;
+        }
+
         $userIds = [];
         foreach ($ajaxSearch as $item) {
             foreach ($item as $label => $value) {
@@ -470,6 +480,7 @@ class Controller extends Base
          * now we have the user id's that match the search result, create the standard user array with hydration.
          */
         $users = $this->userMapper->findByColumn('id', $userIds);
+        $output = [];
         foreach ($users as $user) {
             $apiGroups = $this->groupsHelper->getCurrentGroups($user);
             $groupsArr = $apiGroups->map(new ModelToArray());
