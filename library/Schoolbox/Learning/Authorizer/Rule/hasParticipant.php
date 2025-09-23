@@ -22,7 +22,7 @@ class hasParticipant extends AbstractAssessableRule
 
         /* Check to see if there are any participants in the assessment
          */
-        if ($assessable->getParticipantUsers()->count() == 0) {
+        if ($assessable->getParticipantUsers()->count() === 0) {
             throw new Unauthorized(ErrorMapper::ERROR_PAGE_NOT_FOUND);
         }
     }
