@@ -50,12 +50,14 @@ class Validator
                         // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
                         throw new SchoolboxException("Filter 'year' must be an array of objects.");
                     }
+                    $this->validateArrayOfIdOrNameArrays('year', $value);
                     break;
                 case 'role':
                     if (!is_array($value)) {
                         // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
                         throw new SchoolboxException("Filter 'role' must be an array of objects.");
                     }
+                    $this->validateArrayOfIdOrNameArrays('role', $value);
                     break;
                 case 'roleType':
                     if (!in_array($value, Role::getRoleTypes(), true)) {
@@ -67,9 +69,46 @@ class Validator
                         // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
                         throw new SchoolboxException("Filter 'campus' must be an array of objects.");
                     }
+                    $this->validateArrayOfIdOrNameArrays('campus', $value);
                     break;
                 default:
                     throw new SchoolboxException("Unexpected filter key '$key'.");
+            }
+        }
+    }
+
+    /**
+     * @param string $arrayName
+     * @param array $array
+     */
+    private function validateArrayOfIdOrNameArrays(string $arrayName, array $array): void
+    {
+        if (count($array) === 0) {
+            // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
+            throw new SchoolboxException("Filter '$arrayName' must not be empty.");
+        }
+
+        foreach ($array as $subArray) {
+            if (count($subArray) === 0) {
+                // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
+                throw new SchoolboxException("Filter '$arrayName' contains an item that is missing an expected key.");
+            }
+
+            foreach ($subArray as $key => $subValue) {
+                switch ($key) {
+                    case 'id':
+                        if (!is_int($subValue) && !ctype_digit($subValue)) {
+                            throw new SchoolboxException("Filter '$arrayName' item property 'id' must have an integer value.");
+                        }
+                        break;
+                    case 'name':
+                        if (!is_string($subValue)) {
+                            throw new SchoolboxException("Filter '$arrayName' item property 'name' must have a string value.");
+                        }
+                        break;
+                    default:
+                        throw new SchoolboxException("Each filter '$arrayName' item must have a key of either 'id' or 'name'.");
+                }
             }
         }
     }
