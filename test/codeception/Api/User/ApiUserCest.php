@@ -132,6 +132,21 @@ class ApiUserCest
             'valid'  => true,
         ];
         yield [
+            // Empty array filter.
+            'filter' => [],
+            'valid'  => true,
+        ];
+        yield [
+            // Null filter.
+            'filter' => null,
+            'valid'  => true,
+        ];
+        yield [
+            // Blank string filter.
+            'filter' => '',
+            'valid'  => false,
+        ];
+        yield [
             'filter' => [
                 // Year/role/campus in 'id' format.
                 'year' => [
@@ -196,6 +211,24 @@ class ApiUserCest
                 ],
             ],
             'valid' => true,
+        ];
+        yield [
+            'filter' => [
+                // Year/role/campus incorrectly specified.
+                'year' => '1998',
+                'role' => 'Middle Student',
+                'campus' => 'Secondary',
+            ],
+            'valid' => false,
+        ];
+        yield [
+            'filter' => [
+                // Year/role/campus incorrectly specified.
+                'year' => 1998,
+                'role' => 6,
+                'campus' => 2,
+            ],
+            'valid' => false,
         ];
     }
 
