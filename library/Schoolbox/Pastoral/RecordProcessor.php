@@ -185,19 +185,17 @@ class RecordProcessor
         }
 
         /* Allow token replacements in Confidential
-         * TODO supply a $student instance
          */
         if ($partial['body_private'] ?? false) {
             $record->setBodyPrivate((new TokenReplacer\Student(new TokenReplacer\Simple()))
-                ->replace(trim($partial['body_private']), $student));
+                ->replace(trim($partial['body_private']), $record->getStudent()));
         }
 
         /* Allow token replacements in General
-         * TODO supply a $student instance
          */
         if ($partial['body_public'] ?? false) {
             $record->setBodyPrivate((new TokenReplacer\Student(new TokenReplacer\Simple()))
-                ->replace(trim($partial['body_public']), $student));
+                ->replace(trim($partial['body_public']), $record->getStudent()));
         }
 
         if ($partial['actions'] ?? false) {
