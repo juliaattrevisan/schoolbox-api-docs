@@ -266,7 +266,16 @@ class RecordProcessor
         }
 
         if ($partial['actions'] ?? false) {
+            /* There's a config option which, if enabled, allows you to mutate pastoral actions;
+             * otherwise, leave everything unchanged I suppose
+             */
+            if ($this->config->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
+                /* Spawn a Values instance to make this compatible with existing method which does a lot
+                 */
+                $newRecordActions = $this->prepareRecordActions(new Values($partial));
 
+                $this->updateActions($record, $newRecordActions);
+            }
         }
 
         if ($partial['tagNames'] ?? false) {
@@ -280,6 +289,54 @@ class RecordProcessor
         if ($partial['group'] ?? false) {
 
         }
+
+        print_r($record);
+    }
+
+
+    /**
+     * Perform a mutative in-place update of a pastoral record's Actions collection, mutating the
+     * db whenever we add a new action or remove an existing action.
+     *
+     * @param Model $record
+     * @param Collection $newRecordActions
+     * @return void
+     * @throws MapperException
+     */
+    private function updateActions(PastoralModel $record, Collection $newRecordActions): void
+    {
+        // Save actions, record actions are compared against luAction id rather than recordAction id.
+        $existingRecordActions = $record->getRecordActions()->indexByCallback(
+            static function ($recordAction) {
+                /** @var RecordAction\Model $recordAction */
+                return $recordAction->getAction()->getId();
+            }
+        );
+        $record->setRecordActions($this->pastoralRecordActionMapper->createCollection());
+
+        /** @var RecordAction\Model $action */
+        foreach ($newRecordActions as $action) {
+            // if this action is already set to this record, just put it back
+            if (in_array($action->getAction()->getId(), $existingRecordActions->keys())) {
+                $record->getRecordActions()->add($existingRecordActions->getOffset($action->getAction()->getId()));
+            } else {
+                $recordAction = clone $action;
+                $recordAction->setPastoral($record);
+                $this->pastoralRecordActionMapper->save($recordAction);
+                $record->getRecordActions()->add($recordAction);
+            }
+        }
+        // Delete actions no longer exists
+        $removingRecordActions = $existingRecordActions->filter(
+            static function ($action) use ($newRecordActions) {
+                /** @var RecordAction\Model $action */
+                return !in_array($action->getAction()->getId(), $newRecordActions->keys());
+            }
+        );
+        $this->pastoralRecordActionMapper->deleteByColumn(
+            'id',
+            $removingRecordActions->getPropertyValues('id')
+        );
     }
 
 
@@ -553,36 +610,7 @@ class RecordProcessor
 
             // Save actions, record actions are compared against luAction id rather than recordAction id.
             if ($this->config->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
-                $existingRecordActions = $record->getRecordActions()->indexByCallback(
-                    static function ($recordAction) {
-                        /** @var RecordAction\Model $recordAction */
-                        return $recordAction->getAction()->getId();
-                    }
-                );
-                $record->setRecordActions($this->pastoralRecordActionMapper->createCollection());
-                /** @var RecordAction\Model $action */
-                foreach ($newRecordActions as $action) {
-                    // if this action is already set to this record, just put it back
-                    if (in_array($action->getAction()->getId(), $existingRecordActions->keys())) {
-                        $record->getRecordActions()->add($existingRecordActions->getOffset($action->getAction()->getId()));
-                    } else {
-                        $recordAction = clone $action;
-                        $recordAction->setPastoral($record);
-                        $this->pastoralRecordActionMapper->save($recordAction);
-                        $record->getRecordActions()->add($recordAction);
-                    }
-                }
-                // Delete actions no longer exists
-                $removingRecordActions = $existingRecordActions->filter(
-                    static function ($action) use ($newRecordActions) {
-                        /** @var RecordAction\Model $action */
-                        return !in_array($action->getAction()->getId(), $newRecordActions->keys());
-                    }
-                );
-                $this->pastoralRecordActionMapper->deleteByColumn(
-                    'id',
-                    $removingRecordActions->getPropertyValues('id')
-                );
+                $this->updateActions($record, $newRecordActions);
             }
 
             // preparation
