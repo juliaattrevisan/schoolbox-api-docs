@@ -461,7 +461,9 @@ class Controller extends Base
         $userHelper = new Helper($this->userMapper);
 
         try {
-            $this->validator->validateFilter($filter);
+            if ($filter !== null) {
+                $this->validator->validateFilter($filter);
+            }
             $ajaxSearch = $userHelper->ajaxSearch($search, $filter, $limit, $cursor);
         } catch (SchoolboxException $e) {
             $this->sendJsonError('Failed to get assessments: ' . $e->getMessage(), 400);
