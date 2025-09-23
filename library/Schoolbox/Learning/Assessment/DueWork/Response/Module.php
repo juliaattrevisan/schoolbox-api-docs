@@ -34,6 +34,7 @@ use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
 use Schoolbox\Learning\Authorizer\Rule\CanSeeParticipation;
 use Schoolbox\Learning\Authorizer\Rule\CanViewAssessable;
+use Schoolbox\Learning\Authorizer\Rule\hasParticipant;
 use Schoolbox\Learning\Authorizer\Rule\ParentCanViewFeedback;
 use Schoolbox\Learning\Authorizer\Rule\StudentCanViewFeedback;
 use Schoolbox\Learning\InlineGrader\Kami;
@@ -108,7 +109,10 @@ class Module extends BaseModule
         $hasViewGradeAccess = new Rule\All(
             new Rule\IsLoggedIn(),
             $this->buildRuleHasWriteAccess(),
-            new CanViewAssessable(new Visibility(Access::getInstance()))
+            new CanViewAssessable(new Visibility(Access::getInstance())),
+            /* Check if the assessment has any participants
+             */
+            new hasParticipant()
         );
 
         $hasKamiAccess = new Rule\All(
