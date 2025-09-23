@@ -47,7 +47,9 @@ parse_args(){
     return 1
   fi
   if [[ -z $tz_to ]]; then
-    tz_to=$(cat /etc/timezone)
+    # /etc/timezone no longer exists in Trixie:
+    # see https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=822733
+    tz_to=$(readlink /etc/localtime | sed 's/\/usr\/share\/zoneinfo\///')
   fi
 }
 
