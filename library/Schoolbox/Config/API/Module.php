@@ -17,7 +17,6 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\API\Token\JwtParser\InstanceRegistryIssued;
-use Schoolbox\Config\API\Authorizer\Rule\HasValidInstanceRegistryToken;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
@@ -40,28 +39,21 @@ class Module extends BaseModule
      */
     protected function registerRoutes(): void
     {
-        /* Access to Config API is allowed either by:
-         * 1. Being a logged-in superuser, OR
-         * 2. Having a valid Instance Registry JWT token
-         */
-        $hasApiAccess = new Rule\Any(
-            // superuser access for testing
-            new Rule\All(
-                new Rule\IsLoggedIn(),
-                new Rule\IsSuperuser()
-            ),
-            // Instance Registry JWT token access
-            $this->createInstanceRegistryTokenRule()
+        /* Access to Config API is allowed by being a logged-in superuser */
+        $hasApiAccess = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\IsSuperuser()
         );
 
         $preloadConfig = function ($params) {
             return $this->preloadConfig($params);
         };
 
-        $this->register('POST', '/bulk', 'apiConfigBulkPost', $hasApiAccess);
+        $this->register('PATCH', '/', 'apiConfigBulkPatch', $hasApiAccess);
         $this->register('GET', '/{configName}', 'apiConfigGet', $hasApiAccess, $preloadConfig);
-        $this->register('POST', '/{configName}', 'apiConfigPost', $hasApiAccess, $preloadConfig);
+        $this->register('PATCH', '/{configName}', 'apiConfigPatch', $hasApiAccess, $preloadConfig);
     }
+
 
 
     /**
@@ -106,35 +98,11 @@ class Module extends BaseModule
     }
 
     /**
-     * Creates an Instance Registry JWT token validation rule
-     *
-     * @return HasValidInstanceRegistryToken
-     */
-    private function createInstanceRegistryTokenRule(): HasValidInstanceRegistryToken
-    {
-        // Get required dependencies from the injector
-        $userMapper = $this->getMapperFactory()->get(UserMapper::class);
-        $config = $this->injector->get('config');
-        $logger = $this->injector->get('user.jwtParser.logger');
-
-        // Create the JWT parser
-        $jwtParser = new InstanceRegistryIssued(
-            $userMapper,
-            $config,
-            $logger,
-            INSTANCE_ID
-        );
-
-        // Return the authorization rule
-        return new HasValidInstanceRegistryToken($jwtParser, $logger);
-    }
-
-    /**
-     * Creates an Instance Registry JWT parser
+     * Creates an InstanceRegistryIssued JWT parser with common dependencies
      *
      * @return InstanceRegistryIssued
      */
-    private function createInstanceRegistryJwtParser(): InstanceRegistryIssued
+    private function createInstanceRegistryIssued(): InstanceRegistryIssued
     {
         // Get required dependencies from the injector
         $userMapper = $this->getMapperFactory()->get(UserMapper::class);
@@ -148,6 +116,18 @@ class Module extends BaseModule
             $logger,
             INSTANCE_ID
         );
+    }
+
+
+    /**
+     * Creates an Instance Registry JWT parser
+     *
+     * @return InstanceRegistryIssued
+     */
+    private function createInstanceRegistryJwtParser(): InstanceRegistryIssued
+    {
+        // Use the shared method to create the JWT parser
+        return $this->createInstanceRegistryIssued();
     }
 
     /**

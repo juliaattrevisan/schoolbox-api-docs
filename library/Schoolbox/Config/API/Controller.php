@@ -37,119 +37,6 @@ class Controller extends Base
     ) {
     }
 
-    /**
-     * Check if the current request is from an Instance Registry token
-     *
-     * @return bool
-     */
-    private function isInstanceRegistryTokenRequest(): bool
-    {
-        $authHeader = $this->getAuthorizationHeader();
-        if (empty($authHeader)) {
-            return false;
-        }
-
-        // Check if it's a Bearer token
-        if (!preg_match('/^Bearer\s+(.+)$/i', $authHeader, $matches)) {
-            return false;
-        }
-
-        $jwt = $matches[1];
-
-        try {
-            // Use the InstanceRegistryIssued parser to validate if this is an Instance Registry token
-            return $this->jwtParser->accepts($jwt);
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
-    /**
-     * Get the Authorization header from the current request
-     *
-     * @return string|null
-     */
-    private function getAuthorizationHeader(): ?string
-    {
-        // Try different ways to get the Authorization header
-        if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
-            return $_SERVER['HTTP_AUTHORIZATION'];
-        }
-
-        if (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
-            return $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
-        }
-
-        if (function_exists('apache_request_headers')) {
-            $headers = apache_request_headers();
-            if (isset($headers['Authorization'])) {
-                return $headers['Authorization'];
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Check if user can access this config based on token type
-     * Hidden configs are restricted for superusers but not for Instance Registry tokens
-     *
-     * @param Config $config
-     * @return bool
-     */
-    private function canAccessConfig(Config $config): bool
-    {
-        // Instance Registry tokens can access everything
-        if ($this->isInstanceRegistryTokenRequest()) {
-            return true;
-        }
-
-        // Superusers cannot access hidden configs
-        return !$config->getHidden();
-    }
-
-    /**
-     * Check if user can edit this config based on token type
-     * Hidden and non-editable configs are restricted for superusers but not for Instance Registry tokens
-     *
-     * @param Config $config
-     * @return bool
-     */
-    private function canEditConfig(Config $config): bool
-    {
-        // Instance Registry tokens can edit everything
-        if ($this->isInstanceRegistryTokenRequest()) {
-            return true;
-        }
-
-        // Superusers cannot edit hidden or non-editable configs
-        return !$config->getHidden() && $config->getEditable();
-    }
-
-    /**
-     * Validate and serialize config value using the existing field strategy system
-     *
-     * @param mixed $value
-     * @param Config $config
-     * @return string
-     * @throws \UnexpectedValueException
-     */
-    private function validateAndSerializeConfigValue($value, Config $config): string
-    {
-        $fieldId = $config->getFieldId();
-        if ($fieldId === null) {
-            // No field validation, just basic sanitization
-            return trim((string)$value);
-        }
-
-        try {
-            $valueSerializer = $this->fieldStrategyFactory->makeValueSerializer($fieldId);
-            return $valueSerializer->serializeValue($value, $config);
-        } catch (\UnexpectedValueException $e) {
-            // Re-throw with more context
-            throw new \UnexpectedValueException("Validation failed for config '{$config->getName()}': " . $e->getMessage());
-        }
-    }
 
     /**
      * Returns config object by name
@@ -160,23 +47,12 @@ class Controller extends Base
     public function apiConfigGet(Config $config): void
     {
         // Check if user can access this config
-        if (!$this->canAccessConfig($config)) {
-            $problem = (new ApiProblem('Access denied: Hidden configurations are not accessible to superusers', 'Access Denied'))
-                ->setStatus(403)
-                ->asArray();
-            $this->response = $this->responseAsJson($problem)
-                                   ->withStatus(403);
-            return;
+        $serverParams = $this->request->getServerParams();
+        if (!AuthorizationHelper::canAccessConfig($config, $serverParams, $this->jwtParser)) {
+            throw new SchoolboxException('Config Does not Exist', 404, null, 404);
         }
 
-        $output = [
-            'name' => $config->getName(),
-            'value' => $config->getValue(),
-            'title' => $config->getTitle(),
-            'description' => $config->getDescription()
-        ];
-
-        $this->response = $this->responseAsJson($output);
+        $this->response = $this->responseAsJson(AuthorizationHelper::configToArray($config));
     }
 
     /**
@@ -185,16 +61,12 @@ class Controller extends Base
      * @param Config $config
      * @api POST /api/config/{configName}
      */
-    public function apiConfigPost(Config $config): void
+    public function apiConfigPatch(Config $config): void
     {
         // Check if user can edit this config
-        if (!$this->canEditConfig($config)) {
-            $problem = (new ApiProblem('Access denied: Hidden or non-editable configurations cannot be modified by superusers', 'Access Denied'))
-                ->setStatus(403)
-                ->asArray();
-            $this->response = $this->responseAsJson($problem)
-                                   ->withStatus(403);
-            return;
+        $serverParams = $this->request->getServerParams();
+        if (!AuthorizationHelper::canEditConfig($config, $serverParams, $this->jwtParser)) {
+            throw new SchoolboxException('Config Does not Exist', 404, null, 404);
         }
 
         $data = $this->request->getParsedBody();
@@ -218,7 +90,7 @@ class Controller extends Base
 
         // Validate and serialize the config value
         try {
-            $serializedValue = $this->validateAndSerializeConfigValue($data['value'], $config);
+            $serializedValue = AuthorizationHelper::validateAndSerializeConfigValue($data['value'], $config, $this->fieldStrategyFactory);
             $config->setValue($serializedValue);
         } catch (\UnexpectedValueException $e) {
             $problem = (new ApiProblem('Validation error: ' . $e->getMessage(), 'Validation Failed'))
@@ -240,14 +112,7 @@ class Controller extends Base
             return;
         }
 
-        $output = [
-            'name' => $config->getName(),
-            'value' => $config->getValue(),
-            'title' => $config->getTitle(),
-            'description' => $config->getDescription(),
-        ];
-
-        $this->response = $this->responseAsJson($output);
+        $this->response = $this->responseAsJson(AuthorizationHelper::configToArray($config));
     }
 
     /**
@@ -255,7 +120,7 @@ class Controller extends Base
      *
      * @api POST /api/config/bulk
      */
-    public function apiConfigBulkPost(): void
+    public function apiConfigBulkPatch(): void
     {
 
         $data = $this->request->getParsedBody();
@@ -281,44 +146,43 @@ class Controller extends Base
         $errors = [];
 
         foreach ($data['configs'] as $configData) {
+            $result = [
+                'name' => $configData['name'] ?? 'unknown',
+                'status' => 'failed'
+            ];
+
             if (!isset($configData['name']) || !isset($configData['value'])) {
                 $errors[] = "Each config must have 'name' and 'value' fields";
                 $result['error'] = "Each config must have 'name' and 'value' fields";
                 continue;
             }
-
-            $result = [
-                'name' => $configData['name'],
-                'status' => 'failed'
-            ];
             try {
                 $config = $this->configMapper->findOneByColumn('name', $configData['name']);
 
                 // Check if user can edit this config
-                if (!$this->canEditConfig($config)) {
-                    $errors[] = "Access denied: Config '{$configData['name']}' is hidden or non-editable and cannot be modified by superusers";
+                $serverParams = $this->request->getServerParams();
+                if (!AuthorizationHelper::canEditConfig($config, $serverParams, $this->jwtParser)) {
+                    $errors[] = "Config '{$configData['name']}' not found";
+                    $result['error'] = "Config '{$configData['name']}' not found";
+                    $results[] = $result;
                     continue;
                 }
 
                 // Validate and serialize the config value
                 try {
-                    $serializedValue = $this->validateAndSerializeConfigValue($configData['value'], $config);
+                    $serializedValue = AuthorizationHelper::validateAndSerializeConfigValue($configData['value'], $config, $this->fieldStrategyFactory);
                     $config->setValue($serializedValue);
                 } catch (\UnexpectedValueException $e) {
                     $errors[] = "Validation error for config '{$configData['name']}': " . $e->getMessage();
                     $result['error'] = "Validation error for config '{$configData['name']}': " . $e->getMessage();
+                    $results[] = $result;
                     continue;
                 }
 
                 $this->configMapper->save($config);
 
-                $result = [
-                    'name' => $config->getName(),
-                    'value' => $config->getValue(),
-                    'title' => $config->getTitle(),
-                    'description' => $config->getDescription(),
-                    'status' => 'success'
-                ];
+                $result = AuthorizationHelper::configToArray($config);
+                $result['status'] = 'success';
             } catch (\Schoolbox\Mapper\Exception $e) {
                 $errors[] = "Config '{$configData['name']}' not found";
                 $result['error'] = "Config '{$configData['name']}' not found";
