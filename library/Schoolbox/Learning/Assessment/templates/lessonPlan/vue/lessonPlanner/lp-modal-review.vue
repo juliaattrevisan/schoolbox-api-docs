@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import locale from "@js/terminology/rosettaStone";
+import {sbProps} from "@js/util/sbx/pageUtils";
 import { useLessonPlannerStore } from "./store/lessonPlannerStore";
 import { LessonPlannerModalStep } from "./lessonPlannerTypes";
 
@@ -40,6 +41,7 @@ window.Vue.onMounted(() => {
     </template>
 
     <div class="clearfix"></div>
+    <span class="meta">{{ sbProps.siteTitle }} allows interaction with AI. AI can make mistakes. Please check generated content.</span>
     <div class="l-flex-row l-flex--no-wrap">
         <button class="l-flex__item--1 button" @click="lpStore.modalStep = LessonPlannerModalStep.GENERATE">
             Back
