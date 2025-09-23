@@ -10,8 +10,6 @@ import PrTable from "./table/pr-table.vue";
 
 const props = defineProps<{
     title: string;
-    export: boolean;
-    reportId: number;
     tabs: Tab[];
     config: Config;
     routes: Routes;
@@ -28,8 +26,6 @@ const tabParamName = "tab"; // URL parameter name for the selected tab
 // Provide the state and props to child components
 window.Vue.provide("selectedTab", selectedTab);
 window.Vue.provide("title", props.title);
-window.Vue.provide("export", props.export);
-window.Vue.provide("reportId", props.reportId);
 window.Vue.provide("tabs", props.tabs);
 window.Vue.provide("config", props.config);
 window.Vue.provide("routes", props.routes);
