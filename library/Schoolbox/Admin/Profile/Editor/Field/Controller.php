@@ -285,11 +285,6 @@ class Controller extends Base
                     $value = (bool)$value;
                 } else if ($fieldOptionDefinition['type'] === 'number') {
                     $value = (int)$value;
-
-                    /** the only place we use this currently needs >0, at some point I guess add an optional max/min to the definition per field */
-                    if ($value < 1) {
-                        $value = $defaultAdditionalSettings[$key];
-                    }
                 } else { // if ($fieldOptionDefinition['type'] === 'text') - phpstan doesn't let you check this
                     $value = trim((string)$value);
                 }

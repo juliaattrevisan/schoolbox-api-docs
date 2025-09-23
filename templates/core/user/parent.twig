@@ -91,6 +91,10 @@
                                             {# Renders a mailto: hyperlink #}
                                             {{ macro.email(session, selectedField.value, selectedField.value) }}
                                         </dd>
+                                    {% elseif selectedField.field in ['iframe'] %}
+                                        {% include '@searchUser/field/iframe.twig' with {
+                                            html: selectedField.value,
+                                        } only %}
                                     {% else %}
                                         {# A generic tuple (key, value) pair
                                          #
