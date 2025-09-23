@@ -261,11 +261,11 @@ class Controller extends Base
 
                                     /** the markbook uses responseId !== null to determine if this mark actually exists, so jank a -1 here for projects */
                                     if ($aImpl instanceof Project) {
-                                        if ($authNormMarkPublished) {
+                                        if ($authNormMarkPublished !== null) {
                                             $responseIdPublished = -1;
                                         }
 
-                                        if ($authNormMarkDraft) {
+                                        if ($authNormMarkDraft !== null) {
                                             $responseIdDraft = -1;
                                         }
                                     }
