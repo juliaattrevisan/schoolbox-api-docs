@@ -47,15 +47,15 @@ class Validator
                     break;
                 case 'year':
                     if (!is_array($value)) {
-                        // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
-                        throw new SchoolboxException("Filter 'year' must be an array of objects.");
+                        // Note 'object' in the exception below refers to a JSON object.  JSON objects will appear here as arrays.
+                        throw new SchoolboxException("Filter 'year' must be an object.");
                     }
                     $this->validateIdOrNameArray('year', $value);
                     break;
                 case 'role':
                     if (!is_array($value)) {
-                        // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
-                        throw new SchoolboxException("Filter 'role' must be an array of objects.");
+                        // Note 'object' in the exception below refers to a JSON object.  JSON objects will appear here as arrays.
+                        throw new SchoolboxException("Filter 'role' must be an object.");
                     }
                     $this->validateIdOrNameArray('role', $value);
                     break;
@@ -66,8 +66,8 @@ class Validator
                     break;
                 case 'campus':
                     if (!is_array($value)) {
-                        // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
-                        throw new SchoolboxException("Filter 'campus' must be an array of objects.");
+                        // Note 'object' in the exception below refers to a JSON object.  JSON objects will appear here as arrays.
+                        throw new SchoolboxException("Filter 'campus' must be an object.");
                     }
                     $this->validateIdOrNameArray('campus', $value);
                     break;
