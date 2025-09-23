@@ -333,7 +333,10 @@ class RecordProcessor
             }
         }
 
+        $this->pastoralDataSource->save($record);
 
+        /* TODO db commit transaction
+         */
     }
 
 
