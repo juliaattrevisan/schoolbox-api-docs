@@ -38,7 +38,7 @@ const isClickToReveal = window.Vue.computed(() => {
     if (!("fieldSettings" in props.field)) {
         return false; // This isn't an "active" field, don't show the icon
     }
-    return props.field.fieldSettings[ProfileEditorFieldSettingKey.ADDITIONAL_SETTINGS].includes("clickToReveal");
+    return Boolean(props.field.fieldSettings[ProfileEditorFieldSettingKey.ADDITIONAL_SETTINGS].clickToReveal);
 });
 </script>
 

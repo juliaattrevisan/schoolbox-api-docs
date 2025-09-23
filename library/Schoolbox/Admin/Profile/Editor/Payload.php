@@ -313,15 +313,18 @@ class Payload
                          */
                         self::AVAILABILITY_NODE => $field->getAvailabilityCampus()?->indexByCallback(static function (\Schoolbox\Admin\Profile\Editor\Field\Availability\Campus\Model $campus) {
                             return $campus->getCampus()?->getId();
-                        })->keys(),
+                        })->map(fn() => true),
                         /* Find the roletypes ("ids") for which this field might be visible
                          */
-                        self::VISIBILITY_NODE => $field->getVisibility()?->indexBy('roleType')->keys(),
+                        self::VISIBILITY_NODE => $field->getVisibility()?->indexBy('roleType')->map(fn() => true),
                         /* Find the enabled additional setting keys for this field
+                         * TODO: probably filter out irrelevant keys
                          */
-                        self::ADDITIONAL_SETTINGS_NODE => array_keys(array_filter([
+                        self::ADDITIONAL_SETTINGS_NODE => [
                             'clickToReveal' => $field->getClickToReveal(),
-                        ], static fn($value) => !!$value)),
+                            'iframeLink' => $field->getField() === 'iframe' ? 'some url' : false,
+                            'iframeHeight' => $field->getField() === 'iframe' ? 500 : false,
+                        ],
                     ],
                     'availableFieldSettings' => $this->getFieldSettingsAvailability($field),
                 ];
@@ -356,7 +359,7 @@ class Payload
 
         foreach ($campuses as $campus) {
             $settings['options'][] = [
-                'type' => 'campus',
+                'type' => 'checkbox',
                 'id' => $campus->getId(),
                 'name' => $campus->getName(),
                 'meta' => null
@@ -385,7 +388,7 @@ class Payload
             'tooltip' => self::VISIBILITY_TOOLTIP,
             'options' => [
                 [
-                    'type' => 'roleType',
+                    'type' => 'checkbox',
                     'id' => self::ROLETYPE_SELF,
                     'name' => ucwords(self::ROLETYPE_SELF),
                     'meta' => $metadata[self::ROLETYPE_SELF]
@@ -395,7 +398,7 @@ class Payload
 
         foreach ($roleTypes as $roleType) {
             $settings['options'][] = [
-                'type' => 'roleType',
+                'type' => 'checkbox',
                 'id' => $roleType,
                 'name' => ucwords($roleType),
                 'meta' => $metadata[$roleType] ?? null
@@ -420,10 +423,22 @@ class Payload
             'tooltip' => self::ADDITIONAL_SETTINGS_TOOLTIP,
             'options' => [
                 [
-                    'type' => 'boolean',
+                    'type' => 'checkbox',
                     'id' => 'clickToReveal',
                     'name' => 'Activate View More',
                     'meta' => 'Only show content after the user chooses to view it.'
+                ],
+                [
+                    'type' => 'text',
+                    'id' => 'iframeLink',
+                    'name' => 'iFrame Link',
+                    'meta' => 'TODO' // TODO
+                ],
+                [
+                    'type' => 'number',
+                    'id' => 'iframeHeight',
+                    'name' => 'Height',
+                    'meta' => 'TODO' // TODO
                 ],
             ]
         ];
@@ -448,6 +463,9 @@ class Payload
                  * (i.e. when it will be displayed as an alert box)
                  */
                 'clickToReveal' => $field->isFlag(),
+                // TODO derive this from the DB
+                'iframeLink' => $field->getField() === 'iframe',
+                'iframeHeight' => $field->getField() === 'iframe',
             ]
         ];
 

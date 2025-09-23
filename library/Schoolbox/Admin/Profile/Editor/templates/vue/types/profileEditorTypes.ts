@@ -4,12 +4,23 @@
 
 // #region FIELD SETTINGS
 
-export type ProfileEditorFieldSettingOption = {
+export type ProfileEditorFieldSettingOptionCheckbox = {
     id: number | string;
     name: string;
-    type: string; // currently unused, e.g. "campus" or "role"
+    type: "checkbox";
     meta: Record<ProfileEditorRoleType["roleType"], string> | string | null; // additional explanation about the option, if required
 };
+
+type ProfileEditorFieldSettingOptionInput = {
+    id: number | string;
+    name: string;
+    type: "text" | "number";
+    meta?: Record<ProfileEditorRoleType["roleType"], string> | string | null; // additional explanation about the option, if required
+};
+
+export type ProfileEditorFieldSettingOption =
+    | ProfileEditorFieldSettingOptionCheckbox
+    | ProfileEditorFieldSettingOptionInput;
 
 // The available field setting keys, as per Profile/Editor/Payload.php
 export enum ProfileEditorFieldSettingKey {
@@ -24,7 +35,10 @@ export type ProfileEditorFieldSettingDefinition = {
     options: ProfileEditorFieldSettingOption[];
 };
 
-type ProfileEditorFieldSettings = Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingOption["id"][]>;
+type ProfileEditorFieldSettings = Record<
+    ProfileEditorFieldSettingKey,
+    Partial<Record<ProfileEditorFieldSettingOption["id"], boolean | string | number>>
+>;
 
 type ProfileEditorAvailableFieldSettings = Record<
     ProfileEditorFieldSettingKey,
@@ -113,7 +127,7 @@ export enum ProfileEditorTabSettingKey {
 export type ProfileEditorTabSettingDefinition = {
     displayAs: string;
     tooltip: string | null;
-    options: ProfileEditorFieldSettingOption[];
+    options: ProfileEditorTabSettingOption[];
 };
 
 // The tabs available on the profile editor for a role type
@@ -186,6 +200,6 @@ export type ProfileEditorPayload = {
         // A map of each field setting key to its definition (display name and options)
         fieldSettings: Partial<Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingDefinition>>;
         // A map of each tab setting key to its definition (display name and options)
-        tabSettings: Partial<Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingDefinition>>;
+        tabSettings: Partial<Record<ProfileEditorTabSettingKey, ProfileEditorTabSettingDefinition>>;
     };
 };

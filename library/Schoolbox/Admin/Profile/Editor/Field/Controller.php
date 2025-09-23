@@ -178,6 +178,7 @@ class Controller extends Base
     public function postSettings(string $roleType, Model $field): void
     {
         try {
+            /** @var array<string,array<int|string,string|bool|int>|string[]>|null $settings */
             $settings = $this->requestPost->get('fieldSettings');
 
             if (null === $settings) {
@@ -190,27 +191,30 @@ class Controller extends Base
              * imho it'd be better served seeing a campus node in here and also a
              * roletype node, so you know conclusively what these represent.
              * An additional node is also present, which contains other settings that
-             * don't fit into the other categoryes, currently this only has 'clickToReveal'
+             * don't fit into the other categories
+             * Each node doesn't always have all the possible keys, usually only those that are enabled
              *
                 [fieldSettings] => Array
                     (
                         [availability] => Array
                             (
-                                [0] => 1
-                                [1] => 2
+                                [1] => ?boolean
+                                [2] => ?boolean
                             )
 
                         [visibility] => Array
                             (
-                                [0] => parent
-                                [1] => student
-                                [2] => staff
-                                [3] => self
+                                [parent] => ?boolean
+                                [student] => ?boolean
+                                [staff] => ?boolean
+                                [self] => ?boolean
                             )
 
                         [additional] => Array
                             (
-                                [0] => clickToReveal
+                                [clickToReveal] => ?boolean
+                                [iFrameLink] => ?string
+                                [iFrameHeight] => ?int
                             )
 
                     )
@@ -223,8 +227,8 @@ class Controller extends Base
             /* Then, if there are any campus ids chosen, reinsert these new ones
              * Otherwise leave it empty (this is a legitimate use case)
              */
-            /** @var int[] $newCampusIds */
             $newCampusIds = $settings[Payload::AVAILABILITY_NODE] ?? [];
+            $newCampusIds = array_keys(array_filter($newCampusIds, fn($v) => (bool)$v));
 
             if (\count($newCampusIds)) {
                 $campuses = $this->campusMapper->findByColumn('id', $newCampusIds);
@@ -245,8 +249,8 @@ class Controller extends Base
             /* Then, if there are any roletypes chosen, reinsert these new ones
              * Otherwise leave it empty (this is a legitimate use case)
              */
-            /** @var string[] $newRoleTypes */
             $newRoleTypes = $settings[Payload::VISIBILITY_NODE] ?? [];
+            $newRoleTypes = array_keys(array_filter($newRoleTypes, fn($v) => (bool)$v));
 
             if (\count($newRoleTypes)) {
                 foreach ($newRoleTypes as $newRoleType) {
@@ -259,11 +263,11 @@ class Controller extends Base
             }
 
             /* Apply additional settings
+             * TODO: make this dependent on the field definition and include the other settings
              */
-            /** @var string[] $additionalSettings */
             $additionalSettings = $settings[Payload::ADDITIONAL_SETTINGS_NODE] ?? [];
 
-            $field->setClickToReveal((int)in_array('clickToReveal', $additionalSettings, true));
+            $field->setClickToReveal((int)(bool)($additionalSettings['clickToReveal'] ?? false));
             $this->fieldMapper->save($field);
 
             $this->response = $this->responseAsJson(['success' => true]);
