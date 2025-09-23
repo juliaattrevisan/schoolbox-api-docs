@@ -4,6 +4,7 @@
  * This could easily be expanded to be used in other places when we inevitably need that
  */
 
+import { sbProps } from "@js/util/sbx/pageUtils";
 import { useImageGeneratorStore } from "./store/imageGeneratorStore";
 import type { ImagePromptAttribute } from "./imageGeneratorTypes";
 import IgPrompt from "./ig-prompt.vue";
@@ -44,7 +45,7 @@ window.Vue.onMounted(() => {
             <b>There was a problem uploading the image.</b>
             {{ igStore.uploadError }}
         </div>
-      <span class="meta">Schoolbox allows interaction with AI. AI can make mistakes. Please check generated content.</span>
+      <span class="meta">{{ sbProps.siteTitle }} allows interaction with AI. AI can make mistakes. Please check generated content.</span>
     </div>
     <ig-actions />
 </template>
