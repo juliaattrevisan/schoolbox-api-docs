@@ -257,6 +257,7 @@ class ApiUserCest
         yield [
             'filter' => [
                 // String fields incorrectly specified as ints.
+                // Note: prior to 25.1, this would cause no validation error, but would return no results.
                 'externalId' => 12345,
                 'username' => 12345,
                 'email' => 12345,
@@ -267,6 +268,7 @@ class ApiUserCest
         yield [
             'filter' => [
                 // String fields incorrectly specified as null.
+                // Note: prior to 25.1, this would incorrectly return all results, because the filter would be ignored.
                 'externalId' => null,
                 'username' => null,
                 'email' => null,
@@ -277,6 +279,7 @@ class ApiUserCest
         yield [
             'filter' => [
                 // Non-existent roleType.
+                // Note: prior to 25.1, this would cause no validation error, but would return no results.
                 'roleType' => 'Non-existent role type',
             ],
             'valid' => false,
