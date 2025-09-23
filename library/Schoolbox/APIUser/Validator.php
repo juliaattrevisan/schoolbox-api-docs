@@ -31,8 +31,8 @@ class Validator
         foreach ($filter as $key => $value) {
             switch ($key) {
                 case 'externalId':
-                    if (!is_int($value) && !ctype_digit($value)) {
-                        throw new SchoolboxException("Filter 'externalId' must have an integer value.");
+                    if (!is_string($value)) {
+                        throw new SchoolboxException("Filter 'externalId' must have a string value.");
                     }
                     break;
                 case 'username':
