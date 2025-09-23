@@ -145,6 +145,10 @@ class RecordProcessor
      */
     public function processPartialPastoralRecords(array $partial, PastoralModel $record): void
     {
+        /* TODO set up transaction because we're mutating in situ
+         *  and you can't tell when you'll die
+         */
+
         /* Manually map the partial array into $record, one prop at a time
          * Not all of them can be conveniently derived: body_public maps to setBody_public() (nonexistent method)
          * and some require actual hydrated stubs to proceed (types, subtypes, severity, etc)
@@ -218,8 +222,8 @@ class RecordProcessor
             }
         }
 
-        /* This has to be in one of the rfc formats or the locale's format w
-         * hich might change per instance
+        /* This has to be in one of the rfc formats or the locale's format
+         * which might change per instance
          */
         $locale = new \Alaress_Date_Locale_Config();
 
