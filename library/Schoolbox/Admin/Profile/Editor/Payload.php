@@ -300,6 +300,31 @@ class Payload
                     $node = 'mandatory';
                 }
 
+                /* All the field settings that are currently set for this field
+                 */
+                $fieldSettings = [
+                    /* Find the ids of the campuses for which this field might be available
+                     */
+                    self::AVAILABILITY_NODE => $field->getAvailabilityCampus()?->indexByCallback(static function (\Schoolbox\Admin\Profile\Editor\Field\Availability\Campus\Model $campus) {
+                        return $campus->getCampus()?->getId();
+                    })->map(fn() => true),
+                    /* Find the roletypes ("ids") for which this field might be visible
+                     */
+                    self::VISIBILITY_NODE => $field->getVisibility()?->indexBy('roleType')->map(fn() => true),
+                    /* Find the enabled additional setting keys for this field
+                     */
+                    self::ADDITIONAL_SETTINGS_NODE => $field->getOptions() ?? [],
+                ];
+
+                /* The frontend expects a {} for an empty additional settings node, php will json_encode an empty array as []
+                 * so we need to convert it here
+                 */
+                foreach ($fieldSettings as $settingKey => $settingValue) {
+                    if ($settingValue instanceof \Schoolbox\Collection ? $settingValue->count() === 0 : empty($settingValue)) {
+                        $fieldSettings[$settingKey] = new \stdClass();
+                    }
+                }
+
                 /* Pile it into the stack
                  */
                 $roleTypeSettings['fields'][$node][] = [
@@ -308,24 +333,7 @@ class Payload
                     'icon' => $field->getIcon(),
                     'css' => $field->getCss(),
                     'terminology' => $field->getTerm(),
-                    'fieldSettings' => [
-                        /* Find the ids of the campuses for which this field might be available
-                         */
-                        self::AVAILABILITY_NODE => $field->getAvailabilityCampus()?->indexByCallback(static function (\Schoolbox\Admin\Profile\Editor\Field\Availability\Campus\Model $campus) {
-                            return $campus->getCampus()?->getId();
-                        })->map(fn() => true),
-                        /* Find the roletypes ("ids") for which this field might be visible
-                         */
-                        self::VISIBILITY_NODE => $field->getVisibility()?->indexBy('roleType')->map(fn() => true),
-                        /* Find the enabled additional setting keys for this field
-                         * TODO: probably filter out irrelevant keys
-                         */
-                        self::ADDITIONAL_SETTINGS_NODE => [
-                            'clickToReveal' => $field->getClickToReveal(),
-                            'iframeLink' => $field->getField() === 'iframe' ? 'some url' : false,
-                            'iframeHeight' => $field->getField() === 'iframe' ? 500 : false,
-                        ],
-                    ],
+                    'fieldSettings' => $fieldSettings,
                     'availableFieldSettings' => $this->getFieldSettingsAvailability($field),
                 ];
             }
@@ -422,6 +430,14 @@ class Payload
             'displayAs' => self::ADDITIONAL_SETTINGS_NAME,
             'tooltip' => self::ADDITIONAL_SETTINGS_TOOLTIP,
             'options' => [
+                /**
+                 * currently these are just a global spec that applies to all fields,
+                 * individual fields then opt-in to having these settings available based on
+                 * if the given id exists inside the field's "options" JSON column
+                 *
+                 * Ideally at some point an individual field could define its own additional settings
+                 * completely and we wouldn't need this here
+                 */
                 [
                     'type' => 'checkbox',
                     'id' => 'clickToReveal',
@@ -442,6 +458,34 @@ class Payload
                 ],
             ]
         ];
+
+        // $settings = [
+        //     'displayAs' => "iFrame URL",
+        //     'tooltip' => null,
+        //     'input' => [
+        //         'type' => 'text',
+        //         'id' => 'iFrameURL',
+        //         'default' => '',
+        //         'placeholder' => 'Enter iFrame URL'
+        //     ],
+        // ];
+
+        // $settings = [
+        //     'displayAs' => "Height (px)",
+        //     'tooltip' => null,
+        //     'input' => [
+        //         'type' => 'number',
+        //         'id' => 'height',
+        //         'default' => '400',
+        //         'placeholder' => '',
+        //     ],
+        // ];
+
+        // $values = [
+        //     'clickToReveal' => true,
+        //     'iFrameURL' => '',
+        //     'height' => '400',
+        // ];
 
         return $settings;
     }

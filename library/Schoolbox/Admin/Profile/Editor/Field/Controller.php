@@ -265,9 +265,34 @@ class Controller extends Base
             /* Apply additional settings
              * TODO: make this dependent on the field definition and include the other settings
              */
-            $additionalSettings = $settings[Payload::ADDITIONAL_SETTINGS_NODE] ?? [];
+            $newAdditionalSettings = $settings[Payload::ADDITIONAL_SETTINGS_NODE] ?? [];
+            $fieldAdditionalSettings = $field->getOptions() ?? [];
 
-            $field->setClickToReveal((int)(bool)($additionalSettings['clickToReveal'] ?? false));
+            foreach ($newAdditionalSettings as $key => $value) {
+                // TODO: if we move the specs into the field definition, we can validate here properly
+                if (!array_key_exists($key, $fieldAdditionalSettings)) {
+                    throw new \InvalidArgumentException("Unknown additional setting: {$key}");
+                }
+
+                if ($key === 'clickToReveal') {
+                    $value = (bool)$value;
+                } else if ($key === 'iframeHeight') {
+                    $value = (int)$value;
+
+                    if ($value < 1) {
+                        $value = 300; // TODO pull default from field definition once that exists
+                    }
+                } else if ($key === 'iframeLink') {
+                    $value = trim((string)$value);
+                } else {
+                    throw new \InvalidArgumentException("Unknown additional setting: {$key}");
+                }
+
+                $fieldAdditionalSettings[$key] = $value;
+            }
+
+            $field->setOptions($fieldAdditionalSettings);
+
             $this->fieldMapper->save($field);
 
             $this->response = $this->responseAsJson(['success' => true]);

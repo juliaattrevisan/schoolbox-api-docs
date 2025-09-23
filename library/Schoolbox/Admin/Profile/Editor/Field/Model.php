@@ -99,12 +99,13 @@ class Model
 
 
     /**
-     * Some fields (flags) have an option click-to-reveal for privacy reasons
-     * This is configurable per school in their db; it's not in the user interface atm
-     *
-     * @var int|null
+     * Some fields have additional options such as click to reveal, iframe content, etc.
+     * The value of each additional option is stored as JSON
+     * The existence of a key in this JSON object indicates that the option is available for a given field
+     * @var array|null
      */
-    private ?int $clickToReveal = null;
+    private ?array $options = null;
+
 
     /**
      * Whether the field is an external field (true) or internal field (false)
@@ -359,21 +360,21 @@ class Model
 
 
     /**
-     * @return int|null
+     * @return array|null
      */
-    public function getClickToReveal(): ?int
+    public function getOptions(): ?array
     {
-        return $this->clickToReveal;
+        return $this->options;
     }
 
 
     /**
-     * @param int|null $clickToReveal
+     * @param array|null $options
      * @return $this
      */
-    public function setClickToReveal(?int $clickToReveal): self
+    public function setOptions(?array $options): self
     {
-        $this->clickToReveal = $clickToReveal;
+        $this->options = $options;
         return $this;
     }
 
