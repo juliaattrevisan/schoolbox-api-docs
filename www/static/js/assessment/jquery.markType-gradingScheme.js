@@ -53,9 +53,12 @@
             });
 
             // Whenever any field value changes, sync the entries if we need to
-            config.markTypeDropdown.on("change", syncEntriesIfNeeded);
-            config.maxMarkInput.on("input", syncEntriesIfNeeded);
-            config.gradingSchemeSelect.on("change", syncEntriesIfNeeded);
+            // This only applies to the field that is the source of truth, not targets (or else you'll get an infinite loop)
+            if (config.sync.syncWith === null) {
+                config.markTypeDropdown.on("change", syncEntriesIfNeeded);
+                config.maxMarkInput.on("input", syncEntriesIfNeeded);
+                config.gradingSchemeSelect.on("change", syncEntriesIfNeeded);
+            }
 
             // If this is the first load then apply the initial state
             syncEntriesIfNeeded();
@@ -220,22 +223,20 @@
             }
 
             // If this was triggered by a change in a target entry, ignore it (otherwise we'll get an infinite loop)
-            // or skip it if the source config can't be found (perhaps if the fields loaded in the incorrect order?)
-            const sourceConfig = configEntries[config.sync.syncWith] ?? null;
-            if (sourceConfig === null) {
+            if (config.sync.syncWith !== null) {
                 return;
             }
 
             // Find all target entries that should sync with this source entry
             const targetEntries = Object.values(configEntries).filter(
-                (entry) => entry.sync && entry.sync.syncWith === sourceConfig.context,
+                (entry) => entry.sync && entry.sync.syncWith === config.context,
             );
 
             // Apply the source values to all target entries
             targetEntries.forEach((targetConfig) => {
-                targetConfig.markTypeDropdown.val(sourceConfig.markTypeDropdown.val());
-                targetConfig.maxMarkInput.val(sourceConfig.maxMarkInput.val());
-                targetConfig.gradingSchemeSelect.val(sourceConfig.gradingSchemeSelect.val());
+                targetConfig.markTypeDropdown.val(config.markTypeDropdown.val());
+                targetConfig.maxMarkInput.val(config.maxMarkInput.val());
+                targetConfig.gradingSchemeSelect.val(config.gradingSchemeSelect.val());
 
                 targetConfig.markTypeDropdown.trigger("change");
                 targetConfig.maxMarkInput.trigger("input");
