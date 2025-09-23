@@ -63,11 +63,6 @@ class HasValidInstanceRegistryToken implements IAuthorizationRule
             // Validate the token and determine the user
             $validatedUser = $this->jwtParser->determineUser($jwt);
 
-            if ($validatedUser === null) {
-                $this->logger->debug('JWT validation failed - no user determined');
-                throw new Unauthenticated();
-            }
-
             $this->logger->debug('JWT validation successful', [
                 'user_id' => $validatedUser->getId(),
                 'username' => $validatedUser->getUsername()
