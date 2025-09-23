@@ -270,7 +270,7 @@ class RecordProcessor
         /* Allow token replacements in General
          */
         if ($partial['body_public'] ?? false) {
-            $record->setBodyPrivate((new TokenReplacer\Student(new TokenReplacer\Simple()))
+            $record->setBodyPublic((new TokenReplacer\Student(new TokenReplacer\Simple()))
                 ->replace(trim($partial['body_public']), $record->getStudent()));
         }
 
@@ -332,7 +332,6 @@ class RecordProcessor
             foreach ($accesses as $access) {
                 $recordAccess = clone $access;
                 $recordAccess->setPastoral($record);
-                print_r($recordAccess);
                 $this->pastoralAccessMapper->save($recordAccess);
                 $record->getAccess()->add($recordAccess);
             }
