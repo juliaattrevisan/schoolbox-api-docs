@@ -230,6 +230,30 @@ class ApiUserCest
             ],
             'valid' => false,
         ];
+        yield [
+            'filter' => [
+                // Year incorrectly specified.
+                // Note: prior to 25.1, this would incorrectly return all results, because the filter would be ignored.
+                'year' => [300, 900, 1200],
+            ],
+            'valid' => false,
+        ];
+        yield [
+            'filter' => [
+                // Role incorrectly specified.
+                // Note: prior to 25.1, this would incorrectly return all results, because the filter would be ignored.
+                'role' => ['Non-existent role 1', 'Non-existent role 2', 'Non-existent role 3'],
+            ],
+            'valid' => false,
+        ];
+        yield [
+            'filter' => [
+                // Campus incorrectly specified.
+                // Note: prior to 25.1, this would incorrectly return all results, because the filter would be ignored.
+                'campus' => ['Non-existent campus 1', 'Non-existent campus 2', 'Non-existent campus 3'],
+            ],
+            'valid' => false,
+        ];
     }
 
     /**
