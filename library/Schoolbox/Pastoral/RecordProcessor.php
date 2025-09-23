@@ -146,6 +146,11 @@ class RecordProcessor
      */
     public function processPartialPastoralRecords(array $partial, PastoralModel $record): void
     {
+        /* TODO maybe just convert $partial to a Values instance completely arbitrarily
+         *  though I don't know exactly why we built an object wrapper around an array;
+         *  the benefits seem minimal
+         */
+
         /* Some fields incur an in-situ database mutation (because strange thinking)
          * which means you need to start a db transaction and rollback upon deaths (if any)
          *
