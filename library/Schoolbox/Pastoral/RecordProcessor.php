@@ -153,8 +153,6 @@ class RecordProcessor
 
         /* Some fields incur an in-situ database mutation (because strange thinking)
          * which means you need to start a db transaction and rollback upon deaths (if any)
-         *
-         * TODO maybe throw errors upon invalid data instead of ignoring them
          */
         $db = $this->pastoralTypeMapper->getDatabase();
         $db->beginTransaction();
@@ -166,6 +164,16 @@ class RecordProcessor
          * Do it the long way (really?)
          */
         if ($partial['heading'] ?? false) {
+            $heading = trim((string)$partial['heading']);
+
+            /* Check length first. Invalid headings rollback and die
+             */
+            if ('' === $heading) {
+                $db->rollBack();
+
+                throw new SchoolboxException('Heading cannot be empty');
+            }
+
             $record->setHeading($partial['heading']);
         }
 
@@ -177,6 +185,8 @@ class RecordProcessor
             /* Assert correct value range
              */
             if (!is_numeric($partial['points']) || $points < self::POINTS_MIN || $points > self::POINTS_MAX) {
+                $db->rollBack();
+
                 throw new SchoolboxException(sprintf(
                     'Points must be a float between %s and %s',
                     self::POINTS_MIN,
@@ -195,9 +205,12 @@ class RecordProcessor
                 try {
                     $record->setType($this->pastoralTypeMapper->findById($partial['typeId']));
                 } catch (MapperException $e) {
-                    /* noop: either not found, or it was deleted
-                     * Leave current setting unchanged
-                     */
+                    $db->rollBack();
+
+                    throw new SchoolboxException(sprintf(
+                        'Pastoral type with id %s cannot be found',
+                        $partial['typeId']
+                    ));
                 }
             }
         }
@@ -210,9 +223,12 @@ class RecordProcessor
                 try {
                     $record->setSubType($this->pastoralSubTypeMapper->findById($partial['subtypeId']));
                 } catch (MapperException $e) {
-                    /* noop: either not found, or it was deleted
-                     * Leave current setting unchanged
-                     */
+                    $db->rollBack();
+
+                    throw new SchoolboxException(sprintf(
+                        'Pastoral subtype with id %s cannot be found',
+                        $partial['subtypeId']
+                    ));
                 }
             }
         }
@@ -225,9 +241,12 @@ class RecordProcessor
                 try {
                     $record->setSeverity($this->pastoralSeverityMapper->findById($partial['severityId']));
                 } catch (MapperException $e) {
-                    /* noop: either not found, or it was deleted
-                     * Leave current setting unchanged
-                     */
+                    $db->rollBack();
+
+                    throw new SchoolboxException(sprintf(
+                        'Pastoral severity with id %s cannot be found',
+                        $partial['severityId']
+                    ));
                 }
             }
         }
@@ -279,71 +298,84 @@ class RecordProcessor
                 ->replace(trim($partial['body_public']), $record->getStudent()));
         }
 
-        if ($partial['actions'] ?? false) {
-            /* There's a config option which, if enabled, allows you to mutate pastoral actions;
-             * otherwise, leave everything unchanged I suppose
-             */
-            if ($this->config->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
-                /* Spawn a Values instance to make this compatible with existing method which does a lot
+        /* Everything below this point performs an in-situ mutation
+         * Any random errors should cause the transaction to rollback
+         */
+        try {
+            if ($partial['actions'] ?? false) {
+                /* There's a config option which, if enabled, allows you to mutate pastoral actions;
+                 * otherwise, leave everything unchanged I suppose
                  */
-                $newRecordActions = $this->prepareRecordActions(new Values($partial));
+                if ($this->config->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
+                    /* Spawn a Values instance to make this compatible with existing method which does a lot
+                     */
+                    $newRecordActions = $this->prepareRecordActions(new Values($partial));
 
-                $this->updateActions($record, $newRecordActions);
+                    $this->updateActions($record, $newRecordActions);
+                }
             }
+
+            /* Such a strange mix of philosophies in this place, it does my head in
+             * The same idea is implemented in such subtly different ways everywhere here
+             */
+            if (($partial['tags'] ?? false) || ($partial['tagNames'] ?? false)) {
+                /* At least one of these had data:
+                 * if you supplied both, merge and treat synonymously
+                 */
+                $tags = $this->prepareTags($partial['tags'] ?? '', $partial['tagNames'] ?? '');
+
+                // Save pastoral tags
+                $this->pastoralTagMapper->deleteForRecord($record);
+                foreach ($tags as $tag) {
+                    $this->pastoralTagMapper->assignToRecord($record, $tag);
+                }
+                $record->setTags($tags);
+            }
+
+            /* Role and Group selections are both processed in the same method.
+             * If either was specified in $partial then maybe we have some work to do
+             */
+            if (($partial['role'] ?? false) || ($partial['group'] ?? false) || ($partial['user'] ?? false)) {
+                /* By this point, types and subtypes were already updated in $record which
+                 * is a circumstantial sequential dependency that we happen to fulfil...
+                 */
+                $type = $record->getType();
+                $subtype = $record->getSubtype();
+
+                /* Accesses depend on types and subtypes, somehow
+                 */
+                $accesses = (new VisibilityTranslator(
+                    $this->pastoralAccessMapper,
+                    $this->pastoralGroupMapper,
+                    $this->userMapper,
+                    \Schoolbox\Pastoral\Access\Model::class
+                ))->prepareAccesses(new Values($partial), $subtype ?? $type);
+
+                /* A somewhat-different reimplementation from the one in processPastoralRecords() because
+                 * we don't need $previousRecord afaict
+                 */
+                $record->setAccess($this->pastoralAccessMapper->createCollection());
+
+                /** @var PastoralAccessModel $access */
+                foreach ($accesses as $access) {
+                    $recordAccess = clone $access;
+                    $recordAccess->setPastoral($record);
+                    $this->pastoralAccessMapper->save($recordAccess);
+                    $record->getAccess()->add($recordAccess);
+                }
+            }
+
+            $this->pastoralDataSource->save($record);
+        } catch (\Exception $e) {
+            /* Whatever died here, roll it back and re-throw it
+             */
+            $db->rollBack();
+
+            throw $e;
         }
 
-        /* Such a strange mix of philosophies in this place, it does my head in
-         * The same idea is implemented in such subtly different ways everywhere here
+        /* We ran the gauntlet and didn't die
          */
-        if (($partial['tags'] ?? false) || ($partial['tagNames'] ?? false)) {
-            /* At least one of these had data:
-             * if you supplied both, merge and treat synonymously
-             */
-            $tags = $this->prepareTags($partial['tags'] ?? '', $partial['tagNames'] ?? '');
-
-            // Save pastoral tags
-            $this->pastoralTagMapper->deleteForRecord($record);
-            foreach ($tags as $tag) {
-                $this->pastoralTagMapper->assignToRecord($record, $tag);
-            }
-            $record->setTags($tags);
-        }
-
-        /* Role and Group selections are both processed in the same method.
-         * If either was specified in $partial then maybe we have some work to do
-         */
-        if (($partial['role'] ?? false) || ($partial['group'] ?? false) || ($partial['user'] ?? false)) {
-            /* By this point, types and subtypes were already updated in $record which
-             * is a circumstantial sequential dependency that we happen to fulfil...
-             */
-            $type = $record->getType();
-            $subtype = $record->getSubtype();
-
-            /* Accesses depend on types and subtypes, somehow
-             */
-            $accesses = (new VisibilityTranslator(
-                $this->pastoralAccessMapper,
-                $this->pastoralGroupMapper,
-                $this->userMapper,
-                \Schoolbox\Pastoral\Access\Model::class
-            ))->prepareAccesses(new Values($partial), $subtype ?? $type);
-
-            /* A somewhat-different reimplementation from the one in processPastoralRecords() because
-             * we don't need $previousRecord afaict
-             */
-            $record->setAccess($this->pastoralAccessMapper->createCollection());
-
-            /** @var PastoralAccessModel $access */
-            foreach ($accesses as $access) {
-                $recordAccess = clone $access;
-                $recordAccess->setPastoral($record);
-                $this->pastoralAccessMapper->save($recordAccess);
-                $record->getAccess()->add($recordAccess);
-            }
-        }
-
-        $this->pastoralDataSource->save($record);
-
         $db->commit();
     }
 
