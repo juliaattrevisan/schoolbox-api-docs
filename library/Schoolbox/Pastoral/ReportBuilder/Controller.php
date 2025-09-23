@@ -357,7 +357,6 @@ class Controller extends Base
             '@pastoralReportBuilder/report_results.twig',
             [
                 'title'          => "Records By Tag - {$tag->getName()}",
-                'export'         => false,
                 'showSeverity'   => $showSeverity,
                 'severityColors' => $severityColors,
                 'tabs'           => $defaultSummaryOptions,
@@ -494,12 +493,8 @@ class Controller extends Base
             '@pastoralReportBuilder/report_results.twig',
             [
                 'title'          => $report->getName(),
-                'export'         => true,
-                'report'         => $report,
                 'showSeverity'   => $showSeverity,
                 'severityColors' => $severityColors,
-                /* Summary tables tabs
-                 */
                 'tabs'           => $tabs,
             ],
             $report->getName(),
