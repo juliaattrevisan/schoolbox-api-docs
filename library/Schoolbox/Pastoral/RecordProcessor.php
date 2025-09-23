@@ -44,6 +44,12 @@ use Sentry\State\HubInterface;
  */
 class RecordProcessor
 {
+    /* Pastoral Points must fall within this range
+     */
+    private const POINTS_MIN = -1000000;
+    private const POINTS_MAX = 1000000;
+
+
     /**
      * Partial Updates only accept values from the following fields
      * (a whitelist)
@@ -150,15 +156,18 @@ class RecordProcessor
         }
 
         /* Points must be within a range of valid values randomly hardcoded here
-         * TODO define as consts instead of magic numbers
          */
         if ($partial['points'] ?? false) {
-            /* Assert correct value range
-             */
             $points = (float)$partial['points'];
 
-            if (!is_numeric($partial['points']) || $points < -1000000 || $points > 1000000) {
-                throw new SchoolboxException('Points must be a float between -1000000 and 1000000');
+            /* Assert correct value range
+             */
+            if (!is_numeric($partial['points']) || $points < self::POINTS_MIN || $points > self::POINTS_MAX) {
+                throw new SchoolboxException(sprintf(
+                    'Points must be a float between %s and %s',
+                    self::POINTS_MIN,
+                    self::POINTS_MAX
+                ));
             }
 
             $record->setPoints($data['points']);
@@ -405,9 +414,17 @@ class RecordProcessor
                 $record->setPoints(null);
             } else {
                 $points = $post->getFloat('points');
-                if (!is_numeric($post->get('points')) || $points < -1000000 || $points > 1000000) {
-                    throw new SchoolboxException('Points must be a float between -1000000 and 1000000');
+
+                /* Assert correct value range
+                 */
+                if (!is_numeric($post->get('points')) || $points < self::POINTS_MIN || $points > self::POINTS_MAX) {
+                    throw new SchoolboxException(sprintf(
+                        'Points must be a float between %s and %s',
+                        self::POINTS_MIN,
+                        self::POINTS_MAX
+                    ));
                 }
+
                 $record->setPoints($points);
             }
 
