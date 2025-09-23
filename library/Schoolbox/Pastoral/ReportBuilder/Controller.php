@@ -327,37 +327,62 @@ class Controller extends Base
      * Retrieve report of all pastoral records with the selected tag
      *
      * @param PastoralTag $tag
+     * @throws RouteNotFound
+     * @throws MapperException
      */
     public function getReportTags(PastoralTag $tag): void
     {
-        $records = $this->pastoralDataSource->findByTag($this->getUser(), $tag);
-
         $showSeverity   = $this->getConfigLoader()->get('pastoral_severity');
         $severityColors = $showSeverity ? $this->getSeverityColors() : [];
 
         $defaultSummaryOptions = [
-            ['title' => 'List', 'type' => 'list']
+            [
+                'title' => 'List',
+                'type' => 'list',
+                'key' => 'list',
+                '_links' => [
+                    'view' => $this->getRouteIfAuthorized(
+                        'pastoralReportBuilder.getReportTagsResults',
+                        [
+                            'tag' => $tag,
+                            'tagId' => $tag->getId(),
+                        ]
+                    ),
+                ]
+            ]
         ];
 
-        $tabs = array_merge(
-            $defaultSummaryOptions,
-        );
-
         // And spit this thing out
-
         $this->response = $this->responseFromTemplate(
             '@pastoralReportBuilder/report_results.twig',
             [
                 'title'          => "Records By Tag - {$tag->getName()}",
-                'export'         => false,
-                'results'        => $records->map($this->pastoralTranslator),
                 'showSeverity'   => $showSeverity,
                 'severityColors' => $severityColors,
-                /* Summary tables tabs
-                 */
-                'tabs'           => $tabs,
+                'tabs'           => $defaultSummaryOptions,
             ],
             'Pastoral Tag Report',
+        );
+    }
+
+    /**
+     * Endpoint for payload to the tag record results
+     *
+     * @param PastoralTag $tag
+     * @return void
+     * @api /pastoral/report/results/tag/{tagId:\d+}/result
+     */
+    public function getReportTagsResults(PastoralTag $tag): void
+    {
+        $records = $this->pastoralDataSource->findByTag($this->getUser(), $tag);
+
+        $this->response = $this->responseAsJson(
+            [
+                'data' => [
+                    'results' => $records->map($this->pastoralTranslator),
+                ]
+            ],
+            true
         );
     }
 
@@ -370,8 +395,6 @@ class Controller extends Base
      */
     public function getReportResults(PastoralReport $report): void
     {
-        $records = $this->getReportData($report);
-
         // Keep an audit trail of any reports that are run
 
         $pastoralAuditMapper = PastoralAuditMapper::getInstance();
@@ -470,13 +493,8 @@ class Controller extends Base
             '@pastoralReportBuilder/report_results.twig',
             [
                 'title'          => $report->getName(),
-                'export'         => true,
-                'results'        => $records->map($this->pastoralTranslator),
-                'report'         => $report,
                 'showSeverity'   => $showSeverity,
                 'severityColors' => $severityColors,
-                /* Summary tables tabs
-                 */
                 'tabs'           => $tabs,
             ],
             $report->getName(),

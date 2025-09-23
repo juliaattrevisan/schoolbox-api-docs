@@ -10,8 +10,6 @@
 <div id="pastoral-report-container" class="f-container">
     <pastoral-report
         title="{{ title }}"
-        :export="{{ export ? 'true' : 'false' }}"
-        :report-id="{{ report.id }}"
         :tabs="{{ tabs|json_encode }}"
         :config="{{ {
             pastoralPointEnabled: config.pastoral_point_enabled,
@@ -21,7 +19,6 @@
             getStudentRecord: routeLookup('pastoral.getStudentRecord'),
             getReportTags: routeLookup('pastoralReportBuilder.getReportTags'),
             getIndex: routeLookup('pastoralReportBuilder.getIndex'),
-            getReportResultsExport: routeLookupIfAuthorized('pastoralReportBuilder.getReportResultsExport', {reportId: report.id})
         }|json_encode }}"
         locale-pastoral="{{ locale.pastoral.proper|lower }}"
         :show-severity="{{ showSeverity ? 'true' : 'false' }}"
