@@ -476,18 +476,15 @@ class Payload
      */
     private function getFieldSettingsAvailability(FieldModel $field): array
     {
+        $additionalSettings = new \stdClass();
+        foreach ($field->getOptions() ?? [] as $key => $value) {
+            $additionalSettings->{$key} = true;
+        }
+
         $settings = [
             self::AVAILABILITY_NODE => true,
             self::VISIBILITY_NODE => true,
-            self::ADDITIONAL_SETTINGS_NODE => [
-                /* clickToReveal is only available when the field has both an icon and css
-                 * (i.e. when it will be displayed as an alert box)
-                 */
-                'clickToReveal' => $field->isFlag(),
-                // TODO derive this from the DB
-                'iframeLink' => $field->getField() === 'iframe',
-                'iframeHeight' => $field->getField() === 'iframe',
-            ]
+            self::ADDITIONAL_SETTINGS_NODE => $additionalSettings,
         ];
 
         return $settings;

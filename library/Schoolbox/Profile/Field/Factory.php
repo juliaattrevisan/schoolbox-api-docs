@@ -178,7 +178,7 @@ class Factory
                 'terminology' => $renderableField->getTerm(),
                 'icon' => $renderableField->getIcon(),
                 'css' => $renderableField->getCss(),
-                'clickToReveal' => $renderableField->getClickToReveal(),
+                'clickToReveal' => $renderableField->getOptions()['clickToReveal'] ?? false,
                 'value' => $referenceFields[$renderableField->getField()] ?? null
             ];
 
