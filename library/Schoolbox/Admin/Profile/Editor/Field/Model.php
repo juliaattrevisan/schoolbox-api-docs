@@ -108,6 +108,14 @@ class Model
 
 
     /**
+     * The default options that should be applied to a field when it's first created
+     * Should match the keys in $options
+     * @var array|null
+     */
+    private ?array $optionsDefault = null;
+
+
+    /**
      * Whether the field is an external field (true) or internal field (false)
      * This determines the tab the field appears in on the profile editor's available fields list
      * @var bool|null
@@ -377,6 +385,27 @@ class Model
         $this->options = $options;
         return $this;
     }
+
+
+    /**
+     * @return array|null
+     */
+    public function getOptionsDefault(): ?array
+    {
+        return $this->optionsDefault;
+    }
+
+
+    /**
+     * @param array|null $optionsDefault
+     * @return $this
+     */
+    public function setOptionsDefault(?array $optionsDefault): self
+    {
+        $this->optionsDefault = $optionsDefault;
+        return $this;
+    }
+
 
     /**
      * @return bool|null

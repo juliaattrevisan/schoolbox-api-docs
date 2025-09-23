@@ -260,12 +260,16 @@ class Payload
                 $defaultFieldSettings = [
                     self::AVAILABILITY_NODE => [],
                     self::VISIBILITY_NODE => [],
-                    self::ADDITIONAL_SETTINGS_NODE => []
+                    self::ADDITIONAL_SETTINGS_NODE => $field->getOptionsDefault() ?? [],
                 ];
 
-                // click to reveal is ON by default if it's available for the field
-                if ($availableFieldSettings[self::ADDITIONAL_SETTINGS_NODE]['clickToReveal']) {
-                    array_push($defaultFieldSettings[self::ADDITIONAL_SETTINGS_NODE], 'clickToReveal');
+                /* The frontend expects a {} for an empty additional settings node, php will json_encode an empty array as []
+                 * so we need to convert it here
+                 */
+                foreach ($defaultFieldSettings as $settingKey => $settingValue) {
+                    if ($settingValue instanceof \Schoolbox\Collection ? $settingValue->count() === 0 : empty($settingValue)) {
+                        $defaultFieldSettings[$settingKey] = new \stdClass();
+                    }
                 }
 
                 $roleTypeSettings['fields']['available'][] = [
@@ -458,34 +462,6 @@ class Payload
                 ],
             ]
         ];
-
-        // $settings = [
-        //     'displayAs' => "iFrame URL",
-        //     'tooltip' => null,
-        //     'input' => [
-        //         'type' => 'text',
-        //         'id' => 'iFrameURL',
-        //         'default' => '',
-        //         'placeholder' => 'Enter iFrame URL'
-        //     ],
-        // ];
-
-        // $settings = [
-        //     'displayAs' => "Height (px)",
-        //     'tooltip' => null,
-        //     'input' => [
-        //         'type' => 'number',
-        //         'id' => 'height',
-        //         'default' => '400',
-        //         'placeholder' => '',
-        //     ],
-        // ];
-
-        // $values = [
-        //     'clickToReveal' => true,
-        //     'iFrameURL' => '',
-        //     'height' => '400',
-        // ];
 
         return $settings;
     }

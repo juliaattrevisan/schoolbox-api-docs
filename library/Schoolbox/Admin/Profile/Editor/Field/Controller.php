@@ -267,10 +267,11 @@ class Controller extends Base
              */
             $newAdditionalSettings = $settings[Payload::ADDITIONAL_SETTINGS_NODE] ?? [];
             $fieldAdditionalSettings = $field->getOptions() ?? [];
+            $defaultAdditionalSettings = $field->getOptionsDefault() ?? [];
 
             foreach ($newAdditionalSettings as $key => $value) {
                 // TODO: if we move the specs into the field definition, we can validate here properly
-                if (!array_key_exists($key, $fieldAdditionalSettings)) {
+                if (!array_key_exists($key, $fieldAdditionalSettings) || !array_key_exists($key, $defaultAdditionalSettings)) {
                     throw new \InvalidArgumentException("Unknown additional setting: {$key}");
                 }
 
@@ -280,7 +281,7 @@ class Controller extends Base
                     $value = (int)$value;
 
                     if ($value < 1) {
-                        $value = 300; // TODO pull default from field definition once that exists
+                        $value = $defaultAdditionalSettings[$key];
                     }
                 } else if ($key === 'iframeLink') {
                     $value = trim((string)$value);
