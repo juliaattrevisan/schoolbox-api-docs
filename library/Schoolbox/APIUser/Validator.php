@@ -67,7 +67,6 @@ class Validator
                         // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
                         throw new SchoolboxException("Filter 'campus' must be an array of objects.");
                     }
-                    $this->validateFilterFolderValue($value);
                     break;
                 default:
                     throw new SchoolboxException("Unexpected filter key '$key'.");
