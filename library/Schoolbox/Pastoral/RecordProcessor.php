@@ -203,8 +203,19 @@ class RecordProcessor
             }
         }
 
+        /* If a severity id was specified and it differed to what we already have,
+         * try to find it. If the severity was deleted, disregard it.
+         */
         if ($partial['severityId'] ?? false) {
-
+            if ((int)$partial['severityId'] !== (int)$record->getSeverity()->getId()) {
+                try {
+                    $record->setSeverity($this->pastoralSeverityMapper->findById($partial['severityId']));
+                } catch (MapperException $e) {
+                    /* noop: either not found, or it was deleted
+                     * Leave current setting unchanged
+                     */
+                }
+            }
         }
 
         if ($partial['expiresAt'] ?? false) {
