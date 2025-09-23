@@ -299,15 +299,41 @@ class RecordProcessor
             $record->setTags($tags);
         }
 
-        if ($partial['role'] ?? false) {
+        /* Role and Group selections are both processed in the same method.
+         * If either was specified in $partial then maybe we have some work to do
+         */
+        if (($partial['role'] ?? false) || ($partial['group'] ?? false) || ($partial['user'] ?? false)) {
+            /* By this point, types and subtypes were already updated in $record which
+             * is a circumstantial sequential dependency that we happen to fulfil...
+             */
+            $type = $record->getType();
+            $subtype = $record->getSubtype();
 
+            /* Accesses depend on types and subtypes, somehow
+             */
+            $accesses = (new VisibilityTranslator(
+                $this->pastoralAccessMapper,
+                $this->pastoralGroupMapper,
+                $this->userMapper,
+                \Schoolbox\Pastoral\Access\Model::class
+            ))->prepareAccesses(new Values($partial), $subtype ?? $type);
+
+            /* A somewhat-different reimplementation from the one in processPastoralRecords() because
+             * we don't need $previousRecord afaict
+             */
+            $record->setAccess($this->pastoralAccessMapper->createCollection());
+
+            /** @var PastoralAccessModel $access */
+            foreach ($accesses as $access) {
+                $recordAccess = clone $access;
+                $recordAccess->setPastoral($record);
+                print_r($recordAccess);
+                $this->pastoralAccessMapper->save($recordAccess);
+                $record->getAccess()->add($recordAccess);
+            }
         }
 
-        if ($partial['group'] ?? false) {
 
-        }
-
-        print_r($record);
     }
 
 
