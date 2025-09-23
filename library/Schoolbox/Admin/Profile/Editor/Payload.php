@@ -58,6 +58,34 @@ class Payload
     public const ADDITIONAL_SETTINGS_NODE = 'additional';
     private const ADDITIONAL_SETTINGS_NAME = 'Additional Settings';
     private const ADDITIONAL_SETTINGS_TOOLTIP = null;
+    /**
+     * currently these are just a global spec of additional field settings that applies to all fields,
+     * individual fields then opt-in to having these settings available based on
+     * if the given id exists inside the field's "options" JSON column
+     *
+     * Ideally at some point an individual field could define its own additional settings
+     * completely and we wouldn't need this here
+     */
+    public const ADDITIONAL_SETTINGS_OPTIONS = [
+        [
+            'type' => 'checkbox',
+            'id' => 'clickToReveal',
+            'name' => 'Activate View More',
+            'meta' => 'Only show content after the user chooses to view it.'
+        ],
+        [
+            'type' => 'text',
+            'id' => 'iframeLink',
+            'name' => 'iFrame Link',
+            'meta' => 'TODO' // TODO
+        ],
+        [
+            'type' => 'number',
+            'id' => 'iframeHeight',
+            'name' => 'Height',
+            'meta' => 'TODO' // TODO
+        ],
+    ];
 
     /**
      * The labels of the field categories which are used to group the fields in
@@ -433,34 +461,7 @@ class Payload
         $settings = [
             'displayAs' => self::ADDITIONAL_SETTINGS_NAME,
             'tooltip' => self::ADDITIONAL_SETTINGS_TOOLTIP,
-            'options' => [
-                /**
-                 * currently these are just a global spec that applies to all fields,
-                 * individual fields then opt-in to having these settings available based on
-                 * if the given id exists inside the field's "options" JSON column
-                 *
-                 * Ideally at some point an individual field could define its own additional settings
-                 * completely and we wouldn't need this here
-                 */
-                [
-                    'type' => 'checkbox',
-                    'id' => 'clickToReveal',
-                    'name' => 'Activate View More',
-                    'meta' => 'Only show content after the user chooses to view it.'
-                ],
-                [
-                    'type' => 'text',
-                    'id' => 'iframeLink',
-                    'name' => 'iFrame Link',
-                    'meta' => 'TODO' // TODO
-                ],
-                [
-                    'type' => 'number',
-                    'id' => 'iframeHeight',
-                    'name' => 'Height',
-                    'meta' => 'TODO' // TODO
-                ],
-            ]
+            'options' => self::ADDITIONAL_SETTINGS_OPTIONS,
         ];
 
         return $settings;

@@ -263,30 +263,35 @@ class Controller extends Base
             }
 
             /* Apply additional settings
-             * TODO: make this dependent on the field definition and include the other settings
              */
             $newAdditionalSettings = $settings[Payload::ADDITIONAL_SETTINGS_NODE] ?? [];
             $fieldAdditionalSettings = $field->getOptions() ?? [];
             $defaultAdditionalSettings = $field->getOptionsDefault() ?? [];
 
             foreach ($newAdditionalSettings as $key => $value) {
-                // TODO: if we move the specs into the field definition, we can validate here properly
                 if (!array_key_exists($key, $fieldAdditionalSettings) || !array_key_exists($key, $defaultAdditionalSettings)) {
                     throw new \InvalidArgumentException("Unknown additional setting: {$key}");
                 }
 
-                if ($key === 'clickToReveal') {
+                $fieldOptionDefinition = null;
+                foreach (Payload::ADDITIONAL_SETTINGS_OPTIONS as $def) {
+                    if ($def['id'] === $key) {
+                        $fieldOptionDefinition = $def;
+                        break;
+                    }
+                }
+
+                if ($fieldOptionDefinition['type'] === 'checkbox') {
                     $value = (bool)$value;
-                } else if ($key === 'iframeHeight') {
+                } else if ($fieldOptionDefinition['type'] === 'number') {
                     $value = (int)$value;
 
+                    /** the only place we use this currently needs >0, at some point I guess add an optional max/min to the definition per field */
                     if ($value < 1) {
                         $value = $defaultAdditionalSettings[$key];
                     }
-                } else if ($key === 'iframeLink') {
+                } else { // if ($fieldOptionDefinition['type'] === 'text') - phpstan doesn't let you check this
                     $value = trim((string)$value);
-                } else {
-                    throw new \InvalidArgumentException("Unknown additional setting: {$key}");
                 }
 
                 $fieldAdditionalSettings[$key] = $value;
