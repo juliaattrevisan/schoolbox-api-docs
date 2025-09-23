@@ -142,12 +142,17 @@ class RecordProcessor
      * @param array $partial
      * @param Model $record
      * @return void
+     * @throws MapperException
      */
     public function processPartialPastoralRecords(array $partial, PastoralModel $record): void
     {
-        /* TODO set up transaction because we're mutating in situ
-         *  and you can't tell when you'll die
+        /* Some fields incur an in-situ database mutation (because strange thinking)
+         * which means you need to start a db transaction and rollback upon deaths (if any)
+         *
+         * TODO maybe throw errors upon invalid data instead of ignoring them
          */
+        $db = $this->pastoralTypeMapper->getDatabase();
+        $db->beginTransaction();
 
         /* Manually map the partial array into $record, one prop at a time
          * Not all of them can be conveniently derived: body_public maps to setBody_public() (nonexistent method)
@@ -335,8 +340,7 @@ class RecordProcessor
 
         $this->pastoralDataSource->save($record);
 
-        /* TODO db commit transaction
-         */
+        $db->commit();
     }
 
 

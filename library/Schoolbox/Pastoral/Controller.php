@@ -762,6 +762,9 @@ class Controller extends Base
 
         // Grab the pastoral record we are updating
         try {
+            /* For some reason we chose *not* to prehydrate $record as an arg to this method
+             * or its sister method postRecordUpdate()...was this a shortcut of some kind?!
+             */
             $record = $this->pastoralDataSource->findById($this->getUser(), $partial['id']);
         } catch (MapperException $e) {
             throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
