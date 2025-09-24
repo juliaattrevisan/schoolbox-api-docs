@@ -15,6 +15,7 @@ use Alaress\Web\Controller\Base;
 use Aura\Router\Generator;
 use Crell\ApiProblem\ApiProblem;
 use HouseMapper;
+use PDOException;
 use Schoolbox\Collection;
 use Schoolbox\Group\API\ModelToArray;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -459,10 +460,15 @@ class Controller extends Base
 
         try {
             $this->validator->validateFilter($filter);
-            $ajaxSearch = $userHelper->ajaxSearch($search, $filter, $limit, $cursor);
         } catch (SchoolboxException $e) {
             $this->sendJsonError('Failed to get users: ' . $e->getMessage(), 400);
             return;
+        }
+
+        try {
+            $ajaxSearch = $userHelper->ajaxSearch($search, $filter, $limit, $cursor);
+        } catch (PDOException) {
+            $this->sendJsonError('Failed to get users due to database access problem.', 500);
         }
 
         $userIds = [];

@@ -3,6 +3,7 @@
 namespace Schoolbox\APIUser;
 
 use PDO;
+use PDOException;
 use Schoolbox\UserMapper;
 
 class Helper
@@ -38,13 +39,14 @@ class Helper
 
     /**
      * Find a user based on a keyword, for an AJAX response.
-     * stripped and updated from `library/User.php`
+     * Stripped and updated from `library/User.php`
      *
      * @param string|null $keyword
      * @param array|null $filter
      * @param int|null   $limit
      * @param int|null   $cursor
      * @return array
+     * @throws PDOException
      */
     public function ajaxSearch(
         ?string $keyword,
