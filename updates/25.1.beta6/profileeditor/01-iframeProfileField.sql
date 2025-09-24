@@ -6,7 +6,7 @@ INSERT INTO
 VALUES (
         'student',
         'iframe',
-        'HTML',
+        'iFrame',
         (SELECT MAX(sequence) + 1 FROM profile_field pf WHERE roletype = 'student'),
         0, -- disabled by default
         NULL,
@@ -18,7 +18,7 @@ VALUES (
     (
         'staff',
         'iframe',
-        'HTML',
+        'iFrame',
         (SELECT MAX(sequence) + 1 FROM profile_field pf WHERE roletype = 'staff'),
         0, -- disabled by default
         NULL,
@@ -30,7 +30,7 @@ VALUES (
     (
         'parent',
         'iframe',
-        'HTML',
+        'iFrame',
         (SELECT MAX(sequence) + 1 FROM profile_field pf WHERE roletype = 'parent'),
         0, -- disabled by default
         NULL,
