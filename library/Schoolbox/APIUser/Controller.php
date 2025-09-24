@@ -461,7 +461,7 @@ class Controller extends Base
         }
 
         if (!is_array($filter)) {
-            throw new SchoolboxException('JSON filter could not be decoded.');
+            $this->sendJsonError('JSON filter could not be decoded.', 400);
         }
 
         $userHelper = new Helper($this->userMapper);
