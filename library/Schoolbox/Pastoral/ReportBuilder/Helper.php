@@ -2,6 +2,7 @@
 
 namespace Schoolbox\Pastoral\ReportBuilder;
 
+use Alaress\Database\Predicate\Builder;
 use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
@@ -72,6 +73,15 @@ class Helper
         return $this->report['subtypes'] ?? new Collection();
     }
 
+//    private function poupulateTypeSubTypeIfNull(): void
+//    {
+//        if (null === $this->report['types']) {
+//            $this->report['types'] = $this->pastoralMapper->getTypeCollection();
+//        }
+//        if (null === $this->report['subtypes']) {
+//            $this->report['subtypes'] = $this->pastoralMapper->getSubTypeCollection();
+//        }
+//    }
     /**
      * Date range filter
      *
@@ -87,6 +97,48 @@ class Helper
         if ($this->report['afterDate'] instanceof Alaress_Date_Format) {
             $this->filters[] = "(COALESCE(`pastoral`.`occurred_on`, `pastoral`.`created_at`) >= :afterDate)";
             $this->params['afterDate'] = $this->report['afterDate']->startOfDay()->toIso8601String();
+        }
+    }
+    /**
+     * Type and Subtype filter
+     *
+     * @return void
+     */
+    private function getWhereInTypeSubType(): void
+    {
+        $whereInTypeSubTypeQuery = $whereInTypeSubTypeParams = [];
+        if ($this->getType()->count() > 0) {
+            $typeIds = $this->getType()->getPropertyValues('id');
+            $whereTypeIds = Builder::getArrayPlaceholders(
+                $typeIds,
+                'pastoralTypeId',
+            );
+            $whereInTypeSubTypeQuery[] = "pastoral.type_id IN {$whereTypeIds}";
+            $whereInTypeSubTypeParams = Builder::getArrayParameters(
+                $typeIds,
+                'pastoralTypeId',
+            );
+        }
+        if ($this->getSubTypes()->count() > 0) {
+            $subTypeIds = $this->getSubTypes()->getPropertyValues('id');
+            $whereSubTypeIds = Builder::getArrayPlaceholders(
+                $subTypeIds,
+                'pastoralSubTypeId',
+            );
+            $whereInTypeSubTypeQuery[] = "pastoral.subtype_id IN {$whereSubTypeIds}";
+            $whereInTypeSubTypeParams = array_merge(
+                $whereInTypeSubTypeParams,
+                Builder::getArrayParameters(
+                    $subTypeIds,
+                    'pastoralSubTypeId',
+                )
+            );
+        }
+
+        $query = implode(' OR ', array_filter($whereInTypeSubTypeQuery));
+        if ($query) {
+            $this->filters[] = "({$query})";
+            $this->params = array_merge($this->params, $whereInTypeSubTypeParams);
         }
     }
 
@@ -432,6 +484,7 @@ class Helper
     private function setFilters(): void
     {
         $this->getWhereDate();
+        $this->getWhereInTypeSubType();
         $this->getSeverity();
         $this->getStudents();
         $this->getYears();

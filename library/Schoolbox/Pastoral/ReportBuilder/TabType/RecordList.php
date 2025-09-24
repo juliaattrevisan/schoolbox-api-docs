@@ -138,7 +138,6 @@ class RecordList extends Base implements TabTypeInterface, ICursor
             SELECT COUNT(DISTINCT pastoral.id) as count
             {$this->helper->getFromString()}
             WHERE {$where}
-            AND ({$this->inTypeSubType})
         ",
             $this->helper->getParams(),
         );
@@ -198,7 +197,6 @@ class RecordList extends Base implements TabTypeInterface, ICursor
             LEFT JOIN lu_pastoral_subtype AS c ON pastoral.subtype_id = c.id
             INNER JOIN user AS o on pastoral.owner_id = o.id
             WHERE {$where}
-            AND ({$this->inTypeSubType})
             ORDER BY {$orderSql}
             {$limit}
         ",

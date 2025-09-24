@@ -108,21 +108,6 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
      */
     private function getResultQuery(): string
     {
-        $whereInTypeSubTypeQuery = [];
-
-        $whereTypes = $this->helper->getType();
-        if ($whereTypes->count() > 0) {
-            $whereTypeIds = implode(',', $whereTypes->getPropertyValues('id'));
-            $whereInTypeSubTypeQuery[] = "pastoral.type_id IN ({$whereTypeIds})";
-        }
-
-        $whereSubTypes = $this->helper->getSubTypes();
-        if ($whereSubTypes->count() > 0) {
-            $whereSubTypeIds = implode(',', $whereSubTypes->getPropertyValues('id'));
-            $whereInTypeSubTypeQuery[] = "pastoral.subtype_id IN ({$whereSubTypeIds})";
-        }
-
-        $whereTypeSubTypeQuery = implode(" OR ", $whereInTypeSubTypeQuery);
         $whereQuery = implode(" AND ", $this->helper->getFilters());
 
         $months = $this->getMonths();
@@ -137,7 +122,6 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
             SELECT DISTINCT pastoral.*, CONCAT(s.lastname, ', ', s.chosen_name) as `user`, DATE_FORMAT(COALESCE(pastoral.occurred_on, pastoral.created_at), '{$monthFormat}') AS month
             {$this->helper->getFromString()}
             WHERE
-                ({$whereTypeSubTypeQuery}) AND
                 {$whereQuery}
         ";
 
@@ -245,25 +229,13 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
      */
     public function retrieveResultCount(): ?int
     {
-        $whereInTypeSubTypeQuery = [];
-        if ($this->helper->getType()->count() > 0) {
-            $whereTypeIds = implode(',', $this->helper->getType()->getPropertyValues('id'));
-            $whereInTypeSubTypeQuery[] = "pastoral.type_id IN ({$whereTypeIds})";
-        }
-        if ($this->helper->getSubTypes()->count() > 0) {
-            $whereSubTypeIds = implode(',', $this->helper->getSubTypes()->getPropertyValues('id'));
-            $whereInTypeSubTypeQuery[] = "pastoral.subtype_id IN ({$whereSubTypeIds})";
-        }
-
-        $whereQuery = implode(" OR ", array_filter($whereInTypeSubTypeQuery));
         $whereFilterQuery = implode(" AND ", $this->helper->getFilters());
 
         $query = "
             SELECT pastoral.student_id
             {$this->helper->getFromString()}
             WHERE
-                {$whereQuery}
-                AND {$whereFilterQuery}
+                {$whereFilterQuery}
             GROUP BY pastoral.student_id
         ;";
 

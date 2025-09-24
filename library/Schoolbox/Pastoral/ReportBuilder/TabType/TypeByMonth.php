@@ -55,16 +55,6 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
      */
     private function getResultQuery(): string
     {
-        $inTypeString = $inSubTypeString = '';
-        if ($this->helper->getType()->count() > 0) {
-            $inTypeString = "type.id IN (" . implode(',', $this->helper->getType()->getPropertyValues('id')) . ")";
-        }
-
-        if ($this->helper->getSubTypes()->count() > 0) {
-            $inSubTypeString = "subtype.id IN (" . implode(',', $this->helper->getSubTypes()->getPropertyValues('id')) . ")";
-        }
-
-        $whereInTypeQuery = implode(' OR ', array_filter([$inTypeString, $inSubTypeString]));
         $whereQuery       = "(" . implode(" AND ", $this->helper->getFilters()) . ")";
 
         $months = $this->getMonths();
@@ -91,7 +81,7 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
              ) as type_subtype,
              {$selectMonthsQuery}
           FROM lu_pastoral_type type
-          LEFT JOIN lu_pastoral_subtype subtype ON subtype.pastoral_type_id = type.id
+          LEFT JOIN lu_pastoral_subtype subtype ON subtype.pastoral_type_id = type.id AND subtype.deleted_at IS NULL
           LEFT JOIN (
                 SELECT
                      pastoral.type_id,
@@ -105,7 +95,7 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
                 ) pastoral
             ) monthData
             ON monthData.type_id = type.id AND (monthData.subtype_id = subtype.id OR monthData.subtype_id IS NULL)
-            WHERE {$whereInTypeQuery}
+            WHERE type.deleted_at IS NULL
             GROUP BY typeId, subtypeId
         ";
 
