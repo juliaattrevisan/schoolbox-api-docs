@@ -328,6 +328,21 @@ class ApiUserCest
         ];
         yield [
             'filter' => [
+                // Test externalId with a string value.
+                'externalId' => 'abcde',
+            ],
+            'valid' => true,
+        ];
+        yield [
+            'filter' => [
+                // Test externalId with an integer value.
+                // Although externalId is specified in the API docs as string only, allow integer also for backwards compatibility.
+                'externalId' => 12345,
+            ],
+            'valid' => true,
+        ];
+        yield [
+            'filter' => [
                 // Non-existent roleType.
                 // Note: prior to 25.1, this would cause no validation error, but would return no results.
                 'roleType' => 'Non-existent role type',

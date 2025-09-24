@@ -31,7 +31,7 @@ class Validator
         foreach ($filter as $key => $value) {
             switch ($key) {
                 case 'externalId':
-                    if (!is_string($value)) {
+                    if (!is_string($value) && !is_int($value)) { // Allow integers also for backwards compatibility.
                         throw new SchoolboxException("Filter 'externalId' must have a string value.");
                     }
                     break;
