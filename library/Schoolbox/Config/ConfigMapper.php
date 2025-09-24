@@ -417,6 +417,11 @@ class ConfigMapper extends Mapper
     public const NAME_CLAMD_PORT          = 'clamd_port';
     public const NAME_CLAMD_MAX_FILE_SIZE = 'clamd_max_file_size';
 
+
+    // Storage cleanup settings
+    public const NAME_STORAGE_CLEANUP_ENABLED = 'storage_cleanup_enabled';
+
+
     // Debug settings
     public const NAME_DEBUG_MODE = 'debug_mode';
 
