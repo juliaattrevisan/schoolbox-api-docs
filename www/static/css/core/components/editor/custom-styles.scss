@@ -464,3 +464,13 @@ p.sb-ck-code-block {
 .ck.ck-editor__main {
     cursor: text;
 }
+
+/**
+ * Used to show a disclaimer when using AI.
+ * I'm trying to mimic .meta styling
+ */
+.ck.ck-ai-form .ck-ai-form-content::after {
+    content: "Schoolbox allows interaction with AI. AI can make mistakes. Please check generated content.";
+    font-style: italic;
+    color: $body-foreground;
+}

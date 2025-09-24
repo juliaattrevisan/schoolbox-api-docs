@@ -40,6 +40,9 @@ window.Vue.onMounted(() => {
     </template>
 
     <div class="clearfix"></div>
+    <span class="meta"
+        >Schoolbox allows interaction with AI. AI can make mistakes. Please check generated content.</span
+    >
     <div class="l-flex-row l-flex--no-wrap">
         <button class="l-flex__item--1 button" @click="lpStore.modalStep = LessonPlannerModalStep.GENERATE">
             Back
