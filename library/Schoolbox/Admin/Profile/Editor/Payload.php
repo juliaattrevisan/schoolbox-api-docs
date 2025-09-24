@@ -79,7 +79,7 @@ class Payload
             'name' => 'iFrame Link',
             'meta' => "
                 Enter a webpage URL to embed.
-                Supports tokens: [username], [external_id], [email].
+                Supports tokens: [username], [externalId], [email].
                 Wrap with remote_service(https://...) to use Remote Services.
             ",
         ],

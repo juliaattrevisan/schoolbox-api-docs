@@ -191,7 +191,7 @@ class Factory
                 /* Possible tokens that will be replaced in the URL before it is parsed */
                 $url = strtr($url, [
                     '[username]' => rawurlencode($viewee->getUsername()),
-                    '[external_id]' => rawurlencode($viewee->getExternalId() ?? ''),
+                    '[externalId]' => rawurlencode($viewee->getExternalId() ?? ''),
                     '[email]' => rawurlencode($viewee->getEmail() ?? ''),
                 ]);
 
