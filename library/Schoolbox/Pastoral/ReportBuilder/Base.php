@@ -28,7 +28,7 @@ class Base
      * IMO the maximum is a sensible default.
      */
     public const LIMIT_DEFAULT = self::LIMIT_MAX;
-
+    public const REQUIRE_TYPE_SUBTYPE_EXPLICITLY = true;
     public const RESULT_TYPE_POINTS = 'points';
     public const RESULT_TYPE_RECORDS = 'records';
     public const DEFAULT_SORTING_KEY = null;
@@ -94,6 +94,14 @@ class Base
         if (null === $this->sortBy) {
             $this->sortBy = static::DEFAULT_SORTING_KEY;
         }
+
+        /* If type/subtype is required but not selected in the report it should be populated
+         */
+        if (static::REQUIRE_TYPE_SUBTYPE_EXPLICITLY) {
+            $this->helper->populateTypeSubTypeIfNotSelected();
+        }
+
+        $this->helper->setFilters();
     }
 
     protected function getTotalCount(): Collection

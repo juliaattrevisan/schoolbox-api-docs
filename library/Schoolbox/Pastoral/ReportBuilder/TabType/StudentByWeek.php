@@ -14,6 +14,7 @@ class StudentByWeek extends Base implements TabTypeInterface, ICursor
     public const COLUMN_QUERY_KEY = 'week_%d';
     public const COLUMN_KEY_REGEX = '/(week)_(?<index>\d+)/';
     public const DEFAULT_SORTING_KEY = self::SORT_BY_STUDENT_DEFAULT;
+    public const REQUIRE_TYPE_SUBTYPE_EXPLICITLY = false;
 
     /**
      * Get the weeks in the date range

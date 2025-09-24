@@ -6,13 +6,16 @@ use Alaress\Database\Predicate\Builder;
 use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\AccessLevelCensor;
+use Schoolbox\Pastoral\Type\Mapper as TypeMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Report\Model as Report;
+use Schoolbox\Pastoral\Type\Model as Type;
 use Schoolbox\Pastoral\SubType\Model as SubType;
 
 class Helper
@@ -34,7 +37,6 @@ class Helper
         private User $user,
         private AccessLevelCensor $accessLevelCensor,
     ) {
-        $this->setFilters();
     }
 
     /**
@@ -73,15 +75,18 @@ class Helper
         return $this->report['subtypes'] ?? new Collection();
     }
 
-//    private function poupulateTypeSubTypeIfNull(): void
-//    {
-//        if (null === $this->report['types']) {
-//            $this->report['types'] = $this->pastoralMapper->getTypeCollection();
-//        }
-//        if (null === $this->report['subtypes']) {
-//            $this->report['subtypes'] = $this->pastoralMapper->getSubTypeCollection();
-//        }
-//    }
+    public function populateTypeSubTypeIfNotSelected(): void
+    {
+        if ($this->report['types']->count() === 0) {
+            $allTypes = $this->pastoralMapper->getJoinMapper('type')->findAll();
+            $allSubTypes = $this->pastoralMapper
+                ->getJoinMapper('subtype')
+                ->findByColumn('pastoral_type_id', $allTypes->getPropertyValues('id'));
+            $this->report['types'] = $allTypes;
+            $this->report['subtypes'] = $allSubTypes;
+        }
+    }
+
     /**
      * Date range filter
      *
@@ -481,7 +486,7 @@ class Helper
      *
      * @return void
      */
-    private function setFilters(): void
+    public function setFilters(): void
     {
         $this->getWhereDate();
         $this->getWhereInTypeSubType();

@@ -18,7 +18,6 @@ use ValueError;
 
 class Cursor implements ICursor
 {
-    private string $inTypeSubType;
     /**
      * Maximum number of results returnable from the cursor at once:
      * IMO 20 results is a sensible maximum.
@@ -68,28 +67,6 @@ class Cursor implements ICursor
                 );
             }
         }
-
-        $this->init();
-    }
-
-    /**
-     * Initialise the cursor with some common values
-     *
-     * @return void
-     */
-    private function init(): void
-    {
-        $whereInTypeSubTypeQuery = [];
-        if ($this->helper->getType()->count() > 0) {
-            $whereTypeIds = implode(',', $this->helper->getType()->getPropertyValues('id'));
-            $whereInTypeSubTypeQuery[] = "pastoral.type_id IN ({$whereTypeIds})";
-        }
-        if ($this->helper->getSubTypes()->count() > 0) {
-            $whereSubTypeIds = implode(',', $this->helper->getSubTypes()->getPropertyValues('id'));
-            $whereInTypeSubTypeQuery[] = "pastoral.subtype_id IN ({$whereSubTypeIds})";
-        }
-
-        $this->inTypeSubType = implode(' OR ', array_filter($whereInTypeSubTypeQuery));
     }
 
     /**
@@ -211,7 +188,6 @@ class Cursor implements ICursor
             WHERE {$where}
             {$hideNullPoints}
             AND {$whereFilter}
-            AND ({$this->inTypeSubType})
         ",
             array_merge(
                 $this->helper->getParams(),
@@ -282,7 +258,6 @@ class Cursor implements ICursor
             WHERE {$where}
             {$hideNullPoints}
             AND {$whereFilter}
-            AND ({$this->inTypeSubType})
             ORDER BY {$orderSql}
             {$limit}
         ",

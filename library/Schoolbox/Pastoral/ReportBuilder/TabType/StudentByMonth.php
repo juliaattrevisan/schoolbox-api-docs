@@ -14,6 +14,7 @@ class StudentByMonth extends Base implements TabTypeInterface, ICursor
     public const COLUMN_DATE_FORMAT = "M_Y";
     public const COLUMN_KEY_REGEX = "/(?<month>(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec))_(?<year>[0-9]{4})/i";
     public const DEFAULT_SORTING_KEY = self::SORT_BY_STUDENT_DEFAULT;
+    public const REQUIRE_TYPE_SUBTYPE_EXPLICITLY = false;
 
     /**
      * Get the months in the date range
