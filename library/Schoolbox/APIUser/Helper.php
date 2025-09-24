@@ -21,13 +21,10 @@ class Helper
     /**
      * get the count of users from the search query, irrespective fo the limit, or cursor location
      * @param string $keyword
-     * @param array|null  $filter
+     * @param array $filter
      * @return int
      */
-    public function ajaxSearchCount(
-        string $keyword,
-        ?array $filter
-    ): int {
+    public function ajaxSearchCount(string $keyword, array $filter): int {
         [$query, $params] = $this->buildSearch($keyword, $filter);
         $statement = $this->userMapper->getDatabase()->prepare($query);
         foreach ($params as $label => $value) {
@@ -42,18 +39,13 @@ class Helper
      * Stripped and updated from `library/User.php`
      *
      * @param string $keyword
-     * @param array|null $filter
-     * @param int|null   $limit
-     * @param int|null   $cursor
+     * @param array $filter
+     * @param int|null $limit
+     * @param int|null $cursor
      * @return array
      * @throws PDOException
      */
-    public function ajaxSearch(
-        string $keyword,
-        ?array $filter,
-        ?int $limit = null,
-        ?int $cursor = null
-    ): array {
+    public function ajaxSearch(string $keyword, array $filter, ?int $limit = null, ?int $cursor = null): array {
         [$query, $params] = $this->buildSearch($keyword, $filter);
 
         if (0 !== $cursor) {
@@ -80,10 +72,10 @@ class Helper
 
     /**
      * @param string $keyword
-     * @param array|null  $filter
+     * @param array $filter
      * @return array [sqlQuery, params]
      */
-    private function buildSearch(string $keyword, ?array $filter): array
+    private function buildSearch(string $keyword, array $filter): array
     {
         $username   = $filter['username'] ?? '';
         $externalId = $filter['externalId'] ?? '';
