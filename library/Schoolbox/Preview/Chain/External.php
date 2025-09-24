@@ -10,7 +10,6 @@ namespace Schoolbox\Preview\Chain;
 
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Preview\Chain\Strategy\External\IFrame;
-use Schoolbox\Preview\Chain\Strategy\External\PDF;
 use Schoolbox\Preview\Chain\Strategy\External\Image;
 use Schoolbox\Preview\Chain\Strategy\External\Embed;
 use Schoolbox\Preview\Chain\Strategy\External\Redirect;

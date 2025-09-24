@@ -23,7 +23,6 @@ class PDF extends Base
             $src = $this->url;
             return [
                 'type' => 'pdf',
-                'isLocal' => true, // to pass through a ?file parameter to the viewer based on local or external
                 'src' => $src
             ];
         }
