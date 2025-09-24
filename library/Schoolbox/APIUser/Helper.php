@@ -27,7 +27,7 @@ class Helper
     public function ajaxSearchCount(
         ?string $keyword,
         ?array $filter
-    ) {
+    ): int {
         [$query, $params] = $this->buildSearch($keyword, $filter);
         $statement = $this->userMapper->getDatabase()->prepare($query);
         foreach ($params as $label => $value) {

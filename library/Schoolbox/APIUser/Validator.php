@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\APIUser;
 
+use Alaress\Web\Request\Values as WebRequestValues;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Role;
 
@@ -24,9 +25,54 @@ class Validator
     }
 
     /**
+     * @param WebRequestValues $requestQuery
+     * @return array{string, array, int, string}
+     * @throws SchoolboxException
+     */
+    public function validateForApiUserSearch(WebRequestValues $requestQuery): array
+    {
+        $search = $requestQuery->get('search', '');
+        $cursor = $requestQuery->get('cursor', '');
+        $limit = $requestQuery->get('limit', 5);
+        $filterJson = $requestQuery->get('filter', '');
+
+        if (!is_string($search)) {
+            throw new SchoolboxException("Parameter 'search' must have a string value.");
+        }
+
+        if (!is_int($limit) && !ctype_digit($limit)) { // Allow digit string for backwards compatibility.
+            throw new SchoolboxException("Parameter 'limit' must have an integer value.");
+        }
+        $limit = (int)$limit;
+
+        if (!is_string($cursor)) {
+            throw new SchoolboxException("Parameter 'cursor' must have a string value.");
+        }
+
+        $filter = null;
+        if ($filterJson === '') {
+            $filter = [];
+        } elseif (is_string($filterJson)) {
+            try {
+                $filter = json_decode($filterJson, true, flags: JSON_THROW_ON_ERROR);
+            } catch (\JsonException) {
+                $filter = null;
+            }
+        }
+
+        if (!is_array($filter)) {
+            throw new SchoolboxException('JSON filter could not be decoded.');
+        }
+
+        $this->validateFilter($filter);
+
+        return [$search, $filter, $limit, $cursor];
+    }
+
+    /**
      * @param array $filter
      */
-    public function validateFilter(array $filter): void
+    private function validateFilter(array $filter): void
     {
         foreach ($filter as $key => $value) {
             switch ($key) {

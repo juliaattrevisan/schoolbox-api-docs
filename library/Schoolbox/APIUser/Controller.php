@@ -436,39 +436,23 @@ class Controller extends Base
      */
     public function apiUserSearch(): void
     {
-        $search = $this->requestQuery->get('search', '');
-        $cursor = (int)$this->requestQuery->get('cursor', null);
-        $limit = (int)$this->requestQuery->get('limit', 5);
-        $filterJson = $this->requestQuery->get('filter', '');
-        $filter = null;
-
-        if ($filterJson === '') {
-            $filter = [];
-        } elseif (is_string($filterJson)) {
-            try {
-                $filter = json_decode($filterJson, true, flags: JSON_THROW_ON_ERROR);
-            } catch (\JsonException $e) {
-                $filter = null;
-            }
-        }
-
-        if (!is_array($filter)) {
-            $this->sendJsonError('JSON filter could not be decoded.', 400);
-        }
-
-        $userHelper = new Helper($this->userMapper);
-
         try {
-            $this->validator->validateFilter($filter);
+            [$search, $filter, $limit, $cursor] = $this->validator->validateForApiUserSearch($this->requestQuery);
         } catch (SchoolboxException $e) {
             $this->sendJsonError('Failed to get users: ' . $e->getMessage(), 400);
             return;
         }
 
+        $userHelper = new Helper($this->userMapper);
+
         try {
-            $ajaxSearch = $userHelper->ajaxSearch($search, $filter, $limit, $cursor);
+            // The $cursor must be cast to an int, because it is a string due to that
+            // being the standard type for cursor values specified in the API docs.
+            $ajaxSearch = $userHelper->ajaxSearch($search, $filter, $limit, (int)$cursor);
+            $ajaxSearchCount = $userHelper->ajaxSearchCount($search, $filter);
         } catch (PDOException) {
             $this->sendJsonError('Failed to get users due to database access problem.', 500);
+            return;
         }
 
         $userIds = [];
@@ -503,7 +487,7 @@ class Controller extends Base
             [
                 'data'  =>  $output,
                 'metadata'  => [
-                    'count' => $userHelper->ajaxSearchCount($search, $filter),
+                    'count' => $ajaxSearchCount,
                     'cursor' => end($output)['id'] ?? null
                 ]
             ]
