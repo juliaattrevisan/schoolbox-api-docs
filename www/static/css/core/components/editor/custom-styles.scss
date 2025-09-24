@@ -470,7 +470,7 @@ p.sb-ck-code-block {
  * I'm trying to mimic .meta styling
  */
 .ck.ck-ai-form .ck-ai-form-content::after {
-    content: "Schoolbox allows interaction with AI. AI can make mistakes. Please check generated content.";
+    content: "AI sometimes gets things wrong — please check important details.";
     font-style: italic;
     color: $body-foreground;
 }

@@ -52,7 +52,7 @@ window.Vue.onMounted(() => {
             {{ igStore.uploadError }}
         </div>
         <span class="meta"
-            >Schoolbox allows interaction with AI. AI can make mistakes. Please check generated content.</span
+            >AI sometimes gets things wrong — please check important details.</span
         >
     </div>
     <ig-actions />
