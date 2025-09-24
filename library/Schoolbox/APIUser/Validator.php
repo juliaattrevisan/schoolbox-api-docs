@@ -61,7 +61,9 @@ class Validator
                     break;
                 case 'roleType':
                     if (!in_array($value, Role::getRoleTypes(), true)) {
-                        throw new SchoolboxException("Filter 'roleType' has unknown value.");
+                        throw new SchoolboxException(
+                            "Filter 'roleType' has unknown value.  Expected one of: " . implode(', ', Role::getRoleTypes())
+                        );
                     }
                     break;
                 case 'campus':
