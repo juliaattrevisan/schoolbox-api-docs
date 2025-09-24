@@ -190,10 +190,9 @@ class Factory
 
                 /* Possible tokens that will be replaced in the URL before it is parsed */
                 $url = strtr($url, [
-                    // TODO: should these be escaped in any way..?
-                    '[username]' => $viewee->getUsername(),
-                    '[external_id]' => $viewee->getExternalId() ?? '',
-                    '[email]' => $viewee->getEmail() ?? '',
+                    '[username]' => rawurlencode($viewee->getUsername()),
+                    '[external_id]' => rawurlencode($viewee->getExternalId() ?? ''),
+                    '[email]' => rawurlencode($viewee->getEmail() ?? ''),
                 ]);
 
                 if (preg_match('/remote_service\(([^)]+)\)/', $url, $matches)) {
