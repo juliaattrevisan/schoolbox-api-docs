@@ -78,8 +78,9 @@ class Payload
             'id' => 'iframeLink',
             'name' => 'iFrame Link',
             'meta' => "
-                The URL of a webpage to embed, surround with remote_service(https://...) to integrate with the Remote Services API.
-                Valid tokens: [username], [external_id], [email]
+                Enter a webpage URL to embed.
+                Supports tokens: [username], [external_id], [email].
+                Wrap with remote_service(https://...) to use Remote Services.
             ",
         ],
         [
