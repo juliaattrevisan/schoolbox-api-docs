@@ -20,12 +20,12 @@ class Helper
 
     /**
      * get the count of users from the search query, irrespective fo the limit, or cursor location
-     * @param string|null $keyword
+     * @param string $keyword
      * @param array|null  $filter
      * @return int
      */
     public function ajaxSearchCount(
-        ?string $keyword,
+        string $keyword,
         ?array $filter
     ): int {
         [$query, $params] = $this->buildSearch($keyword, $filter);
@@ -41,7 +41,7 @@ class Helper
      * Find a user based on a keyword, for an AJAX response.
      * Stripped and updated from `library/User.php`
      *
-     * @param string|null $keyword
+     * @param string $keyword
      * @param array|null $filter
      * @param int|null   $limit
      * @param int|null   $cursor
@@ -49,7 +49,7 @@ class Helper
      * @throws PDOException
      */
     public function ajaxSearch(
-        ?string $keyword,
+        string $keyword,
         ?array $filter,
         ?int $limit = null,
         ?int $cursor = null
@@ -79,11 +79,11 @@ class Helper
     }
 
     /**
-     * @param string|null $keyword
+     * @param string $keyword
      * @param array|null  $filter
      * @return array [sqlQuery, params]
      */
-    private function buildSearch(?string $keyword, ?array $filter)
+    private function buildSearch(string $keyword, ?array $filter): array
     {
         $username   = $filter['username'] ?? '';
         $externalId = $filter['externalId'] ?? '';
@@ -117,7 +117,7 @@ class Helper
             WHERE user.deleted_at IS NULL
             ';
         $params = [];
-        if ($keyword != "") {
+        if ($keyword !== "") {
             if (is_numeric($keyword)) {
                 $params['externalId'] = $keyword;
                 $where .= "AND ( synergy_id = :externalId  ) ";
