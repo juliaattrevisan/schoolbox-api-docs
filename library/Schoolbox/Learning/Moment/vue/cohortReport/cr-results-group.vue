@@ -90,7 +90,7 @@ window.Vue.onMounted(() => {
                     <h2>{{ props.label }}</h2>
                 </div>
                 <nav class="c-nav-actions l-flex-row">
-                    <a :class="`icon-${isExpanded ? 'down' : 'up'}-arrow`" @click.prevent="toggleExpanded" />
+                    <a :class="`icon-${isExpanded ? 'up' : 'down'}-arrow`" @click.prevent="toggleExpanded" />
                 </nav>
             </div>
         </div>
