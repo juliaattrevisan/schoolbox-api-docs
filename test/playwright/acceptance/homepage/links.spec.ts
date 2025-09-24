@@ -31,9 +31,14 @@ test.describe("Links Component Tests", () => {
         await homepage.goto(83);
         tester.isGoingTo("Add Links component");
         await homepage.addComponent(Homepage.ELEMENT_ADD_COMPONENT_SECTION_RESOURCES, "Links");
-        linksComponent = page.locator(Homepage.locateComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1));
-        const componentIdStr = await linksComponent.getAttribute("id");
-        componentId = Number(componentIdStr?.match(/\d+/)?.[0]);
+          linksComponent = page.locator(Homepage.locateComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1));
+       const componentIdStr = await linksComponent.getAttribute("id");
+       if (componentIdStr === null) {
+           expect(componentIdStr).not.toBeNull();
+           throw new Error("Component ID is null");
+       }
+
+       componentId = Number(componentIdStr.replaceAll('component', ''));
 
         tester.isGoingTo(`Use component: ${componentId}`);
         await homepage.seeInComponentHeading("Links", Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
@@ -51,7 +56,12 @@ test.describe("Links Component Tests", () => {
         await homepage.goto(83);
         linksComponent = page.locator(Homepage.locateComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1));
         const componentIdStr = await linksComponent.getAttribute("id");
-        componentId = Number(componentIdStr?.match(/\d+/)?.[0]);
+        if (componentIdStr === null) {
+            expect(componentIdStr).not.toBeNull();
+            throw new Error("Component ID is null");
+        }
+
+        componentId = Number(componentIdStr.replaceAll('component', ''));
         await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
         await Homepage.clickComponentSettings(linksComponent);
         tester.isGoingTo("Verify sorting links by Name and Date asc and desc");
@@ -104,7 +114,12 @@ test.describe("Links Component Tests", () => {
         tester.isGoingTo("Modify Link Title");
         linksComponent = page.locator(Homepage.locateComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1));
         const componentIdStr = await linksComponent.getAttribute("id");
-        componentId = Number(componentIdStr?.match(/\d+/)?.[0]);
+        if (componentIdStr === null) {
+            expect(componentIdStr).not.toBeNull();
+            throw new Error("Component ID is null");
+        }
+
+        componentId = Number(componentIdStr.replaceAll('component', ''));
         await links.modifyLink(linksComponent, linkId, newLinkTitle);
         tester.isGoingTo("Update link setting");
         await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
@@ -121,13 +136,18 @@ test.describe("Links Component Tests", () => {
         linkTitle = newLinkTitle;
     });
 
-    test("Verify Link component access for student", async ({ tester, page }) => {
+    test("Verify Link component access for student", async ({ tester, page,api }) => {
         tester.isGoingTo("Navigate to 9A English homepage and update a link in the Links component");
         await homepage.goto(83);
 
         linksComponent = page.locator(Homepage.locateComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1));
         const componentIdStr = await linksComponent.getAttribute("id");
-        componentId = Number(componentIdStr?.match(/\d+/)?.[0]);
+        if (componentIdStr === null) {
+            expect(componentIdStr).not.toBeNull();
+            throw new Error("Component ID is null");
+        }
+
+        componentId = Number(componentIdStr.replaceAll('component', ''));
         await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
         await Homepage.clickComponentSettings(linksComponent);
         tester.isGoingTo("Update the component limit to 2 and un-tick the title to read only");
@@ -141,29 +161,35 @@ test.describe("Links Component Tests", () => {
         await expect(linksHeader).toBeHidden();
         await expect(viewAllLinksBtn).toBeHidden();
         await expect(addLinkBtn).toBeHidden();
+        await api.deleteHomepageComponent(83, componentId);
+
     });
 
-    // test("Verify adding link component to another page", async ({ tester, page }) => {
-    //     tester.isGoingTo("Navigate to 3RW homepage and alt-source the Links component");
-    //     await homepage.goto(188);
-    //     tester.isGoingTo("Add Links component");
-    //     await homepage.addComponent(Homepage.ELEMENT_ADD_COMPONENT_SECTION_RESOURCES, "Links");
-    //     linksComponent = page.locator(Homepage.locateComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1));
-    //     const componentIdStr = await linksComponent.getAttribute("id");
-    //     componentId = Number(componentIdStr?.match(/\d+/)?.[0]);
+    test("Verify adding link component to another page", async ({ tester, page }) => {
+        tester.isGoingTo("Navigate to 3RW homepage and alt-source the Links component");
+        await homepage.goto(188);
+        tester.isGoingTo("Add Links component");
+        await homepage.addComponent(Homepage.ELEMENT_ADD_COMPONENT_SECTION_RESOURCES, "Links");
+        linksComponent = page.locator(Homepage.locateComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1));
+        const componentIdStr = await linksComponent.getAttribute("id");
+        if (componentIdStr === null) {
+            expect(componentIdStr).not.toBeNull();
+            throw new Error("Component ID is null");
+        }
 
-    //     await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
-    //     await Homepage.clickComponentSettings(linksComponent);
-    //     await links.addExistingLink(linksComponent, "English", "9A English");
-    //     const sortedLinks = await Links.getAllLinks(linksComponent);
-    //     tester.isGoingTo(sortedLinks.toString());
-    //     expect(sortedLinks).toEqual([newLinkTitle, "Where did English come from?", "Plain English Romeo and Juliet"]);
-    // });
+        componentId = Number(componentIdStr.replaceAll('component', ''));
+
+        await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
+        await Homepage.clickComponentSettings(linksComponent);
+        await links.addExistingLink(linksComponent, "English", "9A English");
+        const sortedLinks = await Links.getAllLinks(linksComponent);
+        tester.isGoingTo(sortedLinks.toString());
+        expect(sortedLinks).toEqual([newLinkTitle,"Where did English come from?", "Plain English Romeo and Juliet"]);
+    });
 
     test.afterAll(async ({ baseTester, db, api }) => {
         baseTester.isGoingTo("clean up: remove Links component and soft-delete created link rows");
-        await api.deleteHomepageComponent(83, componentId);
         await db.dontHaveInDatabase("link", { url: linkUrl });
-        // await api.deleteHomepageComponent(188, componentId);
+        await api.deleteHomepageComponent(188, componentId);
     });
 });
