@@ -15,7 +15,7 @@ use Schoolbox\Role;
 /**
  * Validator of user-related API requests.
  *
- * @package Schoolbox\User\Password
+ * @package Schoolbox\APIUser
  */
 class Validator
 {

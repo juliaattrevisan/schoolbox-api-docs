@@ -16,7 +16,7 @@ use Schoolbox\Learning\Assessment\AssessmentType;
 /**
  * Validator of assessment-related API requests.
  *
- * @package Schoolbox\User\Password
+ * @package Schoolbox\Assessment\API
  */
 class Validator
 {
