@@ -11,7 +11,6 @@ use Schoolbox\Pastoral\Type\Model as Type;
 class StudentByType extends Base implements TabTypeInterface, ICursor
 {
     public const COLUMN_KEY_FORMAT = "count_%s_%d";
-    public const COLUMN_KEY_REGEX = "/count_(?<type>\w+)_(?<id>\d+)/";
     public const DEFAULT_SORTING_KEY = self::SORT_BY_STUDENT_DEFAULT;
 
     private array $params = [];

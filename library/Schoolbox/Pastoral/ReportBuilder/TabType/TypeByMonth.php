@@ -12,7 +12,6 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
     private $months = [];
     public const COLUMN_QUERY_MONTH_FORMAT = '%b_%Y';
     public const COLUMN_DATE_FORMAT = "M_Y";
-    public const COLUMN_KEY_REGEX = "/(?<month>(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec))_(?<year>[0-9]{4})/i";
     public const DEFAULT_SORTING_KEY = self::SORT_BY_TYPE_DEFAULT;
     private function getMonths(): Collection
     {

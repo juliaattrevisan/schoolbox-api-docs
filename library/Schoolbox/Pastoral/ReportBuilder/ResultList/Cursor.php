@@ -323,7 +323,7 @@ class Cursor implements ICursor
         $query = $param = [];
         switch ($this->tabType) {
             case Factory::STUDENT_BY_TYPE:
-                if (!preg_match(StudentByType::COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
+                if (!preg_match(Base::BY_TYPE_COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
                     throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey), self::BAD_REQUEST_ERROR_CODE);
                 }
                 $query[] = "pastoral.{$matches['type']}_id = :type_id";
@@ -331,7 +331,7 @@ class Cursor implements ICursor
                 break;
             case Factory::TYPE_BY_MONTH:
             case Factory::STUDENT_BY_MONTH:
-                if (!preg_match(TypeByMonth::COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
+                if (!preg_match(Base::BY_MONTH_COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
                     throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey), self::BAD_REQUEST_ERROR_CODE);
                 }
                 $monthFormat = TypeByMonth::COLUMN_QUERY_MONTH_FORMAT;
@@ -340,7 +340,7 @@ class Cursor implements ICursor
                 break;
             case Factory::TYPE_BY_WEEK:
             case Factory::STUDENT_BY_WEEK:
-                if (!preg_match(TypeByWeek::COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
+                if (!preg_match(Base::BY_WEEK_COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
                     throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey), self::BAD_REQUEST_ERROR_CODE);
                 }
                 $weeks = $this->helper->getWeeksInRange(

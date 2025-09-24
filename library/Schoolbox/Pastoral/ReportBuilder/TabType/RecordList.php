@@ -6,7 +6,6 @@ use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as PastoralModel;
-use Schoolbox\Pastoral\Report\Model as Report;
 use Schoolbox\Pastoral\ReportBuilder\Base;
 use Schoolbox\Pastoral\ReportBuilder\Helper;
 use Schoolbox\Pastoral\ReportBuilder\Translator\ModelToArray as PastoralTranslator;
