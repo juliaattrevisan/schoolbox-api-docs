@@ -230,7 +230,7 @@ $app = new class extends CliTool\App {
             WHERE
                 f.deleted_at IS NULL
             AND
-                f.name REGEXP '[[:<:]]CALVC[[:>:]]'
+                f.name REGEXP '[[:<:]]{$schoolcode}[[:>:]]'
             AND
                 f.name like '%OLC%'
             GROUP BY
