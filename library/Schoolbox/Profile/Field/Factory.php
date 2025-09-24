@@ -176,8 +176,8 @@ class Factory
         if (!isset($mutatorIndex['iframe'])) {
             $mutatorIndex['iframe'] = function (\Schoolbox\Admin\Profile\Editor\Field\Model $field) use ($viewee) {
                 $height = (int)($field->getOptions()['iframeHeight'] ?? 0);
-                if ($height < 1) {
-                    $height = $field->getOptionsDefault()['iframeHeight'] ?? 1;
+                if ($height < 0) {
+                    $height = $field->getOptionsDefault()['iframeHeight'] ?? 0;
                 }
 
                 $iframe = '<iframe src="%s" style="height: %dpx"></iframe>';
