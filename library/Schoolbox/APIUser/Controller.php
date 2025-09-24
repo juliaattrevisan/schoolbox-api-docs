@@ -10,7 +10,9 @@ declare(strict_types=1);
 
 namespace Schoolbox\APIUser;
 
+use Alaress\Authorizer\Authorizer;
 use Alaress\Web\Controller\Base;
+use Aura\Router\Generator;
 use Crell\ApiProblem\ApiProblem;
 use HouseMapper;
 use Schoolbox\Collection;
@@ -38,18 +40,12 @@ use UnexpectedValueException;
 class Controller extends Base
 {
     private GroupsHelper $groupsHelper;
-    protected UserMapper $userMapper;
-    protected HouseMapper $houseMapper;
-    protected CampusMapper $campusMapper;
-    protected YearLevelMapper $yearLevelMapper;
-    protected RoleMapper $roleMapper;
-    private Validator $validator;
 
     /**
      * Controller constructor.
      *
-     * @param \Alaress\Authorizer\Authorizer $authorizer
-     * @param \Aura\Router\Generator $routeGenerator
+     * @param Authorizer             $authorizer
+     * @param Generator              $routeGenerator
      * @param UserAccessMapper       $userAccessMapper
      * @param GroupMapper            $groupMapper
      * @param FolderMapper           $folderMapper
@@ -60,6 +56,7 @@ class Controller extends Base
      * @param CampusMapper           $campusMapper
      * @param YearLevelMapper        $yearLevelMapper
      * @param RoleMapper             $roleMapper
+     * @param Validator              $validator
      */
     public function __construct(
         \Alaress\Authorizer\Authorizer $authorizer,
@@ -69,18 +66,13 @@ class Controller extends Base
         FolderMapper $folderMapper,
         Timetable_ColourMapper $timetableColourMapper,
         RerouteOverrideMapper $reRouteOverrideMapper,
-        UserMapper $userMapper,
-        HouseMapper $houseMapper,
-        CampusMapper $campusMapper,
-        YearLevelMapper $yearLevelMapper,
-        RoleMapper $roleMapper,
-        Validator $validator,
+        protected UserMapper $userMapper,
+        protected HouseMapper $houseMapper,
+        protected CampusMapper $campusMapper,
+        protected YearLevelMapper $yearLevelMapper,
+        protected RoleMapper $roleMapper,
+        private readonly Validator $validator,
     ) {
-        $this->userMapper = $userMapper;
-        $this->houseMapper = $houseMapper;
-        $this->campusMapper = $campusMapper;
-        $this->yearLevelMapper = $yearLevelMapper;
-        $this->roleMapper = $roleMapper;
         $this->groupsHelper = new GroupsHelper(
             $authorizer,
             $routeGenerator,
@@ -90,7 +82,6 @@ class Controller extends Base
             $timetableColourMapper,
             $reRouteOverrideMapper,
         );
-        $this->validator = $validator;
     }
 
     /**
