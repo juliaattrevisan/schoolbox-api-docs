@@ -50,14 +50,14 @@ class Validator
                         // Note 'object' in the exception below refers to a JSON object.  JSON objects will appear here as arrays.
                         throw new SchoolboxException("Filter 'year' must be an object.");
                     }
-                    $this->validateIdOrNameArray('year', $value);
+                    $this->validateIdNameArray('year', $value);
                     break;
                 case 'role':
                     if (!is_array($value)) {
                         // Note 'object' in the exception below refers to a JSON object.  JSON objects will appear here as arrays.
                         throw new SchoolboxException("Filter 'role' must be an object.");
                     }
-                    $this->validateIdOrNameArray('role', $value);
+                    $this->validateIdNameArray('role', $value);
                     break;
                 case 'roleType':
                     if (!in_array($value, Role::getRoleTypes(), true)) {
@@ -71,7 +71,7 @@ class Validator
                         // Note 'object' in the exception below refers to a JSON object.  JSON objects will appear here as arrays.
                         throw new SchoolboxException("Filter 'campus' must be an object.");
                     }
-                    $this->validateIdOrNameArray('campus', $value);
+                    $this->validateIdNameArray('campus', $value);
                     break;
                 default:
                     throw new SchoolboxException("Unexpected filter key '$key'.");
@@ -81,30 +81,29 @@ class Validator
 
     /**
      * @param string $arrayName
-     * @param array  $array
-     * @return void
+     * @param array $array
      */
-    private function validateIdOrNameArray(string $arrayName, array $array): void
+    private function validateIdNameArray(string $arrayName, array $array): void
     {
         if (count($array) === 0) {
             // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
-            throw new SchoolboxException("Filter '$arrayName' contains an item that is missing an expected key.");
+            throw new SchoolboxException("Filter '$arrayName' must not be empty.");
         }
 
-        foreach ($array as $key => $subValue) {
+        foreach ($array as $key => $value) {
             switch ($key) {
                 case 'id':
-                    if (!is_int($subValue) && !ctype_digit($subValue)) {
-                        throw new SchoolboxException("Filter '$arrayName' item property 'id' must have an integer value.");
+                    if (!is_int($value) && !ctype_digit($value)) {
+                        throw new SchoolboxException("Filter '$arrayName' property 'id' must have an integer value.");
                     }
                     break;
                 case 'name':
-                    if (!is_string($subValue)) {
-                        throw new SchoolboxException("Filter '$arrayName' item property 'name' must have a string value.");
+                    if (!is_string($value)) {
+                        throw new SchoolboxException("Filter '$arrayName' property 'name' must have a string value.");
                     }
                     break;
                 default:
-                    throw new SchoolboxException("Each filter '$arrayName' item must have key 'id' or 'name'.");
+                    throw new SchoolboxException("Filter '$arrayName' contains unexpected key '$key'.");
             }
         }
     }
