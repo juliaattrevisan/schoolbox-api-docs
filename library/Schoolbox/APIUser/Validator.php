@@ -43,11 +43,12 @@ class Validator
         if (!is_int($limit) && !ctype_digit($limit)) { // Allow digit string for backwards compatibility.
             throw new SchoolboxException("Parameter 'limit' must have an integer value.");
         }
-        $limit = (int)$limit;
+        $limit = (int)$limit; // Set type to that expected according to the API docs.
 
-        if (!is_string($cursor)) {
+        if (!is_string($cursor) && !is_int($cursor)) { // Allow integer for backwards compatibility.
             throw new SchoolboxException("Parameter 'cursor' must have a string value.");
         }
+        $cursor = (string)$cursor; // Set type to that expected according to the API docs.
 
         $filter = null;
         if ($filterJson === '') {

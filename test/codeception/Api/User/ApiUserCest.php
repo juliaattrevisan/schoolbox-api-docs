@@ -24,11 +24,11 @@ class ApiUserCest
     {
     }
 
-
     /**
      * Get a list of assessments
      * @param ApiTester $i
      * @throws ServiceNotFound
+     * @throws \Exception
      */
     public function testGet(ApiTester $i): void
     {
@@ -38,16 +38,18 @@ class ApiUserCest
             $i->switchUser($user);
 
             foreach ($this->filterData($i) as $filterData) {
-                if (isset($filterData['search'])) {
-                    $data = [
-                        'search' => $filterData['search'],
-                        'limit'  => 7,
-                    ];
-                } else {
-                    $data = [
-                        'filter' => json_encode($filterData['filter']),
-                        'limit'  => 7,
-                    ];
+                $data = [];
+                if (array_key_exists('search', $filterData)) {
+                    $data['search'] = $filterData['search'];
+                }
+                if (array_key_exists('limit', $filterData)) {
+                    $data['limit'] = $filterData['limit'];
+                }
+                if (array_key_exists('cursor', $filterData)) {
+                    $data['cursor'] = $filterData['cursor'];
+                }
+                if (array_key_exists('filter', $filterData)) {
+                    $data['filter'] = json_encode($filterData['filter'], JSON_THROW_ON_ERROR);
                 }
                 $i->sendGet('/api/user', $data);
                 if ($user->isSuperuser()) {
@@ -101,7 +103,39 @@ class ApiUserCest
     private function filterData(ApiTester $i): Generator
     {
         yield [
-            'search' => "reed",
+            'search' => 'reed',
+            'valid'  => true,
+        ];
+        yield [
+            'search' => null,
+            'valid'  => true,
+        ];
+        yield [
+            'cursor' => '12345',
+            'valid'  => true,
+        ];
+        yield [
+            'cursor' => 12345, // Allow integer as well as string even through string is specified in the API docs.
+            'valid'  => true,
+        ];
+        yield [
+            'cursor' => null,
+            'valid'  => true,
+        ];
+        yield [
+            'limit' => 'abcde',
+            'valid'  => false,
+        ];
+        yield [
+            'limit' => '2', // Allow digit string as well as integer even through integer is specified in the API docs.
+            'valid'  => true,
+        ];
+        yield [
+            'limit' => 3,
+            'valid'  => true,
+        ];
+        yield [
+            'limit' => null,
             'valid'  => true,
         ];
         yield [
