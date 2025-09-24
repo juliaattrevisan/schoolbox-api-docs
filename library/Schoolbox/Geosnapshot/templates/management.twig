@@ -3,5 +3,5 @@
     <a href="{{ launchUrl }}" class="button submit">Access Photos and Media</a>
 {% else %}
     {# session exists, show iframe of geo #}
-    {% include '@core/sub/iframe.twig' with { url: "{{ libraryUrl }}" } %}
+    {% include '@core/sub/iframe.twig' with { url: libraryUrl } %}
 {% endif %}
