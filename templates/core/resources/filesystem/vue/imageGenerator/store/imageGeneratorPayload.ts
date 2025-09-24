@@ -10,6 +10,13 @@ export type ImageGeneratorApiPayload = {
     attributes: Record<string, string | null>;
     imageUrl: string | null;
     previousResponseId: string | null;
+    /**
+     * to keep track of the current ai conversation thread
+     * on each load of the tab (in the dropzone modal) this will regen from the backend
+     *
+     * This should be unique for a new unique conversation
+     */
+    aiSessionId: string;
 };
 
 /**

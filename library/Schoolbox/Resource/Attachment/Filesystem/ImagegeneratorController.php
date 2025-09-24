@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Resource\Attachment\Filesystem;
 
 use OutOfRangeException;
+use Ramsey\Uuid\Uuid;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Attachment\AbstractController;
@@ -109,6 +110,7 @@ class ImagegeneratorController extends AbstractController
                 'ACCEPTED_FILES' => $mime,
                 'PROMPT_ATTRIBUTES' => Scrub::text(json_encode(OpenAI\Payload\ImageGeneration::getAttributes())),
                 'GENERATE_ROUTE'    => self::IMAGE_GENERATION_ROUTE,
+                'AI_SESSION_ID'     => (string)Uuid::uuid4(), // keep track of the current ai conversation thread, each reload of the tab will start a new conversation
             ),
         );
     }

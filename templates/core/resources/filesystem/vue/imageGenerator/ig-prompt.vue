@@ -10,6 +10,13 @@ interface Props {
      * The extra attributes to show in the prompt (dropdowns)
      */
     promptAttributes: ImagePromptAttribute[];
+    /**
+     * to keep track of the current ai conversation thread
+     * on each load of the tab (in the dropzone modal) this will regen from the backend
+     *
+     * This should be unique for a new unique conversation
+     */
+    aiSessionId: string;
 }
 
 const props = defineProps<Props>();
@@ -66,6 +73,7 @@ async function sendRequest(): Promise<void> {
             attributes: attributes.value,
             imageUrl: currentFile.value ? await getImageUrl(currentFile.value.file) : null,
             previousResponseId: igStore.getPreviousResponseId(),
+            aiSessionId: props.aiSessionId,
         },
         currentFile.value,
     );

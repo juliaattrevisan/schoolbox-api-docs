@@ -272,11 +272,12 @@ class Helper
      * @param User $user // user to log the request against
      * @param string $payload // use this payload instead of generating one
      * @param string $feature // frontend schoolbox ai feature type for logging (lessonplan, image, etc.)
+     * @param string $aiSessionId // used for grouping ai chat conversions and keeping track of things in the logs
      * @return array
      * @throws ClientExceptionInterface
      * @throws Exception
      */
-    public function request(User $user, string $payload, string $feature): array
+    public function request(User $user, string $payload, string $feature, string $aiSessionId): array
     {
         /* Check that we have activated this endpoint
          */
@@ -297,6 +298,7 @@ class Helper
             ->setUser($user)
             ->setPrompt($payload)
             ->setFeature($feature)
+            ->setSessionId($aiSessionId)
             ->setEndpoint($this->getEndpoint());
 
         /* Minimum requirements met: let's send it and see what AI overlords think of our payload
@@ -424,11 +426,12 @@ class Helper
      * @param User $user // user to log the request against
      * @param string $payload // the fully build payload to send to AI
      * @param string $textSystemPrompt // the overarching system prompt to include in the request
+     * @param string $aiSessionId // used for grouping ai chat conversions and keeping track of things in the logs
      * @return void
      * @throws \JsonException
      * @throws Exception
      */
-    public function aiAssistantChat(User $user, string $payload, string $textSystemPrompt): void
+    public function aiAssistantChat(User $user, string $payload, string $textSystemPrompt, string $aiSessionId): void
     {
         /* Check that we have activated this endpoint
          */
@@ -476,6 +479,7 @@ class Helper
                 ->setPrompt($payload)
                 ->setModel($this->openAiModel)
                 ->setFeature(self::FEATURE_CHAT)
+                ->setSessionId($aiSessionId)
                 ->setEndpoint($this->getEndpoint(self::FEATURE_CHAT));
 
             $promise = $this->client->sendAsync($openAiRequest, ['stream' => true]);
