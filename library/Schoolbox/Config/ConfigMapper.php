@@ -296,6 +296,13 @@ class ConfigMapper extends Mapper
     public const NAME_PAPERLY_OPEN_IN_NEW_TAB = 'paperly_open_in_new_tab';
 
 
+    # GeoSnapShot settings
+    public const NAME_GEOSNAPSHOT_ENABLED     = 'geosnapshot_enabled'; // Feature flag
+    public const NAME_GEOSNAPSHOT_API_KEY     = 'geosnapshot_api_key';
+    public const NAME_GEOSNAPSHOT_LAUNCH_URL  = 'geosnapshot_launch_url'; // oAuth Login URL (unique to all schools)
+    public const NAME_GEOSNAPSHOT_LIBRARY_URL = 'geosnapshot_library_url'; // Management URL for staff (common to all schools)
+
+
     public const NAME_KAMI_ENABLED = 'kami_enabled';
 
     /* Kami Worksheets might not be available at v24 release

@@ -1,7 +1,7 @@
 {# if no geo session, show login button #}
 {% if not session %}
-    <a href="https://geosnapshot.com/library" class="button submit">Access Photos and Media</a>
+    <a href="{{ launchUrl }}" class="button submit">Access Photos and Media</a>
 {% else %}
     {# session exists, show iframe of geo #}
-    {% include '@core/sub/iframe.twig' with { url: "https://geosnapshot.com/library" } %}
+    {% include '@core/sub/iframe.twig' with { url: "{{ libraryUrl }}" } %}
 {% endif %}

@@ -16,6 +16,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Oidc\Server\RelyingParty\Grant\Mapper as RelyingPartyGrantMapper;
@@ -55,6 +56,9 @@ class Module extends BaseModule
         $isLoggedIsStaff = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\HasRole(Role::STAFF),
+            // if no launch url or library url is set in config, then no work
+            new Rule\IsConfigOn(ConfigMapper::NAME_GEOSNAPSHOT_LAUNCH_URL, $this->getConfig()),
+            new Rule\IsConfigOn(ConfigMapper::NAME_GEOSNAPSHOT_LIBRARY_URL, $this->getConfig()),
             new Rule\Callback(function (array $params, \Schoolbox\User $sessionUser) {
                 /* No Geosnapshot? No trabajo
                  *
@@ -68,8 +72,8 @@ class Module extends BaseModule
                 );
                 $isGeosnapshotAvailable = $oAuthClients->count() && (new ValidPhotosAvailable())
                     ->isConfigured(
-                        $this->getConfig()->get('geosnapshot_api_key'),
-                        $this->getConfig()->get('geosnapshot_enabled'),
+                        $this->getConfig()->get(ConfigMapper::NAME_GEOSNAPSHOT_API_KEY),
+                        $this->getConfig()->get(ConfigMapper::NAME_GEOSNAPSHOT_ENABLED),
                     );
 
                 if (!$isGeosnapshotAvailable) {

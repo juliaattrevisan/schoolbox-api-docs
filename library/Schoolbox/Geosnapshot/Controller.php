@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Geosnapshot;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Oidc\Server\RelyingParty\Grant\Mapper as RelyingPartyGrantMapper;
 use Schoolbox\Oidc\Server\RelyingParty\Mapper as RelyingPartyMapper;
@@ -114,6 +115,14 @@ class Controller extends Base
             }
         }
 
-        $this->response = $this->responseFromTemplate('@geosnapshotApi/management.twig', ['session' => $session]);
+        // get launch url and library URL from config
+        $launchUrl = trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_GEOSNAPSHOT_LAUNCH_URL));
+        $libraryUrl =  trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_GEOSNAPSHOT_LIBRARY_URL));
+
+        $this->response = $this->responseFromTemplate('@geosnapshotApi/management.twig', [
+            'session' => $session,
+            'launchUrl' => $launchUrl,
+            'libraryUrl' => $libraryUrl
+        ]);
     }
 }
