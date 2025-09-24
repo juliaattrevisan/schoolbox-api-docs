@@ -74,9 +74,9 @@ class FilesystemFactory
     /**
      * Build the fallback storage filesystem.
      *
-     * This will only be set if using the S3 adapter, and an and an alternate
-     * host is set. In that case, it will be an S3 adapter pointed to the
-     * non-alternate host.
+     * This will only be set if using the S3 adapter, and an alternate host is
+     * set. In that case, it will be an S3 adapter pointed to the non-alternate
+     * host.
      *
      * If not using S3, or using S3 with no alternate host: this will be null.
      *
