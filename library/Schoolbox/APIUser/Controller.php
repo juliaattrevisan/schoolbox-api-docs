@@ -470,7 +470,7 @@ class Controller extends Base
             $this->validator->validateFilter($filter);
             $ajaxSearch = $userHelper->ajaxSearch($search, $filter, $limit, $cursor);
         } catch (SchoolboxException $e) {
-            $this->sendJsonError('Failed to get assessments: ' . $e->getMessage(), 400);
+            $this->sendJsonError('Failed to get users: ' . $e->getMessage(), 400);
             return;
         }
 
