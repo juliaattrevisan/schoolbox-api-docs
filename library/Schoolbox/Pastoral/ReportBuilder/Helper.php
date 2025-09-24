@@ -75,6 +75,11 @@ class Helper
         return $this->report['subtypes'] ?? new Collection();
     }
 
+    /**
+     * Populate all types and subtypes as a fallback if none are selected
+     *
+     * @return void
+     */
     public function populateTypeSubTypeIfNotSelected(): void
     {
         if ($this->report['types']->count() === 0) {
