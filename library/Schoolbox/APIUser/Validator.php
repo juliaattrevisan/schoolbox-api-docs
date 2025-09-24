@@ -36,17 +36,22 @@ class Validator
         $limit = $requestQuery->get('limit', 5);
         $filterJson = $requestQuery->get('filter', '');
 
+        // Unfortunately, this API endpoint was in operation for a long time before validation was implemented.
+        // In order not to break previously working requests, we need to be a bit lenient with type checks.
+        // So we allow digit strings for parameters that ought to be integers, etc.
+
         if (!is_string($search)) {
             throw new SchoolboxException("Parameter 'search' must have a string value.");
         }
 
         if (!is_int($limit) && !ctype_digit($limit)) { // Allow digit string for backwards compatibility.
-            throw new SchoolboxException("Parameter 'limit' must have an integer value.");
+            throw new SchoolboxException("Parameter 'limit' should have an integer value.");
         }
         $limit = (int)$limit; // Set type to that expected according to the API docs.
 
+        // Cursor values ought to be strings according to the API docs.
         if (!is_string($cursor) && !is_int($cursor)) { // Allow integer for backwards compatibility.
-            throw new SchoolboxException("Parameter 'cursor' must have a string value.");
+            throw new SchoolboxException("Parameter 'cursor' should have a numeric string value.");
         }
         $cursor = (string)$cursor; // Set type to that expected according to the API docs.
 

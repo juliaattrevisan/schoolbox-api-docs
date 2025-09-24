@@ -443,12 +443,16 @@ class Controller extends Base
             return;
         }
 
+        // The $cursor is a string because that is the standard type for cursor values specified in the API docs.
+        // Cursor values sometimes need to be strings, because database primary keys are sometimes strings.
+        // For this specific endpoint, the relevant primary key (user.id) is an integer, so the cursor should be a digit
+        // string, and so we convert it to an integer or null (null to distinguish from a cursor value of 0).
+        $cursor = ($cursor === '') ? null : (int)$cursor;
+
         $userHelper = new Helper($this->userMapper);
 
         try {
-            // The $cursor must be cast to an int, because it is a string due to that
-            // being the standard type for cursor values specified in the API docs.
-            $ajaxSearch = $userHelper->ajaxSearch($search, $filter, $limit, (int)$cursor);
+            $ajaxSearch = $userHelper->ajaxSearch($search, $filter, $limit, $cursor);
             $ajaxSearchCount = $userHelper->ajaxSearchCount($search, $filter);
         } catch (PDOException) {
             $this->sendJsonError('Failed to get users due to database access problem.', 500);
