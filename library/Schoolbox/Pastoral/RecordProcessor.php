@@ -318,6 +318,33 @@ class RecordProcessor
             }
 
             $this->pastoralDataSource->save($record);
+
+            /* Sync with a third party (synergetic, at time of writing) knowing that we can only ever
+             * update an existing record here, never creating a newo ne.
+             */
+            $pastoralExternal = new External_Pastoral();
+
+            $db->onPersist(
+                function () use ($record, $pastoralExternal): void {
+                    // raise notification
+                    $action = \Schoolbox\Mapper::METHOD_UPDATE;
+                    $this->pastoralDataSource->resetPropagator();
+                    $this->pastoralDataSource->raiseNotification($record, $action);
+
+                    // Save record in external database, and set pastoral external_id in Schoolbox database
+                    try {
+                        $pastoralExternal->syncPastoral(
+                            $record,
+                            $this->config->get('external_pastoral_title_include')
+                        );
+                    } catch (\Exception $e) {
+                        // Send it to Sentry I suppose: there's nothing that
+                        // the end user may do with this information.
+                        /** @noinspection PhpExpressionResultUnusedInspection */
+                        $this->sentry->captureException($e);
+                    }
+                }
+            );
         } catch (\Exception $e) {
             /* Whatever died here, roll it back and re-throw it
              */
