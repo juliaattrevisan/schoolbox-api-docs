@@ -30,30 +30,30 @@ class ApiUserCest
      * @throws ServiceNotFound
      * @throws \Exception
      */
-    public function testGet(ApiTester $i): void
+    public function testApiUserSearch(ApiTester $i): void
     {
         $users = $i->getUsers();
 
         foreach ($users as $user) {
             $i->switchUser($user);
 
-            foreach ($this->filterData($i) as $filterData) {
+            foreach ($this->apiUserSearchData($i) as $apiUserSearchData) {
                 $data = [];
-                if (array_key_exists('search', $filterData)) {
-                    $data['search'] = $filterData['search'];
+                if (array_key_exists('search', $apiUserSearchData)) {
+                    $data['search'] = $apiUserSearchData['search'];
                 }
-                if (array_key_exists('limit', $filterData)) {
-                    $data['limit'] = $filterData['limit'];
+                if (array_key_exists('limit', $apiUserSearchData)) {
+                    $data['limit'] = $apiUserSearchData['limit'];
                 }
-                if (array_key_exists('cursor', $filterData)) {
-                    $data['cursor'] = $filterData['cursor'];
+                if (array_key_exists('cursor', $apiUserSearchData)) {
+                    $data['cursor'] = $apiUserSearchData['cursor'];
                 }
-                if (array_key_exists('filter', $filterData)) {
-                    $data['filter'] = json_encode($filterData['filter'], JSON_THROW_ON_ERROR);
+                if (array_key_exists('filter', $apiUserSearchData)) {
+                    $data['filter'] = json_encode($apiUserSearchData['filter'], JSON_THROW_ON_ERROR);
                 }
                 $i->sendGet('/api/user', $data);
                 if ($user->isSuperuser()) {
-                    if ($filterData['valid']) {
+                    if ($apiUserSearchData['valid']) {
                         $i->seeResponseCodeIs(200);
                     } else {
                         $i->seeResponseCodeIs(400);
@@ -100,7 +100,7 @@ class ApiUserCest
      * @param ApiTester $i
      * @return Generator
      */
-    private function filterData(ApiTester $i): Generator
+    private function apiUserSearchData(ApiTester $i): Generator
     {
         yield [
             'search' => 'reed',
