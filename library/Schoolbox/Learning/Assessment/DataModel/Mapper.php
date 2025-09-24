@@ -197,6 +197,7 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteDueWork']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteLtiAssessment']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteLessonPlan']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCustomisation']);
 
         $this->registerPersistSearchIndexCallbacks();
     }
@@ -399,6 +400,25 @@ class Mapper extends BaseMapper
             $lessonPlanMapper->softDelete($lessonPlans);
         }
 
+        return true;
+    }
+
+    /**
+     * Cascades soft-delete to any customisation of this assessment.
+     *
+     * @param Model $assessment
+     * @return bool
+     */
+    public function softDeleteCustomisation(Model $assessment): bool
+    {
+        try {
+            $customisation = $this->findByColumn('original_assessment_id', $assessment->getId());
+            if ($customisation->count()) {
+                $this->delete($customisation);
+            }
+        } catch (\Schoolbox\Mapper\Exception | \Exception $e) {
+            return false;
+        }
         return true;
     }
 
