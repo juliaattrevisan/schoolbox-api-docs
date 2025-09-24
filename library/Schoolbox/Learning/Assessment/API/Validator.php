@@ -201,6 +201,9 @@ class Validator
     }
 
     /**
+     * See also the same method in the APIUser\Validator class.
+     * TODO: It may be a good idea to combine the two classes with a common parent class.
+     *
      * @param string $arrayName
      * @param array $array
      */
