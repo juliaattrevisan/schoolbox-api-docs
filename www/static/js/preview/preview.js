@@ -84,6 +84,9 @@
                                                         src: response.fragment,
                                                     },
                                                 ],
+                                                mobileSettings: {
+                                                    showCloseIcon: true,
+                                                },
                                             },
                                             onCreated: function (gallery) {
                                                 gallery.openGallery();
@@ -106,8 +109,53 @@
                                                 ],
                                                 iframeWidth: "80%",
                                                 iframeHeight: "80%",
+                                                mobileSettings: {
+                                                    showCloseIcon: true,
+                                                },
                                             },
                                             onCreated: function (gallery) {
+                                                gallery.openGallery();
+                                            },
+                                        },
+                                    }),
+                                );
+                            } else if (response.type == "pdf") {
+                                const src = `${window.cdnPrefix}/js/pdf/pdfjs/web/viewer.html?file=${window.location.origin}${response.fragment}`;
+                                document.dispatchEvent(
+                                    new CustomEvent("IMAGE-LIGHTBOX__CREATE", {
+                                        detail: {
+                                            targetKey: "preview-iframe",
+                                            options: {
+                                                autoplay: false,
+                                                counter: false, // hide as could be confusing with the pages of the pdf conflicting with the gallery counter
+                                                download: false, // download would be of the viewer, not the actual pdf
+                                                dynamic: true,
+                                                dynamicEl: [
+                                                    {
+                                                        src: src,
+                                                        iframe: true,
+                                                    },
+                                                ],
+                                                enableDrag: false, // ensure doesn't cause any conflict with dragging in the pdf viewer
+                                                enableSwipe: false, // ensure doesn't cause any conflict with swiping in the pdf viewer
+                                                iframeWidth: "100%",
+                                                iframeHeight: "100%",
+                                                mobileSettings: {
+                                                    showCloseIcon: true,
+                                                },
+                                            },
+                                            onCreated: function (gallery) {
+                                                gallery.el.addEventListener("lgAfterOpen", function () {
+                                                    const iframe = gallery.$inner.selector.querySelector("iframe");
+                                                    if (iframe) {
+                                                        // Hide the editor mode buttons in the PDF.js viewer
+                                                        iframe.onload = function () {
+                                                            iframe.contentWindow.document.getElementById(
+                                                                "editorModeButtons",
+                                                            ).style.display = "none";
+                                                        };
+                                                    }
+                                                });
                                                 gallery.openGallery();
                                             },
                                         },
@@ -125,6 +173,9 @@
                                                         src: window.cdnPrefix + "/images/foundation/preloader.gif",
                                                     },
                                                 ],
+                                                mobileSettings: {
+                                                    showCloseIcon: true,
+                                                },
                                             },
                                             onCreated: function (gallery) {
                                                 // The fragment sent back can contain scripts, so it is important that we
