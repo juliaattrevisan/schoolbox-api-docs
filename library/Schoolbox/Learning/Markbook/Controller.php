@@ -207,11 +207,21 @@ class Controller extends Base
                             }
                         }
 
+                        /**
+                         * When an assessment is part of a project, we need a way to know which other
+                         * activities need to be updated if the marks for this one change.
+                         */
+                        $parentProject = null;
+                        if ($aImpl->getContext() instanceof Project) {
+                            $parentProject = $aImpl->getContext();
+                        }
+
                         return [
                             'id'             => $aImpl->getId(),
                             'markVisibility' => $aImpl->getMarkVisibility(),
                             'courseManaged'  => $aImpl->getCourseManaged(),
                             'weight'         => $aImpl->getWeight(),
+                            'projectId'      => $parentProject?->getId(),
                             'writable'       => $this->isAssessmentMarkable($this->getUser(), $aImpl, $terms),
                             'instructorMarkScheme' => [
                                 'template' => $instructorMarkScheme->getTemplate(),
@@ -238,6 +248,7 @@ class Controller extends Base
 
                                     $draftMark = isset($markbook->getHasDraft()[$aImpl->getId()][$student->getId()]);
 
+                                    /** This basically matches the logic inside library/Schoolbox/Learning/Assessment/ListController.php:getInfo */
                                     $authoritativeFeedback = $participant->getAuthoritativeFeedback(true);
                                     $authoritativeFeedbackDraft = $draftMark ? $participant->getAuthoritativeFeedback(false) : null;
 

@@ -24,6 +24,7 @@ use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\Quiz;
+use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Task;
 use Schoolbox\Learning\Assessment\Feedback\Visibility;
 use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
@@ -335,12 +336,22 @@ class Controller extends WebController\Base
                                     }
                                 }
 
+                                /**
+                                 * When an assessment is part of a project, we need a way to know which other
+                                 * activities need to be updated if the marks for this one change.
+                                 */
+                                $parentProject = null;
+                                if ($aImpl->getContext() instanceof Project) {
+                                    $parentProject = $aImpl->getContext();
+                                }
+
                                 return [
                                     'id' => $aImpl->getId(),
                                     'markVisibility' => $aImpl->getMarkVisibility(),
                                     'courseManaged'  => $aImpl->getCourseManaged(),
                                     /* unused on the course markbook: */
                                     // 'weight'         => ...,
+                                    'projectId'      => $parentProject?->getId(),
                                     'writable'       => $this->isAssessmentMarkable($this->getUser(), $aImpl, $terms),
                                     'instructorMarkScheme' => [
                                         'template' => $instructorMarkScheme->getTemplate(),
