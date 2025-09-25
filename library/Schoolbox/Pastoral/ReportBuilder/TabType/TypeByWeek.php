@@ -11,7 +11,6 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
     private $params = [];
     private $weeks = [];
     public const COLUMN_QUERY_KEY = 'week_%d';
-    public const COLUMN_KEY_REGEX = '/(week)_(?<index>\d+)/';
     public const DEFAULT_SORTING_KEY = self::SORT_BY_TYPE_DEFAULT;
 
     private function getWeeks(): Collection
@@ -53,14 +52,6 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
 
     private function getResultQuery(): string
     {
-        $inTypeString = $inSubTypeString = '';
-        if ($this->helper->getType()->count() > 0) {
-            $inTypeString = "type.id IN (" . implode(',', $this->helper->getType()->getPropertyValues('id')) . ")";
-        }
-        if ($this->helper->getSubTypes()->count() > 0) {
-            $inSubTypeString = "subtype.id IN (" . implode(',', $this->helper->getSubTypes()->getPropertyValues('id')) . ")";
-        }
-        $whereInTypeQuery = implode(' OR ', array_filter([$inTypeString, $inSubTypeString]));
         $whereQuery       = "(" . implode(" AND ", $this->helper->getFilters()) . ")";
         $weeks = $this->getWeeks();
         $selectWeeksQuery =
@@ -87,7 +78,7 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
              ) as type_subtype,
              {$selectWeeksQuery}
           FROM lu_pastoral_type type
-          LEFT JOIN lu_pastoral_subtype subtype ON subtype.pastoral_type_id = type.id
+          LEFT JOIN lu_pastoral_subtype subtype ON subtype.pastoral_type_id = type.id AND subtype.deleted_at IS NULL
           LEFT JOIN (
                 SELECT
                      pastoral.type_id,
@@ -101,7 +92,7 @@ class TypeByWeek extends Base implements TabTypeInterface, ICursor
                 ) pastoral
             ) weekData
             ON weekData.type_id = type.id AND (weekData.subtype_id = subtype.id OR weekData.subtype_id IS NULL)
-            WHERE {$whereInTypeQuery}
+            WHERE type.deleted_at IS NULL
             GROUP BY typeId, subtypeId
         ";
 

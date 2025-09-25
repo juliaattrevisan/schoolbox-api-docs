@@ -6,7 +6,6 @@ use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Model as PastoralModel;
-use Schoolbox\Pastoral\Report\Model as Report;
 use Schoolbox\Pastoral\ReportBuilder\Base;
 use Schoolbox\Pastoral\ReportBuilder\Helper;
 use Schoolbox\Pastoral\ReportBuilder\Translator\ModelToArray as PastoralTranslator;
@@ -17,7 +16,7 @@ class RecordList extends Base implements TabTypeInterface, ICursor
 {
     public const LIMIT_DEFAULT = 50; // increase from 20 so records linked to recent notifications are more likely to be included in the initial load
     public const LIMIT_MAX = 50;
-    private string $inTypeSubType;
+    public const REQUIRE_TYPE_SUBTYPE_EXPLICITLY = false;
     public function __construct(
         protected Helper $helper,
         protected ModelToArray $userTranslator,
@@ -37,28 +36,6 @@ class RecordList extends Base implements TabTypeInterface, ICursor
             null,
             $this->limit
         );
-
-        $this->init();
-    }
-
-    /**
-     * Initialise the cursor with some common values
-     *
-     * @return void
-     */
-    private function init(): void
-    {
-        $whereInTypeSubTypeQuery = [];
-        if ($this->helper->getType()->count() > 0) {
-            $whereTypeIds = implode(',', $this->helper->getType()->getPropertyValues('id'));
-            $whereInTypeSubTypeQuery[] = "pastoral.type_id IN ({$whereTypeIds})";
-        }
-        if ($this->helper->getSubTypes()->count() > 0) {
-            $whereSubTypeIds = implode(',', $this->helper->getSubTypes()->getPropertyValues('id'));
-            $whereInTypeSubTypeQuery[] = "pastoral.subtype_id IN ({$whereSubTypeIds})";
-        }
-
-        $this->inTypeSubType = implode(' OR ', array_filter($whereInTypeSubTypeQuery));
     }
 
     /**
@@ -138,7 +115,6 @@ class RecordList extends Base implements TabTypeInterface, ICursor
             SELECT COUNT(DISTINCT pastoral.id) as count
             {$this->helper->getFromString()}
             WHERE {$where}
-            AND ({$this->inTypeSubType})
         ",
             $this->helper->getParams(),
         );
@@ -169,7 +145,6 @@ class RecordList extends Base implements TabTypeInterface, ICursor
 
         if ('' !== (string)$encodedCursor) {
             $cursor = $this->codec->decode($encodedCursor);
-            $where .= " AND ({$this->inTypeSubType})";
 
             // Create lexicographic comparison for multiple sort fields
             $cursorConditions = $this->helper->buildCursorConditions($cursor, self::MIN_SORT_BY_VALUE, self::MIN_DATE_VALUE);
@@ -198,7 +173,6 @@ class RecordList extends Base implements TabTypeInterface, ICursor
             LEFT JOIN lu_pastoral_subtype AS c ON pastoral.subtype_id = c.id
             INNER JOIN user AS o on pastoral.owner_id = o.id
             WHERE {$where}
-            AND ({$this->inTypeSubType})
             ORDER BY {$orderSql}
             {$limit}
         ",

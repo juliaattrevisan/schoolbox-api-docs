@@ -28,7 +28,7 @@ class Base
      * IMO the maximum is a sensible default.
      */
     public const LIMIT_DEFAULT = self::LIMIT_MAX;
-
+    public const REQUIRE_TYPE_SUBTYPE_EXPLICITLY = true;
     public const RESULT_TYPE_POINTS = 'points';
     public const RESULT_TYPE_RECORDS = 'records';
     public const DEFAULT_SORTING_KEY = null;
@@ -43,6 +43,13 @@ class Base
     public const MIN_SORT_BY_VALUE = -99999999;
     public const BAD_REQUEST_ERROR_CODE = 400;
     public const MIN_DATE_VALUE = '1970-01-01 00:00:00';
+
+    /**
+     * Column key regex for parsing dynamic column keys
+     */
+    public const BY_MONTH_COLUMN_KEY_REGEX = "/(?<month>(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec))_(?<year>[0-9]{4})/i";
+    public const BY_WEEK_COLUMN_KEY_REGEX = "/(week)_(?<index>\d+)/";
+    public const BY_TYPE_COLUMN_KEY_REGEX = "/count_(?<type>\w+)_(?<id>\d+)/";
 
     public function __construct(
         protected Helper $helper,
@@ -94,6 +101,14 @@ class Base
         if (null === $this->sortBy) {
             $this->sortBy = static::DEFAULT_SORTING_KEY;
         }
+
+        /* If type/subtype is required but not selected in the report it should be populated
+         */
+        if (static::REQUIRE_TYPE_SUBTYPE_EXPLICITLY) {
+            $this->helper->populateTypeSubTypeIfNotSelected();
+        }
+
+        $this->helper->setFilters();
     }
 
     protected function getTotalCount(): Collection

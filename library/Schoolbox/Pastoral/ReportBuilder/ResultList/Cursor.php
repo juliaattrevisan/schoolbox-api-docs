@@ -18,7 +18,6 @@ use ValueError;
 
 class Cursor implements ICursor
 {
-    private string $inTypeSubType;
     /**
      * Maximum number of results returnable from the cursor at once:
      * IMO 20 results is a sensible maximum.
@@ -68,28 +67,6 @@ class Cursor implements ICursor
                 );
             }
         }
-
-        $this->init();
-    }
-
-    /**
-     * Initialise the cursor with some common values
-     *
-     * @return void
-     */
-    private function init(): void
-    {
-        $whereInTypeSubTypeQuery = [];
-        if ($this->helper->getType()->count() > 0) {
-            $whereTypeIds = implode(',', $this->helper->getType()->getPropertyValues('id'));
-            $whereInTypeSubTypeQuery[] = "pastoral.type_id IN ({$whereTypeIds})";
-        }
-        if ($this->helper->getSubTypes()->count() > 0) {
-            $whereSubTypeIds = implode(',', $this->helper->getSubTypes()->getPropertyValues('id'));
-            $whereInTypeSubTypeQuery[] = "pastoral.subtype_id IN ({$whereSubTypeIds})";
-        }
-
-        $this->inTypeSubType = implode(' OR ', array_filter($whereInTypeSubTypeQuery));
     }
 
     /**
@@ -211,7 +188,6 @@ class Cursor implements ICursor
             WHERE {$where}
             {$hideNullPoints}
             AND {$whereFilter}
-            AND ({$this->inTypeSubType})
         ",
             array_merge(
                 $this->helper->getParams(),
@@ -282,7 +258,6 @@ class Cursor implements ICursor
             WHERE {$where}
             {$hideNullPoints}
             AND {$whereFilter}
-            AND ({$this->inTypeSubType})
             ORDER BY {$orderSql}
             {$limit}
         ",
@@ -348,7 +323,7 @@ class Cursor implements ICursor
         $query = $param = [];
         switch ($this->tabType) {
             case Factory::STUDENT_BY_TYPE:
-                if (!preg_match(StudentByType::COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
+                if (!preg_match(Base::BY_TYPE_COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
                     throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey), self::BAD_REQUEST_ERROR_CODE);
                 }
                 $query[] = "pastoral.{$matches['type']}_id = :type_id";
@@ -356,7 +331,7 @@ class Cursor implements ICursor
                 break;
             case Factory::TYPE_BY_MONTH:
             case Factory::STUDENT_BY_MONTH:
-                if (!preg_match(TypeByMonth::COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
+                if (!preg_match(Base::BY_MONTH_COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
                     throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey), self::BAD_REQUEST_ERROR_CODE);
                 }
                 $monthFormat = TypeByMonth::COLUMN_QUERY_MONTH_FORMAT;
@@ -365,7 +340,7 @@ class Cursor implements ICursor
                 break;
             case Factory::TYPE_BY_WEEK:
             case Factory::STUDENT_BY_WEEK:
-                if (!preg_match(TypeByWeek::COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
+                if (!preg_match(Base::BY_WEEK_COLUMN_KEY_REGEX, $this->columnKey, $matches)) {
                     throw new ValueError(sprintf('Unknown column key: %s', $this->columnKey), self::BAD_REQUEST_ERROR_CODE);
                 }
                 $weeks = $this->helper->getWeeksInRange(

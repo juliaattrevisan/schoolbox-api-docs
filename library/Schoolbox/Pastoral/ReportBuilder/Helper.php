@@ -2,16 +2,20 @@
 
 namespace Schoolbox\Pastoral\ReportBuilder;
 
+use Alaress\Database\Predicate\Builder;
 use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 use Schoolbox\Pastoral\AccessLevelCensor;
+use Schoolbox\Pastoral\Type\Mapper as TypeMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Report\Model as Report;
+use Schoolbox\Pastoral\Type\Model as Type;
 use Schoolbox\Pastoral\SubType\Model as SubType;
 
 class Helper
@@ -33,7 +37,6 @@ class Helper
         private User $user,
         private AccessLevelCensor $accessLevelCensor,
     ) {
-        $this->setFilters();
     }
 
     /**
@@ -73,6 +76,23 @@ class Helper
     }
 
     /**
+     * Populate all types and subtypes as a fallback if none are selected
+     *
+     * @return void
+     */
+    public function populateTypeSubTypeIfNotSelected(): void
+    {
+        if ($this->report['types']->count() === 0) {
+            $allTypes = $this->pastoralMapper->getJoinMapper('type')->findAll();
+            $allSubTypes = $this->pastoralMapper
+                ->getJoinMapper('subtype')
+                ->findByColumn('pastoral_type_id', $allTypes->getPropertyValues('id'));
+            $this->report['types'] = $allTypes;
+            $this->report['subtypes'] = $allSubTypes;
+        }
+    }
+
+    /**
      * Date range filter
      *
      * @return void
@@ -87,6 +107,48 @@ class Helper
         if ($this->report['afterDate'] instanceof Alaress_Date_Format) {
             $this->filters[] = "(COALESCE(`pastoral`.`occurred_on`, `pastoral`.`created_at`) >= :afterDate)";
             $this->params['afterDate'] = $this->report['afterDate']->startOfDay()->toIso8601String();
+        }
+    }
+    /**
+     * Type and Subtype filter
+     *
+     * @return void
+     */
+    private function getWhereInTypeSubType(): void
+    {
+        $whereInTypeSubTypeQuery = $whereInTypeSubTypeParams = [];
+        if ($this->getType()->count() > 0) {
+            $typeIds = $this->getType()->getPropertyValues('id');
+            $whereTypeIds = Builder::getArrayPlaceholders(
+                $typeIds,
+                'pastoralTypeId',
+            );
+            $whereInTypeSubTypeQuery[] = "pastoral.type_id IN {$whereTypeIds}";
+            $whereInTypeSubTypeParams = Builder::getArrayParameters(
+                $typeIds,
+                'pastoralTypeId',
+            );
+        }
+        if ($this->getSubTypes()->count() > 0) {
+            $subTypeIds = $this->getSubTypes()->getPropertyValues('id');
+            $whereSubTypeIds = Builder::getArrayPlaceholders(
+                $subTypeIds,
+                'pastoralSubTypeId',
+            );
+            $whereInTypeSubTypeQuery[] = "pastoral.subtype_id IN {$whereSubTypeIds}";
+            $whereInTypeSubTypeParams = array_merge(
+                $whereInTypeSubTypeParams,
+                Builder::getArrayParameters(
+                    $subTypeIds,
+                    'pastoralSubTypeId',
+                )
+            );
+        }
+
+        $query = implode(' OR ', array_filter($whereInTypeSubTypeQuery));
+        if ($query) {
+            $this->filters[] = "({$query})";
+            $this->params = array_merge($this->params, $whereInTypeSubTypeParams);
         }
     }
 
@@ -429,9 +491,10 @@ class Helper
      *
      * @return void
      */
-    private function setFilters(): void
+    public function setFilters(): void
     {
         $this->getWhereDate();
+        $this->getWhereInTypeSubType();
         $this->getSeverity();
         $this->getStudents();
         $this->getYears();
