@@ -606,6 +606,7 @@ class Kernel extends WebKernelAbstract
                         FilesystemFactory::buildDefaultVisibility($adapter),
                         $isLocal,
                         $isLocal ? $config->get('storage_dir') : $config->get('stream_dir'),
+                        (new FilesystemFactory())->buildFallbackStorage($config),
                     );
                 }
             )
