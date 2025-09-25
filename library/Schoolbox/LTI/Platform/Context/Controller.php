@@ -351,7 +351,8 @@ class Controller extends BaseController
                         'ltiPlatformContext.getMembershipsForFolder',
                         ['folderId' => $folder->getId()]
                     )
-                )
+                ),
+            ['2.0'],
         );
 
         $claims = [$contextClaim, $platformInstanceClaim, $nrpsClaim];

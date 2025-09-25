@@ -238,6 +238,7 @@ class LaunchFactory
                     )
                 )
                 ->appendQueryParameters(['rlid' => $resourceLinkCodec->encode($assessment->getId()),]),
+            ['2.0'],
         );
 
         return $additionalClaims;
