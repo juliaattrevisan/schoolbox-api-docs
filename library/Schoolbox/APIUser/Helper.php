@@ -50,19 +50,19 @@ class Helper
     {
         [$query, $params] = $this->buildSearch($keyword, $filter);
 
-        if (0 !== $cursor) {
+        if (null !== $cursor) {
             $query .= " AND user.id > :cursor ";
         }
         $query .= "ORDER BY user.id, lyl.sequence, lastname, chosen_name";
-        if (0 !== $limit) {
+        if (null !== $limit) {
             $query .= " LIMIT :limit";
         }
 
         $statement = $this->userMapper->getDatabase()->prepare($query);
-        if (0 !== $limit) {
+        if (null !== $limit) {
             $statement->bindValue('limit', $limit, PDO::PARAM_INT);
         }
-        if (0 !== $cursor) {
+        if (null !== $cursor) {
             $statement->bindValue('cursor', $cursor, PDO::PARAM_INT);
         }
         foreach ($params as $label => $value) {
