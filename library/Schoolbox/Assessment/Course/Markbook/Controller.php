@@ -284,8 +284,10 @@ class Controller extends WebController\Base
                                 'draftMean' => $courseMarkbook->getAssessmentSpecAverages()[$assessment->getId()]['any'] ?? null,
                             ]
                         ) : null,
-                        /* only show the links for specs, for historical reasons i guess... */
-                        '_links'          => $unitAssessmentsTranslator->getLinks($assessment, true),
+                        /* only show the links for specs, for historical reasons i guess...
+                         * if the spec is deleted, don't show any links as otherwise this will throw errors
+                         */
+                        '_links'          => $assessment->isDeleted() ? null : $unitAssessmentsTranslator->getLinks($assessment, true),
                         '_routes'         => [
                             'postFeedbacks' => $this->getRouteIfAuthorized(
                                 'learningDueWorkFeedback.postParticipantFeedbacks',
