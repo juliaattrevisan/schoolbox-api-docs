@@ -778,6 +778,12 @@ class Controller extends Base
 
         /* TODO Return something to api users...but what...?
          */
+
+        // Go back to students pastoral record
+
+        $this->response = $this->redirectAfterPost(
+            $this->routeGenerator->generate('pastoral.getStudent', ['studentId' => $record->getStudent()->getId(),])
+        );
     }
 
 
