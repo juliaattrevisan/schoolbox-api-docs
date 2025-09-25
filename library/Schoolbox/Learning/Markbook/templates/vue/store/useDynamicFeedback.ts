@@ -17,7 +17,7 @@ interface DynamicFeedbackData extends DynamicFeedbackEditableData {
 interface DynamicFeedbackExtraData {
     hasSubmittedResponse: Ref<boolean>;
     hasPublishedFeedback: Ref<boolean>;
-    plan: Reactive<Pick<Plan, "isDynamic" | "name" | "dueDate">>;
+    plan: Reactive<Pick<Plan, "isStatic" | "name" | "dueDate">>;
 }
 
 interface PostModifyResponsePayload {
@@ -26,7 +26,7 @@ interface PostModifyResponsePayload {
     normalisedMark: number | null;
     humanReadableMark: string | null;
     humanReadableInstructorMark: string | null;
-    plan: Pick<Plan, "isDynamic" | "name" | "dueDate">;
+    plan: Pick<Plan, "isStatic" | "name" | "dueDate">;
 }
 
 const TIMEOUT_DURATION_MS = 600; // After how many milliseconds should we auto-save user input

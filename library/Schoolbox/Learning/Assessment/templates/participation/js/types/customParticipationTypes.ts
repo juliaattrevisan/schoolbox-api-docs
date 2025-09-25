@@ -11,7 +11,7 @@ export type Plan = {
     description: string | null;
     dueDate: string | null;
     id: number;
-    isDynamic: boolean;
+    isStatic: boolean;
     name: string | null;
     openDate: string | null;
     publishDate: string | null;
