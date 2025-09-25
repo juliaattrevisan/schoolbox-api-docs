@@ -321,6 +321,12 @@ export default class Homepage {
         await this.page.getByTestId(Homepage.DATA_TEST_LINK_MENU_BUTTON).click();
     }
 
+    /**
+     * Get a Locator for a component in a layout region by its 1-based position.
+     * @param layoutSelector - The layout region selector (e.g., Homepage.ELEMENT_COMPONENT_LAYOUT_TOP).
+     * @param position - The 1-based index of the component within the region.
+     * @returns Locator pointing to the requested component.
+     */
     getComponent(layoutSelector: string, position: number): Locator {
         return this.page.locator(Homepage.locateComponent(layoutSelector, position));
     }
