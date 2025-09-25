@@ -223,13 +223,12 @@ $app = new class extends CliTool\App {
                 END as 'array_field',
                 count(ua.uid) as 'num'
             FROM
-                folder_code fc
-            JOIN
-                folder f ON fc.folder_id = f.parent
+                folder f
             JOIN
                 userAccess ua ON f.id = ua.sid AND service = '1'
+            JOIN user u ON ua.uid = u.id AND u.deleted_at is NULL
             WHERE
-                fc.deleted_at IS NULL
+                f.deleted_at IS NULL
             AND
                 f.name REGEXP '[[:<:]]{$schoolcode}[[:>:]]'
             AND

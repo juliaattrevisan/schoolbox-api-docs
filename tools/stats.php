@@ -147,6 +147,7 @@ $app = new class extends CliTool\App {
             'activity_plans'  => 'SELECT count(*) FROM participant_plan WHERE deleted_at is null AND is_dynamic = 0',
             'plan_participants'  => 'SELECT count(*) FROM participant JOIN participant_plan ON participant.participant_plan_id = participant_plan.id WHERE excluded_at is null AND is_dynamic = 0 AND participant_plan.deleted_at is null',
             'plan_excluded'  => 'SELECT count(*) FROM participant WHERE excluded_at is not null',
+            'assessment_differentiated' => 'SELECT count(*) FROM assessment WHERE original_assessment_id is not null AND deleted_at is null',
 
 
             // More quiz info:
@@ -269,6 +270,7 @@ $app = new class extends CliTool\App {
             'pastoral_report_view' => 'SELECT COUNT(*) FROM pastoral_audit WHERE report_id is NOT NULL',
             'pastoral_records_active' => 'SELECT count(*) FROM `pastoral` WHERE (expires_at IS NULL OR expires_at > NOW()) and deleted_at IS NULL',
             'pastoral_records_archived' =>  'SELECT count(*) FROM `pastoral` WHERE expires_at <= NOW() and deleted_at IS NULL',
+            'pastoral_points'           => 'SELECT count(*) FROM pastoral WHERE points IS NOT NULL and points != 0 and deleted_at IS NULL',
 
 
 
@@ -311,11 +313,67 @@ $app = new class extends CliTool\App {
             'files'             => 'SELECT COUNT(*) FROM file WHERE deleted_at IS NULL',
             'links'             => 'SELECT count(*) FROM link WHERE deleted_at IS NULL',
             'folders'           => 'SELECT count(*) FROM folder WHERE deleted_at IS NULL',
-            'myfile'            =>  'SELECT count(*) FROM myFile WHERE deleted_at IS NULL',
+            'myfile'            => 'SELECT count(*) FROM myFile WHERE deleted_at IS NULL',
+            'editor_templates'  => 'SELECT count(*) FROM editor_template WHERE deleted_at IS NULL',
 
             //Learning Moments / Evidence
             'evidence'          => 'SELECT count(*) FROM moment WHERE deleted_at IS NULL',
+            'moment_draft'      => 'SELECT count(*) FROM moment WHERE submitted_at IS NULL AND published_at IS NULL AND rejected_at IS NULL AND deleted_at IS NULL',
+            'moment_pending'    => 'SELECT count(*) FROM moment WHERE submitted_at IS NOT NULL AND published_at IS NULL AND rejected_at IS NULL AND deleted_at IS NULL',
+            'moment_approved'   => 'SELECT count(*) FROM moment WHERE published_at IS NOT NULL AND rejected_at IS NULL AND deleted_at IS NULL',
+            'moment_rejected'   => 'SELECT count(*) FROM moment WHERE submitted_at IS NULL AND published_at IS NULL AND rejected_at IS NOT NULL AND deleted_at IS NULL',
+            'moment_evidence'   => 'SELECT count(*) FROM moment_evidence JOIN moment ON moment_evidence.moment_id = moment.id WHERE moment.deleted_at IS NULL',
+            'moment_folder'     => 'SELECT count(*) FROM moment_folder JOIN moment ON moment_folder.moment_id = moment.id WHERE moment.deleted_at IS NULL',
+            'moment_tag'        => 'SELECT count(*) FROM moment_tag JOIN moment ON moment_tag.moment_id = moment.id WHERE moment.deleted_at IS NULL',
             'evidence_comments' => 'SELECT count(*) FROM moment JOIN discussion_thread_comment dtc on moment.discussion_thread_id = dtc.discussion_thread_id',
+            'moment_junior'   => "
+                SELECT COUNT(*)
+                FROM moment m
+                JOIN user u ON m.user_id = u.id
+                JOIN `groups` g ON u.group_id = g.id AND g.group_type = 'student'
+                JOIN lu_year_level yl ON u.year_id = yl.id
+                WHERE m.deleted_at IS NULL
+                  AND u.deleted_at IS NULL
+                  AND u.enabled = 1
+                  AND (
+                        (REGEXP_REPLACE(yl.name, '[^0-9]', '') != '' AND CAST(REGEXP_REPLACE(yl.name, '[^0-9]', '') AS UNSIGNED) < 7)
+                        OR yl.name LIKE 'ELC'
+                        OR yl.name LIKE 'Prep%'
+                        OR yl.name LIKE 'Kind%'
+                  )
+            ",
+            'moment_senior'   => "
+                SELECT COUNT(*)
+                FROM moment m
+                JOIN user u ON m.user_id = u.id
+                JOIN `groups` g ON u.group_id = g.id AND g.group_type = 'student'
+                JOIN lu_year_level yl ON u.year_id = yl.id
+                WHERE m.deleted_at IS NULL
+                  AND u.deleted_at IS NULL
+                  AND u.enabled = 1
+                  AND (
+                        REGEXP_REPLACE(yl.name, '[^0-9]', '') != ''
+                        AND CAST(REGEXP_REPLACE(yl.name, '[^0-9]', '') AS UNSIGNED) > 6
+                  )
+            ",
+            'moment_staff'    => "
+                SELECT COUNT(*)
+                FROM moment m
+                JOIN user u ON m.created_by = u.id
+                JOIN `groups` g ON u.group_id = g.id AND g.group_type = 'staff'
+                WHERE m.deleted_at IS NULL
+                  AND u.deleted_at IS NULL
+                  AND u.enabled = 1
+            ",
+            'moment_parent'   => "
+                SELECT COUNT(*)
+                FROM moment m
+                JOIN user u ON m.created_by = u.id
+                JOIN `groups` g ON u.group_id = g.id AND g.group_type = 'parent'
+                WHERE m.deleted_at IS NULL
+                  AND u.deleted_at IS NULL
+                  AND u.enabled = 1
+            ",
 
             //Badges
             'badges'            => 'SELECT count(*) FROM badge WHERE deleted_at IS NULL',
