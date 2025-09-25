@@ -51,9 +51,7 @@ window.Vue.onMounted(() => {
             <b>There was a problem uploading the image.</b>
             {{ igStore.uploadError }}
         </div>
-        <span class="meta"
-            >AI sometimes gets things wrong — please check important details.</span
-        >
+        <span class="meta">AI sometimes gets things wrong — please check important details.</span>
     </div>
     <ig-actions />
 </template>
