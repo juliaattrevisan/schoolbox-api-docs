@@ -100,14 +100,6 @@ article {
     }
 
     /**
-    * remove the 1px bottom border added to all tables, so if the user sets the table
-    * to have no border, it will actually have no border
-    */
-    .sb-ck-table td {
-        border-bottom: none;
-    }
-
-    /**
      *  Because we have the potential to be displaying an unordered list in content and it'll
      *  be contained *within* a list itself, the list marker style is displaying incorrectly.
      *  Here we replicate the ck-editor internal rules...
