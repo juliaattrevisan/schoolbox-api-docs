@@ -24,7 +24,8 @@ class Helper
      * @param array $filter
      * @return int
      */
-    public function ajaxSearchCount(string $keyword, array $filter): int {
+    public function ajaxSearchCount(string $keyword, array $filter): int
+    {
         [$query, $params] = $this->buildSearch($keyword, $filter);
         $statement = $this->userMapper->getDatabase()->prepare($query);
         foreach ($params as $label => $value) {
@@ -45,7 +46,8 @@ class Helper
      * @return array
      * @throws PDOException
      */
-    public function ajaxSearch(string $keyword, array $filter, ?int $limit = null, ?int $cursor = null): array {
+    public function ajaxSearch(string $keyword, array $filter, ?int $limit = null, ?int $cursor = null): array
+    {
         [$query, $params] = $this->buildSearch($keyword, $filter);
 
         if (0 !== $cursor) {
