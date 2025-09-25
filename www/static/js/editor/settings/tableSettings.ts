@@ -19,6 +19,11 @@ export function getTableSettings(): { table: TableConfig } {
             tableCellProperties: {
                 borderColors: tableBorderColourSwatches,
                 backgroundColors: tableBackgroundColourSwatches,
+                defaultProperties: {
+                    borderColor: "#b3b3b3",
+                    borderStyle: "solid",
+                    borderWidth: "1px",
+                },
             },
         },
     };
