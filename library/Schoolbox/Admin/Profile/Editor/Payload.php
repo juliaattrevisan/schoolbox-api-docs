@@ -58,6 +58,38 @@ class Payload
     public const ADDITIONAL_SETTINGS_NODE = 'additional';
     private const ADDITIONAL_SETTINGS_NAME = 'Additional Settings';
     private const ADDITIONAL_SETTINGS_TOOLTIP = null;
+    /**
+     * currently these are just a global spec of additional field settings that applies to all fields,
+     * individual fields then opt-in to having these settings available based on
+     * if the given id exists inside the field's "options" JSON column
+     *
+     * Ideally at some point an individual field could define its own additional settings
+     * completely and we wouldn't need this here
+     */
+    public const ADDITIONAL_SETTINGS_OPTIONS = [
+        [
+            'type' => 'checkbox',
+            'id' => 'clickToReveal',
+            'name' => 'Activate View More',
+            'meta' => 'Only show content after the user chooses to view it.'
+        ],
+        [
+            'type' => 'text',
+            'id' => 'iframeLink',
+            'name' => 'iFrame Link',
+            'meta' => "
+                Enter a webpage URL to embed.
+                Supports tokens: [username], [externalId], [email].
+                Wrap with remote_service(https://...) to use Remote Services.
+            ",
+        ],
+        [
+            'type' => 'number',
+            'id' => 'iframeHeight',
+            'name' => 'Height',
+            'meta' => 'Height of the iframe in pixels',
+        ],
+    ];
 
     /**
      * The labels of the field categories which are used to group the fields in
@@ -260,12 +292,16 @@ class Payload
                 $defaultFieldSettings = [
                     self::AVAILABILITY_NODE => [],
                     self::VISIBILITY_NODE => [],
-                    self::ADDITIONAL_SETTINGS_NODE => []
+                    self::ADDITIONAL_SETTINGS_NODE => $field->getOptionsDefault() ?? [],
                 ];
 
-                // click to reveal is ON by default if it's available for the field
-                if ($availableFieldSettings[self::ADDITIONAL_SETTINGS_NODE]['clickToReveal']) {
-                    array_push($defaultFieldSettings[self::ADDITIONAL_SETTINGS_NODE], 'clickToReveal');
+                /* The frontend expects a {} for an empty additional settings node, php will json_encode an empty array as []
+                 * so we need to convert it here
+                 */
+                foreach ($defaultFieldSettings as $settingKey => $settingValue) {
+                    if ($settingValue instanceof \Schoolbox\Collection ? $settingValue->count() === 0 : empty($settingValue)) {
+                        $defaultFieldSettings[$settingKey] = new \stdClass();
+                    }
                 }
 
                 $roleTypeSettings['fields']['available'][] = [
@@ -300,6 +336,31 @@ class Payload
                     $node = 'mandatory';
                 }
 
+                /* All the field settings that are currently set for this field
+                 */
+                $fieldSettings = [
+                    /* Find the ids of the campuses for which this field might be available
+                     */
+                    self::AVAILABILITY_NODE => $field->getAvailabilityCampus()?->indexByCallback(static function (\Schoolbox\Admin\Profile\Editor\Field\Availability\Campus\Model $campus) {
+                        return $campus->getCampus()?->getId();
+                    })->map(fn() => true),
+                    /* Find the roletypes ("ids") for which this field might be visible
+                     */
+                    self::VISIBILITY_NODE => $field->getVisibility()?->indexBy('roleType')->map(fn() => true),
+                    /* Find the enabled additional setting keys for this field
+                     */
+                    self::ADDITIONAL_SETTINGS_NODE => $field->getOptions() ?? [],
+                ];
+
+                /* The frontend expects a {} for an empty additional settings node, php will json_encode an empty array as []
+                 * so we need to convert it here
+                 */
+                foreach ($fieldSettings as $settingKey => $settingValue) {
+                    if ($settingValue instanceof \Schoolbox\Collection ? $settingValue->count() === 0 : empty($settingValue)) {
+                        $fieldSettings[$settingKey] = new \stdClass();
+                    }
+                }
+
                 /* Pile it into the stack
                  */
                 $roleTypeSettings['fields'][$node][] = [
@@ -308,21 +369,7 @@ class Payload
                     'icon' => $field->getIcon(),
                     'css' => $field->getCss(),
                     'terminology' => $field->getTerm(),
-                    'fieldSettings' => [
-                        /* Find the ids of the campuses for which this field might be available
-                         */
-                        self::AVAILABILITY_NODE => $field->getAvailabilityCampus()?->indexByCallback(static function (\Schoolbox\Admin\Profile\Editor\Field\Availability\Campus\Model $campus) {
-                            return $campus->getCampus()?->getId();
-                        })->keys(),
-                        /* Find the roletypes ("ids") for which this field might be visible
-                         */
-                        self::VISIBILITY_NODE => $field->getVisibility()?->indexBy('roleType')->keys(),
-                        /* Find the enabled additional setting keys for this field
-                         */
-                        self::ADDITIONAL_SETTINGS_NODE => array_keys(array_filter([
-                            'clickToReveal' => $field->getClickToReveal(),
-                        ], static fn($value) => !!$value)),
-                    ],
+                    'fieldSettings' => $fieldSettings,
                     'availableFieldSettings' => $this->getFieldSettingsAvailability($field),
                 ];
             }
@@ -356,7 +403,7 @@ class Payload
 
         foreach ($campuses as $campus) {
             $settings['options'][] = [
-                'type' => 'campus',
+                'type' => 'checkbox',
                 'id' => $campus->getId(),
                 'name' => $campus->getName(),
                 'meta' => null
@@ -385,7 +432,7 @@ class Payload
             'tooltip' => self::VISIBILITY_TOOLTIP,
             'options' => [
                 [
-                    'type' => 'roleType',
+                    'type' => 'checkbox',
                     'id' => self::ROLETYPE_SELF,
                     'name' => ucwords(self::ROLETYPE_SELF),
                     'meta' => $metadata[self::ROLETYPE_SELF]
@@ -395,7 +442,7 @@ class Payload
 
         foreach ($roleTypes as $roleType) {
             $settings['options'][] = [
-                'type' => 'roleType',
+                'type' => 'checkbox',
                 'id' => $roleType,
                 'name' => ucwords($roleType),
                 'meta' => $metadata[$roleType] ?? null
@@ -418,14 +465,7 @@ class Payload
         $settings = [
             'displayAs' => self::ADDITIONAL_SETTINGS_NAME,
             'tooltip' => self::ADDITIONAL_SETTINGS_TOOLTIP,
-            'options' => [
-                [
-                    'type' => 'boolean',
-                    'id' => 'clickToReveal',
-                    'name' => 'Activate View More',
-                    'meta' => 'Only show content after the user chooses to view it.'
-                ],
-            ]
+            'options' => self::ADDITIONAL_SETTINGS_OPTIONS,
         ];
 
         return $settings;
@@ -440,15 +480,15 @@ class Payload
      */
     private function getFieldSettingsAvailability(FieldModel $field): array
     {
+        $additionalSettings = new \stdClass();
+        foreach ($field->getOptions() ?? [] as $key => $value) {
+            $additionalSettings->{$key} = true;
+        }
+
         $settings = [
             self::AVAILABILITY_NODE => true,
             self::VISIBILITY_NODE => true,
-            self::ADDITIONAL_SETTINGS_NODE => [
-                /* clickToReveal is only available when the field has both an icon and css
-                 * (i.e. when it will be displayed as an alert box)
-                 */
-                'clickToReveal' => $field->isFlag(),
-            ]
+            self::ADDITIONAL_SETTINGS_NODE => $additionalSettings,
         ];
 
         return $settings;

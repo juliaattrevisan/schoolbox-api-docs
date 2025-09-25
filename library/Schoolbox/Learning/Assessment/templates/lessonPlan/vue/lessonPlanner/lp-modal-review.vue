@@ -40,9 +40,7 @@ window.Vue.onMounted(() => {
     </template>
 
     <div class="clearfix"></div>
-    <span class="meta"
-        >AI sometimes gets things wrong — please check important details.</span
-    >
+    <span class="meta">AI sometimes gets things wrong — please check important details.</span>
     <div class="l-flex-row l-flex--no-wrap">
         <button class="l-flex__item--1 button" @click="lpStore.modalStep = LessonPlannerModalStep.GENERATE">
             Back

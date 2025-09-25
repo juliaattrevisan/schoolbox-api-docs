@@ -45,7 +45,8 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('term', self::TYPE_STRING);
         $this->uses('icon', self::TYPE_STRING);
         $this->uses('css', self::TYPE_STRING);
-        $this->uses('click_to_reveal', self::TYPE_INTEGER);
+        $this->uses('options', self::TYPE_JSON);
+        $this->uses('options_default', self::TYPE_JSON);
         $this->uses('is_external', self::TYPE_BOOLEAN);
 
         $this->hasJoin(

@@ -52,12 +52,14 @@ const fieldSettingDefinition = window.Vue.computed(() => {
 
 /**
  * The available options for the current field setting
+ * Split into the type of option (checkbox or input)
  */
 const availableFieldSettingOptions = window.Vue.computed(() => {
     if (fieldSettingDefinition.value === undefined) {
-        return [];
+        return { length: 0, checkbox: [], input: [] };
     }
-    return fieldSettingDefinition.value.options.filter((option) => {
+
+    const availableOptions = fieldSettingDefinition.value.options.filter((option) => {
         const availability = props.field.availableFieldSettings[props.fieldSettingKey];
         if (availability === undefined) {
             return false;
@@ -67,6 +69,12 @@ const availableFieldSettingOptions = window.Vue.computed(() => {
         }
         return availability[option.id];
     });
+
+    return {
+        length: availableOptions.length,
+        checkbox: availableOptions.filter((option) => option.type === "checkbox"),
+        input: availableOptions.filter((option) => option.type !== "checkbox"), // All other types (text/number) are inputs
+    };
 });
 
 /**
@@ -87,7 +95,8 @@ window.Vue.onMounted(() => {
 
 <template>
     <div v-if="fieldSettingDefinition && availableFieldSettingOptions.length" class="l-flex__item--1-grow">
-        <label>
+        <!-- only show the label if there are checkboxes, as each input has its own label instead -->
+        <label v-if="availableFieldSettingOptions.checkbox.length">
             {{ fieldSettingDefinition.displayAs }}
             <span
                 v-if="fieldSettingDefinition.tooltip"
@@ -98,29 +107,57 @@ window.Vue.onMounted(() => {
                 ?
             </span>
         </label>
-        <div class="checklist">
+        <div v-if="availableFieldSettingOptions.checkbox.length" class="checklist">
             <ul class="option-list">
-                <li v-for="fieldSettingOption in availableFieldSettingOptions" :key="fieldSettingOption.id">
+                <li v-for="checkboxOption in availableFieldSettingOptions.checkbox" :key="checkboxOption.id">
                     <input
-                        :id="getLabelKeyForOption(fieldSettingOption)"
+                        :id="getLabelKeyForOption(checkboxOption)"
                         type="checkbox"
-                        :checked="props.field.fieldSettings[props.fieldSettingKey].includes(fieldSettingOption.id)"
+                        :checked="Boolean(props.field.fieldSettings[props.fieldSettingKey][checkboxOption.id])"
                         @change="
-                            onFieldSettingOptionChange(fieldSettingOption, ($event.target as HTMLInputElement).checked)
+                            onFieldSettingOptionChange(checkboxOption, ($event.target as HTMLInputElement).checked)
                         "
                     />
                     <label
-                        :for="getLabelKeyForOption(fieldSettingOption)"
-                        :data-test="getLabelKeyForOption(fieldSettingOption)"
+                        :for="getLabelKeyForOption(checkboxOption)"
+                        :data-test="getLabelKeyForOption(checkboxOption)"
                     >
-                        {{ fieldSettingOption.name }}
-                        <p v-if="getMetaTextForOption(fieldSettingOption)" class="meta">
-                            {{ getMetaTextForOption(fieldSettingOption) }}
+                        {{ checkboxOption.name }}
+                        <p v-if="getMetaTextForOption(checkboxOption)" class="meta">
+                            {{ getMetaTextForOption(checkboxOption) }}
                         </p>
                     </label>
                 </li>
             </ul>
         </div>
+
+        <template v-for="(inputOption, i) in availableFieldSettingOptions.input" :key="inputOption.id">
+            <label :for="getLabelKeyForOption(inputOption)" :class="{ 'l-mar-s--top': i > 0 }">
+                {{ inputOption.name }}
+                <span
+                    v-if="getMetaTextForOption(inputOption)"
+                    data-tooltip
+                    class="has-tip tip-top hint"
+                    :title="getMetaTextForOption(inputOption)!"
+                >
+                    ?
+                </span>
+            </label>
+            <input
+                :id="getLabelKeyForOption(inputOption)"
+                :type="inputOption.type"
+                :name="String(inputOption.id)"
+                :value="props.field.fieldSettings[props.fieldSettingKey][inputOption.id]"
+                @input="
+                    peFieldsStore.updateFieldSettingOption(
+                        props.field.field,
+                        props.fieldSettingKey,
+                        inputOption.id,
+                        ($event.target as HTMLInputElement).value,
+                    )
+                "
+            />
+        </template>
     </div>
 </template>
 

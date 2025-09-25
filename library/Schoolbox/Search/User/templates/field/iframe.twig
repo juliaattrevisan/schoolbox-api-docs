@@ -1,0 +1,11 @@
+{##
+ # Renders the iframe field on any profile page
+ #
+ # @param string html - An already sanitized iframe string (e.g. <iframe src="..."></iframe>)
+ #}
+
+{% if html is not empty %}
+    <dd class="small-12 columns">
+        {{ html|raw }}
+    </dd>
+{% endif %}

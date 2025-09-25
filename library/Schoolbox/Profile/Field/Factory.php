@@ -170,6 +170,44 @@ class Factory
             };
         }
 
+        /**
+         * Override the iframe field's value with the parsed and sanitised URL and height
+         */
+        if (!isset($mutatorIndex['iframe'])) {
+            $mutatorIndex['iframe'] = function (\Schoolbox\Admin\Profile\Editor\Field\Model $field) use ($viewee) {
+                $height = (int)($field->getOptions()['iframeHeight'] ?? 0);
+                if ($height < 0) {
+                    $height = $field->getOptionsDefault()['iframeHeight'] ?? 0;
+                }
+
+                $iframe = '<iframe src="%s" style="height: %dpx"></iframe>';
+
+                /* Look for "remote_service(*)" and replace it with /modules/remote/[BASE64 ENCODED URL]/window
+                 * If there's a match, Scrub will remote /modules/remote but the safe iframe list is already validated within that
+                 * so we can skip scrubbing it there
+                 */
+                $url = $field->getOptions()['iframeLink'] ?? $field->getOptionsDefault()['iframeLink'] ?? '';
+
+                /* Possible tokens that will be replaced in the URL before it is parsed */
+                $url = strtr($url, [
+                    '[username]' => rawurlencode($viewee->getUsername()),
+                    '[externalId]' => rawurlencode($viewee->getExternalId() ?? ''),
+                    '[email]' => rawurlencode($viewee->getEmail() ?? ''),
+                ]);
+
+                if (preg_match('/remote_service\(([^)]+)\)/', $url, $matches)) {
+                    $encodedUrl = base64_encode($matches[1]);
+                    $url = "/modules/remote/{$encodedUrl}/window";
+
+                    $iframe = sprintf($iframe, $url, $height);
+                    return $iframe;
+                }
+
+                $iframe = sprintf($iframe, htmlspecialchars($url, ENT_QUOTES), $height);
+                return $iframe;
+            };
+        }
+
         /** @var \Schoolbox\Admin\Profile\Editor\Field\Model $renderableField */
         foreach ($renderableFields as $renderableField) {
             $node = [
@@ -178,7 +216,7 @@ class Factory
                 'terminology' => $renderableField->getTerm(),
                 'icon' => $renderableField->getIcon(),
                 'css' => $renderableField->getCss(),
-                'clickToReveal' => $renderableField->getClickToReveal(),
+                'clickToReveal' => $renderableField->getOptions()['clickToReveal'] ?? false,
                 'value' => $referenceFields[$renderableField->getField()] ?? null
             ];
 
@@ -190,7 +228,7 @@ class Factory
              * If there is, use that as the value
              */
             if (isset($mutatorIndex[$renderableField->getField()])) {
-                $node['value'] = $mutatorIndex[$renderableField->getField()]();
+                $node['value'] = $mutatorIndex[$renderableField->getField()]($renderableField);
             }
 
             $payload['roleTypes']['fields']['selected'][] = $node;

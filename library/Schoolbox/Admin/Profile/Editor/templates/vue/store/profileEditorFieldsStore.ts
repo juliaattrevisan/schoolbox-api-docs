@@ -401,13 +401,13 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
      * @param field - The key of the field to update
      * @param fieldSettingKey - The key of the field setting to update
      * @param fieldSettingOptionId - The id of the option to set
-     * @param isSelected - Whether the option is selected or deselected
+     * @param value - The value to set the option to, the type is dependent on the field setting's type (checkbox/text/number)
      */
     function updateFieldSettingOption(
         field: ProfileEditorActiveField["field"],
         fieldSettingKey: ProfileEditorFieldSettingKey,
         fieldSettingOptionId: ProfileEditorFieldSettingOption["id"],
-        isSelected: boolean,
+        value: string | boolean | number,
     ): void {
         if (peStore.selectedRoleType === null) throw new Error("No role type selected");
 
@@ -417,16 +417,7 @@ export const useProfileEditorFieldsStore = defineStore("profileEditorFieldsStore
         const activeField = peStore.selectedRoleType.fields[activeFieldType].find((f) => f.field === field);
         if (activeField === undefined) throw new Error(`Field ${field} not found`);
 
-        // Always filter the settings to avoid duplicates
-        const filteredSettings = activeField.fieldSettings[fieldSettingKey].filter((id) => id !== fieldSettingOptionId);
-
-        // Add the setting if it is selected
-        if (isSelected) {
-            filteredSettings.push(fieldSettingOptionId);
-        }
-
-        filteredSettings.sort(); // Sort the settings to ensure consistency and allow for easier comparison
-        activeField.fieldSettings[fieldSettingKey] = filteredSettings;
+        activeField.fieldSettings[fieldSettingKey][fieldSettingOptionId] = value;
     }
 
     /**
