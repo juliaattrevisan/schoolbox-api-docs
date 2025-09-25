@@ -92,6 +92,11 @@ function getCellInfo() {
         }
     }
 
+    // Make sure to clear the existing ref values in case there is no initial data for them to be set to
+    commentRef.value = "";
+    markRef.value = null;
+    resubmissionRequiredRef.value = false;
+
     const feedback = useDynamicFeedback(
         { hrMarkInstructor: markRef, comment: commentRef, resubmissionRequired: resubmissionRequiredRef },
         {
