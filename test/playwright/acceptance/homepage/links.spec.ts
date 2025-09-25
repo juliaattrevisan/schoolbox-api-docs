@@ -26,7 +26,7 @@ test.describe("Links Component Tests", () => {
         await tester.loginAsAdmin();
     });
 
-    test("Verify Add Link", async ({ tester, page }) => {
+    test("Verify Add Link", async ({ tester }) => {
         tester.isGoingTo("Homepage, open tab panel, click components tab");
         await homepage.goto(83);
         tester.isGoingTo("Add Links component");
@@ -91,7 +91,7 @@ test.describe("Links Component Tests", () => {
         await expect(page).toHaveURL(/.*\/resources$/);
     });
 
-    test("Verify Update link", async ({ tester, page, db }) => {
+    test("Verify Update link", async ({ tester, db }) => {
         const linkId = (await db.grabFromDatabase("link", "id", {
             deleted_at: null,
             description: "Test Link Automation",
@@ -118,7 +118,7 @@ test.describe("Links Component Tests", () => {
         linkTitle = newLinkTitle;
     });
 
-    test("Verify Link component access for student", async ({ tester, page, api }) => {
+    test("Verify Link component access for student", async ({ tester, api }) => {
         tester.isGoingTo("Navigate to 9A English homepage and update a link in the Links component");
         await homepage.goto(83);
         linksComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
@@ -139,7 +139,7 @@ test.describe("Links Component Tests", () => {
         await api.deleteHomepageComponent(83, componentId);
     });
 
-    test("Verify adding link component to another page", async ({ tester, page, api }) => {
+    test("Verify adding link component to another page", async ({ tester, api }) => {
         tester.isGoingTo("Navigate to 3RW homepage and alt-source the Links component");
         await homepage.goto(188);
         tester.isGoingTo("Add Links component");
