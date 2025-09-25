@@ -283,7 +283,7 @@ class Controller extends Base
 
                 if ($fieldOptionDefinition['type'] === 'checkbox') {
                     $value = (bool)$value;
-                } else if ($fieldOptionDefinition['type'] === 'number') {
+                } elseif ($fieldOptionDefinition['type'] === 'number') {
                     $value = (int)$value;
                 } else { // if ($fieldOptionDefinition['type'] === 'text') - phpstan doesn't let you check this
                     $value = trim((string)$value);

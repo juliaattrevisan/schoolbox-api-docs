@@ -203,12 +203,7 @@ class Factory
                     return $iframe;
                 }
 
-                /* Otherwise, shove the iframe thru Scrub so that it gets validated against our safe iframe list
-                 * TODO: I don't think we have another way to summon $safeIframeSources outside of Scrub, since it has its own extra ones hardcoded in?
-                 */
                 $iframe = sprintf($iframe, htmlspecialchars($url, ENT_QUOTES), $height);
-                $iframe = \Scrub::html($iframe);
-
                 return $iframe;
             };
         }
