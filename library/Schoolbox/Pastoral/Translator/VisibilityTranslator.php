@@ -117,6 +117,12 @@ class VisibilityTranslator
                 if (!isset($users[$userId])) {
                     throw new SchoolboxException("Invalid user id: $userId");
                 }
+
+                /* TODO nothing ever checked roles for Staff or Parent roletypes,
+                 *  allowing students to get in here by accident due to api usage.
+                 *  Surely that's not right...
+                 */
+
                 $access = self::getBaseAccess(
                     $emptyAccess,
                     $post->getInt("userAccessId{$userId}"),
