@@ -51,19 +51,26 @@ class ApiUserCest
                 if (array_key_exists('filter', $apiUserSearchData)) {
                     $data['filter'] = json_encode($apiUserSearchData['filter'], JSON_THROW_ON_ERROR);
                 }
+
                 $i->sendGet('/api/user', $data);
                 if ($user->isSuperuser()) {
                     if ($apiUserSearchData['valid']) {
                         $i->seeResponseCodeIs(200);
+
+                        $returnedCount = count($i->grabDataFromResponseByJsonPath('$.data')[0]);
+                        $i->comment("{$returnedCount} retrieved.");
+                        $totalCount = $i->grabDataFromResponseByJsonPath('$.metadata.count');
+                        $i->comment("{$totalCount[0]} found.");
+
+                        // Expect results by default for valid searches.  Supply false to expect no results.
+                        if ($apiUserSearchData['expectResults'] ?? true) {
+                            $i->assertGreaterThan(0, $returnedCount);
+                            $i->assertGreaterThanOrEqual($returnedCount, $totalCount);
+                        }
                     } else {
                         $i->seeResponseCodeIs(400);
                         $i->comment(implode('', $i->grabDataFromResponseByJsonPath('$.title')));
-                        continue;
                     }
-                    $dataCount = count($i->grabDataFromResponseByJsonPath('$.data')[0]);
-                    $i->comment("{$dataCount} retrieved.");
-                    $count = $i->grabDataFromResponseByJsonPath('$.metadata.count');
-                    $i->comment("{$count[0]} found.");
                 } else {
                     $i->seeResponseCodeIs(401);
                 }
@@ -111,11 +118,11 @@ class ApiUserCest
             'valid'  => true,
         ];
         yield [
-            'cursor' => '12345',
+            'cursor' => '12', // Low number to ensure results are returned.
             'valid'  => true,
         ];
         yield [
-            'cursor' => 12345, // Allow integer as well as string even through string is specified in the API docs.
+            'cursor' => 12, // Low number to ensure results are returned.  Allow integer as well as string even through string is specified in the API docs.
             'valid'  => true,
         ];
         yield [
@@ -136,13 +143,6 @@ class ApiUserCest
         ];
         yield [
             'limit' => null,
-            'valid'  => true,
-        ];
-        yield [
-            'filter' => [
-                // demo data set
-                'externalId' => "201",
-            ],
             'valid'  => true,
         ];
         yield [
@@ -189,7 +189,7 @@ class ApiUserCest
             'filter' => [
                 // Year/role/campus in 'id' format.
                 'year' => [
-                    'id' => 4 // Year '9' from db table `lu_year_level`.
+                    'id' => 3 // Year '9' from db table `lu_year_level`.
                 ],
                 'role' => [
                     'id' => '6' // Role 'Middle Student' from db table `groups` (supply one as a string - it should be treated the same as an integer).
@@ -219,11 +219,11 @@ class ApiUserCest
             'filter' => [
                 // Year/role/campus in mixed array format.
                 'year' => [
-                    ['id' => '1'], // Year '3' from db table `lu_year_level`.
+                    ['id' => '3'], // Year '9' from db table `lu_year_level`.
                     ['name' => '9'], // From db table `lu_year_level`.
                 ],
                 'role' => [
-                    ['id' => 5], // Role 'Junior Student' from db table `groups`.
+                    ['id' => 6], // Role 'Middle Student' from db table `groups`.
                     ['name' => 'Middle Student'], // From db table `groups`.
                 ],
                 'campus' => [
@@ -237,7 +237,7 @@ class ApiUserCest
             'filter' => [
                 // Year/role/campus redundantly specified.
                 'year' => [
-                    'id' => 4, // Year '9' from db table `lu_year_level`.
+                    'id' => 3, // Year '9' from db table `lu_year_level`.
                     'name' => '9', // From db table `lu_year_level`.
                 ],
                 'role' => [
@@ -256,7 +256,7 @@ class ApiUserCest
                 // Year/role/campus redundantly specified in arrays.
                 'year' => [
                     [
-                        'id' => 4, // Year '9' from db table `lu_year_level`.
+                        'id' => 3, // Year '9' from db table `lu_year_level`.
                         'name' => '9', // From db table `lu_year_level`.
                     ]
                 ],
@@ -279,7 +279,7 @@ class ApiUserCest
             'filter' => [
                 // Extra keys in year/role/campus arrays.
                 'year' => [
-                    'id' => 4, // Year '9' from db table `lu_year_level`.
+                    'id' => 3, // Year '9' from db table `lu_year_level`.
                     'name' => '9', // From db table `lu_year_level`.
                     'unexpectedKey' => 'unexpectedValue',
                 ],
@@ -363,15 +363,17 @@ class ApiUserCest
         yield [
             'filter' => [
                 // Test externalId with a string value.
-                'externalId' => 'abcde',
+                // In sales data set, Jana Reed has externalId 507.
+                'externalId' => '507',
             ],
             'valid' => true,
         ];
         yield [
             'filter' => [
                 // Test externalId with an integer value.
+                // In sales data set, Jana Reed has externalId 507.
                 // Although externalId is specified in the API docs as string only, allow integer also for backwards compatibility.
-                'externalId' => 12345,
+                'externalId' => 507,
             ],
             'valid' => true,
         ];
