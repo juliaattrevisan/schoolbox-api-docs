@@ -134,6 +134,10 @@ article {
 * These defaults are also set within CKEditor, so if settings others than these
 * are applied, those will take precedence.
 */
+.sb-ck-table {
+    border-collapse: collapse;
+}
+
 .sb-ck-table td {
     border-color: #b3b3b3;
     border-style: solid;
