@@ -26,6 +26,10 @@ export type MarkbookActivity = Pick<Activity, "id" | "title" | "assessmentType">
         mean: string | null;
         draftMean: string | null;
     } | null;
+    /**
+     * all links that the user has access to for this activity
+     * null if the spec was deleted on the course markbook
+     */
     _links: Pick<
         NonNullable<Activity["_links"]>,
         "status" | "summary" | "modify" | "modifyContent" | "studentParticipation"

@@ -49,7 +49,7 @@ async function onTitleClick(): Promise<void> {
             <!-- A teacher clicking an assessment from the markbook is most likely interested in seeing more granular results -->
             <span>
                 <a
-                    v-if="props.activity._links?.summary !== null"
+                    v-if="props.activity._links?.summary"
                     :href="props.activity._links?.summary"
                     :title="props.activity.title"
                     @click.prevent="onTitleClick"
