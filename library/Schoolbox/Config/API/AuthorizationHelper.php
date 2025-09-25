@@ -5,6 +5,7 @@ namespace Schoolbox\Config\API;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\API\Token\JwtParser\InstanceRegistryIssued;
 use Schoolbox\Config\Config;
+use Schoolbox\Config\ConfigMapper;
 
 class AuthorizationHelper
 {
@@ -69,8 +70,8 @@ class AuthorizationHelper
      */
     public static function isWriteOnlyConfig(Config $config): bool
     {
-        // Check if field_id is 14 (password field)
-        if ($config->getFieldId() === 14) {
+        // Check if field is a password
+        if ($config->getFieldId() === ConfigMapper::FIELD_PASSWORD) {
             return true;
         }
 
