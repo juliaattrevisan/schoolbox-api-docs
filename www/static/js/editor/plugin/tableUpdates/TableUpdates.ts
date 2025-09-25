@@ -117,79 +117,11 @@ export default class TableUpdates extends Plugin {
             this.editor.execute("tableAlignment", {
                 value: "left",
             });
-            this.editor.execute("tableBorderStyle", {
-                value: "solid",
-            });
-            this.editor.execute("tableBorderWidth", {
-                value: "1px",
-            });
-            this.editor.execute("tableBorderColor", {
-                value: "#b3b3b3",
-            });
             this.editor.model.change((writer) => {
                 // add the isCK5Attribute attribute to the table so we can add .sb-ck-table to the table in the downcast
                 const selectedTable = this.getSelectedTable();
                 if (!selectedTable) return;
                 writer.setAttribute(this.isCK5Attribute, "true", selectedTable);
-            });
-            this.setCellBorders();
-        });
-        const insertColumnAndRowCommands = [
-            "insertTableColumnLeft",
-            "insertTableColumnRight",
-            "insertTableRowAbove",
-            "insertTableRowBelow",
-        ];
-        insertColumnAndRowCommands.forEach((command) => {
-            this.editor.commands.get(command)!.on("execute", () => {
-                const cells = this.getCellElements();
-                // only add default styles if all cells have not been set to border style none
-                const hasBorderStyles = cells.some(
-                    (cell) =>
-                        // @ts-expect-error -- accessing a private property is intentional here, for now...
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access -- see above
-                        cell._attrs.has("tableCellBorderStyle") && cell._attrs.get("tableCellBorderStyle") !== "none",
-                );
-                if (hasBorderStyles) {
-                    this.setCellBorders();
-                }
-            });
-        });
-    }
-
-    /**
-     * Get all the cell elements from the table, first getting each row,
-     * then each cell within each row
-     * @returns An array of all the cell elements in the table
-     */
-    getCellElements(): Element[] {
-        const selectedTable = this.getSelectedTable();
-        if (!selectedTable) return [];
-        const cellElements = Array.from(selectedTable.getChildren())
-            .filter((row) => (row as Element).name === "tableRow")
-            .map((row) =>
-                Array.from((row as Element).getChildren()).filter((cell) => (cell as Element).name === "tableCell"),
-            )
-            .flat();
-        return cellElements as Element[];
-    }
-
-    /**
-     * Set the default border style, width and colour for all cells in the table.
-     * This is a bit more involved than setting the table styles above, as we
-     * need to get the table element from the selection, then get all the cell
-     * elements from the table, then set the attributes on each cell.
-     */
-    setCellBorders(): void {
-        const cells = this.getCellElements();
-        // @ts-expect-error -- accessing a private property is intentional here, for now...
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access -- see above
-        const filteredCells = cells.filter((cell) => !cell._attrs.has("tableCellBorderStyle")); // to update only newly inserted cells
-        this.editor.model.change((writer) => {
-            filteredCells.forEach((cell) => {
-                writer.setAttribute("tableCellBorderStyle", "solid", cell);
-                writer.setAttribute("tableCellBorderWidth", "1px", cell);
-                writer.setAttribute("tableCellBorderColor", "#b3b3b3", cell);
             });
         });
     }
