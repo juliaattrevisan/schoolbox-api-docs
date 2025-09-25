@@ -139,7 +139,7 @@ test.describe("Links Component Tests", () => {
         await api.deleteHomepageComponent(83, componentId);
     });
 
-    test("Verify adding link component to another page", async ({ tester, api }) => {
+    test("Verify adding link component to another page", async ({ tester }) => {
         tester.isGoingTo("Navigate to 3RW homepage and alt-source the Links component");
         await homepage.goto(188);
         tester.isGoingTo("Add Links component");
