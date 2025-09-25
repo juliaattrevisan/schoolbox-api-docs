@@ -250,7 +250,7 @@ class Helper
     private function getAuthors(): void
     {
         if ($this->report['authors']->count() > 0) {
-            $this->filters[] = "pastoral.author_id IN (" .
+            $this->filters[] = "pastoral.owner_id IN (" .
                 implode(',', $this->report['authors']->getPropertyValues('id')) .
                 ")";
         }
@@ -366,7 +366,7 @@ class Helper
     private function getTags(): void
     {
         if ($this->report['tags']->count() > 0) {
-            $this->filters[] = '`t`.`tag_id` IN (' .
+            $this->filters[] = '`g`.`tag_id` IN (' .
                 implode(',', $this->report['tags']->getPropertyValues('id')) .
                 ')';
         }
