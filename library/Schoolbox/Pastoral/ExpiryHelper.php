@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral;
 
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\Mapper\Exception;
@@ -47,15 +48,43 @@ class ExpiryHelper
         }
 
         $records = $this->pastoralMapper->findByPredicates($pb);
-        $records->map(function (Model $record) use ($defaultExpiry): void {
+
+        $expiry = $records->reduce(function (array $carry, Model $record) use ($defaultExpiry) {
             $expiryDate = $this->calculateExpireDate(
                 $record->getCreatedAt(),
                 $defaultExpiry,
                 $record->getStudent()->getYear()
             );
-            $record->setExpiresAt($expiryDate);
-            $this->pastoralMapper->save($record);
-        });
+            $carry[$record->getId()] = $expiryDate->getDatabaseDate();
+            return $carry;
+        }, []);
+
+        $this->bulkUpdateExpiry($expiry);
+    }
+
+    public function bulkUpdateExpiry(array $expiry): void
+    {
+        $ids = array_keys($expiry);
+        $placeholders = Builder::getArrayPlaceholders(array_keys($expiry));
+
+        $caseClauses = [];
+        $params = [];
+
+        foreach ($expiry as $id => $expiryDate) {
+            $caseClauses[] = "WHEN id = ? THEN ?";
+            $params[] = $id;
+            $params[] = $expiryDate ?? null;
+        }
+
+        $params = array_merge($params, $ids);
+
+        $sql = sprintf(
+            "UPDATE pastoral SET expires_at = CASE %s END WHERE id IN %s",
+            implode(' ', $caseClauses),
+            $placeholders
+        );
+
+        $this->pastoralMapper->getDatabase()->executeQuery($sql, $params);
     }
 
     /**
