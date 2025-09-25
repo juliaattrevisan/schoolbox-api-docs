@@ -176,6 +176,12 @@ $app = new class extends CliTool\App {
             }
         }
     }
+
+    /* allow to be run as any user */
+    public function runAsRoot(): ?bool
+    {
+        return null;
+    }
 };
 
 /** @noinspection PhpUnhandledExceptionInspection */
