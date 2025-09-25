@@ -1,14 +1,14 @@
 <script>
     window.onload = function() {
-        fetch('/pastoral/record/57/update', {
+        fetch('/pastoral/record/53/update', {
             method: "PATCH",
             body: JSON.stringify({
-                id: 57,
+                id: 53,
                 heading: 'mr meow',
                 typeId: 1,
                 subtypeId: 2,
-                body_public: 'mlem',
-                body_private: 'blep',
+                body_public: 'mlem MLEM',
+                body_private: 'blep BLEP',
                 cat: 'meow',
                 points: 117,
                 horse: 'neigh',
@@ -20,19 +20,18 @@
                 tags: '1,2,3',
                 tagNames: 'Playground, Commendation, Hadoken',
                 role: {
-                    1: 1,
-                    7: 1,
+                    2: 1,
                 },
-                group: {
-                    3: 1
-                },
-                user: {
-                    9: 1,
-                    24: 1,
-                    29: 0,
-                    28: 2,
-                    31: 2
-                },
+                // group: {
+                //     3: 1
+                // },
+                // user: {
+                //     9: 1,
+                //     24: 1,
+                //     29: 0,
+                //     28: 2,
+                //     31: 2
+                // },
             }),
             headers: {
                 Accept: "application/json",
