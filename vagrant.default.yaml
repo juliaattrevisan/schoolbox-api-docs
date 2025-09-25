@@ -48,7 +48,7 @@ aws_iam_secret: ''
 aws_personal_iam_key: ''
 aws_personal_iam_secret: ''
 
-# Which PHP major version should be enabled? Supported options: ['8.2', '8.4']
+# Which PHP major version should be enabled? Supported options: ['8.4']
 primary_php_majver: '8.4'
 
 
