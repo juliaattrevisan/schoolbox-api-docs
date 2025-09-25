@@ -67,6 +67,8 @@ class Cursor implements ICursor
                 );
             }
         }
+
+        $this->helper->setFilters();
     }
 
     /**
