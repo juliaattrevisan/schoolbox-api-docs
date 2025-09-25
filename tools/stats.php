@@ -322,9 +322,9 @@ $app = new class extends CliTool\App {
             'moment_pending'    => 'SELECT count(*) FROM moment WHERE submitted_at IS NOT NULL AND published_at IS NULL AND rejected_at IS NULL AND deleted_at IS NULL',
             'moment_approved'   => 'SELECT count(*) FROM moment WHERE published_at IS NOT NULL AND rejected_at IS NULL AND deleted_at IS NULL',
             'moment_rejected'   => 'SELECT count(*) FROM moment WHERE submitted_at IS NULL AND published_at IS NULL AND rejected_at IS NOT NULL AND deleted_at IS NULL',
-            'moment_evidence'   => 'SELECT count(*) FROM moment_evidence',
-            'moment_folder'     => 'SELECT count(*) FROM moment_folder',
-            'moment_tag'        => 'SELECT count(*) FROM moment_tag',
+            'moment_evidence'   => 'SELECT count(*) FROM moment_evidence JOIN moment ON moment_evidence.moment_id = moment.id WHERE moment.deleted_at IS NULL',
+            'moment_folder'     => 'SELECT count(*) FROM moment_folder JOIN moment ON moment_folder.moment_id = moment.id WHERE moment.deleted_at IS NULL',
+            'moment_tag'        => 'SELECT count(*) FROM moment_tag JOIN moment ON moment_tag.moment_id = moment.id WHERE moment.deleted_at IS NULL',
             'evidence_comments' => 'SELECT count(*) FROM moment JOIN discussion_thread_comment dtc on moment.discussion_thread_id = dtc.discussion_thread_id',
             'moment_junior'   => "
                 SELECT COUNT(*)
