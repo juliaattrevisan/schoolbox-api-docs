@@ -321,10 +321,7 @@ export default class Homepage {
         await this.page.getByTestId(Homepage.DATA_TEST_LINK_MENU_BUTTON).click();
     }
 
-
-
-
-     getComponent(layoutSelector: string, position: number): Locator {
+    getComponent(layoutSelector: string, position: number): Locator {
         return this.page.locator(Homepage.locateComponent(layoutSelector, position));
     }
     /**
@@ -333,19 +330,17 @@ export default class Homepage {
      * @returns The component ID
      */
 
-  static async getComponentId(component: Locator): Promise<number> {
-  const componentIdStr = await component.getAttribute("id");
+    static async getComponentId(component: Locator): Promise<number> {
+        const componentIdStr = await component.getAttribute("id");
 
-  if (componentIdStr === null) {
-    expect(componentIdStr).not.toBeNull();
-    throw new Error("Component ID is null");
-  }
+        if (componentIdStr === null) {
+            expect(componentIdStr).not.toBeNull();
+            throw new Error("Component ID is null");
+        }
 
-  const componentId = Number(componentIdStr.replaceAll("component", ""));
-  expect(Number.isFinite(componentId), `Bad id format: ${componentIdStr}`).toBeTruthy();
+        const componentId = Number(componentIdStr.replaceAll("component", ""));
+        expect(Number.isFinite(componentId), `Bad id format: ${componentIdStr}`).toBeTruthy();
 
-  return componentId;
-  }
-
-
+        return componentId;
+    }
 }
