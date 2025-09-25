@@ -298,7 +298,7 @@ const plaintextComments = window.Vue.computed(() => {
             ></span>
 
             <span
-                v-if="!participant.plan.isDynamic"
+                v-if="participant.plan.isStatic"
                 class="individualisation has-tip tip-left"
                 data-width="200"
                 data-tooltip

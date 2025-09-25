@@ -60,7 +60,7 @@ export type MarkbookClassImplActivityParticipant = {
      * Instead, the markbook popout will load this data when the user asks to create/edit feedback for a quiz or due work
      */
     extraInfo?: ActivityInfoResponsePayload;
-    plan: Pick<Plan, "isDynamic" | "name" | "dueDate">;
+    plan: Pick<Plan, "isStatic" | "name" | "dueDate">;
 };
 
 export type MarkbookClassImplActivity = {

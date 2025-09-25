@@ -305,7 +305,7 @@ class Controller extends Base
                                             ],
                                         ],
                                         'plan' => [
-                                            'isDynamic' => $participant->getPlan()->getIsDynamic(),
+                                            'isStatic' => $participant->getPlan()->isStatic(),
                                             'name' => $participant->getPlan()->getName(),
                                             'dueDate' => $participant->getPlan()->getDueDate()?->getShort() ?? null,
                                         ],

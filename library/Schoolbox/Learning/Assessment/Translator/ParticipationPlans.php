@@ -39,7 +39,7 @@ class ParticipationPlans
             'id' => $plan->getId(),
             'name' => $plan->getName(),
             'description' => $plan->getDescription(),
-            'isDynamic' => $plan->getIsDynamic(),
+            'isStatic' => $plan->isStatic(),
             'publishDate' => $plan->getPublishDate()?->toRfc3339String(),
             'openDate' => $plan->getOpenDate()?->toRfc3339String(),
             'closeDate' => $plan->getCloseDate()?->toRfc3339String(),

@@ -131,6 +131,16 @@ class Plan
     }
 
     /**
+     * Check if the plan is a static plan
+     *
+     * @return bool
+     */
+    public function isStatic(): bool
+    {
+        return PlanMapper::PLAN_TYPE_STATIC === $this->isDynamic;
+    }
+
+    /**
      * @return int
      */
     public function getIsDynamic(): int

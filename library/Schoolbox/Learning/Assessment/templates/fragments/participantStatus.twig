@@ -18,7 +18,7 @@
     {% if not participant.user.deleted %}
         <h3>
             <a href="/search/user/{{ participant.user.id }}" title="View Profile" data-participant-name>{{ participant.user.fullName }}</a>
-            {% if not participant.plan.isDynamic and not participant.plan.isCustomParticipation %}
+            {% if participant.plan.isStatic %}
                 <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name|purify}} ({{ participant.plan.duedate.short}})">i</span>
             {% endif %}
         </h3>
