@@ -8,6 +8,7 @@ import MarkScheme from "@schoolboxLibrary/Learning/MarkScheme/templates/ts/mark-
 import { ACTIVITY_TYPE_DUE_WORK, ACTIVITY_TYPE_QUIZ } from "@schoolboxAssessment/Types/assessmentTypes";
 import { useMarkbookStore } from "./store/markbookStore";
 import { useDynamicFeedback } from "./store/useDynamicFeedback";
+import type { MarkbookClassImpl, MarkbookClassImplActivity, MarkbookClassImplStudent } from "./types/payload";
 
 interface Props {
     maxHeight: string;
@@ -23,6 +24,29 @@ const lazyCommentRef = window.Vue.ref<string | null>(""); // for lazy loading th
 const commentRef = window.Vue.ref<string | null>("");
 const markRef = window.Vue.ref<string | null>(null);
 const resubmissionRequiredRef = window.Vue.ref<boolean>(false);
+
+/**
+ * When any feedback is saved as a draft or published, update any other relevant data
+ * @param aImpl - The activity implementation the feedback was for
+ * @param classImpl - The class implementation the activity implementation belongs to
+ * @param student - The student the feedback was for
+ */
+function onFeedbackSaved(
+    aImpl: MarkbookClassImplActivity,
+    classImpl: MarkbookClassImpl,
+    student: MarkbookClassImplStudent,
+): void {
+    /** we need to refresh the project stats if this is part of a project */
+    const projectImpl = aImpl.projectId ? classImpl.assessments[aImpl.projectId] : undefined;
+    if (projectImpl !== undefined) {
+        const infoRoute = projectImpl._routes.student[student.id]["learningAssessment.getInfo"];
+        const participant = projectImpl.participants[student.id];
+        if (infoRoute !== null && participant !== undefined) {
+            // void to let it run in the background and not block anything, it'll update when it wants to
+            void mbStore.updateExtraInfo(infoRoute, participant);
+        }
+    }
+}
 
 /**
  * Retrieve the cell information for the current props
@@ -125,6 +149,7 @@ function getCellInfo() {
             extraFormData,
         },
         activity.assessmentType === ACTIVITY_TYPE_QUIZ,
+        () => onFeedbackSaved(aImpl, classImpl, student),
     );
 
     /** For due work, add some extra info like the status page does */

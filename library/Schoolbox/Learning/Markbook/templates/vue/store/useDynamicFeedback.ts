@@ -44,8 +44,9 @@ const TIMEOUT_DURATION_MS = 600; // After how many milliseconds should we auto-s
  * @param dataExtra                - Extra refs to fields that get updated when the user does actions like publishing feedback
  * @param postModify               - See below:
  * @param postModify.route         - The route to post the modified data to
- * @param postModify.extraFormData - Any extra form data to include in the POST reques
+ * @param postModify.extraFormData - Any extra form data to include in the POST request
  * @param isQuiz                   - Whether the activity is a quiz
+ * @param onFeedbackSaved          - Optional callback invoked after feedback has been successfully saved as a draft or published
  * @returns properties
  */
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type -- we want the inferred type from this as it's more useful
@@ -59,6 +60,7 @@ export function useDynamicFeedback(
         extraFormData?: Record<string, unknown>;
     },
     isQuiz: boolean,
+    onFeedbackSaved?: () => void,
 ) {
     /**
      * Figure out if there's any initial data to use, and if so - populate the data with it
@@ -172,6 +174,10 @@ export function useDynamicFeedback(
             dataDraft.hrMark.value = respData.humanReadableMark;
             dataDraft.comment.value = window.Vue.unref(data.comment.value);
             dataDraft.resubmissionRequired.value = window.Vue.unref(data.resubmissionRequired.value);
+
+            if (onFeedbackSaved !== undefined) {
+                onFeedbackSaved();
+            }
         } catch (error) {
             console.error("Error auto-saving draft feedback:", error);
             toast.timeout({ text: "Unable to save draft", isSuccess: false });
@@ -291,6 +297,10 @@ export function useDynamicFeedback(
             dataDraft.normMark.value = null;
             dataDraft.hrMarkInstructor.value = null;
             dataDraft.resubmissionRequired.value = false;
+
+            if (onFeedbackSaved !== undefined) {
+                onFeedbackSaved();
+            }
         } catch (error) {
             console.error("Error publishing feedback:", error);
             toast.timeout({ text: "Unable to publish feedback", isSuccess: false });

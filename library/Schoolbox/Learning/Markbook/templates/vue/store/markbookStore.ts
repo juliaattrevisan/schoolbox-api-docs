@@ -10,6 +10,8 @@ import type {
     MarkbookClassImplActivity,
     MarkbookPopoutSelectedCellInfo,
     MarkbookFeedbackSelectedCellInfo,
+    ActivityInfoResponsePayload,
+    MarkbookClassImplActivityParticipant,
 } from "../types/payload";
 
 export const useMarkbookStore = defineStore("markbookStore", () => {
@@ -207,6 +209,35 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         }
     }
 
+    /**
+     * To update the extraInfo and marks for a given participant
+     * @param infoRoute - The route to fetch the extra info from
+     * @param participant - The participant to update the extra info for
+     */
+    async function updateExtraInfo(
+        infoRoute: string,
+        participant: MarkbookClassImplActivityParticipant,
+    ): Promise<void> {
+        const activityInfoResponse = await fetch(infoRoute, {
+            headers: {
+                "Content-Type": "application/json",
+                Accept: "application/json",
+            },
+        });
+
+        if (!activityInfoResponse.ok) {
+            throw new Error(`Failed to fetch extra activity info: ${activityInfoResponse.statusText}`);
+        }
+
+        /* just shove it on the participant for now, other places can deal with it */
+        const activityInfo = (await activityInfoResponse.json()) as ActivityInfoResponsePayload;
+        participant.extraInfo = activityInfo;
+
+        /* also update the marks since they might have changed */
+        Object.assign(participant.marks.draft, participant.extraInfo.marks.draft);
+        Object.assign(participant.marks.published, participant.extraInfo.marks.published);
+    }
+
     return {
         init,
         data,
@@ -229,5 +260,6 @@ export const useMarkbookStore = defineStore("markbookStore", () => {
         isActivityWritable,
         setFeedbackSelectedCell,
         feedbackDrawerEventBus,
+        updateExtraInfo,
     };
 });

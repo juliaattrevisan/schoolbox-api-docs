@@ -1465,6 +1465,7 @@ class ListController extends Web\Controller\Base
             'scoreMaximum' => null,
         ];
 
+        // TODO: this doesn't support projects up here yet, but we don't need that anywhere internally yet
         if ($participant) {
             $latestResponse = $participant->findMostRecentResponse();
             $latestFeedback = $participant->findMostRecentInstructorGivenFeedback();
@@ -1528,6 +1529,8 @@ class ListController extends Web\Controller\Base
         }
 
         /** Build all the mark information so the markbook can figure out the latest state */
+        /** This basically matches the logic inside library/Schoolbox/Learning/Markbook/Controller.php */
+        // TODO: centralise this logic somewhere
         $authoritativeFeedback = $participant?->getAuthoritativeFeedback(true);
         $authoritativeFeedbackDraft = $participant?->getAuthoritativeFeedback(false);
 
@@ -1543,28 +1546,41 @@ class ListController extends Web\Controller\Base
             ? $authoritativeFeedbackDraft->getResubmissionRequired()
             : false;
 
-        $authNormMarkPublished = $authoritativeFeedback ? $participant->getNormalisedMark(true) : null;
-        $authNormMarkDraft = $authoritativeFeedbackDraft ? $participant->getNormalisedMark(false) : null;
+        $responseIdPublished = $authoritativeFeedback?->getId() ?? null;
+        $responseIdDraft = $authoritativeFeedbackDraft?->getId() ?? null;
+
+        $authNormMarkPublished = $authoritativeFeedback || $assessment instanceof Project ? $participant->getNormalisedMark(true) : null;
+        $authNormMarkDraft = $authoritativeFeedbackDraft || $assessment instanceof Project ? $participant->getNormalisedMark(false) : null;
+
+        /** the markbook uses responseId !== null to determine if this mark actually exists, so jank a -1 here for projects */
+        if ($assessment instanceof Project) {
+            if ($authNormMarkPublished !== null) {
+                $responseIdPublished = -1;
+            }
+
+            if ($authNormMarkDraft !== null) {
+                $responseIdDraft = -1;
+            }
+        }
 
         $marks = [
             'published' => [
                 'norm'         => $authNormMarkPublished,
-                'hr'           => $authoritativeFeedback ? $participant->getHumanReadableMark(true) : null,
-                'hrInstructor' => $authoritativeFeedback ? $participant->getHumanReadableInstructorMark(true) : null,
+                'hr'           => $authoritativeFeedback || $assessment instanceof Project ? $participant->getHumanReadableMark(true) : null,
+                'hrInstructor' => $authoritativeFeedback || $assessment instanceof Project ? $participant->getHumanReadableInstructorMark(true) : null,
                 'comment'      => \Scrub::html($authoritativeFeedback?->getComment()),
                 'resubmissionRequired' => $resubmissionRequiredPublished,
-                'responseId'   => $authoritativeFeedback?->getId() ?? null,
+                'responseId'   => $responseIdPublished,
             ],
             'draft' => [
                 'norm'         => $authNormMarkDraft,
-                'hr'           => $authoritativeFeedbackDraft ? $participant->getHumanReadableMark(false) : null,
-                'hrInstructor' => $authoritativeFeedbackDraft ? $participant->getHumanReadableInstructorMark(false) : null,
+                'hr'           => $authoritativeFeedbackDraft || $assessment instanceof Project ? $participant->getHumanReadableMark(false) : null,
+                'hrInstructor' => $authoritativeFeedbackDraft || $assessment instanceof Project ? $participant->getHumanReadableInstructorMark(false) : null,
                 'comment'      => \Scrub::html($authoritativeFeedbackDraft?->getComment()),
                 'resubmissionRequired' => $resubmissionRequiredDraft,
-                'responseId'   => $authoritativeFeedbackDraft?->getId() ?? null,
+                'responseId'   => $responseIdDraft,
             ],
         ];
-
 
         $this->response = $this->responseAsJson([
             'assessmentTitle' => $assessment->getTitle(),
