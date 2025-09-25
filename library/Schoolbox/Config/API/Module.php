@@ -49,7 +49,7 @@ class Module extends BaseModule
             return $this->preloadConfig($params);
         };
 
-        $this->register('PATCH', '/', 'apiConfigBulkPatch', $hasApiAccess);
+        $this->register('PATCH', '', 'apiConfigBulkPatch', $hasApiAccess);
         $this->register('GET', '/{configName}', 'apiConfigGet', $hasApiAccess, $preloadConfig);
         $this->register('PATCH', '/{configName}', 'apiConfigPatch', $hasApiAccess, $preloadConfig);
     }
