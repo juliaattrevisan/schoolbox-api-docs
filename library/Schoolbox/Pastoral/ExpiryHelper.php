@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace Schoolbox\Pastoral;
 
 use Alaress\Database\Predicate\Builder;
+use http\Exception\RuntimeException;
+use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\Mapper\Exception;
@@ -21,9 +23,11 @@ use Alaress_Date_Format;
 
 class ExpiryHelper
 {
+    public const RECORD_CHUNK_SIZE = 500;
     public function __construct(
         private PastoralMapper $pastoralMapper,
         private TermMapper $termMapper,
+        private ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -34,6 +38,7 @@ class ExpiryHelper
      * @param int|null    $subtypeId
      * @param string|null $defaultExpiry
      * @return void
+     * @throws Exception
      */
     public function updateDefaultExpireAt(int $typeId, ?int $subtypeId, ?string $defaultExpiry): void
     {
@@ -59,32 +64,54 @@ class ExpiryHelper
             return $carry;
         }, []);
 
-        $this->bulkUpdateExpiry($expiry);
+        if (!$this->bulkUpdateExpiry($expiry)) {
+            throw new RuntimeException('Failed to update expiry dates for pastoral records');
+        }
     }
 
-    public function bulkUpdateExpiry(array $expiry): void
+    public function bulkUpdateExpiry(array $expiry): bool
     {
-        $ids = array_keys($expiry);
-        $placeholders = Builder::getArrayPlaceholders(array_keys($expiry));
-
-        $caseClauses = [];
-        $params = [];
-
-        foreach ($expiry as $id => $expiryDate) {
-            $caseClauses[] = "WHEN id = ? THEN ?";
-            $params[] = $id;
-            $params[] = $expiryDate ?? null;
+        if (empty($expiry)) {
+            $this->logger?->info('No records to update for default expiry.');
+            return true;
         }
 
-        $params = array_merge($params, $ids);
+        /* Chunking the array for batch process to avoid too large queries
+         */
+        $chunkSize = self::RECORD_CHUNK_SIZE;
+        $chunks = array_chunk($expiry, $chunkSize, true);
+        try {
+            $this->logger?->info(sprintf('Updating default expiry for %d records...', $chunks));
+            foreach ($chunks as $chunk) {
+                $this->logger?->info(sprintf('Processing chunk of %d records...', count($chunk)));
+                $ids          = array_keys($chunk);
+                $placeholders = Builder::getArrayPlaceholders(array_keys($chunk));
 
-        $sql = sprintf(
-            "UPDATE pastoral SET expires_at = CASE %s END WHERE id IN %s",
-            implode(' ', $caseClauses),
-            $placeholders
-        );
+                $caseClauses = [];
+                $params      = [];
 
-        $this->pastoralMapper->getDatabase()->executeQuery($sql, $params);
+                foreach ($chunk as $id => $expiryDate) {
+                    $caseClauses[] = "WHEN id = ? THEN ?";
+                    $params[]      = $id;
+                    $params[]      = $expiryDate ?? null;
+                }
+
+                $params = array_merge($params, $ids);
+
+                $sql = sprintf(
+                    "UPDATE pastoral SET expires_at = CASE %s END WHERE id IN %s",
+                    implode(' ', $caseClauses),
+                    $placeholders
+                );
+
+                $this->pastoralMapper->getDatabase()->executeQuery($sql, $params);
+            }
+        } catch (\Exception $e) {
+            $this->logger?->error('Error occurred during bulk update of expiry dates: ' . $e->getMessage());
+            return false;
+        }
+        $this->logger?->info(sprintf('Default expiry update completed for %d records.', count($expiry)));
+        return true;
     }
 
     /**
