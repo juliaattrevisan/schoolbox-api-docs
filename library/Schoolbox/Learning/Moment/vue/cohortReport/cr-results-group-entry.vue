@@ -130,7 +130,7 @@ function spawnLightbox(file: StorageFile): void {
                 <article
                     v-if="selectedEvidence !== null && selectedEvidence.hash"
                     :key="selectedEvidence.hash"
-                    style="width: fit-content"
+                    style="width: fit-content; cursor: pointer"
                     @click="spawnLightbox(selectedEvidence)"
                 >
                     <!-- TODO: this doesn't use the file name from the model, rather the base storage name... -->
