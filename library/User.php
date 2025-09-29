@@ -269,28 +269,29 @@ class User extends DeprecatedModel
         if ($keyword != "") {
             $query .= '(';
             if (is_numeric($keyword)) {
-                $query .= "( synergy_id = :externalId ) ";
+                $query .= "( synergy_id = :externalId ) or ";
                 $params['externalId'] = $keyword;
-            } else {
-                // TODO account for preferred name:
-                //      alternately remove and replace with API search
-                if (preg_match('/([[:alpha:]\'"]+) ([[:alpha:]\'"]+)/', $keyword, $name)) {
-                    $query .= "(
-                        ( firstname like :firstname and lastname like :lastname )
-                        or
-                        ( preferred_name like :firstname and lastname like :lastname )
-                    ) or ";
-                    $params['firstname'] = '%' . $this->db->getQuoter()->escapeForLike($name[1]) . '%';
-                    $params['lastname'] = '%' . $this->db->getQuoter()->escapeForLike($name[2]) . '%';
-                }
-                $query .= "(
-                    firstname like :name
-                    or preferred_name like :name
-                    or lastname like :name
-                    or username like :name
-                ) ";
-                $params['name'] = '%' . $this->db->getQuoter()->escapeForLike($keyword) . '%';
             }
+
+            // TODO account for preferred name:
+            //      alternately remove and replace with API search
+            if (preg_match('/([[:alnum:]\'"]+) ([[:alnum:]\'"]+)/', $keyword, $name)) {
+                $query .= "(
+                    ( firstname like :firstname and lastname like :lastname )
+                    or
+                    ( preferred_name like :firstname and lastname like :lastname )
+                ) or ";
+                $params['firstname'] = '%' . $this->db->getQuoter()->escapeForLike($name[1]) . '%';
+                $params['lastname'] = '%' . $this->db->getQuoter()->escapeForLike($name[2]) . '%';
+            }
+            $query .= "(
+                firstname like :name
+                or preferred_name like :name
+                or lastname like :name
+                or username like :name
+            ) ";
+            $params['name'] = '%' . $this->db->getQuoter()->escapeForLike($keyword) . '%';
+
             if (is_array($group)) {
                 // If group = [0]: return all matching users regardless of role
                 $group = array_filter($group);
