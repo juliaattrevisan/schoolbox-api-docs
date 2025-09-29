@@ -131,8 +131,8 @@ test.describe("Links Component Tests", () => {
         await tester.impersonate("Jana Reed");
         await homepage.goto(83);
         const linksHeader = linksComponent.getByTestId("homepage-component-titlebar-name");
-        const viewAllLinksBtn = linksComponent.getByText("View All Links");
-        const addLinkBtn = linksComponent.getByText("Add Link");
+        const viewAllLinksBtn = linksComponent.getByTestId("view-all-links-button");
+        const addLinkBtn = linksComponent.getByTestId("add-link-button");
         await expect(linksHeader).toBeHidden();
         await expect(viewAllLinksBtn).toBeHidden();
         await expect(addLinkBtn).toBeHidden();
