@@ -249,7 +249,7 @@ class ApiUserCest
                     'name' => 'Secondary', // From db table `luCampus`.
                 ],
             ],
-            'valid' => true,
+            'valid' => false, // We only allow one of 'id' or 'name' per filter.
         ];
         yield [
             'filter' => [
@@ -273,7 +273,7 @@ class ApiUserCest
                     ]
                 ],
             ],
-            'valid' => false, // No support for arrays of years/roles/campuses.  Maybe in the future.
+            'valid' => false, // We only allow one of 'id' or 'name' per filter.
         ];
         yield [
             'filter' => [
@@ -340,16 +340,13 @@ class ApiUserCest
                 // Extra keys in year/role/campus arrays.
                 'year' => [
                     'id' => 3, // Year '9' from db table `lu_year_level`.
-                    'name' => '9', // From db table `lu_year_level`.
                     'unexpectedKey' => 'unexpectedValue',
                 ],
                 'role' => [
-                    'id' => 6, // Role 'Middle Student' from db table `groups`.
                     'name' => 'Middle Student', // From db table `groups`.
                     'unexpectedKey' => 'unexpectedValue',
                 ],
                 'campus' => [
-                    'id' => 1, // Campus 'Secondary' from db table `luCampus`.
                     'name' => 'Secondary', // From db table `luCampus`.
                     'unexpectedKey' => 'unexpectedValue',
                 ],

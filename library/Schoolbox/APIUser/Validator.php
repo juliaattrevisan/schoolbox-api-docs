@@ -140,26 +140,31 @@ class Validator
      */
     private function validateIdNameArray(string $arrayName, array $array): void
     {
-        if (count($array) === 0) {
-            // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
-            throw new SchoolboxException("Filter '$arrayName' must not be empty.");
-        }
-
-        foreach ($array as $key => $value) {
-            switch ($key) {
-                case 'id':
-                    if (!is_int($value) && !(is_string($value) && ctype_digit($value))) {
+        switch (count($array)) {
+            case 0:
+                // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
+                throw new SchoolboxException("Filter '$arrayName' must not be empty.");
+            case 1:
+                // This is the expected case.  Do nothing.
+                if (array_key_exists('id', $array)) {
+                    $id = $array['id'];
+                    if (!is_int($id) && !(is_string($id) && ctype_digit($id))) {
                         throw new SchoolboxException("Filter '$arrayName' property 'id' must have an integer value.");
                     }
-                    break;
-                case 'name':
-                    if (!is_string($value)) {
+                } elseif (array_key_exists('name', $array)) {
+                    $name = $array['name'];
+                    if (!is_string($name)) {
                         throw new SchoolboxException("Filter '$arrayName' property 'name' must have a string value.");
                     }
-                    break;
-                default:
-                    throw new SchoolboxException("Filter '$arrayName' contains unexpected key '$key'.");
-            }
+                } else {
+                    throw new SchoolboxException("Filter '$arrayName' property contains unexpected key.");
+                }
+                break;
+            default:
+                // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
+                throw new SchoolboxException(
+                    "Filter '$arrayName' must contain only one key - either 'id' or 'name'."
+                );
         }
     }
 }
