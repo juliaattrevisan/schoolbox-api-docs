@@ -9,15 +9,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral;
 
-use Alaress\Database\Predicate\Builder;
-use http\Exception\RuntimeException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Pastoral\Type\TypeAbstract;
 use Schoolbox\YearLevel\Model as YearLevel;
-use Schoolbox\Pastoral\Type\Model as PastoralType;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Alaress_Date_Format;
 
@@ -87,7 +84,7 @@ class ExpiryHelper
          */
         $chunks = array_chunk($expiry, $chunkSize, true);
         try {
-            $this->logger?->info(sprintf('Updating default expiry for %d records...', $chunks));
+            $this->logger?->info(sprintf('Updating default expiry for %d records...', count($expiry)));
             foreach ($chunks as $chunk) {
                 $this->logger?->info(sprintf('Processing chunk of %d records...', count($chunk)));
 
