@@ -247,7 +247,7 @@
              - statusPending: a string representing the 'pending' state
              - statusReviewed: a string representing the 'reviewed' state
          #}
-        <script type="text/javascript" src='{{ CDN_PREFIX }}/js/submissions/jquery.dynamic-feedback.js'></script>
+        <script type="text/javascript" src='{{ CDN_PREFIX }}/js/submissions/jquery.dynamic-feedback.js?v={{ config.site_version }}'></script>
         {% autoescape 'js' %}
             <script type="text/javascript">
                 $(function () {
@@ -830,7 +830,7 @@
          # Copy directly from a spreadsheet into this textarea. The plugin busts its contents
          # into the quickmark (status) screen's input fields accordingly.
          #}
-        <script type="text/javascript" src='{{ CDN_PREFIX }}/js/submissions/jquery.import-feedback.js'></script>
+        <script type="text/javascript" src='{{ CDN_PREFIX }}/js/submissions/jquery.import-feedback.js?v={{ config.site_version }}'></script>
         <script>
             $(function() {
                 $('#importFeedbackForm').importFeedback();
