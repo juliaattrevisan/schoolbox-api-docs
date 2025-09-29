@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { ResourceType } from "@js/resource/resourceUtils";
 import type { StorageFile } from "@js/resource/resourceUtils";
 import { IMAGE_LIGHTBOX_CREATE } from "@js/image-lightbox/imageLightboxEvent";
 import type { ImageLightboxCreateEvent } from "@js/image-lightbox/imageLightboxEvent";
@@ -130,7 +131,8 @@ function spawnLightbox(file: StorageFile): void {
                 <article
                     v-if="selectedEvidence !== null && selectedEvidence.hash"
                     :key="selectedEvidence.hash"
-                    style="width: fit-content; cursor: pointer"
+                    style="width: fit-content"
+                    :style="{ cursor: selectedEvidence.type === ResourceType.IMAGE ? 'pointer' : undefined }"
                     @click="spawnLightbox(selectedEvidence)"
                 >
                     <!-- TODO: this doesn't use the file name from the model, rather the base storage name... -->
