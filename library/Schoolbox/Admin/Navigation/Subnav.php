@@ -629,6 +629,11 @@ class Subnav
                         'visible'     => $userHasServicePermissionPastoral, // Note this page is special in that available to superusers who are not Pastoral Moderators.
                         'description' => 'Manage Flag, Audience and Template Defaults',
                     ],
+                    '/adminv2/setting/pastoral/learnerProfiles' => [
+                        'name'        => 'Settings -  Learner Profile',
+                        'visible'     => true,
+                        'description' => 'Configure policy settings related to the pastoral care module.',
+                    ],
                     '/adminv2/setting/pastoral/Pastoral%20Care' => [
                         'name'        => 'Settings - Policy',
                         'visible'     => true,
