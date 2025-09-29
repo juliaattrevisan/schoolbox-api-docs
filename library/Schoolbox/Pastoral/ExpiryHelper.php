@@ -65,7 +65,7 @@ class ExpiryHelper
         }, []);
 
         if (!$this->bulkUpdateExpiry($expiry)) {
-            throw new RuntimeException('Failed to update expiry dates for pastoral records');
+            throw new \RuntimeException('Failed to update expiry dates for pastoral records');
         }
     }
 
@@ -90,7 +90,6 @@ class ExpiryHelper
             $this->logger?->info(sprintf('Updating default expiry for %d records...', $chunks));
             foreach ($chunks as $chunk) {
                 $this->logger?->info(sprintf('Processing chunk of %d records...', count($chunk)));
-                $ids          = array_keys($chunk);
 
                 $caseClauses = [];
                 $params      = [];
@@ -100,8 +99,6 @@ class ExpiryHelper
                     $params[]      = $id;
                     $params[]      = $expiryDate ?? null;
                 }
-
-                $params = array_merge($params, $ids);
 
                 $sql = sprintf(
                     "UPDATE pastoral SET expires_at = CASE %s END WHERE id IN (%s)",
