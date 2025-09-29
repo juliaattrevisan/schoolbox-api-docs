@@ -87,8 +87,8 @@ COPY ./config/imagemagick/* /etc/ImageMagick-6/
 COPY ./config/frankenphp/* /etc/frankenphp/
 
 RUN \
-    useradd www-data;
-    mkdir -p /var/lib/schoolbox;
+    useradd www-data; \
+    mkdir -p /var/lib/schoolbox; \
     chown -R www-data /var/lib/schoolbox;
 
 EXPOSE 80 443
