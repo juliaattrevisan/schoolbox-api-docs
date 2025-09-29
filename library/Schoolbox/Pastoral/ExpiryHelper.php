@@ -23,7 +23,7 @@ use Alaress_Date_Format;
 
 class ExpiryHelper
 {
-    public const RECORD_CHUNK_SIZE = 500;
+    public const int RECORD_CHUNK_SIZE = 20;
     public function __construct(
         private PastoralMapper $pastoralMapper,
         private TermMapper $termMapper,
@@ -69,7 +69,14 @@ class ExpiryHelper
         }
     }
 
-    public function bulkUpdateExpiry(array $expiry): bool
+    /**
+     * Bulk update the expiry dates for multiple records
+     *
+     * @param array $expiry An associative array of record IDs and their corresponding expiry dates (or null for no expiry)
+     * @param int   $chunkSize Number of records to process in each chunk
+     * @return bool True on success, false on failure
+     */
+    public function bulkUpdateExpiry(array $expiry, int $chunkSize = self::RECORD_CHUNK_SIZE): bool
     {
         if (empty($expiry)) {
             $this->logger?->info('No records to update for default expiry.');
@@ -78,14 +85,12 @@ class ExpiryHelper
 
         /* Chunking the array for batch process to avoid too large queries
          */
-        $chunkSize = self::RECORD_CHUNK_SIZE;
         $chunks = array_chunk($expiry, $chunkSize, true);
         try {
             $this->logger?->info(sprintf('Updating default expiry for %d records...', $chunks));
             foreach ($chunks as $chunk) {
                 $this->logger?->info(sprintf('Processing chunk of %d records...', count($chunk)));
                 $ids          = array_keys($chunk);
-                $placeholders = Builder::getArrayPlaceholders(array_keys($chunk));
 
                 $caseClauses = [];
                 $params      = [];
@@ -99,12 +104,18 @@ class ExpiryHelper
                 $params = array_merge($params, $ids);
 
                 $sql = sprintf(
-                    "UPDATE pastoral SET expires_at = CASE %s END WHERE id IN %s",
+                    "UPDATE pastoral SET expires_at = CASE %s END WHERE id IN (%s)",
                     implode(' ', $caseClauses),
-                    $placeholders
+                    implode(',', array_fill(0, count($chunk), '?'))
                 );
 
+                // Add IDs to params for WHERE clause
+                $params = array_merge($params, array_keys($chunk));
+
                 $this->pastoralMapper->getDatabase()->executeQuery($sql, $params);
+
+                // Free memory after each chunk
+                unset($chunk, $caseClauses, $params);
             }
         } catch (\Exception $e) {
             $this->logger?->error('Error occurred during bulk update of expiry dates: ' . $e->getMessage());
