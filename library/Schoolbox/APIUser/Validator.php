@@ -44,7 +44,7 @@ class Validator
             throw new SchoolboxException("Parameter 'search' must have a string value.");
         }
 
-        if (!is_int($limit) && !ctype_digit($limit)) { // Allow digit string for backwards compatibility.
+        if (!is_int($limit) && !(is_string($limit) && ctype_digit($limit))) { // Allow digit string for backwards compatibility.
             throw new SchoolboxException("Parameter 'limit' should have an integer value.");
         }
         $limit = (int)$limit; // Set type to that expected according to the API docs.
@@ -148,7 +148,7 @@ class Validator
         foreach ($array as $key => $value) {
             switch ($key) {
                 case 'id':
-                    if (!is_int($value) && !ctype_digit($value)) {
+                    if (!is_int($value) && !(is_string($value) && ctype_digit($value))) {
                         throw new SchoolboxException("Filter '$arrayName' property 'id' must have an integer value.");
                     }
                     break;

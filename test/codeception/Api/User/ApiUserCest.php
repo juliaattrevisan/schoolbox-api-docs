@@ -277,6 +277,66 @@ class ApiUserCest
         ];
         yield [
             'filter' => [
+                // Unexpected values for 'id' in year/role/campus arrays.
+                'year' => [
+                    'id' => false,
+                ],
+                'role' => [
+                    'id' => true,
+                ],
+                'campus' => [
+                    'id' => null,
+                ],
+            ],
+            'valid' => false,
+        ];
+        yield [
+            'filter' => [
+                // Unexpected values for 'id' in year/role/campus arrays.
+                'year' => [
+                    'id' => '',
+                ],
+                'role' => [
+                    'id' => [],
+                ],
+                'campus' => [
+                    'id' => null,
+                ],
+            ],
+            'valid' => false,
+        ];
+        yield [
+            'filter' => [
+                // Unexpected values for 'name' in year/role/campus arrays.
+                'year' => [
+                    'name' => false,
+                ],
+                'role' => [
+                    'name' => true,
+                ],
+                'campus' => [
+                    'name' => null,
+                ],
+            ],
+            'valid' => false,
+        ];
+        yield [
+            'filter' => [
+                // Unexpected values for 'name' in year/role/campus arrays.
+                'year' => [
+                    'name' => '',
+                ],
+                'role' => [
+                    'name' => [],
+                ],
+                'campus' => [
+                    'name' => null,
+                ],
+            ],
+            'valid' => false,
+        ];
+        yield [
+            'filter' => [
                 // Extra keys in year/role/campus arrays.
                 'year' => [
                     'id' => 3, // Year '9' from db table `lu_year_level`.
