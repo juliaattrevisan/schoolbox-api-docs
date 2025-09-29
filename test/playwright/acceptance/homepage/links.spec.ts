@@ -87,7 +87,9 @@ test.describe("Links Component Tests", () => {
         expect(sortedLinks).toEqual([linkTitle, "Where did English come from?"]);
 
         tester.isGoingTo("click view all links and verify navigation to resource page");
-        await linksComponent.getByText("View All Links").click();
+        //await linksComponent.getByText("View All Links").click();
+        //await linksComponent.getByTestId("view-all-links-button").click();
+        await links.clickViewAllLinks(linksComponent);
         await expect(page).toHaveURL(/.*\/resources$/);
     });
 

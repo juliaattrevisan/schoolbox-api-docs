@@ -46,7 +46,17 @@ export default class Links {
      */
     public async clickAddLink(component: Locator): Promise<void> {
         this.tester.isGoingTo(`Click add link button`);
-        await component.locator("a.button", { hasText: "Add Link" }).click();
+        await component.getByTestId("add-link-button").click();
+    }
+
+    /**
+     * Open the “View All Links” page from a Links component.
+     * Waits for the /resources/:id navigation to complete.
+     * @param component - The links component
+     */
+    public async clickViewAllLinks(component: Locator): Promise<void> {
+        this.tester.isGoingTo('Click "View All Links"');
+        await component.getByTestId("view-all-links-button").click();
     }
 
     /**
