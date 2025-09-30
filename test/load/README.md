@@ -1,7 +1,8 @@
 # Schoolbox Load Testing
 
-Schoolbox load tests currently uses [Apache JMeter](https://jmeter.apache.org/),
-with its websocket plugin.
+Schoolbox load tests currently uses:
+- [Apache JMeter](https://jmeter.apache.org/) for websocket load testing
+- [k6](https://k6.io/) for HTTP/page load testing (see the k6 subdirectory's `README.md` for more information)
 
 ## Getting Started
 
