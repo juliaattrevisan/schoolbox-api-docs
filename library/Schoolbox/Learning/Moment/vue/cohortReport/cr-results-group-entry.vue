@@ -28,19 +28,6 @@ const dropdownId = window.Vue.computed(() => {
     return `${props.dataPrefix}-dropdown-${props.entry.id}`;
 });
 
-const relevantUsers = window.Vue.computed(() => {
-    // when creator/recipient are the same, only show one user
-    if (props.entry.creator.id === props.entry.recipient.id) {
-        return [{ ...props.entry.creator, label: props.entry.creator.fullName }];
-    }
-
-    // otherwise show both with meaningful labels
-    return [
-        { ...props.entry.recipient, label: `Received by ${props.entry.recipient.fullName}` },
-        { ...props.entry.creator, label: `Created by ${props.entry.creator.fullName}` },
-    ];
-});
-
 /**
  * The current evidence item hash that should be shown
  */
@@ -117,6 +104,13 @@ function spawnLightbox(file: StorageFile): void {
                 <!-- To avoid padding changes, shove an &nbsp; in here when the status is published -->
                 <template v-else>&nbsp;</template>
             </label>
+            <component
+                :is="props.entry.recipient._links.profile ? 'a' : 'span'"
+                :href="props.entry.recipient._links.profile"
+            >
+                <user-photo :user="props.entry.recipient" render="tiny" />
+                <span class="l-pad-s--left">{{ props.entry.recipient.fullName }}</span>
+            </component>
         </div>
 
         <nav class="c-nav-actions">
@@ -171,8 +165,12 @@ function spawnLightbox(file: StorageFile): void {
             </div>
         </div>
 
-        <div class="l-flex-row l-mar-s--top l-gap-s">
-            <user-photo v-for="user in relevantUsers" :key="user.id" :user="user" render="tiny" :title="user.label" />
+        <div v-if="props.entry.recipient.id !== props.entry.creator.id" class="l-mar-s--top">
+            <user-photo
+                :user="props.entry.creator"
+                render="tiny"
+                :title="`Created by ${props.entry.creator.fullName}`"
+            />
         </div>
     </div>
 </template>

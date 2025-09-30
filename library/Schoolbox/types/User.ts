@@ -30,3 +30,21 @@ export type UserCC = Omit<User, "firstname" | "lastname"> & {
     firstName: string;
     lastName: string;
 };
+
+/**
+ * A variant of User with only the subset of fields that are
+ * relevant for conveying that the user is the author of content
+ *
+ * From User\Translator\Author\ModelToArray.php
+ */
+export type UserAuthor = {
+    id: number | null;
+    title: string;
+    firstName: string;
+    preferredName: string;
+    pronoun: string | null;
+    lastName: string;
+    fullName: string;
+    isDeleted: boolean;
+    _links: UserLinks;
+};

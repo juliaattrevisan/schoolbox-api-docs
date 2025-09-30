@@ -1201,7 +1201,7 @@ class Controller extends Base
             /* This is a stack because empty payloads result in a datatype difference in frontend world:
              * empty payloads emerge as [], but non-empty payloads emerge as {}
              */
-            $userTranslator = new \Schoolbox\User\Translator\ModelToArray();
+            $userTranslator = new \Schoolbox\User\Translator\Author\ModelToArray();
 
             // We'll steal the links from here
             // TODO: Let's see how much of this can be refactored to just use the translator directly... I expect most if not all of it
@@ -1219,8 +1219,8 @@ class Controller extends Base
                  *  Role description helps distinguish them. But it wasn't in any of the designs. I'm expecting
                  *  to need this further down the trail
                  */
-                'recipient' => $userTranslator->convertLinkedUser($moment->getRecipient()),
-                'creator' => $userTranslator->convertLinkedUser($moment->getCreator()),
+                'recipient' => $userTranslator($moment->getRecipient()),
+                'creator' => $userTranslator($moment->getCreator()),
                 /* This is always set
                  */
                 'createdAt' => [
