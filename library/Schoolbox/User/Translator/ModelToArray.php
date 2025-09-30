@@ -205,16 +205,22 @@ class ModelToArray
     protected function deriveLinks(User $user): array
     {
         // TODO consider providing default sizes
-        return $user->getId()
-            ? [
-                'profile' => $user->isDeleted() ? null : '/search/user/' . $user->getId(),
-                'avatar'  =>
-                    sprintf(
-                        '/portrait.php?id=%d&size=%s',
-                        $user->getId(),
-                        urlencode(Storage::TRANSFORM_SQUARE64)
-                    ),
-            ]
-            : [];
+        $links = [];
+
+        if ($user->getId() !== null) {
+            /** User profile link, deleted users have no link */
+            if (!$user->isDeleted()) {
+                $links['profile'] = '/search/user/' . $user->getId();
+            }
+
+            /** User avatar link, deleted users will render as a placeholder */
+            $links['avatar'] = sprintf(
+                '/portrait.php?id=%d&size=%s',
+                $user->getId(),
+                urlencode(Storage::TRANSFORM_SQUARE64)
+            );
+        }
+
+        return $links;
     }
 }
