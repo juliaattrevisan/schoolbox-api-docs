@@ -37,7 +37,7 @@ export default function () {
     sleep(1); // Wait 1 second after login
 
     // Step 2: Visit Dashboard
-    let dashboardRes = http.get(`${BASE_URL}/adminv2/home`);
+    let dashboardRes = http.get(`${BASE_URL}/`);
     check(dashboardRes, {
         'dashboard loaded': (r) => r.status === 200,
     });
@@ -65,7 +65,7 @@ export default function () {
     sleep(2);
 
     // Step 6: Visit Homepage
-    let homepageRes = http.get(`${BASE_URL}/homepage/334`);
+    let homepageRes = http.get(`${BASE_URL}/homepage/80`);
     check(homepageRes, {
         'homepage loaded': (r) => r.status === 200,
     });
