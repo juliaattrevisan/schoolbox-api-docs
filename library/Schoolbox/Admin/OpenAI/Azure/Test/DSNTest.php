@@ -50,54 +50,55 @@ class DSNTest extends TestCase
             ],
 
             'Valid DSN 2 (random order of module credentials)' => [
-                'lmsintegration:companycode=789;appcode=Qvmdbn2764;token=CVWSEFklrsjdswwwidfnesfd,identitymanagement:companycode=456;appcode=xcjFh28;token=ckbj78fj1kdhg=,studentdetails:companycode=123;appcode=ADweh189;token=923nADjl35h0sd7725==',
+                'lessonplan:key=98765;resourcename=gpt-turbo;deploymentid=thisisatest,textchat:key=951;resourcename=somethingelse;deploymentid=cannumbersexist',
                 [
                     'modules' => [
-                        'lmsintegration' => [
-                            'companycode' => 789,
-                            'appcode' => 'Qvmdbn2764',
-                            'token' => 'CVWSEFklrsjdswwwidfnesfd'
+                        'lessonplan' => [
+                            'key' => '98765',
+                            'resourcename' => 'gpt-turbo',
+                            'deploymentid' => 'thisisatest'
                         ],
-                        'identitymanagement' => [
-                            'companycode' => 456,
-                            'appcode' => 'xcjFh28',
-                            'token' => 'ckbj78fj1kdhg=',
-                        ],
-                        'studentdetails' => [
-                            'companycode' => 123,
-                            'appcode' => 'ADweh189',
-                            'token' => '923nADjl35h0sd7725=='
+                        'textchat' => [
+                            'key' => '951',
+                            'resourcename' => 'somethingelse',
+                            'deploymentid' => 'cannumbersexist'
                         ],
                     ],
-                    'options' => []
                 ]
             ],
 
-            'Valid DSN 3 (has options)' => [
-                'lmsintegration:companycode=789;appcode=Qvmdbn2764;token=CVWSEFklrsjdswwwidfnesfd,identitymanagement:companycode=456;appcode=xcjFh28;token=ckbj78fj1kdhg=,studentdetails:companycode=123;appcode=ADweh189;token=923nADjl35h0sd7725==?opt1=val1;opt2=val2;opt3=val3',
+            'Valid DSN 3 (extra module...)' => [
+                'lessonplan:key=98765;resourcename=gpt-turbo;deploymentid=thisisatest,textchat:key=951;resourcename=somethingelse;deploymentid=cannumbersexist,assessment:key=8856;resourcename=assessmentsAI;deploymentid=thisshouldexist',
                 [
                     'modules' => [
-                        'lmsintegration' => [
-                            'companycode' => 789,
-                            'appcode' => 'Qvmdbn2764',
-                            'token' => 'CVWSEFklrsjdswwwidfnesfd'
+                        'lessonplan' => [
+                            'key' => '98765',
+                            'resourcename' => 'gpt-turbo',
+                            'deploymentid' => 'thisisatest'
                         ],
-                        'identitymanagement' => [
-                            'companycode' => 456,
-                            'appcode' => 'xcjFh28',
-                            'token' => 'ckbj78fj1kdhg=',
-                        ],
-                        'studentdetails' => [
-                            'companycode' => 123,
-                            'appcode' => 'ADweh189',
-                            'token' => '923nADjl35h0sd7725=='
+                        'textchat' => [
+                            'key' => '951',
+                            'resourcename' => 'somethingelse',
+                            'deploymentid' => 'cannumbersexist'
                         ],
                     ],
-                    'options' => [
-                        'opt1' => 'val1',
-                        'opt2' => 'val2',
-                        'opt3' => 'val3'
-                    ]
+                ]
+            ],
+            'Valid DNS 4, only text creds exists' => [
+                'textchat:key=000;resourcename=gpt-4o-mini-test;deploymentid=78946,lessonplan:key=;resourcename=;deploymentid=',
+                [
+                    'modules' => [
+                        'textchat' => [
+                            'key' => '000',
+                            'resourcename' => 'gpt-4o-mini-test',
+                            'deploymentid' => '78946'
+                        ],
+                        'lessonplan' => [
+                            'key' => '',
+                            'resourcename' => '',
+                            'deploymentid' => '',
+                        ],
+                    ],
                 ]
             ]
         ];
@@ -129,13 +130,13 @@ class DSNTest extends TestCase
     {
         return [
             'Valid DSN Re-encode 1' => [
-                'studentdetails:companycode=123;appcode=ADweh189;token=923nADjl35h0sd7725==,identitymanagement:companycode=456;appcode=xcjFh28;token=ckbj78fj1kdhg=,lmsintegration:companycode=789;appcode=Qvmdbn2764;token=CVWSEFklrsjdswwwidfnesfd',
-                'studentdetails:companycode=123;appcode=ADweh189;token=923nADjl35h0sd7725==,identitymanagement:companycode=456;appcode=xcjFh28;token=ckbj78fj1kdhg=,lmsintegration:companycode=789;appcode=Qvmdbn2764;token=CVWSEFklrsjdswwwidfnesfd'
+                'textchat:key=000;resourcename=gpt-4o-mini-test;deploymentid=78946,lessonplan:key=001;resourcename=gpt-40mini-test2;deploymentid=1123456',
+                'textchat:key=000;resourcename=gpt-4o-mini-test;deploymentid=78946,lessonplan:key=001;resourcename=gpt-40mini-test2;deploymentid=1123456'
             ],
 
-            'Valid DSN Re-encode 2 (has option tuples)' => [
-                'studentdetails:companycode=123;appcode=ADweh189;token=923nADjl35h0sd7725==,identitymanagement:companycode=456;appcode=xcjFh28;token=ckbj78fj1kdhg=,lmsintegration:companycode=789;appcode=Qvmdbn2764;token=CVWSEFklrsjdswwwidfnesfd?opt1=val1;opt2=val2;opt3=val3;opt4=val4',
-                'studentdetails:companycode=123;appcode=ADweh189;token=923nADjl35h0sd7725==,identitymanagement:companycode=456;appcode=xcjFh28;token=ckbj78fj1kdhg=,lmsintegration:companycode=789;appcode=Qvmdbn2764;token=CVWSEFklrsjdswwwidfnesfd?opt1=val1;opt2=val2;opt3=val3;opt4=val4'
+            'Valid DSN Re-encode 2 (modules out of order)' => [
+                'lessonplan:key=123456789dsfafds;resourcename=gpt-5;deploymentid=somethingelse,textchat:key=keysgiveaccesstothings;resourcename=arandomresource;deploymentid=azuredeploymentidorsomthinglikeit',
+                'lessonplan:key=123456789dsfafds;resourcename=gpt-5;deploymentid=somethingelse,textchat:key=keysgiveaccesstothings;resourcename=arandomresource;deploymentid=azuredeploymentidorsomthinglikeit'
             ],
         ];
     }

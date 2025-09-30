@@ -31,6 +31,11 @@ class DSN implements IDSN
     private const MODULE_SEPARATOR = ',';
 
     /**
+     * This character separates module configuration tuples from each other
+     */
+    private const MODULE_TUPLE_SEPARATOR = ';';
+
+    /**
      * The expected key-value tuples per module
      * At the moment we expect three keys which should have three values
      */
@@ -58,7 +63,7 @@ class DSN implements IDSN
                 $matches[2] ?? null,
                 $matches[3] ?? null,
                 $matches[4] ?? null
-            ]);
+            ], fn ($v) => null !== $v);
 
             /* Check the dsn format matches correctly
              */
@@ -89,6 +94,21 @@ class DSN implements IDSN
      */
     public function encode(#[SensitiveParameter] array $parts): string
     {
-        // TODO: Implement encode() method.
+        $struct = [];
+
+        foreach ($parts['modules'] as $module => $pairs) {
+
+            $module = "{$module}:";
+
+            $tuples = [];
+
+            foreach ($pairs as $key => $value) {
+                $tuples[] = "{$key}={$value}";
+            }
+
+            $struct[] = $module . implode(self::MODULE_TUPLE_SEPARATOR, $tuples);
+        }
+
+        return implode(self::MODULE_SEPARATOR, $struct);
     }
 }
