@@ -61,7 +61,7 @@ class Links extends AbstractLinks
         }
 
         $translation['_links']['detail'] = $this->getRouteIfAuthorized(
-            'learningMomentEvidence.getEvidenceDetail',
+            'learningMomentEvidence.getDetail',
             [
                 'evidenceId' => $moment->getId(),
                 'userId'     => $moment->getRecipient()->getId(),

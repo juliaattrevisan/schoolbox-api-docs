@@ -277,11 +277,16 @@ class Controller extends Base
      * @param Model $evidence
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function getEvidenceDetail(Model $evidence): void
+    public function getDetail(Model $evidence): void
     {
-        $translator = $this->buildTranslatorWithComments(10);
+        /* TODO rename
+         *  Temporary rewrite of misnamed var, but this is linked to the Module implementation
+         *  which is potentially going to affect api behaviour, do this gently for now. You'd
+         *  have to modify preloadEvidence otherwise, which would affect way more things
+         */
+        $moment = $evidence;
 
-        $item = $translator($evidence);
+        $translator = $this->buildTranslatorWithComments(10);
 
         /* Decide whether the current user can comment on this student's learning moments
          *
@@ -298,7 +303,7 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate(
             '@learningMomentEvidence/detail.twig',
             [
-                'moment'                   => $item,
+                'moment'                   => $translator($moment),
                 'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
                 'learningMomentCanComment' => $learningMomentCanComment,
             ]

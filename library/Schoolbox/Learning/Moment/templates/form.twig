@@ -21,7 +21,7 @@
 {% else %}
     {{ bread.crumbs(
         [moment.recipient.fullName, '/search/user/' ~ moment.recipient.id],
-        ['Learning Moment', routeLookupIfAuthorized('@learningMomentEvidence.getEvidenceDetail', {evidenceId: moment.id})],
+        ['Learning Moment', routeLookupIfAuthorized('@learningMomentEvidence.getDetail', {evidenceId: moment.id})],
         ['Modify']
     ) }}
 
