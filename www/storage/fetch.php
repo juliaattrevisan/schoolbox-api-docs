@@ -36,7 +36,8 @@ try {
         $contentType = ($resource->getMime()) ?: 'application/octet-stream';
         $basename = $resource->getBasename();
         $cacheControl = ($_GET['cache'] ?? '0') ? ['private', 'must-revalidate'] : ['no-store'];
-        $bypassPresignedUrls = $resource->getMimetype()->getMime() === 'text/html' && $disposition === PreSignedUrlService::DISPOSITION_INLINE;
+        $bypassPresignedUrls = !empty($_GET['no-presign'])
+            || ($resource->getMimetype()->getMime() === 'text/html' && $disposition === PreSignedUrlService::DISPOSITION_INLINE);
 
         /* Optionally override filename
          *

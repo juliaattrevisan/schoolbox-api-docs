@@ -120,8 +120,12 @@ try {
             throw new Exception("No hash configured for logo '$logo'");
         }
     }
-    $resource = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($hash);
-    if ($config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3) {
+    $resource            = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($hash);
+    $bypassPresignedUrls = !empty($_GET['no-presign']);
+    if (
+        !$bypassPresignedUrls
+        && $config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3
+    ) {
         if ($config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)) {
             $preSignedUrlService = new PreSignedUrlService($config);
 

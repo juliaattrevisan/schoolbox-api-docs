@@ -106,8 +106,10 @@ if (isset($type) && isset($id)) {
 
 
     // Redir to the presigned URL if it is enabled
+    $bypassPresignedUrls = !empty($_GET['no-presign']);
     if (
-        $config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3
+        !$bypassPresignedUrls
+        && $config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3
         && $config->get(ConfigMapper::NAME_S3_PRESIGNED_URL_ENABLED)
     ) {
         $cacheControl = ($_GET['cache'] ?? '0') ? ['private', 'must-revalidate'] : ['no-store'];

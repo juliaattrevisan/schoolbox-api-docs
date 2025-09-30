@@ -112,9 +112,11 @@ $config = $kernel->get('config');
 // (The redirect should never happen anymore, as an invalid transform falls back
 //  to a valid one now.)
 try {
+    $bypassPresignedUrls = !empty($_GET['no-presign']);
     if (
-        $config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3 &&
-        $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)
+        !$bypassPresignedUrls
+        && $config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3
+        && $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)
     ) {
         $preSignedUrlService    = new PreSignedUrlService($config);
         $storage                = (new Storage\Model())->setHash($hash);

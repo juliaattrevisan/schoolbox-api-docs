@@ -81,8 +81,12 @@ if (is_numeric($_GET['id'])) {
     $cacheControl = ($_GET['cache'] ?? '0') ? ['private', 'must-revalidate'] : ['no-store'];
 
     /** @var IConfigLoader $config */
-    $config = $kernel->get('config');
-    if ($config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3) {
+    $config              = $kernel->get('config');
+    $bypassPresignedUrls = !empty($_GET['no-presign']);
+    if (
+        !$bypassPresignedUrls
+        && $config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3
+    ) {
         if ($config->get(ConfigMapper::NAME_S3_PRESIGNED_URL_ENABLED)) {
             $preSignedUrlService = new PreSignedUrlService($config);
             try {

@@ -75,10 +75,12 @@ try {
     );
 
 
-    $portrait  = new Image\Transformation\Portrait();
-    $cacheKey  = (isset($_GET['size'])) ? $portrait->getCacheKey($_GET['size']) : null;
+    $portrait            = new Image\Transformation\Portrait();
+    $cacheKey            = (isset($_GET['size'])) ? $portrait->getCacheKey($_GET['size']) : null;
+    $bypassPresignedUrls = !empty($_GET['no-presign']);
     if (
-        $config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3
+        !$bypassPresignedUrls
+        && $config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3
         && $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)
     ) {
         $preSignedUrlService = new PreSignedUrlService($config);
