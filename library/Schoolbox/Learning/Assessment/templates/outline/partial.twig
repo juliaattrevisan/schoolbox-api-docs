@@ -19,14 +19,14 @@
     <ul data-dropdown-content class="f-dropdown" id="component{{ componentInstance.id }}-options-task{{ assessment.id }}">
         {% if hasAssessmentRoutes %}
             <li class="separator">{{ locale.translate('activity', false, true) }}</li>
-            {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
+            {% if statusRoute %}<li><a href="{{ statusRoute }}" class="icon-progress" data-test="course-outline-view-status-{{ assessment.id }}">View Status</a></li>{% endif %}
             {% if assessment is dueWork %}
                 {% set viewGradeRoute = routeLookupIfAuthorized('learningDueWorkResponse.getFirstParticipantResponse', {
                     assessmentId: assessment.id,
                     assessment: assessment,
                 }) %}
                 {% if viewGradeRoute %}
-                    <li><a class="icon-task" href="{{ viewGradeRoute }}" >View and {{ locale.grades }} submissions</a></li>
+                    <li><a class="icon-task" data-test="course-outline-view-grade-submissions-{{ assessment.id }}" href="{{ viewGradeRoute }}" >View and {{ locale.grades }} submissions</a></li>
                 {% endif %}
             {% endif %}
             {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
@@ -34,18 +34,18 @@
                 assessment: assessment
             }) %}
             {% if viewCustomParticipationRoute and assessment is not project and assessment is not lessonPlan %}
-                <li><a class="icon-group" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
+                <li><a class="icon-group" data-test="course-outline-custom-participation-{{ assessment.id }}" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
             {% endif %}
             {% if assessment is dueWork and assessment.enableWorksheet and kamiWorksheetRoute %}
                 <li>
                     <a id="kamiWorksheet" class="icon-surveys" href="{{ kamiWorksheetRoute }}">Class View</a>
                 </li>
             {% endif %}
-            {% if similarityReportRoute %}<li><a href="{{ similarityReportRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-due-work" title="View Similarity Report">Similarity Report</a></li>{% endif %}
+            {% if similarityReportRoute %}<li><a href="{{ similarityReportRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" class="icon-due-work" title="View Similarity Report" data-test="course-outline-similarity-report-{{ assessment.id }}">Similarity Report</a></li>{% endif %}
             {%  if assessment is dueWork and assessment.useRubric %}
                 <li>
                     <a href="{{ routeLookup('learningAssessment.getOverview', { assessmentId: assessment.id }) }}"
-                       class="icon-criteria">Rubric Report</a>
+                       class="icon-criteria" data-test="course-outline-rubric-report-{{ assessment.id }}">Rubric Report</a>
                 </li>
             {% endif %}
 
@@ -53,15 +53,15 @@
             {% if modifyRoute %}
                 {% if assessment is quiz %}
                     {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessment: assessment, assessmentId: assessment.id}) %}
-                    <li><a class="icon-class-list" href="{{ routeLookup('learnosity.getHorizontalMarking', { assessmentId: assessment.id }) }}">Review horizontally</a></li>
-                    <li><a class="icon-modify" href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="Modify this {{ locale.assessment }}">Modify Settings</a></li>
-                    <li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="Modify this {{ locale.assessment }} contents">Modify Contents</a></li>
+                    <li><a class="icon-class-list" data-test="course-outline-horizontal-{{ assessment.id }}" href="{{ routeLookup('learnosity.getHorizontalMarking', { assessmentId: assessment.id }) }}">Review horizontally</a></li>
+                    <li><a class="icon-modify" data-test="course-outline-modify-settings-{{ assessment.id }}" href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="Modify this {{ locale.assessment }}">Modify Settings</a></li>
+                    <li><a class="icon-modify" data-test="course-outline-modify-contents-{{ assessment.id }}" href="{{ modifyContentsRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="Modify this {{ locale.assessment }} contents">Modify Contents</a></li>
                 {% else %}
-                    <li><a class="icon-modify" href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="Modify this {{ locale.assessment }}">Modify</a></li>
+                    <li><a class="icon-modify" data-test="course-outline-modify-{{ assessment.id }}" href="{{ modifyRoute }}?{{ returnUrlName }}={{ encodedReturnUrl }}" title="Modify this {{ locale.assessment }}">Modify</a></li>
                 {% endif %}
             {% endif %}
 
-            {% if deleteRoute %}<li><a href="{{ deleteRoute }}" class="icon-delete" data-action="delete" data-test="activity-delete-{{ assessment.id }}" title="Delete this {{ locale.assessment }}">Delete</a></li>{% endif %}
+            {% if deleteRoute %}<li><a href="{{ deleteRoute }}" class="icon-delete" data-action="delete" data-test="activity-delete-{{ assessment.id }}" title="Delete this {{ locale.assessment }}" >Delete</a></li>{% endif %}
         {% endif %}
         {% if hasCourseRoutes %}
             <li class="separator">Course</li>

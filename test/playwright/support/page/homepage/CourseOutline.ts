@@ -1,4 +1,4 @@
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import Homepage from "./Homepage";
 
@@ -14,6 +14,36 @@ export default class CourseOutline {
         this.page = page;
 
         this.homepage = new Homepage(tester, page);
+    }
+
+    /**
+     * clicks a filter label in the course outline component
+     * @param componentId - The ID of the course outline component eg: id="component4902"
+     * @param label - The label to click dueWork, task, project, quiz, lessonPlan
+     */
+    async filterByLabel(componentId: string, label: string): Promise<void> {
+        this.tester.isGoingTo(`click the filter label: ${label}`);
+        const courseOutline = this.homepage.locateComponentByName("Course Outline");
+        await courseOutline.locator(`label[for="${componentId}-assessmentTypes-${label}"]`).click();
+    }
+
+    /**
+     * clicks the unit 3-dot menu in the course outline component
+     * @param unitName - The name of the unit to find in the course outline
+     */
+    async clickUnitDotMenu(unitName: string): Promise<void> {
+        // Find the course outline and the unit we created inside it
+        this.tester.isGoingTo("find the unit in the course outline");
+        const courseOutline = this.homepage.locateComponentByName("Course Outline");
+        const courseOutlineId = await courseOutline.getAttribute("id");
+        const courseOutlineUnit = courseOutline.locator("li[data-unit]").filter({ hasText: unitName });
+
+        this.tester.isGoingTo("click to open the 3-dot menu of the unit");
+        await courseOutlineUnit
+            .getByTestId(
+                `sbx-pop-out-${courseOutlineId}-unit-options${await courseOutlineUnit.getAttribute("data-unit")}-button`,
+            )
+            .click();
     }
 
     /**
@@ -37,6 +67,27 @@ export default class CourseOutline {
 
         this.tester.isGoingTo("click one of the dropdown menu options");
         await courseOutlineUnit.getByTestId(`course-outline-menu-add-${menuOption}`).click();
+    }
+
+    /**
+     * Uses the course outline component to find an unit and view the activity 3-dot menu
+     * @param courseOutlineHeader - The header of the course outline component
+     * @param unitName - The name of the unit to find in the course outline
+     * @param activityId - The id of the activity to find in the unit
+     */
+    async clickActivityDotMenu(
+        courseOutlineHeader: string,
+        unitName: string,
+        activityId: number | string,
+    ): Promise<void> {
+        // Find the course outline and the unit we created inside it
+        this.tester.isGoingTo("find the unit in the course outline");
+        const courseOutline = this.homepage.locateComponentByName(courseOutlineHeader);
+        const courseOutlineId = await courseOutline.getAttribute("id");
+        const courseOutlineUnit = courseOutline.locator("li[data-unit]").filter({ hasText: unitName });
+
+        this.tester.isGoingTo("click to open the 3-dot menu of the activity");
+        await courseOutlineUnit.getByTestId(`sbx-pop-out-${courseOutlineId}-options-task${activityId}-button`).click();
     }
 
     /**
@@ -131,5 +182,24 @@ export default class CourseOutline {
         this.tester.isGoingTo("confirm in the confirm dialog");
         await this.page.getByTestId("confirm-dialog-confirm-button").getByText("Yes, permanently delete").click();
         await this.page.getByTestId("confirm-dialog-confirm-button").isHidden();
+    }
+
+    /**
+     * select an imported course from the course outline component dropdown
+     * @param component - The locator of the course outline component
+     * @param courseName - The name of the course to select
+     */
+    static async selectImportedCourse(component: Locator, courseName: string): Promise<void> {
+        await component.locator('select[name="importedCourse"]').selectOption(courseName);
+    }
+
+    /**
+     * click the check box "Show Title to Read-Ony Users"
+     * @param component - The locator of the course outline component
+     * @param componentId - The ID of the course outline component eg: id="component4902"
+     */
+    static async clickReadOnlyUsers(component: Locator, componentId: string): Promise<void> {
+        await component.locator(`label[for="${componentId}-showComponentTitle"]`).isVisible();
+        await component.locator(`label[for="${componentId}-showComponentTitle"]`).click();
     }
 }
