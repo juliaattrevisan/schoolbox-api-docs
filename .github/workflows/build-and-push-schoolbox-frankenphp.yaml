@@ -1,7 +1,6 @@
 name: Build and push schoolbox-frankenphp (push, release)
 
 # Build a new schoolbox-frankenphp image:
-# * when master or develop changes (tags: master, develop, commit hash)
 # * when a release is created (tags: release name (github.ref_name))
 on:
   release:
@@ -38,7 +37,7 @@ jobs:
     needs:
       - build-composer-artifact
       - build-npm-artifact
-    if: github.repository == 'alaress/schoolbox'
+    if: github.repository == 'alaress/schoolbox' && (github.ref_name == 'master' || github.ref_name == 'develop')
     strategy:
       matrix:
         build:
@@ -111,6 +110,7 @@ jobs:
           build-args: |
             ENV=prod
             PHP_MAJOR_VERSION=${{ matrix.phpVersion }}
+            BASE_BRANCH=${{ github.ref_name }}
           platforms: ${{ matrix.build.platform }}/${{ matrix.build.arch }}
           labels: ${{ steps.meta.outputs.labels }}
           tags: |
