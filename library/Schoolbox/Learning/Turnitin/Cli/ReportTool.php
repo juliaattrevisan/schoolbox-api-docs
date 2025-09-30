@@ -196,7 +196,7 @@ HELP;
 
         $models = Turnitin\File\Mapper::getInstance()->findByPredicates($pb);
 
-        foreach($models as $model) {
+        foreach ($models as $model) {
             $this->getLogger()->info(sprintf(
                 'Marking report %s as failed due to over 24 hours in analysing state',
                 $model->getId()
