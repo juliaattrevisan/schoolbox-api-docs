@@ -1,26 +1,25 @@
 {##
- # Evidence Detail Container
+ # Moment Detail Container
  #
- # Launches the detail screen so you can see the fullness of an Evidence,
+ # Launches the detail screen so you can see the fullness of a learning moment,
  # in addition to other parts such as Discussion etc.
  #
- # @param array $evidence  An array, representing a translated Evidence instance
+ # @param array $moment  An array, representing a translated Moment instance
  #}
 {% import 'sub/breadcrumbs.twig' as bread %}
 
 {{ bread.crumbs(
-    [evidence.recipient.fullName, '/search/user/' ~ evidence.recipient.id],
+    [moment.recipient.fullName, '/search/user/' ~ moment.recipient.id],
     ['Learning Moment']
 ) }}
 
-{# TODO this thing makes some really bad assumptions about what an evidence is #}
-<div id="evidence-detail-container">
-    <evidence-detail
-        :evidence="{{ evidence|json_encode }}"
+<div id="moment-detail-container">
+    <moment-detail
+        :moment="{{ moment|json_encode }}"
         :can-comment="{{ learningMomentCanComment ? 'true' : 'false' }}"
     />
 </div>
-<script src="{{ CDN_PREFIX }}/js/bundle/learningMomentsEvidenceDetail.js?v={{ config.site_version }}"></script>
+<script src="{{ CDN_PREFIX }}/js/bundle/learningMomentDetail.js?v={{ config.site_version }}"></script>
 
 <script>
     $(function() {

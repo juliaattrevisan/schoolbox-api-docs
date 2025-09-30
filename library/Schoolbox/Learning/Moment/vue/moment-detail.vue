@@ -10,7 +10,7 @@ import CommentThread from "./comment-thread.vue";
 import type { LearningMoment } from "./evidenceTypes";
 
 interface Props {
-    evidence: LearningMoment;
+    moment: LearningMoment;
     canComment: boolean;
 }
 
@@ -36,20 +36,20 @@ function onCodeSelected(nodeId: number): void {
 </script>
 <template>
     <div class="evidence-detail">
-        <div v-if="evidence._links.modifyForm || evidence._links.delete" class="row">
+        <div v-if="props.moment._links.modifyForm || props.moment._links.delete" class="row">
             <div class="small-12 columns">
                 <div class="actions-small-1">
                     <nav>
-                        <template v-if="evidence._links.delete">
+                        <template v-if="props.moment._links.delete">
                             <sbx-pop-out content-id="header-options"></sbx-pop-out>
                         </template>
                     </nav>
                     <ul id="header-options" class="f-dropdown" data-dropdown-content>
-                        <li v-if="evidence._links.modifyForm">
-                            <a class="icon-modify" :href="getReturnUrl(evidence._links.modifyForm)">Modify</a>
+                        <li v-if="props.moment._links.modifyForm">
+                            <a class="icon-modify" :href="getReturnUrl(props.moment._links.modifyForm)">Modify</a>
                         </li>
-                        <template v-if="evidence._links.delete">
-                            <li><a class="icon-delete" :href="evidence._links.delete" data-delete>Delete</a></li>
+                        <template v-if="props.moment._links.delete">
+                            <li><a class="icon-delete" :href="props.moment._links.delete" data-delete>Delete</a></li>
                         </template>
                     </ul>
                 </div>
@@ -60,10 +60,10 @@ function onCodeSelected(nodeId: number): void {
                 <section>
                     <div class="row">
                         <div class="small-12 island">
-                            <section v-if="evidence.evidence.length" class="banner content">
+                            <section v-if="props.moment.evidence.length" class="banner content">
                                 <div class="feed-body small-12 columns">
                                     <!-- Display evidence -->
-                                    <article v-for="e in evidence.evidence" :key="e.storage.hash">
+                                    <article v-for="e in props.moment.evidence" :key="e.storage.hash">
                                         <storage-object
                                             :storage="e.storage"
                                             :filename="e.filename"
@@ -74,53 +74,53 @@ function onCodeSelected(nodeId: number): void {
                             </section>
                             <section class="detail content">
                                 <p class="meta">
-                                    <template v-if="evidence.creator">
+                                    <template v-if="props.moment.creator">
                                         By
-                                        <a :href="evidence.creator._links.profile" title="View Profile">
-                                            {{ evidence.creator.fullName }}
+                                        <a :href="props.moment.creator._links.profile" title="View Profile">
+                                            {{ props.moment.creator.fullName }}
                                         </a>
                                         &mdash;
-                                        <relative-time :datetime="evidence.createdAt"></relative-time>
+                                        <relative-time :datetime="props.moment.createdAt"></relative-time>
                                     </template>
                                     <!-- Display curriculum codes and tags -->
                                     <template
                                         v-if="
-                                            (evidence.curriculumNodes !== null &&
-                                                evidence.curriculumNodes.length > 0) ||
-                                            (evidence.tags !== null && evidence.tags.length > 0)
+                                            (props.moment.curriculumNodes !== null &&
+                                                props.moment.curriculumNodes.length > 0) ||
+                                            (props.moment.tags !== null && props.moment.tags.length > 0)
                                         "
                                     >
                                         <br />
                                         Tags:
-                                        <template v-if="evidence.curriculumNodes !== null">
+                                        <template v-if="props.moment.curriculumNodes !== null">
                                             <codes-list
-                                                v-if="evidence.curriculumNodes !== null"
-                                                :nodes="evidence.curriculumNodes"
+                                                v-if="props.moment.curriculumNodes !== null"
+                                                :nodes="props.moment.curriculumNodes"
                                                 @selected="(node) => onCodeSelected(node.id)"
                                             /><template
                                                 v-if="
-                                                    evidence.curriculumNodes.length > 0 &&
-                                                    evidence.tags &&
-                                                    evidence.tags.length > 0
+                                                    props.moment.curriculumNodes.length > 0 &&
+                                                    props.moment.tags &&
+                                                    props.moment.tags.length > 0
                                                 "
                                                 >,
                                             </template>
                                         </template>
-                                        <span v-if="evidence.tags !== null && evidence.tags.length > 0">
-                                            {{ evidence.tags.map((tag) => tag.name).join(", ") }}
+                                        <span v-if="props.moment.tags !== null && props.moment.tags.length > 0">
+                                            {{ props.moment.tags.map((tag) => tag.name).join(", ") }}
                                         </span>
                                     </template>
                                 </p>
 
                                 <!-- Display evidence body, with media players initialised -->
-                                <media-article v-if="evidence.body" :content="evidence.body"></media-article>
+                                <media-article v-if="props.moment.body" :content="props.moment.body"></media-article>
                             </section>
                         </div>
 
                         <!-- Discussion thread -->
                         <comment-thread
-                            :thread="evidence.discussionThread ?? undefined"
-                            :create-thread-endpoint="evidence._links.createThread ?? undefined"
+                            :thread="props.moment.discussionThread ?? undefined"
+                            :create-thread-endpoint="props.moment._links.createThread ?? undefined"
                             :can-comment="canComment"
                         />
                     </div>

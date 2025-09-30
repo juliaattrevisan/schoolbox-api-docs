@@ -298,7 +298,7 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate(
             '@learningMomentEvidence/detail.twig',
             [
-                'evidence'                 => $item,
+                'moment'                   => $item,
                 'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
                 'learningMomentCanComment' => $learningMomentCanComment,
             ]
