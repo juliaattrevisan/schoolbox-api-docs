@@ -1,532 +1,521 @@
-<script>
-/* eslint-disable eslint-comments/disable-enable-pair -- see below */
-/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
-/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
-/* eslint-enable vue/no-v-html */
-import MediaArticle from "@schoolboxVue/components/media-article";
-import StorageObject from "@schoolboxVue/components/storage-object";
-import CommentThread from "./comment-thread";
-import RevealModal from "@schoolboxVue/components/reveal-modal";
-import Toast from "@schoolboxVue/components/toast";
-import AwardDetailModal from "../../Badge/Award/vue/award-detail-modal";
-import BadgeImage from "../../Badge/vue/badge-image";
-import CodesList from "@schoolboxCurriculum/vue/codes-list";
-import NodeDetails from "@schoolboxCurriculum/vue/node-details";
-import foundationMixin from "@schoolboxVue/components/foundation-mixin";
-import userProfileConstants from "../../vue/user-profile/constants";
+<script setup lang="ts">
+import type { Dayjs } from "dayjs";
+import { Template } from "@js/editor/types/editorTypes";
+import MediaArticle from "@schoolboxVue/components/media-article.vue";
+import StorageObject from "@schoolboxVue/components/storage-object.vue";
+import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
+import foundationMixin from "@schoolboxVue/components/foundation-mixin";
+import CodesList from "@schoolboxCurriculum/vue/codes-list.vue";
+import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
+import AwardDetailModal from "../../Badge/Award/vue/award-detail-modal.vue";
+import BadgeImage from "../../Badge/vue/badge-image.vue";
+import userProfileConstants from "../../vue/user-profile/constants";
+import CommentThread from "./comment-thread.vue";
 import { EvidenceStatus, evidenceStatusLabels } from "./evidenceTypes";
+import type { LearningMoment } from "./evidenceTypes";
 
-export default {
-    components: {
-        AwardDetailModal,
-        Toast,
-        RevealModal,
-        MediaArticle,
-        StorageObject,
-        CommentThread,
-        BadgeImage,
-        CodesList,
-        NodeDetails,
+// TODO:
+// mixins: [foundationMixin, cdnPrefixMixin],
+
+interface Props {
+    siteVersion: string;
+    /** Whether to show learning moments within the feed */
+    showLearningMoments: boolean;
+    /** Whether to show goals within the feed */
+    showGoals: boolean;
+    /** Whether to show achievements within the feed */
+    showAchievements: boolean;
+    /** Whether to show feedback within the feed */
+    showFeedback: boolean;
+    /** Learning moment moderation requirement */
+    moderationRequired: boolean;
+    /** Whether parents can create learning moments */
+    evidenceParentCreate: boolean;
+    /** Feedback editor templates to use in the comment field */
+    editorTemplates?: Template[];
+    /** Whether to use tokens in the comment editor */
+    editorHasTokens?: boolean;
+}
+
+const props = defineProps<Props>();
+
+window.Vue.provide("editorTemplates", props.editorTemplates);
+window.Vue.provide("editorHasTokens", props.editorHasTokens);
+
+enum FeedDiscriminator {
+    /**
+     * Discriminator value for identifying that a retrieved result points to an
+     * learning moment record.
+     */
+    LEARNING_MOMENT = "moment",
+    /**
+     * Discriminator value for identifying that a retrieved result points to a
+     * badge award.
+     */
+    BADGE_AWARD = "badgeAward",
+    /**
+     * Discriminator value for identifying that a retrieved result points to a
+     * duework feedback.
+     */
+    DUE_WORK_FEEDBACK = "dueWorkFeedback",
+    /**
+     * Discriminator value for identifying that a retrieved result points to a
+     * quiz feedback.
+     */
+    QUIZ_FEEDBACK_OLD = "quizFeedback",
+}
+
+type BadgeAward = unknown;
+type DueWorkFeedback = unknown;
+type QuizFeedbackOld = unknown;
+
+type FeedItem = {
+    date: string;
+} & (
+    | { discriminator: FeedDiscriminator.LEARNING_MOMENT; object: LearningMoment }
+    | { discriminator: FeedDiscriminator.BADGE_AWARD; object: BadgeAward }
+    | { discriminator: FeedDiscriminator.DUE_WORK_FEEDBACK; object: DueWorkFeedback }
+    | { discriminator: FeedDiscriminator.QUIZ_FEEDBACK_OLD; object: QuizFeedbackOld }
+);
+
+const data = window.Vue.ref<FeedItem[]>([]);
+const metadata = window.Vue.reactive({
+    count: null,
+    cursor: null,
+});
+const showSkeletonLoader = window.Vue.ref(true);
+const currentlyDeletingEvidence = window.Vue.ref<FeedItem | null>(null);
+const isDeleteModalOpen = window.Vue.ref(false);
+
+/** the selected curriculum code to display further details for */
+const selectedNodeId = window.Vue.ref<number | null>(null);
+
+const isNodeDetailsModalOpen = window.Vue.computed({
+    get: () => selectedNodeId.value !== null,
+    set: (val: boolean) => {
+        if (!val) selectedNodeId.value = null;
     },
-    mixins: [foundationMixin, cdnPrefixMixin],
-    props: {
-        siteVersion: {
-            type: String,
-            required: true,
-        },
-        showLearningMoments: {
-            // whether to show learning moments within the feed
-            type: Boolean,
-            required: true,
-        },
-        showGoals: {
-            // whether to show goals within the feed
-            type: Boolean,
-            required: true,
-        },
-        showAchievements: {
-            // whether to show achievements within the feed
-            type: Boolean,
-            required: true,
-        },
-        showFeedback: {
-            // whether to show feedback within the feed
-            type: Boolean,
-            required: true,
-        },
-        moderationRequired: {
-            // learning moment moderation requirement
-            type: Boolean,
-            required: true,
-        },
-        evidenceParentCreate: {
-            // whether parents can create learning moments
-            type: Boolean,
-            required: true,
-        },
-        editorTemplates: {
-            // Feedback editor templates to use in the comment field
-            type: Array,
-            default: () => [],
-        },
-        editorHasTokens: {
-            // Whether to use tokens in the comment editor
-            type: Boolean,
-            default: false,
-        },
-    },
-    provide() {
-        return {
-            editorTemplates: this.editorTemplates,
-            editorHasTokens: this.editorHasTokens,
-        };
-    },
-    data() {
-        return {
-            data: [],
-            metadata: {
-                count: null,
-                cursor: null,
-            },
-            showSkeletonLoader: true,
-            currentlyDeletingEvidence: null,
-            selectedNodeId: null, // number|null, The selected curriculum code to display further details for.
-            selectedTag: "", // The tag clicked by the user in order to filter to items having that tag.
-            selectedFilters: {
-                // NOTE: There is an array in library/Schoolbox/Learning/Moment/Feed/Cursor.php whose values must match
-                //       the keys in this object.  If any change is made to these keys, a similar change should be made
-                //       to that array.
-                goals: false,
-                learningMoments: false,
-                achievements: false,
-                feedback: false,
-            },
+});
 
-            showFeed: true,
+/** The tag clicked by the user in order to filter to items having that tag. */
+const selectedTag = window.Vue.ref<string>("");
 
-            EvidenceStatus,
-            evidenceStatusLabels,
-        };
-    },
-    computed: {
-        jQuery: () => window.jQuery,
-        config: () => window.learningEvidenceFeedConfig,
-        dateDisplayFormats: () => window.dateDisplayFormats,
-        groupedEvidence() {
-            return this.groupFeedResults(this.data);
-        },
-        currentCount() {
-            return data.length;
-        },
-        returnUrl() {
-            return btoa(window.location.pathname);
-        },
-    },
-    async mounted() {
-        document.addEventListener(userProfileConstants.events.AWARDS_UPDATED, () => this.load());
-        window.onpopstate = async (event) => {
-            // NOTE: event.state should never be null because of the history.replaceState() call in this.loadFilteredContent().
-            this.setSelectedTagAndFiltersToMatchState(event.state);
-            await this.$nextTick(); // Wait for Vue to sync checkboxes to match this.selectedFilters (due to 'v-model' attribute on relevant HTML input).
-            this.loadFilteredContent(this.selectedTag, false);
-        };
+/**
+ * NOTE: There is an array in library/Schoolbox/Learning/Moment/Feed/Cursor.php whose values must match
+ * the keys in this object.  If any change is made to these keys, a similar change should be made
+ * to that array.
+ */
+const selectedFilters = window.Vue.reactive({
+    goals: false,
+    learningMoments: false,
+    achievements: false,
+    feedback: false,
+});
 
-        this.setSelectedTagAndFiltersToMatchState(this.getFiltersStateFromUrl());
-        await this.$nextTick(); // Wait for Vue to sync checkboxes to match this.selectedFilters (due to 'v-model' attribute on relevant HTML input).
-        this.loadFilteredContent(this.selectedTag, false);
-    },
+const showFeed = window.Vue.ref(true);
 
-    methods: {
-        /**
-         * Load learning evidence for the student in question.
-         *
-         * Once received, group them by date.
-         */
-        load() {
-            this.showFeed = false;
-            this.data = [];
-            this.append(null);
-        },
+// TODO check, also probably doesnt need to be computed
+const config = window.Vue.computed(() => window.learningEvidenceFeedConfig);
+const dateDisplayFormats = window.Vue.computed(() => window.dateDisplayFormats);
 
-        /**
-         * Appends learning evidence to the data list.
-         *
-         * @param {string} cursor -
-         */
-        async append(cursor) {
-            const params = {};
-            if (cursor) {
-                params.cursor = cursor;
-            }
+const awardDetailModalEl = window.Vue.useTemplateRef<InstanceType<typeof AwardDetailModal> | null>(
+    "awardDetailModalRef",
+);
 
-            params.filter = btoa(JSON.stringify(this.getFiltersStateFromDom()));
-
-            try {
-                const response = await fetch(this.config.routes.getFeed + "?" + new URLSearchParams(params));
-                const responseData = await response.json();
-                this.data = this.data.concat(responseData.data ? responseData.data : []);
-                this.metadata.count = responseData.metadata?.count ? responseData.metadata.count : 0;
-                this.metadata.cursor = responseData.metadata?.cursor ? responseData.metadata.cursor : null;
-            } catch (error) {
-                console.warn(error);
-                this.loading = false;
-            } finally {
-                this.showSkeletonLoader = false;
-                this.showFeed = true;
-            }
-        },
-
-        /**
-         * Groups learning evidence / badges by the date which it was posted.
-         *
-         * @param { Array } feedResults -
-         * @returns { Array } -
-         */
-        groupFeedResults(feedResults) {
-            let groupedEvidenceByDate = {};
-            feedResults.forEach((v) => {
-                let date = dayjs(v.date),
-                    key = date.format("YYYYMMDD");
-                if (!(key in groupedEvidenceByDate)) {
-                    groupedEvidenceByDate[key] = {
-                        date: dayjs(date).startOf("d"),
-                        evidence: [],
-                    };
-                }
-                v.date = date;
-                groupedEvidenceByDate[key].evidence.push(v);
-            });
-
-            // Flatten grouped evidence into an array
-            let groupedEvidence = Object.values(groupedEvidenceByDate).sort((a, b) =>
-                a.date.isBefore(b.date) ? 1 : -1,
-            );
-
-            // Ensure that each evidence within the group is sorted
-            groupedEvidence.forEach((v) => {
-                v.evidence.sort((a, b) => (a.date.isBefore(b.date) ? 1 : -1));
-            });
-
-            return groupedEvidence;
-        },
-
-        /**
-         * Renders the created-at time as a string.
-         *
-         * @param {object} createdAt -
-         * @returns {string} - Created at date in human-readable format.
-         */
-        renderCreatedAt(createdAt) {
-            let now = dayjs().startOf("d"),
-                dayDiff = createdAt.diff(now, "d");
-            if (dayDiff === 0) {
-                return "today";
-            }
-            if (dayDiff === -1) {
-                return "yesterday";
-            }
-            if (dayDiff === 1) {
-                return "tomorrow";
-            }
-            return dayjs.duration(dayDiff, "d").humanize(true);
-        },
-
-        /**
-         * Open the share learning moment modal.
-         */
-        openShareLearningMomentModal() {
-            // shareLearningMoment
-            this.jQuery("#shareLearningMoment").foundation("reveal", "open");
-        },
-
-        /**
-         * Does this evidence have a menu?
-         *
-         * @param { object } evidence -
-         * @returns { boolean } -
-         */
-        hasMenu(evidence) {
-            return Boolean(evidence?._links?.modifyForm || evidence?._links?.deleteForm);
-        },
-
-        /**
-         * Display the delete modal for a piece of evidence.
-         *
-         * @param { object } evidence -
-         */
-        showDeleteModal(evidence) {
-            this.currentlyDeletingEvidence = evidence;
-            this.$refs.deleteModal.open();
-        },
-
-        /**
-         * Actually delete this evidence.
-         *
-         * @param { object } evidence -
-         */
-        async deleteEvidence(evidence) {
-            this.$refs.toast.activate("Deleting...");
-
-            //awards, other things may also be deleted in the future, so ensure this is also the right data type
-            const removeEvidenceToDelete = (data) => {
-                if (data.discriminator !== evidence.discriminator) {
-                    return true;
-                }
-                return data.object.id !== evidence.object.id;
-            };
-            const newData = this.data.filter(removeEvidenceToDelete);
-
-            // Replacing the data in place in the same tick causes issues with
-            // the MediaElement player and Foundation dropdowns for some reason.
-            // Clear it first; then replace it with the filtered data in the
-            // next tick.
-            try {
-                await fetch(evidence.object._links.delete, {
-                    method: "DELETE",
-                });
-                this.data = [];
-                this.$refs.toast.timeout("Deleted", true);
-                this.$nextTick(() => {
-                    this.data = newData;
-                    this.metadata.count -= 1;
-                });
-            } catch (error) {
-                this.$refs.toast.timeout("Could not delete", false);
-            } finally {
-                this.$refs.deleteModal.close();
-            }
-        },
-
-        /**
-         * Open the view badge award modal.
-         *
-         * @param {object} badgeAward - The badge award object to display
-         */
-        openViewBadgeAwardModal(badgeAward) {
-            this.$refs.awardDetailModal.open(badgeAward);
-        },
-
-        /**
-         * Format the date as specified
-         *
-         * @param {Date} date -
-         * @param {string} format -
-         * @returns {string} -
-         */
-        formatDate(date, format) {
-            return dayjs(date).format(format);
-        },
-
-        /**
-         * Retrieve the class to use for the gradient background based on the grade
-         * @param {null|string} data - The grade gradient value, if it exists
-         * @returns {string}
-         */
-        gradient(data) {
-            if (data === null) {
-                return "gradient-none-bg"; // Gradients are disabled, or no grade exists
-            }
-            return `gradient-${data}-bg`;
-        },
-
-        /**
-         * to open up the node details modal
-         *
-         * @param {object} node -
-         */
-        onCodeSelected(node) {
-            this.selectedNodeId = node.id;
-            this.$refs.nodeDetailsModal.open();
-        },
-
-        /**
-         * Load new content based on the changed state of the filters, and optionally simulate a redirect.
-         * The point of simulating a redirect is to enable use of the back button to visit previous filter states, and
-         * enable sharing of the URL of the page in a particular filter state.
-         *
-         * @param { string } selectedTag -
-         * @param { boolean } simulateRedirect
-         *  - Set this to true if you want a click of the browser 'back' button to return the user to the state before this function was called.
-         */
-        loadFilteredContent(selectedTag, simulateRedirect) {
-            // Note Regarding behaviour when all-checked/none-checked
-            // ------------------------------------------------------
-            // If all checkboxes are checked, we leave them that way.
-            // We could have decided to uncheck all in this situation, to match the default state of all unchecked,
-            // which behaves the same as if all were checked.  However, we decided it would be less confusing to the
-            // user if checking the last checkbox resulted in all being checked rather than none being checked.
-
-            this.selectedTag = selectedTag;
-
-            if (simulateRedirect) {
-                // Push the old filters state to the history object.
-                history.pushState(this.getFiltersStateFromUrl(), "", window.location.href);
-            }
-
-            // Get the new filters state from the DOM, and create a new URL to match that state.
-            let filtersState = this.getFiltersStateFromDom();
-            let newUrl = new URL(window.location.href);
-            newUrl.searchParams.delete("tag");
-            newUrl.searchParams.delete("filterNames[]");
-            if (filtersState !== null) {
-                if (filtersState.tag !== "") {
-                    newUrl.searchParams.append("tag", encodeURIComponent(filtersState.tag));
-                }
-
-                for (let filterName of filtersState.filterNames) {
-                    newUrl.searchParams.append("filterNames[]", encodeURIComponent(filterName));
-                }
-            }
-
-            // Get new content based on changed filters state.
-            this.load();
-
-            // Replace the current state in the history object with the new state (and set the current URL to match that state).
-            history.replaceState(filtersState, "", newUrl.toString());
-        },
-
-        /**
-         * Generate a filterState object from the URL parameters (if there are any).
-         *
-         * The URL is expected to have parameters like this:
-         *    https://schoolbox.com.au/search/user/69?tag=Class%20Work&filterNames[]=feedback&filterNames[]=achievements
-         *    - Both parameters ('tag' and 'filterNames') are optional
-         *    - filterNames are expected to match the keys from this.selectedFilters.
-         *
-         * Example of return value:
-         *    {
-         *       filterNames: ['feedback', 'learningMoments'], { Array of keys from this.selectedFilters }
-         *       tag: '' { String }
-         *    }
-         *
-         * @returns {?object} -
-         * @see this.getFiltersStateFromDom()
-         */
-        getFiltersStateFromUrl() {
-            let url = new URL(window.location.href);
-
-            let filtersState = { tag: "", filterNames: [] };
-
-            for (let [key, value] of url.searchParams.entries()) {
-                key = decodeURIComponent(key);
-                value = decodeURIComponent(value);
-
-                switch (key) {
-                    case "tag":
-                        filtersState.tag = value;
-                        break;
-
-                    case "filterNames[]":
-                        filtersState.filterNames.push(value);
-                        break;
-
-                    default:
-                    // Unrecognised key, so ignore.  Do nothing.
-                }
-            }
-
-            return filtersState;
-        },
-
-        /**
-         * Generate a filterState object from the current state of the DOM.
-         * Since the selectedTag is not stored in the DOM, we get that from this.selectedTag.
-         *
-         * Example of return value:
-         *    {
-         *       filterNames: ['feedback', 'learningMoments'], { Array of keys from this.selectedFilters }
-         *       tag: '' { String }
-         *    }
-         *
-         * @returns {object} -
-         * @see this.getFiltersStateFromUrl()
-         */
-        getFiltersStateFromDom() {
-            let checkedFeedItemTypes = [];
-
-            for (const filterName of Object.keys(this.selectedFilters)) {
-                if ($("#filter-" + filterName).prop("checked")) {
-                    checkedFeedItemTypes.push(filterName);
-                }
-            }
-
-            return { filterNames: checkedFeedItemTypes, tag: this.selectedTag };
-        },
-
-        /**
-         * @param  {?object} filtersState -
-         *
-         * Example of non-null filtersState object:
-         *    {
-         *       filterNames: ['feedback', 'learningMoments'],
-         *       tag: '' { String }
-         *    }
-         */
-        setSelectedTagAndFiltersToMatchState(filtersState) {
-            if (filtersState === null) {
-                // Return the filters to their default state.
-                this.selectedTag = "";
-
-                for (let filterName of Object.keys(this.selectedFilters)) {
-                    this.selectedFilters.filterName = false;
-                }
-            } else {
-                // Restore state of selectedTag.
-                this.selectedTag = filtersState.tag;
-
-                // Restore state of filter checkboxes.
-                for (const filterName of Object.keys(this.selectedFilters)) {
-                    this.selectedFilters[filterName] = filtersState.filterNames.includes(filterName);
-                }
-            }
-        },
-
-        /**
-         * Put the $evidence into the Submitted state as-is
-         *
-         * @param evidence
-         */
-        submitEvidence(evidence) {
-            const submitLink = evidence?._links?.submit;
-
-            if (submitLink) {
-                this.$refs.toast.activate("Submitting...");
-
-                fetch(submitLink, {
-                    method: "PUT",
-                })
-                    .then(() => {
-                        this.$refs.toast.timeout("Submitted.", true, 2000);
-                        this.loadFilteredContent("", true);
-                    })
-                    .catch(() => this.$refs.toast.timeout("Submit failed", false, 5000));
-            }
-        },
-
-        /**
-         * Put the $evidence into the Published state as-is
-         *
-         * @param evidence
-         */
-        publishEvidence(evidence) {
-            const publishLink = evidence?._links?.publish;
-
-            if (publishLink) {
-                this.$refs.toast.activate("Publishing...");
-
-                fetch(publishLink, {
-                    method: "PUT",
-                })
-                    .then(() => {
-                        this.$refs.toast.timeout("Published.", true, 2000);
-                        this.loadFilteredContent("", true);
-                    })
-                    .catch(() => this.$refs.toast.timeout("Publish failed", false, 5000));
-            }
-        },
-    },
+type GroupedFeedResult = {
+    date: Dayjs;
+    evidence: FeedItem[];
 };
+
+/**
+ * Groups learning evidence / badges by the date which it was posted.
+ * @param feedResults -
+ * @returns -
+ */
+function groupFeedResults(feedResults: FeedItem[]): GroupedFeedResult[] {
+    const groupedEvidenceByDate: Record<string, GroupedFeedResult> = {};
+    feedResults.forEach((v) => {
+        const date = window.dayjs(v.date);
+        const key = date.format("YYYYMMDD");
+        if (!(key in groupedEvidenceByDate)) {
+            groupedEvidenceByDate[key] = {
+                date: window.dayjs(date).startOf("d"),
+                evidence: [],
+            };
+        }
+
+        v.date = date; // TODO: don't mutate the original object...
+        groupedEvidenceByDate[key].evidence.push(v);
+    });
+
+    // Flatten grouped evidence into an array
+    const groupedEvidence = Object.values(groupedEvidenceByDate).sort((a, b) => (a.date.isBefore(b.date) ? 1 : -1));
+
+    // Ensure that each evidence within the group is sorted
+    groupedEvidence.forEach((v) => {
+        v.evidence.sort((a, b) => (a.date.isBefore(b.date) ? 1 : -1));
+    });
+
+    return groupedEvidence;
+}
+
+const groupedEvidence = window.Vue.computed(() => groupFeedResults(data.value));
+
+const currentCount = window.Vue.computed(() => data.value.length);
+
+/**
+ * Appends learning evidence to the data list.
+ * @param cursor -
+ */
+async function append(cursor: string | null): Promise<void> {
+    const params = new URLSearchParams();
+    if (cursor) {
+        params.set("cursor", cursor);
+    }
+
+    params.set("filter", btoa(JSON.stringify(getFiltersStateFromDom())));
+
+    try {
+        const response = await fetch(`${config.value.routes.getFeed}?${params}`);
+        const responseData = await response.json();
+        data.value = data.value.concat(responseData.data ? responseData.data : []);
+        metadata.count = responseData.metadata?.count ? responseData.metadata.count : 0;
+        metadata.cursor = responseData.metadata?.cursor ? responseData.metadata.cursor : null;
+    } catch (error) {
+        console.warn(error);
+    } finally {
+        showSkeletonLoader.value = false;
+        showFeed.value = true;
+    }
+}
+
+/**
+ * Load learning evidence for the student in question.
+ *
+ * Once received, group them by date.
+ */
+function load(): void {
+    showFeed.value = false;
+    data.value = [];
+    append(null);
+}
+
+/**
+ * Renders the created-at time as a string.
+ * @param createdAt -
+ * @returns - Created at date in human-readable format.
+ */
+function renderCreatedAt(createdAt: Dayjs): string {
+    const now = window.dayjs().startOf("d");
+    const dayDiff = createdAt.diff(now, "d");
+
+    if (dayDiff === 0) {
+        return "today";
+    }
+    if (dayDiff === -1) {
+        return "yesterday";
+    }
+    if (dayDiff === 1) {
+        return "tomorrow";
+    }
+    return window.dayjs.duration(dayDiff, "d").humanize(true);
+}
+
+/**
+ * Open the share learning moment modal.
+ */
+function openShareLearningMomentModal(): void {
+    window.jQuery("#shareLearningMoment").foundation("reveal", "open");
+}
+
+/**
+ * Does this evidence have a menu?
+ *
+ * @param evidence -
+ * @returns - whether this evidence has a menu
+ */
+function hasMenu(evidence: FeedItem["object"]): boolean {
+    return Boolean(evidence?._links?.modifyForm || evidence?._links?.deleteForm);
+}
+
+/**
+ * Display the delete modal for a piece of evidence.
+ * @param evidence -
+ */
+function showDeleteModal(evidence: FeedItem): void {
+    currentlyDeletingEvidence.value = evidence;
+    isDeleteModalOpen.value = true;
+}
+
+/**
+ * Actually delete this evidence.
+ * @param evidence -
+ */
+async function deleteEvidence(evidence: FeedItem): Promise<void> {
+    const toast = window.sbProps.toastActivate("Deleting...");
+
+    //awards, other things may also be deleted in the future, so ensure this is also the right data type
+    const newData = this.data.filter((data) => {
+        if (data.discriminator !== evidence.discriminator) {
+            return true;
+        }
+        return data.object.id !== evidence.object.id;
+    });
+
+    // Replacing the data in place in the same tick causes issues with
+    // the MediaElement player and Foundation dropdowns for some reason.
+    // Clear it first; then replace it with the filtered data in the
+    // next tick.
+    try {
+        await fetch(evidence.object._links.delete, {
+            method: "DELETE",
+        });
+        data.value = [];
+        toast.timeout({ text: "Deleted", isSuccess: true });
+        window.Vue.nextTick(() => {
+            data.value = newData;
+            metadata.count -= 1;
+        });
+    } catch (error) {
+        toast.timeout({ text: "Could not delete", isSuccess: false });
+    } finally {
+        isDeleteModalOpen.value = false;
+    }
+}
+
+/**
+ * Open the view badge award modal.
+ * @param badgeAward - The badge award object to display
+ */
+function openViewBadgeAwardModal(badgeAward: BadgeAward): void {
+    if (!awardDetailModalEl.value) {
+        throw new Error("Missing award detail modal element");
+    }
+
+    awardDetailModalEl.value.open(badgeAward);
+}
+
+/**
+ * Format the date as specified
+ * @param date -
+ * @param format -
+ * @returns the formatted date
+ */
+function formatDate(date: string | Dayjs, format: string): string {
+    return window.dayjs(date).format(format);
+}
+
+/**
+ * Retrieve the class to use for the gradient background based on the grade
+ * @param val - The grade gradient value, if it exists
+ * @returns The gradient class to use
+ */
+function gradient(val: string | null): string {
+    if (val === null) {
+        return "gradient-none-bg"; // Gradients are disabled, or no grade exists
+    }
+    return `gradient-${val}-bg`;
+}
+
+/**
+ * Load new content based on the changed state of the filters, and optionally simulate a redirect.
+ * The point of simulating a redirect is to enable use of the back button to visit previous filter states, and
+ * enable sharing of the URL of the page in a particular filter state.
+ * @param $selectedTag -
+ * @param simulateRedirect
+ *  - Set this to true if you want a click of the browser 'back' button to return the user to the state before this function was called.
+ */
+function loadFilteredContent($selectedTag: string, simulateRedirect: boolean): void {
+    // Note Regarding behaviour when all-checked/none-checked
+    // ------------------------------------------------------
+    // If all checkboxes are checked, we leave them that way.
+    // We could have decided to uncheck all in this situation, to match the default state of all unchecked,
+    // which behaves the same as if all were checked.  However, we decided it would be less confusing to the
+    // user if checking the last checkbox resulted in all being checked rather than none being checked.
+
+    selectedTag.value = $selectedTag;
+
+    if (simulateRedirect) {
+        // Push the old filters state to the history object.
+        window.history.pushState(getFiltersStateFromUrl(), "", window.location.href);
+    }
+
+    // Get the new filters state from the DOM, and create a new URL to match that state.
+    let filtersState = getFiltersStateFromDom();
+    let newUrl = new URL(window.location.href);
+    newUrl.searchParams.delete("tag");
+    newUrl.searchParams.delete("filterNames[]");
+    if (filtersState !== null) {
+        if (filtersState.tag !== "") {
+            newUrl.searchParams.append("tag", encodeURIComponent(filtersState.tag));
+        }
+
+        for (let filterName of filtersState.filterNames) {
+            newUrl.searchParams.append("filterNames[]", encodeURIComponent(filterName));
+        }
+    }
+
+    // Get new content based on changed filters state.
+    load();
+
+    // Replace the current state in the history object with the new state (and set the current URL to match that state).
+    window.history.replaceState(filtersState, "", newUrl.toString());
+}
+
+type FiltersState = {
+    tag: string;
+    filterNames: string[];
+};
+
+/**
+ * Generate a filterState object from the URL parameters (if there are any).
+ *
+ * The URL is expected to have parameters like this:
+ *    https://schoolbox.com.au/search/user/69?tag=Class%20Work&filterNames[]=feedback&filterNames[]=achievements
+ *    - Both parameters ('tag' and 'filterNames') are optional
+ *    - filterNames are expected to match the keys from this.selectedFilters.
+ *
+ * Example of return value:
+ *    {
+ *       filterNames: ['feedback', 'learningMoments'], { Array of keys from this.selectedFilters }
+ *       tag: '' { String }
+ *    }
+ * @returns - -
+ * @see getFiltersStateFromDom()
+ */
+function getFiltersStateFromUrl(): FiltersState {
+    const url = new URL(window.location.href);
+
+    const filtersState: FiltersState = { tag: "", filterNames: [] };
+
+    for (let [key, value] of url.searchParams.entries()) {
+        key = decodeURIComponent(key);
+        value = decodeURIComponent(value);
+
+        switch (key) {
+            case "tag":
+                filtersState.tag = value;
+                break;
+
+            case "filterNames[]":
+                filtersState.filterNames.push(value);
+                break;
+
+            default:
+            // Unrecognised key, so ignore.  Do nothing.
+        }
+    }
+
+    return filtersState;
+}
+
+/**
+ * Generate a filterState object from the current state of the DOM.
+ * Since the selectedTag is not stored in the DOM, we get that from this.selectedTag.
+ *
+ * Example of return value:
+ *    {
+ *       filterNames: ['feedback', 'learningMoments'], { Array of keys from this.selectedFilters }
+ *       tag: '' { String }
+ *    }
+ * @returns -
+ * @see getFiltersStateFromUrl()
+ */
+function getFiltersStateFromDom(): FiltersState {
+    const checkedFeedItemTypes: string[] = [];
+
+    for (const filterName of Object.keys(selectedFilters)) {
+        if ($("#filter-" + filterName).prop("checked")) {
+            checkedFeedItemTypes.push(filterName);
+        }
+    }
+
+    return { filterNames: checkedFeedItemTypes, tag: selectedTag.value };
+}
+
+/**
+ * @param filtersState -
+ * Example of non-null filtersState object:
+ *    {
+ *       filterNames: ['feedback', 'learningMoments'],
+ *       tag: '' { String }
+ *    }
+ */
+function setSelectedTagAndFiltersToMatchState(filtersState: FiltersState | null): void {
+    if (filtersState === null) {
+        // Return the filters to their default state.
+        selectedTag.value = "";
+
+        for (let filterName of Object.keys(selectedFilters)) {
+            selectedFilters[filterName] = false;
+        }
+    } else {
+        // Restore state of selectedTag.
+        selectedTag.value = filtersState.tag;
+
+        // Restore state of filter checkboxes.
+        for (const filterName of Object.keys(selectedFilters)) {
+            selectedFilters[filterName] = filtersState.filterNames.includes(filterName);
+        }
+    }
+}
+
+/**
+ * Put the $evidence into the Submitted state as-is
+ * @param evidence - The evidence object to submit
+ */
+function submitEvidence(evidence: LearningMoment): void {
+    const submitLink = evidence?._links?.submit;
+
+    if (submitLink) {
+        const toast = window.sbProps.toastActivate("Submitting...");
+
+        fetch(submitLink, {
+            method: "PUT",
+        })
+            .then(() => {
+                toast.timeout({ text: "Submitted.", isSuccess: true });
+                loadFilteredContent("", true);
+            })
+            .catch(() => toast.timeout({ text: "Submit failed", isSuccess: false }));
+    }
+}
+
+/**
+ * Put the $evidence into the Published state as-is
+ * @param evidence - The evidence object to publish
+ */
+function publishEvidence(evidence: LearningMoment): void {
+    const publishLink = evidence?._links?.publish;
+
+    if (publishLink) {
+        const toast = window.sbProps.toastActivate("Publishing...");
+
+        fetch(publishLink, {
+            method: "PUT",
+        })
+            .then(() => {
+                toast.timeout({ text: "Published.", isSuccess: true });
+                loadFilteredContent("", true);
+            })
+            .catch(() => toast.timeout({ text: "Publish failed", isSuccess: false }));
+    }
+}
+
+window.Vue.onMounted(async () => {
+    document.addEventListener(userProfileConstants.events.AWARDS_UPDATED, () => load());
+    window.onpopstate = async (event): Promise<void> => {
+        // NOTE: event.state should never be null because of the history.replaceState() call in this.loadFilteredContent().
+        setSelectedTagAndFiltersToMatchState(event.state as FiltersState);
+        await window.Vue.nextTick(); // Wait for Vue to sync checkboxes to match this.selectedFilters (due to 'v-model' attribute on relevant HTML input).
+        loadFilteredContent(selectedTag.value, false);
+    };
+
+    setSelectedTagAndFiltersToMatchState(getFiltersStateFromUrl());
+    await window.Vue.nextTick(); // Wait for Vue to sync checkboxes to match this.selectedFilters (due to 'v-model' attribute on relevant HTML input).
+    loadFilteredContent(selectedTag.value, false);
+});
 </script>
 
 <template>
@@ -1220,12 +1209,12 @@ export default {
             </div>
         </div>
 
-        <reveal-modal ref="nodeDetailsModal">
+        <basic-modal v-model:is-open="isNodeDetailsModalOpen" :has-background-click="true">
             <node-details v-if="selectedNodeId !== null" :node-id="selectedNodeId" />
-        </reveal-modal>
+        </basic-modal>
 
         <!-- TODO create a Vue equivalent of $.confirmDialog -->
-        <reveal-modal ref="deleteModal">
+        <basic-modal v-model:is-open="isDeleteModalOpen" has-background-click>
             <h2>Please confirm</h2>
             <p>Are you sure you wish to delete this Learning Moment?</p>
             <ul class="flex-list buttons">
@@ -1238,13 +1227,11 @@ export default {
                         >Delete</a
                     >
                 </li>
-                <li><a @click.prevent="$refs.deleteModal.close()" class="button">Cancel</a></li>
+                <li><a @click.prevent="isDeleteModalOpen = false" class="button">Cancel</a></li>
             </ul>
-        </reveal-modal>
+        </basic-modal>
 
-        <award-detail-modal ref="awardDetailModal" :cdn-prefix="this.cdnPrefix" :site-version="this.siteVersion" />
-
-        <toast ref="toast"></toast>
+        <award-detail-modal ref="awardDetailModalRef" />
     </div>
 </template>
 <style>
