@@ -5,7 +5,7 @@
  */
 declare(strict_types=1);
 
-namespace Admin\OpenAI\Azure;
+namespace Schoolbox\Admin\OpenAI\Azure;
 
 use Schoolbox\Admin\OpenAI\IDSN;
 use SensitiveParameter;

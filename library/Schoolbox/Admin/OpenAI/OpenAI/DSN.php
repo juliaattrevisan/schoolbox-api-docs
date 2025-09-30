@@ -6,7 +6,7 @@
 
 declare(strict_types=1);
 
-namespace Admin\OpenAI\OpenAI;
+namespace Schoolbox\Admin\OpenAI\OpenAI;
 
 use Schoolbox\Admin\OpenAI\IDSN;
 use SensitiveParameter;
