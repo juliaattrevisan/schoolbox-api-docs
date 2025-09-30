@@ -1,0 +1,53 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+{% set debug = true %}
+{% set debug = false %}
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="usage-charts">
+            <div id="usage-global-container">
+                <table>
+                    <tr>
+                        {% if debug %}
+                            <th>Session ID</th>
+                        {% endif %}
+                        <th>Date</th>
+                        <th>Feature</th>
+                        <th>User</th>
+                    </tr>
+                    {% for log in logs %}
+                        <tr data-log-session-id="{{ log.sessionId }}">
+                            {% if debug %}
+                                {% set route = routeLookupIfAuthorized('openAIUsage.getLog', {sessionId: log.sessionId, log: log}) %}
+                                <td>
+                                    {% if route %}
+                                    <a href="{{ route }}">{{ log.sessionId }}</a>
+                                    {% else %}
+                                        {{ log.sessionId }}
+                                    {% endif %}
+                                </td>
+                            {% endif %}
+                            <td>
+                                {{ log.getCreatedAt|date("Y-m-d H:i:s") }}
+                            </td>
+                            <td>
+                                {{ log.feature }}
+                            </td>
+                            <td>
+                                <a href="/search/user/{{ log.user.getId }}">{{ log.user.getFullName }}</a>
+                            </td>
+                        </tr>
+
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="toast" class="toast"></div>

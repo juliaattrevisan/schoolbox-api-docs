@@ -1,0 +1,111 @@
+<?php
+
+/**
+ * @author      Justin Clarke <justin.clarke@schoolbox.education>
+ * @copyright   Copyright 2025, Schoolbox Pty Ltd
+ * @link        https://schoolbox.education/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Admin\OpenAI\Usage;
+
+use Alaress\Authorizer\Rule;
+use Alaress\Module\Module as BaseModule;
+use Alaress\Twig\Loader\IChainLoader;
+use Alaress\Web\Controller\Base;
+use InvalidArgumentException;
+use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Mapper;
+use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\UserMapper;
+
+class Module extends BaseModule
+{
+    /**
+     * @inheritdoc
+     */
+    protected $basename = 'openAIUsage';
+
+
+    /**
+     * Hook method for setting up routes via self::register()
+     *
+     * @return void
+     */
+    protected function registerRoutes(): void
+    {
+        /* Anyone can see the form
+         */
+        $isAdmin = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\IsSuperuser(),
+        );
+
+        $preload = function (array $params) {
+            return $this->preloadLog($params);
+        };
+
+        $this->register('GET', '', 'getIndex', $isAdmin);
+
+        // load next group of logs by cursor
+        $this->register('POST', '', 'postSearch', $isAdmin);
+
+        $this->register('GET', '/log/{sessionId}', 'getLog', $isAdmin, $preload);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function buildController(): Base
+    {
+        return new Controller(
+            $this->getAILogMapper()
+        );
+    }
+
+    /**
+     * Preload the first log entry on the {sessionId} param
+     */
+    private function preloadLog(array $params)
+    {
+        // if preloaded, then return
+        if ($params['log'] ?? null) {
+            return ['log' => $params['log']];
+        }
+
+        // fetch the first log entry for this sessionId
+        if (!isset($params['sessionId'])) {
+            throw new InvalidArgumentException('UUID parameter is missing.');
+        }
+
+        $log = $this->getAILogMapper()->findOneByColumn('session_id', $params['sessionId']);
+
+        if (empty($log)) {
+            throw new NotFound('Log entry not found.');
+        }
+
+        return ['log' => $log];
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    public function initTemplatePaths(IChainLoader $templateLoader): void
+    {
+        $this->addTemplatePath($templateLoader, __DIR__ . '/templates');
+    }
+
+
+    /**
+     * @return Mapper|AILogMapper
+     * @throws \InvalidArgumentException If cannot find mapper class
+     */
+    protected function getAILogMapper()
+    {
+        return $this->getMapperFactory()->get(AILogMapper::class);
+    }
+}

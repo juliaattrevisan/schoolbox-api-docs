@@ -777,6 +777,13 @@ class Subnav
                         'searchable' => true,
                         'children' => []
                     ],
+                    '/adminv2/aiLog' => [
+                        'name' => 'AI Usage Log',
+                        'visible' => true,
+                        'description' => 'Search the log of AI requests made by users, including the prompt and response.',
+                        'searchable' => true,
+                        'children' => []
+                    ],
                     '/adminv2/setting/Debugging' => [
                         'name'        => 'Debugging',
                         'visible'     => count($enabledConfigs[ConfigMapper::TYPE_DEBUGGING] ?? []) > 0,
