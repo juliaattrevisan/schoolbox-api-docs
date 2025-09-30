@@ -60,26 +60,29 @@ function onCodeSelected(nodeId: number): void {
                 <section>
                     <div class="row">
                         <div class="small-12 island">
-                            <section class="banner content">
-                                <!-- Is there an attachment? Display it appropriately -->
-                                <!-- The wrapping div is expected by mepUtils.fixVideoPlayerDimensions(). -->
-                                <!-- TODO: this is totally wrong -->
-                                <div v-if="evidence.storage" class="feed-body small-12 columns">
-                                    <article>
-                                        <storage-object :storage="evidence.storage" />
+                            <section v-if="evidence.evidence.length" class="banner content">
+                                <div class="feed-body small-12 columns">
+                                    <!-- Display evidence -->
+                                    <article v-for="e in evidence.evidence" :key="e.storage.hash">
+                                        <storage-object
+                                            :storage="e.storage"
+                                            :filename="e.filename"
+                                            data-test="learning-moment-evidence-media"
+                                        />
                                     </article>
                                 </div>
                             </section>
                             <section class="detail content">
                                 <p class="meta">
-                                    By
-                                    <a :href="evidence.creator._links.profile" title="View Profile">
-                                        {{ evidence.creator.fullName }}
-                                    </a>
-                                    &mdash;
-                                    <relative-time :datetime="evidence.createdAt"></relative-time>
+                                    <template v-if="evidence.creator">
+                                        By
+                                        <a :href="evidence.creator._links.profile" title="View Profile">
+                                            {{ evidence.creator.fullName }}
+                                        </a>
+                                        &mdash;
+                                        <relative-time :datetime="evidence.createdAt"></relative-time>
+                                    </template>
                                     <!-- Display curriculum codes and tags -->
-                                    <br />
                                     <template
                                         v-if="
                                             (evidence.curriculumNodes !== null &&
@@ -87,6 +90,7 @@ function onCodeSelected(nodeId: number): void {
                                             (evidence.tags !== null && evidence.tags.length > 0)
                                         "
                                     >
+                                        <br />
                                         Tags:
                                         <template v-if="evidence.curriculumNodes !== null">
                                             <codes-list
