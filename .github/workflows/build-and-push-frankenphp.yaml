@@ -155,8 +155,8 @@ jobs:
           done
 
           docker buildx imagetools create \
-            -t '${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}-${{ matrix.env }}' \
+            -t '${{ vars.DOCKERHUB_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}-${{ matrix.env }}-${{ github.base_ref }}' \
             "${DOCKERHUB_IMAGES[@]}"
           docker buildx imagetools create \
-            -t '${{ vars.ECR_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}-${{ matrix.env }}' \
+            -t '${{ vars.ECR_NAMESPACE }}/${{ vars.FRANKENPHP_IMAGE_NAME }}:latest-php${{ matrix.phpVersion }}-${{ matrix.env }}-${{ github.base_ref }}' \
             "${ECR_IMAGES[@]}"
