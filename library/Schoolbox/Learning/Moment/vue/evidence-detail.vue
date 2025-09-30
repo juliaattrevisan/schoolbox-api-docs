@@ -115,8 +115,8 @@ function onCodeSelected(nodeId: number): void {
 
                         <!-- Discussion thread -->
                         <comment-thread
-                            :thread="evidence.discussionThread"
-                            :create-thread-endpoint="evidence._links.createThread"
+                            :thread="evidence.discussionThread ?? undefined"
+                            :create-thread-endpoint="evidence._links.createThread ?? undefined"
                             :can-comment="canComment"
                         />
                     </div>
