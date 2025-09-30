@@ -10,7 +10,7 @@ namespace Admin\OpenAI\Azure;
 use Schoolbox\Admin\OpenAI\IDSN;
 use SensitiveParameter;
 
-class DNS implements IDSN
+class DSN implements IDSN
 {
 
     /**
