@@ -21,40 +21,4 @@
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/learningMomentDetail.js?v={{ config.site_version }}"></script>
 
-<script>
-    $(function() {
-        $('#container').on('click', 'a[data-delete]', function(event) {
-            event.preventDefault();
-
-            let element = $(this);
-            let toast = $('[data-toast]');
-
-            $(this).confirmDialog({
-                text: 'Are you sure you want to delete this Learning Moment?',
-                confirmLabel: 'Delete',
-                confirmEvent: function() {
-                    toast.toastActivate({
-                        'text': 'Deleting Learning Moment...'
-                    });
-
-                    $.ajax({
-                        url: element.attr('href'),
-                        type: 'DELETE',
-                        success: function(result) {
-                            toast.toastTimeout({text: 'Learning Moment deleted', css: 'success'});
-
-                            /* Redirect to dashboard, I guess
-                             */
-                            window.location.href = '/';
-                        },
-                        error: function() {
-                            toast.toastTimeout({text: 'Delete failed', css: 'alert'});
-                        }
-                    });
-                }
-            });
-        });
-    });
-</script>
-
 <div class="toast" data-toast></div>
