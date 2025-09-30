@@ -303,7 +303,7 @@ class CSV extends AbstractCSV
 
             if ($dataFound) {
                 if ($this->hasTotalMarkColumn($assessment, $showDisplayMarks)) {
-                    if ($humanReadableMark === null || $humanReadableMark === '') {
+                    if (empty($humanReadableMark)) {
                         $row[] = '';
                         $row[] = '';
                     } else {
