@@ -57,22 +57,26 @@ async function deleteMoment(): Promise<void> {
 }
 </script>
 <template>
-    <div class="actions-small-1 row">
-        <template v-if="props.moment._links.modifyForm || props.moment._links.delete">
-            <nav>
-                <sbx-pop-out content-id="mf-pop-out"></sbx-pop-out>
-            </nav>
-            <ul id="mf-pop-out" class="f-dropdown" data-dropdown-content>
-                <li v-if="props.moment._links.modifyForm">
-                    <a class="icon-modify" :href="getReturnUrl(props.moment._links.modifyForm)"> Modify </a>
-                </li>
-                <li v-if="props.moment._links.delete">
-                    <a class="icon-delete" :href="props.moment._links.delete" @click.prevent="isDeleteModalOpen = true">
-                        Delete
-                    </a>
-                </li>
-            </ul>
-        </template>
+    <div v-if="props.moment._links.modifyForm || props.moment._links.delete" class="actions-small-1 row">
+        <div class="list-item">
+            <div class="small-12 column">
+                <h1>&nbsp;</h1>
+            </div>
+        </div>
+
+        <nav>
+            <sbx-pop-out content-id="mf-pop-out"></sbx-pop-out>
+        </nav>
+        <ul id="mf-pop-out" class="f-dropdown" data-dropdown-content>
+            <li v-if="props.moment._links.modifyForm">
+                <a class="icon-modify" :href="getReturnUrl(props.moment._links.modifyForm)"> Modify </a>
+            </li>
+            <li v-if="props.moment._links.delete">
+                <a class="icon-delete" :href="props.moment._links.delete" @click.prevent="isDeleteModalOpen = true">
+                    Delete
+                </a>
+            </li>
+        </ul>
     </div>
 
     <div class="evidence-detail news-post row">
