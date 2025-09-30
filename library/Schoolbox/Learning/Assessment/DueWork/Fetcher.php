@@ -44,10 +44,11 @@ class Fetcher
      *
      * @param string $basename
      * @param Model  $resource
-     * @param bool   $useCache if true, allow the response from S3 presigned to
-     *                         be cached.
-     * @param bool   $forceDownload  set to true if you want to force download directly, rather than
-     *                               display inline in your browser
+     * @param bool   $useCache            if true, allow the response from S3 presigned to be cached.
+     * @param bool   $forceDownload       set to true if you want to force download directly, rather than display inline
+     *                                    in your browser
+     * @param bool   $bypassPresignedUrls set to true if you want to bypass S3 presigned URLs, and download from S3
+     *                                    directly.
      * @return void
      * @throws FilesystemException
      * @throws UnableToReadFile
@@ -57,12 +58,14 @@ class Fetcher
         string $basename,
         \Schoolbox\Resource\Storage\Model $resource,
         bool $useCache,
-        bool $forceDownload
+        bool $forceDownload,
+        bool $bypassPresignedUrls = false,
     ): void {
         $disposition = $forceDownload ? PreSignedUrlService::DISPOSITION_ATTACHMENT : PreSignedUrlService::DISPOSITION_INLINE;
         $contentType = ($resource->getMime()) ?: 'application/octet-stream';
         $cacheControl = $useCache ? ['private', 'must-revalidate'] : ['no-store'];
-        $bypassPresignedUrls = $resource->getMimetype()->getMime() === 'text/html' && $disposition === PreSignedUrlService::DISPOSITION_INLINE;
+        $bypassPresignedUrls = $bypassPresignedUrls
+            || ($resource->getMimetype()->getMime() === 'text/html' && $disposition === PreSignedUrlService::DISPOSITION_INLINE);
 
         if (
             !$bypassPresignedUrls

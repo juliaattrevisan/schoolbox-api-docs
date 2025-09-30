@@ -48,6 +48,7 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Receiver;
+use Schoolbox\Resource\Storage\S3\PreSignedUrlService;
 use Schoolbox\Url\Uri;
 use Schoolbox\User;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
@@ -775,8 +776,17 @@ class Controller extends Base
 
         /* TODO Arguably this should be in a storage controller in a storage route
          */
-        (new Fetcher($this->getConfigLoader(), $this->getDi()->get('filesystem.storageProxy')))
-            ->fetch($file->getBasename(), $resource, (bool)$this->requestQuery->get('cache'), $this->requestQuery['save'] ?? false);
+        $bypassPresignedUrls = !empty($this->requestQuery[PreSignedUrlService::BYPASS_QUERY_PARAM]);
+        new Fetcher(
+            $this->getConfigLoader(),
+            $this->getDi()->get('filesystem.storageProxy')
+        )->fetch(
+            $file->getBasename(),
+            $resource,
+            (bool)$this->requestQuery->get('cache'),
+            $this->requestQuery['save'] ?? false,
+            $bypassPresignedUrls,
+        );
         exit;
     }
 
