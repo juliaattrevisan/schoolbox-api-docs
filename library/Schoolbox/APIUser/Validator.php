@@ -145,7 +145,7 @@ class Validator
                 // Note 'object' in the exception below refers to JSON objects.  JSON objects will appear here as arrays.
                 throw new SchoolboxException("Filter '$arrayName' must not be empty.");
             case 1:
-                // This is the expected case.  Do nothing.
+                // This is the expected case.  Check that the key is either 'id' or 'name'.
                 if (array_key_exists('id', $array)) {
                     $id = $array['id'];
                     if (!is_int($id) && !(is_string($id) && ctype_digit($id))) {
