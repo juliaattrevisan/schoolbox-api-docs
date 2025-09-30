@@ -11,6 +11,7 @@ test.describe("Links Component Tests", () => {
     test.describe.configure({ mode: "serial" });
 
     let componentId: number;
+    let componentEnglishId: number;
     let homepage: Homepage;
     let links: Links;
     let linksComponent: Locator;
@@ -122,11 +123,11 @@ test.describe("Links Component Tests", () => {
         tester.isGoingTo("Navigate to 9A English homepage and update a link in the Links component");
         await homepage.goto(83);
         linksComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
-        componentId = await Homepage.getComponentId(linksComponent);
+        componentEnglishId = await Homepage.getComponentId(linksComponent);
         await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
         await Homepage.clickComponentSettings(linksComponent);
         tester.isGoingTo("Update the component limit to 2 and un-tick the title to read only");
-        await Links.updateLinkComponentSetting(linksComponent, "2", componentId, true);
+        await Links.updateLinkComponentSetting(linksComponent, "2", componentEnglishId, true);
         tester.isGoingTo("Login as student and check the header and buttons are not visible");
         await tester.impersonate("Jana Reed");
         await homepage.goto(83);
@@ -136,7 +137,6 @@ test.describe("Links Component Tests", () => {
         await expect(linksHeader).toBeHidden();
         await expect(viewAllLinksBtn).toBeHidden();
         await expect(addLinkBtn).toBeHidden();
-        await api.deleteHomepageComponent(83, componentId);
     });
 
     test("Verify adding link component to another page", async ({ tester }) => {
@@ -157,6 +157,7 @@ test.describe("Links Component Tests", () => {
     test.afterAll(async ({ baseTester, db, api }) => {
         baseTester.isGoingTo("clean up: remove Links component and soft-delete created link rows");
         await db.dontHaveInDatabase("link", { url: linkUrl });
+        await api.deleteHomepageComponent(83, componentEnglishId);
         await api.deleteHomepageComponent(188, componentId);
     });
 });
