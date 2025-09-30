@@ -320,4 +320,33 @@ export default class Homepage {
     async openLinkMenu(): Promise<void> {
         await this.page.getByTestId(Homepage.DATA_TEST_LINK_MENU_BUTTON).click();
     }
+
+    /**
+     * Get a Locator for a component in a layout region by its 1-based position.
+     * @param layoutSelector - The layout region selector (e.g., Homepage.ELEMENT_COMPONENT_LAYOUT_TOP).
+     * @param position - The 1-based index of the component within the region.
+     * @returns Locator pointing to the requested component.
+     */
+    getComponent(layoutSelector: string, position: number): Locator {
+        return this.page.locator(Homepage.locateComponent(layoutSelector, position));
+    }
+    /**
+     * Get the component ID from the component locator
+     * @param componentLocator : The Component locator
+     * @returns The component ID
+     */
+
+    static async getComponentId(component: Locator): Promise<number> {
+        const componentIdStr = await component.getAttribute("id");
+
+        if (componentIdStr === null) {
+            expect(componentIdStr).not.toBeNull();
+            throw new Error("Component ID is null");
+        }
+
+        const componentId = Number(componentIdStr.replaceAll("component", ""));
+        expect(Number.isFinite(componentId), `Bad id format: ${componentIdStr}`).toBeTruthy();
+
+        return componentId;
+    }
 }
