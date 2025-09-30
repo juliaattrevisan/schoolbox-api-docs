@@ -21,11 +21,14 @@ const BASE_URL = 'https://vagrant.dev.schoolbox.cloud';
 
 export default function () {
 
+    // Pick a random user for this VU's iteration
+    const user = credentials[Math.floor(Math.random() * credentials.length)];
+
     // Step 1: Login
     let loginRes = http.post(`${BASE_URL}/login?`, {
         page: '',
-        username: credentials.username,
-        password: credentials.password,
+        username: user.username,
+        password: user.password,
         Submit: 'Login'
     });
 
