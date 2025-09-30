@@ -57,7 +57,7 @@ class ExpiryHelper
                 $defaultExpiry,
                 $record->getStudent()->getYear()
             );
-            $carry[$record->getId()] = $expiryDate->getDatabaseDate();
+            $carry[$record->getId()] = $expiryDate?->getDatabaseDate();
             return $carry;
         }, []);
 
