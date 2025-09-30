@@ -5,7 +5,6 @@ import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import StorageObject from "@schoolboxVue/components/storage-object.vue";
 import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
-import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import CodesList from "@schoolboxCurriculum/vue/codes-list.vue";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
 import CommentThread from "./comment-thread.vue";
@@ -21,20 +20,12 @@ const props = defineProps<Props>();
 /** the selected curriculum code to display further details for */
 const selectedNodeId = window.Vue.ref<number | null>(null);
 
-const nodeDetailsModalEl = window.Vue.useTemplateRef<InstanceType<typeof RevealModal> | null>("nodeDetailsModalRef");
-
-/**
- * to open up the node details modal
- * @param nodeId The ID of the curriculum node that was selected
- */
-function onCodeSelected(nodeId: number): void {
-    if (nodeDetailsModalEl.value === null) {
-        throw new Error("nodeDetailsModalEl is null");
-    }
-
-    selectedNodeId.value = nodeId;
-    nodeDetailsModalEl.value.open();
-}
+const isNodeDetailsModalOpen = window.Vue.computed({
+    get: () => selectedNodeId.value !== null,
+    set: (val: boolean) => {
+        if (!val) selectedNodeId.value = null;
+    },
+});
 
 const isDeleteModalOpen = window.Vue.ref(false);
 
@@ -125,7 +116,7 @@ async function deleteMoment(): Promise<void> {
                                         <codes-list
                                             v-if="props.moment.curriculumNodes !== null"
                                             :nodes="props.moment.curriculumNodes"
-                                            @selected="(node) => onCodeSelected(node.id)"
+                                            @selected="(node) => (selectedNodeId = node.id)"
                                         /><template
                                             v-if="
                                                 props.moment.curriculumNodes.length > 0 &&
@@ -157,9 +148,9 @@ async function deleteMoment(): Promise<void> {
         </div>
     </div>
 
-    <reveal-modal ref="nodeDetailsModalRef">
+    <basic-modal v-model:is-open="isNodeDetailsModalOpen" :has-background-click="true">
         <node-details v-if="selectedNodeId !== null" :node-id="selectedNodeId" />
-    </reveal-modal>
+    </basic-modal>
 
     <basic-modal v-model:is-open="isDeleteModalOpen" :has-background-click="true">
         <h2>Please confirm</h2>
