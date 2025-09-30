@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import StorageObject from "@schoolboxVue/components/storage-object.vue";
 import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vue";
@@ -11,13 +12,7 @@ import type { LearningMoment } from "./evidenceTypes";
 
 interface Props {
     evidence: LearningMoment;
-    returnUrl: {
-        name?: string;
-        current?: string;
-    };
     canComment: boolean;
-    cdnPrefix: string;
-    siteVersion: string;
 }
 
 const props = defineProps<Props>();
@@ -26,27 +21,6 @@ const props = defineProps<Props>();
 const selectedNodeId = window.Vue.ref<number | null>(null);
 
 const nodeDetailsModalEl = window.Vue.useTemplateRef<InstanceType<typeof NodeDetails> | null>("nodeDetailsModalRef");
-
-/**
- * Create a modify form URL for this evidence, consisting of the
- * evidence's existing modify form link and a return URL query string.
- * @returns the modify form URL, or an empty string if no modify form link exists
- */
-function createModifyFormUrl(): string {
-    if (props.evidence._links.modifyForm) {
-        let baseModifyLink = props.evidence._links.modifyForm;
-        if (props.returnUrl.name && props.returnUrl.current) {
-            baseModifyLink =
-                baseModifyLink +
-                "?" +
-                encodeURIComponent(props.returnUrl.name) +
-                "=" +
-                encodeURIComponent(props.returnUrl.current);
-        }
-        return baseModifyLink;
-    }
-    return "";
-}
 
 /**
  * Format each tag except last with a comma
@@ -82,7 +56,7 @@ function onCodeSelected(node: Node): void {
                     </nav>
                     <ul id="header-options" class="f-dropdown" data-dropdown-content>
                         <li v-if="evidence._links.modifyForm">
-                            <a class="icon-modify" :href="createModifyFormUrl()">Modify</a>
+                            <a class="icon-modify" :href="getReturnUrl(evidence._links.modifyForm)">Modify</a>
                         </li>
                         <template v-if="evidence._links.delete">
                             <li><a class="icon-delete" :href="evidence._links.delete" data-delete>Delete</a></li>
