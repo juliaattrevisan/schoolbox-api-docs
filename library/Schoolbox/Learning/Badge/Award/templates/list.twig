@@ -30,8 +30,6 @@
         get-student-lists-endpoint="{{ routeLookup('learningBadgeAward.getListByFolderId', {folderId: folder.getId, folder: folder}) }}"
         return-url-name="{{ RETURN_URL.name }}"
         encoded-return-url="{{ RETURN_URL.current }}"
-        cdn-prefix="{{ CDN_PREFIX }}"
-        site-version="{{ config.site_version }}"
         {# If the user does not have permissions to the acheivement form, then do NOT have permissions to award goals, so don't show those option #}
         :has-award-permissions="{{ (routeLookupIfAuthorized('learningBadgeAward.redirectToAwardAsAchievementForm') is not same as('')) ? 'true' : 'false' }}"
     >
