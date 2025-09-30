@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { fromEntriesOf, keysOf } from "@js/util/arrayUtils";
+import { assertUnreachable } from "@js/util/errorUtils";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import { evidenceStatusLabels } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 import { useCohortReportStore } from "./store/cohortReportStore";
@@ -95,7 +96,7 @@ async function onAction(type: keyof typeof selectedResultActions.value): Promise
     } else if (type === "reject") {
         crmStore.openModal(entries, CohortReportModalType.CONFIRM_REJECT);
     } else {
-        ((unreachable: never): void => console.error(`Unknown action:`, unreachable))(type); // Type assertion
+        assertUnreachable(type);
     }
 }
 </script>
