@@ -27,6 +27,9 @@ async function onPublish(deleteComments: boolean): Promise<void> {
 
     crmStore.isModalOpen = false;
     await crStore.publishEntries(crmStore.selectedEntries, deleteComments);
+    if (crmStore.onConfirm) {
+        crmStore.onConfirm();
+    }
 }
 
 /**
@@ -40,6 +43,9 @@ async function onReject(): Promise<void> {
     crmStore.isModalOpen = false;
     await crStore.rejectEntries(crmStore.selectedEntries, rejectReason.value);
     rejectReason.value = "";
+    if (crmStore.onConfirm) {
+        crmStore.onConfirm();
+    }
 }
 
 /**
@@ -52,6 +58,9 @@ async function onDelete(): Promise<void> {
 
     crmStore.isModalOpen = false;
     await crStore.deleteEntries(crmStore.selectedEntries);
+    if (crmStore.onConfirm) {
+        crmStore.onConfirm();
+    }
 }
 </script>
 

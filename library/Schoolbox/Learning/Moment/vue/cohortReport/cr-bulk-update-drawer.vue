@@ -81,20 +81,19 @@ async function onAction(type: keyof typeof selectedResultActions.value): Promise
     }
 
     const entries = selectedResultActions.value[type];
-    clearSelection();
 
     if (type === "delete") {
-        crmStore.openModal(entries, CohortReportModalType.CONFIRM_DELETE);
+        crmStore.openModal(entries, CohortReportModalType.CONFIRM_DELETE, clearSelection);
     } else if (type === "publish") {
         if (entries.some((entry) => entry.hasComments)) {
             // If there are comments, open the confirmation modal to ask if they want to delete them
-            crmStore.openModal(entries, CohortReportModalType.CONFIRM_PUBLISH);
+            crmStore.openModal(entries, CohortReportModalType.CONFIRM_PUBLISH, clearSelection);
         } else {
             // Otherwise just publish immediately
             await crStore.publishEntries(entries, false);
         }
     } else if (type === "reject") {
-        crmStore.openModal(entries, CohortReportModalType.CONFIRM_REJECT);
+        crmStore.openModal(entries, CohortReportModalType.CONFIRM_REJECT, clearSelection);
     } else {
         assertUnreachable(type);
     }
