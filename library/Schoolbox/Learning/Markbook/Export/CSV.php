@@ -25,6 +25,12 @@ use Schoolbox\User;
 class CSV extends AbstractCSV
 {
     /**
+     * This should be used in situations where there is no data to
+     * export, but a blank string would be inappropriate or misleading.
+     */
+    private const string NOT_APPLICABLE_PLACEHOLDER = '-';
+
+    /**
      * Export this markbook as a CSV.
      *
      * @param Markbook $markbook   The markbook to export.
@@ -316,9 +322,9 @@ class CSV extends AbstractCSV
                             // Although this assessment has a total mark column, the human-readable mark is not
                             // fractional.  This will be because the mark type of the assessment has changed after the
                             // mark was given.  Do not attempt to convert the mark to a fraction.  Just export the
-                            // human-readable mark in the numerator column and a hyphen in the denominator column.
+                            // human-readable mark in the numerator column and an N/A placeholder in the denominator column.
                             $row[] = $humanReadableMark;
-                            $row[] = '-';
+                            $row[] = self::NOT_APPLICABLE_PLACEHOLDER;
                         }
                     }
                 } else {
