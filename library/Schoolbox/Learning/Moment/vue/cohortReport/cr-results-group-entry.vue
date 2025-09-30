@@ -103,10 +103,13 @@ function spawnLightbox(file: StorageFile): void {
                 <!-- To avoid padding changes, shove an &nbsp; in here when the status is published -->
                 <template v-else>&nbsp;</template>
             </label>
-            <a :href="`/search/user/${props.entry.recipient.id}`">
+            <component
+                :is="props.entry.recipient._links.profile ? 'a' : 'span'"
+                :href="props.entry.recipient._links.profile"
+            >
                 <user-photo :user="props.entry.recipient" render="tiny" />
                 <span class="l-pad-s--left">{{ props.entry.recipient.fullName }}</span>
-            </a>
+            </component>
         </div>
 
         <nav class="c-nav-actions">
