@@ -106,7 +106,7 @@ if (isset($type) && isset($id)) {
 
 
     // Redir to the presigned URL if it is enabled
-    $bypassPresignedUrls = !empty($_GET['no-presign']);
+    $bypassPresignedUrls = !empty($_GET[PreSignedUrlService::BYPASS_QUERY_PARAM]);
     if (
         !$bypassPresignedUrls
         && $config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3

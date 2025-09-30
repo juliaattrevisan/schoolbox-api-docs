@@ -77,7 +77,7 @@ try {
 
     $portrait            = new Image\Transformation\Portrait();
     $cacheKey            = (isset($_GET['size'])) ? $portrait->getCacheKey($_GET['size']) : null;
-    $bypassPresignedUrls = !empty($_GET['no-presign']);
+    $bypassPresignedUrls = !empty($_GET[PreSignedUrlService::BYPASS_QUERY_PARAM]);
     if (
         !$bypassPresignedUrls
         && $config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3

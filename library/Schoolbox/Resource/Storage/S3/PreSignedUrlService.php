@@ -27,6 +27,12 @@ class PreSignedUrlService
     public const DISPOSITION_ATTACHMENT = 'attachment';    // Prompt browser to download
 
     /**
+     * If this parameter is present in the query string, presigned URL
+     * generation should be bypassed.
+     */
+    public const BYPASS_QUERY_PARAM = 'no-presign';
+
+    /**
      * @var S3Client
      */
     private $s3Client;

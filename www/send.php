@@ -82,7 +82,7 @@ if (is_numeric($_GET['id'])) {
 
     /** @var IConfigLoader $config */
     $config              = $kernel->get('config');
-    $bypassPresignedUrls = !empty($_GET['no-presign']);
+    $bypassPresignedUrls = !empty($_GET[PreSignedUrlService::BYPASS_QUERY_PARAM]);
     if (
         !$bypassPresignedUrls
         && $config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3
