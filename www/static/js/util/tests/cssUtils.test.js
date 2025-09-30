@@ -36,6 +36,10 @@ describe("removeClasses()", () => {
 });
 
 describe("getGradient()", () => {
+    beforeEach(() => {
+        window.sbProps.gradeGradientEnabled = true;
+    });
+
     test("current count of 0/10 returns gradient-0", () => {
         expect(getGradient(0, 10)).toBe("gradient-0");
     });
@@ -59,5 +63,9 @@ describe("getGradient()", () => {
     });
     test("passing a string to return gradient-none", () => {
         expect(getGradient("0", 0)).toBe("gradient-none");
+    });
+    test("current count of 5/10 with gradient disabled returns gradient-none", () => {
+        window.sbProps.gradeGradientEnabled = false;
+        expect(getGradient(5, 10)).toBe("gradient-none");
     });
 });

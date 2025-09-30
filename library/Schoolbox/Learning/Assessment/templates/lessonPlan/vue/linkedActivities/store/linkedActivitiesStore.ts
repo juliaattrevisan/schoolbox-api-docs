@@ -5,7 +5,6 @@ import { LessonPlanEvent } from "../../../js/event/lessonPlanEvent";
 export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () => {
     const sourceId = window.Vue.ref(0); // The id of the source lesson plan
     const linkedActivities = window.Vue.ref([] as Activity[]);
-    const gradeGradientEnable = window.Vue.ref(false); // Whether the grade gradient is enabled or not
     const isStudentView = window.Vue.ref(false); // Whether the page is in student view or not
     const selectedActivities = window.Vue.ref([] as Activity[]); // Current state of the selected activities in the modal
 
@@ -33,12 +32,10 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
      * store any passed through properties
      * @param $sourceId - the id of the source lesson plan
      * @param $linkedActivities - the linked activities
-     * @param $gradeGradientEnable - whether the grade gradient is enabled
      */
-    function init($sourceId: number, $linkedActivities: Activity[], $gradeGradientEnable: boolean): void {
+    function init($sourceId: number, $linkedActivities: Activity[]): void {
         sourceId.value = $sourceId;
         linkedActivities.value = $linkedActivities;
-        gradeGradientEnable.value = $gradeGradientEnable;
         selectedActivities.value = [...linkedActivities.value];
         addListeners();
     }
@@ -185,7 +182,6 @@ export const useLinkedActivitiesStore = defineStore("linkedActivitiesStore", () 
         isPreviousSelected,
         clearChanges,
         linkedActivities,
-        gradeGradientEnable,
         isStudentView,
         selectedActivities,
         addActivity,

@@ -13,7 +13,6 @@ interface Props {
     linkedActivities: Activity[];
     canModify: boolean;
     sourceId: number;
-    gradeGradientEnable: boolean; // whether to show the student completion colour gradient on linked activities
 }
 
 const props = defineProps<Props>();
@@ -107,7 +106,7 @@ const sortedUnitsByDate = window.Vue.computed(() => {
 });
 
 window.Vue.onMounted(() => {
-    useLinkedActivitiesStore().init(props.sourceId, props.linkedActivities, props.gradeGradientEnable);
+    useLinkedActivitiesStore().init(props.sourceId, props.linkedActivities);
     $("[data-collapser]").collapsable();
 });
 </script>
