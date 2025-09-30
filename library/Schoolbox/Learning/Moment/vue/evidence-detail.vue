@@ -1,138 +1,85 @@
-<script>
-/* eslint-disable eslint-comments/disable-enable-pair -- see below */
-/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
-/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
-/* eslint-enable vue/no-v-html */
-import MediaArticle from "@schoolboxVue/components/media-article";
-import StorageObject from "@schoolboxVue/components/storage-object";
+<script setup lang="ts">
+import MediaArticle from "@schoolboxVue/components/media-article.vue";
+import StorageObject from "@schoolboxVue/components/storage-object.vue";
 import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vue";
-import CommentThread from "./comment-thread";
-import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
-import CodesList from "@schoolboxCurriculum/vue/codes-list";
-import RevealModal from "@schoolboxVue/components/reveal-modal";
-import NodeDetails from "@schoolboxCurriculum/vue/node-details";
+import CodesList from "@schoolboxCurriculum/vue/codes-list.vue";
+import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
+import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
+import type { Node } from "@schoolboxCurriculum/types/Node";
+import CommentThread from "./comment-thread.vue";
+import type { LearningMoment } from "./evidenceTypes";
 
-export default {
-    /**
-     * Name.
-     * The name of the component that we have here. This name will be used in the container
-     * to spawn this component.
+interface Props {
+    evidence: LearningMoment;
+    returnUrl: {
+        name?: string;
+        current?: string;
+    };
+    canComment: boolean;
+    cdnPrefix: string;
+    siteVersion: string;
+}
+
+const props = defineProps<Props>();
+
+/** the selected curriculum code to display further details for */
+const selectedNodeId = window.Vue.ref<number | null>(null);
+
+const nodeDetailsModalEl = window.Vue.useTemplateRef<InstanceType<typeof NodeDetails> | null>("nodeDetailsModalRef");
+
+/**
+ * @returns whether to show the tot menu - only provide when it has at least one
+ * accessible route
+ */
+function hasRoutes(): boolean {
+    /* For now there are only two options, so tot is fairly
+     * straightforward to calculate this way
      */
-    name: "evidence-detail",
+    return props.evidence._links.modify || props.evidence._links.delete;
+}
 
-    /**
-     * Mixins.
-     * Basically traits for vue; allows you to share javascript between components in the same
-     * manner as a php trait. They must already be imported at the top of the file and will
-     * be superpositioned on top of this javascript here, inside export default {}
-     */
-    mixins: [cdnPrefixMixin],
+/**
+ * Create a modify form URL for this evidence, consisting of the
+ * evidence's existing modify form link and a return URL query string.
+ * @returns the modify form URL, or an empty string if no modify form link exists
+ */
+function createModifyFormUrl(): string {
+    if (props.evidence._links.modifyForm) {
+        let baseModifyLink = props.evidence._links.modifyForm;
+        if (props.returnUrl.name && props.returnUrl.current) {
+            baseModifyLink =
+                baseModifyLink +
+                "?" +
+                encodeURIComponent(props.returnUrl.name) +
+                "=" +
+                encodeURIComponent(props.returnUrl.current);
+        }
+        return baseModifyLink;
+    }
+    return "";
+}
 
-    /**
-     * Props.
-     * Immutable props that were passed to this component, usually via twig, in our setup.
-     * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
-     */
-    props: ["evidence", "returnUrl", "canComment", "siteVersion"],
+/**
+ * Format each tag except last with a comma
+ * @param index The index of the tag in the evidence tags array
+ * @returns A comma separated tag name
+ */
+function tagNameWithComma(index: number): string {
+    if (index !== props.evidence.tags.length - 1) {
+        return `${props.evidence.tags[index].name}, `;
+    } else {
+        return props.evidence.tags[index].name;
+    }
+}
 
-    /**
-     * Components.
-     * Any other vue components you also want to use here; they must already be imported
-     * at the top of the file.
-     */
-    components: {
-        MediaArticle,
-        StorageObject,
-        RelativeTime,
-        CommentThread,
-        CodesList,
-        RevealModal,
-        NodeDetails,
-    },
-
-    /**
-     * Data.
-     * Mutable properties that can be accessed from within this component via "this" keyword
-     * Note that v-if and v-for must never be on the same node together, as this overrides
-     * the meaning of "this" in a way you don't expect.
-     */
-    data() {
-        return {
-            selectedNodeId: null, // number|null, the selected curriculum code to display further details for
-        };
-    },
-
-    /**
-     * Computed properties.
-     * Access the results of a function as if they were a property of an object.
-     */
-    computed: {},
-
-    /**
-     * Methods.
-     * Arbitrary javascript functions which operate on the args provided, just like any
-     * other ordinary javascript that you might have written before.
-     */
-    methods: {
-        /**
-         * Decide whether to show the tot menu - only provide when it has at least one
-         * accessible route
-         */
-        hasRoutes: function () {
-            /* For now there are only two options, so tot is fairly
-             * straightforward to calculate this way
-             */
-            return this.evidence._links.modify || this.evidence._links.delete;
-        },
-
-        /**
-         * Create a modify form URL for this evidence, consisting of the
-         * evidence's existing modify form link and a return URL query string.
-         *
-         * @return {String}
-         */
-        createModifyFormUrl() {
-            if (this.evidence._links.modifyForm) {
-                let baseModifyLink = this.evidence._links.modifyForm;
-                if (this.returnUrl.name && this.returnUrl.current) {
-                    baseModifyLink =
-                        baseModifyLink +
-                        "?" +
-                        encodeURIComponent(this.returnUrl.name) +
-                        "=" +
-                        encodeURIComponent(this.returnUrl.current);
-                }
-                return baseModifyLink;
-            }
-            return "";
-        },
-
-        /**
-         * Format each except last with a comma
-         *
-         * @param { Number }
-         *
-         * @return { String }
-         */
-        tagNameWithComma(index) {
-            if (index !== this.evidence.tags.length - 1) {
-                return `${this.evidence.tags[index].name}, `;
-            } else {
-                return this.evidence.tags[index].name;
-            }
-        },
-
-        /**
-         * to open up the node details modal
-         *
-         * @pararm { object }
-         */
-        onCodeSelected(node) {
-            this.selectedNodeId = node.id;
-            this.$refs.nodeDetailsModal.open();
-        },
-    },
-};
+/**
+ * to open up the node details modal
+ * @param node The curriculum node that was selected
+ */
+function onCodeSelected(node: Node): void {
+    selectedNodeId.value = node.id;
+    nodeDetailsModalEl.value.open();
+}
 </script>
 <template>
     <div class="evidence-detail">
@@ -213,7 +160,7 @@ export default {
             </div>
         </div>
     </div>
-    <reveal-modal ref="nodeDetailsModal">
+    <reveal-modal ref="nodeDetailsModalRef">
         <node-details v-if="selectedNodeId !== null" :node-id="selectedNodeId" />
     </reveal-modal>
 </template>
