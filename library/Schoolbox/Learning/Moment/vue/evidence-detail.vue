@@ -28,17 +28,6 @@ const selectedNodeId = window.Vue.ref<number | null>(null);
 const nodeDetailsModalEl = window.Vue.useTemplateRef<InstanceType<typeof NodeDetails> | null>("nodeDetailsModalRef");
 
 /**
- * @returns whether to show the tot menu - only provide when it has at least one
- * accessible route
- */
-function hasRoutes(): boolean {
-    /* For now there are only two options, so tot is fairly
-     * straightforward to calculate this way
-     */
-    return props.evidence._links.modify || props.evidence._links.delete;
-}
-
-/**
  * Create a modify form URL for this evidence, consisting of the
  * evidence's existing modify form link and a return URL query string.
  * @returns the modify form URL, or an empty string if no modify form link exists
@@ -83,27 +72,25 @@ function onCodeSelected(node: Node): void {
 </script>
 <template>
     <div class="evidence-detail">
-        <template v-if="hasRoutes()">
-            <div class="row">
-                <div class="small-12 columns">
-                    <div class="actions-small-1">
-                        <nav>
-                            <template v-if="evidence._links.delete">
-                                <sbx-pop-out content-id="header-options"></sbx-pop-out>
-                            </template>
-                        </nav>
-                        <ul id="header-options" class="f-dropdown" data-dropdown-content>
-                            <li v-if="evidence._links.modifyForm">
-                                <a class="icon-modify" :href="createModifyFormUrl()">Modify</a>
-                            </li>
-                            <template v-if="evidence._links.delete">
-                                <li><a class="icon-delete" :href="evidence._links.delete" data-delete>Delete</a></li>
-                            </template>
-                        </ul>
-                    </div>
+        <div v-if="evidence._links.modifyForm || evidence._links.delete" class="row">
+            <div class="small-12 columns">
+                <div class="actions-small-1">
+                    <nav>
+                        <template v-if="evidence._links.delete">
+                            <sbx-pop-out content-id="header-options"></sbx-pop-out>
+                        </template>
+                    </nav>
+                    <ul id="header-options" class="f-dropdown" data-dropdown-content>
+                        <li v-if="evidence._links.modifyForm">
+                            <a class="icon-modify" :href="createModifyFormUrl()">Modify</a>
+                        </li>
+                        <template v-if="evidence._links.delete">
+                            <li><a class="icon-delete" :href="evidence._links.delete" data-delete>Delete</a></li>
+                        </template>
+                    </ul>
                 </div>
             </div>
-        </template>
+        </div>
         <div class="news-post row">
             <div class="small-12 island">
                 <section>
