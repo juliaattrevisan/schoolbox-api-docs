@@ -207,7 +207,7 @@ class ModelToArray
         // TODO consider providing default sizes
         return $user->getId()
             ? [
-                'profile' => '/search/user/' . $user->getId(),
+                'profile' => $user->isDeleted() ? null : '/search/user/' . $user->getId(),
                 'avatar'  =>
                     sprintf(
                         '/portrait.php?id=%d&size=%s',
