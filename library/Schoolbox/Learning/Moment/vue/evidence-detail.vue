@@ -6,7 +6,6 @@ import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vu
 import CodesList from "@schoolboxCurriculum/vue/codes-list.vue";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
-import type { Node } from "@schoolboxCurriculum/types/Node";
 import CommentThread from "./comment-thread.vue";
 import type { LearningMoment } from "./evidenceTypes";
 
@@ -20,27 +19,18 @@ const props = defineProps<Props>();
 /** the selected curriculum code to display further details for */
 const selectedNodeId = window.Vue.ref<number | null>(null);
 
-const nodeDetailsModalEl = window.Vue.useTemplateRef<InstanceType<typeof NodeDetails> | null>("nodeDetailsModalRef");
-
-/**
- * Format each tag except last with a comma
- * @param index The index of the tag in the evidence tags array
- * @returns A comma separated tag name
- */
-function tagNameWithComma(index: number): string {
-    if (index !== props.evidence.tags.length - 1) {
-        return `${props.evidence.tags[index].name}, `;
-    } else {
-        return props.evidence.tags[index].name;
-    }
-}
+const nodeDetailsModalEl = window.Vue.useTemplateRef<InstanceType<typeof RevealModal> | null>("nodeDetailsModalRef");
 
 /**
  * to open up the node details modal
- * @param node The curriculum node that was selected
+ * @param nodeId The ID of the curriculum node that was selected
  */
-function onCodeSelected(node: Node): void {
-    selectedNodeId.value = node.id;
+function onCodeSelected(nodeId: number): void {
+    if (nodeDetailsModalEl.value === null) {
+        throw new Error("nodeDetailsModalEl is null");
+    }
+
+    selectedNodeId.value = nodeId;
     nodeDetailsModalEl.value.open();
 }
 </script>
@@ -90,18 +80,31 @@ function onCodeSelected(node: Node): void {
                                     <relative-time :datetime="evidence.createdAt"></relative-time>
                                     <!-- Display curriculum codes and tags -->
                                     <br />
-                                    <template v-if="evidence.curriculumNodes.length > 0 || evidence.tags.length > 0">
+                                    <template
+                                        v-if="
+                                            (evidence.curriculumNodes !== null &&
+                                                evidence.curriculumNodes.length > 0) ||
+                                            (evidence.tags !== null && evidence.tags.length > 0)
+                                        "
+                                    >
                                         Tags:
-                                        <codes-list
-                                            :nodes="evidence.curriculumNodes"
-                                            @selected="onCodeSelected"
-                                        /><template
-                                            v-if="evidence.curriculumNodes.length > 0 && evidence.tags.length > 0"
-                                            >,
+                                        <template v-if="evidence.curriculumNodes !== null">
+                                            <codes-list
+                                                v-if="evidence.curriculumNodes !== null"
+                                                :nodes="evidence.curriculumNodes"
+                                                @selected="(node) => onCodeSelected(node.id)"
+                                            /><template
+                                                v-if="
+                                                    evidence.curriculumNodes.length > 0 &&
+                                                    evidence.tags &&
+                                                    evidence.tags.length > 0
+                                                "
+                                                >,
+                                            </template>
                                         </template>
-                                        <span v-for="(tag, index) in evidence.tags" :key="tag.name">
-                                            {{ tagNameWithComma(index) }}</span
-                                        >
+                                        <span v-if="evidence.tags !== null && evidence.tags.length > 0">
+                                            {{ evidence.tags.map((tag) => tag.name).join(", ") }}
+                                        </span>
                                     </template>
                                 </p>
 
