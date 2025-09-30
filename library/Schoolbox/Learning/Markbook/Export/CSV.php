@@ -303,8 +303,24 @@ class CSV extends AbstractCSV
 
             if ($dataFound) {
                 if ($this->hasTotalMarkColumn($assessment, $showDisplayMarks)) {
-                    $row[] = $humanReadableMark == '' ? '' : $this->parseNumerator($humanReadableMark) . $suffix;
-                    $row[] = $humanReadableMark == '' ? '' : $this->parseDenominator($humanReadableMark) . $suffix;
+                    if ($humanReadableMark === null || $humanReadableMark === '') {
+                        $row[] = '';
+                        $row[] = '';
+                    } else {
+                        $numerator = $this->parseNumerator($humanReadableMark);
+                        $denominator = $this->parseDenominator($humanReadableMark);
+                        if ($numerator !== null && $denominator !== null) {
+                            $row[] = $numerator . $suffix;
+                            $row[] = $denominator . $suffix;
+                        } else {
+                            // Although this assessment has a total mark column, the human-readable mark is not
+                            // fractional.  This will be because the mark type of the assessment has changed after the
+                            // mark was given.  Do not attempt to convert the mark to a fraction.  Just export the
+                            // human-readable mark in the numerator column and a hyphen in the denominator column.
+                            $row[] = $humanReadableMark;
+                            $row[] = '-';
+                        }
+                    }
                 } else {
                     $row[] = $humanReadableMark == '' ? '' : $humanReadableMark . $suffix;
                 }
