@@ -68,18 +68,18 @@ class DSNTest extends TestCase
             ],
 
             'Valid DSN 3 (extra module...)' => [
-                'lessonplan:key=98765;resourcename=gpt-turbo;deploymentid=thisisatest,textchat:key=951;resourcename=somethingelse;deploymentid=cannumbersexist,assessment:key=8856;resourcename=assessmentsAI;deploymentid=thisshouldexist',
+                'lessonplan:key=98765aa;resourcename=lsdkfjhaa;deploymentid=testisthis,textchat:key=99995464684;resourcename=andanotherthing;deploymentid=idsexisthere,assessment:key=8856;resourcename=assessmentsAI;deploymentid=thisshouldexist',
                 [
                     'modules' => [
                         'lessonplan' => [
-                            'key' => '98765',
-                            'resourcename' => 'gpt-turbo',
-                            'deploymentid' => 'thisisatest'
+                            'key' => '98765aa',
+                            'resourcename' => 'lsdkfjhaa',
+                            'deploymentid' => 'testisthis'
                         ],
                         'textchat' => [
-                            'key' => '951',
-                            'resourcename' => 'somethingelse',
-                            'deploymentid' => 'cannumbersexist'
+                            'key' => '99995464684',
+                            'resourcename' => 'andanotherthing',
+                            'deploymentid' => 'idsexisthere'
                         ],
                     ],
                 ]
@@ -92,6 +92,23 @@ class DSNTest extends TestCase
                             'key' => '000',
                             'resourcename' => 'gpt-4o-mini-test',
                             'deploymentid' => '78946'
+                        ],
+                        'lessonplan' => [
+                            'key' => '',
+                            'resourcename' => '',
+                            'deploymentid' => '',
+                        ],
+                    ],
+                ]
+            ],
+            'Valid DNS 5, all empty' => [
+                'textchat:key=;resourcename=;deploymentid=,lessonplan:key=;resourcename=;deploymentid=',
+                [
+                    'modules' => [
+                        'textchat' => [
+                            'key' => '',
+                            'resourcename' => '',
+                            'deploymentid' => ''
                         ],
                         'lessonplan' => [
                             'key' => '',
@@ -187,66 +204,51 @@ class DSNTest extends TestCase
             ],
 
             'Invalid DSN 4 (missing modules)' => [
-                'studentdetails:', []
+                'lessonplan:', []
             ],
 
             'Invalid DSN 5 (missing modules)' => [
-                'identitymanagement:', []
+                'textchat:', []
             ],
 
             'Invalid DSN 6 (missing modules)' => [
-                'lmsintegration:', []
+                'assessment:', []
             ],
 
             'Invalid DSN 7 (no tuples)' => [
-                'studentdetails:,identitymanagement:,lmsintegration:', []
+                'lessonplan:,textchat:,assessment:', []
             ],
 
             'Invalid DSN 8 (bad separation of module credentials)' => [
-                'studentdetails:companycode=123appcode=ADweh189token=923nADjl35h0sd7725==identitymanagement:companycode=456appcode=xcjFh28token=ckbj78fj1kdhg=lmsintegration:companycode=789appcode=Qvmdbn2764token=CVWSEFklrsjdswwwidfnesfd',
+                'lessonplan:key=123456789dsfafdsresourcename=gpt-5deploymentid=somethingelsetextchat:key=keysgiveaccesstothingsresourcename=arandomresourcedeploymentid=azuredeploymentidorsomthinglikeit',
                 []
             ],
 
             'Invalid DSN 9 (malformed tuples)' => [
-                'studentdetails:companycode=appcode=identitymanagement:companycode=appcode=lmsintegration:companycode=appcode=',
-                []
-            ],
-
-            'Invalid DSN 10 (half-tuples)' => [
-                'studentdetails:companycode=;appcode=;token=,identitymanagement:companycode=;appcode=;token=,lmsintegration:companycode=;appcode=;token=',
-                []
-            ],
-
-            'Invalid DSN 11 (missing module credentials)' => [
-                'studentdetails:companycode=123;appcode=ADweh189;token=923nADjl35h0sd7725==,identitymanagement:companycode=;appcode=;token=,lmsintegration:companycode=;appcode=;token=',
+                'lessonplan:key=resourcename=deploymentid=:textchat=key=resourcename=deploymentid=',
                 []
             ],
 
             'Invalid DSN 12 (case sensitive)' => [
-                'studentdetails:Appcode=ADweh189;Companycode=123;Token=923nADjl35h0sd7725==,identitymanagement:appcode=werklj2i9jsdf;companycode=234xv;;token=ol2j5ljsdf89,lmsintegration:token=923nADjl35h0sd7725==;companycode=werwer;appcode=bdefgdf',
+                'lessonplan:Key=123456789dsfafds;resourceName=gpt-5;deploymentID=somethingelse,textchat:key=keysgiveaccesstothings;ResourceName=arandomresource;deploymentid=azuredeploymentidorsomthinglikeit',
                 []
             ],
 
             'Invalid DSN 12 (mixed case)' => [
-                'studentdetails:Companycode=123;appcode=ADweh189;Token=923nADjl35h0sd7725==,identitymanagement:companycode=456;Appcode=xcjFh28;token=ckbj78fj1kdhg=,lmsintegration:companycode=789;appcode=Qvmdbn2764;Token=CVWSEFklrsjdswwwidfnesfd',
+                'lessonplan:KEY=123456789dsfafds;resourceName=gpt-5;deploymentID=somethingelse,textchat:key=keysgiveaccesstothings;RESOURCENAME=arandomresource;deploymentid=azuredeploymentidorsomthinglikeit',
                 []
             ],
             'Invalid DSN 14 (bad tuple ordering)' => [
-                'studentdetails:appcode=ADweh189;companycode=123;token=923nADjl35h0sd7725==,identitymanagement:appcode=werklj2i9jsdf;companycode=234xv;;token=ol2j5ljsdf89,lmsintegration:token=923nADjl35h0sd7725==;companycode=werwer;appcode=bdefgdf',
+                'textchat:resourcename=gpt-4o-mini-test;key=000deploymentid=78946,lessonplan:deploymentid=1123456;resourcename=gpt-40mini-test2;key=001',
                 []
             ],
 
             /* Add all possible permutations; there's probably more than 300 you could add
              */
-            'Invalid DSN 15 (separator chars in tokens)' => [
-                'student:details:appcode=ADweh;189;companycode=12;3;token=923nAD,jl35h0sd7725==,identitymanagement:appcode=werklj2i9jsdf;companycode=234xv;;token=ol2j5ljsdf89,lmsintegration:token=923nADjl35h0sd7725==;companycode=werwer;appcode=bdefgdf',
+            'Invalid DSN 15 (missing module)' => [
+                'textchat:key=000;resourcename=gpt-4o-mini-test;deploymentid=78946',
                 []
             ],
-
-            'Invalid DSN 16 (malformed options)' => [
-                'studentdetails:companycode=123;appcode=ADweh189;token=923nADjl35h0sd7725==,identitymanagement:companycode=456;appcode=xcjFh28;token=ckbj78fj1kdhg=,lmsintegration:companycode=789;appcode=Qvmdbn2764;token=CVWSEFklrsjdswwwidfnesfd?',
-                []
-            ]
         ];
     }
 
