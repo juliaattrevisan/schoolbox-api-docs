@@ -119,7 +119,7 @@ test.describe("Links Component Tests", () => {
         linkTitle = newLinkTitle;
     });
 
-    test("Verify Link component access for student", async ({ tester, api }) => {
+    test("Verify Link component access for student", async ({ tester }) => {
         tester.isGoingTo("Navigate to 9A English homepage and update a link in the Links component");
         await homepage.goto(83);
         linksComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
