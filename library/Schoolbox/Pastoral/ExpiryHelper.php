@@ -9,20 +9,22 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Assessment\Term\Model as TermModel;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Pastoral\Type\TypeAbstract;
 use Schoolbox\YearLevel\Model as YearLevel;
-use Schoolbox\Pastoral\Type\Model as PastoralType;
 use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Alaress_Date_Format;
 
 class ExpiryHelper
 {
+    public const int RECORD_CHUNK_SIZE = 20;
     public function __construct(
         private PastoralMapper $pastoralMapper,
         private TermMapper $termMapper,
+        private ?LoggerInterface $logger = null,
     ) {
     }
 
@@ -33,6 +35,7 @@ class ExpiryHelper
      * @param int|null    $subtypeId
      * @param string|null $defaultExpiry
      * @return void
+     * @throws Exception
      */
     public function updateDefaultExpireAt(int $typeId, ?int $subtypeId, ?string $defaultExpiry): void
     {
@@ -47,15 +50,73 @@ class ExpiryHelper
         }
 
         $records = $this->pastoralMapper->findByPredicates($pb);
-        $records->map(function (Model $record) use ($defaultExpiry): void {
+
+        $expiry = $records->reduce(function (array $carry, Model $record) use ($defaultExpiry) {
             $expiryDate = $this->calculateExpireDate(
                 $record->getCreatedAt(),
                 $defaultExpiry,
                 $record->getStudent()->getYear()
             );
-            $record->setExpiresAt($expiryDate);
-            $this->pastoralMapper->save($record);
-        });
+            $carry[$record->getId()] = $expiryDate?->getDatabaseDate();
+            return $carry;
+        }, []);
+
+        if (!$this->bulkUpdateExpiry($expiry)) {
+            throw new \RuntimeException('Failed to update expiry dates for pastoral records');
+        }
+    }
+
+    /**
+     * Bulk update the expiry dates for multiple records
+     *
+     * @param array $expiry An associative array of record IDs and their corresponding expiry dates (or null for no expiry)
+     * @param int   $chunkSize Number of records to process in each chunk
+     * @return bool True on success, false on failure
+     */
+    public function bulkUpdateExpiry(array $expiry, int $chunkSize = self::RECORD_CHUNK_SIZE): bool
+    {
+        if (empty($expiry)) {
+            $this->logger?->info('No records to update for default expiry.');
+            return true;
+        }
+
+        /* Chunking the array for batch process to avoid too large queries
+         */
+        $chunks = array_chunk($expiry, $chunkSize, true);
+        try {
+            $this->logger?->info(sprintf('Updating default expiry for %d records...', count($expiry)));
+            foreach ($chunks as $chunk) {
+                $this->logger?->info(sprintf('Processing chunk of %d records...', count($chunk)));
+
+                $caseClauses = [];
+                $params      = [];
+
+                foreach ($chunk as $id => $expiryDate) {
+                    $caseClauses[] = "WHEN id = ? THEN ?";
+                    $params[]      = $id;
+                    $params[]      = $expiryDate ?? null;
+                }
+
+                $sql = sprintf(
+                    "UPDATE pastoral SET expires_at = CASE %s END WHERE id IN (%s)",
+                    implode(' ', $caseClauses),
+                    implode(',', array_fill(0, count($chunk), '?'))
+                );
+
+                // Add IDs to params for WHERE clause
+                $params = array_merge($params, array_keys($chunk));
+
+                $this->pastoralMapper->getDatabase()->executeQuery($sql, $params);
+
+                // Free memory after each chunk
+                unset($chunk, $caseClauses, $params);
+            }
+        } catch (\Exception $e) {
+            $this->logger?->error('Error occurred during bulk update of expiry dates: ' . $e->getMessage());
+            return false;
+        }
+        $this->logger?->info(sprintf('Default expiry update completed for %d records.', count($expiry)));
+        return true;
     }
 
     /**
