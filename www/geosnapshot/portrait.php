@@ -86,10 +86,12 @@ try {
     );
 
 
-    $portrait  = new Image\Transformation\Portrait();
-    $cacheKey  = $portrait->getCacheKey(TRANSFORM_KEY);
+    $portrait            = new Image\Transformation\Portrait();
+    $cacheKey            = $portrait->getCacheKey(TRANSFORM_KEY);
+    $bypassPresignedUrls = !empty($_GET[PreSignedUrlService::BYPASS_QUERY_PARAM]);
     if (
-        $config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3
+        !$bypassPresignedUrls
+        && $config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3
         && $config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)
     ) {
         $preSignedUrlService = new PreSignedUrlService($config);

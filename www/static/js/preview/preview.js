@@ -120,7 +120,7 @@
                                     }),
                                 );
                             } else if (response.type == "pdf") {
-                                const src = `${window.cdnPrefix}/js/pdf/pdfjs/web/viewer.html?file=${window.location.origin}${response.fragment}`;
+                                const src = `${window.cdnPrefix}/js/pdf/pdfjs/web/viewer.html?file=${encodeURIComponent(window.location.origin + response.fragment)}`;
                                 document.dispatchEvent(
                                     new CustomEvent("IMAGE-LIGHTBOX__CREATE", {
                                         detail: {
