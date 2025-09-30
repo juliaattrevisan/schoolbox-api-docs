@@ -192,17 +192,17 @@ HELP;
         $pb = Turnitin\File\Mapper::getInstance()->getPredicateBuilder();
         $pb->equals('status', Turnitin\File\Model::STATUS_REPORT_ANALYSING)
            ->lessThan('created_at', date('Y-m-d H:i:s', time() - 86400))
-           ->notNull('deleted_at');
+           ->isNull('deleted_at');
 
         $models = Turnitin\File\Mapper::getInstance()->findByPredicates($pb);
 
         foreach($models as $model) {
             $this->getLogger()->info(sprintf(
-                'Marking report %s as failed due to excessive time in analysing state',
+                'Marking report %s as failed due to over 24 hours in analysing state',
                 $model->getId()
             ));
             $model->setStatus(Turnitin\File\Model::STATUS_ERROR);
-            $model->setErrorMessage('Report failed due to excessive time in analysing state');
+            $model->setErrorMessage('Report failed due to over 24 hours in analysing state');
             Turnitin\File\Mapper::getInstance()->save($model);
         }
     }
