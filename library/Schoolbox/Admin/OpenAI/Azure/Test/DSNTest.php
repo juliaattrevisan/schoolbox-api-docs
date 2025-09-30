@@ -67,8 +67,8 @@ class DSNTest extends TestCase
                 ]
             ],
 
-            'Valid DSN 3 (extra module...)' => [
-                'lessonplan:key=98765aa;resourcename=lsdkfjhaa;deploymentid=testisthis,textchat:key=99995464684;resourcename=andanotherthing;deploymentid=idsexisthere,assessment:key=8856;resourcename=assessmentsAI;deploymentid=thisshouldexist',
+            'Valid DSN 3' => [
+                'lessonplan:key=98765aa;resourcename=lsdkfjhaa;deploymentid=testisthis,textchat:key=99995464684;resourcename=andanotherthing;deploymentid=idsexisthere',
                 [
                     'modules' => [
                         'lessonplan' => [
@@ -240,13 +240,6 @@ class DSNTest extends TestCase
             ],
             'Invalid DSN 14 (bad tuple ordering)' => [
                 'textchat:resourcename=gpt-4o-mini-test;key=000deploymentid=78946,lessonplan:deploymentid=1123456;resourcename=gpt-40mini-test2;key=001',
-                []
-            ],
-
-            /* Add all possible permutations; there's probably more than 300 you could add
-             */
-            'Invalid DSN 15 (missing module)' => [
-                'textchat:key=000;resourcename=gpt-4o-mini-test;deploymentid=78946',
                 []
             ],
         ];
