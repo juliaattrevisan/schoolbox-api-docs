@@ -119,28 +119,6 @@ class Session extends BaseSession
     }
 
     /**
-     * Is the current session's IP address valid?
-     *
-     * It will be, unless:
-     * * `config.track_ip` is on, and;
-     * * the current IP address does not match the IP address the session was
-     *   created with
-     *
-     * @return bool
-     */
-    public function isSessionIpAddressValid(): bool
-    {
-        $authSession = $this->getSegment(null);
-        if ($this->config->get('track_ip')) {
-            $sessionIpAddress = $authSession->get('ip');
-            if ($sessionIpAddress && $sessionIpAddress !== \Session::getIP() && !$authSession->get(\Session::BYPASS_IP_TRACKING, false)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /**
      * Override to set cookie params as an array, thus allowing the `samesite`
      * option to be set.
      *
