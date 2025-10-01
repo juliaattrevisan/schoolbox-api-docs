@@ -25,12 +25,6 @@ use Schoolbox\User;
 class CSV extends AbstractCSV
 {
     /**
-     * This should be used in situations where there is no data to
-     * export, but a blank string would be inappropriate or misleading.
-     */
-    private const string NOT_APPLICABLE_PLACEHOLDER = '-';
-
-    /**
      * Export this markbook as a CSV.
      *
      * @param Markbook $markbook   The markbook to export.

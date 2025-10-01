@@ -23,6 +23,12 @@ use Schoolbox\User;
 class AbstractCSV
 {
     /**
+     * This should be used in situations where there is no data to
+     * export, but a blank string would be inappropriate or misleading.
+     */
+    protected const string NOT_APPLICABLE_PLACEHOLDER = '-';
+
+    /**
      * A suffix for all fields in the CSV which are a draft value, or are
      * calculated from values which contain one or more drafts values.
      */
