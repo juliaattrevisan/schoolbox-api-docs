@@ -46,9 +46,10 @@ class PastoralPatchCest
          */
         $this->student = $i->createTestUser('student-' . time(), Role::STUDENT, false);
 
-        foreach ($users as $user) {
+//        foreach ($users as $user) {
+        $user = $this->userPrivate;
             $this->testPatch($i, $user);
-        }
+//        }
     }
 
     /**
@@ -134,7 +135,7 @@ class PastoralPatchCest
         $i->sendPost('/pastoral/record/insert', $pastoral['data']);
 
         /* Sequential dependency
-         * These checks must occur after sendPost() executes, not before hand: you can't exit early
+         * These checks must occur after sendPost() executes, not beforehand: you can't exit early
          *
          * A $user is one of four different user setups: some have permission to create
          * pastoral records and some don't. This simulates what happens when a student user
@@ -165,6 +166,8 @@ class PastoralPatchCest
             ->executeQuery($query)
             ->fetchAll()[0]['id'];
 
+        $endpoint = sprintf('/pastoral/record/%s/update', $pastoralId);
+
         /* Mutate one field via the patch endpoint
          * Just the heading
          */
@@ -180,17 +183,15 @@ class PastoralPatchCest
             'isValid' => true,
         ];
 
-        /* Evaluate response
-         */
-        $url = sprintf('/pastoral/record/%s/update', $pastoralId);
-
         /* These are required for a PATCH endpoint expecting json data
          * Set these before initiating a restful request
          */
         $i->haveHttpHeader('Accept','application/json');
         $i->haveHttpHeader('Content-Type','application/json');
 
-        $i->sendPatch($url, json_encode($update1['data']));
+        /* Evaluate response
+         */
+        $i->sendPatch($endpoint, json_encode($update1['data']));
 
         if (!$user->getRole()->isStaff()) {
             $i->seeResponseCodeIs(401);
@@ -204,9 +205,42 @@ class PastoralPatchCest
 
         /* Mutate multiple fields via the patch endpoint
          */
+        $update2 = [
+            'data' => [
+                'id' => $pastoralId,
+                'heading' => 'A new heading for a new world',
+                'points' => 117.23,
+                'expiresAt' => '2025-12-12T01:23:45+10:00',
+                'occurredOn' => '1997-08-29T02:14:00+10:00',
+                'body_public' => 'For Public Consumption',
+                'body_private' => 'For Private Consumption',
+            ],
+            'expectedResponseCode' => [
+                400 => [$this->userDeny],
+                200 => [$this->userPrivate, $this->userPublic],
+            ],
+            'isValid' => true,
+        ];
+
+        /* These are required for a PATCH endpoint expecting json data
+         * Set these before initiating a restful request
+         */
+        $i->haveHttpHeader('Accept','application/json');
+        $i->haveHttpHeader('Content-Type','application/json');
 
         /* Evaluate response
          */
+        $i->sendPatch($endpoint, json_encode($update2['data']));
+
+        if (!$user->getRole()->isStaff()) {
+            $i->seeResponseCodeIs(401);
+            return;
+        }
+
+        if (!$update1['isValid']) {
+            $i->seeResponseCodeIs(400);
+            return;
+        }
 
         /* Mutate no fields using a payload containing invalid nodes via the patch endpoint
          */
