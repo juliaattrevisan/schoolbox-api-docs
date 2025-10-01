@@ -38,9 +38,13 @@ class PastoralPatchCest
         $users = $i->getUsers();
 
         $this->userPrivate = $i->createTestUser('private-' . time(), Role::STAFF, false);
-        $this->userPublic  = $i->createTestUser('public-' . time(), Role::STAFF, false);
-        $this->userDeny    = $i->createTestUser('deny-' . time(), Role::STAFF, false);
-        $this->student     = $i->createTestUser('student-' . time(), Role::STUDENT, false);
+        $this->userPublic = $i->createTestUser('public-' . time(), Role::STAFF, false);
+        $this->userDeny = $i->createTestUser('deny-' . time(), Role::STAFF, false);
+
+        /* Pastoral records get created with this user as the recipient
+         * The foreach() below also tests a student creating the pastoral record for themselves
+         */
+        $this->student = $i->createTestUser('student-' . time(), Role::STUDENT, false);
 
         /** @var User $user */
         foreach ($users as $user) {
@@ -50,16 +54,81 @@ class PastoralPatchCest
 
     /**
      * @param ApiTester $i
-     * @param User      $operator
+     * @param User      $user
      * @return void
      * @throws \Aura\Di\Exception\ServiceNotFound
      */
-    private function testPatch(ApiTester $i, User $operator)
+    private function testPatch(ApiTester $i, User $user)
     {
+        /* A $user is one of four different user setups: some have permission to create
+         * pastoral records and some don't. This simulates what happens when a student user
+         * tries to create a pastoral record, etc.
+         */
+        if (!$user->getRole()->isStaff()) {
+            $i->seeResponseCodeIs(401);
+        }
+
+        /* Yoink the first Pastoral Type that is in the lookup, somewhat arbitrarily
+         */
+        /** @var \Schoolbox\Pastoral\Type\Model $pastoralType */
+        $pastoralType = $i->getPastoralTypes()->first();
+
+        /* Yoink the first Pastoral Subtype that is in the Pastoral Type, somewhat arbitrarily
+         */
+        $pastoralSubtype = $pastoralType->getSubTypes()->first()?->getId();
+
         /* Set up a pastoral record that's mostly complete.
          * It fulfils the minimum required fields, and maybe a couple more.
          * This emulates the most averagest pastoral record in the wild to my best estimation.
          */
+        $pastoral = [
+            'data' => [
+                'student_id' => $this->student->getId(),
+                'heading' => 'Base record for PATCH mutations',
+                'occurredOn' => \Alaress_Date_Format::now()->getLocalShort(),
+                'typeId' => $pastoralType->getId(),
+                'subtypeId' => $pastoralSubtype,
+                'severityId' => $i->getPastoralSeverities()->first()->getId(),
+                'role'=> [
+                    /* These are hardcoded in the user interface: valid options are
+                     *     role-type-student
+                     *     role-type-parent
+                     *     whatever the id happens to be for Staff roles (in sales data I suppose this is simply 1)
+                     */
+                    1 => Mapper::ACCESS_PUBLIC,
+                    'role-type-parent' => Mapper::ACCESS_PUBLIC,
+                ],
+                'group'               => [1 => Mapper::ACCESS_PUBLIC],
+                'user'                => [
+                    $this->userPrivate->getId() => Mapper::ACCESS_PRIVATE,
+                    $this->userPublic->getId()  => Mapper::ACCESS_PUBLIC,
+                    $this->userDeny->getId()    => Mapper::ACCESS_DENY,
+                ],
+                'public_attachments'  => ['store:723b6e31c2979b33deea852cdbbad9c4b0e00b96:piglet2.jpg'],
+                'private_attachments' => ['store:69903e5d89e1574d92de8afd1634f472e3096b3c:scrabble2.jpg'],
+                'tags'                => implode(',', [
+                    $i->getPastoralTags()->first()->getId(),
+                    $i->getPastoralTags()->last()->getId(),
+                ]),
+                'tagNames'            => "test tag A,test tag B",
+                'duplicateIds'        => '25,26',
+                'points'              => 100.1,
+                'body_public'         => "Public body\nPublic body.",
+                'body_private'        => "Private body\nPrivate body.",
+            ],
+            'expectedResponseCode' => [
+                400 => [$this->userDeny],
+                200 => [$this->userPrivate, $this->userPublic],
+            ],
+            'isValid'              => true,
+        ];
+
+        $i->comment("Testing as user {$user->getUsername()} [{$user->getId()}]");
+        $i->switchUser($user);
+
+        /* Create a pastoral record
+         */
+        $i->sendPost('/pastoral/record/insert', $pastoral);
 
         /* The following mutations occur on the same pastoral record, in sequence, to test
          * repeated mutability.
@@ -104,9 +173,7 @@ class PastoralPatchCest
 
 
         foreach ($this->getCreateTestData($i) as $postData) {
-            $i->comment("Testing as user {$operator->getUsername()} [{$operator->getId()}]");
-            $i->switchUser($operator);
-            $i->sendPost('/pastoral/record/insert', $postData['data']);
+
 
             // TODO: check role permission
             if (!$operator->getRole()->isStaff()) {
