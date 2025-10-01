@@ -91,9 +91,12 @@ class PastoralPatchCest
                 'severityId' => $i->getPastoralSeverities()->first()->getId(),
                 'role'=> [
                     /* These are hardcoded in the user interface: valid options are
-                     *     role-type-student
-                     *     role-type-parent
-                     *     whatever the id happens to be for Staff roles (in sales data I suppose this is simply 1)
+                     *     - role-type-student
+                     *     - role-type-parent
+                     *     - an integer id
+                     *         - this corresponds to "Administration" in sales data
+                     *         - this corresponds to "Staff" in demo datums
+                     *
                      */
                     1 => Mapper::ACCESS_PUBLIC,
                     'role-type-parent' => Mapper::ACCESS_PUBLIC,
