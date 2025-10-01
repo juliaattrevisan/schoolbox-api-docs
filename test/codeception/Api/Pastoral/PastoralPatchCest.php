@@ -80,7 +80,7 @@ class PastoralPatchCest
                 'typeId' => $pastoralType->getId(),
                 'subtypeId' => $pastoralSubtype,
                 'severityId' => $i->getPastoralSeverities()->first()->getId(),
-                'role'=> [
+                'role' => [
                     /* These are hardcoded in the user interface: valid options are
                      *     - role-type-student
                      *     - role-type-parent
@@ -170,8 +170,8 @@ class PastoralPatchCest
         /* These are required for a PATCH endpoint expecting json data
          * Set these before initiating a restful request
          */
-        $i->haveHttpHeader('Accept','application/json');
-        $i->haveHttpHeader('Content-Type','application/json');
+        $i->haveHttpHeader('Accept', 'application/json');
+        $i->haveHttpHeader('Content-Type', 'application/json');
 
         /* Mutate one field via the patch endpoint
          * Just the heading
@@ -336,8 +336,7 @@ class PastoralPatchCest
 
         /* Evaluate response
          */
-        $result =$i->sendPatch($endpoint, json_encode($update5['data']));
-        var_dump($result);
+        $i->sendPatch($endpoint, json_encode($update5['data']));
 
         if (!$user->getRole()->isStaff()) {
             $i->seeResponseCodeIs(401);
