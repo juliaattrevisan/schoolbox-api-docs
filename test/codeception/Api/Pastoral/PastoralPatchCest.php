@@ -315,10 +315,16 @@ class PastoralPatchCest
                 'id' => $pastoralId,
                 'heading' => 'Roles and Groups updated',
                 'role' => [
+                    /* Administration
+                     */
                     1 => 1,
                 ],
                 'group' => [
+                    /* Year 9 Coordinators
+                     */
                     1 => 1,
+                    /* Student Wellbeing Team
+                     */
                     2 => 1,
                 ],
             ],
