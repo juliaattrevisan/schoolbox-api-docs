@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Learning\Turnitin\Cli;
 
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Learning\Turnitin;
 use Schoolbox\Learning\Turnitin\Exception\Exception;
@@ -160,6 +161,8 @@ HELP;
             $this->getLogger()
         ));
 
+        $this->processFailedReports();
+
         /* Start kicking things along
          *
          * Loaded reports get shoved toward Prepared
@@ -179,6 +182,30 @@ HELP;
         $lock->release();
     }
 
+    /** Find reports that have been stuck in the analysing state for more than 24 hours and mark them as error */
+    private function processFailedReports(): void
+    {
+        if ($this->getOpt(self::OPT_LONG_REPORT_ID)) {
+            return;
+        }
+
+        $pb = Turnitin\File\Mapper::getInstance()->getPredicateBuilder();
+        $pb->equals('status', Turnitin\File\Model::STATUS_REPORT_ANALYSING)
+           ->lessThan('created_at', date('Y-m-d H:i:s', time() - 86400))
+           ->isNull('deleted_at');
+
+        $models = Turnitin\File\Mapper::getInstance()->findByPredicates($pb);
+
+        foreach ($models as $model) {
+            $this->getLogger()->info(sprintf(
+                'Marking report %s as failed due to over 24 hours in analysing state',
+                $model->getId()
+            ));
+            $model->setStatus(Turnitin\File\Model::STATUS_ERROR);
+            $model->setErrorMessage('Report failed due to over 24 hours in analysing state');
+            Turnitin\File\Mapper::getInstance()->save($model);
+        }
+    }
 
     /**
      * Find all the reports that were loaded and move them into Prepared, meaning
