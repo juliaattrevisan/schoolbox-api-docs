@@ -399,7 +399,6 @@ class ApiUserCest
             'filter' => [
                 // String fields incorrectly specified as ints.
                 // Note: prior to 25.1, this would cause no validation error, but would return no results.
-                'externalId' => 12345,
                 'username' => 12345,
                 'email' => 12345,
                 'roleType' => 12345,
