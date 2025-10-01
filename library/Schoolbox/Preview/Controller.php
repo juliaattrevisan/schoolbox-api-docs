@@ -123,13 +123,13 @@ class Controller extends Base
         $fullPath = realpath($basePath . implode('/', $pathParts));
         if (str_starts_with($fullPath, $basePath) && file_exists($fullPath) && is_readable($fullPath)) {
             // What is this filetype?
+            // Use a proper mimetype for common web files, otherwise guess
             $mimetype = match (pathinfo($fullPath, PATHINFO_EXTENSION)) {
-                'js'          => 'application/javascript',
-                'css'         => 'text/css',
-                'png'         => 'image/png',
-                'jpg', 'jpeg' => 'image/jpeg',
-                'svg'         => 'image/svg+xml',
-                default       => mime_content_type($fullPath) ?: 'application/octet-stream',
+                'js'    => 'application/javascript',
+                'html'  => 'text/html',
+                'css'   => 'text/css',
+                'svg'   => 'image/svg+xml',
+                default => mime_content_type($fullPath) ?: 'application/octet-stream',
             };
             $this->response = $this->responseFromStream(new Stream(fopen($fullPath, 'r')), null, $mimetype);
         } else {
