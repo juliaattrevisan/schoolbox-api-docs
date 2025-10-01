@@ -278,7 +278,8 @@ services:
     depends_on:
       redis-storage:
         condition: service_healthy
-    image: schoolbox/epl:latest
+    build:
+      context: ./schoolbox-etherpad
     env_file: ./schoolbox-etherpad/default.env
 
   clamav:
