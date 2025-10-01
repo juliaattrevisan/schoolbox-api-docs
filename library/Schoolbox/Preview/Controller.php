@@ -122,11 +122,16 @@ class Controller extends Base
         $basePath = SITE_root . '/www/static/js/pdf/pdfjs/';
         $fullPath = realpath($basePath . implode('/', $pathParts));
         if (str_starts_with($fullPath, $basePath) && file_exists($fullPath) && is_readable($fullPath)) {
-            $this->response = $this->responseFromStream(
-                new Stream(fopen($fullPath, 'r')),
-                null,
-                mime_content_type($fullPath) ?: 'application/octet-stream'
-            );
+            // What is this filetype?
+            $mimetype = match (pathinfo($fullPath, PATHINFO_EXTENSION)) {
+                'js'          => 'application/javascript',
+                'css'         => 'text/css',
+                'png'         => 'image/png',
+                'jpg', 'jpeg' => 'image/jpeg',
+                'svg'         => 'image/svg+xml',
+                default       => mime_content_type($fullPath) ?: 'application/octet-stream',
+            };
+            $this->response = $this->responseFromStream(new Stream(fopen($fullPath, 'r')), null, $mimetype);
         } else {
             throw new NotFound();
         }
