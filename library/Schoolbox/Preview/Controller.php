@@ -119,8 +119,9 @@ class Controller extends Base
     public function pdfJs(array $pathParts)
     {
         // Passthru whatever PDF.js path was requested
-        $fullPath = SITE_root . '/www/static/js/pdf/pdfjs/' . implode('/', $pathParts);
-        if (file_exists($fullPath) && is_readable($fullPath)) {
+        $basePath = SITE_root . '/www/static/js/pdf/pdfjs/';
+        $fullPath = realpath($basePath . implode('/', $pathParts));
+        if (str_starts_with($fullPath, $basePath) && file_exists($fullPath) && is_readable($fullPath)) {
             $this->response = $this->responseFromStream(
                 new Stream(fopen($fullPath, 'r')),
                 null,
