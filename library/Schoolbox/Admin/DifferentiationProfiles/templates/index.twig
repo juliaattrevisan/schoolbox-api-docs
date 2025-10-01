@@ -1,0 +1,53 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 island">
+            <form method="post" action="{{ routeLookup('differentiationProfiles.postConfig') }}">
+                <section>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label id="differentiation-profiles" class="inline-block" for="differentiation-profiles-field">
+                                <span class="{% if differentiationProfilesEnabled.required ?? false %} required-with-tip{% endif %}">{{ (differentiationProfilesEnabled.title ?? '')|trim }}</span>
+                                {% if differentiationProfilesEnabled.description|trim %}
+                                    <span data-tooltip class="hint has-tip tip-bottom" title="{{ differentiationProfilesEnabled.description }}">?</span>
+                                {% endif %}
+                            </label>
+                            <div class="switch">
+                                <input id="differentiation-profiles-field" type="checkbox" name="enabled" {% if differentiationProfilesEnabled.value ?? false %}checked{% endif %}/>
+                                <label for="differentiation-profiles-field">
+                                    <span>On</span>
+                                    <span>Off</span>
+                                </label>
+                            </div>
+                        </div>
+                    </fieldset>
+                </section>
+{#                <section>#}
+{#                    <fieldset class="content">#}
+{#                        {% for differentiationProfile in differentiationProfilesConfig %}#}
+{#                        <div class="small-12 columns">#}
+{#                            <div class="switch">#}
+{#                                <input id="differentiation-profiles-adjustments-field" type="checkbox" name="enabled" {% if differentiationProfile.isEnabled ?? false %}checked{% endif %}/>#}
+{#                                <label for="differentiation-profiles-adjustments-field">#}
+{#                                    <span>On</span>#}
+{#                                    <span>Off</span>#}
+{#                                </label>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                        {% endfor %}#}
+{#                    </fieldset>#}
+{#                </section>#}
+                <div class="row">
+                    <div class="small-12 column">
+                        <input type="hidden" name="returnUrl" value="{{ returnUrl }}">
+                        <input type="submit" name="btnSubmit" value="Save">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

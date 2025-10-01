@@ -395,6 +395,11 @@ class ConfigMapper extends Mapper
     public const NAME_OPENAI_IMAGE_OUTPUT_QUALITY = 'openai_image_output_quality';
 
 
+    /* Differentiation profiles
+     */
+    public const NAME_DIFFERENTIATION_PROFILE_ENABLED = 'differentiation_profiles_enabled';
+
+
     public const NAME_DATASET_INSTANCE = 'dataset_instance';
     /**
      * Isams specific

@@ -155,5 +155,9 @@ class Admin extends ModuleLoader
         /* Editor Templates
          */
         $this->loadModule($di, \Schoolbox\Admin\Editor\Templates\Module::class, '/adminv2/editor-templates');
+
+        /* Learner Profiles
+         */
+        $this->loadModule($di, \Schoolbox\Admin\DifferentiationProfiles\Module::class, '/adminv2/pastoral/differentiation-profiles');
     }
 }
