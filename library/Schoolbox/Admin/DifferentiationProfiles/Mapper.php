@@ -1,8 +1,7 @@
 <?php
 
 /**
- * @author      Steve Chan <steve.chan@alaress.com.au>
- * @copyright   Copyright 2024, Schoolbox Pty Ltd
+ * @copyright   Copyright 2025, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
@@ -39,18 +38,4 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('module', self::TYPE_STRING);
         $this->uses('sequence', self::TYPE_INTEGER);
     }
-
-    /**
-     * Example pre-save validation.
-     *
-     * @param Model $model
-     * @return bool
-     */
-//    public function validateUserId(Model $model): bool
-//    {
-//        if ($model->getUser()->getId() > 100) {
-//            throw new UnexpectedValueException('User cannot have an ID above 100');
-//        }
-//        return true;
-//    }
 }

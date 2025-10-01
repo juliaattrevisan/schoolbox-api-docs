@@ -1,4 +1,4 @@
-INSERT INTO config (`name`, `title`, `value`, `description`, `field_id`,  `type_id`, `editable`, `hidden`, `required`, `module`, sequence)
+INSERT INTO config (`name`, `title`, `value`, `description`, `field_id`,  `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
 VALUES (
            'differentiation_profiles_enabled',
            'Enable Differentiation Profiles',
