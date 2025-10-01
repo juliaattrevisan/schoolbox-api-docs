@@ -22,20 +22,20 @@ class UserAccess implements IModel
      * Service permission constants.
      * These are the possible values of $this->service, and correspond to IDs from the lu_service database table.
      */
-    public const SERVICE_HOMEPAGE = 1; // Note SERVICE_HOMEPAGE is used to define group membership.  See User->isGroupMember().
-    public const SERVICE_CALENDAR = 2; // Note SERVICE_CALENDAR is special, in that it requires a campusId to be set in userAccess.sid.
-    public const SERVICE_NEWS = 3;
-    public const SERVICE_CMS = 5;
-    public const SERVICE_RESOURCE_BOOKING = 7;
-    public const SERVICE_CURRICULUM = 8;
-    public const SERVICE_PASTORAL = 9;
-    public const SERVICE_SPORTS_ADMINISTRATOR = 10; // This pertains to the Fixtures section.
-    public const SERVICE_BADGE = 11;
-    public const SERVICE_TIMETABLE = 12;
-    public const SERVICE_DESIGN = 13;
-    public const SERVICE_LMS = 14;
-    public const SERVICE_IMPERSONATOR = 15; // Note SERVICE_IMPERSONATOR is special, in that it requires a roleId to be set in userAccess.sid.
-    public const SERVICE_DIFFERENTIATION_PROFILE_MANAGEMENT = 16;
+    public const int SERVICE_HOMEPAGE = 1; // Note SERVICE_HOMEPAGE is used to define group membership.  See User->isGroupMember().
+    public const int SERVICE_CALENDAR = 2; // Note SERVICE_CALENDAR is special, in that it requires a campusId to be set in userAccess.sid.
+    public const int SERVICE_NEWS = 3;
+    public const int SERVICE_CMS = 5;
+    public const int SERVICE_RESOURCE_BOOKING = 7;
+    public const int SERVICE_CURRICULUM = 8;
+    public const int SERVICE_PASTORAL = 9;
+    public const int SERVICE_SPORTS_ADMINISTRATOR = 10; // This pertains to the Fixtures section.
+    public const int SERVICE_BADGE = 11;
+    public const int SERVICE_TIMETABLE = 12;
+    public const int SERVICE_DESIGN = 13;
+    public const int SERVICE_LMS = 14;
+    public const int SERVICE_IMPERSONATOR = 15; // Note SERVICE_IMPERSONATOR is special, in that it requires a roleId to be set in userAccess.sid.
+    public const int SERVICE_DIFFERENTIATION_PROFILE_MANAGEMENT = 16;
 
     /**
      * Services that do not have service identifiers (sid) use this value
@@ -139,6 +139,7 @@ class UserAccess implements IModel
             self::SERVICE_DESIGN,
             self::SERVICE_LMS,
             self::SERVICE_IMPERSONATOR,
+            self::SERVICE_DIFFERENTIATION_PROFILE_MANAGEMENT,
         ];
     }
 
@@ -153,6 +154,7 @@ class UserAccess implements IModel
             self::SERVICE_HOMEPAGE,
             self::SERVICE_CALENDAR,
             self::SERVICE_IMPERSONATOR,
+            self::SERVICE_DIFFERENTIATION_PROFILE_MANAGEMENT,
         ];
     }
 
