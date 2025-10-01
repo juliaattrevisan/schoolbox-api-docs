@@ -31,27 +31,29 @@ class Validator
      */
     public function validateForApiUserSearch(WebRequestValues $requestQuery): array
     {
+        // Note any value (including integers) that is supplied directly in the URL will arrive here as a string.
+        // The default values set here should be strings also for consistency.
         $search = $requestQuery->get('search', '');
         $cursor = $requestQuery->get('cursor', '');
-        $limit = $requestQuery->get('limit', 5);
+        $limit = $requestQuery->get('limit', '5');
         $filterJson = $requestQuery->get('filter', '');
-
-        // Unfortunately, this API endpoint was in operation for a long time before validation was implemented.
-        // In order not to break previously working requests, we need to be a bit lenient with type checks.
-        // So we allow digit strings for parameters that ought to be integers, etc.
 
         if (!is_string($search)) {
             throw new SchoolboxException("Parameter 'search' must have a string value.");
         }
 
-        if (!is_int($limit) && !(is_string($limit) && ctype_digit($limit))) { // Allow digit string for backwards compatibility.
-            throw new SchoolboxException("Parameter 'limit' should have an integer value.");
+        if (!ctype_digit($limit)) {
+            // The API docs say 'integer' here, but the value will always be a string because it comes from the URL.
+            throw new SchoolboxException("Parameter 'limit' should have an integer or integer string value.");
         }
         $limit = (int)$limit; // Set type to that expected according to the API docs.
 
-        // Cursor values ought to be strings according to the API docs.
-        if (!is_string($cursor) && !is_int($cursor)) { // Allow integer for backwards compatibility.
-            throw new SchoolboxException("Parameter 'cursor' should have a numeric string value.");
+        if (!ctype_digit($cursor)) {
+            // The API docs say the value for 'cursor' should be a string.  That is because 'cursor' in the API docs
+            // has a templated docblock, and cursors in general can be strings.  So the API docs are fine, and we
+            // must cope with that.  This specific cursor should be an integer string, which is also fine and doesn't
+            // contradict the API docs.
+            throw new SchoolboxException("Parameter 'cursor' should have an integer or integer string value.");
         }
         $cursor = (string)$cursor; // Set type to that expected according to the API docs.
 
