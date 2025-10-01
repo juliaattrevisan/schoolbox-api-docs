@@ -46,10 +46,9 @@ class PastoralPatchCest
          */
         $this->student = $i->createTestUser('student-' . time(), Role::STUDENT, false);
 
-//        foreach ($users as $user) {
-        $user = $this->userPrivate;
+        foreach ($users as $user) {
             $this->testPatch($i, $user);
-//        }
+        }
     }
 
     /**
