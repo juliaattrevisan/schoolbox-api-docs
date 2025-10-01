@@ -286,7 +286,7 @@ class Controller extends Base
          */
         $moment = $evidence;
 
-        $translator = $this->buildTranslatorWithComments(self::MOMENT_MAX_EVIDENCE);
+        $translator = $this->buildTranslatorWithComments(10);
 
         /* Decide whether the current user can comment on this student's learning moments
          *
