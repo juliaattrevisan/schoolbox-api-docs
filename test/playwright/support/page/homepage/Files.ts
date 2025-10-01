@@ -17,6 +17,7 @@ export default class Files {
     static readonly ELEMENT_ATTACH_FILE_BUTTON = "#CmsZone";
     static readonly ELEMENT_MY_FILES_LINK = 'a.icon-files[href="#filesystem-myfile-panel"]';
     static readonly ELEMENT_FILE_ITEM = 'a[title="Abby"]';
+    static readonly ELEMENT_PREVIEW_FILES = '.action-list li a[data-plugin="preview"] h3';
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -86,5 +87,119 @@ export default class Files {
         }
 
         await page.click(Files.ELEMENT_POST_FILE_BUTTON);
+    }
+
+    /**
+     *
+     * @param filesComponent - The files component locator
+
+     */
+    public static async sortImageFiles(filesComponent: Locator): Promise<void> {
+        await filesComponent.locator('label[for$="-filter-document"]').click();
+        await filesComponent.locator('label[for$="-filter-audio"]').click();
+        await filesComponent.locator('label[for$="-filter-video"]').click();
+        await filesComponent.locator('label[for$="-filter-other"]').click();
+        await filesComponent.locator('input[value="Update"]').click();
+        await expect(filesComponent.locator('select[name="sort"]')).toBeHidden();
+    }
+
+    /**
+     *
+     * @param filesComponent - The files component locator
+
+     */
+    public static async sortVideoAndDocumentFiles(filesComponent: Locator): Promise<void> {
+        await filesComponent.locator('label[for$="-filter-document"]').click();
+        await filesComponent.locator('label[for$="-filter-video"]').click();
+        await filesComponent.locator('label[for$="-filter-image"]').click();
+        await filesComponent.locator('input[value="Update"]').click();
+        await expect(filesComponent.locator('select[name="sort"]')).toBeHidden();
+    }
+
+    /*
+     * Retrieve all file titles from a files component
+     * @param filesComponent - The files component locator
+     * @returns An array of file titles
+     */
+    public static async getAllFiles(filesComponent: Locator): Promise<string[]> {
+        const filesLocator = filesComponent.locator(Files.ELEMENT_PREVIEW_FILES);
+        const fileTexts = await filesLocator.allTextContents();
+        return fileTexts;
+    }
+
+    /**
+     *
+     * @param filesComponent - The files component locator
+     * @param sortBy - The criteria to sort by (e.g., 'Name' or 'Date')
+     * @param sortingOrder - The order of sorting (e.g., 'Ascending' or 'Descending')
+     */
+    public static async sortFiles(filesComponent: Locator, sortBy: string, sortingOrder: string): Promise<void> {
+        await filesComponent.locator('label[for$="-filter-audio"]').click();
+        await filesComponent.locator('label[for$="-filter-image"]').click();
+        await filesComponent.locator('label[for$="-filter-other"]').click();
+        await filesComponent.locator('select[name="sort"]').selectOption(sortBy);
+        await filesComponent.locator('select[name="sortdir"]').selectOption(sortingOrder);
+        await filesComponent.locator('input[value="Update"]').click();
+        await expect(filesComponent.locator('select[name="sort"]')).toBeHidden();
+    }
+
+    /**
+     *
+     * @param filesComponent - The files component locator
+     * @param sortBy - The criteria to sort by (e.g., 'Name' or 'Date')
+     * @param sortingOrder - The order of sorting (e.g., 'Ascending' or 'Descending')
+     */
+    public static async sortFilesDesc(filesComponent: Locator, sortBy: string, sortingOrder: string): Promise<void> {
+        await filesComponent.locator('select[name="sort"]').selectOption(sortBy);
+        await filesComponent.locator('select[name="sortdir"]').selectOption(sortingOrder);
+        await filesComponent.locator('input[value="Update"]').click();
+        await expect(filesComponent.locator('select[name="sort"]')).toBeHidden();
+    }
+
+    /**
+     *
+     * @param linkComponent - The links component locator
+     * @param Limit - The number of links to display (e.g., '5', '10', '15', '25', 'All')
+     */
+    public static async setFileLimit(fileComponent: Locator, Limit: string): Promise<void> {
+        await fileComponent.locator("select[name='size']").selectOption(Limit);
+        await fileComponent.locator('input[value="Update"]').click();
+        await expect(fileComponent.locator('select[name="sort"]')).toBeHidden();
+    }
+
+    /**
+     *
+     * @param fileComponent - The files component locator
+     * @param limit - The number of links to display (e.g., '5', '10', '15', '25', 'All')
+     * @param componentId - The ID of the component
+     * @param showTitle - Whether to show the component title (default: true)
+     */
+    public static async updateFileComponentSetting(fileComponent: Locator): Promise<void> {
+        await fileComponent.locator('label[for$="-compactMode"]').click();
+        await fileComponent.locator('label[for$="-showComponentTitle"]').click();
+        await fileComponent.locator('input[value="Update"]').click();
+        await expect(fileComponent.locator("select[name='size']")).toBeHidden();
+    }
+
+    /*
+     * Check the description and metadata of a specific link in a links component
+     * @param linkComponent - The links component locator
+     * @param expectedTitle - The expected title of the link
+     * @param expectedDesc - The expected description of the link
+     */
+    public static async checkFileDescription(
+        fileComponent: Locator,
+        expectedTitle: string,
+        expectedDesc: string,
+    ): Promise<void> {
+        const REGEX_TIMESTAMP =
+            /\b(?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{1,2},\s\d{4}\s\d{1,2}:\d{2}\s?(?:am|pm)|(?:just now|\d+\s+(?:second|minute|hour|day|week|month|year)s?\s+ago))\b/i;
+        const ELEMENT_METADATA_P = `//h3[normalize-space()='${expectedTitle}']/ancestor::div[contains(@class,'card')]//p`;
+        const allTexts = await fileComponent.locator(ELEMENT_METADATA_P).allTextContents();
+        const meta = allTexts[0].trim();
+        const actualDesc = allTexts[1].trim();
+        expect(meta).toContain("Schoolbox Admin");
+        expect(meta).toMatch(REGEX_TIMESTAMP);
+        expect(actualDesc).toBe(expectedDesc);
     }
 }
