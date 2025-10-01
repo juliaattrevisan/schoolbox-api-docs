@@ -244,6 +244,40 @@ class PastoralPatchCest
 
         /* Mutate no fields using a payload containing invalid nodes via the patch endpoint
          */
+        $update3 = [
+            'data' => [
+                'id' => $pastoralId,
+                'cat' => 'meow',
+                'dog' => 'woof',
+                'horse' => 'neighborhood',
+                'lion' => 'rawr',
+            ],
+            'expectedResponseCode' => [
+                400 => [$this->userDeny],
+                200 => [$this->userPrivate, $this->userPublic],
+            ],
+            'isValid' => true,
+        ];
+
+        /* These are required for a PATCH endpoint expecting json data
+         * Set these before initiating a restful request
+         */
+        $i->haveHttpHeader('Accept','application/json');
+        $i->haveHttpHeader('Content-Type','application/json');
+
+        /* Evaluate response
+         */
+        $i->sendPatch($endpoint, json_encode($update3['data']));
+
+        if (!$user->getRole()->isStaff()) {
+            $i->seeResponseCodeIs(401);
+            return;
+        }
+
+        if (!$update1['isValid']) {
+            $i->seeResponseCodeIs(400);
+            return;
+        }
 
         /* Evaluate response
          */
