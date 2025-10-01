@@ -202,6 +202,7 @@ HELP;
                 $model->getId()
             ));
             $model->setStatus(Turnitin\File\Model::STATUS_ERROR);
+            $model->setErrorCode('TIMEOUT');
             $model->setErrorMessage('Report failed due to over 24 hours in analysing state');
             Turnitin\File\Mapper::getInstance()->save($model);
         }
