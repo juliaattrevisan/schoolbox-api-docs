@@ -168,6 +168,12 @@ class PastoralPatchCest
 
         $endpoint = sprintf('/pastoral/record/%s/update', $pastoralId);
 
+        /* These are required for a PATCH endpoint expecting json data
+         * Set these before initiating a restful request
+         */
+        $i->haveHttpHeader('Accept','application/json');
+        $i->haveHttpHeader('Content-Type','application/json');
+
         /* Mutate one field via the patch endpoint
          * Just the heading
          */
@@ -182,12 +188,6 @@ class PastoralPatchCest
             ],
             'isValid' => true,
         ];
-
-        /* These are required for a PATCH endpoint expecting json data
-         * Set these before initiating a restful request
-         */
-        $i->haveHttpHeader('Accept','application/json');
-        $i->haveHttpHeader('Content-Type','application/json');
 
         /* Evaluate response
          */
@@ -222,12 +222,6 @@ class PastoralPatchCest
             'isValid' => true,
         ];
 
-        /* These are required for a PATCH endpoint expecting json data
-         * Set these before initiating a restful request
-         */
-        $i->haveHttpHeader('Accept','application/json');
-        $i->haveHttpHeader('Content-Type','application/json');
-
         /* Evaluate response
          */
         $i->sendPatch($endpoint, json_encode($update2['data']));
@@ -258,12 +252,6 @@ class PastoralPatchCest
             ],
             'isValid' => true,
         ];
-
-        /* These are required for a PATCH endpoint expecting json data
-         * Set these before initiating a restful request
-         */
-        $i->haveHttpHeader('Accept','application/json');
-        $i->haveHttpHeader('Content-Type','application/json');
 
         /* Evaluate response
          */
@@ -304,12 +292,6 @@ class PastoralPatchCest
             ],
             'isValid' => true,
         ];
-
-        /* These are required for a PATCH endpoint expecting json data
-         * Set these before initiating a restful request
-         */
-        $i->haveHttpHeader('Accept','application/json');
-        $i->haveHttpHeader('Content-Type','application/json');
 
         /* Evaluate response
          */
