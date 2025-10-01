@@ -252,19 +252,9 @@ class CSV extends AbstractCSV
         $suffix            = $isDraft ? self::DRAFT_SUFFIX : '';
         $humanReadableMark = $showDisplayMarks ? $mark['hr'] : $mark['hrInstructor'];
         if ($this->hasTotalMarkColumn($assessment, $showDisplayMarks)) {
-            $numerator = $this->parseNumerator($humanReadableMark);
-            $denominator = $this->parseDenominator($humanReadableMark);
-            if ($numerator !== null && $denominator !== null) {
-                $row[] = $numerator . $suffix;
-                $row[] = $denominator . $suffix;
-            } else {
-                // Although this assessment has a total mark column, the human-readable mark is not
-                // fractional.  This will be because the mark type of the assessment has changed after the
-                // mark was given.  Do not attempt to convert the mark to a fraction.  Just export the
-                // human-readable mark in the numerator column and an N/A placeholder in the denominator column.
-                $row[] = $humanReadableMark;
-                $row[] = self::NOT_APPLICABLE_PLACEHOLDER;
-            }
+            [$numerator, $denominator] = $this->parseNumeratorAndDenominatorFromHumanReadableMark($humanReadableMark);
+            $row[] = $numerator . $suffix;
+            $row[] = $denominator . $suffix;
         } else {
             $row[] = $humanReadableMark . $suffix;
         }

@@ -154,6 +154,33 @@ class AbstractCSV
 
 
     /**
+     * @param null|string $humanReadableMark
+     * @return array
+     */
+    protected function parseNumeratorAndDenominatorFromHumanReadableMark(?string $humanReadableMark): array
+    {
+        if (empty($humanReadableMark)) {
+            $numerator = '';
+            $denominator = '';
+        } else {
+            $numerator = $this->parseNumerator($humanReadableMark);
+            $denominator = $this->parseDenominator($humanReadableMark);
+
+            if ($numerator === null || $denominator === null) {
+                // Either both numerator and denominator should be parseable, or both not.
+                // If we cannot parse both, this cause will be that the mark type of the assessment has changed after
+                // the mark was given.  In this situation do not attempt to convert the mark to a fraction.  Just export
+                // the human-readable mark as the numerator and a Not-Applicable placeholder as the denominator.
+                $numerator = $humanReadableMark;
+                $denominator = self::NOT_APPLICABLE_PLACEHOLDER;
+            }
+        }
+
+        return [$numerator, $denominator];
+    }
+
+
+    /**
      * Parse the denominator from a total mark
      *
      * @param null|string $humanReadableMark
