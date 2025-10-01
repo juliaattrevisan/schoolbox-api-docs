@@ -23,6 +23,12 @@ use Schoolbox\User;
 class CSV extends AbstractCSV
 {
     /**
+     * This should be used in situations where there is no data to
+     * export, but a blank string would be inappropriate or misleading.
+     */
+    private const string NOT_APPLICABLE_PLACEHOLDER = '-';
+
+    /**
      * Export the course markbook
      *
      * @param CourseMarkbook $courseMarkbook
@@ -252,8 +258,19 @@ class CSV extends AbstractCSV
         $suffix            = $isDraft ? self::DRAFT_SUFFIX : '';
         $humanReadableMark = $showDisplayMarks ? $mark['hr'] : $mark['hrInstructor'];
         if ($this->hasTotalMarkColumn($assessment, $showDisplayMarks)) {
-            $row[] = $this->parseNumerator($humanReadableMark) . $suffix;
-            $row[] = $this->parseDenominator($humanReadableMark) . $suffix;
+            $numerator = $this->parseNumerator($humanReadableMark);
+            $denominator = $this->parseDenominator($humanReadableMark);
+            if ($numerator !== null && $denominator !== null) {
+                $row[] = $numerator . $suffix;
+                $row[] = $denominator . $suffix;
+            } else {
+                // Although this assessment has a total mark column, the human-readable mark is not
+                // fractional.  This will be because the mark type of the assessment has changed after the
+                // mark was given.  Do not attempt to convert the mark to a fraction.  Just export the
+                // human-readable mark in the numerator column and an N/A placeholder in the denominator column.
+                $row[] = $humanReadableMark;
+                $row[] = self::NOT_APPLICABLE_PLACEHOLDER;
+            }
         } else {
             $row[] = $humanReadableMark . $suffix;
         }
