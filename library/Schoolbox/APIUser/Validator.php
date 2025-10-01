@@ -48,11 +48,11 @@ class Validator
         }
         $limit = (int)$limit; // Set type to that expected according to the API docs.
 
-        if (!ctype_digit($cursor)) {
+        if ($cursor !== '' && !ctype_digit($cursor)) {
             // The API docs say the value for 'cursor' should be a string.  That is because 'cursor' in the API docs
             // has a templated docblock, and cursors in general can be strings.  So the API docs are fine, and we
             // must cope with that.  This specific cursor should be an integer string, which is also fine and doesn't
-            // contradict the API docs.
+            // contradict the API docs.  A blank string cursor is equivalent to no cursor value.
             throw new SchoolboxException("Parameter 'cursor' should have an integer or integer string value.");
         }
         $cursor = (string)$cursor; // Set type to that expected according to the API docs.
