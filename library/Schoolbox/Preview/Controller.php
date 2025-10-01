@@ -9,6 +9,8 @@
 namespace Schoolbox\Preview;
 
 use Alaress\Web\Controller\Base;
+use GuzzleHttp\Psr7\Stream;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Cyberhound\Url\Translator;
 
 /**
@@ -104,5 +106,28 @@ class Controller extends Base
         unset($previewFragment['twig']);
 
         $this->response = $this->responseAsJson($previewFragment);
+    }
+
+    /**
+     * Serve any PDF.js file.
+     *
+     * @api GET /preview/pdfjs/{pathParts:.*}
+     *
+     * @param array  $pathParts All parts of the path.
+     * @return void
+     */
+    public function pdfJs(array $pathParts)
+    {
+        // Passthru whatever PDF.js path was requested
+        $fullPath = SITE_root . '/www/static/js/pdf/pdfjs/' . implode('/', $pathParts);
+        if (file_exists($fullPath) && is_readable($fullPath)) {
+            $this->response = $this->responseFromStream(
+                new Stream(fopen($fullPath, 'r')),
+                null,
+                mime_content_type($fullPath) ?: 'application/octet-stream'
+            );
+        } else {
+            throw new NotFound();
+        }
     }
 }
