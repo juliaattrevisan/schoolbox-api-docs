@@ -308,6 +308,41 @@ class PastoralPatchCest
         }
 
 
+        /* Chuck some roles and groups on
+         */
+        $update5 = [
+            'data' => [
+                'id' => $pastoralId,
+                'heading' => 'Roles and Groups updated',
+                'role' => [
+                    1 => 1,
+                ],
+                'group' => [
+                    1 => 1,
+                    2 => 1,
+                ],
+            ],
+            'expectedResponseCode' => [
+                400 => [$this->userDeny],
+                200 => [$this->userPrivate, $this->userPublic],
+            ],
+            'isValid' => true,
+        ];
+
+        /* Evaluate response
+         */
+        $result = $i->sendPatch($endpoint, json_encode($update5['data']));
+
+        if (!$user->getRole()->isStaff()) {
+            $i->seeResponseCodeIs(401);
+            return;
+        }
+
+        if (!$update1['isValid']) {
+            $i->seeResponseCodeIs(400);
+            return;
+        }
+
 
 
 
