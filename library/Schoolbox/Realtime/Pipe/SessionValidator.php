@@ -100,7 +100,7 @@ class SessionValidator
             $session = $this->handler->unserialize(
                 $this->findData($instanceId, $sessionId, 'sessionID', PipeManager::REDIS_SESSION_PREFIX_BASE . $instanceId . ':')
             );
-        } catch (\RuntimeException $e) {
+        } catch (\RuntimeException | \ErrorException $e) {
             throw new SessionException('Could not decode session', 0, $e);
         }
 
