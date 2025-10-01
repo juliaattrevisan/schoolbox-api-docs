@@ -26,18 +26,21 @@ See https://grafana.com/docs/k6/latest/set-up/install-k6/
 
 2. **Edit `config.js` with your test credentials:**
 ```javascript
-   export const credentials = [
+export const credentials = [
     {
         username: 'testuser1',
-        password: 'password1'
+        password: 'password1',
+        userId: 1
     },
     {
         username: 'testuser2',
-        password: 'password2'
+        password: 'password2',
+        userId: 2
     },
     {
         username: 'testuser3',
-        password: 'password3'
+        password: 'password3',
+        userId: 3
     }
 ];
 ```
