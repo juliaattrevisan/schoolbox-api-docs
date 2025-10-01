@@ -306,7 +306,7 @@ class PastoralPatchCest
             return;
         }
 
-        /* Chuck some roles and groups on
+        /* Chuck some actions, roles and groups on
          */
         $update5 = [
             'data' => [
@@ -325,6 +325,7 @@ class PastoralPatchCest
                      */
                     2 => 1,
                 ],
+                'actions' => [1, 3, 5]
             ],
             'expectedResponseCode' => [
                 400 => [$this->userDeny],
@@ -335,7 +336,8 @@ class PastoralPatchCest
 
         /* Evaluate response
          */
-        $i->sendPatch($endpoint, json_encode($update5['data']));
+        $result =$i->sendPatch($endpoint, json_encode($update5['data']));
+        var_dump($result);
 
         if (!$user->getRole()->isStaff()) {
             $i->seeResponseCodeIs(401);
