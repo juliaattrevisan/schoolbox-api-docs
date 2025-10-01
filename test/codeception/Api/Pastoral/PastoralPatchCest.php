@@ -101,29 +101,38 @@ class PastoralPatchCest
                     1 => Mapper::ACCESS_PUBLIC,
                     'role-type-parent' => Mapper::ACCESS_PUBLIC,
                 ],
-                'group'               => [1 => Mapper::ACCESS_PUBLIC],
-                'user'                => [
-                    $this->userPrivate->getId() => Mapper::ACCESS_PRIVATE,
-                    $this->userPublic->getId()  => Mapper::ACCESS_PUBLIC,
-                    $this->userDeny->getId()    => Mapper::ACCESS_DENY,
+                'group' => [
+                    /* These are ids of Pastoral Groups which are user-definable.
+                     * 1 corresponds to Year 9 Coordinators in the sales data
+                     */
+                    1 => Mapper::ACCESS_PUBLIC
                 ],
-                'public_attachments'  => ['store:723b6e31c2979b33deea852cdbbad9c4b0e00b96:piglet2.jpg'],
-                'private_attachments' => ['store:69903e5d89e1574d92de8afd1634f472e3096b3c:scrabble2.jpg'],
-                'tags'                => implode(',', [
+                'user' => [
+                    $this->userPrivate->getId() => Mapper::ACCESS_PRIVATE,
+                    $this->userPublic->getId() => Mapper::ACCESS_PUBLIC,
+                    $this->userDeny->getId() => Mapper::ACCESS_DENY,
+                ],
+                'public_attachments' => [
+                    'store:723b6e31c2979b33deea852cdbbad9c4b0e00b96:piglet2.jpg'
+                ],
+                'private_attachments' => [
+                    'store:69903e5d89e1574d92de8afd1634f472e3096b3c:scrabble2.jpg'
+                ],
+                'tags' => implode(',', [
                     $i->getPastoralTags()->first()->getId(),
                     $i->getPastoralTags()->last()->getId(),
                 ]),
-                'tagNames'            => "test tag A,test tag B",
-                'duplicateIds'        => '25,26',
-                'points'              => 100.1,
-                'body_public'         => "Public body\nPublic body.",
-                'body_private'        => "Private body\nPrivate body.",
+                'tagNames' => "test tag A,test tag B",
+                'duplicateIds' => '25,26',
+                'points' => 100.1,
+                'body_public' => "Public body\nPublic body.",
+                'body_private' => "Private body\nPrivate body.",
             ],
             'expectedResponseCode' => [
                 400 => [$this->userDeny],
                 200 => [$this->userPrivate, $this->userPublic],
             ],
-            'isValid'              => true,
+            'isValid' => true,
         ];
 
         $i->comment("Testing as user {$user->getUsername()} [{$user->getId()}]");
