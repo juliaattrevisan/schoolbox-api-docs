@@ -186,7 +186,7 @@ class AbstractCSV
      * @param null|string $humanReadableMark
      * @return null|string
      */
-    protected function parseDenominator(?string $humanReadableMark): ?string
+    private function parseDenominator(?string $humanReadableMark): ?string
     {
         if ($humanReadableMark && preg_match('/(\\d*\\.?\\d*)\\s*\\/\\s*(\\d*\\.?\\d*)/', $humanReadableMark, $markParts)) {
             return $markParts[2];
@@ -201,7 +201,7 @@ class AbstractCSV
      * @param null|string $humanReadableMark
      * @return null|string
      */
-    protected function parseNumerator(?string $humanReadableMark): ?string
+    private function parseNumerator(?string $humanReadableMark): ?string
     {
         if ($humanReadableMark && preg_match('/(\\d*\\.?\\d*)\\s*\\/\\s*(\\d*\\.?\\d*)/', $humanReadableMark, $markParts)) {
             return $markParts[1];
