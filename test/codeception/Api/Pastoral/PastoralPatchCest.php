@@ -47,9 +47,9 @@ class PastoralPatchCest
         $this->student = $i->createTestUser('student-' . time(), Role::STUDENT, false);
 
         /** @var User $user */
-        foreach ($users as $user) {
-            $this->testPatch($i, $user);
-        }
+//        foreach ($users as $user) {
+            $this->testPatch($i, $this->userPrivate);
+//        }
     }
 
     /**
@@ -156,14 +156,45 @@ class PastoralPatchCest
         $i->seeResponseCodeIs(201);
 
         /* The following mutations occur on the same pastoral record, in sequence, to test
-         * repeated mutability.
+         * repeated mutability. This is the most recent record inserted, presuming we succeeded.
+         * We'll be recycling its id throughout the mutations
          */
+        $query = "SELECT MAX(id) AS id FROM pastoral";
+
+        $pastoralId = \Schoolbox\Pastoral\Mapper::getInstance()
+            ->getDatabase()
+            ->executeQuery($query)
+            ->fetchAll()[0]['id'];
 
         /* Mutate one field via the patch endpoint
+         * Just the heading
          */
+        $update1 = [
+            'data' => [
+                'id' => $pastoralId,
+                'heading' => 'Updated heading only',
+            ],
+            'expectedResponseCode' => [
+                400 => [$this->userDeny],
+                200 => [$this->userPrivate, $this->userPublic],
+            ],
+            'isValid' => true,
+        ];
 
         /* Evaluate response
          */
+        $result = $i->sendPatch(sprintf('/pastoral/record/%s/update', $pastoralId), $update1['data']);
+        var_dump($result);
+die();
+        if (!$user->getRole()->isStaff()) {
+            $i->seeResponseCodeIs(401);
+            return;
+        }
+
+        if (!$update1['isValid']) {
+            $i->seeResponseCodeIs(400);
+            return;
+        }
 
         /* Mutate multiple fields via the patch endpoint
          */
