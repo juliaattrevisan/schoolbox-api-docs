@@ -86,7 +86,12 @@ class Validator
             switch ($key) {
                 case 'externalId':
                     if (!is_string($value) && !is_int($value)) { // Allow integers also for backwards compatibility.
-                        throw new SchoolboxException("Filter 'externalId' must have a string value.");
+                        // The API docs say the value for 'externalId' should be a string.  That is because string is
+                        // a more general type than int, and some external systems may use strings as identifiers.
+                        // Also the relevant database field (user.synergetic_id has a type of varchar).
+                        // However, it is common for users to supply externalId as an integer, and that has worked in the
+                        // past.  Therefore we accept integers as well as strings.
+                        throw new SchoolboxException("Filter 'externalId' must have a string or integer value.");
                     }
                     break;
                 case 'username':
