@@ -119,11 +119,6 @@ class PastoralPatchCest
                 'body_public' => "Public body\nPublic body.",
                 'body_private' => "Private body\nPrivate body.",
             ],
-            'expectedResponseCode' => [
-                400 => [$this->userDeny],
-                200 => [$this->userPrivate, $this->userPublic],
-            ],
-            'isValid' => true,
         ];
 
         $i->comment("Testing as user {$user->getUsername()} [{$user->getId()}]");
@@ -142,11 +137,6 @@ class PastoralPatchCest
          */
         if (!$user->getRole()->isStaff()) {
             $i->seeResponseCodeIs(401);
-            return;
-        }
-
-        if (!$pastoral['isValid']) {
-            $i->seeResponseCodeIs(400);
             return;
         }
 
@@ -181,26 +171,11 @@ class PastoralPatchCest
                 'id' => $pastoralId,
                 'heading' => 'Updated heading only',
             ],
-            'expectedResponseCode' => [
-                400 => [$this->userDeny],
-                200 => [$this->userPrivate, $this->userPublic],
-            ],
-            'isValid' => true,
         ];
 
         /* Evaluate response
          */
         $i->sendPatch($endpoint, json_encode($update1['data']));
-
-        if (!$user->getRole()->isStaff()) {
-            $i->seeResponseCodeIs(401);
-            return;
-        }
-
-        if (!$update1['isValid']) {
-            $i->seeResponseCodeIs(400);
-            return;
-        }
 
         /* Mutate multiple fields via the patch endpoint
          */
@@ -214,26 +189,11 @@ class PastoralPatchCest
                 'body_public' => 'For Public Consumption',
                 'body_private' => 'For Private Consumption',
             ],
-            'expectedResponseCode' => [
-                400 => [$this->userDeny],
-                200 => [$this->userPrivate, $this->userPublic],
-            ],
-            'isValid' => true,
         ];
 
         /* Evaluate response
          */
         $i->sendPatch($endpoint, json_encode($update2['data']));
-
-        if (!$user->getRole()->isStaff()) {
-            $i->seeResponseCodeIs(401);
-            return;
-        }
-
-        if (!$update2['isValid']) {
-            $i->seeResponseCodeIs(400);
-            return;
-        }
 
         /* Mutate no fields using a payload containing invalid nodes via the patch endpoint
          */
@@ -245,26 +205,11 @@ class PastoralPatchCest
                 'horse' => 'neighborhood',
                 'lion' => 'rawr',
             ],
-            'expectedResponseCode' => [
-                400 => [$this->userDeny],
-                200 => [$this->userPrivate, $this->userPublic],
-            ],
-            'isValid' => true,
         ];
 
         /* Evaluate response
          */
         $i->sendPatch($endpoint, json_encode($update3['data']));
-
-        if (!$user->getRole()->isStaff()) {
-            $i->seeResponseCodeIs(401);
-            return;
-        }
-
-        if (!$update3['isValid']) {
-            $i->seeResponseCodeIs(400);
-            return;
-        }
 
         /* Mutate a mixture of valid and invalid nodes in a payload via the patch endpoint
          */
@@ -285,26 +230,11 @@ class PastoralPatchCest
                  */
                 'severity' => 3,
             ],
-            'expectedResponseCode' => [
-                400 => [$this->userDeny],
-                200 => [$this->userPrivate, $this->userPublic],
-            ],
-            'isValid' => true,
         ];
 
         /* Evaluate response
          */
         $i->sendPatch($endpoint, json_encode($update4['data']));
-
-        if (!$user->getRole()->isStaff()) {
-            $i->seeResponseCodeIs(401);
-            return;
-        }
-
-        if (!$update4['isValid']) {
-            $i->seeResponseCodeIs(400);
-            return;
-        }
 
         /* Chuck some actions, roles and groups on
          */
@@ -327,25 +257,10 @@ class PastoralPatchCest
                 ],
                 'actions' => [1, 3, 5]
             ],
-            'expectedResponseCode' => [
-                400 => [$this->userDeny],
-                200 => [$this->userPrivate, $this->userPublic],
-            ],
-            'isValid' => true,
         ];
 
         /* Evaluate response
          */
         $i->sendPatch($endpoint, json_encode($update5['data']));
-
-        if (!$user->getRole()->isStaff()) {
-            $i->seeResponseCodeIs(401);
-            return;
-        }
-
-        if (!$update5['isValid']) {
-            $i->seeResponseCodeIs(400);
-            return;
-        }
     }
 }
