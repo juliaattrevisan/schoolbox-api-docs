@@ -131,7 +131,9 @@ class Controller extends Base
                 'svg'   => 'image/svg+xml',
                 default => mime_content_type($fullPath) ?: 'application/octet-stream',
             };
-            $this->response = $this->responseFromStream(new Stream(fopen($fullPath, 'r')), null, $mimetype);
+            $this->response = $this->responseFromStream(new Stream(fopen($fullPath, 'r')), null, $mimetype)
+                ->withHeader('Cache-Control', 'max-age=86400, private')
+                ->withHeader('Pragma', '');
         } else {
             throw new NotFound();
         }
