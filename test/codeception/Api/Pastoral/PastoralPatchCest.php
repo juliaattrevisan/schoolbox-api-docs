@@ -183,9 +183,16 @@ class PastoralPatchCest
 
         /* Evaluate response
          */
-        $result = $i->sendPatch(sprintf('/pastoral/record/%s/update', $pastoralId), $update1['data']);
-        var_dump($result);
-die();
+        $url = sprintf('/pastoral/record/%s/update', $pastoralId);
+
+        /* These are required for a PATCH endpoint expecting json data
+         * Set these before initiating a restful request
+         */
+        $i->haveHttpHeader('Accept','application/json');
+        $i->haveHttpHeader('Content-Type','application/json');
+
+        $i->sendPatch($url, json_encode($update1['data']));
+
         if (!$user->getRole()->isStaff()) {
             $i->seeResponseCodeIs(401);
             return;

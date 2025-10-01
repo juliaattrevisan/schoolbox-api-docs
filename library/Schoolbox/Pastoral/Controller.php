@@ -759,12 +759,6 @@ class Controller extends Base
         /* A partial set of fields
          */
         $partial = $this->request->getParsedBody();
-        echo "\n-----\n";
-        var_dump($this->requestQuery->getArrayCopy());
-        var_dump($this->requestPost->getArrayCopy());
-        var_dump($partial);
-        var_dump($_REQUEST);
-        echo "\n======\n";
 
         // Grab the pastoral record we are updating
         try {
