@@ -2,6 +2,7 @@ import type { StorageFile } from "@js/resource/resourceUtils";
 import type { Metadata } from "@js/util/sbx/apiUtils";
 import type { SelectizeSelectorItem } from "@js/vendors/selectize/selectizeSelectorTypes";
 import type { Node } from "@schoolboxCurriculum/types/Node";
+import type { UserAuthor } from "@schoolboxLibrary/types/User";
 
 /** The current state of a learning moment, see /library/Schoolbox/Learning/Moment/Evidence/Model.php */
 export enum EvidenceStatus {
@@ -19,11 +20,25 @@ export const evidenceStatusLabels: Record<EvidenceStatus, string> = {
     [EvidenceStatus.REJECTED]: "Requiring update",
 };
 
+/**
+ * A learning moment
+ * @see /library/Schoolbox/Learning/Moment/Translator/ModelToArray/Base.php
+ */
 export type LearningMoment = {
-    // NOTE: this doesn't have all properties yet, see library/Schoolbox/Learning/Moment/Translator/ModelToArray/Base.php
     id: number;
     body: string | null;
+    createdAt: string | null;
+    updatedAt: string | null;
+    creator: UserAuthor | null;
+    recipient: UserAuthor | null;
     currentState: EvidenceStatus;
+    folders:
+        | {
+              id: number | string;
+              name: string;
+              code: string;
+          }[]
+        | null;
     curriculumNodes: Pick<Node, "id" | "name" | "code">[] | null;
     discussionThread: null | {
         children: {

@@ -143,7 +143,7 @@ module.exports = {
         learningMomentForm: "./library/Schoolbox/Learning/Moment/vue/form/learningMomentForm.ts",
         learningMomentsEvidenceCohortReport:
             "./library/Schoolbox/Learning/Moment/vue/cohortReport/learningMomentsEvidenceCohortReport.ts",
-        learningMomentsEvidenceDetail: "./library/Schoolbox/Learning/Moment/vue/learningMomentsEvidenceDetail.ts",
+        learningMomentDetail: "./library/Schoolbox/Learning/Moment/vue/learningMomentDetail.ts",
         userProfileFeeds: "./library/Schoolbox/Learning/vue/user-profile/userProfileFeeds.ts",
         badgeList: "./library/Schoolbox/Learning/Badge/vue/badgeList.ts",
         badgeListForm: "./library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.ts",
