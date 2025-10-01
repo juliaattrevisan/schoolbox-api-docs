@@ -248,7 +248,7 @@ class Communications
                         'surname' => trim((string)$address['m_surname']),
                         'mobile' => $mobilePhone1 ?: $mobilePhone2,
                         'home' => trim((string)$address['home_phone']),
-                        'work' => '',
+                        'work' => trim((string)$address['business_phone']),
                         'email' => $email1 ?: $email2,
                         'relationship' => $relationshipM,
                         'validCommRule' => true
@@ -265,7 +265,7 @@ class Communications
                         'surname' => trim((string)$address['f_surname']),
                         'mobile' => $mobilePhone1 ?: $mobilePhone2,
                         'home' => trim((string)$address['home_phone']),
-                        'work' => '',
+                        'work' => trim((string)$address['business_phone']),
                         'email' => $email1 ?: $email2,
                         'relationship' => $relationshipF,
                         'validCommRule' => true
@@ -284,7 +284,7 @@ class Communications
                         'surname' => trim((string)$address['m_surname']),
                         'mobile' => $mobilePhone1,
                         'home' => trim((string)$address['home_phone']),
-                        'work' => '',
+                        'work' => trim((string)$address['business_phone']),
                         'email' => $email1,
                         'relationship' => $relationshipM,
                         'validCommRule' => true
@@ -301,7 +301,7 @@ class Communications
                         'surname' => trim((string)$address['f_surname']),
                         'mobile' => $mobilePhone2,
                         'home' => trim((string)$address['home_phone']),
-                        'work' => '',
+                        'work' => trim((string)$address['business_phone']),
                         'email' => $email2,
                         'relationship' => $relationshipF,
                         'validCommRule' => true
