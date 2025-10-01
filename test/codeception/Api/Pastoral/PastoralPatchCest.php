@@ -306,7 +306,6 @@ class PastoralPatchCest
             return;
         }
 
-
         /* Chuck some roles and groups on
          */
         $update5 = [
@@ -336,7 +335,7 @@ class PastoralPatchCest
 
         /* Evaluate response
          */
-        $result = $i->sendPatch($endpoint, json_encode($update5['data']));
+        $i->sendPatch($endpoint, json_encode($update5['data']));
 
         if (!$user->getRole()->isStaff()) {
             $i->seeResponseCodeIs(401);
