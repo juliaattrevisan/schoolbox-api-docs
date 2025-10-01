@@ -153,6 +153,23 @@ class Controller extends Base
     }
 
     /**
+     * Get DKIM private key, domain and selector data by ID
+     *
+     * @param Model $emailDKIM
+     * @return void
+     */
+    public function getDKIMPrivateDataJson(Model $emailDKIM)
+    {
+        $data = [
+            'id'         => $emailDKIM->getId(),
+            'domain'     => $emailDKIM->getDomain(),
+            'selector'   => Model::SELECTOR,
+            'privateKey' => $emailDKIM->getPrivate(),
+        ];
+        $this->response = $this->responseAsJson($data);
+    }
+
+    /**
      * Delete domain
      *
      * @param Model $emailDKIM
