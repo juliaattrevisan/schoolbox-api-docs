@@ -57,6 +57,12 @@ class ReportTool extends CliTool\App
      */
     private const LOCK_TTL = 60;
 
+    /**
+     * If a report has been in the analysing state for more than this many seconds, mark it as failed
+     * (24 hours = 86400 seconds)
+     */
+    private const int     ANAYLSIS_TIMEOUT        = 86400;
+
 
     /**
      * @inheritdoc
@@ -191,7 +197,7 @@ HELP;
 
         $pb = Turnitin\File\Mapper::getInstance()->getPredicateBuilder();
         $pb->equals('status', Turnitin\File\Model::STATUS_REPORT_ANALYSING)
-           ->lessThan('created_at', date('Y-m-d H:i:s', time() - 86400))
+           ->lessThan('created_at', date('Y-m-d H:i:s', time() - self::ANAYLSIS_TIMEOUT))
            ->isNull('deleted_at');
 
         $models = Turnitin\File\Mapper::getInstance()->findByPredicates($pb);
