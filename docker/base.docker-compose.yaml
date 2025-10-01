@@ -280,6 +280,8 @@ services:
         condition: service_healthy
     build:
       context: ./schoolbox-etherpad
+      args:
+        ETHERPAD_MAJOR_VERSION : ${ETHERPAD_MAJOR_VERSION}
     env_file: ./schoolbox-etherpad/default.env
 
   clamav:
