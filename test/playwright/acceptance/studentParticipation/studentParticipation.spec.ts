@@ -47,6 +47,6 @@ test.describe("Student Participation Tests", () => {
 
         // Navigate to participation page and modify student's activity
         await studentParticipation.goto();
-        await studentParticipation.modifyStudentActivity(userId, studentName, newTitle);
+        await studentParticipation.modifyStudentActivity(userId, studentName, newTitle, "02/10/2025 11:59pm");
     });
 });

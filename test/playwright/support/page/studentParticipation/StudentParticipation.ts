@@ -137,7 +137,12 @@ export default class StudentParticipation {
      * @param studentName - The name of the student for verification
      * @param newTitle - The new title for the activity
      */
-    async modifyStudentActivity(userId: string, studentName: string, newTitle: string): Promise<void> {
+    async modifyStudentActivity(
+        userId: string,
+        studentName: string,
+        newTitle: string,
+        newDueDate: string,
+    ): Promise<void> {
         this.tester.isGoingTo(`Click the Show Actions button for participant ${userId} (${studentName})`);
         await this.page.locator(`[data-test="sbx-pop-out-participant-${userId}-button"]`).click();
 
@@ -146,6 +151,8 @@ export default class StudentParticipation {
 
         this.tester.isGoingTo(`Add '${newTitle}' as the Title and select Update button`);
         await this.page.getByLabel("Title").fill(newTitle);
+        await this.page.getByLabel("Description").fill("Updated description");
+        await this.page.getByLabel("Due Date").fill(newDueDate);
         await this.page.getByRole("button", { name: "Update" }).click();
 
         this.tester.isGoingTo(`Verify the text '${newTitle} (Modified activity)' is visible in the student row`);
