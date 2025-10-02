@@ -113,6 +113,7 @@ module.exports = {
                 require("eslint-config-airbnb-base/rules/style").rules["no-restricted-syntax"][1],
             ),
         ],
+        "no-await-in-loop": "off",
     },
     settings: {
         "import/parsers": {
