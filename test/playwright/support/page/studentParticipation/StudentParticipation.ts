@@ -136,12 +136,15 @@ export default class StudentParticipation {
      * @param userId - The user ID of the student
      * @param studentName - The name of the student for verification
      * @param newTitle - The new title for the activity
+     * @param description - The description for the activity
+     * @param dueDate - The due date for the activity
      */
     async modifyStudentActivity(
         userId: string,
         studentName: string,
         newTitle: string,
-        newDueDate: string,
+        description: string,
+        dueDate: string,
     ): Promise<void> {
         this.tester.isGoingTo(`Click the Show Actions button for participant ${userId} (${studentName})`);
         await this.page.locator(`[data-test="sbx-pop-out-participant-${userId}-button"]`).click();
@@ -149,14 +152,35 @@ export default class StudentParticipation {
         this.tester.isGoingTo("Click the Modify button in the popup");
         await this.page.locator(`[id="participant-${userId}"]`).getByRole("button", { name: "Modify" }).click();
 
-        this.tester.isGoingTo(`Add '${newTitle}' as the Title and select Update button`);
+        this.tester.isGoingTo(`Add '${newTitle}' as the Title`);
         await this.page.getByLabel("Title").fill(newTitle);
-        await this.page.getByLabel("Description").fill("Updated description");
-        await this.page.getByLabel("Due Date").fill(newDueDate);
+
+        this.tester.isGoingTo(`Add '${description}' into the Description`);
+        await this.page.getByLabel("Description").fill(description);
+
+        this.tester.isGoingTo(`Add '${dueDate}' as the Due Date`);
+        await this.page.getByLabel("Due Date").fill(dueDate);
+
+        this.tester.isGoingTo("Select the Update button to save");
         await this.page.getByRole("button", { name: "Update" }).click();
 
         this.tester.isGoingTo(`Verify the text '${newTitle} (Modified activity)' is visible in the student row`);
         const studentRow = this.page.locator("tr").filter({ hasText: studentName });
         await expect(studentRow).toContainText(`${newTitle} (Modified activity)`);
+    }
+
+    /**
+     * Verify due date text on student's individual assessment page
+     * @param userId - The user ID of the student
+     * @param assessmentId - The assessment ID
+     * @param expectedText - The expected text to find in the due date span
+     */
+    async verifyDueDateText(userId: string, assessmentId: string, expectedText: string): Promise<void> {
+        this.tester.isGoingTo(`Navigate to student's assessment page and verify due date text`);
+        await this.page.goto(`/learning/assessments/${assessmentId}/${userId}`);
+
+        this.tester.isGoingTo(`Verify the span within the calendar icon contains '${expectedText}'`);
+        const calendarElement = this.page.locator("li.icon-calendar span");
+        await expect(calendarElement).toContainText(expectedText);
     }
 }
