@@ -190,7 +190,7 @@ class Hydrator extends BaseHydrator
             'userId' => $searchResultUser->getId(),
             'user' => $searchResultUser
         ];
-        $links[] = $this->generateLinkIfRouteAuthorized($route, $params, $viewer, 'Calendar', 'icon-calendar');
+        $links[] = $this->generateLinkIfRouteAuthorized($route, $params, $viewer, $this->rosettaStone->translate('calendar', false, true), 'icon-calendar');
 
         $route  = 'learningUpcoming.getUpcomingForStudent';
         $params = [
@@ -199,7 +199,7 @@ class Hydrator extends BaseHydrator
             'student' => $searchResultUser
         ];
         if ($searchResultUser->getRole()->isStudent()) {
-            $links[] = $this->generateLinkIfRouteAuthorized($route, $params, $viewer, 'Due Work', 'icon-due-work');
+            $links[] = $this->generateLinkIfRouteAuthorized($route, $params, $viewer, $this->rosettaStone->translate('dueWork', false, true), 'icon-due-work');
         }
 
         $authenticator = new Eportfolio_Authenticator($viewer, $searchResultUser, null);
@@ -216,7 +216,7 @@ class Hydrator extends BaseHydrator
         $route  = 'learningGrades.getGrades';
         $params = ['userId' => $searchResultUser->getId(), 'user' => $searchResultUser];
         if ($searchResultUser->getRole()->isStudent()) {
-            $links[] = $this->generateLinkIfRouteAuthorized($route, $params, $viewer, 'Grades', 'icon-approve');
+            $links[] = $this->generateLinkIfRouteAuthorized($route, $params, $viewer, $this->rosettaStone->translate('grades', true, true), 'icon-approve');
         }
 
         $route  = 'pastoral.getStudent';
