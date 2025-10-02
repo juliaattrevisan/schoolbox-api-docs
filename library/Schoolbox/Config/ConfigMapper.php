@@ -201,7 +201,6 @@ class ConfigMapper extends Mapper
 
     public const NAME_GOTENBERG_HOST = 'gotenberg_host';
     public const NAME_GOTENBERG_API_KEY = 'gotenberg_api_key';
-    public const NAME_GOTENBERG_API_VERSION = 'gotenberg_api_version';
     public const NAME_SUMMATIVE_REPORT_ENABLED = 'summative_report_enabled';
 
     public const NAME_CURRICULUM_COVERAGE_REPORT_ENABLED = 'curriculum_coverage_report_enabled';
