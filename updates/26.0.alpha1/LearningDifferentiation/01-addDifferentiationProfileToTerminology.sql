@@ -10,8 +10,8 @@ INSERT INTO
 VALUES (
         'differentiationProfile',
         'Differentiation Profile',
-        'differentiation profile',
-        'differentiation profiles',
+        'Differentiation Profile',
+        'Differentiation Profiles',
         1,
         'a'
     );
