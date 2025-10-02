@@ -118,7 +118,6 @@ async function deleteMoment(): Promise<void> {
                                     Tags:
                                     <template v-if="props.moment.curriculumNodes !== null">
                                         <codes-list
-                                            v-if="props.moment.curriculumNodes !== null"
                                             :nodes="props.moment.curriculumNodes"
                                             @selected="(node) => (selectedNodeId = node.id)"
                                         /><template
