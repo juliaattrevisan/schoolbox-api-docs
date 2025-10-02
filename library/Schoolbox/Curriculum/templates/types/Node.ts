@@ -1,3 +1,4 @@
+import type { Badge } from "@schoolboxBadge/templates/types/Badge";
 import type { Breadcrumb } from "@schoolboxCurriculum/types/Breadcrumb";
 
 /**
@@ -128,33 +129,7 @@ export interface LearningActivityUsageObject extends UsageObject {
 /**
  * The further details of the the badge usage
  */
-export interface BadgeUsageObject {
-    id: number;
-    name: string;
-    category: {
-        id: number;
-        name: string;
-    };
-    yearLevel: string;
-    image: string | null;
-    icon: string | null;
-    body: string;
-    createdAt: string;
-    updatedAt: string;
-    allowAsGoal: boolean;
-    animate: boolean;
-    achievementExpiry: string | null;
-    goalExpiry: string | null;
-    _links: {
-        update: string;
-        delete: string;
-        achievementRecipients: string;
-        goalRecipients: string;
-        achievementWithdraw: string;
-        goalWithdraw: string;
-        icon: string;
-    };
-}
+export type BadgeUsageObject = Badge;
 
 /**
  * Just the field properties that can be updated

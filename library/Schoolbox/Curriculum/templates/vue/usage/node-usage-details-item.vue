@@ -70,7 +70,7 @@ function onSelect(): void {
                         {{ (props.usage.object as LearningActivityUsageObject).unit?.title }}
                     </p>
                     <p v-else-if="props.usage.discriminator === ActivityTypes.BADGE" class="meta">
-                        {{ (props.usage.object as BadgeUsageObject).category.name }}
+                        {{ (props.usage.object as BadgeUsageObject).category?.name }}
                     </p>
                 </div>
             </div>

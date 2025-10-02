@@ -2,8 +2,10 @@
  * A badge that can be assigned to a student as a goal or achievement
  */
 
+import type { StorageFile } from "@js/resource/resourceUtils";
 import type { Node } from "@schoolboxCurriculum/types/Node";
 
+/** @see /library/Schoolbox/Learning/Badge/Translator/ModelToArray.php */
 export interface Badge {
     id: number;
     createdAt: string;
@@ -38,18 +40,18 @@ export interface Badge {
     };
     name: string;
     body: string;
-    image: string | null;
+    image: StorageFile | null;
     icon: string;
     allowAsGoal: boolean;
     animate: boolean;
     category: {
         id: string;
         name: string;
-    };
+    } | null;
     achievementExpiry: number | null; // how many days the achievement is valid for
     goalExpiry: number | null; // how many days the goal is valid for
-    curriculumNodes: Node[];
-    tags: string | null;
+    curriculumNodes: Pick<Node, "id" | "name" | "code">[];
+    tags: null;
     _links: {
         update: string;
         delete: string;
@@ -58,8 +60,8 @@ export interface Badge {
         achievementWithdraw: string;
         goalWithdraw: string;
         icon: string;
-        awardAsAchievement: string;
-        setAsGoal: string;
-        setAsGoalForSelf: string | null;
+        awardAsAchievement?: string;
+        setAsGoal?: string;
+        setAsGoalForSelf?: string | null;
     };
 }
