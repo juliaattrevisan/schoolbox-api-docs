@@ -1,4 +1,5 @@
 import type { Locator, Page } from "@playwright/test";
+import { expect } from "@schoolboxTest/playwright/support/integrations";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import Homepage from "./Homepage";
 
@@ -70,21 +71,41 @@ export default class CourseOutline {
     }
 
     /**
+     * finds the activity id by passing its name
+     * @param courseOutlineHeader - The header of the course outline component
+     * @param unitName - The name of the unit to find in the course outline
+     * @param activityName - The title of the activity to find in the unit
+     * @returns the activity id as a string
+     */
+    public async getActivityId(courseOutlineHeader: string, unitName: string, activityName: string): Promise<number> {
+        // Find the course outline and the unit we created inside it
+        const courseOutline = this.homepage.locateComponentByName(courseOutlineHeader);
+        const courseOutlineUnit = courseOutline.locator("li[data-unit]").filter({ hasText: unitName });
+        // Find the activities under the unit using the activity title
+        const activities = courseOutlineUnit.locator("li[data-unit-assessment]");
+        const activity = activities.filter({ hasText: activityName });
+        const activityId = await activity.getAttribute("data-unit-assessment");
+        expect(activityId).not.toBeNull();
+        if (activityId === null) throw new Error("activityId is null");
+        return parseInt(activityId, 10);
+    }
+
+    /**
      * Uses the course outline component to find an unit and view the activity 3-dot menu
      * @param courseOutlineHeader - The header of the course outline component
      * @param unitName - The name of the unit to find in the course outline
-     * @param activityId - The id of the activity to find in the unit
+     * @param activityName - The title of the activity to find in the unit
      */
-    async clickActivityDotMenu(
-        courseOutlineHeader: string,
-        unitName: string,
-        activityId: number | string,
-    ): Promise<void> {
+    async clickActivityDotMenu(courseOutlineHeader: string, unitName: string, activityName: string): Promise<void> {
         // Find the course outline and the unit we created inside it
-        this.tester.isGoingTo("find the unit in the course outline");
         const courseOutline = this.homepage.locateComponentByName(courseOutlineHeader);
-        const courseOutlineId = await courseOutline.getAttribute("id");
         const courseOutlineUnit = courseOutline.locator("li[data-unit]").filter({ hasText: unitName });
+        // Find the activities under the unit using the activity title
+        const activities = courseOutlineUnit.locator("li[data-unit-assessment]");
+        const activity = activities.filter({ hasText: activityName });
+        // gets the activity id
+        const activityId = await activity.getAttribute("data-unit-assessment");
+        const courseOutlineId = await courseOutline.getAttribute("id");
 
         this.tester.isGoingTo("click to open the 3-dot menu of the activity");
         await courseOutlineUnit.getByTestId(`sbx-pop-out-${courseOutlineId}-options-task${activityId}-button`).click();
