@@ -130,4 +130,26 @@ export default class StudentParticipation {
         this.tester.isGoingTo("Navigate back to participation page to remove the exclusion");
         await this.page.goto(StudentParticipation.URL_PARTICIPATION);
     }
+
+    /**
+     * Modify current activity for a student
+     * @param userId - The user ID of the student
+     * @param studentName - The name of the student for verification
+     * @param newTitle - The new title for the activity
+     */
+    async modifyStudentActivity(userId: string, studentName: string, newTitle: string): Promise<void> {
+        this.tester.isGoingTo(`Click the Show Actions button for participant ${userId} (${studentName})`);
+        await this.page.locator(`[data-test="sbx-pop-out-participant-${userId}-button"]`).click();
+
+        this.tester.isGoingTo("Click the Modify button in the popup");
+        await this.page.locator(`[id="participant-${userId}"]`).getByRole("button", { name: "Modify" }).click();
+
+        this.tester.isGoingTo(`Add '${newTitle}' as the Title and select Update button`);
+        await this.page.getByLabel("Title").fill(newTitle);
+        await this.page.getByRole("button", { name: "Update" }).click();
+
+        this.tester.isGoingTo(`Verify the text '${newTitle} (Modified activity)' is visible in the student row`);
+        const studentRow = this.page.locator("tr").filter({ hasText: studentName });
+        await expect(studentRow).toContainText(`${newTitle} (Modified activity)`);
+    }
 }

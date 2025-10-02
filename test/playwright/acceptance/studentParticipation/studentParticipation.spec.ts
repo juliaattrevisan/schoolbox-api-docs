@@ -38,4 +38,15 @@ test.describe("Student Participation Tests", () => {
         await studentParticipation.verifyClassMarkbookNotExcluded(userId, classActivityId);
         await studentParticipation.verifyCourseMarkbookNotExcluded(userId, courseActivityId);
     });
+
+    test("modify current activity for a student should update the activity title", async ({ tester, page }) => {
+        const studentParticipation = new StudentParticipation(tester, page);
+        const userId = "63";
+        const studentName = "Izzo, Mario";
+        const newTitle = "Party task";
+
+        // Navigate to participation page and modify student's activity
+        await studentParticipation.goto();
+        await studentParticipation.modifyStudentActivity(userId, studentName, newTitle);
+    });
 });
