@@ -2,14 +2,15 @@
 /**
  * Custom Participation Vue Component
  */
-import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
-import { getReturnUrl } from "@js/util/sbx/urlUtils";
-import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
+import {hasErrorMessage, isAbortError} from "@js/util/errorUtils";
+import {getReturnUrl} from "@js/util/sbx/urlUtils";
+import {extractErrorMessage} from "@js/util/sbx/fetchUtils";
 import locale from "@js/terminology/rosettaStone";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
-import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
+import type {StudentPastoralCountBadge} from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
-import type { Participant, Plan, CustomisedPlan } from "../js/types/customParticipationTypes";
+import type {CustomisedPlan, Participant, Plan} from "../js/types/customParticipationTypes";
+import {postIncludeParticipant} from "../js/types/customParticipationPayload";
 
 interface Props {
     allParticipants: Participant[];
@@ -170,27 +171,23 @@ async function excludeParticipants(participants: Participant[]): Promise<void> {
  */
 async function includeParticipant(participant: Participant): Promise<void> {
     const toast = window.sbProps.toastActivate("Removing customisation...");
-    try {
-        const response = await fetch(participant._links.include, {
-            method: "POST",
-            headers: { Accept: "application/json", "Content-Type": "application/json" },
-        });
-        if (!response.ok) {
-            const errorMessage = await extractErrorMessage(response);
-            throw new Error(errorMessage);
-        }
-        participant.excludedAt = null; // Resetting the exclusion timestamp
-        participant.plan.name = null; // Resetting the plan
-        participant.customisedPlan = null; // Resetting the customised plan
-        participant.hasInteraction = false;
-        toast.timeout({ text: "Customisation removed successfully" });
-    } catch (error) {
-        if (error instanceof Error && hasErrorMessage(error)) {
-            loadError.value = error.message;
-        }
+    const response = await postIncludeParticipant(participant._links.include, {
+        includeResponse: true,
+    });
+
+    if (!response.success) {
+        const error = response.message ?? "Error excluding student";
+        loadError.value = error;
         console.error("Error including participant:", error);
-        toast.timeout({ text: "Error excluding student", isSuccess: false });
+        toast.timeout({ text: error, isSuccess: false });
+        return;
     }
+
+    participant.excludedAt = null; // Resetting the exclusion timestamp
+    participant.plan.name = null; // Resetting the plan
+    participant.customisedPlan = null; // Resetting the customised plan
+    participant.hasInteraction = response.data?.hasInteraction ?? false
+    toast.timeout({ text: "Customisation removed successfully" });
 }
 
 /**
