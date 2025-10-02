@@ -62,4 +62,7 @@ export type LearningMoment = {
         submit?: string | null;
         delete?: string | null;
     };
+    _labels: {
+        publish: string;
+    };
 };
