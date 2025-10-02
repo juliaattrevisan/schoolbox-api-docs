@@ -109,6 +109,18 @@ export default class ApiHelper {
     }
 
     /**
+     * Delete a file
+     * @param fileId - ID of the file to delete
+     */
+    async deleteFile(fileId: string | number): Promise<void> {
+        this.baseTester.isGoingTo(`soft delete the file with ID ${fileId}`);
+        const resp = await this.request.delete(`/fileForm.php?delete=${fileId}`, await this.getAuthHeader());
+        if (!resp.ok()) {
+            throw new Error(`Failed to delete file: ${resp.status()} ${resp.statusText()}`);
+        }
+    }
+
+    /**
      * Delete all folders by name
      * @param db - DatabaseHelper instance
      * @param names - A name, or list of names to delete folders by - Uses SQL LIKE (so % for wildcards)
