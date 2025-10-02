@@ -154,6 +154,8 @@ class AbstractCSV
 
 
     /**
+     * Extracts via regex the numerator and denominator from a human readable mark.
+     *
      * @param null|string $humanReadableMark
      * @return array{null|string, null|string}
      */
