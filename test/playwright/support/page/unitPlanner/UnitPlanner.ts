@@ -119,7 +119,6 @@ export default class UnitPlanner {
             newUnitOrder.indexOf(unitIdToDrag.toString()) > newUnitOrder.indexOf(unitIdToDragFrom.toString()) &&
             Date.now() - startTime < 5000 // Timeout after 5 seconds
         ) {
-            // eslint-disable-next-line no-await-in-loop -- Need to wait for the order to change, await is acceptable here.
             newUnitOrder = await this.getUnitOrder();
         }
 
