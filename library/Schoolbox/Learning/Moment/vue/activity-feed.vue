@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import type { Dayjs } from "dayjs";
+import { keysOf } from "@js/util/arrayUtils";
+import { getReturnUrl } from "@js/util/sbx/urlUtils";
+import type { Metadata } from "@js/util/sbx/apiUtils";
 import { Template } from "@js/editor/types/editorTypes";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import StorageObject from "@schoolboxVue/components/storage-object.vue";
@@ -78,12 +81,15 @@ type FeedItem = {
 );
 
 const data = window.Vue.ref<FeedItem[]>([]);
-const metadata = window.Vue.reactive({
-    count: null,
-    cursor: null,
+const metadata = window.Vue.reactive<Metadata>({
+    count: 0,
+    cursor: {
+        current: null,
+        next: null,
+    },
 });
 const showSkeletonLoader = window.Vue.ref(true);
-const currentlyDeletingEvidence = window.Vue.ref<FeedItem | null>(null);
+const currentlyDeletingItem = window.Vue.ref<FeedItem | null>(null);
 const isDeleteModalOpen = window.Vue.ref(false);
 
 /** the selected curriculum code to display further details for */
@@ -121,9 +127,9 @@ const awardDetailModalEl = window.Vue.useTemplateRef<InstanceType<typeof AwardDe
     "awardDetailModalRef",
 );
 
-type GroupedFeedResult = {
+type GroupedFeedItem = {
     date: Dayjs;
-    evidence: FeedItem[];
+    items: FeedItem[];
 };
 
 /**
@@ -131,36 +137,34 @@ type GroupedFeedResult = {
  * @param feedResults -
  * @returns -
  */
-function groupFeedResults(feedResults: FeedItem[]): GroupedFeedResult[] {
-    const groupedEvidenceByDate: Record<string, GroupedFeedResult> = {};
+function groupFeedResults(feedResults: FeedItem[]): GroupedFeedItem[] {
+    const groupedFeedResultsByDate: Record<string, GroupedFeedItem> = {};
     feedResults.forEach((v) => {
         const date = window.dayjs(v.date);
         const key = date.format("YYYYMMDD");
-        if (!(key in groupedEvidenceByDate)) {
-            groupedEvidenceByDate[key] = {
+        if (!(key in groupedFeedResultsByDate)) {
+            groupedFeedResultsByDate[key] = {
                 date: window.dayjs(date).startOf("d"),
-                evidence: [],
+                items: [],
             };
         }
 
         v.date = date; // TODO: don't mutate the original object...
-        groupedEvidenceByDate[key].evidence.push(v);
+        groupedFeedResultsByDate[key].items.push(v);
     });
 
     // Flatten grouped evidence into an array
-    const groupedEvidence = Object.values(groupedEvidenceByDate).sort((a, b) => (a.date.isBefore(b.date) ? 1 : -1));
+    const groupedItems = Object.values(groupedFeedResultsByDate).sort((a, b) => (a.date.isBefore(b.date) ? 1 : -1));
 
-    // Ensure that each evidence within the group is sorted
-    groupedEvidence.forEach((v) => {
-        v.evidence.sort((a, b) => (a.date.isBefore(b.date) ? 1 : -1));
+    // Ensure that each item within the group is sorted
+    groupedItems.forEach((v) => {
+        v.items.sort((a, b) => (a.date.isBefore(b.date) ? 1 : -1));
     });
 
-    return groupedEvidence;
+    return groupedItems;
 }
 
-const groupedEvidence = window.Vue.computed(() => groupFeedResults(data.value));
-
-const currentCount = window.Vue.computed(() => data.value.length);
+const groupedFeedItems = window.Vue.computed(() => groupFeedResults(data.value));
 
 /**
  * Appends learning evidence to the data list.
@@ -175,11 +179,16 @@ async function append(cursor: string | null): Promise<void> {
     params.set("filter", btoa(JSON.stringify(getFiltersStateFromDom())));
 
     try {
-        const response = await fetch(`${config.value.routes.getFeed}?${params}`);
-        const responseData = await response.json();
+        const response = await fetch(`${config.value.routes.getFeed}?${params.toString()}`);
+        const responseData = (await response.json()) as {
+            data: FeedItem[];
+            metadata?: Metadata;
+        };
+
         data.value = data.value.concat(responseData.data ? responseData.data : []);
         metadata.count = responseData.metadata?.count ? responseData.metadata.count : 0;
-        metadata.cursor = responseData.metadata?.cursor ? responseData.metadata.cursor : null;
+        metadata.cursor.current = responseData.metadata?.cursor?.current ? responseData.metadata.cursor.current : null;
+        metadata.cursor.next = responseData.metadata?.cursor?.next ? responseData.metadata.cursor.next : null;
     } catch (error) {
         console.warn(error);
     } finally {
@@ -193,10 +202,10 @@ async function append(cursor: string | null): Promise<void> {
  *
  * Once received, group them by date.
  */
-function load(): void {
+async function load(): Promise<void> {
     showFeed.value = false;
     data.value = [];
-    append(null);
+    await append(null);
 }
 
 /**
@@ -221,57 +230,63 @@ function renderCreatedAt(createdAt: Dayjs): string {
 }
 
 /**
- * Open the share learning moment modal.
+ * Does this feed item have a menu?
+ * @param item -
+ * @returns - whether this feed item has a menu
  */
-function openShareLearningMomentModal(): void {
-    window.jQuery("#shareLearningMoment").foundation("reveal", "open");
+function hasMenu(item: FeedItem["object"]): boolean {
+    if ("modifyForm" in item._links && !!item._links.modifyForm) {
+        return true;
+    }
+
+    if ("delete" in item._links && !!item._links.delete) {
+        return true;
+    }
+
+    return false;
 }
 
 /**
- * Does this evidence have a menu?
- *
- * @param evidence -
- * @returns - whether this evidence has a menu
+ * Display the delete modal for a feed item
+ * @param item -
  */
-function hasMenu(evidence: FeedItem["object"]): boolean {
-    return Boolean(evidence?._links?.modifyForm || evidence?._links?.deleteForm);
-}
-
-/**
- * Display the delete modal for a piece of evidence.
- * @param evidence -
- */
-function showDeleteModal(evidence: FeedItem): void {
-    currentlyDeletingEvidence.value = evidence;
+function showDeleteModal(item: FeedItem): void {
+    currentlyDeletingItem.value = item;
     isDeleteModalOpen.value = true;
 }
 
 /**
- * Actually delete this evidence.
- * @param evidence -
+ * Actually delete an item from the feed
+ * @param targetItem -
  */
-async function deleteEvidence(evidence: FeedItem): Promise<void> {
-    const toast = window.sbProps.toastActivate("Deleting...");
+async function deleteEvidence(targetItem: FeedItem): Promise<void> {
+    const deleteRoute = "delete" in targetItem.object._links ? targetItem.object._links.delete : null;
+    if (!deleteRoute) {
+        throw new Error("Missing access to delete this evidence");
+    }
 
-    //awards, other things may also be deleted in the future, so ensure this is also the right data type
-    const newData = this.data.filter((data) => {
-        if (data.discriminator !== evidence.discriminator) {
+    // awards, other things may also be deleted in the future, so ensure this is also the right data type
+    const newData = data.value.filter((item) => {
+        if (item.discriminator !== targetItem.discriminator) {
             return true;
         }
-        return data.object.id !== evidence.object.id;
+        return item.object.id !== targetItem.object.id;
     });
+
+    const toast = window.sbProps.toastActivate("Deleting...");
 
     // Replacing the data in place in the same tick causes issues with
     // the MediaElement player and Foundation dropdowns for some reason.
     // Clear it first; then replace it with the filtered data in the
     // next tick.
     try {
-        await fetch(evidence.object._links.delete, {
+        await fetch(deleteRoute, {
             method: "DELETE",
         });
         data.value = [];
         toast.timeout({ text: "Deleted", isSuccess: true });
-        window.Vue.nextTick(() => {
+
+        void window.Vue.nextTick(() => {
             data.value = newData;
             metadata.count -= 1;
         });
@@ -300,7 +315,7 @@ function openViewBadgeAwardModal(badgeAward: BadgeAward): void {
  * @param format -
  * @returns the formatted date
  */
-function formatDate(date: string | Dayjs, format: string): string {
+function formatDate(date: string | Dayjs, format?: string): string {
     return window.dayjs(date).format(format);
 }
 
@@ -340,8 +355,8 @@ function loadFilteredContent($selectedTag: string, simulateRedirect: boolean): v
     }
 
     // Get the new filters state from the DOM, and create a new URL to match that state.
-    let filtersState = getFiltersStateFromDom();
-    let newUrl = new URL(window.location.href);
+    const filtersState = getFiltersStateFromDom();
+    const newUrl = new URL(window.location.href);
     newUrl.searchParams.delete("tag");
     newUrl.searchParams.delete("filterNames[]");
     if (filtersState !== null) {
@@ -349,13 +364,13 @@ function loadFilteredContent($selectedTag: string, simulateRedirect: boolean): v
             newUrl.searchParams.append("tag", encodeURIComponent(filtersState.tag));
         }
 
-        for (let filterName of filtersState.filterNames) {
+        for (const filterName of filtersState.filterNames) {
             newUrl.searchParams.append("filterNames[]", encodeURIComponent(filterName));
         }
     }
 
     // Get new content based on changed filters state.
-    load();
+    void load();
 
     // Replace the current state in the history object with the new state (and set the current URL to match that state).
     window.history.replaceState(filtersState, "", newUrl.toString());
@@ -423,8 +438,8 @@ function getFiltersStateFromUrl(): FiltersState {
 function getFiltersStateFromDom(): FiltersState {
     const checkedFeedItemTypes: string[] = [];
 
-    for (const filterName of Object.keys(selectedFilters)) {
-        if ($("#filter-" + filterName).prop("checked")) {
+    for (const filterName of keysOf(selectedFilters)) {
+        if ($(`#filter-${filterName}`).prop("checked")) {
             checkedFeedItemTypes.push(filterName);
         }
     }
@@ -445,7 +460,7 @@ function setSelectedTagAndFiltersToMatchState(filtersState: FiltersState | null)
         // Return the filters to their default state.
         selectedTag.value = "";
 
-        for (let filterName of Object.keys(selectedFilters)) {
+        for (const filterName of keysOf(selectedFilters)) {
             selectedFilters[filterName] = false;
         }
     } else {
@@ -453,7 +468,7 @@ function setSelectedTagAndFiltersToMatchState(filtersState: FiltersState | null)
         selectedTag.value = filtersState.tag;
 
         // Restore state of filter checkboxes.
-        for (const filterName of Object.keys(selectedFilters)) {
+        for (const filterName of keysOf(selectedFilters)) {
             selectedFilters[filterName] = filtersState.filterNames.includes(filterName);
         }
     }
@@ -464,7 +479,7 @@ function setSelectedTagAndFiltersToMatchState(filtersState: FiltersState | null)
  * @param evidence - The evidence object to submit
  */
 function submitEvidence(evidence: LearningMoment): void {
-    const submitLink = evidence?._links?.submit;
+    const submitLink = evidence._links?.submit;
 
     if (submitLink) {
         const toast = window.sbProps.toastActivate("Submitting...");
@@ -485,7 +500,7 @@ function submitEvidence(evidence: LearningMoment): void {
  * @param evidence - The evidence object to publish
  */
 function publishEvidence(evidence: LearningMoment): void {
-    const publishLink = evidence?._links?.publish;
+    const publishLink = evidence._links?.publish;
 
     if (publishLink) {
         const toast = window.sbProps.toastActivate("Publishing...");
@@ -502,7 +517,7 @@ function publishEvidence(evidence: LearningMoment): void {
 }
 
 window.Vue.onMounted(async () => {
-    document.addEventListener(userProfileConstants.events.AWARDS_UPDATED, () => load());
+    document.addEventListener(userProfileConstants.events.AWARDS_UPDATED, () => void load());
     window.onpopstate = async (event): Promise<void> => {
         // NOTE: event.state should never be null because of the history.replaceState() call in this.loadFilteredContent().
         setSelectedTagAndFiltersToMatchState(event.state as FiltersState);
@@ -641,9 +656,13 @@ window.Vue.onMounted(async () => {
                             <template v-if="selectedTag !== ''">
                                 <p>
                                     Showing tag "{{ selectedTag }}"
-                                    <span class="anchor-style" id="removeFilters" @click="loadFilteredContent('', true)"
-                                        >(remove)</span
+                                    <span
+                                        id="removeFilters"
+                                        class="anchor-style"
+                                        @click="loadFilteredContent('', true)"
                                     >
+                                        (remove)
+                                    </span>
                                 </p>
                             </template>
                         </div>
@@ -655,117 +674,119 @@ window.Vue.onMounted(async () => {
 
         <Transition name="fade" mode="out-in">
             <div v-if="showFeed">
-                <div class="feed" v-for="(evidenceGroup, index) in groupedEvidence" :key="index">
+                <div v-for="(itemGroup, groupIndex) in groupedFeedItems" :key="groupIndex" class="feed">
                     <div class="feed-column left"></div>
                     <section class="activity-feed">
                         <h2 class="subheader no-margin">
                             <time
-                                :datetime="formatDate(evidenceGroup.date, 'YYYY-MM-DD')"
-                                :title="formatDate(evidenceGroup.date, dateDisplayFormats.dayjsDateLong)"
-                                >{{ renderCreatedAt(evidenceGroup.date) }}</time
+                                :datetime="formatDate(itemGroup.date, 'YYYY-MM-DD')"
+                                :title="formatDate(itemGroup.date, dateDisplayFormats.dayjsDateLong)"
                             >
+                                {{ renderCreatedAt(itemGroup.date) }}
+                            </time>
                         </h2>
                         <ul class="information-list">
-                            <li v-for="(evidence, index) in evidenceGroup.evidence" class="feed-item" :key="index">
-                                <template v-if="evidence.discriminator === 'moment'">
+                            <li v-for="(item, itemIndex) in itemGroup.items" :key="itemIndex" class="feed-item">
+                                <template v-if="item.discriminator === FeedDiscriminator.LEARNING_MOMENT">
                                     <!-- This evidence isn't necessarily editable -->
                                     <div
                                         :class="{
-                                            'actions-small-1': hasMenu(evidence.object),
-                                            'actions-small-0': !hasMenu(evidence.object),
+                                            'actions-small-1': hasMenu(item.object),
+                                            'actions-small-0': !hasMenu(item.object),
                                         }"
                                     >
                                         <div class="card small-12 compact">
                                             <component
-                                                :is="!evidence.object.creator.isDeleted ? 'a' : 'span'"
-                                                :href="
-                                                    !evidence.object.creator.isDeleted
-                                                        ? evidence.object.creator._links.profile
-                                                        : null
+                                                :is="item.object.creator?._links.profile ? 'a' : 'span'"
+                                                :href="item.object.creator?._links.profile ?? undefined"
+                                                :title="
+                                                    item.object.creator?._links.profile ? 'View Profile' : undefined
                                                 "
-                                                :title="!evidence.object.creator.isDeleted ? 'View Profile' : null"
                                                 class="l-gap-s"
                                             >
                                                 <div class="l-flex-row l-flex--align-center">
-                                                    <img
-                                                        :src="evidence.object.creator._links.avatar"
-                                                        :alt="
-                                                            !evidence.object.creator.isDeleted ? 'View Profile' : null
-                                                        "
-                                                    />
-                                                    <p>{{ evidence.object.creator.fullName }}</p>
+                                                    <template v-if="item.object.creator">
+                                                        <img
+                                                            :src="item.object.creator?._links.avatar"
+                                                            :alt="
+                                                                item.object.creator?._links.profile
+                                                                    ? 'View Profile'
+                                                                    : undefined
+                                                            "
+                                                        />
+                                                        <p>{{ item.object.creator.fullName }}</p>
+                                                    </template>
 
                                                     <time
+                                                        v-if="item.object.createdAt"
                                                         class="pipe meta"
-                                                        :datetime="formatDate(evidence.object.createdAt)"
+                                                        :datetime="formatDate(item.object.createdAt)"
                                                         :title="
                                                             formatDate(
-                                                                evidence.object.createdAt,
+                                                                item.object.createdAt,
                                                                 dateDisplayFormats.dayjsDatetime,
                                                             )
                                                         "
-                                                        >{{
+                                                    >
+                                                        {{
                                                             formatDate(
-                                                                evidence.object.createdAt,
+                                                                item.object.createdAt,
                                                                 dateDisplayFormats.dayjsTime,
                                                             )
-                                                        }}</time
-                                                    >
+                                                        }}
+                                                    </time>
                                                 </div>
 
                                                 <!-- Only show status that isn't published, since that is the default state -->
                                                 <span
-                                                    v-if="evidence.object.currentState !== EvidenceStatus.PUBLISHED"
+                                                    v-if="item.object.currentState !== EvidenceStatus.PUBLISHED"
                                                     class="label l-mar--0"
-                                                    :class="`label--moment-${evidence.object.currentState}`"
+                                                    :class="`label--moment-${item.object.currentState}`"
                                                 >
-                                                    {{ evidenceStatusLabels[evidence.object.currentState] }}
+                                                    {{ evidenceStatusLabels[item.object.currentState] }}
                                                 </span>
                                             </component>
                                         </div>
-                                        <nav v-if="hasMenu(evidence.object)">
+                                        <nav v-if="hasMenu(item.object)">
                                             <sbx-pop-out
-                                                :content-id="`evidence-${evidence.object.id}-dropdown`"
-                                                :data-test="`sbx-pop-out-evidence-${evidence.object.id}`"
+                                                :content-id="`evidence-${item.object.id}-dropdown`"
+                                                :data-test="`sbx-pop-out-evidence-${item.object.id}`"
                                             ></sbx-pop-out>
                                         </nav>
                                         <ul
-                                            v-if="hasMenu(evidence.object)"
-                                            :id="'evidence-' + String(evidence.object.id) + '-dropdown'"
+                                            v-if="hasMenu(item.object)"
+                                            :id="'evidence-' + String(item.object.id) + '-dropdown'"
                                             class="f-dropdown"
                                             data-dropdown-content
                                         >
                                             <li>
                                                 <a
-                                                    v-if="evidence.object._links.modifyForm"
-                                                    :href="
-                                                        evidence.object._links.modifyForm + '?returnUrl=' + returnUrl
-                                                    "
+                                                    v-if="item.object._links.modifyForm"
+                                                    :href="getReturnUrl(item.object._links.modifyForm)"
                                                     class="icon-modify"
                                                     title="Modify"
-                                                    :data-test="`learning-moment-evidence-popout-option-modify-${evidence.object.id}`"
-                                                    >Modify</a
+                                                    :data-test="`learning-moment-evidence-popout-option-modify-${item.object.id}`"
                                                 >
+                                                    Modify
+                                                </a>
                                             </li>
                                             <li>
                                                 <a
-                                                    v-if="evidence.object._links.delete"
+                                                    v-if="item.object._links.delete"
                                                     class="icon-delete"
                                                     title="Delete"
-                                                    :data-test="`learning-moment-evidence-delete-${evidence.object.id}`"
-                                                    @click.prevent="showDeleteModal(evidence)"
-                                                    >Delete</a
+                                                    :data-test="`learning-moment-evidence-delete-${item.object.id}`"
+                                                    @click.prevent="showDeleteModal(item)"
                                                 >
+                                                    Delete
+                                                </a>
                                             </li>
                                         </ul>
                                     </div>
 
                                     <div class="feed-body small-12 columns">
                                         <!-- Is there an attachment? Display it appropriately -->
-                                        <article
-                                            v-for="evidence in evidence.object.evidence"
-                                            :key="evidence.storage.hash"
-                                        >
+                                        <article v-for="evidence in item.object.evidence" :key="evidence.storage.hash">
                                             <storage-object
                                                 :storage="evidence.storage"
                                                 :filename="evidence.filename"
@@ -775,42 +796,48 @@ window.Vue.onMounted(async () => {
 
                                         <!-- Display evidence body, with media players initialised -->
                                         <media-article
-                                            v-if="evidence.object.body"
+                                            v-if="item.object.body"
                                             data-test="learning-moment-evidence-body"
-                                            :content="evidence.object.body"
+                                            :content="item.object.body"
                                         ></media-article>
 
                                         <!-- Display curriculum codes and tags -->
-                                        <div class="tags">
-                                            <p
-                                                class="meta"
-                                                v-if="
-                                                    evidence.object.curriculumNodes.length > 0 ||
-                                                    evidence.object.tags.length > 0
-                                                "
-                                            >
+                                        <div
+                                            v-if="
+                                                (item.object.curriculumNodes &&
+                                                    item.object.curriculumNodes.length > 0) ||
+                                                (item.object.tags && item.object.tags.length > 0)
+                                            "
+                                            class="tags"
+                                        >
+                                            <p class="meta">
                                                 <codes-list
-                                                    :nodes="evidence.object.curriculumNodes"
-                                                    @selected="onCodeSelected"
+                                                    v-if="item.object.curriculumNodes !== null"
+                                                    :nodes="item.object.curriculumNodes"
+                                                    @selected="(node) => (selectedNodeId = node.id)"
                                                 />
-                                                <br
-                                                    v-if="
-                                                        evidence.object.tags.length > 0 &&
-                                                        evidence.object.curriculumNodes.length > 0
-                                                    "
-                                                />
-                                                <span v-if="evidence.object.tags.length > 0">Tags:</span>
                                                 <template
-                                                    v-for="(tag, index) in evidence.object.tags"
-                                                    :key="`${index}-${tag.name}`"
+                                                    v-if="item.object.tags !== null && item.object.tags.length > 0"
                                                 >
-                                                    <template v-if="index !== 0">, </template>
-                                                    <span
-                                                        class="anchor-style"
-                                                        @click="loadFilteredContent(tag.name, true)"
-                                                        title="Click to only show items with this tag."
-                                                        >{{ tag.name }}</span
+                                                    <br
+                                                        v-if="
+                                                            item.object.curriculumNodes !== null &&
+                                                            item.object.curriculumNodes.length > 0
+                                                        "
+                                                    />
+                                                    <span>Tags:</span>
+                                                    <template
+                                                        v-for="(tag, index) in item.object.tags"
+                                                        :key="`${index}-${tag.name}`"
                                                     >
+                                                        <template v-if="index !== 0">, </template>
+                                                        <span
+                                                            class="anchor-style"
+                                                            title="Click to only show items with this tag."
+                                                            @click="loadFilteredContent(tag.name, true)"
+                                                            >{{ tag.name }}</span
+                                                        >
+                                                    </template>
                                                 </template>
                                             </p>
                                         </div>
@@ -818,8 +845,8 @@ window.Vue.onMounted(async () => {
 
                                     <div class="feed-comments small-12 columns">
                                         <comment-thread
-                                            :thread="evidence.object.discussionThread"
-                                            :create-thread-endpoint="evidence.object._links.createThread"
+                                            :thread="item.object.discussionThread ?? undefined"
+                                            :create-thread-endpoint="item.object._links.createThread ?? undefined"
                                             :can-comment="config.canComment"
                                         />
                                     </div>
@@ -831,35 +858,37 @@ window.Vue.onMounted(async () => {
                                             <!-- Student buttons -->
                                             <template v-if="'student' === config.currentUser.role.type">
                                                 <!-- current user must be the author of the learning moment to have these actions -->
-                                                <template v-if="config.currentUser.id === evidence.object.creator.id">
+                                                <template
+                                                    v-if="
+                                                        item.object.creator &&
+                                                        config.currentUser.id === item.object.creator.id
+                                                    "
+                                                >
                                                     <template
                                                         v-if="
-                                                            'draft' === evidence.object.currentState ||
-                                                            'submitted' === evidence.object.currentState ||
-                                                            'rejected' === evidence.object.currentState
+                                                            'draft' === item.object.currentState ||
+                                                            'submitted' === item.object.currentState ||
+                                                            'rejected' === item.object.currentState
                                                         "
                                                     >
                                                         <!-- Modify button available when a learning moment is: draft/submitted/rejected -->
-                                                        <li>
+                                                        <li v-if="item.object._links.modifyForm">
                                                             <a
                                                                 class="button"
-                                                                :href="
-                                                                    evidence.object._links.modifyForm +
-                                                                    '?returnUrl=' +
-                                                                    returnUrl
-                                                                "
-                                                                >Modify</a
+                                                                :href="getReturnUrl(item.object._links.modifyForm)"
                                                             >
+                                                                Modify
+                                                            </a>
                                                         </li>
                                                     </template>
 
-                                                    <template v-if="'draft' === evidence.object.currentState">
+                                                    <template v-if="'draft' === item.object.currentState">
                                                         <!-- Submit button available when a learning moment is: draft -->
                                                         <template v-if="moderationRequired">
                                                             <li>
                                                                 <button
                                                                     class="submit"
-                                                                    @click="submitEvidence(evidence.object)"
+                                                                    @click="submitEvidence(item.object)"
                                                                 >
                                                                     Submit for approval
                                                                 </button>
@@ -869,7 +898,7 @@ window.Vue.onMounted(async () => {
                                                             <li>
                                                                 <button
                                                                     class="submit"
-                                                                    @click="publishEvidence(evidence.object)"
+                                                                    @click="publishEvidence(item.object)"
                                                                 >
                                                                     Publish
                                                                 </button>
@@ -887,32 +916,26 @@ window.Vue.onMounted(async () => {
                                             >
                                                 <template
                                                     v-if="
-                                                        'draft' === evidence.object.currentState ||
-                                                        'submitted' === evidence.object.currentState ||
-                                                        'rejected' === evidence.object.currentState
+                                                        'draft' === item.object.currentState ||
+                                                        'submitted' === item.object.currentState ||
+                                                        'rejected' === item.object.currentState
                                                     "
                                                 >
                                                     <!-- Modify button available when a learning moment is: draft/submitted/rejected -->
-                                                    <li>
+                                                    <li v-if="item.object._links.modifyForm">
                                                         <a
                                                             class="button"
-                                                            :href="
-                                                                evidence.object._links.modifyForm +
-                                                                '?returnUrl=' +
-                                                                returnUrl
-                                                            "
-                                                            >Modify</a
+                                                            :href="getReturnUrl(item.object._links.modifyForm)"
                                                         >
+                                                            Modify
+                                                        </a>
                                                     </li>
                                                 </template>
 
-                                                <template v-if="'draft' === evidence.object.currentState">
+                                                <template v-if="'draft' === item.object.currentState">
                                                     <!-- Publish button available when a learning moment is: draft/submitted/rejected -->
                                                     <li>
-                                                        <button
-                                                            class="submit"
-                                                            @click="publishEvidence(evidence.object)"
-                                                        >
+                                                        <button class="submit" @click="publishEvidence(item.object)">
                                                             Publish
                                                         </button>
                                                     </li>
@@ -923,39 +946,34 @@ window.Vue.onMounted(async () => {
                                             <template v-else-if="'staff' === config.currentUser.role.type">
                                                 <template
                                                     v-if="
-                                                        'draft' === evidence.object.currentState ||
-                                                        'submitted' === evidence.object.currentState ||
-                                                        'rejected' === evidence.object.currentState
+                                                        'draft' === item.object.currentState ||
+                                                        'submitted' === item.object.currentState ||
+                                                        'rejected' === item.object.currentState
                                                     "
                                                 >
                                                     <!-- Modify button available when a learning moment is: draft/submitted/rejected -->
-                                                    <li>
+                                                    <li v-if="item.object._links.modifyForm">
                                                         <a
                                                             class="button"
-                                                            :href="
-                                                                evidence.object._links.modifyForm +
-                                                                '?returnUrl=' +
-                                                                returnUrl
-                                                            "
-                                                            >Modify</a
+                                                            :href="getReturnUrl(item.object._links.modifyForm)"
+                                                        >
+                                                            Modify
+                                                        </a>
                                                         >
                                                     </li>
                                                 </template>
 
                                                 <template
                                                     v-if="
-                                                        'draft' === evidence.object.currentState ||
-                                                        'submitted' === evidence.object.currentState ||
-                                                        'rejected' === evidence.object.currentState
+                                                        'draft' === item.object.currentState ||
+                                                        'submitted' === item.object.currentState ||
+                                                        'rejected' === item.object.currentState
                                                     "
                                                 >
                                                     <!-- Publish button available when a learning moment is: draft/submitted/rejected -->
-                                                    <li>
-                                                        <button
-                                                            class="submit"
-                                                            @click="publishEvidence(evidence.object)"
-                                                        >
-                                                            {{ evidence.object._labels.publish }}
+                                                    <li v-if="item.object._links.publish">
+                                                        <button class="submit" @click="publishEvidence(item.object)">
+                                                            {{ item.object._labels.publish }}
                                                         </button>
                                                     </li>
                                                 </template>
@@ -963,36 +981,38 @@ window.Vue.onMounted(async () => {
                                         </ul>
                                     </div>
                                 </template>
-                                <template v-if="evidence.discriminator === 'badgeAward'">
+                                <template v-if="item.discriminator === FeedDiscriminator.BADGE_AWARD">
                                     <div class="card badge-card small-12">
-                                        <a href="#" @click.prevent="openViewBadgeAwardModal(evidence.object)">
+                                        <a href="#" @click.prevent="openViewBadgeAwardModal(item.object)">
                                             <badge-image
-                                                :badge="evidence.object.badge"
-                                                :css="evidence.object.status === 'goal' ? 'goal' : ''"
+                                                :badge="item.object.badge"
+                                                :css="item.object.status === 'goal' ? 'goal' : ''"
                                             ></badge-image>
-                                            <h3>{{ evidence.object.badge.name }}</h3>
-                                            <p class="meta">
-                                                <template v-if="evidence.object.status === 'achievement'"
-                                                    >Achievement awarded</template
-                                                >
-                                                <template v-if="evidence.object.status === 'goal'">Goal set</template>
-                                                by {{ evidence.object.awardedBy.fullName }}
-                                                |
+                                            <h3>{{ item.object.badge.name }}</h3>
+                                            <p v-if="item.object.awardedAt || item.object.awardedBy" class="meta">
+                                                <template v-if="item.object.status === 'achievement'">
+                                                    Achievement awarded
+                                                </template>
+                                                <template v-if="item.object.status === 'goal'">Goal set</template>
+                                                <template v-if="item.object.awardedBy">
+                                                    by {{ item.object.awardedBy.fullName }}
+                                                </template>
+                                                <template v-if="item.object.awardedBy && item.object.awardedAt">
+                                                    |
+                                                </template>
                                                 <time
+                                                    v-if="item.object.awardedAt"
                                                     class="meta"
-                                                    :datetime="formatDate(evidence.object.awardedAt)"
+                                                    :datetime="formatDate(item.object.awardedAt)"
                                                     :title="
                                                         formatDate(
-                                                            evidence.object.awardedAt,
+                                                            item.object.awardedAt,
                                                             dateDisplayFormats.dayjsDatetime,
                                                         )
                                                     "
                                                 >
                                                     {{
-                                                        formatDate(
-                                                            evidence.object.awardedAt,
-                                                            dateDisplayFormats.dayjsTime,
-                                                        )
+                                                        formatDate(item.object.awardedAt, dateDisplayFormats.dayjsTime)
                                                     }}
                                                 </time>
                                             </p>
@@ -1001,41 +1021,52 @@ window.Vue.onMounted(async () => {
                                 </template>
                                 <template
                                     v-if="
-                                        evidence.discriminator === 'dueWorkFeedback' ||
-                                        evidence.discriminator === 'quizFeedback'
+                                        item.discriminator === FeedDiscriminator.DUE_WORK_FEEDBACK ||
+                                        item.discriminator === FeedDiscriminator.QUIZ_FEEDBACK
                                     "
                                 >
                                     <div class="flex-grade">
                                         <div class="small-12 card columns">
-                                            <div>
-                                                <span class="icon-feedback"></span
-                                                ><a :href="evidence.object._links.summary">{{
-                                                    evidence.object.assessment.title
-                                                }}</a>
+                                            <div v-if="item.object.assessment">
+                                                <span class="icon-feedback"></span>
+                                                <component
+                                                    :is="item.object._links.summary ? 'a' : 'span'"
+                                                    :href="
+                                                        item.object._links.summary
+                                                            ? item.object._links.summary
+                                                            : undefined
+                                                    "
+                                                >
+                                                    {{ item.object.assessment.title }}
+                                                </component>
                                             </div>
                                             <p class="meta">
                                                 Reviewed by
                                                 <a
-                                                    v-if="evidence.object.instructor"
-                                                    :href="evidence.object.instructor._links.profile"
+                                                    v-if="item.object.instructor"
+                                                    :href="item.object.instructor._links.profile"
                                                     title="View Profile"
-                                                    >{{ evidence.object.instructor.fullName }}</a
                                                 >
+                                                    {{ item.object.instructor.fullName }}
+                                                </a>
                                                 <span v-else>Unknown</span>
-                                                in {{ evidence.object.assessment.folderName }} |
+                                                <template v-if="item.object.assessment">
+                                                    in {{ item.object.assessment?.folderName }}
+                                                </template>
+                                                |
                                                 <time
                                                     class="meta"
-                                                    :datetime="formatDate(evidence.object.publishedAt)"
+                                                    :datetime="formatDate(item.object.publishedAt)"
                                                     :title="
                                                         formatDate(
-                                                            evidence.object.publishedAt,
+                                                            item.object.publishedAt,
                                                             dateDisplayFormats.dayjsDatetime,
                                                         )
                                                     "
                                                 >
                                                     {{
                                                         formatDate(
-                                                            evidence.object.publishedAt,
+                                                            item.object.publishedAt,
                                                             dateDisplayFormats.dayjsTime,
                                                         )
                                                     }}
@@ -1043,20 +1074,22 @@ window.Vue.onMounted(async () => {
                                             </p>
                                         </div>
                                         <div
-                                            v-if="evidence.object.mark"
-                                            :class="`grade ${gradient(evidence.object.gradientMark)}`"
+                                            v-if="item.object.mark"
+                                            :class="`grade ${gradient(item.object.gradientMark)}`"
                                         >
-                                            <span>{{ evidence.object.mark }}</span>
+                                            <span>{{ item.object.mark }}</span>
                                         </div>
                                     </div>
                                     <div class="content">
-                                        <blockquote v-if="evidence.object.comment">
+                                        <blockquote v-if="item.object.comment">
                                             <media-article
                                                 data-test="activity-feed-assessment-comment"
-                                                :content="evidence.object.comment"
+                                                :content="item.object.comment"
                                             ></media-article>
                                         </blockquote>
-                                        <a :href="evidence.object._links.summary"> View assessment details </a>
+                                        <a v-if="item.object._links.summary" :href="item.object._links.summary">
+                                            View assessment details
+                                        </a>
                                     </div>
                                 </template>
                             </li>
@@ -1066,9 +1099,9 @@ window.Vue.onMounted(async () => {
                 </div>
             </div>
         </Transition>
-        <div class="skeleton-feed" v-if="showSkeletonLoader">
+        <div v-if="showSkeletonLoader" class="skeleton-feed">
             <ul class="information-list">
-                <li class="row" v-for="n in 3" :key="n">
+                <li v-for="n in 3" :key="n" class="row">
                     <div class="small-12 card skeleton">
                         <div class="img"></div>
                         <h3></h3>
@@ -1198,8 +1231,8 @@ window.Vue.onMounted(async () => {
             </div>
 
             <div
+                v-else-if="metadata.cursor && metadata.cursor.next && metadata.count > data.length && data.length > 0"
                 class="feed-load-more content"
-                v-else-if="metadata.cursor.next && metadata.count > data.length && data.length > 0"
             >
                 <button class="load-more expand" @click="append(metadata.cursor.next)" title="Load more">
                     Load more
@@ -1211,21 +1244,21 @@ window.Vue.onMounted(async () => {
             <node-details v-if="selectedNodeId !== null" :node-id="selectedNodeId" />
         </basic-modal>
 
-        <!-- TODO create a Vue equivalent of $.confirmDialog -->
         <basic-modal v-model:is-open="isDeleteModalOpen" has-background-click>
             <h2>Please confirm</h2>
             <p>Are you sure you wish to delete this Learning Moment?</p>
             <ul class="flex-list buttons">
-                <li>
+                <li v-if="currentlyDeletingItem !== null">
                     <a
                         id="confirm-delete-learning-moment"
                         class="button submit"
                         data-test="learning-moment-evidence-delete-confirm"
-                        @click.prevent="deleteEvidence(currentlyDeletingEvidence)"
-                        >Delete</a
+                        @click.prevent="deleteEvidence(currentlyDeletingItem)"
                     >
+                        Delete
+                    </a>
                 </li>
-                <li><a @click.prevent="isDeleteModalOpen = false" class="button">Cancel</a></li>
+                <li><a class="button" @click.prevent="isDeleteModalOpen = false"> Cancel </a></li>
             </ul>
         </basic-modal>
 
