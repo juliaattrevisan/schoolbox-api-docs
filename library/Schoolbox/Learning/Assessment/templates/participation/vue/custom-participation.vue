@@ -2,15 +2,15 @@
 /**
  * Custom Participation Vue Component
  */
-import {hasErrorMessage, isAbortError} from "@js/util/errorUtils";
-import {getReturnUrl} from "@js/util/sbx/urlUtils";
-import {extractErrorMessage} from "@js/util/sbx/fetchUtils";
+import { hasErrorMessage, isAbortError } from "@js/util/errorUtils";
+import { getReturnUrl } from "@js/util/sbx/urlUtils";
+import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import locale from "@js/terminology/rosettaStone";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
-import type {StudentPastoralCountBadge} from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
+import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
-import type {CustomisedPlan, Participant, Plan} from "../js/types/customParticipationTypes";
-import {postIncludeParticipant} from "../js/types/customParticipationPayload";
+import type { CustomisedPlan, Participant, Plan } from "../js/types/customParticipationTypes";
+import { postIncludeParticipant } from "../js/types/customParticipationPayload";
 
 interface Props {
     allParticipants: Participant[];
@@ -186,7 +186,7 @@ async function includeParticipant(participant: Participant): Promise<void> {
     participant.excludedAt = null; // Resetting the exclusion timestamp
     participant.plan.name = null; // Resetting the plan
     participant.customisedPlan = null; // Resetting the customised plan
-    participant.hasInteraction = response.data?.hasInteraction ?? false
+    participant.hasInteraction = response.data?.hasInteraction ?? false;
     toast.timeout({ text: "Customisation removed successfully" });
 }
 
