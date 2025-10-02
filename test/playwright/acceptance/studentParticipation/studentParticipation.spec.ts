@@ -31,5 +31,13 @@ test.describe("Student Participation Tests", () => {
 
         tester.isGoingTo("Verify success message is displayed");
         await expect(page.getByText("Student excluded successfully")).toBeVisible();
+
+        tester.isGoingTo("Navigate to class markbook and verify excluded class is present");
+        await page.goto("/learning/markbook/class/83?1=&5=&8=&10=&11=&12=");
+        await expect(page.locator('[data-test="markbook-cell-650-60"]')).toHaveClass(/excluded/);
+
+        tester.isGoingTo("Navigate to course markbook and verify excluded class is present");
+        await page.goto("/learning/courseMarkbook/6?1=&5=&8[15]=1&10=&11=&12=&14[83]=1");
+        await expect(page.locator('[data-test="markbook-cell-54-60"]')).toHaveClass(/excluded/);
     });
 });
