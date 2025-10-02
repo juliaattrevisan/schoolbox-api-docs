@@ -8,8 +8,10 @@ import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
 import foundationMixin from "@schoolboxVue/components/foundation-mixin";
 import CodesList from "@schoolboxCurriculum/vue/codes-list.vue";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
-import AwardDetailModal from "../../Badge/Award/vue/award-detail-modal.vue";
-import BadgeImage from "../../Badge/vue/badge-image.vue";
+import AwardDetailModal from "@schoolboxBadge/Award/vue/award-detail-modal.vue";
+import BadgeImage from "@schoolboxBadge/vue/badge-image.vue";
+import type { BadgeAward } from "@schoolboxBadge/templates/types/BadgeAward";
+import type { DueWorkFeedback, QuizFeedback } from "@schoolboxLibrary/Learning/templates/types/activityTypes";
 import userProfileConstants from "../../vue/user-profile/constants";
 import CommentThread from "./comment-thread.vue";
 import { EvidenceStatus, evidenceStatusLabels } from "./evidenceTypes";
@@ -63,12 +65,8 @@ enum FeedDiscriminator {
      * Discriminator value for identifying that a retrieved result points to a
      * quiz feedback.
      */
-    QUIZ_FEEDBACK_OLD = "quizFeedback",
+    QUIZ_FEEDBACK = "quizFeedback",
 }
-
-type BadgeAward = unknown;
-type DueWorkFeedback = unknown;
-type QuizFeedbackOld = unknown;
 
 type FeedItem = {
     date: string;
@@ -76,7 +74,7 @@ type FeedItem = {
     | { discriminator: FeedDiscriminator.LEARNING_MOMENT; object: LearningMoment }
     | { discriminator: FeedDiscriminator.BADGE_AWARD; object: BadgeAward }
     | { discriminator: FeedDiscriminator.DUE_WORK_FEEDBACK; object: DueWorkFeedback }
-    | { discriminator: FeedDiscriminator.QUIZ_FEEDBACK_OLD; object: QuizFeedbackOld }
+    | { discriminator: FeedDiscriminator.QUIZ_FEEDBACK; object: QuizFeedback }
 );
 
 const data = window.Vue.ref<FeedItem[]>([]);
