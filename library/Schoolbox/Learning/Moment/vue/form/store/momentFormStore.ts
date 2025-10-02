@@ -249,7 +249,12 @@ export const useMomentFormStore = defineStore("momentForm", () => {
 
         toast.timeout({ text: "Learning Moment deleted", isSuccess: true });
 
-        // Redirect to the return URL
+        // Redirect to the return URL, unless you came from the detail page
+        if (moment.value._links.detail && returnUrl.value.startsWith(moment.value._links.detail)) {
+            window.location.href = "/";
+            return;
+        }
+
         window.location.href = returnUrl.value;
     }
 
