@@ -462,6 +462,7 @@ class Mapper extends BaseMapper
         ?Alaress_Date_Format $from = null,
         ?Alaress_Date_Format $to = null
     ): array {
+        // First, fetch the assessments which the student is participating in
         $pb = $this->getPredicateBuilder();
         $pb->isNull('a.deleted_at');
         // Filter task/dueWork/quiz by term dates
@@ -481,9 +482,27 @@ class Mapper extends BaseMapper
         $query = "
             SELECT DISTINCT a.id
             FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
+                  {$planJoin}
+            WHERE {$where}
+            ORDER BY id ASC
+        ";
+        $statement = $this->getDatabase()->prepare($query);
+        $statement->execute($pb->getParams());
+        $assessmentIds = array_column($statement->fetchAll(\PDO::FETCH_ASSOC), 'id');
+        if (empty($assessmentIds)) {
+            return [];
+        }
+
+        // Then, find the interactions within those assessments
+        $pb    = $this->getPredicateBuilder()
+                      ->in('a.id', $assessmentIds)
+                      ->putParam('userId', $student->getId());
+        $where = implode(' AND ', $pb->getWhere());
+        $query = "
+            SELECT DISTINCT a.id
+            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
             JOIN  {$this->getJoinSql('task', 'a', 't', true)}
             JOIN  {$this->getJoinSql('task.completion', 't', 'tc')} AND tc.student_id = :userId
-                  {$planJoin}
             WHERE {$where}
 
             UNION
@@ -492,7 +511,6 @@ class Mapper extends BaseMapper
             FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
             JOIN  {$this->getJoinSql('duework', 'a', 'd', true)}
             JOIN  {$this->getJoinSql('duework.submission', 'd', 'ds')} AND ds.owner = :userId
-                  {$planJoin}
             WHERE {$where}
 
             UNION
@@ -501,7 +519,6 @@ class Mapper extends BaseMapper
             FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
             JOIN  {$this->getJoinSql('duework', 'a', 'd', true)}
             JOIN  {$this->getJoinSql('duework.return', 'd', 'dr')} AND dr.owner = :userId
-                  {$planJoin}
             WHERE {$where}
 
             UNION
@@ -510,7 +527,6 @@ class Mapper extends BaseMapper
             FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
             JOIN  {$this->getJoinSql('quiz', 'a', 'q', true)}
             JOIN  {$this->getJoinSql('quiz.attempt', 'q', 'qa')} AND qa.user_id = :userId
-                  {$planJoin}
             WHERE {$where}
 
             UNION
@@ -519,7 +535,6 @@ class Mapper extends BaseMapper
             FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
             JOIN  {$this->getJoinSql('ltiAssessment', 'a', 'l', true)}
             JOIN  {$this->getJoinSql('ltiAssessment.scores', 'l', 'ls')} AND ls.student_id = :userId
-                  {$planJoin}
             WHERE {$where}
             
             UNION
