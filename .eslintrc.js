@@ -101,6 +101,18 @@ module.exports = {
         "eslint-comments/no-unused-disable": "error",
         "eslint-comments/no-unused-enable": "error",
         "eslint-comments/require-description": "warn",
+        /**
+         * Override the ForOfStatement restriction from airbnb, as we want to allow
+         * for-of loops (including with await) as they are more readable than .forEach or .reduce
+         * and our browser targets support them without the need for regenerator-runtime
+         * It should also help avoid Promise.all() accidentally being used for operations that must be sequential
+         */
+        "no-restricted-syntax": [
+            "error",
+            (({ ForOfStatement, ..._rules }) => _rules)(
+                require("eslint-config-airbnb-base/rules/style").rules["no-restricted-syntax"][1],
+            ),
+        ],
     },
     settings: {
         "import/parsers": {
