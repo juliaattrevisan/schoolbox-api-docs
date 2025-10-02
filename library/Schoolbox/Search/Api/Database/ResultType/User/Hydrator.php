@@ -24,6 +24,7 @@ use Schoolbox\Search\Api\SearchFilter;
 use Schoolbox\User;
 use Schoolbox\User\Formatter\Formatter;
 use Schoolbox\UserMapper;
+use Schoolbox\L10n\RosettaStone;
 
 /**
  * Hydrate a set of raw user results into a set of full user results.
@@ -53,6 +54,7 @@ class Hydrator extends BaseHydrator
     /**
      * Constructor
      *
+     * @param RosettaStone  $rosettaStone      Used to translate terminology.
      * @param UserMapper    $userMapper        Used to fetch users for hydration.
      * @param Formatter     $userNameFormatter Used to format a user's name on output.
      * @param IConfigLoader $config            Used for fetching configuration, which controls user search
@@ -61,6 +63,7 @@ class Hydrator extends BaseHydrator
      * @param Authorizer    $authorizer
      */
     public function __construct(
+        private RosettaStone $rosettaStone,
         private UserMapper $userMapper,
         private User\Formatter\Formatter $userNameFormatter,
         private IConfigLoader $config,
@@ -219,7 +222,7 @@ class Hydrator extends BaseHydrator
         $route  = 'pastoral.getStudent';
         $params = ['studentId' => $searchResultUser->getId(), 'student' => $searchResultUser];
         if ($searchResultUser->getRole()->isStudent()) {
-            $links[] = $this->generateLinkIfRouteAuthorized($route, $params, $viewer, 'Pastoral Care', 'icon-pastoral');
+            $links[] = $this->generateLinkIfRouteAuthorized($route, $params, $viewer, $this->rosettaStone->translate('pastoralCare', false, true), 'icon-pastoral');
         }
 
         // The timetable link from a search result should work in the same way as the timetable link from the user profile.

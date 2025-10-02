@@ -111,6 +111,7 @@ class Module extends BaseModule
 
         $hydrators = [
             new Database\ResultType\User\Hydrator(
+                $rosettaStone,
                 $mapperFactory->get(UserMapper::class),
                 $userNameFormatter,
                 $config,
