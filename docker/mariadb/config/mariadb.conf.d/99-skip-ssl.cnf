@@ -1,2 +1,2 @@
 [mariadb]
-have_ssl = DISABLED
+skip-ssl
