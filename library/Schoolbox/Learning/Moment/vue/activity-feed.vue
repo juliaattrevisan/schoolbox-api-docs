@@ -3,7 +3,7 @@ import type { Dayjs } from "dayjs";
 import { keysOf } from "@js/util/arrayUtils";
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import type { Metadata } from "@js/util/sbx/apiUtils";
-import { Template } from "@js/editor/types/editorTypes";
+import type { Template } from "@js/editor/types/editorTypes";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import StorageObject from "@schoolboxVue/components/storage-object.vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
@@ -126,6 +126,104 @@ const dateDisplayFormats = window.Vue.computed(() => window.dateDisplayFormats);
 const awardDetailModalEl = window.Vue.useTemplateRef<InstanceType<typeof AwardDetailModal> | null>(
     "awardDetailModalRef",
 );
+
+type FiltersState = {
+    tag: string;
+    filterNames: string[];
+};
+
+/**
+ * Generate a filterState object from the URL parameters (if there are any).
+ *
+ * The URL is expected to have parameters like this:
+ *    https://schoolbox.com.au/search/user/69?tag=Class%20Work&filterNames[]=feedback&filterNames[]=achievements
+ *    - Both parameters ('tag' and 'filterNames') are optional
+ *    - filterNames are expected to match the keys from this.selectedFilters.
+ *
+ * Example of return value:
+ *    {
+ *       filterNames: ['feedback', 'learningMoments'], { Array of keys from this.selectedFilters }
+ *       tag: '' { String }
+ *    }
+ * @returns - -
+ * @see getFiltersStateFromDom()
+ */
+function getFiltersStateFromUrl(): FiltersState {
+    const url = new URL(window.location.href);
+
+    const filtersState: FiltersState = { tag: "", filterNames: [] };
+
+    for (let [key, value] of url.searchParams.entries()) {
+        key = decodeURIComponent(key);
+        value = decodeURIComponent(value);
+
+        switch (key) {
+            case "tag":
+                filtersState.tag = value;
+                break;
+
+            case "filterNames[]":
+                filtersState.filterNames.push(value);
+                break;
+
+            default:
+            // Unrecognised key, so ignore.  Do nothing.
+        }
+    }
+
+    return filtersState;
+}
+
+/**
+ * Generate a filterState object from the current state of the DOM.
+ * Since the selectedTag is not stored in the DOM, we get that from this.selectedTag.
+ *
+ * Example of return value:
+ *    {
+ *       filterNames: ['feedback', 'learningMoments'], { Array of keys from this.selectedFilters }
+ *       tag: '' { String }
+ *    }
+ * @returns -
+ * @see getFiltersStateFromUrl()
+ */
+function getFiltersStateFromDom(): FiltersState {
+    const checkedFeedItemTypes: string[] = [];
+
+    for (const filterName of keysOf(selectedFilters)) {
+        if ($(`#filter-${filterName}`).prop("checked")) {
+            checkedFeedItemTypes.push(filterName);
+        }
+    }
+
+    return { filterNames: checkedFeedItemTypes, tag: selectedTag.value };
+}
+
+/**
+ * @param filtersState -
+ * Example of non-null filtersState object:
+ *    {
+ *       filterNames: ['feedback', 'learningMoments'],
+ *       tag: '' { String }
+ *    }
+ */
+function setSelectedTagAndFiltersToMatchState(filtersState: FiltersState | null): void {
+    if (filtersState === null) {
+        // Return the filters to their default state.
+        selectedTag.value = "";
+
+        for (const filterName of keysOf(selectedFilters)) {
+            selectedFilters[filterName] = false;
+        }
+    } else {
+        // Restore state of selectedTag.
+        selectedTag.value = filtersState.tag;
+
+        // Restore state of filter checkboxes.
+        for (const filterName of keysOf(selectedFilters)) {
+            selectedFilters[filterName] = filtersState.filterNames.includes(filterName);
+        }
+    }
+}
 
 type GroupedFeedItem = {
     date: Dayjs;
@@ -374,104 +472,6 @@ function loadFilteredContent($selectedTag: string, simulateRedirect: boolean): v
 
     // Replace the current state in the history object with the new state (and set the current URL to match that state).
     window.history.replaceState(filtersState, "", newUrl.toString());
-}
-
-type FiltersState = {
-    tag: string;
-    filterNames: string[];
-};
-
-/**
- * Generate a filterState object from the URL parameters (if there are any).
- *
- * The URL is expected to have parameters like this:
- *    https://schoolbox.com.au/search/user/69?tag=Class%20Work&filterNames[]=feedback&filterNames[]=achievements
- *    - Both parameters ('tag' and 'filterNames') are optional
- *    - filterNames are expected to match the keys from this.selectedFilters.
- *
- * Example of return value:
- *    {
- *       filterNames: ['feedback', 'learningMoments'], { Array of keys from this.selectedFilters }
- *       tag: '' { String }
- *    }
- * @returns - -
- * @see getFiltersStateFromDom()
- */
-function getFiltersStateFromUrl(): FiltersState {
-    const url = new URL(window.location.href);
-
-    const filtersState: FiltersState = { tag: "", filterNames: [] };
-
-    for (let [key, value] of url.searchParams.entries()) {
-        key = decodeURIComponent(key);
-        value = decodeURIComponent(value);
-
-        switch (key) {
-            case "tag":
-                filtersState.tag = value;
-                break;
-
-            case "filterNames[]":
-                filtersState.filterNames.push(value);
-                break;
-
-            default:
-            // Unrecognised key, so ignore.  Do nothing.
-        }
-    }
-
-    return filtersState;
-}
-
-/**
- * Generate a filterState object from the current state of the DOM.
- * Since the selectedTag is not stored in the DOM, we get that from this.selectedTag.
- *
- * Example of return value:
- *    {
- *       filterNames: ['feedback', 'learningMoments'], { Array of keys from this.selectedFilters }
- *       tag: '' { String }
- *    }
- * @returns -
- * @see getFiltersStateFromUrl()
- */
-function getFiltersStateFromDom(): FiltersState {
-    const checkedFeedItemTypes: string[] = [];
-
-    for (const filterName of keysOf(selectedFilters)) {
-        if ($(`#filter-${filterName}`).prop("checked")) {
-            checkedFeedItemTypes.push(filterName);
-        }
-    }
-
-    return { filterNames: checkedFeedItemTypes, tag: selectedTag.value };
-}
-
-/**
- * @param filtersState -
- * Example of non-null filtersState object:
- *    {
- *       filterNames: ['feedback', 'learningMoments'],
- *       tag: '' { String }
- *    }
- */
-function setSelectedTagAndFiltersToMatchState(filtersState: FiltersState | null): void {
-    if (filtersState === null) {
-        // Return the filters to their default state.
-        selectedTag.value = "";
-
-        for (const filterName of keysOf(selectedFilters)) {
-            selectedFilters[filterName] = false;
-        }
-    } else {
-        // Restore state of selectedTag.
-        selectedTag.value = filtersState.tag;
-
-        // Restore state of filter checkboxes.
-        for (const filterName of keysOf(selectedFilters)) {
-            selectedFilters[filterName] = filtersState.filterNames.includes(filterName);
-        }
-    }
 }
 
 /**
