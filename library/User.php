@@ -278,7 +278,7 @@ class User extends DeprecatedModel
             // TODO account for preferred name:
             //      alternately remove and replace with API search
             if (preg_match('/([[:alnum:]\'"]+) ([[:alnum:]\'"]+)/', $keyword, $name)) {
-                // Since the keyword is two words, we infer that the user may be trying to search for a users's full name.
+                // Since the keyword is two words, we infer that the user may be trying to search for a user's full name.
                 // The ' or ' suffix avoids syntax errors when the 'always search basic names' clause is appended below.
                 $query .= "(
                     ( firstname like :firstname and lastname like :lastname )
