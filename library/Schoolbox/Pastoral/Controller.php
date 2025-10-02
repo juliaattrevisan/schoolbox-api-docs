@@ -776,8 +776,12 @@ class Controller extends Base
          */
         $this->recordProcessor->processPartialPastoralRecords($partial, $record);
 
-        /* TODO Return something to api users...but what...?
+        /* Send back a json copy of what we just mutated in $record
          */
+        if ($this->isJsonRequest()) {
+            $this->response = $this->responseAsJson(($this->pastoralTranslator)($record))->withStatus(201);
+            return;
+        }
 
         // Go back to students pastoral record
 
