@@ -81,10 +81,6 @@ class TaskD
                 'outfile'   => mb_substr($outfile, 0, self::FILENAME_MAX_LENGTH, 'UTF-8') . '.zip',
                 'gotenberg' => [
                     'url'     => $this->config->get(ConfigMapper::NAME_GOTENBERG_HOST),
-                    'version' => [
-                        'value'  => $this->config->get(ConfigMapper::NAME_GOTENBERG_API_VERSION),
-                        'header' => Client::API_VERSION_HEADER,
-                    ],
                     'auth'    => [
                         'key'    => $this->config->get(ConfigMapper::NAME_GOTENBERG_API_KEY),
                         'header' => Client::API_KEY_HEADER,
