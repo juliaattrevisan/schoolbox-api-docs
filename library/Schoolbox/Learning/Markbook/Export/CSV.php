@@ -303,7 +303,7 @@ class CSV extends AbstractCSV
 
             if ($dataFound) {
                 if ($this->hasTotalMarkColumn($assessment, $showDisplayMarks)) {
-                    [$numerator, $denominator] = $this->parseNumeratorAndDenominatorFromHumanReadableMark($humanReadableMark);
+                    [$numerator, $denominator] = $this->getFractionFromHumanReadable($humanReadableMark);
                     $row[] = $numerator . $suffix;
                     $row[] = $denominator . $suffix;
                 } else {

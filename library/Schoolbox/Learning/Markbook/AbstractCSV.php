@@ -157,7 +157,7 @@ class AbstractCSV
      * @param null|string $humanReadableMark
      * @return array{null|string, null|string}
      */
-    protected function parseNumeratorAndDenominatorFromHumanReadableMark(?string $humanReadableMark): array
+    protected function getFractionFromHumanReadable(?string $humanReadableMark): array
     {
         if (empty($humanReadableMark)) {
             $numerator = '';
