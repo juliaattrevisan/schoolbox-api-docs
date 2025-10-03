@@ -2,6 +2,7 @@ import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import Form from "@schoolboxTest/playwright/support/page/news/Form";
 import Index from "@schoolboxTest/playwright/support/page/news/Index";
 import Item from "@schoolboxTest/playwright/support/page/news/Item";
+import EditorTemplate from "@schoolboxTest/playwright/support/page/admin/design/EditorTemplates";
 
 /**
  * create a news article, unpublish it, publish it, audience view the article, enable comments,
@@ -26,26 +27,37 @@ test.describe("Create a News Article", () => {
     test("Create a News Article and publish it", async ({ tester, page }) => {
         const form = new Form(tester, page);
         const index = new Index(tester, page);
+        const editorTemplate = new EditorTemplate(page, tester);
 
         const headline = "Test News Title";
         const article = "wow what interesting news";
         const audienceOption = "Year Levels";
         const yearLevel = "Year 9";
 
+        tester.isGoingTo("Create a editor template to use in the news article");
+        await editorTemplate.gotoCreateTemplatePage(8);
+        await editorTemplate.createTemplate("News Automation Template", "This is an automation template", article);
+
         tester.isGoingTo("Go to the create news article page");
         await form.goto();
         await form.fillHeadline(headline);
         await form.fillArticle(article);
+        await tester.clickEditorTemplateCKEditor("body", "News Automation Template");
         await form.selectAudienceOption(audienceOption);
         await form.checkboxAudience(yearLevel);
         await form.clickAddAudience();
         await form.submit();
         // had to add this as it was going away from this page too quickly and not publishing
-        await page.waitForURL("/");
+        // await page.waitForURL("/");
 
         tester.isGoingTo("Verify that the news is in the All topic, and is the first news item");
         await index.goto("all");
         await index.seeHeadline(headline);
+
+        tester.isGoingTo("click the article title to view it and checks its content as per template selection");
+        const listItem = page.locator(`ul.information-list`).first();
+        await listItem.locator(`a:has-text("${headline}")`).first().click();
+        await expect(page.locator(`section.detail.content`)).toContainText(headline);
     });
 
     test("Unpublish the News Article", async ({ tester, page, db }) => {
@@ -211,6 +223,11 @@ test.describe("Create a News Article", () => {
             "comms_news_article",
             { deleted_at: "2022-01-15 11:22:34" },
             { "title like": "Acceptance Test News%", deleted_at: null },
+        );
+        await db.updateInDatabase(
+            "editor_template",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": "News Automation Template%" },
         );
     });
 });

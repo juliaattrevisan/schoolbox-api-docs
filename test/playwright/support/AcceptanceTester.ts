@@ -185,6 +185,48 @@ export default class AcceptanceTester extends BaseTester {
     }
 
     /**
+     * Click the template icon in the CKEditor5 bar based on the CKEditor on its ID and the template name
+     * @param editorId - The ID of the CKEditor5 instance
+     * @param templateName - The name of the template to select
+     */
+    async clickEditorTemplateCKEditor(editorId: string, templateName: string): Promise<void> {
+        // There should be at least one ckeditor, somewhere on the page, first.
+        // The actual element of the ckeditor has no direct correlation to the editorId, but if one exists then
+        // we can proceed with the next checks to find the actual editor we want
+        await expect(this.page.locator("div.ck.ck-editor").first()).toHaveCount(1);
+
+        // Wait for the editor to be ready
+        await this.page.waitForFunction(
+            ([_editorId]) => {
+                if (window.sbProps === undefined || window.sbProps.editors === undefined) {
+                    return false;
+                }
+                if (window.sbProps.editors[_editorId] === undefined) {
+                    return false;
+                }
+                return true;
+            },
+            [editorId],
+        );
+
+        // Focus the editor, and clear all content
+        await this.page.evaluate(
+            ([_editorId]) => {
+                window.sbProps.editors[_editorId]!.focus();
+                window.sbProps.editors[_editorId]!.setData("");
+            },
+            [editorId],
+        );
+
+        // click the template icon in the ckeditor toolbar
+        this.isGoingTo("click the template icon in the ckeditor toolbar and select a template");
+        await this.page.locator(`button[data-cke-tooltip-text="Insert template"]`).click();
+
+        // select a template
+        await this.page.locator("li.ck.ck-list__item").getByText(templateName).click();
+    }
+
+    /**
      * Attach a file to an attachzone, by simulating drag and drop
      * @param db - The DatabaseHelper instance
      * @param locator - the locator of the attachzone (usually an element with class "attachzone")

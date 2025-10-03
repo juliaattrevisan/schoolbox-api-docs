@@ -40,14 +40,14 @@ export default class EditorTemplate {
     }
 
     /**
-     * Navigates to the editor templates page
+     * Navigates to the editor templates page "/adminv2/editor-templates"
      */
     async goto(): Promise<void> {
         await this.page.goto(EditorTemplate.URL);
     }
 
     /**
-     * Navigates to the create templates page
+     * Navigates to the create templates page "/adminv2/editor-templates/{category_id}/create"
      * @param categoryId - The category ID: 1 for badge, 2 for calendar, 3 for email, 4 for feedback, 5 for homepage, 6 for activity, 7 for moments, 8 for news
      */
     async gotoCreateTemplatePage(categoryId: number): Promise<void> {
