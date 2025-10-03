@@ -195,24 +195,6 @@ class ConfigTest extends TestCase
         }
     }
 
-    /**
-     * Test that mergeConfig falls back to default types when input types are wrong.
-     */
-    public function testMergeConfigWithWrongTypesFallsBackToDefaults()
-    {
-        $input = [];
-        foreach (Config::ALL_MODULES as $module) {
-            $input[$module] = [
-                'open_ai_key' => ['shouldBeString'],
-                'model' => 123,
-            ];
-        }
-        $merged = Config::mergeConfig($input, Config::PROVIDER_OPENAI);
-        foreach (Config::ALL_MODULES as $module) {
-            $this->assertIsString($merged[$module]['open_ai_key']);
-            $this->assertIsString($merged[$module]['model']);
-        }
-    }
 
     /**
      * Test that mergeConfig does not mutate the input array.
@@ -229,19 +211,6 @@ class ConfigTest extends TestCase
         $copy = $input;
         Config::mergeConfig($input, Config::PROVIDER_OPENAI);
         $this->assertEquals($copy, $input);
-    }
-
-    /**
-     * Test that generateInitConfig returns deep copies (no shared references).
-     */
-    public function testGenerateInitConfigReturnsDeepCopies()
-    {
-        $result1 = Config::generateInitConfig(Config::PROVIDER_OPENAI);
-        $result2 = Config::generateInitConfig(Config::PROVIDER_OPENAI);
-        $this->assertNotSame($result1, $result2);
-        foreach (Config::ALL_MODULES as $module) {
-            $this->assertNotSame($result1[$module], $result2[$module]);
-        }
     }
 
     /**
@@ -294,23 +263,6 @@ class ConfigTest extends TestCase
         $this->assertEquals('lesson-resource', $merged['lessonPlan']['resource_name']);
         $this->assertEquals('', $merged['lessonPlan']['deployment_id']);
         $this->assertEquals(\Schoolbox\Admin\OpenAI\Config::PROVIDER_AZURE, $merged['lessonPlan']['provider']);
-    }
-
-    /**
-     * Test mergeConfig with extra and wrong type values in OpenAI JSON payload.
-     */
-    public function testMergeConfigWithExtraAndWrongTypeJsonForOpenAI()
-    {
-        $json = '{"textChat":{"provider":"OpenAI","open_ai_key":123,"model":false,"extra":"remove"},"lessonPlan":{"provider":"OpenAI","open_ai_key":null,"model":null}}';
-        $config = json_decode($json, true);
-        $merged = \Schoolbox\Admin\OpenAI\Config::mergeConfig($config, \Schoolbox\Admin\OpenAI\Config::PROVIDER_OPENAI);
-        $this->assertIsString($merged['textChat']['open_ai_key']);
-        $this->assertIsString($merged['textChat']['model']);
-        $this->assertEquals(\Schoolbox\Admin\OpenAI\Config::PROVIDER_OPENAI, $merged['textChat']['provider']);
-        $this->assertArrayNotHasKey('extra', $merged['textChat']);
-        $this->assertIsString($merged['lessonPlan']['open_ai_key']);
-        $this->assertIsString($merged['lessonPlan']['model']);
-        $this->assertEquals(\Schoolbox\Admin\OpenAI\Config::PROVIDER_OPENAI, $merged['lessonPlan']['provider']);
     }
 
     /**

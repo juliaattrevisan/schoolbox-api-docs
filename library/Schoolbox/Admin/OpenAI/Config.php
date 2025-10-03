@@ -23,6 +23,24 @@ class Config
 //        self::MODULE_AIASSESSMENT,
     ];
 
+
+    // field name and types
+    public const FIELD_PROVIDER = 'provider';
+    public const FIELD_ENABLED = 'enabled';
+    public const FIELD_OPENAIKEY = 'open_ai_key';
+    public const FIELD_RESOURCE_NAME = 'resource_name';
+    public const FIELD_DEPLOYMENT_ID = 'deployment_id';
+    public const FIELD_MODEL = 'model';
+    // model options
+    public const FIELD_OPTIONS = [
+        self::FIELD_PROVIDER => 'input',
+        self::FIELD_ENABLED => 'checkbox',
+        self::FIELD_OPENAIKEY => 'input',
+        self::FIELD_RESOURCE_NAME => 'input',
+        self::FIELD_DEPLOYMENT_ID => 'input',
+        self::FIELD_MODEL => 'select',
+    ];
+
     public const NOT_ACTIVE = "Not Active";
     public const AI_MODELS = [
         self::NOT_ACTIVE,
@@ -35,21 +53,19 @@ class Config
     public const PROVIDER_AZURE = 'Azure';
     public const PROVIDER_OPENAI = 'OpenAI';
 
-    public const CONFIG_STRUCT_AZURE =
-        [
-            'provider' => self::PROVIDER_AZURE,
-            'enabled' => false,
-            'open_ai_key' => '',
-            'resource_name' => '',
-            'deployment_id' => '',
-        ];
+    public const CONFIG_STRUCT_AZURE = [
+        self::FIELD_PROVIDER => self::PROVIDER_AZURE,
+        self::FIELD_ENABLED => false,
+        self::FIELD_OPENAIKEY => '',
+        self::FIELD_RESOURCE_NAME => '',
+        self::FIELD_DEPLOYMENT_ID => '',
+    ];
 
-    public const CONFIG_STRUCT_OPENAI =
-        [
-            'provider' => self::PROVIDER_OPENAI,
-            'open_ai_key' => '',
-            'model' => self::NOT_ACTIVE,
-        ];
+    public const CONFIG_STRUCT_OPENAI = [
+        self::FIELD_PROVIDER => self::PROVIDER_OPENAI,
+        self::FIELD_OPENAIKEY => '',
+        self::FIELD_MODEL => self::NOT_ACTIVE,
+    ];
 
     /**
      * Take the stored settings and convert it into an associative array
