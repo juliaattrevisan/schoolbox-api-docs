@@ -745,10 +745,12 @@ class Controller extends Base
      *
      * This is a somewhat-unique take on processPastoralRecords()
      *
+     * @param Model $record
      * @return void
-     * @throws Exception
+     * @throws MapperException
+     * @throws RouteNotFound
      */
-    public function patchRecordUpdate(): void
+    public function patchRecordUpdate(Model $record): void
     {
         /* In admin, if pastoral synchronisation was turned on,
          * but the currently-logged-in-user doesn't have a meaningful external id,
@@ -759,16 +761,6 @@ class Controller extends Base
         /* A partial set of fields
          */
         $partial = $this->request->getParsedBody();
-
-        // Grab the pastoral record we are updating
-        try {
-            /* For some reason we chose *not* to prehydrate $record as an arg to this method
-             * or its sister method postRecordUpdate()...was this a shortcut of some kind?!
-             */
-            $record = $this->pastoralDataSource->findById($this->getUser(), $partial['id']);
-        } catch (MapperException $e) {
-            throw $this->errorMapper->generateException(ErrorMapper::ERROR_PASTORAL_NOT_FOUND);
-        }
 
         /* Not entirely sure why there's a processPastoralRecords() wrapper around one method that
          * you could directly access: recordProcessors aren't interchangeable and there's only one
