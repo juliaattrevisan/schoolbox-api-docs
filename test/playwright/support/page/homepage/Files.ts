@@ -187,6 +187,22 @@ export default class Files {
      * @param expectedTitle - The expected title of the link
      * @param expectedDesc - The expected description of the link
      */
+    // public static async checkFileDescription(
+    //     fileComponent: Locator,
+    //     expectedTitle: string,
+    //     expectedDesc: string,
+    // ): Promise<void> {
+    //     const REGEX_TIMESTAMP =
+    //         /\b(?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{1,2},\s\d{4}\s\d{1,2}:\d{2}\s?(?:am|pm)|(?:just now|\d+\s+(?:second|minute|hour|day|week|month|year)s?\s+ago))\b/i;
+    //     const ELEMENT_METADATA_P = `//h3[normalize-space()='${expectedTitle}']/ancestor::div[contains(@class,'card')]//p`;
+    //     const allTexts = await fileComponent.locator(ELEMENT_METADATA_P).allTextContents();
+    //     const meta = allTexts[0].trim();
+    //     const actualDesc = allTexts[1].trim();
+    //     expect(meta).toContain("Schoolbox Admin");
+    //     expect(meta).toMatch(REGEX_TIMESTAMP);
+    //     expect(actualDesc).toBe(expectedDesc);
+    // }
+
     public static async checkFileDescription(
         fileComponent: Locator,
         expectedTitle: string,
@@ -194,12 +210,55 @@ export default class Files {
     ): Promise<void> {
         const REGEX_TIMESTAMP =
             /\b(?:(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s\d{1,2},\s\d{4}\s\d{1,2}:\d{2}\s?(?:am|pm)|(?:just now|\d+\s+(?:second|minute|hour|day|week|month|year)s?\s+ago))\b/i;
-        const ELEMENT_METADATA_P = `//h3[normalize-space()='${expectedTitle}']/ancestor::div[contains(@class,'card')]//p`;
-        const allTexts = await fileComponent.locator(ELEMENT_METADATA_P).allTextContents();
-        const meta = allTexts[0].trim();
-        const actualDesc = allTexts[1].trim();
-        expect(meta).toContain("Schoolbox Admin");
-        expect(meta).toMatch(REGEX_TIMESTAMP);
-        expect(actualDesc).toBe(expectedDesc);
+
+        const P = fileComponent.locator(
+            `//h3[normalize-space()='${expectedTitle}']/ancestor::div[contains(@class,'card')]//p`,
+        );
+
+        // meta = first <p>
+        await expect(P.first()).toBeVisible();
+        await expect(P.first()).toContainText("Schoolbox Admin");
+        await expect(P.first()).toContainText(REGEX_TIMESTAMP);
+
+        // description = second <p>
+        if (expectedDesc) {
+            await expect(P.nth(1), "Description <p> missing").toBeVisible();
+            await expect(P.nth(1)).toHaveText(expectedDesc);
+        }
+    }
+
+    /*
+     * Modify a file previously created
+     * @param fileComponent - The files component
+     * @param fileID - The id of the file to be modified from table file
+     * @param newFileTitle - The new title for the file
+     */
+    public async modifyFile(fileComponent: Locator, fileId: number, newFileTitle: string): Promise<void> {
+        // await fileComponent.locator(`//a[text()='${existingFileTitle}']//ancestor::li//nav//a`).click();
+        await fileComponent.locator(`a.icon-modify[title="Modify File"][href^="/cms/file/${fileId}"]`).click();
+        await this.page.locator("#description").fill(newFileTitle);
+        await this.page.locator('input[value="Modify File"]').click();
+        await expect(this.page.locator("#description")).toBeHidden();
+    }
+    /*
+     * Add an existing link from the file system to a links component
+     * @param fileComponent - The links component locator
+     * @param srcFolder - The source folder name
+     * @param subSrcFolder - The sub-source folder name
+     */
+    public async addExistingLink(fileComponent: Locator, srcFolder: string, subSrcFolder: string): Promise<void> {
+        const regexSrc = new RegExp(`^${srcFolder}$`);
+        await fileComponent.locator('[id*="modalLinkButton"]', { hasText: "Browse" }).click();
+        await this.page.locator("#filesystem-browse-panel a", { hasText: regexSrc }).click();
+        const locatorEng9A = this.page.locator("#filesystem-browse-panel li.resource a", { hasText: subSrcFolder });
+        await locatorEng9A.click({ delay: 1000 });
+        await expect(locatorEng9A).toBeHidden();
+        await this.page
+            .locator("#filesystem-browse-panel div.component-action a", { hasText: "Use This Folder" })
+            .click();
+        const locatorEng = fileComponent.locator("div.source a", { hasText: subSrcFolder });
+        await expect(locatorEng).toBeVisible();
+        await fileComponent.locator('input[type="submit"][value="Update"]').click();
+        await expect(locatorEng).toBeHidden();
     }
 }

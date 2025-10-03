@@ -16,6 +16,7 @@ test.describe("Files Component Tests", () => {
     let homepage: Homepage;
     let files: Files;
     let filesComponent: Locator;
+    let newFileTitle: string = "Text Automation Rayed File";
     let linkTitle: string = "Test Link Automation";
     const newLinkTitle: string = "Test Link Automation Updated";
     const linkUrl: string = "https://www.youtube.com";
@@ -127,5 +128,48 @@ test.describe("Files Component Tests", () => {
         await Homepage.clickComponentSettings(filesComponent);
         await Files.updateFileComponentSetting(filesComponent);
         await Files.checkFileDescription(filesComponent, "Test Automation File", "Description for File");
+    });
+
+    test("Verify Update file", async ({ tester, db }) => {
+        const fileId = (await db.grabFromDatabase("file", "id", {
+            deleted_at: null,
+            description: "Test Automation File",
+        })) as number;
+
+        tester.isGoingTo("Navigate to 9A English homepage and update a link in the Links component");
+        await homepage.goto(83);
+        tester.isGoingTo("Modify Link Title");
+        filesComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
+        componentId = await Homepage.getComponentId(filesComponent);
+        await files.modifyFile(filesComponent, fileId, newFileTitle);
+        await Files.checkFileDescription(filesComponent, newFileTitle, "Description for File");
+    });
+
+    test("Verify adding file component to another page", async ({ tester }) => {
+        tester.isGoingTo("Navigate to 3RW homepage and alt-source the Files component");
+        await homepage.goto(188);
+        tester.isGoingTo("Add Files component");
+        await homepage.addComponent(Homepage.ELEMENT_ADD_COMPONENT_SECTION_RESOURCES, "Files");
+        filesComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
+        componentId = await Homepage.getComponentId(filesComponent);
+        await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
+        await Homepage.clickComponentSettings(filesComponent);
+        await files.addExistingLink(filesComponent, "English", "9A English");
+        const sortedFiles = await Files.getAllFiles(filesComponent);
+        tester.isGoingTo(sortedFiles.toString());
+        expect(sortedFiles).toEqual([newFileTitle, "Glasses", "Where did English come from?", "Spelling tips"]);
+    });
+
+    test("Verify Link component access for student", async ({ tester }) => {
+        await tester.impersonate("Jana Reed");
+        await homepage.goto(83);
+        filesComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
+        componentEnglishId = await Homepage.getComponentId(filesComponent);
+        const filesHeader = filesComponent.getByTestId("homepage-component-titlebar-name");
+        const viewAllFilesBtn = filesComponent.getByTestId("view-all-links-button");
+        const addFileBtn = filesComponent.getByTestId("add-link-button");
+        await expect(filesHeader).toBeHidden();
+        await expect(viewAllFilesBtn).toBeHidden();
+        await expect(addFileBtn).toBeHidden();
     });
 });

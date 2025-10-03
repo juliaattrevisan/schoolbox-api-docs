@@ -109,12 +109,12 @@ export default class ApiHelper {
     }
 
     /**
-     * Delete a file
+     * Delete a file (legacy PHP)
      * @param fileId - ID of the file to delete
      */
     async deleteFile(fileId: string | number): Promise<void> {
         this.baseTester.isGoingTo(`soft delete the file with ID ${fileId}`);
-        const resp = await this.request.delete(`/fileForm.php?delete=${fileId}`, await this.getAuthHeader());
+        const resp = await this.request.get(`/cms/fileForm.php?delete=${fileId}&ajax=true`, await this.getAuthHeader());
         if (!resp.ok()) {
             throw new Error(`Failed to delete file: ${resp.status()} ${resp.statusText()}`);
         }
