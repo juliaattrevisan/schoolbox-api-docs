@@ -9,6 +9,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\OpenAI;
 
+use Schoolbox\Admin\Settings\ModuleConfig;
+use Schoolbox\GenericCollection;
+use Schoolbox\Config\ConfigMapper;
+
 class Config
 {
     // CKEditor chat
@@ -33,12 +37,12 @@ class Config
     public const FIELD_MODEL = 'model';
     // model options
     public const FIELD_OPTIONS = [
-        self::FIELD_PROVIDER => 'input',
-        self::FIELD_ENABLED => 'checkbox',
-        self::FIELD_OPENAIKEY => 'input',
-        self::FIELD_RESOURCE_NAME => 'input',
-        self::FIELD_DEPLOYMENT_ID => 'input',
-        self::FIELD_MODEL => 'select',
+        self::FIELD_PROVIDER => ConfigMapper::FIELD_INPUT,
+        self::FIELD_ENABLED => ConfigMapper::FIELD_BOOLEAN,
+        self::FIELD_OPENAIKEY => ConfigMapper::FIELD_INPUT,
+        self::FIELD_RESOURCE_NAME => ConfigMapper::FIELD_INPUT,
+        self::FIELD_DEPLOYMENT_ID => ConfigMapper::FIELD_INPUT,
+        self::FIELD_MODEL => ConfigMapper::FIELD_SELECT,
     ];
 
     public const NOT_ACTIVE = "Not Active";
@@ -155,5 +159,51 @@ class Config
         }
 
         return $merged;
+    }
+
+    /**
+     * Build the standard Twig config for setting page for all modules
+     * @param array $config
+     * @param $fieldStrategyFactory
+     * @param $siteVersion
+     * @param $postRoute
+     * @param $additionalContext
+     * @return array|void
+     */
+    public function buildTwigConfig(array $config, $fieldStrategyFactory, $siteVersion, $postRoute, $additionalContext)
+    {
+        //loop through the modules
+        if (empty($config) || !is_array($config)) {
+            return;
+        }
+        $modules = [];
+        foreach ($config as $module => $settings) {
+            // create a fake config collection
+            $configCollection = new GenericCollection(\Schoolbox\Config\Config::class);
+            foreach ($settings as $key => $value) {
+                $cfg = new \Schoolbox\Config\Config();
+                $cfg->setName($key)
+                    ->setTitle($key)
+                    ->setValue((string)$value)
+                    ->setTypeId(ConfigMapper::TYPE_AI)
+                    ->setFieldId(self::FIELD_OPTIONS[$key] ?? ConfigMapper::FIELD_INPUT)
+                    ->setEditable(true);
+
+                // don't show provider
+                if ($key === self::FIELD_PROVIDER) {
+                    $cfg->setEditable(false);
+                }
+                $configCollection->add($cfg);
+            }
+
+            $modules[$module] = (new ModuleConfig($fieldStrategyFactory))->getContext(
+                $siteVersion,
+                $configCollection,
+                $postRoute,
+                $additionalContext,
+            );
+        }
+
+        return $modules;
     }
 }

@@ -33,7 +33,7 @@ class Controller extends ConfigController
      */
     public function __construct(
         ConfigMapper $configMapper,
-        FieldStrategyFactory $fieldStrategyFactory,
+        private FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
         CacheInterface $oidcCache,
     ) {
@@ -53,11 +53,21 @@ class Controller extends ConfigController
 
         $textConfig = $aiConfig->decode($this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_SETTINGS), $textProvider);
 
-        $textConfigContext = $this->buildConfigContext(
-            $this->buildTextConfigPredicate(),
+        $textConfigContext = $aiConfig->buildTwigConfig(
+            $textConfig,
+            $this->fieldStrategyFactory,
+            $this->getConfigLoader()->get('site_version'),
             $this->routeGenerator->generate('adminOpenAi.postTextOptions'),
-            [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false],
+            [
+                ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,
+                'formId' => 'textSettings'
+            ]
         );
+//        $textConfigContext = $this->buildConfigContext(
+//            $this->buildTextConfigPredicate(),
+//            $this->routeGenerator->generate('adminOpenAi.postTextOptions'),
+//            [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false],
+//        );
 
         $imageConfigContext = $this->buildConfigContext(
             $this->buildImageConfigPredicate(),
@@ -67,13 +77,14 @@ class Controller extends ConfigController
 
         /* Make islands independent of each other for validation reasons
          */
-        $textConfigContext['formId'] = 'textSettings';
+        $textConfigFormId = 'textSettings';
         $imageConfigContext['formId'] = 'imageSettings';
 
         $this->response = $this->responseFromTemplate('@adminOpenAi/index.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminOpenAi.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminOpenAi.getIndex')),
             'textConfigContext' => $textConfigContext,
+            'textConfigFormId' => $textConfigFormId,
             'textConfig' => $textConfig,
             'imageConfigContext' => $imageConfigContext,
             'endpointTypeOff' => Helper::ENDPOINT_TYPE_OFF,

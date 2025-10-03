@@ -101,6 +101,7 @@ class ConfigMapper extends Mapper
     public const TYPE_PASTORAL_CARE = 19;
     public const TYPE_DOC_MANAGE    = 20;
     public const TYPE_SAML          = 21;
+    public const TYPE_AI            = 22;
 
     // Technically these should be prefixed with 'NAME_', but it gets a bit verbose for little extra clarity
     public const _GLOBAL_MODERATION              = 'global_moderation';
