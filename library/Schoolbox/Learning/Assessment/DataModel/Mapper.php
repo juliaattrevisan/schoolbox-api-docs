@@ -475,8 +475,8 @@ class Mapper extends BaseMapper
                 LEFT JOIN {$this->getJoinSql('plans', 'a', 'pp')}
                 JOIN {$this->getJoinSql('plans.participants', 'pp', 'p')} AND p.user_id = :userId
             ";
+            $pb->putParam('userId', $student->getId());
         }
-        $pb->putParam('userId', $student->getId()); // For join
 
         $where = implode(' AND ', $pb->getWhere());
         $query = "
