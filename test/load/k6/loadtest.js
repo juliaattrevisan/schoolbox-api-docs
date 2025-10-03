@@ -28,8 +28,8 @@ export default function () {
     const startOfToday = now - (now % 86400); // Round down to midnight
     const startOfTomorrow = startOfToday + 86400; // Add 24 hours
     const dayOfWeek = new Date().getDay(); // 0 = Sunday
-    const calendarStart = startOfToday - (dayOfWeek * 86400); // Back to Sunday, i.e., start of current week
-    const calendarEnd = calendarStart + (42 * 86400); // Forward 6 weeks
+    const calendarStart = startOfToday - dayOfWeek * 86400; // Back to Sunday, i.e., start of current week
+    const calendarEnd = calendarStart + 42 * 86400; // Forward 6 weeks
     const currentYear = new Date().getFullYear();
     const endOfYear = Math.floor(new Date(currentYear + 1, 0, 1).getTime() / 1000);
 
@@ -47,7 +47,6 @@ export default function () {
     });
     sleep(1); // Wait 1 second after login
 
-
     // Step 2: Visit Dashboard
     let dashboardRes = http.get(`${BASE_URL}/`);
     check(dashboardRes, {
@@ -61,7 +60,6 @@ export default function () {
     http.get(`${BASE_URL}/calendar/ajax/full?start=${startOfToday}&end=${startOfTomorrow}&userId=${user.userId}`);
     sleep(2);
 
-
     // Step 3: Visit Calendar
     let calendarRes = http.get(`${BASE_URL}/calendar/`);
     check(calendarRes, {
@@ -72,14 +70,12 @@ export default function () {
     http.get(`${BASE_URL}/calendar/ajax/full?start=${calendarStart}&end=${calendarEnd}&userId=${user.userId}`);
     sleep(2);
 
-
     // Step 4: Visit Timetable
     let timetableRes = http.get(`${BASE_URL}/timetable`);
     check(timetableRes, {
         "timetable loaded": (r) => r.status === 200,
     });
     sleep(2);
-
 
     // Step 5: Visit Due Work
     let dueWorkRes = http.get(`${BASE_URL}/learning/due/`);
@@ -92,20 +88,30 @@ export default function () {
     sleep(2);
 
     // Step 6: Visit Homepage
-    let homepageRes = http.get(`${BASE_URL}/homepage/${user.homepageId}`);
-    check(homepageRes, {
-        "homepage loaded": (r) => r.status === 200,
-    });
+    if (user.roleType !== "Parent") {
+        let homepageRes = http.get(`${BASE_URL}/homepage/${user.homepageId}`);
+        check(homepageRes, {
+            "homepage loaded": (r) => r.status === 200,
+        });
 
-    // Homepage AJAX request
-    http.get(`${BASE_URL}/calendar/ajax/full?start=${startOfToday}&end=${endOfYear}&userId=${user.userId}`);
-    sleep(2);
-
+        // Homepage AJAX request
+        http.get(`${BASE_URL}/calendar/ajax/full?start=${startOfToday}&end=${endOfYear}&userId=${user.userId}`);
+        sleep(2);
+    }
 
     // Step 7: Visit Grades
     let gradesRes = http.get(`${BASE_URL}/learning/grades`);
     check(gradesRes, {
         "grades loaded": (r) => r.status === 200,
     });
-    sleep(3);
+    sleep(2);
+
+    // Step 8: Visit Course List
+    if (user.roleType === "Staff") {
+        let courseListRes = http.get(`${BASE_URL}/course/list`);
+        check(courseListRes, {
+            "course list loaded:": (r) => r.status === 200,
+        });
+        sleep(3);
+     }
 }
