@@ -50,10 +50,10 @@ const imageSrc = window.Vue.computed(() => {
         />
         <label :for="radioId"> </label>
 
-        <div v-if="props.message.status === 'error'" class="alert-box alert l-mar--0">
+        <p v-if="props.message.status === 'error'" class="alert-box alert l-mar--0">
             <b>There was a problem generating the image.</b>
             {{ props.message.message }}
-        </div>
+        </p>
 
         <div v-else>
             <div v-if="imageSrc" class="actions-small-1">
