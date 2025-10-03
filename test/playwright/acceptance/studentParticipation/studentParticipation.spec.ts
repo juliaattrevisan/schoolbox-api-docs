@@ -77,11 +77,33 @@ test.describe("Student Participation Tests", () => {
         await studentParticipation.goto();
         await studentParticipation.modifyStudentActivity(userId, studentName, newTitle, description, dueDate);
 
+        // Select the button with data-test attribute
+        await page.click('[data-test="sbx-pop-out-participant-29-button"]');
+
+        // Find the Include in Existing customisation link within participant-29 element
+        await page.locator("#participant-29").getByText("Include in Existing customisation").click();
+
+        // When the customisation modal opens, find the select with label Customisation
+        const customisationSelect = page.locator('label:has-text("Customisation")').locator("..").locator("select");
+
+        // Select the option which contains the newTitle text
+        const optionWithTitle = customisationSelect.locator(`option:has-text("${newTitle}")`);
+        await optionWithTitle.click();
+
+        // In the modal select the button that includes the text 'Confirm'
+        await page.getByRole("button", { name: /Confirm/ }).click();
+
+        // Once the modal is closed, look for the table row that contains the student 'Li, Penelope'
+        const penelopeRow = page.locator('tr:has-text("Li, Penelope")');
+
+        // For that student, in the 'Customisation' column, they should have the newTitle text
+        await expect(penelopeRow.locator("td").nth(4)).toContainText(newTitle); // Assuming Customisation is the 5th column (index 4)
+
         // Clean up database entries, removing the foreign key then the plan itself
-        // const planId = (await db.grabFromDatabase("participant_plan", "id", {
-        //     "name like": newTitle,
-        // })) as number;
-        // await db.dontHaveInDatabase("participant", { participant_plan_id: planId });
-        // await db.dontHaveInDatabase("participant_plan", { name: newTitle });
+        const planId = (await db.grabFromDatabase("participant_plan", "id", {
+            "name like": newTitle,
+        })) as number;
+        await db.dontHaveInDatabase("participant", { participant_plan_id: planId });
+        await db.dontHaveInDatabase("participant_plan", { name: newTitle });
     });
 });
