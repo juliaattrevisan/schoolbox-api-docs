@@ -16,8 +16,6 @@ use Schoolbox\Config\ConfigMapper;
 
 class Config
 {
-    public const MODULE_AIASSESSMENT = 'aiAssessment';
-
     public const ALL_MODULES = [
         Helper::FEATURE_CHAT,
         Helper::FEATURE_LESSONPLAN,
@@ -182,6 +180,11 @@ class Config
                     ->setTypeId(ConfigMapper::TYPE_AI)
                     ->setFieldId(self::FIELD_OPTIONS[$key] ?? ConfigMapper::FIELD_INPUT)
                     ->setEditable(true);
+
+                // if model, show options
+                if ($key === self::FIELD_MODEL) {
+                    $cfg->setOptions(implode(':', self::AI_MODELS));
+                }
 
                 // don't show provider
                 if ($key === self::FIELD_PROVIDER) {
