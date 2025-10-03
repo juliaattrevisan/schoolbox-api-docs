@@ -49,6 +49,7 @@ declare global {
                 swatches: string[];
             };
             editors: Partial<Record<string, SbxEditor>>;
+            gradeGradientEnabled: boolean;
             hasAIFeatures: true | undefined; // to display the AI features around the site
             openAIModel: string | undefined; // chosen open AI model to use
             lightGallery: typeof lightGallery;

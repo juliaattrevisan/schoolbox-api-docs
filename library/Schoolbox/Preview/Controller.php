@@ -9,6 +9,8 @@
 namespace Schoolbox\Preview;
 
 use Alaress\Web\Controller\Base;
+use GuzzleHttp\Psr7\Stream;
+use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Cyberhound\Url\Translator;
 
 /**
@@ -104,5 +106,36 @@ class Controller extends Base
         unset($previewFragment['twig']);
 
         $this->response = $this->responseAsJson($previewFragment);
+    }
+
+    /**
+     * Serve any PDF.js file.
+     *
+     * @api GET /preview/pdfjs/{pathParts:.*}
+     *
+     * @param array  $pathParts All parts of the path.
+     * @return void
+     */
+    public function pdfJs(array $pathParts)
+    {
+        // Passthru whatever PDF.js path was requested
+        $basePath = SITE_root . '/www/static/js/pdf/pdfjs/';
+        $fullPath = realpath($basePath . implode('/', $pathParts));
+        if (str_starts_with($fullPath, $basePath) && file_exists($fullPath) && is_readable($fullPath)) {
+            // What is this filetype?
+            // Use a proper mimetype for common web files, otherwise guess
+            $mimetype = match (pathinfo($fullPath, PATHINFO_EXTENSION)) {
+                'js'    => 'application/javascript',
+                'html'  => 'text/html',
+                'css'   => 'text/css',
+                'svg'   => 'image/svg+xml',
+                default => mime_content_type($fullPath) ?: 'application/octet-stream',
+            };
+            $this->response = $this->responseFromStream(new Stream(fopen($fullPath, 'r')), null, $mimetype)
+                ->withHeader('Cache-Control', 'max-age=86400, private')
+                ->withHeader('Pragma', '');
+        } else {
+            throw new NotFound();
+        }
     }
 }

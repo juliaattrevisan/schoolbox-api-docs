@@ -54,3 +54,7 @@ docker/schoolbox/config/instance-registry.json
 # the provision process will build it
 docker/schoolbox/config/cron_config.ini
 test/load/k6/config.js
+
+# The provision process will build config.ini too, so that Sentry settings may
+# be configured.
+docker/schoolbox/config/config.ini

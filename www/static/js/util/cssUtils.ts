@@ -50,6 +50,9 @@ export function getGradient(
     background: boolean = false,
 ): string {
     const gradientNone = background ? "gradient-none-bg" : "gradient-none";
+    if (!window.sbProps.gradeGradientEnabled) {
+        return gradientNone;
+    }
     if (typeof currentCount !== "number" || typeof totalCount !== "number") {
         return gradientNone;
     }

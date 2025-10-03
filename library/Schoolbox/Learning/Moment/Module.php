@@ -78,7 +78,7 @@ class Module extends BaseModule
         /* Superusers, Staff, Parents of Evidence Recipient and Evidence Recipients
          * can view the detail screen
          */
-        $viewEvidenceDetailRule = new Rule\All(
+        $viewDetailRule = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
                 new Rule\IsSuperuser(),
@@ -183,8 +183,8 @@ class Module extends BaseModule
         $this->register(
             self::METHOD_GET,
             '/{evidenceId:\d+}',
-            'getEvidenceDetail',
-            $viewEvidenceDetailRule,
+            'getDetail',
+            $viewDetailRule,
             Closure::fromCallable([$this, 'preloadEvidence']),
         );
 

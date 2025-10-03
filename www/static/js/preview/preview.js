@@ -120,7 +120,12 @@
                                     }),
                                 );
                             } else if (response.type == "pdf") {
-                                const src = `${window.cdnPrefix}/js/pdf/pdfjs/web/viewer.html?file=${window.location.origin}${response.fragment}`;
+                                // Workaround CORS issues by forcing the PDF.js viewer to be loaded from Schoolbox's
+                                // host, rather than from the CDN.
+                                let viewerUrl = new URL("/preview/pdfjs/web/viewer.html", window.location.origin),
+                                    pdfUrl = new URL(response.fragment, window.location.origin);
+                                viewerUrl.searchParams.set("file", pdfUrl);
+                                const src = viewerUrl.toString();
                                 document.dispatchEvent(
                                     new CustomEvent("IMAGE-LIGHTBOX__CREATE", {
                                         detail: {

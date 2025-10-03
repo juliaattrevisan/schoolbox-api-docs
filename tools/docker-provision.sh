@@ -43,8 +43,13 @@ function verify_folders() {
     if [ -d "${!var}" ]; then
       log "${var}: ${!var} is a folder";
     else
-      warn "${var}: ${!var} is not a folder";
-      return=0
+      warn "${var}: ${!var} is not a folder: attempting to create it";
+      if [[ "$(mkdir -p "${!var}" 2>/dev/null)" -eq 0 ]]; then
+        log "${var}: ${!var} created";
+      else
+        error "${var}: ${!var} could not be created";
+        return=0
+      fi
     fi
   done
   return $return

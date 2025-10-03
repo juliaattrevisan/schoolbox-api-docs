@@ -277,11 +277,16 @@ class Controller extends Base
      * @param Model $evidence
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function getEvidenceDetail(Model $evidence): void
+    public function getDetail(Model $evidence): void
     {
-        $translator = $this->buildTranslatorWithComments(10);
+        /* TODO rename
+         *  Temporary rewrite of misnamed var, but this is linked to the Module implementation
+         *  which is potentially going to affect api behaviour, do this gently for now. You'd
+         *  have to modify preloadEvidence otherwise, which would affect way more things
+         */
+        $moment = $evidence;
 
-        $item = $translator($evidence);
+        $translator = $this->buildTranslatorWithComments(10);
 
         /* Decide whether the current user can comment on this student's learning moments
          *
@@ -298,7 +303,7 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate(
             '@learningMomentEvidence/detail.twig',
             [
-                'evidence'                 => $item,
+                'moment'                   => $translator($moment),
                 'curriculumTaggingEnabled' => $this->getConfigLoader()->get('curriculum_tagging_enabled'),
                 'learningMomentCanComment' => $learningMomentCanComment,
             ]
@@ -1201,7 +1206,7 @@ class Controller extends Base
             /* This is a stack because empty payloads result in a datatype difference in frontend world:
              * empty payloads emerge as [], but non-empty payloads emerge as {}
              */
-            $userTranslator = new \Schoolbox\User\Translator\ModelToArray();
+            $userTranslator = new \Schoolbox\User\Translator\Author\ModelToArray();
 
             // We'll steal the links from here
             // TODO: Let's see how much of this can be refactored to just use the translator directly... I expect most if not all of it
@@ -1219,8 +1224,8 @@ class Controller extends Base
                  *  Role description helps distinguish them. But it wasn't in any of the designs. I'm expecting
                  *  to need this further down the trail
                  */
-                'recipient' => $userTranslator->convertLinkedUser($moment->getRecipient()),
-                'creator' => $userTranslator->convertLinkedUser($moment->getCreator()),
+                'recipient' => $userTranslator($moment->getRecipient()),
+                'creator' => $userTranslator($moment->getCreator()),
                 /* This is always set
                  */
                 'createdAt' => [

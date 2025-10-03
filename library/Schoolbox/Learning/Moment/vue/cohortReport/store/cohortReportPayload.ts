@@ -1,7 +1,7 @@
 import { buildApiRequest } from "@js/util/sbx/apiUtils";
 import type { Metadata } from "@js/util/sbx/apiUtils";
 import type { StorageFile } from "@js/resource/resourceUtils";
-import type { UserCC as User } from "@schoolboxLibrary/types/User";
+import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import type { EvidenceStatus } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 
 export type CohortReportEntry = {
@@ -10,8 +10,8 @@ export type CohortReportEntry = {
     blurb: string;
     showReadMore: boolean;
     files: StorageFile[];
-    recipient: User;
-    creator: User;
+    recipient: UserAuthor;
+    creator: UserAuthor;
     createdAt: {
         timestamp: number;
         displayAs: string;

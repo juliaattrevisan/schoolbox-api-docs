@@ -11,6 +11,7 @@ test.describe("Links Component Tests", () => {
     test.describe.configure({ mode: "serial" });
 
     let componentId: number;
+    let componentEnglishId: number;
     let homepage: Homepage;
     let links: Links;
     let linksComponent: Locator;
@@ -26,15 +27,13 @@ test.describe("Links Component Tests", () => {
         await tester.loginAsAdmin();
     });
 
-    test("Verify Add Link", async ({ tester, page }) => {
+    test("Verify Add Link", async ({ tester }) => {
         tester.isGoingTo("Homepage, open tab panel, click components tab");
         await homepage.goto(83);
         tester.isGoingTo("Add Links component");
         await homepage.addComponent(Homepage.ELEMENT_ADD_COMPONENT_SECTION_RESOURCES, "Links");
-        linksComponent = page.locator(Homepage.locateComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1));
-        const componentIdStr = await linksComponent.getAttribute("id");
-        componentId = Number(componentIdStr?.match(/\d+/)?.[0]);
-
+        linksComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
+        componentId = await Homepage.getComponentId(linksComponent);
         tester.isGoingTo(`Use component: ${componentId}`);
         await homepage.seeInComponentHeading("Links", Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
         tester.isGoingTo("Check the two links exists ");
@@ -49,9 +48,9 @@ test.describe("Links Component Tests", () => {
     test("Verify Sorting Links", async ({ tester, page }) => {
         tester.isGoingTo("Navigate to 9A English homepage and configure the Links component");
         await homepage.goto(83);
-        linksComponent = page.locator(Homepage.locateComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1));
-        const componentIdStr = await linksComponent.getAttribute("id");
-        componentId = Number(componentIdStr?.match(/\d+/)?.[0]);
+        linksComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
+        componentId = await Homepage.getComponentId(linksComponent);
+
         await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
         await Homepage.clickComponentSettings(linksComponent);
         tester.isGoingTo("Verify sorting links by Name and Date asc and desc");
@@ -89,11 +88,11 @@ test.describe("Links Component Tests", () => {
         expect(sortedLinks).toEqual([linkTitle, "Where did English come from?"]);
 
         tester.isGoingTo("click view all links and verify navigation to resource page");
-        await linksComponent.getByText("View All Links").click();
+        await links.clickViewAllLinks(linksComponent);
         await expect(page).toHaveURL(/.*\/resources$/);
     });
 
-    test("Verify Update link", async ({ tester, page, db }) => {
+    test("Verify Update link", async ({ tester, db }) => {
         const linkId = (await db.grabFromDatabase("link", "id", {
             deleted_at: null,
             description: "Test Link Automation",
@@ -102,9 +101,8 @@ test.describe("Links Component Tests", () => {
         tester.isGoingTo("Navigate to 9A English homepage and update a link in the Links component");
         await homepage.goto(83);
         tester.isGoingTo("Modify Link Title");
-        linksComponent = page.locator(Homepage.locateComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1));
-        const componentIdStr = await linksComponent.getAttribute("id");
-        componentId = Number(componentIdStr?.match(/\d+/)?.[0]);
+        linksComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
+        componentId = await Homepage.getComponentId(linksComponent);
         await links.modifyLink(linksComponent, linkId, newLinkTitle);
         tester.isGoingTo("Update link setting");
         await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
@@ -121,49 +119,45 @@ test.describe("Links Component Tests", () => {
         linkTitle = newLinkTitle;
     });
 
-    test("Verify Link component access for student", async ({ tester, page }) => {
+    test("Verify Link component access for student", async ({ tester }) => {
         tester.isGoingTo("Navigate to 9A English homepage and update a link in the Links component");
         await homepage.goto(83);
-
-        linksComponent = page.locator(Homepage.locateComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1));
-        const componentIdStr = await linksComponent.getAttribute("id");
-        componentId = Number(componentIdStr?.match(/\d+/)?.[0]);
+        linksComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
+        componentEnglishId = await Homepage.getComponentId(linksComponent);
         await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
         await Homepage.clickComponentSettings(linksComponent);
         tester.isGoingTo("Update the component limit to 2 and un-tick the title to read only");
-        await Links.updateLinkComponentSetting(linksComponent, "2", componentId, true);
+        await Links.updateLinkComponentSetting(linksComponent, "2", componentEnglishId, true);
         tester.isGoingTo("Login as student and check the header and buttons are not visible");
         await tester.impersonate("Jana Reed");
         await homepage.goto(83);
         const linksHeader = linksComponent.getByTestId("homepage-component-titlebar-name");
-        const viewAllLinksBtn = linksComponent.getByText("View All Links");
-        const addLinkBtn = linksComponent.getByText("Add Link");
+        const viewAllLinksBtn = linksComponent.getByTestId("view-all-links-button");
+        const addLinkBtn = linksComponent.getByTestId("add-link-button");
         await expect(linksHeader).toBeHidden();
         await expect(viewAllLinksBtn).toBeHidden();
         await expect(addLinkBtn).toBeHidden();
     });
 
-    // test("Verify adding link component to another page", async ({ tester, page }) => {
-    //     tester.isGoingTo("Navigate to 3RW homepage and alt-source the Links component");
-    //     await homepage.goto(188);
-    //     tester.isGoingTo("Add Links component");
-    //     await homepage.addComponent(Homepage.ELEMENT_ADD_COMPONENT_SECTION_RESOURCES, "Links");
-    //     linksComponent = page.locator(Homepage.locateComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1));
-    //     const componentIdStr = await linksComponent.getAttribute("id");
-    //     componentId = Number(componentIdStr?.match(/\d+/)?.[0]);
-
-    //     await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
-    //     await Homepage.clickComponentSettings(linksComponent);
-    //     await links.addExistingLink(linksComponent, "English", "9A English");
-    //     const sortedLinks = await Links.getAllLinks(linksComponent);
-    //     tester.isGoingTo(sortedLinks.toString());
-    //     expect(sortedLinks).toEqual([newLinkTitle, "Where did English come from?", "Plain English Romeo and Juliet"]);
-    // });
+    test("Verify adding link component to another page", async ({ tester }) => {
+        tester.isGoingTo("Navigate to 3RW homepage and alt-source the Links component");
+        await homepage.goto(188);
+        tester.isGoingTo("Add Links component");
+        await homepage.addComponent(Homepage.ELEMENT_ADD_COMPONENT_SECTION_RESOURCES, "Links");
+        linksComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
+        componentId = await Homepage.getComponentId(linksComponent);
+        await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
+        await Homepage.clickComponentSettings(linksComponent);
+        await links.addExistingLink(linksComponent, "English", "9A English");
+        const sortedLinks = await Links.getAllLinks(linksComponent);
+        tester.isGoingTo(sortedLinks.toString());
+        expect(sortedLinks).toEqual([newLinkTitle, "Where did English come from?", "Plain English Romeo and Juliet"]);
+    });
 
     test.afterAll(async ({ baseTester, db, api }) => {
         baseTester.isGoingTo("clean up: remove Links component and soft-delete created link rows");
-        await api.deleteHomepageComponent(83, componentId);
         await db.dontHaveInDatabase("link", { url: linkUrl });
-        // await api.deleteHomepageComponent(188, componentId);
+        await api.deleteHomepageComponent(83, componentEnglishId);
+        await api.deleteHomepageComponent(188, componentId);
     });
 });

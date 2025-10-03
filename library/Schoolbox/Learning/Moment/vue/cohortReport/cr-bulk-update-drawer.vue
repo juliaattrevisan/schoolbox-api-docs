@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { fromEntriesOf, keysOf } from "@js/util/arrayUtils";
+import { assertUnreachable } from "@js/util/errorUtils";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import { evidenceStatusLabels } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 import { useCohortReportStore } from "./store/cohortReportStore";
@@ -80,22 +81,21 @@ async function onAction(type: keyof typeof selectedResultActions.value): Promise
     }
 
     const entries = selectedResultActions.value[type];
-    clearSelection();
 
     if (type === "delete") {
-        await crStore.deleteEntries(entries);
+        crmStore.openModal(entries, CohortReportModalType.CONFIRM_DELETE, clearSelection);
     } else if (type === "publish") {
         if (entries.some((entry) => entry.hasComments)) {
             // If there are comments, open the confirmation modal to ask if they want to delete them
-            crmStore.openModal(entries, CohortReportModalType.CONFIRM_PUBLISH);
+            crmStore.openModal(entries, CohortReportModalType.CONFIRM_PUBLISH, clearSelection);
         } else {
             // Otherwise just publish immediately
             await crStore.publishEntries(entries, false);
         }
     } else if (type === "reject") {
-        crmStore.openModal(entries, CohortReportModalType.CONFIRM_REJECT);
+        crmStore.openModal(entries, CohortReportModalType.CONFIRM_REJECT, clearSelection);
     } else {
-        ((unreachable: never): void => console.error(`Unknown action:`, unreachable))(type); // Type assertion
+        assertUnreachable(type);
     }
 }
 </script>

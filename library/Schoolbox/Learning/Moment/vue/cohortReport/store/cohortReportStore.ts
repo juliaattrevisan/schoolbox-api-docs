@@ -271,6 +271,11 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
 
         toast.timeout({ isSuccess: true, text: "Deleted." });
         results.value = results.value.filter((e) => !entries.includes(e));
+
+        if (results.value.length === 0) {
+            // If everything got deleted, load the next page if there is one
+            await loadNextPage();
+        }
     }
 
     return {

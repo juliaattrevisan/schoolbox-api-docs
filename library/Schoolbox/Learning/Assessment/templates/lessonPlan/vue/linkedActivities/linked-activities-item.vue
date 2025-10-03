@@ -34,17 +34,6 @@ function handleUnlinkClick(): void {
     store.isSingleUnlinkOpen = true;
 }
 
-/**
- * Get the colour gradient class for the activity, that helps indicate the
- * completion status of the current activity
- * @returns The urgency class
- */
-function getUrgency(): string {
-    return store.gradeGradientEnable
-        ? getGradient(props.activity.completionCount, props.activity.studentCount)
-        : "gradient-none";
-}
-
 const activityLink = window.Vue.computed(() => {
     if (props.activity._links === null) {
         return undefined;
@@ -74,7 +63,7 @@ const activityLink = window.Vue.computed(() => {
             {{ getActivityMeta(activity) }}
             <template v-if="activity.dueAt && props.canModify && !store.isStudentView">
                 |
-                <span :class="getUrgency()"
+                <span :class="getGradient(props.activity.completionCount, props.activity.studentCount)"
                     >{{ props.activity.completionCount }}/{{ props.activity.studentCount }} students completed</span
                 >
             </template>

@@ -36,8 +36,12 @@ try {
         $resource        = Schoolbox\Resource\Storage\Mapper::getInstance()->findByHash($_GET['hash']);
         $transforms      = new Transformation\Storage();
         /** @var IConfigLoader $config */
-        $config = $kernel->get('config');
-        if ($config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3) {
+        $config              = $kernel->get('config');
+        $bypassPresignedUrls = !empty($_GET[PreSignedUrlService::BYPASS_QUERY_PARAM]);
+        if (
+            !$bypassPresignedUrls
+            && $config->get(ConfigMapper::NAME_OTFS_ADAPTER) === FilesystemFactory::FILE_SYSTEM_ADAPTER_AWS_S3
+        ) {
             if ($config->get(ConfigMapper::NAME_IMAGE_S3_PRESIGNED_URL_ENABLED)) {
                 $preSignedUrlService    = new PreSignedUrlService($config);
                 $preSignedUrlDataObject = $preSignedUrlService->generate(

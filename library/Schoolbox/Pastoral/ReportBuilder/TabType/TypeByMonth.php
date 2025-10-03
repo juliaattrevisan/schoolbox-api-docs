@@ -2,6 +2,7 @@
 
 namespace Schoolbox\Pastoral\ReportBuilder\TabType;
 
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\API\Cursor\ICursor;
 use Schoolbox\Collection;
 use Schoolbox\Pastoral\ReportBuilder\Base;
@@ -58,6 +59,23 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
 
         $months = $this->getMonths();
 
+        /* Filtering for types and subtypes
+         */
+        $inTypeString = $inSubTypeString = '';
+        if ($this->helper->getType()->count() > 0) {
+            $typeIds = $this->helper->getType()->getPropertyValues('id');
+            $inTypeString = "type.id IN " . Builder::getArrayPlaceHolders($typeIds, 'typeIds');
+            $this->params = array_merge($this->params, Builder::getArrayParameters($typeIds, 'typeIds'));
+        }
+
+        if ($this->helper->getSubTypes()->count() > 0) {
+            $typeIds = $this->helper->getSubTypes()->getPropertyValues('id');
+            $inSubTypeString = "subtype.id IN " . Builder::getArrayPlaceHolders($typeIds, 'typeIds');
+            $this->params = array_merge($this->params, Builder::getArrayParameters($typeIds, 'typeIds'));
+        }
+
+        $whereInTypeQuery = implode(' OR ', array_filter([$inTypeString, $inSubTypeString]));
+
         $selectMonthsQuery =
             implode(
                 ', ',
@@ -94,7 +112,7 @@ class TypeByMonth extends Base implements TabTypeInterface, ICursor
                 ) pastoral
             ) monthData
             ON monthData.type_id = type.id AND (monthData.subtype_id = subtype.id OR monthData.subtype_id IS NULL)
-            WHERE type.deleted_at IS NULL
+            WHERE type.deleted_at IS NULL AND ({$whereInTypeQuery})
             GROUP BY typeId, subtypeId
         ";
 

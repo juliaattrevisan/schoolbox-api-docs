@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="TCurriculumNode extends Pick<Node, 'id' | 'code'>">
 /**
  * Used to display an inline list of curriculum codes that can be selected
  * and emit an event when a node is selected
@@ -9,19 +9,19 @@ interface Props {
     /**
      * the nodes containing the codes to display
      */
-    nodes: Node[];
+    nodes: TCurriculumNode[];
 }
 
 const props = defineProps<Props>();
 const emit = defineEmits<{
-    selected: [value: Node];
+    selected: [value: TCurriculumNode];
 }>();
 
 /**
  * dispatch an emit to notify that a node has been selected
  * @param node - the selected node
  */
-function onCodeSelected(node: Node): void {
+function onCodeSelected(node: TCurriculumNode): void {
     emit("selected", node);
 }
 </script>

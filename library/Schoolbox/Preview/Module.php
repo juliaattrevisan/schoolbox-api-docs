@@ -25,13 +25,16 @@ class Module extends BaseModule
      */
     public function initRoutes(string $basePath)
     {
-
         /* Render html fragment, or redirect
          */
         $this->addGetRoute('preview', $basePath, '/{encodedUrl}')
             ->attributes([
                 'format' => '.json'
             ]);
+
+        // Allow this to match anything after /pdfjs/, no matter how many path attrs
+        $this->addGetRoute('pdfJs', $basePath, '/pdfjs/')
+             ->wildcard('pathParts');
     }
 
     /**
