@@ -159,7 +159,7 @@ function init_database() {
   #mysql_tzinfo_to_sql /usr/share/zoneinfo 2>/dev/null | mysql --defaults-extra-file=/root/.my.cnf mysql 2>/dev/null;
 
   log "Creating Schoolbox MariaDB schema and user";
-  mariadb -h mariadb -u root --skip-ssl-verify-server-cert < "${SITE_ROOT}/docker/schoolbox/sql/setup.sql"
+  mariadb -h mariadb -u root < "${SITE_ROOT}/docker/schoolbox/sql/setup.sql"
 }
 
 function download_artifact() {
