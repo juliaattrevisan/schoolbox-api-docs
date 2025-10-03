@@ -269,28 +269,33 @@ class User extends DeprecatedModel
         if ($keyword != "") {
             $query .= '(';
             if (is_numeric($keyword)) {
-                $query .= "( synergy_id = :externalId ) ";
+                // Since the keyword is numeric, we infer that the user may be trying to search against externalIds.
+                // The ' or ' suffix avoids syntax errors when the 'always search basic names' clause is appended below.
+                $query .= "( synergy_id = :externalId ) or ";
                 $params['externalId'] = $keyword;
-            } else {
-                // TODO account for preferred name:
-                //      alternately remove and replace with API search
-                if (preg_match('/([[:alpha:]\'"]+) ([[:alpha:]\'"]+)/', $keyword, $name)) {
-                    $query .= "(
-                        ( firstname like :firstname and lastname like :lastname )
-                        or
-                        ( preferred_name like :firstname and lastname like :lastname )
-                    ) or ";
-                    $params['firstname'] = '%' . $this->db->getQuoter()->escapeForLike($name[1]) . '%';
-                    $params['lastname'] = '%' . $this->db->getQuoter()->escapeForLike($name[2]) . '%';
-                }
-                $query .= "(
-                    firstname like :name
-                    or preferred_name like :name
-                    or lastname like :name
-                    or username like :name
-                ) ";
-                $params['name'] = '%' . $this->db->getQuoter()->escapeForLike($keyword) . '%';
             }
+
+            if (preg_match('/([[:alnum:]\'"]+) ([[:alnum:]\'"]+)/', $keyword, $name)) {
+                // Since the keyword is two words, we infer that the user may be trying to search for a user's full name.
+                // The ' or ' suffix avoids syntax errors when the 'always search basic names' clause is appended below.
+                $query .= "(
+                    ( firstname like :firstname and lastname like :lastname )
+                    or
+                    ( preferred_name like :firstname and lastname like :lastname )
+                ) or ";
+                $params['firstname'] = '%' . $this->db->getQuoter()->escapeForLike($name[1]) . '%';
+                $params['lastname'] = '%' . $this->db->getQuoter()->escapeForLike($name[2]) . '%';
+            }
+
+            // Always search basic names (firstname, preferred_name, lastname, username).
+            $query .= "(
+                firstname like :name
+                or preferred_name like :name
+                or lastname like :name
+                or username like :name
+            ) ";
+            $params['name'] = '%' . $this->db->getQuoter()->escapeForLike($keyword) . '%';
+
             if (is_array($group)) {
                 // If group = [0]: return all matching users regardless of role
                 $group = array_filter($group);
