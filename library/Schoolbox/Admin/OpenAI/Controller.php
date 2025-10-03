@@ -47,6 +47,12 @@ class Controller extends ConfigController
      */
     public function getIndex(): void
     {
+        $textProvider = $this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT);
+        // 26.0 grab the config for text and add in any new or missing configs
+        $aiConfig = new Config();
+
+        $textConfig = $aiConfig->decode($this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_SETTINGS), $textProvider);
+
         $textConfigContext = $this->buildConfigContext(
             $this->buildTextConfigPredicate(),
             $this->routeGenerator->generate('adminOpenAi.postTextOptions'),
@@ -68,6 +74,7 @@ class Controller extends ConfigController
             'pageCurrent' => $this->routeGenerator->generate('adminOpenAi.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminOpenAi.getIndex')),
             'textConfigContext' => $textConfigContext,
+            'textConfig' => $textConfig,
             'imageConfigContext' => $imageConfigContext,
             'endpointTypeOff' => Helper::ENDPOINT_TYPE_OFF,
             'models' => [

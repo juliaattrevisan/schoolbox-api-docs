@@ -11,7 +11,20 @@
         </div>
 
         <div id="textSettingsContainer" style="display:none">
-            {% include '@settings/moduleConfig.twig' with textConfigContext only %}
+            {# there will be a collection of things in textConfig, we should have a form for each of those... #}
+            {% for moduleName, module in textConfig %}
+
+                <div>{{ moduleName }}</div>
+                <table>
+                    {% for field,value in module %}
+                        <tr>
+                            <td>{{ field }}</td>
+                            <td>{{ value }}</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endfor %}
+
         </div>
 
         <div class="small-12 columns">
