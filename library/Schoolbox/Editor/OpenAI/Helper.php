@@ -47,6 +47,7 @@ class Helper
     public const FEATURE_CHAT = 'chat';
     public const FEATURE_LESSONPLAN = 'lessonplan';
     public const FEATURE_IMAGE = 'image';
+    public const FEATURE_ASSESSMENT = 'assessment';
 
 
     /**

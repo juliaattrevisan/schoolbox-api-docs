@@ -10,21 +10,18 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\OpenAI;
 
 use Schoolbox\Admin\Settings\ModuleConfig;
+use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Config\ConfigMapper;
 
 class Config
 {
-    // CKEditor chat
-    public const MODULE_TEXTCHAT = 'textChat';
-    // Lesson Plan Generator
-    public const MODULE_LESSONPLAN = 'lessonPlan';
     public const MODULE_AIASSESSMENT = 'aiAssessment';
 
     public const ALL_MODULES = [
-        self::MODULE_TEXTCHAT,
-        self::MODULE_LESSONPLAN,
-//        self::MODULE_AIASSESSMENT,
+        Helper::FEATURE_CHAT,
+        Helper::FEATURE_LESSONPLAN,
+//        Helper::FEATURE_ASSESSMENT,
     ];
 
 
@@ -54,11 +51,8 @@ class Config
         "gpt-4.1-mini",
     ];
 
-    public const PROVIDER_AZURE = 'Azure';
-    public const PROVIDER_OPENAI = 'OpenAI';
-
     public const CONFIG_STRUCT_AZURE = [
-        self::FIELD_PROVIDER => self::PROVIDER_AZURE,
+        self::FIELD_PROVIDER => Helper::ENDPOINT_TYPE_AZURE,
         self::FIELD_ENABLED => false,
         self::FIELD_OPENAIKEY => '',
         self::FIELD_RESOURCE_NAME => '',
@@ -66,7 +60,7 @@ class Config
     ];
 
     public const CONFIG_STRUCT_OPENAI = [
-        self::FIELD_PROVIDER => self::PROVIDER_OPENAI,
+        self::FIELD_PROVIDER => Helper::ENDPOINT_TYPE_OPENAI,
         self::FIELD_OPENAIKEY => '',
         self::FIELD_MODEL => self::NOT_ACTIVE,
     ];
@@ -106,10 +100,10 @@ class Config
     public static function generateInitConfig(string $provider): array
     {
         switch ($provider) {
-            case self::PROVIDER_AZURE:
+            case Helper::ENDPOINT_TYPE_AZURE:
                 $config = self::CONFIG_STRUCT_AZURE;
                 break;
-            case self::PROVIDER_OPENAI:
+            case Helper::ENDPOINT_TYPE_OPENAI:
                 $config = self::CONFIG_STRUCT_OPENAI;
                 break;
             default:
@@ -134,10 +128,10 @@ class Config
     public static function mergeConfig(array $config, string $provider): array
     {
         switch ($provider) {
-            case self::PROVIDER_AZURE:
+            case Helper::ENDPOINT_TYPE_AZURE:
                 $expected = self::CONFIG_STRUCT_AZURE;
                 break;
-            case self::PROVIDER_OPENAI:
+            case Helper::ENDPOINT_TYPE_OPENAI:
                 $expected = self::CONFIG_STRUCT_OPENAI;
                 break;
             default:
