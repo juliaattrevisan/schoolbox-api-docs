@@ -13,10 +13,7 @@ test.describe("Student Participation Tests", () => {
         await tester.loginAsAdmin();
     });
 
-    test("exclude/include a student should reflect on the page as well as class and course mark books", async ({
-        tester,
-        page,
-    }) => {
+    test("exclude/include a student", async ({ tester, page }) => {
         const studentParticipation = new StudentParticipation(tester, page);
         const userId = "60";
         const studentName = "Ali, Jamal";
@@ -40,11 +37,11 @@ test.describe("Student Participation Tests", () => {
         await studentParticipation.verifyCourseMarkbookNotExcluded(userId, courseActivityId);
     });
 
-    test("modify current activity for a student should update the activity title", async ({ tester, page, db }) => {
+    test("modify current activity for student", async ({ tester, page, db }) => {
         const studentParticipation = new StudentParticipation(tester, page);
         const userId = "63";
         const studentName = "Izzo, Mario";
-        const newTitle = "Party task";
+        const newTitle = "Single task";
         const description = "test";
         const dueDate = dayjs().add(7, "day").format("DD/MM/YYYY HH:mma");
 
@@ -52,11 +49,11 @@ test.describe("Student Participation Tests", () => {
         await studentParticipation.goto();
         await studentParticipation.modifyStudentActivity(userId, studentName, newTitle, description, dueDate);
 
-        // Impersonate Mario Izzo and verify the due date text
+        // Impersonate Mario Izzo and verify the new due date of the activity
         await tester.impersonateViaUserProfilePage("Mario Izzo");
         await studentParticipation.verifyDueDateText(userId, "650", "6 days remaining");
 
-        // Impersonate Jack Coles and verify the due date span on status page
+        // Impersonate Jack Coles and verify the new due date activity on status page
         await tester.impersonateTeacher();
         await studentParticipation.verifyDueDateSpan("650", dueDate);
 
@@ -66,5 +63,25 @@ test.describe("Student Participation Tests", () => {
         })) as number;
         await db.dontHaveInDatabase("participant", { participant_plan_id: planId });
         await db.dontHaveInDatabase("participant_plan", { name: newTitle });
+    });
+
+    test("include in existing customisation", async ({ tester, page, db }) => {
+        const studentParticipation = new StudentParticipation(tester, page);
+        const userId = "63";
+        const studentName = "Izzo, Mario";
+        const newTitle = "Shared task";
+        const description = "test";
+        const dueDate = dayjs().add(7, "day").format("DD/MM/YYYY HH:mma");
+
+        // Navigate to participation page and modify student's activity
+        await studentParticipation.goto();
+        await studentParticipation.modifyStudentActivity(userId, studentName, newTitle, description, dueDate);
+
+        // Clean up database entries, removing the foreign key then the plan itself
+        // const planId = (await db.grabFromDatabase("participant_plan", "id", {
+        //     "name like": newTitle,
+        // })) as number;
+        // await db.dontHaveInDatabase("participant", { participant_plan_id: planId });
+        // await db.dontHaveInDatabase("participant_plan", { name: newTitle });
     });
 });
