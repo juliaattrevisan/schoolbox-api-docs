@@ -1656,7 +1656,8 @@ class ListController extends Web\Controller\Base
     {
         $post = $this->requestPost;
         $assessmentId = $post->get('assessmentId');
-        $studentIds = $post->get('students') ?? [];
+        $studentIds = $post->get('students', []);
+        $includeResponse = $post->get('includeResponse', false);
         $students = $this->getUserMapper()->findByColumn('id', $studentIds);
         try {
             $assessmentDataModel = $this->assessmentMapper->translateToDataModel($assessment);
@@ -1680,11 +1681,33 @@ class ListController extends Web\Controller\Base
                 }
             }
 
-            $this->response = $this->responseEmpty(201);
+            if ($includeResponse) {
+                $assessmentToRehydrate = $customisedAssessment ?? $assessment;
+                /* Forces refresh of participation data, before returning the updated participation info
+                 */
+                $this->participantDataSource->loadParticipationIntoAssessment($assessmentToRehydrate);
+
+                $hasInteraction = $students->reduce(function (array $hasInteraction, User $student) use ($assessmentToRehydrate) {
+                    $participation = $assessmentToRehydrate->getParticipantIfExtant($student) ?? null;
+                    /* Determine if the participant has any interaction (responses or feedbacks)
+                     * in an odd case where $participation might be null, will return false
+                     */
+                    $hasInteraction[$student->getId()] =
+                        $participation?->getAllFeedbacks()?->count() || $participation?->getAllResponses()?->count();
+                    return $hasInteraction;
+                }, []);
+                $this->response = $this->responseAsJson(
+                    [
+                        'hasInteraction' => $hasInteraction,
+                    ]
+                )->withStatus(201);
+            } else {
+                $this->response = $this->responseEmpty(201);
+            }
         } catch (\Exception $e) {
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($e->getCode());
-            $this->response = $this->responseAsJson($problem->asArray());
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus($e->getCode());
         }
     }
 }

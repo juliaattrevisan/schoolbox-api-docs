@@ -176,7 +176,7 @@ async function includeParticipant(participant: Participant): Promise<void> {
     });
 
     if (!response.success) {
-        const error = response.message ?? "Error excluding student";
+        const error = response.message ?? "";
         loadError.value = error;
         console.error("Error including participant:", error);
         toast.timeout({ text: error, isSuccess: false });
@@ -223,38 +223,35 @@ async function includeParticipantInExistingPlan(): Promise<void> {
     if (includeInExistingActivity.value === null) return;
     const activity: Plan | CustomisedPlan = includeInExistingActivity.value;
     const toast = window.sbProps.toastActivate("Adding to customisation...");
-    try {
-        const response = await fetch(props.includeInExistingCustomisation, {
-            method: "POST",
-            headers: { Accept: "application/json", "Content-Type": "application/json" },
-            body: JSON.stringify({
-                students: includeInExistingList.value.map((p) => p.user.id),
-                ...("assessable" in activity ? { assessmentId: activity.assessable.id } : {}),
-                ...(activity.name !== null ? { planId: activity.id } : {}),
-            }),
-        });
-        if (!response.ok) {
-            const errorMessage = await extractErrorMessage(response);
-            throw new Error(errorMessage);
-        }
-        // add the activity to each participant
-        includeInExistingList.value.forEach((participant) => {
-            if ("assessable" in activity) {
-                participant.customisedPlan = { ...activity };
-            } else {
-                participant.plan = { ...activity };
-            }
-        });
-        toast.timeout({ text: "Customisation added successfully", isSuccess: true });
-        isIncludeInExistingOpen.value = false;
-        includeInExistingList.value = [];
-    } catch (error) {
-        if (error instanceof Error && hasErrorMessage(error)) {
-            loadError.value = error.message;
-        }
+    const response = await postIncludeParticipant(props.includeInExistingCustomisation, {
+        students: includeInExistingList.value.map((p) => p.user.id),
+        ...( "assessable" in activity ? { assessmentId: activity.assessable.id } : {}),
+        ...( activity.name !== null ? { planId: activity.id } : {}),
+        includeResponse: true,
+    });
+
+    if (!response.success) {
+        const error = response.message ?? "";
+        loadError.value = error;
         console.error("Error adding Customisation:", error);
-        toast.timeout({ text: "Error adding Customisation", isSuccess: false });
+        toast.timeout({ text: error, isSuccess: false });
+        return;
     }
+
+    const data = response.data;
+    //add the activity to each participant
+    includeInExistingList.value.forEach((participant) => {
+        if ("assessable" in activity) {
+            participant.customisedPlan = { ...activity };
+            participant.hasInteraction = data.hasInteraction[participant.user.id] ?? false;
+        } else {
+            participant.plan = { ...activity };
+            participant.hasInteraction = data.hasInteraction[participant.user.id] ?? false;
+        }
+    });
+    toast.timeout({ text: "Customisation added successfully", isSuccess: true });
+    isIncludeInExistingOpen.value = false;
+    includeInExistingList.value = [];
 }
 
 /**
