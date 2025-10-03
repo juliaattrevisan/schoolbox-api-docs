@@ -113,5 +113,5 @@ export default function () {
             "course list loaded:": (r) => r.status === 200,
         });
         sleep(3);
-     }
+    }
 }
