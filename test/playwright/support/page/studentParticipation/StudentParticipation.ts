@@ -183,4 +183,18 @@ export default class StudentParticipation {
         const calendarElement = this.page.locator("li.icon-calendar span");
         await expect(calendarElement).toContainText(expectedText);
     }
+
+    /**
+     * Verify due date span on assessment status page
+     * @param assessmentId - The assessment ID
+     * @param expectedDueDate - The expected due date text to find in a span
+     */
+    async verifyDueDateSpan(assessmentId: string, expectedDueDate: string): Promise<void> {
+        this.tester.isGoingTo(`Navigate to assessment status page and verify due date span`);
+        await this.page.goto(`/learning/assessments/${assessmentId}/status`);
+
+        this.tester.isGoingTo(`Verify there is a span element that includes the set due date '${expectedDueDate}'`);
+        const dueDateSpan = this.page.locator(`span:text-is("${expectedDueDate}")`);
+        await expect(dueDateSpan).toBeDefined();
+    }
 }

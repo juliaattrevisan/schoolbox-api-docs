@@ -56,6 +56,10 @@ test.describe("Student Participation Tests", () => {
         await tester.impersonateViaUserProfilePage("Mario Izzo");
         await studentParticipation.verifyDueDateText(userId, "650", "6 days remaining");
 
+        // Impersonate Jack Coles and verify the due date span on status page
+        await tester.impersonateTeacher();
+        await studentParticipation.verifyDueDateSpan("650", dueDate);
+
         // Clean up database entries, removing the foreign key then the plan itself
         const planId = (await db.grabFromDatabase("participant_plan", "id", {
             "name like": newTitle,
