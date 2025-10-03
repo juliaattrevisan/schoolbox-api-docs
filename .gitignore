@@ -53,3 +53,7 @@ docker/schoolbox/config/instance-registry.json
 # This file is required by schoolbox-cli for building a crontab:
 # the provision process will build it
 docker/schoolbox/config/cron_config.ini
+
+# The provision process will build config.ini too, so that Sentry settings may
+# be configured.
+docker/schoolbox/config/config.ini
