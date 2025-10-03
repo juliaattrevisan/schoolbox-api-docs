@@ -284,8 +284,15 @@ class RecordProcessor
                 $record->setTags($tags);
             }
 
+            /* This precedes any mutations to roles/groups/users access changes, because those
+             * mutate in situ...for some reason.
+             */
+            $this->pastoralDataSource->save($record);
+
             /* Role and Group selections are both processed in the same method.
-             * If either was specified in $partial then maybe we have some work to do
+             * If either was specified in $partial then maybe we have some work to do.
+             *
+             * Note that these mutate in situ.
              */
             if (($partial['role'] ?? false) || ($partial['group'] ?? false) || ($partial['user'] ?? false)) {
                 /* By this point, types and subtypes were already updated in $record which
@@ -303,21 +310,41 @@ class RecordProcessor
                     \Schoolbox\Pastoral\Access\Model::class
                 ))->prepareAccesses(new Values($partial), $subtype ?? $type);
 
+                /* Remember the accesses that currently exist
+                 */
+                $existingAccesses = $record->getAccess()->indexBy('id');
+
                 /* A somewhat-different reimplementation from the one in processPastoralRecords() because
                  * we don't need $previousRecord afaict
                  */
                 $record->setAccess($this->pastoralAccessMapper->createCollection());
 
+                /* A list of accesses we want to keep
+                 */
+                $keptAccessIds = [];
+
                 /** @var PastoralAccessModel $access */
                 foreach ($accesses as $access) {
+                    if ($access->getId()) {
+                        $keptAccessIds[] = $access->getId();
+                    }
+
                     $recordAccess = clone $access;
                     $recordAccess->setPastoral($record);
                     $this->pastoralAccessMapper->save($recordAccess);
                     $record->getAccess()->add($recordAccess);
                 }
-            }
 
-            $this->pastoralDataSource->save($record);
+                // Delete accesses no longer exists
+                $removingAccesses = $existingAccesses->filter(
+                    static function ($access) use ($keptAccessIds) {
+                        /** @var PastoralAccessModel $access */
+                        return !in_array($access->getId(), $keptAccessIds);
+                    }
+                );
+
+                $this->pastoralAccessMapper->delete($removingAccesses);
+            }
 
             /* Sync with a third party (synergetic, at time of writing) knowing that we can only ever
              * update an existing record here, never creating a new one.
