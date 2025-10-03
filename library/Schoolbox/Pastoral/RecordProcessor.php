@@ -320,7 +320,7 @@ class RecordProcessor
             $this->pastoralDataSource->save($record);
 
             /* Sync with a third party (synergetic, at time of writing) knowing that we can only ever
-             * update an existing record here, never creating a newo ne.
+             * update an existing record here, never creating a new one.
              */
             $pastoralExternal = new External_Pastoral();
 
