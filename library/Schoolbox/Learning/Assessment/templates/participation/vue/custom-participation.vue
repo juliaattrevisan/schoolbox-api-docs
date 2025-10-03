@@ -10,7 +10,7 @@ import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vu
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import type { CustomisedPlan, Participant, Plan } from "../js/types/customParticipationTypes";
-import { postIncludeParticipant } from "../js/types/customParticipationPayload";
+import {postIncludeExistingParticipant, postIncludeParticipant } from "../js/types/customParticipationPayload";
 
 interface Props {
     allParticipants: Participant[];
@@ -223,10 +223,10 @@ async function includeParticipantInExistingPlan(): Promise<void> {
     if (includeInExistingActivity.value === null) return;
     const activity: Plan | CustomisedPlan = includeInExistingActivity.value;
     const toast = window.sbProps.toastActivate("Adding to customisation...");
-    const response = await postIncludeParticipant(props.includeInExistingCustomisation, {
+    const response = await postIncludeExistingParticipant(props.includeInExistingCustomisation, {
         students: includeInExistingList.value.map((p) => p.user.id),
-        ...( "assessable" in activity ? { assessmentId: activity.assessable.id } : {}),
-        ...( activity.name !== null ? { planId: activity.id } : {}),
+        ...("assessable" in activity ? { assessmentId: activity.assessable.id } : {}),
+        ...(activity.name !== null ? { planId: activity.id } : {}),
         includeResponse: true,
     });
 
@@ -243,10 +243,10 @@ async function includeParticipantInExistingPlan(): Promise<void> {
     includeInExistingList.value.forEach((participant) => {
         if ("assessable" in activity) {
             participant.customisedPlan = { ...activity };
-            participant.hasInteraction = data.hasInteraction[participant.user.id] ?? false;
+            participant.hasInteraction = data?.hasInteraction?.[participant.user.id] ?? false;
         } else {
             participant.plan = { ...activity };
-            participant.hasInteraction = data.hasInteraction[participant.user.id] ?? false;
+            participant.hasInteraction = data?.hasInteraction?.[participant.user.id] ?? false;
         }
     });
     toast.timeout({ text: "Customisation added successfully", isSuccess: true });
