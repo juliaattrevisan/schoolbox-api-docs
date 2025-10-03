@@ -166,10 +166,10 @@ test.describe("Files Component Tests", () => {
         filesComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
         componentEnglishId = await Homepage.getComponentId(filesComponent);
         const filesHeader = filesComponent.getByTestId("homepage-component-titlebar-name");
-        const viewAllFilesBtn = filesComponent.getByTestId("view-all-links-button");
-        const addFileBtn = filesComponent.getByTestId("add-link-button");
+        const viewAllFilesBtn = filesComponent.getByTestId("view-all-files-button");
+        const addFileBtn = filesComponent.getByTestId("file-select-link");
         await expect(filesHeader).toBeHidden();
-        await expect(viewAllFilesBtn).toBeHidden();
+        await expect(viewAllFilesBtn).toBeTruthy();
         await expect(addFileBtn).toBeHidden();
     });
 });
