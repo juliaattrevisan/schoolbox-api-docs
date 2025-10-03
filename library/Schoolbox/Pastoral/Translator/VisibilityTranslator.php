@@ -118,29 +118,39 @@ class VisibilityTranslator
                     throw new SchoolboxException("Invalid user id: $userId");
                 }
 
-                /* Nothing ever checked roles for Staff or Parent roletypes,
+                /* TODO Check student role access only if admin setting is on
+                 *
+                 * Nothing ever checked roles for Staff or Parent roletypes,
                  * allowing students to get in here by accident due to api usage.
                  * Surely that's not right...anyway, this now only adds Staff
                  * and Parents, silently discarding any other roletype
+                 *
+                 * However, this depends on an admin setting: Allow Student Pastoral Access
                  *
                  * You could throw exceptions but then you have to deal with all the
                  * errors in a set of people, which sounds eminently frustrating
                  * You can't even change the outcome of that because students aren't
                  * meant to be given access anyway.
+                 *
+                 * if (!allowStudentPastoralAccess) {
+                 *     if ($user->getRole()->isStaff() || $user->getRole()->isParent()) {
+                 *         $access = self::getBaseAccess(..)
+                 *         ...
+                 *         ...
+                 *     }
+                 * }
                  */
                 $user = $users[$userId];
 
-                if ($user->getRole()->isStaff() || $user->getRole()->isParent()) {
-                    $access = self::getBaseAccess(
-                        $emptyAccess,
-                        $post->getInt("userAccessId{$userId}"),
-                        (int)$accessLevel,
-                        false,
-                        $post->getBool("userComment{$userId}", false)
-                    );
-                    $access->setUser($user);
-                    $accesses->add($access);
-                }
+                $access = self::getBaseAccess(
+                    $emptyAccess,
+                    $post->getInt("userAccessId{$userId}"),
+                    (int)$accessLevel,
+                    false,
+                    $post->getBool("userComment{$userId}", false)
+                );
+                $access->setUser($user);
+                $accesses->add($access);
             }
         }
 
