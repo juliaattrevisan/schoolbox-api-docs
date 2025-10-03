@@ -17,7 +17,7 @@ export let options = {
     },
 };
 
-const BASE_URL = "https://vagrant.dev.schoolbox.cloud";
+const BASE_URL = "https://canary.dev.schoolbox.cloud";
 
 export default function () {
     // Pick a random user for this VU's iteration
@@ -43,6 +43,17 @@ export default function () {
     check(dashboardRes, {
         "dashboard loaded": (r) => r.status === 200,
     });
+
+    // Calculate Unix timestamps
+    const now = Math.floor(Date.now() / 1000);
+    const startOfToday = now - (now % 86400); // Round down to midnight
+    const startOfTomorrow = startOfToday + 86400; // Add 24 hours
+
+    // Dashboard AJAX requests
+    http.get(`${BASE_URL}/news/saved`);
+    http.get(`${BASE_URL}/news/lists/feed`);
+    http.get(`${BASE_URL}/paperly/viewPaperly`);
+    http.get(`${BASE_URL}/calendar/ajax/full?start=${startOfToday}&end=${startOfTomorrow}&userId=${user.userId}`);
     sleep(2);
 
     // Step 3: Visit Calendar
@@ -50,6 +61,14 @@ export default function () {
     check(calendarRes, {
         "calendar loaded": (r) => r.status === 200,
     });
+
+    // Calculate Unix timestamps
+    const dayOfWeek = new Date().getDay(); // 0 = Sunday
+    const calendarStart = startOfToday - (dayOfWeek * 86400); // Back to Sunday, i.e., start of current week
+    const calendarEnd = calendarStart + (42 * 86400); // Forward 6 weeks
+
+    // Calendar AJAX request
+    http.get(`${BASE_URL}/calendar/ajax/full?start=${calendarStart}&end=${calendarEnd}&userId=${user.userId}`);
     sleep(2);
 
     // Step 4: Visit Timetable
@@ -64,13 +83,23 @@ export default function () {
     check(dueWorkRes, {
         "due work loaded": (r) => r.status === 200,
     });
+
+    // Timetable AJAX request
+    http.get(`${BASE_URL}/learning/due/events/${user.userId}?start=${calendarStart}&end=${calendarEnd}`);
     sleep(2);
 
     // Step 6: Visit Homepage
-    let homepageRes = http.get(`${BASE_URL}/homepage/80`);
+    let homepageRes = http.get(`${BASE_URL}/homepage/${user.homepageId}`);
     check(homepageRes, {
         "homepage loaded": (r) => r.status === 200,
     });
+
+    // Calculate Unix timestamps
+    const currentYear = new Date().getFullYear();
+    const endOfYear = Math.floor(new Date(currentYear + 1, 0, 1).getTime() / 1000);
+
+    // Homepage AJAX request
+    http.get(`${BASE_URL}/calendar/ajax/full?start=${startOfToday}&end=${endOfYear}&userId=${user.userId}`);
     sleep(2);
 
     // Step 7: Visit Grades
