@@ -23,6 +23,16 @@ export default function () {
     // Pick a random user for this VU's iteration
     const user = credentials[Math.floor(Math.random() * credentials.length)];
 
+    // Calculate Unix timestamps
+    const now = Math.floor(Date.now() / 1000);
+    const startOfToday = now - (now % 86400); // Round down to midnight
+    const startOfTomorrow = startOfToday + 86400; // Add 24 hours
+    const dayOfWeek = new Date().getDay(); // 0 = Sunday
+    const calendarStart = startOfToday - (dayOfWeek * 86400); // Back to Sunday, i.e., start of current week
+    const calendarEnd = calendarStart + (42 * 86400); // Forward 6 weeks
+    const currentYear = new Date().getFullYear();
+    const endOfYear = Math.floor(new Date(currentYear + 1, 0, 1).getTime() / 1000);
+
     // Step 1: Login
     let loginRes = http.post(`${BASE_URL}/login?`, {
         page: "",
@@ -35,19 +45,14 @@ export default function () {
     check(loginRes, {
         "login successful": (r) => r.status === 200 || r.status === 302,
     });
-
     sleep(1); // Wait 1 second after login
+
 
     // Step 2: Visit Dashboard
     let dashboardRes = http.get(`${BASE_URL}/`);
     check(dashboardRes, {
         "dashboard loaded": (r) => r.status === 200,
     });
-
-    // Calculate Unix timestamps
-    const now = Math.floor(Date.now() / 1000);
-    const startOfToday = now - (now % 86400); // Round down to midnight
-    const startOfTomorrow = startOfToday + 86400; // Add 24 hours
 
     // Dashboard AJAX requests
     http.get(`${BASE_URL}/news/saved`);
@@ -56,20 +61,17 @@ export default function () {
     http.get(`${BASE_URL}/calendar/ajax/full?start=${startOfToday}&end=${startOfTomorrow}&userId=${user.userId}`);
     sleep(2);
 
+
     // Step 3: Visit Calendar
     let calendarRes = http.get(`${BASE_URL}/calendar/`);
     check(calendarRes, {
         "calendar loaded": (r) => r.status === 200,
     });
 
-    // Calculate Unix timestamps
-    const dayOfWeek = new Date().getDay(); // 0 = Sunday
-    const calendarStart = startOfToday - (dayOfWeek * 86400); // Back to Sunday, i.e., start of current week
-    const calendarEnd = calendarStart + (42 * 86400); // Forward 6 weeks
-
     // Calendar AJAX request
     http.get(`${BASE_URL}/calendar/ajax/full?start=${calendarStart}&end=${calendarEnd}&userId=${user.userId}`);
     sleep(2);
+
 
     // Step 4: Visit Timetable
     let timetableRes = http.get(`${BASE_URL}/timetable`);
@@ -78,13 +80,14 @@ export default function () {
     });
     sleep(2);
 
+
     // Step 5: Visit Due Work
     let dueWorkRes = http.get(`${BASE_URL}/learning/due/`);
     check(dueWorkRes, {
         "due work loaded": (r) => r.status === 200,
     });
 
-    // Timetable AJAX request
+    // Due Work AJAX request
     http.get(`${BASE_URL}/learning/due/events/${user.userId}?start=${calendarStart}&end=${calendarEnd}`);
     sleep(2);
 
@@ -94,13 +97,10 @@ export default function () {
         "homepage loaded": (r) => r.status === 200,
     });
 
-    // Calculate Unix timestamps
-    const currentYear = new Date().getFullYear();
-    const endOfYear = Math.floor(new Date(currentYear + 1, 0, 1).getTime() / 1000);
-
     // Homepage AJAX request
     http.get(`${BASE_URL}/calendar/ajax/full?start=${startOfToday}&end=${endOfYear}&userId=${user.userId}`);
     sleep(2);
+
 
     // Step 7: Visit Grades
     let gradesRes = http.get(`${BASE_URL}/learning/grades`);
