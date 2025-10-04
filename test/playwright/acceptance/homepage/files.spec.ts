@@ -44,7 +44,7 @@ test.describe("Files Component Tests", () => {
         await Files.verifyFileTitle(filesComponent, fileTitle, false);
     });
 
-    test("Verify Sorting Image Files", async ({ tester, page }) => {
+    test("Verify Sorting Image Files", async ({ tester }) => {
         tester.isGoingTo("Navigate to 9A English homepage and configure the Files component");
         await homepage.goto(83);
         filesComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
@@ -53,12 +53,12 @@ test.describe("Files Component Tests", () => {
         await Homepage.clickComponentSettings(filesComponent);
         tester.isGoingTo("Verify sorting files by Image files");
         await Files.sortImageFiles(filesComponent);
-        let sortedImageFiles: string[] = await Files.getAllFiles(filesComponent);
+        const sortedImageFiles = await Files.getAllFiles(filesComponent);
         tester.isGoingTo(sortedImageFiles.toString());
         expect(sortedImageFiles).toEqual([fileTitle, "Glasses"]);
     });
 
-    test("Verify Sorting Document and Video Files", async ({ tester, page }) => {
+    test("Verify Sorting Document and Video Files", async ({ tester }) => {
         tester.isGoingTo("Navigate to 9A English homepage and configure the Files component");
         await homepage.goto(83);
         filesComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
@@ -180,7 +180,7 @@ test.describe("Files Component Tests", () => {
         await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
         await Homepage.clickComponentSettings(filesComponent);
         tester.isGoingTo("Set heading to 'Automation Heading Test' and verify breadcrumb on Resources page");
-        await files.setHeadingAndVerifyBreadcrumb(page, filesComponent, 83, "Automation Heading Test");
+        await Files.setHeadingAndVerifyBreadcrumb(page, filesComponent, 83, "Automation Heading Test");
         tester.isGoingTo("Return to homepage to reset heading");
         await homepage.goto(83);
         tester.isGoingTo("Add Files component locator and ID again");

@@ -248,7 +248,7 @@ export default class Files {
      * @param classPageId - The homepage/class ID (e.g., 83).
      * @param newHeading - New heading to set (default: "Automation Heading Test").
      */
-    public async setHeadingAndVerifyBreadcrumb(
+    public static async setHeadingAndVerifyBreadcrumb(
         page: Page,
         filesComponent: Locator,
         classPageId: number,
