@@ -66,14 +66,15 @@ export default class Files {
         }
     }
 
-    /**
-+     * Add/post a file into the Files component.
-+     * @param page - Playwright Page.
-+     * @param component - Root locator for this Files component.
-+     * @param fileTitle - Title to enter in the form.
-+     * @param description - Description to enter in the form.
-+     * @param expectedVisibility - Whether the file should be visible after posting.
-+     */
+    /*
+     * Add/post a file into the Files component.
+     *
+     * @param page - Playwright Page.
+     * @param component - Root locator for this Files component.
+     * @param fileTitle - Title to enter in the form.
+     * @param description - Description to enter in the form.
+     * @param expectedVisibility - Whether the file should be visible after posting.
+     */
     public static async selectFile(
         page: Page,
         component: Locator,
