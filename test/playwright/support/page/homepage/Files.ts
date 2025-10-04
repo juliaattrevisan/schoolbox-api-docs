@@ -1,20 +1,32 @@
 import { expect } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+
 export default class Files {
     private tester: AcceptanceTester;
+
     private page: Page;
 
     static readonly ELEMENT_FILE_TITLE_TEXTBOX = "#description";
+
     static readonly ELEMENT_FILE_DESCRIPTION_TEXTBOX = "#comment";
+
     static readonly FILE_TILE_TITLE_TRANSLUCENT = 'div.translucent h3:has-text("{fileTitle}")';
+
     static readonly FILE_TILE_TITLE_NONTRANSLUCENT = 'div h3:has-text("{fileTitle}")';
+
     static readonly ELEMENT_POST_FILE_BUTTON = 'input[value="Post File"]';
+
     static readonly ELEMENT_ATTACH_FILE_BUTTON = "#CmsZone";
+
     static readonly ELEMENT_MY_FILES_LINK = 'a.icon-files[href="#filesystem-myfile-panel"]';
+
     static readonly ELEMENT_FILE_ITEM = 'a[title="Abby"]';
+
     static readonly ELEMENT_PREVIEW_FILES = '.action-list li a[data-plugin="preview"] h3';
+
     static readonly ELEMENT_FILE_VISIBILITY_CHECKBOX_INPUT = "#visible";
+
     static readonly ELEMENT_FILE_VISIBILITY_CHECKBOX_LABEL = 'label[for="visible"]';
 
     constructor(tester: AcceptanceTester, page: Page) {
@@ -55,12 +67,13 @@ export default class Files {
     }
 
     /**
-     * Add/post a file into the Files component.
-     * @param component - Root locator for this Files component.
-     * @param fileTitle - Title to enter in the form.
-     * @param description - Description to enter in the form.
-     * @param expectedVisibility - Whether the file should be visible after posting.
-     */
++     * Add/post a file into the Files component.
++     * @param page - Playwright Page.
++     * @param component - Root locator for this Files component.
++     * @param fileTitle - Title to enter in the form.
++     * @param description - Description to enter in the form.
++     * @param expectedVisibility - Whether the file should be visible after posting.
++     */
     public static async selectFile(
         page: Page,
         component: Locator,

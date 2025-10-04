@@ -67,12 +67,12 @@ test.describe("Files Component Tests", () => {
         await Homepage.clickComponentSettings(filesComponent);
         tester.isGoingTo("Verify sorting by Document and Video files");
         await Files.sortVideoAndDocumentFiles(filesComponent);
-        let sortedDocumentAndVideoFiles: string[] = await Files.getAllFiles(filesComponent);
+        const sortedDocumentAndVideoFiles: string[] = await Files.getAllFiles(filesComponent);
         tester.isGoingTo(sortedDocumentAndVideoFiles.toString());
         expect(sortedDocumentAndVideoFiles).toEqual(["Where did English come from?", "Spelling tips"]);
         await Homepage.clickComponentSettings(filesComponent);
         await Files.sortFiles(filesComponent, "Name", "asc");
-        let sortedFilesByNameAsc: string[] = await Files.getAllFiles(filesComponent);
+        const sortedFilesByNameAsc: string[] = await Files.getAllFiles(filesComponent);
         tester.isGoingTo(sortedFilesByNameAsc.toString());
         expect(sortedFilesByNameAsc).toEqual([
             "Glasses",
@@ -83,7 +83,7 @@ test.describe("Files Component Tests", () => {
 
         await Homepage.clickComponentSettings(filesComponent);
         await Files.sortFilesDesc(filesComponent, "Name", "desc");
-        let sortedFilesByNameDesc: string[] = await Files.getAllFiles(filesComponent);
+        const sortedFilesByNameDesc: string[] = await Files.getAllFiles(filesComponent);
         tester.isGoingTo(sortedFilesByNameDesc.toString());
         expect(sortedFilesByNameDesc).toEqual([
             "Where did English come from?",
@@ -94,7 +94,7 @@ test.describe("Files Component Tests", () => {
 
         await Homepage.clickComponentSettings(filesComponent);
         await Files.sortFilesDesc(filesComponent, "Date", "asc");
-        let sortedFilesByDateAsc: string[] = await Files.getAllFiles(filesComponent);
+        const sortedFilesByDateAsc: string[] = await Files.getAllFiles(filesComponent);
         tester.isGoingTo(sortedFilesByDateAsc.toString());
         expect(sortedFilesByDateAsc).toEqual([
             "Spelling tips",
@@ -105,7 +105,7 @@ test.describe("Files Component Tests", () => {
 
         await Homepage.clickComponentSettings(filesComponent);
         await Files.sortFilesDesc(filesComponent, "Date", "desc");
-        let sortedFilesByDateDesc: string[] = await Files.getAllFiles(filesComponent);
+        const sortedFilesByDateDesc: string[] = await Files.getAllFiles(filesComponent);
         tester.isGoingTo(sortedFilesByDateDesc.toString());
         expect(sortedFilesByDateDesc).toEqual([
             "Test Automation File",
@@ -116,7 +116,7 @@ test.describe("Files Component Tests", () => {
 
         await Homepage.clickComponentSettings(filesComponent);
         await Files.setFileLimit(filesComponent, "2");
-        let setLimit: string[] = await Files.getAllFiles(filesComponent);
+        const setLimit: string[] = await Files.getAllFiles(filesComponent);
         tester.isGoingTo(setLimit.toString());
         expect(setLimit).toEqual(["Test Automation File", "Glasses"]);
         await Homepage.clickComponentSettings(filesComponent);
