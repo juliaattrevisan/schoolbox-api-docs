@@ -4,6 +4,11 @@ use Schoolbox\Breadcrumbs;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
+if (!isset($this)) {
+    http_response_code(404);
+    die('No direct access permitted');
+}
+
 $threadMapper = \Schoolbox\Forum\ThreadMapper::getInstance();
 $groupHandler = new Group();
 
