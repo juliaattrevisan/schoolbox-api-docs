@@ -81,9 +81,7 @@ export default class CurriculumSelector {
      */
     async browseToNode(ids: number[], $context?: Locator): Promise<void> {
         const context = $context || this.page;
-        // eslint-disable-next-line no-restricted-syntax -- need to loop through each sequentially, rather than in parallel with Promise.all
         for (const id of ids) {
-            // eslint-disable-next-line no-await-in-loop -- need to click each item sequentially
             await context.getByTestId(`${CurriculumSelector.DATA_TEST_MODAL_NODE_NAME}${id.toString()}`).click();
         }
     }
@@ -95,9 +93,7 @@ export default class CurriculumSelector {
      */
     async selectNodes(ids: number[], $context?: Locator): Promise<void> {
         const context = $context || this.page;
-        // eslint-disable-next-line no-restricted-syntax -- need to loop through each sequentially, rather than in parallel with Promise.all
         for (const id of ids) {
-            // eslint-disable-next-line no-await-in-loop -- need to click each item sequentially
             await context
                 .getByTestId(`${CurriculumSelector.DATA_TEST_MODAL_NODE_CHECKBOX_LABEL}${id.toString()}`)
                 .click();
@@ -123,9 +119,7 @@ export default class CurriculumSelector {
      */
     async selectUnitNodes(ids: number[], $context?: Locator): Promise<void> {
         const context = $context || this.page;
-        // eslint-disable-next-line no-restricted-syntax -- need to loop through each sequentially, rather than in parallel with Promise.all
         for (const id of ids) {
-            // eslint-disable-next-line no-await-in-loop -- need to click each item sequentially
             await context
                 .getByTestId(`${CurriculumSelector.DATA_TEST_MODAL_CURRENT_NODE_CHECKBOX_LABEL}${id.toString()}`)
                 .click();

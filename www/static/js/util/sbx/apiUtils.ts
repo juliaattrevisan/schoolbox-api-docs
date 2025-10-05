@@ -328,7 +328,6 @@ export async function sseApiRequest<
     let buffer = "";
     let finalResponseData: string | undefined;
     while (finalResponseData === undefined) {
-        // eslint-disable-next-line no-await-in-loop -- Must handle chunks sequentially
         const { done, value } = await reader.read();
 
         // If the stream ended normally
