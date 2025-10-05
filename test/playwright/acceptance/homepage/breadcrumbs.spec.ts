@@ -92,9 +92,9 @@ test.describe("Breadcrumbs Component Tests", () => {
         const breadcrumbStudent = page.locator("ul.breadcrumb");
         const classes = breadcrumbStudent.locator('a:has-text("Classes")');
         tester.isGoingTo('Ensure "Classes" is visible but not linking to /homepage/263/');
-        await expect(breadcrumbStudent).toBeVisible(); // breadcrumb is on the page
-        await expect(classes).toBeVisible(); // “Classes” link is shown
-        await expect(classes).not.toHaveAttribute("href", "/homepage/263/"); // but not that U;
+        await expect(breadcrumbStudent).toBeVisible();
+        await expect(classes).toBeVisible();
+        await expect(classes).not.toHaveAttribute("href", "/homepage/263/");
         await expect(breadcrumbStudent.locator('a:text-is("2019 Classes")')).toHaveAttribute("href", "/homepage/51/");
         await expect(breadcrumbStudent.locator('a:text-is("Middle School")')).toHaveAttribute("href", "/homepage/100/");
         await expect(breadcrumbStudent.locator('a:text-is("Year 9")')).toHaveAttribute("href", "/homepage/198/");
