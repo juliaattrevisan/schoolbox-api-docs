@@ -625,19 +625,14 @@ abstract class Kernel
                     if ($gotenbergApiKey === '') {
                         $gotenbergApiKey = null;
                     }
-                    $gotenbergApiVersion = filter_var(
-                        $config->get(ConfigMapper::NAME_GOTENBERG_API_VERSION),
-                        FILTER_VALIDATE_INT,
-                        FILTER_NULL_ON_FAILURE,
-                    );
                     return (new DownloadPagesMessageFactory(
                         $instance,
                         $tokenBuilder,
                         $config->get(ConfigMapper::NAME_GOTENBERG_HOST),
                         $gotenbergApiKey,
-                        $gotenbergApiVersion,
+                        null,
                         GotenbergClient::API_KEY_HEADER,
-                        GotenbergClient::API_VERSION_HEADER,
+                        null,
                         $config->get(ConfigMapper::NAME_KAMI_API_HOST),
                         $config->get(ConfigMapper::NAME_KAMI_API_KEY),
                         $config->get('turnitin_api_key'),
@@ -1860,17 +1855,11 @@ abstract class Kernel
                         $gotenbergApiKey = null;
                     }
 
-                    $gotenbergApiVersion = filter_var(
-                        $config->get(ConfigMapper::NAME_GOTENBERG_API_VERSION),
-                        FILTER_VALIDATE_INT,
-                        FILTER_NULL_ON_FAILURE,
-                    );
-
                     return new GotenbergClient(
                         new GuzzleAdapter($httpClient),
                         $config->get(ConfigMapper::NAME_GOTENBERG_HOST),
                         $gotenbergApiKey,
-                        $gotenbergApiVersion,
+                        null,
                     );
                 }
             )
