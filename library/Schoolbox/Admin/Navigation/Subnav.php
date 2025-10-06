@@ -629,6 +629,11 @@ class Subnav
                         'visible'     => $userHasServicePermissionPastoral, // Note this page is special in that available to superusers who are not Pastoral Moderators.
                         'description' => 'Manage Flag, Audience and Template Defaults',
                     ],
+                    '/adminv2/pastoral/differentiation-profiles' => [
+                        'name'        => 'Settings - Differentiation Profile',
+                        'visible'     => true, //TODO update when SA-20900 service permission added
+                        'description' => 'Configure settings related to the differentiation profiles.',
+                    ],
                     '/adminv2/setting/pastoral/Pastoral%20Care' => [
                         'name'        => 'Settings - Policy',
                         'visible'     => true,
