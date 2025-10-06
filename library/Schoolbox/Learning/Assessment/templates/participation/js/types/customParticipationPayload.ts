@@ -12,9 +12,9 @@ type IncludeParticipantApiPayload = {
 
 /**
  * Include a participant in an activity
- *
- * @param postIncludeUrl
- * @param body
+ * @param postIncludeUrl paritcipant._links.include
+ * @param body request body
+ * @return response
  */
 export function postIncludeParticipant(
     postIncludeUrl: string,
@@ -40,9 +40,9 @@ type IncludeExistingParticipantApiPayload = {
 
 /**
  * Include participants into a customised activity
- *
- * @param postIncludeExistingUrl
- * @param body
+ * @param postIncludeExistingUrl porps.includeInExistingCustomisation
+ * @param body request body
+ * @return response
  */
 export function postIncludeExistingParticipant(
     postIncludeExistingUrl: string,
