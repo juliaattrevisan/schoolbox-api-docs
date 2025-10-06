@@ -231,13 +231,11 @@ type GroupedFeedItem = {
 };
 
 /**
- * Groups learning evidence / badges by the date which it was posted.
- * @param feedResults -
- * @returns -
+ * Groups learning evidence / badges by the date which it was posted
  */
-function groupFeedResults(feedResults: FeedItem[]): GroupedFeedItem[] {
+const groupedFeedItems = window.Vue.computed<GroupedFeedItem[]>(() => {
     const groupedFeedResultsByDate: Record<string, GroupedFeedItem> = {};
-    feedResults.forEach((v) => {
+    data.value.forEach((v) => {
         const date = window.dayjs(v.date);
         const key = date.format("YYYYMMDD");
         if (!(key in groupedFeedResultsByDate)) {
@@ -247,7 +245,6 @@ function groupFeedResults(feedResults: FeedItem[]): GroupedFeedItem[] {
             };
         }
 
-        v.date = date; // TODO: don't mutate the original object...
         groupedFeedResultsByDate[key].items.push(v);
     });
 
@@ -256,13 +253,11 @@ function groupFeedResults(feedResults: FeedItem[]): GroupedFeedItem[] {
 
     // Ensure that each item within the group is sorted
     groupedItems.forEach((v) => {
-        v.items.sort((a, b) => (a.date.isBefore(b.date) ? 1 : -1));
+        v.items.sort((a, b) => window.dayjs(b.date).diff(window.dayjs(a.date)));
     });
 
     return groupedItems;
-}
-
-const groupedFeedItems = window.Vue.computed(() => groupFeedResults(data.value));
+});
 
 /**
  * Appends learning evidence to the data list.
@@ -1234,7 +1229,7 @@ window.Vue.onMounted(async () => {
                 v-else-if="metadata.cursor && metadata.cursor.next && metadata.count > data.length && data.length > 0"
                 class="feed-load-more content"
             >
-                <button class="load-more expand" @click="append(metadata.cursor.next)" title="Load more">
+                <button class="load-more expand" title="Load more" @click="append(metadata.cursor.next)">
                     Load more
                 </button>
             </div>
