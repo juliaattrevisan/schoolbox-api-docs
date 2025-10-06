@@ -9,9 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\DifferentiationProfiles;
 
-use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model as ModelTrait;
-use Schoolbox\User;
 
 class Model
 {

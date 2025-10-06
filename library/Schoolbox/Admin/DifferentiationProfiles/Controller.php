@@ -77,7 +77,6 @@ class Controller extends ConfigController
      * Updating the differentiation profiles configs
      *
      * @throws Exception
-     * @throws RouteNotFound
      * @throws Deleted
      * @api POST /adminv2/pastoral/differentiation-profiles
      */
@@ -93,7 +92,6 @@ class Controller extends ConfigController
                      ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED
                  );
         $this->getConfigMapper()->save($differentiationProfilesEnabledConfig->setValue($enabled));
-        $this->response = $this->redirectAfterPost($this->getRouteIfAuthorized('differentiationProfiles.getIndex'));
-        $this->redirectAfterPost($returnUrl ? Redirect::decode($returnUrl) : $this->getSession()->getHistory());
+        $this->response = $this->redirectAfterPost($returnUrl ? Redirect::decode($returnUrl) : $this->getSession()->getHistory());
     }
 }

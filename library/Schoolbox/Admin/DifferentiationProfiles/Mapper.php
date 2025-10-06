@@ -10,8 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\DifferentiationProfiles;
 
 use Schoolbox\GenericCollection;
-use Schoolbox\UserMapper;
-use UnexpectedValueException;
 
 /**
  * Class Mapper

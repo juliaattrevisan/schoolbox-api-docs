@@ -3,8 +3,8 @@ CREATE TABLE differentiation_profiles_config
     id          INT PRIMARY KEY AUTO_INCREMENT,
     name        VARCHAR(80)                   NOT NULL,
     title       VARCHAR(100)                  NOT NULL,
-    terminology VARCHAR(256),
-    description TEXT,
+    terminology VARCHAR(100),
+    description VARCHAR(256),
     is_enabled  TINYINT(1) unsigned DEFAULT 1 NOT NULL,
     module      VARCHAR(50)                   NOT NULL,
     sequence    INT                 DEFAULT 0
