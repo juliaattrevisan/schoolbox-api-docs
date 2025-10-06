@@ -227,6 +227,11 @@ class Profile implements IStrategy
         $this->log->debug('Prefetching languages...');
         $languageLookup = (new Language($this->api, $this->watchlist))->generate();
 
+        /* Prefetch a list of alerts
+         */
+        $this->log->debug('Prefetching alerts...');
+        $alertLookup = $this->alertLookup->generate();
+
         /* Optionally process profile pics
          */
         $photoLookup = null;
