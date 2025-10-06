@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\OpenAi;
 
+use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
@@ -34,11 +35,24 @@ interface IClient
      * This method should also handle logging of the request and its response,
      * and also handoff to any anonymisation service before logging.
      *
-     * @param array $payload
+     * @param string $method
+     * @param array  $payload
      * @return ResponseInterface The response from the AI provider.
      *                           Note that the response may be an event stream:
      *                           if so, the calling method must handle the
      *                           stream.
+     * @throws ClientExceptionInterface if something went wrong with the request
      */
-    public function request(array $payload): ResponseInterface;
+    public function request(string $method, array $payload): ResponseInterface;
+
+    /**
+     * Same as `request`, but instead indicates that the response body is to be
+     * streamed as it is received.
+     *
+     * @param string $method
+     * @param array  $payload
+     * @return iterable Each event as it is received from the response.
+     * @throws ClientExceptionInterface if something went wrong with the request
+     */
+    public function requestStream(string $method, array $payload): iterable;
 }
