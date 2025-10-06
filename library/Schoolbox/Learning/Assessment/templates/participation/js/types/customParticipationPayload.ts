@@ -10,6 +10,12 @@ type IncludeParticipantApiPayload = {
     includeResponse?: boolean;
 };
 
+/**
+ * Include a participant in an activity
+ *
+ * @param postIncludeUrl
+ * @param body
+ */
 export function postIncludeParticipant(
     postIncludeUrl: string,
     body: IncludeParticipantApiPayload,
@@ -32,6 +38,12 @@ type IncludeExistingParticipantApiPayload = {
     includeResponse?: boolean;
 };
 
+/**
+ * Include participants into a customised activity
+ *
+ * @param postIncludeExistingUrl
+ * @param body
+ */
 export function postIncludeExistingParticipant(
     postIncludeExistingUrl: string,
     body: IncludeExistingParticipantApiPayload,

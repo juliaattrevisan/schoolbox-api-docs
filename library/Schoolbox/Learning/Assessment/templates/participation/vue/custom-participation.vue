@@ -238,8 +238,8 @@ async function includeParticipantInExistingPlan(): Promise<void> {
         return;
     }
 
-    const data = response.data;
-    //add the activity to each participant
+    const { data } = response;
+    // add the activity to each participant
     includeInExistingList.value.forEach((participant) => {
         if ("assessable" in activity) {
             participant.customisedPlan = { ...activity };
