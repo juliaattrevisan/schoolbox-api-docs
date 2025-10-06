@@ -16,10 +16,12 @@
         </div>
 
         {# module specific config #}
-        <div id="textModuleContainer" style="display:block">
+        <div id="textModuleContainer" class="l-grid l-gap-l l-mar-m--bottom">
             {% for module,textConfig in textModuleContext %}
-                <div>{{ module }}</div>
-                {% include '@settings/moduleConfig.twig' with textConfig only %}
+                <div data-module="{{ module }}">
+                    <div>{{ module }}</div>
+                    {% include '@settings/moduleConfig.twig' with textConfig only %}
+                </div>
             {% endfor %}
         </div>
 
