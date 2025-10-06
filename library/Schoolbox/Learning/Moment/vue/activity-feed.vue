@@ -546,40 +546,40 @@ window.Vue.onMounted(async () => {
             <section class="activity-feed">
                 <div class="profile-learning-actions">
                     <div>
-                        <template v-if="props.routes.getCreateEvidenceForm">
-                            <a
-                                href="#"
-                                title="Share Learning"
-                                class="learning icon-share"
-                                data-reveal-id="shareLearningMoment"
-                                data-test="learning-moment-evidence-share"
-                                ><span>Share Learning</span></a
-                            >
-                        </template>
-                        <template v-if="props.routes.getSetAsGoalForm">
-                            <a
-                                :href="getReturnUrl(props.routes.getSetAsGoalForm)"
-                                title="Set goals"
-                                class="goals icon-goal"
-                                ><span>Set Goals</span></a
-                            >
-                        </template>
-                        <template v-if="props.routes.getSetAsGoalForSelfForm">
-                            <a
-                                :href="getReturnUrl(props.routes.getSetAsGoalForSelfForm)"
-                                title="Set goals"
-                                class="goals icon-goal"
-                                ><span>Set My Goals</span></a
-                            >
-                        </template>
-                        <template v-if="props.routes.getAwardAsAchievementForm">
-                            <a
-                                :href="getReturnUrl(props.routes.getAwardAsAchievementForm)"
-                                title="Award achievement"
-                                class="achievement icon-achievement"
-                                ><span>Award Achievement</span></a
-                            >
-                        </template>
+                        <a
+                            v-if="props.routes.getCreateEvidenceForm"
+                            href="#"
+                            title="Share Learning"
+                            class="learning icon-share"
+                            data-reveal-id="shareLearningMoment"
+                            data-test="learning-moment-evidence-share"
+                        >
+                            <span>Share Learning</span>
+                        </a>
+                        <a
+                            v-if="props.routes.getSetAsGoalForm"
+                            :href="getReturnUrl(props.routes.getSetAsGoalForm)"
+                            title="Set goals"
+                            class="goals icon-goal"
+                        >
+                            <span>Set Goals</span>
+                        </a>
+                        <a
+                            v-if="props.routes.getSetAsGoalForSelfForm"
+                            :href="getReturnUrl(props.routes.getSetAsGoalForSelfForm)"
+                            title="Set goals"
+                            class="goals icon-goal"
+                        >
+                            <span>Set My Goals</span>
+                        </a>
+                        <a
+                            v-if="props.routes.getAwardAsAchievementForm"
+                            :href="getReturnUrl(props.routes.getAwardAsAchievementForm)"
+                            title="Award achievement"
+                            class="achievement icon-achievement"
+                        >
+                            <span>Award Achievement</span>
+                        </a>
                     </div>
                 </div>
             </section>
@@ -643,18 +643,12 @@ window.Vue.onMounted(async () => {
                             </ul>
                         </div>
                         <div class="filters-description" data-filters-description>
-                            <template v-if="selectedTag !== ''">
-                                <p>
-                                    Showing tag "{{ selectedTag }}"
-                                    <span
-                                        id="removeFilters"
-                                        class="anchor-style"
-                                        @click="loadFilteredContent('', true)"
-                                    >
-                                        (remove)
-                                    </span>
-                                </p>
-                            </template>
+                            <p v-if="selectedTag !== ''">
+                                Showing tag "{{ selectedTag }}"
+                                <span id="removeFilters" class="anchor-style" @click="loadFilteredContent('', true)">
+                                    (remove)
+                                </span>
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -1120,13 +1114,15 @@ window.Vue.onMounted(async () => {
                             ><template v-else-if="props.routes.getSetAsGoalForSelfForm"> or </template>
                         </template>
 
-                        <template v-if="props.routes.getSetAsGoalForSelfForm">
-                            <a :href="getReturnUrl(props.routes.getSetAsGoalForSelfForm)" title="Set a goal">
-                                <!-- Different capitalization for if this is start or middle of a sentence -->
-                                <template v-if="props.routes.getCreateEvidenceForm">set a goal</template>
-                                <template v-else>Set a goal</template>
-                            </a>
-                        </template>
+                        <a
+                            v-if="props.routes.getSetAsGoalForSelfForm"
+                            :href="getReturnUrl(props.routes.getSetAsGoalForSelfForm)"
+                            title="Set a goal"
+                        >
+                            <!-- Different capitalization for if this is start or middle of a sentence -->
+                            <template v-if="props.routes.getCreateEvidenceForm">set a goal</template>
+                            <template v-else>Set a goal</template>
+                        </a>
 
                         to see it appear in your activity feed.
                     </p>
@@ -1163,25 +1159,29 @@ window.Vue.onMounted(async () => {
                             </template>
                         </template>
 
-                        <template v-if="props.routes.getSetAsGoalForm">
-                            <a :href="getReturnUrl(props.routes.getSetAsGoalForm)" title="Set a goal">
+                        <template>
+                            <a
+                                v-if="props.routes.getSetAsGoalForm"
+                                :href="getReturnUrl(props.routes.getSetAsGoalForm)"
+                                title="Set a goal"
+                            >
                                 <!-- Different capitalization for if this is start or middle of a sentence -->
                                 <template v-if="props.routes.getCreateEvidenceForm">set a goal</template>
-                                <template v-else>Set a goal</template> </a
-                            ><template v-if="props.routes.getAwardAsAchievementForm"> or </template>
+                                <template v-else>Set a goal</template>
+                            </a>
+                            <template v-if="props.routes.getAwardAsAchievementForm"> or </template>
                         </template>
 
-                        <template v-if="props.routes.getAwardAsAchievementForm">
-                            <a
-                                :href="getReturnUrl(props.routes.getAwardAsAchievementForm)"
-                                title="Award an achievement"
+                        <a
+                            v-if="props.routes.getAwardAsAchievementForm"
+                            :href="getReturnUrl(props.routes.getAwardAsAchievementForm)"
+                            title="Award an achievement"
+                        >
+                            <template v-if="props.routes.getCreateEvidenceForm || props.routes.getSetAsGoalForm"
+                                >award an achievement</template
                             >
-                                <template v-if="props.routes.getCreateEvidenceForm || props.routes.getSetAsGoalForm"
-                                    >award an achievement</template
-                                >
-                                <template v-else>Award an achievement</template>
-                            </a>
-                        </template>
+                            <template v-else>Award an achievement</template>
+                        </a>
 
                         to see it appear here.
                     </p>
