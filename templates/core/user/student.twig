@@ -380,6 +380,25 @@
                             :editor-templates="{{ editorTemplates|json_encode }}"
                             {% endif %}
                             :editor-has-tokens="{{ editorHasTokens ? 'true' : 'false' }}"
+                            :student="{{ user|json_encode }}"
+                            :can-comment="{{ learningMomentCanComment ? 'true' : 'false' }}"
+                            :routes="{
+                                getCreateEvidenceForm: '{{ routeLookupIfAuthorized(
+                                    'learningMomentEvidence.getCreateForm',
+                                    {users: [user], userIds: user.id}
+                                ) }}',
+                                getSetAsGoalForm: '{{ routeLookupIfAuthorized(
+                                    'learningBadgeAward.getSetAsGoalForm',
+                                    {users: [user], userIds: user.id}
+                                ) }}',
+                                getSetAsGoalForSelfForm: '{{ routeLookupIfAuthorized(
+                                    'learningBadgeAward.getSetAsGoalForSelfForm'
+                                ) }}',
+                                getFeed: '{{ routeLookupIfAuthorized(
+                                    'learningMomentFeed.getFeedForUser',
+                                    {user: user, userId: user.id}
+                                ) }}',
+                            }"
                         />
                     </div>
                 </div>
@@ -429,12 +448,6 @@
                             current: '{{ RETURN_URL.current }}',
                         },
                     };
-                    window.learningEvidenceFeedConfig = $.extend(true, {}, baseConfig);
-                    window.learningEvidenceFeedConfig.routes.getFeed = '{{ routeLookupIfAuthorized(
-                        'learningMomentFeed.getFeedForUser',
-                        {user: user, userId: user.id}
-                    ) }}';
-                    window.learningEvidenceFeedConfig.canComment = Boolean('{{ learningMomentCanComment }}');
 
                     window.learningBadgeGoalFeedConfig = $.extend(true, {}, baseConfig);
                     window.learningBadgeGoalFeedConfig.routes.getAwardFeed = '{{ routeLookupIfAuthorized(

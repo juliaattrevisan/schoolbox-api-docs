@@ -35,9 +35,25 @@ interface Props {
     editorTemplates?: Template[];
     /** Whether to use tokens in the comment editor */
     editorHasTokens?: boolean;
+    /** The student that this feed is for */
+    student: {
+        id: number;
+        givenName: string;
+    };
+    /** Whether the current user can comment on learning moments */
+    canComment: boolean;
+    /** Relevant routes */
+    routes: {
+        getCreateEvidenceForm: string | null;
+        getSetAsGoalForm: string | null;
+        getSetAsGoalForSelfForm: string | null;
+        getAwardAsAchievementForm: string | null;
+        getFeed: string | null;
+    };
 }
 
 const props = defineProps<Props>();
+const currentUser = window.schoolboxUser;
 
 window.Vue.provide("editorTemplates", props.editorTemplates);
 window.Vue.provide("editorHasTokens", props.editorHasTokens);
@@ -114,7 +130,6 @@ const selectedFilters = window.Vue.reactive({
 const showFeed = window.Vue.ref(true);
 
 // TODO check, also probably doesnt need to be computed
-const config = window.Vue.computed(() => window.learningEvidenceFeedConfig);
 const dateDisplayFormats = window.Vue.computed(() => window.dateDisplayFormats);
 
 const awardDetailModalEl = window.Vue.useTemplateRef<InstanceType<typeof AwardDetailModal> | null>(
@@ -266,7 +281,11 @@ async function append(cursor: string | null): Promise<void> {
     params.set("filter", btoa(JSON.stringify(getFiltersStateFromDom())));
 
     try {
-        const response = await fetch(`${config.value.routes.getFeed}?${params.toString()}`);
+        if (!props.routes.getFeed) {
+            throw new Error("Unable to access feed");
+        }
+
+        const response = await fetch(`${props.routes.getFeed}?${params.toString()}`);
         const responseData = (await response.json()) as {
             data: FeedItem[];
             metadata?: Metadata;
@@ -527,7 +546,7 @@ window.Vue.onMounted(async () => {
             <section class="activity-feed">
                 <div class="profile-learning-actions">
                     <div>
-                        <template v-if="config.routes.getCreateEvidenceForm">
+                        <template v-if="props.routes.getCreateEvidenceForm">
                             <a
                                 href="#"
                                 title="Share Learning"
@@ -537,43 +556,25 @@ window.Vue.onMounted(async () => {
                                 ><span>Share Learning</span></a
                             >
                         </template>
-                        <template v-if="config.routes.getSetAsGoalForm">
+                        <template v-if="props.routes.getSetAsGoalForm">
                             <a
-                                :href="
-                                    config.routes.getSetAsGoalForm +
-                                    '?' +
-                                    config.returnUrl.name +
-                                    '=' +
-                                    config.returnUrl.current
-                                "
+                                :href="getReturnUrl(props.routes.getSetAsGoalForm)"
                                 title="Set goals"
                                 class="goals icon-goal"
                                 ><span>Set Goals</span></a
                             >
                         </template>
-                        <template v-if="config.routes.getSetAsGoalForSelfForm">
+                        <template v-if="props.routes.getSetAsGoalForSelfForm">
                             <a
-                                :href="
-                                    config.routes.getSetAsGoalForSelfForm +
-                                    '?' +
-                                    config.returnUrl.name +
-                                    '=' +
-                                    config.returnUrl.current
-                                "
+                                :href="getReturnUrl(props.routes.getSetAsGoalForSelfForm)"
                                 title="Set goals"
                                 class="goals icon-goal"
                                 ><span>Set My Goals</span></a
                             >
                         </template>
-                        <template v-if="config.routes.getAwardAsAchievementForm">
+                        <template v-if="props.routes.getAwardAsAchievementForm">
                             <a
-                                :href="
-                                    config.routes.getAwardAsAchievementForm +
-                                    '?' +
-                                    config.returnUrl.name +
-                                    '=' +
-                                    config.returnUrl.current
-                                "
+                                :href="getReturnUrl(props.routes.getAwardAsAchievementForm)"
                                 title="Award achievement"
                                 class="achievement icon-achievement"
                                 ><span>Award Achievement</span></a
@@ -836,7 +837,7 @@ window.Vue.onMounted(async () => {
                                         <comment-thread
                                             :thread="item.object.discussionThread ?? undefined"
                                             :create-thread-endpoint="item.object._links.createThread ?? undefined"
-                                            :can-comment="config.canComment"
+                                            :can-comment="props.canComment"
                                         />
                                     </div>
 
@@ -845,12 +846,11 @@ window.Vue.onMounted(async () => {
                                     <div class="learning-moment-cta small-12 columns">
                                         <ul class="flex-list buttons">
                                             <!-- Student buttons -->
-                                            <template v-if="'student' === config.currentUser.role.type">
+                                            <template v-if="'student' === currentUser.role.type">
                                                 <!-- current user must be the author of the learning moment to have these actions -->
                                                 <template
                                                     v-if="
-                                                        item.object.creator &&
-                                                        config.currentUser.id === item.object.creator.id
+                                                        item.object.creator && currentUser.id === item.object.creator.id
                                                     "
                                                 >
                                                     <template
@@ -899,9 +899,7 @@ window.Vue.onMounted(async () => {
 
                                             <!-- Parent buttons -->
                                             <template
-                                                v-else-if="
-                                                    'parent' === config.currentUser.role.type && evidenceParentCreate
-                                                "
+                                                v-else-if="'parent' === currentUser.role.type && evidenceParentCreate"
                                             >
                                                 <template
                                                     v-if="
@@ -932,7 +930,7 @@ window.Vue.onMounted(async () => {
                                             </template>
 
                                             <!-- Staff buttons -->
-                                            <template v-else-if="'staff' === config.currentUser.role.type">
+                                            <template v-else-if="'staff' === currentUser.role.type">
                                                 <template
                                                     v-if="
                                                         'draft' === item.object.currentState ||
@@ -1103,13 +1101,13 @@ window.Vue.onMounted(async () => {
             <div v-if="metadata.count === 0" class="empty-state">
                 <i class="icon-advanced-list"></i>
 
-                <template v-if="config.currentUser.id === config.student.id">
+                <template v-if="currentUser.id === props.student.id">
                     <!-- Current user -->
                     <p>You don't have any activity yet.</p>
 
                     <!-- Can share moments? -->
-                    <p v-if="config.routes.getCreateEvidenceForm || config.routes.getSetAsGoalForSelfForm">
-                        <template v-if="config.routes.getCreateEvidenceForm">
+                    <p v-if="props.routes.getCreateEvidenceForm || props.routes.getSetAsGoalForSelfForm">
+                        <template v-if="props.routes.getCreateEvidenceForm">
                             <!--
                                 All these tags need to be on the same line,
                                 because otherwise there will be a space between
@@ -1117,24 +1115,15 @@ window.Vue.onMounted(async () => {
                              -->
                             <a href="#" title="Share a learning moment" data-reveal-id="shareLearningMoment"
                                 >Share your learning</a
-                            ><template v-if="config.routes.getSetAsGoalForm && config.routes.getAwardAsAchievementForm"
+                            ><template v-if="props.routes.getSetAsGoalForm && props.routes.getAwardAsAchievementForm"
                                 >, </template
-                            ><template v-else-if="config.routes.getSetAsGoalForSelfForm"> or </template>
+                            ><template v-else-if="props.routes.getSetAsGoalForSelfForm"> or </template>
                         </template>
 
-                        <template v-if="config.routes.getSetAsGoalForSelfForm">
-                            <a
-                                :href="
-                                    config.routes.getSetAsGoalForSelfForm +
-                                    '?' +
-                                    config.returnUrl.name +
-                                    '=' +
-                                    config.returnUrl.current
-                                "
-                                title="Set a goal"
-                            >
+                        <template v-if="props.routes.getSetAsGoalForSelfForm">
+                            <a :href="getReturnUrl(props.routes.getSetAsGoalForSelfForm)" title="Set a goal">
                                 <!-- Different capitalization for if this is start or middle of a sentence -->
-                                <template v-if="config.routes.getCreateEvidenceForm">set a goal</template>
+                                <template v-if="props.routes.getCreateEvidenceForm">set a goal</template>
                                 <template v-else>Set a goal</template>
                             </a>
                         </template>
@@ -1145,19 +1134,19 @@ window.Vue.onMounted(async () => {
 
                 <template v-else>
                     <!-- Parent or student -->
-                    <p>{{ config.student.givenName }} doesn't have any activity yet.</p>
+                    <p>{{ props.student.givenName }} doesn't have any activity yet.</p>
 
                     <!-- What can the current user do? -->
 
                     <!-- Can share moments? -->
                     <p
                         v-if="
-                            config.routes.getCreateEvidenceForm ||
-                            config.routes.getSetAsGoalForm ||
-                            config.routes.getAwardAsAchievementForm
+                            props.routes.getCreateEvidenceForm ||
+                            props.routes.getSetAsGoalForm ||
+                            props.routes.getAwardAsAchievementForm
                         "
                     >
-                        <template v-if="config.routes.getCreateEvidenceForm">
+                        <template v-if="props.routes.getCreateEvidenceForm">
                             <!--
                                 All these tags need to be on the same line,
                                 because otherwise there will be a space between
@@ -1165,44 +1154,29 @@ window.Vue.onMounted(async () => {
                              -->
                             <a href="#" title="Share a learning moment" data-reveal-id="shareLearningMoment"
                                 >Share a learning moment</a
-                            ><template v-if="config.routes.getSetAsGoalForm && config.routes.getAwardAsAchievementForm"
+                            ><template v-if="props.routes.getSetAsGoalForm && props.routes.getAwardAsAchievementForm"
                                 >, </template
                             ><template
-                                v-else-if="config.routes.getSetAsGoalForm || config.routes.getAwardAsAchievementForm"
+                                v-else-if="props.routes.getSetAsGoalForm || props.routes.getAwardAsAchievementForm"
                             >
                                 or
                             </template>
                         </template>
 
-                        <template v-if="config.routes.getSetAsGoalForm">
-                            <a
-                                :href="
-                                    config.routes.getSetAsGoalForm +
-                                    '?' +
-                                    config.returnUrl.name +
-                                    '=' +
-                                    config.returnUrl.current
-                                "
-                                title="Set a goal"
-                            >
+                        <template v-if="props.routes.getSetAsGoalForm">
+                            <a :href="getReturnUrl(props.routes.getSetAsGoalForm)" title="Set a goal">
                                 <!-- Different capitalization for if this is start or middle of a sentence -->
-                                <template v-if="config.routes.getCreateEvidenceForm">set a goal</template>
+                                <template v-if="props.routes.getCreateEvidenceForm">set a goal</template>
                                 <template v-else>Set a goal</template> </a
-                            ><template v-if="config.routes.getAwardAsAchievementForm"> or </template>
+                            ><template v-if="props.routes.getAwardAsAchievementForm"> or </template>
                         </template>
 
-                        <template v-if="config.routes.getAwardAsAchievementForm">
+                        <template v-if="props.routes.getAwardAsAchievementForm">
                             <a
-                                :href="
-                                    config.routes.getAwardAsAchievementForm +
-                                    '?' +
-                                    config.returnUrl.name +
-                                    '=' +
-                                    config.returnUrl.current
-                                "
+                                :href="getReturnUrl(props.routes.getAwardAsAchievementForm)"
                                 title="Award an achievement"
                             >
-                                <template v-if="config.routes.getCreateEvidenceForm || config.routes.getSetAsGoalForm"
+                                <template v-if="props.routes.getCreateEvidenceForm || props.routes.getSetAsGoalForm"
                                     >award an achievement</template
                                 >
                                 <template v-else>Award an achievement</template>
@@ -1214,7 +1188,7 @@ window.Vue.onMounted(async () => {
 
                     <!-- Can't share moments? -->
                     <p v-else>
-                        When {{ config.student.givenName }} or their teacher shares learning, it will appear here.
+                        When {{ props.student.givenName }} or their teacher shares learning, it will appear here.
                     </p>
                 </template>
             </div>
