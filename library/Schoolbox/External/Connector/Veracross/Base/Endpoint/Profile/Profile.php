@@ -20,6 +20,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Alert;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\ContactInfo;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\EmergencyContact;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Health;
@@ -61,6 +62,7 @@ class Profile implements IStrategy
      * staff_faculty:list
      * contact_info:list
      * person_photos:list
+     * academics.student_alerts:list
      */
     public const SCOPE = '
         students:list
@@ -72,6 +74,7 @@ class Profile implements IStrategy
         staff_faculty:list
         contact_info:list
         person_photos:list
+        academics.student_alerts:list
     ';
 
 
@@ -105,6 +108,14 @@ class Profile implements IStrategy
      * @var Photo
      */
     private Photo $photoLookup;
+
+
+    /**
+     * A list of alerts
+     *
+     * @var Alert
+     */
+    private Alert $alertLookup;
 
 
     /**
@@ -161,6 +172,7 @@ class Profile implements IStrategy
         /* Shared lookups
          */
         $this->contactInfoLookup = new ContactInfo($this->api);
+        $this->alertLookup = new Alert($this->api, $this->watchlist);
 
         /* Students might have profile pics;
          * Staff might have profile pics
