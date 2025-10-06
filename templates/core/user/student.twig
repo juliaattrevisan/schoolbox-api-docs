@@ -370,18 +370,16 @@
                 <div class="content no-pad {% if activeTab == 'activity' %}active{% endif %}" id="tab-activity">
                     <div id="activity-feed">
                         <activity-feed
-                                cdn-prefix="{{ CDN_PREFIX }}"
-                                site-version="{{ config.site_version }}"
-                                :show-learning-moments="{{ config.learning_moments_enabled ? 'true' : 'false' }}"
-                                :show-goals="{{ config.badges_enabled ? 'true' : 'false' }}"
-                                :show-achievements="{{ config.badges_enabled ? 'true' : 'false' }}"
-                                :show-feedback="{{ config.activity_feed_feedback_enabled ? 'true' : 'false' }}"
-                                :moderation-required="{{ moderationRequired ? 'true' : 'false' }}"
-                                :evidence-parent-create="{{ config.evidence_parent_create ? 'true' : 'false' }}"
-                                {% if editorTemplates is defined %}
-                                :editor-templates="{{ editorTemplates|json_encode }}"
-                                {% endif %}
-                                :editor-has-tokens="{{ editorHasTokens ? 'true' : 'false' }}"
+                            :show-learning-moments="{{ config.learning_moments_enabled ? 'true' : 'false' }}"
+                            :show-goals="{{ config.badges_enabled ? 'true' : 'false' }}"
+                            :show-achievements="{{ config.badges_enabled ? 'true' : 'false' }}"
+                            :show-feedback="{{ config.activity_feed_feedback_enabled ? 'true' : 'false' }}"
+                            :moderation-required="{{ moderationRequired ? 'true' : 'false' }}"
+                            :evidence-parent-create="{{ config.evidence_parent_create ? 'true' : 'false' }}"
+                            {% if editorTemplates is defined %}
+                            :editor-templates="{{ editorTemplates|json_encode }}"
+                            {% endif %}
+                            :editor-has-tokens="{{ editorHasTokens ? 'true' : 'false' }}"
                         />
                     </div>
                 </div>

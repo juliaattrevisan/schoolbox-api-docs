@@ -7,8 +7,6 @@ import type { Template } from "@js/editor/types/editorTypes";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import StorageObject from "@schoolboxVue/components/storage-object.vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
-import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
-import foundationMixin from "@schoolboxVue/components/foundation-mixin";
 import CodesList from "@schoolboxCurriculum/vue/codes-list.vue";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
 import AwardDetailModal from "@schoolboxBadge/Award/vue/award-detail-modal.vue";
@@ -20,11 +18,7 @@ import CommentThread from "./comment-thread.vue";
 import { EvidenceStatus, evidenceStatusLabels } from "./evidenceTypes";
 import type { LearningMoment } from "./evidenceTypes";
 
-// TODO:
-// mixins: [foundationMixin, cdnPrefixMixin],
-
 interface Props {
-    siteVersion: string;
     /** Whether to show learning moments within the feed */
     showLearningMoments: boolean;
     /** Whether to show goals within the feed */
