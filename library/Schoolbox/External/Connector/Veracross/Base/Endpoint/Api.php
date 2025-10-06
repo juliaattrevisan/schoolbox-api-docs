@@ -157,11 +157,17 @@ class Api implements IApi
         );
 
         /* Access Token Generator
+         *
+         * Note that schools can configure an authentication host closer to their geographic location
+         * THe default is https://accounts.veracross.com but Aussies will use https://accounts.veracross.au
+         *
+         * This auth host is different to School Data Endpoint Host.
          */
         $this->accessTokenGenerator = new AccessTokenGenerator(
             $this->credentials['schoolroute'],
             $this->credentials['clientid'],
-            $this->credentials['clientsecret']
+            $this->credentials['clientsecret'],
+            $this->credentials['authhost']
         );
 
         return new Client([
