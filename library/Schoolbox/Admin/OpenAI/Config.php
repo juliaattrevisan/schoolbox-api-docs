@@ -74,14 +74,7 @@ class Config
      */
     public function decode(?string $config, string $provider): ?array
     {
-        $optionsPayload = json_decode($config, true, 512, JSON_THROW_ON_ERROR);
-
-        /* Bad data or couldn't decode, for some obscure reason
-         * Kind of common with third parties, more so than us
-         */
-        if (!$optionsPayload) {
-            return null;
-        }
+        $optionsPayload = json_decode($config ?? '{}', true, 512, JSON_THROW_ON_ERROR);
 
         /* Superimpose selected options over the default
          * Disabling fields prevents the keys from existing
