@@ -53,7 +53,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const currentUser = window.schoolboxUser;
+const { dateDisplayFormats, schoolboxUser: currentUser } = window;
 
 window.Vue.provide("editorTemplates", props.editorTemplates);
 window.Vue.provide("editorHasTokens", props.editorHasTokens);
@@ -98,6 +98,8 @@ const metadata = window.Vue.reactive<Metadata>({
         next: null,
     },
 });
+
+const showFeed = window.Vue.ref(true);
 const showSkeletonLoader = window.Vue.ref(true);
 const currentlyDeletingItem = window.Vue.ref<FeedItem | null>(null);
 const isDeleteModalOpen = window.Vue.ref(false);
@@ -126,11 +128,6 @@ const selectedFilters = window.Vue.reactive({
     achievements: false,
     feedback: false,
 });
-
-const showFeed = window.Vue.ref(true);
-
-// TODO check, also probably doesnt need to be computed
-const dateDisplayFormats = window.Vue.computed(() => window.dateDisplayFormats);
 
 const awardDetailModalEl = window.Vue.useTemplateRef<InstanceType<typeof AwardDetailModal> | null>(
     "awardDetailModalRef",
