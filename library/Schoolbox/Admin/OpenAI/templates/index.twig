@@ -13,16 +13,16 @@
         {# main text config space, which provider. #}
         <div id="textSettingsContainer" style="display:none">
             {% include '@settings/moduleConfig.twig' with textConfigContext only %}
-        </div>
 
-        {# module specific config #}
-        <div id="textModuleContainer" class="l-grid l-gap-l l-mar-m--bottom">
-            {% for module,textConfig in textModuleContext %}
-                <div data-module="{{ module }}">
-                    <div>{{ module }}</div>
-                    {% include '@settings/moduleConfig.twig' with textConfig only %}
-                </div>
-            {% endfor %}
+            {# module specific config #}
+            <div id="textModuleContainer" class="l-grid l-gap-l l-mar-m--bottom">
+                {% for module,textConfig in textModuleContext %}
+                    <div data-module="{{ module }}">
+                        <div>{{ module }}</div>
+                        {% include '@settings/moduleConfig.twig' with textConfig only %}
+                    </div>
+                {% endfor %}
+            </div>
         </div>
 
         <div class="small-12 columns">
@@ -50,10 +50,30 @@
 
                 textProvider.on('change', function(event) {
                     event.preventDefault();
-                    init(textContainer, textProvider, textKey, textModel, textAzureResourceName, textAzureDeploymentId, null, textSystemPrompt);
+                    initText(textProvider);
                 });
 
                 init(textContainer, textProvider, textKey, textModel, textAzureResourceName, textAzureDeploymentId, null, textSystemPrompt);
+
+                // when the text provider changes, we need to fetch the new html from adminOpenAi.getConfigStruct
+                function initText(textProvider) {
+                    // get the provider
+                    const provider = textProvider.val();
+                    //replace the url with the provider
+                    const path = '{{ routeLookupIfAuthorized('adminOpenAi.getConfigStruct') }}'.replace('{provider}', provider);
+                    // fetch the new html
+                    $.ajax({
+                        url: path,
+                        type: 'GET',
+                        success: function(response) {
+                            // replace the html in the textModuleContainer
+                            $('#textModuleContainer').html(response);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error fetching config struct:', error);
+                        }
+                    })
+                }
 
                 /* Image credentials
                  */

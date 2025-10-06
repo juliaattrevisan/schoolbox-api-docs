@@ -147,8 +147,22 @@ class Controller extends ConfigController
      */
     public function getConfigStruct(string $provider): void
     {
+        $aiConfig = new Config();
         $struct = Config::generateInitConfig($provider);
-        $this->response = $this->responseAsJson($struct);
+
+        $textModuleContext = $aiConfig->buildTwigConfig(
+            $struct,
+            $this->fieldStrategyFactory,
+            $this->getConfigLoader()->get('site_version'),
+            $this->routeGenerator->generate('adminOpenAi.postTextOptions'),
+            [
+                ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,
+                'formId' => 'textSettings'
+            ]
+        );
+
+        $this->response = $this->responseFromTemplateUnthemed('@adminOpenAi/config.twig', ['textModuleContext' => $textModuleContext]);
+//        $this->response = $this->responseAsJson($struct);
     }
 
 

@@ -159,7 +159,7 @@ class Config
     public function buildTwigConfig(array $config, $fieldStrategyFactory, $siteVersion, $postRoute, $additionalContext)
     {
         //loop through the modules
-        if (empty($config) || !is_array($config)) {
+        if (empty($config)) {
             return;
         }
         $modules = [];
@@ -182,7 +182,8 @@ class Config
 
                 // don't show provider
                 if ($key === self::FIELD_PROVIDER) {
-                    $cfg->setEditable(false);
+                    $cfg->setEditable(false)
+                        ->setHidden(true);
                 }
                 $configCollection->add($cfg);
             }
