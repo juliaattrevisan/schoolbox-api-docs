@@ -147,9 +147,9 @@ class Controller extends ConfigController
      *
      * @param string $provider
      * @return void
-     * @api GET /adminv2/ai-services/struct/OpenAI
+     * @api GET /adminv2/ai-services/blank/OpenAI
      */
-    public function getConfigStruct(string $provider): void
+    public function getBlankConfig(string $provider): void
     {
         $aiConfig = new Config();
         $struct = Config::generateInitConfig($provider);
@@ -161,6 +161,7 @@ class Controller extends ConfigController
             $this->routeGenerator->generate('adminOpenAi.postTextOptions'),
             [
                 ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,
+                ModuleConfig::CONTEXT_ISEDITABLE => false,
                 'formId' => 'textSettings'
             ]
         );

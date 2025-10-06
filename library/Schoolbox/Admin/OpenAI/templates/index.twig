@@ -62,7 +62,7 @@
                     // get the provider
                     const provider = textProvider.val();
                     //replace the url with the provider
-                    const path = '{{ routeLookupIfAuthorized('adminOpenAi.getConfigStruct') }}'.replace('{provider}', provider);
+                    const path = '{{ routeLookupIfAuthorized('adminOpenAi.getBlankConfig') }}'.replace('{provider}', provider);
                     // fetch the new html
                     $.ajax({
                         url: path,
