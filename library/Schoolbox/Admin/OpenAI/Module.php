@@ -43,6 +43,9 @@ class Module extends BaseModule
         $this->register('GET', '', 'getIndex', $perms);
         $this->register('POST', '/text', 'postTextOptions', $perms);
         $this->register('POST', '/image', 'postImageOptions', $perms);
+
+        // vue use, get the config structure for a provider
+        $this->register('GET', '/struct/{provider}', 'getConfigStruct', $perms);
     }
 
 

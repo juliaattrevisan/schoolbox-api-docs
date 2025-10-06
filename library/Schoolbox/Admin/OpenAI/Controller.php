@@ -138,6 +138,19 @@ class Controller extends ConfigController
         $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminOpenAi.getIndex'));
     }
 
+    /**
+     * Get the blank configuration structure for a given provider
+     *
+     * @param string $provider
+     * @return void
+     * @api GET /adminv2/ai-services/struct/OpenAI
+     */
+    public function getConfigStruct(string $provider): void
+    {
+        $struct = Config::generateInitConfig($provider);
+        $this->response = $this->responseAsJson($struct);
+    }
+
 
     /**
      *
