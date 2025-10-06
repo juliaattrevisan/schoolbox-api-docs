@@ -204,6 +204,15 @@ class Controller extends Base
                 'moderate' => true
             ]
         ],
+        UserAccess::SERVICE_DIFFERENTIATION_PROFILE => [
+            'name' => 'Differentiation Profile',
+            'identifier' => self::IDENTIFIER_CAMPUS,
+            'availability' => [
+                'read' => false,
+                'write' => true,
+                'moderate' => true
+            ]
+        ],
         UserAccess::SERVICE_SPORTS_ADMINISTRATOR => [
             'name' => 'Fixtures',
             'identifier' => self::IDENTIFIER_NONE,
@@ -264,15 +273,6 @@ class Controller extends Base
             'availability' => [
                 'read' => false,
                 'write' => false,
-                'moderate' => true
-            ]
-        ],
-        UserAccess::SERVICE_DIFFERENTIATION_PROFILE => [
-            'name' => 'Differentiation Profile',
-            'identifier' => self::IDENTIFIER_CAMPUS,
-            'availability' => [
-                'read' => false,
-                'write' => true,
                 'moderate' => true
             ]
         ],
