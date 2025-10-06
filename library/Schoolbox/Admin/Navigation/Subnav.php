@@ -157,7 +157,7 @@ class Subnav
             $this->user->hasServicePermission(UserAccess::SERVICE_TIMETABLE, UserAccess::ACCESS_FULL)
         );
         $userHasServicePermissionDifferentiationProfileManagement = (
-            $this->user->hasServicePermission(UserAccess::SERVICE_DIFFERENTIATION_PROFILE_MANAGEMENT, UserAccess::ACCESS_FULL)
+            $this->user->hasServicePermission(UserAccess::SERVICE_DIFFERENTIATION_PROFILE, UserAccess::ACCESS_FULL)
         );
         $userHasAnyModeratorServicePermission = (
             $userHasServicePermissionNews ||

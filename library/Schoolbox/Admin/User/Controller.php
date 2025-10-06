@@ -267,8 +267,8 @@ class Controller extends Base
                 'moderate' => true
             ]
         ],
-        UserAccess::SERVICE_DIFFERENTIATION_PROFILE_MANAGEMENT => [
-            'name' => 'Differentiation Profile Management',
+        UserAccess::SERVICE_DIFFERENTIATION_PROFILE => [
+            'name' => 'Differentiation Profile',
             'identifier' => self::IDENTIFIER_CAMPUS,
             'availability' => [
                 'read' => false,

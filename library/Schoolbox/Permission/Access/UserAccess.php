@@ -35,7 +35,7 @@ class UserAccess implements IModel
     public const int SERVICE_DESIGN = 13;
     public const int SERVICE_LMS = 14;
     public const int SERVICE_IMPERSONATOR = 15; // Note SERVICE_IMPERSONATOR is special, in that it requires a roleId to be set in userAccess.sid.
-    public const int SERVICE_DIFFERENTIATION_PROFILE_MANAGEMENT = 16;
+    public const int SERVICE_DIFFERENTIATION_PROFILE = 16;
 
     /**
      * Services that do not have service identifiers (sid) use this value
@@ -139,7 +139,7 @@ class UserAccess implements IModel
             self::SERVICE_DESIGN,
             self::SERVICE_LMS,
             self::SERVICE_IMPERSONATOR,
-            self::SERVICE_DIFFERENTIATION_PROFILE_MANAGEMENT,
+            self::SERVICE_DIFFERENTIATION_PROFILE,
         ];
     }
 
@@ -154,7 +154,7 @@ class UserAccess implements IModel
             self::SERVICE_HOMEPAGE,
             self::SERVICE_CALENDAR,
             self::SERVICE_IMPERSONATOR,
-            self::SERVICE_DIFFERENTIATION_PROFILE_MANAGEMENT,
+            self::SERVICE_DIFFERENTIATION_PROFILE,
         ];
     }
 

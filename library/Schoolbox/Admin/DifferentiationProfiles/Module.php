@@ -15,6 +15,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 
 class Module extends BaseModule
@@ -36,7 +37,10 @@ class Module extends BaseModule
          */
         $perms = new Rule\All(
             new Rule\IsLoggedIn(),
-            new Rule\IsSuperuser()
+            new Rule\Any(
+                new Rule\HasServicePermission(UserAccess::SERVICE_DIFFERENTIATION_PROFILE, UserAccess::ACCESS_FULL),
+                new Rule\IsSuperuser()
+            ),
         );
 
         $this->register('GET', '', 'getIndex', $perms);
