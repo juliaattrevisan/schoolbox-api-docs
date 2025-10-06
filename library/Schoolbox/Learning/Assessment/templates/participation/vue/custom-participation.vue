@@ -10,7 +10,7 @@ import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vu
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import type { CustomisedPlan, Participant, Plan } from "../js/types/customParticipationTypes";
-import {postIncludeExistingParticipant, postIncludeParticipant } from "../js/types/customParticipationPayload";
+import { postIncludeExistingParticipant, postIncludeParticipant } from "../js/types/customParticipationPayload";
 
 interface Props {
     allParticipants: Participant[];
