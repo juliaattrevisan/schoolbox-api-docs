@@ -2,14 +2,15 @@
 /**
  * Custom Participation Vue Component
  */
-import { isAbortError, hasErrorMessage } from "@js/util/errorUtils";
+import { hasErrorMessage, isAbortError } from "@js/util/errorUtils";
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import locale from "@js/terminology/rosettaStone";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
 import type { StudentPastoralCountBadge } from "@schoolboxLibrary/Pastoral/types/StudentPastoralCountBadge";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
-import type { Participant, Plan, CustomisedPlan } from "../js/types/customParticipationTypes";
+import type { CustomisedPlan, Participant, Plan } from "../js/types/customParticipationTypes";
+import { postIncludeExistingParticipant, postIncludeParticipant } from "../js/types/customParticipationPayload";
 
 interface Props {
     allParticipants: Participant[];
@@ -170,27 +171,23 @@ async function excludeParticipants(participants: Participant[]): Promise<void> {
  */
 async function includeParticipant(participant: Participant): Promise<void> {
     const toast = window.sbProps.toastActivate("Removing customisation...");
-    try {
-        const response = await fetch(participant._links.include, {
-            method: "POST",
-            headers: { Accept: "application/json", "Content-Type": "application/json" },
-        });
-        if (!response.ok) {
-            const errorMessage = await extractErrorMessage(response);
-            throw new Error(errorMessage);
-        }
-        participant.excludedAt = null; // Resetting the exclusion timestamp
-        participant.plan.name = null; // Resetting the plan
-        participant.customisedPlan = null; // Resetting the customised plan
-        participant.hasInteraction = false;
-        toast.timeout({ text: "Customisation removed successfully" });
-    } catch (error) {
-        if (error instanceof Error && hasErrorMessage(error)) {
-            loadError.value = error.message;
-        }
+    const response = await postIncludeParticipant(participant._links.include, {
+        includeResponse: true,
+    });
+
+    if (!response.success) {
+        const error = response.message ?? "";
+        loadError.value = error;
         console.error("Error including participant:", error);
-        toast.timeout({ text: "Error excluding student", isSuccess: false });
+        toast.timeout({ text: error, isSuccess: false });
+        return;
     }
+
+    participant.excludedAt = null; // Resetting the exclusion timestamp
+    participant.plan.name = null; // Resetting the plan
+    participant.customisedPlan = null; // Resetting the customised plan
+    participant.hasInteraction = response.data?.hasInteraction ?? false;
+    toast.timeout({ text: "Customisation removed successfully" });
 }
 
 /**
@@ -226,38 +223,35 @@ async function includeParticipantInExistingPlan(): Promise<void> {
     if (includeInExistingActivity.value === null) return;
     const activity: Plan | CustomisedPlan = includeInExistingActivity.value;
     const toast = window.sbProps.toastActivate("Adding to customisation...");
-    try {
-        const response = await fetch(props.includeInExistingCustomisation, {
-            method: "POST",
-            headers: { Accept: "application/json", "Content-Type": "application/json" },
-            body: JSON.stringify({
-                students: includeInExistingList.value.map((p) => p.user.id),
-                ...("assessable" in activity ? { assessmentId: activity.assessable.id } : {}),
-                ...(activity.name !== null ? { planId: activity.id } : {}),
-            }),
-        });
-        if (!response.ok) {
-            const errorMessage = await extractErrorMessage(response);
-            throw new Error(errorMessage);
-        }
-        // add the activity to each participant
-        includeInExistingList.value.forEach((participant) => {
-            if ("assessable" in activity) {
-                participant.customisedPlan = { ...activity };
-            } else {
-                participant.plan = { ...activity };
-            }
-        });
-        toast.timeout({ text: "Customisation added successfully", isSuccess: true });
-        isIncludeInExistingOpen.value = false;
-        includeInExistingList.value = [];
-    } catch (error) {
-        if (error instanceof Error && hasErrorMessage(error)) {
-            loadError.value = error.message;
-        }
+    const response = await postIncludeExistingParticipant(props.includeInExistingCustomisation, {
+        students: includeInExistingList.value.map((p) => p.user.id),
+        ...("assessable" in activity ? { assessmentId: activity.assessable.id } : {}),
+        ...(activity.name !== null ? { planId: activity.id } : {}),
+        includeResponse: true,
+    });
+
+    if (!response.success) {
+        const error = response.message ?? "";
+        loadError.value = error;
         console.error("Error adding Customisation:", error);
-        toast.timeout({ text: "Error adding Customisation", isSuccess: false });
+        toast.timeout({ text: error, isSuccess: false });
+        return;
     }
+
+    const { data } = response;
+    // add the activity to each participant
+    includeInExistingList.value.forEach((participant) => {
+        if ("assessable" in activity) {
+            participant.customisedPlan = { ...activity };
+            participant.hasInteraction = data?.hasInteraction?.[participant.user.id] ?? false;
+        } else {
+            participant.plan = { ...activity };
+            participant.hasInteraction = data?.hasInteraction?.[participant.user.id] ?? false;
+        }
+    });
+    toast.timeout({ text: "Customisation added successfully", isSuccess: true });
+    isIncludeInExistingOpen.value = false;
+    includeInExistingList.value = [];
 }
 
 /**

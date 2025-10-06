@@ -1000,6 +1000,7 @@ class ListController extends Web\Controller\Base
 
     /**
      * Easy access to include students into the default assessment Plan
+     * It now also optionally return partial participation info when required
      *
      * @api   POST /learning/assessments/:assessmentId/:userId/include
      * @param IAssessable $assessment
@@ -1010,16 +1011,30 @@ class ListController extends Web\Controller\Base
     {
         $assessmentDataModel = $this->assessmentMapper->translateToDataModel($assessment);
         $partitionHelper = new ParticipationHelper($assessmentDataModel, $this->participantDataSource, $this->userMapper, $this->assessmentMapper);
+        $post = $this->requestPost;
+        $includeResponse = $post->get('includeResponse', false);
         try {
             $partitionHelper->include($student->getId(), null);
             // Update project mark as the excluded assessment may affect the project result
             (new \Schoolbox\Learning\Assessment\Project\ResultCache\ResultCache($this->projectResultCacheMapper))
                 ->refresh($this->getAssessmentMapper(), $assessment, $student);
-            $this->response = $this->responseEmpty(201);
+            if ($includeResponse) {
+                /* Forces refresh of participation data, before returning the updated participation info
+                 */
+                $this->participantDataSource->loadParticipationIntoAssessment($assessment, $student);
+                $participation           = $assessment->getParticipantIfExtant($student);
+                $this->response = $this->responseAsJson(
+                    [
+                        'hasInteraction' => $participation->getAllFeedbacks()->count() || $participation->getAllResponses()->count(),
+                    ]
+                )->withStatus(201);
+            } else {
+                $this->response = $this->responseEmpty(201);
+            }
         } catch (MapperException $e) {
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($e->getCode());
-            $this->response = $this->responseAsJson($problem->asArray());
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus($e->getCode());
         }
     }
 
@@ -1641,7 +1656,8 @@ class ListController extends Web\Controller\Base
     {
         $post = $this->requestPost;
         $assessmentId = $post->get('assessmentId');
-        $studentIds = $post->get('students') ?? [];
+        $studentIds = $post->get('students', []);
+        $includeResponse = $post->get('includeResponse', false);
         $students = $this->getUserMapper()->findByColumn('id', $studentIds);
         try {
             $assessmentDataModel = $this->assessmentMapper->translateToDataModel($assessment);
@@ -1665,11 +1681,33 @@ class ListController extends Web\Controller\Base
                 }
             }
 
-            $this->response = $this->responseEmpty(201);
+            if ($includeResponse) {
+                $assessmentToRehydrate = $customisedAssessment ?? $assessment;
+                /* Forces refresh of participation data, before returning the updated participation info
+                 */
+                $this->participantDataSource->loadParticipationIntoAssessment($assessmentToRehydrate);
+
+                $hasInteraction = $students->reduce(function (array $hasInteraction, User $student) use ($assessmentToRehydrate) {
+                    $participation = $assessmentToRehydrate->getParticipantIfExtant($student) ?? null;
+                    /* Determine if the participant has any interaction (responses or feedbacks)
+                     * in an odd case where $participation might be null, will return false
+                     */
+                    $hasInteraction[$student->getId()] =
+                        $participation?->getAllFeedbacks()?->count() || $participation?->getAllResponses()?->count();
+                    return $hasInteraction;
+                }, []);
+                $this->response = $this->responseAsJson(
+                    [
+                        'hasInteraction' => $hasInteraction,
+                    ]
+                )->withStatus(201);
+            } else {
+                $this->response = $this->responseEmpty(201);
+            }
         } catch (\Exception $e) {
             $problem = new ApiProblem($e->getMessage());
             $problem->setStatus($e->getCode());
-            $this->response = $this->responseAsJson($problem->asArray());
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus($e->getCode());
         }
     }
 }
