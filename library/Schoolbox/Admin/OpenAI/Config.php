@@ -19,6 +19,7 @@ class Config
     public const ALL_MODULES = [
         Helper::FEATURE_CHAT,
         Helper::FEATURE_LESSONPLAN,
+//        Helper::FEATURE_DIFFERENTIATION,
 //        Helper::FEATURE_ASSESSMENT,
     ];
 
