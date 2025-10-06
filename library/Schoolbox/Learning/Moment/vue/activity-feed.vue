@@ -30,7 +30,7 @@ interface Props {
     /** Learning moment moderation requirement */
     moderationRequired: boolean;
     /** Whether parents can create learning moments */
-    evidenceParentCreate: boolean;
+    momentParentCreate: boolean;
     /** Feedback editor templates to use in the comment field */
     editorTemplates?: Template[];
     /** Whether to use tokens in the comment editor */
@@ -237,7 +237,7 @@ type GroupedFeedItem = {
 };
 
 /**
- * Groups learning evidence / badges by the date which it was posted
+ * Groups feed items by the date which it was posted
  */
 const groupedFeedItems = window.Vue.computed<GroupedFeedItem[]>(() => {
     const groupedFeedResultsByDate: Record<string, GroupedFeedItem> = {};
@@ -254,7 +254,7 @@ const groupedFeedItems = window.Vue.computed<GroupedFeedItem[]>(() => {
         groupedFeedResultsByDate[key].items.push(v);
     });
 
-    // Flatten grouped evidence into an array
+    // Flatten grouped feed items into an array
     const groupedItems = Object.values(groupedFeedResultsByDate).sort((a, b) => (a.date.isBefore(b.date) ? 1 : -1));
 
     // Ensure that each item within the group is sorted
@@ -266,7 +266,7 @@ const groupedFeedItems = window.Vue.computed<GroupedFeedItem[]>(() => {
 });
 
 /**
- * Appends learning evidence to the data list.
+ * Appends feed items to the data list.
  * @param cursor -
  */
 async function append(cursor: string | null): Promise<void> {
@@ -301,8 +301,7 @@ async function append(cursor: string | null): Promise<void> {
 }
 
 /**
- * Load learning evidence for the student in question.
- *
+ * Load more feed items for the student in question.
  * Once received, group them by date.
  */
 async function load(): Promise<void> {
@@ -362,7 +361,7 @@ function showDeleteModal(item: FeedItem): void {
  * Actually delete an item from the feed
  * @param targetItem -
  */
-async function deleteEvidence(targetItem: FeedItem): Promise<void> {
+async function deleteFeedItem(targetItem: FeedItem): Promise<void> {
     const deleteRoute = "delete" in targetItem.object._links ? targetItem.object._links.delete : null;
     if (!deleteRoute) {
         throw new Error("Missing access to delete this evidence");
@@ -480,11 +479,11 @@ function loadFilteredContent($selectedTag: string, simulateRedirect: boolean): v
 }
 
 /**
- * Put the $evidence into the Submitted state as-is
- * @param evidence - The evidence object to submit
+ * Put the $moment into the Submitted state as-is
+ * @param moment - The moment object to submit
  */
-function submitEvidence(evidence: LearningMoment): void {
-    const submitLink = evidence._links?.submit;
+function submitMoment(moment: LearningMoment): void {
+    const submitLink = moment._links?.submit;
 
     if (submitLink) {
         const toast = window.sbProps.toastActivate("Submitting...");
@@ -501,11 +500,11 @@ function submitEvidence(evidence: LearningMoment): void {
 }
 
 /**
- * Put the $evidence into the Published state as-is
- * @param evidence - The evidence object to publish
+ * Put the $moment into the Published state as-is
+ * @param moment - The moment object to publish
  */
-function publishEvidence(evidence: LearningMoment): void {
-    const publishLink = evidence._links?.publish;
+function publishMoment(moment: LearningMoment): void {
+    const publishLink = moment._links?.publish;
 
     if (publishLink) {
         const toast = window.sbProps.toastActivate("Publishing...");
@@ -669,7 +668,7 @@ window.Vue.onMounted(async () => {
                         <ul class="information-list">
                             <li v-for="(item, itemIndex) in itemGroup.items" :key="itemIndex" class="feed-item">
                                 <template v-if="item.discriminator === FeedDiscriminator.LEARNING_MOMENT">
-                                    <!-- This evidence isn't necessarily editable -->
+                                    <!-- This moment isn't necessarily editable -->
                                     <div
                                         :class="{
                                             'actions-small-1': hasMenu(item.object),
@@ -775,7 +774,7 @@ window.Vue.onMounted(async () => {
                                             />
                                         </article>
 
-                                        <!-- Display evidence body, with media players initialised -->
+                                        <!-- Display moment body, with media players initialised -->
                                         <media-article
                                             v-if="item.object.body"
                                             data-test="learning-moment-evidence-body"
@@ -868,7 +867,7 @@ window.Vue.onMounted(async () => {
                                                             <li>
                                                                 <button
                                                                     class="submit"
-                                                                    @click="submitEvidence(item.object)"
+                                                                    @click="submitMoment(item.object)"
                                                                 >
                                                                     Submit for approval
                                                                 </button>
@@ -878,7 +877,7 @@ window.Vue.onMounted(async () => {
                                                             <li>
                                                                 <button
                                                                     class="submit"
-                                                                    @click="publishEvidence(item.object)"
+                                                                    @click="publishMoment(item.object)"
                                                                 >
                                                                     Publish
                                                                 </button>
@@ -890,7 +889,9 @@ window.Vue.onMounted(async () => {
 
                                             <!-- Parent buttons -->
                                             <template
-                                                v-else-if="'parent' === currentUser.role.type && evidenceParentCreate"
+                                                v-else-if="
+                                                    'parent' === currentUser.role.type && props.momentParentCreate
+                                                "
                                             >
                                                 <template
                                                     v-if="
@@ -913,7 +914,7 @@ window.Vue.onMounted(async () => {
                                                 <template v-if="'draft' === item.object.currentState">
                                                     <!-- Publish button available when a learning moment is: draft/submitted/rejected -->
                                                     <li>
-                                                        <button class="submit" @click="publishEvidence(item.object)">
+                                                        <button class="submit" @click="publishMoment(item.object)">
                                                             Publish
                                                         </button>
                                                     </li>
@@ -950,7 +951,7 @@ window.Vue.onMounted(async () => {
                                                 >
                                                     <!-- Publish button available when a learning moment is: draft/submitted/rejected -->
                                                     <li v-if="item.object._links.publish">
-                                                        <button class="submit" @click="publishEvidence(item.object)">
+                                                        <button class="submit" @click="publishMoment(item.object)">
                                                             {{ item.object._labels.publish }}
                                                         </button>
                                                     </li>
@@ -1213,7 +1214,7 @@ window.Vue.onMounted(async () => {
                         id="confirm-delete-learning-moment"
                         class="button submit"
                         data-test="learning-moment-evidence-delete-confirm"
-                        @click.prevent="deleteEvidence(currentlyDeletingItem)"
+                        @click.prevent="deleteFeedItem(currentlyDeletingItem)"
                     >
                         Delete
                     </a>
