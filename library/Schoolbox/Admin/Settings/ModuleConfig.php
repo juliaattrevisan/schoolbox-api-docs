@@ -25,7 +25,7 @@ class ModuleConfig
     private const CONTEXT_HAS_HTML_EDITOR     = 'hasHtmlEditor';
     private const CONTEXT_HAS_RESOURCE_PICKER = 'hasResourcePicker';
     private const CONTEXT_SETTINGS            = 'settings';
-    private const CONTEXT_ISEDITABLE          = 'isEditable';
+    public const CONTEXT_ISEDITABLE          = 'isEditable';
     private const CONTEXT_POSTROUTE           = 'postRoute';
 
     /**

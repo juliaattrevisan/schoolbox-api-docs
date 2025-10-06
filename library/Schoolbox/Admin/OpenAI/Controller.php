@@ -60,13 +60,17 @@ class Controller extends ConfigController
             $this->routeGenerator->generate('adminOpenAi.postTextOptions'),
             [
                 ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,
+                ModuleConfig::CONTEXT_ISEDITABLE => false,
                 'formId' => 'textSettings'
             ]
         );
         $textConfigContext = $this->buildConfigContext(
             $this->buildTextConfigPredicate(),
             $this->routeGenerator->generate('adminOpenAi.postTextOptions'),
-            [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false],
+            [
+                ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,
+                ModuleConfig::CONTEXT_ISEDITABLE => false
+            ],
         );
 
         $imageConfigContext = $this->buildConfigContext(
