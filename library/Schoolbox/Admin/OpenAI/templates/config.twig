@@ -1,6 +1,6 @@
 {% for module,textConfig in textModuleContext %}
     <div data-module="{{ module }}">
-        <div>{{ module }}</div>
+        <h2 class="subheader">{{ module }}</h2>
         {% include '@settings/moduleConfig.twig' with textConfig only %}
     </div>
 {% endfor %}

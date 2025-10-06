@@ -16,12 +16,7 @@
 
             {# module specific config #}
             <div id="textModuleContainer" class="l-grid l-gap-l l-mar-m--bottom">
-                {% for module,textConfig in textModuleContext %}
-                    <div data-module="{{ module }}">
-                        <div>{{ module }}</div>
-                        {% include '@settings/moduleConfig.twig' with textConfig only %}
-                    </div>
-                {% endfor %}
+                {% include '@adminOpenAi/config.twig' with {textModuleContext: textModuleContext} only %}
             </div>
             {# manually create a save button for this section... #}
             <input type="submit" value="Save">

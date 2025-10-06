@@ -178,8 +178,9 @@ class Config
             $configCollection = new GenericCollection(\Schoolbox\Config\Config::class);
             foreach ($settings as $key => $value) {
                 $cfg = new \Schoolbox\Config\Config();
-                $cfg->setName($key)
+                $cfg->setName(sprintf("[%s][%s]", $module, $key))
                     ->setTitle(self::FIELD_TITLE[$key])
+                    ->setDescription('hello')
                     ->setValue((string)$value)
                     ->setTypeId(ConfigMapper::TYPE_AI)
                     ->setFieldId(self::FIELD_OPTIONS[$key] ?? ConfigMapper::FIELD_INPUT)
@@ -192,8 +193,8 @@ class Config
 
                 // don't show provider
                 if ($key === self::FIELD_PROVIDER) {
-                    $cfg->setEditable(false)
-                        ->setHidden(true);
+                    $cfg->setEditable(false);
+//                        ->setHidden(true);
                 }
                 $configCollection->add($cfg);
             }
