@@ -41,6 +41,16 @@ class Config
         self::FIELD_MODEL => ConfigMapper::FIELD_SELECT,
     ];
 
+    // human readable titles
+    public const FIELD_TITLE = [
+        self::FIELD_PROVIDER => 'Endpoint Provider',
+        self::FIELD_ENABLED => 'Enable Feature',
+        self::FIELD_OPENAIKEY => 'OpenAI API Key',
+        self::FIELD_RESOURCE_NAME => 'Azure Resource Name',
+        self::FIELD_DEPLOYMENT_ID => 'Azure Deployment ID',
+        self::FIELD_MODEL => 'OpenAI Model',
+    ];
+
     public const NOT_ACTIVE = "Not Active";
     public const AI_MODELS = [
         self::NOT_ACTIVE,
@@ -169,7 +179,7 @@ class Config
             foreach ($settings as $key => $value) {
                 $cfg = new \Schoolbox\Config\Config();
                 $cfg->setName($key)
-                    ->setTitle($key)
+                    ->setTitle(self::FIELD_TITLE[$key])
                     ->setValue((string)$value)
                     ->setTypeId(ConfigMapper::TYPE_AI)
                     ->setFieldId(self::FIELD_OPTIONS[$key] ?? ConfigMapper::FIELD_INPUT)
