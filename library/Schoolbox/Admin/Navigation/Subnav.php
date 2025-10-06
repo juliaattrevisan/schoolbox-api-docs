@@ -138,6 +138,9 @@ class Subnav
         $userHasServicePermissionPastoral = (
             $this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL)
         );
+        $userIsSuperuserOrHasServicePermissionPastoral = (
+            $userIsSuperuser || $userHasServicePermissionPastoral
+        );
         $userHasServicePermissionLms = (
             $this->user->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL)
         );
@@ -153,6 +156,9 @@ class Subnav
         $userHasServicePermissionTimetable = (
             $this->user->hasServicePermission(UserAccess::SERVICE_TIMETABLE, UserAccess::ACCESS_FULL)
         );
+        $userHasServicePermissionDifferentiationProfileManagement = (
+            $this->user->hasServicePermission(UserAccess::SERVICE_DIFFERENTIATION_PROFILE, UserAccess::ACCESS_FULL)
+        );
         $userHasAnyModeratorServicePermission = (
             $userHasServicePermissionNews ||
             $userHasServicePermissionCalendar ||
@@ -161,7 +167,8 @@ class Subnav
             $userHasServicePermissionBadge ||
             $userHasServicePermissionCms ||
             $userHasServicePermissionDesign ||
-            $userHasServicePermissionTimetable
+            $userHasServicePermissionTimetable ||
+            $userHasServicePermissionDifferentiationProfileManagement
         );
 
         /* Keys of this array uniquely identify a page and its subpages
@@ -574,74 +581,74 @@ class Subnav
             '/adminv2/pastoral' => [
                 'name'       => 'Pastoral Care',
                 'visible'    => (
-                    ($userIsSuperuser || $userHasServicePermissionPastoral) &&
+                    ($userIsSuperuser || $userHasServicePermissionPastoral || $userHasServicePermissionDifferentiationProfileManagement) &&
                     $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
                 ),
                 'searchable' => false,
                 'children'   => [
                     '/pastoral/bulk-import' => [
                         'name'        => 'Bulk Import',
-                        'visible'     => true,
+                        'visible'     => $userIsSuperuserOrHasServicePermissionPastoral,
                         'description' => 'Import a large number of pastoral records from files within a ZIP',
                     ],
                     '/adminv2/filters/pastoral/classPastoral' => [
                         'name'        => 'Filters - ' . $filterLabelBuilder->buildLabel(FilterPageModel::PAGE_CLASS_PASTORAL),
-                        'visible'     => $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_PASTORAL),
+                        'visible'     => $userIsSuperuserOrHasServicePermissionPastoral && $filterAvailabilityChecker->isAvailable(FilterPageModel::PAGE_CLASS_PASTORAL),
                         'description' => 'Configure the default and available filter options on the class pastoral report.',
                     ],
                     '/pastoral/management/groups' => [
                         'name'        => 'Groups Management',
-                        'visible'     => $userHasServicePermissionPastoral, // Note this page is special in that available to superusers who are not Pastoral Moderators.
+                        'visible'     => $userHasServicePermissionPastoral, // This page is only available to Pastoral Moderators
                         'description' => 'Manage Groups within the pastoral system',
                     ],
                     '/adminv2/lists/pastoral/pastoral-action' => [
                         'name'        => 'Lists - Actions',
-                        'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED),
+                        'visible'     => $userIsSuperuserOrHasServicePermissionPastoral && (bool)$this->configLoader->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED),
                         'description' => 'Setup the actions of pastoral records.',
                     ],
                     '/adminv2/lists/pastoral/pastoral-severity' => [
                         'name'        => 'Lists - Record Severity',
-                        'visible'     => (bool)$this->configLoader->get('pastoral_severity'),
+                        'visible'     => $userIsSuperuserOrHasServicePermissionPastoral && (bool)$this->configLoader->get('pastoral_severity'),
                         'description' => 'Setup appropriate severity or importance of your pastoral records.',
                     ],
                     '/adminv2/lists/pastoral/pastoral-tags' => [
                         'name'        => 'Lists - Record Tags',
-                        'visible'     => true,
+                        'visible'     => $userIsSuperuserOrHasServicePermissionPastoral,
                         'description' => 'Maintain tags used on pastoral records, or if setup, lock this list to be the only tags available.',
                     ],
                     '/adminv2/lists/pastoral/pastoral-document-classification' => [
                         'name'        => 'Lists - SIS Document Classifications',
-                        'visible'     => true,
+                        'visible'     => $userIsSuperuserOrHasServicePermissionPastoral,
                         'description' => 'Configure how file attachments in pastoral are synchronised back to DocMan in Synergetic.',
                     ],
                     '/adminv2/lists/pastoral/pastoral-category' => [
                         'name'        => 'Lists - Sub-Types',
-                        'visible'     => true,
+                        'visible'     => $userIsSuperuserOrHasServicePermissionPastoral,
                         'description' => 'Optionally configure further sub types under your existing types for more detailed categorisation of pastoral records.',
                     ],
                     '/adminv2/lists/pastoral/pastoral-type' => [
                         'name'        => 'Lists - Types',
-                        'visible'     => true,
+                        'visible'     => $userIsSuperuserOrHasServicePermissionPastoral,
                         'description' => 'Setup the types of pastoral records, to control visibility and categorisation..',
                     ],
                     '/pastoral/management/audience/' => [
                         'name'        => 'Pastoral Record Settings',
-                        'visible'     => $userHasServicePermissionPastoral, // Note this page is special in that available to superusers who are not Pastoral Moderators.
+                        'visible'     => $userHasServicePermissionPastoral, // This page is only available to Pastoral Moderators
                         'description' => 'Manage Flag, Audience and Template Defaults',
                     ],
                     '/adminv2/pastoral/differentiation-profiles' => [
                         'name'        => 'Settings - Differentiation Profile',
-                        'visible'     => true, //TODO update when SA-20900 service permission added
+                        'visible'     => $userHasServicePermissionDifferentiationProfileManagement,
                         'description' => 'Configure settings related to the differentiation profiles.',
                     ],
                     '/adminv2/setting/pastoral/Pastoral%20Care' => [
                         'name'        => 'Settings - Policy',
-                        'visible'     => true,
+                        'visible'     => $userIsSuperuserOrHasServicePermissionPastoral,
                         'description' => 'Configure policy settings related to the pastoral care module.',
                     ],
                     '/adminv2/import/pastoral' => [
                         'name'        => 'Synergetic Import',
-                        'visible'     => $this->configLoader->get('external_type') === 'synergetic',
+                        'visible'     => $userIsSuperuserOrHasServicePermissionPastoral && ($this->configLoader->get('external_type') === 'synergetic'),
                         'description' => 'Import your pastoral care records from Synergetic.',
                     ],
                 ]
