@@ -10,8 +10,14 @@
             <h2 class="subheader" style="display:none" data-subheader>Text Generation</h2>
         </div>
 
+        {# main text config space, which provider. #}
         <div id="textSettingsContainer" style="display:none">
-            {% for module,textConfig in textConfigContext %}
+            {% include '@settings/moduleConfig.twig' with textConfigContext only %}
+        </div>
+
+        {# module specific config #}
+        <div id="textModuleContainer" style="display:block">
+            {% for module,textConfig in textModuleContext %}
                 <div>{{ module }}</div>
                 {% include '@settings/moduleConfig.twig' with textConfig only %}
             {% endfor %}

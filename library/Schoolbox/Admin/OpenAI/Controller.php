@@ -53,7 +53,7 @@ class Controller extends ConfigController
 
         $textConfig = $aiConfig->decode($this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_SETTINGS), $textProvider);
 
-        $textConfigContext = $aiConfig->buildTwigConfig(
+        $textModuleContext = $aiConfig->buildTwigConfig(
             $textConfig,
             $this->fieldStrategyFactory,
             $this->getConfigLoader()->get('site_version'),
@@ -63,11 +63,11 @@ class Controller extends ConfigController
                 'formId' => 'textSettings'
             ]
         );
-//        $textConfigContext = $this->buildConfigContext(
-//            $this->buildTextConfigPredicate(),
-//            $this->routeGenerator->generate('adminOpenAi.postTextOptions'),
-//            [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false],
-//        );
+        $textConfigContext = $this->buildConfigContext(
+            $this->buildTextConfigPredicate(),
+            $this->routeGenerator->generate('adminOpenAi.postTextOptions'),
+            [ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false],
+        );
 
         $imageConfigContext = $this->buildConfigContext(
             $this->buildImageConfigPredicate(),
@@ -83,6 +83,7 @@ class Controller extends ConfigController
         $this->response = $this->responseFromTemplate('@adminOpenAi/index.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminOpenAi.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminOpenAi.getIndex')),
+            'textModuleContext' => $textModuleContext,
             'textConfigContext' => $textConfigContext,
             'textConfigFormId' => $textConfigFormId,
             'textConfig' => $textConfig,
@@ -140,14 +141,21 @@ class Controller extends ConfigController
 
     /**
      *
-     * Returns a predicate builder for finding all custom config for this module
+     * Returns a predicate builder for finding main system config for the AI text module
      *
      * @return Builder
      * @throws InvalidColumnException
      */
     private function buildTextConfigPredicate(): Builder
     {
-        return $this->getConfigMapper()->getPredicateBuilder()->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_OPENAI_TEXT);
+        // as of 26.0 text config is only endpoint and the system prompt
+        $pb = $this->getConfigMapper()->getPredicateBuilder();
+        return $this->getConfigMapper()->getPredicateBuilder()
+            ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_OPENAI_TEXT)
+            ->any(
+                $pb->equals(ConfigMapper::COL_NAME, ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)
+                    ->equals(ConfigMapper::COL_NAME, ConfigMapper::NAME_OPENAI_TEXT_SYSTEM_PROMPT)
+            );
     }
 
 
