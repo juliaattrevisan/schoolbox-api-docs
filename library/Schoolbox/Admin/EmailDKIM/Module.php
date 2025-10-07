@@ -44,8 +44,8 @@ class Module extends BaseModule
         $this->register(self::METHOD_GET, '', 'getDomainListPage', $perm);
         $this->register(self::METHOD_GET, '/list', 'getDomainJsonList', $perm);
         $this->register(self::METHOD_GET, '/domain/{emailDKIMId:\d+}', 'getDKIMJson', $perm, $preloadEmailDKIM);
-        $this->register(self::METHOD_GET, '/private/{emailDKIMId:\d+}', 'getDKIMPrivateDataJson', $perm, $preloadEmailDKIM);
         $this->register(self::METHOD_POST, '/domain', 'postDomain', $perm);
+        $this->register(self::METHOD_POST, '/config', 'postDKIMConfig', $perm);
         $this->register(self::METHOD_DELETE, '/{emailDKIMId:\d+}', 'deleteDKIM', $perm, $preloadEmailDKIM);
     }
 

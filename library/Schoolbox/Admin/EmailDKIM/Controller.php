@@ -153,20 +153,70 @@ class Controller extends Base
     }
 
     /**
-     * Get DKIM private key, domain and selector data by ID
+     * Create DKIM configuration with custom keys - Used By IR
      *
-     * @param Model $emailDKIM
      * @return void
      */
-    public function getDKIMPrivateDataJson(Model $emailDKIM)
+    public function postDKIMConfig()
     {
-        $data = [
-            'id'         => $emailDKIM->getId(),
-            'domain'     => $emailDKIM->getDomain(),
-            'selector'   => Model::SELECTOR,
-            'privateKey' => $emailDKIM->getPrivate(),
-        ];
-        $this->response = $this->responseAsJson($data);
+        $domain = trim($this->requestPost->get('domain') ?? '');
+        $selector = trim($this->requestPost->get('selector') ?? '');
+        $publicKey = trim($this->requestPost->get('publicKey') ?? '');
+        $privateKey = trim($this->requestPost->get('privateKey') ?? '');
+
+        if (empty($domain)) {
+            $this->response = $this->responseAsJson(['error' => 'Domain name is required'])
+                ->withStatus(400);
+            return;
+        }
+
+        if (empty($selector)) {
+            $this->response = $this->responseAsJson(['error' => 'Selector is required'])
+                ->withStatus(400);
+            return;
+        }
+
+        if (empty($publicKey)) {
+            $this->response = $this->responseAsJson(['error' => 'Public key is required'])
+                ->withStatus(400);
+            return;
+        }
+
+        if (empty($privateKey)) {
+            $this->response = $this->responseAsJson(['error' => 'Private key is required'])
+                ->withStatus(400);
+            return;
+        }
+
+        try {
+            if (!$this->emailDKIMMapper->isUnique(['domain' => $domain], null)) {
+                $this->response = $this->responseAsJson(['error' => 'The domain already exists'])
+                    ->withStatus(409);
+                return;
+            }
+
+            $emailDKIM = $this->emailDKIMMapper->createModel();
+            $emailDKIM->setDomain($domain)
+                      ->setPublic($publicKey)
+                      ->setPrivate($privateKey)
+                      ->setCreatedAt(\Alaress_Date_Format::now())
+                      ->setUpdatedAt(\Alaress_Date_Format::now());
+
+            $this->emailDKIMMapper->save($emailDKIM);
+
+            $this->response = $this->responseAsJson([
+                'success' => true,
+                'message' => 'DKIM configuration created successfully',
+                'data' => [
+                    'id' => $emailDKIM->getId(),
+                    'domain' => $emailDKIM->getDomain()
+                ]
+            ]);
+        } catch (MapperException $e) {
+            $this->response = $this->responseAsJson(['error' => $e->getMessage()])
+                ->withStatus(500);
+            return;
+        }
     }
 
     /**
