@@ -26,7 +26,7 @@ function onCreateSelected(): void {
                 <p>
                     This course currently does not have any {{ locale.unit.translate(true, false) }}. To begin building
                     this course start by
-                    <button @click.prevent="onCreateSelected">
+                    <button data-test="up-empty-state-create" @click.prevent="onCreateSelected">
                         creating a {{ locale.unit.translate(false, false) }}.
                     </button>
                 </p>

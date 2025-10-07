@@ -42,15 +42,32 @@ function onAddSelected(): void {
                             :disabled="addUnitsStore.newUnits.length === 1"
                             title="Delete"
                             aria-label="Delete"
+                            data-test="up-add-units-delete"
                             @click.prevent="addUnitsStore.remove(index)"
                         ></button>
                     </div>
                 </div>
-                <button class="button icon-add f-no-margins" @click.prevent="addUnitsStore.add()">Add another</button>
+                <button
+                    class="button icon-add f-no-margins"
+                    data-test="up-add-units-add"
+                    @click.prevent="addUnitsStore.add()"
+                >
+                    Add another
+                </button>
             </div>
             <div class="l-flex l-gap-xs f-no-margins">
-                <button class="button l-flex__item--1" @click.prevent="addUnitsStore.cancel()">Cancel</button>
-                <button class="button submit l-flex__item--1" @click.prevent="onAddSelected">
+                <button
+                    class="button l-flex__item--1"
+                    data-test="up-add-units-cancel"
+                    @click.prevent="addUnitsStore.cancel()"
+                >
+                    Cancel
+                </button>
+                <button
+                    class="button submit l-flex__item--1"
+                    data-test="up-add-units-create"
+                    @click.prevent="onAddSelected"
+                >
                     {{ addUnitsStore.isProcessing ? "Creating..." : "Create" }}
                 </button>
             </div>
