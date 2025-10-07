@@ -18,7 +18,9 @@ use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
+use Schoolbox\OpenAi\Agent\ImageGeneration;
 use Scrub;
+use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 /**
  * This controller acts as a proxy for OpenAI API.  It just appends the configured API key to the request in
@@ -282,8 +284,40 @@ class Controller extends Base
                 return;
             }
 
+            $agent = new ImageGeneration(
+                new \Schoolbox\OpenAi\Client(
+                    $this->client,
+                    'https://api.openai.com/v1/responses',
+                    $this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_KEY),
+                ),
+                $this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_MODEL),
+                $this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_OUTPUT_QUALITY) ?? 'low',
+                $this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_SYSTEM_PROMPT),
+            );
             try {
-                $helper->request($this->getUser(), $payload, Helper::FEATURE_IMAGE, $sessionId);
+                // Size and style need to be converted
+                $response = $agent->requestStream([
+                    'prompt'             => $this->requestPost->get('userPrompt'),
+                    'size'               => '1024x1024',
+//                    'size'               => ($this->requestPost->get('attributes') ?? [])['size'] ?? null,
+                    'style'              => ($this->requestPost->get('attributes') ?? [])['style'] ?? null,
+                    'imageUrl'           => $this->requestPost->get('imageUrl') ?? null,
+                    'previousResponseId' => $this->requestPost->get('previousResponseId') ?? null,
+                ]);
+
+                // TODO move this to a helper
+                header('Content-Type: text/event-stream');
+                header('Cache-Control: no-cache');
+                header('Connection: keep-alive');
+                header('Content-Encoding: none');
+                foreach ($response as $event) {
+                    echo $event . "\n\n";
+                }
+                $this->response = $this->responseEmpty(HttpResponse::HTTP_OK);
+                return;
+
+                // TODO also output a list of known shape arrays when streaming
+//                $helper->request($this->getUser(), $payload, Helper::FEATURE_IMAGE, $sessionId);
             } catch (SchoolboxException $e) {
                 $problem = (new ApiProblem($e->getMessage()))
                     ->setStatus($e->getCode())
