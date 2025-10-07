@@ -10,24 +10,6 @@ import { useAddUnitsStore } from "./store/unitPlannerAddUnitsStore";
 const addUnitsStore = useAddUnitsStore();
 
 /**
- * To update the button text as the component state changes.
- * @returns {string}
- */
-const addButtonText = window.Vue.computed(() => {
-    if (addUnitsStore.isProcessing) {
-        return "Creating...";
-    }
-    return "Create unit";
-});
-
-/**
- * to close the add unit view
- */
-function onCancelSelected(): void {
-    addUnitsStore.cancel();
-}
-
-/**
  * to add a new unit
  */
 function onAddSelected(): void {
@@ -40,6 +22,14 @@ function onAddSelected(): void {
 
 <template>
     <basic-modal v-model:is-open="addUnitsStore.isOpen">
-        <h2>Create new {{ locale.unit.translate(true, false) }}</h2>
+        <div class="l-flex-col l-gap-s f-no-margins">
+            <h2>Create new {{ locale.unit.translate(true, false) }}</h2>
+            <div class="l-flex l-gap-xs f-no-margins">
+                <button class="button l-flex__item--1" @click.prevent="addUnitsStore.cancel()">Cancel</button>
+                <button class="button submit l-flex__item--1" @click.prevent="onAddSelected">
+                    {{ addUnitsStore.isProcessing ? "Creating..." : "Create" }}
+                </button>
+            </div>
+        </div>
     </basic-modal>
 </template>
