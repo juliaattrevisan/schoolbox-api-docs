@@ -5,30 +5,36 @@
 import { createLightbox, getStorageGallerySlides } from "@js/image-lightbox/imageLightboxEvent";
 import type { StorageFile } from "./resourceUtils";
 
-type FileWithName = {
+type GalleryFile = {
     storage: StorageFile;
     filename?: string;
+    hidden?: boolean; // whether to hide this file from the gallery but still show it in the lightbox
 };
 
 interface Props {
     id: string; // a unique ID to identify this image gallery
-    files: FileWithName[];
+    files: GalleryFile[];
 }
 
 const props = defineProps<Props>();
 
-/** Files (all images) to show in the gallery */
-const galleryFiles = window.Vue.computed(() => {
+/** Files (all images) to show in the gallery or lightbox */
+const availableFiles = window.Vue.computed(() => {
     return props.files.filter((f) => f.storage._links.image);
+});
+
+/** Files (not hidden) to show in the gallery */
+const galleryFiles = window.Vue.computed(() => {
+    return availableFiles.value.filter((f) => !f.hidden);
 });
 
 /**
  * Open an image lightbox for the given image
  * @param file The file to open
  */
-async function openImageLightbox(file: FileWithName): Promise<void> {
+async function openImageLightbox(file: GalleryFile): Promise<void> {
     const { slides, selectedIndex } = getStorageGallerySlides(
-        galleryFiles.value.map((f) => f.storage),
+        availableFiles.value.map((f) => f.storage),
         file.storage.hash,
     );
 

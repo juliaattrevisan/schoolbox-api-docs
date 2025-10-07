@@ -28,23 +28,14 @@ const featuredEvidence = window.Vue.computed(() => {
 /** show the image gallery if there are images that aren't the first evidence item */
 const imageGalleryEvidence = window.Vue.computed(() => {
     const images = props.momentEvidence.filter((e) => e.storage._links.image);
-
-    if (images.filter((e) => e !== featuredEvidence.value).length === 0) {
-        return []; // there is only one image, and it's already the featured one
-    }
-
-    return images;
+    return images.map((image) => ({ ...image, hidden: image === featuredEvidence.value }));
 });
 
-/** show the file grid if there are files of any type that aren't the first evidence item */
+/** show the file grid if there are files of any type that aren't the first evidence item or in the image gallery */
 const fileGridEvidence = window.Vue.computed(() => {
-    const files = props.momentEvidence;
-
-    if (files.filter((e) => e !== featuredEvidence.value).length === 0) {
-        return []; // there are no other files to show
-    }
-
-    return files;
+    return props.momentEvidence
+        .filter((file) => file !== featuredEvidence.value)
+        .filter((file) => !imageGalleryEvidence.value.map((i) => i.storage).includes(file.storage));
 });
 </script>
 
