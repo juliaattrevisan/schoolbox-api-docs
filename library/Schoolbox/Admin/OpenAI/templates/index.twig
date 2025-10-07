@@ -11,15 +11,17 @@
         </div>
 
         {# main text config space, which provider. #}
-        <div id="textSettingsContainer" style="display:none">
-            {% include '@settings/moduleConfig.twig' with textConfigContext only %}
+        <div class="small-12 columns island">
+            <section id="textSettingsContainer" style="display:none">
+                {% include '@settings/moduleConfig.twig' with textConfigContext only %}
 
-            {# module specific config #}
-            <div id="textModuleContainer" class="l-grid l-gap-l l-mar-m--bottom">
-                {% include '@adminOpenAi/config.twig' with {textModuleContext: textModuleContext} only %}
-            </div>
-            {# manually create a save button for this section... #}
-            <input type="submit" value="Save">
+                {# module specific config #}
+                <div id="textModuleContainer" class="l-grid l-gap-l l-mar-m--bottom">
+                    {% include '@adminOpenAi/config.twig' with {textModuleContext: textModuleContext} only %}
+                </div>
+                {# manually create a save button for this section... #}
+                <input type="submit" value="Save">
+            </section>
         </div>
 
         <div class="small-12 columns">
@@ -135,5 +137,8 @@
                 }
             });
         </script>
+        <style>
+
+        </style>
     </div>
 </div>
