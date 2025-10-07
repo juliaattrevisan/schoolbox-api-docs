@@ -231,7 +231,6 @@ class Config
                 $config = self::generateInitConfig($provider);
                 $config[self::FIELD_OPENAIKEY] = $key ?? '';
                 $config[self::FIELD_MODEL] = $model ?? self::NOT_ACTIVE;
-                $config[self::FIELD_ENABLED] = true;
 
                 break;
             default:
