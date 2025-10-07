@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import FileDrop from "@js/resource/file-drop.vue";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
-import type { AsyncUploadResponseSuccess } from "@js/resource/resourceUtils";
+import type { AsyncUploadResponseSuccess, StorageFile } from "@js/resource/resourceUtils";
 import type { Template } from "@js/editor/types/editorTypes";
 import StorageObject from "@schoolboxVue/components/storage-object.vue";
 import TextEditor from "@schoolboxVue/components/ckeditor/text-editor.vue";
@@ -54,12 +54,24 @@ const hasRecordedData = window.Vue.computed(() => {
 
 /**
  * After evidence is uploaded
+ * @param newFile -
+ * @param newFile.storage The storage file object
+ * @param newFile.filename The original filename
+ * @param select whether to select the newly added evidence and clear the selected media type
  */
-function onEvidenceUploaded(): void {
+function onEvidenceUploaded(newFile: { storage: StorageFile; filename: string }, select: boolean): void {
     if (!mfStore.moment) return;
 
-    mediaType.value = null;
-    selectedEvidenceId.value = mfStore.moment.evidence.length - 1; // select the newly added evidence
+    // only add this file if it doesn't already exist in the evidence list
+    if (!mfStore.moment.evidence.find((e) => e.storage.hash === newFile.storage.hash)) {
+        mfStore.moment.evidence.push(newFile);
+    }
+
+    if (select) {
+        // select the newly added evidence, and clear the selected media type
+        mediaType.value = null;
+        selectedEvidenceId.value = mfStore.moment.evidence.findIndex((e) => e.storage.hash === newFile.storage.hash);
+    }
 
     // new evidence has been added, so remove the validation error message
     mfStore.showInvalidEvidenceError = false;
@@ -93,12 +105,13 @@ async function uploadMediaRecording(): Promise<void> {
         return; // failed but already handled by evidence-media-recording.vue
     }
 
-    mfStore.moment.evidence.push({
-        storage: response.meta.file,
-        filename: response.meta.name,
-    });
-
-    onEvidenceUploaded();
+    onEvidenceUploaded(
+        {
+            storage: response.meta.file,
+            filename: response.meta.name,
+        },
+        true,
+    );
 }
 
 window.Vue.watch(hasRecordedData, async () => {
@@ -256,10 +269,7 @@ function onFileDropFileUploaded(file: FileDropFile): void {
         return; // not yet uploaded
     }
 
-    mfStore.moment.evidence.push({
-        storage: file.storageFile,
-        filename: file.file.name,
-    });
+    mfStore.moment.evidence.push();
 
     // remove from the list so we don't add it again
     const index = currentFileDropFiles.value.indexOf(file);
@@ -267,9 +277,14 @@ function onFileDropFileUploaded(file: FileDropFile): void {
         currentFileDropFiles.value.splice(index, 1);
     }
 
-    if (currentFileDropFiles.value.length === 0) {
-        onEvidenceUploaded();
-    }
+    onEvidenceUploaded(
+        {
+            storage: file.storageFile,
+            filename: file.storageFile.name,
+        },
+        // only select the newly added evidence if there's no other evidence left to upload
+        currentFileDropFiles.value.length === 0,
+    );
 }
 
 /**
