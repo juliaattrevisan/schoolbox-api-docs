@@ -157,7 +157,7 @@ class Controller extends Base
      *
      * @return void
      */
-    public function postDKIMConfig()
+    public function postDKIMConfig(): void
     {
         $domain = trim($this->requestPost->get('domain', ''));
         $selector = trim($this->requestPost->get('selector', ''));
