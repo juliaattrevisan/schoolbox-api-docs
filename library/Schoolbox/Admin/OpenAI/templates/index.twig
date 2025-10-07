@@ -20,7 +20,7 @@
                     {% include '@adminOpenAi/config.twig' with {textModuleContext: textModuleContext} only %}
                 </div>
                 {# manually create a save button for this section... #}
-                <input type="submit" value="Save">
+                <input id="textFormSubmit" type="submit" value="Save">
             </section>
         </div>
 
@@ -135,10 +135,53 @@
                     $('[data-subheader]').show();
                     container.show();
                 }
+
+                $('#textFormSubmit').on('click', function(event) {
+                    event.preventDefault();
+                    submitTextSettings();
+                });
+
+                /** submit text settings from all text forms **/
+                function submitTextSettings() {
+                    // Find all forms inside the container
+                    const forms = document.querySelector('#textSettingsContainer').querySelectorAll('form');
+
+                    // Create a new form element
+                    const combinedForm = document.createElement('form');
+                    combinedForm.id = 'combinedForm';
+
+                    // Loop through each form
+                    forms.forEach(form => {
+                        // Clone each field (input, select, textarea) and append to the new form
+                        Array.from(form.elements).forEach(field => {
+                            // Only include named fields and skip buttons
+                            if (field.name && !['submit', 'button', 'reset'].includes(field.type)) {
+                                // Clone the field
+                                const clonedField = field.cloneNode(true);
+                                // Optionally, rename to avoid duplicates (if needed)
+                                // Otherwise, just append
+                                combinedForm.appendChild(clonedField);
+                            }
+                        });
+                    });
+
+                    // Now you can add the form to the DOM, e.g.:
+                    // document.body.appendChild(combinedForm);
+
+                    // Or send it as FormData to the backend
+                    const formData = new FormData(combinedForm);
+                    fetch('{{ routeLookupIfAuthorized('adminOpenAi.postTextOptions') }}', {
+                        method: 'POST',
+                        body: formData
+                    });
+                }
+
             });
         </script>
         <style>
-
+            [id$=";provider-field"] {
+                display: none;
+            }
         </style>
     </div>
 </div>

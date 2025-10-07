@@ -114,9 +114,15 @@ class Controller extends ConfigController
     {
         $postData = $this->requestPost->getArrayCopy();
 
+        // for each ai feature module, update the config if needed
+        $aiConfig = new Config();
+        foreach (Config::ALL_MODULES as $module) {
+            $conf = $aiConfig->extractPost($postData, $module);
+            $postData[Config::MODULE_CONFIG[$module]] = json_encode($conf, JSON_THROW_ON_ERROR);
+        }
         /* Save it
          */
-        $this->updateConfig($postData, $this->buildTextConfigPredicate());
+        $this->updateConfig($postData, $this->buildTextAllPredicate());
 
         /* Go back to the place from whence you came
          */
@@ -192,6 +198,20 @@ class Controller extends ConfigController
                 $pb->equals(ConfigMapper::COL_NAME, ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)
                     ->equals(ConfigMapper::COL_NAME, ConfigMapper::NAME_OPENAI_TEXT_SYSTEM_PROMPT)
             );
+    }
+
+    /**
+     *
+     * Returns a predicate builder for finding main system config for the AI text module
+     *
+     * @return Builder
+     * @throws InvalidColumnException
+     */
+    private function buildTextAllPredicate(): Builder
+    {
+        // as of 26.0 text config is only endpoint and the system prompt
+        return $this->getConfigMapper()->getPredicateBuilder()
+            ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_OPENAI_TEXT);
     }
 
 

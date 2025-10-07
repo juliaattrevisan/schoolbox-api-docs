@@ -31,7 +31,6 @@ class Config
         Helper::FEATURE_ASSESSMENT => ConfigMapper::NAME_OPENAI_DIFFERENTIATION,
     ];
 
-
     // field name and types
     public const FIELD_PROVIDER = 'provider';
     public const FIELD_ENABLED = 'enabled';
@@ -39,6 +38,7 @@ class Config
     public const FIELD_RESOURCE_NAME = 'resource_name';
     public const FIELD_DEPLOYMENT_ID = 'deployment_id';
     public const FIELD_MODEL = 'model';
+
     // model options
     public const FIELD_OPTIONS = [
         self::FIELD_PROVIDER => ConfigMapper::FIELD_INPUT,
@@ -91,6 +91,9 @@ class Config
         self::FIELD_OPENAIKEY => '',
         self::FIELD_MODEL => self::NOT_ACTIVE,
     ];
+
+    // sprintf format for form field names (e.g. $module, $key)
+    private const FORM_NAME_SPRINTF = '%s;%s';
 
     /**
      * Take the stored settings and convert it into an associative array
@@ -177,7 +180,7 @@ class Config
             $configCollection = new GenericCollection(\Schoolbox\Config\Config::class);
             foreach ($settings as $key => $value) {
                 $cfg = new \Schoolbox\Config\Config();
-                $cfg->setName(sprintf("[%s][%s]", $module, $key))
+                $cfg->setName(sprintf(self::FORM_NAME_SPRINTF, $module, $key))
                     ->setTitle(self::FIELD_TITLE[$key])
                     ->setDescription(self::FIELD_DESCRIPTION[$key])
                     ->setValue((string)$value)
@@ -192,7 +195,7 @@ class Config
 
                 // don't show provider
                 if ($key === self::FIELD_PROVIDER) {
-                    $cfg->setEditable(false);
+//                    $cfg->setEditable(false);
 //                        ->setHidden(true);
                 }
                 $configCollection->add($cfg);
@@ -240,6 +243,30 @@ class Config
                 break;
             default:
                 $config = [];
+        }
+        return $config;
+    }
+
+    /**
+     * Extract the posted data for a given module
+     *
+     * @param array $postData
+     * @param string $module
+     * @return array
+     */
+    public function extractPost(array $postData, string $module): array
+    {
+        $config = [];
+        foreach (self::FIELD_OPTIONS as $field => $type) {
+            $key = sprintf(self::FORM_NAME_SPRINTF, $module, $field);
+            if (array_key_exists($key, $postData)) {
+                // boolean fields are sent as 'on' or not at all
+                if ($type === ConfigMapper::FIELD_BOOLEAN) {
+                    $config[$field] = $postData[$key] === 'on';
+                } else {
+                    $config[$field] = trim((string)$postData[$key]);
+                }
+            }
         }
         return $config;
     }
