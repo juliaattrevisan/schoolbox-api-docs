@@ -112,7 +112,10 @@ document.addEventListener(IMAGE_LIGHTBOX_CREATE, (e) => {
     }
 
     targetElement.setAttribute("data-lightbox-loaded", "true");
-    const newLightGallery = lightGallery(targetElement, Object.assign(imageLightboxDefaults, eventDetail.options));
+    const newLightGallery = lightGallery(targetElement, {
+        ...imageLightboxDefaults,
+        ...eventDetail.options,
+    });
 
     window.sbProps.lightGalleries[eventDetail.targetKey] = newLightGallery;
 
