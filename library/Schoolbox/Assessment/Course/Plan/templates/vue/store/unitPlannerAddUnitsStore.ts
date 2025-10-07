@@ -34,6 +34,14 @@ export const useAddUnitsStore = defineStore("unitPlannerAddUnits", () => {
     }
 
     /**
+     * to remove a unit from the list of new units being created
+     * @param index - the index of the unit to remove
+     */
+    function remove(index: number): void {
+        newUnits.value.splice(index, 1);
+    }
+
+    /**
      * Get the data to pass to the backend
      * @returns the form data
      */
@@ -79,6 +87,7 @@ export const useAddUnitsStore = defineStore("unitPlannerAddUnits", () => {
         newUnits,
         prompt,
         add,
+        remove,
         create,
         cancel,
     };

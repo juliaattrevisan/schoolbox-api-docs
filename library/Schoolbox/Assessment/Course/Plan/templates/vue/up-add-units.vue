@@ -28,15 +28,25 @@ function onAddSelected(): void {
                 <!-- Loop through newUnits and display label and text input for each -->
                 <div v-for="(unit, index) in addUnitsStore.newUnits" :key="index" class="l-flex-col l-gap-xs">
                     <label :for="`unit-${index}`">Name:</label>
-                    <input
-                        :id="`unit-${index}`"
-                        v-model="addUnitsStore.newUnits[index]"
-                        type="text"
-                        class="input"
-                        :placeholder="`Enter ${locale.unit.translate(false, false).toLowerCase()} name`"
-                    />
+                    <div class="l-flex l-gap-xs l-align-items-center">
+                        <input
+                            :id="`unit-${index}`"
+                            v-model="addUnitsStore.newUnits[index]"
+                            type="text"
+                            class="input l-flex__item--1"
+                            :placeholder="`Enter ${locale.unit.translate(false, false).toLowerCase()} name`"
+                        />
+                        <button
+                            v-if="index > 0"
+                            class="button button--icon-only icon-delete f-no-margins"
+                            :disabled="addUnitsStore.newUnits.length === 1"
+                            title="Delete"
+                            aria-label="Delete"
+                            @click.prevent="addUnitsStore.remove(index)"
+                        ></button>
+                    </div>
                 </div>
-                <button class="button" @click.prevent="addUnitsStore.add()">Add another</button>
+                <button class="button icon-add f-no-margins" @click.prevent="addUnitsStore.add()">Add another</button>
             </div>
             <div class="l-flex l-gap-xs f-no-margins">
                 <button class="button l-flex__item--1" @click.prevent="addUnitsStore.cancel()">Cancel</button>
