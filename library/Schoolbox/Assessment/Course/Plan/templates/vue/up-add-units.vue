@@ -24,6 +24,20 @@ function onAddSelected(): void {
     <basic-modal v-model:is-open="addUnitsStore.isOpen">
         <div class="l-flex-col l-gap-s f-no-margins">
             <h2>Create new {{ locale.unit.translate(true, false) }}</h2>
+            <div>
+                <!-- Loop through newUnits and display label and text input for each -->
+                <div v-for="(unit, index) in addUnitsStore.newUnits" :key="index" class="l-flex-col l-gap-xs">
+                    <label :for="`unit-${index}`">Name:</label>
+                    <input
+                        :id="`unit-${index}`"
+                        v-model="addUnitsStore.newUnits[index]"
+                        type="text"
+                        class="input"
+                        :placeholder="`Enter ${locale.unit.translate(false, false).toLowerCase()} name`"
+                    />
+                </div>
+                <button class="button" @click.prevent="addUnitsStore.add()">Add another</button>
+            </div>
             <div class="l-flex l-gap-xs f-no-margins">
                 <button class="button l-flex__item--1" @click.prevent="addUnitsStore.cancel()">Cancel</button>
                 <button class="button submit l-flex__item--1" @click.prevent="onAddSelected">

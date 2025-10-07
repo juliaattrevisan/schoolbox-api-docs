@@ -9,7 +9,7 @@ import type { Unit } from "../unitPlannerTypes";
 export const useAddUnitsStore = defineStore("unitPlannerAddUnits", () => {
     const isProcessing = window.Vue.ref(false);
     const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
-    const newUnits = window.Vue.ref<string[]>([]); // to store the new units being created
+    const newUnits = window.Vue.ref<string[]>([""]); // to store the new units being created
 
     /**
      * to display a prompt to add a unit
@@ -23,7 +23,7 @@ export const useAddUnitsStore = defineStore("unitPlannerAddUnits", () => {
      */
     function cancel(): void {
         isOpen.value = false;
-        newUnits.value = [];
+        newUnits.value = [""]; // reset to one empty unit input
     }
 
     /**
