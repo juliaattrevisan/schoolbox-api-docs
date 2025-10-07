@@ -160,7 +160,7 @@ window.Vue.onUnmounted(() => {
         :folder-id="props.folderId"
         :route-curriculum-coverage="props.routeCurriculumCoverage"
     />
-    <up-empty-state v-if="store.units.length === 0" :course-id="store.courseId" />
+    <up-empty-state v-if="store.units.length === 0" />
     <div v-else class="row">
         <div class="small-12 island">
             <dl ref="tabsEl" class="tabs no-print">
