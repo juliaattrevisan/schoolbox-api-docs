@@ -62,7 +62,6 @@ class ConfigTest extends TestCase
         $this->assertEquals('dep', $merged['deployment_id']);
         $this->assertArrayNotHasKey('invalid_key', $merged);
         $this->assertCount(count(Config::CONFIG_STRUCT_AZURE), $merged);
-
     }
 
     /**
