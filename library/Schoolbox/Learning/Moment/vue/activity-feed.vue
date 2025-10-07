@@ -4,6 +4,7 @@ import { keysOf } from "@js/util/arrayUtils";
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import type { Metadata } from "@js/util/sbx/apiUtils";
 import type { Template } from "@js/editor/types/editorTypes";
+import ImgGallery from "@js/resource/img-gallery.vue";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import StorageObject from "@schoolboxVue/components/storage-object.vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
@@ -765,14 +766,23 @@ window.Vue.onMounted(async () => {
                                     </div>
 
                                     <div class="feed-body small-12 columns">
-                                        <!-- Is there an attachment? Display it appropriately -->
-                                        <article v-for="evidence in item.object.evidence" :key="evidence.storage.hash">
+                                        <!-- Show the first evidence item as the featured media, any other evidence will show in the gallery -->
+                                        <!-- TODO: preview on click -->
+                                        <article v-if="item.object.evidence.length > 0">
                                             <storage-object
-                                                :storage="evidence.storage"
-                                                :filename="evidence.filename"
+                                                :storage="item.object.evidence[0].storage"
+                                                :filename="item.object.evidence[0].filename"
                                                 data-test="learning-moment-evidence-media"
                                             />
                                         </article>
+
+                                        <img-gallery
+                                            v-if="item.object.evidence.length > 1"
+                                            id="activity-feed"
+                                            :files="item.object.evidence"
+                                        />
+
+                                        <!-- TODO: files grid -->
 
                                         <!-- Display moment body, with media players initialised -->
                                         <media-article
