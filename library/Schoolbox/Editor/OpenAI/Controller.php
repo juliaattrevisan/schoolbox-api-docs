@@ -13,6 +13,7 @@ use Crell\ApiProblem\ApiProblem;
 use GuzzleHttp\Client;
 use Psr\Http\Client\ClientExceptionInterface;
 use Ramsey\Uuid\Uuid;
+use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
@@ -57,22 +58,40 @@ class Controller extends Base
         // No BTTF in this space
         $this->setAllowBackToTheFuture(false);
 
+        // ai Config
+        $aiConfig = new Config();
+        $lpConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_LESSONPLAN), trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)));
+
+        // if not enabled, 404
+        if ($aiConfig::isEnabled($lpConfig) === false) {
+            $returnCode = 404;
+
+            $problem = new ApiProblem("Lesson Plan AI is not enabled.")
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus($returnCode);
+
+            return;
+        }
+
         try {
             $helper = new Helper(
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_KEY)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_RESOURCE_NAME)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_DEPLOYMENT_ID)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_MODEL)),
+                trim($lpConfig[Config::FIELD_PROVIDER]),
+                trim($lpConfig[Config::FIELD_OPENAIKEY]),
+                trim($lpConfig[Config::FIELD_RESOURCE_NAME] ?? ''),
+                trim($lpConfig[Config::FIELD_DEPLOYMENT_ID] ?? ''),
+                trim($lpConfig[Config::FIELD_MODEL] ?? ''),
                 $this->client,
                 $this->errorMapper,
                 $this->logMapper,
             );
 
             $payloadGenerator = (new Payload\LessonPlan(
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_MODEL)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_DEPLOYMENT_ID)),
+                trim($lpConfig[Config::FIELD_PROVIDER]),
+                trim($lpConfig[Config::FIELD_MODEL] ?? ''),
+                trim($lpConfig[Config::FIELD_DEPLOYMENT_ID] ?? ''),
                 trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_SYSTEM_PROMPT)),
                 trim((string)$this->getConfigLoader()->get('spellcheck_language')),
                 $this->curriculumNodeMapper
