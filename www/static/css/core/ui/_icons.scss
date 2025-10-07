@@ -181,6 +181,11 @@
     font-family: $font-family-icon;
 }
 
+.icon-compass:before {
+    content: "\e935";
+    font-family: $font-family-icon;
+}
+
 .icon-components:before {
     content: "\e611";
     font-family: $font-family-icon;
