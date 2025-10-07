@@ -1,5 +1,5 @@
 /**
- * Add a new unit, also contains the prompt to open/close the new unit display
+ * Add new units, also contains the prompt to open/close the new unit display
  */
 
 import { defineStore } from "pinia";
@@ -9,6 +9,7 @@ import type { Unit } from "../unitPlannerTypes";
 export const useAddUnitsStore = defineStore("unitPlannerAddUnits", () => {
     const isProcessing = window.Vue.ref(false);
     const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
+    const newUnits = window.Vue.ref<string[]>([]); // to store the new units being created
 
     /**
      * to display a prompt to add a unit
@@ -22,6 +23,14 @@ export const useAddUnitsStore = defineStore("unitPlannerAddUnits", () => {
      */
     function cancel(): void {
         isOpen.value = false;
+        newUnits.value = [];
+    }
+
+    /**
+     * to add another unit to the list of new units being created
+     */
+    function add(): void {
+        newUnits.value.push("");
     }
 
     /**
@@ -35,7 +44,7 @@ export const useAddUnitsStore = defineStore("unitPlannerAddUnits", () => {
     /**
      * pass the new unit details to the backend
      */
-    async function add(): Promise<void> {
+    async function create(): Promise<void> {
         const unitPlannerStore = useUnitPlannerStore();
         const toast = window.sbProps.toastActivate("Adding...");
         try {
@@ -67,8 +76,10 @@ export const useAddUnitsStore = defineStore("unitPlannerAddUnits", () => {
     return {
         isProcessing,
         isOpen,
+        newUnits,
         prompt,
         add,
+        create,
         cancel,
     };
 });

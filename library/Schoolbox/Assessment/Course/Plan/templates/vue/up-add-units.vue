@@ -16,7 +16,7 @@ function onAddSelected(): void {
     if (addUnitsStore.isProcessing) {
         return;
     }
-    void addUnitsStore.add();
+    void addUnitsStore.create();
 }
 </script>
 
