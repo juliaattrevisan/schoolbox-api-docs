@@ -49,6 +49,10 @@ interface IClient
      * Same as `request`, but instead indicates that the response body is to be
      * streamed as it is received.
      *
+     * This is split into a separate function, because streams need to be
+     * handled differently to standard responses.
+     * TODO consider adding stream() helper in another class? `stream($this->request())`
+     *
      * @param string   $method
      * @param array    $payload
      * @param int|null $chunkSize If provided, read this many bytes for each stream iteration:

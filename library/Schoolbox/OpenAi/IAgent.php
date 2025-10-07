@@ -27,8 +27,22 @@ interface IAgent
     /**
      * Send a request to the AI provider via its underlying client.
      *
-     * @param array $payload
-     * @return array The response from the provider.
+     * @param array $payload The payload to be sent.
+     *                       This payload should be as simple as possible:
+     *                       implementations of this class should be able to
+     *                       augment the payload with further instructions and
+     *                       context before sending to the AI provider.
+     * @return array The response from the provider, after having been extracted
+     *               from the body.
      */
     public function request(array $payload): array;
+
+    /**
+     * Same as `request`, but instead indicates that the response is to be
+     * streamed as it is received and parsed.
+     *
+     * @param array $payload
+     * @return iterable
+     */
+    public function requestStream(array $payload): iterable;
 }
