@@ -38,7 +38,7 @@ class Client implements IClient
             $method,
             $this->endpoint,
             $this->getAuthorization() + ['Content-Type' => 'application/json'],
-            $payload,
+            json_encode($payload),
         );
         return $this->httpClient->send(
             $request,
@@ -55,11 +55,12 @@ class Client implements IClient
      */
     public function requestStream(string $method, array $payload, ?int $chunkSize = null): iterable
     {
+        $chunkSize ??= self::DEFAULT_CHUNK_SIZE;
         $request = new Request(
             $method,
             $this->endpoint,
             $this->getAuthorization() + ['Content-Type' => 'application/json'],
-            $payload,
+            json_encode($payload),
         );
         $response = $this->httpClient->send(
             $request,
