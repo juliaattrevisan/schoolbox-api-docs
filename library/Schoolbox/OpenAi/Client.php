@@ -111,11 +111,17 @@ class Client implements IClient
     }
 
     /**
-     * @param StreamInterface $stream
-     * @param int             $chunkSize
+     * Read events from the response's body stream.
+     *
+     * This will read bytes from the stream whilst it's still open, and output
+     * them as event objects.
+     *
+     * @param StreamInterface $stream    The response's body, as a stream.
+     * @param int             $chunkSize How many bytes should be read from the
+     *                                   stream at once?
      * @return iterable
      */
-    private function readStream(StreamInterface $stream, int $chunkSize): iterable
+    private function readEvents(StreamInterface $stream, int $chunkSize): iterable
     {
         $chunkBuffer = '';
         $completedEvent = null;
@@ -136,12 +142,9 @@ class Client implements IClient
 
             // while there's at least one full chunk in the buffer, process it
             while (false !== ($pos = strpos($chunkBuffer, "\n\n"))) {
-                $chunk       = substr($chunkBuffer, 0, $pos);
+                yield substr($chunkBuffer, 0, $pos);
+
                 $chunkBuffer = substr($chunkBuffer, $pos + 2);
-
-                // Yield the chunk value
-                yield $chunk;
-
 //                $event = $this->parseChunk($chunk);
 ////                $this->appendChunkToLog($event, $log, $type);
 //
