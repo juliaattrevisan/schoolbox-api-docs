@@ -147,19 +147,11 @@ class Config
                 return [];
         }
 
-//        $merged = [];
-//        foreach (self::ALL_MODULES as $module) {
-            // Get existing config for this module if it exists
-            $moduleConfig = isset($config) && is_array($config)
-                ? $config
-                : [];
+        // Only keep expected keys and overwrite defaults
+        $merged = array_intersect_key($config, $expected) + $expected;
 
-            // Only keep expected keys and overwrite defaults
-            $merged = array_intersect_key($moduleConfig, $expected) + $expected;
-
-            // Always set provider to avoid issues if switching providers
-            $merged['provider'] = $provider;
-//        }
+        // Always set provider to avoid issues if switching providers
+        $merged['provider'] = $provider;
 
         return $merged;
     }

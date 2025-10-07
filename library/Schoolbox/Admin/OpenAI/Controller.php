@@ -55,7 +55,6 @@ class Controller extends ConfigController
         foreach (Config::ALL_MODULES as $module) {
             $textModules[$module] = $aiConfig->decode($this->getConfigLoader()->get(Config::MODULE_CONFIG[$module]), $textProvider);
         }
-//        $textConfig = $aiConfig->decode($this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_SETTINGS), $textProvider);
 
         $textModuleContext = $aiConfig->buildTwigConfig(
             $textModules,
@@ -175,7 +174,6 @@ class Controller extends ConfigController
         );
 
         $this->response = $this->responseFromTemplateUnthemed('@adminOpenAi/config.twig', ['textModuleContext' => $textModuleContext]);
-//        $this->response = $this->responseAsJson($struct);
     }
 
 
