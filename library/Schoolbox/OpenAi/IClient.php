@@ -49,10 +49,12 @@ interface IClient
      * Same as `request`, but instead indicates that the response body is to be
      * streamed as it is received.
      *
-     * @param string $method
-     * @param array  $payload
+     * @param string   $method
+     * @param array    $payload
+     * @param int|null $chunkSize If provided, read this many bytes for each stream iteration:
+     *                            otherwise, allow the implementation to decide.
      * @return iterable Each event as it is received from the response.
      * @throws ClientExceptionInterface if something went wrong with the request
      */
-    public function requestStream(string $method, array $payload): iterable;
+    public function requestStream(string $method, array $payload, ?int $chunkSize = null): iterable;
 }
