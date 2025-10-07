@@ -156,7 +156,7 @@ class Subnav
         $userHasServicePermissionTimetable = (
             $this->user->hasServicePermission(UserAccess::SERVICE_TIMETABLE, UserAccess::ACCESS_FULL)
         );
-        $userHasServicePermissionDifferentiationProfileManagement = (
+        $userHasServicePermissionDifferentiationProfile = (
             $this->user->hasServicePermission(UserAccess::SERVICE_DIFFERENTIATION_PROFILE, UserAccess::ACCESS_FULL)
         );
         $userHasAnyModeratorServicePermission = (
@@ -168,7 +168,7 @@ class Subnav
             $userHasServicePermissionCms ||
             $userHasServicePermissionDesign ||
             $userHasServicePermissionTimetable ||
-            $userHasServicePermissionDifferentiationProfileManagement
+            $userHasServicePermissionDifferentiationProfile
         );
 
         /* Keys of this array uniquely identify a page and its subpages
@@ -581,7 +581,7 @@ class Subnav
             '/adminv2/pastoral' => [
                 'name'       => 'Pastoral Care',
                 'visible'    => (
-                    ($userIsSuperuser || $userHasServicePermissionPastoral || $userHasServicePermissionDifferentiationProfileManagement) &&
+                    ($userIsSuperuser || $userHasServicePermissionPastoral || $userHasServicePermissionDifferentiationProfile) &&
                     $this->configLoader->get(ConfigMapper::NAME_PASTORAL_ENABLED)
                 ),
                 'searchable' => false,
@@ -638,7 +638,7 @@ class Subnav
                     ],
                     '/adminv2/pastoral/differentiation-profiles' => [
                         'name'        => 'Settings - Differentiation Profile',
-                        'visible'     => $userHasServicePermissionDifferentiationProfileManagement,
+                        'visible'     => $userIsSuperuser || $userHasServicePermissionDifferentiationProfile,
                         'description' => 'Configure settings related to the differentiation profiles.',
                     ],
                     '/adminv2/setting/pastoral/Pastoral%20Care' => [
