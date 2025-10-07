@@ -27,13 +27,14 @@ function onAddSelected(): void {
             <div class="l-flex-col l-gap-s">
                 <!-- Loop through newUnits and display label and text input for each -->
                 <div v-for="(unit, index) in addUnitsStore.newUnits" :key="index" class="l-flex-col l-gap-xs">
-                    <label :for="`unit-${index}`">Name:</label>
+                    <label :for="`unit-${index}`" class="required">Name</label>
                     <div class="l-flex l-gap-xs l-align-items-center f-no-margins">
                         <input
                             :id="`unit-${index}`"
                             v-model="addUnitsStore.newUnits[index]"
                             type="text"
                             class="input l-flex__item--1"
+                            maxlength="255"
                             :placeholder="`Enter ${locale.unit.translate(false, false).toLowerCase()} name`"
                         />
                         <button
@@ -46,6 +47,9 @@ function onAddSelected(): void {
                             @click.prevent="addUnitsStore.remove(index)"
                         ></button>
                     </div>
+                    <label v-if="addUnitsStore.validationErrors[index]" class="error"
+                        >Please add a {{ locale.unit.translate(false, false) }} name</label
+                    >
                 </div>
             </div>
             <div>
