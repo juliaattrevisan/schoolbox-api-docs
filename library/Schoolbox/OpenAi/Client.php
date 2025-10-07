@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\OpenAi;
 
 use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
@@ -20,8 +21,19 @@ use Psr\Http\Message\StreamInterface;
  */
 class Client implements IClient
 {
+    /**
+     * Default chunk size when reading a streaming response.
+     */
     private const DEFAULT_CHUNK_SIZE = 128;
 
+    /**
+     * Constructor
+     *
+     * @param HttpClient $httpClient The HTTP client, for making requests to the AI provider.
+     * @param string     $endpoint   The base endpoint for the API provider.
+     * @param string     $apiKey     The API key which must be provided to the provider, in order to authenticate
+     *                               requests.
+     */
     public function __construct(
         private HttpClient $httpClient,
         private string $endpoint,
@@ -72,10 +84,17 @@ class Client implements IClient
         );
 
         // This needs to be an event stream: otherwise raise an exception
-        if (str_contains($response->getHeaderLine('Content-Type'), 'text/event-stream')) {
-            foreach ($this->readStream($response->getBody(), $chunkSize) as $stream) {
+        $contentType = $response->getHeaderLine('Content-Type');
+        if (str_contains($contentType, 'text/event-stream')) {
+            foreach ($this->readEvents($response->getBody(), $chunkSize) as $stream) {
                 yield $stream;
             }
+        } else {
+            throw new BadResponseException(
+                sprintf('Expected text/event-stream response: received %s', $contentType),
+                $request,
+                $response,
+            );
         }
 
         // Once entire stream is received: log it
