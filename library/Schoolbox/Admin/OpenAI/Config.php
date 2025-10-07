@@ -217,4 +217,44 @@ class Config
 
         return $modules;
     }
+
+    /**
+     * migrate from the old config to the new config structure
+     *
+     * @param string|null $provider
+     * @param string|null $key
+     * @param string|null $resourceName
+     * @param string|null $deploymentId
+     * @param string|null $model
+     * @return array
+     */
+    public static function migrate(?string $provider, ?string $key, ?string $resourceName, ?string $deploymentId, ?string $model): array
+    {
+        // for each module set the using the data from the old system
+        $config = [];
+        switch ($provider) {
+            case Helper::ENDPOINT_TYPE_AZURE:
+                $config = self::generateInitConfig($provider);
+                foreach (self::ALL_MODULES as $module) {
+                    $config[$module][self::FIELD_OPENAIKEY] = $key ?? '';
+                    $config[$module][self::FIELD_RESOURCE_NAME] = $resourceName ?? '';
+                    $config[$module][self::FIELD_DEPLOYMENT_ID] = $deploymentId ?? '';
+                    $config[$module][self::FIELD_ENABLED] = true;
+                }
+                break;
+            case Helper::ENDPOINT_TYPE_OPENAI:
+                $config = self::generateInitConfig($provider);
+                foreach (self::ALL_MODULES as $module) {
+                    $config[$module][self::FIELD_OPENAIKEY] = $key ?? '';
+                    $config[$module][self::FIELD_MODEL] = $model ?? self::NOT_ACTIVE;
+                    $config[$module][self::FIELD_ENABLED] = true;
+                }
+                break;
+            default:
+                foreach (self::ALL_MODULES as $module) {
+                    $config[$module] = [];
+                }
+        }
+        return $config;
+    }
 }
