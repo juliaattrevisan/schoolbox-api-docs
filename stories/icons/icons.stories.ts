@@ -160,6 +160,12 @@ export const Default: Story = {
             </div>
             <div class="box-icon-wrapper">
                 <div class="box-icon">
+                    <sbx-icon name="compass"></sbx-icon>
+                </div>
+                <p>compass</p>
+            </div>
+            <div class="box-icon-wrapper">
+                <div class="box-icon">
                     <sbx-icon name="components"></sbx-icon>
                 </div>
                 <p>components</p>
