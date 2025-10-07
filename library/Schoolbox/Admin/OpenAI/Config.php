@@ -109,14 +109,11 @@ class Config
      */
     public static function generateInitConfig(string $provider): array
     {
-        switch ($provider) {
-            case Helper::ENDPOINT_TYPE_AZURE:
-                return self::CONFIG_STRUCT_AZURE;
-            case Helper::ENDPOINT_TYPE_OPENAI:
-                return self::CONFIG_STRUCT_OPENAI;
-            default:
-                return [];
-        }
+        return match ($provider) {
+            Helper::ENDPOINT_TYPE_AZURE => self::CONFIG_STRUCT_AZURE,
+            Helper::ENDPOINT_TYPE_OPENAI => self::CONFIG_STRUCT_OPENAI,
+            default => [],
+        };
     }
 
     /**
@@ -241,5 +238,21 @@ class Config
                 $config = [];
         }
         return $config;
+    }
+
+    /**
+     * check if the config is enabled
+     * both openai and azure do this differently
+     */
+    public static function isEnabled(?array $config): bool
+    {
+        if (empty($config) || !isset($config['provider'])) {
+            return false;
+        }
+        return match ($config['provider']) {
+            Helper::ENDPOINT_TYPE_AZURE => $config['enabled'],
+            Helper::ENDPOINT_TYPE_OPENAI => $config['model'] !== self::NOT_ACTIVE,
+            default => false,
+        };
     }
 }
