@@ -20,7 +20,7 @@ export interface ImageLightboxDocumentEventHandlerMap {
 
 /**
  * Turn a storage file into a previewable item in a lightbox
- * TODO: Currenty unimplemented for anything except images, use preview.js for other types
+ * TODO: Currenty unimplemented for anything except images, use preview.ts for other types
  * @param storageFile - the file to convert
  * @param filename - optionally override the filename
  * @returns The gallery items to show in the lightbox, or null if the file is not previewable
@@ -34,7 +34,7 @@ export function getStorageGallerySlide(storageFile: StorageFile, filename?: stri
         };
     }
 
-    // all other types are currently unsupported thru this method, use preview.js instead or add here
+    // all other types are currently unsupported thru this method, use preview.ts instead or add here
     return null;
 }
 

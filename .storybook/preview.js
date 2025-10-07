@@ -1,5 +1,5 @@
 /**
- * preview.js provides any extra scaffolding for all our stories, further info at: https://storybook.js.org/docs/react/configure/overview#configure-story-rendering
+ * preview.ts provides any extra scaffolding for all our stories, further info at: https://storybook.js.org/docs/react/configure/overview#configure-story-rendering
  * for us we are:
  *  pulling in all our CSS,
  *  MSW (https://storybook.js.org/addons/msw-storybook-addon) to be able to load dummy data into stories
