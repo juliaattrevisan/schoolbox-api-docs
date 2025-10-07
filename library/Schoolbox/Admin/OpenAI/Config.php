@@ -59,6 +59,16 @@ class Config
         self::FIELD_MODEL => 'OpenAI Model',
     ];
 
+    // human readable descriptions (tooltips)
+    public const FIELD_DESCRIPTION = [
+        self::FIELD_PROVIDER => 'Select which provider you will use for conducting AI text queries.',
+        self::FIELD_ENABLED => 'Enable or disable this AI feature.',
+        self::FIELD_OPENAIKEY => 'This is your secure key for authorising GPT based AI assistant services. The key can be created at https://openai.com/ or in Azure',
+        self::FIELD_RESOURCE_NAME => 'The name of your Azure OpenAI Resource',
+        self::FIELD_DEPLOYMENT_ID => 'The deployment name you chose when you deployed the model in Azure',
+        self::FIELD_MODEL => 'Select which model you wish to use for your OpenAI service.',
+    ];
+
     public const NOT_ACTIVE = "Not Active";
     public const AI_MODELS = [
         self::NOT_ACTIVE,
@@ -177,7 +187,7 @@ class Config
                 $cfg = new \Schoolbox\Config\Config();
                 $cfg->setName(sprintf("[%s][%s]", $module, $key))
                     ->setTitle(self::FIELD_TITLE[$key])
-                    ->setDescription('hello')
+                    ->setDescription(self::FIELD_DESCRIPTION[$key])
                     ->setValue((string)$value)
                     ->setTypeId(ConfigMapper::TYPE_AI)
                     ->setFieldId(self::FIELD_OPTIONS[$key] ?? ConfigMapper::FIELD_INPUT)

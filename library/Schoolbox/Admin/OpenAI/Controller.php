@@ -156,10 +156,14 @@ class Controller extends ConfigController
     public function getBlankConfig(string $provider): void
     {
         $aiConfig = new Config();
-        $struct = Config::generateInitConfig($provider);
+        $blank = Config::generateInitConfig($provider);
+        $textModules = [];
+        foreach (Config::ALL_MODULES as $module) {
+            $textModules[$module] = $blank;
+        }
 
         $textModuleContext = $aiConfig->buildTwigConfig(
-            $struct,
+            $textModules,
             $this->fieldStrategyFactory,
             $this->getConfigLoader()->get('site_version'),
             $this->routeGenerator->generate('adminOpenAi.postTextOptions'),
