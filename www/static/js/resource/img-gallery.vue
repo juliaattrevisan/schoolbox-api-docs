@@ -44,12 +44,12 @@ async function openImageLightbox(file: FileWithName): Promise<void> {
         <li v-for="file in galleryFiles" :key="file.storage.hash">
             <a
                 :href="`${file.storage._links.image}&size=maxsize`"
-                :title="file.filename || file.storage.name"
+                :title="file.filename || file.storage.name || undefined"
                 @click.prevent="() => openImageLightbox(file)"
             >
                 <img
                     :src="`${file.storage._links.image}&size=square128`"
-                    :alt="file.filename || file.storage.name"
+                    :alt="file.filename || file.storage.name || undefined"
                     style="width: 128px"
                 />
             </a>
