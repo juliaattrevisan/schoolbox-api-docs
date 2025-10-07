@@ -2,6 +2,8 @@
 /**
  * Displayed when there's currently no Units linked to the Course
  */
+
+import locale from "@js/terminology/rosettaStone";
 import { useAddUnitsStore } from "./store/unitPlannerAddUnitsStore";
 
 const addUnitsStore = useAddUnitsStore();
@@ -22,8 +24,11 @@ function onCreateSelected(): void {
             <div class="empty-state-flex-centered">
                 <i class="icon-unit"></i>
                 <p>
-                    This course currently does not have any units. To begin building this course start by
-                    <button @click.prevent="onCreateSelected">creating a unit.</button>
+                    This course currently does not have any {{ locale.unit.translate(true, false) }}. To begin building
+                    this course start by
+                    <button @click.prevent="onCreateSelected">
+                        creating a {{ locale.unit.translate(false, false) }}.
+                    </button>
                 </p>
             </div>
         </div>

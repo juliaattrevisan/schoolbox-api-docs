@@ -3,6 +3,7 @@
  * To add new units to the course
  */
 
+import locale from "@js/terminology/rosettaStone";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import { useAddUnitsStore } from "./store/unitPlannerAddUnitsStore";
 
@@ -39,6 +40,6 @@ function onAddSelected(): void {
 
 <template>
     <basic-modal v-model:is-open="addUnitsStore.isOpen">
-        <h2>Create new unit</h2>
+        <h2>Create new {{ locale.unit.translate(true, false) }}</h2>
     </basic-modal>
 </template>
