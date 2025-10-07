@@ -2,13 +2,13 @@
 import { apiRequest } from "@js/util/sbx/apiUtils";
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
-import StorageObject from "@schoolboxVue/components/storage-object.vue";
 import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vue";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import CodesList from "@schoolboxCurriculum/vue/codes-list.vue";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
 import CommentThread from "./comment-thread.vue";
 import type { LearningMoment } from "./evidenceTypes";
+import MomentEvidenceGallery from "./moment-evidence-gallery.vue";
 
 interface Props {
     moment: LearningMoment;
@@ -84,16 +84,10 @@ async function deleteMoment(): Promise<void> {
             <section>
                 <div class="row">
                     <div class="small-12 island">
-                        <section v-if="props.moment.evidence.length" class="banner content">
+                        <section v-if="props.moment.evidence.length > 0" class="detail content">
                             <div class="feed-body small-12 columns">
                                 <!-- Display evidence -->
-                                <article v-for="e in props.moment.evidence" :key="e.storage.hash">
-                                    <storage-object
-                                        :storage="e.storage"
-                                        :filename="e.filename"
-                                        data-test="learning-moment-evidence-media"
-                                    />
-                                </article>
+                                <moment-evidence-gallery :moment-evidence="props.moment.evidence" />
                             </div>
                         </section>
                         <section class="detail content">
@@ -135,7 +129,7 @@ async function deleteMoment(): Promise<void> {
                                 </template>
                             </p>
 
-                            <!-- Display evidence body, with media players initialised -->
+                            <!-- Display moment body, with media players initialised -->
                             <media-article v-if="props.moment.body" :content="props.moment.body"></media-article>
                         </section>
                     </div>
