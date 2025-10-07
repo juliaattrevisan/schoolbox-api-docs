@@ -16,11 +16,19 @@ use Schoolbox\Config\ConfigMapper;
 
 class Config
 {
+    // enabled AI features (to be configured as part of the text Gen settings)
     public const ALL_MODULES = [
         Helper::FEATURE_CHAT,
         Helper::FEATURE_LESSONPLAN,
 //        Helper::FEATURE_DIFFERENTIATION,
 //        Helper::FEATURE_ASSESSMENT,
+    ];
+
+    public const MODULE_CONFIG = [
+        Helper::FEATURE_CHAT => ConfigMapper::NAME_OPENAI_TEXT_CHAT,
+        Helper::FEATURE_LESSONPLAN => ConfigMapper::NAME_OPENAI_LESSONPLAN,
+        Helper::FEATURE_DIFFERENTIATION => ConfigMapper::NAME_OPENAI_ASSESSMENT,
+        Helper::FEATURE_ASSESSMENT => ConfigMapper::NAME_OPENAI_DIFFERENTIATION,
     ];
 
 
@@ -140,19 +148,19 @@ class Config
                 return [];
         }
 
-        $merged = [];
-        foreach (self::ALL_MODULES as $module) {
+//        $merged = [];
+//        foreach (self::ALL_MODULES as $module) {
             // Get existing config for this module if it exists
-            $moduleConfig = isset($config[$module]) && is_array($config[$module])
-                ? $config[$module]
+            $moduleConfig = isset($config) && is_array($config)
+                ? $config
                 : [];
 
             // Only keep expected keys and overwrite defaults
-            $merged[$module] = array_intersect_key($moduleConfig, $expected) + $expected;
+            $merged = array_intersect_key($moduleConfig, $expected) + $expected;
 
             // Always set provider to avoid issues if switching providers
-            $merged[$module]['provider'] = $provider;
-        }
+            $merged['provider'] = $provider;
+//        }
 
         return $merged;
     }

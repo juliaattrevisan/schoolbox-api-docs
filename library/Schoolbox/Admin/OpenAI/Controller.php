@@ -51,10 +51,14 @@ class Controller extends ConfigController
         // 26.0 grab the config for text and add in any new or missing configs
         $aiConfig = new Config();
 
-        $textConfig = $aiConfig->decode($this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_SETTINGS), $textProvider);
+        $textModules = [];
+        foreach (Config::ALL_MODULES as $module) {
+            $textModules[$module] = $aiConfig->decode($this->getConfigLoader()->get(Config::MODULE_CONFIG[$module]), $textProvider);
+        }
+//        $textConfig = $aiConfig->decode($this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_SETTINGS), $textProvider);
 
         $textModuleContext = $aiConfig->buildTwigConfig(
-            $textConfig,
+            $textModules,
             $this->fieldStrategyFactory,
             $this->getConfigLoader()->get('site_version'),
             $this->routeGenerator->generate('adminOpenAi.postTextOptions'),
@@ -90,7 +94,7 @@ class Controller extends ConfigController
             'textModuleContext' => $textModuleContext,
             'textConfigContext' => $textConfigContext,
             'textConfigFormId' => $textConfigFormId,
-            'textConfig' => $textConfig,
+            'textConfig' => $textModules,
             'imageConfigContext' => $imageConfigContext,
             'endpointTypeOff' => Helper::ENDPOINT_TYPE_OFF,
             'models' => [
