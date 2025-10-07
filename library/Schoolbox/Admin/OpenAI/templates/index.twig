@@ -152,14 +152,30 @@
 
                     // Loop through each form
                     forms.forEach(form => {
-                        // Clone each field (input, select, textarea) and append to the new form
                         Array.from(form.elements).forEach(field => {
-                            // Only include named fields and skip buttons
                             if (field.name && !['submit', 'button', 'reset'].includes(field.type)) {
-                                // Clone the field
-                                const clonedField = field.cloneNode(true);
-                                // Optionally, rename to avoid duplicates (if needed)
-                                // Otherwise, just append
+                                let clonedField;
+
+                                if (field.tagName === 'SELECT') {
+                                    clonedField = field.cloneNode(true);
+                                    // Explicitly set the selected value on the cloned select
+                                    clonedField.value = field.value;
+                                    // For multiple selects, copy the selected options
+                                    if (field.multiple) {
+                                        Array.from(field.options).forEach((option, i) => {
+                                            clonedField.options[i].selected = option.selected;
+                                        });
+                                    }
+                                } else {
+                                    clonedField = field.cloneNode(true);
+                                    // For other input types, ensure the value is copied
+                                    if (field.type !== 'checkbox' && field.type !== 'radio') {
+                                        clonedField.value = field.value;
+                                    } else {
+                                        clonedField.checked = field.checked;
+                                    }
+                                }
+
                                 combinedForm.appendChild(clonedField);
                             }
                         });
