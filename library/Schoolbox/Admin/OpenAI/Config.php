@@ -202,7 +202,10 @@ class Config
                 $siteVersion,
                 $configCollection,
                 $postRoute,
-                $additionalContext,
+                $additionalContext +
+                [
+                    'formId' => sprintf('text_config_%s', $module)
+                ],
             );
         }
 

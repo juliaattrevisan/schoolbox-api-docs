@@ -64,7 +64,6 @@ class Controller extends ConfigController
             [
                 ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,
                 ModuleConfig::CONTEXT_ISEDITABLE => false,
-                'formId' => 'textSettings'
             ]
         );
         $textConfigContext = $this->buildConfigContext(
@@ -169,7 +168,6 @@ class Controller extends ConfigController
             [
                 ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,
                 ModuleConfig::CONTEXT_ISEDITABLE => false,
-                'formId' => 'textSettings'
             ]
         );
 
