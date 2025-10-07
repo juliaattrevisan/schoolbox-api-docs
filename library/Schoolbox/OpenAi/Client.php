@@ -119,7 +119,7 @@ class Client implements IClient
      * @param StreamInterface $stream    The response's body, as a stream.
      * @param int             $chunkSize How many bytes should be read from the
      *                                   stream at once?
-     * @return iterable
+     * @return iterable<EventStream\Message>
      */
     private function readEvents(StreamInterface $stream, int $chunkSize): iterable
     {
@@ -142,7 +142,7 @@ class Client implements IClient
 
             // while there's at least one full chunk in the buffer, process it
             while (false !== ($pos = strpos($chunkBuffer, "\n\n"))) {
-                yield substr($chunkBuffer, 0, $pos);
+                yield EventStream\Message::fromString(substr($chunkBuffer, 0, $pos));
 
                 $chunkBuffer = substr($chunkBuffer, $pos + 2);
 //                $event = $this->parseChunk($chunk);

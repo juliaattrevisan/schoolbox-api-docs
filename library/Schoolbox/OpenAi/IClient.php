@@ -57,7 +57,7 @@ interface IClient
      * @param array    $payload
      * @param int|null $chunkSize If provided, read this many bytes for each stream iteration:
      *                            otherwise, allow the implementation to decide.
-     * @return iterable Each event as it is received from the response.
+     * @return iterable<EventStream\Message> Each event as it is received from the response.
      * @throws ClientExceptionInterface if something went wrong with the request
      */
     public function requestStream(string $method, array $payload, ?int $chunkSize = null): iterable;
