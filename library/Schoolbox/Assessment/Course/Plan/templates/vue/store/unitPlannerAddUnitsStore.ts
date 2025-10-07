@@ -6,10 +6,9 @@ import { defineStore } from "pinia";
 import { useUnitPlannerStore } from "./unitPlannerStore";
 import type { Unit } from "../unitPlannerTypes";
 
-export const useAddUnitStore = defineStore("unitPlannerAddUnit", () => {
+export const useAddUnitsStore = defineStore("unitPlannerAddUnits", () => {
     const isProcessing = window.Vue.ref(false);
     const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
-    const name = window.Vue.ref(""); // the name of the new unit
 
     /**
      * to display a prompt to add a unit
@@ -23,7 +22,6 @@ export const useAddUnitStore = defineStore("unitPlannerAddUnit", () => {
      */
     function cancel(): void {
         isOpen.value = false;
-        name.value = "";
     }
 
     /**
@@ -31,9 +29,7 @@ export const useAddUnitStore = defineStore("unitPlannerAddUnit", () => {
      * @returns the form data
      */
     function getFormData(): string {
-        return JSON.stringify({
-            name: name.value,
-        });
+        return "temp";
     }
 
     /**
@@ -71,7 +67,6 @@ export const useAddUnitStore = defineStore("unitPlannerAddUnit", () => {
     return {
         isProcessing,
         isOpen,
-        name,
         prompt,
         add,
         cancel,
