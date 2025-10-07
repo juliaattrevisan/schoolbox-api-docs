@@ -130,3 +130,16 @@ SET
     sequence = sequence + 4
 WHERE
     module = 'openai-image';
+
+### deprecate the old fields append (Deprecated) to the title for the following fields
+UPDATE config
+SET
+    title = CONCAT(title, ' (Deprecated)'),
+    editable = 'false'
+WHERE
+    name IN (
+        'openai_text_key',
+        'openai_text_azure_resource_name',
+        'openai_text_azure_deployment_id',
+        'openai_text_model'
+    );

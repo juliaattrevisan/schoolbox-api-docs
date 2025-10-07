@@ -394,18 +394,23 @@ class ConfigMapper extends Mapper
     /* OpenAI
      */
     public const NAME_OPENAI_TEXT_ENDPOINT = 'openai_text_endpoint';
+    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
     public const NAME_OPENAI_TEXT_KEY = 'openai_text_key';
+    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
     public const NAME_OPENAI_TEXT_RESOURCE_NAME = 'openai_text_azure_resource_name';
+    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
     public const NAME_OPENAI_TEXT_DEPLOYMENT_ID = 'openai_text_azure_deployment_id';
+    /* @deprecated now ai feature specific \Schoolbox\Editor\OpenAI\Helper::FEATURE_* */
     public const NAME_OPENAI_TEXT_MODEL = 'openai_text_model';
     public const NAME_OPENAI_TEXT_SYSTEM_PROMPT = 'openai_text_generation_system_prompt';
-    public const NAME_OPENAI_TEXT_SETTINGS = 'openai_text_settings';
 
+    // Text Feature json config
     public const NAME_OPENAI_TEXT_CHAT = 'openai_text_chat';
     public const NAME_OPENAI_LESSONPLAN = 'openai_lessonplan';
     public const NAME_OPENAI_ASSESSMENT = 'openai_assessment';
     public const NAME_OPENAI_DIFFERENTIATION = 'openai_differentiation';
 
+    // image ai configs
     public const NAME_OPENAI_IMAGE_ENDPOINT = 'openai_image_endpoint';
     public const NAME_OPENAI_IMAGE_KEY = 'openai_image_key';
     public const NAME_OPENAI_IMAGE_RESOURCE_NAME = 'openai_image_azure_resource_name';
