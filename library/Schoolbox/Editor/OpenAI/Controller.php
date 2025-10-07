@@ -338,6 +338,24 @@ class Controller extends Base
         // No BTTF in this space
         $this->setAllowBackToTheFuture(false);
 
+        // ai Config
+        $aiConfig = new Config();
+        $chatConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_CHAT), trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)));
+
+        // if not enabled, 404
+        if ($aiConfig::isEnabled($chatConfig) === false) {
+            $returnCode = 404;
+
+            $problem = new ApiProblem("Lesson Plan AI is not enabled.")
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus($returnCode);
+
+            return;
+        }
+
         /** gen a sessionID guid for keeping track of what is happening
          * for ckeditor chat each ai request is a new session
          */
@@ -345,11 +363,11 @@ class Controller extends Base
 
         try {
             (new Helper(
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_KEY)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_RESOURCE_NAME)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_DEPLOYMENT_ID)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_MODEL)),
+                trim($chatConfig[Config::FIELD_PROVIDER]),
+                trim($chatConfig[Config::FIELD_OPENAIKEY]),
+                trim($chatConfig[Config::FIELD_RESOURCE_NAME] ?? ''),
+                trim($chatConfig[Config::FIELD_DEPLOYMENT_ID] ?? ''),
+                trim($chatConfig[Config::FIELD_MODEL] ?? ''),
                 $this->client,
                 $this->errorMapper,
                 $this->logMapper,
