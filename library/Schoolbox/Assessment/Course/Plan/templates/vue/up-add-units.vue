@@ -3,6 +3,7 @@
  * To add new units to the course
  */
 
+import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
 import { useAddUnitsStore } from "./store/unitPlannerAddUnitsStore";
 
 const addUnitsStore = useAddUnitsStore();
@@ -36,4 +37,8 @@ function onAddSelected(): void {
 }
 </script>
 
-<template></template>
+<template>
+    <basic-modal v-model:is-open="addUnitsStore.isOpen">
+        <h2>Create new unit</h2>
+    </basic-modal>
+</template>
