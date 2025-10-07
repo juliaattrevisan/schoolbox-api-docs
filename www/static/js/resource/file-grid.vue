@@ -3,7 +3,7 @@
  * Show a grid of storage files with previews on click
  */
 import { humanFileSize } from "@js/util/fileUtils";
-import { createLightbox, getStorageGallerySlides } from "@js/image-lightbox/imageLightboxEvent";
+import { openFilePreview } from "@js/preview/previewUtils";
 import type { StorageFile } from "./resourceUtils";
 
 type FileWithName = {
@@ -19,19 +19,22 @@ interface Props {
 const props = defineProps<Props>();
 
 /**
- * Open an image lightbox for the given image
- * @param file The file to open
+ * When the user clicks on a file
+ * @param file The file that was clicked
+ * @param event The click event
  */
-async function openImageLightbox(file: FileWithName): Promise<void> {
-    const { slides, selectedIndex } = getStorageGallerySlides(
-        props.files.map((f) => f.storage),
-        file.storage.hash,
-    );
+async function onFileClick(file: FileWithName, event: MouseEvent): Promise<void> {
+    const href = file.storage._links.fetch;
+    if (!href) {
+        return; // no fetch link, can't preview
+    }
 
-    const lightbox = await createLightbox(`img-gallery-${props.id}`, slides, {
-        index: selectedIndex,
-    });
-    lightbox.openGallery();
+    if (event.ctrlKey || event.shiftKey || event.metaKey) {
+        return; // the user is trying to open in a new tab/window, don't open the preview
+    }
+
+    event.preventDefault();
+    await openFilePreview(href);
 }
 
 /**
@@ -64,7 +67,7 @@ function getFileIcon(file: StorageFile): string {
                     <a
                         :href="file.storage._links.fetch"
                         :title="file.filename || file.storage.name || undefined"
-                        @click.prevent="() => openImageLightbox(file)"
+                        @click="(event) => onFileClick(file, event)"
                     >
                         <img :src="getFileIcon(file.storage)" alt="Download" />
                         <p>{{ file.filename || file.storage.name }}</p>
