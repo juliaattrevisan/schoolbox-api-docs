@@ -1,12 +1,12 @@
 #!/usr/bin/php
 <?php
+
 /*
  * @copyright   Copyright 2025, Schoolbox Pty Ltd
  * @link        https://schoolbox.education/
  */
 
 declare(strict_types=1);
-
 
 use Schoolbox\Application\CliTool;
 
@@ -28,7 +28,8 @@ $app = new class extends CliTool\App {
                     'openai_text_azure_resource_name',
                     'openai_text_azure_deployment_id',
                     'openai_text_model'
-                    )");
+                    )"
+        );
 
         //clean config into array
         $conf = [];
