@@ -24,11 +24,11 @@ function onAddSelected(): void {
     <basic-modal v-model:is-open="addUnitsStore.isOpen">
         <div class="l-flex-col l-gap-s f-no-margins">
             <h2>Create new {{ locale.unit.translate(true, false) }}</h2>
-            <div>
+            <div class="l-flex-col l-gap-s">
                 <!-- Loop through newUnits and display label and text input for each -->
                 <div v-for="(unit, index) in addUnitsStore.newUnits" :key="index" class="l-flex-col l-gap-xs">
                     <label :for="`unit-${index}`">Name:</label>
-                    <div class="l-flex l-gap-xs l-align-items-center">
+                    <div class="l-flex l-gap-xs l-align-items-center f-no-margins">
                         <input
                             :id="`unit-${index}`"
                             v-model="addUnitsStore.newUnits[index]"
@@ -47,6 +47,8 @@ function onAddSelected(): void {
                         ></button>
                     </div>
                 </div>
+            </div>
+            <div>
                 <button
                     class="button icon-add f-no-margins"
                     data-test="up-add-units-add"
