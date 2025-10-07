@@ -159,10 +159,10 @@ class Controller extends Base
      */
     public function postDKIMConfig()
     {
-        $domain = trim($this->requestPost->get('domain') ?? '');
-        $selector = trim($this->requestPost->get('selector') ?? '');
-        $publicKey = trim($this->requestPost->get('publicKey') ?? '');
-        $privateKey = trim($this->requestPost->get('privateKey') ?? '');
+        $domain = trim($this->requestPost->get('domain', ''));
+        $selector = trim($this->requestPost->get('selector', ''));
+        $publicKey = trim($this->requestPost->get('publicKey', ''));
+        $privateKey = trim($this->requestPost->get('privateKey', ''));
 
         if (empty($domain)) {
             $this->response = $this->responseAsJson(['error' => 'Domain name is required'])
