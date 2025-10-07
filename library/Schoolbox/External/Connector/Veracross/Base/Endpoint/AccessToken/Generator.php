@@ -28,13 +28,6 @@ use GuzzleHttp\RequestOptions;
 class Generator
 {
     /**
-     * A special host for their special token;
-     * differs to the rest of their api
-     */
-    private const HOST = 'https://accounts.veracross.com';
-
-
-    /**
      * Dynamically constructed endpoint
      */
     private const OAUTH_PATH = '%s/oauth/token';
@@ -99,11 +92,13 @@ class Generator
      * @param string $schoolRoute
      * @param string $clientId
      * @param string $clientSecret
+     * @param string $authhost
      */
     public function __construct(
         private string $schoolRoute,
         private string $clientId,
-        private string $clientSecret
+        private string $clientSecret,
+        private string $authhost
     ) {
     }
 
@@ -274,7 +269,7 @@ class Generator
         return new Client([
             'headers' => $headers,
             'curl' => \Proxy\Server::getInstance()->buildCurlOptions(),
-            'base_uri' => self::HOST,
+            'base_uri' => $this->authhost,
             'timeout' => self::DEFAULT_TIMEOUT,
             'http_errors' => false,
         ]);

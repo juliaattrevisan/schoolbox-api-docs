@@ -34,13 +34,13 @@ class DSN implements IDSN
     /**
      * DSN format
      */
-    private const DSN_FORMAT = '/schoolroute=([^;]+);clientid=([^;]+);clientsecret=([^;]+);portalaccessname=([^;]+)/';
+    private const DSN_FORMAT = '/schoolroute=([^;]+);clientid=([^;]+);clientsecret=([^;]+);portalaccessname=([^;]+);authhost=([^;]+)/';
 
 
     /**
      * The expected key-value tuples
      */
-    private const EXPECTED_TUPLE = ['schoolroute', 'clientid', 'clientsecret', 'portalaccessname'];
+    private const EXPECTED_TUPLE = ['schoolroute', 'clientid', 'clientsecret', 'portalaccessname', 'authhost'];
 
 
     /**
@@ -63,7 +63,7 @@ class DSN implements IDSN
 
         /* Check that each module comes with the expected number of key-value pairs
          *
-         * original dsn string + \count(expected_tuple) = 1 + 4 = 5
+         * original dsn string + \count(expected_tuple) = 1 + 5 = 6
          */
         if (count($matches) !== count(self::EXPECTED_TUPLE) + 1) {
             throw new DomainException('Veracross API DSN: could not decode; missing some credentials.');
@@ -74,6 +74,7 @@ class DSN implements IDSN
             'clientid' => $matches[2],
             'clientsecret' => $matches[3],
             'portalaccessname' => $matches[4],
+            'authhost' => $matches[5]
         ];
     }
 
@@ -88,6 +89,6 @@ class DSN implements IDSN
      */
     public function encode(#[SensitiveParameter] array $parts): string
     {
-        return "schoolroute={$parts['schoolroute']};clientid={$parts['clientid']};clientsecret={$parts['clientsecret']};portalaccessname={$parts['portalaccessname']}";
+        return "schoolroute={$parts['schoolroute']};clientid={$parts['clientid']};clientsecret={$parts['clientsecret']};portalaccessname={$parts['portalaccessname']};authhost={$parts['authhost']}";
     }
 }
