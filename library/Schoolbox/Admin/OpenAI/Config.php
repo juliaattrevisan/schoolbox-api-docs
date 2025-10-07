@@ -97,12 +97,12 @@ class Config
         /* Superimpose selected options over the default
          * Disabling fields prevents the keys from existing
          */
-        return $this->mergeConfig($optionsPayload, $provider);
+        return self::mergeConfig($optionsPayload, $provider);
     }
 
 
     /**
-     * Generate initial config structure for all modules based on provider
+     * Generate initial config structure based on provider
      *
      * @param string $provider
      * @return array
@@ -111,20 +111,12 @@ class Config
     {
         switch ($provider) {
             case Helper::ENDPOINT_TYPE_AZURE:
-                $config = self::CONFIG_STRUCT_AZURE;
-                break;
+                return self::CONFIG_STRUCT_AZURE;
             case Helper::ENDPOINT_TYPE_OPENAI:
-                $config = self::CONFIG_STRUCT_OPENAI;
-                break;
+                return self::CONFIG_STRUCT_OPENAI;
             default:
                 return [];
         }
-
-        $result = [];
-        foreach (self::ALL_MODULES as $module) {
-            $result[$module] = $config;
-        }
-        return $result;
     }
 
     /**
@@ -230,30 +222,23 @@ class Config
      */
     public static function migrate(?string $provider, ?string $key, ?string $resourceName, ?string $deploymentId, ?string $model): array
     {
-        // for each module set the using the data from the old system
-        $config = [];
         switch ($provider) {
             case Helper::ENDPOINT_TYPE_AZURE:
                 $config = self::generateInitConfig($provider);
-                foreach (self::ALL_MODULES as $module) {
-                    $config[$module][self::FIELD_OPENAIKEY] = $key ?? '';
-                    $config[$module][self::FIELD_RESOURCE_NAME] = $resourceName ?? '';
-                    $config[$module][self::FIELD_DEPLOYMENT_ID] = $deploymentId ?? '';
-                    $config[$module][self::FIELD_ENABLED] = true;
-                }
+                $config[self::FIELD_OPENAIKEY] = $key ?? '';
+                $config[self::FIELD_RESOURCE_NAME] = $resourceName ?? '';
+                $config[self::FIELD_DEPLOYMENT_ID] = $deploymentId ?? '';
+                $config[self::FIELD_ENABLED] = true;
                 break;
             case Helper::ENDPOINT_TYPE_OPENAI:
                 $config = self::generateInitConfig($provider);
-                foreach (self::ALL_MODULES as $module) {
-                    $config[$module][self::FIELD_OPENAIKEY] = $key ?? '';
-                    $config[$module][self::FIELD_MODEL] = $model ?? self::NOT_ACTIVE;
-                    $config[$module][self::FIELD_ENABLED] = true;
-                }
+                $config[self::FIELD_OPENAIKEY] = $key ?? '';
+                $config[self::FIELD_MODEL] = $model ?? self::NOT_ACTIVE;
+                $config[self::FIELD_ENABLED] = true;
+
                 break;
             default:
-                foreach (self::ALL_MODULES as $module) {
-                    $config[$module] = [];
-                }
+                $config = [];
         }
         return $config;
     }

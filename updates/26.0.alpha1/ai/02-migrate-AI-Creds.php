@@ -37,31 +37,28 @@ $app = new class extends CliTool\App {
         }
 
         // migrate to new config format
-        $newConfig = Schoolbox\Admin\OpenAI\Config::migrate($conf['openai_text_endpoint'] ?? null,
+        $newConfig = Schoolbox\Admin\OpenAI\Config::migrate(
+            $conf['openai_text_endpoint'] ?? null,
             $conf['openai_text_key'] ?? null,
             $conf['openai_text_azure_resource_name'] ?? null,
             $conf['openai_text_azure_deployment_id'] ?? null,
-            $conf['openai_text_model'] ?? null);
+            $conf['openai_text_model'] ?? null
+        );
+
+        // log provider
+        $this->getLogger()->notice("Migrated AI text config, provider: " . ($newConfig['provider'] ?? 'unknown'));
 
         // insert new config into DB
-        foreach (Schoolbox\Admin\OpenAI\Config::MODULE_CONFIG as $module => $configName) {
-            if (!isset($newConfig[$module])) {
-                $this->getLogger()->warning("No new config for module $module, skipping");
-                // nothing to do
-                continue;
-            }
-
-            $this->getLogger()->notice("Migrating OpenAI config for module $module");
+        foreach (['openai_text_chat', 'openai_lessonplan', 'openai_assessment', 'openai_differentiation'] as $moduleKey) {
+            $this->getLogger()->notice("Migrating AI config for module $moduleKey");
             $this->getDatabaseInternal()->executeQuery(
                 "UPDATE config SET value = :value WHERE name = :name;",
                 [
-                    'name' => $configName,
-                    'value' => json_encode($newConfig[$module], JSON_THROW_ON_ERROR),
+                    'name' => $moduleKey,
+                    'value' => json_encode($newConfig, JSON_THROW_ON_ERROR),
                 ]
             );
-
         }
-
     }
     public function runAsRoot(): ?bool
     {
