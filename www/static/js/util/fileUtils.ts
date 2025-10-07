@@ -5,108 +5,98 @@
 
 /**
  * check whether a file name matches specific extension
- *
- * @param { String } '593042579804375.webm'
- * @param { String } 'mp4'
- *
- * @returns { Boolean } depending of if matches
+ * @param filename '593042579804375.webm'
+ * @param extension 'mp4'
+ * @returns depending of if matches
  */
-export const isOfFileType = (filename, extension) => {
+export function isOfFileType(filename: string, extension: string): boolean {
     const filenameExtension = filename.split(".").pop();
     return filenameExtension === extension;
-};
+}
 
 /**
  * check whether a file is of a certain mime type
- *
- * @param { String } 'audio/webm;codecs=opus'
- * @param { String } 'video/webm'
- *
- * @returns { Boolean } depending of if matches
+ * @param mimeType 'audio/webm;codecs=opus'
+ * @param mimeTypeMatch 'video/webm'
+ * @returns depending of if matches
  */
-export const isOfMimeType = (mimeType, mimeTypeMatch) => {
+export function isOfMimeType(mimeType: string, mimeTypeMatch: string): boolean {
     return mimeType.includes(mimeTypeMatch);
-};
+}
 
 /**
  * convert the filename to use the extension instead of whatever it was
- *
- * @param { String } '593042579804375.webm'
- * @param { String } '.mp4'
- *
- * @returns { String } '593042579804375.mp4'
+ * @param filename '593042579804375.webm'
+ * @param extension '.mp4'
+ * @returns '593042579804375.mp4'
  */
-export const convertFilenameExtension = (filname, extension) => {
-    const filenameWithoutExtension = filname.replace(/\.[^/.]+$/, "");
+export function convertFilenameExtension(filename: string, extension: string): string {
+    const filenameWithoutExtension = filename.replace(/\.[^/.]+$/, "");
     return filenameWithoutExtension + extension;
-};
+}
 
 /**
  * extract the media type from a Data URL
- *
- * @param { String } ''data:image/png;base64,abcdefghijklm...' - https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
- *
- * @returns { String } 'image/png'
+ * @param dataURL ''data:image/png;base64,abcdefghijklm...' - https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
+ * @returns 'image/png'
  */
-export const getMediaTypeFromDataURL = (dataURL) => {
+export function getMediaTypeFromDataURL(dataURL: string): string {
     return dataURL.substring(dataURL.indexOf(":") + 1, dataURL.indexOf(";"));
-};
+}
 
 /**
  * convert Data URL to Blob - https://gist.github.com/wuchengwei/b7e1820d39445f431aeaa9c786753d8e
- *
- * @param { String } ''data:image/png;base64,abcdefghijklm...' - https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
- *
- * @returns { Blob }
+ * @param dataURL ''data:image/png;base64,abcdefghijklm...' - https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/Data_URIs
+ * @returns blob
  */
-export const dataURLtoBlob = (dataURL) => {
-    var arr = dataURL.split(","),
-        mime = arr[0].match(/:(.*?);/)[1],
-        bstr = atob(arr[1]),
-        n = bstr.length,
-        u8arr = new Uint8Array(n);
-    while (n--) {
+export function dataURLtoBlob(dataURL: string): Blob {
+    const arr = dataURL.split(",");
+    const mime = arr[0].match(/:(.*?);/)![1];
+    const bstr = atob(arr[1]);
+
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n > 0) {
+        n -= 1;
         u8arr[n] = bstr.charCodeAt(n);
     }
+
     return new Blob([u8arr], { type: mime });
-};
+}
 
 /**
  * convert Blob to Data URL - https://gist.github.com/wuchengwei/b7e1820d39445f431aeaa9c786753d8e
- *
- * @param { Blob }
- *
- * @returns { DataURL }
+ * @param blob - the blob to convert
+ * @returns dataURL
  */
-export const blobToDataURL = async (blob) => {
-    return new Promise((resolve, reject) => {
+export async function blobToDataURL(blob: Blob): Promise<string> {
+    return new Promise((resolve) => {
         const fileReader = new FileReader();
-        fileReader.onload = () => {
-            resolve(fileReader.result);
+        fileReader.onload = (): void => {
+            resolve(fileReader.result as string);
         };
         fileReader.readAsDataURL(blob);
     });
-};
+}
 
 /**
  * Format bytes as human-readable text.
  * Modified from https://stackoverflow.com/questions/10420352/converting-file-size-in-bytes-to-human-readable-string/14919494
- *
- * @param { Number } bytes - Number of bytes.
- * @param { Number } dp - Number of decimal places to display.
- * @param { Boolean } si - True to use metric (SI) units, aka powers of 1000.
+ * @param $bytes - Number of bytes.
+ * @param dp - Number of decimal places to display.
+ * @param si - True to use metric (SI) units, aka powers of 1000.
  *                               False to use binary (IEC), aka powers of 1024.
- * @returns { String } - Formatted string.
+ * @returns - Formatted string.
  */
-export const humanFileSize = (bytes, dp = 2, si = false) => {
+export function humanFileSize($bytes: number | string, dp: number = 2, si: boolean = false): string {
     const thresh = si ? 1000 : 1024;
 
     // Return input if it is not numeric
-    if (isNaN(bytes)) {
-        return bytes;
+    if (Number.isNaN(Number($bytes))) {
+        return $bytes.toString();
     }
 
-    bytes = parseFloat(bytes);
+    let bytes = parseFloat($bytes.toString());
 
     let selectedUnit = "B";
 
@@ -120,37 +110,34 @@ export const humanFileSize = (bytes, dp = 2, si = false) => {
 
         do {
             bytes /= thresh;
-            ++u;
+            u += 1;
         } while (Math.round(Math.abs(bytes) * r) / r >= thresh && u < units.length - 1);
 
         selectedUnit = units[u];
     }
 
-    return parseFloat(bytes.toFixed(dp)).toString() + " " + selectedUnit;
-};
+    return `${parseFloat(bytes.toFixed(dp)).toString()} ${selectedUnit}`;
+}
 
 /**
  * Returns the HTML of a given URL
- *
- * @param { string } url - address for the HTML to fetch
- * @return { string } the resulting HTML string fragment
+ * @param url - address for the HTML to fetch
+ * @returns the resulting HTML string fragment
  */
-export async function fetchHtmlAsText(url) {
-    return await (await fetch(url)).text();
+export async function fetchHtmlAsText(url: string): Promise<string> {
+    return (await fetch(url)).text();
 }
 
 /**
  * Strip file extension
- *
- * @param { string } url - address for the HTML to fetch
- * @return { string } the resulting HTML string fragment
+ * @param filename - the filename to process
+ * @returns the filename without its extension
  */
-export function getWithoutExtension(filename) {
-    let lastDotIndex = filename.lastIndexOf(".");
+export function getWithoutExtension(filename: string): string {
+    const lastDotIndex = filename.lastIndexOf(".");
     if (lastDotIndex === -1) {
         // Filename has no extension
         return filename;
-    } else {
-        return filename.slice(0, lastDotIndex);
     }
+    return filename.slice(0, lastDotIndex);
 }
