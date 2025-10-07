@@ -17,8 +17,30 @@
 
                 <div class="row">
                     <div class="small-12 columns">
-                        <label class="required">Authentication Host</label>
-                        <input type="text" class='required suds-crypto' name="dsn[veracross][authhost]" value="{{ authhost ?? 'https://accounts.veracross.com'}}" />
+                        <label class="required" for="veracross-authhost">Authentication Host</label>
+
+                        <select id="veracross-authhost" name="dsn[veracross][authhost]">
+                            {% set opts = [
+                                {
+                                    'name': 'Global',
+                                    'value': 'https://accounts.veracross.com'
+                                },
+                                {
+                                    'name': 'Australia',
+                                    'value': 'https://accounts.veracross.au'
+                                },
+                            ] %}
+
+                            {% for opt in opts %}
+                                {% set selected = '' %}
+
+                                {% if opt.value == (authhost ?? false) %}
+                                    {% set selected = 'selected="selected"' %}
+                                {% endif %}
+
+                                <option value="{{ opt.value }}" {{ selected }}>{{ opt.name }}</option>
+                            {% endfor %}
+                        </select>
                     </div>
                     <div class="small-12 columns">
                         <label class="required">School Route</label>
