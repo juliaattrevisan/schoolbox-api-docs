@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\OpenAi\Agent;
 
+use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\OpenAi\IAgent;
 use Schoolbox\OpenAi\IClient;
 
@@ -122,6 +123,7 @@ class ImageGeneration implements IAgent
      * Generate an image from the payload.
      *
      * @param T $payload
+     * @throws ClientExceptionInterface if HTTP request fails
      */
     public function request(array $payload): array
     {
@@ -136,7 +138,7 @@ class ImageGeneration implements IAgent
      * Streams an image generation payload.
      *
      * @param T $payload
-     * @return iterable
+     * @throws ClientExceptionInterface if HTTP request fails
      */
     public function requestStream(array $payload): iterable
     {
@@ -147,6 +149,12 @@ class ImageGeneration implements IAgent
         );
     }
 
+    /**
+     * Augment a base payload with the extra fields required by the AI provider.
+     *
+     * @param array $basePayload
+     * @return array
+     */
     private function augmentPayload(array $basePayload): array
     {
         /* See https://platform.openai.com/docs/api-reference/responses/create */
