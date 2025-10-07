@@ -43,6 +43,8 @@ async function openImageLightbox(file: GalleryFile): Promise<void> {
     });
     lightbox.openGallery();
 }
+
+defineExpose({ openImageLightbox });
 </script>
 
 <template>

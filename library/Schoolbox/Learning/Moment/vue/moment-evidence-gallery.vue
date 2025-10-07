@@ -15,6 +15,8 @@ const props = withDefaults(defineProps<Props>(), {
     dataTest: "learning-moment-evidence",
 });
 
+const imgGalleryEl = window.Vue.useTemplateRef<InstanceType<typeof ImgGallery>>("imgGalleryRef");
+
 /**
  * show the first image, video, or audio to show as the featured media,
  * any other evidence will show in the galleries
@@ -37,12 +39,49 @@ const fileGridEvidence = window.Vue.computed(() => {
         .filter((file) => file !== featuredEvidence.value)
         .filter((file) => !imageGalleryEvidence.value.map((i) => i.storage).includes(file.storage));
 });
+
+/**
+ * @returns Whether the featured evidence can be clicked to open the lightbox (i.e. it's an image in the gallery)
+ */
+const canOpenFeaturedEvidenceLightbox = window.Vue.computed(() => {
+    if (!featuredEvidence.value) {
+        return false; // no featured evidence
+    }
+
+    if (!imageGalleryEvidence.value.map((i) => i.storage).includes(featuredEvidence.value.storage)) {
+        return false; // the featured evidence isn't in the gallery
+    }
+
+    return true;
+});
+
+/**
+ * When the user clicks on the featured evidence
+ */
+function onFeaturedEvidenceClick(): void {
+    if (!canOpenFeaturedEvidenceLightbox.value) {
+        return; // not clickable
+    }
+
+    if (!featuredEvidence.value) {
+        throw new Error("No featured evidence to open");
+    }
+
+    if (!imgGalleryEl.value) {
+        throw new Error("Image gallery ref not set");
+    }
+
+    imgGalleryEl.value.openImageLightbox(featuredEvidence.value);
+}
 </script>
 
 <template>
     <!-- Show the first evidence item as the featured media, any other evidence will show in the gallery -->
-    <!-- TODO: preview on click -->
-    <article v-if="featuredEvidence">
+    <article
+        v-if="featuredEvidence"
+        :style="{ cursor: canOpenFeaturedEvidenceLightbox ? 'pointer' : undefined }"
+        @click="onFeaturedEvidenceClick"
+    >
         <storage-object
             :storage="featuredEvidence.storage"
             :filename="featuredEvidence.filename"
@@ -50,7 +89,13 @@ const fileGridEvidence = window.Vue.computed(() => {
         />
     </article>
 
-    <img-gallery v-if="imageGalleryEvidence.length > 0" :id="props.id" :files="imageGalleryEvidence" />
+    <img-gallery
+        v-if="imageGalleryEvidence.length > 0"
+        :id="props.id"
+        ref="imgGalleryRef"
+        :files="imageGalleryEvidence"
+    />
+
     <file-grid v-if="fileGridEvidence.length > 0" :id="props.id" :files="fileGridEvidence" class="l-mar-m--top" />
 </template>
 
