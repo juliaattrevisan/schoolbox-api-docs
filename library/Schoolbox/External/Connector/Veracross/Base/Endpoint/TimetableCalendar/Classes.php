@@ -144,58 +144,24 @@ class Classes implements IStrategy
          *
          * Otherwise, don't apply a person_id limiter on the enrolments.
          */
-        $this->log->debug(sprintf('Prefetching enrolments...'));
-
-        $lookupStart = microtime(true);
-        $enrolmentsLookup = (new Enrolments($this->api, $this->watchlist))->generate();
-        $lookupEnd = microtime(true);
-
-        $this->log->debug(sprintf(
-            'Prefetching enrolments took %s seconds',
-            number_format($lookupEnd - $lookupStart, 2)
-        ));
-
-        $this->log->debug('');
+        $enrolmentsLookup = (new Enrolments($this->api, $this->watchlist, $this->log))->generate();
 
         /* Once you have all the enrolments, find all the internal_class_id values.
          * Use these internal_class_id to prefilter classes:list to the ones we need.
          *
          * This results in a list of classes that are relevant to the enrolments we prefetched.
          */
-        $this->log->debug(sprintf('Prefetching classes...'));
-
-        $lookupStart = microtime(true);
-        $classesLookup = (new ClassIndex($this->api, $this->watchlist, $enrolmentsLookup))->generate();
-        $lookupEnd = microtime(true);
-
-        $this->log->debug(sprintf(
-            'Prefetching classes took %s seconds',
-            number_format($lookupEnd - $lookupStart, 2)
-        ));
-
-        $this->log->debug('');
+        $classesLookup = (new ClassIndex($this->api, $this->watchlist, $enrolmentsLookup, $this->log))->generate();
 
         /* Each class needs its meeting times which we can obtain with academics.classes.meeting_times:list
          * and precompile that into each class.
-         */
-        $this->log->debug(sprintf('Prefetching meeting times...'));
-
-        $lookupStart = microtime(true);
-
-        /* Only get meeting times between these two dates
+         *
+         * Only get meeting times between these two dates
          */
         $startDate = $this->fromDate->getDatabaseDate();
         $endDate = $this->toDate->getDatabaseDate();
 
-        $meetingTimesLookup = (new MeetingTimes($this->api, array_keys($classesLookup)))->generate($startDate, $endDate);
-        $lookupEnd = microtime(true);
-
-        $this->log->debug(sprintf(
-            'Prefetching meeting times took %s seconds',
-            number_format($lookupEnd - $lookupStart, 2)
-        ));
-
-        $this->log->debug('');
+        $meetingTimesLookup = (new MeetingTimes($this->api, array_keys($classesLookup), $this->log))->generate($startDate, $endDate);
 
         /* At the end of all this you should have a:
          *   - a lookup of enrolments which tells you a person and the internal_class_ids they're in

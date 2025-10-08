@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup;
 
+use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\TimetableCalendar\Classes;
 
@@ -31,9 +32,14 @@ class ClassIndex
      * @param IApi $api
      * @param array $watchlist
      * @param array $enrolmentsLookup
+     * @param LoggerInterface $log
      */
-    public function __construct(private IApi $api, private array $watchlist, private array $enrolmentsLookup)
-    {
+    public function __construct(
+        private IApi $api,
+        private array $watchlist,
+        private array $enrolmentsLookup,
+        private LoggerInterface $log
+    ) {
     }
 
 
@@ -44,6 +50,10 @@ class ClassIndex
      */
     public function generate(): array
     {
+        $this->log->debug('Prefetching classes...');
+
+        $start = microtime(true);
+
         /* If we generated this lookup previously, just recycle it
          */
         if (null === $this->lookup) {
@@ -98,6 +108,15 @@ class ClassIndex
                 }
             }
         }
+
+        $end = microtime(true);
+
+        $this->log->debug(sprintf(
+            'Prefetching classes took %s seconds',
+            number_format($end - $start, 2)
+        ));
+
+        $this->log->debug('');
 
         return $this->lookup;
     }
