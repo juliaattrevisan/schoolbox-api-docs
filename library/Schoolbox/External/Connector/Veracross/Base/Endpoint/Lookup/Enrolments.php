@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @copyright   Copyright 2023, Schoolbox Pty Ltd
+ * @copyright   Copyright 2025, Schoolbox Pty Ltd
  * @link        https://schoolbox.com.au/
  */
 
@@ -14,7 +14,7 @@ use Schoolbox\External\Connector\Veracross\Base\Endpoint\TimetableCalendar\Class
 use Schoolbox\External\Connector\Watchlist;
 
 /**
- * Grab all the Classes everywhere
+ * Grab all the Enrolments everywhere
  */
 class Enrolments
 {

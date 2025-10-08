@@ -19,6 +19,7 @@ use Schoolbox\External\Connector\Veracross\Base\Endpoint\Factory;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\ClassIndex;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Enrolments;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\MeetingTimes;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Users;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Event\Mapper;
@@ -156,7 +157,7 @@ class Classes implements IStrategy
         /* Each class needs its meeting times which we can obtain with academics.classes.meeting_times:list
          * and precompile that into each class.
          */
-
+        $meetingTimesLookup = (new MeetingTimes($this->api, array_keys($classesLookup)))->generate($this->fromDate->getDatabaseDate(), $this->toDate->getDatabaseDate());
 
         /* At the end of all this you should have a:
          *   - a lookup of enrolments which tells you a person and the internal_class_ids they're in
@@ -165,6 +166,7 @@ class Classes implements IStrategy
          * ...which should allow you to craft the entire timetable for every relevant person
          * without needing api spam to veracross
          */
+
 
 
 
