@@ -11,9 +11,10 @@ export default class Files {
 
     static readonly ELEMENT_FILE_DESCRIPTION_TEXTBOX = "#comment";
 
-    static readonly FILE_TILE_TITLE_TRANSLUCENT = 'div.translucent h3:has-text("{fileTitle}")';
+    static readonly FILE_TILE_TITLE_TRANSLUCENT = 'div.translucent a[data-plugin="preview"][title="{fileTitle}"] h3';
 
-    static readonly FILE_TILE_TITLE_NONTRANSLUCENT = 'div h3:has-text("{fileTitle}")';
+    static readonly FILE_TILE_TITLE_NONTRANSLUCENT =
+        'div:not(.translucent) a[data-plugin="preview"][title="{fileTitle}"] h3';
 
     static readonly ELEMENT_POST_FILE_BUTTON = 'input[value="Post File"]';
 
@@ -23,7 +24,7 @@ export default class Files {
 
     static readonly ELEMENT_FILE_ITEM = 'a[title="Abby"]';
 
-    static readonly ELEMENT_PREVIEW_FILES = '.action-list li a[data-plugin="preview"] h3';
+    static readonly ELEMENT_PREVIEW_FILES = '[data-test^="file-component-title-"]';
 
     static readonly ELEMENT_FILE_VISIBILITY_CHECKBOX_INPUT = "#visible";
 
@@ -98,7 +99,6 @@ export default class Files {
         } else if (!expectedVisibility && actualVisibility) {
             await page.click(Files.ELEMENT_FILE_VISIBILITY_CHECKBOX_LABEL);
         }
-
         await page.click(Files.ELEMENT_POST_FILE_BUTTON);
     }
 
@@ -133,9 +133,8 @@ export default class Files {
      * @returns Array of file titles.
      */
     public static async getAllFiles(filesComponent: Locator): Promise<string[]> {
-        const filesLocator = filesComponent.locator(Files.ELEMENT_PREVIEW_FILES);
-        const fileTexts = await filesLocator.allTextContents();
-        return fileTexts;
+        const fileTexts = await filesComponent.locator(Files.ELEMENT_PREVIEW_FILES).allTextContents();
+        return fileTexts.map((text) => text.trim());
     }
 
     /**

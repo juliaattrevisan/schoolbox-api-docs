@@ -156,7 +156,7 @@ test.describe("Links Component Tests", () => {
 
     test.afterAll(async ({ baseTester, db, api }) => {
         baseTester.isGoingTo("clean up: remove Links component and soft-delete created link rows");
-        await db.dontHaveInDatabase("link", { url: linkUrl });
+        await db.dontHaveInDatabase("link", { url: linkUrl, deleted_at: null });
         await api.deleteHomepageComponent(83, componentEnglishId);
         await api.deleteHomepageComponent(188, componentId);
     });
