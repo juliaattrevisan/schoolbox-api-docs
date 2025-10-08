@@ -322,7 +322,7 @@ window.Vue.watch(
     <div class="share-work-buttons l-grid l-gap-m l-mar-m--bottom">
         <a
             class="icon-camera share-photo"
-            title="Take a photo"
+            :title="canAddEvidence ? 'Take a photo' : `You can only add up to ${MOMENT_MAX_EVIDENCE} evidence`"
             :disabled="(MediaType.PHOTO === mediaType && !hasRecordedData) || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.PHOTO)"
         >
@@ -330,7 +330,7 @@ window.Vue.watch(
         </a>
         <a
             class="icon-video share-video"
-            title="Record a video"
+            :title="canAddEvidence ? 'Record a video' : `You can only add up to ${MOMENT_MAX_EVIDENCE} evidence`"
             :disabled="(MediaType.VIDEO === mediaType && !hasRecordedData) || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.VIDEO)"
         >
@@ -338,7 +338,7 @@ window.Vue.watch(
         </a>
         <a
             class="icon-audio share-audio"
-            title="Record audio"
+            :title="canAddEvidence ? 'Record audio' : `You can only add up to ${MOMENT_MAX_EVIDENCE} evidence`"
             :disabled="(MediaType.AUDIO === mediaType && !hasRecordedData) || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.AUDIO)"
         >
@@ -346,7 +346,7 @@ window.Vue.watch(
         </a>
         <a
             class="icon-upload share-file"
-            title="Upload file"
+            :title="canAddEvidence ? 'Upload file' : `You can only add up to ${MOMENT_MAX_EVIDENCE} evidence`"
             :disabled="MediaType.UPLOAD === mediaType || !canAddEvidence || undefined"
             @click.prevent="changeMediaType(MediaType.UPLOAD)"
         >
