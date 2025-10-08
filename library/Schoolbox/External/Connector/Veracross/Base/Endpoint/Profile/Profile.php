@@ -345,7 +345,7 @@ class Profile implements IStrategy
 
                 /* Alerts
                  */
-                $comments = '';
+                $comments = $alertLookup[$externalId]['academic_alert'] ?? null;
 
                 /* TODO Find out how a split family is represented in pilot school
                  *
@@ -354,17 +354,10 @@ class Profile implements IStrategy
                  * The relationships lookup specifically filters to legal_custody 1
                  * so anyone appearing here is legally allowed to do so
                  */
-                $legal = '';
+                $legal = $alertLookup[$externalId]['family_alert'] ?? null;
 
-                /* This student might not have any meaningful medical records
-                 */
-                $medical = null;
-
-                if (isset($medicalLookup[$student['id']])) {
-                    $medical = 'This student has medical conditions.';
-                }
-
-                $messages = '';
+                $medical = $alertLookup[$externalId]['medical_alert'] ?? null;
+                $messages = $alertLookup[$externalId]['general_alert'] ?? null;
 
                 /* From Thad, 7/2/23:
                  *     "In the U.S., an Advisor is typically a faculty or staff member who meets with
