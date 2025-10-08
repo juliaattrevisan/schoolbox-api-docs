@@ -50,19 +50,16 @@ class Alert
             $this->lookup = [];
             $watchlist = new Watchlist();
 
-            /* Rebuild lookups on each page
-             */
-            $lookupConverter = new ValueListConverter();
-
             $generator = $this->api->retrieve('GET', 'academics/student_alerts', Profile::SCOPE);
 
             foreach ($generator as $page) {
-                $valueLists = $lookupConverter->generate($page['value_lists']);
-
                 /* Avengers Assemble!
                  */
                 foreach ($page['data'] as $record) {
-                    $externalId = trim((string)$record['person_id']);
+                    /* omg why couldn't they have called this person_id instead...
+                     * that's what id allegedly means
+                     */
+                    $externalId = trim((string)$record['id']);
 
                     /* Only import for specific users
                      */
@@ -70,9 +67,17 @@ class Alert
                         continue;
                     }
 
-                    print_r($record);
-
-                    $this->lookup[$externalId] = false;
+                    /* Record is a 4-tuple whose array nodes *should* all exist
+                     * but sometimes they're empty/null. Note that these are multiline
+                     * strings, not just one sentence.
+                     *
+                            [id] => 40622
+                            [family_alert] =>
+                            [medical_alert] =>
+                            [general_alert] =>
+                            [academic_alert] =>
+                     */
+                    $this->lookup[$externalId] = $record;
                 }
             }
         }
