@@ -305,15 +305,7 @@ class Controller extends Base
                     'previousResponseId' => $this->requestPost->get('previousResponseId') ?? null,
                 ]);
 
-                // TODO move this to a helper
-                header('Content-Type: text/event-stream');
-                header('Cache-Control: no-cache');
-                header('Connection: keep-alive');
-                header('Content-Encoding: none');
-                foreach ($response as $event) {
-                    echo $event . "\n\n";
-                }
-                $this->response = $this->responseEmpty(HttpResponse::HTTP_OK);
+                $this->response = $this->responseFromEventStream($response);
                 return;
 
                 // TODO also output a list of known shape arrays when streaming

@@ -776,6 +776,29 @@ abstract class Base
     }
 
     /**
+     * Shortcut method for building an event stream response.
+     *
+     * @param iterable $events
+     * @param int      $statusCode
+     * @return ResponseInterface
+     */
+    protected function responseFromEventStream(
+        iterable $events,
+        int $statusCode = HttpResponse::HTTP_OK,
+    ): ResponseInterface {
+        // These headers must be output before a response object is created, so
+        // the client knows this is an event stream before the stream is output.
+        header('Content-Type: text/event-stream');
+        header('Cache-Control: no-cache');
+        header('Connection: keep-alive');
+        header('Content-Encoding: none');
+        foreach ($events as $event) {
+            echo $event . "\n\n";
+        }
+        return $this->responseEmpty($statusCode);
+    }
+
+    /**
      * Convenience method for building a response, depending on what the request
      * specifies it accepts.
      * - JSON requests (accept: application/json) will have a JSON request made
