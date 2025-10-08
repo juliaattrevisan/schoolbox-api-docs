@@ -661,22 +661,6 @@ class Controller extends Base
 
 
     /**
-     * Find out if there any comments related to this learning moment
-     * Finding at least one comment means there's stuff to delete here
-     *
-     * @param Model $evidence
-     * @return bool
-     */
-    private function hasComments(Model $evidence): bool
-    {
-        $translator = $this->buildTranslatorWithComments(1);
-        $item = $translator($evidence);
-
-        return (bool)\count($item['discussionThread']['children']['data'] ?? []);
-    }
-
-
-    /**
      * Builds a translator which contains comments.
      *
      * @param int $commentLimit
@@ -1244,10 +1228,10 @@ class Controller extends Base
                     'displayAs' => $moment->getUpdatedAt()->getShortDateOnly(),
                     'rfc' => $moment->getUpdatedAt()->toRfc3339String(),
                 ],
-                /* Whether this moment had comments or not, which affects a user interaction
-                 * where they have an opportunity to delete comments upon approval
+                /* The discussion thread, if any, to determine if there are comments,
+                 * which affects a user interaction where they have an opportunity to delete comments upon approval
                  */
-                'hasComments' => $this->hasComments($moment),
+                'discussionThread' => $momentTranslated['discussionThread'],
                 /* The current state of the learning moment
                  */
                 'currentState' => $moment->getCurrentState(),

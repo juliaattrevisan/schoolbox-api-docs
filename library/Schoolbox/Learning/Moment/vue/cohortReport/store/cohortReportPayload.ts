@@ -5,7 +5,7 @@ import type { EvidenceStatus, LearningMoment } from "@schoolboxLearningMomentEvi
 
 export type CohortReportEntry = Pick<
     LearningMoment,
-    "id" | "body" | "currentState" | "evidence" | "tags" | "_links" | "_labels"
+    "id" | "body" | "currentState" | "evidence" | "discussionThread" | "tags" | "_links" | "_labels"
 > & {
     blurb: string;
     showReadMore: boolean;
@@ -19,7 +19,6 @@ export type CohortReportEntry = Pick<
         timestamp: number;
         displayAs: string;
     };
-    hasComments: boolean;
 };
 
 export type CohortReportApiPayload = {
