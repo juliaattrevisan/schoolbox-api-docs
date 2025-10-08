@@ -35,6 +35,16 @@ interface Props {
      */
     autoUploadToStorage?: boolean;
     /**
+     * Should this allow multiple files to be selected?
+     * If a number is specified, that is the maximum number of files that can be selected
+     */
+    multiple?: number;
+    /**
+     * The actual length of the files that are already uploaded/selected
+     * This is used if the parent removes files, but the multiple limit should still apply based on a different factor
+     */
+    actualFilesLength?: number;
+    /**
      * Handler for the File object when a file is selected
      * @param file - The file object
      * @returns Whether the file should be considered as valid or not, return a string to specify an error message
@@ -43,54 +53,46 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    placeholder: "Click or drag here to attach a file",
+    placeholder: undefined,
     accept: "*/*",
     class: "l-mar-s--bottom",
     inputName: undefined,
     required: false,
     disabled: false,
     autoUploadToStorage: false,
+    multiple: undefined,
+    actualFilesLength: undefined,
     fileHandler: () => true,
 });
 
+const emit = defineEmits<{ (e: "file-uploaded", file: FileDropFile): void }>();
+
 const currentFile = defineModel<FileDropFile | null>("currentFile", { default: null });
+const currentFiles = defineModel<FileDropFile[]>("currentFiles", { default: [] });
 
 const { reset, open, onChange, onCancel } = useFileDialog({
     accept: props.accept,
-    multiple: false,
+    multiple: !!props.multiple,
 });
 
-const inputEl = window.Vue.useTemplateRef<HTMLInputElement>("inputRef");
-
-/**
- * Keep the hidden input in sync with currentFile
- */
-window.Vue.watch(
-    currentFile,
-    (file) => {
-        if (inputEl.value === null) {
-            return;
-        }
-
-        // no file? clear it
-        if (file === null || file.error !== false) {
-            inputEl.value.value = "";
-            inputEl.value.files = null;
-            return;
-        }
-
-        // otherwise, set the file
-        const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file.file);
-        inputEl.value.files = dataTransfer.files;
-    },
-    { immediate: true },
-);
+const filesList = window.Vue.computed<FileDropFile[]>(() => {
+    if (props.multiple) {
+        return currentFiles.value;
+    }
+    if (currentFile.value === null) {
+        return [];
+    }
+    return [currentFile.value];
+});
 
 /**
  * When the file import is cancelled
  */
 function handleCancel(): void {
+    while (currentFiles.value.pop()) {
+        // remove all files without changing the reference
+    }
+
     currentFile.value = null;
 }
 
@@ -101,6 +103,8 @@ function handleClick(): void {
     reset();
     open();
 }
+
+const uploadingFiles = window.Vue.ref<FileDropFile[]>([]);
 
 /**
  * When the File is loaded
@@ -114,7 +118,54 @@ async function handleLoad(file: FileDropFile): Promise<void> {
         file.error = result || "Invalid file";
     }
 
+    currentFiles.value.push(file);
     currentFile.value = file;
+
+    if (props.autoUploadToStorage && !file.storageHash) {
+        // If the file is valid, we can upload it
+        uploadingFiles.value.push(file);
+        const resource = await uploadFileToStorage(file.file);
+        uploadingFiles.value = uploadingFiles.value.filter((f) => f !== file);
+
+        if (resource.success === false) {
+            let errorMessage = resource.message || "Failed to upload file";
+
+            // Try to pull the message from the response if available
+            if (
+                typeof resource.data === "object" &&
+                resource.data !== null &&
+                "message" in resource.data &&
+                typeof resource.data.message === "string"
+            ) {
+                errorMessage = resource.data.message || errorMessage;
+            }
+
+            file.error = errorMessage;
+            return;
+        }
+
+        file.storageHash = resource.data.hash;
+        file.storageFile = resource.data.meta.file;
+
+        emit("file-uploaded", file);
+    }
+}
+
+/**
+ * When the user removes a file
+ * @param file - The file to remove
+ */
+function handleRemove(file: FileDropFile): void {
+    if (props.disabled) {
+        return; // don't allow removing if disabled
+    }
+
+    const index = currentFiles.value.indexOf(file);
+    if (index !== -1) {
+        currentFiles.value.splice(index, 1);
+    }
+
+    currentFile.value = null;
 }
 
 /**
@@ -127,18 +178,32 @@ function handleFiles(files: FileList | null): void {
         return;
     }
 
-    const file = { file: files[0], error: false } as const;
+    let filesAdded = 0;
+    [...files].forEach((fileListFile) => {
+        const file = { file: fileListFile, error: false } as const;
 
-    // Is the file the right type?
-    if (props.accept !== "*/*" && !window.Dropzone.isValidFile(file.file, props.accept)) {
-        currentFile.value = {
-            ...file,
-            error: "You can't upload files of this type.",
-        };
-        return;
-    }
+        // Is the file the right type?
+        if (props.accept !== "*/*" && !window.Dropzone.isValidFile(file.file, props.accept)) {
+            currentFile.value = {
+                ...file,
+                error: "You can't upload files of this type.",
+            };
 
-    void handleLoad(file);
+            currentFiles.value.push({ ...currentFile.value });
+            return;
+        }
+
+        filesAdded += 1;
+        if (props.multiple && filesAdded > props.multiple - (props.actualFilesLength || currentFiles.value.length)) {
+            currentFiles.value.push({
+                ...file,
+                error: `You can only upload up to ${props.multiple} files.`,
+            });
+            return;
+        }
+
+        void handleLoad(file);
+    });
 }
 
 onChange(handleFiles);
@@ -169,60 +234,27 @@ function handleDrop(event: DragEvent): void {
     if (!event.dataTransfer) return;
     handleFiles(event.dataTransfer.files);
 }
-
-const isUploading = window.Vue.ref(false);
-
-/**
- * Automatically upload a file to storage when it is uploaded successfully
- */
-window.Vue.watch(currentFile, async (file) => {
-    if (file === null || file.error !== false) {
-        return;
-    }
-
-    if (props.autoUploadToStorage === false || file.storageHash) {
-        return; // don't auto upload, or file is already uploaded - nothing to do
-    }
-
-    // If the file is valid, we can upload it
-    isUploading.value = true;
-    const resource = await uploadFileToStorage(file.file);
-    isUploading.value = false;
-
-    if (resource.success === false) {
-        let errorMessage = resource.message || "Failed to upload file";
-
-        // Try to pull the message from the response if available
-        if (
-            typeof resource.data === "object" &&
-            resource.data !== null &&
-            "message" in resource.data &&
-            typeof resource.data.message === "string"
-        ) {
-            errorMessage = resource.data.message || errorMessage;
-        }
-
-        file.error = errorMessage;
-        return;
-    }
-
-    file.storageHash = resource.data.hash;
-    file.storageFile = resource.data.meta.file;
-});
 </script>
 
 <template>
     <div>
-        <div v-if="currentFile" class="ab-upload ab-upload-panel" :class="props.class">
-            <div class="dzone dz-clickable dz-started" style="border: 0">
-                <file-drop-preview
-                    :file="currentFile"
-                    :disabled="props.disabled"
-                    :is-uploading="isUploading"
-                    @remove="currentFile = null"
-                />
+        <template v-if="filesList.length > 0">
+            <div
+                v-for="(file, index) in filesList"
+                :key="`${index}-${file.storageHash}`"
+                class="ab-upload ab-upload-panel"
+                :class="props.class"
+            >
+                <div class="dzone dz-clickable dz-started" style="border: 0">
+                    <file-drop-preview
+                        :file="file"
+                        :disabled="props.disabled"
+                        :is-uploading="uploadingFiles.includes(file)"
+                        @remove="() => handleRemove(file)"
+                    />
+                </div>
             </div>
-        </div>
+        </template>
 
         <label
             v-else
@@ -237,7 +269,9 @@ window.Vue.watch(currentFile, async (file) => {
             @dragend="isOverDropZone = false"
         >
             <div class="dzone icon-attach">
-                <span>{{ props.placeholder }}</span>
+                <span>
+                    {{ props.placeholder || `Click or drag here to attach ${props.multiple ? "files" : "a file"}` }}
+                </span>
             </div>
         </label>
 
@@ -247,6 +281,7 @@ window.Vue.watch(currentFile, async (file) => {
             ref="inputRef"
             type="file"
             :accept="props.accept"
+            :multiple="!!props.multiple || undefined"
             :name="props.inputName"
             :required="props.required || undefined"
             autocomplete="off"

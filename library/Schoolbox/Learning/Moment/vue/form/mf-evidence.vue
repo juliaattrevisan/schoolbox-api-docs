@@ -36,7 +36,7 @@ const mediaRecordingTypes = [MediaType.VIDEO, MediaType.AUDIO, MediaType.PHOTO];
 const mediaRecordingEl = window.Vue.useTemplateRef<InstanceType<typeof EvidenceMediaRecording>>("mediaRecordingRef");
 
 const mediaType = window.Vue.ref<MediaType | null>(null);
-const currentFileDropFile = window.Vue.ref<FileDropFile | null>(null);
+const currentFileDropFiles = window.Vue.ref<FileDropFile[]>([]);
 
 const canAddEvidence = window.Vue.computed(() => {
     if (!mfStore.moment) return false;
@@ -245,27 +245,32 @@ const showDescriptionEditor = window.Vue.computed(() => {
 /**
  * When a file is uploaded, force it to fully upload and add it to the evidence list
  * TODO: this probably shouldn't be the way we do this, but speeeeeeeeed
+ * @param file - The file that was uploaded
  */
-window.Vue.watch(
-    () => currentFileDropFile.value?.storageHash,
-    () => {
-        if (!mfStore.moment) {
-            return;
-        }
+function onFileDropFileUploaded(file: FileDropFile): void {
+    if (!mfStore.moment) {
+        return;
+    }
 
-        if (!currentFileDropFile.value?.storageHash || !currentFileDropFile.value.storageFile) {
-            return; // not yet uploaded
-        }
+    if (!file.storageHash || !file.storageFile) {
+        return; // not yet uploaded
+    }
 
-        mfStore.moment.evidence.push({
-            storage: currentFileDropFile.value.storageFile,
-            filename: currentFileDropFile.value.file.name,
-        });
+    mfStore.moment.evidence.push({
+        storage: file.storageFile,
+        filename: file.file.name,
+    });
 
-        currentFileDropFile.value = null;
+    // remove from the list so we don't add it again
+    const index = currentFileDropFiles.value.indexOf(file);
+    if (index !== -1) {
+        currentFileDropFiles.value.splice(index, 1);
+    }
+
+    if (currentFileDropFiles.value.length === 0) {
         onEvidenceUploaded();
-    },
-);
+    }
+}
 
 /**
  * Watch for changes to the moment body.
@@ -349,7 +354,14 @@ window.Vue.watch(
         <div v-else-if="mediaType === MediaType.UPLOAD">
             <label for="mf-evidence-file-drop" :class="{ required: isEvidenceRequired }"> Upload File </label>
             <!-- TODO for speed reasons i've used this, but it should be a proper file input... that's a bit more complex atm -->
-            <file-drop id="mf-evidence-file-drop" v-model:current-file="currentFileDropFile" auto-upload-to-storage />
+            <file-drop
+                id="mf-evidence-file-drop"
+                v-model:current-files="currentFileDropFiles"
+                auto-upload-to-storage
+                :multiple="MOMENT_MAX_EVIDENCE"
+                :actual-files-length="(mfStore.moment?.evidence.length || 0) + currentFileDropFiles.length"
+                @file-uploaded="onFileDropFileUploaded"
+            />
         </div>
     </div>
 
