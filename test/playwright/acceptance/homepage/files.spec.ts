@@ -31,8 +31,8 @@ test.describe("Files Component Tests", () => {
         tester.isGoingTo("Add Files component");
         await homepage.addComponent(Homepage.ELEMENT_ADD_COMPONENT_SECTION_RESOURCES, "Files");
         filesComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
-        componentId = await Homepage.getComponentId(filesComponent);
-        tester.isGoingTo(`Use component: ${componentId}`);
+        componentEnglishId = await Homepage.getComponentId(filesComponent);
+        tester.isGoingTo(`Use component: ${componentEnglishId}`);
         await homepage.seeInComponentHeading("Files", Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
         tester.isGoingTo("Check the Three Files exists ");
         await Files.verifyFileTitle(filesComponent, "Glasses", false);
@@ -131,7 +131,7 @@ test.describe("Files Component Tests", () => {
         tester.isGoingTo("Add Files component");
         await homepage.addComponent(Homepage.ELEMENT_ADD_COMPONENT_SECTION_RESOURCES, "Files");
         filesComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
-        componentEnglishId = await Homepage.getComponentId(filesComponent);
+        componentId = await Homepage.getComponentId(filesComponent);
         tester.isGoingTo("Attach the existing Files from 9A English → English.");
         await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
         await Homepage.clickComponentSettings(filesComponent);
@@ -178,8 +178,9 @@ test.describe("Files Component Tests", () => {
 
     test.afterAll(async ({ baseTester, db, api }) => {
         baseTester.isGoingTo("clean up: remove Files component and soft-delete created file rows");
+
         await db.dontHaveInDatabase("file", { description: newFileTitle, deleted_at: null });
-        await api.deleteHomepageComponent(188, componentEnglishId);
-        await api.deleteHomepageComponent(83, componentId);
+        await api.deleteHomepageComponent(83, componentEnglishId);
+        await api.deleteHomepageComponent(188, componentId);
     });
 });
