@@ -41,6 +41,7 @@ function onAddSelected(): void {
                         <button
                             v-if="index > 0"
                             class="button button--icon-only icon-delete f-no-margins"
+                            type="button"
                             :disabled="addUnitsStore.newUnits.length === 1"
                             title="Delete"
                             aria-label="Delete"

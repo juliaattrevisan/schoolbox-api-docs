@@ -81,7 +81,7 @@ export const useAddUnitsStore = defineStore("unitPlannerAddUnits", () => {
             }
             const createdUnits = response.data;
             unitPlannerStore.units = [...unitPlannerStore.units, ...createdUnits];
-            toast.timeout({ text: `${locale.unit.translate(true, false)} successfully created` });
+            toast.timeout({ text: `${locale.unit.translate(newUnits.value.length > 1, true)} successfully created` });
             cancel();
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
