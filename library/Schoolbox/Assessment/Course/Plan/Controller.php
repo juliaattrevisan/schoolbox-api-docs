@@ -24,6 +24,7 @@ use Schoolbox\Assessment\Course\Config\Mapper as CourseConfigMapper;
 use Schoolbox\Collection;
 use Schoolbox\Curriculum\Component\CurriculumOverviewController;
 use Schoolbox\Curriculum\Node\Mapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Component\Homepage\Builder\Controller as CourseBuilderController;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
@@ -478,52 +479,11 @@ class Controller extends Base
 
         // create the new unit
         try {
-            // Need:
-            // base config
-            // course config
-            $rolePermissions = [];
+            $unitSpec = $this->createUnit($unitName, $course);
 
-            foreach ($this->courseConfigMapper->findByColumn('page', 'unit') as $courseConfig) {
-                $rolePermissions[$courseConfig->getRoleId()] = $courseConfig->getPermission();
-            }
-            /** @var \Schoolbox\Assessment\Course\Controller $courseController */
-            $courseController = $this->getController('course');
-
-            $folder = $courseController->persistFolder(
-                $unitName,
-                $course->getFolder()->getId(),
-                [],
-                (bool)$this->getConfigLoader()->get('course_builder_default_unit_page_inherit'),
-                $course->getTemplate()->getUnitTemplate()->getId(),
-                $rolePermissions,
-                false,
-                []
-            );
-
-            // Persist the unit too
-            $unitSpec = $this->unitSpecificationMapper->createModel()
-                ->setFolder($folder)
-                ->setCourse($course);
-
-            $this->unitSpecificationMapper->save($unitSpec);
-
-            // return json of that unit specifically with components identically as the unit planner unit payload (part payload)
-            [$curriculumTemplate, $curriculumKey, $curriculumDefId] = $this->getTemplateCurric($course->getTemplate()?->getUnitTemplate()->getId());
-            [$activityTemplate, $activityKey, $activityDefId] = $this->getTemplateCourseBuilder($course->getTemplate()?->getUnitTemplate()->getId());
-            // Textbox and curriculum def ID can be null for now:
-            // AFAICT this is unused
             $this->response = $this->responseAsJson(
-                $this->getUnitData(
-                    $unitSpec,
-                    $course->getTemplate()->getUnitTemplate()->getId(),
-                    $curriculumKey,
-                    $activityKey,
-                    null,
-                    $curriculumDefId,
-                    $activityDefId
-                )
-            )
-                ->withStatus(201);
+                $this->getTranslatedUnitData($unitSpec, $course)
+            )->withStatus(201);
         } catch (\Exception $e) {
             $problem = (new ApiProblem($e->getMessage()))
                 ->setStatus($e->getCode())
@@ -532,6 +492,115 @@ class Controller extends Base
                 ->withStatus($e->getCode());
             return;
         }
+    }
+
+    /**
+     * Bulk creating units for a course
+     *
+     * @param CourseSpecification $course
+     * @return void
+     * @api POST /course/plan/{courseID}/newUnits
+     */
+    public function newUnits(CourseSpecification $course): void
+    {
+        $post = $this->requestPost;
+        $names = $post->get('names');
+
+        /* If the names is not an array or is an empty array, return error
+         */
+        if (!is_array($names) || count($names) === 0) {
+            $problem = (new ApiProblem('Could not create units. You need to give at least one unit name'))
+                ->setStatus(400)
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus(400);
+            return; // exit early don't try to create a new unit with no name
+        }
+
+        $units = [];
+        try {
+            foreach ($names as $name) {
+                $newUnit = ($this->createUnit(trim($name ?? ''), $course));
+                $units[] = $this->getTranslatedUnitData($newUnit, $course);
+            }
+        } catch (\Exception $e) {
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus($e->getCode())
+                ->asArray();
+            $this->response = $this->responseAsJson($problem)
+                                   ->withStatus($e->getCode());
+            return;
+        }
+
+        $this->response = $this->responseAsJson($units);
+    }
+
+    /**
+     * @param string              $unitName
+     * @param CourseSpecification $course
+     * @return Model
+     * @throws Deleted
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function createUnit(string $unitName, CourseSpecification $course): Model
+    {
+        // Need:
+        // base config
+        // course config
+        $rolePermissions = [];
+
+        foreach ($this->courseConfigMapper->findByColumn('page', 'unit') as $courseConfig) {
+            $rolePermissions[$courseConfig->getRoleId()] = $courseConfig->getPermission();
+        }
+        /** @var \Schoolbox\Assessment\Course\Controller $courseController */
+        $courseController = $this->getController('course');
+
+        $folder = $courseController->persistFolder(
+            $unitName,
+            $course->getFolder()->getId(),
+            [],
+            (bool)$this->getConfigLoader()->get('course_builder_default_unit_page_inherit'),
+            $course->getTemplate()->getUnitTemplate()->getId(),
+            $rolePermissions,
+            false,
+            []
+        );
+
+        // Persist the unit too
+        $unitSpec = $this->unitSpecificationMapper
+            ->createModel()
+            ->setFolder($folder)
+            ->setCourse($course);
+
+        $this->unitSpecificationMapper->save($unitSpec);
+
+        return $unitSpec;
+    }
+
+    /**
+     * return json of that unit specifically with components identically as the unit planner unit payload (part payload)
+     *
+     * @param Model               $unitSpec
+     * @param CourseSpecification $course
+     * @return array
+     * @throws Deleted
+     * @throws NotFound
+     * @throws RouteNotFound
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function getTranslatedUnitData(Model $unitSpec, CourseSpecification $course): array
+    {
+        [$curriculumTemplate, $curriculumKey, $curriculumDefId] = $this->getTemplateCurric($course->getTemplate()?->getUnitTemplate()->getId());
+        [$activityTemplate, $activityKey, $activityDefId] = $this->getTemplateCourseBuilder($course->getTemplate()?->getUnitTemplate()->getId());
+        return $this->getUnitData(
+            $unitSpec,
+            $course->getTemplate()->getUnitTemplate()->getId(),
+            $curriculumKey,
+            $activityKey,
+            null,
+            $curriculumDefId,
+            $activityDefId
+        );
     }
 
     /**
