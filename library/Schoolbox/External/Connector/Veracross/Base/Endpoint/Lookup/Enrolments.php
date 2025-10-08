@@ -19,6 +19,25 @@ use Schoolbox\External\Connector\Watchlist;
 class Enrolments
 {
     /**
+     * Presume the Veracross class statuses cannot be mutated by schools
+     * These ints correspond to a human-readable value via a Value List
+     * that you get with each payload page.
+     *
+     * From the sandbox instance:
+     *     0: <None>
+     *     1: Active
+     *     2: Future
+     *     3: Completed
+     *     4: Canceled
+     *     5: On Hold
+     *
+     * TODO Currently unknown if schools can modify this value list
+     *  For now I have to presume immutability
+     */
+
+    private const CLASS_STATUS_ACTIVE = 1;
+
+    /**
      * Remember the output we might have previously generated
      *
      * @var array|null
@@ -60,7 +79,8 @@ class Enrolments
                  */
                 foreach ($this->watchlist as $externalId) {
                     $generator = $this->api->retrieve('GET', 'academics/enrollments', Classes::SCOPE, [
-                        'person_id' => $externalId
+                        'person_id' => $externalId,
+                        'class_status' => self::CLASS_STATUS_ACTIVE,
                     ]);
 
                     foreach ($generator as $page) {
@@ -75,7 +95,9 @@ class Enrolments
                 /* Otherwise just obtain all the enrolments.
                  * This is the main use case in the fleet.
                  */
-                $generator = $this->api->retrieve('GET', 'academics/enrollments', Classes::SCOPE);
+                $generator = $this->api->retrieve('GET', 'academics/enrollments', Classes::SCOPE, [
+                    'class_status' => self::CLASS_STATUS_ACTIVE,
+                ]);
 
                 foreach ($generator as $page) {
                     /* Avengers Assemble!

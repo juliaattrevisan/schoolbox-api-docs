@@ -157,6 +157,7 @@ class Classes implements IStrategy
          * and precompile that into each class.
          */
 
+
         /* At the end of all this you should have a:
          *   - a lookup of enrolments which tells you a person and the internal_class_ids they're in
          *   - a lookup of classes + their meeting times
