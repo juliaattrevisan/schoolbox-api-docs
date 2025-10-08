@@ -55,16 +55,6 @@ export const useAddUnitsStore = defineStore("unitPlannerAddUnits", () => {
     }
 
     /**
-     * Get the data to pass to the backend
-     * @returns the form data
-     */
-    function getFormData(): Record<string, unknown> {
-        return {
-            names: newUnits.value.filter((unit) => unit.trim() !== ""),
-        };
-    }
-
-    /**
      * pass the new unit details to the backend
      */
     async function create(): Promise<void> {
@@ -79,13 +69,15 @@ export const useAddUnitsStore = defineStore("unitPlannerAddUnits", () => {
             const response = await apiRequest<Unit[], Record<string, unknown>>({
                 url: `/course/plan/${unitPlannerStore.courseId}/newUnits`,
                 method: "POST",
-                body: getFormData(),
+                body: {
+                    names: newUnits.value.filter((unit) => unit.trim() !== ""),
+                },
             });
             if (!response.success) {
                 throw new Error(response.message || "Failed to create units");
             }
-            const newUnits = response.data;
-            unitPlannerStore.units = [...unitPlannerStore.units, ...newUnits];
+            const createdUnits = response.data;
+            unitPlannerStore.units = [...unitPlannerStore.units, ...createdUnits];
             toast.timeout({ text: "Units created successfully" });
             cancel();
         } catch (error) {
