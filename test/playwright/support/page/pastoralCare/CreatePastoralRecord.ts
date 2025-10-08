@@ -56,14 +56,14 @@ export default class CreatePastoralRecord {
      * click type dropdown
      */
     async clickTypeDropdown(): Promise<void> {
-        await this.page.click(CreatePastoralRecord.PASTORAL_TYPE);
+        await this.page.locator(CreatePastoralRecord.PASTORAL_TYPE).click();
     }
 
     /**
      * click subType dropdown
      */
     async clickSubTypeDropdown(): Promise<void> {
-        await this.page.click(CreatePastoralRecord.PASTORAL_SUB_TYPE);
+        await this.page.locator(CreatePastoralRecord.PASTORAL_SUB_TYPE).click();
     }
 
     /**
@@ -87,7 +87,7 @@ export default class CreatePastoralRecord {
      * @param visibilityTitle - The title of the visibility link
      */
     async clickVisibilityLink(visibilityTitle: string): Promise<void> {
-        await this.page.click(`a[title="Add ${visibilityTitle}"]`);
+        await this.page.locator(`a[title="Add ${visibilityTitle}"]`).click();
     }
 
     /**
@@ -95,7 +95,7 @@ export default class CreatePastoralRecord {
      * @param role  - The pastoral role for the pastoral record
      */
     async clickPastoralRole(role: string): Promise<void> {
-        await this.page.click(`li[data-role-name="${role}"]`);
+        await this.page.locator(`li[data-role-name="${role}"]`).click();
     }
 
     /**
