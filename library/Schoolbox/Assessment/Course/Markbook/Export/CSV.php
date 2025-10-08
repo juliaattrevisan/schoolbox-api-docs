@@ -252,8 +252,9 @@ class CSV extends AbstractCSV
         $suffix            = $isDraft ? self::DRAFT_SUFFIX : '';
         $humanReadableMark = $showDisplayMarks ? $mark['hr'] : $mark['hrInstructor'];
         if ($this->hasTotalMarkColumn($assessment, $showDisplayMarks)) {
-            $row[] = $this->parseNumerator($humanReadableMark) . $suffix;
-            $row[] = $this->parseDenominator($humanReadableMark) . $suffix;
+            [$numerator, $denominator] = $this->getFractionFromHumanReadable($humanReadableMark);
+            $row[] = $numerator . $suffix;
+            $row[] = $denominator . $suffix;
         } else {
             $row[] = $humanReadableMark . $suffix;
         }

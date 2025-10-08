@@ -23,6 +23,12 @@ use Schoolbox\User;
 class AbstractCSV
 {
     /**
+     * This should be used in situations where there is no data to
+     * export, but a blank string would be inappropriate or misleading.
+     */
+    protected const string NOT_APPLICABLE_PLACEHOLDER = '-';
+
+    /**
      * A suffix for all fields in the CSV which are a draft value, or are
      * calculated from values which contain one or more drafts values.
      */
@@ -148,12 +154,41 @@ class AbstractCSV
 
 
     /**
+     * Extracts via regex the numerator and denominator from a human readable mark.
+     *
+     * @param null|string $humanReadableMark
+     * @return array{null|string, null|string}
+     */
+    protected function getFractionFromHumanReadable(?string $humanReadableMark): array
+    {
+        if (empty($humanReadableMark)) {
+            $numerator = '';
+            $denominator = '';
+        } else {
+            $numerator = $this->parseNumerator($humanReadableMark);
+            $denominator = $this->parseDenominator($humanReadableMark);
+
+            if ($numerator === null || $denominator === null) {
+                // Either both numerator and denominator should be parseable, or both not.
+                // If we cannot parse both, the cause will be that the mark type of the assessment has changed after
+                // the mark was given.  In this situation do not attempt to convert the mark to a fraction.  Just export
+                // the human-readable mark as the numerator and a Not-Applicable placeholder as the denominator.
+                $numerator = $humanReadableMark;
+                $denominator = self::NOT_APPLICABLE_PLACEHOLDER;
+            }
+        }
+
+        return [$numerator, $denominator];
+    }
+
+
+    /**
      * Parse the denominator from a total mark
      *
      * @param null|string $humanReadableMark
      * @return null|string
      */
-    protected function parseDenominator(?string $humanReadableMark): ?string
+    private function parseDenominator(?string $humanReadableMark): ?string
     {
         if ($humanReadableMark && preg_match('/(\\d*\\.?\\d*)\\s*\\/\\s*(\\d*\\.?\\d*)/', $humanReadableMark, $markParts)) {
             return $markParts[2];
@@ -168,7 +203,7 @@ class AbstractCSV
      * @param null|string $humanReadableMark
      * @return null|string
      */
-    protected function parseNumerator(?string $humanReadableMark): ?string
+    private function parseNumerator(?string $humanReadableMark): ?string
     {
         if ($humanReadableMark && preg_match('/(\\d*\\.?\\d*)\\s*\\/\\s*(\\d*\\.?\\d*)/', $humanReadableMark, $markParts)) {
             return $markParts[1];

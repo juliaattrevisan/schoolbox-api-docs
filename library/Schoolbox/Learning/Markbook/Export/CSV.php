@@ -234,7 +234,7 @@ class CSV extends AbstractCSV
             && !$participants[$assessment->getId()][$userId]->isExcluded()
         ) {
             $participant = $participants[$assessment->getId()][$userId];
-            $suffix = null;
+            $suffix = '';
             $humanReadableMark = null;
             $normalisedMark = null;
             $comment = null;
@@ -303,8 +303,9 @@ class CSV extends AbstractCSV
 
             if ($dataFound) {
                 if ($this->hasTotalMarkColumn($assessment, $showDisplayMarks)) {
-                    $row[] = $humanReadableMark == '' ? '' : $this->parseNumerator($humanReadableMark) . $suffix;
-                    $row[] = $humanReadableMark == '' ? '' : $this->parseDenominator($humanReadableMark) . $suffix;
+                    [$numerator, $denominator] = $this->getFractionFromHumanReadable($humanReadableMark);
+                    $row[] = $numerator . $suffix;
+                    $row[] = $denominator . $suffix;
                 } else {
                     $row[] = $humanReadableMark == '' ? '' : $humanReadableMark . $suffix;
                 }
