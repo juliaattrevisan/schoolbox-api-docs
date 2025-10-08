@@ -2,7 +2,7 @@ import { buildApiRequest } from "@js/util/sbx/apiUtils";
 import type { Metadata } from "@js/util/sbx/apiUtils";
 import type { StorageFile } from "@js/resource/resourceUtils";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
-import type { EvidenceStatus } from "@schoolboxLearningMomentEvidence/evidenceTypes";
+import type { EvidenceStatus, LearningMoment } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 
 export type CohortReportEntry = {
     id: number;
@@ -26,16 +26,8 @@ export type CohortReportEntry = {
         id: number;
         name: string;
     }[];
-    _links: {
-        submit: null;
-        publish: string | null;
-        reject: string | null;
-        modifyForm: string | null;
-        delete: string | null;
-    };
-    _labels: {
-        publish: string;
-    };
+    _links: LearningMoment["_links"];
+    _labels: LearningMoment["_labels"];
 };
 
 export type CohortReportApiPayload = {

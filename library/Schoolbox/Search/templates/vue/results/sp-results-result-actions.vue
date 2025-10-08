@@ -4,7 +4,7 @@
  */
 
 import type { Badge } from "@schoolboxBadge/templates/types/Badge";
-import type { BadgeAward } from "@schoolboxBadge/templates/types/BadgeAward";
+import type { SPBadgeAward } from "@schoolboxBadge/templates/types/BadgeAward";
 import { useBadgeStore } from "./store/spBadgeStore";
 import type { Result } from "../../js/types/Result";
 
@@ -18,10 +18,10 @@ const badgeStore = useBadgeStore();
  * Get the badge to award, adding the type and expiry to it
  * @param type - The type of badge to award
  */
-async function awardBadge(type: BadgeAward["type"]): Promise<void> {
+async function awardBadge(type: SPBadgeAward["type"]): Promise<void> {
     const getBadge = await fetch(`learning/badge/${props.result.id}`);
     const badge = (await getBadge.json()) as Badge;
-    const badgeAward: BadgeAward = {
+    const badgeAward: SPBadgeAward = {
         ...badge,
         type,
         expiry: type === "goal" ? badge.goalExpiry : badge.achievementExpiry,

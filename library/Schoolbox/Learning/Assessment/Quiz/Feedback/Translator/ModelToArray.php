@@ -63,6 +63,7 @@ class ModelToArray
         return [
             'id'             => $model->getId(),
             'mark'           => $model->getHumanReadableMark(),
+            // TODO: Add gradientMark (SA-21069), frontend types already expect it to exist so just need to clone the DueWorkFeedback translator
             'normalisedMark' => $model->getNormalisedMark(),
             'comment'        => $this->purifier->purify($model->getComment()),
             'publishedAt'    => $model->getPublishedAt()->getUsingFormat(DATE_ATOM),

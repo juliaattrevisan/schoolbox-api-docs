@@ -86,7 +86,7 @@ function initLightGallery(): void {
 /**
  * Allow pages to create a lightbox dynamically using the IMAGE-LIGHTBOX__CREATE event
  * This is useful for pages which need create a new lightbox after the page has already loaded
- * For example, preview.js needs to create a lightbox
+ * For example, preview.ts needs to create a lightbox
  *
  * The event detail should contain the following:
  * - targetKey: the rel key to distinguish the lightbox
@@ -112,7 +112,10 @@ document.addEventListener(IMAGE_LIGHTBOX_CREATE, (e) => {
     }
 
     targetElement.setAttribute("data-lightbox-loaded", "true");
-    const newLightGallery = lightGallery(targetElement, Object.assign(imageLightboxDefaults, eventDetail.options));
+    const newLightGallery = lightGallery(targetElement, {
+        ...imageLightboxDefaults,
+        ...eventDetail.options,
+    });
 
     window.sbProps.lightGalleries[eventDetail.targetKey] = newLightGallery;
 

@@ -60,7 +60,7 @@ module.exports = {
             "./www/static/js/resource/jquery.resourceAttach.js",
 
             // Image/File previewing
-            "./www/static/js/preview/preview.js",
+            "./www/static/js/preview/preview.ts",
 
             // Image Lightbox
             "./www/static/js/image-lightbox/imageLightboxInit.ts",

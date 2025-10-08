@@ -14,7 +14,6 @@ import BadgeReportHeader from "./badge-report-header";
 import BadgeReportStudent from "./badge-report-student";
 import AwardDetailModal from "./award-detail-modal";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer";
-import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
 
 export default {
     /**
@@ -23,7 +22,7 @@ export default {
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [cdnPrefixMixin],
+    mixins: [],
 
     components: {
         BadgeReportHeader,
@@ -49,10 +48,6 @@ export default {
         },
         encodedReturnUrl: {
             // Along with `returnUrlName` this is used when generating a link to learning moments and badges, so that the user may be redirected somewhere after those forms are submitted.
-            type: String,
-            required: true,
-        },
-        siteVersion: {
             type: String,
             required: true,
         },
@@ -251,8 +246,6 @@ export default {
                 <award-detail-modal
                     ref="awardDetailModal"
                     @on-achievement-awarded="onAchievementAwarded"
-                    :cdn-prefix="this.cdnPrefix"
-                    :site-version="this.siteVersion"
                     :return-url="this.encodedReturnUrl"
                 />
             </section>

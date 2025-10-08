@@ -5,12 +5,12 @@
 
 import { defineStore } from "pinia";
 import type { Badge } from "@schoolboxBadge/templates/types/Badge";
-import type { BadgeAward } from "@schoolboxBadge/templates/types/BadgeAward";
+import type { SPBadgeAward } from "@schoolboxBadge/templates/types/BadgeAward";
 
 export const useBadgeStore = defineStore("spBadgeStore", () => {
     const isDetailModalOpen = window.Vue.ref(false); // to display a badges details
     const detailBadge = window.Vue.ref<Badge | null>(null); // the badge to display details for
-    const awardBadge = window.Vue.ref<BadgeAward | null>(null); // the badge to award
+    const awardBadge = window.Vue.ref<SPBadgeAward | null>(null); // the badge to award
 
     /**
      * Opens a modal window for viewing this badge's full details.
@@ -25,7 +25,7 @@ export const useBadgeStore = defineStore("spBadgeStore", () => {
      * Set the badge to award
      * @param $badgeAward - the badge to award
      */
-    function setAwardBadge($badgeAward: BadgeAward): void {
+    function setAwardBadge($badgeAward: SPBadgeAward): void {
         awardBadge.value = $badgeAward;
     }
 

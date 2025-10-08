@@ -102,7 +102,7 @@ class Controller extends Base
                                                 ->getBody()->getContents();
         }
 
-        //Not required by preview.js
+        //Not required by preview.ts
         unset($previewFragment['twig']);
 
         $this->response = $this->responseAsJson($previewFragment);

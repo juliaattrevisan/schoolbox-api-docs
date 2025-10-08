@@ -13,7 +13,6 @@ import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vu
 import toastMixin from "@schoolboxVue/components/toast-mixin";
 import userProfileConstants from "../../../vue/user-profile/constants";
 import userProfileMixin from "../../../vue/user-profile/mixin";
-import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
 
 export default {
     /**
@@ -29,16 +28,14 @@ export default {
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [cdnPrefixMixin, foundationMixin, goalMixin, toastMixin, userProfileMixin],
+    mixins: [foundationMixin, goalMixin, toastMixin, userProfileMixin],
 
     /**
      * Props.
      * Immutable props that were passed to this component, usually via twig, in our setup.
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
-    props: {
-        siteVersion: String,
-    },
+    props: {},
 
     /**
      * Components.
@@ -320,11 +317,7 @@ export default {
             </div>
         </template>
 
-        <award-detail-modal
-            ref="awardDetailModal"
-            :cdn-prefix="this.cdnPrefix"
-            :site-version="this.siteVersion"
-        ></award-detail-modal>
+        <award-detail-modal ref="awardDetailModal"></award-detail-modal>
 
         <achievement-withdraw-modal
             ref="achievementWithdrawModal"

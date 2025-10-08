@@ -126,6 +126,7 @@ class Base
                 }
             )->reindex(),
             '_links'           => [],
+            '_labels'          => [],
         ];
 
         /* Process storage instances separately, if any exist

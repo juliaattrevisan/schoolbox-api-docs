@@ -27,8 +27,14 @@ declare global {
         cdnPrefix: string;
         dayjs: typeof dayjs;
         dateDisplayFormats: {
+            calendarStartTime: string;
             dayjs: string;
             dayjsDatetime: string;
+            dayjsDateLong: string;
+            dayjsTime: string;
+            localDate: string;
+            localDateTime: string;
+            localTime: string;
         };
         iframely: {
             load: (containerElement: Element, url?: string) => void;

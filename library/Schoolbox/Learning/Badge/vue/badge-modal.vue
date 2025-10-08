@@ -6,7 +6,7 @@
 
 import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal.vue";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details.vue";
-import type { Node, BadgeUsageObject } from "@schoolboxCurriculum/types/Node";
+import type { Node } from "@schoolboxCurriculum/types/Node";
 import type { Badge } from "@schoolboxBadge/templates/types/Badge";
 import BadgeDetail from "./badgeDetail.vue";
 
@@ -18,7 +18,7 @@ interface Props {
     /**
      * the badge to display
      */
-    badge: Badge | BadgeUsageObject | null;
+    badge: Badge | null;
 }
 
 const props = withDefaults(defineProps<Props>(), {

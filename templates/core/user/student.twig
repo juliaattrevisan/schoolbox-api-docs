@@ -370,18 +370,35 @@
                 <div class="content no-pad {% if activeTab == 'activity' %}active{% endif %}" id="tab-activity">
                     <div id="activity-feed">
                         <activity-feed
-                                cdn-prefix="{{ CDN_PREFIX }}"
-                                site-version="{{ config.site_version }}"
-                                :show-learning-moments="{{ config.learning_moments_enabled ? 'true' : 'false' }}"
-                                :show-goals="{{ config.badges_enabled ? 'true' : 'false' }}"
-                                :show-achievements="{{ config.badges_enabled ? 'true' : 'false' }}"
-                                :show-feedback="{{ config.activity_feed_feedback_enabled ? 'true' : 'false' }}"
-                                :moderation-required="{{ moderationRequired ? 'true' : 'false' }}"
-                                :evidence-parent-create="{{ config.evidence_parent_create ? 'true' : 'false' }}"
-                                {% if editorTemplates is defined %}
-                                :editor-templates="{{ editorTemplates|json_encode }}"
-                                {% endif %}
-                                :editor-has-tokens="{{ editorHasTokens ? 'true' : 'false' }}"
+                            :show-learning-moments="{{ config.learning_moments_enabled ? 'true' : 'false' }}"
+                            :show-goals="{{ config.badges_enabled ? 'true' : 'false' }}"
+                            :show-achievements="{{ config.badges_enabled ? 'true' : 'false' }}"
+                            :show-feedback="{{ config.activity_feed_feedback_enabled ? 'true' : 'false' }}"
+                            :moderation-required="{{ moderationRequired ? 'true' : 'false' }}"
+                            :moment-parent-create="{{ config.evidence_parent_create ? 'true' : 'false' }}"
+                            {% if editorTemplates is defined %}
+                            :editor-templates="{{ editorTemplates|json_encode }}"
+                            {% endif %}
+                            :editor-has-tokens="{{ editorHasTokens ? 'true' : 'false' }}"
+                            :student="{{ user|json_encode }}"
+                            :can-comment="{{ learningMomentCanComment ? 'true' : 'false' }}"
+                            :routes="{
+                                getCreateEvidenceForm: '{{ routeLookupIfAuthorized(
+                                    'learningMomentEvidence.getCreateForm',
+                                    {users: [user], userIds: user.id}
+                                ) }}',
+                                getSetAsGoalForm: '{{ routeLookupIfAuthorized(
+                                    'learningBadgeAward.getSetAsGoalForm',
+                                    {users: [user], userIds: user.id}
+                                ) }}',
+                                getSetAsGoalForSelfForm: '{{ routeLookupIfAuthorized(
+                                    'learningBadgeAward.getSetAsGoalForSelfForm'
+                                ) }}',
+                                getFeed: '{{ routeLookupIfAuthorized(
+                                    'learningMomentFeed.getFeedForUser',
+                                    {user: user, userId: user.id}
+                                ) }}',
+                            }"
                         />
                     </div>
                 </div>
@@ -390,10 +407,7 @@
             {% if 'goals' in possibleTabNames %}
                 <div class="content no-pad {% if activeTab == 'goals' %}active{% endif %}" id="tab-goals">
                     <div id="goal-feed" class="goals-achievements">
-                        <goal-feed
-                                cdn-prefix="{{ CDN_PREFIX }}"
-                                site-version="{{ config.site_version }}"
-                        />
+                        <goal-feed />
                     </div>
                 </div>
             {% endif %}
@@ -401,10 +415,7 @@
             {% if 'achievements' in possibleTabNames %}
                 <div class="content no-pad {% if activeTab == 'achievements' %}active{% endif %}" id="tab-achievements">
                     <div id="achievement-feed" class="goals-achievements">
-                        <achievement-feed
-                                cdn-prefix="{{ CDN_PREFIX }}"
-                                site-version="{{ config.site_version }}"
-                        />
+                        <achievement-feed />
                     </div>
                 </div>
             {% endif %}
@@ -437,12 +448,6 @@
                             current: '{{ RETURN_URL.current }}',
                         },
                     };
-                    window.learningEvidenceFeedConfig = $.extend(true, {}, baseConfig);
-                    window.learningEvidenceFeedConfig.routes.getFeed = '{{ routeLookupIfAuthorized(
-                        'learningMomentFeed.getFeedForUser',
-                        {user: user, userId: user.id}
-                    ) }}';
-                    window.learningEvidenceFeedConfig.canComment = Boolean('{{ learningMomentCanComment }}');
 
                     window.learningBadgeGoalFeedConfig = $.extend(true, {}, baseConfig);
                     window.learningBadgeGoalFeedConfig.routes.getAwardFeed = '{{ routeLookupIfAuthorized(

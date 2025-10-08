@@ -13,7 +13,6 @@ import { animateBadgeImage } from "../js/animateBadgeImage";
 import CodesList from "@schoolboxCurriculum/vue/codes-list";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details";
 import MediaArticle from "@schoolboxVue/components/media-article";
-import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
 import { generateAwardWithEvidenceUrl } from "../js/awardBadgeUtils";
 
 /**
@@ -36,7 +35,7 @@ export default {
      * manner as a php trait. They must already be imported at the top of the file and will
      * be superpositioned on top of this javascript here, inside export default {}
      */
-    mixins: [cdnPrefixMixin, goalMixin, toastMixin, userProfileMixin],
+    mixins: [goalMixin, toastMixin, userProfileMixin],
 
     /**
      * Props.
@@ -44,7 +43,6 @@ export default {
      * These are the hyphen-separated vars which are magically computed into camelcase elsewhere.
      */
     props: {
-        siteVersion: String,
         returnUrl: {
             type: String,
             default: null,
