@@ -4,9 +4,7 @@ import type { StorageFile } from "@js/resource/resourceUtils";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import type { EvidenceStatus, LearningMoment } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 
-export type CohortReportEntry = {
-    id: number;
-    body: string;
+export type CohortReportEntry = Pick<LearningMoment, "id" | "body" | "currentState" | "tags" | "_links" | "_labels"> & {
     blurb: string;
     showReadMore: boolean;
     files: StorageFile[];
@@ -21,13 +19,6 @@ export type CohortReportEntry = {
         displayAs: string;
     };
     hasComments: boolean;
-    currentState: EvidenceStatus;
-    tags: {
-        id: number;
-        name: string;
-    }[];
-    _links: LearningMoment["_links"];
-    _labels: LearningMoment["_labels"];
 };
 
 export type CohortReportApiPayload = {
