@@ -111,6 +111,8 @@ class Classes implements IStrategy
      */
     public function import(): void
     {
+        $start = microtime(true);
+
         $this->log->info('Processing timetables.');
 
         $this->log->debug(sprintf(
@@ -166,6 +168,15 @@ class Classes implements IStrategy
                 $this->processClass((string)$externalId, $enrolment, $userLookup);
             }
         }
+
+        $end = microtime(true);
+
+        $this->log->info('');
+
+        $this->log->info(sprintf(
+            'Duration: %s seconds.',
+            ($end - $start) * 1000
+        ));
     }
 
 
