@@ -105,17 +105,17 @@ class Api implements IApi
     /**
      * Constructor.
      *
-     * @param string       $host
-     * @param string       $apiKey
-     * @param int          $timeout
+     * @param string $host
+     * @param string $apiKey
+     * @param int $timeout
+     * @param bool $deepLog
      * @param Timecop|null $timecop
-     * @throws InvalidArgumentException
-     * @throws \DomainException
      */
     public function __construct(
         private string $host,
         #[SensitiveParameter] private string $apiKey,
         private int $timeout = self::DEFAULT_TIMEOUT,
+        private bool $deepLog = false,
         private ?Timecop $timecop = null
     ) {
         $this->client = $this->initClient($this->host, $this->apiKey, $this->timeout);
@@ -167,7 +167,8 @@ class Api implements IApi
             $this->credentials['schoolroute'],
             $this->credentials['clientid'],
             $this->credentials['clientsecret'],
-            $this->credentials['authhost']
+            $this->credentials['authhost'],
+            $this->deepLog
         );
 
         return new Client([
@@ -218,7 +219,22 @@ class Api implements IApi
          * 3. The payload size == page size
          */
         while (($n < self::MAX_PAYLOADS) && (!$payload || \count($payload['data']) === self::PAGE_SIZE)) {
+            $this->log(sprintf(
+                "Retrieving %s @ page %s with %s max elements per page...\n",
+                $endpoint,
+                $pageNum,
+                $pageSize
+            ));
+
+            $start = microtime(true);
             $payload = $this->retrieveOne($method, $endpoint, $scope, $pageNum, $pageSize, $params);
+            $end = microtime(true);
+
+            $this->log(sprintf(
+                " -- Obtained payload containing %s elements over %s seconds.\n\n",
+                \count($payload['data']),
+                number_format($end - $start, 2),
+            ));
 
             $pageNum++;
             $n++;
@@ -305,7 +321,14 @@ class Api implements IApi
                     ));
                 }
 
+                $start = microtime(true);
                 $response = $this->client->request($method, $endpoint, $options);
+                $end = microtime(true);
+
+                $this->log(sprintf(
+                    " -- Client request took %s seconds to obtain response.\n",
+                    number_format($end - $start, 2),
+                ));
 
                 if ($this->timecop) {
                     $this->timecop->regulate(sprintf(
@@ -373,6 +396,19 @@ class Api implements IApi
          * was being requested, so I guess you ended up here
          */
         throw new \DomainException('Could not access server, or bad json payload returned.', 0, $e ?? null);
+    }
+
+
+    /**
+     * Deeper diagnostics
+     *
+     * @param string $msg
+     * @return void
+     */
+    private function log(string $msg): void {
+        if ($this->deepLog) {
+            echo $msg;
+        }
     }
 
 

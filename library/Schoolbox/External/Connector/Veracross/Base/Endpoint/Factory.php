@@ -125,7 +125,7 @@ class Factory
 
         /* Spawn an Api instance
          */
-        $api = new Api($this->host, $this->key);
+        $api = new Api(host: $this->host, apiKey: $this->key, deepLog: true);
 
         $bus = new GenericCollection(IStrategy::class);
 

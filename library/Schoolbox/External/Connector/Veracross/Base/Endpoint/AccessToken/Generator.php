@@ -93,12 +93,14 @@ class Generator
      * @param string $clientId
      * @param string $clientSecret
      * @param string $authhost
+     * @param bool $deepLog
      */
     public function __construct(
         private string $schoolRoute,
         private string $clientId,
         private string $clientSecret,
-        private string $authhost
+        private string $authhost,
+        private bool $deepLog = false,
     ) {
     }
 
@@ -177,6 +179,11 @@ class Generator
             /* Any exception thrown by guzzle might as well be a reason to nap and retry
              */
             try {
+                $this->log(sprintf(
+                    "Generating access token via %s...\n",
+                    $this->authhost
+                ));
+
                 $response = $this->client->request('POST', $endpoint, [
                     RequestOptions::FORM_PARAMS => [
                         'grant_type' => self::GRANT_TYPE,
@@ -273,5 +280,18 @@ class Generator
             'timeout' => self::DEFAULT_TIMEOUT,
             'http_errors' => false,
         ]);
+    }
+
+
+    /**
+     * Deeper diagnostics
+     *
+     * @param string $msg
+     * @return void
+     */
+    private function log(string $msg): void {
+        if ($this->deepLog) {
+            echo $msg;
+        }
     }
 }
