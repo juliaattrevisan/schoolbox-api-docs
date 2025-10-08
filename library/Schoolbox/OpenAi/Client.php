@@ -134,54 +134,55 @@ class Client implements IClient
                 usleep(100000);
                 continue;
             }
+            yield $data;
 
-            // Normalise CRLF to LF
-            $data = strtr($data, ["\r\n" => "\n", "\r" => "\n"]);
-
-            $chunkBuffer .= $data;
-
-            // while there's at least one full chunk in the buffer, process it
-            while (false !== ($pos = strpos($chunkBuffer, "\n\n"))) {
-                $chunk = substr($chunkBuffer, 0, $pos);
-                yield $chunk;
-                yield "\n\n";
-//                yield EventStream\Message::fromString($chunk);
-
-                $chunkBuffer = substr($chunkBuffer, $pos + 2);
-//                $event = $this->parseChunk($chunk);
-////                $this->appendChunkToLog($event, $log, $type);
+//            // Normalise CRLF to LF
+//            $data = strtr($data, ["\r\n" => "\n", "\r" => "\n"]);
 //
-////                // Don't echo an 'error' chunk if this isn't going to ckeditor as it won't follow the format of an ApiProblem
-////                if ($type === self::FEATURE_CHAT || $event['type'] !== 'error') {
-////                    echo "{$chunk}\n\n";
+//            $chunkBuffer .= $data;
+//
+//            // while there's at least one full chunk in the buffer, process it
+//            while (false !== ($pos = strpos($chunkBuffer, "\n\n"))) {
+//                $chunk = substr($chunkBuffer, 0, $pos);
+//                yield $chunk;
+//                yield "\n\n";
+////                yield EventStream\Message::fromString($chunk);
+//
+//                $chunkBuffer = substr($chunkBuffer, $pos + 2);
+////                $event = $this->parseChunk($chunk);
+//////                $this->appendChunkToLog($event, $log, $type);
+////
+//////                // Don't echo an 'error' chunk if this isn't going to ckeditor as it won't follow the format of an ApiProblem
+//////                if ($type === self::FEATURE_CHAT || $event['type'] !== 'error') {
+//////                    echo "{$chunk}\n\n";
+//////                }
+////
+////                // Is this the final event?
+////                // There are 3 possible events that indicate the end of a response (see https://platform.openai.com/docs/api-reference/responses-streaming/response)
+////                if (in_array($event['type'], ['response.completed', 'response.failed', 'response.incomplete'])) {
+////                    $completedEvent = $event['data'][0]['response'];
+////                    // Keep reading the stream as there *might* be more later that we can still log to debug issues
 ////                }
 //
-//                // Is this the final event?
-//                // There are 3 possible events that indicate the end of a response (see https://platform.openai.com/docs/api-reference/responses-streaming/response)
-//                if (in_array($event['type'], ['response.completed', 'response.failed', 'response.incomplete'])) {
-//                    $completedEvent = $event['data'][0]['response'];
-//                    // Keep reading the stream as there *might* be more later that we can still log to debug issues
-//                }
-
-//                // Keep track of whether we're generating an image
-//                if ($event['type'] === 'response.image_generation_call.generating') {
-//                    $isGeneratingImage = true;
-//                } else if ($event['type'] === 'response.image_generation_call.completed') {
-//                    $isGeneratingImage = false;
-//                }
-//
-//                // flush PHP buffers
-//                if (ob_get_length()) {
-//                    @ob_flush();
-//                }
-//                @flush();
-            }
+////                // Keep track of whether we're generating an image
+////                if ($event['type'] === 'response.image_generation_call.generating') {
+////                    $isGeneratingImage = true;
+////                } else if ($event['type'] === 'response.image_generation_call.completed') {
+////                    $isGeneratingImage = false;
+////                }
+////
+////                // flush PHP buffers
+////                if (ob_get_length()) {
+////                    @ob_flush();
+////                }
+////                @flush();
+//            }
         }
 
-//        // If we have any remaining data in the buffer, process it
-        if (strlen(trim($chunkBuffer)) > 0) {
-            yield $chunkBuffer;
-        }
+////        // If we have any remaining data in the buffer, process it
+//        if (strlen(trim($chunkBuffer)) > 0) {
+//            yield $chunkBuffer;
+//        }
 
 //        return $completedEvent;
     }
