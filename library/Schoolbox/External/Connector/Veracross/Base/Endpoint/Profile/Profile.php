@@ -217,11 +217,6 @@ class Profile implements IStrategy
      */
     private function importStudents(): void
     {
-        /* Prefetch a list of medically-afflicted dudes
-         */
-        $this->log->debug('Prefetching medicals...');
-        $medicalLookup = (new Health($this->api, $this->watchlist))->generate();
-
         /* Prefetch a list of language usages
          */
         $this->log->debug('Prefetching languages...');
