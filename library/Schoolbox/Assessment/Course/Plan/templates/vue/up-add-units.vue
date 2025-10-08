@@ -22,7 +22,7 @@ function onAddSelected(): void {
 
 <template>
     <basic-modal v-model:is-open="addUnitsStore.isOpen">
-        <div class="l-flex-col l-gap-s f-no-margins">
+        <form class="l-flex-col l-gap-s f-no-margins" @submit.prevent="onAddSelected">
             <h2>Create new {{ locale.unit.translate(true, false) }}</h2>
             <div class="l-flex-col l-gap-s">
                 <!-- Loop through newUnits and display label and text input for each -->
@@ -56,6 +56,7 @@ function onAddSelected(): void {
                 <button
                     class="button icon-add f-no-margins"
                     data-test="up-add-units-add"
+                    type="button"
                     @click.prevent="addUnitsStore.add()"
                 >
                     Add another
@@ -65,18 +66,15 @@ function onAddSelected(): void {
                 <button
                     class="button l-flex__item--1"
                     data-test="up-add-units-cancel"
+                    type="button"
                     @click.prevent="addUnitsStore.cancel()"
                 >
                     Cancel
                 </button>
-                <button
-                    class="button submit l-flex__item--1"
-                    data-test="up-add-units-create"
-                    @click.prevent="onAddSelected"
-                >
+                <button class="button submit l-flex__item--1" data-test="up-add-units-create">
                     {{ addUnitsStore.isProcessing ? "Creating..." : "Create" }}
                 </button>
             </div>
-        </div>
+        </form>
     </basic-modal>
 </template>
