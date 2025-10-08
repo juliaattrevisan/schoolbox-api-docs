@@ -12,7 +12,6 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\TimetableCalendar\Classes;
-use Schoolbox\External\Connector\Watchlist;
 
 /**
  * Grab all the Enrolments everywhere
