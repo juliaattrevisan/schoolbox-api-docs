@@ -90,6 +90,7 @@ class Enrolments
                     $generator = $this->api->retrieve('GET', 'academics/enrollments', Classes::SCOPE, [
                         'person_id' => $externalId,
                         'class_status' => self::CLASS_STATUS_ACTIVE,
+                        'currently_enrolled' => true,
                     ]);
 
                     foreach ($generator as $page) {
@@ -106,6 +107,7 @@ class Enrolments
                  */
                 $generator = $this->api->retrieve('GET', 'academics/enrollments', Classes::SCOPE, [
                     'class_status' => self::CLASS_STATUS_ACTIVE,
+                    'currently_enrolled' => true,
                 ]);
 
                 foreach ($generator as $page) {
