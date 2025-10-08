@@ -55,7 +55,7 @@ class Alert
             foreach ($generator as $page) {
                 /* Avengers Assemble!
                  */
-                foreach ($page['data'] as $record) {
+                foreach ($page['data'] as &$record) {
                     /* omg why couldn't they have called this person_id instead...
                      * that's what id allegedly means
                      */
@@ -76,9 +76,22 @@ class Alert
                             [medical_alert] =>
                             [general_alert] =>
                             [academic_alert] =>
+                     *
+                     * Sometimes slabs of text contain a bunch of extraneous whitespace,
+                     * so we can trim them here and not worry about it anymore
                      */
+                    $keys = ['family_alert', 'medical_alert', 'general_alert', 'academic_alert'];
+
+                    foreach ($keys as $key) {
+                        if (null !== $record[$key]) {
+                            $record[$key] = trim($record[$key]);
+                        }
+                    }
+
                     $this->lookup[$externalId] = $record;
                 }
+
+                unset ($record);
             }
         }
 
