@@ -49,7 +49,7 @@ export const useAddUnitsStore = defineStore("unitPlannerAddUnits", () => {
      * Validate all unit names are filled
      * @returns true if all units have names, false otherwise
      */
-    function validate(): boolean {
+    function isValid(): boolean {
         validationErrors.value = newUnits.value.map((unit) => unit.trim() === "");
         return !validationErrors.value.some((hasError) => hasError);
     }
@@ -69,7 +69,7 @@ export const useAddUnitsStore = defineStore("unitPlannerAddUnits", () => {
      */
     async function create(): Promise<void> {
         // Validate all units have names
-        if (!validate()) {
+        if (!isValid()) {
             return; // Stop if validation fails
         }
         const unitPlannerStore = useUnitPlannerStore();
@@ -104,7 +104,6 @@ export const useAddUnitsStore = defineStore("unitPlannerAddUnits", () => {
         prompt,
         add,
         remove,
-        validate,
         create,
         cancel,
     };
