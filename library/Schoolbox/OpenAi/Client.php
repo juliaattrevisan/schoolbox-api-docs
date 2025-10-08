@@ -119,7 +119,7 @@ class Client implements IClient
      * @param StreamInterface $stream    The response's body, as a stream.
      * @param int             $chunkSize How many bytes should be read from the
      *                                   stream at once?
-     * @return iterable<EventStream\Message>
+     * @return iterable<string>
      */
     private function readEvents(StreamInterface $stream, int $chunkSize): iterable
     {

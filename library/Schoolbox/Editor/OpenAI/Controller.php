@@ -315,7 +315,6 @@ class Controller extends Base
                     ->withHeader('Content-Encoding', 'none');
                 return;
 
-                // TODO also output a list of known shape arrays when streaming
 //                $helper->request($this->getUser(), $payload, Helper::FEATURE_IMAGE, $sessionId);
             } catch (SchoolboxException $e) {
                 $problem = (new ApiProblem($e->getMessage()))
