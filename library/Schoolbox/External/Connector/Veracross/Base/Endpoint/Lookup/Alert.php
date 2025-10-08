@@ -91,7 +91,7 @@ class Alert
                     $this->lookup[$externalId] = $record;
                 }
 
-                unset ($record);
+                unset($record);
             }
         }
 
