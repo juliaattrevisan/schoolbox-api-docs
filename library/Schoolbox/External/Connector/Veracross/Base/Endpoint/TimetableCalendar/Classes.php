@@ -133,6 +133,36 @@ class Classes implements IStrategy
         $startDate = $this->fromDate->getDatabaseDate();
         $endDate = $this->toDate->getDatabaseDate();
 
+        /* Start with an enrolments-first philosophy.
+         * The list of enrolments informs us which internal_class_ids we care about.
+         *
+         * If a watchlist contains external ids, only obtain a list of enrolments
+         * for each of the external ids (person ids) provided. This limits the amount
+         * of classes and meeting times we need to prefetch and remember.
+         *
+         * Otherwise, don't apply a person_id limiter on the enrolments.
+         */
+
+        /* Once you have all the enrolments, find all the internal_class_id values.
+         * Use these internal_class_id to prefilter classes:list to the ones we need.
+         *
+         * This results in a list of classes that are relevant to the enrolments we prefetched.
+         */
+
+        /* Each class needs its meeting times which we can obtain with academics.classes.meeting_times:list
+         * and precompile that into each class.
+         */
+
+        /* At the end of all this you should have a:
+         *   - a lookup of enrolments which tells you a person and the internal_class_ids they're in
+         *   - a lookup of classes + their meeting times
+         *
+         * ...which should allow you to craft the entire timetable for every relevant person
+         * without needing api spam to veracross
+         */
+
+
+
         foreach ($userLookup as $externalId => $user) {
             /* Only import for specific users
              */
@@ -147,26 +177,26 @@ class Classes implements IStrategy
                 $externalId
             ));
 
-            $timetable = $compiler->compile((string)$externalId, $startDate, $endDate);
-
-            /* A student's timetable is a set of enrolments for their classes
-             */
-            foreach ($timetable as $enrolment) {
-                /* You can use the class_id (this is the Veracross class code)
-                 * as a watchlist param to specifically import this one class.
-                 * Once we find it, we exit this loop - we don't expect it to
-                 * appear again in the classes index. You can use the numeric
-                 * class id instead if that helps
-                 */
-//                if (!$this->watcher->isOnWatchlist((string)$enrolment['internal_class_id']['id'], $this->watchlist)) {
-//                    continue;
-//                }
-//                if (!$this->watcher->isOnWatchlist((string)$enrolment['internal_class_id']['class_id'], $this->watchlist)) {
-//                    continue;
-//                }
-
-                $this->processClass((string)$externalId, $enrolment, $userLookup);
-            }
+//            $timetable = $compiler->compile((string)$externalId, $startDate, $endDate);
+//
+//            /* A student's timetable is a set of enrolments for their classes
+//             */
+//            foreach ($timetable as $enrolment) {
+//                /* You can use the class_id (this is the Veracross class code)
+//                 * as a watchlist param to specifically import this one class.
+//                 * Once we find it, we exit this loop - we don't expect it to
+//                 * appear again in the classes index. You can use the numeric
+//                 * class id instead if that helps
+//                 */
+////                if (!$this->watcher->isOnWatchlist((string)$enrolment['internal_class_id']['id'], $this->watchlist)) {
+////                    continue;
+////                }
+////                if (!$this->watcher->isOnWatchlist((string)$enrolment['internal_class_id']['class_id'], $this->watchlist)) {
+////                    continue;
+////                }
+//
+//                $this->processClass((string)$externalId, $enrolment, $userLookup);
+//            }
         }
 
         $end = microtime(true);
