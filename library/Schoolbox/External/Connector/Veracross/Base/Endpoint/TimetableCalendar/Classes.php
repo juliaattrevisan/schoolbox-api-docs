@@ -17,6 +17,7 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\ClassCode;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Factory;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Enrolments;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Users;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Event\Mapper;
@@ -142,6 +143,7 @@ class Classes implements IStrategy
          *
          * Otherwise, don't apply a person_id limiter on the enrolments.
          */
+        $enrolmentsLookup = (new Enrolments($this->api, $this->watchlist))->generate();
 
         /* Once you have all the enrolments, find all the internal_class_id values.
          * Use these internal_class_id to prefilter classes:list to the ones we need.
