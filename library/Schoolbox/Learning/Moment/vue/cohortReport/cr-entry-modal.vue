@@ -81,6 +81,7 @@ async function onDelete(): Promise<void> {
                 <div class="clearfix"></div>
                 <!-- eslint-disable-next-line vue/no-v-html - this is scrubbed on the backend -->
                 <div class="l-mar-s--top" v-html="entry.body"></div>
+                <div class="clearfix"></div>
             </template>
         </template>
 
