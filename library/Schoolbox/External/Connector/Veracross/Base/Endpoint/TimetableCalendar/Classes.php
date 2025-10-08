@@ -171,6 +171,12 @@ class Classes implements IStrategy
          * without needing api spam to veracross
          */
 
+        /* TODO can't get past Meeting Times lookup: every request takes 2 seconds even for empty payloads.
+         */
+
+        /* TODO Chunk users to keep memory usage down; atm retaining the entire universe
+         */
+
 
 
 
