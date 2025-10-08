@@ -155,6 +155,9 @@ class ConfigMapper extends Mapper
     public const AMAZON_SES_PASSWORD         = 'amazon_ses_password';
 
     public const AMAZON_SES_REGION         = 'amazon_ses_region';
+    
+    public const AMAZON_SES_ENDPOINT_FORMAT = 'email-smtp.%s.amazonaws.com';
+    
     public const NAME_AUTH_EMAIL_ENABLED     = 'auth_email_enabled';
 
     public const NAME_BROWSER_CACHE_IMAGE_TIMEOUT    = 'browser_cache_image_timeout';

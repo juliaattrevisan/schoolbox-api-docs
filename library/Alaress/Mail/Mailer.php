@@ -410,7 +410,7 @@ class Mailer
             // Check if all three config values are present for SES
             if (count(array_filter($configValues)) === count($configKeys)) {
                 [$username, $password, $region] = $configValues;
-                $endpoint = sprintf('email-smtp.%s.amazonaws.com', $region);
+                $endpoint = sprintf(ConfigMapper::AMAZON_SES_ENDPOINT_FORMAT, $region);
                 self::$transport = new EsmtpTransport($endpoint, 587);
                 self::$transport->setUsername($username);
                 self::$transport->setPassword($password);
