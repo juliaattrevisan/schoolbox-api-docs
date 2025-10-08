@@ -210,7 +210,7 @@ class Classes implements IStrategy
 
         $this->log->info(sprintf(
             'Duration: %s seconds.',
-            ($end - $start) * 1000
+            ($end - $start)
         ));
     }
 
