@@ -1393,7 +1393,7 @@ class Controller extends Base\Base
         /* It's possible for template to be null, so we want to return error and end early if it does
          */
         if (null === $courseSpec->getTemplate()) {
-            $this->response = $this->responseAsJson(['error' => 'Course has no framework selected'])->withStatus(400);
+            $this->response = $this->responseAsJson(['error' => 'No framework selected'])->withStatus(400);
             return;
         }
 
