@@ -168,5 +168,4 @@ class Controller extends Base
         $this->emailDKIMMapper->delete($emailDKIM);
         $this->response = $this->responseAsJson([]);
     }
-
 }
