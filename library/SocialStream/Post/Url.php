@@ -14,7 +14,6 @@ use Schoolbox\File\MimetypeMapper;
  */
 class SocialStream_Post_Url extends SocialStream_Post_Abstract
 {
-
     /**
      * @var string
      */
