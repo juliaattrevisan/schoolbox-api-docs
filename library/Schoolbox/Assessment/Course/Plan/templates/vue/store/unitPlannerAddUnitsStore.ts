@@ -3,6 +3,7 @@
  */
 
 import { defineStore } from "pinia";
+import { apiRequest } from "@js/util/sbx/apiUtils";
 import { useUnitPlannerStore } from "./unitPlannerStore";
 import type { Unit } from "../unitPlannerTypes";
 
@@ -53,12 +54,14 @@ export const useAddUnitsStore = defineStore("unitPlannerAddUnits", () => {
         return !validationErrors.value.some((hasError) => hasError);
     }
 
-    /**s
+    /**
      * Get the data to pass to the backend
      * @returns the form data
      */
-    function getFormData(): string {
-        return "temp";
+    function getFormData(): Record<string, unknown> {
+        return {
+            names: newUnits.value.filter((unit) => unit.trim() !== ""),
+        };
     }
 
     /**
@@ -73,25 +76,21 @@ export const useAddUnitsStore = defineStore("unitPlannerAddUnits", () => {
         const toast = window.sbProps.toastActivate("Adding...");
         try {
             isProcessing.value = true;
-            const response = await fetch(`/course/plan/${unitPlannerStore.courseId}/newUnit`, {
+            const response = await apiRequest<Unit[], Record<string, unknown>>({
+                url: `/course/plan/${unitPlannerStore.courseId}/newUnits`,
                 method: "POST",
-                headers: {
-                    Accept: "application/json",
-                    "Content-Type": "application/json",
-                },
                 body: getFormData(),
             });
-            if (response.ok) {
-                const newUnit = (await response.json()) as Unit;
-                unitPlannerStore.units = [...unitPlannerStore.units, newUnit];
-                toast.timeout({ text: "Unit created successfully" });
-                cancel();
-            } else {
-                const responseText = (await response.json()) as { title: string; type: string; status: number };
-                toast.timeout({ text: responseText.title, isSuccess: false });
+            if (!response.success) {
+                throw new Error(response.message || "Failed to create units");
             }
+            const newUnits = response.data;
+            unitPlannerStore.units = [...unitPlannerStore.units, ...newUnits];
+            toast.timeout({ text: "Units created successfully" });
+            cancel();
         } catch (error) {
-            toast.timeout({ text: "There was an unexpected error", isSuccess: false });
+            const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
+            toast.timeout({ text: errorMessage, isSuccess: false });
         } finally {
             isProcessing.value = false;
         }
