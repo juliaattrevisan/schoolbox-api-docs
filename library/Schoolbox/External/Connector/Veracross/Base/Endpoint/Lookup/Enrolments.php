@@ -48,23 +48,43 @@ class Enrolments
          */
         if (null === $this->lookup) {
             $this->lookup = [];
-            $watchlist = new Watchlist();
 
-            $generator = $this->api->retrieve('GET', 'academics/enrollments', Classes::SCOPE);
+            /* If there was a specific set of external ids, obtain those separately
+             * the long way: this is for diagnostic usages only and should be used
+             * for a limited set of individuals.
+             */
+            $watchlistEnabled = (bool)\count($this->watchlist);
 
-            foreach ($generator as $page) {
-                /* Avengers Assemble!
+            if ($watchlistEnabled) {
+                /* Segregated Import for a specific set of people
                  */
-                foreach ($page['data'] as $record) {
-                    $externalId = trim((string)$record['person_id']);
+                foreach ($this->watchlist as $externalId) {
+                    $generator = $this->api->retrieve('GET', 'academics/enrollments', Classes::SCOPE, [
+                        'person_id' => $externalId
+                    ]);
 
-                    /* Only compile enrolments for guys on the watchlist
-                     */
-                    if (!$watchlist->isOnWatchlist($externalId, $this->watchlist)) {
-                        continue;
+                    foreach ($generator as $page) {
+                        /* Avengers Assemble!
+                         */
+                        foreach ($page['data'] as $record) {
+                            $this->lookup[$externalId][$record['internal_class_id']] = $record;
+                        }
                     }
+                }
+            } else {
+                /* Otherwise just obtain all the enrolments.
+                 * This is the main use case in the fleet.
+                 */
+                $generator = $this->api->retrieve('GET', 'academics/enrollments', Classes::SCOPE);
 
-                    $this->lookup[$externalId][$record['internal_class_id']] = $record;
+                foreach ($generator as $page) {
+                    /* Avengers Assemble!
+                     */
+                    foreach ($page['data'] as $record) {
+                        $externalId = trim((string)$record['person_id']);
+
+                        $this->lookup[$externalId][$record['internal_class_id']] = $record;
+                    }
                 }
             }
         }
