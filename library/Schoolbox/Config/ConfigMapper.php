@@ -46,6 +46,7 @@ class ConfigMapper extends Mapper
     public const MODULE_LTI        = 'lti';
     public const MODULE_REPORT_EXPORT = 'summative-report';
     public const MODULE_FEATURE_TOURS = 'feature-tours';
+    public const MODULE_DIFFERENTIATION_PROFILES = 'differentiation-profiles';
 
     /* Logically group each set of ai credentials based purely on the purpose they serve
      * since the settings controllers group by module
@@ -547,6 +548,7 @@ class ConfigMapper extends Mapper
                 self::MODULE_FEATURE_TOURS,
                 self::MODULE_OPENAI_TEXT,
                 self::MODULE_OPENAI_IMAGE,
+                self::MODULE_DIFFERENTIATION_PROFILES,
             ]
         );
         $this->joins(self::COL_TYPE, Type\Mapper::class, 'id', self::TYPE_MODEL, null, 'type', 'type');
