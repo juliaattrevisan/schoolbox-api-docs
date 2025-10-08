@@ -109,14 +109,12 @@ class Api implements IApi
      * @param string $apiKey
      * @param int $timeout
      * @param bool $deepLog
-     * @param Timecop|null $timecop
      */
     public function __construct(
         private string $host,
         #[SensitiveParameter] private string $apiKey,
         private int $timeout = self::DEFAULT_TIMEOUT,
         private bool $deepLog = false,
-        private ?Timecop $timecop = null
     ) {
         $this->client = $this->initClient($this->host, $this->apiKey, $this->timeout);
 
@@ -226,15 +224,7 @@ class Api implements IApi
                 $pageSize
             ));
 
-            $start = microtime(true);
             $payload = $this->retrieveOne($method, $endpoint, $scope, $pageNum, $pageSize, $params);
-            $end = microtime(true);
-
-            $this->log(sprintf(
-                " -- Obtained payload containing %s elements over %s seconds.\n\n",
-                \count($payload['data']),
-                number_format($end - $start, 2),
-            ));
 
             $pageNum++;
             $n++;
@@ -291,15 +281,14 @@ class Api implements IApi
 
                 /* Grab an Access Token
                  */
-                if ($this->timecop) {
-                    $this->timecop->regulate('** Access Token: about to obtain/reuse one');
-                }
-
+                $start = microtime(true);
                 $accessToken = ($this->accessTokenGenerator->generate($scope))->getToken();
+                $end = microtime(true);
 
-                if ($this->timecop) {
-                    $this->timecop->regulate('** Access Token: token obtained');
-                }
+                $this->log(sprintf(
+                    " ** Access token generation took %s seconds.\n",
+                    number_format($end - $start, 2)
+                ));
 
                 /* Slam in headers with the dynamic token
                  *
@@ -314,13 +303,6 @@ class Api implements IApi
                     'X-Page-Size' => $pageSize
                 ];
 
-                if ($this->timecop) {
-                    $this->timecop->regulate(sprintf(
-                        '++ API Request to endpoint: %s (started)',
-                        $endpoint
-                    ));
-                }
-
                 $start = microtime(true);
                 $response = $this->client->request($method, $endpoint, $options);
                 $end = microtime(true);
@@ -329,13 +311,6 @@ class Api implements IApi
                     " -- Client request took %s seconds to obtain response.\n",
                     number_format($end - $start, 2),
                 ));
-
-                if ($this->timecop) {
-                    $this->timecop->regulate(sprintf(
-                        '++ API Request to endpoint: %s (finished)',
-                        $endpoint
-                    ));
-                }
 
                 /* Debugging:
                  * Find out what guzzle calculated as the endpoint + query string params
