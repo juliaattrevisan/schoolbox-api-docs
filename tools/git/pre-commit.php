@@ -11,6 +11,15 @@
 
 // this is run per-file to be committed; $argv[1] is the filename
 
+/**
+ * Deprecation notice
+ */
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m" . PHP_EOL;
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+
 $filename = $argv[1];
 
 // we're only interested in php files
@@ -67,5 +76,14 @@ if (count($output) && $output[0] != 'stdin.php') {
     exec("php-cs-fixer fix $filename", $output, $return);
     exit(1);
 }
+
+/**
+ * Deprecation notice
+ */
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m" . PHP_EOL;
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
 
 exit(0);

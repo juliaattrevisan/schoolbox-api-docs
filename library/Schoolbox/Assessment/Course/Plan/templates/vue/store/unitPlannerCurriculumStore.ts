@@ -5,11 +5,11 @@
 
 import { defineStore } from "pinia";
 import { watchIgnorable } from "@vueuse/core";
-import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import { UNSET_ID } from "@schoolboxCurriculum/js/nodeUtils";
 import { useStore as useSelectorStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/curriculumSelectorStore";
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csSelectedNodesStore";
+import { useCurrentNodesStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csCurrentNodesStore";
 import { useStore as useFolderNodesStore } from "@schoolboxCurriculum/vue/folderNodes/store/folderNodesStore";
 import { useModalStore } from "@schoolboxCurriculum/vue/curriculumSelector/store/csModalStore";
 import { useUnitPlannerStore } from "./unitPlannerStore";
@@ -19,6 +19,7 @@ import type { Column } from "../unitPlannerConfig";
 export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`, () => {
     const selectorStore = useSelectorStore(); // for the curriculum selector modal
     const selectedNodesStore = useSelectedNodesStore(); // to update the selectedNodes linked to the curriculum selector modal
+    const currentNodesStore = useCurrentNodesStore(); // to load the nodes linked to the unit
     const modalStore = useModalStore(); // to open the modal
     const startingNodeId = window.Vue.ref<number>(UNSET_ID); // to open the modal at a specific node
     const selectedDetailsNodeId = window.Vue.ref<number>(UNSET_ID); // when changed will trigger the curriculum-details-modal to open
@@ -27,14 +28,17 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
 
     /**
      * Initialises the curriculum selector modal store, which loads the initial curriculum data
+     * @param folderId - the folderId to target
      */
-    function init(): void {
+    function init(folderId: number): void {
         selectorStore.init({
             isReadOnly: false,
             formValueName: "", // not required in this context
             dataEndpoint: "/api/curriculum",
             selectedNodes: [], // so the modal displays the latest selected nodes
             includeChildren: true, // include all children in selections
+            hasTabs: true, // show the tabs for curriculum selector
+            parentFolderId: folderId, // the folderId to target, which represents the parent folder id for each unit curriculum
         });
     }
 
@@ -53,7 +57,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
 
     /**
      * To open the curriculum selector modal, targeting the relevant folderNodesStore
-     * @param folderId - the folderId to target
+     * @param folderId - the unit folderId to target
      * @param componentId - the componentId to target
      */
     function openCurriculumSelectorModal(folderId: number, componentId: number): void {
@@ -111,7 +115,7 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
             throw new Error("No Curriculum components exist on the template,");
         }
 
-        activate("Creating curriculum...");
+        const toast = window.sbProps.toastActivate("Creating curriculum...");
         try {
             // First create a new component
             const createFormData = new FormData();
@@ -166,15 +170,16 @@ export const useUnitPlannerCurriculumStore = defineStore(`unitPlannerCurriculum`
             };
             unitPlannerStore.addCurriculumComponent(unit.id, newComponent);
 
-            timeout({ text: "Curriculum created successfully" });
+            toast.timeout({ text: "Curriculum created successfully" });
         } catch (error) {
-            timeout({ text: error as string, isSuccess: false });
+            toast.timeout({ text: error as string, isSuccess: false });
         }
     }
 
     return {
         init,
         selectorStore,
+        currentNodesStore,
         startingNodeId,
         selectedDetailsNodeId,
         openCurriculumSelectorModal,

@@ -1,14 +1,28 @@
-#news-component {
+#news-component,
+.news-list {
     .card {
         padding: 1rem;
-
-        > a > img {
+        article img {
+            margin: 0px;
+            width: auto;
+        }
+        p > img,
+        p > a > img {
+            float: none;
+        }
+        > a:not([data-plugin]) > img {
             margin: 0 1rem 0 0;
-            width: 12.5rem;
 
-            @media #{$medium-down} {
-                width: 6rem;
+            &:not(.thumbnail) {
+                width: 12.5rem;
+
+                @media #{$medium-down} {
+                    width: 6rem;
+                }
             }
+        }
+        > a:not([data-plugin]) > img.homepage-news-feature-image {
+            width: 4rem;
         }
         .thumbnail {
             width: 4rem;
@@ -67,6 +81,9 @@
         }
         article {
             padding-top: 0.5rem;
+            p {
+                margin-bottom: 0.75rem;
+            }
         }
     }
     .v-card {

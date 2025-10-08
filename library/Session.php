@@ -250,11 +250,6 @@ class Session
             throw new SchoolboxAccessDeniedException();
         }
 
-        // Store password as hash for DAV authentication later
-        if (Config::get('webdav_auth_type') === 'digest') {
-            $userMapper->storeHash($user, md5($username . ':' . Config::get('site_school_code') . ':' . $password));
-        }
-
         // ensure a key is set on login
         if (!$user->getKey()) {
             $user->setKey(substr(md5(uniqid() . time()), 0, 25));
@@ -295,24 +290,14 @@ class Session
                 $storageMapper   = StorageMapper::getInstance();
                 $ldapCaCert      = $storageMapper->findByHash($ldapCaCertHash);
                 $filesystemProxy = $storageMapper->getStorageFilesystemProxy();
-                $ldapCaCertPath  = sprintf(
-                    '%s/ldap-ca-cert-%s-%s',
-                    Config::get('stream_dir'),
-                    INSTANCE_ID,
-                    $ldapCaCert->getHash()
-                );
-                if (!file_exists($ldapCaCertPath)) {
-                    try {
-                        file_put_contents($ldapCaCertPath, $filesystemProxy->read($ldapCaCert));
-                    } catch (FilesystemException $e) {
-                        //can't read cert, just continue without the certificate
-                    }
-                }
 
-                // Now if the file _does_ exist: set ldap options
-                if (file_exists($ldapCaCertPath)) {
+                try {
+                    $ldapCaCertPath = $filesystemProxy->localPath($ldapCaCert);
+
                     ldap_set_option(null, LDAP_OPT_X_TLS_CACERTDIR, dirname($ldapCaCertPath));
                     ldap_set_option(null, LDAP_OPT_X_TLS_CACERTFILE, $ldapCaCertPath);
+                } catch (FilesystemException $e) {
+                    //can't read cert, just continue without the certificate
                 }
             }
             $ds = ldap_connect($host);
@@ -573,6 +558,14 @@ class Session
                         }
                     }
                 }
+            }
+            /* Student birthday check session
+             */
+            if ($user->getRole()->isStudent()) {
+                $externalStudent = $synUser->getStudent($synergyId);
+                /* In case where the external database is offline, the StudentBirthDate won't exist, so we need to null-coalesce it
+                 */
+                $_SESSION['isBirthdayCelebration'] = $user->isBirthday($externalStudent['StudentBirthDate'] ?? null);
             }
         }
     }

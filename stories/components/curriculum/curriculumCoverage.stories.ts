@@ -1,5 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies -- storybook is a dev dependency, so it's okay */
-
 import type { Meta, StoryObj } from "@storybook/vue3";
 import CcReport from "../../../library/Schoolbox/Curriculum/Reports/templates/vue/cc-report.vue";
 

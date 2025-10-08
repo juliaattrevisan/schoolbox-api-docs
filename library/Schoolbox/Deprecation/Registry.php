@@ -34,12 +34,12 @@ class Registry
      * If a class in any of these paths raises a deprecation warning: it will
      * be silenced.
      *
-     * For now, this covers the `vendor` folder for Composer requires: as more
-     * vendor libraries are updated to no longer raise deprecation warnings,
+     * As vendor libraries are updated to no longer raise deprecation warnings,
      * they should be added to `PATH_WHITELIST`.
      */
     public const PATH_BLACKLIST = [
-        SITE_root . '/vendor/',
+        SITE_root . '/vendor/cboden/ratchet/',
+        SITE_root . '/vendor/ratchet/rfc6455/',
     ];
 
     /**

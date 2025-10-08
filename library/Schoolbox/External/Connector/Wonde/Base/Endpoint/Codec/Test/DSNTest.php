@@ -35,7 +35,30 @@ class DSNTest extends TestCase
                 'school=A1234567890;token=67b9c3c0b1e92882e3e146f01de5054',
                 [
                     'school' => 'A1234567890',
-                    'token' => '67b9c3c0b1e92882e3e146f01de5054'
+                    'token' => '67b9c3c0b1e92882e3e146f01de5054',
+                    'options' => []
+                ]
+            ],
+            'Valid DSN 2' => [
+                'school=A1234567890;token=67b9c3c0b1e92882e3e146f01de5054?futurefamilies=1',
+                [
+                    'school' => 'A1234567890',
+                    'token' => '67b9c3c0b1e92882e3e146f01de5054',
+                    'options' => [
+                        'futurefamilies' => 1
+                    ]
+                ]
+            ],
+            'Valid DSN 3' => [
+                'school=A1234567890;token=67b9c3c0b1e92882e3e146f01de5054?futurefamilies=1;newopt=2;anotheropt=3',
+                [
+                    'school' => 'A1234567890',
+                    'token' => '67b9c3c0b1e92882e3e146f01de5054',
+                    'options' => [
+                        'futurefamilies' => 1,
+                        'newopt' => 2,
+                        'anotheropt' => 3
+                    ]
                 ]
             ],
         ];
@@ -69,6 +92,10 @@ class DSNTest extends TestCase
             'Valid DSN Re-encode 1' => [
                 'school=A1234567890;token=67b9c3c0b1e92882e3e146f01de5054',
                 'school=A1234567890;token=67b9c3c0b1e92882e3e146f01de5054'
+            ],
+            'Valid DSN Re-encode 2' => [
+                'school=A1234567890;token=67b9c3c0b1e92882e3e146f01de5054?futurefamilies=1;newopt=2;anotheropt=3',
+                'school=A1234567890;token=67b9c3c0b1e92882e3e146f01de5054?futurefamilies=1;newopt=2;anotheropt=3'
             ],
         ];
     }

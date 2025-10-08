@@ -53,7 +53,10 @@ if (isset($_REQUEST['page_id']) && is_numeric($_REQUEST['page_id'])) {
                 foreach ($components[$position] as $sequence => $componentID) {
                     if ($componentID) {
                         try {
-                            $inst = $componentInstanceMapper->findById($componentID);
+                            $inst = $componentInstanceMapper->findByInstanceId($componentID, $eportfolioHandler->getPageInstance()->getPageId());
+                            if (null === $inst) {
+                                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                            }
                             $inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database
                             $inst->setPosition($position);
                             $instanceCollection->add($inst);
@@ -83,7 +86,11 @@ if (isset($_REQUEST['page_id']) && is_numeric($_REQUEST['page_id'])) {
         } elseif (is_numeric($_POST['delete'] ?? false)) {
             // Delete the instance and its configuration
 
-            $instance = $componentInstanceMapper->findById($_POST['delete']);
+            $instance = $componentInstanceMapper->findByInstanceId($_POST['delete'], $eportfolioHandler->getPageInstance()->getPageId());
+            if (null === $instance) {
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
+
             $configs  = $componentConfigInstanceMapper->findByColumn('component_instance_id', $instance->getId());
 
             foreach ($configs as $c) {

@@ -61,13 +61,18 @@ class NotifierHelper
     }
 
     /**
-     * @param Report        $report
-     * @param Model|null    $pastoral
+     * @param Report     $report
+     * @param Model|null $pastoral
+     * @param bool       $commentNotif
      * @return string
      */
-    public static function getReportHref(Report $report, ?Model $pastoral): string
+    public static function getReportHref(Report $report, ?Model $pastoral, bool $commentNotif = false): string
     {
-        return sprintf("/pastoral/report/results/%d#record%d", $report->getId(), $pastoral->getId());
+        $reportHref = sprintf("/pastoral/report/results/%d", $report->getId());
+        if ($commentNotif) {
+            $reportHref .= "#record{$pastoral->getId()}";
+        }
+        return $reportHref;
     }
 
     /**

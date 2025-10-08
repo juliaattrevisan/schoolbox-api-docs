@@ -14,6 +14,9 @@ use Schoolbox\Comms\News\Querystring;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
+use Schoolbox\Editor\Templates\Mapper as EditorTemplateMapper;
+use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
 
 /**
  * Homepage textbox component.
@@ -104,6 +107,12 @@ class Controller extends Component_Homepage_ControllerAbstract
             return $this->renderSourceUnavailableTwig($templateHandle);
         }
 
+        $editorTemplateHelper = new EditorTemplateHelper(
+            $this->getMapperFactory()->get(EditorTemplateMapper::class),
+            EditorTemplatesCategoryModel::HOMEPAGE,
+            $this->getUser()
+        );
+
         return $this->renderTwigTemplate(
             $templateHandle,
             '@textbox/component/homepage.twig',
@@ -112,7 +121,8 @@ class Controller extends Component_Homepage_ControllerAbstract
                 'textbox'   => $this->textbox,
                 'context'   => $this->getContext(),
                 'writable'  => $this->getContentPermission() >= UserAccess::ACCESS_WRITE,
-                'returnUrl' => Querystring::encode("/homepage/{$this->getContext()->getId()}")
+                'returnUrl' => Querystring::encode("/homepage/{$this->getContext()->getId()}"),
+                'editorTemplates' => $editorTemplateHelper->getTemplatesForCategory()
             ],
             !$this->getConfig('compactMode')
         );

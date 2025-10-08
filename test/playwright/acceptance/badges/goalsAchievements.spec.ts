@@ -54,13 +54,13 @@ test.describe("Goals and Achievements tests", () => {
         await badges.clickBadgeDropdown(badgeId);
         await badges.clickDropdownOptionFirstElement(badgeId, "goal");
         tester.isGoingTo("search and select Jana Reed on the modal");
-        await badges.selectStudentSetGoal(student);
+        await badges.selectStudentSetGoalOrAchievement(student);
         tester.isGoingTo("click Set Goal button on the modal");
 
         await badges.clickSetGoalorAwardAchievement("Set goal");
 
         tester.isGoingTo("check the goal is presented on Jana Reed profile page activity feed");
-        await profilePage.goto(studentId.toString());
+        await profilePage.goto(studentId);
         await expect(page.locator("#container")).toContainText(badgeName);
         tester.isGoingTo("check the goal is presented on Jana Reed profile page tab Goals");
         await profilePage.clickTab("goals");
@@ -96,11 +96,11 @@ test.describe("Goals and Achievements tests", () => {
         await badges.clickBadgeDropdown(badgeId);
         await badges.clickDropdownOptionFirstElement(badgeId, "achievement");
         tester.isGoingTo("search and select Jana Reed on the modal");
-        await badges.selectStudentAwardAchievement(student);
+        await badges.selectStudentSetGoalOrAchievement(student);
         tester.isGoingTo("click Award achievement button on the modal");
         await badges.clickSetGoalorAwardAchievement("Award");
         tester.isGoingTo("check the achievement is presented on Jana Reed activity feed");
-        await profilePage.goto(studentId.toString());
+        await profilePage.goto(studentId);
         await expect(page.locator("#container")).toContainText(badgeName);
     });
 
@@ -116,7 +116,7 @@ test.describe("Goals and Achievements tests", () => {
         const badgeNameAchievement = "Automation Badge created for award achievement from Badges page";
         const studentId = 25;
         tester.isGoingTo("Navigate to Jana Reed profile page, click Goals tab and award the goal as achievement");
-        await profilePage.goto(studentId.toString());
+        await profilePage.goto(studentId);
         await profilePage.clickTab("goals");
         await expect(page.locator("#goal-feed")).toContainText(badgeNameGoal);
         await profilePage.clickBadgeOrDropdownOption(badgeNameGoal);
@@ -179,12 +179,12 @@ test.describe("Goals and Achievements tests", () => {
         await badges.clickBadgeDropdown(badgeId);
         await badges.clickDropdownOptionFirstElement(badgeId, "goal");
         tester.isGoingTo("search and select Jana Reed on the modal");
-        await badges.selectStudentSetGoal(student);
+        await badges.selectStudentSetGoalOrAchievement(student);
         tester.isGoingTo("click Set Goal button on the modal");
         await badges.clickSetGoalorAwardAchievement("Set goal");
 
         tester.isGoingTo("Navigate to Jana Reed profile page goals tab and add an evidence to the goal");
-        await profilePage.goto(studentId.toString());
+        await profilePage.goto(studentId);
         await profilePage.clickTab("goals");
         await expect(page.locator("#goal-feed")).toContainText(badgeNameGoal);
         await profilePage.clickBadgeOrDropdownOption(badgeNameGoal);
@@ -193,7 +193,7 @@ test.describe("Goals and Achievements tests", () => {
         await badges.clickEvidenceSubmitButton();
 
         tester.isGoingTo("Check the evidence is presented by navigating to view evidence");
-        await profilePage.goto(studentId.toString());
+        await profilePage.goto(studentId);
         await profilePage.clickTab("goals");
         await profilePage.clickBadgeOrDropdownOption(badgeNameGoal);
         await profilePage.clickBadgeOrDropdownOption("View evidence");
@@ -212,7 +212,7 @@ test.describe("Goals and Achievements tests", () => {
         );
         await badges.clickConfirm();
         await expect(page.locator('[class="icon-achievement"]')).toBeVisible();
-        await profilePage.goto(studentId.toString());
+        await profilePage.goto(studentId);
         await profilePage.clickTab("achievements");
         await expect(page.locator("#achievement-feed")).toContainText(badgeNameGoal);
 
@@ -222,7 +222,7 @@ test.describe("Goals and Achievements tests", () => {
         await expect(page.locator("#container")).toContainText("Well done, Jana!");
 
         tester.isGoingTo("Navigate to the profile page and withdraw the achievement");
-        await profilePage.goto(studentId.toString());
+        await profilePage.goto(studentId);
         await profilePage.clickTab("achievements");
         await profilePage.clickBadgeAchievementDropdown(badgeId);
         await profilePage.clickBadgeOrDropdownOption("Withdraw achievement");
@@ -240,13 +240,13 @@ test.describe("Goals and Achievements tests", () => {
         await expect(page.locator("#container")).not.toContainText("Well done, Jana!");
 
         tester.isGoingTo("Award the goal as achievement with evidence and check the evidence");
-        await profilePage.goto(studentId.toString());
+        await profilePage.goto(studentId);
         await profilePage.clickTab("goals");
         await profilePage.clickBadgeOrDropdownOption(badgeNameGoal);
         await profilePage.clickBadgeOrDropdownOption("Award with evidence");
         await tester.fillCKEditorById("reason", "Awarding this as achievement with evidence.");
         await badges.clickEvidenceSubmitButton();
-        await profilePage.goto(studentId.toString());
+        await profilePage.goto(studentId);
         await profilePage.clickTab("achievements");
         await profilePage.clickBadgeOrDropdownOption(badgeNameGoal);
         await profilePage.clickBadgeOrDropdownOption("View evidence");

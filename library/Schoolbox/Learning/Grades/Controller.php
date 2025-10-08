@@ -23,6 +23,8 @@ use Schoolbox\Collection;
 use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Filter\Filters\Assessment as AssessmentFilters;
+use Schoolbox\Filter\Filters\Assessment\IdFinder;
+use Schoolbox\Filter\IFactoryFactory;
 use Schoolbox\Filter\Page as FilterPage;
 use Schoolbox\Filter\Selection as FilterSelection;
 use Schoolbox\GenericCollection;
@@ -42,6 +44,7 @@ use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder;
+use Schoolbox\Resource\Folder\Mapper;
 use Schoolbox\User;
 use Twig\Error\Error as TwigError;
 use TypeError;
@@ -52,14 +55,15 @@ use function func_get_args;
 class Controller extends Base
 {
     /**
-     * @param AssessmentMapperProxy      $assessmentMapperProxy
-     * @param Folder\Mapper              $folderMapper
-     * @param Term\Mapper                $termMapper
-     * @param RubricDataSource           $rubricMapper
-     * @param FilterSelection\Mapper     $filterSelectionMapper
-     * @param Access                     $access
-     * @param AssessmentFilters\IdFinder $assessmentIdFinder
-     * @param Filter\IFactoryFactory     $filterFactoryFactory
+     * @param AssessmentMapperProxy $assessmentMapperProxy
+     * @param Mapper $folderMapper
+     * @param Term\Mapper $termMapper
+     * @param RubricDataSource $rubricMapper
+     * @param FilterSelection\Mapper $filterSelectionMapper
+     * @param Access $access
+     * @param IdFinder $assessmentIdFinder
+     * @param IFactoryFactory $filterFactoryFactory
+     * @param WorkType\Mapper $workTypeMapper
      */
     public function __construct(
         private AssessmentMapperProxy $assessmentMapperProxy,
@@ -69,7 +73,8 @@ class Controller extends Base
         private FilterSelection\Mapper $filterSelectionMapper,
         private Access $access,
         private AssessmentFilters\IdFinder $assessmentIdFinder,
-        private Filter\IFactoryFactory $filterFactoryFactory
+        private Filter\IFactoryFactory $filterFactoryFactory,
+        private WorkType\Mapper $workTypeMapper,
     ) {
     }
 
@@ -150,7 +155,7 @@ class Controller extends Base
      * @throws TwigError
      * @throws MapperException
      */
-    private function getCustomGrades(User $viewee, Term\Model $term, string $selectedYear = null): void
+    private function getCustomGrades(User $viewee, Term\Model $term, ?string $selectedYear = null): void
     {
         $markSchemeFactory = new Factory($this->getConfigLoader());
         $gradeHelper       = new Helper(
@@ -380,6 +385,13 @@ class Controller extends Base
         $graph = [];
         $isCohort = false;
 
+        /* All worktypes should show up here, for now. There are no specific admin controls to decide
+         * which worktypes appear here: this means that non-statistical worktypes (e.g. for attendance
+         * and other basic reporting) will still get plotted on the graph. You'd need something like the
+         * checkboxes in Summative Reports to address this, or reuse the existing ones in admin somehow.
+         */
+        $workTypeIds = $this->workTypeMapper->findAll()->indexBy('id')->keys();
+
         if ($hasPermissionsAndSettings) {
             if ((new ValidUseCohortMarks())->isSatisfiedBy($this->getConfigLoader()->get('lms_cohort_comparison'), $subject)) {
                 $isCohort = true;
@@ -389,7 +401,7 @@ class Controller extends Base
                     $assessments,
                     $this->getUser(),
                     $term,
-                ))->collate($viewee);
+                ))->collate($viewee, $workTypeIds);
             } else {
                 $gradeHelper       = new Helper(
                     $this->folderMapper,
@@ -397,7 +409,15 @@ class Controller extends Base
                     $this->access,
                     $markSchemeFactory
                 );
-                $graph = $gradeHelper->buildGraph($filteredMarkbook, $viewee, $this->getUser(), $this->getConfigLoader()->get('grade_gradient_enable'));
+
+                /* All worktypes should show up here, for now. There are no specific admin controls to decide
+                 * which worktypes appear here: this means that non-statistical worktypes (e.g. for attendance
+                 * and other basic reporting) will still get plotted on the graph. You'd need something like the
+                 * checkboxes in Summative Reports to address this, or reuse the existing ones in admin somehow.
+                 */
+                $workTypeIds = $this->workTypeMapper->findAll()->indexBy('id')->keys();
+
+                $graph = $gradeHelper->buildGraph($filteredMarkbook, $viewee, $this->getUser(), $this->getConfigLoader()->get('grade_gradient_enable'), $workTypeIds);
             }
 
             // return [
@@ -415,14 +435,9 @@ class Controller extends Base
              * Having a set of data points being all null means you didn't get any results for your assessments
              * That's why we array_filter first
              */
-            $decodedResults = json_decode($graph['scatter']);
-            $hasDataToShow = false;
-
-            if (null !== $decodedResults) {
-                $hasDataToShow = count(array_filter($decodedResults, function ($item) {
-                    return $item !== null;
-                })) > 0;
-            }
+            $hasDataToShow = count(array_filter($graph['scatter'], function ($item) {
+                return $item !== null;
+            })) > 0;
         }
 
         /* The Cohort Results graph is visible when two conditions are met:
@@ -511,6 +526,12 @@ class Controller extends Base
             'teacherAssessed' => 'incomplete',
         ];
 
+        /**
+         * Only staff can view instructor marks in the grade report
+         * This avoids a student gaining write+ access to a page (becoming an "instructor") then seeing the marks
+         */
+        $canViewInstructorMarks = $this->getUser()->getRole()->isStaff();
+
         $this->response = $this->responseAsJson([
             'status'  => 200,
             'content' => $this->responseFromTemplateUnthemed('@learningGrades/gradesInner.twig', [
@@ -520,6 +541,7 @@ class Controller extends Base
                 'tabs'                  => $tabs,
                 'selectedTab'           => $selectedTab,
                 'canSeeShowcaseButton'  => $canSeeShowcaseButton,
+                'canViewInstructorMarks' => $canViewInstructorMarks,
                 'graph'                 => $graph,
                 'longitudinalRubric'    => $longitudinalRubric,
                 'showRubricPoints'      => $showRubricPoints,

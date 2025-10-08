@@ -216,7 +216,7 @@ class Controller extends AbstractController
 
             $this->saveDivision($sport, $season, $this->requestPost->get('name'), $this->requestPost->get('url'), $entity);
 
-            $return = base64_decode($this->requestPost->get('returnUrl'));
+            $return = base64_decode($this->requestPost->get('returnUrl') ?? '');
 
             if (empty($return)) {
                 $return = $this->routeGenerator->generate('sportsfixturesSport.getEntity', [

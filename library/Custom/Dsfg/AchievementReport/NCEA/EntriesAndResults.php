@@ -21,20 +21,17 @@ class EntriesAndResults extends Base
     /**
      * Returns data for twig rendering
      *
-     * @return mixed
+     * @return array
      */
-    public function findData()
+    public function findData(): array
     {
         $finalStack = [];
-        $totalEnteredCredits = [];
-
         $allResults = $this->findEntries();
 
         foreach ($allResults as $current) {
             $courseName = $current['CourseDescription'];
-            $internalExternal = $current['InternalorExternalAssessment'];
+            $internalExternal = self::getExOrIn($current['InternalorExternalAssessment']);
             $letter = $current['StrippedResult'];
-            $level = $current['Level'];
             $studentYear = $current['StudentYear'];
             $result = $current['Result'];
             $strippedResult = $current['StrippedResult'];
@@ -42,6 +39,9 @@ class EntriesAndResults extends Base
             /* Teachers
              * Trim empty teachers out for course teachers
              */
+            if (!isset($finalStack[$courseName]['allTeachers'])) {
+                $finalStack[$courseName]['allTeachers'] = [];
+            }
             foreach ([1, 2, 3] as $currentTeacherIndex) {
                 $key = "ClassTeacher{$currentTeacherIndex}";
                 $emailKey = "ClassTeacher{$currentTeacherIndex}Email";
@@ -101,14 +101,7 @@ class EntriesAndResults extends Base
                         ]
                     ]
                 ];
-
-                $totalEnteredCredits[$level] = [
-                    'IN' => 0,
-                    'EX' => 0
-                ];
             }
-
-            $totalEnteredCredits[$level][$internalExternal] += $current['EnteredCredits'];
 
             $finalStack[$courseName]['summary']['level'] = $current['Level'];
             $finalStack[$courseName]['summary']['totalEnteredCredits'] += $current['EnteredCredits'];
@@ -148,8 +141,6 @@ class EntriesAndResults extends Base
             }
         }
 
-        ksort($finalStack);
-
         return $finalStack;
     }
 
@@ -161,6 +152,18 @@ class EntriesAndResults extends Base
      */
     private function findEntries(): array
     {
+        $dbTableName = (
+            ($this->getDbTableName() === self::MAIN_DB_TABLE_NCEA)
+            ? 'dbo.uvSchoolBoxNCEAResultsV2'
+            : $this->getDbTableName()
+        );
+
+        $columnForSorting = (
+            ($dbTableName === self::MAIN_DB_TABLE_YEAR11)
+            ? 'CourseDescriptionForSorting'
+            : 'CourseDescription'
+        );
+
         $params = [
             'externalId' => $this->getExternalUserId(),
             'year' => $this->year
@@ -169,6 +172,7 @@ class EntriesAndResults extends Base
         $query = '
             SELECT
                 CourseDescription,
+                ' . $columnForSorting . ' AS CourseDescriptionForSorting,
                 ClassTeacher1,
                 ClassTeacher1Email,
                 ClassTeacher2,
@@ -187,11 +191,13 @@ class EntriesAndResults extends Base
                 ResultCredits,
                 StudentYear
             FROM
-                dbo.uvSchoolBoxNCEAResultsV2
+                ' . $dbTableName . '
             WHERE
                 id = :externalId AND
                 WithdrawnFlag = 0
                 AND StudentYear = :year
+            ORDER BY
+                ' . $columnForSorting . ' ASC
         ';
 
         return $this->db->executeQuery($query, $params)->fetchAll();

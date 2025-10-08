@@ -159,7 +159,7 @@ Data:
             </div>
             {% endblock card %}
             {% if currentFeedback.humanReadableMark %}
-                <div class="grade {{ urgency.marks(currentFeedback.normalisedMark) }}-bg">
+                <div class="grade {{ urgency.marks(currentFeedback.normalisedMark) }}-bg" data-test="assessment-feedback-mark">
                     <span>{{ currentFeedback.humanReadableMark }}</span>
                 </div>
             {% endif %}
@@ -179,7 +179,7 @@ Data:
                 data-collapse-state="{{ collapsed ? 'collapsed' : 'expanded' }}"
                 data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"
                     {% endif %}>
-                {{ currentFeedback.comment|linkify|nl2br }}
+                {{ currentFeedback.comment|purify }}
             </blockquote>
         {% else %}
             <article>
@@ -269,3 +269,14 @@ Data:
         {% endif %}
     </li>
 </ul>
+<script>
+// Ensure media is replaced when collapsables are expanded
+document.addEventListener("DOMContentLoaded", function() {
+    $('[data-collapser="feedback-{{ responseId }}-{{ currentFeedback.id }}"]').on('click', function() {
+        setTimeout(
+            () => $.fn.schoolboxResource_ProxyReplacement('[data-collapsable="feedback-{{ responseId }}-{{ currentFeedback.id }}"]'),
+            1 // need the collapser to trigger first
+        );
+    });
+});
+</script>

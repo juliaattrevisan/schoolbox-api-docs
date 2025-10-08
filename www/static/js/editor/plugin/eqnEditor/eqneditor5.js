@@ -17,9 +17,7 @@
  * 		...
  */
 
-import { Plugin } from "@ckeditor/ckeditor5-core/src";
-import { ButtonView, ContextualBalloon, clickOutsideHandler } from "@ckeditor/ckeditor5-ui";
-import DomEventObserver from "@ckeditor/ckeditor5-engine/src/view/observer/domeventobserver";
+import { Plugin, ButtonView, ContextualBalloon, clickOutsideHandler, DomEventObserver } from "ckeditor5";
 import { default as EqnEditorView } from "./dialog";
 const fxIcon =
     '<svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="18px" height="20px" viewBox="0 0 18 20" enable-background="new 0 0 18 20" xml:space="preserve"><rect x="4.4" y="5.1" fill="none" width="38.6" height="43.4"/><g enable-background="new"><path d="M4,9.5H2L2.3,7h2.1l0.3-1.8C4.7,4.6,4.9,4.1,5,3.6c0.2-0.5,0.4-0.9,0.7-1.3c0.3-0.4,0.8-0.7,1.3-0.9C7.7,1.1,8.4,1,9.2,1c0.3,0,0.6,0,0.9,0c0.3,0,0.6,0.1,0.9,0.1l-0.5,2.7c-0.2-0.1-0.3-0.1-0.5-0.2c-0.1,0-0.3-0.1-0.5-0.1C9,3.7,8.6,3.8,8.4,4C8.1,4.2,7.9,4.7,7.8,5.4L7.6,7h2.3L9.5,9.5H7.2l-1.1,7.7H3L4,9.5z"/></g><g enable-background="new"><path d="M11.1,15.3l-2.3-3.2h2.5l1.2,1.8l1.2-1.8H16l-2.2,3.2l2.6,3.6h-2.5l-1.5-2.3L10.8,19H8.4L11.1,15.3z"/></g></svg>';
@@ -82,7 +80,7 @@ export default class Eqneditor5 extends Plugin {
             viewDocument,
             "dblclick",
             function (e, dat) {
-                console.log(dat);
+                // console.log(dat);
                 if (dat.domTarget.nodeName.toLowerCase() == "img") {
                     var sName = dat.domTarget.src.match(/(gif|svg)\.image\?(.*)/);
                     if (sName != null) this._initEqnEditor(null, sName[2]);
@@ -121,7 +119,13 @@ export default class Eqneditor5 extends Plugin {
         }
 
         this.textarea.clear();
-        this.textarea.insert(inp.replace(/&space;/g, " "), inp.length);
+        /**
+         * As per below, we are using 'this.output.exportAs("urlencoded")' to avoid the bug in the 'html' export format.
+         * So if we edit the same equation (double click the image), we need to decode the URL encoded string to display the original equation.
+         */
+        const encoded = inp.replace(/&space;/g, " ");
+        const decoded = decodeURIComponent(encoded);
+        this.textarea.insert(decoded, decoded.length);
     }
 
     _createEqnEditorView() {

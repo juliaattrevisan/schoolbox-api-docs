@@ -25,7 +25,6 @@ use InvalidArgumentException;
  */
 class CanPreview extends AbstractParticipationRule
 {
-
     /**
      * @var Access
      */
@@ -47,7 +46,7 @@ class CanPreview extends AbstractParticipationRule
      * @inheritdoc
      * @throws InvalidArgumentException
      */
-    public function authorize(array $params = [], User $user = null)
+    public function authorize(array $params = [], ?User $user = null)
     {
         if (!$user) {
             throw new InvalidArgumentException("No session user available to test permissions");

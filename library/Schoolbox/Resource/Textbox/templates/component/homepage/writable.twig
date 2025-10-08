@@ -4,6 +4,7 @@
  # component: \Schoolbox\Resource\Textbox\Component\Homepage\Controller this component
  # textbox:   \Schoolbox\Resource\Textbox\Model|null                    this component's textbox, if any
  # context:   \Schoolbox\Resource\Folder\Model|null                     this component's context, if any
+ # editorTemplates: \Schoolbox\Editor\Templates\Model[]                 List of editor templates available for this component
  #}
 
 {% set textboxExists = textbox is not null and textbox.id is not null %}
@@ -105,6 +106,9 @@
                 saveButton:            '[data-action="save"]',
                 editorInstance:        '[data-content]',
                 fileBrowserCategoryId: Number("{{ context.id }}"),
+                {% if editorTemplates is defined %}
+                editorTemplates:       {{ editorTemplates | json_encode | raw }},
+                {% endif %}
             });
 
             //to start the Text Box editor automatically after creating a Text Box,

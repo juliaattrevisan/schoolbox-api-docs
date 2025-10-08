@@ -43,7 +43,7 @@ class IsConfigOn implements IAuthorizationRule
     /**
      * {@inheritdoc}
      */
-    public function authorize(array $params = array(), User $user = null)
+    public function authorize(array $params = array(), ?User $user = null)
     {
         if ((bool)$this->configLoader->get($this->paramsKey)) {
             return true;

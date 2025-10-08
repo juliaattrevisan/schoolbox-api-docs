@@ -5,7 +5,6 @@
  */
 
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
-import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import LoadingTable from "@schoolboxVue/components/loading/loading-table.vue";
 import DataLoadError from "@schoolboxVue/components/error/data-load-error.vue";
@@ -109,8 +108,8 @@ async function addClient(): Promise<void> {
         return;
     }
     resetValidationChecks();
+    const toast = window.sbProps.toastActivate("Adding...");
     try {
-        activate("Adding...");
         const response = await fetch(props.postItemEndpoint, {
             method: "POST",
             body: JSON.stringify(addingClient.value),
@@ -124,13 +123,13 @@ async function addClient(): Promise<void> {
             addingClient.value = newClient;
             currentAction.value = ActionType.ADDED;
             clientList.value = [...clientList.value, newClient];
-            timeout({ text: "Client added successfully" });
+            toast.timeout({ text: "Client added successfully" });
         } else {
             saveError.value = await extractErrorMessage(response);
-            timeout({ text: "Client couldn't be added", isSuccess: false });
+            toast.timeout({ text: "Client couldn't be added", isSuccess: false });
         }
     } catch (error) {
-        timeout({ text: "Client couldn't be added", isSuccess: false });
+        toast.timeout({ text: "Client couldn't be added", isSuccess: false });
     }
 }
 
@@ -167,11 +166,11 @@ async function modifyItem(client: OAuthClient): Promise<void> {
         return;
     }
     resetValidationChecks();
+    const toast = window.sbProps.toastActivate("Modifying...");
     try {
         if (!client._links?.patch) {
             throw new Error("No patch link found for client");
         }
-        activate("Modifying...");
         const response = await fetch(client._links?.patch, {
             method: "PATCH",
             body: JSON.stringify(client),
@@ -181,17 +180,17 @@ async function modifyItem(client: OAuthClient): Promise<void> {
             },
         });
         if (response.ok) {
-            timeout({ text: "Client modified successfully" });
+            toast.timeout({ text: "Client modified successfully" });
             // Replace the existing modified client with the new version
             const modifiedClient = (await response.json()) as OAuthClient;
             clientList.value = clientList.value.map((c) => (c.id === modifiedClient.id ? modifiedClient : c));
             closeModal();
         } else {
             saveError.value = await extractErrorMessage(response);
-            timeout({ text: "Client couldn't be modified", isSuccess: false });
+            toast.timeout({ text: "Client couldn't be modified", isSuccess: false });
         }
     } catch (error) {
-        timeout({ text: "Client couldn't be modified", isSuccess: false });
+        toast?.timeout({ text: "Client couldn't be modified", isSuccess: false });
     }
 }
 
@@ -217,11 +216,11 @@ async function regenerateClient(client: OAuthClient): Promise<void> {
     if (isProcessing.value) {
         return;
     }
+    const toast = window.sbProps.toastActivate("Regenerating...");
     try {
         if (!client._links?.regenerate) {
             throw new Error("No patch link found for client");
         }
-        activate("Regenerating...");
         const response = await fetch(client._links.regenerate, {
             method: "POST",
             headers: {
@@ -231,13 +230,13 @@ async function regenerateClient(client: OAuthClient): Promise<void> {
         if (response.ok) {
             regeneratingClient.value = (await response.json()) as OAuthClient;
             currentAction.value = ActionType.REGENERATED;
-            timeout({ text: "Client regenerated successfully" });
+            toast.timeout({ text: "Client regenerated successfully" });
         } else {
             saveError.value = await extractErrorMessage(response);
-            timeout({ text: "Client couldn't be regenerated", isSuccess: false });
+            toast.timeout({ text: "Client couldn't be regenerated", isSuccess: false });
         }
     } catch (error) {
-        timeout({ text: "Client couldn't be regenerated", isSuccess: false });
+        toast.timeout({ text: "Client couldn't be regenerated", isSuccess: false });
     }
 }
 
@@ -262,24 +261,24 @@ async function deleteClient(client: OAuthClient): Promise<void> {
     if (isProcessing.value) {
         return;
     }
+    const toast = window.sbProps.toastActivate("Deleting...");
     try {
         if (!client._links?.delete) {
             throw new Error("No patch link found for client");
         }
-        activate("Deleting...");
         const response = await fetch(client._links.delete, {
             method: "DELETE",
         });
         if (response.ok) {
             clientList.value = clientList.value.filter((c) => c.id !== client.id);
-            timeout({ text: "Client deleted successfully" });
+            toast.timeout({ text: "Client deleted successfully" });
             closeModal();
         } else {
             saveError.value = await extractErrorMessage(response);
-            timeout({ text: "Client couldn't be deleted", isSuccess: false });
+            toast.timeout({ text: "Client couldn't be deleted", isSuccess: false });
         }
     } catch (error) {
-        timeout({ text: "Client couldn't be deleted", isSuccess: false });
+        toast.timeout({ text: "Client couldn't be deleted", isSuccess: false });
     }
 }
 
@@ -365,7 +364,9 @@ window.Vue.watch(modifySelected, (newSelected) => {
 
 <template>
     <loading-table v-if="isDataLoading" />
-    <data-load-error v-else-if="hasDataLoadError" data-title="client list" />
+    <section v-else-if="hasDataLoadError" class="content">
+        <data-load-error data-title="client list" />
+    </section>
     <div v-else>
         <div class="small-12 island">
             <template v-if="clientList.length === 0">

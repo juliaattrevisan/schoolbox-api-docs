@@ -194,6 +194,10 @@
     & > li:first-child {
         border-top: 1px solid $gainsboro;
     }
+    //Fixes issue where numbers get cut off due to inherited list styling
+    article ol {
+        list-style-position: inside;
+    }
 }
 
 .lp-display {
@@ -211,6 +215,11 @@
         &:first-child {
             border-top: 1px solid $gainsboro;
         }
+    }
+
+    //Fixes issue where numbers get cut off due to inherited list styling
+    article ol {
+        list-style-position: inside;
     }
 }
 

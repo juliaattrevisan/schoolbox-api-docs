@@ -1,0 +1,23 @@
+#!/bin/bash
+# Useful constants and functions for docker's provision script
+
+# Global constants
+readonly SITE_ROOT=/usr/share/schoolbox
+readonly LOG=/usr/bin/alaress-logger
+readonly L_INFO=200;
+readonly L_WARN=300;
+readonly L_ERROR=400;
+
+# Currently this cache is shared between Docker and Vagrant:
+# keep using the Vagrant cache dir for now
+readonly CACHE_DIR="$SITE_ROOT"/vagrantcache;
+
+function log(){
+  $LOG $L_INFO "$1"
+}
+function warn(){
+  $LOG $L_WARN "$1"
+}
+function error(){
+  $LOG $L_ERROR "$1"
+}

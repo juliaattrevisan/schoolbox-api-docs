@@ -120,6 +120,11 @@ class Factory
     private bool $sebEnabled;
 
     /**
+     * @var int|null
+     */
+    private ?int $originalAssessmentId;
+
+    /**
      * @var string
      */
     protected $publishAt;
@@ -155,6 +160,17 @@ class Factory
     /** @var Error\Mapper */
     private Error\Mapper $errorMapper;
 
+
+    /**
+     * Used in Lesson Plans' AI generation to decide how much data
+     * the LLM should generate. Unfortunately shares a similar name,
+     * but not concept, with other duration fields here
+     *
+     * @var string|null
+     */
+    private ?string $duration = null;
+
+
     /**
      * Factory constructor.
      * @param User             $creator
@@ -176,6 +192,7 @@ class Factory
         $this->setDefaultOpenSpan(empty($post['default_open_span']) ? null : intval($post['default_open_span']));
         $this->setCourseManaged((bool)($post['courseManaged'] ?? ''));
         $this->setSebEnabled((bool)($post['sebEnabled'] ?? ''));
+        $this->setOriginalAssessmentId(isset($post['customisedFor']) ? (int)($post['customisedFor'] ) : null);
         $this->setPublishAt(trim($post['publishDate'] ?? ''));
         $this->setOpenAt(trim($post['openDate'] ?? ''));
         $this->setDueAt(trim($post['dueDate'] ?? ''));
@@ -204,7 +221,10 @@ class Factory
         $this->setAcceptOnline((int)trim($post['acceptOnline'] ?? ''));
         $markType = (int)trim($post['markType'] ?? '');
         $this->setMarkType($markType);
+        $instructorMarkType = (int)trim($post['instructor-markType'] ?? '');
+        $this->setInstructorMarkType($instructorMarkType);
         $this->setGradingScheme(empty($post['gradingScheme']) ? null : (int)trim($post['gradingScheme']));
+        $this->setInstructorGradingScheme(empty($post['instructor-gradingScheme']) ? null : (int)trim($post['instructor-gradingScheme']));
         $this->setUseRubric((bool)($post['useRubric'] ?? ''));
         $this->setSimilarityCheckEnabled(trim($post['similarityCheckEnabled'] ?? '') === 'on');
 
@@ -268,6 +288,25 @@ class Factory
                 throw new UnexpectedValueException('Please provide maximum available marks greater than 0');
             }
             $this->setMaxMark($maxMark);
+
+            // and do it all over again for the instructor mark type
+
+            switch ($instructorMarkType) {
+                case MarkType::TYPE_PERCENT:
+                case MarkType::TYPE_LETTER:
+                case MarkType::TYPE_NONE:
+                    $instructorMaxMark = null;
+                    break;
+                default:
+                    $instructorMaxMark = (float)trim($post['instructor-maxMark'] ?? '');
+                    break;
+            }
+
+            // We should never end up with a 0 max mark unless something goes very wrong, but if that does happen, we want to handle it nicely.
+            if ($instructorMaxMark === 0.0) {
+                throw new UnexpectedValueException('Please provide maximum available marks greater than 0');
+            }
+            $this->setInstructorMaxMark($instructorMaxMark);
         }
 
         if (isset($post['self_reviewable'])) {
@@ -319,6 +358,7 @@ class Factory
         $this->setLessonPlanTemplateId((int)($post['lessonPlanTemplateId'] ?? null));
         $this->setLessonPlanFields($post['field'] ?? []);
         $this->setLessonPlanVisibility('on' === ($post['lessonPlanVisibility'] ?? null) ? \Schoolbox\Role::STUDENT : \Schoolbox\Role::STAFF);
+        $this->setLessonPlanDuration((string)($post['duration'] ?? null));
 
         // Ensure custom fields is an array if it's set
         $customFields = $post['customFields'] ?? null;
@@ -347,7 +387,7 @@ class Factory
      * @throws MapperException
      * @throws ResourceException
      */
-    public function produce(IAssessable $assessment = null): IAssessable
+    public function produce(?IAssessable $assessment = null): IAssessable
     {
         if ($assessment instanceof IAssessable) {
             return $this->produceFromExistingAssessment($assessment);
@@ -424,12 +464,15 @@ class Factory
             if ($courseManagedFields->isReadonly()) {
                 $decorator = new DueWorkCourseManagedDecorator(
                     $this->getMarkType(),
+                    $this->getInstructorMarkType(),
                     $this->getGradingScheme(),
+                    $this->getInstructorGradingScheme(),
                     $this->getUseRubric(),
                     $this->getCapabilityMarkType(),
                     $this->getCapabilityGradeGroup(),
                     $this->getUseMarkRange(),
                     $this->getMaxMark(),
+                    $this->getInstructorMaxMark(),
                     $this->getRubricData(),
                     $this->getAttachedFiles(),
                     $this->getEnableWorksheet(),
@@ -444,12 +487,15 @@ class Factory
                 $decorator = new DueWorkDecorator(
                     $this->getAcceptOnline(),
                     $this->getMarkType(),
+                    $this->getInstructorMarkType(),
                     $this->getGradingScheme(),
+                    $this->getInstructorGradingScheme(),
                     $this->getUseRubric(),
                     $this->getCapabilityMarkType(),
                     $this->getCapabilityGradeGroup(),
                     $this->getUseMarkRange(),
                     $this->getMaxMark(),
+                    $this->getInstructorMaxMark(),
                     $this->getRubricData(),
                     $this->getAttachedFiles(),
                     $this->getSelfReviewable(),
@@ -500,7 +546,8 @@ class Factory
                 $this->getLessonPlanTemplateId(),
                 $this->getLessonPlanFields(),
                 $this->getLessonPlanVisibility(),
-                $this->getAttachedFiles()
+                $this->getAttachedFiles(),
+                $this->getLessonPlanDuration(),
             );
         } else {
             throw new DomainException('Please select an assessment type');
@@ -538,6 +585,7 @@ class Factory
                 ->setDefaultOpenSpan($this->getDefaultOpenSpan())
                 ->setCourseManaged($this->getCourseManaged())
                 ->setSebEnabled($this->getSebEnabled())
+                ->setOriginalAssessmentId($this->getOriginalAssessmentId())
                 ->setMarkVisibility($this->getMarkVisibility())
                 ->setPublishAt($this->deriveDate($assessment->getBaseContext(), $this->getPublishAt()))
                 ->setOpenAt($this->deriveDate($assessment->getBaseContext(), $this->getOpenAt()))
@@ -764,6 +812,23 @@ class Factory
         return $this;
     }
 
+    /**
+     * @return int|null
+     */
+    public function getOriginalAssessmentId(): ?int
+    {
+        return $this->originalAssessmentId;
+    }
+
+    /**
+     * @param int|null $originalAssessmentId
+     * @return self
+     */
+    public function setOriginalAssessmentId(?int $originalAssessmentId): self
+    {
+        $this->originalAssessmentId = $originalAssessmentId;
+        return $this;
+    }
 
     /**
      * @return string
@@ -880,6 +945,26 @@ class Factory
     protected function setCurriculumNodes($curriculumNodes)
     {
         $this->curriculumNodes = $curriculumNodes;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getLessonPlanDuration(): ?string
+    {
+        return $this->duration;
+    }
+
+
+    /**
+     * @param string|null $duration
+     * @return $this
+     */
+    public function setLessonPlanDuration(?string $duration): self
+    {
+        $this->duration = $duration;
         return $this;
     }
 }

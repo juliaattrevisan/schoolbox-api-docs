@@ -24,16 +24,18 @@
                 </thead>
                 <tbody>
                 {% for courseName, allValues in courseCreditSummary.data.courses %}
-                    <tr>
-                        <td>{{ courseName }}</td>
-                        <td class="numeric">{{ allValues.enteredCredits }}</td>
-                        {% for currentLetter in courseCreditSummary.allLetters %}
-                            <td class="numeric">{{ allValues.letters[currentLetter] }}</td>
-                        {% endfor %}
-                        <td class="numeric">{{ allValues.achieved }}</td>
-                        <td class="numeric">{{ allValues.attempted }}</td>
-                        <td>{{ allValues.endorsement }}</td>
-                    </tr>
+                    {% if navigation['selected'] != 'year11' or 'NCEA' in courseName %}
+                        <tr>
+                            <td>{{ courseName }}</td>
+                            <td class="numeric">{{ allValues.enteredCredits }}</td>
+                            {% for currentLetter in courseCreditSummary.allLetters %}
+                                <td class="numeric">{{ allValues.letters[currentLetter] }}</td>
+                            {% endfor %}
+                            <td class="numeric">{{ allValues.achieved }}</td>
+                            <td class="numeric">{{ allValues.attempted }}</td>
+                            <td>{{ allValues.endorsement }}</td>
+                        </tr>
+                    {% endif %}
                 {% endfor %}
                 </tbody>
                 <tfoot>

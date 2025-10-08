@@ -7,6 +7,7 @@
         markScheme:   LetterGrade
         errors:       string[]       Admin-configured submission states
         readonly:     bool           Should this form input be rendered as readonly?
+        useInstructorMark: bool      Should the instructor mark be used? (only relevant for due works)
     ]
 #}
 
@@ -16,6 +17,7 @@
         feedback:    feedback,
         tabIndex:    tabIndex,
         placeholder: readonly ? '(no grade given)' : '(no grade)',
+        useInstructorMark: useInstructorMark,
         limit:       100,
         maxLength:   48,
         inputTitle:  '',
@@ -49,13 +51,20 @@
     </script>
 
     {% if feedback %}
-        {% set humanReadableMark = feedback.humanReadableMark(false) %}
+        {% set humanReadableMark = useInstructorMark ? feedback.humanReadableInstructorMark(false) : feedback.humanReadableMark(false) %}
     {% else %}
-        {% set humanReadableMark = participant.humanReadableMark(false) %}
+        {% set humanReadableMark = useInstructorMark ? participant.humanReadableInstructorMark(false) : participant.humanReadableMark(false) %}
     {% endif %}
 
     {% set found = false %}
-    <select class="letter-grade-select" data-mark-input name="mark" tabindex="{{ tabIndex }}" title="Select a {{ locale.grades.proper }}">
+    <select
+        class="letter-grade-select"
+        data-test="assessment-feedback-mark-select-{{ participant.user.id }}"
+        data-mark-input
+        name="mark"
+        tabindex="{{ tabIndex }}"
+        title="Select a {{ locale.grades.proper }}"
+    >
 
         {# If humanReadableMark is null, there isn't an existing mark; this is a new draft
          # Select No Grade. Otherwise we need to find out whether the humanReadableMark exists
@@ -131,5 +140,3 @@
 
     </select>
 {% endif %}
-
-

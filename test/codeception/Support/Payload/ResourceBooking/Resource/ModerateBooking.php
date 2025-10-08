@@ -30,7 +30,6 @@ class ModerateBooking extends Payload\Request
         $this->resourceID = $Booking->getResource()->getId();
         $this->setHeader('Accept', 'application/json, text/javascript, */*; q=0.01');
         $this->setHeader('Accept-Encoding', 'gzip, deflate, br');
-        $this->setHeader('Origin', 'https://vagrant.dev.schoolbox.cloud');
         $this->setHeader('Content-Type', 'application/x-www-form-urlencoded');
         $this->setHeader('Pragma', 'no-cache');
         $this->setHeader('TE', 'Trailers');
@@ -47,6 +46,7 @@ class ModerateBooking extends Payload\Request
             case $this::ACTION_APPROVE:
                 $this->actionString = 'approve';
                 $this->setEfficacy('false');
+                break;
             default:
                 $this->actionString = 'approve';
         }

@@ -17,10 +17,17 @@ if (
     throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
 }
 
-if ($this->arg[0] ?? null) {
-    $selectedType = urldecode($this->arg[0]);
+$type = $this->arg[0] ?? null;
+if ($type === null || strtolower($type) === 'import') {
+    $importType = $this->arg[1] ?? null;
+    if ('' !== strtolower((string)$importType)) {
+        SitePage::localRedir("/adminv2/calendar/import/{$importType}");
+    } else {
+        //Fallback
+        SitePage::localRedir('/adminv2/calendar/import/school-events');
+    }
 } else {
-    $selectedType = 'Import';
+    $selectedType = urldecode($type);
 }
 
 /** @var SitePage $this */

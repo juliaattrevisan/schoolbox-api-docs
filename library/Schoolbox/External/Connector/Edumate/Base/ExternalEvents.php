@@ -23,28 +23,30 @@ class ExternalEvents extends Base implements IExternalEvents
         }
 
         $query = 'SELECT
-                    EVENT_ID AS "id",
-                    TITLE AS "title",
-                    COMMENT AS "comment",
-                    OWNER AS "owner",
-                    ROOM AS "room",
-                    TYPE AS "type",
-                    START_DATE AS "start",
-                    END_DATE AS "finish",
-                    LOCATION AS "location"
+                    EVENT_ID AS ID,
+                    TITLE,
+                    COMMENT,
+                    OWNER,
+                    ROOM ,
+                    TYPE,
+                    START_DATE AS START,
+                    END_DATE AS FINISH,
+                    LOCATION
                 FROM SCHOOLBOX_EVENT
                 WHERE
                     OWNER = :externalId
                     AND START_DATE >= :startDate
                     AND END_DATE <= :endDate';
 
-        return $this->databaseExternal->getQueryIterator(
-            $query,
-            [
-             'externalId' => $user->getExternalId(),
-             'startDate'  => date('Y-m-d', $startDate),
-             'endDate'    => date('Y-m-d', $endDate)
-            ]
+        return new ResultIterator(
+            $this->databaseExternal->getQueryIterator(
+                $query,
+                [
+                    'externalId' => $user->getExternalId(),
+                    'startDate'  => date('Y-m-d', $startDate),
+                    'endDate'    => date('Y-m-d', $endDate)
+                ]
+            ),
         );
     }
 }

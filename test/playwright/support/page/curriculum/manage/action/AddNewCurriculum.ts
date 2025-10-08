@@ -8,13 +8,13 @@ export default class AddNewCurriculum {
 
     private tester: AcceptanceTester;
 
-    static readonly DATATEST_DISPLAY_TOGGLE = "toggle-create-curriculum";
+    static readonly DATA_TEST_DISPLAY_TOGGLE = "toggle-create-curriculum";
 
     static readonly NAME_FIELD = "#name";
 
     static readonly CODE_FIELD = "#code";
 
-    static readonly DATATEST_ADD_BUTTON = "add-curriculum";
+    static readonly DATA_TEST_ADD_BUTTON = "add-curriculum";
 
     constructor(page: Page, tester: AcceptanceTester) {
         this.page = page;
@@ -25,14 +25,14 @@ export default class AddNewCurriculum {
      * select the add new curriculum button
      */
     async clickDisplay(): Promise<void> {
-        await this.page.getByTestId(AddNewCurriculum.DATATEST_DISPLAY_TOGGLE).click();
+        await this.page.getByTestId(AddNewCurriculum.DATA_TEST_DISPLAY_TOGGLE).click();
     }
 
     /**
      * check if button is disabled, should be when no name has been entered
      */
     async seeAddButtonIsDisabled(): Promise<void> {
-        await expect(this.page.getByTestId(AddNewCurriculum.DATATEST_ADD_BUTTON)).toBeDisabled();
+        await expect(this.page.getByTestId(AddNewCurriculum.DATA_TEST_ADD_BUTTON)).toBeDisabled();
     }
 
     /**
@@ -55,7 +55,7 @@ export default class AddNewCurriculum {
      * click the add button
      */
     async clickAddButton(): Promise<void> {
-        await this.page.getByTestId(AddNewCurriculum.DATATEST_ADD_BUTTON).click();
+        await this.page.getByTestId(AddNewCurriculum.DATA_TEST_ADD_BUTTON).click();
     }
 
     /**
@@ -63,6 +63,6 @@ export default class AddNewCurriculum {
      * @param name - The name to check
      */
     async seeCurriculumExists(name: string): Promise<void> {
-        await expect(this.page.getByTestId(ManageCurriculum.DATATEST_MC_VIEW_NODES_LIST)).toContainText(name);
+        await expect(this.page.getByTestId(ManageCurriculum.DATA_TEST_MC_VIEW_NODES_LIST)).toContainText(name);
     }
 }

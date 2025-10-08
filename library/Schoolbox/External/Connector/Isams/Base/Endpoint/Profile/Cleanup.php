@@ -25,92 +25,25 @@ use Schoolbox\External\Profile\Mapper;
 class Cleanup implements IStrategy
 {
     /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var bool
-     */
-    private bool $includePhoto;
-
-
-    /**
-     * @var UserProfile\Mapper
-     */
-    private UserProfile\Mapper $baseProfileMapper;
-
-
-    /**
-     * @var UserProfile\Student\Mapper
-     */
-    private UserProfile\Student\Mapper $studentProfileMapper;
-
-
-    /**
-     * @var UserProfile\Parent\Mapper
-     */
-    private UserProfile\Parent\Mapper $parentProfileMapper;
-
-
-    /**
-     * @var UserProfile\Staff\Mapper
-     */
-    private UserProfile\Staff\Mapper $staffProfileMapper;
-
-
-    /**
-     * @var UserProfile\Relationship\Mapper
-     */
-    private UserProfile\Relationship\Mapper $relationshipMapper;
-
-
-    /**
-     * @var PhotoDownloader
-     */
-    private PhotoDownloader $photoDownloader;
-
-
-    /**
      * Cleanup constructor.
      *
      * @param LoggerInterface                 $log
      * @param bool                            $perform
-     * @param bool                            $includePhoto
      * @param Mapper                          $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
-     * @param PhotoDownloader                 $photoDownloader
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        bool $includePhoto,
-        UserProfile\Mapper $baseProfileMapper,
-        UserProfile\Student\Mapper $studentProfileMapper,
-        UserProfile\Parent\Mapper $parentProfileMapper,
-        UserProfile\Staff\Mapper $staffProfileMapper,
-        UserProfile\Relationship\Mapper $relationshipMapper,
-        PhotoDownloader $photoDownloader
+        private LoggerInterface $log,
+        private bool $perform,
+        private UserProfile\Mapper $baseProfileMapper,
+        private UserProfile\Student\Mapper $studentProfileMapper,
+        private UserProfile\Parent\Mapper $parentProfileMapper,
+        private UserProfile\Staff\Mapper $staffProfileMapper,
+        private UserProfile\Relationship\Mapper $relationshipMapper,
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->includePhoto = $includePhoto;
-        $this->baseProfileMapper = $baseProfileMapper;
-        $this->studentProfileMapper = $studentProfileMapper;
-        $this->parentProfileMapper = $parentProfileMapper;
-        $this->staffProfileMapper = $staffProfileMapper;
-        $this->relationshipMapper = $relationshipMapper;
-        $this->photoDownloader = $photoDownloader;
     }
 
 
@@ -140,15 +73,6 @@ class Cleanup implements IStrategy
             ))->remove();
 
             $this->log->info("Removed {$orphans} orphaned profiles.");
-
-            /* Only try to clean up photos if we actually tried to import them
-             * Otherwise leave this place untouched
-             */
-            if ($this->includePhoto) {
-                $this->photoDownloader->cleanup();
-
-                $this->log->info("Removed residual photos and zip files from isams cache dir.");
-            }
         }
     }
 }

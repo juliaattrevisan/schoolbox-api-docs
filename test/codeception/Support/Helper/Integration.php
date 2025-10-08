@@ -100,7 +100,7 @@ class Integration extends REST
      */
     public function grabResponseCode(): string
     {
-        return $this->connectionModule->_getResponseStatusCode();
+        return (string)$this->connectionModule->_getResponseStatusCode();
     }
 
     /**
@@ -111,5 +111,15 @@ class Integration extends REST
         /** @var Db $db */
         $db = $this->getModule('Db');
         return $db;
+    }
+
+    /**
+     * Grab the base URL out of this module's configuration.
+     *
+     * @return string
+     */
+    public function grabBaseUrl(): string
+    {
+        return $this->_getConfig('url');
     }
 }

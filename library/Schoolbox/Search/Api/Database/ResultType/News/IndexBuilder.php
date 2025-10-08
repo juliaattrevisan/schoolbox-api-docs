@@ -75,9 +75,16 @@ class IndexBuilder extends BaseBuilder
             }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
         }
+        // Set max_statement_time at the query level to ensure no timeouts even if global max_statement_time is set.
+        // The query will not work as expected without the CAST, even though a float value is supplied.
+        $queryString = "SET STATEMENT max_statement_time = CAST(:maxStatementTime AS DECIMAL(4,4)) FOR\n$queryString";
+        $params['maxStatementTime'] = BaseBuilder::QUERY_LEVEL_MAX_STATEMENT_TIME;
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding news articles...');
+        $t0 = microtime(true);
         $query->execute($params);
+        $t1 = microtime(true);
+        $this->logger->debug('Done.  Time taken: ' . round($t1 - $t0, 4) . ' seconds.');
         $this->logger->info(sprintf('Building search indices for %d news articles', $query->rowCount()));
         foreach ($query as $row) {
             $index = $this->buildIndex(
@@ -100,13 +107,15 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
-        // Remove all articles that are not currently published.
-        $queryString = 'SELECT
-            n.id
-            FROM comms_news_article n
-            WHERE NOT ' . $this->getSqlConditionForCurrentlyPublished() . '
+        // Select all search_index rows linked to unpublished news articles.
+        $queryString = '
+            SELECT si.identifier AS id, si.type
+            FROM search_index si
+            JOIN comms_news_article n ON si.identifier = n.id
+            WHERE si.type = "' . Hydrator::BASE_TYPE . '"
+            AND NOT ' . $this->getSqlConditionForCurrentlyPublished() . '
         ';
-        $params      = [];
+        $params = [];
         if ($fromDate) {
             $queryString .= ' AND n.deleted_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
@@ -117,7 +126,7 @@ class IndexBuilder extends BaseBuilder
         }
         if ($subject) {
             if (!$this->accepts($subject, BuildType::DELETE)) {
-                return;
+                return null;
             }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::DELETE, $queryString, $params);
         }

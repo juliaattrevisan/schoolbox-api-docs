@@ -23,7 +23,7 @@ class Implicit extends ImplicitGrant
     /**
      * @inheritdoc
      */
-    public function canRespondToAuthorizationRequest(ServerRequestInterface $request)
+    public function canRespondToAuthorizationRequest(ServerRequestInterface $request): bool
     {
         return
             isset($request->getQueryParams()['client_id'])

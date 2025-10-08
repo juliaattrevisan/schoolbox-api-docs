@@ -54,7 +54,10 @@ if (is_numeric($_REQUEST['cid'])) {
                 if ($componentID) {
                     try {
                         /** @var Component_Instance $inst */
-                        $inst = $componentInstanceMapper->findById($componentID);
+                        $inst = $componentInstanceMapper->findByInstanceId($componentID, $folder->getId());
+                        if (null === $inst) {
+                            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+                        }
                         $inst->setSequence($sequence + 1); // because we prefer to not have 0s in the database///
                         $inst->setPosition($position);
                         $instanceList[] = $inst;
@@ -80,7 +83,10 @@ if (is_numeric($_REQUEST['cid'])) {
         // locate the instance, locate its config instances, then blast them away
         try {
             /** @var Component_Instance $instance */
-            $instance = $componentInstanceMapper->findById($_POST['delete']);
+            $instance = $componentInstanceMapper->findByInstanceId($_POST['delete'], $folder->getId());
+            if (null === $instance) {
+                throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+            }
             $configs  = $componentConfigInstanceMapper->findByColumn('component_instance_id', $instance->getId());
             foreach ($configs as $c) {
                 $componentConfigInstanceMapper->delete($c);
@@ -203,7 +209,7 @@ if (is_numeric($_REQUEST['cid'])) {
             }
 
             if (count($configInstances)) {
-                $componentConfigInstanceMapper->getDatabase()->transact(function () use ($componentConfigInstanceMapper, $configInstances) {
+                $componentConfigInstanceMapper->getDatabase()->transact(function () use ($componentConfigInstanceMapper, $configInstances): void {
                     $componentConfigInstanceMapper->save($configInstances);
                 });
             }

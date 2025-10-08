@@ -87,6 +87,13 @@ class Model implements IAssessableDataModel, ISoftDeletable
      */
     private ?string $visibility = null;
 
+
+    /**
+     * @var string|null
+     */
+    private ?string $duration = null;
+
+
     /**
      * Assessments that are linked to this lesson plan
      */
@@ -262,5 +269,25 @@ class Model implements IAssessableDataModel, ISoftDeletable
     public function getLinkedAssessments(): ?GenericCollection
     {
         return $this->linkedAssessments;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getLessonPlanDuration(): ?string
+    {
+        return $this->duration;
+    }
+
+
+    /**
+     * @param string|null $duration
+     * @return $this
+     */
+    public function setLessonPlanDuration(?string $duration): self
+    {
+        $this->duration = $duration;
+        return $this;
     }
 }

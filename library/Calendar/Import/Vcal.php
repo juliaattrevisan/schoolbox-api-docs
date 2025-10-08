@@ -24,7 +24,6 @@ use Schoolbox\Realtime\Schedule\Trigger\Test\MockPropagator;
 
 class Vcal extends Base
 {
-
     /**
      * Find an event type from an array of possibilities
      * The array contains the "type" (name) values
@@ -57,13 +56,17 @@ class Vcal extends Base
     /**
      * Load all events into schoolbox, generate outcome array
      *
+     * @param bool $perform should it be a dry-run instead, this should always be true as this function
+     *                      does not use the perform mode
+     * @return void
+     *
      * @throws VObject\InvalidDataException
      * @throws \InvalidArgumentException
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function load(): void
+    public function load(bool $perform = true): void
     {
         $output = [];
 
@@ -87,18 +90,58 @@ class Vcal extends Base
 
             /* All the events from the file
              */
-            $now = new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U');
+            $now = (new \Alaress_Date_Format($_SERVER['REQUEST_TIME'], 'U'))->startOfMonth();
             $later = new \Alaress_Date_Format(strtotime('+1 year', $_SERVER['REQUEST_TIME']), 'U');
 
             /** @var VObject\Component\VCalendar $allEvents */
             $allEvents = VObject\Reader::read(file_get_contents($this->getFile()));
 
-            $allEvents = $allEvents->expand(new \DateTime($now->getDatabaseDate()), new \DateTime($later->getDatabaseDate()));
+            /* Specifically look for events that are in the past, or are too far in the future
+             * (this latter idea is probably less significant in the general usage) since events
+             * in the past will be quietly disregarded by $allEvents->expand(). There's a check
+             * inside the vendor library to ensure events start (or end) within the time range
+             * [$now - $later].
+             */
+            $rangeStart = new \DateTime($now->getDatabaseDate());
+            $rangeEnd = new \DateTime($later->getDatabaseDate());
 
             foreach ($allEvents->getComponents() as $currentEvent) {
                 /* Skip non-VEvent instances
                  */
                 if (!$currentEvent instanceof VEvent) {
+                    continue;
+                }
+
+                if (!$currentEvent->isInTimeRange($rangeStart, $rangeEnd)) {
+                    $output[] = [
+                        'name'   => \Scrub::text((string)$currentEvent->SUMMARY),
+                        'status' => 'Not Added',
+                        'error'  => 'Event must start or end between now and one year later',
+                    ];
+                }
+            }
+
+            /* Forcibly expand the date range requirements of every event, silently excluding those
+             * which somehow fall outside this date range.
+             */
+            $allEvents = $allEvents->expand($rangeStart, $rangeEnd);
+
+            foreach ($allEvents->getComponents() as $currentEvent) {
+                /* Skip non-VEvent instances
+                 */
+                if (!$currentEvent instanceof VEvent) {
+                    continue;
+                }
+
+                /* Event name is too long
+                 */
+                if (strlen(trim((string)$currentEvent->SUMMARY)) > self::MAX_EVENT_TITLE) {
+                    $output[] = [
+                        'name'   => \Scrub::text((string)$currentEvent->SUMMARY),
+                        'status' => 'Not Added',
+                        'error'  => 'Event name is too long',
+                    ];
+
                     continue;
                 }
 
@@ -164,31 +207,37 @@ class Vcal extends Base
                 $event->setAttendance(0);
                 $event->setCompleted(0);
 
-                /* Save it
-                 */
-                $result = $eventMapper->save($event);
+                $isSuccessful = false;
+                if ($perform) {
+                    /* Save it
+                     */
+                    $result = $eventMapper->save($event);
 
-                /* Assign Category relations
-                 */
-                foreach ($this->getCategoryList() as $currentCategory) {
-                    $category = new Category();
-                    $category->setEventId($event->getId());
-                    $category->setCategoryId($currentCategory);
-                    $categoryRelationMapper->save($category);
+                    /* Assign Category relations
+                     */
+                    foreach ($this->getCategoryList() as $currentCategory) {
+                        $category = new Category();
+                        $category->setEventId($event->getId());
+                        $category->setCategoryId($currentCategory);
+                        $categoryRelationMapper->save($category);
+                    }
+
+                    /* Assign Role relations
+                     */
+                    foreach ($this->getGroupList() as $currentRole) {
+                        $role = new Role();
+                        $role->setEventId($event->getId());
+                        $role->setRoleId($currentRole);
+                        $roleRelationMapper->save($role);
+                    }
+
+                    if (\is_array($result) && \count($result)) {
+                        $isSuccessful = true;
+                    }
                 }
-
-                /* Assign Role relations
-                 */
-                foreach ($this->getGroupList() as $currentRole) {
-                    $role = new Role();
-                    $role->setEventId($event->getId());
-                    $role->setRoleId($currentRole);
-                    $roleRelationMapper->save($role);
-                }
-
                 /* Output messages
                  */
-                if (\is_array($result) && \count($result)) {
+                if ($isSuccessful || !$perform) {
                     $output[] = array(
                         'name'   => $event->getTitle(),
                         'status' => 'Added',

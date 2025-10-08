@@ -41,6 +41,8 @@ class Mapper extends Schoolbox\Mapper
     public const COL_LMS_COHORT_COMPARISON     = 'lms_cohort_comparison';
     public const COL_LEARNING_MOMENTS_ENABLED  = 'learning_moments_enabled';
     public const COL_QRCODE_ENABLED            = 'qrcode_enabled';
+    public const COL_BIRTHDAY_ENABLED          = 'birthday_celebration_enabled';
+    public const COL_LEARNING_MOMENTS_MODERATION_ENABLED = 'learning_moments_moderation';
     public const COL_SEQUENCE                  = 'sequence';
     public const COL_CREATED_AT                = 'created_at';
     public const COL_UPDATED_AT                = 'updated_at';
@@ -71,6 +73,8 @@ class Mapper extends Schoolbox\Mapper
         $this->uses(self::COL_LMS_COHORT_COMPARISON, self::TYPE_BOOLEAN);
         $this->uses(self::COL_LEARNING_MOMENTS_ENABLED, self::TYPE_BOOLEAN);
         $this->uses(self::COL_QRCODE_ENABLED, self::TYPE_BOOLEAN);
+        $this->uses(self::COL_BIRTHDAY_ENABLED, self::TYPE_BOOLEAN);
+        $this->uses(self::COL_LEARNING_MOMENTS_MODERATION_ENABLED, self::TYPE_BOOLEAN);
         $this->uses(self::COL_SEQUENCE, self::TYPE_INTEGER);
         $this->uses(self::COL_CREATED_AT, self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses(self::COL_UPDATED_AT, self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);

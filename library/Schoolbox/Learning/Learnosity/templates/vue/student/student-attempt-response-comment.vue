@@ -5,7 +5,11 @@
 
 import { watchDebounced } from "@vueuse/core";
 import { timeout } from "@js/util/jsUtils";
+import { EditorToolbar } from "@js/editor/types/editorTypes";
+import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
+import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
+import { useStudentItemStore } from "./store/studentItemStore";
 
 interface Props {
     student: Student; // the student to display
@@ -14,7 +18,13 @@ interface Props {
 const props = defineProps<Props>();
 
 const editorId = `final-review-comment-${props.student.elementId}`;
-const comment = window.Vue.ref(props.student.attemptResponse.comment ?? "");
+const comment = useEditor(props.student.attemptResponse.comment ?? "", `#${editorId}`, {
+    targetElements: [`#${editorId}`],
+    hasTokens: true,
+    maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
+    toolbar: EditorToolbar.COMMENT_AI,
+    templates: useStudentItemStore().editorTemplates,
+});
 const isSaving = window.Vue.ref(false);
 const hasSaved = window.Vue.ref(false);
 const hasError = window.Vue.ref(false);
@@ -129,13 +139,24 @@ window.Vue.onUnmounted(async () => {
                 <em>No comment added.</em>
             </p>
         </div>
-        <div v-else-if="props.isReadOnly && props.student.attemptResponse.comment !== ''" class="l-flex-col l-gap-s">
+        <div
+            v-else-if="
+                props.isReadOnly &&
+                props.student.attemptResponse.comment &&
+                props.student.attemptResponse.comment !== ''
+            "
+            class="l-flex-col l-gap-s"
+        >
             <label>Comment</label>
-            <p>{{ props.student.attemptResponse.comment }}</p>
+            <media-article tag="div" :content="props.student.attemptResponse.comment"></media-article>
         </div>
         <template v-else>
             <label :for="editorId">Comment</label>
-            <textarea :id="editorId" v-model="comment" rows="3" class="f-no-margins"></textarea>
+            <p class="meta">
+                Student detail tokens can be viewed when you press [. Tokens will be substituted with the students
+                details on creation.
+            </p>
+            <textarea :id="editorId" v-model="comment" rows="3" class="comment-input f-no-margins"></textarea>
             <div class="save-container l-grid">
                 <div class="save-container__inner-container">
                     <div :class="`alert-box f-no-margins ${hasSaved ? 'success' : ''} ${hasError ? 'alert' : ''}`">
@@ -148,8 +169,13 @@ window.Vue.onUnmounted(async () => {
 </template>
 
 <style lang="scss" scoped>
+.comment-input {
+    resize: vertical; // only allow the textarea to be resized vertically
+}
+
 .save-container {
     grid-template-rows: v-bind(saveContainerHeight);
+    margin-top: -1rem; /* offset the margin so it can butt up against the bottom of the editor */
     transition: grid-template-rows 300ms;
     &__inner-container {
         overflow: hidden;

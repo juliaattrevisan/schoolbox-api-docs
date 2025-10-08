@@ -2,17 +2,16 @@
  * Handles the insertion of a resource into the editor
  */
 
-import { Command, type Editor } from "@ckeditor/ckeditor5-core";
-import { getSrc } from "@js/editor/plugin/resource/resourceUtils";
-import type { Resource } from "@js/editor/plugin/resource/resourceUtils";
+import { Command, type Editor } from "ckeditor5";
+import { getSrc } from "@js/resource/resourceUtils";
+import type { Resource } from "@js/resource/resourceUtils";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
-import type LinkUI from "@js/editor/plugin/link/LinkUI";
 
 export default class InsertResourceLinkCommand extends Command {
     /**
      * Whether the button is on or off
      */
-    public declare isOn: boolean;
+    declare public isOn: boolean;
 
     // @ts-expect-error -- as .bind() returns a new function object, we need to store it in a variable
     messageBinding;
@@ -57,7 +56,7 @@ export default class InsertResourceLinkCommand extends Command {
          * Fire of the jQuery plugin to display the resource modal
          */
         // @ts-expect-error -- This is a custom jQuery plugin, so it won't be found in the types
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- see above
         $.fn.schoolboxResource({
             allowedFilesystems: "link",
             allowedFiles: null,
@@ -82,7 +81,7 @@ export default class InsertResourceLinkCommand extends Command {
      */
     closeModal(): void {
         // @ts-expect-error -- jquery plugin
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- see above
         $("#file-picker").foundation("reveal", "close");
         this.set("isOn", false);
     }
@@ -92,7 +91,7 @@ export default class InsertResourceLinkCommand extends Command {
      * @param value - the value to update the link to
      */
     updateLink(value: string): void {
-        const linkUI = this.editor.plugins.get("LinkUI") as LinkUI;
+        const linkUI = this.editor.plugins.get("LinkUI");
         const { formView } = linkUI;
         if (formView === null) return;
         formView.urlInputView.fieldView.focus();
@@ -112,7 +111,8 @@ export default class InsertResourceLinkCommand extends Command {
                 },
             });
             const resource = (await response.json()) as Resource;
-            const src = getSrc(resource, this.editor.config.get("sbConfig") as SbxEditorConfig) as string;
+            const config = this.editor.config.get("sbConfig") as SbxEditorConfig;
+            const src = getSrc(resource, config.baseHref) as string;
             this.updateLink(src);
         } catch (error) {
             console.error(error);
@@ -126,7 +126,7 @@ export default class InsertResourceLinkCommand extends Command {
      */
     onResourceReturned(event: MessageEvent): void {
         // Disable eslint checks for this function, since it is integrating with jquery.modal.js and untyped
-        /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
+        /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access -- see above */
         let message;
         try {
             message = JSON.parse(event.data);
@@ -156,6 +156,6 @@ export default class InsertResourceLinkCommand extends Command {
         } else {
             // Connecting to your Google Drive (event is fired when the drive is first accessed)
         }
-        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
+        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-member-access -- re-enable those rules */
     }
 }

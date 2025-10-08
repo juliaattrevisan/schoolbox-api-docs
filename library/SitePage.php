@@ -325,9 +325,6 @@ class SitePage
             $response = $responseFactory->buildUnthemedHtml($template, $data, $user);
         }
 
-        // Do this leftover thing
-        self::disableXssProtectionAfterForm();
-
         // Finagle a response
         /** @var Outputter $outputter */
         $outputter = $this->di->get('httpResponseOutputter');
@@ -460,7 +457,7 @@ class SitePage
     public static function backToTheFuture($page)
     {
         /* In Dans honour, time is ours */
-        if (is_array($_SESSION['history'])) {
+        if (is_array($_SESSION['history'] ?? null)) {
             if (count($_SESSION['history']) >= $page) {
                 SitePage::localRedir($_SESSION['history'][$page - 1]);
             } else {
@@ -577,7 +574,7 @@ class SitePage
         }
         header('Location: ' . $file, true, $responseCode ?? 0);
         header('Content-Type:');
-        self::disableXssProtectionAfterForm();
+
         if ($keepProcessing) {
             // don't quit
             self::keepProcessingInBackground();
@@ -695,26 +692,21 @@ class SitePage
     }
 
     /**
-     * Forces a redirect to the login page, by throwing an unauthenticated
-     * exception.
+     * Forces a redirect to the login page.
      *
      * @throws Unauthenticated
      */
     public function goLoginPage()
     {
-        try {
-            throw new Unauthenticated();
-        } catch (NotFoundExceptionInterface | ContainerExceptionInterface | RuntimeException $e) {
-            $parts = parse_url($_SERVER['REQUEST_URI']);
-            if (!($parts['path'] == '/login/' || $parts['path'] == '/login')) {
-                if ($parts['path'] != '/') {
-                    $this->localRedir('/login/?page=' . rawurlencode($_SERVER['REQUEST_URI']));
-                } else {
-                    $this->localRedir('/login/');
-                }
+        $parts = parse_url($_SERVER['REQUEST_URI']);
+        if (!($parts['path'] == '/login/' || $parts['path'] == '/login')) {
+            if ($parts['path'] != '/') {
+                $this->localRedir('/login/?page=' . rawurlencode($_SERVER['REQUEST_URI']));
+            } else {
+                $this->localRedir('/login/');
             }
-            exit;
         }
+        exit;
     }
 
     /**
@@ -827,54 +819,6 @@ class SitePage
         }
     }
 
-    /**
-     * Disables XSS protections for the request immediately proceeding a form
-     * submission. This gets around issue SB-1706, where a Youtube video in a
-     * frame won't display after it has been submitted (but is fine after page
-     * is refreshed).
-     *
-     * * If this is a form, XSS protection is removed for the NEXT page load.
-     * * If the last page was a form, XSS protection is removed
-     * * If the referrer contained "create" or "modify", protection is removed
-     *
-     * Want more information?
-     *
-     * @see  http://stackoverflow.com/questions/1547884/refused-to-execute-a-javascript-script-source-code-of-script-found-within-reque
-     *
-     * @todo consider using Content-Security-Policy header instead of this
-     *
-     * @return bool True if protection was disabled, false if not.
-     */
-    protected static function disableXssProtectionAfterForm()
-    {
-        // Is this a form? If so, disable for NEXT page load
-        if (stripos($_SERVER['REQUEST_URI'], 'form.php') !== false) {
-            $_SESSION['disableXssProtectionForNextPage'] = true;
-            return true;
-        }
-
-        // Was the last page a form? If so, disable
-        if (!empty($_SESSION['disableXssProtectionForNextPage'])) {
-            unset($_SESSION['disableXssProtectionForNextPage']);
-            header("X-XSS-Protection: 0\r\n");
-            return true;
-        }
-
-        // Check referrer for if the last page was a create or modify page.
-        unset($_SESSION['disableXssProtectionForNextPage']);
-        if (isset($_SERVER['HTTP_REFERER'])) {
-            $referer = parse_url($_SERVER['HTTP_REFERER']);
-            if ($referer['host'] === $_SERVER['SERVER_NAME']) {
-                foreach (array('create', 'modify') as $path) {
-                    if (stripos($referer['path'] ?? '', $path) !== false) {
-                        header("X-XSS-Protection: 0\r\n");
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
 
     /**
      * Extends execution time limit.

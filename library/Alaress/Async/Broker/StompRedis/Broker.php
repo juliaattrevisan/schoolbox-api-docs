@@ -133,7 +133,7 @@ class Broker implements IBroker
      * @param int|null   $ttl
      * @return void
      */
-    public function publish(mixed $serializable, array $context = null, ?int $ttl = null): void
+    public function publish(mixed $serializable, ?array $context = null, ?int $ttl = null): void
     {
         [$storageKey, $gzip] = RedisQueue::getStorage($serializable, $this->instanceId);
         $routingKey = $this->getRoutingKey();

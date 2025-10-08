@@ -41,9 +41,11 @@ class Reader implements Iterator
     /**
      * Field escaper for the CSV file
      *
+     * As of 8.4, this is an empty string:
+     *
      * @var string
      */
-    private const ESCAPE = '\\';
+    private const ESCAPE = '';
 
 
     /**

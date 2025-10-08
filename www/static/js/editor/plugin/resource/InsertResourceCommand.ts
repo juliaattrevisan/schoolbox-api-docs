@@ -2,10 +2,10 @@
  * Handles the insertion of a resource into the editor
  */
 
-import { Command } from "@ckeditor/ckeditor5-core";
+import { Command } from "ckeditor5";
+import type { Resource } from "@js/resource/resourceUtils";
+import { addResource } from "@js/editor/plugin/resource/editorResourceUtils";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
-import { addResource } from "./resourceUtils";
-import type { Resource } from "./resourceUtils";
 
 export default class InsertResourceCommand extends Command {
     // @ts-expect-error -- as .bind() returns a new function object, we need to store it in a variable
@@ -46,7 +46,7 @@ export default class InsertResourceCommand extends Command {
          * Fire off the jQuery plugin to display the resource modal
          */
         // @ts-expect-error -- This is a custom jQuery plugin, so it won't be found in the types
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- see above
         $.fn.schoolboxResource({
             allowedFilesystems: "files",
             allowedFiles: "*/*",
@@ -89,7 +89,7 @@ export default class InsertResourceCommand extends Command {
         }
         // to close the resource modal
         // @ts-expect-error -- jquery plugin
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- see above
         $("#file-picker").foundation("reveal", "close");
     }
 
@@ -99,7 +99,7 @@ export default class InsertResourceCommand extends Command {
      */
     onResourceReturned(event: MessageEvent): void {
         // Disable eslint checks for this function, since it is integrating with jquery.modal.js and untyped
-        /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
+        /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access -- see above */
         let message;
         try {
             message = JSON.parse(event.data);
@@ -122,6 +122,6 @@ export default class InsertResourceCommand extends Command {
         } else {
             // Connecting to your Google Drive (event is fired when the drive is first accessed)
         }
-        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access */
+        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access -- re-enable those rules */
     }
 }

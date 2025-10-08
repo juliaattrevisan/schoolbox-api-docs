@@ -1,14 +1,61 @@
-<ul>
-{% for field in fields %}
-    <li>
-        {% if field.terminology %}
-            <span style="color:green">Used localisation for {{ field.field }}: <strong>{{ locale.translate(field.terminology) }}</strong></span>
-        {% else %}
-            <span style="color:red">Used default for {{ field.field }}: {{ field.displayAs }}</span>
-        {% endif %}
-    </li>
-{% endfor %}
-</ul>
+<script>
+    window.onload = function() {
+        // fetch('/learning/evidence/moderation/bulk/reject', {
+        fetch('/learning/evidence/moderation/bulk/delete', {
+            method: "DELETE",
+            body: JSON.stringify({
+                momentIds: [13,14],
+            }),
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            }
+        });
+    }
+</script>
+
+
+{#<script>#}
+{#    $(function() {#}
+{#        $('#simForm').submit(function(event) {#}
+{#            event.preventDefault();#}
+
+{#            let data = $('#simForm').serializeArray();#}
+
+{#            $.post($('#simForm').attr('action'), data, function(responseText) {#}
+{#                console.log(responseText);#}
+{#            })#}
+{#        })#}
+{#    });#}
+{#</script>#}
+{#<div class="small-12 island">#}
+{#    <section class="content">#}
+{#        <form action="{{ routeLookup('openai.postLessonPlan') }}" method="post" id="simForm">#}
+{#            <fieldset>#}
+{#                <label>Lesson Plan Id</label>#}
+{#                <input type="text" name="lessonPlanId" />#}
+{#            </fieldset>#}
+
+{#            <fieldset>#}
+{#                <label>Context</label>#}
+{#                <input type="text" name="context" />#}
+
+{#                <label>Folder</label>#}
+{#                <input type="text" name="folder" />#}
+
+{#                <label>Lesson Plan Template Field Ids</label>#}
+{#                <input type="text" name="lessonPlanTemplateFieldIds" />#}
+
+{#                <label>Curric Node Ids</label>#}
+{#                <input type="text" name="curriculumNodeIds" id="submit" />#}
+{#            </fieldset>#}
+
+{#            <input type="submit" />#}
+{#        </form>#}
+{#    </section>#}
+{#</div>#}
+
+
 
 
 {#<h1>Audit</h1>#}
@@ -28,70 +75,70 @@
 
 
 
-<div style="display:none">
-    <style>
-        .grid-container {
-            display: grid;
-            grid-template-columns: 4fr 1fr 2fr
-        }
-        .grid-item {
-            padding: 10px;
-            border: 1px solid #f00;
-        }
-    </style>
+{#<div style="display:none">#}
+{#    <style>#}
+{#        .grid-container {#}
+{#            display: grid;#}
+{#            grid-template-columns: 4fr 1fr 2fr#}
+{#        }#}
+{#        .grid-item {#}
+{#            padding: 10px;#}
+{#            border: 1px solid #f00;#}
+{#        }#}
+{#    </style>#}
 
 
 
 
-    <ul class="action-list threaded content-container">
-    <li class="list-item">
-        <div class="student-container">
-            <div class="grid-container">
-                <div class="grid-item"><a href="/pastoral/student/13/record/12" title="View record" data-v-2c4763f5=""><img src="/portrait.php?id=2&amp;size=square64" alt="profile photo of Jack Coles" class="portrait" data-v-2c4763f5=""> Academic Honesty</a></div>
-                <div class="grid-item"><p class="meta" data-v-2c4763f5=""> created by <a href="/search/user/2" title="View profile" class="name" data-v-2c4763f5="">Jack Coles</a></p></div>
-                <div class="grid-item"><div class="time-container" data-v-2c4763f5=""><time datetime="25/08/2022 2:46pm" title="25/08/2022 2:46pm" data-v-2c4763f5="">25/08/2022</time><!--v-if--></div></div>
-            </div>
-        </div>
-    </li>
-    <li class="list-item">
-        <div class="student-container">
-            <div class="grid-container">
-                <div class="grid-item"><a href="/pastoral/student/13/record/12" title="View record" data-v-2c4763f5=""><img src="/portrait.php?id=2&amp;size=square64" alt="profile photo of Jack Coles" class="portrait" data-v-2c4763f5="">To the Joshua generation, these challenges seem momentous - and they are. The fact is that the comments that have been made and the issues that have surfaced over the last few weeks reflect the complexities of race in this country that we've never really worked through</a></div>
-                <div class="grid-item"><p class="meta" data-v-2c4763f5=""> created by <a href="/search/user/2" title="View profile" class="name" data-v-2c4763f5="">Jack Coles</a></p></div>
-                <div class="grid-item"><div class="time-container" data-v-2c4763f5=""><time datetime="25/08/2022 9:08am" title="25/08/2022 9:08am" data-v-2c4763f5="">25/08/2022</time>, updated <!--v-if--><time datetime="25/08/2022 9:16am" title="25/08/2022 9:16am" data-v-2c4763f5="">25/08/2022</time></div></div>
-            </div>
-        </div>
-    </li>
-    <li class="list-item">
-        <div class="student-container">
-            <div class="grid-container">
-                <div class="grid-item"><a href="/pastoral/student/13/record/12" title="View record" data-v-2c4763f5=""><img src="/portrait.php?id=2&amp;size=square64" alt="profile photo of Jack Coles" class="portrait" data-v-2c4763f5=""> Academic Honesty</a></div>
-                <div class="grid-item"><p class="meta" data-v-2c4763f5=""> created by <a href="/search/user/2" title="View profile" class="name" data-v-2c4763f5="">Jack Coles</a></p></div>
-                <div class="grid-item"><div class="time-container" data-v-2c4763f5=""><time datetime="25/08/2022 2:46pm" title="25/08/2022 2:46pm" data-v-2c4763f5="">25/08/2022</time><!--v-if--></div></div>
-            </div>
-        </div>
-    </li>
-</ul>
+{#    <ul class="action-list threaded content-container">#}
+{#    <li class="list-item">#}
+{#        <div class="student-container">#}
+{#            <div class="grid-container">#}
+{#                <div class="grid-item"><a href="/pastoral/student/13/record/12" title="View record" data-v-2c4763f5=""><img src="/portrait.php?id=2&amp;size=square64" alt="profile photo of Jack Coles" class="portrait" data-v-2c4763f5=""> Academic Honesty</a></div>#}
+{#                <div class="grid-item"><p class="meta" data-v-2c4763f5=""> created by <a href="/search/user/2" title="View profile" class="name" data-v-2c4763f5="">Jack Coles</a></p></div>#}
+{#                <div class="grid-item"><div class="time-container" data-v-2c4763f5=""><time datetime="25/08/2022 2:46pm" title="25/08/2022 2:46pm" data-v-2c4763f5="">25/08/2022</time><!--v-if--></div></div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </li>#}
+{#    <li class="list-item">#}
+{#        <div class="student-container">#}
+{#            <div class="grid-container">#}
+{#                <div class="grid-item"><a href="/pastoral/student/13/record/12" title="View record" data-v-2c4763f5=""><img src="/portrait.php?id=2&amp;size=square64" alt="profile photo of Jack Coles" class="portrait" data-v-2c4763f5="">To the Joshua generation, these challenges seem momentous - and they are. The fact is that the comments that have been made and the issues that have surfaced over the last few weeks reflect the complexities of race in this country that we've never really worked through</a></div>#}
+{#                <div class="grid-item"><p class="meta" data-v-2c4763f5=""> created by <a href="/search/user/2" title="View profile" class="name" data-v-2c4763f5="">Jack Coles</a></p></div>#}
+{#                <div class="grid-item"><div class="time-container" data-v-2c4763f5=""><time datetime="25/08/2022 9:08am" title="25/08/2022 9:08am" data-v-2c4763f5="">25/08/2022</time>, updated <!--v-if--><time datetime="25/08/2022 9:16am" title="25/08/2022 9:16am" data-v-2c4763f5="">25/08/2022</time></div></div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </li>#}
+{#    <li class="list-item">#}
+{#        <div class="student-container">#}
+{#            <div class="grid-container">#}
+{#                <div class="grid-item"><a href="/pastoral/student/13/record/12" title="View record" data-v-2c4763f5=""><img src="/portrait.php?id=2&amp;size=square64" alt="profile photo of Jack Coles" class="portrait" data-v-2c4763f5=""> Academic Honesty</a></div>#}
+{#                <div class="grid-item"><p class="meta" data-v-2c4763f5=""> created by <a href="/search/user/2" title="View profile" class="name" data-v-2c4763f5="">Jack Coles</a></p></div>#}
+{#                <div class="grid-item"><div class="time-container" data-v-2c4763f5=""><time datetime="25/08/2022 2:46pm" title="25/08/2022 2:46pm" data-v-2c4763f5="">25/08/2022</time><!--v-if--></div></div>#}
+{#            </div>#}
+{#        </div>#}
+{#    </li>#}
+{#</ul>#}
 
 
 
 
 
-<style>
-    .report-footer {
-        border-top: 1px solid #ccc;
-        height: 1rem;
-        width:100%;
-        text-align: right
-    }
+{#<style>#}
+{#    .report-footer {#}
+{#        border-top: 1px solid #ccc;#}
+{#        height: 1rem;#}
+{#        width:100%;#}
+{#        text-align: right#}
+{#    }#}
 
-    .report-footer p {
-        font-family: Arial, sans-serif;
-        margin-top: 0.5rem;
-    }
-</style>
+{#    .report-footer p {#}
+{#        font-family: Arial, sans-serif;#}
+{#        margin-top: 0.5rem;#}
+{#    }#}
+{#</style>#}
 
-<div class="report-footer">
-    <p>Page <span class="pageNumber">1</span> of <span class="totalPages">3</span></p>
-</div>
-</div>
+{#<div class="report-footer">#}
+{#    <p>Page <span class="pageNumber">1</span> of <span class="totalPages">3</span></p>#}
+{#</div>#}
+{#</div>#}

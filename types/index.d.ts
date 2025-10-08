@@ -12,8 +12,15 @@ import type { DefineComponent } from "vue";
 import type { SbxEditor } from "@js/editor/types/editorTypes";
 import type { RosettaStone } from "@js/terminology/rosettaStone";
 import type { injectScriptsIfNotLoaded } from "@js/util/domUtils";
-import type { pwaConfig } from "@js/global/pwaConfig";
+import type { MediaElementPlayer } from "@js/mediaelementplayer/mepUtils";
+import type { SelectizeSelectorOptions } from "@js/vendors/selectize/selectizeSelectorTypes";
+import type { Toast } from "@schoolboxVue/components/toast/sbxToastTypes";
 import type { SbxGlobalDocumentEventHandlerMap, SbxGlobalElementEventHandlerMap } from "./sbxEvents";
+
+type Dropzone = {
+    addFile(file: File): void;
+    isValidFile(file: File, acceptedFiles: string): boolean;
+};
 
 declare global {
     interface Window {
@@ -21,6 +28,7 @@ declare global {
         dayjs: typeof dayjs;
         dateDisplayFormats: {
             dayjs: string;
+            dayjsDatetime: string;
         };
         iframely: {
             load: (containerElement: Element, url?: string) => void;
@@ -28,9 +36,12 @@ declare global {
             on: (eventName: "click", callback: (href: string) => void) => void;
         };
         jQuery: JQueryStatic;
+        Dropzone: Dropzone;
+        MediaElementPlayer: MediaElementPlayer;
         sbProps: {
             ckeditor5LicenseKey: string;
             iframelyLicenseKey: string;
+            siteTitle: string;
             colourDefaults: {
                 skin: string[];
                 skinUnique: string[];
@@ -38,7 +49,7 @@ declare global {
                 swatches: string[];
             };
             editors: Partial<Record<string, SbxEditor>>;
-            hasEditorAI: true | undefined; // to display the AI features within the editor
+            hasAIFeatures: true | undefined; // to display the AI features around the site
             openAIModel: string | undefined; // chosen open AI model to use
             lightGallery: typeof lightGallery;
             lightGalleryInit: InitLightGallery;
@@ -46,10 +57,10 @@ declare global {
             imageLightboxLicenseKey: string;
             imageSlideshowListenerExists?: true | undefined;
             injectScriptsIfNotLoaded: typeof injectScriptsIfNotLoaded;
+            toastActivate: Toast["activate"];
             MAX_BYTES_MYSQL_TEXT: number;
             MAX_BYTES_MYSQL_MEDIUMTEXT: number;
             l10n: RosettaStone;
-            pwaConfig: typeof pwaConfig;
             firebaseApps: Array<{
                 appIdentifier: string;
                 publicConfiguration: { [key: string]: unknown };
@@ -61,7 +72,18 @@ declare global {
         };
         schoolboxUser: {
             id: number;
+            externalId: string | null;
             name: string;
+            impersonated: boolean;
+            role: {
+                id: number;
+                name: string;
+                guest: boolean;
+                parent: boolean;
+                staff: boolean;
+                student: boolean;
+                type: "staff" | "student" | "parent" | "guest";
+            };
         };
         siteVersion: string;
         STORYBOOK_ENV: string;
@@ -84,6 +106,29 @@ declare global {
          */
         alaressDateTimePicker(): JQuery;
         collapsable(): JQuery;
+        /**
+         * From jquery-validation
+         */
+        valid(): boolean;
+        /**
+         * From jquery.combobox.js
+         */
+        combobox(selectOptions: string[]): JQuery;
+        /**
+         * From jquery.alaressValidate.js
+         */
+        alaressValidate(options?: Record<string, unknown>): JQuery;
+        /**
+         * From jquery.resourceAttach.js
+         */
+        data(key: "plugin_resourceAttach"): {
+            dropzone: Dropzone;
+        };
+        /**
+         * From jquery.selectize-selector.js
+         */
+        selectizeSelector(options: SelectizeSelectorOptions): JQuery;
+        selectizeSelector<TData, TValue>(options: SelectizeSelectorOptions<TData, TValue>): JQuery;
     }
 
     // Fix types when importing .vue files and using with window.Vue.createApp

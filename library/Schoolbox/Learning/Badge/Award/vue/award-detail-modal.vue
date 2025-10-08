@@ -1,6 +1,7 @@
 <script>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
 import BadgeImage from "./../../vue/badge-image";
 import goalMixin from "./goal-mixin";
@@ -8,7 +9,6 @@ import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time";
 import SequentialRevealModal from "@schoolboxVue/components/sequential-reveal-modal";
 import toastMixin from "@schoolboxVue/components/toast-mixin";
 import userProfileMixin from "../../../vue/user-profile/mixin";
-import axios from "axios";
 import { animateBadgeImage } from "../js/animateBadgeImage";
 import CodesList from "@schoolboxCurriculum/vue/codes-list";
 import NodeDetails from "@schoolboxCurriculum/vue/node-details";
@@ -186,7 +186,9 @@ export default {
             const awardCanvas = this.$refs.awardCanvas;
             animateBadgeImage(badgeImage, awardCanvas);
             this.award.viewedOn = ""; //viewedOn will currently only be updated on page reload due to the way awards are currently displayed
-            axios.post(`/learning/badge/award/${this.award.id}/view`); //to update viewedOn in the backend
+            fetch(`/learning/badge/award/${this.award.id}/view`, {
+                method: "POST",
+            }); //to update viewedOn in the backend
         },
 
         /**
@@ -195,11 +197,12 @@ export default {
         awardAchievement() {
             this.toastActivate("Awarding...");
             this.convertToAchievement(this.award)
+                .then((response) => response.json())
                 .then((response) => {
                     this.toastSuccess("Achievement awarded");
 
                     // Once awarded: update the award within this object
-                    this.award = response.data;
+                    this.award = response;
 
                     this.$emit("on-achievement-awarded", this.award); //dispatch to react specifically to this badge achievement
 

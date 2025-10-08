@@ -2,11 +2,10 @@
 
 class Component_Config_Transition extends Component_Config_Abstract
 {
-
     protected $options       = array('swipe', 'fade', 'flip', 'cube', 'creative');
     protected $showAllOption = true;
 
-    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
+    public function parse(SitePage $page, $key, $keyblock, $configValue, ?Component_ControllerAbstract $component = null)
     {
 
         // has an internal block for the select element

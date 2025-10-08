@@ -65,21 +65,25 @@
             var $element = $(this);
             var $assessmentRow = $element.closest("[data-unit-assessment]");
             var $taskList = $assessmentRow.closest("[data-task-list]");
+            const $customisedAssessments = $element.closest("[data-customised-assessments]");
+            const customisationCount = $customisedAssessments.find("[data-unit-assessment]").length;
 
             $element.confirmDialog({
-                header: "Are you sure you wish to delete this activity?",
+                header: `Are you sure you wish to delete this ${window.sbProps.l10n.dictionary.activity.singular()}?`,
                 text: '<span class="alert alert-box"><b>WARNING</b> All student responses, feedback and marks will also be deleted.</span>',
                 format: "html",
                 confirmLabel: "Yes, permanently delete",
                 cancelLabel: "No, keep it",
                 confirmEvent: function () {
                     var toaster = component.find("[data-alert]");
-                    toaster.toastActivate({ text: "Deleting activity..." });
+                    toaster.toastActivate({
+                        text: `Deleting ${window.sbProps.l10n.dictionary.activity.singular()}...`,
+                    });
 
                     $.post($element.attr("href"))
                         .done(function () {
                             toaster.toastTimeout({
-                                text: "Activity deleted.",
+                                text: `${window.sbProps.l10n.dictionary.activity.proper()} deleted.`,
                                 css: "pop success",
                             });
 
@@ -94,12 +98,24 @@
                                             component.find(settings.contentSelector).attr("hidden", true);
                                         }
                                     }
+
+                                    /**
+                                     * if the activity being removed is a customisation,
+                                     * and it's the last customisation within the parent activity
+                                     */
+                                    if ($customisedAssessments.length !== 0 && customisationCount === 1) {
+                                        // remove the expand/collapse as there's nothing left
+                                        $customisedAssessments
+                                            .parent()
+                                            .find("[data-interaction-has-customised]")
+                                            .remove();
+                                    }
                                 },
                             });
                         })
                         .fail(function () {
                             toaster.toastTimeout({
-                                text: "Could not delete this activity.",
+                                text: `Could not delete this ${window.sbProps.l10n.dictionary.activity.singular()}.`,
                                 css: "pop alert",
                             });
                         });

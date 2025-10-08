@@ -6,9 +6,8 @@
  */
 
 import { defineStore } from "pinia";
-import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import type { Node } from "@schoolboxCurriculum/types/Node";
-import { UNSET_ID, findById } from "@schoolboxCurriculum/js/nodeUtils";
+import { UNSET_ID, findById, includeChildren } from "@schoolboxCurriculum/js/nodeUtils";
 
 const FOLDER_NODES_UPDATED = "folderNodesStore__UPDATED"; // the event to trigger when the nodes have been updated
 
@@ -39,20 +38,23 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
          * To notify the backend of a change in the selected nodes
          */
         async function pushChanges(): Promise<void> {
+            const toast = window.sbProps.toastActivate("Updating...");
             try {
-                activate("Updating...");
                 isProcessing.value = true;
-                const response = await fetch(`/api/curriculum/usage/folder/${folderId}?returnFormat=tree`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
+                const response = await fetch(
+                    `/api/curriculum/usage/folder/${folderId}?returnFormat=tree&descendants=0`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify([...selectedNodes.value]),
                     },
-                    body: JSON.stringify([...selectedNodes.value]),
-                });
+                );
                 if (response.ok) {
                     const newNodes = (await response.json()) as Node[];
                     nodes.value = newNodes;
-                    timeout({ text: "Curriculum updated successfully" });
+                    toast.timeout({ text: "Curriculum updated successfully" });
                     document.dispatchEvent(
                         new CustomEvent(FOLDER_NODES_UPDATED, {
                             detail: {
@@ -65,10 +67,10 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
                     );
                 } else {
                     const responseText = (await response.json()) as { title: string; type: string; status: number };
-                    timeout({ text: responseText.title, isSuccess: false });
+                    toast.timeout({ text: responseText.title, isSuccess: false });
                 }
             } catch (error) {
-                timeout({ text: "There was an unexpected error", isSuccess: false });
+                toast.timeout({ text: "There was an unexpected error", isSuccess: false });
             } finally {
                 isProcessing.value = false;
             }
@@ -164,9 +166,11 @@ export const useStore = (folderId: number, componentInstanceId: number) =>
             if (nodeToRemove.value === null) {
                 return;
             }
-            selectedNodes.value = selectedNodes.value.filter(
-                (selectedNode) => selectedNode.id !== nodeToRemove.value?.id,
+            // get the id of the node to remove and all its children
+            const idsToRemove = [nodeToRemove.value, ...includeChildren(nodeToRemove.value.children)].map(
+                (node) => node.id,
             );
+            selectedNodes.value = selectedNodes.value.filter((node) => !idsToRemove.includes(node.id)); // remove the node and all its children
             await pushChanges();
             nodeToRemove.value = null;
         }

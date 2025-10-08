@@ -78,3 +78,15 @@ export function replaceAllStringSections(
     });
     return newString;
 }
+
+/**
+ * Converts a kebab-case string to Title Case
+ * @param string - the kebab-case string to convert
+ * @returns - the string converted to Title Case
+ */
+export function kebabToTitleCase(string: string): string {
+    return string
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+}

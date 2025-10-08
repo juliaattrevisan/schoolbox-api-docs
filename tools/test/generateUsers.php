@@ -20,6 +20,8 @@ $app = new class extends CliTool\App {
     /** @inheritDoc */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         $userMapper = new UserMapper();
 
         $roleMapper   = new RoleMapper();
@@ -41,6 +43,8 @@ $app = new class extends CliTool\App {
                 $userMapper->save($user);
             }
         }
+
+        $this->deprecationNotice("SA-19334");
     }
 };
 

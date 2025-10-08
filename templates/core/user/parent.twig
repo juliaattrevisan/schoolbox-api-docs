@@ -10,19 +10,15 @@
 {% set isStaff = isSuperuser or session.user.getRole().isStaff() %}
 {% set isSelf = session.user.getId() == user.getId() %}
 {% set isParent = session.user.getRole().isParent() %}
+{% set canImpersonate = routeLookupIfAuthorized('user.impersonate', { user: user, userId: user.id }) %}
 
-<div class="actions-small-{{ isSuperuser ? 1 : 0 }} row">
-    <div class="list-item">
-        <div class="small-12 column">
-            <h1 data-test="user-profile-name">{{ user.formatName(nameFormat) }}</h1>
-        </div>
-    </div>
-    <nav>
-        {% if routeLookupIfAuthorized('adminUser.getModify') %}
-            <a href="{{ routeLookup('adminUser.getModify', {'userId': user.id}) }}" class="icon-modify" title="Modify User" data-test="user-profile-modify"></a>
-        {% endif %}
-    </nav>
-</div>
+{% include '@searchUser/heading/heading.twig' with {
+    user: user,
+    isSuperuser: isSuperuser,
+    canImpersonate: canImpersonate,
+    nameFormat: nameFormat,
+    linksInfo: linksInfo,
+} only %}
 
 <div class="row">
     <div class="small-12 island">
@@ -116,7 +112,7 @@
                     </div>
                 </div>
             </div>
-            <ul class="flex-list flex-wrap buttons">
+            <ul class="flex-list flex-wrap buttons" data-test="profile-buttons">
                 {% block buttons %}
                     {# Special constraints that further reduce the payload I built
                      # It uses the exact same philosophy as additionalConstraints for

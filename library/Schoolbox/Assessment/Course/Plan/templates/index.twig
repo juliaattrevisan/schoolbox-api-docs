@@ -10,13 +10,9 @@
         :template="{{ template |json_encode }}"
         {% set routeCurriculumReport = routeLookupIfAuthorized('curriculumreports.getCoverage') %}
         :route-curriculum-coverage="{{ routeCurriculumReport ? (routeCurriculumReport|json_encode) : 'null' }}"
+        {% if editorTemplates is defined %}
+        :editor-templates="{{ editorTemplates |json_encode }}"
+        {% endif %}
     ></unit-planner>
 </div>
-<script>
-    {# Add required locales for the unit planner #}
-    window.sbProps.l10n.addTerm({{ locale.project.toArray |json_encode |raw }});
-    window.sbProps.l10n.addTerm({{ locale.dueWork.toArray |json_encode |raw }});
-    window.sbProps.l10n.addTerm({{ locale.rubricGroup.toArray |json_encode |raw }});
-    window.sbProps.l10n.addTerm({{ locale.lessonPlan.toArray |json_encode |raw }});
-</script>
 <script src="{{ CDN_PREFIX }}/js/bundle/unitPlanner.js?v={{ config.site_version }}"></script>

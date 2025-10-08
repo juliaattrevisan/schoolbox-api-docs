@@ -158,7 +158,7 @@ interface IFeedback
      * @param IResponse|null $response
      * @return static
      */
-    public function setResponse(IResponse $response = null);
+    public function setResponse(?IResponse $response = null);
 
     /**
      * Get the date when this IFeedback was made accessible to respondents

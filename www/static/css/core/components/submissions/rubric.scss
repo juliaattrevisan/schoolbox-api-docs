@@ -435,9 +435,6 @@ table.rb {
 select.letter-grade-select {
     margin-bottom: 0;
 }
-.rubric-levels-mobile {
-    display: none; // Hides rubric levels by default in big screens
-}
 @media not print {
     @media #{$medium-down} {
         table.rb.markable {
@@ -545,9 +542,6 @@ select.letter-grade-select {
                 margin-bottom: 0.5rem;
             }
         }
-        .rubric-levels-mobile {
-            display: block !important; // Shows rubric levels in small screens
-        }
     }
 
     // Rubric progression graph
@@ -570,10 +564,13 @@ select.letter-grade-select {
     .rb td,
     .rb th {
         border: solid 1px #8c8c8c !important; //make happen, print needs this... I don't care...
+        min-width: none !important;
+        padding: 0.1rem !important;
+        margin: 0 !important;
     }
     //force text size for rubric when printing
     .rb * {
-        font-size: 10pt !important;
+        font-size: 8pt !important;
     }
 }
 

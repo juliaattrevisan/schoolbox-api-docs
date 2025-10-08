@@ -62,6 +62,9 @@ class RoleCloner
         $this->cloneSchoolCalendarPermissions($source, $destination);
         $this->cloneTours($source, $destination);
 
+        //Profile button settings need to be clone over
+        $this->cloneProfileButton($source, $destination);
+
         //notification transfer...
         $this->cloneNotifs($source, $destination);
     }
@@ -343,5 +346,47 @@ class RoleCloner
 
         // insert new perms
         $this->db->query($insertQuery, $args);
+    }
+
+    /**
+     * Cloning Profile button permission settings
+     *
+     * @param Role $source
+     * @param Role $destination
+     * @return void
+     */
+    protected function cloneProfileButton(Role $source, Role $destination): void
+    {
+        $roleAvailabilityTable = 'profile_button_role_availability';
+
+        $this->clonePerms("
+            DELETE FROM `$roleAvailabilityTable` WHERE `role_id` = ?
+        ", "
+            INSERT INTO `$roleAvailabilityTable` (profile_button_id, role_id)
+            (
+                SELECT profile_button_id, :dest
+                FROM `$roleAvailabilityTable`
+                WHERE `role_id` = :src
+            )
+        ", [
+            'src'  => $source->getId(),
+            'dest' => $destination->getId(),
+        ]);
+
+        $roleVisibilityTable = 'profile_button_role_visibility';
+
+        $this->clonePerms("
+            DELETE FROM `$roleVisibilityTable` WHERE `role_id` = ?
+        ", "
+            INSERT INTO `$roleVisibilityTable` (profile_button_id, role_id)
+            (
+                SELECT profile_button_id, :dest
+                FROM `$roleVisibilityTable`
+                WHERE `role_id` = :src
+            )
+        ", [
+            'src'  => $source->getId(),
+            'dest' => $destination->getId(),
+        ]);
     }
 }

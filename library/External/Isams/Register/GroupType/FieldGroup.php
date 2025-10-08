@@ -13,10 +13,9 @@ class FieldGroup extends GroupTypeBase
     /**
      * Getting the student fields for data output
      *
-     * @return array|mixed
+     * @return array|null
      * @throws InvalidArgumentException
      * @throws \JsonException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     protected function retrieveRecords(): ?array
     {
@@ -28,7 +27,6 @@ class FieldGroup extends GroupTypeBase
      *
      * @throws InvalidArgumentException
      * @throws \JsonException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function process(array $out): array
     {

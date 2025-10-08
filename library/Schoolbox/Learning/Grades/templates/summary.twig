@@ -12,10 +12,25 @@
 
 {{ bread.crumbs(['Learning', routeLookup('learning.getClasses')], [locale.grades.properPlural]) }}
 
-<div class="row">
+{% set canViewInstructorMarks = USER.role.isStaff %}
+<div class="row{% if canViewInstructorMarks %} actions-small-2{% endif %}">
     <div class="small-12 columns">
         <h1>{{ locale.grades.properPlural }} for {{ term.title }}</h1>
+
+        {% if canViewInstructorMarks %}
+        <ul class="meta">
+            <li data-has-student-view-meta class="icon-teacher">Teacher view</li>
+        </ul>
+        {% endif %}
     </div>
+    {% if canViewInstructorMarks %}
+        <nav>
+            <sbx-pop-out content-id="header-options" data-test="sbx-pop-out-header-options"></sbx-pop-out>
+        </nav>
+        <ul id="header-options" class="f-dropdown" data-dropdown-content>
+            {% include '@learningGrades/fragments/studentViewNavSwitcher.twig' %}
+        </ul>
+    {% endif %}
 </div>
 
 <div class="row">
@@ -64,8 +79,8 @@
     <div class="small-12 island">
         <section>
             {% for folder in folders %}
-                <ul class="activity-list group">
-                    <li class="subject-group">
+                <ul class="activity-list group" data-test="grades-subject">
+                    <li class="subject-group" data-test="grades-subject-heading">
                         {% if term.id is not null %}
                             {# The supplied term matches a row in the schoolbox.term database table, so we can link to the getGradesForSubject() page for this term/subject. #}
                             <a href="{{ routeLookup('learningGrades.getGradesForSubject', {viewee: student, userId: student.id, term: term, termCode: term.code, subject: folder, subjectId: folder.id}) }}"
@@ -107,7 +122,8 @@
                                 <li class="assessment">
                                     {% include '@learningGrades/fragments/assessmentGrade.twig' with {
                                         assessment:  assessment,
-                                        student:     student
+                                        student:     student,
+                                        canViewInstructorMarks: canViewInstructorMarks
                                     } only %}
                                 </li>
                             {% endfor %}

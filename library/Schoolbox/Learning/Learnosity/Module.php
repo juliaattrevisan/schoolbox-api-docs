@@ -24,6 +24,7 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Learning\Assessment\AssessmentContextType;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\LockedChecker;
 use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
@@ -35,16 +36,22 @@ use Schoolbox\Learning\Authorizer\Rule\IsImplementation;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructor;
 use Schoolbox\Learning\Authorizer\Rule\IsInstructorOrHasHomepageAccess;
 use Schoolbox\Learning\Authorizer\Rule\IsInteractionUnLocked;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
+use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
+use Schoolbox\Editor\Templates\Mapper as EditorTemplateMapper;
+use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
 
 class Module extends BaseModule
 {
@@ -228,6 +235,15 @@ class Module extends BaseModule
             $preloadAttempt,
         );
 
+        // pluralise for REST
+        $contextTypes = AssessmentContextType::getStringValuesAsRegex(function ($name) {
+            return $name . 's';
+        });
+
+        $preloadContext = function ($params) {
+            return $this->preloadContext($params);
+        };
+
         /* Update a particular attempt due to rescoring being finished asynchronously via polld
          */
         $this->register('POST', '/{assessmentId}/rescore/{studentId}/{learnositySessionReference}', 'postRescoreAttemptsCallback', $instructorPerms, $preloadAttemptForReview);
@@ -256,6 +272,40 @@ class Module extends BaseModule
         /* Archive a set of reference identifiers in Learnosity
          */
         $this->register('GET', '/archive/{learnosityReference}', 'getArchiveReference', $instructorPerms, null);
+
+        /* Export a schoolbox quiz and its learnosity content into a portable json payload
+         */
+        $this->register('GET', '/{assessmentId}/export/json', 'getExportToJson', $instructorPerms, $preloadAssessment);
+    }
+
+
+    /**
+     * Convert route params into a context object
+     *
+     * @param array $params
+     * @return array
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     */
+    protected function preloadContext(array $params): array
+    {
+        try {
+            $contextFactory = new \Schoolbox\Learning\Assessment\DataModel\Context\Factory(
+                $this->getMapperFactory()->get(FolderMapper::class),
+                $this->getMapperFactory()->get(UnitImplementationMapper::class),
+                $this->injector->get('assessmentDataSource'),
+                $this->getMapperFactory()->get(UnitSpecificationMapper::class)
+            );
+            $c = $contextFactory->produce($params['contextType'], $params['contextId']);
+        } catch (MapperException\Deleted $e) {
+            $c = $e->getDeletedObject();
+        } catch (MapperException $e) {
+            throw new NotFound();
+        }
+
+        return [
+            'context' => $c
+        ];
     }
 
 
@@ -557,8 +607,8 @@ class Module extends BaseModule
     /**
      * Convert route params into an assessment object
      *
-     * @param array $params
-     * @param null|User $student If provided, only load this student's participation
+     * @param array     $params
+     * @param User|null $student If provided, only load this student's participation
      * @return array
      * @throws ContainerExceptionInterface
      * @throws DefinitionException If a specified join mapper is not found
@@ -570,7 +620,7 @@ class Module extends BaseModule
      * @throws UnexpectedValueException If unable to derive project participant collections
      * @throws \Exception If not found or deleted
      */
-    protected function preloadAssessment(array $params, User $student = null): array
+    protected function preloadAssessment(array $params, ?User $student = null): array
     {
         try {
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], $student);
@@ -594,7 +644,7 @@ class Module extends BaseModule
      * Convert route params into an assessment object, and a destination
      * assessment object.
      *
-     * @param array $params
+     * @param array     $params
      * @param User|null $student
      * @return array
      * @throws ContainerExceptionInterface
@@ -606,7 +656,7 @@ class Module extends BaseModule
      * @throws NotFoundExceptionInterface
      * @throws UnexpectedValueException If unable to derive project participant collections
      */
-    protected function preloadAssessmentAndDestinationAssessment(array $params, User $student = null): array
+    protected function preloadAssessmentAndDestinationAssessment(array $params, ?User $student = null): array
     {
         $sourceAssessment      = $this->preloadAssessment(
             ['assessmentId' => $params['sourceId']],
@@ -764,10 +814,17 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Learning\Learnosity\Feedback\Mapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
             $this->getMapperFactory()->get(StateMapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Resource\Storage\Mapper::class),
+            $this->injector->get('filesystem.storageProxy'),
             $this->injector->get('httpFactory'),
             $this->injector->get('taskd.httpRequestMessageFactory'),
             $this->injector->get('taskd.messageProducer'),
             $this->injector->get('taskd.downloadPagesMessageFactory'),
+            new EditorTemplateHelper(
+                $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                EditorTemplatesCategoryModel::FEEDBACK,
+                $this->injector->get('user')
+            ),
         );
     }
 

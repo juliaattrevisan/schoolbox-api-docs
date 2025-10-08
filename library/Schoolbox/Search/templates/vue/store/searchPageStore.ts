@@ -3,12 +3,13 @@
  */
 
 import { defineStore } from "pinia";
+import { EMPTY_DATE } from "@schoolboxVue/components/dateTimePicker/datePickerTypes";
 import { useQueryStore } from "./spQueryStore";
 import { useFiltersStore } from "../filters/store/spFiltersStore";
 import type { FilterType } from "../filters/store/spFilterTypesStore";
 import { useFilterTypesStore } from "../filters/store/spFilterTypesStore";
 import type { FilterDateRange } from "../filters/store/spFilterDateRangeStore";
-import { EMPTY_DATE, useFilterDateRangeStore } from "../filters/store/spFilterDateRangeStore";
+import { useFilterDateRangeStore } from "../filters/store/spFilterDateRangeStore";
 import type { Creator } from "../filters/store/spFilterCreatorsStore";
 import { useFilterCreatorsStore } from "../filters/store/spFilterCreatorsStore";
 
@@ -16,6 +17,7 @@ const SINGLE_COLUMN_BREAKPOINT = 800;
 
 export const useStore = defineStore("searchPage", () => {
     let endpoint = ""; // the endpoint to use for searching
+    const resultPageSize = window.Vue.ref(0); // Maximum number of search results per page.  The value will come from the server.
 
     const isSingleColumn = window.Vue.ref(true); // whether to use a single column layout
     const filterCreatorsStore = useFilterCreatorsStore();
@@ -29,6 +31,7 @@ export const useStore = defineStore("searchPage", () => {
      * @param $creator - the selected creator
      * @param $filterTypesAvailable - the available filter types
      * @param $filterTypesSelected - the selected filter types
+     * @param $resultPageSize - the maximum number of results per page
      */
     function init(
         $endpoint: string,
@@ -36,8 +39,10 @@ export const useStore = defineStore("searchPage", () => {
         $creator: Creator | null,
         $filterTypesAvailable: FilterType[],
         $filterTypesSelected: string[],
+        $resultPageSize: number,
     ): void {
         endpoint = $endpoint;
+        resultPageSize.value = $resultPageSize;
 
         if ($creator !== null) {
             filterCreatorsStore.creator = [$creator];
@@ -107,5 +112,6 @@ export const useStore = defineStore("searchPage", () => {
         getEndpointWithParams,
         containerWidthChange,
         isSingleColumn,
+        resultPageSize,
     };
 });

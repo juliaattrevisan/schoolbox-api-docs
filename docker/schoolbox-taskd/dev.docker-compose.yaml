@@ -1,0 +1,30 @@
+# This taskd container references a code base somewhere on the file system,
+# thus changes made to that container are made available immediately.
+# This container is intended for development of taskd.
+
+services:
+  # Local taskd definition:
+  # must assume that taskd is in a sibling folder named `taskd`
+  schoolbox-taskd:
+    container_name: schoolbox-taskd
+    depends_on:
+      redis-storage:
+        condition: service_healthy
+    build:
+      context: ../../taskd
+    env_file:
+      - path: ./schoolbox-taskd/default.env
+        required: true
+      - path: ./../docker-taskd.env
+        required: false
+    volumes:
+      - taskd-code:/app
+
+# Also mount taskd's code, so that changes are available without rebuilding
+volumes:
+  taskd-code:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ../../taskd

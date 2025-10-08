@@ -7,12 +7,6 @@
         </div>
     </fieldset>
     <fieldset class="content">
-        <div class="small-12 medium-12 columns">
-            <label for="occurredOn">
-                Occurred On
-            </label>
-            <input type="text" name="occurredOn" id="occurredOn" data-datepicker maxlength="50" value="{{ record.occurredOn ? record.occurredOn.localShort : null }}" />
-        </div>
         <div class="small-12 medium-6 columns">
             <label for="typeId" class="required">Type</label>
                 <select name="typeId" id="typeId" required>
@@ -45,6 +39,24 @@
                     {% endfor %}
                 </select> </label>
         </div>
+        <!-- the entry tip will only be shown when a tip is set for the current type/subtype selection -->
+        <div id="entry-tip-container" class="small-12 columns" style="display: none;">
+            <div id="entry-tip-input" class="alert-box"></div>
+        </div>
+        <div class="small-12 medium-6 columns">
+            <label for="occurredOn">
+                Occurred On
+            </label>
+            <input type="text" name="occurredOn" id="occurredOn" data-datepicker maxlength="50" value="{{ record.occurredOn ? record.occurredOn.localShort : null }}" />
+        </div>
+        <div class="small-12 medium-6 columns">
+            <label for="expiresAt">
+                Expires At
+                <span class="hint has-tip tip-top" data-tooltip title="Select when the record will expire.
+                Expired records will move to an archived state.">?</span>
+            </label>
+            <input type="text" name="expiresAt" id="expiresAt" maxlength="50" value="{{ record.expiresAt ? record.expiresAt.localShort : null }}" {% if canModifyExpiresAt %}data-datepicker{% else %}readonly{% endif %}  data-test="modify-section-general-pastoral-expires-at-input" />
+        </div>
         <div class="small-12 medium-6 columns">
             {% if severities | length %}
                 <label for="severityId">{{ locale.severity.proper }}</label>
@@ -61,7 +73,14 @@
         <div class="small-12 medium-6 columns">
             {# This label is intentionally unusual, there exists custom JS that PST uses occasionally which targets
              this <input> field, moving up one will break the form. See SA-18992 for more. #}
-            <label> Points <input type="number" inputmode="numeric" name="points" size="35" min="-1000000" max="1000000" value="{{ record.points }}"/> </label>
+            {% if config.pastoral_point_enabled %}
+                <label> Points
+                    <input id="points" type="text" inputmode="numeric" name="points" value="{{ record.points }}" {% if canModifyPoints == false %}readonly {% endif %}/>
+                </label>
+            {% else %}
+            {# We want to preserve the points when they toggle the pastoral points off#}
+                <input id="points" type="hidden" inputmode="numeric" name="points" value="{{ record.points }}"/>
+            {% endif %}
         </div>
         <div class="small-12 medium-6 columns">
             <label> Tags

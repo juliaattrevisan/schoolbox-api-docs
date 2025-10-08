@@ -87,7 +87,6 @@ abstract class SubmissionAbstract
      */
     protected function loadParticipants(IAssessable $assessmentImpl): ?IAssessable
     {
-        /** @phpstan-ignore-next-line */
         if (!$assessmentImpl->getContext()) {
             // this seems to happen for past assessments in future term in canvas
             $this->log->warning("Failed to load participant: assessment {$assessmentImpl->getId()} does not have context.");
@@ -218,6 +217,7 @@ abstract class SubmissionAbstract
      * @param array                $canvasSubmission
      * @param GenericCollection    $existingFeedbacks
      * @param IMarkScheme          $markScheme
+     * @param IMarkScheme|null     $instructorMarkScheme (only relevant for due work)
      * @param string               $feedbackTime
      * @return mixed
      */
@@ -228,6 +228,7 @@ abstract class SubmissionAbstract
         array $canvasSubmission,
         GenericCollection $existingFeedbacks,
         IMarkScheme $markScheme,
+        ?IMarkScheme $instructorMarkScheme,
         string $feedbackTime
     ): mixed;
 

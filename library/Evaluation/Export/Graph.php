@@ -169,7 +169,7 @@ class Evaluation_Export_Graph
                 // Not all questions have pre-defined answers:
                 // for example, the Parent Child question allows a parent to
                 // select one of their own children.
-                if (isset($answerRecord['answer'])) {
+                if (isset($answerRecord['answer']) && is_string($answerRecord['answer'])) {
                     $allAnswers = unserialize($answerRecord['answer']);
 
                     /* If this was a multi-choice or radio variant, answers
@@ -179,6 +179,12 @@ class Evaluation_Export_Graph
                      */
                     if (is_array($allAnswers) && count($allAnswers)) {
                         foreach ($allAnswers as $currentAnswer) {
+                            /* Skip the answer if the value does not exist
+                             * TODO: Will need to fix the import/export to fix the issue completely
+                             */
+                            if (!isset($currentAnswer->value)) {
+                                continue;
+                            }
                             $this->sectionValues[$sectionIndex]['questions'][$i]['summary'][$currentAnswer->value]['values'] = 0;
                             $this->sectionValues[$sectionIndex]['questions'][$i]['summary'][$currentAnswer->value]['text'] = $currentAnswer->description ?? '';
                         }
@@ -386,7 +392,7 @@ class Evaluation_Export_Graph
      */
     public function __outputCSV(&$vals, $key, $filehandler)
     {
-        fputcsv($filehandler, $vals, ',', '"');
+        fputcsv($filehandler, $vals, ',', '"', escape: '');
     }
 
     /* Getters/Setters

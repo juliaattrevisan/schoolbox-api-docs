@@ -71,7 +71,7 @@ export default class QuestionForm {
     async modify(): Promise<void> {
         await this.page.locator(QuestionForm.SELECTOR_BUTTON_MODIFY).isEnabled();
         await this.page.click(QuestionForm.SELECTOR_BUTTON_MODIFY);
-        await expect(this.page.locator(`h1:has-text("Question Bank")`)).toBeVisible();
+        await this.page.waitForURL("**/survey/questionbank/contents/**");
     }
 
     /*

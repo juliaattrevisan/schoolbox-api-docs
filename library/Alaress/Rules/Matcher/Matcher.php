@@ -66,18 +66,31 @@ class Matcher
     private function buildRegexp(string $pattern): string
     {
         $pattern = preg_replace_callback(
-            '/\\\\*\\[!/',
+            '/\\\\*\\[\^/',
             function ($matches) {
                 // Is there an even number of escape chars (inc. 0)?
                 // Replace if so: otherwise do not
                 [$match] = $matches;
                 if (strlen($match) % 2 === 0) {
-                    return str_replace('[!', '[^', $match);
+                    return str_replace('[^', '[!', $match);
                 }
                 return $match;
             },
             $pattern,
         );
+
+        /* Special case to accommodate user experience.
+         * Double-asterisk ** matches data where there are slashes, such as in the example:
+         *
+         * Chemistry/Physics Teacher & Assistant Director of Academic Operations 7-12 (SS)
+         *
+         * Having to educate users on the nuance between * and ** is probably too annoying so
+         * we'll do it on their behalf, saving them the thinking. This vendor library is a
+         * directory parser and we're using it a bit obliquely here as we don't experience
+         * folder path problems in the UPS space.
+         */
+        $pattern = str_replace('*', '**', $pattern);
+
         return (new Pattern($pattern))->toRegex() . 'i';
     }
 }

@@ -26,7 +26,7 @@ class IsCommentAuthor implements IAuthorizationRule
      * @param User|null $user
      * @return void
      */
-    public function authorize(array $params = [], User $user = null): void
+    public function authorize(array $params = [], ?User $user = null): void
     {
         $comment = $params['comment'] ?? null;
         if (!$comment instanceof Comment\Model) {

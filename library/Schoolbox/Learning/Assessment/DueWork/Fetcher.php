@@ -59,7 +59,7 @@ class Fetcher
         bool $useCache,
         bool $forceDownload
     ): void {
-        $disposition = (!$resource->getMimetype()->getInline() || $forceDownload) ? PreSignedUrlService::DISPOSITION_ATTACHMENT : PreSignedUrlService::DISPOSITION_INLINE;
+        $disposition = $forceDownload ? PreSignedUrlService::DISPOSITION_ATTACHMENT : PreSignedUrlService::DISPOSITION_INLINE;
         $contentType = ($resource->getMime()) ?: 'application/octet-stream';
         $cacheControl = $useCache ? ['private', 'must-revalidate'] : ['no-store'];
         $bypassPresignedUrls = $resource->getMimetype()->getMime() === 'text/html' && $disposition === PreSignedUrlService::DISPOSITION_INLINE;

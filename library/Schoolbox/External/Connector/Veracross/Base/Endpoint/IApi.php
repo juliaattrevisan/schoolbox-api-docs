@@ -49,4 +49,12 @@ interface IApi
      * @return ApiUsage
      */
     public function getUsage(): ApiUsage;
+
+
+    /**
+     * Get decoded DSN pieces
+     *
+     * @return array
+     */
+    public function getCredentials(): array;
 }

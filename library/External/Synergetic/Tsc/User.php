@@ -56,10 +56,13 @@ class External_Synergetic_Tsc_User extends External_Synergetic_User
                         vStudentsAll.StudentSpecialNeedsFlag,
                         vStudentsAll.EnglishSecondFlag,
                         vStudentsAll.StudentStudiesCode,
-                        AlertMessage,
+                        CASE WHEN AlertCategoryCode != ''
+                            THEN CONCAT(AlertCategoryCode,': ',AlertMessage)
+                            ELSE AlertMessage
+                        END AS AlertMessage,
                         vStudentsAll.LegalCourtOrderType AS CourtOrderType,
                         vStudentsAll.LegalParentsSeparatedFlag AS ParentsSeparatedFlag,
-                        vStudentsAll.StudentBoarder,
+                        luBoarder.Description AS StudentBoarder,
                         vStudentsAll.StudentsComment as Comment,
                         '' AS StudentEnrolmentDate,
                         '' AS StudentLeavingDate,
@@ -72,7 +75,7 @@ class External_Synergetic_Tsc_User extends External_Synergetic_User
                             WHERE     IEP.ID = vStudentsAll.ID AND
                             StartDate <= CURRENT_TIMESTAMP AND
                             (EndDate >= CURRENT_TIMESTAMP OR EndDate IS NULL)
-                        ) AS countIndividualEducationPlans
+                        ) AS countIndividualEducationPlans,
                         uLECaseManager.LECaseManagerID,
                         uLECaseManager.LECaseManagerName,
                         uLECaseManager.*
@@ -100,6 +103,7 @@ class External_Synergetic_Tsc_User extends External_Synergetic_User
                             Semester.FileYear = vStudentsAll.FileYear AND
                             Semester.SystemCurrentFlag = 1
             LEFT JOIN dbo.uLECaseManager ON vStudentsAll.StudentID = uLECaseManager.ID
+            LEFT JOIN luBoarder ON luBoarder.Code = vStudentsAll.StudentBoarder
             WHERE       vStudentsAll.StudentID = :externalId
         ";
 
@@ -121,7 +125,7 @@ class External_Synergetic_Tsc_User extends External_Synergetic_User
 
                 /* Forcibly re-evaluate boarderlyness using this connector's specific interpretation
                  */
-                $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
+                // $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
 
                 /* Initialise stacks
                  */

@@ -39,7 +39,10 @@ if (is_string($_POST['description'] ?? null) && isset($_POST['category'])) {
     try {
         // if we're editing an existing file, ensure the file exists
         if ($modifyExisting) {
-            $file = FileMapper::getInstance()->findById($_POST['fileID'] ?? null);
+            $file = FileMapper::getInstance()->findOneByColumnList([
+                "id" => $_POST['fileID'] ?? null,
+                "category" => $_POST['category'],
+            ]);
         } else {
             $file = FileMapper::getInstance()->createModel();
         }
@@ -194,7 +197,6 @@ if (is_string($_POST['description'] ?? null) && isset($_POST['category'])) {
                     'iconFile'          => $file->getStorage()->getMimetype()->getIconFile(),
                     'description'       => $file->getStorage()->getMimetype()->getDescription(),
                     'url'               => '/images/mime/' . $file->getStorage()->getMimetype()->getIconFile(),
-                    'inline'            => $file->getStorage()->getMimetype()->getInline()
                 ],
                 'hidden'                => $file->isHidden(),
                 'type'                  => $file->getStorage()->getMimetype()->getType(),
@@ -217,6 +219,11 @@ if (is_string($_POST['description'] ?? null) && isset($_POST['category'])) {
     /* Move file from one category to another */
     try {
         $file = FileMapper::getInstance()->findById($_POST['move']);
+
+        // can you move this file?
+        if ($groupHandler->getPermission($file->getFolder()->getId()) < UserAccess::ACCESS_WRITE) {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_CATEGORY_WRITE);
+        }
 
         if (0 == $_POST['categoryID']) {
             $result = "Cannot attach files to root";

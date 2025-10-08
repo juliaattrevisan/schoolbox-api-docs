@@ -2,7 +2,9 @@
     {{ assessment.selfGradable ? locale.selfAssessment.proper : locale.selfReflection.proper }}
 </h2>
 
-{% set gradable = selfAssess and '' != assessment.markScheme.template %}
+{% set markScheme = assessment.markScheme %}
+
+{% set gradable = selfAssess and '' != markScheme.template %}
 
 {% set rubricText = ''  %}
 {% set selfAssessText = '' %}
@@ -46,10 +48,11 @@
     {% if gradable %}
         <div class="small-12 medium-3 column">
             <label>{{ locale.grades.proper }}
-                {% include '@learningMarkScheme/'~assessment.markScheme.template~'.twig' with {
+                {% include '@learningMarkScheme/'~markScheme.template~'.twig' with {
                     participant: participant,
                     feedback: feedback,
-                    markScheme: assessment.markScheme,
+                    markScheme: markScheme,
+                    useInstructorMark: false,
                     tabIndex: 1,
                     errors: errors,
                     readonly: readonly
@@ -74,7 +77,8 @@
             feedback: feedback,
             selfAssessment: selfAssess,
             selfReflection: selfReflect,
-            blindMode: false
+            blindMode: false,
+            isRichText: true
         } only %}
     </div>
 </section>

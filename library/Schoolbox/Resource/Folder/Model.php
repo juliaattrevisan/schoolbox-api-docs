@@ -560,10 +560,10 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
     }
 
     /**
-     * @param CourseSpecification $courseSpecification
+     * @param CourseSpecification|null $courseSpecification
      * @return static
      */
-    public function setCourseSpecification(CourseSpecification $courseSpecification = null)
+    public function setCourseSpecification(?CourseSpecification $courseSpecification = null)
     {
         $this->courseSpecification = $courseSpecification;
         return $this;
@@ -599,7 +599,7 @@ class Model extends AbstractFolder implements ISoftDeletable, ValueLabelInterfac
      * @param UnitSpecification|null $unitSpecification
      * @return static
      */
-    public function setUnitSpecification(UnitSpecification $unitSpecification = null)
+    public function setUnitSpecification(?UnitSpecification $unitSpecification = null)
     {
         $this->unitSpecification = $unitSpecification;
         return $this;

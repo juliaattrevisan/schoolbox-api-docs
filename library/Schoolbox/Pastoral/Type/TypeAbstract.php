@@ -38,8 +38,32 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
         self::SENTIMENT_NEGATIVE,
     ];
 
+    /**
+     * Pastoral Expiry
+     */
+    public const PASTORAL_EXPIRY_DEFAULT = null;
+    public const PASTORAL_EXPIRY = [
+        'never'           => self::PASTORAL_EXPIRY_DEFAULT,
+        '1 day'           => '1 day',
+        '1 week'          => '1 week',
+        '2 weeks'         => '2 weeks',
+        '1 month'         => '1 month',
+        '3 months'        => '3 months',
+        '6 months'        => '6 months',
+        '12 months'       => '12 months',
+        '24 months'       => '24 months',
+        'calendar year'   => 'calendar year',
+        'academic period' => 'academic period',
+        'academic year'   => 'academic year',
+    ];
+
     /** @var string|null */
     protected ?string $name = null;
+
+    /**
+     * @var string|null
+     */
+    protected ?string $entryTip = null;
 
     /**
      * @var string|null
@@ -78,6 +102,19 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
      * Sentiment 'positive', 'neutral', 'negative'
      */
     protected string $sentiment = Model::SENTIMENT_NEUTRAL;
+
+    /**
+     * Optional. Default Points for this type.
+     *
+     * @var null|float
+     */
+    protected ?float $defaultPoints = null;
+
+    /**
+     * Pastoral expiry period
+     * @var ?string
+     */
+    protected ?string $defaultExpiry = Model::PASTORAL_EXPIRY_DEFAULT;
 
     /** @var GenericCollection */
     protected GenericCollection $typeActions;
@@ -125,6 +162,24 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
     public function getExternalCode(): ?string
     {
         return $this->externalCode;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getEntryTip(): ?string
+    {
+        return $this->entryTip;
+    }
+
+    /**
+     * @param string|null $entryTip
+     * @return static
+     */
+    public function setEntryTip(?string $entryTip): self
+    {
+        $this->entryTip = $entryTip;
+        return $this;
     }
 
     /**
@@ -232,6 +287,24 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
     }
 
     /**
+     * @return float|null
+     */
+    public function getDefaultPoints(): ?float
+    {
+        return $this->defaultPoints;
+    }
+
+    /**
+     * @param float|null $defaultPoints
+     * @return static
+     */
+    public function setDefaultPoints(?float $defaultPoints): self
+    {
+        $this->defaultPoints = $defaultPoints;
+        return $this;
+    }
+
+    /**
      * @return GenericCollection|Action[]
      */
     public function getTypeActions()
@@ -262,5 +335,23 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
             'id'   => $this->getId(),
             'name' => $this->getName(),
         ];
+    }
+
+    /**
+     * @return ?string
+     */
+    public function getDefaultExpiry(): ?string
+    {
+        return $this->defaultExpiry;
+    }
+
+    /**
+     * @param ?string $defaultExpiry
+     * @return static
+     */
+    public function setDefaultExpiry(?string $defaultExpiry): self
+    {
+        $this->defaultExpiry = $defaultExpiry;
+        return $this;
     }
 }

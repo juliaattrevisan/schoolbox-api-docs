@@ -12,6 +12,7 @@ namespace Schoolbox\Learning\Assessment\DueWork;
 
 use Alaress_Date_Format;
 use DomainException;
+use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Model as GradeGroup;
 use Schoolbox\Assessment\Component\SubmissionBox\MarkType;
 use Schoolbox\Assessment\Rubric\Grid\Grid;
 use Schoolbox\Learning\Assessment\AssessmentType;
@@ -25,6 +26,7 @@ use Schoolbox\Assessment\Component\SubmissionBox;
 use Schoolbox\Collection;
 use Schoolbox\User;
 use Schoolbox\Learning\Assessment\AbstractAssessment;
+use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\Assessment\Participant;
@@ -110,10 +112,36 @@ class Model extends AbstractAssessment implements ISelfAssessable
 
     /**
      * Only relevant if this DueWork's MarkType is 'TotalMark'
+     * The max mark as per $this->markType
      *
      * @var float
      */
     private $maxMark;
+
+    /**
+     * Only relevant if this DueWork's MarkType is 'TotalMark'
+     * The max mark as per $this->instructorMarkType
+     *
+     * @var float
+     */
+    private $instructorMaxMark;
+
+    /**
+     * The input (instructor) mark type
+     *
+     * @var MarkType
+     */
+    private $instructorMarkType;
+
+    /**
+     * @var GradeGroup|null
+     */
+    private $instructorGradeGroup;
+
+    /**
+     * @var IMarkScheme
+     */
+    private $instructorMarkScheme;
 
     /**
      * @var string
@@ -249,6 +277,10 @@ class Model extends AbstractAssessment implements ISelfAssessable
         $this->capabilityGradeGroup   = $source->capabilityGradeGroup;
         $this->capabilityMarkType     = $source->capabilityMarkType;
         $this->maxMark                = $source->maxMark;
+        $this->instructorMaxMark      = $source->instructorMaxMark;
+        $this->instructorMarkType     = $source->instructorMarkType;
+        $this->instructorGradeGroup   = $source->instructorGradeGroup;
+        $this->instructorMarkScheme   = $source->instructorMarkScheme;
         $this->selfReviewability      = $source->selfReviewability;
         $this->showSubmittedOnly      = $source->showSubmittedOnly;
         $this->similarityCheckEnabled = $source->similarityCheckEnabled;
@@ -420,7 +452,7 @@ class Model extends AbstractAssessment implements ISelfAssessable
      *
      * @throws DomainException
      */
-    private function assertOpen(Participant $participant = null)
+    private function assertOpen(?Participant $participant = null)
     {
         if ($participant != null) {
             $openDate = $participant->getOpenDate();
@@ -559,6 +591,19 @@ class Model extends AbstractAssessment implements ISelfAssessable
     {
         $feedback = $this->getAuthoritativeFeedback($participant, $publishedOnly);
         return $feedback ? $feedback->getHumanReadableMark() : null;
+    }
+
+
+    /**
+     * DueWork does not use the MarkScheme. It merely returns the cached value.
+     *
+     * @inheritdoc
+     */
+    public function getHumanReadableInstructorMark(Participant $participant, $publishedOnly)
+    {
+        /** @var Feedback\Model|null $feedback */
+        $feedback = $this->getAuthoritativeFeedback($participant, $publishedOnly);
+        return $feedback ? $feedback->getHumanReadableInstructorMark() : null;
     }
 
 
@@ -823,6 +868,78 @@ class Model extends AbstractAssessment implements ISelfAssessable
     public function setMaxMark(?float $maxMark): self
     {
         $this->maxMark = $maxMark;
+        return $this;
+    }
+
+    /**
+     * @return float|null
+     */
+    public function getInstructorMaxMark(): ?float
+    {
+        return $this->instructorMaxMark;
+    }
+
+    /**
+     * @param float|null $instructorMaxMark
+     * @return static
+     */
+    public function setInstructorMaxMark(?float $instructorMaxMark): self
+    {
+        $this->instructorMaxMark = $instructorMaxMark;
+        return $this;
+    }
+
+    /**
+     * @return MarkType
+     */
+    public function getInstructorMarkType()
+    {
+        return $this->instructorMarkType;
+    }
+
+    /**
+     * @param MarkType $instructorMarkType
+     * @return $this
+     */
+    public function setInstructorMarkType($instructorMarkType): self
+    {
+        $this->instructorMarkType = $instructorMarkType;
+        return $this;
+    }
+
+    /**
+     * @return GradeGroup|null
+     */
+    public function getInstructorGradeGroup()
+    {
+        return $this->instructorGradeGroup;
+    }
+
+    /**
+     * @param GradeGroup|null $instructorGradeGroup
+     * @return $this
+     */
+    public function setInstructorGradeGroup(?GradeGroup $instructorGradeGroup): self
+    {
+        $this->instructorGradeGroup = $instructorGradeGroup;
+        return $this;
+    }
+
+    /**
+     * @return IMarkScheme
+     */
+    public function getInstructorMarkScheme()
+    {
+        return $this->instructorMarkScheme;
+    }
+
+    /**
+     * @param IMarkScheme $instructorMarkScheme
+     * @return $this
+     */
+    public function setInstructorMarkScheme(IMarkScheme $instructorMarkScheme): self
+    {
+        $this->instructorMarkScheme = $instructorMarkScheme;
         return $this;
     }
 

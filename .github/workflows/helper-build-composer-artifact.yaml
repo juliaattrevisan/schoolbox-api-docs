@@ -1,0 +1,38 @@
+name: Build Composer artifact
+
+on:
+  workflow_call:
+
+jobs:
+  build-composer-artifact:
+    timeout-minutes: 15
+    runs-on: onprem-k3s
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Load vendor cache
+        uses: actions/cache@v4
+        id: cache-vendor
+        with:
+          path: /tmp/composer-cache
+          key: vendor-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+
+      # The composer install runs regardless of cache hit above, because:
+      # * the cache populates Composer's cache, not vendor/
+      # * the autoload still needs to be built
+      - name: Composer install
+        uses: php-actions/composer@v6
+        with:
+          dev: no
+          args: --profile --ignore-platform-reqs -a
+          php_version: '8.4'
+          # The Composer action takes `2.2.x` but not `2.8.x`? Srsly?
+          version: '2.8.6'
+
+      - name: Upload composer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: schoolbox-composer
+          path: vendor/
+          retention-days: 1

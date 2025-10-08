@@ -24,12 +24,12 @@ class IsSchoolboxAdmin implements IAuthorizationRule
     /**
      * Performs an authorization check.
      *
-     * @param  array $params Any parameters passed as part of the route.
-     * @param  User  $user   The user to authorize, if any. Null value assumes
+     * @param  array    $params Any parameters passed as part of the route.
+     * @param User|null $user   The user to authorize, if any. Null value assumes
      *                       that no user is logged in.
      * @throws \Alaress\Authorizer\Failure\Base if the request isn't authorized.
      */
-    public function authorize(array $params = array(), User $user = null)
+    public function authorize(array $params = array(), ?User $user = null)
     {
         // ensure the user actually is a super, for starters
         (new IsSuperuser())->authorize($params, $user);

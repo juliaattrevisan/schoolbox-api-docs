@@ -119,11 +119,15 @@ class Calendar_Api_EventType_Fixtures_Schoolbox_Default extends Calendar_Api_Eve
 
         /* Find the list of matches that $user is somehow involved in,
          * and also get a list of teams that $user is somehow involved in
-         * This is used to cross reference, sow e can generate a link to a
+         * This is used to cross reference, so we can generate a link to a
          * results screen which is team-specific (findInvolvedMatchups()
          * won't tell you which team you're involved with specifically)
          */
-        $matchups = $this->matchupMapper->findInvolvedMatchups($this->getUser());
+        $matchups = $this->matchupMapper->findInvolvedMatchups(
+            $this->getUser(),
+            Alaress_Date_Format::newFromTimestamp($startTimestamp),
+            Alaress_Date_Format::newFromTimestamp($endTimestamp),
+        );
         $involvedTeamIds = $this->teamPlayerMapper->findInvolvedTeamIds($this->getUser());
 
         /** @var \Schoolbox\Fixtures\Matchup\Model $matchup */

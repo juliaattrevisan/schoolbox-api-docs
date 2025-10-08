@@ -18,14 +18,13 @@ namespace Schoolbox\Learning\Assessment;
  */
 trait TypeTrait
 {
-
     /**
      * Return as a regex string, optionally mutated by an array_map function
      *
-     * @param callable $map
+     * @param callable|null $map
      * @return string
      */
-    public static function getStringValuesAsRegex(callable $map = null)
+    public static function getStringValuesAsRegex(?callable $map = null)
     {
         $values = self::getStringValues();
 

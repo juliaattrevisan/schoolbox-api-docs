@@ -83,6 +83,14 @@
             </script>
         {% endif %}
 
+        {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
+            assessmentId: assessment.id,
+            assessment: assessment
+        }) %}
+        {% if viewCustomParticipationRoute and assessment.isImplementation and (assessment is dueWork or assessment is quiz or assessment is task) %}
+            <li><a class="icon-group" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
+        {% endif %}
+
         {% if assessment is quiz %}
             {# modifyRoute was already passed into this fragment #}
             {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessment: assessment, assessmentId: assessment.id}) %}

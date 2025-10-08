@@ -1,0 +1,75 @@
+{##
+ # dualMarkTypes
+ #
+ # Renders the input and display mark type dropdowns for an assessment
+ # as well as a toggle to determine if they should be in-sync or not
+ #
+ # @param IAssessable $assessment       An assessment instance
+ # @param array $allMarkTypes           tuples for (id, name) of mark types
+ # @param array $allGradeSchemes        tuples for (id, name) of grading schemes
+ # @param int|null $selectedMaxMark     The maximum mark currently selected
+ # @param int|null $selectedMarkType    The mark type currently selected
+ # @param int|null $selectedGradeGroup  The grade group currently selected
+ # @param int $defaultGradeGroup        Set in admin via default_grade_group config var
+ # @param bool $courseManagedReadonly   A bool to decide if this is readonly or not
+ #}
+
+{% set selectedInstructorMarkType = assessment.instructorMarkType.id ?? null %}
+{% set selectedDisplayMarkType = assessment.markType.id ?? null %}
+
+{% set dualMarkTypesEnabled = selectedInstructorMarkType != selectedDisplayMarkType %}
+
+<div class="row">
+    <div class="small-12 columns">
+        <label for="useDualMarkTypes" class="inline-block">Use Dual Mark Types?</label>
+
+        <div class="switch">
+            <input
+                name="useDualMarkTypes"
+                id="useDualMarkTypes"
+                type="checkbox"
+                {% if dualMarkTypesEnabled %}checked="checked"{% endif %}
+                {% if courseManagedReadonly %}disabled{% endif %}
+            />
+            <label for="useDualMarkTypes" data-test="assessment-form-checkbox-dualMarkTypes">
+                <span class="icon-approve"></span>
+                <span class="icon-cancel"></span>
+            </label>
+        </div>
+    </div>
+</div>
+
+{% include '@learningAssessment/fragments/markType.twig' with {
+    context: 'instructor',
+    assessment: assessment,
+    allMarkTypes: allMarkTypes,
+    allGradeSchemes: allGradeSchemes,
+    selectedMaxMark: assessment.instructorMaxMark ?? null,
+    selectedMarkType: selectedInstructorMarkType,
+    selectedGradeGroup: assessment.instructorGradeGroup.id ?? null,
+    defaultGradeGroup: defaultGradeGroup,
+    renderMaxMark: true,
+    markTypeLabel: 'Input Mark Type',
+    markTypeTooltip: 'Select the mark type that the teacher will input',
+    courseManagedReadonly: courseManagedReadonly,
+    syncSwitchSelector: '#useDualMarkTypes',
+    syncMarkTypeLabel: 'Mark Type',
+} %}
+
+{% include '@learningAssessment/fragments/markType.twig' with {
+    context: '',
+    assessment: assessment,
+    allMarkTypes: allMarkTypes,
+    allGradeSchemes: allGradeSchemes,
+    selectedMaxMark: assessment.maxMark ?? null,
+    selectedMarkType: selectedDisplayMarkType,
+    selectedGradeGroup: assessment.gradeGroup.id ?? null,
+    defaultGradeGroup: defaultGradeGroup,
+    renderMaxMark: true,
+    markTypeLabel: 'Display Mark Type',
+    markTypeTooltip: 'Select the mark type that will be displayed to students and parents',
+    courseManagedReadonly: courseManaged.isReadonly,
+    rowHidden: not dualMarkTypesEnabled,
+    syncSwitchSelector: '#useDualMarkTypes',
+    syncContext: 'instructor',
+} %}

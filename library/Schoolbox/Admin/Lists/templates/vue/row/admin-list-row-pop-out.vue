@@ -1,6 +1,7 @@
 <script>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
 /**
  * A 'pop out' for a row, it's a list of options that animate out from the right side
@@ -52,11 +53,10 @@ export default {
          * @returns { Array of Objects }
          */
         activeFields() {
-            const fieldIdList = this.fields.map((field) => field.id); //a list of just field.id to get the relevant key/value in rowKeyValueList
-            const popOutKeyValueList = this.rowKeyValueList.filter((row) =>
-                fieldIdList.some((fieldId) => fieldId === row.key),
-            ); //pull out those rowKeyValue object pairs that are part of the pop out
-            return this.fields.filter((field, index) => popOutKeyValueList[index].value); //when the value is set to true, put in the list
+            return this.fields.filter((field) => {
+                const fieldValue = this.rowKeyValueList.find((row) => row.key === field.id);
+                return fieldValue !== undefined && fieldValue.value; // only show those fields that are set to true
+            });
         },
     },
 

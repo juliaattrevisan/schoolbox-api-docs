@@ -8,10 +8,14 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Database\Factory;
+use Schoolbox\IConfigLoader;
 
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
+
+$kernel->deprecationNotice("SA-19334");
 
 if ($argc < 3) {
     die("Usage: php {$argv[0]} <sessionID> <count>\n");
@@ -23,9 +27,14 @@ $count   = intval($argv[2]);
 // remove existing
 Factory::getInstanceInternal()->execute("UPDATE news_items SET item_deleted = 1");
 
-
-$rss = new Alaress_Rss_Stream(Config::get('welcome_rss_url'));
-$size = $count ?: Config::get('welcome_rss_limit');
+/** @var IConfigLoader $config */
+$config = $kernel->get('config');
+$rss    = new Alaress_Rss_Stream(
+    $config->get('welcome_rss_url'),
+    $kernel->get('httpClient.cache'),
+    (int)$config->get(ConfigMapper::NAME_XML_CACHE_TIMEOUT),
+);
+$size = $count ?: $config->get('welcome_rss_limit');
 $rss->setLimit($size);
 try {
     $rss->stream();
@@ -40,7 +49,7 @@ try {
 foreach ($allRss as $item) {
     $title = Scrub::text($item['title']);
     $body = Scrub::html($item['content'] ? $item['content'] : $item['description']);
-    $url = 'http://' . Config::get('site_hostname') . '.' . Config::get('site_domain') . '/news/modifyForm.php';
+    $url = 'http://' . $config->get('site_hostname') . '.' . $config->get('site_domain') . '/news/modifyForm.php';
 
     $aurl = parse_url($url);
     $host = $aurl['host'];
@@ -99,3 +108,5 @@ foreach ($allRss as $item) {
 
     echo "[ ] Response: $response\n";
 }
+
+$kernel->deprecationNotice("SA-19334");

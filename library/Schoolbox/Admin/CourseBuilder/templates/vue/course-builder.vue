@@ -34,6 +34,7 @@ function onAddNewRow(): void {
         name: "",
         courseTemplate: firstValidTemplate,
         unitTemplate: firstValidTemplate,
+        sequence: store.courseTemplates.length, // default this to the end of the list (may need to actually set the sequence at some point)
     });
 }
 
@@ -63,12 +64,16 @@ window.Vue.onMounted(() => {
                 <div class="list-container">
                     <header class="list-header actions-small-1">
                         <div class="list-item">
-                            <label class="small-12 medium-6 column required">Framework Name</label>
+                            <label class="small-12 medium-1 column">&nbsp;</label>
+                            <label class="small-12 medium-1 column">ID</label>
+                            <label class="small-12 medium-4 column required">Framework Name</label>
                             <label class="small-12 medium-3 column required">Course Page Template</label>
                             <label class="small-12 medium-3 column required">Unit Page Template</label>
                         </div>
                     </header>
+
                     <course-builder-rows :available-templates="props.availableTemplates" />
+
                     <div class="component-action">
                         <section>
                             <a class="button" @click.prevent="onAddNewRow">Add Framework</a>

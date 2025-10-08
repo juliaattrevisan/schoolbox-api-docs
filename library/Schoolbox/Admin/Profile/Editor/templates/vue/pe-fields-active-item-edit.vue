@@ -5,7 +5,6 @@
 
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import PeFieldsActiveItemEditSetting from "./pe-fields-active-item-edit-setting.vue";
-import { useProfileEditorStore } from "./store/profileEditorStore";
 import { useProfileEditorFieldsStore } from "./store/profileEditorFieldsStore";
 import type { ProfileEditorActiveField } from "./types/profileEditorTypes";
 
@@ -15,17 +14,8 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const peStore = useProfileEditorStore();
 const peFieldsStore = useProfileEditorFieldsStore();
 const emit = defineEmits(["close"]);
-
-/**
- * A list of all the field setting keys that are valid for the current field
- */
-const validFieldSettingKeys = window.Vue.computed(() => {
-    const validKeysForField = Object.keys(props.field.fieldSettings);
-    return Object.keys(peStore.fieldSettings).filter((fieldSettingKey) => validKeysForField.includes(fieldSettingKey));
-});
 
 const isUpdating = window.Vue.ref(false);
 
@@ -48,7 +38,7 @@ async function onUpdateClicked(): Promise<void> {
         <div v-if="props.isOpen" class="column content small-12">
             <div class="l-flex-row l-gap-m l-pad-s">
                 <pe-fields-active-item-edit-setting
-                    v-for="fieldSettingKey in validFieldSettingKeys"
+                    v-for="(_, fieldSettingKey) in props.field.availableFieldSettings"
                     :key="fieldSettingKey"
                     :field="props.field"
                     :field-setting-key="fieldSettingKey"

@@ -45,7 +45,17 @@ class ConfigMapper extends Mapper
     public const MODULE_SCHOOLDATA = 'schoolData';
     public const MODULE_LTI        = 'lti';
     public const MODULE_REPORT_EXPORT = 'summative-report';
-    public const MODULE_EPORTFOLIO = 'eportfolio';
+    public const MODULE_FEATURE_TOURS = 'feature-tours';
+
+    /* Logically group each set of ai credentials based purely on the purpose they serve
+     * since the settings controllers group by module
+     */
+    public const MODULE_OPENAI_TEXT = 'openai-text';
+    public const MODULE_OPENAI_IMAGE = 'openai-image';
+
+    /* A special case for search
+     */
+    public const MODULE_OPENAI_AI_SERVICES = 'ai-services';
 
     // Field enum (kinda)
     public const FIELD_INPUT         =  1;
@@ -99,7 +109,7 @@ class ConfigMapper extends Mapper
     public const _SAVE_FOR_LATER                 = 'save_for_later';
     public const _STAFF_CAN_POST_NEWS            = 'news_staff_post_enabled';
     public const _AUDIENCE_TO_FOLDER_TEACHERS    = 'audience_to_folder_users_teachers';
-//    public const _EXTERNAL_MS_SQL_SERVER_DRIVER  = 'external_ms_sql_server_driver';
+    //    public const _EXTERNAL_MS_SQL_SERVER_DRIVER  = 'external_ms_sql_server_driver';
     public const COMMS_COMMENTS_ENABLED          = 'comms_comments_enabled';
     public const COMMS_STATISTICS_ENABLED        = 'comms_statistics_enabled';
     public const COMMS_STICKY_ENABLED            = 'comms_sticky_enabled';
@@ -123,6 +133,7 @@ class ConfigMapper extends Mapper
     public const NAME_OAUTH_ENABLE_SSO                   = 'oauth_enable_sso';
     public const NAME_OAUTH_RESPONSE_TYPE                = 'oauth_response_type';
     public const NAME_OAUTH_SCOPES                       = 'oauth_scopes';
+    public const NAME_OAUTH_DEBUG_MODE                   = 'oauth_debug_mode';
 
     public const _CANVAS_DATA_API_KEY    = 'canvas_data_api_key';
     public const _CANVAS_DATA_API_SECRET = 'canvas_data_api_secret';
@@ -139,6 +150,11 @@ class ConfigMapper extends Mapper
     public const NAME_OTFS_S3_CRED_SECRET            = 'otfs_s3_cred_secret';
     public const NAME_OTFS_S3_REGION                 = 'otfs_s3_region';
     public const NAME_OTFS_S3_VERSION                = 'otfs_s3_version';
+    public const NAME_OTFS_S3_ALT_HOST               = 'otfs_s3_alt_host';
+    public const NAME_OTFS_S3_ALT_ACCESS_KEY         = 'otfs_s3_alt_access_key';
+    public const NAME_OTFS_S3_ALT_SECRET_KEY         = 'otfs_s3_alt_secret_key';
+    public const NAME_OTFS_S3_ALT_BUCKET             = 'otfs_s3_alt_bucket';
+    public const NAME_OTFS_S3_ALT_REGION             = 'otfs_s3_alt_region';
 
     public const NAME_MAIL_ENABLED           = 'mail_enable';
     public const NAME_MAIL_ADDRESS           = 'mail_address';
@@ -163,10 +179,15 @@ class ConfigMapper extends Mapper
     public const NAME_BROWSER_CACHE_IMAGE_TIMEOUT    = 'browser_cache_image_timeout';
     public const NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT = 'browser_cache_portrait_timeout';
 
+    public const NAME_XML_CACHE_TIMEOUT = 'xml_cache_timeout';
+
     public const NAME_UPCOMING_ASSESSMENTS_ENABLED = 'upcoming_assessments_enabled';
     public const NAME_GRADES_ENABLED               = 'grades_enabled';
+    public const NAME_GRADE_GRADIENT_ENABLED       = 'grade_gradient_enable';
 
     public const NAME_LEARNING_MOMENTS_ENABLED       = 'learning_moments_enabled';
+    public const NAME_LEARNING_MOMENTS_MODERATION_ENABLED    = 'learning_moments_moderation_enabled';
+
     public const NAME_BADGES_ENABLED                 = 'badges_enabled';
     public const NAME_ACTIVITY_FEED_FEEDBACK_ENABLED = 'activity_feed_feedback_enabled';
 
@@ -179,6 +200,7 @@ class ConfigMapper extends Mapper
     public const NAME_SITE_PLAN = 'site_plan';
     public const NAME_SITE_VERSION = 'site_version';
     public const NAME_SITE_PACKAGE = 'site_package';
+    public const NAME_SITE_HOSTNAME = 'site_hostname';
     public const NAME_SITE_DOMAIN = 'site_domain';
     public const NAME_SITE_SCHOOL_CODE = 'site_school_code';
     public const NAME_SITE_STATIC_ASSET_SERVE_FROM_CDN = 'site_static_asset_serve_from_cdn';
@@ -208,8 +230,11 @@ class ConfigMapper extends Mapper
     public const NAME_MOBILE_DAEMON_ENABLED = 'mobile_daemon_enabled';
     public const NAME_LMS_ENABLED = 'lms_enabled';
     public const NAME_RESTRICT_STUDENT_SUBMISSIONS = 'restrict_student_submissions';
+
+    public const NAME_SUBMISSION_VISIBILITY_MAX = 'submission_visibility_max';
     public const NAME_LTI_ASSESSMENTS_ENABLE = 'lti_assessments_enable';
 
+    public const NAME_CUSTOM_ASSESSMENT_PARTICIPATION = 'custom_assessment_participation';
     public const NAME_ASSESSMENT_CALENDAR_ENABLED = 'assessment_calendar_enabled';
     public const NAME_RESOURCE_BOOKING_ENABLED = 'resource_booking_enabled';
     public const NAME_FIXTURES_ENABLED = 'fixtures_enabled';
@@ -233,7 +258,6 @@ class ConfigMapper extends Mapper
     public const NAME_INTELLISCHOOL_LEARNER_DASHBOARD_BASE_URL        = 'intellischool_learner_dashboard_base_url';
     public const NAME_INTELLISCHOOL_COHORT_DASHBOARD_BASE_URL         = 'intellischool_cohort_dashboard_base_url';
 
-    public const NAME_PASTORAL_FLAG_COUNT_PERIOD = 'pastoral_flag_count_period';
     public const NAME_PASTORAL_SEVERITY_ENABLED = 'pastoral_severity';
     public const NAME_PASTORAL_ACTION_ENABLED = 'pastoral_action_enable';
     public const NAME_EXTERNAL_PASTORAL = 'external_pastoral';
@@ -245,6 +269,8 @@ class ConfigMapper extends Mapper
     public const NAME_PASTORAL_PARENT_ACCESS_ENABLED = 'pastoral_parent_access';
     public const NAME_PASTORAL_STUDENT_ACCESS_ENABLED = 'pastoral_student_access';
     public const NAME_PASTORAL_BULK_IMPORT_ENABLED    = 'pastoral_bulk_import_enabled';
+    public const NAME_PASTORAL_POINT_ENABLED    = 'pastoral_point_enabled';
+    public const NAME_PASTORAL_DEFAULT_POINTS_ENABLED    = 'pastoral_default_points_enabled';
 
     public const NAME_REPORT_TITLE = 'report_title';
 
@@ -276,6 +302,7 @@ class ConfigMapper extends Mapper
     public const NAME_PAPERLY_AGENT_EXTERNAL_DB_USER_OVERRIDE = 'paperly_agent_external_db_user_override';
     public const NAME_PAPERLY_AGENT_EXTERNAL_DB_PASSWORD_OVERRIDE = 'paperly_agent_external_db_password_override';
     public const NAME_PAPERLY_AGENT_EXTERNAL_DB_NAME_OVERRIDE = 'paperly_agent_external_db_name_override';
+    public const NAME_PAPERLY_OPEN_IN_NEW_TAB = 'paperly_open_in_new_tab';
 
 
     public const NAME_KAMI_ENABLED = 'kami_enabled';
@@ -292,6 +319,12 @@ class ConfigMapper extends Mapper
      * Components
      */
     public const NAME_IMAGE_SLIDESHOW_MAX = 'image_slideshow_max';
+
+    /**
+     * Advanced Search
+     */
+    public const NAME_ADVANCED_SEARCH_RESULT_PAGE_SIZE = 'advanced_search_result_page_size';
+    public const NAME_ADVANCED_SEARCH_RESULT_PAGES_PER_BATCH = 'advanced_search_result_pages_per_batch';
 
     /**
      * Skin Config Fields
@@ -347,7 +380,31 @@ class ConfigMapper extends Mapper
     public const NAME_NAME_FORMAT_STAFF = 'name_format_staff';
     public const NAME_NAME_FORMAT_PARENT = 'name_format_parent';
 
+    /* Learnosity configuration/credentials
+     */
+    public const NAME_LEARNOSITY_VERSION = 'learnosity_version';
+    public const NAME_LEARNOSITY_CONSUMER_KEY = 'learnosity_consumer_key';
+    public const NAME_LEARNOSITY_CONSUMER_SECRET = 'learnosity_consumer_secret';
 
+    /* OpenAI
+     */
+    public const NAME_OPENAI_TEXT_ENDPOINT = 'openai_text_endpoint';
+    public const NAME_OPENAI_TEXT_KEY = 'openai_text_key';
+    public const NAME_OPENAI_TEXT_RESOURCE_NAME = 'openai_text_azure_resource_name';
+    public const NAME_OPENAI_TEXT_DEPLOYMENT_ID = 'openai_text_azure_deployment_id';
+    public const NAME_OPENAI_TEXT_MODEL = 'openai_text_model';
+    public const NAME_OPENAI_TEXT_SYSTEM_PROMPT = 'openai_text_generation_system_prompt';
+
+    public const NAME_OPENAI_IMAGE_ENDPOINT = 'openai_image_endpoint';
+    public const NAME_OPENAI_IMAGE_KEY = 'openai_image_key';
+    public const NAME_OPENAI_IMAGE_RESOURCE_NAME = 'openai_image_azure_resource_name';
+    public const NAME_OPENAI_IMAGE_DEPLOYMENT_ID = 'openai_image_azure_deployment_id';
+    public const NAME_OPENAI_IMAGE_MODEL = 'openai_image_model';
+    public const NAME_OPENAI_IMAGE_SYSTEM_PROMPT = 'openai_image_system_prompt';
+    public const NAME_OPENAI_IMAGE_OUTPUT_QUALITY = 'openai_image_output_quality';
+
+
+    public const NAME_DATASET_INSTANCE = 'dataset_instance';
     /**
      * Isams specific
      */
@@ -358,10 +415,19 @@ class ConfigMapper extends Mapper
     public const EXTERNAL_ISAMS_FINANCIAL_REGISTERS = 'external_isams_financial_registers';
 
 
-    // Debugging settings
-    public const NAME_SENTRY_TRACE_DEFAULT_SAMPLE_RATE = 'sentry_trace_default_sample_rate';
-    public const NAME_SENTRY_TRACE_CUSTOM_SAMPLE_RATES = 'sentry_trace_custom_sample_rates';
+    // Notification settings
+    public const NAME_NOTIFICATION_BLACKOUT_ENABLED    = 'notification_blackout_enabled';
+    public const NAME_NOTIFICATION_BLACKOUT_START_TIME = 'notification_blackout_start_time';
+    public const NAME_NOTIFICATION_BLACKOUT_END_TIME   = 'notification_blackout_end_time';
 
+
+    // Virus scanner settings
+    public const NAME_CLAMD_HOST          = 'clamd_host';
+    public const NAME_CLAMD_PORT          = 'clamd_port';
+    public const NAME_CLAMD_MAX_FILE_SIZE = 'clamd_max_file_size';
+
+    // Debug settings
+    public const NAME_DEBUG_MODE = 'debug_mode';
 
     /**
      * Config settings which may affect the behaviour of the router daemon.
@@ -389,6 +455,18 @@ class ConfigMapper extends Mapper
         'restrict_student_submissions',
         'restrict_parent_grades',
         self::NAME_MOBILE_DAEMON_ENABLED,
+    ];
+
+    /**
+     * Config settings which may affect the behaviour of the mobile daemon.
+     *
+     * If any of these settings change: send a refresh configuration message
+     * to the mobile daemon.
+     */
+    public const SETTINGS_AFFECTING_MOBILED = [
+        self::NAME_NOTIFICATION_BLACKOUT_ENABLED,
+        self::NAME_NOTIFICATION_BLACKOUT_START_TIME,
+        self::NAME_NOTIFICATION_BLACKOUT_END_TIME,
     ];
 
     /**
@@ -458,7 +536,18 @@ class ConfigMapper extends Mapper
             self::TYPE_STRING,
             self::COLUMN_ENUM,
             null,
-            [self::MODULE_SETTINGS, self::MODULE_COMMS, self::MODULE_CUSTOM, self::MODULE_OAUTH, self::MODULE_SCHOOLDATA, self::MODULE_LTI, self::MODULE_REPORT_EXPORT]
+            [
+                self::MODULE_SETTINGS,
+                self::MODULE_COMMS,
+                self::MODULE_CUSTOM,
+                self::MODULE_OAUTH,
+                self::MODULE_SCHOOLDATA,
+                self::MODULE_LTI,
+                self::MODULE_REPORT_EXPORT,
+                self::MODULE_FEATURE_TOURS,
+                self::MODULE_OPENAI_TEXT,
+                self::MODULE_OPENAI_IMAGE,
+            ]
         );
         $this->joins(self::COL_TYPE, Type\Mapper::class, 'id', self::TYPE_MODEL, null, 'type', 'type');
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'updateCache']);

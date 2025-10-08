@@ -35,14 +35,14 @@
     </div>
 </div>
 
-{# Only Elite plan has access to Audio and Video player
+{# Only Learning-Enhanced plan has access to Audio and Video player
  # Audio: 734ea0be-309b-4ff8-b004-3abd70094efd
  # Video: 25368800-1ebe-4f2c-b220-6fe90a44883b
  #
  # Hide them in css, then remove the li with javascript since the li elements
  # reserve a 33% width in the learnosity ui lol and I can't css-selector those
  #}
-{% if 'elite' != config.site_plan|lower %}
+{% if 'learning-enhanced' != config.site_plan|lower %}
 <style>
     [data-lrn-qe-template-reference="734ea0be-309b-4ff8-b004-3abd70094efd"],
     [data-lrn-qe-template-reference="25368800-1ebe-4f2c-b220-6fe90a44883b"]

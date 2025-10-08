@@ -109,7 +109,7 @@ class Factory
              * Only the xml files can/should be stored and read locally afaict
              */
             $api = [
-                DSN::MODULE_BATCHXML => new Batchxml(new MockFileApi($this->file, $this->key)),
+                DSN::MODULE_BATCHXML => new Api\Batch\Batchxml(new Api\Batch\MockFileApi($this->file, $this->key)),
             ];
         } else {
             $this->log->info('Accessing api endpoint');
@@ -117,13 +117,13 @@ class Factory
             /* Connect and shank data for all the modules we know about
              */
             $api = [
-                DSN::MODULE_BATCHXML => new Batchxml(new Api($this->host, $this->key, DSN::MODULE_BATCHXML)),
+                DSN::MODULE_BATCHXML => new Api\Batch\Batchxml(new Api\Batch\Api($this->host, $this->key, DSN::MODULE_BATCHXML)),
             ];
         }
 
-        /* This lets you shank down zip files containing everyone's profile pictures
+        /* A list of user ids that we previously imported
          */
-        $photoDownloader = new Profile\PhotoDownloader($this->host, $this->key, $this->zipDir);
+        $registry = new Registry();
 
         /* Purge previously-imported profile relationships and classes
          */
@@ -145,26 +145,51 @@ class Factory
                     $this->log,
                     $this->perform,
                     $api,
-                    $this->includePhoto,
-                    $photoDownloader,
+                    $this->watchlist,
                     $this->baseProfileMapper,
                     $this->studentProfileMapper,
                     $this->parentProfileMapper,
                     $this->staffProfileMapper,
                     $this->relationshipMapper,
-                    $this->storageMapper
+                    $registry
                 ))
                 ->add(new Profile\Cleanup(
                     $this->log,
                     $this->perform,
-                    $this->includePhoto,
                     $this->baseProfileMapper,
                     $this->studentProfileMapper,
                     $this->parentProfileMapper,
                     $this->staffProfileMapper,
                     $this->relationshipMapper,
-                    $photoDownloader
                 ));
+
+                /* Only try to process photos if Load Photos From SIS was activated in admin,
+                 * and if you're doing the profile segment of a segregated import
+                 */
+                if ($this->includePhoto) {
+                    $bus
+                        ->add(new Profile\Images\Prepare(
+                            $this->log,
+                            $this->host,
+                            $this->key,
+                            $this->zipDir,
+                            $this->validStrats
+                        ))->add(new Profile\Images\Download(
+                            $this->log,
+                            $this->perform,
+                            $registry,
+                            $this->host,
+                            $this->key,
+                            $this->zipDir,
+                            $this->baseProfileMapper,
+                            $this->storageMapper
+                        ))
+                        ->add(new Profile\Images\Cleanup(
+                            $this->log,
+                            $this->key,
+                            $this->zipDir,
+                        ));
+                }
         }
 
         if ($this->validStrats->isTimetableStratEnabled()) {

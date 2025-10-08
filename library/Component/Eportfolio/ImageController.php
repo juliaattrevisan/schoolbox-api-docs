@@ -62,6 +62,7 @@ class Component_Eportfolio_ImageController extends Component_Eportfolio_Controll
             $this->setVar([
                 'PREVIEW_IMAGE_URL'  => "/cms/myImage.php?id={$file->getId()}&height=$pixel&width=$pixel",
                 'PREVIEW_IMAGE_DESC' => Scrub::text($file->getTitle()),
+                'PIXEL' => $pixel,
             ]);
             $this->parse('image_block', 'image');
         } catch (\Exception $e) {

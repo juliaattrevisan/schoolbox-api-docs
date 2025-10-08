@@ -51,9 +51,9 @@ class ISoftDeletableTest extends TestCase
     /**
      * Provides all mappers to be tested
      *
-     * @return array
+     * @return iterable
      */
-    public static function providerMappers(): array
+    public static function providerMappers(): iterable
     {
         self::loadAllMapperClasses();
         $mappers = [];
@@ -72,6 +72,19 @@ class ISoftDeletableTest extends TestCase
                 // Does not have a getInstance, probably not a real mapper
                 continue;
             }
+
+            // Create a new mapper instance
+            $reflectionConstructor = $reflection->getConstructor();
+            if (!$reflectionConstructor->isPublic()) {
+                // Can't call a non-public constructor
+                continue;
+            }
+            if ($reflectionConstructor->getNumberOfRequiredParameters() > 0) {
+                // Can't construct if there's constructor params
+                // ("real" mappers won't have any)
+                continue;
+            }
+
             /**
              * @var \Schoolbox\Mapper $mapper
              */
@@ -83,7 +96,7 @@ class ISoftDeletableTest extends TestCase
                 continue;
             }
             $mapper->setConfigLoader(new ArrayLoader());
-            $mappers[] = [$mapper, $reflection, $className];
+            yield $className => [$mapper, $reflection, $className];
         }
         return $mappers;
     }

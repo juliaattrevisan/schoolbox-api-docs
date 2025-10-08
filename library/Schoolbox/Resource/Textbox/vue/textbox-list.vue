@@ -1,8 +1,8 @@
 <script>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
-import axios from "axios";
 import Toast from "@schoolboxVue/components/toast";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import { EditorEvent } from "@js/editor/event/editorEvent";
@@ -63,6 +63,15 @@ export default {
             type: String,
             required: true,
         },
+
+        /**
+         * Editor templates to use in the CKEditor instances.
+         * Can refer to www/static/js/editor/types/editorTypes.ts:Template
+         */
+        editorTemplates: {
+            type: Array,
+            default: () => [],
+        },
     },
     data() {
         return {
@@ -82,9 +91,9 @@ export default {
         };
     },
     mounted() {
-        axios
-            .get(this.textboxUsageEndpoint)
-            .then((response) => (this.textboxes = response.data))
+        fetch(this.textboxUsageEndpoint)
+            .then((response) => response.json())
+            .then((response) => (this.textboxes = response))
             .finally(() => (this.showSkeletonLoader = false));
 
         // Add event so that a new textbox may be added from outside of this
@@ -181,10 +190,24 @@ export default {
                     // If it doesn't it's new, so create it: otherwise update.
                     let updateEndpoint = textbox?._links?.update;
                     if (updateEndpoint) {
-                        requests.push(axios.put(updateEndpoint, textbox).then(() => this.markAsClean(index)));
+                        requests.push(
+                            fetch(updateEndpoint, {
+                                method: "PUT",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify(textbox),
+                            }).then(() => this.markAsClean(index)),
+                        );
                     } else {
                         requests.push(
-                            axios.post(this.createTextboxEndpoint, textbox).then(() => this.markAsClean(index)),
+                            fetch(this.createTextboxEndpoint, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify(textbox),
+                            }).then(() => this.markAsClean(index)),
                         );
                     }
                 }
@@ -252,6 +275,7 @@ export default {
                                 maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                                 targetElements: [`#${this.id}`],
                                 fileBrowserCategoryId: self.folderId,
+                                templates: self.editorTemplates,
                             },
                         }),
                     );
@@ -397,7 +421,9 @@ export default {
             try {
                 /* Asynchronously access the endpoint to delete the thing
                  */
-                await axios.delete(this.textboxes[this.textboxIndexToDelete].textbox._links.delete);
+                await fetch(this.textboxes[this.textboxIndexToDelete].textbox._links.delete, {
+                    method: "DELETE",
+                });
 
                 /* Mark this textbox as deleted
                  */

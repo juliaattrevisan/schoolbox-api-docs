@@ -21,9 +21,9 @@ abstract class TestCase extends BaseTestCase
     /**
      * The object that's being tested.
      *
-     * @var object
+     * @var object|null
      */
-    protected $object;
+    protected $object = null;
 
     /**
      * Configuration variables to set in the mock config.
@@ -41,7 +41,7 @@ abstract class TestCase extends BaseTestCase
 
     public function setUp(): void
     {
-        unset($this->object);
+        $this->object = null;
 
         //
         // Set up a mock configuration.

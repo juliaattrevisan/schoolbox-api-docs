@@ -22,5 +22,5 @@ interface IAuthorizationRule
      *                          that no user is logged in.
      * @throws \Alaress\Authorizer\Failure\Base if the request isn't authorized.
      */
-    public function authorize(array $params = array(), User $user = null);
+    public function authorize(array $params = array(), ?User $user = null);
 }

@@ -12,10 +12,13 @@ namespace Schoolbox\Pastoral;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\Pastoral;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
+use Schoolbox\Assessment\Term\Mapper as TermMapper;
+use Schoolbox\Assessment\Term\Model as TermModel;
 
 /**
  * Helper class for loading data to be passed to a Twig template for the
@@ -72,8 +75,14 @@ class TemplateDataHelper
 
         $typesIndex           = $types->map(fn (Pastoral\Type\Model $model) => $model->getTemplate());
         $typesIndexPrivate    = $types->map(fn (Pastoral\Type\Model $model) => $model->getTemplatePrivate());
+        $typesIndexEntryTip   = $types->map(fn (Pastoral\Type\Model $model) => $model->getEntryTip());
+        $typesIndexDefaultExpiry   = $types->map(fn (Pastoral\Type\Model $model) => $model->getDefaultExpiry());
+        $typesIndexDefaultPoints     = $types->map(fn (Pastoral\Type\Model $model) => $model->getDefaultPoints());
         $subtypesIndex        = $subtypes->map(fn (Pastoral\SubType\Model $model) => $model->getTemplate());
         $subtypesIndexPrivate = $subtypes->map(fn (Pastoral\SubType\Model $model) => $model->getTemplatePrivate());
+        $subtypesIndexEntryTip = $subtypes->map(fn (Pastoral\SubType\Model $model) => $model->getEntryTip());
+        $subtypesIndexDefaultExpiry = $subtypes->map(fn (Pastoral\SubType\Model $model) => $model->getDefaultExpiry());
+        $subtypesIndexDefaultPoints  = $subtypes->map(fn (Pastoral\SubType\Model $model) => $model->getDefaultPoints());
 
         $audienceDefaults = $this->loadTypeAndSubtypeDefaults($types, $typeAudiences, $subtypes, $subtypeAudiences);
 
@@ -84,6 +93,7 @@ class TemplateDataHelper
             'severities' => $this->config->get(ConfigMapper::NAME_PASTORAL_SEVERITY_ENABLED)
                 ? $this->pastoralSeverityMapper->findAll()
                 : [],
+            'expires'    => Pastoral\Type\TypeAbstract::PASTORAL_EXPIRY,
 
             // Requirements for displaying visibility inputs
             'allowIndividual' => $allowIndividual,
@@ -99,9 +109,15 @@ class TemplateDataHelper
             // Requirements for displaying scripts
             'audiences'            => $audienceDefaults,
             'typesIndexPrivate'    => $typesIndexPrivate,
+            'typesIndexEntryTip'    => $typesIndexEntryTip,
+            'typesIndexDefaultExpiry' => $typesIndexDefaultExpiry,
+            'typesIndexDefaultPoints'     => $typesIndexDefaultPoints,
             'typesIndex'           => $typesIndex,
+            'subtypesIndexEntryTip' => $subtypesIndexEntryTip,
             'subtypesIndexPrivate' => $subtypesIndexPrivate,
             'subtypesIndex'        => $subtypesIndex,
+            'subtypesIndexDefaultExpiry' => $subtypesIndexDefaultExpiry,
+            'subtypesIndexDefaultPoints'  => $subtypesIndexDefaultPoints,
         ];
     }
 
@@ -197,6 +213,9 @@ class TemplateDataHelper
         foreach ($types as $type) {
             $typesIndex[$type->getId()]        = $type->getTemplate();
             $typesIndexPrivate[$type->getId()] = $type->getTemplatePrivate();
+            $typesIndexEntryTip[$type->getId()] = $type->getEntryTip();
+            $typesIndexDefaultExpiry[$type->getId()] = $type->getDefaultExpiry();
+            $typesIndexDefaultPoints[$type->getId()] = $type->getDefaultPoints();
             if (key_exists($type->getId(), $typeAudiences) || $type->getVisibilityLocked()) {
                 $audienceDefaults[] = [
                     'typeId'    => $type->getId(),
@@ -209,6 +228,9 @@ class TemplateDataHelper
         foreach ($subtypes as $subtype) {
             $subtypesIndex[$subtype->getId()]        = $subtype->getTemplate();
             $subtypesIndexPrivate[$subtype->getId()] = $subtype->getTemplatePrivate();
+            $subtypesIndexEntryTip[$subtype->getId()] = $subtype->getEntryTip();
+            $subtypesIndexDefaultExpiry[$subtype->getId()] = $subtype->getDefaultExpiry();
+            $subtypesIndexDefaultPoints[$subtype->getId()] = $subtype->getDefaultPoints();
             if (key_exists($subtype->getId(), $subtypeAudiences) || $subtype->getVisibilityLocked()) {
                 $audienceDefaults[] = [
                     'typeId'    => $subtype->getPastoralType()->getId(),

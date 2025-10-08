@@ -92,7 +92,7 @@ function onClearSearchSelected(): void {
     </div>
     <div class="medium-4 small-12 columns">
         <label class="inline-block">Show disabled outcomes</label>
-        <div class="long switch">
+        <div class="switch">
             <input
                 id="show-only-enabled"
                 v-model="viewNodesStore.showDisabled"
@@ -100,8 +100,8 @@ function onClearSearchSelected(): void {
                 :disabled="props.isDisabled"
             />
             <label for="show-only-enabled" data-test="show-only-enabled">
-                <span>Shown</span>
-                <span>Hidden</span>
+                <span class="icon-approve"></span>
+                <span class="icon-cancel"></span>
             </label>
         </div>
     </div>

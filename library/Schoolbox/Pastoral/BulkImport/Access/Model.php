@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\BulkImport\Access;
 
+use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
@@ -26,7 +27,7 @@ use Schoolbox\User;
  * Used as a template for adding access records to the pastoral records the bulk
  * import process creates.
  */
-class Model implements IPastoralAccess
+class Model implements IPastoralAccess, ISoftDeletable
 {
     use Id;
     use CreatedAtDate;

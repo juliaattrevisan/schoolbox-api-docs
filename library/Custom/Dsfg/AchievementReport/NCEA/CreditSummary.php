@@ -8,6 +8,9 @@
 
 namespace Custom\Dsfg\AchievementReport\NCEA;
 
+use Alaress\Database\Connector\IConnector;
+use Schoolbox\User;
+
 class CreditSummary extends Base
 {
     /**
@@ -16,6 +19,26 @@ class CreditSummary extends Base
      * @var string
      */
     protected $heading = 'Credit Summary - All Years';
+
+
+    /**
+     * Constructor
+     *
+     * @param User        $user
+     * @param array       $externalUser
+     * @param IConnector  $db
+     * @param string|null $year
+     * @param string      $dbTableName
+     */
+    public function __construct(User $user, array $externalUser, IConnector $db, $year, string $dbTableName)
+    {
+        parent::__construct($user, $externalUser, $db, $year, $dbTableName);
+
+        if ($dbTableName === self::MAIN_DB_TABLE_YEAR11) {
+            // Override heading because the Year 11 report concerns only one year, and thd default heading includes 'All Years'.
+            $this->heading = 'Credit Summary';
+        }
+    }
 
 
     /**
@@ -64,7 +87,7 @@ class CreditSummary extends Base
                 StandardType,
                 StudentYear
             FROM
-                dbo.uvSchoolBoxNCEAResults
+                ' . $this->getDbTableName() . '
             WHERE
                 id = :externalId AND
                 WithdrawnFlag = 0
@@ -95,8 +118,15 @@ class CreditSummary extends Base
 
         foreach ($allResults as $current) {
             $level = $current['Level'];
-            $internalExternal = $current['InternalorExternalAssessment'];
             $letter = $current['StrippedResult'];
+            $internalExternal = self::getExOrIn($current['InternalorExternalAssessment']);
+
+            if ($level == '' && $current['EnteredCredits'] == 0 && $current['ResultCredits'] == 0) {
+                // Avoid creating the data structure for $finalStack[$level] if it will contain only zeros and a blank level.
+                // This prevents an extra row with a blank value for 'Level' and zeroes for all other columns being
+                // displayed in the Credit Summary table on the Year 11 report.
+                continue;
+            }
 
             if (!isset($finalStack[$level])) {
                 $finalStack[$level] = [
@@ -176,7 +206,7 @@ class CreditSummary extends Base
          */
         foreach ($allResults as $current) {
             $level = $current['Level'];
-            $internalExternal = $current['InternalorExternalAssessment'];
+            $internalExternal = self::getExOrIn($current['InternalorExternalAssessment']);
 
             if (!isset($finalStack[$level])) {
                 $finalStack[$level] = [
@@ -234,7 +264,7 @@ class CreditSummary extends Base
 
         foreach ($allResults as $current) {
             $level = $current['Level'];
-            $internalExternal = $current['InternalorExternalAssessment'];
+            $internalExternal = self::getExOrIn($current['InternalorExternalAssessment']);
 
             if (!isset($finalStack[$level])) {
                 $finalStack[$level] = [
@@ -294,7 +324,7 @@ class CreditSummary extends Base
 
         foreach ($allResults as $current) {
             $level = $current['Level'];
-            $internalExternal = $current['InternalorExternalAssessment'];
+            $internalExternal = self::getExOrIn($current['InternalorExternalAssessment']);
 
             if (!isset($finalStack[$level])) {
                 $finalStack[$level] = [
@@ -350,7 +380,7 @@ class CreditSummary extends Base
 
         foreach ($allResults as $current) {
             $level = $current['Level'];
-            $internalExternal = $current['InternalorExternalAssessment'];
+            $internalExternal = self::getExOrIn($current['InternalorExternalAssessment']);
 
             if (!isset($finalStack[$level])) {
                 $finalStack[$level] = array_fill_keys($this->achievementLetterRegistry, 0);

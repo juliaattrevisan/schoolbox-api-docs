@@ -3,73 +3,61 @@
     $(function() {
         var $toast = $('[data-toast]');
 
-        $('[data-restore-folder]').click(function(event) {
+        $('[data-restore]').click(function(event) {
             event.preventDefault();
+            let object = $(event.target).attr('data-restore-type'),
+                href = $(event.target).attr('data-restore-href');
             $(this).confirmDialog({
-                text: 'Are you sure you want to recover this folder?',
+                text: 'Are you sure you want to recover this ' + object + '?',
                 confirmEvent: function() {
-                    var config = {text: 'Restoring folder...'};
+                    var config = {text: 'Restoring ' + object + '...'};
                     $toast.toastActivate(config);
 
                     $.ajax({
                         type: 'POST',
-                        url: "{{ routeLookup('restore.restoreFolder') }}",
+                        url: href,
                         dataType: 'json',
                         data: {
-                            id: $(event.target).attr('data-restore-folder')
+                            id: $(event.target).attr('data-restore-id')
                         }
                     })
-                    .done(function() {
-                        $toast.toastTimeout({
-                            text: 'Folder recovered!',
-                            css: 'success'
-                        });
-                        $(event.target).closest('tr').remove();
-                    })
-                    .fail(function(response) {
-                        var temp = $.parseJSON(response.responseText);
+                        .done(function() {
+                            $toast.toastTimeout({
+                                text: object + ' recovered!',
+                                css: 'success'
+                            });
+                            $(event.target).closest('tr').remove();
+                        })
+                        .fail(function(response) {
+                            var temp = $.parseJSON(response.responseText);
 
-                        $toast.toastTimeout({
-                            text: temp.message,
-                            css: 'alert'
+                            $toast.toastTimeout({
+                                text: temp.message,
+                                css: 'alert'
+                            });
                         });
-                    });
                 }
             });
         });
+    });
 
-        $('[data-restore-assessment]').click(function(event) {
-            event.preventDefault();
-            $(this).confirmDialog({
-                text: 'Are you sure you want to recover this activity?',
-                confirmEvent: function() {
-                    var config = {text: 'Restoring activity...'};
-                    $toast.toastActivate(config);
+    /* Window load, set the default value for the date range */
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('[data-restore-range]').value = '{{ restoreRange }}';
+        /* when the search window changes, reload the page */
+        document.querySelector('[data-restore-range]').addEventListener('change', function() {
+            const searchParams = new URLSearchParams(window.location.search);
+            searchParams.set('restoreRange', this.value);
+            window.location.search = searchParams.toString();
+        });
 
-                    $.ajax({
-                        type: 'POST',
-                        url: "{{ routeLookup('restore.restoreAssessment') }}",
-                        dataType: 'json',
-                        data: {
-                            id: $(event.target).attr('data-restore-assessment')
-                        }
-                    })
-                    .done(function() {
-                        $toast.toastTimeout({
-                            text: 'Activity recovered!',
-                            css: 'success'
-                        });
-                        $(event.target).closest('tr').remove();
-                    })
-                    .fail(function(response) {
-                        var temp = $.parseJSON(response.responseText);
-
-                        $toast.toastTimeout({
-                            text: temp.message,
-                            css: 'alert'
-                        });
-                    });
-                }
+        /* when the tab changes, update the URL hash */
+        if (window.location.hash) {
+            document.querySelector(`[data-tab] a[href="${window.location.hash}"]`).click();
+        }
+        document.querySelectorAll('[data-tab] a').forEach(function(tab) {
+            tab.addEventListener('click', function() {
+                window.location.hash = this.getAttribute('href').replace('#', '');
             });
         });
     });
@@ -93,9 +81,26 @@
 
     <div class="admin-content">
         <div class="small-12 island">
+            <div>
+                <label for="restoreDateRange">
+                    Filter Deleted Records:
+                </label>
+                <select id="restoreDateRange" data-restore-range>
+                    <option value="1week">Last 7 days</option>
+                    <option value="2week">Last 14 days</option>
+                    <option value="1month">Last month</option>
+                    <option value="3month">Last 3 months</option>
+                </select>
+            </div>
             <dl class="tabs" data-tab>
                 <dd class="active"><a href="#panel1-1">Folder</a></dd>
                 <dd><a href="#panel1-2">Learning Activity</a></dd>
+                <dd><a href="#panel1-3">Users</a></dd>
+                <dd><a href="#panel1-4">Files</a></dd>
+                <dd><a href="#panel1-5">Courses</a></dd>
+                <dd><a href="#panel1-6">Units</a></dd>
+                <dd><a href="#panel1-7">Imported Courses</a></dd>
+                <dd><a href="#panel1-8">Imported Units</a></dd>
             </dl>
             <section class="content tabs-content">
                 <div class="content active" id="panel1-1">
@@ -110,9 +115,9 @@
                         <tbody>
                         {% for folder in deletedFolders %}
                         <tr>
-                            <td>{{ folder.nameWithCodes }}</td>
+                            <td>{{ folder.title }}{% if folder.codes is not empty %} ({% for code in folder.codes %}{{ code.code }}{% if not loop.last %},{% endif %}{% endfor %}){% endif %}</td>
                             <td>{{ folder.deletedAt.long }}</td>
-                            <td><a data-restore-folder="{{ folder.id }}" href="#" class="icon-upload" title="Restore"></a></td>
+                            <td><a data-restore data-restore-id="{{ folder.id }}" data-restore-href="{{ routeLookup('restore.restoreFolder') }}" data-restore-type="Folder" href="#" class="icon-upload" title="Restore"></a></td>
                         </tr>
                         {% endfor %}
                         </tbody>
@@ -152,10 +157,154 @@
                             </td>
                             <td>{{ assessment.assessmentContext.folder.nameWithCodes }}</td>
                             <td>{{ assessment.deletedAt.long }}</td>
-                            <td><span><a data-restore-assessment="{{ assessment.id }}" href="#" class="icon-upload" title="Restore"></a></span></td>
+                            <td><span><a data-restore data-restore-id="{{ assessment.id }}" data-restore-href="{{ routeLookup('restore.restoreAssessment') }}" data-restore-type="Assessment" href="#" class="icon-upload" title="Restore"></a></span></td>
                         </tr>
                         {% endfor %}
                         </tbody>
+                    </table>
+                </div>
+                <div class="content" id="panel1-3">
+                    <table>
+                        <thead>
+                        <tr>
+                            <td>User</td>
+                            <td>Role/type</td>
+                            <td>Campus</td>
+                            <td>Deleted On</td>
+                            <td>Restore</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for user in deletedUsers %}
+                            <tr>
+                                <td>{{ user.getFullName }}{% if user.getExternalId %} ({{ user.getExternalId }}){% endif %}</td>
+                                <td>{{ user.getRole.getName }}/{{ user.getRole.getType }}</td>
+                                <td>{% for campus in user.getCampusCollection %}{{ campus.name }}<br>{% endfor %}</td>
+                                <td>{{ user.deletedAt.long }}</td>
+                                <td><a data-restore data-restore-id="{{ user.id }}" data-restore-href="{{ routeLookup('restore.restoreUser') }}" data-restore-type="User" href="#" class="icon-upload" title="Restore"></a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="content" id="panel1-4">
+                    <table>
+                        <thead>
+                        <tr>
+                            <td>File</td>
+                            <td>Location</td>
+                            <td>Deleted On</td>
+                            <td>Restore</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for file in deletedFiles %}
+                            <tr>
+                                <td>{{ file.getBaseName }}</td>
+                                <td><a href="/resources/{{ file.getFolder.getId }}">{{ file.getFolder.getTitle }}</a></td>
+                                <td>{{ file.deletedAt.long }}</td>
+                                <td><a data-restore data-restore-id="{{ file.id }}" data-restore-href="{{ routeLookup('restore.restoreFile') }}" data-restore-type="File" href="#" class="icon-upload" title="Restore"></a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {# Course / unit #}
+                <div class="content" id="panel1-5">
+                    <table>
+                        <thead>
+                        <tr>
+                            <td>Course</td>
+                            <td>Location</td>
+                            <td>Deleted On</td>
+                            <td>Restore</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for course in deletedCourseSpec %}
+                            <tr>
+                                <td>{{ course.getTitle }}</td>
+                                <td><a href="/resources/{{ course.getFolder.getId }}">{{ course.getFolder.getTitle }}</a></td>
+                                <td>{{ course.deletedAt.long }}</td>
+                                <td><a data-restore data-restore-id="{{ course.id }}" data-restore-href="{{ routeLookup('restore.restoreCourseSpec') }}" data-restore-type="Course" href="#" class="icon-upload" title="Restore"></a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+
+                    </table>
+                </div>
+                <div class="content" id="panel1-6">
+                    <table>
+                        <thead>
+                        <tr>
+                            <td>Unit</td>
+                            <td>Course</td>
+                            <td>Deleted On</td>
+                            <td>Restore</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for unit in deletedUnitSpec %}
+                            <tr>
+                                <td>{{ unit.getTitle }}</td>
+                                <td><a href="{{ routeLookupIfAuthorized('course.modifyCourse', {courseSpec: unit.getCourse, id: unit.getCourse.getId})  }}">{{ unit.getCourse.getTitle }}</a></td>
+                                <td>{{ unit.deletedAt.long }}</td>
+                                <td><a data-restore data-restore-id="{{ unit.id }}" data-restore-href="{{ routeLookup('restore.restoreUnitSpec') }}" data-restore-type="Unit" href="#" class="icon-upload" title="Restore"></a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+
+                    </table>
+                </div>
+                <div class="content" id="panel1-7">
+                    <p class="meta">
+                        A course outline that is removed from a homepage will not delete the imported course, and as a
+                        result it will not show in to be restored here. To return the course outline component and its
+                        associated course, instead navigate to the homepage and utilise the 3-dot-menu to 'Manage Courses'.
+                    </p>
+                    <table>
+                        <thead>
+                        <tr>
+                            <td>Course</td>
+                            <td>Location</td>
+                            <td>Deleted On</td>
+                            <td>Restore</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for course in deletedCourseImpl %}
+                            <tr>
+                                <td>{{ course.getSpecification.getTitle }}</td>
+                                <td><a href="/resources/{{ course.getFolder.getId }}">{{ course.getFolder.getTitle }}</a></td>
+                                <td>{{ course.deletedAt.long }}</td>
+                                <td><a data-restore data-restore-id="{{ course.id }}" data-restore-href="{{ routeLookup('restore.restoreCourseImpl') }}" data-restore-type="Course" href="#" class="icon-upload" title="Restore"></a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+
+                    </table>
+                </div>
+                <div class="content" id="panel1-8">
+                    <table>
+                        <thead>
+                        <tr>
+                            <td>Unit</td>
+                            <td>Location</td>
+                            <td>Deleted On</td>
+                            <td>Restore</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for unit in deletedUnitImpl %}
+                            <tr>
+                                <td>{{ unit.getTitle }}</td>
+                                <td><a href="/resources/{{ unit.getFolder.getId }}">{{ unit.getFolder.getTitle }}</a></td>
+                                <td>{{ unit.deletedAt.long }}</td>
+                                <td><a data-restore data-restore-id="{{ unit.id }}" data-restore-href="{{ routeLookup('restore.restoreUnitImpl') }}" data-restore-type="Unit" href="#" class="icon-upload" title="Restore"></a></td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+
                     </table>
                 </div>
             </section>

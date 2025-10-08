@@ -27,7 +27,7 @@ class UnitAssessments
     /**
      * @param Generator|null  $routeGenerator
      * @param Authorizer|null $authorizer
-     * @param User|null       $student         The student whose lesson plan is being viewed.
+     * @param User|null       $student         The student whose assessment is being viewed.
      * @param User|null       $loggedInUser    The logged-in user.
      * @param bool            $hideLessonPlan  Should we be removing lesson plans from the output?
      */
@@ -47,60 +47,6 @@ class UnitAssessments
      */
     public function __invoke(IAssessable $assessment): array
     {
-        $links = [];
-        if ($this->routeGenerator) {
-            $availableLinks = [
-                'summary' => ["route" => "learningAssessment.getSummary", "params" => [
-                    'assessmentId' => $assessment->getId(),
-                    'assessment' => $assessment,
-                    'studentId' => $this->student->getId(),
-                    'student' => $this->student,
-                ]],
-                'status' => ["route" => "learningAssessment.getStatus", "params" => [
-                    'assessmentId' => $assessment->getId(),
-                    'assessment' => $assessment,
-                ]],
-                'modify' => ["route" => "learningAssessment.getUpdateAssessmentForm", "params" => [
-                    'assessmentId' => $assessment->getId(),
-                    'assessment' => $assessment,
-                ]],
-                'delete' => ["route" => "learningAssessment.postDeleteAssessment", "params" => [
-                    'assessmentId' => $assessment->getId(),
-                    'assessment' => $assessment,
-                ]],
-                'modifyContent' => null,
-                'export' => null,
-            ];
-            // if quiz we have special links
-            if ($assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
-                $availableLinks['modifyContent'] = ["route" => "learnosity.getContent", "params" => [
-                    'assessmentId' => $assessment->getId(),
-                    'assessment' => $assessment,
-                ]];
-            }
-            // spec assessments can be exported
-            if ($assessment->isSpecification()) {
-                $availableLinks['export'] = ["route" => "learningAssessmentExporter.getExportFormForAssessment", "params" => [
-                    'assessmentId' => $assessment->getId(),
-                    'assessment'   => $assessment,
-                ]];
-            }
-
-            // Filter out links that the user is not authorized to access (null if not authorized or not applicable)
-            foreach ($availableLinks as $key => $link) {
-                if ($link === null || !$this->authorizer->isPathAuthorizedForUser($link['route'], $link['params'], $this->loggedInUser)) {
-                    $links[$key] = null;
-                } else {
-                    $links[$key] = $this->routeGenerator->generate($link['route'], $link['params']);
-                }
-            }
-        }
-
-        // If the user does not have access to any links, set $links to null
-        if (empty(array_filter($links))) {
-            $links = null;
-        }
-
         $assessments = null;
         if ($assessment instanceof Project) {
             $assessments = $assessment->getAssessables();
@@ -140,7 +86,14 @@ class UnitAssessments
             $studentCount++;
         }
 
-        $progressTick = $this->getProgressTick($assessment);
+
+        // Progress ticks should only be shown if the logged-in user is the user whose activities are being viewed.
+        $progressTick = null;
+        if ($this->student->getId() === $this->loggedInUser->getId()) {
+            $participant = $assessment->getParticipantIfExtant($this->student);
+            $progressTick = $this->getProgressTick($assessment, $participant);
+        }
+
         $dueAt = $this->getDueAt($assessment);
 
         return [
@@ -155,7 +108,7 @@ class UnitAssessments
                 'long' => $dueAt->getLong(),
                 'relative' => $dueAt->getRelativeDayWithoutMidnight(),
             ] : null,
-            '_links'               => $links,
+            '_links'               => $this->getLinks($assessment, true),
             'assessments'          => $assessments?->reindex()->map($this),
             'completionCount'      => $completionCount,
             'studentCount'         => $studentCount,
@@ -165,6 +118,101 @@ class UnitAssessments
                 $assessment->isSelfAssessable()
             )
         ];
+    }
+
+    /**
+     * Get all the relevant links for an assessment
+     *
+     * @param IAssessable $assessment
+     * @param bool $authorize - Should we check for authorization to the links?
+     * @return array|null
+     */
+    public function getLinks(IAssessable $assessment, bool $authorize): ?array
+    {
+        $links = [];
+        if ($this->routeGenerator) {
+            /** The status page is the same for all assessments */
+            $statusLink = [
+                "route" => "learningAssessment.getStatus",
+                "params" => [
+                    'assessmentId' => $assessment->getId(),
+                    'assessment'   => $assessment,
+                ],
+            ];
+
+            /**
+             * Create a link for the student participation page if the assessment is
+             * within an implementation, is not a project or lesson plan and is not
+             * a child assessment (a custom participation activity)
+             */
+            if (
+                $assessment->getBaseContext() instanceof \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model
+                && $assessment instanceof Project === false
+                && $assessment instanceof \Schoolbox\Learning\Assessment\LessonPlan\Model === false
+                && $assessment->getOriginalAssessmentId() === null
+            ) {
+                $studentParticipationLink = [
+                    "route" => "learningAssessment.getAssessmentParticipationForm",
+                    "params" => [
+                        'assessmentId' => $assessment->getId(),
+                        'assessment'   => $assessment,
+                    ],
+                ];
+            } else {
+                $studentParticipationLink = null;
+            }
+
+            $availableLinks = [
+                'summary' => ["route" => "learningAssessment.getSummary", "params" => [
+                    'assessmentId' => $assessment->getId(),
+                    'assessment' => $assessment,
+                    'studentId' => $this->student->getId(),
+                    'student' => $this->student,
+                ]],
+                'status' => $statusLink,
+                'studentParticipation' => $studentParticipationLink,
+                'modify' => ["route" => "learningAssessment.getUpdateAssessmentForm", "params" => [
+                    'assessmentId' => $assessment->getId(),
+                    'assessment' => $assessment,
+                ]],
+                'delete' => ["route" => "learningAssessment.postDeleteAssessment", "params" => [
+                    'assessmentId' => $assessment->getId(),
+                    'assessment' => $assessment,
+                ]],
+                'modifyContent' => null,
+                'export' => null,
+            ];
+            // if quiz we have special links
+            if ($assessment instanceof \Schoolbox\Learning\Assessment\Quiz\Model) {
+                $availableLinks['modifyContent'] = ["route" => "learnosity.getContent", "params" => [
+                    'assessmentId' => $assessment->getId(),
+                    'assessment' => $assessment,
+                ]];
+            }
+            // spec assessments can be exported
+            if ($assessment->isSpecification()) {
+                $availableLinks['export'] = ["route" => "learningAssessmentExporter.getExportFormForAssessment", "params" => [
+                    'assessmentId' => $assessment->getId(),
+                    'assessment'   => $assessment,
+                ]];
+            }
+
+            // Filter out links that the user is not authorized to access (null if not authorized or not applicable)
+            foreach ($availableLinks as $key => $link) {
+                if ($link === null || ($authorize && !$this->authorizer->isPathAuthorizedForUser($link['route'], $link['params'], $this->loggedInUser))) {
+                    $links[$key] = null;
+                } else {
+                    $links[$key] = $this->routeGenerator->generate($link['route'], $link['params']);
+                }
+            }
+        }
+
+        // If the user does not have access to any links, set $links to null
+        if (empty(array_filter($links))) {
+            $links = null;
+        }
+
+        return $links;
     }
 
     /**
@@ -204,19 +252,13 @@ class UnitAssessments
      * The logic used in this function is intended to match the logic used in progressTick.twig.
      *
      * @param IAssessable $assessable
+     * @param Participant|null $participant
      * @return ?array
      * @throws RouteNotFound
      * @see library/Schoolbox/Learning/Assessment/templates/fragments/progressTick.twig
      */
-    private function getProgressTick(IAssessable $assessable): ?array
+    public function getProgressTick(IAssessable $assessable, ?Participant $participant): ?array
     {
-        // Progress ticks should only be shown if the logged-in user is the user whose activities are being viewed.
-        if ($this->student->getId() !== $this->loggedInUser->getId()) {
-            return null;
-        }
-
-        $participant = $assessable->getParticipantIfExtant($this->student);
-
         if (null === $participant || $participant->isExcluded()) {
             // The student ought to be a participant.  The only way this situation could arise is if the student was
             // excluded from the assessment, or marked as deleted, by another process, since permissions were checked

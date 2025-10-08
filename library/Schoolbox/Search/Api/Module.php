@@ -31,7 +31,6 @@ use Schoolbox\Resource\Folder\Translator\ModelToArray\LinkOnly as FolderTranslat
 use Schoolbox\Resource\LinkMapper;
 use Schoolbox\Resource\Textbox\Mapper as TextboxMapper;
 use Schoolbox\Tile\Mapper as TileMapper;
-use Schoolbox\Tile\Layout\Mapper as TileLayoutMapper;
 use Schoolbox\User\Formatter\Factory;
 use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
 use Schoolbox\UserMapper;
@@ -159,7 +158,6 @@ class Module extends BaseModule
             ),
             new Database\ResultType\Tile\Hydrator(
                 $mapperFactory->get(TileMapper::class),
-                $mapperFactory->get(TileLayoutMapper::class),
                 $mapperFactory->get(FolderMapper::class),
                 Access::getInstance(),
             ),

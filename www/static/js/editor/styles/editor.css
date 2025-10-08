@@ -8,18 +8,21 @@
 :root {
     /* Remove the border radius */
     --ck-border-radius: 0px;
+
     /* -- Border colours */
     --ck-color-toolbar-border: var(--form-border-color);
     --ck-color-base-border: var(--form-border-color);
+
     /* Button hover colour */
     --ck-color-button-default-hover-background: var(--form-bg-hover-color);
+
     /* Change the colour of the mentions */
     --ck-color-mention-background: var(--accent-background);
     --ck-color-mention-text: #222222;
-    /* make a little longer, only seen in the Link plugin for Link URL */
-    --ck-input-width: 19rem;
-    /* to sit above the side menus */
-    --ck-z-modal: var(--sbx-depth-ui-overlay);
+
+    /* resolve depth issues */
+    --ck-z-modal: var(--sbx-depth-pop-over);
+    --ck-z-panel: var(--sbx-depth-pop-over);
 
     /* The colours that are referenced in the overrides below */
     --sb-ck-active: #cae3fa;
@@ -45,6 +48,21 @@
     --ck-color-list-button-on-background-focus: var(--sb-ck-active-grey);
     --ck-color-switch-button-on-background: var(--sb-ck-active);
     --ck-color-switch-button-on-hover-background: var(--sb-ck-active);
+
+    /* Override primary action button to match our submit button colours */
+    --ck-color-button-action-background: var(--content-ui-submit-background);
+    --ck-color-button-action-hover-background: rgba(
+        calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
+        calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
+        calc(var(--content-ui-submit-background-b) + (255 - var(--content-ui-submit-background-b)) * 0.2),
+        var(--content-ui-submit-background-a)
+    );
+    --ck-color-button-action-text: var(--content-ui-submit-foreground);
+}
+
+body.ck-fullscreen {
+    /* resolve depth issues linked to the full screen plugin */
+    --ck-z-fullscreen: var(--sbx-depth-pop-over);
 }
 
 .ck.ck-editor {
@@ -60,7 +78,7 @@
 }
 
 /**
- * to allow enough space for the media/table baloon UI's
+ * to allow enough space for the media/table balloon UI's
  * so they don't overlap the toolbar
  */
 .ck.ck-content > figure:first-child,
@@ -103,6 +121,13 @@
 
 .ck.ck-button.ck-heading_heading5 {
     font-size: 0.9375rem;
+}
+
+.ck.ck-button.ck-heading_heading2 .ck-button__label,
+.ck.ck-button.ck-heading_heading3 .ck-button__label,
+.ck.ck-button.ck-heading_heading4 .ck-button__label,
+.ck.ck-button.ck-heading_heading5 .ck-button__label {
+    font-size: inherit;
 }
 
 /**
@@ -379,4 +404,42 @@ turned on */
 
 .ck.ck-editor__main .ck-source-editing-area textarea:focus {
     background-color: var(--sb-ck-active-grey) !important;
+}
+
+/**
+ * Fullscreen styles
+ * These styles are applied when the editor is in fullscreen mode.
+ * They ensure that the editor takes up the full screen displays
+ * in a 'page less' style, stretching across the entire screen
+ */
+
+.ck.ck-fullscreen__main-wrapper .ck-fullscreen__sidebar {
+    display: none;
+}
+
+.ck.ck-fullscreen__main-wrapper .ck-fullscreen__editable {
+    margin: 0;
+    width: 100%;
+}
+
+.ck.ck-fullscreen__main-wrapper .ck-fullscreen__editable .ck-editor__editable_inline:not(.ck-editor__nested-editable) {
+    border: 0;
+    margin: 0;
+    max-width: 100%;
+    min-height: 0;
+    padding: 1rem;
+    width: 100%;
+}
+
+/**
+ * Remove the image that sits alongside template options as we don't use them
+ */
+
+.ck.ck-template-form > .ck-search__results > .ck.ck-list.ck-template-list > .ck.ck-list__item > .ck.ck-button {
+    grid-template-areas: "ck-template-content";
+    grid-template-columns: 1fr;
+}
+
+.ck-template-button .ck-button__icon {
+    display: none;
 }

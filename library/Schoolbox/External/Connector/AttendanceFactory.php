@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector;
 
 use Schoolbox\IConfigLoader;
+use Schoolbox\External\Importer\Endpoint\Factory;
 
 /**
  * Produces a class that can manufacture an attendance link in some manner
@@ -34,16 +35,20 @@ class AttendanceFactory
     public function produce(): ?IAttendanceLink
     {
         return match ($this->configLoader->get('schooldata_import_data_source')) {
-            \Schoolbox\External\Importer\Endpoint\Factory::TASS_API => new \Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\AttendanceLink(
+            Factory::TASS_API => new \Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\AttendanceLink(
                 (bool)$this->configLoader->get('external_attendance'),
                 (int)$this->configLoader->get('external_attendance_days'),
                 (bool)$this->configLoader->get('external_tass_attendance_show_prod_menu')
             ),
-            \Schoolbox\External\Importer\Endpoint\Factory::CIVICA => new \Schoolbox\External\Connector\Civica\Base\Endpoint\Codec\AttendanceLink(
+            Factory::CIVICA => new \Schoolbox\External\Connector\Civica\Base\Endpoint\Codec\AttendanceLink(
                 (bool)$this->configLoader->get('external_attendance'),
                 (int)$this->configLoader->get('external_attendance_days')
             ),
-            \Schoolbox\External\Importer\Endpoint\Factory::SENTRAL => new \Schoolbox\External\Connector\Sentral\Base\Endpoint\Codec\AttendanceLink(
+            Factory::SENTRAL => new \Schoolbox\External\Connector\Sentral\Base\Endpoint\Codec\AttendanceLink(
+                (bool)$this->configLoader->get('external_attendance'),
+                (int)$this->configLoader->get('external_attendance_days')
+            ),
+            Factory::VERACROSS => new \Schoolbox\External\Connector\Veracross\Base\Endpoint\Codec\AttendanceLink(
                 (bool)$this->configLoader->get('external_attendance'),
                 (int)$this->configLoader->get('external_attendance_days')
             ),

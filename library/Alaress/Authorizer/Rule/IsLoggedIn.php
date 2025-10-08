@@ -17,13 +17,12 @@ use Schoolbox\User;
 
 class IsLoggedIn implements IAuthorizationRule
 {
-
     /**
-     * @param array $params
-     * @param User  $user
+     * @param array     $params
+     * @param User|null $user
      * @throws Unauthenticated
      */
-    public function authorize(array $params = array(), User $user = null): void
+    public function authorize(array $params = array(), ?User $user = null): void
     {
         // True:  skip to next item in chain
         // False: break chain with request that redirects somewhere

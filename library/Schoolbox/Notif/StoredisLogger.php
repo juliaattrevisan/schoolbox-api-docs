@@ -43,16 +43,16 @@ class StoredisLogger implements CacheableLoggerInterface, CompositeLoggerInterfa
 
 
     /**
-     * @param Predis\ClientInterface $redisClient
-     * @param string                 $redisKey
-     * @param Storage\IReceiver      $receiver
-     * @param FormatterInterface     $formatter
+     * @param Predis\ClientInterface  $redisClient
+     * @param string                  $redisKey
+     * @param Storage\IReceiver       $receiver
+     * @param FormatterInterface|null $formatter
      */
     public function __construct(
         Predis\ClientInterface $redisClient,
         $redisKey,
         Storage\IReceiver $receiver,
-        FormatterInterface $formatter = null
+        ?FormatterInterface $formatter = null
     ) {
         $this->key      = $redisKey;
         $this->client   = $redisClient;
@@ -98,7 +98,7 @@ class StoredisLogger implements CacheableLoggerInterface, CompositeLoggerInterfa
             $basename = Date::now()->getDatabase() . '.log';
         }
 
-        $tempLocation = sb_tempnam('log');
+        $tempLocation = tempnam(sys_get_temp_dir(), 'log');
 
         $fp = fopen($tempLocation, 'wiggle');
 

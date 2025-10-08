@@ -46,6 +46,8 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
      */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         $this->instanceId = $this->getOpt(self::OPT_LONG_INSTANCE_ID);
         if (empty($this->instanceId)) {
             $this->instanceId = INSTANCE_ID;
@@ -72,7 +74,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
                 $uncompressed = gzuncompress($rawRedisData);
                 $instance = unserialize($uncompressed);
             } catch (Exception $e) {
-                if ($keyType->getPayload() === 'set') {
+                if ($keyType === 'set') {
                     $setCount = \count($this->redis->smembers($key));
                     $this->getLogger()->info("{$setCount} messages exist.");
 
@@ -107,6 +109,8 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             $this->extractInstance($instance);
             $idx++;
         }
+
+        $this->deprecationNotice("SA-19334");
     }
 
 
@@ -194,8 +198,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             case -2:
                 return "expired";
             default:
-                // @phpstan-ignore-next-line: date can return false
-                return date('Y-m-d H:i:s', time() + $ttl) ?: '';
+                return date('Y-m-d H:i:s', time() + $ttl);
         }
     }
 }, [CliTool\Kernel::OPTION_LEVEL => Monolog\Logger::INFO, CliTool\Kernel::OPTION_ERRORS => E_ALL]);

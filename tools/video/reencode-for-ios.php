@@ -22,7 +22,6 @@ use Schoolbox\Application\CliTool;
 require_once __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App{
-
     /** @inheritDoc */
     public function getLongOpts(): array
     {
@@ -55,6 +54,8 @@ HELP;
     /** @inheritDoc */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         if ($this->getOpt('help')) {
             $this->displayHelp();
             exit(0);
@@ -74,6 +75,8 @@ HELP;
         $statement->execute(['date' => $date]);
 
         $this->getLogger()->info(sprintf('Updated %d videos to pending', $statement->rowCount()));
+
+        $this->deprecationNotice("SA-19334");
     }
 
     public function runAsRoot(): ?bool

@@ -8,7 +8,7 @@
 
 namespace Schoolbox\Resource\Browser;
 
-use Enqueue\Consumption\Exception\InvalidArgumentException;
+use Alaress_Date_Format;
 use Schoolbox\Collection;
 use Schoolbox\Mapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -48,11 +48,11 @@ abstract class AbstractTreeBuilder
 
 
     /**
-     * @param Folder\ILocator $locator
+     * @param Folder\ILocator|null $locator
      * @param string $namespace
      * @param string $rootNodeLabel
      */
-    public function __construct(Folder\ILocator $locator = null, $namespace = null, $rootNodeLabel = 'Top Level')
+    public function __construct(?Folder\ILocator $locator = null, $namespace = null, $rootNodeLabel = 'Top Level')
     {
         $this->folderLocator = $locator;
         $this->rootNodeLabel = $rootNodeLabel;
@@ -166,13 +166,22 @@ abstract class AbstractTreeBuilder
      * @param string     $mime
      * @return array
      */
-    public function buildChildNodes($folderId, $parentList = [], $mime = "*/*")
+    public function buildChildNodes($folderId, $parentList = [], $mime = "*/*"): array
     {
         $output = [];
 
         // Did I ask for the root node? get it
         if ($folderId === IFolder::ROOT_PARENT_ID) {
             $folder = $this->folderLocator->findById(IFolder::ROOT_ID);
+
+            if ($folder instanceof Folder\Model) {
+                $sequence = $folder->getSequence() ?? 0;
+                $createdAt = $folder->getCreatedAt();
+            } else {
+                $sequence = 0;
+                $createdAt = null;
+            }
+
             $output[] = $this->generateNodeArray(
                 $folder->getId(),
                 $folder->getParent()->getId(),
@@ -183,7 +192,11 @@ abstract class AbstractTreeBuilder
                 [
                     'data-permission' => $this->getFolderPermission($folder->getId()),
                     'data-type' => 'folder'
-                ]
+                ],
+                null,
+                [],
+                $sequence,
+                $createdAt,
             );
         } else {
             // Child nodes
@@ -249,6 +262,14 @@ abstract class AbstractTreeBuilder
             }
         }
 
+        if ($folder instanceof Folder\Model) {
+            $sequence = $folder->getSequence() ?? 0;
+            $createdAt = $folder->getCreatedAt();
+        } else {
+            $sequence = 0;
+            $createdAt = null;
+        }
+
         // Output something.
         return $this->generateFolderArray(
             $folder,
@@ -260,7 +281,9 @@ abstract class AbstractTreeBuilder
             [
                 'href' => $href
             ],
-            $parentList
+            $parentList,
+            $sequence,
+            $createdAt,
         );
     }
 
@@ -324,26 +347,30 @@ abstract class AbstractTreeBuilder
 
 
     /**
-     * @param IFolder $folder
-     * @param string $type
-     * @param string $name
-     * @param Color $colour
-     * @param IStorage $coverImage
-     * @param array $liAttributes
-     * @param array $aAttributes
-     * @param array $parentList
+     * @param IFolder                  $folder
+     * @param string                   $type
+     * @param null                     $name
+     * @param Color|null               $colour
+     * @param IStorage|null            $coverImage
+     * @param array|null               $liAttributes
+     * @param array|null               $aAttributes
+     * @param array                    $parentList
+     * @param int                      $sequence
+     * @param Alaress_Date_Format|null $createdAt
      * @return array
      */
     protected function generateFolderArray(
         IFolder $folder,
         $type,
         $name = null,
-        Color $colour = null,
-        IStorage $coverImage = null,
-        array $liAttributes = null,
-        array $aAttributes = null,
-        array $parentList = []
-    ) {
+        ?Color $colour = null,
+        ?IStorage $coverImage = null,
+        ?array $liAttributes = null,
+        ?array $aAttributes = null,
+        array $parentList = [],
+        int $sequence = 0,
+        ?Alaress_Date_Format $createdAt = null,
+    ): array {
         return $this->generateNodeArray(
             $folder->getId(),
             $folder->getParent()->getId(),
@@ -353,19 +380,21 @@ abstract class AbstractTreeBuilder
             $coverImage,
             $liAttributes,
             $aAttributes,
-            $parentList
+            $parentList,
+            $sequence,
+            $createdAt,
         );
     }
 
 
     /**
      * @param Resource\AbstractFile $file
-     * @param string $name
-     * @param array $liAttributes
-     * @param array $aAttributes
+     * @param string                $name
+     * @param array|null            $liAttributes
+     * @param array|null            $aAttributes
      * @return array
      */
-    protected function generateFileArray(Resource\AbstractFile $file, $name = null, array $liAttributes = null, array $aAttributes = null)
+    protected function generateFileArray(Resource\AbstractFile $file, $name = null, ?array $liAttributes = null, ?array $aAttributes = null)
     {
         /* Folders in the root node of My Files have no Parent folder hydrated
          * generateNodeArray() can deal with this, but need to check here first
@@ -390,15 +419,17 @@ abstract class AbstractTreeBuilder
 
 
     /**
-     * @param int $nodeId
-     * @param int $parentId
-     * @param string $type
-     * @param string $name
-     * @param \Alaress\Color\Color $colour
-     * @param \Schoolbox\Resource\Storage\IStorage $coverImage
-     * @param array $liAttributes
-     * @param array $aAttributes
-     * @param array $parentList
+     * @param int                      $nodeId
+     * @param int                      $parentId
+     * @param string                   $type
+     * @param string                   $name
+     * @param Color|null               $colour
+     * @param IStorage|null            $coverImage
+     * @param array|null               $liAttributes
+     * @param array|null               $aAttributes
+     * @param array                    $parentList
+     * @param int                      $sequence
+     * @param Alaress_Date_Format|null $createdAt
      * @return array
      */
     protected function generateNodeArray(
@@ -406,12 +437,14 @@ abstract class AbstractTreeBuilder
         $parentId,
         $type,
         $name,
-        Color $colour = null,
-        IStorage $coverImage = null,
-        array $liAttributes = null,
-        array $aAttributes = null,
-        array $parentList = []
-    ) {
+        ?Color $colour = null,
+        ?IStorage $coverImage = null,
+        ?array $liAttributes = null,
+        ?array $aAttributes = null,
+        array $parentList = [],
+        int $sequence = 0,
+        ?Alaress_Date_Format $createdAt = null,
+    ): array {
         $array = array(
             'id' => $nodeId,
             'parent' => $parentId ?: '0',
@@ -420,6 +453,8 @@ abstract class AbstractTreeBuilder
             'type' => $type,
             'colour' => $colour ? $colour->__toString() : null,
             'coverImage' => $coverImage,
+            'sequence' => $sequence,
+            'createdAt' => $createdAt,
         );
 
         if ($type === NodeInterface::TYPE_FILE || $type === NodeInterface::TYPE_LINK) {

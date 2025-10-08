@@ -1,4 +1,4 @@
-import type { HeadingConfig } from "@ckeditor/ckeditor5-heading";
+import type { HeadingConfig } from "ckeditor5";
 
 /**
  * Returns the settings for the headings dropdown

@@ -12,7 +12,6 @@ namespace External\Tass\Api;
 
 use External\Tass\Api\Exception\NotFound;
 use External\Tass\Api\Exception\UdParseException;
-use External\Tass\Api\Models;
 use Alaress_Date_Format;
 use Schoolbox\GenericCollection;
 
@@ -21,7 +20,6 @@ use Schoolbox\GenericCollection;
  */
 class ModelFactory
 {
-
     /**
      * @param mixed[] $data
      * @return Models\Student
@@ -426,7 +424,7 @@ class ModelFactory
 
     /**
      * @param string[][][]|string[][][][]|int[][][] $data
-     * @return Models\TeacherTimetable[][]
+     * @return array<(int|string), array<Models\StudentTimetable>>
      */
     public function buildTeacherTimetable(array $data): array
     {
@@ -435,6 +433,7 @@ class ModelFactory
         foreach ($data as $key => $val) {
             if (\is_numeric($key)) {
                 foreach ($val as $subKey => $subVal) {
+                    // Note Models\StudentTimetable has been used here.  Models\TeacherTimetable is an empty class.
                     $timetables[$key][$subKey] = new Models\StudentTimetable(
                         $subVal['DATE'],
                         $subVal['DAY_CODE'],

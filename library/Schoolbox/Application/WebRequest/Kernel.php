@@ -28,6 +28,7 @@ use Aura\Router\RouterContainer;
 use Psr\Http\Message\ServerRequestInterface;
 use ReflectionMethod;
 use RuntimeException;
+use Schoolbox\API\Token\JwtParser\Exception\Base;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Application\Login\Controller as LoginController;
 use Schoolbox\Application\WebKernelAbstract;
@@ -64,6 +65,23 @@ class Kernel extends WebKernelAbstract
         parent::__construct();
 
         $this->runMiddleware();
+    }
+
+
+    /**
+     * Called after sessions are initialised so we can inject user identifiers into sentry reports.
+     *
+     * @return void
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    protected function configureSentry(): void
+    {
+        /* A bit of an antipattern, but ok
+         */
+        parent::configureSentry();
+
+        // Configure Sentry with the current instance, now it's known.
+        \Alaress\Sentry\Config::useSessionIdentifier($this->di->get('session')->get('identifier'));
     }
 
 
@@ -141,7 +159,7 @@ class Kernel extends WebKernelAbstract
             } else {
                 $this->outputSitepageContent($path, $authHeaderUser, $bypassIpTracking);
             }
-        } catch (Unauthenticated $e) {
+        } catch (Unauthenticated | Base $e) {
             // Unauthenticated response - redirect to a login page.
             // Preserve GET params that aren't "page" or "samlAuth", so the user
             // can get redirected back to what they requested when they log in.

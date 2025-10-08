@@ -35,14 +35,26 @@ export type CurriculumOverviewComponent = {
     inTemplate: boolean; // whether the component is part of the Unit template, or just a component added to the Unit home page
 };
 
+/**
+ * A single Course Builder component that's been added to a Unit's home page
+ */
+export type CourseBuilderComponent = {
+    componentId: number;
+    heading: string;
+    inTemplate: boolean; // whether the component is part of the Unit template, or just a component added to the Unit home page
+};
+
 export type Unit = {
     id: number;
     title: string;
     homepage: string;
     folderId: number;
     activities: {
-        _routes: ActivitiesListRoutes;
+        _routes: ActivitiesListRoutes & {
+            createComponent: string | null;
+        };
         items: Activity[];
+        components: CourseBuilderComponent[];
     };
     curriculum: {
         _routes: {
@@ -71,6 +83,7 @@ export type Unit = {
     };
 
     extraTextboxes: number;
+    extraActivities: number;
     sequence: number;
 };
 
@@ -94,6 +107,8 @@ export interface UnitTemplateTextboxComponent extends UnitTemplateComponent {
 export type UnitTemplate = {
     textboxDefId: null | number; // the textbox component definition ID
     curriculumDefId: null | number; // the curriculum component definition ID
+    activityDefId: null | number; // the course builder definition ID
     curriculum: UnitTemplateComponent[]; // Curriculum Overview components
     textboxes: UnitTemplateTextboxComponent[]; // Textbox components
+    activities: UnitTemplateComponent[]; // course builder components
 };

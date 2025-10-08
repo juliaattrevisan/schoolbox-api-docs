@@ -1,0 +1,252 @@
+<?php
+
+/**
+ * @author      Michael Heydon <michael.heydon@schoolbox.education>
+ * @copyright   Copyright 2025, Schoolbox Pty Ltd
+ * @link        https://schoolbox.education/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\Admin\Editor\Templates;
+
+use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Admin\Editor\Templates\Category\ModelToArray;
+use Schoolbox\Admin\Editor\Templates\Category\Model as CategoryModel;
+use Schoolbox\Admin\Editor\Templates\Category\Mapper as CategoryMapper;
+use Schoolbox\Editor\Templates\Model as TemplateModel;
+use Schoolbox\Editor\Templates\Mapper as TemplateMapper;
+use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Collection;
+use Schoolbox\IConfigLoader;
+use Schoolbox\Config\ConfigMapper;
+
+class Controller extends Base
+{
+    /**
+     * Controller constructor.
+     *
+     * @param IConfigLoader $config
+     * @param ErrorMapper $errorMapper
+     * @param CategoryMapper $categoryMapper
+     * @param TemplateMapper $templateMapper
+     */
+    public function __construct(
+        private IConfigLoader $config,
+        private ErrorMapper $errorMapper,
+        private CategoryMapper $categoryMapper,
+        private TemplateMapper $templateMapper,
+    ) {
+    }
+
+    /**
+     * Only get the categories available on the current plan
+     * @return Collection
+     */
+    public function getPlanCategories(): Collection
+    {
+        $categories = $this->categoryMapper->findAll()->sortNaturally('name');
+
+        // Define which categories require which config settings to be enabled
+        $categoryConfigMap = [
+            CategoryModel::BADGE_EVIDENCE => ConfigMapper::NAME_BADGES_ENABLED,
+            CategoryModel::FEEDBACK => ConfigMapper::NAME_LMS_ENABLED,
+            CategoryModel::LEARNING_ACTIVITY => ConfigMapper::NAME_LMS_ENABLED,
+            CategoryModel::LEARNING_MOMENTS => ConfigMapper::NAME_LEARNING_MOMENTS_ENABLED,
+        ];
+
+        // Filter out categories where the feature is disabled
+        return $categories->filter(function (CategoryModel $category) use ($categoryConfigMap) {
+            $categoryId = $category->getId();
+
+            // If this category has a config requirement, check if it's enabled
+            if (isset($categoryConfigMap[$categoryId])) {
+                $configValue = $this->config->get($categoryConfigMap[$categoryId]);
+                // Ensure we have a boolean value for reliable filtering
+                // Treat null, false, 0, empty string, empty array as false
+                // Everything else as true
+                return !empty($configValue) && $configValue != false;
+            }
+
+            // Categories without config requirements are always included
+            return true;
+        })->reindex();
+    }
+
+    /**
+     * Generate template data for create/update forms
+     *
+     * @param CategoryModel $category
+     * @param TemplateModel|null $template
+     * @param string $breadcrumbTitle
+     * @return array
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    private function getTemplateFormData(CategoryModel $category, ?TemplateModel $template, string $breadcrumbTitle): array
+    {
+        return [
+            'pageCurrent' => $this->routeGenerator->generate('adminEditorTemplates.getList'),
+            'allBreadcrumbs' => array_merge(
+                (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminEditorTemplates.getList')),
+                [[$breadcrumbTitle, null]]
+            ),
+            'category' => $category,
+            'hasTokens' => in_array($category->getId(), [CategoryModel::BADGE_EVIDENCE, CategoryModel::FEEDBACK, CategoryModel::LEARNING_MOMENTS]),
+            'template' => $template,
+        ];
+    }
+
+    /**
+     * Display list of editor template categories
+     */
+    public function getList(): void
+    {
+        // Get the categories from the mapper and transform each category into an array
+        $categories = $this->getPlanCategories();
+        $translator = new ModelToArray();
+
+        $this->response = $this->responseFromTemplate(
+            '@adminEditorTemplates/list.twig',
+            [
+                'pageCurrent' => $this->routeGenerator->generate('adminEditorTemplates.getList'),
+                'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminEditorTemplates.getList')),
+                'categories' => $categories->map($translator),
+            ]
+        );
+    }
+
+    /**
+     * Create a new editor template
+     *
+     * @param CategoryModel $category
+     * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    public function getCreate(CategoryModel $category): void
+    {
+        $this->response = $this->responseFromTemplate(
+            '@adminEditorTemplates/create.twig',
+            $this->getTemplateFormData(
+                $category,
+                null,
+                'Create ' . ucwords(str_replace('-', ' ', $category->getName())) . ' Template'
+            )
+        );
+    }
+
+    /**
+     * Persist a new editor template
+     *
+     * @param CategoryModel $category
+     * @return void
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Aura\Router\Exception\RouteNotFound
+     * @throws \PDOException
+     * @throws \Schoolbox\Application\Exception\Exception
+     * @throws \UnexpectedValueException
+     */
+    public function postCreate(CategoryModel $category): void
+    {
+        $postData = $this->requestPost->getArrayCopy();
+
+        $title = trim((string)($postData['title'] ?? ''));
+        $description = trim((string)($postData['description'] ?? ''));
+        $body = trim((string)($postData['body'] ?? ''));
+
+        // Validate required fields
+        if (empty($title)) {
+            throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+        }
+        if (empty($body)) {
+            throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+        }
+
+        // Create new template
+        $template = $this->templateMapper->createModel()
+            ->setCategoryId($category->getId())
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setBody($body)
+            ->setCreatedBy($this->getUser()->getId())
+            ->setUpdatedBy($this->getUser()->getId());
+
+        $this->templateMapper->save($template);
+
+        // Redirect back to list
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminEditorTemplates.getList') . '?category=' . $category->getName());
+    }
+
+    /**
+     * To update an editor template
+     *
+     * @param TemplateModel $template
+     * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    public function getUpdate(TemplateModel $template): void
+    {
+        $category = $this->categoryMapper->findById($template->getCategoryId());
+
+        $this->response = $this->responseFromTemplate(
+            '@adminEditorTemplates/create.twig',
+            $this->getTemplateFormData(
+                $category,
+                $template,
+                'Update ' . $template->getTitle()
+            )
+        );
+    }
+
+    /**
+     * Update an editor template
+     *
+     * @param TemplateModel $template
+     * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    public function postUpdate(TemplateModel $template): void
+    {
+        $postData = $this->requestPost->getArrayCopy();
+
+        $title = trim((string)($postData['title'] ?? ''));
+        $description = trim((string)($postData['description'] ?? ''));
+        $body = trim((string)($postData['body'] ?? ''));
+
+        // Validate required fields
+        if (empty($title)) {
+            throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+        }
+        if (empty($body)) {
+            throw $this->errorMapper->generateException(\Schoolbox\Error\Mapper::ERROR_INFORMATION_MISSING);
+        }
+
+        // Update the existing template
+        $template
+            ->setTitle($title)
+            ->setDescription($description)
+            ->setBody($body)
+            ->setUpdatedBy($this->getUser()->getId());
+
+        $this->templateMapper->save($template);
+
+        // Redirect back to list
+        $category = $this->categoryMapper->findById($template->getCategoryId());
+        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminEditorTemplates.getList') . '?category=' . $category->getName());
+    }
+
+    /**
+     * Delete a template
+     *
+     * @param TemplateModel $template
+     * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    public function delete(TemplateModel $template): void
+    {
+        // Soft delete the existing template
+        $template->setDeletedBy($this->getUser()->getId());
+        $this->templateMapper->save($template);
+        $this->templateMapper->delete($template);
+    }
+}

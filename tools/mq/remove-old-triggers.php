@@ -83,7 +83,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             $keyType = $this->redis->type($key);
 
             // clean up set
-            if ($keyType->getPayload() === 'set') {
+            if ($keyType === 'set') {
                 $members = $this->redis->smembers($key);
                 $memberCount = count($members);
                 foreach ($members as $member) {
@@ -105,8 +105,8 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             }
 
             // if the key is not string (unexpectedly), skip
-            if ($keyType->getPayload() !== 'string') {
-                $this->getLogger()->debug("Skipping {$key} type: {$keyType->getPayload()} ");
+            if ($keyType !== 'string') {
+                $this->getLogger()->debug("Skipping {$key} type: {$keyType} ");
                 continue;
             }
 
@@ -119,7 +119,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
                 }
                 $uncompressed = gzuncompress($rawRedisData);
                 $instance = unserialize($uncompressed);
-            } catch (Exception $e) {
+            } catch (Exception | TypeError $e) {
                 if ($uncompressed) {
                     // likely be corrupted data
                     $this->deleteFromRedis("Cannot unserialize: {$key}", null, $key);
@@ -176,8 +176,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
             case -2:
                 return "expired";
             default:
-                // @phpstan-ignore-next-line: date can return false
-                return date('Y-m-d H:i:s', time() + $ttl) ?: '';
+                return date('Y-m-d H:i:s', time() + $ttl);
         }
     }
 
@@ -228,7 +227,7 @@ $kernel = new CliTool\Kernel(new class extends CliTool\App
         }
 
         try {
-            $this->redis->executeCommand(new RawCommand(['UNLINK', $key]));
+            $this->redis->executeCommand(new RawCommand('UNLINK', [$key]));
         } catch (ServerException $e) {
             $this->useUnlink = false;
             $this->redis->del([$key]);

@@ -133,7 +133,7 @@ class Folder extends SimpleStrategy
     /**
      * @inheritdoc
      */
-    public function getValidRelationshipModifiers(string $entityMeta = null): array
+    public function getValidRelationshipModifiers(?string $entityMeta = null): array
     {
         return $this->canTargetTeachersOfUsersInFolder
             ? [Audience\Model::RELATIONSHIP_SELF, Audience\Model::RELATIONSHIP_PARENTS_OF, Audience\Model::RELATIONSHIP_TEACHERS_OF]
@@ -228,7 +228,7 @@ class Folder extends SimpleStrategy
      * @throws InvalidColumnException
      * @throws Mapper\DefinitionException
      */
-    public function getAudiencingSql(User $user, string $searchPlaceholder = null): ?string
+    public function getAudiencingSql(User $user, ?string $searchPlaceholder = null): ?string
     {
         $folderMembershipSql = '';
         $entityType          = self::getEntityType();

@@ -3,7 +3,8 @@
  */
 
 import { defineStore } from "pinia";
-import { useStore, apiEndpoint } from "./curriculumSelectorStore";
+import { useStore } from "./curriculumSelectorStore";
+import { useSharedStore } from "./csSharedStore";
 import { useSelectedNodesStore } from "./csSelectedNodesStore";
 
 const MIN_QUERY_LENGTH = 2; //the amount of characters typed before the search becomes active
@@ -68,7 +69,7 @@ export const useSearchStore = defineStore(`csSearch`, {
                 const includeWithoutCode = store.includeWithoutCode ? 1 : 0; // search for nodes without a code
                 const descendants = store.includeChildren ? 10 : 0; // if we're including children, load in all descendants, otherwise we just load in the next level to show the structure
                 const response = await fetch(
-                    `${apiEndpoint}?query=${this.query}&enabled=1&limit=50&includeWithoutCode=${includeWithoutCode}&descendants=${descendants}`,
+                    `${useSharedStore().apiEndpoint}?query=${this.query}${store.includeDisabled ? "" : "&enabled=1"}&limit=50&includeWithoutCode=${includeWithoutCode}&descendants=${descendants}`,
                     {
                         method: "GET",
                         headers: {

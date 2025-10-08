@@ -104,10 +104,27 @@ class Helper
     public const LEARNOSITY_PROCESS_STATUS_UNPROCESSABLE = 'unprocessable';
 
     /**
+     * A placeholder for the status of a quiz prior to finding out from Learnosity
+     */
+    public const LEARNOSITY_STATUS_UNKNOWN = 'unknown';
+
+    /**
      * The default number of times the quiz attempt may be polled for completion
      * before being marked as failed.
      */
     public const LEARNOSITY_ATTEMPT_COMPLETION_MAX_POLLS = 10;
+
+
+    /**
+     * The name of the lock used for the Learnosity Activity Restore tool
+     */
+    public const LEARNOSITY_ACTIVITY_RESTORE_TOOL_NAME = 'learnosity_activity_restore';
+
+    /**
+     * Decide how long this should be based on your usage
+     * You might have to adjust it, but it should cover the cost of an iteration
+     */
+    public const LEARNOSITY_ACTIVITY_RESTORE_LOCK_TTL = 60;
 
     /**
      * The configuration used for the regions to show in the Learnosity player
@@ -210,6 +227,7 @@ class Helper
      * @return void
      * @throws ValidationException
      * @throws \RuntimeException
+     * @throws \JsonException
      */
     public function restore(string $learnosityReference): void
     {

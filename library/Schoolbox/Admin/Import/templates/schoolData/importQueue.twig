@@ -17,14 +17,43 @@
             <tr>
                 <th>Data Source</th>
                 <th>User</th>
+                <th>Type</th>
                 <th>Requested</th>
+                <th></th>
             </tr>
             </thead>
             <tbody>
                 <tr>
                     <td>{{ importQueue.script }}</td>
                     <td>{{ importQueue.instance.user.fullname }}</td>
+                    <td>{{ importQueue.instance.strats }}</td>
                     <td>{{ importQueue.instance.createdAt.local }}</td>
+                    <td class="actions-small-1">
+                        {% set deleteRoute = routeLookupIfAuthorized('adminImportIndex.postCancelUpdate') %}
+
+                        {% if deleteRoute %}
+                            <script>
+                                $(function() {
+                                    $('[data-delete]').on('click', function (event) {
+                                        event.preventDefault();
+
+                                        let url = $(this).attr('href');
+
+                                        $(this).confirmDialog({
+                                            text: "Are you sure you want to delete this request to sync?",
+                                            confirmLabel: 'Delete',
+                                            confirmEvent: function () {
+                                                $.post(url, function (responseText) {
+                                                    window.location.reload();
+                                                });
+                                            },
+                                        });
+                                    });
+                                });
+                            </script>
+                            <nav><a href="{{ deleteRoute }}" class="icon-delete" data-delete></a></nav>
+                        {% endif %}
+                    </td>
                 </tr>
             </tbody>
         </table>

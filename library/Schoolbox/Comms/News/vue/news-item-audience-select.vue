@@ -1,6 +1,7 @@
 <script>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
 /**
  * To select who will be able to see the news item
@@ -755,7 +756,9 @@ export default {
                     :placeholder="audiencePlaceholder"
                     required
                 />
-                <button class="button icon-drag-drop" @click.prevent="openBrowseModal">Browse&hellip;</button>
+                <button type="button" class="button icon-drag-drop" @click.prevent="openBrowseModal">
+                    Browse&hellip;
+                </button>
             </div>
             <input type="hidden" name="audience" :value="audienceFormString" />
         </div>

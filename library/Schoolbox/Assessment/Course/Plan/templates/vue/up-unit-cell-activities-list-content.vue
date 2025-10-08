@@ -6,8 +6,9 @@ import ActivitiesListContent from "./activities-list/activities-list-content.vue
 import { useActivitiesListStore } from "./activities-list/store/activitiesListStore";
 import { useActivitiesListDragStore } from "./activities-list/store/activitiesListDragStore";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
-import type { Unit } from "./unitPlannerTypes";
+import type { CourseBuilderComponent, Unit } from "./unitPlannerTypes";
 import type { Column } from "./unitPlannerConfig";
+import { useUnitPlannerActivityListStore } from "./store/unitPlannerActivityListStore";
 
 interface Props {
     unit: Unit; // the unit linked to the curriculum cell
@@ -21,7 +22,12 @@ const store = useUnitPlannerStore();
 const activitiesListStoreId = `${props.unit.id}-${props.column.id}`;
 
 const activitiesListStore = useActivitiesListStore(activitiesListStoreId);
+const unitPlannerActivityListStore = useUnitPlannerActivityListStore();
 const activitiesListDragStore = useActivitiesListDragStore(activitiesListStoreId);
+
+const component = window.Vue.computed<CourseBuilderComponent | null>(() => {
+    return unitPlannerActivityListStore.getComponent(props.unit.activities.components, props.column);
+});
 
 window.Vue.onMounted(() => {
     if (!props.preventStoreInit) {
@@ -41,7 +47,7 @@ window.Vue.onMounted(() => {
  * Used by the parent component to determine whether to show the empty state
  */
 const isEmpty = window.Vue.computed(() => {
-    return activitiesListDragStore().orderedActivities.length === 0;
+    return activitiesListDragStore().orderedActivities.length === 0 || component.value === null;
 });
 
 // Allow the parent component to identify if the cell is empty

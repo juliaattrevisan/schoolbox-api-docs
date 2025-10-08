@@ -26,11 +26,27 @@ class Module extends BaseModule
             new Rule\HasRole(Role::STAFF),
         );
 
-        $this->register('POST', '', 'postForward', $isStaff, null);
+        /* This /openai/ route is used by Little Robot Dude from the ckeditor
+         * directly, to produce its output
+         */
+        $this->register('POST', '', 'postAiAssistant', $isStaff);
+
+        /* Lesson Plan field generators
+         */
+        $this->register('POST', '/lesson-plan', 'postLessonPlan', $isStaff);
+
+        /* Image generation
+         */
+        $this->register('POST', '/image', 'postImage', $isStaff);
     }
 
     public function buildController(): Base
     {
-        return new Controller($this->injector->get('httpClient'), $this->getMapperFactory()->get(Mapper::class));
+        return new Controller(
+            $this->injector->get('httpClient'),
+            $this->getMapperFactory()->get(\Schoolbox\Error\Mapper::class),
+            $this->getMapperFactory()->get(Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Curriculum\Node\Mapper::class),
+        );
     }
 }

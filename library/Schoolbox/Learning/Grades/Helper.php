@@ -28,6 +28,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\User;
+use Scrub;
 
 /**
  * Helper class to generate grade pages
@@ -169,13 +170,13 @@ class Helper
      * Builds an array of data used by twig to render the assessment box-and-whiskers graph
      *
      * @param Markbook $markbook
-     * @param User     $viewee        // studnet / learner
-     * @param User     $viewer        // user viewing the graph
-     * @param Boolean  $gradeGradient config.grade_gradient_enable
-     *
-     * @return array{info: string, assessments: string, data: string, scatter: string}
+     * @param User $viewee // studnet / learner
+     * @param User $viewer // user viewing the graph
+     * @param Boolean $gradeGradient config.grade_gradient_enable
+     * @param array $workTypeWhitelist A set of worktype ids that you want to include on the boxplot.
+     * @return array{info: array, assessments: array, data: array, scatter: array}
      */
-    public function buildGraph(Markbook $markbook, User $viewee, User $viewer, bool $gradeGradient): array
+    public function buildGraph(Markbook $markbook, User $viewee, User $viewer, bool $gradeGradient, array $workTypeWhitelist = []): array
     {
         // Get the data for the graph
         $graphInfo        = [];
@@ -183,10 +184,15 @@ class Helper
         $graphData        = [];
         $graphScatter     = [];
 
-
         $statistics = $markbook->getAssessmentStatistics();
 
         foreach ($markbook->getAssessments() as $assessment) {
+            /* If the assessment does not have a work type, or the work type is not in the whitelist, skip it.
+             */
+            if (!in_array($assessment->getWorkType()?->getId(), $workTypeWhitelist, true)) {
+                continue;
+            }
+
             if ($assessment->isFeedbackVisibleToUser($viewer) && $assessment->getMarkScheme()->isQuantitative()) {
                 $graphAssessments[] = $assessment->getTitle();
 
@@ -212,7 +218,7 @@ class Helper
                         $graphInfoValue = [
                             'displayMark'  => $humanReadableMark,
                             'gradientMark' => $gradeGradient ? (int)($normalisedMark / 10) : 'none',
-                            'info'         => $comment ?? '',
+                            'info'         => Scrub::text(Scrub::html2text($comment)),
                         ];
                     }
                 }
@@ -261,10 +267,10 @@ class Helper
         }
 
         return [
-            'info'        => json_encode($graphInfo),
-            'assessments' => json_encode($graphAssessments),
-            'data'        => json_encode($graphData),
-            'scatter'     => json_encode($graphScatter),
+            'info'        => $graphInfo,
+            'assessments' => $graphAssessments,
+            'data'        => $graphData,
+            'scatter'     => $graphScatter,
         ];
     }
 }

@@ -16,7 +16,6 @@ namespace Schoolbox\External\Connector\Wonde\Base\Endpoint;
  */
 interface IApi
 {
-
     /**
      * Retrieves data from an endpoint
      *
@@ -32,4 +31,12 @@ interface IApi
      * @return ApiUsage
      */
     public function getUsage(): ApiUsage;
+
+
+    /**
+     * Optional settings in the wonde connector.
+     *
+     * @return array
+     */
+    public function getOptions(): array;
 }

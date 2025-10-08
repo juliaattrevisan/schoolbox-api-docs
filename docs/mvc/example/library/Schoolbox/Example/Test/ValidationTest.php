@@ -15,18 +15,19 @@ declare(strict_types=1);
 
 namespace Schoolbox\Example\Test;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 /**
- * TODO This format has changed in 24.1
+ * Validation test
  */
 class ValidationTest extends TestCase
 {
     /**
-     * @dataProvider providerValidExample
      * @param mixed $input
      * @param int   $expected
      */
+    #[DataProvider('providerValidExample')]
     public function testValidExample($input, $expected)
     {
         /* Substitute this with a spec pattern or other conditional
@@ -47,7 +48,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function providerValidExample(): array
+    public static function providerValidExample(): array
     {
         return [
 
@@ -106,6 +107,7 @@ class ValidationTest extends TestCase
      * @dataProvider getTestErrorRaisedData
      *
      */
+    #[DataProvider('getTestErrorRaisedData')]
     public function testErrorRaised($input): void
     {
         $this->expectException(\TypeError::class);
@@ -124,7 +126,7 @@ class ValidationTest extends TestCase
      *
      * @return array
      */
-    public function getTestErrorRaisedData(): array
+    public static function getTestErrorRaisedData(): array
     {
         return [
             [1.5],

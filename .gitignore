@@ -39,3 +39,17 @@ v8-compile-cache-0/
 # < 21.0 static assets: exclude from <= 21.0 so it's not committed by accident
 www/css/core/*.css
 www/javascript
+
+# Docker environment configuration
+docker.env
+docker-taskd.env
+.aws/
+.docker-compose.env
+
+# IR configuration is created by the Docker provision process:
+# it should not be committed
+docker/schoolbox/config/instance-registry.json
+
+# This file is required by schoolbox-cli for building a crontab:
+# the provision process will build it
+docker/schoolbox/config/cron_config.ini

@@ -32,11 +32,12 @@ class DSNTest extends TestCase
     {
         return [
             'Valid DSN 1' => [
-                'schoolroute=api-aaabbbccc;clientid=klo25j98ASjFgVh25j0g9gs87;clientsecret=j258AjDJ489G78j45nhfy1z0v8',
+                'schoolroute=api-aaabbbccc;clientid=klo25j98ASjFgVh25j0g9gs87;clientsecret=j258AjDJ489G78j45nhfy1z0v8;portalaccessname=facultythingy',
                 [
                     'schoolroute' => 'api-aaabbbccc',
                     'clientid' => 'klo25j98ASjFgVh25j0g9gs87',
-                    'clientsecret' => 'j258AjDJ489G78j45nhfy1z0v8'
+                    'clientsecret' => 'j258AjDJ489G78j45nhfy1z0v8',
+                    'portalaccessname' => 'facultythingy'
                 ]
             ],
         ];
@@ -68,8 +69,8 @@ class DSNTest extends TestCase
     {
         return [
             'Valid DSN Re-encode 1' => [
-                'schoolroute=api-aaabbbccc;clientid=klo25j98ASjFgVh25j0g9gs87;clientsecret=j258AjDJ489G78j45nhfy1z0v8',
-                'schoolroute=api-aaabbbccc;clientid=klo25j98ASjFgVh25j0g9gs87;clientsecret=j258AjDJ489G78j45nhfy1z0v8',
+                'schoolroute=api-aaabbbccc;clientid=klo25j98ASjFgVh25j0g9gs87;clientsecret=j258AjDJ489G78j45nhfy1z0v8;portalaccessname=facultythingy',
+                'schoolroute=api-aaabbbccc;clientid=klo25j98ASjFgVh25j0g9gs87;clientsecret=j258AjDJ489G78j45nhfy1z0v8;portalaccessname=facultythingy',
             ],
         ];
     }
@@ -129,10 +130,14 @@ class DSNTest extends TestCase
             ],
 
             'Invalid DSN 6 (malformed tuples)' => [
+                'schoolroute=;clientid=;clientsecret=;portalaccessname=', []
+            ],
+
+            'Invalid DSN 7 (malformed tuples)' => [
                 'schoolroute=;', []
             ],
 
-            'Invalid DSN 7 (no tuples)' => [
+            'Invalid DSN 8 (no tuples)' => [
                 ';', []
             ],
         ];

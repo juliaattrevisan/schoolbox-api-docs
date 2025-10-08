@@ -320,7 +320,16 @@ class Profile implements IStrategy
 
             /* Emergency Contacts
              */
-            $emergencyContacts = $this->traverser->findEmergencyContacts($student);
+            $emergencyContacts = [];
+            if (null === $student->emergencycontacts?->contact) {
+                $this->log->info(sprintf(
+                    'No emergency contacts found for %s',
+                    trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+                ));
+            } else {
+                $emergencyContacts = $this->traverser->findEmergencyContacts($student);
+            }
+
 
             /* Smoosh it all together
              */
@@ -427,6 +436,15 @@ class Profile implements IStrategy
     private function importParentsOfStudent(SimpleXMLElement $student, UserProfile\Model $studentBaseProfile): void
     {
         $siblingLink = trim((string)$student->siblinglink);
+
+        if (null === $student->caregivers?->caregiver) {
+            $this->log->info(sprintf(
+                'No caregivers found for %s',
+                trim("{$studentBaseProfile->getFirstname()} {$studentBaseProfile->getLastname()}")
+            ));
+
+            return;
+        }
 
         /** @var SimpleXMLElement $parent */
         foreach ($student->caregivers->caregiver as $parent) {

@@ -1,0 +1,111 @@
+<?php
+
+/**
+ * @copyright   Copyright 2025, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\External\Connector\Civica\Base\Endpoint\Calendar;
+
+use Psr\Log\LoggerInterface;
+use Schoolbox\External\Importer\Endpoint\IStrategy;
+
+/**
+ * Blow away all the Event and Event Sources that never got updated during the import process
+ */
+class Cleanup implements IStrategy
+{
+    /**
+     * Base constructor.
+     *
+     * Event source is an arbitrary string that helps identify the thing that imported
+     * them into the local event table so you can do a mass remove if needed
+     *
+     * @param LoggerInterface                  $log
+     * @param bool                             $perform
+     * @param \Schoolbox\External\Event\Mapper $eventMapper
+     * @param string                           $source
+     */
+    public function __construct(
+        private LoggerInterface $log,
+        private bool $perform,
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private string $source
+    ) {
+    }
+
+
+    /**
+     * Purge existing events so we don't have to worry about diffing their
+     * relationships and stuff. It's going to be wrapped in a transaction
+     * anyway, so if anything dies we roll back.
+     *
+     * @throws \PDOException
+     */
+    public function import(): void
+    {
+        if ($this->perform) {
+            $eventTable         = $this->eventMapper->getTable();
+            $eventCampusTable   = \Schoolbox\External\Event\Campus\Mapper::getInstance()->getTable();
+            $eventRoleTypeTable = \Schoolbox\External\Event\Roletype\Mapper::getInstance()->getTable();
+            $eventUserTable     = \Schoolbox\External\Event\User\Mapper::getInstance()->getTable();
+            $queries = [
+                [
+                    'query' => "
+                        DELETE {$eventCampusTable}
+                        FROM {$eventCampusTable}
+                        INNER JOIN {$eventTable} ON {$eventTable}.id = {$eventCampusTable}.event_id AND {$eventTable}.updated_at = '0000-00-00 00:00:00'
+                        WHERE {$eventTable}.source = :source
+                    ",
+                    'params' => [
+                        'source' => $this->source
+                    ]
+                ],
+                [
+                    'query' => "
+                        DELETE {$eventRoleTypeTable}
+                        FROM {$eventRoleTypeTable}
+                        INNER JOIN {$eventTable} ON {$eventTable}.id = {$eventRoleTypeTable}.event_id AND {$eventTable}.updated_at = '0000-00-00 00:00:00'
+                        WHERE {$eventTable}.source = :source
+                    ",
+                    'params' => [
+                        'source' => $this->source
+                    ]
+                ],
+                [
+                    'query' => "
+                        DELETE {$eventUserTable}
+                        FROM {$eventUserTable}
+                        INNER JOIN {$eventTable} ON {$eventTable}.id = {$eventUserTable}.event_id AND {$eventTable}.updated_at = '0000-00-00 00:00:00'
+                        WHERE {$eventTable}.source = :source
+                    ",
+                    'params' => [
+                        'source' => $this->source
+                    ]
+                ],
+                [
+                    'query' => "
+                        DELETE FROM {$eventTable}
+                        WHERE updated_at = '0000-00-00 00:00:00'
+                        AND {$eventTable}.source = :source
+                    ",
+                    'params' => [
+                        'source' => $this->source
+                    ]
+                ],
+            ];
+
+            foreach ($queries as $setup) {
+                $statement = $this->eventMapper->getDatabase()->prepare($setup['query']);
+                $statement->execute($setup['params']);
+            }
+
+            $this->log->debug(sprintf(
+                'Deleting all %s events that never updated during import',
+                $this->source,
+            ));
+        }
+    }
+}

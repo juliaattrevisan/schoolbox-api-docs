@@ -97,7 +97,7 @@ class Controller extends UserAccount\Controller
             'Period Title',
             'Period Start',
             'Period Finish',
-        ]);
+        ], escape: '');
 
         /* Export properties into the same format as the csv
          */
@@ -124,7 +124,7 @@ class Controller extends UserAccount\Controller
                 $period->getFinish()->getDatabaseTime()
             ];
 
-            fputcsv($fp, $row);
+            fputcsv($fp, $row, escape: '');
         }
 
         rewind($fp);

@@ -201,32 +201,45 @@ class Factory
         if ($this->mark !== null && $this->mark !== '') {
             // mark defined and non-empty
             try {
-                $scheme = $this->participant->getAssessable()->getMarkScheme();
+                /** @var \Schoolbox\Learning\Assessment\DueWork\Model $assessable */
+                $assessable = $this->participant->getAssessable();
 
-                // verify normalisation, then sanitise the output
-                $norm = $scheme->getNormalisedMark($this->mark);
-                $humanReadableMark = $scheme->getHumanReadableMark($norm);
+                /** Get mark schemes
+                 * - Instructor mark scheme is used to normalise what was inputted by the user
+                 * - Learner mark scheme is used when displaying the mark back to learners/parents
+                 */
+                $instructorScheme = $assessable->getInstructorMarkScheme();
+                $learnerScheme = $assessable->getMarkScheme();
+
+                // verify normalisation
+                // for self-assessment, we use the learner mark scheme instead
+                $normScheme = $feedback->isSelfAssessment() ? $learnerScheme : $instructorScheme;
+                $norm = $normScheme->getNormalisedMark($this->mark);
+
+                //then sanitise the output for both instructor and learner marks
+                $humanReadableMark = $learnerScheme->getHumanReadableMark($norm);
+                $humanReadableInstructorMark = $instructorScheme->getHumanReadableMark($norm);
 
                 $feedback
                     ->setNormalisedMark($norm)
-                    ->setHumanReadableMark($humanReadableMark);
+                    ->setHumanReadableMark($humanReadableMark)
+                    ->setHumanReadableInstructorMark($humanReadableInstructorMark);
             } catch (\InvalidArgumentException $e) {
                 $code = StateMapper::getInstance()->findOneByColumn('display_as', $this->mark);
 
                 $feedback
                     ->setNormalisedMark($code->getNormaliseAs())
-                    ->setHumanReadableMark($this->mark);
+                    ->setHumanReadableMark($this->mark)
+                    ->setHumanReadableInstructorMark($this->mark);
             }
         } else {
-            // TODO what on EARTH is going on here? what is this "special case"?
-
-            //If mark is set to empty string this is a special case
-            //TODO potentially the mark post var may not have been set, we may lose the mark in this case so we should
-            //test the existence of the post var as well
-
+            /* "None" mark type was used here, so we won't get a teacher-assigned mark in this usage
+             * Set norm and hr marks to be acceptable defaults.
+             */
             $feedback
                 ->setNormalisedMark(null)
-                ->setHumanReadableMark('');
+                ->setHumanReadableMark('')
+                ->setHumanReadableInstructorMark('');
         }
 
         // Attach any attached files (if this kind of attachment accepts them)

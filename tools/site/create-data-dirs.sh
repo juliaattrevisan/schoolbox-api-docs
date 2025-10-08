@@ -180,11 +180,11 @@ function parse_available_data_dirs_config_names(){
   fuzzy_fallback=0;       # Reset for current instance
   available_data_dirs=(); # Reset for current instance
 
-  data_dirs_config=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -ss -e "SELECT value from config WHERE name = 'data_dirs_defaults'")
+  data_dirs_config=$(mariadb -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -ss -e "SELECT value from config WHERE name = 'data_dirs_defaults'")
   debug "Data dir defaults: '$data_dirs_config'"
   if [[ -z $data_dirs_config ]]; then
     local sql_version;
-    sql_version=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -ss -e "SELECT value from config WHERE name = 'site_version'")
+    sql_version=$(mariadb -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -ss -e "SELECT value from config WHERE name = 'site_version'")
     local message="Data dir default config not found or empty. SQL version: $sql_version"
     if [[ "$(echo -e "20.1.7\n${sql_version}" | sort -V | head -n 1)" == "20.1.7" ]]; then
       error "$message"
@@ -210,7 +210,7 @@ function create_data_dirs() {
 
   # Check the include dir is valid
   for data_dir_name in ${available_data_dirs[*]}; do
-    data_dir_value=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -ss -e "SELECT value from config WHERE name = '$data_dir_name'")
+    data_dir_value=$(mariadb -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_schema" -ss -e "SELECT value from config WHERE name = '$data_dir_name'")
     data_dir_map[$data_dir_name]="$data_dir_value"
   done
 

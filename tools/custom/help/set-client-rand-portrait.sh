@@ -54,19 +54,33 @@ set_image() {
   sql_pass=$(schoolbox-read-instances --option SQL_passwd)
   sql_db=$(schoolbox-read-instances --option SQL_db)
 
-  for i in $(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -BNe "SELECT synergy_id FROM user WHERE group_id in ('6','7','8','13') AND synergy_id IS NOT NULL AND synergy_id != ''" 2>/dev/null); do
+  for i in $(mariadb -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -BNe "SELECT synergy_id FROM user WHERE group_id in ('6','7','8','13') AND synergy_id IS NOT NULL AND synergy_id != ''" 2>/dev/null); do
     rand=$((RANDOM % ${#hashes[@]} + 1))
     hash=${hashes[$rand]}
     log "setting profile image for user $i as $hash"
-    if [[ ! $(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -BNe "UPDATE user SET portrait_hash = '$hash' WHERE synergy_id = '$i'") ]]; then
+    if [[ ! $(mariadb -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -BNe "UPDATE user SET portrait_hash = '$hash' WHERE synergy_id = '$i'") ]]; then
       error "Couldn't set image for user $i"
     fi
   done
 }
 
 main (){
+  # Deprecation notice
+  echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+  echo -e "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m"
+  echo -e "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m"
+  echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+  echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+
   parse_args "$@"
   set_image
+
+  # Deprecation notice
+  echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+  echo -e "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m"
+  echo -e "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m"
+  echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+  echo -e "\033[1;33m/******************************************************************************************/\033[0m"
 }
 
 main "$@"

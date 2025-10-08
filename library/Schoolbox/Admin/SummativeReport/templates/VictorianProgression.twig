@@ -1,11 +1,11 @@
 {##
  # Victorian Curriculum Progression Point visualisation chart
  #
- # @param array $payload  A struct containing all the curriculum nodes, feedbacks and student metadata
- # @param bool $annotate  Optionally show some diagnostic data
+ # @param string $identifier  An arbitrarily-chosen string - use with Skin Config
+ # @param array $payload      A struct containing all the curriculum nodes, feedbacks and student metadata
+ # @param bool $annotate      Optionally show some diagnostic data
  #}
-{# Victorian Curriculum Progressions is Penola-specific atm #}
-{% if payload is not null %}
+{% if payload is not null and payload.data is not null and payload.data|length %}
 <style>
     table.victorian-progression  {
         border-collapse: collapse;
@@ -79,6 +79,9 @@
 
     table.victorian-progression .dot.black {
         background-color: #000;
+        /* ensure the background colour is displayed when printing */
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
     }
 
     /* Line between dots; z-index ensures it's always rendered below a .dot
@@ -108,6 +111,9 @@
      */
     table.victorian-progression .yellow {
         background-color: gold;
+        /* ensure the background colour is displayed when printing */
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
     }
 
     /* The top-left corner of the grid
@@ -125,49 +131,51 @@
     }
 </style>
 
-<h2 class="victorian-progression-heading">Summary of Victorian Curriculum Standards</h2>
+<div id="{{ identifier }}">
+    <h2 class="victorian-progression-heading">{{ title }}</h2>
 
-<table class="victorian-progression">
-    <thead>
-    <tr class="header">
-        <th colspan="2" class="corner"></th>
-        <th class="rating">Rating</th>
+    <table class="victorian-progression">
+        <thead>
+            <tr class="header">
+                <th colspan="2" class="corner"></th>
+                <th class="rating">Rating</th>
 
-        {% for i in payload.levels %}
-            {# Check current year; smear it yellow if i matches student year level #}
-            <th colspan="2" class="text-center {% if i == payload.student.currentYearLevel %}yellow{% endif %}">
-                Level {{ i }}
-            </th>
-        {% endfor %}
-    </tr>
-    </thead>
-    <tbody>
-    {% for parentNodeId, parentNodeData in payload.data %}
-        {% set nSubrows = parentNodeData.subnodes|length %}
-
-        {% if nSubrows %}
-            {# Render at least one subnode with various spanning for presentation #}
-            <tr>
-                <td rowspan="{{ nSubrows + 1 }}">
-                    {{ parentNodeData.name }}
-                </td>
+                {% for i in payload.levels %}
+                    {# Check current year; smear it yellow if i matches student year level #}
+                    <th colspan="2" class="text-center {% if i == payload.student.currentYearLevel %}yellow{% endif %}">
+                        Level {{ i }}
+                    </th>
+                {% endfor %}
             </tr>
-            {% for nodeId, nodeData in parentNodeData.subnodes %}
+        </thead>
+        <tbody>
+        {% for parentNodeId, parentNodeData in payload.data %}
+            {% set nSubrows = parentNodeData.subnodes|length %}
+
+            {% if nSubrows %}
+                {# Render at least one subnode with various spanning for presentation #}
                 <tr>
-                    <td>{{ nodeData.name }}</td>
-                    {{ _self.renderOutcomes(nodeData, payload.possibleOutcomes, payload.student.currentYearLevel, payload.currentSemester, annotate) }}
+                    <td rowspan="{{ nSubrows + 1 }}">
+                        {{ parentNodeData.name }}
+                    </td>
                 </tr>
-            {% endfor %}
-        {% else %}
-            {# No subnodes: occupy available space #}
-            <tr>
-                <td colspan="2">{{ parentNodeData.name }}</td>
-                {{ _self.renderOutcomes(parentNodeData, payload.possibleOutcomes, payload.student.currentYearLevel, payload.currentSemester, annotate) }}
-            </tr>
-        {% endif %}
-    {% endfor %}
-    </tbody>
-</table>
+                {% for nodeId, nodeData in parentNodeData.subnodes %}
+                    <tr>
+                        <td>{{ nodeData.name }}</td>
+                        {{ _self.renderOutcomes(nodeData, payload.possibleOutcomes, payload.student.currentYearLevel, payload.currentSemester, annotate) }}
+                    </tr>
+                {% endfor %}
+            {% else %}
+                {# No subnodes: occupy available space #}
+                <tr>
+                    <td colspan="2">{{ parentNodeData.name }}</td>
+                    {{ _self.renderOutcomes(parentNodeData, payload.possibleOutcomes, payload.student.currentYearLevel, payload.currentSemester, annotate) }}
+                </tr>
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endif %}
 
 {##

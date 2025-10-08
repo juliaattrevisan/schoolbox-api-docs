@@ -88,7 +88,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
         if (is_numeric($question_id)) {
             $answerGroup = parent::getForQuestion($question_id);
 
-            if ($answerGroup) {
+            if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
                 $allAnswers = unserialize($answerGroup['answer']);
 
                 if (is_array($allAnswers) && count($allAnswers)) {
@@ -207,7 +207,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
 
         $answerGroup = $this->getByQuestionID($question_id);
 
-        if ($answerGroup) {
+        if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
             $allAnswers = unserialize($answerGroup['answer']);
 
             $i = 1;
@@ -227,7 +227,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
                     )
                 );
 
-                if ($existing['response']) {
+                if (isset($existing['response']) && is_string($existing['response'])) {
                     $existingAnswer = unserialize($existing['response']);
 
                     if (is_array($existingAnswer) && in_array($currentAnswer->value, $existingAnswer)) {
@@ -305,7 +305,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
         $answerGroup = $this->getByQuestionID($question_id);
         $page->setVar('answerOption_block', '');
 
-        if ($answerGroup) {
+        if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
             $allAnswers = unserialize($answerGroup['answer']);
 
             if (is_array($allAnswers)) {
@@ -380,7 +380,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
             ];
         }
 
-        $data = unserialize($response['response']);
+        $data = unserialize($response['response'] ?? '');
 
         if (is_array($data)) {
             /* Answer text to appear in export
@@ -398,15 +398,21 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
             } else {
                 $data['response'] = strip_tags(implode(', ', $postprocessed));
             }
+        } else {
+            /* If this is a partial attempt and the student hasn't answered yet, $data will be set to false
+             * Make sure it's an array so we can continue on.
+             * Provide an empty 'response' key so it doesn't cause other warnings down the line.
+             */
+            $data = ['response' => ''];
         }
 
         /* Append commentary
          */
-        $data['comment'] = $response['comment'];
+        $data['comment'] = $response['comment'] ?? '';
 
         /* Append awarded mark
          */
-        $data['mark'] = $response['mark'];
+        $data['mark'] = $response['mark'] ?? '';
 
         return $data;
     }
@@ -422,14 +428,15 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
     {
         $answer = $this->getByQuestionID($question_id);
 
-        $allOptions = unserialize($answer['answer']);
+        if (isset($answer['answer']) && is_string($answer['answer'])) {
+            $allOptions = unserialize($answer['answer']);
 
-        foreach ($allOptions as $currentOption) {
-            if ($currentOption->value == $value) {
-                return $currentOption->description;
+            foreach ($allOptions as $currentOption) {
+                if ($currentOption->value == $value) {
+                    return $currentOption->description;
+                }
             }
         }
-
         return '';
     }
 
@@ -447,7 +454,7 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
         /* If a question was added after the attempt was made by the student,
          * then $response['response'] might not even exist; return empty array
          */
-        if ($response) {
+        if (isset($response['response']) && is_string($response['response'])) {
             return unserialize($response['response']);
         }
 
@@ -467,13 +474,13 @@ abstract class Evaluation_Answer_Radio extends Evaluation_Answer
     {
         $existing = $this->getResponseHandler()->isResponseExists($attemptId, $question_id);
 
-        if ($existing) {
+        if (isset($existing['response']) && is_string($existing['response'])) {
             $existingAnswer = unserialize($existing['response']);
         }
 
         $answerGroup = $this->getByQuestionID($question_id);
 
-        if ($answerGroup) {
+        if (isset($answerGroup['answer']) && is_string($answerGroup['answer'])) {
             $allAnswers = unserialize($answerGroup['answer']);
 
             $page->setVar(

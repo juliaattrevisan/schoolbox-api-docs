@@ -10,6 +10,4 @@
  */
 
 import Highcharts from 'highcharts';
-import hcMore from 'highcharts/highcharts-more';
-
-hcMore(Highcharts);
+import 'highcharts/highcharts-more';

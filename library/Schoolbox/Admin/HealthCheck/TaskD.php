@@ -11,6 +11,7 @@ use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\MessageFactory;
 use Schoolbox\Url\Uri;
 use Schoolbox\User;
+use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\User\Translator\Author\ModelToArray;
 use Scrub;
 
@@ -20,12 +21,8 @@ class TaskD
      * Max length for filenames: anything longer causes issues on upload.
      */
     private const FILENAME_MAX_LENGTH = 250;
-    private Jwt $tokenBuilder;
-    private IConfigLoader $config;
-    private Generator $routeGenerator;
+
     private Uri $urlBase;
-    private MessageFactory $messageFactory;
-    private Producer $producer;
 
     private array $sources;
 
@@ -33,20 +30,21 @@ class TaskD
      * Constructor
      *
      * @param Jwt $tokenBuilder
+     * @param IConfigLoader $config
+     * @param Generator $routeGenerator
+     * @param MessageFactory $messageFactory
+     * @param Producer $producer
+     * @param TokenMapper $tokenMapper
      */
     public function __construct(
-        Jwt $tokenBuilder,
-        IConfigLoader $config,
-        Generator $routeGenerator,
-        MessageFactory $messageFactory,
-        Producer $producer
+        private Jwt $tokenBuilder,
+        private IConfigLoader $config,
+        private Generator $routeGenerator,
+        private MessageFactory $messageFactory,
+        private Producer $producer,
+        private TokenMapper $tokenMapper,
     ) {
-        $this->tokenBuilder = $tokenBuilder;
-        $this->config = $config;
-        $this->routeGenerator = $routeGenerator;
         $this->urlBase = (new \Schoolbox\Url\Factory($config))->buildFullyQualified();
-        $this->messageFactory = $messageFactory;
-        $this->producer = $producer;
     }
 
     /**
@@ -74,10 +72,11 @@ class TaskD
         $outfile = $escapedTitle !== ''
             ? ($date . '-' . $escapedTitle)
             : $date;
+        $token = $this->tokenMapper->generateForUser($user, $user, \Alaress_Date_Format::now()->addSeconds(JWT::API_JWT_TIMEOUT));
         $message = $this->messageFactory->build(
             'download-pages',
             [
-                'token'     => $this->tokenBuilder->generate($user),
+                'token'     => $this->tokenBuilder->generate($user, $token->getJwtId(), $token->getExpiry()),
                 'content'   => $sources,
                 'outfile'   => mb_substr($outfile, 0, self::FILENAME_MAX_LENGTH, 'UTF-8') . '.zip',
                 'gotenberg' => [

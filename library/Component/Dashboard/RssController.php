@@ -9,6 +9,7 @@
  */
 
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Config\ConfigMapper;
 
 class Component_Dashboard_RssController extends Component_Dashboard_ControllerAbstract
 {
@@ -18,8 +19,12 @@ class Component_Dashboard_RssController extends Component_Dashboard_ControllerAb
     {
         parent::__construct($instance, $user, $sitepage);
 
-
-        $this->rss = new Alaress_Rss_Stream($this->getConfig('url'));
+        // Get the DI container out of SitePage I guess?
+        $this->rss = new Alaress_Rss_Stream(
+            $this->getConfig('url'),
+            $sitepage->getDi()->get('httpClient.cache'),
+            (int)$this->getConfigLoader()->get(ConfigMapper::NAME_XML_CACHE_TIMEOUT),
+        );
         $size = $this->getConfig('size');
         if (!$size) {
             $size = Config::get('welcome_rss_limit');

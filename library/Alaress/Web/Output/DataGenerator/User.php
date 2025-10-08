@@ -20,29 +20,16 @@ use Schoolbox\User as UserModel;
 class User implements IDataGenerator
 {
     /**
-     * @var null|UserModel
-     */
-    private $currentUser;
-
-
-    /**
-     * @var Session
-     */
-    private $session;
-
-
-    /**
      * Constructor
      *
      * @param null|UserModel $currentUser
      * @param Session        $session
      */
-    public function __construct(?UserModel $currentUser, Session $session)
-    {
-        $this->currentUser = $currentUser;
-        $this->session     = $session;
+    public function __construct(
+        private ?UserModel $currentUser,
+        private Session $session,
+    ) {
     }
-
 
     /**
      * @inheritdoc
@@ -52,14 +39,16 @@ class User implements IDataGenerator
         $initialUser  = $this->session->get(ImpersonationCheck::SESSION_KEY_INITIAL_USER);
         $previousUser = $this->session->get(ImpersonationCheck::SESSION_KEY_PREVIOUS_USER);
         $this->session->set('no_header', $this->session->get('no_header') ?: isset($_GET['no_header']));
+        $birthdaySession = $this->session->getCookie('birthdayCelebrated_' . $this->currentUser->getId());
 
         return [
-            'current'        => $this->currentUser,
-            'initial'        => $initialUser,
-            'previous'       => $previousUser,
-            'impersonated'   => (new ImpersonationCheck())->isImpersonated($this->currentUser, $previousUser),
-            'communityLogin' => $this->session->get('communityLogin'),
-            'no_header'      => $this->session->get('no_header'),  //Hides top nav header if user session var set
+            'current'           => $this->currentUser,
+            'initial'           => $initialUser,
+            'previous'          => $previousUser,
+            'impersonated'      => (new ImpersonationCheck())->isImpersonated($this->currentUser, $previousUser),
+            'communityLogin'    => $this->session->get('communityLogin'),
+            'no_header'         => $this->session->get('no_header'),  //Hides top nav header if user session var set
+            'celebrateBirthday' => !isset($birthdaySession) && ($this->session->get('isBirthdayCelebration') ?? false),
         ];
     }
 }

@@ -26,6 +26,10 @@ Admin,"User Management Activity Report",Superuser,https://vagrant.dev.schoolbox.
 Admin,"User Management Activity Report",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/reports/activity/all,400
 Admin,"User Management Activity Report",Student,https://vagrant.dev.schoolbox.cloud/adminv2/reports/activity/all,400
 Admin,"User Management Activity Report",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/reports/activity/all,400
+Admin,"User Management Impersonation Log",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/reports/impersonation/all,200
+Admin,"User Management Impersonation Log",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/reports/impersonation/all,400
+Admin,"User Management Impersonation Log",Student,https://vagrant.dev.schoolbox.cloud/adminv2/reports/impersonation/all,400
+Admin,"User Management Impersonation Log",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/reports/impersonation/all,400
 Admin,"User Management Login Log",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/reports/login/all,200
 Admin,"User Management Login Log",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/reports/login/all,400
 Admin,"User Management Login Log",Student,https://vagrant.dev.schoolbox.cloud/adminv2/reports/login/all,400
@@ -247,21 +251,49 @@ Admin,"Configure Terminology",Teacher,https://vagrant.dev.schoolbox.cloud/adminv
 Admin,"Configure Terminology",Student,https://vagrant.dev.schoolbox.cloud/adminv2/terminology,401
 Admin,"Configure Terminology",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/terminology,401
 Admin,"Import a calendar",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/calendar,200
-Admin,"Import a calendar",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/calendar,401
-Admin,"Import a calendar",Student,https://vagrant.dev.schoolbox.cloud/adminv2/calendar,401
-Admin,"Import a calendar",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/calendar,401
-Admin,"Import a calendar calendar/import",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,200
-Admin,"Import a calendar calendar/import","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,401
-Admin,"Import a calendar calendar/import","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,401
-Admin,"Import a calendar calendar/import","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,200
-Admin,"Import a calendar calendar/import","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,401
-Admin,"Import a calendar calendar/import","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,401
-Admin,"Import a calendar calendar/import","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,401
-Admin,"Import a calendar calendar/import","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,401
-Admin,"Import a calendar calendar/import","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,401
-Admin,"Import a calendar calendar/import",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,401
-Admin,"Import a calendar calendar/import",Student,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,401
-Admin,"Import a calendar calendar/import",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import,401
+Admin,"Import a calendar",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/calendar,400
+Admin,"Import a calendar",Student,https://vagrant.dev.schoolbox.cloud/adminv2/calendar,400
+Admin,"Import a calendar",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/calendar,400
+Admin,"Import a calendar calendar/import",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/import,200
+Admin,"Import a calendar calendar/import",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/import,400
+Admin,"Import a calendar calendar/import",Student,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/import,400
+Admin,"Import a calendar calendar/import",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/import,400
+Admin,"Import School Events",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/import/school-events,200
+Admin,"Import School Events","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/import/school-events,403
+Admin,"Import School Events","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/ccalendar/import/school-events,404
+Admin,"Import School Events","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/import/school-events,200
+Admin,"Import School Events","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/import/school-events,403
+Admin,"Import School Events","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/import/school-events,403
+Admin,"Import School Events","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import/school-events,400
+Admin,"Import School Events","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import/school-events,400
+Admin,"Import School Events","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import/school-events,400
+Admin,"Import School Events",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import/school-events,400
+Admin,"Import School Events",Student,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import/school-events,400
+Admin,"Import School Events",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import/school-events,400
+Admin,"Import Group Events",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/import/group-events,200
+Admin,"Import Group Events","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/import/group-events,403
+Admin,"Import Group Events","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/ccalendar/import/group-events,404
+Admin,"Import Group Events","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/import/group-events,200
+Admin,"Import Group Events","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/import/group-events,403
+Admin,"Import Group Events","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/import/group-events,403
+Admin,"Import Group Events","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import/group-events,400
+Admin,"Import Group Events","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import/group-events,400
+Admin,"Import Group Events","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import/group-events,400
+Admin,"Import Group Events",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import/group-events,400
+Admin,"Import Group Events",Student,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import/group-events,400
+Admin,"Import Group Events",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import/group-events,400
+Admin,"Import iCalendar Events",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/import/icalendar-events,200
+Admin,"Import iCalendar Events","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/import/icalendar-events,403
+Admin,"Import iCalendar Events","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/ccalendar/import/icalendar-events,404
+Admin,"Import iCalendar Events","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/import/icalendar-events,200
+Admin,"Import iCalendar Events","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/import/icalendar-events,403
+Admin,"Import iCalendar Events","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/import/icalendar-events,403
+Admin,"Import iCalendar Events","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import/icalendar-events,400
+Admin,"Import iCalendar Events","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import/icalendar-events,400
+Admin,"Import iCalendar Events","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import/icalendar-events,400
+Admin,"Import iCalendar Events",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import/icalendar-events,400
+Admin,"Import iCalendar Events",Student,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import/icalendar-events,400
+Admin,"Import iCalendar Events",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Import/icalendar-events,400
 Admin,"Subscribe to a calendar",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,200
 Admin,"Subscribe to a calendar","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,401
 Admin,"Subscribe to a calendar","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/calendar/Subscribe,401
@@ -382,6 +414,18 @@ Admin,"Configure terms","Timetable Moderator",https://vagrant.dev.schoolbox.clou
 Admin,"Configure terms",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/terms,401
 Admin,"Configure terms",Student,https://vagrant.dev.schoolbox.cloud/adminv2/terms,401
 Admin,"Configure terms",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/terms,401
+Admin,"Bulk Feedback Import",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/bulk-feedback-import,200
+Admin,"Bulk Feedback Import","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/bulk-feedback-import,401
+Admin,"Bulk Feedback Import","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/bulk-feedback-import,401
+Admin,"Bulk Feedback Import","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/bulk-feedback-import,401
+Admin,"Bulk Feedback Import","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/bulk-feedback-import,401
+Admin,"Bulk Feedback Import","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/bulk-feedback-import,401
+Admin,"Bulk Feedback Import","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/bulk-feedback-import,401
+Admin,"Bulk Feedback Import","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/bulk-feedback-import,401
+Admin,"Bulk Feedback Import","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/bulk-feedback-import,401
+Admin,"Bulk Feedback Import",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/bulk-feedback-import,401
+Admin,"Bulk Feedback Import",Student,https://vagrant.dev.schoolbox.cloud/adminv2/bulk-feedback-import,401
+Admin,"Bulk Feedback Import",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/bulk-feedback-import,401
 Admin,"Bulk Course Import",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/bulkCourseImport,200
 Admin,"Bulk Course Import","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/bulkCourseImport,401
 Admin,"Bulk Course Import","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/bulkCourseImport,401
@@ -426,10 +470,10 @@ Admin,"System Settings 3rd Party Services",Superuser,https://vagrant.dev.schoolb
 Admin,"System Settings 3rd Party Services",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/3rd Party Services,401
 Admin,"System Settings 3rd Party Services",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/3rd Party Services,401
 Admin,"System Settings 3rd Party Services",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/setting/3rd Party Services,401
-Admin,"System Settings AI Services",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/setting/AI,200
-Admin,"System Settings AI Services",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/AI,401
-Admin,"System Settings AI Services",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/AI,401
-Admin,"System Settings AI Services",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/setting/AI,401
+Admin,"System Settings AI Services",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/ai-services,200
+Admin,"System Settings AI Services",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/ai-services,401
+Admin,"System Settings AI Services",Student,https://vagrant.dev.schoolbox.cloud/adminv2/ai-services,401
+Admin,"System Settings AI Services",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/ai-services,401
 Admin,"System Settings Debugging",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Debugging,200
 Admin,"System Settings Debugging",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Debugging,401
 Admin,"System Settings Debugging",Student,https://vagrant.dev.schoolbox.cloud/adminv2/setting/Debugging,401
@@ -700,7 +744,7 @@ Admin,"Resources Settings",Student,https://vagrant.dev.schoolbox.cloud/adminv2/s
 Admin,"Resources Settings",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/setting/cms/Resources,401
 Admin,"Resources Restore",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/restore,200
 Admin,"Resources Restore","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/restore,401
-Admin,"Resources Restore","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/restore,200
+Admin,"Resources Restore","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/restore,401
 Admin,"Resources Restore","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/restore,401
 Admin,"Resources Restore","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/restore,401
 Admin,"Resources Restore","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/restore,401
@@ -990,6 +1034,18 @@ Admin,"Import timetable enrolment","Timetable Moderator",https://vagrant.dev.sch
 Admin,"Import timetable enrolment",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableEnrolment,401
 Admin,"Import timetable enrolment",Student,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableEnrolment,401
 Admin,"Import timetable enrolment",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/import/timetableEnrolment,401
+Admin,"Editor Templates",Superuser,https://vagrant.dev.schoolbox.cloud/adminv2/editor-templates,200
+Admin,"Editor Templates","Badges Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/editor-templates,403
+Admin,"Editor Templates","CMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/editor-templates,403
+Admin,"Editor Templates","Calendar Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/editor-templates,403
+Admin,"Editor Templates","Design Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/editor-templates,200
+Admin,"Editor Templates","LMS Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/editor-templates,403
+Admin,"Editor Templates","News Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/editor-templates,403
+Admin,"Editor Templates","Pastoral Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/editor-templates,403
+Admin,"Editor Templates","Timetable Moderator",https://vagrant.dev.schoolbox.cloud/adminv2/editor-templates,403
+Admin,"Editor Templates",Teacher,https://vagrant.dev.schoolbox.cloud/adminv2/editor-templates,403
+Admin,"Editor Templates",Student,https://vagrant.dev.schoolbox.cloud/adminv2/editor-templates,403
+Admin,"Editor Templates",Parent,https://vagrant.dev.schoolbox.cloud/adminv2/editor-templates,403
 Calendar,"View calendar",Superuser,https://vagrant.dev.schoolbox.cloud/calendar,200
 Calendar,"View calendar",Teacher,https://vagrant.dev.schoolbox.cloud/calendar,200
 Calendar,"View calendar",Student,https://vagrant.dev.schoolbox.cloud/calendar,200
@@ -1231,10 +1287,42 @@ LMS,"View assessment with rubric and feedback history",Superuser,https://vagrant
 LMS,"View assessment with rubric and feedback history",Teacher,https://vagrant.dev.schoolbox.cloud/learning/assessments/676/25?returnUrl=L2xlYXJuaW5nL2dyYWRlcy8yNS8yMDE5LTEvODM%3D,200
 LMS,"View assessment with rubric and feedback history",Student,https://vagrant.dev.schoolbox.cloud/learning/assessments/676/25?returnUrl=L2xlYXJuaW5nL2dyYWRlcy8yNS8yMDE5LTEvODM%3D,200
 LMS,"View assessment with rubric and feedback history",Parent,https://vagrant.dev.schoolbox.cloud/learning/assessments/676/25?returnUrl=L2xlYXJuaW5nL2dyYWRlcy8yNS8yMDE5LTEvODM%3D,200
+LMS,"View due work participation page",Superuser,https://vagrant.dev.schoolbox.cloud/learning/assessments/665/participation,200
+LMS,"View due work participation page",Teacher,https://vagrant.dev.schoolbox.cloud/learning/assessments/665/participation,200
+LMS,"View due work participation page",Student,https://vagrant.dev.schoolbox.cloud/learning/assessments/665/participation,400
+LMS,"View due work participation page",Parent,https://vagrant.dev.schoolbox.cloud/learning/assessments/665/participation,400
+LMS,"View task participation page",Superuser,https://vagrant.dev.schoolbox.cloud/learning/assessments/664/participation,200
+LMS,"View task participation page",Teacher,https://vagrant.dev.schoolbox.cloud/learning/assessments/664/participation,200
+LMS,"View task participation page",Student,https://vagrant.dev.schoolbox.cloud/learning/assessments/664/participation,400
+LMS,"View task participation page",Parent,https://vagrant.dev.schoolbox.cloud/learning/assessments/664/participation,400
+LMS,"View quiz participation page",Superuser,https://vagrant.dev.schoolbox.cloud/learning/assessments/648/participation,200
+LMS,"View quiz participation page",Teacher,https://vagrant.dev.schoolbox.cloud/learning/assessments/648/participation,200
+LMS,"View quiz participation page",Student,https://vagrant.dev.schoolbox.cloud/learning/assessments/648/participation,400
+LMS,"View quiz participation page",Parent,https://vagrant.dev.schoolbox.cloud/learning/assessments/648/participation,400
+LMS,"View project participation page",Superuser,https://vagrant.dev.schoolbox.cloud/learning/assessments/697/participation,400
+LMS,"View project participation page",Teacher,https://vagrant.dev.schoolbox.cloud/learning/assessments/697/participation,400
+LMS,"View project participation page",Student,https://vagrant.dev.schoolbox.cloud/learning/assessments/697/participation,400
+LMS,"View project participation page",Parent,https://vagrant.dev.schoolbox.cloud/learning/assessments/697/participation,400
+LMS,"View due work participation modify page",Superuser,https://vagrant.dev.schoolbox.cloud/learning/assessments/665/participation/new?student=60,200
+LMS,"View due work participation modify page",Teacher,https://vagrant.dev.schoolbox.cloud/learning/assessments/665/participation/new?student=60,200
+LMS,"View due work participation modify page",Student,https://vagrant.dev.schoolbox.cloud/learning/assessments/665/participation/new?student=60,400
+LMS,"View due work participation modify page",Parent,https://vagrant.dev.schoolbox.cloud/learning/assessments/665/participation/new?student=60,400
+LMS,"View due work participation new activity page",Superuser,https://vagrant.dev.schoolbox.cloud/learning/units/91/assessments/new?student=60&original=665,200
+LMS,"View due work participation new activity page",Teacher,https://vagrant.dev.schoolbox.cloud/learning/units/91/assessments/new?student=60&original=665,200
+LMS,"View due work participation new activity page",Student,https://vagrant.dev.schoolbox.cloud/learning/units/91/assessments/new?student=60&original=665,400
+LMS,"View due work participation new activity page",Parent,https://vagrant.dev.schoolbox.cloud/learning/units/91/assessments/new?student=60&original=665,400
+LMS,"View due work participation clone activity page",Superuser,https://vagrant.dev.schoolbox.cloud/learning/assessments/665/clone?student=60&original=665,200
+LMS,"View due work participation clone activity page",Teacher,https://vagrant.dev.schoolbox.cloud/learning/assessments/665/clone?student=60&original=665,200
+LMS,"View due work participation clone activity page",Student,https://vagrant.dev.schoolbox.cloud/learning/assessments/665/clone?student=60&original=665,400
+LMS,"View due work participation clone activity page",Parent,https://vagrant.dev.schoolbox.cloud/learning/assessments/665/clone?student=60&original=665,400
 LMS,"QR Code page",Superuser,https://vagrant.dev.schoolbox.cloud/qrcode/83,200
 LMS,"QR Code page",Teacher,https://vagrant.dev.schoolbox.cloud/qrcode/83,400
 LMS,"QR Code page",Student,https://vagrant.dev.schoolbox.cloud/qrcode/83,401
 LMS,"QR Code page",Parent,https://vagrant.dev.schoolbox.cloud/qrcode/83,401
+LMS,"Curriculum Coverage",Superuser,https://vagrant.dev.schoolbox.cloud/curriculum/reports/coverage,200
+LMS,"Curriculum Coverage",Teacher,https://vagrant.dev.schoolbox.cloud/curriculum/reports/coverage,200
+LMS,"Curriculum Coverage",Student,https://vagrant.dev.schoolbox.cloud/curriculum/reports/coverage,403
+LMS,"Curriculum Coverage",Parent,https://vagrant.dev.schoolbox.cloud/curriculum/reports/coverage,403
 "Resource Booking","View all resources",Superuser,https://vagrant.dev.schoolbox.cloud/resource-booking/item,200
 "Resource Booking","View all resources",Teacher,https://vagrant.dev.schoolbox.cloud/resource-booking/item,200
 "Resource Booking","View all resources",Student,https://vagrant.dev.schoolbox.cloud/resource-booking/item,200
@@ -1245,8 +1333,8 @@ LMS,"QR Code page",Parent,https://vagrant.dev.schoolbox.cloud/qrcode/83,401
 "Resource Booking","View resource booking category",Parent,https://vagrant.dev.schoolbox.cloud/resource-booking/category/5,200
 "Resource Booking","View resource item",Superuser,https://vagrant.dev.schoolbox.cloud/resource-booking/item/5,200
 "Resource Booking","View resource item",Teacher,https://vagrant.dev.schoolbox.cloud/resource-booking/item/5,200
-"Resource Booking","View resource item",Student,https://vagrant.dev.schoolbox.cloud/resource-booking/item/5,200
-"Resource Booking","View resource item",Parent,https://vagrant.dev.schoolbox.cloud/resource-booking/item/5,200
+"Resource Booking","View resource item",Student,https://vagrant.dev.schoolbox.cloud/resource-booking/item/5,403
+"Resource Booking","View resource item",Parent,https://vagrant.dev.schoolbox.cloud/resource-booking/item/5,403
 "Resource Booking","Add new resource",Superuser,https://vagrant.dev.schoolbox.cloud/resource-booking/item/add,200
 "Resource Booking","Add new resource",Teacher,https://vagrant.dev.schoolbox.cloud/resource-booking/item/add,401
 "Resource Booking","Add new resource",Student,https://vagrant.dev.schoolbox.cloud/resource-booking/item/add,401

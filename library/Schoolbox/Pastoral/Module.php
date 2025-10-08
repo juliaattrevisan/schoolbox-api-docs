@@ -306,6 +306,7 @@ class Module extends BaseModule
                 $this->getMapperFactory()->get(UserMapper::class)
             ),
             $pastoralRecordProcessor,
+            $this->getMapperFactory()->get(PastoralMapper::class),
         );
     }
 

@@ -9,7 +9,6 @@
  */
 class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
 {
-
     /**
      * Template file containing the graph
      *
@@ -95,21 +94,16 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
      */
     private function ordinal($num)
     {
+        $num = (int) $num;
+        $suffixes = ['th', 'st', 'nd', 'rd'];
 
-        // Special case "teenth"
-        if (($num / 10) % 10 != 1) {
-            // Handle 1st, 2nd, 3rd
-            switch ($num % 10) {
-                case 1:
-                    return $num . 'st';
-                case 2:
-                    return $num . 'nd';
-                case 3:
-                    return $num . 'rd';
-            }
+        // Special case: numbers ending in 11, 12, or 13 are always "th"
+        if ($num % 100 >= 11 && $num % 100 <= 13) {
+            return $num . 'th';
         }
-        // Everything else is "nth"
-        return $num . 'th';
+
+        // Get the correct suffix for 1, 2, 3; default to "th"
+        return $num . ($suffixes[$num % 10] ?? 'th');
     }
 
 
@@ -121,13 +115,15 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
      */
     private function generateTicks($numTicks)
     {
-        $ticks = array();
+        /* 0th element
+         */
+        $ticks = [''];
 
         for ($i = 1; $i <= $numTicks; $i++) {
-            $ticks[] = "$i:'{$this->ordinal($i)}'";
+            $ticks[] = $this->ordinal($i);
         }
 
-        return '{' . implode(', ', $ticks) . '}';
+        return json_encode($ticks);
     }
 
 
@@ -278,12 +274,18 @@ class Survey_Answer_Ranking extends Evaluation_Answer_Ranking
         if (is_array($allResults)) {
             foreach ($allResults as $currentResult) {
                 $response = unserialize($currentResult['response']);
+
                 if (!is_array($response)) {
                     continue;
                 }
 
                 for ($i = 0; $i < count($response); $i++) {
-                    $scoreboard[$i][$response[$i]]++;
+                    /* Disregard any responses that might have been given to an option
+                     * that no longer exists in the question.
+                     */
+                    if (isset($scoreboard[$i][$response[$i]])) {
+                        $scoreboard[$i][$response[$i]]++;
+                    }
                 }
             }
         }

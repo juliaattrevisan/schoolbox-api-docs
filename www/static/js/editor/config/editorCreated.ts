@@ -21,6 +21,35 @@ function addToGlobalScope(editor: SbxEditor, sourceElement: SbxEditorElement): v
 }
 
 /**
+ * CKEditor doesn't automatically check the readonly attribute on the source element,
+ * so we do it here instead.
+ * @param editor - the CKEditor instance
+ * @param sourceElement - the sourceElement the CKEditor will replace
+ */
+function checkReadonly(editor: SbxEditor, sourceElement: SbxEditorElement): void {
+    if (sourceElement instanceof HTMLTextAreaElement && sourceElement.readOnly) {
+        editor.enableReadOnlyMode("readonly");
+    }
+}
+
+/**
+ * Mirror editor change events back to the source element if enabled in the config
+ * Sometimes the editor is used in a form which pays attention to the base <textarea> element for autosave/etc
+ * in this case, we need to dispatch the change event from the editor back to the source element
+ * @param editor - the CKEditor instance
+ * @param config - the CKEditor config object
+ */
+function mirrorEditorChanges(editor: SbxEditor, config: SbxEditorConfig): void {
+    if (config.mirrorChangeEvents && !editor.isReadOnly) {
+        editor.model.document.on("change", () => {
+            if (!(editor.sourceElement instanceof HTMLTextAreaElement)) return;
+            editor.sourceElement.value = editor.getData();
+            editor.sourceElement.dispatchEvent(new Event("change", { bubbles: true }));
+        });
+    }
+}
+
+/**
  * For the simple editor, we need to disable the drag and drop
  * and the ability for the editor to auto embed media
  * @param editor - the CKEditor instance
@@ -43,7 +72,7 @@ function removeValidation(): void {
         // @ts-expect-error - ignore the error as we're using jquery
         if ($(this).data("validator")) {
             // @ts-expect-error - ignore the error as we're using jquery
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- see above
             $(this).data("validator").settings.ignore = ".ck";
         }
     });
@@ -84,22 +113,6 @@ function configureIframelyListener(editor: SbxEditor): void {
 }
 
 /**
- * Add the inspector to the editor to help with debugging
- * in development mode: https://ckeditor.com/docs/ckeditor5/latest/framework/development-tools.html
- * The process.env.NODE_ENV is built into node/webpack:
- * https://webpack.js.org/configuration/mode/
- * so it will only be imported in development mode, not in production
- * No longer used, but kept for any future debugging needs
- * @param { SbxEditor } editor - the CKEditor instance
- */
-// async function attachInspector(editor: SbxEditor) {
-//     if (process.env.NODE_ENV === "development") {
-//         const inspector = await import("@ckeditor/ckeditor5-inspector");
-//         inspector.default.attach(editor);
-//     }
-// }
-
-/**
  * Add in any additional setup required and then dispatch that the editor is ready
  * @param sourceElement - the sourceElement the CKEditor will replace
  * @param editor - the CKEditor instance
@@ -107,6 +120,8 @@ function configureIframelyListener(editor: SbxEditor): void {
  */
 export function modifyEditor(sourceElement: SbxEditorElement, editor: SbxEditor, config: SbxEditorConfig): void {
     addToGlobalScope(editor, sourceElement);
+    checkReadonly(editor, sourceElement);
+    mirrorEditorChanges(editor, config);
     insertWordCount(sourceElement, editor, config);
     disableAutoMedia(editor, config);
     removeValidation();

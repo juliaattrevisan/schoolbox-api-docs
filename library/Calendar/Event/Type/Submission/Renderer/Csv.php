@@ -35,7 +35,7 @@ class Csv extends Base
                 : '',
         ];
 
-        fputcsv($fd, $data);
+        fputcsv($fd, $data, escape: '');
         rewind($fd);
         return fread($fd, 10000);
     }

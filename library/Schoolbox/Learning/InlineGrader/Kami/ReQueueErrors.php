@@ -24,7 +24,6 @@ use Throwable;
  */
 class ReQueueErrors
 {
-
     public const DEFAULT_MAX_ATTEMPTS = 3;           // How many times to try each document
     public const DEFAULT_MAX_SKIPS = 3;              // Number of consecutive failures that will trigger exit
     public const DEFAULT_BASE_JITTER_BACK_OFF = 500; // Number of milliseconds to wait if an attempt fails
@@ -78,11 +77,11 @@ class ReQueueErrors
     /**
      * @param bool        $dryRun
      * @param int         $maxSkips
-     * @param null|string $errorMessageFilter If supplied, only re-queue documents which match this error message
+     * @param string|null $errorMessageFilter If supplied, only re-queue documents which match this error message
      * @return int
      * @throws \Throwable
      */
-    public function deleteAndReQueue(bool $dryRun, int $maxSkips, string $errorMessageFilter = null): int
+    public function deleteAndReQueue(bool $dryRun, int $maxSkips, ?string $errorMessageFilter = null): int
     {
         $this->resetCounts();
 
@@ -143,7 +142,7 @@ class ReQueueErrors
      * Returns the IDs of all Kami documents that have a status of 'error'
      *
      * @param null|string $errorMessageFilter If supplied, only re-queue documents which match this error message
-     * @return string[]
+     * @return array
      * @throws \Alaress\Database\Predicate\InvalidColumnException
      * @throws \TypeError
      */
@@ -155,7 +154,7 @@ class ReQueueErrors
         }
         $ids = $this->mapper->findIdsByPredicates($pb);
 
-        $msg = sprintf("Re-queuing %d documents that with status = '%s'", \count($ids), Model::STATUS_ERROR);
+        $msg = 'Re-queuing ' . count($ids) . " documents that with status = '" . Model::STATUS_ERROR . "'";
         if (\is_string($errorMessageFilter)) {
             $msg .= " and 'error_message' = '{$errorMessageFilter}'";
         }

@@ -9,15 +9,17 @@ export default class ManageCurriculum {
 
     static readonly URL = "/curriculum";
 
+    static readonly URL_NODE = "/curriculum/#{nodeId}";
+
     static readonly TOAST = ".toast";
 
     static readonly NODES = "[data-test-node]:not([data-test-view-node])";
 
     static readonly ALL_NODES = "[data-test-node]";
 
-    static readonly DATATEST_NODE_NAME = "view-node-name";
+    static readonly DATA_TEST_NODE_NAME = "view-node-name";
 
-    static readonly DATATEST_MC_VIEW_NODES_LIST = "mc-view-nodes-list";
+    static readonly DATA_TEST_MC_VIEW_NODES_LIST = "mc-view-nodes-list";
 
     constructor(page: Page, tester: AcceptanceTester) {
         this.page = page;
@@ -32,6 +34,14 @@ export default class ManageCurriculum {
     }
 
     /**
+     * Navigate to a specific node on the curriculum page
+     * @param nodeId - The id of the node
+     */
+    async gotoNode(nodeId: number): Promise<void> {
+        await this.page.goto(ManageCurriculum.URL_NODE.replace("{nodeId}", nodeId.toString()));
+    }
+
+    /**
      * Locate a given node's row by its name
      * @param name - The name of the node
      * @param matchAllNodes - Whether to include base nodes
@@ -40,7 +50,7 @@ export default class ManageCurriculum {
     async locateNode(name: string, matchAllNodes: boolean = false): Promise<Locator> {
         // The name container elements that match the text
         const matchingNameContainer = this.page
-            .getByTestId(ManageCurriculum.DATATEST_NODE_NAME)
+            .getByTestId(ManageCurriculum.DATA_TEST_NODE_NAME)
             .filter({ hasText: name });
 
         // Filter the full node rows by the matching name container
@@ -69,6 +79,6 @@ export default class ManageCurriculum {
      */
     async clickNode(value: string, matchAllNodes: boolean = false): Promise<void> {
         const node = await this.locateNode(value, matchAllNodes);
-        await node.getByTestId(ManageCurriculum.DATATEST_NODE_NAME).click();
+        await node.getByTestId(ManageCurriculum.DATA_TEST_NODE_NAME).click();
     }
 }

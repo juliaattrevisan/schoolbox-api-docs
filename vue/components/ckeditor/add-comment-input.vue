@@ -1,6 +1,7 @@
 <script>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
 /**
  * Lazy load the CKEditor instance on demand and pass through the current comment
@@ -9,21 +10,14 @@
 
 let __uniqueId = 0; //to ensure multiple instances of CKEditor on the same page have unique ids
 
-import cdnPrefixMixin from "@schoolboxVue/components/cdn-prefix-mixin";
 import { getButtonTextDisabledDueToStorageLimitSuffix } from "@js/editor/settings/wordCountSettings";
 import { injectScript, isScriptAdded } from "@js/util/domUtils";
 import { EditorEvent } from "@js/editor/event/editorEvent";
 
 export default {
-    mixins: [cdnPrefixMixin],
-
     props: {
         isProcessing: {
             type: Boolean,
-            required: true,
-        },
-        siteVersion: {
-            type: String,
             required: true,
         },
         presetUniqueId: {
@@ -103,7 +97,7 @@ export default {
             try {
                 this.isCKEditorLoading = true; // to replace 'Add a Comment' with 'Loading' once the prompt button is selected
 
-                const editorScript = `${this.cdnPrefix}/js/bundle/editor.js?v=${this.siteVersion}`;
+                const editorScript = `${window.cdnPrefix}/js/bundle/editor.js?v=${window.siteVersion}`;
 
                 if (!isScriptAdded(editorScript)) {
                     await injectScript(editorScript);

@@ -1,6 +1,7 @@
 <script>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
 import tinycolor from "tinycolor2";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
@@ -18,6 +19,22 @@ export default {
         return {
             selected: this.selectedFilters,
         };
+    },
+
+    computed: {
+        /**
+         * Check if selected is empty
+         * @returns {boolean} - whether the selected object is empty
+         */
+        isSelectedEmpty() {
+            let isEmpty = true;
+            for (const key in this.selected) {
+                if (Array.isArray(this.selected[key]) && this.selected[key].length > 0) {
+                    isEmpty = false;
+                }
+            }
+            return isEmpty;
+        },
     },
 
     methods: {
@@ -38,9 +55,10 @@ export default {
             // filters exclude them: the event's visibility just needs to be
             // updated.
 
-            // Hopefully selectedFilters isn't passed by reference:
-            // I don't want to apply filters till I click this button.
-            // (Turns out they are: I'll have to think of something else)
+            // prevent the form from submitting when there are no filters selected
+            if (this.isSelectedEmpty) {
+                return;
+            }
             this.$emit(FILTER_CHANGED, this.selected);
             this.$refs.modal.close();
         },
@@ -257,6 +275,7 @@ export default {
                     </div>
                 </fieldset>
             </section>
+            <div v-if="isSelectedEmpty" class="alert-box alert">Please select at least one filter.</div>
             <input type="submit" value="Apply Filters" />
         </form>
     </reveal-modal>

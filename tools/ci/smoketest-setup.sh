@@ -97,6 +97,10 @@ echo 'started redis-server'
 service mariadb start
 echo 'started mariadb'
 
+# Set sandbox's site_hostname and site_domain properly:
+# in default data, it doesn't match vagrant.dev.schoolbox.cloud
+mariadb schoolbox -e "UPDATE config SET value='vagrant' WHERE name='site_hostname';"
+mariadb schoolbox -e "UPDATE config SET value='dev.schoolbox.cloud' WHERE name='site_domain';"
 
 # Sandbox has no ephemeral Redis instance; use the persistent instance.
 # This must happen both before and after updates:
@@ -113,13 +117,12 @@ composer install -o
 cd tools || exit 1
 ./module/refresh-cache.php
 ./generate-dir-sql-dynamically.sh $instance_data_dir | mariadb schoolbox
-./set-plan.php --plan=elite
-./build-sql-update.sh
-
-# Enter/exit maintenance mode before/after update
-./maintenance/site_down.sh
-./update-sql-nocheck.sh
-./maintenance/site_up.sh
+./build-sql-update.sh      # Build list of update scripts.
+./maintenance/site_down.sh # Enter maintenance mode before running update scripts.
+./update-sql-nocheck.sh    # Run update scripts (note this must be done before set-plan,
+                           # because e.g. set-plan might depend on feature flags added by update scripts.
+./maintenance/site_up.sh   # Exit maintenance mode after running update scripts.
+./set-plan.php --plan=learning-enhanced
 
 ./schema/charset.php --perform
 echo "enabling summative report exporter"
@@ -127,6 +130,9 @@ mariadb schoolbox -e "UPDATE config SET value='1',editable='true' WHERE name = '
 ./module/refresh-cache.php
 echo "re building project result Cache" # When we upgrade sales to after 23.0.alpha1 we can remove this
 php assessment/projectResultCacheReload.php --perform
+
+# Avoid twig file permission issues (i.e. "Unable to write in the cache directory")
+./set-data-dir-perms.sh
 
 # Force the persistent instance again
 mariadb schoolbox -e "$use_redis_persistent_instance_sql"

@@ -113,7 +113,10 @@
             height: 1rem;
             width: 30%;
         }
-        p,
+        p {
+            height: 0.8125rem;
+            width: 100%;
+        }
         span {
             height: 0.8125rem;
             width: 20%;
@@ -122,6 +125,10 @@
 
     &--border-end {
         border-block-end: 1px solid var(--border-colour);
+    }
+
+    &--border-end-alt {
+        border-block-end: 1px solid var(--body-background);
     }
 
     &--alt-bkg {

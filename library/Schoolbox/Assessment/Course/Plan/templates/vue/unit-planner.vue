@@ -3,6 +3,7 @@
  * The main component for the unit planner
  */
 import type { Ref } from "vue";
+import type { Template as EditorTemplate } from "@js/editor/types/editorTypes";
 import { useActivitiesListGlobalStore } from "./activities-list/store/activitiesListGlobalStore";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
@@ -24,6 +25,7 @@ interface Props {
     ltiAssessmentsEnabled: boolean;
     template: UnitTemplate; // the course framework template that units are linked to
     routeCurriculumCoverage: string | null;
+    editorTemplates: EditorTemplate[]; // the editor templates available for insertion into textboxes
 }
 
 const props = defineProps<Props>();
@@ -119,7 +121,7 @@ window.Vue.watch(
 );
 
 window.Vue.onMounted(() => {
-    store.init(props.courseId, props.units, props.template);
+    store.init(props.courseId, props.units, props.template, props.editorTemplates);
     activitiesListGlobalStore.init(props.ltiAssessmentsEnabled);
     dragStore.init(
         props.routeFolderSequence,
@@ -163,7 +165,7 @@ window.Vue.onUnmounted(() => {
         <div class="small-12 island">
             <dl ref="tabsEl" class="tabs no-print">
                 <dd v-for="tab in tabs" :key="tab.id" :class="{ active: selectedTab.id === tab.id }">
-                    <a @click="selectedTab = tab">{{ tab.label }}</a>
+                    <a :data-test="`unit-planner-tabs-${tab.label}`" @click="selectedTab = tab">{{ tab.label }}</a>
                 </dd>
             </dl>
             <div
@@ -233,7 +235,7 @@ window.Vue.onUnmounted(() => {
         </div>
     </div>
     <activities-list-delete-modal />
-    <up-curriculum />
+    <up-curriculum :parent-folder-id="props.folderId" />
 </template>
 
 <style scoped lang="scss">

@@ -16,7 +16,6 @@ use Alaress\Authorizer\Failure\Unauthorized;
 
 class HasRolePermission extends All
 {
-
     /**
      * The permission to check against.
      */
@@ -52,7 +51,7 @@ class HasRolePermission extends All
      * @param array     $params
      * @param User|null $user
      */
-    public function authorizeMethod(array $params = [], User $user = null)
+    public function authorizeMethod(array $params = [], ?User $user = null)
     {
         if ($user instanceof User) {
             if ($this->roleType && ($user->getRole()->getType() !== $this->roleType)) {

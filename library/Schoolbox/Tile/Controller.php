@@ -15,6 +15,7 @@ use Alaress\Web\Controller\Base;
 use Component_Config;
 use Component_ConfigMapper;
 use Component_Instance;
+use InvalidArgumentException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -86,7 +87,9 @@ class Controller extends Base
             '@tile/layout.twig',
             [
                 'item' => $layout,
-                'maxPaddingPercentage' => Layout\Model::MAX_PADDING_PERCENTAGE
+                'maxPaddingPercentage' => Layout\Model::MAX_PADDING_PERCENTAGE,
+                'minAspectRatioXorY' => Layout\Model::MIN_ASPECT_RATIO_X_OR_Y,
+                'maxAspectRatioXorY' => Layout\Model::MAX_ASPECT_RATIO_X_OR_Y
             ],
             'Tile Component Layout',
         );
@@ -108,6 +111,19 @@ class Controller extends Base
          */
         if ($columnPadding > Layout\Model::MAX_PADDING_PERCENTAGE) {
             $columnPadding = 0;
+        }
+
+        if (
+            $this->requestPost['aspect_ratio_x'] < Layout\Model::MIN_ASPECT_RATIO_X_OR_Y ||
+            $this->requestPost['aspect_ratio_y'] > Layout\Model::MAX_ASPECT_RATIO_X_OR_Y ||
+            $this->requestPost['aspect_ratio_x'] < Layout\Model::MIN_ASPECT_RATIO_X_OR_Y ||
+            $this->requestPost['aspect_ratio_y'] > Layout\Model::MAX_ASPECT_RATIO_X_OR_Y
+        ) {
+            // Note client-side validation should prevent this from happening.
+            throw new InvalidArgumentException(
+                'Custom aspect ratio values must be in range ' .
+                '[' . Layout\Model::MIN_ASPECT_RATIO_X_OR_Y . ', ' . Layout\Model::MAX_ASPECT_RATIO_X_OR_Y . '].'
+            );
         }
 
         $layout

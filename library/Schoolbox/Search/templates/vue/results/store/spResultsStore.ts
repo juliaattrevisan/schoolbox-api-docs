@@ -7,7 +7,7 @@ import type { Results } from "../../../js/types/Results";
 import type { Result } from "../../../js/types/Result";
 import { useHasMoreResults } from "../composable/useHasMoreResults";
 
-const EMPTY_RESULTS = { data: [], metadata: { cursor: { next: "" } } }; // empty results to initialise the store
+const EMPTY_RESULTS = { data: [], metadata: { count: 0, cursor: { next: null } } }; // empty results to initialise the store
 
 export const useResultsStore = defineStore("spResults", () => {
     const allResults = window.Vue.ref<Result[]>([]); // all returned search results
@@ -15,12 +15,16 @@ export const useResultsStore = defineStore("spResults", () => {
     const moreResultsCount = window.Vue.ref(0); // number of subsequent result sets that have been loaded
     const hasLoadedAllResults = window.Vue.ref(false); // to determine whether all results have been loaded
 
+    // The total number of results, according to counts returned by the server, not including results returned from subfolder searches.
+    const numberOfResultsInMainThread = window.Vue.ref(0);
+
     /**
      * To show that there is results that match the current search
      * @returns {boolean}
      */
     const hasResults = window.Vue.computed(() => {
-        return allResults.value.length > 0;
+        // Note allResults.value.length is the number of groups of results (results are grouped by parent folder).
+        return allResults.value.length > 0 || latestResults.value.metadata.cursor.next !== null;
     });
 
     /**
@@ -28,7 +32,8 @@ export const useResultsStore = defineStore("spResults", () => {
      * @returns {boolean}
      */
     const hasNoResults = window.Vue.computed(() => {
-        return allResults.value.length === 0;
+        // Note allResults.value.length is the number of groups of results (results are grouped by parent folder).
+        return allResults.value.length === 0 && latestResults.value.metadata.cursor.next === null;
     });
 
     /**
@@ -45,6 +50,7 @@ export const useResultsStore = defineStore("spResults", () => {
         hasLoadedAllResults.value = false;
         allResults.value = firstResults.data;
         latestResults.value = firstResults;
+        numberOfResultsInMainThread.value = firstResults.metadata.count;
         // If cursor.next has not been supplied, we have loaded all results.
         if (firstResults.metadata.cursor.next === null) {
             hasLoadedAllResults.value = true;
@@ -59,6 +65,7 @@ export const useResultsStore = defineStore("spResults", () => {
         allResults.value = [...allResults.value, ...moreResults.data];
         latestResults.value = moreResults;
         moreResultsCount.value += 1;
+        numberOfResultsInMainThread.value += moreResults.metadata.count;
         // If cursor.next has not been supplied, we have loaded all results.
         if (moreResults.metadata.cursor.next === null) {
             hasLoadedAllResults.value = true;
@@ -90,6 +97,7 @@ export const useResultsStore = defineStore("spResults", () => {
 
     return {
         allResults,
+        numberOfResultsInMainThread,
         latestResults,
         hasLoadedAllResults,
         hasResults,

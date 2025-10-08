@@ -13,6 +13,7 @@ import PdcUpcomingItem from "./pdc-upcoming-item.vue";
 
 interface Props {
     getPaperlyViewEndpoint: string; // The endpoint for fetching the list of Paperly items and its iframe urls
+    openItemsInNewTab: boolean; // Whether to open the Paperly items in a new tab
 }
 
 const props = defineProps<Props>();
@@ -78,11 +79,19 @@ const upcoming = window.Vue.computed<UpcomingItem[]>(() => {
             <loading-table />
         </div>
     </div>
-    <data-load-error v-else-if="hasLoadError" data-title="Paperly" />
+    <section v-else-if="hasLoadError" class="content">
+        <data-load-error data-title="Paperly" />
+    </section>
     <template v-else>
         <ul class="flex-list flex-wrap buttons">
             <li v-for="feature in paperlyPayload.features" :key="feature.url">
-                <a :class="feature.icon ?? ''" :href="feature.url ?? ''">{{ feature.title ?? "" }}</a>
+                <a
+                    :class="feature.icon ?? ''"
+                    :href="feature.url ?? ''"
+                    :target="props.openItemsInNewTab ? '_blank' : undefined"
+                >
+                    {{ feature.title ?? "" }}
+                </a>
             </li>
         </ul>
         <div class="c-island l-flex-col">
@@ -93,7 +102,13 @@ const upcoming = window.Vue.computed<UpcomingItem[]>(() => {
                 <i class="icon-paperly-forms"></i>
                 <p>There are currently no upcoming tasks that require action.</p>
             </div>
-            <pdc-upcoming-item v-for="item in upcoming" v-else :key="item.url" :item="item" />
+            <pdc-upcoming-item
+                v-for="item in upcoming"
+                v-else
+                :key="item.url"
+                :item="item"
+                :open-items-in-new-tab="props.openItemsInNewTab"
+            />
         </div>
         <div v-if="paperlyPayload && paperlyPayload.upcoming.length > 3 && !viewMore" class="component-action">
             <section>

@@ -29,7 +29,13 @@ class External_Edumate_Connection
                 unset($record[$upper]);
             }
         }
-        return $record;
+
+        /* $fieldNames is the expected struct to return
+         * $record may be an incomplete subset of $fieldNames
+         */
+        $indexed = array_fill_keys($fieldNames, null);
+
+        return array_merge($indexed, $record);
     }
 
     // Getters & Setters
@@ -40,17 +46,5 @@ class External_Edumate_Connection
     {
         /** @noinspection PhpDeprecationInspection */
         return DatabaseFactory::getInstanceExternal();
-    }
-
-
-    /**
-     * Quote input for safety
-     *
-     * @param string $value
-     * @return string
-     */
-    public function quote($value)
-    {
-        return db2_escape_string($value);
     }
 }

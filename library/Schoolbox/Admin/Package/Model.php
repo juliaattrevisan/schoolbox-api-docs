@@ -43,7 +43,7 @@ class Model implements IModel
     protected ?bool $installed;
 
     /** @var bool */
-    private ?bool $hidden;
+    private bool $hidden;
 
     /**
      * @return string|null

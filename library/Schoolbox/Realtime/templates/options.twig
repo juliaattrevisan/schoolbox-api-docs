@@ -8,17 +8,35 @@ set iconClassnames = {
     'Email': 'email'
 }
 %}
+{# Overrides for display names
+ # Since the keys are meaningful in the backend/database, we need to override
+ # them for frontend display purposes when they change
+ #}
+{%
+set labelDisplayNames = {
+    'Muted': 'Muted',
+    'Digest': 'Digest',
+    'Instant': 'Instant',
+    'Mobile': 'Device',
+    'Email': 'Email'
+}
+%}
 
 {% for level, perm in perms %}
+    {% set permInputId = mode ~ '-' ~ (ns[namespace.id].slug ?: 0) ~ '-' ~ (source.id ?: 0) ~ (role ? '-' ~ role.id : '') ~ '-' ~ level %}
+    {% set permKey = perm[1] | slice(0, 2) | upper %}
+    {% set isChecked = permKey in role.default %}
+    {% set isDisabled = permKey not in role.mask %}
+    {% set inputType = level <= 1 or level > 4 ? 'radio' : 'checkbox' %}
     <span data-perm-container data-perm="{{ level }}">
-        <input id="{{ mode }}-{{ ns[namespace.id].slug ?: 0 }}-{{ source.id ?: 0 }}{%if role %}-{{ role.id }}{% endif %}-{{ level }}"
+        <input id="{{ permInputId }}"
                name="data[{{ ns[namespace.id].slug ?: 0 }}][{{ sources[source.id].key ?: 0 }}]{% if role %}[{{ role.id }}]{% endif %}[perm][]"
                value="{{ level }}" data-perm="{{ level }}" type="{{ level <= 1 or level > 4 ? 'radio' : 'checkbox' }}"
-               {% if perm[1] | slice(0, 2) | upper in role.default %}checked="checked"{% endif %}
-                {% if perm[1] | slice(0, 2) | upper not in role.mask %}disabled="disabled"{% endif %}
+               {% if isChecked %}checked="checked"{% endif %}
+               {% if isDisabled %}disabled="disabled"{% endif %}
         />
-        <label for="{{ mode }}-{{ ns[namespace.id].slug ?: 0 }}-{{ source.id ?: 0 }}{%if role %}-{{ role.id }}{% endif %}-{{ level }}"
-               title="{{ perm[1] }}{% if perm[1] | slice(0, 2) | upper not in role.mask %} (disabled){% endif %}"
+        <label for="{{ permInputId }}"
+               title="{{ labelDisplayNames[perm[1]] }}{% if isDisabled %} (disabled){% endif %}"
                class="input-toggle">
             <span class="icon-{{ iconClassnames[perm[1]] }}"></span>
         </label>
@@ -29,4 +47,3 @@ set iconClassnames = {
     </span>
     {% endif %}
 {% endfor %}
-

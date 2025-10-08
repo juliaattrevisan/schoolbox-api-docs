@@ -196,7 +196,7 @@ class Markbook
      *
      * @return array
      */
-    public function getAssessmentStatistics()
+    public function getAssessmentStatistics(): array
     {
         return $this->assessmentStatistics;
     }
@@ -490,7 +490,7 @@ class Markbook
      * @param IAssessableComparator|null $comparator
      * @return $this
      */
-    public function sortAssessables(IAssessableComparator $comparator = null): self
+    public function sortAssessables(?IAssessableComparator $comparator = null): self
     {
         if (!$comparator) {
             $comparator = new SortForMarkbook();

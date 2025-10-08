@@ -16,6 +16,7 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\Factory;
 use Schoolbox\External\Connector\Civica\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\ClassCode;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Event\Model;
@@ -71,6 +72,7 @@ class Classes implements IStrategy
         private bool $perform,
         private IApi $api,
         private array $watchlist,
+        private string $externalStaffPortal,
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
         private ClassEntryMapper $classEntryMapper,
@@ -266,7 +268,7 @@ class Classes implements IStrategy
         \Alaress_Date_Format $startAt,
         \Alaress_Date_Format $finishAt,
     ): \Schoolbox\External\Event\Model {
-        $classCode = trim((string)$class['className']);
+        $classCode = (new ClassCode($this->log))->generate(trim((string)$class['className']));
         $day = null;
         $detail = null;
 
@@ -328,7 +330,7 @@ class Classes implements IStrategy
             ->setStartAt($startAt)
             ->setFinishAt($finishAt)
             ->setType($type)
-            ->setMetadata((new Metadata\Builder())->build($class, $classInstance))
+            ->setMetadata((new Metadata\Builder($this->externalStaffPortal))->build($class, $classInstance))
             ->setClassification(Model::CLASSIFICATION_TIMETABLE)
             ->setGuid($guid)
             ->setSource(Factory::SOURCE_NAME);

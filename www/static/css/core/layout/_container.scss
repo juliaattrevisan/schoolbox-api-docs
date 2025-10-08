@@ -69,7 +69,7 @@
          * See _list-actions.scss for how many buttons we support
          */
         @for $i from 1 through 4 {
-            @media #{$mediumwide-up} {
+            @media #{$medium-up} {
                 .row {
                     &.actions-small-#{$i} > nav {
                         margin-right: 1rem;

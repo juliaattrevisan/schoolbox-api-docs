@@ -69,8 +69,6 @@ if ($mimes->count()) {
             'FILE_MAXSIZE'             => $mime->getMaxFileSize() ? $max_size_output : "<em>$placeholder</em>",
             'FILE_MAXSIZE_INPUT'       => $mime->getMaxFileSize() ? $max_size_output : '',
             'FILE_MAXSIZE_PLACEHOLDER' => htmlspecialchars($placeholder, ENT_QUOTES),
-            'FILE_INLINE'              => $mime->getInline() ? 'Inline' : 'External',
-            'FILE_EXTERN_CHECKED'      => $mime->getInline() ? '' : 'selected="selected"',
         );
         $this->setVar($output);
         $this->parse('file_block', 'file', true);

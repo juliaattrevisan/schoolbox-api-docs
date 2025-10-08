@@ -75,7 +75,7 @@ class TeamsController extends AbstractController
         $multi,
         $mimeFilter = null,
         $conf = null,
-        User $user = null
+        ?User $user = null
     ) {
         parent::__construct($multi, $mimeFilter);
 

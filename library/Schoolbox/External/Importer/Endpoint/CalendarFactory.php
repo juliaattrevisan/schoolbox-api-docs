@@ -10,9 +10,11 @@ declare(strict_types=1);
 namespace Schoolbox\External\Importer\Endpoint;
 
 use Psr\Log\LoggerInterface;
+use Schoolbox\Config\Loader;
 use Schoolbox\External\Connector\Base\ShadowTable;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint as TassApiEndpoint;
 use Schoolbox\External\Connector\Compass\Base\Endpoint as CompassEndpoint;
+use Schoolbox\External\Connector\Civica\Base\Endpoint as CivicaEndpoint;
 use Schoolbox\GenericCollection;
 use Schoolbox\RoleMapper;
 use SensitiveParameter;
@@ -32,54 +34,25 @@ class CalendarFactory implements IFactory
      */
     public const TASS_API = 'tassapi';
     public const COMPASS = 'compass';
-
-
-    /**
-     * API Endpoint url
-     *
-     * @var string
-     */
-    private string $host;
-
-
-    /**
-     * API Endpoint access token
-     *
-     * @var string
-     */
-    private string $key;
-
-
-    /**
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $logger;
+    public const CIVICA = 'civica';
 
 
     /**
      * CalendarFactory constructor.
      *
-     * @param string          $host
-     * @param string          $key
-     * @param bool            $perform
+     * @param string $host
+     * @param string $key
+     * @param bool $perform
+     * @param string $version
      * @param LoggerInterface $logger
      */
     public function __construct(
-        string $host,
-        #[SensitiveParameter] string $key,
-        bool $perform,
-        LoggerInterface $logger
+        private string $host,
+        #[SensitiveParameter] private string $key,
+        private bool $perform,
+        private string $version,
+        private LoggerInterface $logger
     ) {
-        $this->host = $host;
-        $this->key = $key;
-        $this->perform = $perform;
-        $this->logger = $logger;
     }
 
 
@@ -110,12 +83,23 @@ class CalendarFactory implements IFactory
                     \Schoolbox\External\Event\Roletype\Mapper::getInstance()->disableCache(),
                     \Schoolbox\External\Event\Campus\Mapper::getInstance()->disableCache(),
                     \Schoolbox\External\Event\User\Mapper::getInstance()->disableCache(),
-                    RoleMapper::getInstance()->disableCache()
                 ))->produce();
                 break;
 
             case self::COMPASS:
                 $composites = (new CompassEndpoint\Calendar\Factory(
+                    $this->logger,
+                    $this->perform,
+                    $this->host,
+                    $this->key,
+                    Loader::getInstance()->get('guzzle_custom_user_agent'),
+                    \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
+                    \Schoolbox\External\Event\User\Mapper::getInstance()->disableCache()
+                ))->produce();
+                break;
+
+            case self::CIVICA:
+                $composites = (new CivicaEndpoint\Calendar\Factory(
                     $this->logger,
                     $this->perform,
                     $this->host,
@@ -150,6 +134,7 @@ class CalendarFactory implements IFactory
                 new ShadowTable\Calendar\Disable(
                     $this->logger,
                     $this->perform,
+                    $this->version,
                     \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
                     \Schoolbox\External\Event\Roletype\Mapper::getInstance()->disableCache(),
                     \Schoolbox\External\Event\Campus\Mapper::getInstance()->disableCache(),

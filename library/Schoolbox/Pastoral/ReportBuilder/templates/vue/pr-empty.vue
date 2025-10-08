@@ -1,0 +1,21 @@
+<script setup lang="ts">
+/**
+ * To display an empty state for the Pastoral Report Builder
+ * when no records are available.
+ */
+
+import type { Routes } from "../js/types/pastoralReportTypes";
+
+const localePastoral = window.Vue.inject<string>("localePastoral");
+const routes = window.Vue.inject<Routes>("routes");
+</script>
+
+<template>
+    <div class="empty-state-flex-centered f-no-margins">
+        <i class="icon-pastoral"></i>
+        <p>No {{ localePastoral }} records matched your report criteria.</p>
+        <a :href="routes?.getIndex"> Select Another Report </a>
+    </div>
+</template>
+
+<style scoped></style>

@@ -4,6 +4,8 @@
 require_once __DIR__ . '/../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\Daemon\Kernel(__FILE__);
 
+$kernel->deprecationNotice("SA-19334");
+
 $options = getopt('', ['structure', 'timetable', 'enrolment',]);
 
 $reader = new XMLReader();
@@ -36,3 +38,5 @@ HELP;
 
 $writer = new \Alaress\Csv\Writer(STDOUT, $translator->translateXmlToArray());
 $writer->write();
+
+$kernel->deprecationNotice("SA-19334");

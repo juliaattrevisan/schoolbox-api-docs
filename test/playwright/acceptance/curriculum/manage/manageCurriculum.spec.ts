@@ -105,9 +105,13 @@ test.describe("Manage Curriculum Tests", () => {
     test("Search Nodes", async ({ tester, page }) => {
         tester.isGoingTo("search for nodes containing 'historical' in Year 4 History");
         const manageCurriculum = new ManageCurriculum(page, tester);
+        const searchNodes = new SearchNodes(page, tester);
+
+        tester.isGoingTo("show disabled nodes");
+        await searchNodes.checkShowDisabledNodes();
+
         await manageCurriculum.clickNode("Year 4 History");
 
-        const searchNodes = new SearchNodes(page, tester);
         await searchNodes.fillSearch("historical");
 
         tester.isGoingTo("expect 4 search results are shown");
@@ -117,6 +121,11 @@ test.describe("Manage Curriculum Tests", () => {
     test("Update Node", async ({ tester, page }) => {
         tester.isGoingTo("update Year 9 History");
         const updateNode = new UpdateNode(page, tester);
+        const searchNodes = new SearchNodes(page, tester);
+
+        tester.isGoingTo("show disabled nodes");
+        await searchNodes.checkShowDisabledNodes();
+
         await updateNode.clickDisplay("Year 9 History");
         await updateNode.fillName("Year 9 Ancient History");
         await updateNode.fillDescription("1", "Here we will focus mainly on the Romans, Egyptians and Babylonians");
@@ -132,30 +141,42 @@ test.describe("Manage Curriculum Tests", () => {
     test("hideDisabledNodesAndSearch", async ({ tester, page }) => {
         tester.isGoingTo("navigate to First Contacts in Year 4 History");
         const manageCurriculum = new ManageCurriculum(page, tester);
+        const searchNodes = new SearchNodes(page, tester);
+
+        tester.isGoingTo("show disabled nodes");
+        await searchNodes.checkShowDisabledNodes();
+
         await manageCurriculum.clickNode("Year 4 History");
         await manageCurriculum.clickNode("Year 4");
         await manageCurriculum.clickNode("Historical Knowledge and Understanding");
         await manageCurriculum.clickNode("First Contacts");
 
         tester.isGoingTo("search for nodes containing ACHH");
-        const searchNodes = new SearchNodes(page, tester);
         await searchNodes.fillSearch("ACHH");
+
+        tester.isGoingTo("disabled nodes and hidden by default so expect no search results are now shown");
+        await page.waitForSelector("[data-test-node]", { state: "hidden" });
+        await searchNodes.seeResultsMatch(0);
+
+        tester.isGoingTo("show disabled nodes");
+        await searchNodes.checkShowDisabledNodes();
 
         tester.isGoingTo("expect 4 search results are shown");
         await searchNodes.seeResultsMatch(4);
-
-        tester.isGoingTo("hide disabled nodes and so expect no search results are now shown");
-        await searchNodes.uncheckShowDisabledNodes();
-        await page.waitForSelector("[data-test-node]", { state: "hidden" });
-
-        await searchNodes.seeResultsMatch(0);
     });
 
     test("Check Node Sort", async ({ tester, page, db }) => {
+        const searchNodes = new SearchNodes(page, tester);
+
         tester.isGoingTo("check nodes are sorted by order, code, then name");
         tester.isGoingTo("add order: 1 to Year 4 History so it appears at the top of the list");
         await db.updateInDatabase("curriculum_node", { "`order`": 1 }, { "name like": "Year 4 History" });
+
         await page.reload();
+
+        tester.isGoingTo("show disabled nodes");
+        await searchNodes.checkShowDisabledNodes();
+
         const expectedOrder = [
             "Year 4 History",
             "English",
@@ -176,6 +197,11 @@ test.describe("Manage Curriculum Tests", () => {
             "traverse to 'Curricula > English > Year 9 > Literature > Creating literature' and ensure 'ACELT1773' is visible",
         );
         const manageCurriculum = new ManageCurriculum(page, tester);
+        const searchNodes = new SearchNodes(page, tester);
+
+        tester.isGoingTo("show disabled nodes");
+        await searchNodes.checkShowDisabledNodes();
+
         await manageCurriculum.clickNode("English");
         await manageCurriculum.clickNode("Year 9");
         await manageCurriculum.clickNode("Literature");
@@ -198,7 +224,6 @@ test.describe("Manage Curriculum Tests", () => {
         await page.goBack();
         await page.goBack();
 
-        const searchNodes = new SearchNodes(page, tester);
         await searchNodes.fillSearch("ACELT1638");
         await manageCurriculum.clickNode(
             "[ACELT1638] Experiment with the ways that language features, image and sound can be adapted in literary texts, for example the effects of stereotypical characters and settings, the playfulness of humour and pun and the use of hyperlink",
@@ -245,8 +270,6 @@ test.describe("Manage Curriculum Tests", () => {
 
         await db.updateInDatabase("curriculum_node", { deleted_at: null }, { "name like": "Year 12 French" });
 
-        await db.updateInDatabase("curriculum_node", { enabled: 1 }, { "name like": "Year 4 History" });
-
-        await db.updateInDatabase("curriculum_node", { enabled: 1 }, { "name like": "Year 9 History" });
+        await db.updateInDatabase("curriculum_node", { enabled: 1 });
     });
 });

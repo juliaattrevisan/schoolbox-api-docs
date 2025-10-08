@@ -29,67 +29,25 @@ use SensitiveParameter;
 class Factory
 {
     /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
-     *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var string
-     */
-    private string $host;
-
-
-    /**
-     * @var string
-     */
-    private string $key;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Mapper
-     */
-    private \Schoolbox\External\Event\Mapper $eventMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\User\Mapper
-     */
-    private \Schoolbox\External\Event\User\Mapper $eventUserMapper;
-
-
-    /**
      * Factory constructor.
      *
-     * @param LoggerInterface                       $log
-     * @param bool                                  $perform
-     * @param string                                $host
-     * @param string                                $key
-     * @param Mapper                                $eventMapper
+     * @param LoggerInterface $log
+     * @param bool $perform
+     * @param string $host
+     * @param string $key
+     * @param string $customUserAgent
+     * @param Mapper $eventMapper
      * @param \Schoolbox\External\Event\User\Mapper $eventUserMapper
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        string $host,
-        #[SensitiveParameter] string $key,
-        \Schoolbox\External\Event\Mapper $eventMapper,
-        \Schoolbox\External\Event\User\Mapper $eventUserMapper
+        private LoggerInterface $log,
+        private bool $perform,
+        private string $host,
+        #[SensitiveParameter] private string $key,
+        private string $customUserAgent,
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private \Schoolbox\External\Event\User\Mapper $eventUserMapper
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->host = $host;
-        $this->key = $key;
-        $this->eventMapper = $eventMapper;
-        $this->eventUserMapper = $eventUserMapper;
     }
 
 
@@ -101,7 +59,7 @@ class Factory
      */
     public function produce(): ?GenericCollection
     {
-        $api = new Api($this->host, $this->key);
+        $api = new Api($this->host, $this->key, $this->customUserAgent);
 
         /* Data is obtained daily; remember lower and upper bound values
          * for api calls. It needs to be in a specific format so might

@@ -10,19 +10,17 @@ namespace Alaress\Application;
 
 use Alaress\Authorizer\Authorizer;
 use Alaress\Authorizer\Rule;
-use Alaress\Codec\Json\Base64;
+use Alaress\Codec\MarshallerAdapter;
 use Alaress\Database\Connector\IConnector;
 use Alaress\Database\Connector\NullConnector;
 use Alaress\Database\Exception as AlaressDatabaseException;
-use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Image\ProcessorFactory;
+use Alaress\Lumberjack\Logger;
 use Alaress\Module\Cache as ModuleCache;
 use Alaress\Module\Loader as ModuleLoader;
 use Alaress\Module\Registry;
 use Alaress\Redis;
-use Alaress\Redis\Cache\ItemPool;
-use Alaress\Redis\Cache\KeyGenerator;
 use Alaress\Sentry\Tracing\GuzzleTracingMiddleware;
 use Alaress\Sentry\Tracing\Tracer;
 use Alaress\Session\Factory;
@@ -30,6 +28,7 @@ use Alaress\Session\Session;
 use Alaress\Twig\Loader\ChainLoader;
 use Alaress\Twig\Method as TwigMethod;
 use Alaress\Web\Output;
+use Alaress\Web\Request\IsJson;
 use Alaress\Web\Response\Factory as ResponseFactory;
 use Alaress\Web\Response\Outputter;
 use Alaress\Web\Router\PathMatcher;
@@ -39,9 +38,9 @@ use Aura\Di;
 use Aura\Router\Generator;
 use Aura\Router\Map;
 use Aura\Router\RouterContainer;
-use Cache\Bridge\SimpleCache\SimpleCacheBridge;
 use Calendar\Api\ModuleChecker;
 use Calendar_Api_Factory;
+use Crell\ApiProblem\ApiProblem;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
 use External_Class;
 use External_ClassInterface;
@@ -55,11 +54,13 @@ use Http\Discovery\Psr17Factory;
 use InvalidArgumentException;
 use League\Flysystem\Filesystem;
 use LogicException;
+use Monolog\Level;
 use OAT\Library\Lti1p3Core\Registration\RegistrationRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\Key\KeyChainRepositoryInterface;
 use OAT\Library\Lti1p3Core\Security\OAuth2\Repository\ClientRepository;
 use Predis;
 use Proxy\Server as ProxyServer;
+use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Psr\SimpleCache\CacheInterface;
 use RuntimeException;
@@ -186,12 +187,12 @@ use Schoolbox\Url\Factory as UrlFactory;
 use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Version\Version;
+use Schoolbox\Weather\WeatherstackClient;
 use Scrub;
-use Sentry\State\HubInterface;
-use Sentry\Tracing\Transaction;
-use Sentry\Tracing\TransactionContext;
-use Sentry\Tracing\TransactionSource;
+use Sentry\SentrySdk;
 use SitePage;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 use Symfony\Component\Lock\LockFactory;
 use Symfony\Component\Lock\Store\RedisStore;
 use Throwable;
@@ -213,6 +214,20 @@ abstract class Kernel
     protected Di\Container $di;
 
     /**
+     * Previous error handler, if any.
+     *
+     * @var callable|null
+     */
+    protected $previousErrorHandler = null;
+
+    /**
+     * Previous exception handler, if any.
+     *
+     * @var callable|null
+     */
+    protected $previousExceptionHandler = null;
+
+    /**
      * Wrapper to enable prioritisation of shutdown functions
      *
      * @var ShutdownHandler
@@ -226,6 +241,8 @@ abstract class Kernel
      * @var callable[]
      */
     private $exceptionCallbacks = [];
+
+    private const HTTP_RESPONSE_CODE_BAD_REQUEST = 400;
 
     /**
      * @throws Di\Exception
@@ -255,9 +272,10 @@ abstract class Kernel
             'kernel:' . get_class($this),
             operation: 'app.bootstrap.di',
         );
-        static::installDependencies($this->di);
         $this->postInstallDependencies($bypassMaintenanceModeCheck);
+        $this->configureSentry();
         $this->checkServerApiEnvironment();
+
         Tracer::getDefaultTrace()->finishSpan();
     }
 
@@ -268,7 +286,6 @@ abstract class Kernel
     {
         return $this->shutdownHandler;
     }
-
 
     /**
      * Returns whether the current PHP process is being run by the system root user
@@ -312,19 +329,104 @@ abstract class Kernel
         session_save_path(PipeManager::getSessionSavePath($config->get(ConfigMapper::NAME_REDIS_URL), INSTANCE_ID));
     }
 
-    /**
-     * Register any error handling required
-     *
-     * @return void
-     */
-    abstract protected function registerErrorHandling(): void;
 
     /**
-     * Register any out-the-top exception handling required
+     * Called after sessions are initialised so we can inject user identifiers into sentry reports.
+     *
+     * @return void
+     * @throws Di\Exception\ServiceNotFound
+     */
+    protected function configureSentry(): void
+    {
+        // Configure Sentry with the current instance, now it's known.
+        \Alaress\Sentry\Config::useInstance($this->di->get('instance'));
+    }
+
+    /**
+     * Registers `$this->onError` as the error handling callback, and preserves
+     * the previous error handling callback to be called prior to that method.
      *
      * @return void
      */
-    abstract protected function registerExceptionHandling(): void;
+    protected function registerErrorHandling(): void
+    {
+        $this->previousErrorHandler = set_error_handler(
+            function ($errNum, $errStr, $errFile, $errLine) {
+                // Explicitly silenced deprecations should not be sent to
+                // Sentry, or otherwise handled.
+                if ($errNum & (E_DEPRECATED | E_USER_DEPRECATED)) {
+                    if (\Schoolbox\Deprecation\Registry::silenceWarningsForPath($errFile)) {
+                        return true;
+                    }
+                }
+
+                // Call the previous error handler (presumably Sentry's):
+                // but what should be done with its return, and when should it
+                // be called?
+                if (is_callable($this->previousErrorHandler)) {
+                    call_user_func($this->previousErrorHandler, $errNum, $errStr, $errFile, $errLine);
+                }
+
+                if (!(error_reporting() & $errNum)) {
+                    // This error code is not included in error_reporting:
+                    // * should it be silenced (return true), or;
+                    // * handled by standard error handler (return false)?
+                    // Currently it's silenced, but I'm not sure that's correct.
+                    return true;
+                }
+
+                return $this->onError($errNum, $errStr, $errFile, $errLine);
+            }
+        );
+    }
+
+    /**
+     * Error handling callback.
+     *
+     * @param int    $errNum
+     * @param string $errStr
+     * @param string $errFile
+     * @param int    $errLine
+     * @return bool
+     */
+    abstract protected function onError(int $errNum, string $errStr, string $errFile, int $errLine): bool;
+
+    /**
+     * Registers `$this->onException` as the exception handling callback, and
+     * preserves the previous exception handling callback to be called prior to
+     * that method.
+     *
+     * @return void
+     */
+    protected function registerExceptionHandling(): void
+    {
+        $this->previousExceptionHandler = set_exception_handler(
+            function ($e): void {
+                if (is_callable($this->previousExceptionHandler)) {
+                    // The previous handler may rethrow the same exception.
+                    // If it does, catch and shutdown as per normal:
+                    // if it's different, something truly exceptional happened
+                    // so rethrow.
+                    try {
+                        call_user_func($this->previousExceptionHandler, $e);
+                    } catch (Throwable $rethrow) {
+                        if ($rethrow !== $e) {
+                            throw $rethrow;
+                        }
+                    }
+                }
+                $this->onException($e);
+            }
+        );
+    }
+
+    /**
+     * Exception handling callback.
+     *
+     * @param Throwable $e
+     * @return void
+     */
+    abstract protected function onException(Throwable $e): void;
 
     /**
      * Register any shutdown handling required
@@ -336,7 +438,6 @@ abstract class Kernel
         register_shutdown_function($this->getShutdownHandler());
     }
 
-
     /**
      * @return Di\Container
      */
@@ -344,7 +445,6 @@ abstract class Kernel
     {
         return $this->di;
     }
-
 
     /**
      * Convenience method to retrieve service from DI
@@ -357,7 +457,6 @@ abstract class Kernel
     {
         return $this->getDependencyInjector()->get($service);
     }
-
 
     /**
      * @param callable $callable
@@ -389,7 +488,6 @@ abstract class Kernel
         }
     }
 
-
     /**
      * Ensures this kernel is being run in appropriate environment.
      *
@@ -400,7 +498,6 @@ abstract class Kernel
      * @throws WrongSapiException If this Kernel has been constructed in an invalid environment.
      */
     abstract protected function checkServerApiEnvironment(): void;
-
 
     /**
      * Install any internal dependencies into the kernel (routing, etc.)
@@ -444,6 +541,10 @@ abstract class Kernel
             return Redis::getSignalQueueClientInstance();
         });
 
+        // Enable mappers to be injectable, but instantiated only when required
+        $mapperFactory = new MapperFactory($di);
+        $di->set('mapperFactory', $mapperFactory);
+
         $di->set(
             'moduleCache',
             $di->lazyNew(
@@ -484,20 +585,24 @@ abstract class Kernel
                 [
                     'instance'     => $di->lazyGet('instance'),
                     'tokenBuilder' => $di->lazyGet('user.tokenBuilder'),
+                    'tokenMapper' => $mapperFactory->getLazy(TokenMapper::class),
                 ],
             )
         );
         $di->set(
             'taskd.httpRequestMessageFactory',
             $di->lazy(
-                function () use ($di) {
+                function () use ($di, $mapperFactory) {
                     /** @var Instance $instance */
                     $instance = $di->get('instance');
 
                     /** @var Jwt $tokenBuilder */
                     $tokenBuilder = $di->get('user.tokenBuilder');
 
-                    return (new HttpRequestMessageFactory($instance, $tokenBuilder))
+                    /** @var TokenMapper $tokenMapper */
+                    $tokenMapper = $mapperFactory->get(TokenMapper::class);
+
+                    return (new HttpRequestMessageFactory($instance, $tokenBuilder, $tokenMapper))
                         ->setTokenExpiry(Alaress_Date_Format::now()->addDays(1));
                 }
             )
@@ -505,12 +610,15 @@ abstract class Kernel
         $di->set(
             'taskd.downloadPagesMessageFactory',
             $di->lazy(
-                function () use ($config, $di) {
+                function () use ($config, $di, $mapperFactory) {
                     /** @var Instance $instance */
                     $instance = $di->get('instance');
 
                     /** @var Jwt $tokenBuilder */
                     $tokenBuilder = $di->get('user.tokenBuilder');
+
+                    /** @var TokenMapper $tokenMapper */
+                    $tokenMapper = $mapperFactory->get(TokenMapper::class);
 
                     // Build API key and version
                     $gotenbergApiKey = $config->get(ConfigMapper::NAME_GOTENBERG_API_KEY);
@@ -534,6 +642,7 @@ abstract class Kernel
                         $config->get(ConfigMapper::NAME_KAMI_API_KEY),
                         $config->get('turnitin_api_key'),
                         $config->get('turnitin_api_host'),
+                        $tokenMapper,
                     ))->setTokenExpiry(Alaress_Date_Format::now()->addDays(1));
                 }
             )
@@ -582,9 +691,7 @@ abstract class Kernel
         $di->set(
             'databaseFactory',
             function () {
-                return new SchoolboxDatabaseFactory(
-                    new AlaressDatabaseFactory()
-                );
+                return SchoolboxDatabaseFactory::getInstance();
             }
         );
 
@@ -672,10 +779,6 @@ abstract class Kernel
             $di->lazyNew(PrefixGenerator::class, ['config' => $di->lazyGet('config')])
         );
 
-        // Enable mappers to be injectable, but instantiated only when required
-        $mapperFactory = new MapperFactory($di);
-        $di->set('mapperFactory', $mapperFactory);
-
         // Preload of route parameters, and its module loader
         $di->set(
             'moduleLoader',
@@ -724,16 +827,58 @@ abstract class Kernel
                     // That should be fine: they all obey the same interface.
                     /** @var Psr17Factory $httpFactory */
                     $httpFactory = $di->get('httpFactory');
-                    $request     = $httpFactory->createServerRequestFromGlobals();
+                    $request = $httpFactory->createServerRequestFromGlobals();
+                    $request->getBody()->rewind();
+                    $content = $request->getBody()->getContents();
+                    $request->getBody()->rewind();
 
-                    // If the request is JSON:
-                    // set the parsed body appropriately
                     // TODO move to spec pattern or middleware?
-                    if (str_contains($request->getHeaderLine('content-type'), 'application/json')) {
-                        $request->getBody()->rewind();
-                        $content = $request->getBody()->getContents();
-                        $request->getBody()->rewind();
-                        $request = $request->withParsedBody(json_decode($content, true));
+                    // If the request content is JSON, and the content is non-empty, decode the JSON content.
+                    // (Empty content must be ignored because attempting to json_decode empty content leads to errors.)
+                    if (str_contains($request->getHeaderLine('content-type'), 'application/json') && $content !== '') {
+                        try {
+                            $decodedContent = json_decode($content, true, flags: JSON_THROW_ON_ERROR);
+                        } catch (\JsonException) {
+                            $decodedContent = null;
+                        }
+                        // Note json_decode(.., true) can return many data types after a successful decode:
+                        //  * json_decode('null', true) returns null
+                        //  * json_decode('false', true) returns false
+                        //  * json_decode('true', true) returns true
+                        //  * json_decode('123', true) returns int(123)
+                        //  * json_decode(' -12.054e3 ', true) returns float(-12054)
+                        //  * json_decode('[]', true) returns []
+                        //  * json_decode('{}', true) returns []
+                        // All the example responses above are valid JSON data.  However, we are only interested in
+                        // JSON data that decodes to an array.  Also, the withParsedBody() function called below
+                        // requires that its parameter be either object, array, or null.  Therefore, treat all the edge
+                        // cases above as client errors, and send a 400 response since we do not want these edge cases
+                        // to cause errors that end up in Sentry.
+                        // (No need to check for object, since json_decode(..., true) converts objects to arrays.)
+                        if (!is_array($decodedContent)) {
+                            $message = 'Invalid JSON in request body';
+
+                            if ((new IsJson())->isSatisfiedBy($request)) { // Note IsJson() means AcceptsJson().
+                                $problem = (new ApiProblem($message))
+                                    ->setStatus(self::HTTP_RESPONSE_CODE_BAD_REQUEST)
+                                    ->asArray();
+
+                                /** @var ResponseFactory $responseFactory */
+                                $responseFactory = $di->get('httpResponseFactory');
+
+                                $response = $responseFactory->buildJson($problem);
+
+                                /** @var Outputter $responseFactory */
+                                $responseOutputter = $di->get('httpResponseOutputter');
+                                $responseOutputter->output($response->withStatus(self::HTTP_RESPONSE_CODE_BAD_REQUEST));
+                            } else {
+                                http_response_code(self::HTTP_RESPONSE_CODE_BAD_REQUEST);
+                                header('Content-Type: text/plain');
+                                echo "$message\n";
+                            }
+                            die;
+                        }
+                        $request = $request->withParsedBody($decodedContent);
                     }
                     return $request;
                 }
@@ -779,6 +924,11 @@ abstract class Kernel
                     /** @var Predis\ClientInterface $redisStorage */
                     $redisStorage = $di->get('redis.storage');
 
+                    /* Find the main version number for this instance
+                     */
+                    preg_match('/(\d+\.\d+)\.(.*)/', $config->get('site_version'), $matches);
+                    $version = $matches[1];
+
                     $dataGenerators = [
                         'ws' => new Output\DataGenerator\Websocket(
                             $config,
@@ -786,7 +936,8 @@ abstract class Kernel
                             new UnreadRetriever($redisStorage),
                             INSTANCE_ID
                         ),
-                        'tour' => new Output\DataGenerator\Tour($config, $session->getAuthUser(), $tourList, $_SERVER),
+                        'tour' => new Output\DataGenerator\Tour($config, $session->getAuthUser(), $tourList, $_SERVER, null),
+                        'tourPersistent' => new Output\DataGenerator\Tour($config, $session->getAuthUser(), $tourList, $_SERVER, $version),
                         'user' => new Output\DataGenerator\User($session->getAuthUser(), $session),
                         'topMenu' => new Output\DataGenerator\TopMenu(
                             $session->getAuthUser(),
@@ -805,7 +956,7 @@ abstract class Kernel
                     if ($config->get('debug_mode')) {
                         $dataGenerators['debugBar'] = new Output\DataGenerator\DebugBar(
                             \Alaress\DebugBar\Instance::getInstance(),
-                            '/debugbar/',
+                            '/php-debugbar/',
                         );
                     }
 
@@ -1273,7 +1424,7 @@ abstract class Kernel
                         /** @var IConfigLoader $config */
                         $config = $di->get('config');
 
-                        /** @var array|IConnector $databaseExternal */
+                        /** @var IConnector $databaseExternal */
                         $databaseExternal = $di->get('databaseExternal');
                         $databaseExternal = ($databaseExternal instanceof NullConnector) ? null : $databaseExternal;
 
@@ -1307,7 +1458,7 @@ abstract class Kernel
             /** @var IConfigLoader $config */
             $config = $di->get('config');
 
-            /** @var array|IConnector $databaseExternal */
+            /** @var IConnector $databaseExternal */
             $databaseExternal = $di->get('databaseExternal');
 
             // Create the external connection to community portal
@@ -1357,7 +1508,7 @@ abstract class Kernel
             /** @var IConfigLoader $config */
             $config = $di->get('config');
 
-            /** @var array|IConnector $databaseExternal */
+            /** @var IConnector $databaseExternal */
             $databaseExternal = $di->get('databaseExternal');
 
             // Create the external connection to docman
@@ -1366,38 +1517,6 @@ abstract class Kernel
                 $config,
                 $databaseExternal,
                 ExternalConnectorFactory::EXTERNAL_DOCUMENT
-            );
-        }));
-
-        // Register external NDS object services
-
-        $di->set('externalNDSUser', $di->lazy(function () use ($di) {
-            /** @var IConfigLoader $config */
-            $config = $di->get('config');
-
-            /** @var array|IConnector $databaseExternal */
-            $databaseExternal = $di->get('databaseExternal');
-
-            $factory = new ExternalConnectorFactory();
-            return $factory->build(
-                $config,
-                $databaseExternal,
-                ExternalConnectorFactory::EXTERNAL_USER
-            );
-        }));
-
-        $di->set('externalNDSTimetable', $di->lazy(function () use ($di) {
-            /** @var IConfigLoader $config */
-            $config = $di->get('config');
-
-            /** @var array|IConnector $databaseExternal */
-            $databaseExternal = $di->get('databaseExternal');
-
-            $factory = new ExternalConnectorFactory();
-            return $factory->build(
-                $config,
-                $databaseExternal,
-                ExternalConnectorFactory::EXTERNAL_TIMETABLE
             );
         }));
 
@@ -1459,7 +1578,6 @@ abstract class Kernel
             )
         );
 
-
         /* DUE WORK SOURCES */
         $di->set(
             'submissionDataSource',
@@ -1475,7 +1593,6 @@ abstract class Kernel
                 ['mapper' => $mapperFactory->getLazy(ReturnedWorkMapper::class)]
             )
         );
-
 
         /* QUIZ SOURCES */
         $di->set(
@@ -1493,7 +1610,6 @@ abstract class Kernel
             )
         );
 
-
         /* TASK SOURCES */
         $di->set(
             'completionDataSource',
@@ -1510,7 +1626,6 @@ abstract class Kernel
             )
         );
 
-
         // LTI sources, without funny names
         $di->set(
             'ltiResponseDataSource',
@@ -1526,7 +1641,6 @@ abstract class Kernel
                 ['mapper' => $mapperFactory->getLazy(LtiScoreMapper::class)]
             )
         );
-
 
         // Register response data source
         $di->set(
@@ -1672,6 +1786,43 @@ abstract class Kernel
             ),
         );
 
+        // Cache wrappers around HTTP clients
+        $di->set(
+            'httpClient.internalCache',
+            $di->lazy(
+                function () use ($di) {
+                    return new Psr16Cache(
+                        new RedisAdapter(
+                            $di->get('redis.cache'),
+                            'httpClient.' . INSTANCE_ID,
+                        )
+                    );
+                }
+            ),
+        );
+        $di->set(
+            'httpClient.cache',
+            $di->lazyNew(
+                \Alaress\Http\Cache::class,
+                [
+                    'httpClient'      => $di->lazyGet('httpClient'),
+                    'internalCache'   => $di->lazyGet('httpClient.internalCache'),
+                    'defaultLifetime' => null,
+                    'baseUrl'         => $di->lazyGet('baseUrl'),
+                ]
+            )
+        );
+
+        // Base URL: finally add this to DI
+        $di->set(
+            'baseUrl',
+            $di->lazy(
+                function () use ($config) {
+                    return (new \Schoolbox\Url\Factory($config))->buildFullyQualified();
+                }
+            )
+        );
+
         // Kami connector, as used for communicating with Kami's API
         $di->set('kamiConnector', $di->lazyNew(Kami\Connector::class, [
             'client'            => $di->lazyGet('httpClient'),
@@ -1740,7 +1891,6 @@ abstract class Kernel
             return new Rule\Any($di->get('rule:isStaff'), $di->get('rule:isStudent'));
         }));
 
-
         // Calendar API factory - requires an assessment data source to build some types
         $di->set(
             'calendarApiFactory',
@@ -1758,31 +1908,27 @@ abstract class Kernel
                     $assessmentDataSource  = $di->get('assessmentDataSource');
                     /** @var IConfigLoader $config */
                     $config = $di->get('config');
-                    return new Calendar_Api_Factory($assessmentDataSource, new ModuleChecker($config), $config, $databaseExternal);
+                    return new Calendar_Api_Factory(
+                        $assessmentDataSource,
+                        new ModuleChecker($config),
+                        $config,
+                        $databaseExternal,
+                        $di->get('redis.cache'),
+                        $di->get('httpClient.cache'),
+                    );
                 }
             )
         );
 
         $di->set(
             'calendarDashboardApiFactory',
-            $di->lazy(
-                function () use ($di) {
-                    try {
-                        /** @var IConnector $databaseExternal */
-                        $databaseExternal = $di->get('databaseExternal');
-                    } catch (AlaressDatabaseException $e) {
-                        $databaseExternal = null;
-                    }
-
-                    /** @var AssessmentDataSource $assessmentDataSource */
-                    $assessmentDataSource  = $di->get('assessmentDataSource');
-                    /** @var IConfigLoader $config */
-                    $config = $di->get('config');
-                    return new \Schoolbox\Calendar\Component\Dashboard\ApiFactory($assessmentDataSource, new ModuleChecker($config), $config, $databaseExternal);
-                }
+            $di->lazyNew(
+                \Schoolbox\Calendar\Component\Dashboard\ApiFactory::class,
+                [
+                    'factory' => $di->lazyGet('calendarApiFactory'),
+                ],
             )
         );
-
 
         // Pastoral Care data source
         // TODO consider moving into a module's dependencies?
@@ -1863,21 +2009,7 @@ abstract class Kernel
         // add sentry to the DI
         $di->set(
             'sentry',
-            $di->lazy(
-                static function () use ($di, $config) {
-                    $sentryToken   = defined('SENTRY_TOKEN') ? SENTRY_TOKEN : null;
-                    $sentryProject = defined('SENTRY_PROJECT') ? SENTRY_PROJECT : null;
-                    /** @var Instance $sb */
-                    $sb = $di->get('instance');
-                    return (new \Alaress\Sentry\Factory())->build(
-                        $sb,
-                        Instance::APPLICATION_NAME,
-                        $sentryToken,
-                        $sentryProject,
-                        $config,
-                    );
-                }
-            )
+            $di->lazy(SentrySdk::getCurrentHub(...)),
         );
 
 
@@ -1930,21 +2062,40 @@ abstract class Kernel
             $di->lazy(
                 function () use ($di, $config, $mapperFactory) {
                     /** @var GuzzleHttp\Client $httpClient */
-                    $httpClient             = $di->get('httpClient');
+                    $httpClient         = $di->get('httpClient');
                     /** @var CacheInterface $oidcCache */
-                    $oidcCache              = $di->get('oidc.cache');
-                    $userMapper             = $mapperFactory->get(UserMapper::class);
-                    $tokenMapper            = $mapperFactory->get(TokenMapper::class);
-                    $relyingPartyMapper     = $mapperFactory->get(RelyingPartyMapper::class);
+                    $oidcCache          = $di->get('oidc.cache');
+                    /** @var LoggerInterface $logger */
+                    $logger             = $di->get('user.jwtParser.logger');
+                    $userMapper         = $mapperFactory->get(UserMapper::class);
+                    $tokenMapper        = $mapperFactory->get(TokenMapper::class);
+                    $relyingPartyMapper = $mapperFactory->get(RelyingPartyMapper::class);
                     return new JwtParser\Composite(
-                        new JwtParser\OtherInstanceIssued($userMapper, $config),
-                        new JwtParser\SelfIssued($userMapper, $config, $tokenMapper),
-                        new JwtParser\OauthProviderIssued($userMapper, $config, $httpClient, $oidcCache),
-                        new JwtParser\InstanceRegistryIssued($userMapper, $config),
-                        new JwtParser\OauthClientHeld($userMapper, $config, $relyingPartyMapper),
+                        $logger,
+                        new JwtParser\OtherInstanceIssued($userMapper, $config, $logger),
+                        new JwtParser\SelfIssued($userMapper, $config, $logger, $tokenMapper),
+                        new JwtParser\OauthProviderIssued($userMapper, $config, $logger, $httpClient, $oidcCache),
+                        new JwtParser\InstanceRegistryIssued($userMapper, $config, $logger, (string)INSTANCE_ID),
+                        new JwtParser\OauthClientHeld($userMapper, $config, $logger, $relyingPartyMapper),
                     );
                 }
             )
+        );
+
+        // Logger for JWT parsing
+        $di->set(
+            'user.jwtParser.logger',
+            $di->lazyNew(
+                Logger::class,
+                [
+                    STDOUT,
+                    null,
+                    $config->get(ConfigMapper::NAME_OAUTH_DEBUG_MODE) ? Level::Debug : Level::Info,
+                    [],
+                    true,
+                    'jwtParser.' . INSTANCE_ID,
+                ],
+            ),
         );
 
         // Lock factory
@@ -2039,10 +2190,12 @@ abstract class Kernel
                 $redis = $di->get('redis.storage');
                 /** @var RegistrationRepositoryInterface $registrationRepository */
                 $registrationRepository = $di->get('lti.registrations');
-                return new ItemPool(
+
+                return new RedisAdapter(
                     $redis,
-                    new Codec(new ClientRepository($registrationRepository)),
-                    new KeyGenerator('accessToken', INSTANCE_ID),
+                    'accessToken.' . INSTANCE_ID,
+                    0,
+                    new MarshallerAdapter(new Codec(new ClientRepository($registrationRepository))),
                 );
             })
         );
@@ -2054,11 +2207,10 @@ abstract class Kernel
             'oidc.cache',
             $di->lazy(
                 function () use ($di) {
-                    return new SimpleCacheBridge(
-                        new ItemPool(
+                    return new Psr16Cache(
+                        new RedisAdapter(
                             $di->get('redis.cache'),
-                            new Base64(),
-                            new KeyGenerator(CacheHelper::BASE_CLIENT_KEY, INSTANCE_ID),
+                            CacheHelper::BASE_CLIENT_KEY . '.' . INSTANCE_ID,
                         )
                     );
                 }
@@ -2070,11 +2222,10 @@ abstract class Kernel
             'component.homepage.clickview.cache',
             $di->lazy(
                 function () use ($di) {
-                    return new SimpleCacheBridge(
-                        new ItemPool(
+                    return new Psr16Cache(
+                        new RedisAdapter(
                             $di->get('redis.cache'),
-                            new Base64(),
-                            new KeyGenerator('component.homepage.clickview', INSTANCE_ID),
+                            'component.homepage.clickview.' . INSTANCE_ID,
                         )
                     );
                 }
@@ -2085,11 +2236,10 @@ abstract class Kernel
             'paperly.cache',
             $di->lazy(
                 function () use ($di) {
-                    return new SimpleCacheBridge(
-                        new ItemPool(
+                    return new Psr16Cache(
+                        new RedisAdapter(
                             $di->get('redis.cache'),
-                            new Base64(),
-                            new KeyGenerator('paperly', INSTANCE_ID),
+                            'paperly.' . INSTANCE_ID,
                         )
                     );
                 }
@@ -2111,11 +2261,15 @@ abstract class Kernel
                 function () use ($di, $config) {
                     /** @var Filesystem $storage */
                     $storage = $di->get('filesystem.storage');
+                    $adapter = $config->get(ConfigMapper::NAME_OTFS_ADAPTER);
+                    $isLocal = $adapter === FilesystemFactory::FILE_SYSTEM_ADAPTER_LOCAL;
                     return new FilesystemProxy(
                         $storage,
                         new HashGenerator(),
                         $config->get(ConfigMapper::NAME_OTFS_VERIFY_PREVIOUS_FILE),
-                        FilesystemFactory::buildDefaultVisibility($config->get(ConfigMapper::NAME_OTFS_ADAPTER)),
+                        FilesystemFactory::buildDefaultVisibility($adapter),
+                        $isLocal,
+                        $isLocal ? $config->get('storage_dir') : $config->get('stream_dir'),
                     );
                 }
             )
@@ -2132,6 +2286,7 @@ abstract class Kernel
                     'tempFilesystem'         => $di->lazyGet('filesystem.temp'),
                     // CLI scripts have no current user, thus this is null
                     'currentUser'            => (PHP_SAPI === 'cli' ? null : $di->lazyGet('user')),
+                    'virusScanner'           => $di->lazyGet('virus.scanner'),
                 ],
             )
         );
@@ -2152,6 +2307,22 @@ abstract class Kernel
                     return new ProcessorFactory($storage, new HashGenerator());
                 }
             ),
+        );
+
+        // Virus scanner
+        $di->set(
+            'virus.scannerFactory',
+            $di->lazyNew(
+                \Schoolbox\Resource\Storage\Virus\ScannerFactory::class,
+                [
+                    'config'         => $config,
+                    'tempFileSystem' => $di->lazyGet('filesystem.temp'),
+                ]
+            )
+        );
+        $di->set(
+            'virus.scanner',
+            $di->lazyGetCall('virus.scannerFactory', 'build'),
         );
 
         // email
@@ -2176,11 +2347,8 @@ abstract class Kernel
             'search.indexBuilder',
             $di->lazy(
                 function () use ($di) {
-                    /** @var SchoolboxDatabaseFactory $dbFactory */
-                    $dbFactory = $di->get('databaseFactory');
-
-                    // Should this return write database always?
-                    $dbi = $dbFactory->getInternalDatabase();
+                    /** @var IConnector $dbi */
+                    $dbi = $di->get('databaseInternal');
 
                     // What sort of logger should this use?
                     // The CLI variant should use the kernel's logger:
@@ -2215,6 +2383,20 @@ abstract class Kernel
             )
         );
 
+        // Weather client
+        $di->set(
+            'weatherClient',
+            $di->lazyNew(
+                WeatherstackClient::class,
+                [
+                    'apiKey'       => $config->get('weather_api_key'),
+                    'apiUrl'       => $config->get('weather_api_url'),
+                    'cache'        => $di->lazyGet('httpClient.cache'),
+                    'cacheTimeout' => (int)$config->get('weather_api_caching'),
+                ]
+            )
+        );
+
         return $di;
     }
 
@@ -2227,7 +2409,6 @@ abstract class Kernel
      * @return array
      */
     abstract protected static function getKnownUserClassesFromSession(Di\Container $di): array;
-
 
     /**
      * Consistently register the 'session' and 'session.rememberer' DI services.

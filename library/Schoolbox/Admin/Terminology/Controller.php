@@ -16,16 +16,12 @@ use Schoolbox\L10n\Mapper as L10nMapper;
 class Controller extends Base
 {
     /**
-     * @var L10nMapper
-     */
-    protected $l10nMapper;
-
-    /**
      * Lets build this thing!
      */
-    public function __construct()
-    {
-        $this->l10nMapper = L10nMapper::getInstance();
+    public function __construct(
+        protected \Schoolbox\Config\ConfigMapper $configMapper,
+        protected L10nMapper $l10nMapper
+    ) {
     }
 
     /**
@@ -53,15 +49,27 @@ class Controller extends Base
         $post = $this->requestPost;
 
         try {
-            foreach ($post['singularForm'] as $term => $singularForm) {
-                $localisation = $this->l10nMapper->findById($term)
-                    ->setSingularForm(trim($singularForm))
+            // Find all the terms that the user is trying to update
+            $terms = array_keys($post['singularForm']);
+            $localisations = $this->l10nMapper->findByColumn('term', $terms);
+
+            foreach ($localisations as $localisation) {
+                $term = $localisation->getTerm();
+
+                $localisation
+                    ->setSingularForm(trim($post['singularForm'][$term]))
                     ->setPluralForm(trim($post['pluralForm'][$term]))
                     ->setCapitaliseFirst(!empty($post['capitaliseFirst'][$term]))
                     ->setIndefiniteArticle(trim($post['indefiniteArticle'][$term]));
 
                 $this->l10nMapper->save($localisation);
             }
+
+            // Fetching the model so it can be updated since iConfigLoader is read-only
+            // Update the last modified time so the cache can be invalidated
+            $lastModified = $this->configMapper->findOneByColumn("name", "terminology_last_modified");
+            $lastModified->setValue(time());
+            $this->configMapper->save($lastModified);
         } catch (MapperException $e) {
             // noop, I guess? skip unknown terminologies
         }

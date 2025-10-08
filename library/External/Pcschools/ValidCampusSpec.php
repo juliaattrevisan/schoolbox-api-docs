@@ -25,6 +25,6 @@ class External_Pcschools_ValidCampusSpec
      */
     public function isSatisfiedBy(Campus $campus): bool
     {
-        return is_numeric(trim($campus->getExtTimetableCode()));
+        return is_numeric(trim((string)$campus->getExtTimetableCode()));
     }
 }

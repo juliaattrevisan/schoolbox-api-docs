@@ -125,19 +125,15 @@ class Kernel extends CliKernelAbstract
         // Instrument here
         $trace = Tracer::getDefaultTrace();
         $trace->setServerVars($_SERVER);
-        $trace->startTransaction(startTimestamp: microtime(true));
+        $trace->startTransaction();
         $trace->setTransactionContextForCommandLineTool(
             $this->app->getToolFilenameAbsolute(),
         );
         $this->getShutdownHandler()->registerFunction(
-            function (): void {
-                // I don't believe it's possible to capture the exit code.
-                // I don't even reliably have an error here, so leave status
-                // as empty.
-                Tracer::getDefaultTrace()->finishTransaction(
-                    microtime(true),
-                );
-            },
+            // I don't believe it's possible to capture the exit code.
+            // I don't even reliably have an error here, so leave status
+            // as empty.
+            fn () => $trace->finishTransaction(),
         );
 
         $perform = $forcePerform || $this->getKernelOpt(self::OPT_SHORT_PERFORM) || $this->getKernelOpt(self::OPT_LONG_PERFORM);

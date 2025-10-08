@@ -21,6 +21,7 @@ use Custom\Dsfg\AchievementReport\StandardisedTest\Writing;
 use Custom\Dsfg\AchievementReport\StandardisedTest\Mathematics;
 use Custom\Dsfg\AchievementReport\StandardisedTest\LiteracyNumeracy;
 use Schoolbox\User;
+use Twig\Error\Error;
 
 /**
  */
@@ -71,7 +72,6 @@ class Controller extends Base
                     'message' => $this->getConfigLoader()->get('dio_achievement_report_unavailable')
                 ]
             );
-
             return;
         }
 
@@ -94,7 +94,6 @@ class Controller extends Base
                         'year' => $year
                     ])
                 );
-
                 break;
 
             case NavigationSelector::IB_KEY:
@@ -104,7 +103,6 @@ class Controller extends Base
                         'year' => $year
                     ])
                 );
-
                 break;
 
             case NavigationSelector::NCEA_KEY:
@@ -114,7 +112,6 @@ class Controller extends Base
                         'year' => $year
                     ])
                 );
-
                 break;
 
             case NavigationSelector::COMMENTS_KEY:
@@ -124,7 +121,6 @@ class Controller extends Base
                         'year' => $year
                     ])
                 );
-
                 break;
 
             case NavigationSelector::STANDARDISEDTEST_KEY:
@@ -134,7 +130,6 @@ class Controller extends Base
                         'year' => $year
                     ])
                 );
-
                 break;
 
             case NavigationSelector::COCURRICULAR_KEY:
@@ -144,7 +139,6 @@ class Controller extends Base
                         'year' => $year
                     ])
                 );
-
                 break;
 
             case NavigationSelector::MYP_KEY:
@@ -154,7 +148,15 @@ class Controller extends Base
                         'year'           => $year,
                     ])
                 );
+                break;
 
+            case NavigationSelector::YEAR11_KEY:
+                $this->response = $this->redirectFound(
+                    $this->routeGenerator->generate('achievementreport.getYear11', [
+                        'externalUserId' => $externalUser['StudentID'],
+                        'year'           => $year,
+                    ])
+                );
                 break;
 
             /* Error state - render an error page and leave it
@@ -164,10 +166,9 @@ class Controller extends Base
                 $this->response = $this->responseFromTemplate(
                     '@achievementreport/Error.twig',
                     [
-                        'errorMessage' => $report['error']
+                        'errorMessage' => $report['error'] ?? ''
                     ]
                 );
-
                 break;
         }
     }
@@ -650,120 +651,44 @@ class Controller extends Base
      * @param array      $externalUser
      * @param int|null   $year
      * @throws RouteNotFound
+     * @throws Error
      */
     public function getNcea(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
-        $footer = new NCEA\Footer($user, $externalUser, $db, null);
+        $output = $this->getNceaOrYear11(
+            $db,
+            $user,
+            $externalUser,
+            $year,
+            NavigationSelector::NCEA_KEY,
+            NCEA\Base::MAIN_DB_TABLE_NCEA
+        );
+        $this->response = $this->responseFromTemplate($output['template'], $output['data']);
+    }
 
-        $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($user, $externalUser, $db, $year);
-        $qualifications = new NCEA\Qualifications($user, $externalUser, $db, null);
-        $creditSummary = new NCEA\CreditSummary($user, $externalUser, $db, null);
 
-        $output = [
-            'template' => '@ncea/index.twig',
-            'data' => [
-                'navigation' => [
-                    'all' => (new NavigationSelector($this->routeGenerator, $user, $externalUser, $db, $year))->getAvailableNavigation(),
-                    'selected' => NavigationSelector::NCEA_KEY
-                ],
-                'footer' => [
-                    'data' => $footer->findData(),
-                ],
-                'preselectedYear' => $year,
-                'externalUser' => $externalUser,
-                'user' => $user,
-                'year' => $year,
-
-                /* That checkbox thing at the top
-                 */
-                'literacyNumeracyCheckbox' => [
-                    'heading' => $literacyNumeracyCheckbox->getHeading(),
-                    'headingSuffix' => $literacyNumeracyCheckbox->getHeadingSuffix(),
-                    'data' => $literacyNumeracyCheckbox->findData()
-                ],
-
-                /* Qualifications rating
-                 */
-                'qualifications' => [
-                    'heading' => $qualifications->getHeading(),
-                    'data' => $qualifications->findData(),
-                ],
-
-                /* Credit Summary graphs for all years combined
-                 */
-                'creditSummary' => [
-                    'heading' => $creditSummary->getHeading(),
-                    'data' => $creditSummary->findData(),
-                    'allLetters' => $creditSummary->getLetterRegistry(),
-                    'allTypes' => self::TYPES,
-
-                    /* Suffix for graph div id's
-                     */
-                    'suffix' => 'all',
-                ],
-            ]
-        ];
-
-        /* The selected year should contain data. If a selected
-         * year contains no data, probably 404 or something - you
-         * could fiddle with the url to get illegal values
-         */
-        $navigation = new NCEA\CourseCreditSummaryNavigation($user, $externalUser, $db, null);
-        $allYears = $navigation->findData();
-
-        if (\count($allYears)) {
-            /* Course Credit Summary year selectors
-             */
-            $output['data']['courseCreditSummaryNavigation'] = [
-                'heading' => $navigation->getHeading(),
-                'all' => $allYears,
-                'selected' => $year
-            ];
-
-            /* Conditionally, if a year was selected; do another round of
-             * processing specific to that year. Otherwise skip all this
-             * shenanigans altogether
-             */
-            if ($year) {
-                $creditSummaryYear = new NCEA\CreditSummary($user, $externalUser, $db, $year);
-                $courseCreditSummary = new NCEA\CourseCreditSummary($user, $externalUser, $db, $year);
-                $entriesAndResults = new NCEA\EntriesAndResults($user, $externalUser, $db, $year);
-
-                /* Course Credit Summary graphs for a specific year
-                 */
-                $output['data']['creditSummaryYear'] = [
-                    'data' => $creditSummaryYear->findData(),
-                    'allLetters' => $creditSummaryYear->getLetterRegistry(),
-
-                    /* Suffix for graph div id's
-                     */
-                    'suffix' => "year{$year}",
-                ];
-
-                /* Course Credit Summary for a specific year
-                 */
-                $output['data']['courseCreditSummary'] = [
-                    'data' => $courseCreditSummary->findData(),
-                    'allLetters' => $courseCreditSummary->getLetterRegistry(),
-                ];
-
-                /* Entries And Results for a specific year
-                 */
-
-                /* Get all the comments for $year for this user
-                 * Then rearrange all the subjects
-                 */
-                $output['data']['entriesAndResults'] = [
-                    'data' => $entriesAndResults->findData(),
-                    'comments' => (new Comments\Comments($user, $externalUser, $db, $year))->findNCEAData(),
-                    'allLetters' => $entriesAndResults->getLetterRegistry(),
-                    'allTypes' => self::TYPES,
-                    'year' => $year,
-                    'currentYear' => $entriesAndResults->getCurrentYear()
-                ];
-            }
-        }
-
+    /**
+     * Year 11 page
+     * (same structure as NCEA page)
+     * (uses database view with same schema as view used for NCEA page)
+     *
+     * @param IConnector $db
+     * @param User       $user
+     * @param array      $externalUser
+     * @param int|null   $year
+     * @throws RouteNotFound
+     * @throws Error
+     */
+    public function getYear11(IConnector $db, User $user, array $externalUser, ?int $year): void
+    {
+        $output = $this->getNceaOrYear11(
+            $db,
+            $user,
+            $externalUser,
+            $year,
+            NavigationSelector::YEAR11_KEY,
+            NCEA\Base::MAIN_DB_TABLE_YEAR11
+        );
         $this->response = $this->responseFromTemplate($output['template'], $output['data']);
     }
 
@@ -855,12 +780,7 @@ class Controller extends Base
      */
     public function getMyp(IConnector $db, User $user, array $externalUser, ?int $year): void
     {
-        /* Default to this year if none specified
-         */
-        $currentYear  = (int)date('Y');
-        $selectedYear = $year ?? $currentYear;
-        $mypBase      = new MYP\Base($user, $externalUser, $db, $selectedYear);
-        $mypData      = $mypBase->findData();
+        $currentYear = (int)date('Y');
 
         // get historical data
         $currentYearLevel = (int)$user->getYear()->getName();
@@ -869,15 +789,35 @@ class Controller extends Base
             if ($yearLevel === $currentYearLevel) {
                 break;
             }
-            $historicalYear              = $currentYear - ($currentYearLevel - $yearLevel);
-            $historicalMypBase           = new MYP\Base($user, $externalUser, $db, $historicalYear);
-            $historical[$historicalYear] = [
-                'subjects' => $historicalMypBase->findData(),
-                'grades'   => $historicalMypBase->getMYPGrade(),
-            ];
+            $historicalYear    = $currentYear - ($currentYearLevel - $yearLevel);
+            $historicalMypBase = new MYP\Base($user, $externalUser, $db, $historicalYear);
+
+            $subjects = $historicalMypBase->findData();
+            $grades   = $historicalMypBase->getMYPGrade();
+
+            if (count($grades) > 0) {
+                $historical[$historicalYear] = [
+                    'subjects' => $subjects,
+                    'grades'   => $grades,
+                ];
+            }
         }
 
         krsort($historical); // Ensure historical tabs are displayed in reverse chronological order.
+
+        /* Default to this year if none specified
+         */
+        $selectedYear = $year ?? $currentYear;
+        $historicalYears = array_keys($historical);
+
+        /* If no data for the selected year and data exists for at least one year, select the most recent year with data.
+         */
+        if (!in_array($selectedYear, $historicalYears, false) && count($historicalYears) > 0) {
+            $selectedYear = $historicalYears[0];
+        }
+
+        $mypBase = new MYP\Base($user, $externalUser, $db, $selectedYear);
+        $mypData = $mypBase->findData();
 
         $this->response = $this->responseFromTemplate(
             '@myp/index.twig',
@@ -888,12 +828,182 @@ class Controller extends Base
                 ],
                 'externalUser' => $externalUser,
                 'user'         => $user,
-                'year'         => $currentYear,
+                'year'         => $selectedYear,
                 'headings'     => $mypData['headings'],
                 'subjects'     => $mypData['data'],
                 'grades'       => $mypBase->getMYPGrade(),
                 'historical'   => $historical
             ],
         );
+    }
+
+
+    /**
+     * @param IConnector $db
+     * @param User       $user
+     * @param array      $externalUser
+     * @param int|null   $year
+     * @param string     $navigationKey
+     * @return array
+     * @throws RouteNotFound
+     */
+    private function getNceaOrYear11(
+        IConnector $db,
+        User $user,
+        array $externalUser,
+        ?int $year,
+        string $navigationKey,
+        string $dbTableName
+    ): array {
+        $footer = new NCEA\Footer($user, $externalUser, $db, null, $dbTableName);
+
+        $literacyNumeracyCheckbox = new NCEA\LiteracyNumeracyCheckbox($user, $externalUser, $db, $year, $dbTableName);
+        $qualifications = new NCEA\Qualifications($user, $externalUser, $db, null, $dbTableName);
+        $creditSummary = new NCEA\CreditSummary($user, $externalUser, $db, null, $dbTableName);
+
+        $output = [
+            'template' => '@ncea/index.twig',
+            'data' => [
+                'navigation' => [
+                    'all' => (new NavigationSelector($this->routeGenerator, $user, $externalUser, $db, $year))->getAvailableNavigation(),
+                    'selected' => $navigationKey
+                ],
+                'footer' => [
+                    'data' => $footer->findData(),
+                ],
+                'preselectedYear' => $year,
+                'externalUser' => $externalUser,
+                'user' => $user,
+                'year' => $year,
+
+                /* That checkbox thing at the top
+                 */
+                'literacyNumeracyCheckbox' => [
+                    'heading' => $literacyNumeracyCheckbox->getHeading(),
+                    'headingSuffix' => $literacyNumeracyCheckbox->getHeadingSuffix(),
+                    'data' => $literacyNumeracyCheckbox->findData()
+                ],
+
+                /* Qualifications rating
+                 */
+                'qualifications' => [
+                    'heading' => $qualifications->getHeading(),
+                    'data' => $qualifications->findData(),
+                ],
+
+                /* Credit Summary graphs for all years combined
+                 */
+                'creditSummary' => [
+                    'heading' => $creditSummary->getHeading(),
+                    'data' => $creditSummary->findData(),
+                    'allLetters' => $creditSummary->getLetterRegistry(),
+                    'allTypes' => self::TYPES,
+
+                    /* Suffix for graph div id's
+                     */
+                    'suffix' => 'all',
+                ],
+            ]
+        ];
+
+        /* The selected year should contain data. If a selected
+         * year contains no data, probably 404 or something - you
+         * could fiddle with the url to get illegal values
+         */
+        $navigation = new NCEA\CourseCreditSummaryNavigation($user, $externalUser, $db, null, $dbTableName);
+        $allYears = $navigation->findData();
+
+        /* Course Credit Summary year selectors
+         */
+        $output['data']['courseCreditSummaryNavigation'] = [
+            'heading' => $navigation->getHeading(),
+            'all' => $allYears,
+            'selected' => $year
+        ];
+
+        if (\count($allYears)) {
+            /* Conditionally, if a year was selected; do another round of
+             * processing specific to that year. Otherwise skip all this
+             * shenanigans altogether
+             */
+            if ($year) {
+                $creditSummaryYear = new NCEA\CreditSummary($user, $externalUser, $db, $year, $dbTableName);
+                $courseCreditSummary = new NCEA\CourseCreditSummary($user, $externalUser, $db, $year, $dbTableName);
+                $entriesAndResults = new NCEA\EntriesAndResults($user, $externalUser, $db, $year, $dbTableName);
+
+                /* Course Credit Summary graphs for a specific year
+                 */
+                $output['data']['creditSummaryYear'] = [
+                    'data' => $creditSummaryYear->findData(),
+                    'allLetters' => $creditSummaryYear->getLetterRegistry(),
+
+                    /* Suffix for graph div id's
+                     */
+                    'suffix' => "year{$year}",
+                ];
+
+                /* Course Credit Summary for a specific year
+                 */
+                $output['data']['courseCreditSummary'] = [
+                    'data' => $courseCreditSummary->findData(),
+                    'allLetters' => $courseCreditSummary->getLetterRegistry(),
+                ];
+
+                /* Entries And Results for a specific year
+                 */
+
+                $data = $entriesAndResults->findData();
+                $commentsObj = new Comments\Comments($user, $externalUser, $db, $year);
+                $comments = (
+                    $dbTableName === NCEA\Base::MAIN_DB_TABLE_YEAR11
+                    ? $commentsObj->findYear11Data()
+                    : $commentsObj->findNCEAData()
+                );
+
+                if ($dbTableName === NCEA\Base::MAIN_DB_TABLE_YEAR11) {
+                    // Loop through data as is done in the Twig template, and remove duplicate comments.
+                    // Duplicate comments are those that will have already been displayed under a subject with the same class code.
+                    // This is done here rather than in Comments.php, because the order in which the comments are displayed is
+                    // important, and the order in which the comments are displayed is determined by the sort order of $data.
+                    // This is done here rather than in the Twig template because array manipulation in Twig is painful.
+                    $commentsAlreadyDisplayedByClassCode = [];
+                    foreach ($data as $courseName => $allData) {
+                        if (count($comments[$year]['courses'][$courseName]['terms'] ?? []) > 0) {
+                            $classCode = $comments[$year]['courses'][$courseName]['classCode'];
+                            if (!array_key_exists($classCode, $commentsAlreadyDisplayedByClassCode)) {
+                                $commentsAlreadyDisplayedByClassCode[$classCode] = [];
+                            }
+                            foreach ($comments[$year]['courses'][$courseName]['terms'] as $term => $commentData) {
+                                if (($commentData['comment'] ?? '') !== '') {
+                                    if (in_array($commentData['comment'], $commentsAlreadyDisplayedByClassCode[$classCode], false)) {
+                                        // In the Twig template in processed, this comment will already have been displayed under a
+                                        // subject with this class code.  So clear this comment so it doesn't get displayed again.
+                                        $comments[$year]['courses'][$courseName]['terms'][$term]['comment'] = ''; // Remove duplicate comment.
+                                    } else {
+                                        // This comment will be displayed in the Twig template.
+                                        // Remember that it has been displayed.
+                                        $commentsAlreadyDisplayedByClassCode[$classCode][] = $commentData['comment'];
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                /* Get all the comments for $year for this user
+                 * Then rearrange all the subjects
+                 */
+                $output['data']['entriesAndResults'] = [
+                    'data' => $data,
+                    'comments' => $comments,
+                    'allLetters' => $entriesAndResults->getLetterRegistry(),
+                    'allTypes' => self::TYPES,
+                    'year' => $year,
+                    'currentYear' => $entriesAndResults->getCurrentYear()
+                ];
+            }
+        }
+
+        return $output;
     }
 }

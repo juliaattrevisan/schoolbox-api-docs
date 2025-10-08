@@ -18,7 +18,6 @@ use Schoolbox\Realtime\Notification\Decorator;
 require_once __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App{
-
     /** @var string|null $instanceId */
     private ?string $instanceId;
 
@@ -43,6 +42,7 @@ $app = new class extends CliTool\App{
     /** @inheritDoc */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
 
         if ($this->getOpt('h') || $this->getOpt('help')) {
             $this->printHelp();
@@ -80,6 +80,8 @@ $app = new class extends CliTool\App{
         }
 
         $this->checkRedis($args, $regexMode);
+
+        $this->deprecationNotice("SA-19334");
     }
 
 

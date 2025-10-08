@@ -9,6 +9,16 @@ $options = getopt($shortopts, $longopts);
 $debug = array_key_exists('debug', $options);
 $help = array_key_exists('help', $options);
 
+/**
+ * Deprecation notice
+ */
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m" . PHP_EOL;
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+
+
 if ($help) {
     printf("-- Help --\n");
     printf("\ndev_tools_har_to_url_csv.php is used to convert a har file from a dev tools browser output in the network tab into a csv of urls.\n");
@@ -109,7 +119,7 @@ foreach ($url_entries as $log_entry) {
     }
     if (!array_key_exists($log_entry['request']['url'], $have_seen) && !array_key_exists($extention, $filtered_extensions) && $VAGRANT_DOMAIN == $host && !isset($port)) {
         //Write the row to the CSV file.
-        fputcsv($csv_file, ['', 'Superuser', 'Har Exported Action', 'url' => $log_entry['request']['url']]);
+        fputcsv($csv_file, ['', 'Superuser', 'Har Exported Action', 'url' => $log_entry['request']['url']], escape: '');
         $have_seen[$log_entry['request']['url']] = 'url';
         if ($debug) {
             printf("Inserted url: %s\n", $log_entry['request']['url']);
@@ -125,3 +135,12 @@ printf("Finished extracting URL requests from HAR file, extracted %s records\n",
 
 //Finally, close the file pointer.
 fclose($csv_file);
+
+/**
+ * Deprecation notice
+ */
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m" . PHP_EOL;
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;
+echo "\033[1;33m/******************************************************************************************/\033[0m" . PHP_EOL;

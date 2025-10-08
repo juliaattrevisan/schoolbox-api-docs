@@ -294,14 +294,14 @@ class Controller extends AbstractController
             }
         }
 
-        /* Tell me the weather
+        /* Tell me the weather:
+         * since this module is special, the weather client is not injected
+         * into the constructor: instead it must be conjured out of DI.
          */
-        /** @var Matchup $matchup */
-        $apiKey = $this->getConfigLoader()->get('weather_api_key');
-        $apiUrl = $this->getConfigLoader()->get('weather_api_url');
-        $weatherClient = new WeatherstackClient($apiKey, $apiUrl);
-        $forecast = new MatchupWeather($matchup, $weatherClient);
-        $forecast->loadForecast();
+        /** @var WeatherstackClient $weatherClient */
+        $weatherClient = $this->getDi()->get('weatherClient');
+
+        $forecast = (new MatchupWeather($matchup, $weatherClient))->loadForecast();
 
         /* Determine whether you've got write access or not
          * when viewing this page
@@ -364,7 +364,8 @@ class Controller extends AbstractController
         /* Coaches of this Team can add results
          */
         foreach ($allCoaches as $currentCoach) {
-            if ($currentCoach->getUser()->getId() == $sessionUser->getId()) {
+            // Note sportsfixtures_coach.user_id is nullable, hence the null coalesce below.
+            if ($currentCoach->getUser()?->getId() == $sessionUser->getId()) {
                 return true;
             }
         }

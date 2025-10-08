@@ -1,6 +1,7 @@
 <script>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
 import FullCalendar from "@fullcalendar/vue3";
 import interactionPlugin from "@fullcalendar/interaction";
@@ -13,7 +14,6 @@ import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import ViewEventModal from "@schoolboxVue/components/fullcalendar/view-event-modal.vue";
 import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
 import CustomisedCalendarEvent from "@schoolboxVue/components/fullcalendar/customised-calendar-event.vue";
-import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import ViewGroupedEventsModal from "./view-grouped-events-modal.vue";
 
 // Various URLs this calendar can make use of
@@ -229,6 +229,7 @@ export default {
             dateClick: this.onDateClick,
             datesSet: this.datesSet,
             resourceOrder: "title", // sort resources(events) by the event title
+            resourceLabelDidMount: this.resourceLabelDidMount,
         };
     },
 
@@ -256,7 +257,7 @@ export default {
                 successCallback([]);
                 return;
             }
-            activate("Retrieving calendar events...");
+            const toast = window.sbProps.toastActivate("Retrieving calendar events...");
             // AJAX params: the same for all requests
             const ajaxParams = {
                 start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
@@ -270,7 +271,7 @@ export default {
             })
                 .then((response) => response.json())
                 .then((response) => {
-                    timeout({ text: "Events retrieved successfully" });
+                    toast.timeout({ text: "Events retrieved successfully" });
                     // Assign event grouping and resourceIds into every event
                     response = response.map((element) => {
                         element.resourceId = this.buildResourceIdFromEvent(element);
@@ -302,7 +303,7 @@ export default {
                     successCallback(response.filter((v) => "start" in v));
                 })
                 .catch((error) => {
-                    timeout({ text: "Events could not be retrieved", isSuccess: false });
+                    toast.timeout({ text: "Events could not be retrieved", isSuccess: false });
                     console.error(error);
                 });
         },
@@ -627,6 +628,17 @@ export default {
         },
 
         /**
+         * This is called after the resource label section on the left of the page has been rendered,
+         * once for each label or sub-label (e.g. once for 'Events', and once again for 'Events -> Extra Curricular').
+         */
+        resourceLabelDidMount({ el, resource }) {
+            if (resource.extendedProps.isDeleted) {
+                el.classList.add("meta"); // Add 'meta' class to distinguish deleted from non-deleted event types.
+                el.title = "This event type has been deleted.";
+            }
+        },
+
+        /**
          * Customise today button behaviour for semester view.
          *
          * Clicking today button while on semester view will navigate to
@@ -896,6 +908,7 @@ export default {
                     id: RESOURCE_EVENT_TYPE_PREFIX + String(a.id),
                     title: a.type,
                     eventBackgroundColor: a.color,
+                    isDeleted: a.isDeleted,
                 };
             });
         },

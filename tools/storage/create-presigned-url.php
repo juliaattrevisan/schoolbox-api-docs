@@ -6,6 +6,7 @@ declare(strict_types=1);
 use Aws\S3\S3Client;
 use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Resource\FilesystemFactory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -15,7 +16,6 @@ require_once __DIR__ . '/../../conf/core/require.php';
  * Eg, if we need to provide a user-friendly URL for a client, eg during decommission to their storage+db dump files
  */
 $app    = new class extends CliTool\App {
-
     private const OPT_SHORT_HELP      = 'h';
     private const OPT_LONG_HELP       = 'help';
     private const OPT_LONG_OBJECT_KEY = 'key:';
@@ -39,6 +39,8 @@ $app    = new class extends CliTool\App {
 
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
             $this->printHelp();
             exit(CliTool\Kernel::EXIT_STATUS_OK);
@@ -62,6 +64,8 @@ $app    = new class extends CliTool\App {
             exit(CliTool\Kernel::EXIT_STATUS_APP_ERROR);
         }
         $this->generatePresignedUrl($objectKey, $expiry);
+
+        $this->deprecationNotice("SA-19334");
     }
 
 
@@ -73,7 +77,12 @@ $app    = new class extends CliTool\App {
     private function generatePresignedUrl(string $objectKey, string $expiry): void
     {
         $s3Client = $this->buildS3Client();
-        $bucket   = $this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_BUCKET);
+
+        $s3AltHost   = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_HOST) ?? "");
+        $s3AltBucket = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_BUCKET) ?? "");
+        $bucket      = !empty($s3AltHost) && !empty($s3AltBucket)
+            ? $s3AltBucket
+            : $this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_BUCKET);
 
         $command = $s3Client->getCommand('GetObject', [
             'Bucket' => $bucket,
@@ -91,14 +100,27 @@ $app    = new class extends CliTool\App {
      */
     private function buildS3Client(): S3Client
     {
-        return new S3Client([
+        $altHost = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_HOST) ?? "");
+        $s3AltAccessKey = trim($this->getConfig()->get('otfs_s3_alt_access_key') ?? "");
+        $s3AltSecretAccessKey = trim($this->getConfig()->get('otfs_s3_alt_secret_key') ?? "");
+        $altBucket = trim($this->getConfig()->get('otfs_s3_alt_bucket') ?? "");
+        $s3AltRegion = trim($this->getConfig()->get('otfs_s3_alt_region') ?? "");
+        $cfg = [
             'credentials' => [
                 'key'    => trim($this->getConfig()->get('otfs_s3_cred_key') ?? ""),
                 'secret' => trim($this->getConfig()->get('otfs_s3_cred_secret') ?? ""),
             ],
-            'region'      => trim($this->getConfig()->get('otfs_s3_region') ?? ""),
-            'version'     => trim($this->getConfig()->get('otfs_s3_version') ?? ""),
-        ]);
+            'region'  => trim($this->getConfig()->get('otfs_s3_region') ?? ""),
+            'version' => trim($this->getConfig()->get('otfs_s3_version') ?? ""),
+        ];
+
+        if (!empty($altHost)) {
+            $cfg['endpoint'] = $altHost;
+            $cfg['credentials']['key'] = $s3AltAccessKey;
+            $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
+            $cfg['region'] = $s3AltRegion;
+        }
+        return new S3Client($cfg);
     }
 
     /**

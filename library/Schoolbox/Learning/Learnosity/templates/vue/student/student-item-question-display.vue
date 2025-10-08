@@ -176,7 +176,7 @@ window.Vue.onMounted(() => {
          */
         if (response && !response.querySelector("[data-schoolboxmedia-replacement-container]")) {
             // @ts-expect-error - schoolboxResource is available here, but untyped.
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- see above
             $.fn.schoolboxResource_ProxyReplacement($(selector));
         }
 
@@ -196,6 +196,12 @@ window.Vue.onMounted(() => {
         const inputElement = response?.querySelector(".lrn_textinput input");
         if (inputElement) {
             inputElement.removeAttribute("disabled");
+        }
+
+        // Remove disabled attribute from the textarea field so field can be selected to view all the text within on smaller screens
+        const textareaElement = response?.querySelector(".lrn_plaintextarea textarea");
+        if (textareaElement) {
+            textareaElement.removeAttribute("disabled");
         }
     }
 });

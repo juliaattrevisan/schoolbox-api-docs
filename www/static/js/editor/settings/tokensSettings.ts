@@ -2,7 +2,7 @@
  * Returns the tokens settings for the editor
  */
 
-import type { MentionConfig } from "@ckeditor/ckeditor5-mention";
+import type { MentionConfig } from "ckeditor5";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 import type { StringSection } from "@js/util/stringUtils";
 import { replaceAllStringSections } from "@js/util/stringUtils";

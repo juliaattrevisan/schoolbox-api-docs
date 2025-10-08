@@ -32,9 +32,18 @@ class Javascript extends Base
         // Add campus list to list of classes
         $classes = $this->getEvent()->getEventClasses();
 
+        /* Augment title with a location, if a meaningful value exists
+         */
+        $title = implode(', ', array_filter([
+            $this->getEvent()->getTitle(),
+            $this->event->getLocation()
+        ], static function ($val) {
+            return '' !== trim($val ?? '');
+        }));
+
         $event = [
             'resourceId' => $this->getEvent()->getResourceId(),
-            'title'      => $this->getEvent()->getTitle(),
+            'title'      => $title,
             'start'      => $start,
             'end'        => $end,
 

@@ -134,7 +134,7 @@ class SubmissionNotifier extends AbstractModuleNotifier
             return;
         }
 
-        $studentId = $submission->getOwner()->getId();
+        $studentId = (int)$submission->getOwner()->getId();
         $boxId     = $submission->getSubmissionBox()->getId();
 
         $mapper = $this->getMapper();
@@ -147,7 +147,12 @@ class SubmissionNotifier extends AbstractModuleNotifier
                 }
 
                 // is this the first? or a resubmit?
-                $counts = $mapper->findCountsForSubmissionBoxes(array($boxId), $studentId);
+                $counts = $this->submissionBoxMapper->findSubmissionCountsForSubmissionBoxes(
+                    [$boxId],
+                    $studentId,
+                    false,
+                    true
+                );
                 // because '1' would be the first submission
                 if (array_key_exists($boxId, $counts) && $counts[$boxId] > 1) {
                     $bundle->attach(self::TRIGGER_RESUBMITTED, self::IMMEDIATELY);
@@ -176,7 +181,12 @@ class SubmissionNotifier extends AbstractModuleNotifier
                 // if we've gone from draft to not, notify submission
                 if (array_key_exists('submittedAt', $diff) && $diff['submittedAt'][1] === null) {
                     // is this the first? or a resubmit?
-                    $counts = $mapper->findCountsForSubmissionBoxes(array($boxId), $studentId);
+                    $counts = $this->submissionBoxMapper->findSubmissionCountsForSubmissionBoxes(
+                        [$boxId],
+                        $studentId,
+                        false,
+                        true
+                    );
                     if (array_key_exists($boxId, $counts) && $counts[$boxId] > 1) {
                         $bundle->attach(self::TRIGGER_RESUBMITTED, self::IMMEDIATELY);
                         break;

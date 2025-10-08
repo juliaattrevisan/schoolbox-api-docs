@@ -16,7 +16,7 @@ use GuzzleHttp\RequestOptions;
 use League\Flysystem\FilesystemException;
 use Schoolbox\Geosnapshot\Payload\EventPhoto;
 use Schoolbox\Geosnapshot\Payload\RedactedPhotoList;
-use Schoolbox\Geosnapshot\Payload\StudentPhoto;
+use Schoolbox\Geosnapshot\Payload\Photo;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\User;
 use SensitiveParameter;
@@ -105,9 +105,13 @@ class Api
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    public function retrieveStudentPhotos(User $viewee, User $viewer, FilesystemProxy $filesystemProxy): array
+    public function retrievePhotos(User $viewee, User $viewer, FilesystemProxy $filesystemProxy): array
     {
-        return $this->retrieve(self::GEOSNAPSHOT_ENDPOINT, (new StudentPhoto($filesystemProxy))->build($viewee, $viewer));
+        return $this->retrieve(
+            endpoint: self::GEOSNAPSHOT_ENDPOINT,
+            payload: (new Photo($filesystemProxy))->build($viewee, $viewer),
+            viewee: $viewee
+        );
     }
 
 
@@ -117,6 +121,7 @@ class Api
      * Manufacture a payload with the necessary parts and send it out there
      *
      * @param string $eventName
+     * @param string $albumName
      * @param User $viewer
      * @return array
      * @throws GuzzleException
@@ -125,9 +130,13 @@ class Api
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    public function retrieveEventPhotos(string $eventName, User $viewer): array
+    public function retrieveEventPhotos(string $eventName, string $albumName, User $viewer): array
     {
-        return $this->retrieve(self::GEOSNAPSHOT_ENDPOINT, (new EventPhoto())->build($eventName, $viewer));
+        return $this->retrieve(
+            endpoint: self::GEOSNAPSHOT_ENDPOINT,
+            payload: (new EventPhoto())->build($eventName, $albumName, $viewer),
+            viewee: null
+        );
     }
 
 
@@ -147,7 +156,11 @@ class Api
     {
         $payload = (new RedactedPhotoList($fqdn))->build($externalRedactionList);
 
-        return $this->retrieve(self::GEOSNAPSHOT_ENDPOINT_REDACTION, $payload);
+        return $this->retrieve(
+            endpoint: self::GEOSNAPSHOT_ENDPOINT_REDACTION,
+            payload: $payload,
+            viewee: null
+        );
     }
 
 
@@ -155,15 +168,13 @@ class Api
      * Send a payload to the endpoint
      *
      * @param string $endpoint
-     * @param array  $payload
+     * @param array $payload
+     * @param User|null $viewee
      * @return array
-     * @throws \DomainException
-     * @throws \GuzzleHttp\Exception\GuzzleException
-     * @throws \GuzzleHttp\Exception\InvalidArgumentException
+     * @throws GuzzleException
      * @throws \JsonException
-     * @throws \RuntimeException
      */
-    private function retrieve(string $endpoint, array $payload): array
+    private function retrieve(string $endpoint, array $payload, ?User $viewee): array
     {
         /* Remember it if we need to inspect it for some reason
          */
@@ -179,7 +190,8 @@ class Api
             RequestOptions::JSON => $payload
         ]);
 
-        /* Responds with this tuple: {"url":"https://geosnapshot.com/e/schoolbox-office-re-opening-from-iso-to-posh"}
+        /* Responds with this tuple:
+         * {"url":"https://geosnapshot.com/organization_photos?embed=true&p=eyJhbGciOiJIUzI1NiJ9.eyJyZWZlcmVuY2VfaW1hZ2UiOiJodHRwczovL3NlbGZpZS1zZWFyY2gtc3JjLnMzLmFtYXpvbmF3cy5jb20vNjVmZWVmZDdkNzFiMTZlMTI5ZjJiNzc2OGI1YjViYTg4NDE5ZGE4NTJhMThiYjQzYzY4MGZlNDc1ODdmZjA1YSIsImV2ZW50X25hbWUiOm51bGwsImFsYnVtX25hbWUiOm51bGwsImV4cGlyZXNfYXQiOjE3NTA2NzMwMjEsInVzZXJfaWQiOjEzOTQ5OH0.BrtmLJfbdCaclVogIx8CgSyktgEwOaBkN5_Kvxvl_pw&plain_embed=true"}
          */
         if ($response->getStatusCode() === 200) {
             /* Geosnapshot endpoints sometimes just echo back an empty string
@@ -193,7 +205,15 @@ class Api
 
             /* Try to decode whatever json payload was given back
              */
-            return json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+            $decoded = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+
+            /* Add an external id to the end if a viewee was provided
+             */
+            if ($viewee) {
+                $decoded['url'] = $this->addExternalId($decoded['url'], trim((string)$viewee->getExternalId()));
+            }
+
+            return $decoded;
         }
 
         throw new \DomainException(sprintf(
@@ -201,6 +221,40 @@ class Api
             $response->getStatusCode(),
             $response->getReasonPhrase()
         ));
+    }
+
+
+    /**
+     * Augment the url with the user's external id
+     *
+     * The querystring params might or might not exist...so use http_build_query
+     * to ensure the resultant querystring param is correctly structured
+     *
+     * @param string $url
+     * @param string $externalId
+     * @return string
+     */
+    private function addExternalId(string $url, string $externalId): string
+    {
+        /* Accommodate the probably-unlikely scenario that geosnapshot decided to have no
+         * querystring params one day, for no reason. This url originally came from them
+         * so...no guarantees about params, unfortunately.
+         */
+        $parts = parse_url($url);
+
+        parse_str($parts['query'], $result);
+
+        $result['external_id'] = $externalId;
+
+        $querystring = http_build_query($result);
+
+        return sprintf(
+            '%s://%s%s?%s',
+            $parts['scheme'],
+            $parts['host'],
+            $parts['path'],
+            $querystring
+        );
     }
 
 

@@ -1,0 +1,46 @@
+{##
+ # Renders the currentLocation field for a staff or student on the profile page
+ #
+ # @param string fieldName      The name of the field
+ # @param \Schoobox\User $user  The viewee
+ # @param array currentEvents   An array of events the user could be at
+ #}
+
+{% set hasMultipleEvents = currentEvents|length > 1 %}
+
+<dt class="small-4 medium-3 columns">{{ fieldName }}</dt>
+<dd class="small-8 medium-9 columns">
+    {# If there are more than 1 possible locations, make it a list #}
+    {% if hasMultipleEvents %}<ul>{% endif %}
+    {% for event in currentEvents %}
+        {% if hasMultipleEvents %}<li>{% endif %}
+        <span {% if event.periodCancelled %}class="strike" title="This period has been cancelled"{% endif %}>
+            {% if event.location != '' %}
+                {{ event.location }}
+                -
+            {% endif %}
+            {% if event.periodName is not empty %}
+                {{ event.periodName }}
+                -
+            {% endif %}
+            {{ event.title }}
+            {% set hasShownStaff = false %}
+            {% for staffId, staffName in event.staff %}
+                {# Only show "with" if it's a different user (i.e. don't show a teacher is with themselves) #}
+                {% if staffId != user.id %}
+                    {% set staffProfileRoute = routeLookupIfAuthorized('searchUser.getProfile', {userId: user.id, user: user}) %}
+                    {% if hasShownStaff %}/{% else %}with{% endif %}
+                    {% if staffProfileRoute %}
+                        <a href="{{ staffProfileRoute }}">{{ staffName }}</a>
+                    {% else %}
+                        {{ staffName }}
+                    {% endif %}
+                    {% set hasShownStaff = true %}
+                {% endif %}
+            {% endfor %}
+            <span class="meta"> ({{ event.startTime.timeOnly }} - {{ event.endTime.timeOnly }}) </span>
+        </span>
+        {% if hasMultipleEvents %}</li>{% endif %}
+    {% endfor %}
+    {% if hasMultipleEvents %}</ul>{% endif %}
+</dd>

@@ -5,8 +5,8 @@
     margin: 0;
     position: absolute;
     top: 0;
-    width: 5rem;
-    z-index: var(--sbx-depth-menu);
+    width: 4.5rem;
+    z-index: calc(var(--sbx-depth-menu) - 1); // -1 to avoid overlap with the side menus, which should sit on top
     ::placeholder {
         color: transparent;
         font-weight: normal;
@@ -16,7 +16,7 @@
         width: 100%;
         padding-left: calc(var(--tabbar-icon-width) * 2);
         .c-search-input {
-            grid-template-columns: 1fr 5rem;
+            grid-template-columns: 1fr 4.5rem;
         }
         .c-search-input__field {
             opacity: 1;
@@ -31,7 +31,7 @@
     }
 
     .c-search-input {
-        grid-template-columns: 0 5rem;
+        grid-template-columns: 0 4.5rem;
         &__field {
             opacity: 0;
             transition: opacity 0.2s ease-out;
@@ -64,7 +64,7 @@
 }
 
 // Smallest screen size (both panels are always unpinned)
-@media #{$mediumwide-down} {
+@media #{$medium-down} {
     body {
         // Search bar always has right=1 and left-padding=2 while notifications are enabled
         &:not(.disableNotifications) .c-header-search {

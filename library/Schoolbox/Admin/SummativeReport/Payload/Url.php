@@ -231,6 +231,32 @@ class Url
                         continue;
                     }
 
+                    /* Need this to fetch the Govt. Student Number and slap it onto summative reports
+                     * Your connector might not supply this, so could be entirely null for all we know
+                     */
+                    $govtStudentNumber = null;
+
+                    if ('' !== trim((string)$student->getExternalId())) {
+                        $externalUser = (new \External_User())->getStudent($student->getExternalId());
+                        $govtStudentNumber = $externalUser['StudentGovernmentStudentNumber'] ?? null;
+                    }
+
+                    $footer = $tokenReplacer->replace(
+                        $report->getFooter(),
+                        [
+                            '[firstname]'        => ($student->getFirstname() ?: ''),
+                            '[surname]'          => ($student->getLastname() ?: ''),
+                            '[externalId]'       => ($student->getExternalId() ?: ''),
+                            '[year]'             => ($student->getYear()?->getName() ?: ''),
+                            //yes getGivenName returns the firstname if the preferred name is not set. but it says it can also return null... I don't trust this. so null coalesce
+                            '[preferredname]'    => ($student->getGivenName() ?: ''),
+                            '[fullname]'         => ($student->getFullName() ?: ''),
+                            '[title]'            => ($student->getTitle() ?: ''),
+                            '[govstudentnumber]' => ($govtStudentNumber ?: ''),
+                            '[reportTitle]'      => ($report->getTitle() ?: ''),
+                        ]
+                    );
+
                     /* Assemble paths/hierarchy in the zip
                      *
                      * The zip file contains the student's externalId as a folder
@@ -240,6 +266,7 @@ class Url
                     $reportConfig = [
                         'filename' => sprintf("%s.pdf", $filename),
                         'url' => (string)$urlBase->withPath($reportPath),
+                        'footer' => $footer,
                     ];
 
                     $reportConfigs[] = $reportConfig;

@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Oidc\Server;
 
 use Alaress\Web\Controller\Base;
+use Alaress_Date_Format;
 use Firebase\JWT\Key;
 use League\OAuth2\Server;
 use OAT\Library\Lti1p3Core\Security\Jwks\Exporter\JwksExporter;
@@ -18,6 +19,7 @@ use OpenIDConnectServer\ClaimExtractor;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\API\Token\JwtParser\IParser;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\GenericCollection;
 use Schoolbox\LTI\KeyChain\RepositoryFactory;
 use Schoolbox\Url\Factory;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,25 +33,31 @@ use Symfony\Component\HttpFoundation\Response;
 class Controller extends Base
 {
     /**
-     * Session var where OIDC clients which have authenticated using this server
-     * are stored: when this logs out, this server will send logout requests to
-     * all of those clients.
-     */
-    public const SESSION_OIDC_SERVER_CLIENTS = 'oidcServerClients';
-
-    /**
      * Constructor
      *
-     * @param Server\AuthorizationServer  $authServer     The authorization server used to service OIDC auth requests.
-     * @param KeyChainRepositoryInterface $keyChains      Repository of keychains: set up for LTI, but usable outside of
-     *                                                    that context.
-     * @param ClaimExtractor              $claimExtractor Claim extractor: used to filter claims shown in userinfo.
+     * @param Server\AuthorizationServer      $authServer                   The authorization server for servicing OIDC
+     *                                                                      auth requests.
+     * @param KeyChainRepositoryInterface     $keyChains                    Repository of keychains: set up for LTI, but
+     *                                                                      usable outside of that context.
+     * @param IParser                         $jwtParser                    JWT parser, for extracting a user out of an
+     *                                                                      access token.
+     * @param ClaimExtractor                  $claimExtractor               Claim extractor: used to filter claims shown
+     *                                                                      in userinfo.
+     * @param RelyingParty\Mapper             $relyingPartyMapper           Mapper for loading relying parties from the
+     *                                                                      auth request.
+     * @param RelyingParty\Grant\Mapper       $relyingPartyGrantMapper      Mapper for saving that a user has granted
+     *                                                                      access to a relying party.
+     * @param RelyingParty\Grant\Scope\Mapper $relyingPartyGrantScopeMapper Mapper for saving the scopes a user has
+     *                                                                      granted to a relying party.
      */
     public function __construct(
         private Server\AuthorizationServer $authServer,
         private KeyChainRepositoryInterface $keyChains,
         private IParser $jwtParser,
         private ClaimExtractor $claimExtractor,
+        private RelyingParty\Mapper $relyingPartyMapper,
+        private RelyingParty\Grant\Mapper $relyingPartyGrantMapper,
+        private RelyingParty\Grant\Scope\Mapper $relyingPartyGrantScopeMapper,
     ) {
     }
 
@@ -71,19 +79,43 @@ class Controller extends Base
             new Entity\User($this->getUser(), (new Factory($this->getConfigLoader()))->buildFullyQualified()),
         );
 
+        // Load the relying party and the auth for the current user.
+        // If it's accepted already, skip asking for permission.
+        $relyingParty      = $this->relyingPartyMapper->findByClientId($authRequest->getClient()->getIdentifier());
+        $relyingPartyGrant = $this->relyingPartyGrantMapper->findByRelyingPartyAndUser($relyingParty, $this->getUser());
+        $requestedScopes   = $this->convertAuthRequestScopesToCollection($authRequest);
+        $grantExpired      = $relyingPartyGrant && $relyingPartyGrant->isExpired(Alaress_Date_Format::now());
+        $scopeChanged      = $relyingPartyGrant
+            && $requestedScopes->diffBy($relyingPartyGrant->getScopes(), 'scope')->count() > 0;
+
+        // If permission was not passed in the request:
+        // * if new scopes have been requested, re-ask for permission
+        // * if granted permission has expired, re-ask for permission
+        // * otherwise, don't ask if permission already granted
+        $permission = $this->requestPost->getBool('permission');
+        if (!isset($permission)) {
+            if ($relyingPartyGrant) {
+                if ($scopeChanged) {
+                    $permission = null;
+                } elseif (!$grantExpired) {
+                    $permission = true;
+                }
+            }
+        }
+
         // Display confirm auth page:
         // this should be bypassed if the user has already given permission
         // for this client.
         // (but in this case, the access token will probably just be used)
-        $permission = $this->requestPost->getBool('permission');
         if (!isset($permission)) {
             $this->response = $this->responseFromTemplateUnthemed(
                 '@oidcServer/authorization.twig',
                 [
-                    'authorizationUrl' => $this->request->getUri(),
-                    'authRequest'      => $authRequest,
+                    'authorizationUrl'  => $this->request->getUri(),
+                    'authRequest'       => $authRequest,
                     // Separate variable, as this isn't a standard scope name.
-                    'schoolboxScope'   => Repository\Scope::SCOPE_SCHOOLBOX,
+                    'schoolboxScope'    => Repository\Scope::SCOPE_SCHOOLBOX,
+                    'relyingPartyGrant' => $relyingPartyGrant,
                 ],
             );
         } else {
@@ -95,10 +127,24 @@ class Controller extends Base
             // session ID (as that doesn't exist in the auth code, and I can't
             // easily add it).
             if ($permission) {
-                $client           = $authRequest->getClient();
-                $currentClients   = $this->getSession()->get(self::SESSION_OIDC_SERVER_CLIENTS, []);
-                $currentClients[] = $client->getIdentifier();
-                $this->getSession()->set(self::SESSION_OIDC_SERVER_CLIENTS, array_unique($currentClients));
+                // Save user's grant of permission
+                $updateRelyingPartyGrant = false;
+                if (!$relyingPartyGrant) {
+                    $relyingPartyGrant = $this->relyingPartyGrantMapper->createModel()
+                        ->setUser($this->getUser())
+                        ->setRelyingParty($relyingParty)
+                        ->setScopes($this->relyingPartyGrantScopeMapper->createCollection());
+                    $updateRelyingPartyGrant = true;
+                } elseif ($scopeChanged || $grantExpired) {
+                    $updateRelyingPartyGrant = true;
+                }
+                if ($updateRelyingPartyGrant) {
+                    // Set expiry and scopes
+                    $relyingPartyGrant = $relyingPartyGrant
+                        ->setExpiresAt(Alaress_Date_Format::now()->modify(RelyingParty\Grant\Model::DEFAULT_EXPIRY))
+                        ->setScopes($requestedScopes);
+                    $this->relyingPartyGrantMapper->save($relyingPartyGrant);
+                }
             }
 
             try {
@@ -263,5 +309,25 @@ class Controller extends Base
         } else {
             $this->response = $this->responseAsJson($idTokenClaims);
         }
+    }
+
+    /**
+     * Convert the scopes from an auth request into a set of scopes for the
+     * granted permission.
+     *
+     * @param Server\RequestTypes\AuthorizationRequest $authRequest
+     * @return GenericCollection<RelyingParty\Grant\Scope\Model>
+     */
+    private function convertAuthRequestScopesToCollection(
+        Server\RequestTypes\AuthorizationRequest $authRequest,
+    ): GenericCollection {
+        $newScopes = $this->relyingPartyGrantScopeMapper->createCollection();
+        foreach ($authRequest->getScopes() as $scope) {
+            $newScopes->add(
+                $this->relyingPartyGrantScopeMapper->createModel()
+                    ->setScope($scope->getIdentifier())
+            );
+        }
+        return $newScopes;
     }
 }

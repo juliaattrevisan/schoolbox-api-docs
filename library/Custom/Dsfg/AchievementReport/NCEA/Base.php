@@ -8,10 +8,49 @@
 
 namespace Custom\Dsfg\AchievementReport\NCEA;
 
+use Alaress\Database\Connector\IConnector;
 use Custom\Dsfg\AchievementReport\Base as AchievementReportBase;
+use Schoolbox\User;
 
 abstract class Base extends AchievementReportBase
 {
+    /**
+     * Source database table names for the NCEA and Year 11 reports.
+     *
+     * The Year 11 report is generated using the same code as the NCEA report, but uses a different data source.
+     * The Year 11 report also displays data in a different order in a couple of places.
+     */
+    const MAIN_DB_TABLE_NCEA = 'dbo.uvSchoolBoxNCEAResults';
+    const MAIN_DB_TABLE_YEAR11 = 'dbo.uvSchoolBoxNCEAResultsforDataRefreshV2_Year11';
+
+    /**
+     * The main source table for data used in the NCEA report.
+     * @var string
+     */
+    private string $dbTableName;
+
+    /**
+     * Constructor
+     *
+     * @param User        $user
+     * @param array       $externalUser
+     * @param IConnector  $db
+     * @param string|null $year
+     * @param string      $dbTableName
+     */
+    public function __construct(User $user, array $externalUser, IConnector $db, $year, string $dbTableName)
+    {
+        $this->dbTableName = $dbTableName;
+        parent::__construct($user, $externalUser, $db, $year);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getDbTableName(): string
+    {
+        return $this->dbTableName;
+    }
 
     /**
      * Explorer, reporting!
@@ -55,5 +94,18 @@ abstract class Base extends AchievementReportBase
         $externallyAssessed = $internalExternal === 'EX';
 
         return !$externallyAssessed || !$currentYearSelected;
+    }
+
+    /**
+     * The 'InternalorExternalAssessment' column (found in a few different database views) is expected to contain
+     * either 'IN' or 'EX'.  However, some data does not meet this requirement, and that has caused errors.
+     * So if it ain't 'EX', assume it's 'IN'.
+     *
+     * @param string $internalExternal
+     * @return string
+     */
+    protected static function getExOrIn(string $internalExternal): string
+    {
+        return trim($internalExternal) === 'EX' ? 'EX' : 'IN';
     }
 }

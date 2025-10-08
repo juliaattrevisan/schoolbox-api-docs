@@ -105,15 +105,23 @@ class DeleteTransforms extends CliTool\App
 
 
     /**
-     * Load all transform files in AWS S3
+     * Deletes transform files from AWS S3
+     *
+     * @throws UnexpectedValueException
+     * @throws AlaressDatabase\Exception
      * @throws InvalidArgumentException
      * @return int
      */
     private function deleteTransformFilesInS3(): int
     {
         $this->getLogger()->notice("Deleting AWS S3 storage transform files...");
-        $bucketName = trim($this->getConfig()->get('otfs_s3_bucket') ?? "");
-        $s3Client   = $this->buildS3Client($bucketName);
+        $s3AltHost   = trim($this->getConfig()->get('otfs_s3_alt_host') ?? "");
+        $s3AltBucket = trim($this->getConfig()->get('otfs_s3_alt_bucket') ?? "");
+        $bucketName  = !empty($s3AltHost) && !empty($s3AltBucket)
+            ? $s3AltBucket
+            : trim($this->getConfig()->get('otfs_s3_bucket') ?? "");
+
+        $s3Client = $this->buildS3Client($bucketName);
         if (!$s3Client) {
             return 0;
         }
@@ -273,33 +281,46 @@ class DeleteTransforms extends CliTool\App
 
 
     /**
-     * Attempts to build and return a S3Client. Returns NULL if config is empty
+     * Builds an S3Client
      *
      * @param string $bucketName
+     *
      * @return S3Client|null
      * @throws InvalidArgumentException
      */
     private function buildS3Client(string $bucketName): ?S3Client
     {
-        $s3Region    = trim($this->getConfig()->get('otfs_s3_region') ?? "");
-        $s3Version   = trim($this->getConfig()->get('otfs_s3_version') ?? "");
-        $s3AccessKey = trim($this->getConfig()->get('otfs_s3_cred_key') ?? "");
-        $s3SecretKey = trim($this->getConfig()->get('otfs_s3_cred_secret') ?? "");
+        $s3AccessKey          = trim($this->getConfig()->get('otfs_s3_cred_key') ?? "");
+        $s3SecretKey          = trim($this->getConfig()->get('otfs_s3_cred_secret') ?? "");
+        $s3Region             = trim($this->getConfig()->get('otfs_s3_region') ?? "");
+        $s3Version            = trim($this->getConfig()->get('otfs_s3_version') ?? "");
+        $s3AltHost            = trim($this->getConfig()->get('otfs_s3_alt_host') ?? "");
+        $s3AltAccessKey       = trim($this->getConfig()->get('otfs_s3_alt_access_key') ?? "");
+        $s3AltSecretAccessKey = trim($this->getConfig()->get('otfs_s3_alt_secret_key') ?? "");
+        $s3AltRegion          = trim($this->getConfig()->get('otfs_s3_alt_region') ?? "");
 
-        $badConfig = empty($s3AccessKey) || empty($s3SecretKey) || empty($s3Region) || empty($s3Version) || empty($bucketName);
-        if ($badConfig) {
-            $this->getLogger()->warning("S3 config appears invalid, skipping");
-            return null;
-        }
-
-        return new S3Client([
+        $cfg = [
             'credentials' => [
                 'key'    => $s3AccessKey,
                 'secret' => $s3SecretKey,
             ],
             'region'      => $s3Region,
             'version'     => $s3Version,
-        ]);
+        ];
+
+        if (empty($s3AccessKey) || empty($s3SecretKey) || empty($s3Region) || empty($s3Version)) {
+            $this->getLogger()->error("AWS S3 config appears invalid");
+            return null;
+        }
+
+        if (!empty($s3AltHost)) {
+            $cfg['endpoint'] = $s3AltHost;
+            $cfg['credentials']['key'] = $s3AltAccessKey;
+            $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
+            $cfg['region'] = $s3AltRegion;
+        }
+
+        return new S3Client($cfg);
     }
 
 

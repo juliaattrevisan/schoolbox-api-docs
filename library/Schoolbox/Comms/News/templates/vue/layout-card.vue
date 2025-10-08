@@ -1,9 +1,11 @@
 <script>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
 import articleListMixin from "./article-list-mixin";
 import MediaArticle from "@schoolboxVue/components/media-article";
+import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time";
 
 export default {
     name: "layout-card",
@@ -22,7 +24,7 @@ export default {
         "articles-loading",
         "current-articles",
     ],
-    components: { MediaArticle },
+    components: { MediaArticle, RelativeTime },
     data() {
         return {};
     },
@@ -86,8 +88,8 @@ export default {
                         </span>
                         <span>
                             &mdash;
-                            <time :title="article.publishAt.long">{{ article.publishAt.relativeTime }}</time></span
-                        >
+                            <relative-time :datetime="article.publishAt" full-diff></relative-time>
+                        </span>
                         <span v-if="article.topics.length">
                             in
                             <template v-for="(topic, index) in article.topics">

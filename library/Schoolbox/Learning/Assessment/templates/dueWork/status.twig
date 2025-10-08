@@ -8,7 +8,7 @@
      - statusReviewed:   a string representing the 'reviewed'   state
      - errors:           string[]  Admin-configured submission states, eg 'Absent', 'Pending', 'Not Submitted' etc
      - rubricMarks:       bool[]  Whether the student's instructor-given feedback exists and has rubric marks, indexed by user.id
-     - interactionLocked: bool Is the assessment locked for interactions because it is due in an archived term?
+     - readonly: bool     Is the assessment read-only for this user?
      - selfAssess:        bool            Is this being viewed in a self assessment context?
      - selfReflect:       bool            Is this being viewed in a self reflection context?
      - blindReviewUrl:   string
@@ -16,7 +16,7 @@
  # @param array $draftResponses  A lookup of (user id, response id) for those who have drafts
  #}
 
-{% extends '@learningAssessment/status.twig' %}
+{% extends '@learningAssessment/status/status.twig' %}
 
 {% set labelIncomplete = 'Submission required' %}
 {% set labelFailed     = 'Resubmission required' %}
@@ -24,44 +24,54 @@
 {% set labelReviewed   = 'Reviewed' %}
 {% set statusFailed    = 'failed' %}
 
-{% set readonly = interactionLocked and not USER.superUser %}
+{% set allReadonly = allInteractionsLocked and not USER.superUser %}
 
 {% block headerOptions %}
     {% set kamiWorksheetRoute = routeLookupIfAuthorized('learningAssessment.getWorksheet', {assessmentId: assessment.id, assessment: assessment}) %}
-    {% if assessment.enableWorksheet and assessment.kamiWorksheetTemplate and kamiWorksheetRoute %}
+    {% if assessment.enableWorksheet and assessment.kamiWorksheetTemplate and kamiWorksheetRoute and assessment.isImplementation%}
         <li>
             <a id="kamiWorksheet" class="icon-surveys" href="{{ kamiWorksheetRoute }}">Class View</a>
         </li>
     {% endif %}
-    <li>
-        <a id="import-feedback" data-reveal-id="importFeedbackModal" class="icon-upload">Import Feedback</a>
-    </li>
 
-    {% if blindReviewUrl %}
-    <li>
-        <a href="{{ blindReviewUrl }}" class="icon-task">Blind Review</a>
-    </li>
-    {% endif %}
-
-    {% if download %}
-        <li><a class="icon-download" data-mass="publish" data-reveal-id="mass-download">Download All</a></li>
-    {% endif %}
-
-    {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessment.id, assessment: assessment}) %}
-    {% if similarityReportRoute %}
-        <li><a href="{{ similarityReportRoute }}" class="icon-due-work">Similarity Report</a></li>
-    {% endif %}
-
-    {% if assessment.useRubric %}
+    {% if not allReadonly %}
         <li>
-            <a href="{{ routeLookup('learningAssessment.getOverview', { assessmentId: assessment.id }) }}"
-               class="icon-criteria">Rubric Report</a>
+            <a id="import-feedback" data-reveal-id="importFeedbackModal" class="icon-upload">Import Feedback</a>
         </li>
     {% endif %}
-    {% if not readonly %}
-        <li class="separator">Bulk Actions</li>
-        <li><a class="icon-approve" data-mass="submit" data-reveal-id="manage-submissions">Manage submissions</a></li>
-        <li><a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish">Publish grades & feedback</a></li>
+
+    {% if assessment.isImplementation %}
+        {% if blindReviewUrl %}
+        <li>
+            <a href="{{ blindReviewUrl }}" class="icon-task">Blind Review</a>
+        </li>
+        {% endif %}
+
+        {% if download %}
+            <li><a class="icon-download" data-mass="publish" data-reveal-id="mass-download">Download All</a></li>
+        {% endif %}
+
+        {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessment.id, assessment: assessment}) %}
+        {% if similarityReportRoute %}
+            <li><a href="{{ similarityReportRoute }}" class="icon-due-work">Similarity Report</a></li>
+        {% endif %}
+
+        {% if assessment.useRubric %}
+            <li>
+                <a href="{{ routeLookup('learningAssessment.getOverview', { assessmentId: assessment.id }) }}"
+                   class="icon-criteria">Rubric Report</a>
+            </li>
+        {% endif %}
+        {% if not allReadonly %}
+            <li class="separator">Bulk Actions</li>
+            <li><a class="icon-approve" data-mass="submit" data-reveal-id="manage-submissions">Manage submissions</a></li>
+            <li><a class="icon-approve" data-mass="publish" data-reveal-id="mass-publish">Publish grades & feedback</a></li>
+
+            {% set rescoreRoute = routeLookupIfAuthorized('learningAssessment.getRescore', {assessment: assessment, assessmentId: assessment.id}) %}
+            {% if rescoreRoute %}
+                <li><a class="icon-due-work" href="{{ rescoreRoute }}">Rescore {{ locale.grades.plural }}</a></li>
+            {% endif %}
+        {% endif %}
     {% endif %}
 {% endblock %}
 
@@ -73,366 +83,151 @@
  # Each type of assessment renders their participants uniquely
  #}
 {% block participant %}
-    {% set latestFeedback    = participant.findMostRecentInstructorGivenFeedback %}
-    {% set latestResponse    = participant.findMostRecentSubmittedResponse %}
-    {% set multipleResponses = participant.allResponses | length > 1 %}
-
-    {% set isPublished       = latestFeedback.published ?? false %}
-    {% set canPublish        = latestFeedback and not isPublished %}
-
-    {# Tot actions are derived from access to the Attempt History route
-     # By default this empty, hiding the tot
-     #}
-    {% set pActionSummary    = routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) %}
-    {% set pActionResponses  = routeLookupIfAuthorized('learningDueWorkResponse.getParticularResponse', routeArgs) %}
-    {% set pActionCount      = (pActionResponses ? 1 : 0) + (pActionSummary ? 1 : 0) %}
-
-    {# A route to see the list of responses for this participation #}
-    {% set fbUrl             = routeLookupIfAuthorized('learningDueWorkFeedback.postParticipantFeedback', routeArgs) %}
-    {% set pActionSobo       = routeLookupIfAuthorized('learningAssessment.getCreateResponseForm', routeArgs) %}
-    {% set pAckReceipt       = routeLookupIfAuthorized('learningAssessment.postStatusAcknowledge', routeArgs) %}
-
-    {# Progress icon
-     # One of [ '', 'pending', 'complete' ] to denote the action status of this participation
-     # The green dot/grey square/oj diamond
-     #}
-    {% set pStatusClass %}
-        {%- apply spaceless %}
-            {% if participant.responseRequired %}
-                {{ statusIncomplete }}
-            {% elseif participant.resubmissionRequired %}
-                {{ statusFailed }}
-            {% elseif participant.feedbackRequired %}
-                {{ statusPending }}
-            {% else %}
-                {{ statusReviewed }}
-            {% endif %}
-        {% endapply -%}
-    {% endset %}
-
-    {% set inputNo = 1 %}
-    {% if '' == assessment.markScheme.template %}
-        {% set inputsPerFeedback = 2 %}
-    {% else %}
-        {% set inputsPerFeedback = 3 %}
-    {% endif %}
-
-    <li data-status="{{ pStatusClass }}" data-participant-external-id="{{ participant.user.externalId }}" data-participant="{{ participant.user.id }}" data-participant-name="{{ participant.user.fullName }}">
-        <div class="small-12 column">
-            <div class="row actions-small-{{ pActionCount }}">
-                <div class="list-item">
-                    {% include '@learningAssessment/fragments/participantStatus.twig' with {
-                        participant: participant,
-                        latestResponse: latestResponse,
-                        pActionResponses: pActionResponses
-                    } only %}
-                </div>
-                {% if pActionCount %}
-                    <nav>
-                        <sbx-pop-out content-id="feedback-options-{{ participant.user.id }}" data-test="sbx-pop-out-feedback-options-{{ participant.user.id }}"></sbx-pop-out>
-                    </nav>
-                    <ul id="feedback-options-{{ participant.user.id }}" class="f-dropdown" data-dropdown-content>
-                        {%- apply spaceless %}
-                            {% if pActionResponses %}
-                                <li><a class="icon-task" href="{{ pActionResponses }}" title="View submission for {{ participant.user.givenName }}" data-inline-grader data-test="assessment-status-feedback-viewSubmission-{{ participant.user.id }}">View {% if fbUrl %}and {{ locale.grades }} {% endif %}submission</a></li>
-                            {% endif %}
-                            {% if pActionSummary %}
-                                <li><a class="icon-history" href="{{ pActionSummary }}" title="View {{ participant.user.givenName }}'s history">{{ responseHistory }}</a></li>
-                            {% endif %}
-                            {% if pActionSobo %}
-                                <li><a class="icon-due-work" href="{{ pActionSobo }}" title="Submit on behalf of {{ participant.user.givenName }}">Submit on behalf of {{ participant.user.givenName }}</a></li>
-                            {% endif %}
-                        {% endapply -%}
-                    </ul>
-                {% endif %}
-            </div>
-        </div>
-
-        <div class="small-12 column">
-
-            {% if fbUrl %}
-            <form data-feedback-form="{{ participant.user.id }}" method="post" action="{{ fbUrl }}">
-            {% endif %}
-
-                <input type="hidden" name="responseId" value="{{ response.id ?? '' }}"/>
-
-                <div class="row">
-                    {% if '' != assessment.markScheme.template %}
-                        <div class="small-12 medium-3 column">
-                            <label>{{ locale.grades.proper }}
-                                {% include '@learningMarkScheme/'~assessment.markScheme.template~'.twig' with {
-                                    participant: participant,
-                                    feedback:    participant.findMostRecentInstructorGivenFeedback,
-                                    markScheme:  assessment.markScheme,
-                                    tabIndex:    (loop.index0 * inputsPerFeedback) + inputNo,
-                                    errors:      errors,
-                                    readonly:    readonly
-                                } only %}
-                                {% set inputNo = inputNo + 1 %}
-                            </label>
-                            {% include '@learningAssessment/dueWork/resubmissionRequired.twig' with {
-                                feedback:    participant.findMostRecentInstructorGivenFeedback,
-                                participant: participant,
-                                tabIndex:    (loop.index0 * inputsPerFeedback) + inputNo,
-                                readonly:    readonly
-                            } only %}
-                            {% set inputNo = inputNo + 1 %}
-                        </div>
-
-                    {% endif %}
-                    <div class="small-12{% if '' != assessment.markScheme.template %} medium-9{% endif %} column">
-                        {% include '@learningAssessment/dueWork/comment.twig' with {
-                            feedback:       participant.findMostRecentInstructorGivenFeedback,
-                            participant:    participant,
-                            tabIndex:       (loop.index0 * inputsPerFeedback) + inputNo,
-                            readonly:       readonly,
-                            selfAssessment: selfAssess,
-                            selfReflection: selfReflect,
-                            blindMode:      false
-                        } only %}
-                        {% set inputNo = inputNo + 1 %}
-                        {% if '' == assessment.markScheme.template %}
-                            {% include '@learningAssessment/dueWork/resubmissionRequired.twig' with {
-                                feedback:    participant.findMostRecentInstructorGivenFeedback,
-                                participant: participant,
-                                tabIndex:    (loop.index0 * inputsPerFeedback) + inputNo,
-                                readonly:    readonly
-                            } only %}
-                            {% set inputNo = inputNo + 1 %}
-                        {% endif %}
-                    </div>
-                </div>
-            {% if fbUrl %}
-            </form>
-            {% endif %}
-        </div>
-
-        {#
-        If there's any files, rubric marks, or kami docs
-        attached to the feedback - tell the user that this feedback also includes those.
-        #}
-        {% set hasKami = latestFeedback and latestFeedback.hasResponseWithKamiDocs %}
-        {% set fileCount = latestFeedback ? latestFeedback.allFiles.count : 0 %}
-        {% set showRubricLink = assessment.useRubric and (rubricMarks[participant.user.id]|default(false)) %}
-
-        {% if hasKami or fileCount or showRubricLink %}
-            {% set meta = [] %}
-
-            {# Kami #}
-            {% if hasKami %}
-                {% set meta = meta|merge(['annotated document']) %}
-            {% endif %}
-
-            {# Rubric #}
-            {% if showRubricLink %}
-                {% set meta = meta|merge(['rubric']) %}
-            {% endif %}
-
-            {# Files #}
-            {% if fileCount %}
-                {% set meta = meta|merge(['file' ~ (fileCount > 1 ? 's' : '') ]) %}
-            {% endif %}
-
-            {% set attachedMsg = 'Feedback also includes <a href="' ~ pActionResponses ~ '">' %}
-            {% for mataLabel in meta %}
-                {% set attachedMsg = attachedMsg ~ mataLabel %}
-                {% if loop.revindex0 > 1 %}
-                    {% set attachedMsg = attachedMsg ~ ', ' %}
-                {% elseif loop.revindex0 == 1 %}
-                    {% set attachedMsg = attachedMsg ~ ' and ' %}
-                {% endif %}
-            {% endfor %}
-            {% set attachedMsg = attachedMsg ~ '</a>.' %}
-        {% endif %}
-
-
-        {##
-         # Action Bar at the bottom of each participant's row
-         #}
-        {% set isDraftFeedback     = latestFeedback and not latestFeedback.published %}
-        {% set isPublishedFeedback = latestFeedback and latestFeedback.published %}
-        {% set actionStyle         = isDraftFeedback or (attachedMsg is defined) or pAckReceipt ? '' : 'display: none;' %}
-
-        {# Action Bar data attrs #}
-        {% set massActions = isDraftFeedback ? 'data-mass-publish' : '' %}
-        {% set massActions = massActions ~ (pAckReceipt ? ' data-mass-submit' : '') %}
-        {% set massActions = massActions ~ (download ? ' data-mass-download' : '') %}
-        {% set massActions = massActions ~ (draftResponses[participant.user.id] ?? false ? ' data-mass-submit-draft=' ~ draftResponses[participant.user.id] : '') %}
-        {% set dataAttrs   = isPublishedFeedback ? 'data-published' : '' %}
-
-        {% set buttons %}
-            {%- apply spaceless %}
-                {% if pAckReceipt %}
-                    {% set soboTitle = 'Acknowledge receipt of student submission' %}
-                    <button data-sobo title="{{ soboTitle }}" href="{{ pAckReceipt }}">Mark as Submitted</button>
-                {% endif %}
-                {% set draftSaveTitle = 'You can discard this draft from the Grading Overview screen' %}
-                {% set draftSaveHtml = isDraftFeedback ? 'Saved as Draft' : '' %}
-                <button class="button disabled" data-draft="drafted" title="{{ draftSaveTitle }}" data-test="assessment-response-info-saved-as-draft">{{ draftSaveHtml }}</button>
-                {% if not readonly %}
-                    <a class="button"
-                        data-draft="publish"
-                        {% if not latestFeedback or latestFeedback.published %}style="display:none;"{% endif %}
-                            {% if isDraftFeedback %}data-draft-id="{{ latestFeedback.id }}"{% endif %}
-                    >Publish</a>
-                {% endif %}
-            {% endapply -%}
-        {% endset %}
-
-    {% include '@learningAssessment/fragments/actionBar.twig' with {
-        actionStyle:  actionStyle,
-        attachedMsg:  attachedMsg ?? '',
-        massActions:  massActions,
-        dataAttrs:    dataAttrs,
-        buttons:      buttons,
-        participant:  participant
-    } only %}
-
-    </li>
+   {% include '@learningAssessment/dueWork/participant.twig' %}
 {% endblock %}
-
 
 {##
  # Massive javascript hulk
  #}
 {% block scripts %}
-    {% if not readonly and assessment.isImplementation %}
-        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/jquery.select-all.basic.js?v={{ config.site_version }}"></script>
-        <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.bulky.js?v={{ config.site_version }}"></script>
-
-        {# The div below is used by bulky.js to create the mass-publish modal. #}
-        <div id="mass-publish" class="reveal-modal" data-reveal data-list-id="mass-publish-list" aria-hidden="true"
-             role="dialog">
-            <h2>Publish Drafts</h2>
-            <p data-mass-unavailable>There aren't any valid and unpublished drafts for this activity.</p>
-            <p data-mass-available>The following drafts can be published:</p>
-            <section class="checklist" id="mass-publish-list">
-                <div data-template>{# this will get detached from the DOM on pageload (jquery.bulky.js) #}
-                    <input type="checkbox" data-selected checked/>
-                    <label class="checkbox-label" data-participant-name></label>
-                </div>
-            </section>
-            <div class="component-action">
-                <section>
-                    {%- apply spaceless -%}
-                        <a class="button">Cancel</a>
-                        <a class="button" data-submit>Publish All</a>
-                    {%- endapply -%}
+    {% if not allReadonly %}
+        {% if assessment.isImplementation %}
+            <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/jquery.select-all.basic.js?v={{ config.site_version }}"></script>
+            <script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/jquery.bulky.js?v={{ config.site_version }}"></script>
+            {# The div below is used by bulky.js to create the mass-publish modal. #}
+            <div id="mass-publish" class="reveal-modal" data-reveal data-list-id="mass-publish-list" aria-hidden="true"
+                 role="dialog">
+                <h2>Publish Drafts</h2>
+                <p data-mass-unavailable>There aren't any valid and unpublished drafts for this activity.</p>
+                <p data-mass-available>The following drafts can be published:</p>
+                <section class="checklist" id="mass-publish-list">
+                    <div data-template>{# this will get detached from the DOM on pageload (jquery.bulky.js) #}
+                        <input type="checkbox" data-selected checked/>
+                        <label class="checkbox-label" data-participant-name></label>
+                    </div>
                 </section>
-            </div>
-            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-        </div>
-
-        {# The div below is used by bulky.js to create the manage-submissions modal. #}
-        <div id="manage-submissions" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
-            <h2>Manage Submissions</h2>
-
-            {# Decide if this assessment is overdue
-             # If so, blind users with a big orange box
-             #}
-            <span class="alert-box warning" data-overdue-warning style="display:none">{{ assessment.title }} is now overdue.</span>
-
-            <div class="row">
-                <div class="small-12 medium-6 columns" id="mass-submit-draft" data-list-id="mass-submit-draft-list">
-                    <p data-mass-unavailable>You have no students with draft submissions.</p>
-                    <p data-mass-available>Submit students' drafts:</p>
-
-                    <section class="checklist" id="mass-submit-draft-list">
-                        {# this will get detached from the DOM on pageload (jquery.bulky.js) #}
-                        {# data-articipant-name label is populated by JS (jquery.bulky.js) #}
-                        <div data-template>
-                            <input type="checkbox" data-selected />
-                            <label class="checkbox-label" data-participant-name></label>
-                        </div>
+                <div class="component-action">
+                    <section>
+                        {%- apply spaceless -%}
+                            <a class="button">Cancel</a>
+                            <a class="button" data-submit>Publish All</a>
+                        {%- endapply -%}
                     </section>
+                </div>
+                <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+            </div>
 
-                    {# Submission Date override: this is used to state that despite when the action
-                     # to submit a draft actually occurred, the student should have been considered on
-                     # time. This occurs when teachers submit drafts on behalf of their students after
-                     # the due date is reached, despite having practically done the work on time; they
-                     # just didn't complete the workflow.
-                     #}
-                    <div id="mass-submit-draft-punctual-container" data-mass-available>
-                        <hr />
-                        <p>
-                            Did these students submit their work on time? <br />
-                            <span class="switch">
-                                <input id="draft-punctual" type="checkbox" checked="">
-                                <label for="draft-punctual">
-                                    <span>Yes</span>
-                                    <span>No</span>
-                                </label>
-                            </span>
-                        </p>
+            {# The div below is used by bulky.js to create the manage-submissions modal. #}
+            <div id="manage-submissions" class="reveal-modal" data-reveal aria-hidden="true" role="dialog">
+                <h2>Manage Submissions</h2>
+
+                {# Decide if this assessment is overdue
+                 # If so, blind users with a big orange box
+                 #}
+                <span class="alert-box warning" data-overdue-warning style="display:none">{{ assessment.title }} is now overdue.</span>
+
+                <div class="row">
+                    <div class="small-12 medium-6 columns" id="mass-submit-draft" data-list-id="mass-submit-draft-list">
+                        <p data-mass-unavailable>You have no students with draft submissions.</p>
+                        <p data-mass-available>Submit students' drafts:</p>
+
+                        <section class="checklist" id="mass-submit-draft-list">
+                            {# this will get detached from the DOM on pageload (jquery.bulky.js) #}
+                            {# data-articipant-name label is populated by JS (jquery.bulky.js) #}
+                            <div data-template>
+                                <input type="checkbox" data-selected />
+                                <label class="checkbox-label" data-participant-name></label>
+                            </div>
+                        </section>
+
+                        {# Submission Date override: this is used to state that despite when the action
+                         # to submit a draft actually occurred, the student should have been considered on
+                         # time. This occurs when teachers submit drafts on behalf of their students after
+                         # the due date is reached, despite having practically done the work on time; they
+                         # just didn't complete the workflow.
+                         #}
+                        <div id="mass-submit-draft-punctual-container" data-mass-available>
+                            <hr />
+                            <p>
+                                Did these students submit their work on time? <br />
+                                <span class="switch">
+                                    <input id="draft-punctual" type="checkbox" checked="">
+                                    <label for="draft-punctual">
+                                        <span>Yes</span>
+                                        <span>No</span>
+                                    </label>
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="small-12 medium-6 columns" id="mass-submit-offline" data-list-id="mass-submit-offline-list">
+                        <p data-mass-unavailable>You have no students requiring submission.</p>
+                        <p data-mass-available>Mark students as submitted:</p>
+
+                        <section class="checklist" id="mass-submit-offline-list">
+                            {# this will get detached from the DOM on pageload (jquery.bulky.js) #}
+                            {# data-articipant-name label is populated by JS (jquery.bulky.js) #}
+                            <div data-template>
+                                <input type="checkbox" data-selected />
+                                <label class="checkbox-label" data-participant-name></label>
+                            </div>
+                        </section>
+
+                        {# Submission Date override: this is used to state that despite when the action
+                         # to submit offline actually occurred, the student should have been considered on
+                         # time. This occurs when teachers Mark As Submitted on behalf of their students after
+                         # the due date is reached, despite having practically done the work on time; they
+                         # just didn't complete the workflow.
+                         #}
+                        <div id="mass-submit-offline-punctual-container" data-mass-available>
+                            <hr />
+                            <p>
+                                Did these students submit their work on time? <br />
+                                <span class="switch">
+                                    <input id="offline-punctual" type="checkbox" checked="">
+                                    <label for="offline-punctual">
+                                        <span>Yes</span>
+                                        <span>No</span>
+                                    </label>
+                                </span>
+                            </p>
+                        </div>
                     </div>
                 </div>
-                <div class="small-12 medium-6 columns" id="mass-submit-offline" data-list-id="mass-submit-offline-list">
-                    <p data-mass-unavailable>You have no students requiring submission.</p>
-                    <p data-mass-available>Mark students as submitted:</p>
 
-                    <section class="checklist" id="mass-submit-offline-list">
-                        {# this will get detached from the DOM on pageload (jquery.bulky.js) #}
-                        {# data-articipant-name label is populated by JS (jquery.bulky.js) #}
-                        <div data-template>
-                            <input type="checkbox" data-selected />
-                            <label class="checkbox-label" data-participant-name></label>
-                        </div>
+                <div class="component-action">
+                    <section>
+                        {%- apply spaceless -%}
+                            <a class="button">Cancel</a>
+                            <a class="button" data-submit>Save</a>
+                        {%- endapply -%}
                     </section>
+                </div>
+                <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+            </div>
 
-                    {# Submission Date override: this is used to state that despite when the action
-                     # to submit offline actually occurred, the student should have been considered on
-                     # time. This occurs when teachers Mark As Submitted on behalf of their students after
-                     # the due date is reached, despite having practically done the work on time; they
-                     # just didn't complete the workflow.
-                     #}
-                    <div id="mass-submit-offline-punctual-container" data-mass-available>
-                        <hr />
-                        <p>
-                            Did these students submit their work on time? <br />
-                            <span class="switch">
-                                <input id="offline-punctual" type="checkbox" checked="">
-                                <label for="offline-punctual">
-                                    <span>Yes</span>
-                                    <span>No</span>
-                                </label>
-                            </span>
-                        </p>
+            {# The div below is used by bulky.js to create the mass-download modal. #}
+            <div id="mass-download" class="reveal-modal" data-reveal data-list-id="mass-download-list" aria-hidden="true"
+                 role="dialog">
+                <h2>Download All Submissions</h2>
+                <p>Download all submissions from these students:</p>
+                <section class="checklist" id="mass-download-list">
+                    <div data-template>{# this will get detached from the DOM on pageload (jquery.bulky.js) #}
+                        <input type="checkbox" data-selected checked/>
+                        <label class="checkbox-label" data-participant-name>{# populated by JS (jquery.bulky.js) #}</label>
                     </div>
-                </div>
-            </div>
-
-            <div class="component-action">
-                <section>
-                    {%- apply spaceless -%}
-                        <a class="button">Cancel</a>
-                        <a class="button" data-submit>Save</a>
-                    {%- endapply -%}
                 </section>
-            </div>
-            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-        </div>
-
-        {# The div below is used by bulky.js to create the mass-download modal. #}
-        <div id="mass-download" class="reveal-modal" data-reveal data-list-id="mass-download-list" aria-hidden="true"
-             role="dialog">
-            <h2>Download All Submissions</h2>
-            <p>Download all submissions from these students:</p>
-            <section class="checklist" id="mass-download-list">
-                <div data-template>{# this will get detached from the DOM on pageload (jquery.bulky.js) #}
-                    <input type="checkbox" data-selected checked/>
-                    <label class="checkbox-label" data-participant-name>{# populated by JS (jquery.bulky.js) #}</label>
+                <div class="component-action">
+                    <section>
+                        {%- apply spaceless -%}
+                            <a class="button" onclick="$('#mass-download').foundation('reveal', 'close');">Cancel</a>
+                            <a class="button" id="download-submissions" data-submit>Download</a>
+                        {%- endapply -%}
+                    </section>
                 </div>
-            </section>
-            <div class="component-action">
-                <section>
-                    {%- apply spaceless -%}
-                        <a class="button" onclick="$('#mass-download').foundation('reveal', 'close');">Cancel</a>
-                        <a class="button" id="download-submissions" data-submit>Download</a>
-                    {%- endapply -%}
-                </section>
+                <a class="close-reveal-modal" aria-label="Close">&#215;</a>
             </div>
-            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-        </div>
+        {% endif %}
 
         <div class="toast" data-alert data-toast></div>
 
@@ -456,82 +251,84 @@
         {% autoescape 'js' %}
             <script type="text/javascript">
                 $(function () {
-                    {# Decide if this assessment is overdue during runtime
-                     # This accommodates a temporal edge case where you loaded the status screen,
-                     # then waited around for a while before executing a time-sensitive action
-                     # What we knew at the time of loading the screen is different to what's actually
-                     # happening now.
-                     #}
-                    function isOverdue() {
-                        return (Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}');
-                    }
-
-                    {# Decide if the Save button should show
-                     # You only know the lists of humans after they've been built; if there's at least
-                     # one input, show the Save button. Otherwise there's nothing we can do; hide it
-                     #}
-                    function renderCallToAction() {
-                        if (0 === $('#mass-submit-draft-list, #mass-submit-offline-list').find('input:checked').length) {
-                            $('#manage-submissions').find('[data-submit]').hide();
-                        } else {
-                            $('#manage-submissions').find('[data-submit]').show();
-                        }
-                    }
-
-                    {# If you appear in both lists, ensure only one of your checkboxes
-                     # can be active at a given time
-                     #}
-                    function mutex(thisName, thisSelectAll, otherName, otherSelectAll, defaultState) {
-                        let modal = $('#manage-submissions');
-
-                        modal.find('[' + thisName + ']').on('change', function(event) {
-                            if ($(this).is(':checked')) {
-                                let id = $(this).attr(thisName);
-
-                                modal.find('[' + otherName + '="' + id + '"]').prop('checked', false).trigger('change');
-                            }
-
-                            mutexSelectAll(modal, thisName, thisSelectAll, defaultState);
-                            mutexSelectAll(modal, otherName, otherSelectAll, defaultState);
-                        });
-                    }
-
-                    {# Micromanage select-all checkbox
-                     # There's now a really delicate interplay between all these checkboxes.
-                     #}
-                    function mutexSelectAll(defaultState) {
-                        let modal = $('#manage-submissions');
-                        let cssIndeterminate = 'indeterminate';
-
-                        let lists = [
-                            {
-                                'numElems': modal.find('[data-mass-draft]').length,
-                                'numChecked': modal.find('[data-mass-draft]:checked').length,
-                                'selectAll': modal.find('#data-bulky-select-all-checkbox-mass-draft')
-                            },
-                            {
-                                'numElems': modal.find('[data-mass-offline]').length,
-                                'numChecked': modal.find('[data-mass-offline]:checked').length,
-                                'selectAll': modal.find('#data-bulky-select-all-checkbox-mass-offline')
-                            },
-                        ];
-
-                        {# Despite what's coded in select-all.basic, for whatever jquery-based reason,
-                         # programmatically changing a checkbox state doesn't recalculate the select-all's
-                         # state, especially when one list causes the last element in another list to be
-                         # unticked. The select-all for this latter list will no longer represent the correct
-                         # state it's in. That forces me to micromanage (and maybe double-handle) this usage.
+                    {% if assessment.isImplementation %}
+                        {# Decide if this assessment is overdue during runtime
+                         # This accommodates a temporal edge case where you loaded the status screen,
+                         # then waited around for a while before executing a time-sensitive action
+                         # What we knew at the time of loading the screen is different to what's actually
+                         # happening now.
                          #}
-                        $.each(lists, function(index, element) {
-                            if (0 === element.numChecked && !defaultState) {
-                                element.selectAll.removeClass(cssIndeterminate).attr('checked', false);
-                            } else if (element.numChecked === element.numElems) {
-                                element.selectAll.removeClass(cssIndeterminate).attr('checked', true);
+                        function isOverdue() {
+                            return (Date.now() / 1000) > Number('{{ assessment.dueAt.unixTimestamp }}');
+                        }
+
+                        {# Decide if the Save button should show
+                         # You only know the lists of humans after they've been built; if there's at least
+                         # one input, show the Save button. Otherwise there's nothing we can do; hide it
+                         #}
+                        function renderCallToAction() {
+                            if (0 === $('#mass-submit-draft-list, #mass-submit-offline-list').find('input:checked').length) {
+                                $('#manage-submissions').find('[data-submit]').hide();
                             } else {
-                                element.selectAll.addClass(cssIndeterminate);
+                                $('#manage-submissions').find('[data-submit]').show();
                             }
-                        });
-                    }
+                        }
+
+                        {# If you appear in both lists, ensure only one of your checkboxes
+                         # can be active at a given time
+                         #}
+                        function mutex(thisName, thisSelectAll, otherName, otherSelectAll, defaultState) {
+                            let modal = $('#manage-submissions');
+
+                            modal.find('[' + thisName + ']').on('change', function(event) {
+                                if ($(this).is(':checked')) {
+                                    let id = $(this).attr(thisName);
+
+                                    modal.find('[' + otherName + '="' + id + '"]').prop('checked', false).trigger('change');
+                                }
+
+                                mutexSelectAll(modal, thisName, thisSelectAll, defaultState);
+                                mutexSelectAll(modal, otherName, otherSelectAll, defaultState);
+                            });
+                        }
+
+                        {# Micromanage select-all checkbox
+                         # There's now a really delicate interplay between all these checkboxes.
+                         #}
+                        function mutexSelectAll(defaultState) {
+                            let modal = $('#manage-submissions');
+                            let cssIndeterminate = 'indeterminate';
+
+                            let lists = [
+                                {
+                                    'numElems': modal.find('[data-mass-draft]').length,
+                                    'numChecked': modal.find('[data-mass-draft]:checked').length,
+                                    'selectAll': modal.find('#data-bulky-select-all-checkbox-mass-draft')
+                                },
+                                {
+                                    'numElems': modal.find('[data-mass-offline]').length,
+                                    'numChecked': modal.find('[data-mass-offline]:checked').length,
+                                    'selectAll': modal.find('#data-bulky-select-all-checkbox-mass-offline')
+                                },
+                            ];
+
+                            {# Despite what's coded in select-all.basic, for whatever jquery-based reason,
+                             # programmatically changing a checkbox state doesn't recalculate the select-all's
+                             # state, especially when one list causes the last element in another list to be
+                             # unticked. The select-all for this latter list will no longer represent the correct
+                             # state it's in. That forces me to micromanage (and maybe double-handle) this usage.
+                             #}
+                            $.each(lists, function(index, element) {
+                                if (0 === element.numChecked && !defaultState) {
+                                    element.selectAll.removeClass(cssIndeterminate).attr('checked', false);
+                                } else if (element.numChecked === element.numElems) {
+                                    element.selectAll.removeClass(cssIndeterminate).attr('checked', true);
+                                } else {
+                                    element.selectAll.addClass(cssIndeterminate);
+                                }
+                            });
+                        }
+                    {% endif %}
 
                     $.fn.dynamicFeedback({
                         statusIncomplete: '{{ statusIncomplete }}',
@@ -564,452 +361,466 @@
                             });
                         }
                     });
+                    {% if assessment.isImplementation %}
+                        let $userList = $('[data-assessment-status]');
 
-                    let $userList = $('#assessment-status');
+                        {# Mass publish draft feedbacks #}
+                        $('#mass-publish').bulky({
+                            submitText: function (len, all) {
+                                if (!len) {
+                                    return 'None Selected';
+                                }
 
-                    {# Mass publish draft feedbacks #}
-                    $('#mass-publish').bulky({
-                        submitText: function (len, all) {
-                            if (!len) {
-                                return 'None Selected';
-                            }
+                                if (len === all) {
+                                    return 'Publish All';
+                                }
 
-                            if (len === all) {
-                                return 'Publish All';
-                            }
+                                return 'Publish ' + len + ' of ' + all;
+                            },
 
-                            return 'Publish ' + len + ' of ' + all;
-                        },
+                            userSelector: '[data-mass-publish]',
+                            userList: $userList,
 
-                        userSelector: '[data-mass-publish]',
-                        userList: $userList,
+                            {# The people you want to publish must have currently-valid data
+                             # Otherwise you'll end up potentially publishing invalid data
+                             #}
+                            checkboxConditionality: function(id) {
+                                return $('[data-feedback-form="' + id + '"]').valid();
+                            },
 
-                        {# The people you want to publish must have currently-valid data
-                         # Otherwise you'll end up potentially publishing invalid data
-                         #}
-                        checkboxConditionality: function(id) {
-                            return $('[data-feedback-form="' + id + '"]').valid();
-                        },
+                            {# When you hit Publish All, it attempts to save each draft feedback in the list
+                             # It gets those feedbacks' ids and publishes them in the back end
+                             #
+                             # This should take an intersect of the checkbox list that you saw in the modal
+                             # and the available drafts in the quickmark screen
+                             #}
+                            onSubmit: function (toPublish) {
+                                let draftFeedbackIds = [],
+                                    $actionBars      = [],
+                                    $toast = $('[data-toast]');
 
-                        {# When you hit Publish All, it attempts to save each draft feedback in the list
-                         # It gets those feedbacks' ids and publishes them in the back end
-                         #
-                         # This should take an intersect of the checkbox list that you saw in the modal
-                         # and the available drafts in the quickmark screen
-                         #}
-                        onSubmit: function (toPublish) {
-                            let draftFeedbackIds = [],
-                                $actionBars      = [],
-                                $toast = $('[data-toast]');
+                                $toast.toastActivate({text: 'Publishing drafts...'});
 
-                            $toast.toastActivate({text: 'Publishing drafts...'});
+                                {# Iterate through each publish button #}
+                                toPublish.each(function () {
+                                    let $actionBar      = $(this),
+                                        $publishButton  = $actionBar.find('[data-draft=publish]'),
+                                        draftFeedbackId = $publishButton.attr('data-draft-id');
 
-                            {# Iterate through each publish button #}
-                            toPublish.each(function () {
-                                let $actionBar      = $(this),
-                                    $publishButton  = $actionBar.find('[data-draft=publish]'),
-                                    draftFeedbackId = $publishButton.attr('data-draft-id');
+                                    $publishButton.html('Publishing...');
+                                    $publishButton.attr('disabled', 'disabled');
+                                    draftFeedbackIds.push(draftFeedbackId);
+                                    $actionBars[draftFeedbackId] = $actionBar;
+                                });
 
-                                $publishButton.html('Publishing...');
-                                $publishButton.attr('disabled', 'disabled');
-                                draftFeedbackIds.push(draftFeedbackId);
-                                $actionBars[draftFeedbackId] = $actionBar;
-                            });
+                                $.post('{{ routeLookup('learningDueWorkFeedback.postParticipantFeedbacks', {assessmentId: assessment.id}) }}', {
+                                    'drafts': draftFeedbackIds
+                                }).done(function (response) {
+                                    let feedbackErrors = false;
 
-                            $.post('{{ routeLookup('learningDueWorkFeedback.postParticipantFeedbacks', {assessmentId: assessment.id}) }}', {
-                                'drafts': draftFeedbackIds
-                            }).done(function (response) {
-                                let feedbackErrors = false;
+                                    for (let feedbackId in response) {
+                                        if (response.hasOwnProperty(feedbackId)) {
+                                            let result           = response[feedbackId],
+                                                isPublishSuccess = result['publishSuccess'],
+                                                $actionBar       = $actionBars[feedbackId],
+                                                $publishButton   = $actionBar.find('[data-draft=publish]');
 
-                                for (let feedbackId in response) {
-                                    if (response.hasOwnProperty(feedbackId)) {
-                                        let result           = response[feedbackId],
-                                            isPublishSuccess = result['publishSuccess'],
-                                            $actionBar       = $actionBars[feedbackId],
-                                            $publishButton   = $actionBar.find('[data-draft=publish]');
+                                            feedbackErrors = feedbackErrors || !isPublishSuccess;
 
-                                        feedbackErrors = feedbackErrors || !isPublishSuccess;
+                                            $publishButton.html('Publish');
+                                            $publishButton.removeAttr('disabled');
 
-                                        $publishButton.html('Publish');
-                                        $publishButton.removeAttr('disabled');
-
-                                        if (isPublishSuccess) {
-                                            draftPublishSuccess($actionBar, $publishButton);
+                                            if (isPublishSuccess) {
+                                                draftPublishSuccess($actionBar, $publishButton);
+                                            }
                                         }
                                     }
+
+                                    {# Update the toast depending on error/success #}
+                                    if (feedbackErrors) {
+                                        $toast.toastTimeout({text: 'Unable to publish all drafts', css: 'alert'});
+                                    } else {
+                                        $toast.toastTimeout({text: 'Published all drafts', css: 'success'});
+                                    }
+                                }).fail(function () {
+                                    {# Something went wrong, display an error toast #}
+                                    $toast.toastTimeout({text: 'Unable to publish draft feedbacks.', css: 'alert'});
+                                });
+                            }
+                        });
+
+                        {# Decide if we've gone past the due date
+                         # If we did, provide a checkbox to allow teachers to override when this action occurred
+                         #}
+                        $('#mass-submit-draft').bulky({
+                            includeSelectAllCheckbox: true,
+                            /* Default state of select-all checkbox
+                             * Ensure the mutex also has this value
+                             */
+                            defaultState: false,
+                            modal: $('#manage-submissions'),
+                            userSelector: '[data-mass-submit-draft]',
+                            userList: $userList,
+                            checkboxPrefix: 'mass-draft',
+                            submitText: function (len, all) {
+                                let onTimeContainer = $('#mass-submit-draft-punctual-container');
+
+                                {# Initially hide this checkbox thing until we actually need it #}
+                                onTimeContainer.hide();
+
+                                if (isOverdue()) {
+                                    $('[data-overdue-warning]').show();
+                                    onTimeContainer.show();
                                 }
 
-                                {# Update the toast depending on error/success #}
-                                if (feedbackErrors) {
-                                    $toast.toastTimeout({text: 'Unable to publish all drafts', css: 'alert'});
-                                } else {
-                                    $toast.toastTimeout({text: 'Published all drafts', css: 'success'});
-                                }
-                            }).fail(function () {
-                                {# Something went wrong, display an error toast #}
-                                $toast.toastTimeout({text: 'Unable to publish draft feedbacks.', css: 'alert'});
-                            });
-                        }
-                    });
-
-                    {# Decide if we've gone past the due date
-                     # If we did, provide a checkbox to allow teachers to override when this action occurred
-                     #}
-                    $('#mass-submit-draft').bulky({
-                        includeSelectAllCheckbox: true,
-                        /* Default state of select-all checkbox
-                         * Ensure the mutex also has this value
-                         */
-                        defaultState: false,
-                        modal: $('#manage-submissions'),
-                        userSelector: '[data-mass-submit-draft]',
-                        userList: $userList,
-                        checkboxPrefix: 'mass-draft',
-                        submitText: function (len, all) {
-                            let onTimeContainer = $('#mass-submit-draft-punctual-container');
-
-                            {# Initially hide this checkbox thing until we actually need it #}
-                            onTimeContainer.hide();
-
-                            if (isOverdue()) {
-                                $('[data-overdue-warning]').show();
-                                onTimeContainer.show();
-                            }
-
-                            {# Both bulkys alter the same ui element #}
-                            return 'Save';
-                        },
-                        onAfterBuildList: function() {
-                            /* Maybe hide the call to action if there's nobody to choose
-                             */
-                            renderCallToAction();
-
-                            /* Mutex checkboxes with other list
-                             */
-                            mutex('data-mass-draft', 'data-bulky-select-all-checkbox-mass-draft', 'data-mass-offline', 'data-bulky-select-all-checkbox-mass-offline', false);
-                        },
-                        onAfterSelectAllChange: function() {
-                            /* Maybe hide the call to action if there's nobody to choose
-                             */
-                            renderCallToAction();
-                            mutexSelectAll();
-                        },
-                        onAfterCheckboxChange: function() {
-                            /* Maybe hide the call to action if there's nobody to choose
-                             */
-                            renderCallToAction();
-                            mutexSelectAll();
-                        }
-                    });
-
-                    $('#mass-submit-offline').bulky({
-                        includeSelectAllCheckbox: true,
-                        /* Default state of select-all checkbox
-                         * Ensure the mutex also has this value
-                         */
-                        defaultState: false,
-                        modal: $('#manage-submissions'),
-                        userSelector: '[data-mass-submit]',
-                        userList: $userList,
-                        checkboxPrefix: 'mass-offline',
-                        submitText: function (len, all) {
-                            let onTimeContainer = $('#mass-submit-offline-punctual-container');
-
-                            {# Initially hide this checkbox thing until we actually need it #}
-                            onTimeContainer.hide();
-
-                            if (isOverdue()) {
-                                $('[data-overdue-warning]').show();
-                                onTimeContainer.show();
-                            }
-
-                            {# Both bulkys alter the same ui element #}
-                            return 'Save';
-                        },
-                        onAfterBuildList: function() {
-                            /* Maybe hide the call to action if there's nobody to choose
-                             */
-                            renderCallToAction();
-
-                            /* Mutex checkboxes with other list
-                             */
-                            mutex('data-mass-offline', 'data-bulky-select-all-checkbox-mass-offline', 'data-mass-draft', 'data-bulky-select-all-checkbox-mass-draft', false);
-                        },
-                        onAfterSelectAllChange: function() {
-                            /* Maybe hide the call to action if there's nobody to choose
-                             */
-                            renderCallToAction();
-                            mutexSelectAll();
-                        },
-                        onAfterCheckboxChange: function() {
-                            /* Maybe hide the call to action if there's nobody to choose
-                             */
-                            renderCallToAction();
-                            mutexSelectAll();
-                        }
-                    });
-
-                    {# Construct mega-payload of forcibly-submitted drafts and receipt of submissions.
-                     # This sends everything to the backend for processing, then reloads this very screen,
-                     # otherwise users won't see the latest outcome of submissions (offline or otherwise)
-                     #}
-                    $('#manage-submissions').find('[data-submit]').on('click', function(event) {
-                        event.preventDefault();
-
-                        {# Compile the list of selected draftees and selected offliners #}
-                        let payload = {
-                            'draft': {
-                                'ids': [],
-                                'punctual': 'false'
+                                {# Both bulkys alter the same ui element #}
+                                return 'Save';
                             },
-                            'offline': {
-                                'ids': [],
-                                'punctual': 'false'
+                            onAfterBuildList: function() {
+                                /* Maybe hide the call to action if there's nobody to choose
+                                 */
+                                renderCallToAction();
+
+                                /* Mutex checkboxes with other list
+                                 */
+                                mutex('data-mass-draft', 'data-bulky-select-all-checkbox-mass-draft', 'data-mass-offline', 'data-bulky-select-all-checkbox-mass-offline', false);
+                            },
+                            onAfterSelectAllChange: function() {
+                                /* Maybe hide the call to action if there's nobody to choose
+                                 */
+                                renderCallToAction();
+                                mutexSelectAll();
+                            },
+                            onAfterCheckboxChange: function() {
+                                /* Maybe hide the call to action if there's nobody to choose
+                                 */
+                                renderCallToAction();
+                                mutexSelectAll();
                             }
-                        }
+                        });
 
-                        {# Compile the list of selected draftees #}
-                        $('#mass-submit-draft-list')
-                                .find('input[type=checkbox]:checked')
-                                .each(function(index, element) {
-                                    payload.draft.ids.push($(element).attr('data-mass-draft'));
+                        $('#mass-submit-offline').bulky({
+                            includeSelectAllCheckbox: true,
+                            /* Default state of select-all checkbox
+                             * Ensure the mutex also has this value
+                             */
+                            defaultState: false,
+                            modal: $('#manage-submissions'),
+                            userSelector: '[data-mass-submit]',
+                            userList: $userList,
+                            checkboxPrefix: 'mass-offline',
+                            submitText: function (len, all) {
+                                let onTimeContainer = $('#mass-submit-offline-punctual-container');
+
+                                {# Initially hide this checkbox thing until we actually need it #}
+                                onTimeContainer.hide();
+
+                                if (isOverdue()) {
+                                    $('[data-overdue-warning]').show();
+                                    onTimeContainer.show();
+                                }
+
+                                {# Both bulkys alter the same ui element #}
+                                return 'Save';
+                            },
+                            onAfterBuildList: function() {
+                                /* Maybe hide the call to action if there's nobody to choose
+                                 */
+                                renderCallToAction();
+
+                                /* Mutex checkboxes with other list
+                                 */
+                                mutex('data-mass-offline', 'data-bulky-select-all-checkbox-mass-offline', 'data-mass-draft', 'data-bulky-select-all-checkbox-mass-draft', false);
+                            },
+                            onAfterSelectAllChange: function() {
+                                /* Maybe hide the call to action if there's nobody to choose
+                                 */
+                                renderCallToAction();
+                                mutexSelectAll();
+                            },
+                            onAfterCheckboxChange: function() {
+                                /* Maybe hide the call to action if there's nobody to choose
+                                 */
+                                renderCallToAction();
+                                mutexSelectAll();
+                            }
+                        });
+
+                        {# Construct mega-payload of forcibly-submitted drafts and receipt of submissions.
+                         # This sends everything to the backend for processing, then reloads this very screen,
+                         # otherwise users won't see the latest outcome of submissions (offline or otherwise)
+                         #}
+                        $('#manage-submissions').find('[data-submit]').on('click', function(event) {
+                            event.preventDefault();
+
+                            {# Compile the list of selected draftees and selected offliners #}
+                            let payload = {
+                                'draft': {
+                                    'ids': [],
+                                    'punctual': 'false'
+                                },
+                                'offline': {
+                                    'ids': [],
+                                    'punctual': 'false'
+                                }
+                            }
+
+                            {# Compile the list of selected draftees #}
+                            $('#mass-submit-draft-list')
+                                    .find('input[type=checkbox]:checked')
+                                    .each(function(index, element) {
+                                        payload.draft.ids.push($(element).attr('data-mass-draft'));
+                                    });
+
+                            payload.draft.punctual = $('#draft-punctual').is(':checked');
+
+                            {# Compile the list of selected offliners #}
+                            $('#mass-submit-offline-list')
+                                    .find('input[type=checkbox]:checked')
+                                    .each(function(index, element) {
+                                        payload.offline.ids.push($(element).attr('data-mass-offline'));
+                                    });
+
+                            payload.offline.punctual = $('#offline-punctual').is(':checked');
+
+                            let route = '{{ routeLookupIfAuthorized('learningAssessment.postManageSubmissions', {assessmentId: assessment.id, assessment: assessment}) }}';
+
+                            if (route.length) {
+                                const toast = window.sbProps.toastActivate("Saving...");
+
+                                $.post(route, payload)
+                                    .done((responseText) => {
+                                        toast.timeout({ text: "Saved. Reloading..." });
+                                        window.location.reload();
+                                    })
+                                    .fail(() => {
+                                        /* this could potentially be that the assessment has been marked as submitted but
+                                         * but some other things have gone wrong (ie. notifier), so will use a more generic message
+                                         */
+                                        toast.timeout({
+                                            text: "Something has gone wrong, please contact your support if the problem persists",
+                                            isSuccess: false
+                                        });
+                                    });
+                            }
+                        });
+
+                        {# Mass download submissions #}
+                        $('#mass-download').bulky({
+                            includeSelectAllCheckbox: true,
+                            invalidOptionText: 'nothing to download',
+
+                            // Prevent multiple download requests by clicking the download button multiple times...
+                            downloadRequested: false,
+
+                            /**
+                             * @param len - the number of enabled checkboxes that are checked.
+                             * @param all - the number of enabled checkboxes.
+                             *
+                             * Neither of the counts include the 'select all' checkbox.
+                             */
+                            submitText: function (len, all) {
+                                if (len === 0) {
+                                    return 'Download None';
+                                }
+                                if (len === all) {
+                                    return 'Download All';
+                                }
+                                return 'Download ' + len + ' of ' + all;
+                            },
+                            userSelector: '[data-mass-download]',
+                            userList: $userList,
+                            checkboxConditionality: function (id) {
+                                // Exclude students with no downloadable work.
+                                return ($('[data-participant=' + id + ']').attr('data-status') !== 'incomplete');
+                            },
+                            onSubmit: function (toSubmit) {
+                                $('body').confirmDialog({
+                                    header: 'Download all feedback and submissions?',
+                                    format: 'html',
+                                    text: `
+                                        <p>
+                                            Please be aware that your download will take some time
+                                            to complete, as we compile the students&rsquo; feedback
+                                            and submissions into a ZIP file.
+                                        </p>
+                                        <p>
+                                            Feel free to move away from this page and continue
+                                            working: we will send you a notification when the file
+                                            is ready to download.
+                                        </p>
+                                        `,
+                                    confirmEvent: function () {
+                                        if (!this.downloadRequested) {
+                                            this.downloadRequested = true;
+                                            let userIdsString = '';
+                                            for (let elem of toSubmit) {
+                                                let userId = $(elem).attr('data-action-bar')
+                                                userIdsString += '&userIds[]=' + userId;
+                                            }
+
+                                            let url = (
+                                                    "{{ routeLookup('learningAssessment.downloadSubmissions', {
+                                                        assessmentId: assessment.id,
+                                                        assessment: assessment
+                                                    }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" + userIdsString
+                                            );
+
+                                            window.location.replace(url);
+                                        }
+                                    }
                                 });
+                            },
+                            // Override the default 'onClose' action with no action.  This is necessary because the default
+                            // action (which is to close the bulky modal), has the unwanted side-effect of also closing the
+                            // confirmDialog modal before the user can interact with it.
+                            onClose: function () {}
+                        });
 
-                        payload.draft.punctual = $('#draft-punctual').is(':checked');
+                        {# Handle clicks on 'Submission Received' buttons #}
+                        $('[data-sobo]').on('click', function () {
+                            let $buttonClicked = $(this);
 
-                        {# Compile the list of selected offliners #}
-                        $('#mass-submit-offline-list')
-                                .find('input[type=checkbox]:checked')
-                                .each(function(index, element) {
-                                    payload.offline.ids.push($(element).attr('data-mass-offline'));
-                                });
+                            if (isOverdue()) {
+                                $('#confirm-dialog').foundation('reveal', 'open'); {# Reveal confirm popup to ask the user whether submission was on-time. #}
 
-                        payload.offline.punctual = $('#offline-punctual').is(':checked');
-
-                        let route = '{{ routeLookupIfAuthorized('learningAssessment.postManageSubmissions', {assessmentId: assessment.id, assessment: assessment}) }}';
-
-                        if (route.length) {
-                            $.post(route, payload, function(responseText) {
-                                window.location.reload();
-                            })
-                        }
-                    });
-
-                    {# Mass download submissions #}
-                    $('#mass-download').bulky({
-                        includeSelectAllCheckbox: true,
-                        invalidOptionText: 'nothing to download',
-
-                        // Prevent multiple download requests by clicking the download button multiple times...
-                        downloadRequested: false,
+                                {# Handle clicks on confirm popup buttons. #}
+                                {# We bind click handlers here so we can pass $buttonClicked to postSobo() directly. #}
+                                {# Because we bind here, we first unbind to avoid binding the same function again each time the 'No' or 'Yes' button is clicked. #}
+                                $('#confirm-dialog [data-yes]').unbind('click').click(function () {postSobo($buttonClicked, true );});
+                                $('#confirm-dialog [data-no]' ).unbind('click').click(function () {postSobo($buttonClicked, false);});
+                            } else {
+                                postSobo($buttonClicked, false); {# Submission was not confirmed to be on-time. #}
+                            }
+                        });
 
                         /**
-                         * @param len - the number of enabled checkboxes that are checked.
-                         * @param all - the number of enabled checkboxes.
+                         * Send a post request to the server, notifying that:
+                         *  * the student (identified by the button clicked)
+                         *  * has submitted the assessment task (identified by the button href).
                          *
-                         * Neither of the counts include the 'select all' checkbox.
+                         * @param $button
+                         * @param {boolean} submissionWasOnTime - true if the submission was received on time.
                          */
-                        submitText: function (len, all) {
-                            if (len === 0) {
-                                return 'Download None';
-                            }
-                            if (len === all) {
-                                return 'Download All';
-                            }
-                            return 'Download ' + len + ' of ' + all;
-                        },
-                        userSelector: '[data-mass-download]',
-                        userList: $userList,
-                        checkboxConditionality: function (id) {
-                            // Exclude students with no downloadable work.
-                            return ($('[data-participant=' + id + ']').attr('data-status') !== 'incomplete');
-                        },
-                        onSubmit: function (toSubmit) {
-                            $('body').confirmDialog({
-                                header: 'Download all feedback and submissions?',
-                                format: 'html',
-                                text: `
-                                    <p>
-                                        Please be aware that your download will take some time
-                                        to complete, as we compile the students&rsquo; feedback
-                                        and submissions into a ZIP file.
-                                    </p>
-                                    <p>
-                                        Feel free to move away from this page and continue
-                                        working: we will send you a notification when the file
-                                        is ready to download.
-                                    </p>
-                                    `,
-                                confirmEvent: function () {
-                                    if (!this.downloadRequested) {
-                                        this.downloadRequested = true;
-                                        let userIdsString = '';
-                                        for (let elem of toSubmit) {
-                                            let userId = $(elem).attr('data-action-bar')
-                                            userIdsString += '&userIds[]=' + userId;
-                                        }
+                        function postSobo($button, submissionWasOnTime) {
+                            let buttonText   = $button.html(),
+                                $actionBar   = $button.closest('[data-action-bar]'),
+                                $participant = $actionBar.closest('[data-participant]'),
+                                $statusIcon  = $participant.find('[data-status]'),
+                                $statusLabel = $participant.find('[data-status-label]'),
+                                $toast       = $('[data-toast]');
 
-                                        let url = (
-                                                "{{ routeLookup('learningAssessment.downloadSubmissions', {
-                                                    assessmentId: assessment.id,
-                                                    assessment: assessment
-                                                }) }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" + userIdsString
-                                        );
+                            $toast.toastActivate({text: 'Marking submission as received...'});
+                            $button.html('Working...');
+                            $button.attr('disabled', '');
 
-                                        window.location.replace(url);
+                            $.post($button.attr('href'), {'submissionWasOnTime': submissionWasOnTime})
+                            .done(function(response) {
+                                /** @var {bool} response.success */
+                                if (true !== Boolean(response.success)) {
+                                    soboFailure($button, buttonText, $toast);
+                                    return;
+                                }
+
+                                /** @var {bool} response.submittedLate */
+                                soboSuccess(
+                                    $participant,
+                                    $button,
+                                    $actionBar,
+                                    $statusIcon,
+                                    $statusLabel,
+                                    response.submittedLate,
+                                    $toast
+                                )
+                            })
+                            .fail(function () {
+                                $('#confirm-dialog').hide();
+                                soboFailure($button, buttonText, $toast);
+                            });
+
+                            $('#confirm-dialog').foundation('reveal', 'close');
+                        }
+
+                        /**
+                         * Handle a submission receipt success
+                         *
+                         * @param {jQuery} $participant
+                         * @param {jQuery} $button
+                         * @param {jQuery} $actionBar
+                         * @param {jQuery} $statusIcon
+                         * @param {jQuery} $statusLabel
+                         * @param {bool}   submittedLate
+                         * @param {jQuery} $toast
+                         */
+                        function soboSuccess($participant,
+                                             $button,
+                                             $actionBar,
+                                             $statusIcon,
+                                             $statusLabel,
+                                             submittedLate,
+                                             $toast) {
+                            $toast.toastTimeout({text: 'Submission marked as received', css: 'success'});
+                            $button.fadeOut({
+                                done: function () {
+                                    if (!$actionBar.is('[data-mass-publish]')) {
+                                        $actionBar.slideUp();
                                     }
+                                    $button.remove();
                                 }
                             });
-                        },
-                        // Override the default 'onClose' action with no action.  This is necessary because the default
-                        // action (which is to close the bulky modal), has the unwanted side-effect of also closing the
-                        // confirmDialog modal before the user can interact with it.
-                        onClose: function () {}
-                    });
-
-                    {# Handle clicks on 'Submission Received' buttons #}
-                    $('[data-sobo]').on('click', function () {
-                        let $buttonClicked = $(this);
-
-                        if (isOverdue()) {
-                            $('#confirm-dialog').foundation('reveal', 'open'); {# Reveal confirm popup to ask the user whether submission was on-time. #}
-
-                            {# Handle clicks on confirm popup buttons. #}
-                            {# We bind click handlers here so we can pass $buttonClicked to postSobo() directly. #}
-                            {# Because we bind here, we first unbind to avoid binding the same function again each time the 'No' or 'Yes' button is clicked. #}
-                            $('#confirm-dialog [data-yes]').unbind('click').click(function () {postSobo($buttonClicked, true );});
-                            $('#confirm-dialog [data-no]' ).unbind('click').click(function () {postSobo($buttonClicked, false);});
-                        } else {
-                            postSobo($buttonClicked, false); {# Submission was not confirmed to be on-time. #}
+                            $participant.attr('data-status', 'pending');
+                            $actionBar.removeAttr('data-mass-submit');
+                            $statusIcon.addClass('{{ statusPending }}');
+                            $statusLabel.html('Submitted in person ' + (submittedLate ? 'late' : 'on time'));
+                            $statusIcon.attr('title', '{{ labelPending }}');
+                            $statusIcon.attr('data-assessment-status-light', 'pending');
+                            $('#filters').find('[data-status="pending"]').prop('checked', true);
                         }
-                    });
 
-                    /**
-                     * Send a post request to the server, notifying that:
-                     *  * the student (identified by the button clicked)
-                     *  * has submitted the assessment task (identified by the button href).
-                     *
-                     * @param $button
-                     * @param {boolean} submissionWasOnTime - true if the submission was received on time.
-                     */
-                    function postSobo($button, submissionWasOnTime) {
-                        let buttonText   = $button.html(),
-                            $actionBar   = $button.closest('[data-action-bar]'),
-                            $participant = $actionBar.closest('[data-participant]'),
-                            $statusIcon  = $participant.find('[data-status]'),
-                            $statusLabel = $participant.find('[data-status-label]'),
-                            $toast       = $('[data-toast]');
+                        /**
+                         * Handle a submission receipt failure
+                         *
+                         * @param {jQuery} $button
+                         * @param {string} buttonText
+                         * @param {jQuery} $toast
+                         */
+                        function soboFailure($button, buttonText, $toast) {
+                            $button.html(buttonText);
+                            $button.removeAttr('disabled');
+                            $toast.toastTimeout({text: 'Unable to mark submission as received', css: 'alert'});
+                        }
 
-                        $toast.toastActivate({text: 'Marking submission as received...'});
-                        $button.html('Working...');
-                        $button.attr('disabled', '');
+                        /**
+                         * Handle a draft submission success
+                         *
+                         * @param {jQuery} $actionBar
+                         * @param {jQuery} $publishButton
+                         */
+                        function draftPublishSuccess($actionBar, $publishButton) {
+                            let $soboButton      = $actionBar.find('[data-sobo]'),
+                                $draftedSpan     = $actionBar.find('[data-draft=drafted]'),
+                                $extraMeta       = $actionBar.find('[data-feedback-attach-info]'),
+                                $feedbackButtons = $draftedSpan.add($publishButton);
 
-                        $.post($button.attr('href'), {'submissionWasOnTime': submissionWasOnTime})
-                        .done(function(response) {
-                            /** @var {bool} response.success */
-                            if (true !== Boolean(response.success)) {
-                                soboFailure($button, buttonText, $toast);
-                                return;
-                            }
+                            $actionBar.removeAttr('data-mass-publish');
+                            $actionBar.removeAttr('data-manage-submissions');
 
-                            /** @var {bool} response.submittedLate */
-                            soboSuccess(
-                                $participant,
-                                $button,
-                                $actionBar,
-                                $statusIcon,
-                                $statusLabel,
-                                response.submittedLate,
-                                $toast
-                            )
-                        })
-                        .fail(function () {
-                            $('#confirm-dialog').hide();
-                            soboFailure($button, buttonText, $toast);
-                        });
-
-                        $('#confirm-dialog').foundation('reveal', 'close');
-                    }
-
-                    /**
-                     * Handle a submission receipt success
-                     *
-                     * @param {jQuery} $participant
-                     * @param {jQuery} $button
-                     * @param {jQuery} $actionBar
-                     * @param {jQuery} $statusIcon
-                     * @param {jQuery} $statusLabel
-                     * @param {bool}   submittedLate
-                     * @param {jQuery} $toast
-                     */
-                    function soboSuccess($participant,
-                                         $button,
-                                         $actionBar,
-                                         $statusIcon,
-                                         $statusLabel,
-                                         submittedLate,
-                                         $toast) {
-                        $toast.toastTimeout({text: 'Submission marked as received', css: 'success'});
-                        $button.fadeOut({
-                            done: function () {
-                                if (!$actionBar.is('[data-mass-publish]')) {
-                                    $actionBar.slideUp();
+                            // Cannot sobo an acknowledgment once published feedback exists
+                            $soboButton.fadeOut({
+                                done: function () {
+                                    $soboButton.remove();
                                 }
-                                $button.remove();
+                            });
+
+                            // Hide the feedback buttons
+                            $feedbackButtons.fadeOut();
+
+                            // Slide up if no meta to display
+                            if (!$extraMeta.length) {
+                                $actionBar.slideUp();
                             }
-                        });
-                        $participant.attr('data-status', 'pending');
-                        $actionBar.removeAttr('data-mass-submit');
-                        $statusIcon.addClass('{{ statusPending }}');
-                        $statusLabel.html('Submitted in person ' + (submittedLate ? 'late' : 'on time'));
-                        $statusIcon.attr('title', '{{ labelPending }}');
-                        $statusIcon.attr('data-assessment-status-light', 'pending');
-                        $('#filters').find('[data-status="pending"]').prop('checked', true);
-                    }
-
-                    /**
-                     * Handle a submission receipt failure
-                     *
-                     * @param {jQuery} $button
-                     * @param {string} buttonText
-                     * @param {jQuery} $toast
-                     */
-                    function soboFailure($button, buttonText, $toast) {
-                        $button.html(buttonText);
-                        $button.removeAttr('disabled');
-                        $toast.toastTimeout({text: 'Unable to mark submission as received', css: 'alert'});
-                    }
-
-                    /**
-                     * Handle a draft submission success
-                     *
-                     * @param {jQuery} $actionBar
-                     * @param {jQuery} $publishButton
-                     */
-                    function draftPublishSuccess($actionBar, $publishButton) {
-                        let $soboButton      = $actionBar.find('[data-sobo]'),
-                            $draftedSpan     = $actionBar.find('[data-draft=drafted]'),
-                            $extraMeta       = $actionBar.find('[data-feedback-attach-info]'),
-                            $feedbackButtons = $draftedSpan.add($publishButton);
-
-                        $actionBar.removeAttr('data-mass-publish');
-                        $actionBar.removeAttr('data-manage-submissions');
-
-                        // Cannot sobo an acknowledgment once published feedback exists
-                        $soboButton.fadeOut({
-                            done: function () {
-                                $soboButton.remove();
-                            }
-                        });
-
-                        // Hide the feedback buttons
-                        $feedbackButtons.fadeOut();
-
-                        // Slide up if no meta to display
-                        if (!$extraMeta.length) {
-                            $actionBar.slideUp();
                         }
-                    }
+                    {% endif %}
                 });
             </script>
         {% endautoescape %}
@@ -1023,6 +834,11 @@
         <script>
             $(function() {
                 $('#importFeedbackForm').importFeedback();
+
+                /** open the Import Feedback modal when the page loads if the user has asked for it (likely come from the markbook) */
+                if (new URLSearchParams(window.location.search).has('importFeedback')) {
+                    $('#importFeedbackModal').foundation('reveal', 'open');
+                }
             });
         </script>
 

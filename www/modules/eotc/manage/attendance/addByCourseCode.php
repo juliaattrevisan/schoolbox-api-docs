@@ -24,7 +24,18 @@ if ($authenticator->isEOTCCreator($_SESSION['user'])) {
     /* If a course code was provided, find all the students in it
      */
     if (strlen($_POST['courseCode'] ?? '')) {
-        $externalHandler = new \External_Synergetic_Class();
+        /* This only works with the Synergetic connector.
+         * An alternative to 404 would be errors:
+         *  169 Access to this module is denied
+         *  19 You do not have permission to view this page.
+         *
+         * ...but none of those really fit the context as to why you'd be unable to access this place.
+         */
+        if (\External\IConnector::EXTERNAL_TYPE_SYNERGETIC !== Config::get('external_type')) {
+            error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+        }
+
+        $externalHandler = new External_Class();
         $allStudents = $externalHandler->getStudents($_POST['courseCode']);
 
         if (is_array($allStudents) && count($allStudents)) {

@@ -819,10 +819,11 @@ class Event implements ISoftDeletable
      */
     public function setEndDate(string $endDate): self
     {
-        // preserve time if already set
-        [$year, $month, $day] = explode('-', $endDate);
+        $date = new DateTime($endDate);
+        $year = (int) $date->format('Y');
+        $month = (int) $date->format('m');
+        $day = (int) $date->format('d');
         $this->getEndDateTime()->setDate($year, $month, $day);
-
         return $this;
     }
 
@@ -851,8 +852,10 @@ class Event implements ISoftDeletable
      */
     public function setStartDate(string $startDate): self
     {
-        // preserve time if set
-        [$year, $month, $day] = explode('-', $startDate);
+        $date = new DateTime($startDate);
+        $year = (int) $date->format('Y');
+        $month = (int) $date->format('m');
+        $day = (int) $date->format('d');
         $this->getStartDateTime()->setDate($year, $month, $day);
         return $this;
     }

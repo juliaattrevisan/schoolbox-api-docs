@@ -52,7 +52,7 @@ class Controller extends Base
      * @throws \JsonException
      * @throws \Schoolbox\Application\Exception\Exception
      */
-    public function getStudentPhotos(User $viewee): void
+    public function getPhotos(User $viewee): void
     {
         /* Set up guzzle with the authentication pieces
          *
@@ -61,7 +61,7 @@ class Controller extends Base
         try {
             $api = new Api($this->getConfigLoader()->get('geosnapshot_api_key'));
 
-            $response = $api->retrieveStudentPhotos($viewee, $this->getUser(), $this->filesystemProxy);
+            $response = $api->retrievePhotos($viewee, $this->getUser(), $this->filesystemProxy);
         } catch (\RuntimeException | \DomainException $e) {
             /* RuntimeException is thrown when student doesn't have a profile pic
              * DomainException is thrown when json can't be decoded
@@ -72,7 +72,7 @@ class Controller extends Base
         /* Otherwise show the gallery
          */
         $this->response = $this->responseFromTemplate(
-            '@geosnapshotApi/studentPhotos.twig',
+            '@geosnapshotApi/photos.twig',
             [
                 'allBreadcrumbs' => [
                     [$viewee->getFullName(), '/search/user/' . $viewee->getId()],

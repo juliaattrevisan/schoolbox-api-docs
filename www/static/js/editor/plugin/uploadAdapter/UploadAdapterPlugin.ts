@@ -3,7 +3,7 @@
  * uploaded to the server
  */
 
-import type { Editor } from "@ckeditor/ckeditor5-core";
+import type { Editor } from "ckeditor5";
 import UploadAdapter from "@js/editor/plugin/uploadAdapter/UploadAdapter";
 
 /**

@@ -138,7 +138,6 @@ class FilesBuilder
                 'iconFile'    => $file->getStorage()->getMimetype()->getIconFile(),
                 'description' => $file->getStorage()->getMimetype()->getDescription(),
                 'url'         => '/images/mime/' . $file->getStorage()->getMimetype()->getIconFile(),
-                'inline'      => $file->getStorage()->getMimetype()->getInline(),
             ],
             'hidden'        => $file->isHidden(),
             'type'          => $file->getMimetype()->getType(),

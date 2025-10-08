@@ -5,6 +5,7 @@
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import CreateFolder from "@schoolboxTest/playwright/support/page/folder/CreateFolder";
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
+import FeedbackForm from "@schoolboxTest/playwright/support/page/dueWork/FeedbackForm";
 
 // TODO: Move selectors into relevant support page files
 const SELECTOR_RESOURCE_ACTION_HOMEPAGE = "resource-action-homepage";
@@ -39,8 +40,6 @@ const SELECTOR_ASSESSMENT_SUBMISSION_HISTORY = "assessment-submission-history";
 const SELECTOR_ASSESSMENT_SUBMISSION_INPUT_BODY = "assessment-submission-input-body";
 const SELECTOR_ASSESSMENT_RESPONSE_META_TITLE = "assessment-response-meta-title";
 const SELECTOR_ASSESSMENT_FEEDBACK_PUBLISH_BUTTON = "assessment-feedback-publish-button";
-const SELECTOR_ASSESSMENT_FEEDBACK_COMMENT_TEXTAREA = "assessment-feedback-comment-textarea"; // Append "-[userId]"
-const SELECTOR_ASSESSMENT_FEEDBACK_MARK_INPUT = "assessment-feedback-mark-input"; // Append "-[userId]"
 const SELECTOR_ASSESSMENT_STUDENT_CAROUSEL_STATUSLABEL = "assessment-student-carousel-statusLabel"; // Append "-[userId]"
 
 const SELECTOR_CONFIRM_DIALOG_BUTTON_CONFIRM = "confirm-dialog-confirm-button";
@@ -56,8 +55,8 @@ test.describe("Initial Due Work functionality tests", () => {
         await tester.loginAsAdmin();
     });
 
-    test("Create 2 Assessments", async ({ tester, page }) => {
-        const createFolder = new CreateFolder(page);
+    test("Create 2 Assessments", async ({ tester, page, db }) => {
+        const createFolder = new CreateFolder(tester, page);
         const assessmentForm = new AssessmentForm(tester, page);
 
         const teacher = "Jack Coles";
@@ -67,18 +66,23 @@ test.describe("Initial Due Work functionality tests", () => {
 
         // Simulate creating a homepage and adding members
         folderName = `Test Class Homepage ${Date.now()}`; // Timestamp to ensure uniqueness
-        tester.isGoingTo(`create a homepage named "${folderName}"`);
-        await createFolder.goto();
-        await createFolder.setHomepageTemplate("Blank");
-        await createFolder.typeName(folderName);
+        const homepageTemplateOption = "Blank";
+        const schoolCode = "";
 
-        await createFolder.setAccessPermission(1, "write");
-        await createFolder.setAccessPermission(2, "write");
-        await createFolder.setAccessPermission(3, "read");
-        await createFolder.setAccessPermission(4, "read");
-        await createFolder.setAccessPermission(5, "read");
-
-        await createFolder.submit();
+        // sets write access permission for Administration and Teacher, read access permission for senior student, parent, junior student
+        await createFolder.createFolder(
+            folderName,
+            homepageTemplateOption,
+            db,
+            [
+                [1, "write"],
+                [2, "write"],
+                [3, "read"],
+                [4, "read"],
+                [5, "read"],
+            ],
+            schoolCode,
+        );
 
         // Navigate to newly created folder
         tester.isGoingTo("navigate to the newly created folder and store its location for later tests");
@@ -137,7 +141,7 @@ test.describe("Initial Due Work functionality tests", () => {
         await assessmentForm.setTitle("Test Due Work");
         await assessmentForm.setDescription("We need more fish.");
         await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
-        await assessmentForm.setMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
+        await assessmentForm.setInstructorMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
         await assessmentForm.setAcceptSubmission(AssessmentForm.ACCEPT_SUBMISSION_SINGLE);
         await assessmentForm.setWeight(5);
         await assessmentForm.checkSubmissionAllowed(AssessmentForm.ALLOW_OFFLINE);
@@ -291,12 +295,11 @@ test.describe("Initial Due Work functionality tests", () => {
         await expect(page.getByTestId(SELECTOR_ASSESSMENT_RESPONSE_META_TITLE)).toHaveText("Grading Test Due Work");
 
         const studentWeAreMarkingUrl = page.url();
-        tester.isGoingTo("mark the submission");
-        await page
-            .getByTestId(`${SELECTOR_ASSESSMENT_FEEDBACK_COMMENT_TEXTAREA}-${studentId}`)
-            .fill("Not bad, but you should work on your spelling.");
 
-        await page.getByTestId(`${SELECTOR_ASSESSMENT_FEEDBACK_MARK_INPUT}-${studentId}`).fill("65");
+        tester.isGoingTo("mark the submission");
+        const feedbackForm = new FeedbackForm(tester, page);
+        await feedbackForm.setComment("Not bad, but you should work on your spelling.", studentId);
+        await feedbackForm.setGrade("65", studentId);
 
         tester.isGoingTo("publish feedback for the submission and expect to be redirected to the status page");
         await page.getByTestId(SELECTOR_ASSESSMENT_FEEDBACK_PUBLISH_BUTTON).click();
@@ -399,21 +402,8 @@ test.describe("Initial Due Work functionality tests", () => {
         await tester.logout();
     });
 
-    test.afterAll(async ({ baseTester, db }) => {
+    test.afterAll(async ({ db, api }) => {
         // Soft-delete data to not interfere with other tests
-        baseTester.isGoingTo(
-            "update delete_at for the data created in this test so it does not impact next suite of tests",
-        );
-
-        await db.updateInDatabase(
-            "folder",
-            { deleted_at: "2022-01-15 11:12:34" },
-            { "name LIKE": "Test Class Homepage%" },
-        );
-        await db.updateInDatabase(
-            "assessment",
-            { deleted_at: "2022-01-15 11:12:34" },
-            { "title LIKE": "Test Due Work%" },
-        );
+        await api.deleteFoldersByName(db, ["Test Class Homepage%", "Test Due Work%"]);
     });
 });

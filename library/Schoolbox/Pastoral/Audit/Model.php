@@ -40,7 +40,7 @@ class Model
      *
      * @return $this
      */
-    public function setStudent(User $student = null): self
+    public function setStudent(?User $student = null): self
     {
         $this->student = $student;
 
@@ -56,11 +56,11 @@ class Model
     }
 
     /**
-     * @param null|Pastoral $pastoral
+     * @param Pastoral|null $pastoral
      *
      * @return $this
      */
-    public function setPastoral(Pastoral $pastoral = null): self
+    public function setPastoral(?Pastoral $pastoral = null): self
     {
         $this->pastoral = $pastoral;
 

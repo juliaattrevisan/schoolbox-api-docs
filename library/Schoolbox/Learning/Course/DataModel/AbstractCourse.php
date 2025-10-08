@@ -41,10 +41,10 @@ abstract class AbstractCourse implements ISoftDeletable
     }
 
     /**
-     * @param Folder $folder
+     * @param Folder|null $folder
      * @return static
      */
-    public function setFolder(Folder $folder = null)
+    public function setFolder(?Folder $folder = null)
     {
         $this->folder = $folder;
         return $this;

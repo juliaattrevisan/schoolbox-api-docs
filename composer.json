@@ -30,15 +30,15 @@
         }
     },
     "require": {
-        "php": "8.2.*",
+        "php": "8.2.* || 8.4.*",
         "symfony/http-foundation": "^6.4.0",
         "league/oauth2-client": "^2.4",
+        "lcobucci/jwt": "5.5.0 as 4.3.0",
         "sabre/dav": "^4.2.1",
         "sabre/vobject" : "^4.4.0",
         "ezyang/htmlpurifier": "^4.14.0",
-        "twig/twig": "^3.4.1",
-        "maximebf/debugbar": "^1.17.3",
-        "predis/predis": "^1.0",
+        "twig/twig": "^v3.20.0",
+        "predis/predis": "^3.1",
         "monolog/monolog": "^3.7",
         "league/flysystem": "^3.5.2",
         "league/flysystem-aws-s3-v3": "^3.5",
@@ -70,7 +70,6 @@
         "react/socket": "^1.2.1",
         "react/promise": "^3.2",
         "react/event-loop": "^1.1.0",
-        "laravie/predis-async": "^0.4.0",
         "sentry/sdk": "^4.0",
         "league/commonmark": "^2.1",
         "ext-imagick": "*",
@@ -78,7 +77,7 @@
         "ssnepenthe/color-utils": "^0.4.2",
         "dragonmantank/cron-expression": "^3.0",
         "ext-simplexml": "*",
-        "enshrined/svg-sanitize": "~0.20.0",
+        "enshrined/svg-sanitize": "^0.22.0",
         "maennchen/zipstream-php": "^3.1.0",
         "ext-mbstring": "*",
         "ext-intl": "*",
@@ -88,7 +87,6 @@
         "rodneyrehm/plist": "^2.0",
         "oat-sa/lib-lti1p3-core": "^7.0",
         "oat-sa/lib-lti1p3-ags": "^2.0",
-        "cache/array-adapter": "^1.1",
         "ext-ldap": "*",
         "oat-sa/lib-lti1p3-deep-linking": "^4.1",
         "oat-sa/lib-lti1p3-nrps": "^8.0",
@@ -102,21 +100,31 @@
         "enqueue/enqueue": "^0.10.15",
         "enqueue/redis": "^0.10.9",
         "imangazaliev/didom": "^2.0",
-        "phlak/splat": "^5.0",
+        "phlak/splat": "^6.0.0",
         "gotenberg/gotenberg-php": "^2.7",
         "guzzlehttp/psr7": "^2.4",
-        "learnosity/learnosity-sdk-php": "1.0.3",
-        "fileeye/pel": "^0.10",
+        "learnosity/learnosity-sdk-php": "^1.0.5",
+        "fileeye/pel": "^0.12.0",
         "ramsey/uuid": "^4.7",
         "steverhoades/oauth2-openid-connect-client": "^2.0",
-        "cache/simple-cache-bridge": "^1.2",
         "kreait/firebase-php": "^7.9",
-        "league/oauth2-server": "^8.5",
-        "steverhoades/oauth2-openid-connect-server": "^2.6",
+        "league/oauth2-server": "^9.2",
+        "steverhoades/oauth2-openid-connect-server": "^v3.0.1",
         "google/common-protos": "^4.8",
         "ext-xmlreader": "*",
         "ext-dom": "*",
-        "violet/streaming-json-encoder": "^1.1"
+        "violet/streaming-json-encoder": "^1.1",
+        "ext-exif": "*",
+        "ext-zlib": "*",
+        "ext-fileinfo": "*",
+        "ext-libxml": "*",
+        "ext-imap": "*",
+        "ext-sockets": "*",
+        "psr/http-message": "2.0 as 1.1",
+        "cweagans/composer-patches": "^1.0.0",
+        "symfony/cache": "^7.2",
+        "psr/simple-cache": "^3.0",
+        "clue/redis-react": "^2.8"
     },
     "autoload-dev": {
       "psr-4": {
@@ -124,12 +132,12 @@
       }
     },
     "require-dev": {
-        "phpunit/phpunit": "^11.3",
-        "phpstan/phpstan": "^1.2.0",
+        "phpunit/phpunit": "^11.5",
+        "phpstan/phpstan": "^2.1.2",
         "roave/security-advisories": "dev-latest",
         "squizlabs/php_codesniffer": "^3.5",
         "phpcompatibility/php-compatibility": "*",
-        "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.1",
         "fakerphp/faker": "^1.17",
         "brianium/paratest": "^7.5",
         "codeception/codeception": "^5.1",
@@ -139,13 +147,18 @@
         "codeception/module-cli": "^2.0",
         "codeception/module-rest": "^3.4",
         "codeception/module-phpbrowser": "^3.0",
-        "rector/rector": "^1.2"
+        "rector/rector": "^2.0.7",
+        "php-debugbar/php-debugbar": "^2.2"
     },
     "config": {
         "allow-plugins": {
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "ramsey/composer-repl": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "cweagans/composer-patches": true
         }
+    },
+    "extra": {
+        "patches-file": "patches.json"
     }
 }

@@ -1,13 +1,11 @@
 /**
- * To extend imageBlock and imageInline to allow for additional data attributes
+ * To extend imageInline to allow for additional data attributes
  * and add the insertResource command to the editor
  */
 
-import { Plugin } from "@ckeditor/ckeditor5-core";
-import type { ResizeImageCommand } from "@ckeditor/ckeditor5-image";
-import type { Element } from "@ckeditor/ckeditor5-engine";
+import { Plugin, type ResizeImageCommand, type Element } from "ckeditor5";
+import { ResourceType, getExtraAttributes } from "@js/resource/resourceUtils";
 import InsertResourceCommand from "./InsertResourceCommand";
-import { ResourceType, getExtraAttributes } from "./resourceUtils";
 
 export default class ResourceEditing extends Plugin {
     /**

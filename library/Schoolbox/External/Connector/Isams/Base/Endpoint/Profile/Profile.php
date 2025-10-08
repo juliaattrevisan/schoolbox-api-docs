@@ -16,14 +16,15 @@ use Psr\Log\LoggerInterface;
 use RuntimeException;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\Isams\Base\Endpoint\Codec\DSN;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Profile\Metadata\Reader;
+use Schoolbox\External\Connector\Isams\Base\Endpoint\Registry;
 use Schoolbox\External\Connector\ValidStrats;
+use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Normalise\User\Common\Campus;
 use Schoolbox\External\Profile as UserProfile;
-use Schoolbox\External\Profile\Model;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception;
-use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\Role;
 use UnexpectedValueException;
 
@@ -65,38 +66,10 @@ class Profile implements IStrategy
      */
     private const CAMPUS_SEPARATOR = ';';
 
-
     /**
-     * @var ValidStrats
+     * Parent type are separated by commas here.
      */
-    private ValidStrats $validStrats;
-
-
-    /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
-     *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var array
-     */
-    private array $api;
-
-
-    /**
-     * @var bool
-     */
-    private bool $includePhoto;
-
+    private const PARENT_TYPE_SEPARATOR = ',';
 
     /**
      * A list of (strat, externalid) tuples that each have one or more error messages
@@ -109,89 +82,33 @@ class Profile implements IStrategy
 
 
     /**
-     * @var PhotoDownloader
-     */
-    private PhotoDownloader $photoDownloader;
-
-
-    /**
-     * @var UserProfile\Mapper
-     */
-    private UserProfile\Mapper $baseProfileMapper;
-
-
-    /**
-     * @var UserProfile\Student\Mapper
-     */
-    private UserProfile\Student\Mapper $studentProfileMapper;
-
-
-    /**
-     * @var UserProfile\Parent\Mapper
-     */
-    private UserProfile\Parent\Mapper $parentProfileMapper;
-
-
-    /**
-     * @var UserProfile\Staff\Mapper
-     */
-    private UserProfile\Staff\Mapper $staffProfileMapper;
-
-
-    /**
-     * @var UserProfile\Relationship\Mapper
-     */
-    private UserProfile\Relationship\Mapper $relationshipMapper;
-
-
-    /**
-     * @var StorageMapper
-     */
-    private StorageMapper $storageMapper;
-
-
-    /**
      * Profile constructor.
      *
      * @param ValidStrats                     $validStrats
      * @param LoggerInterface                 $log
      * @param bool                            $perform
      * @param array                           $api
-     * @param bool                            $includePhoto
-     * @param PhotoDownloader                 $photoDownloader
+     * @param array                           $watchlist
      * @param UserProfile\Mapper              $baseProfileMapper
      * @param UserProfile\Student\Mapper      $studentProfileMapper
      * @param UserProfile\Parent\Mapper       $parentProfileMapper
      * @param UserProfile\Staff\Mapper        $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
-     * @param StorageMapper                   $storageMapper
+     * @param Registry                        $registry
      */
     public function __construct(
-        ValidStrats $validStrats,
-        LoggerInterface $log,
-        bool $perform,
-        array $api,
-        bool $includePhoto,
-        PhotoDownloader $photoDownloader,
-        UserProfile\Mapper $baseProfileMapper,
-        UserProfile\Student\Mapper $studentProfileMapper,
-        UserProfile\Parent\Mapper $parentProfileMapper,
-        UserProfile\Staff\Mapper $staffProfileMapper,
-        UserProfile\Relationship\Mapper $relationshipMapper,
-        StorageMapper $storageMapper
+        private ValidStrats $validStrats,
+        private LoggerInterface $log,
+        private bool $perform,
+        private array $api,
+        private array $watchlist,
+        private UserProfile\Mapper $baseProfileMapper,
+        private UserProfile\Student\Mapper $studentProfileMapper,
+        private UserProfile\Parent\Mapper $parentProfileMapper,
+        private UserProfile\Staff\Mapper $staffProfileMapper,
+        private UserProfile\Relationship\Mapper $relationshipMapper,
+        private Registry $registry
     ) {
-        $this->validStrats = $validStrats;
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->api = $api;
-        $this->includePhoto = $includePhoto;
-        $this->photoDownloader = $photoDownloader;
-        $this->baseProfileMapper = $baseProfileMapper;
-        $this->studentProfileMapper = $studentProfileMapper;
-        $this->parentProfileMapper = $parentProfileMapper;
-        $this->staffProfileMapper = $staffProfileMapper;
-        $this->relationshipMapper = $relationshipMapper;
-        $this->storageMapper = $storageMapper;
     }
 
 
@@ -211,15 +128,6 @@ class Profile implements IStrategy
          * Import their specific parents' profile data
          */
         if ($this->validStrats->isStudentStratEnabled() || $this->validStrats->isFamiliesStratEnabled()) {
-            /* Download a zip containing everyone's profile pictures, and extract them
-             * It uses isams internal ids, not external ids
-             */
-            if ($this->includePhoto) {
-                $this->log->info('Downloading student profile photos (this might take a while)');
-
-                $this->photoDownloader->downloadStudentPhotos();
-            }
-
             $this->log->info('Processing students and their parents.');
 
             $this->importStudents();
@@ -228,15 +136,6 @@ class Profile implements IStrategy
         /* Import staff profile data
          */
         if ($this->validStrats->isStaffStratEnabled()) {
-            /* Download a zip containing everyone's profile pictures, and extract them
-             * It uses isams internal ids, not external ids
-             */
-            if ($this->includePhoto) {
-                $this->log->info('Downloading staff profile photos (this might take a while)');
-
-                $this->photoDownloader->downloadStaffPhotos();
-            }
-
             $this->log->info('Processing staff.');
 
             $this->importStaff();
@@ -267,6 +166,10 @@ class Profile implements IStrategy
          */
         $campusMapping = $this->prefetchCampuses();
 
+        /* Used to manipulate metadata json for each person
+         */
+        $metadataReader = new Reader();
+
         $students = $this->api[DSN::MODULE_BATCHXML]->fetchXml('/iSAMS/PupilManager/CurrentPupils/Pupil');
 
         /* $student is a stdclass derived from xml data,
@@ -274,8 +177,17 @@ class Profile implements IStrategy
          */
         foreach ($students as $student) {
             $externalId = trim((string)$student->SchoolId);
+            $internalId = trim((string)$student->xpath('@Id')[0]->Id);
+
+            /* Only import data for externalIds in $watchlist, if provided
+             */
+            if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                continue;
+            }
+
             $academicHouse = trim((string)$student->AcademicHouse);
-            $boardingHouseName = '';
+            $boardingStatus = isset($student->xpath('@BoardingHouseId')[0]);
+            $boardingHouseName = trim((string)$student->BoardingHouse);
             $dob = strtotime(trim((string)$student->DOB));
             $firstname = trim((string)$student->Forename);
 
@@ -431,8 +343,11 @@ class Profile implements IStrategy
                  *
                  * We can't check for this effectively unless we predetermine what these
                  * statuses could contain and what those statuses mean
+                 *
+                 * Update 10/01/2025:
+                 * We are now assuming boarding status can be determined by BoardingHouseId in attribute
                  */
-                ->setBoardingStatus(false)
+                ->setBoardingStatus($boardingStatus)
                 ->setEsl(null)
                 ->setIb(null)
                 ->setIndividualLearningPlans(null)
@@ -457,10 +372,6 @@ class Profile implements IStrategy
                 $externalId
             ));
 
-            /* Import photos from sis
-             */
-            $this->importPortrait($studentBaseProfile, $personId);
-
             try {
                 /* Then save it
                  */
@@ -476,96 +387,30 @@ class Profile implements IStrategy
             } catch (\Exception $e) {
                 $this->rememberError(Role::STUDENT, $externalId, $e->getMessage());
             }
-        }
-    }
 
-
-    /**
-     * Import a profile picture for the given $baseProfile
-     *
-     * Importing a profile picture requires you to enable photo_from_sis config var
-     * ("Load Photos From SIS" needs to be on)
-     *
-     * This populates the portrait_hash in $baseProfile
-     *
-     * @param Model  $baseProfile
-     * @param string $personId
-     * @return void
-     */
-    private function importPortrait(UserProfile\Model $baseProfile, string $personId): void
-    {
-        /* Check if config setting allows photos from sis
-         * If it's enabled, continue importing pics
-         */
-        if (!$this->includePhoto) {
-            return;
-        }
-
-        /* Start validating the contents of $fileInfo to ensure we have what we need
-         *
-         * file_info node might not exist; if it doesn't, skip it
-         */
-        $photoContents = $this->photoDownloader->getPhoto($personId);
-
-        if (null === $photoContents) {
-            $this->log->debug(sprintf(
-                'Profile picture: no data found for %s %s (%s)',
-                $baseProfile->getFirstname(),
-                $baseProfile->getLastname(),
-                $baseProfile->getExternalId()
-            ));
-
-            return;
-        }
-
-        /* Start the part where we save the image
-         */
-        $this->log->debug(sprintf(
-            'Importing profile picture for %s %s (%s)',
-            $baseProfile->getFirstname(),
-            $baseProfile->getLastname(),
-            $baseProfile->getExternalId()
-        ));
-
-        /* Only try to persist images if perform mode is activated
-         */
-        if (!$this->perform) {
-            return;
-        }
-
-        /* Otherwise, all the parts are here and valid; continue with the persistence
-         * to storage and assignation to the $baseProfile by reference
-         *
-         * Not using $fileInfo['file_name'] and $fileInfo['mime_type'] for now
-         */
-        try {
-            $portrait = $this->storageMapper->acceptStream($baseProfile->getExternalId() . '.jpg', $photoContents);
-
-            /* You get a picture if any of the following occur:
-             *     - you don't have a portrait yet; you can get one added
-             *     - your existing picture is different to the one we just got; update it
+            /* Remember that we saw a particular student id
+             *
+             * We may need to get each dude's photos separately via some other api endpoint
+             * and we won't encounter this id again unless we remember it here
              */
-            if (!$baseProfile->getPortrait() || ($baseProfile->getPortrait()->getHash() !== $portrait->getHash())) {
-                $this->log->debug(sprintf(
-                    'Profile picture: %s %s (%s) has profile hash %s derived from %s.png',
-                    $baseProfile->getFirstname(),
-                    $baseProfile->getLastname(),
-                    $baseProfile->getExternalId(),
-                    $portrait->getHash(),
-                    $personId
-                ));
-
-                $baseProfile->setPortrait($portrait);
-            }
-        } catch (\Exception $e) {
-            // noop, but warn the cli that something unusual has transpired
-            $this->log->warning(sprintf(
-                'Profile picture: exception thrown. %s',
-                $e->getMessage()
-            ));
+            $this->registry->remember($externalId, [
+                'person' => [
+                    'type' => Role::STUDENT,
+                    /* "@Id" is the isams internal identifier which is used to obtain their profile pictures.
+                     * This is NOT the same as their external id.
+                     */
+                    'internalId' => $internalId,
+                    'externalId' => $externalId,
+                    'personId' => $personId,
+                    'sisPhotoId' => $metadataReader->getProfileSisPhotoId($studentBaseProfile->getMetadata()),
+                    'portrait'  => $studentBaseProfile->getPortrait()?->getHash(),
+                    'firstname' => $studentBaseProfile->getFirstname(),
+                    'firstnamePreferred' => $studentBaseProfile->getFirstnamePreferred(),
+                    'lastname' => $studentBaseProfile->getLastname()
+                ],
+            ]);
         }
     }
-
 
     /**
      * Find campus name
@@ -864,6 +709,20 @@ class Profile implements IStrategy
         $path = "/iSAMS/PupilManager/Contacts/Contact/Pupils/Pupil[@Id='{$studentId}']/ancestor::*[position()=2]";
         $parents =  $this->api[DSN::MODULE_BATCHXML]->fetchXml($path);
 
+        $allowedRelationshipType = $this->api[DSN::MODULE_BATCHXML]->getOptions()['parentRelations'] ?? '';
+        if ('' !== $allowedRelationshipType) {
+            /*  Get the type of contact identified as parents of student
+             */
+            $allowedRelationshipType = explode(
+                self::PARENT_TYPE_SEPARATOR,
+                $this->api[DSN::MODULE_BATCHXML]->getOptions()['parentRelations'] ?? ''
+            );
+            $allowedRelationshipType = array_map(fn($v) => trim(strtolower($v)), $allowedRelationshipType);
+            $this->log->debug(
+                sprintf('Contact type filtered to: %s.', json_encode($allowedRelationshipType)),
+            );
+        }
+
         /* As per Duane's conclusion:
          * A contact's aggregated SOS field equates to Message Alerts for their student
          */
@@ -932,6 +791,25 @@ class Profile implements IStrategy
             $username = '';
 
             $relationship = trim((string)$parent->RelationshipRaw);
+
+            /* If the whitelist is not set then allow all by default
+             */
+            if (is_array($allowedRelationshipType)) {
+                /* We only allow the assignment of Parents of the type identified by schools
+                 */
+                if (!in_array(strtolower($relationship), $allowedRelationshipType, true)) {
+                    $this->log->debug(
+                        sprintf(
+                            'Parent profile for %s (%s) is a %s of the student. %s is not allowed relation type - skipping.',
+                            $fullname,
+                            $externalId,
+                            $relationship,
+                            $relationship,
+                        )
+                    );
+                    continue;
+                }
+            }
 
             /* Parents might inadvertently have the same externalId as someone else's
              * base profile (e.g. parent has same external id as student)
@@ -1040,6 +918,10 @@ class Profile implements IStrategy
      */
     private function importStaff(): void
     {
+        /* Used to manipulate metadata json for each person
+         */
+        $metadataReader = new Reader();
+
         $staffs =  $this->api[DSN::MODULE_BATCHXML]->fetchXml('/iSAMS/HRManager/CurrentStaff/StaffMember');
 
         /* $staff is a stdclass derived from xml data,
@@ -1047,6 +929,14 @@ class Profile implements IStrategy
          */
         foreach ($staffs as $staff) {
             $externalId = trim((string)$staff->xpath('@PersonId')[0]->PersonId);
+            $internalId = trim((string)$staff->xpath('@Id')[0]->Id);
+
+            /* Only import data for externalIds in $watchlist, if provided
+             */
+            if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                continue;
+            }
+
             $username = trim((string)$staff->UserName);
             $firstname = trim((string)$staff->Forename);
 
@@ -1174,10 +1064,6 @@ class Profile implements IStrategy
                 $externalId
             ));
 
-            /* Import photos from sis
-             */
-            $this->importPortrait($staffBaseProfile, $personId);
-
             try {
                 /* Then save it
                  */
@@ -1193,6 +1079,36 @@ class Profile implements IStrategy
             } catch (\Exception $e) {
                 $this->rememberError(Role::STAFF, $externalId, $e->getMessage());
             }
+
+            /* Remember that we saw a particular student id
+             *
+             * We may need to get each dude's photos separately via some other api endpoint
+             * and we won't encounter this id again unless we remember it here
+             */
+            $this->registry->remember($externalId, [
+                'person' => [
+                    'type' => Role::STAFF,
+                    /* "@Id" is the isams internal identifier which is used to obtain their profile pictures.
+                     * This is NOT the same as their external id.
+                     */
+                    'internalId' => $internalId,
+                    /* "@PersonId" attribute is used for our external id
+                     * Philosophically $personId is the same as $externalId
+                     */
+                    'externalId' => $externalId,
+                    'personId' => $personId,
+                    /* We remembered the last identifier used to obtain a profile picture
+                     * so we can tell when the school updates it on their end.
+                     */
+                    'sisPhotoId' => $metadataReader->getProfileSisPhotoId($staffBaseProfile->getMetadata()),
+                    /* schoolbox stuff
+                     */
+                    'portrait'  => $staffBaseProfile->getPortrait()?->getHash(),
+                    'firstname' => $staffBaseProfile->getFirstname(),
+                    'firstnamePreferred' => $staffBaseProfile->getFirstnamePreferred(),
+                    'lastname' => $staffBaseProfile->getLastname()
+                ],
+            ]);
         }
     }
 

@@ -44,18 +44,18 @@ class Generator implements GeneratorInterface
 
 
     /**
-     * @param External_UserInterface $xUserHandler
-     * @param Mapper                 $userMapper
-     * @param Mapper                 $roleMapper
-     * @param Mapper                 $userAccessMapper
-     * @param FolderMapper         $categoryMapper
+     * @param External_UserInterface|null $xUserHandler
+     * @param Mapper|null                 $userMapper
+     * @param Mapper|null                 $roleMapper
+     * @param Mapper|null                 $userAccessMapper
+     * @param FolderMapper|null           $categoryMapper
      */
     public function __construct(
-        External_UserInterface $xUserHandler = null,
-        Mapper $userMapper = null,
-        Mapper $roleMapper = null,
-        Mapper $userAccessMapper = null,
-        FolderMapper $categoryMapper = null
+        ?External_UserInterface $xUserHandler = null,
+        ?Mapper $userMapper = null,
+        ?Mapper $roleMapper = null,
+        ?Mapper $userAccessMapper = null,
+        ?FolderMapper $categoryMapper = null
     ) {
         $this->setExternalUserHandler($xUserHandler)
              ->setUserMapper($userMapper)

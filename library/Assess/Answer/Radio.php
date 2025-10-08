@@ -22,8 +22,8 @@ class Assess_Answer_Radio extends Assess_Answer_Multi
      */
     public function mark($currentResponse): void
     {
-        $response = unserialize($currentResponse['response']);
-        $answer = unserialize($currentResponse['answer']);
+        $response = unserialize($currentResponse['response'] ?? '');
+        $answer = unserialize($currentResponse['answer'] ?? '');
 
         /* Find out how much each correct answer is worth
          *

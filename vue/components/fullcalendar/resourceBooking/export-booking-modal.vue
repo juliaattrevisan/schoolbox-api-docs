@@ -1,6 +1,7 @@
 <script>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import { getSearchString } from "@js/util/queryUtils";
@@ -16,7 +17,7 @@ export default {
         window: () => window,
 
         exportUrl() {
-            let values = Object.assign({}, this.form);
+            const values = {};
 
             // Add token to object
             values.token = this.token;

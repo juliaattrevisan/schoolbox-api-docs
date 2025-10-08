@@ -1,0 +1,30 @@
+tour:
+  title: '25.0 Pastoral Care Enhancements'
+  description: 'Introduce superusers and moderators to the new admin features of the 25.0 release'
+  roles:
+    - staff
+  trigger:
+    urlRegex: '^/$'
+    selector: body
+    event: tourReady
+  steps:
+    - step:
+        title: Pastoral Care Enhancements
+        type: modal
+        content: "<video id='feature_tour_video'
+                   controls
+                   loop
+                   preload='none'
+                   poster='{CDN_PREFIX}/images/tour/25.0/3_pastoral_care.jpg'
+                   width='100%'
+                   style='max-width: 100%;'>
+                   <source src='{CDN_PREFIX}/images/tour/25.0/pastoral.mp4' type='video/mp4'>
+                   </video><br />
+
+                  <h3>Pastoral Care Enhancements</h3>
+                  <p>
+                    Keep pastoral care records relevant. Automatically archive outdated records based on type-specific
+                    expiry settings - reducing clutter while retaining long-term visibility when needed.
+                  </p>
+                  <p>To learn more, see the <a href='/help/sso/send?returnUrl=/homepage/5362#component502156'>release notes</a>.</p>"
+        class: introjs-whatsnewmodal

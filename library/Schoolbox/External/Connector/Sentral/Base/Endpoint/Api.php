@@ -268,6 +268,60 @@ class Api implements IApi
         ));
     }
 
+    /**
+     * Retrieves endpoint data representing the portrait from the API call.
+     *
+     * @param string $endpoint
+     * @return string
+     */
+    public function retrievePortrait(string $endpoint): string
+    {
+        /* Mine out an error message if you try to access a thing that doesn't exist
+        */
+        $lastGuzzleError = '';
+        $fails = 0;
+
+        /* Urls come in mixed formats; some have a version number,
+         * some have a host in front of it. Accessing endpoints in a
+         * consistent manner means removing all this junk.
+         *
+         * Remove the host prefix from the endpoint
+         * Remove the version number from the endpoint
+         */
+        $endpointFiltered = str_replace($this->host, '', $endpoint);
+        $endpointFiltered = preg_replace('#^\/v1\/#', '', $endpointFiltered);
+
+        /* Record endpoint usage
+         */
+        $this->apiUsage->record($endpointFiltered);
+
+        /* Try multiple times in case sentral dies for a random reason
+         */
+        while ($fails < self::NUM_RETRY) {
+            try {
+                $response = $this->client->request('GET', $endpointFiltered);
+            } catch (\GuzzleHttp\Exception\GuzzleException $e) {
+                $fails++;
+
+                $lastGuzzleError = $e->getMessage();
+
+                sleep(self::NAP_TIMEOUT);
+
+                continue;
+            }
+
+            return $response->getBody()->getContents();
+        }
+
+        /* We got here because $fails exceeded a number of retries
+         */
+        throw new InvalidArgumentException(sprintf(
+            'Sentral Endpoint error at endpoint %s: could not establish connection to server after %s retries. %s',
+            $endpoint,
+            self::NUM_RETRY,
+            $lastGuzzleError
+        ));
+    }
 
     /**
      * @return ApiUsage

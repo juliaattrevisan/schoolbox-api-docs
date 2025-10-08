@@ -16,7 +16,7 @@ use Closure;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
 use Schoolbox\Learning\Assessment\Visibility;
 use Schoolbox\Learning\Badge\Award\Mapper as BadgeAwardMapper;
-use Schoolbox\Learning\Moment\Evidence\Mapper as EvidenceMapper;
+use Schoolbox\Learning\Moment\Mapper as EvidenceMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;

@@ -305,7 +305,7 @@ interface External_UserInterface extends External\IConnector
      * @param string|null $externalUserId
      * @return string|null The current semester
      */
-    public function getCurrentSemester(string $externalUserId = null): ?string;
+    public function getCurrentSemester(?string $externalUserId = null): ?string;
 
     /**
      * Gets the current year for the user.
@@ -318,7 +318,7 @@ interface External_UserInterface extends External\IConnector
      * @param string|null $externalUserId
      * @return string|null The current file year for the user
      */
-    public function getCurrentYear(string $externalUserId = null): ?string;
+    public function getCurrentYear(?string $externalUserId = null): ?string;
 
     /**
      * Get a list of subjects for $externalUserId

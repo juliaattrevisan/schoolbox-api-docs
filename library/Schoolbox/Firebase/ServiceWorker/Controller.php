@@ -36,6 +36,8 @@ class Controller extends Base
                 ['firebase' => $dataGenerator->generate()],
             )
             ->withHeader('Content-Type', 'application/javascript')
+            ->withHeader('Cache-Control', 'max-age=86400, private')
+            ->withHeader('Pragma', '')
         ;
     }
 }

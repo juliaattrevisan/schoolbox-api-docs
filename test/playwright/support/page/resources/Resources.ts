@@ -4,6 +4,8 @@ import type { Page } from "@playwright/test";
 export default class Resources {
     private page: Page;
 
+    static readonly URL = "/resources";
+
     static readonly RESOURCE_BROWSER = ".resource-browser";
 
     /**
@@ -15,6 +17,13 @@ export default class Resources {
 
     constructor(page: Page) {
         this.page = page;
+    }
+
+    /**
+     * Navigates to the learning badges page
+     */
+    async goto(): Promise<void> {
+        await this.page.goto(Resources.URL);
     }
 
     /**

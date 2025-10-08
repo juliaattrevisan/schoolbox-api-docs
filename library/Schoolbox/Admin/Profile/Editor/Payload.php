@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Profile\Editor;
 
 use Schoolbox\Admin\Profile\Editor\Field\Mapper as FieldMapper;
+use Schoolbox\Admin\Profile\Editor\Field\Model as FieldModel;
 use Schoolbox\Admin\Profile\Editor\Tab\Mapper as TabMapper;
 use Schoolbox\Profile\Button\Mapper as ButtonMapper;
 use Schoolbox\CampusMapper;
@@ -46,13 +47,17 @@ class Payload
 
     /**
      * Common nodes and human-readable name equivalents
+     * The nodes also map to types in profileEditorTypes.ts
      */
-    private const AVAILABILITY_NODE = 'availability';
+    public const AVAILABILITY_NODE = 'availability';
     private const AVAILABILITY_NAME = 'Appears On';
     private const AVAILABILITY_TOOLTIP = 'Will appear on the selected campuses';
-    private const VISIBILITY_NODE = 'visibility';
+    public const VISIBILITY_NODE = 'visibility';
     private const VISIBILITY_NAME = 'Visible For';
     private const VISIBILITY_TOOLTIP = 'Will appear for profile viewers in the selected role types';
+    public const ADDITIONAL_SETTINGS_NODE = 'additional';
+    private const ADDITIONAL_SETTINGS_NAME = 'Additional Settings';
+    private const ADDITIONAL_SETTINGS_TOOLTIP = null;
 
     /**
      * The labels of the field categories which are used to group the fields in
@@ -141,7 +146,8 @@ class Payload
             'data' => [
                 'fieldSettings' => [
                     self::AVAILABILITY_NODE => $this->getSettingsForAvailabilityNode(),
-                    self::VISIBILITY_NODE => $this->getSettingsForVisibilityNode($roleTypes)
+                    self::VISIBILITY_NODE => $this->getSettingsForVisibilityNode($roleTypes),
+                    self::ADDITIONAL_SETTINGS_NODE => $this->getSettingsForAdditionalSettingsNode(),
                 ],
                 'tabSettings' => [
                     self::AVAILABILITY_NODE => $this->getSettingsForAvailabilityNode(),
@@ -222,7 +228,11 @@ class Payload
                         /* Find the roletypes ("ids") for which this tab might be visible
                          */
                         self::VISIBILITY_NODE => $tab->getVisibility()?->indexBy('roleType')->keys()
-                    ]
+                    ],
+                    'availableTabSettings' => [
+                        self::AVAILABILITY_NODE => true,
+                        self::VISIBILITY_NODE => true
+                    ],
                 ];
             }
 
@@ -243,6 +253,21 @@ class Payload
                     continue;
                 }
 
+                $availableFieldSettings = $this->getFieldSettingsAvailability($field);
+
+                /* The default settings to set for this field when it gets selected
+                 */
+                $defaultFieldSettings = [
+                    self::AVAILABILITY_NODE => [],
+                    self::VISIBILITY_NODE => [],
+                    self::ADDITIONAL_SETTINGS_NODE => []
+                ];
+
+                // click to reveal is ON by default if it's available for the field
+                if ($availableFieldSettings[self::ADDITIONAL_SETTINGS_NODE]['clickToReveal']) {
+                    array_push($defaultFieldSettings[self::ADDITIONAL_SETTINGS_NODE], 'clickToReveal');
+                }
+
                 $roleTypeSettings['fields']['available'][] = [
                     'field' => $field->getField(),
                     'displayAs' => $field->getDisplayAs(),
@@ -250,6 +275,8 @@ class Payload
                     'css' => $field->getCss(),
                     'terminology' => $field->getTerm(),
                     'category' => $field->getIsExternal() ? self::FIELD_CATEGORY_EXTERNAL : self::FIELD_CATEGORY_INTERNAL,
+                    'defaultFieldSettings' => $defaultFieldSettings,
+                    'availableFieldSettings' => $availableFieldSettings,
                 ];
             }
 
@@ -289,8 +316,14 @@ class Payload
                         })->keys(),
                         /* Find the roletypes ("ids") for which this field might be visible
                          */
-                        self::VISIBILITY_NODE => $field->getVisibility()?->indexBy('roleType')->keys()
-                    ]
+                        self::VISIBILITY_NODE => $field->getVisibility()?->indexBy('roleType')->keys(),
+                        /* Find the enabled additional setting keys for this field
+                         */
+                        self::ADDITIONAL_SETTINGS_NODE => array_keys(array_filter([
+                            'clickToReveal' => $field->getClickToReveal(),
+                        ], static fn($value) => !!$value)),
+                    ],
+                    'availableFieldSettings' => $this->getFieldSettingsAvailability($field),
                 ];
             }
 
@@ -368,6 +401,55 @@ class Payload
                 'meta' => $metadata[$roleType] ?? null
             ];
         }
+
+        return $settings;
+    }
+
+    /**
+     * Generate payload data for:
+     *  - $payload['data']['fieldSettings'][self::ADDITIONAL_SETTINGS_NODE]
+     *
+     * @return array
+     */
+    private function getSettingsForAdditionalSettingsNode(): array
+    {
+        /* Field settings (groups of checkboxes) that you can tick
+         */
+        $settings = [
+            'displayAs' => self::ADDITIONAL_SETTINGS_NAME,
+            'tooltip' => self::ADDITIONAL_SETTINGS_TOOLTIP,
+            'options' => [
+                [
+                    'type' => 'boolean',
+                    'id' => 'clickToReveal',
+                    'name' => 'Activate View More',
+                    'meta' => 'Only show content after the user chooses to view it.'
+                ],
+            ]
+        ];
+
+        return $settings;
+    }
+
+    /**
+     * Generate payload data for a specific field's settings availability:
+     *  - $payload['data']['roleTypes'][*]['fields'][*][*]['availableFieldSettings']
+     *
+     * @param FieldModel $field
+     * @return array
+     */
+    private function getFieldSettingsAvailability(FieldModel $field): array
+    {
+        $settings = [
+            self::AVAILABILITY_NODE => true,
+            self::VISIBILITY_NODE => true,
+            self::ADDITIONAL_SETTINGS_NODE => [
+                /* clickToReveal is only available when the field has both an icon and css
+                 * (i.e. when it will be displayed as an alert box)
+                 */
+                'clickToReveal' => $field->isFlag(),
+            ]
+        ];
 
         return $settings;
     }

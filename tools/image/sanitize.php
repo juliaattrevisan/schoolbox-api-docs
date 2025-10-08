@@ -24,7 +24,7 @@ $app = new class extends CliTool\App {
     /**
      * This process needs to write to storage, thus it must run as `www-data`.
      */
-    public function getRequiredProcessUser(): ?string
+    public function getRequiredProcessUser(): string
     {
         return 'www-data';
     }
@@ -34,6 +34,8 @@ $app = new class extends CliTool\App {
      */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         if ($this->perform()) {
             $this->getLogger()->info('Running in perform mode (-p): changes will be written to filesystem');
         } else {
@@ -67,6 +69,8 @@ $app = new class extends CliTool\App {
                 $this->getLogger()->debug(($this->perform() ? 'Skipped: ' : 'Will be skipped: ') . $svgFile->getHash());
             }
         }
+
+        $this->deprecationNotice("SA-19334");
     }
 };
 

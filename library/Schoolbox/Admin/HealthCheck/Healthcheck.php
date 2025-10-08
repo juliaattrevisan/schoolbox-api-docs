@@ -393,14 +393,6 @@ class Healthcheck
             'SCHOOLBOX_TIMETABLE',
             'SCHOOLBOX_TIMETABLE_DAYS',
             'SCHOOLBOX_TIMETABLE_DEFINITION',
-            'EVENT',
-            'EVENT_STUDENT',
-            'EVENT_STAFF',
-            'STUDENT',
-            'STAFF',
-            'EVENT_TYPE',
-            'EVENT_ROOM',
-            'ROOM'
         ];
 
         $this->selectTest($db2inst1Tables, null, null, "SELECT * FROM :object FETCH FIRST 1 ROWS ONLY");

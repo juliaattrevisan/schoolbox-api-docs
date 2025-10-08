@@ -96,6 +96,10 @@ class LessonPlan implements IAssessmentTypeTranslator
          */
         $dataModel->setVisibility($domainObject->getVisibility());
 
+        /* Duration, for the LLM
+         */
+        $dataModel->setLessonPlanDuration($domainObject->getLessonPlanDuration());
+
         /* Lesson Plans don't have any marking-related stuff
          * Andy's Filters and the Andy Markbook requires it for all assessment types
          * but we're hardcoding a None markscheme for LPs
@@ -122,6 +126,7 @@ class LessonPlan implements IAssessmentTypeTranslator
                     ->setLessonPlan($dataModel)
                     ->setLessonPlanTemplateField($lessonPlanTemplateFieldId)
                     ->setTitle($lessonPlanField->getTitle())
+                    ->setDescription($lessonPlanField->getDescription())
                     ->setBody($lessonPlanField->getBody())
                     ->setVisibility($lessonPlanField->getVisibility())
                     ->setSequence($lessonPlanField->getSequence());
@@ -182,6 +187,10 @@ class LessonPlan implements IAssessmentTypeTranslator
          */
         $domainObject->setVisibility($dataModel->getVisibility());
 
+        /* Duration, for the LLM
+         */
+        $domainObject->setLessonPlanDuration($dataModel->getLessonPlanDuration());
+
         /* Lesson Plans don't have any marking-related stuff
          * Andy's Filters and the Andy Markbook requires it for all assessment types
          * but we're hardcoding a None markscheme for LPs
@@ -207,6 +216,7 @@ class LessonPlan implements IAssessmentTypeTranslator
                     ->setLessonPlan($dataModel)
                     ->setLessonPlanTemplateField($lessonPlanTemplateFieldId)
                     ->setTitle($lessonPlanField->getTitle())
+                    ->setDescription($lessonPlanField->getDescription())
                     ->setBody($lessonPlanField->getBody())
                     ->setVisibility($lessonPlanField->getVisibility())
                     ->setSequence($lessonPlanField->getSequence());

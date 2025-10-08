@@ -794,12 +794,12 @@ class IdFinder extends Filter\AbstractIdFinder
     /**
      * Get query fragments dependent on 'Project' filter
      *
-     * @param null|Collection|int[] $projectIds
+     * @param Collection|null $projectIds
      * @return mixed[]
      * @throws InvalidColumnException
      * @throws UnderflowException
      */
-    private function getClauseProject(Collection $projectIds = null)
+    private function getClauseProject(?Collection $projectIds = null)
     {
         if (null === $projectIds || !$projectIds->count()) {
             $whereClause = 'TRUE';
@@ -881,12 +881,12 @@ class IdFinder extends Filter\AbstractIdFinder
     /**
      * Get query fragments dependent on 'UnitImpl' filter
      *
-     * @param null|Collection|int[] $unitImplIds
+     * @param Collection|null $unitImplIds
      * @return mixed[]
      * @throws InvalidColumnException
      * @throws UnderflowException
      */
-    private function getClauseUnitImpl(Collection $unitImplIds = null)
+    private function getClauseUnitImpl(?Collection $unitImplIds = null)
     {
         if (null === $unitImplIds || !$unitImplIds->count()) {
             $whereClause = 'TRUE';
@@ -908,12 +908,12 @@ class IdFinder extends Filter\AbstractIdFinder
     /**
      * Get query fragments dependent on 'UnitImportSpec' filter
      *
-     * @param null|Collection|int[] $unitImpSpcIds
+     * @param Collection|null $unitImpSpcIds
      * @return mixed[]
      * @throws InvalidColumnException
      * @throws UnderflowException
      */
-    private function getClauseUnitImplSpec(Collection $unitImpSpcIds = null)
+    private function getClauseUnitImplSpec(?Collection $unitImpSpcIds = null)
     {
         if (null === $unitImpSpcIds || !$unitImpSpcIds->count()) {
             $joinClause  = '';
@@ -937,12 +937,12 @@ class IdFinder extends Filter\AbstractIdFinder
     /**
      * Get query fragments dependent on 'UnitSpec' filter
      *
-     * @param null|Collection|int[] $unitSpecIds
+     * @param Collection|null $unitSpecIds
      * @return mixed[]
      * @throws InvalidColumnException
      * @throws UnderflowException
      */
-    private function getClauseUnitSpec(Collection $unitSpecIds = null)
+    private function getClauseUnitSpec(?Collection $unitSpecIds = null)
     {
         if (null === $unitSpecIds || !$unitSpecIds->count()) {
             $whereClause = 'TRUE';
@@ -964,11 +964,11 @@ class IdFinder extends Filter\AbstractIdFinder
     /**
      * Get query fragments dependent on 'Weighting' filter
      *
-     * @param Collection|string[] $weightings (can also be NULL but storm doesn't like iterating that type-hint)
+     * @param Collection|null $weightings (can also be NULL but storm doesn't like iterating that type-hint)
      * @return mixed[]
      * @throws InvalidColumnException
      */
-    private function getClauseWeighting(Collection $weightings = null)
+    private function getClauseWeighting(?Collection $weightings = null)
     {
         // If no weighting types are selected, don't filter
         if (null === $weightings) {
@@ -991,11 +991,11 @@ class IdFinder extends Filter\AbstractIdFinder
     /**
      * Get query fragments dependent on 'TemporalState' filter
      *
-     * @param Collection|string[] $temporalStates (can also be NULL but storm doesn't like iterating that type-hint)
+     * @param Collection|null $temporalStates (can also be NULL but storm doesn't like iterating that type-hint)
      * @return mixed[]
      * @throws UnexpectedValueException
      */
-    private function getClauseTemporalState(Collection $temporalStates = null): array
+    private function getClauseTemporalState(?Collection $temporalStates = null): array
     {
         // If no options are selected, don't filter
         if (null === $temporalStates) {
@@ -1066,11 +1066,11 @@ class IdFinder extends Filter\AbstractIdFinder
     /**
      * Get query fragments dependent on 'WorkType' filter
      *
-     * @param Collection|int[] $workTypeIds
+     * @param Collection|null $workTypeIds
      * @return mixed[]
      * @throws InvalidColumnException
      */
-    private function getClauseWorkType(Collection $workTypeIds = null)
+    private function getClauseWorkType(?Collection $workTypeIds = null)
     {
         // If no workTypes selected, don't filter
         if (null === $workTypeIds) {

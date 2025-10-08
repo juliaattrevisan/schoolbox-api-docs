@@ -11,10 +11,12 @@ namespace Schoolbox\Editor\OpenAI;
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\GuzzleException;
-use GuzzleHttp\Exception\ClientException;
-use GuzzleHttp\Psr7\Request;
-use Schoolbox\Error\Mapper as ErrorMapper;
+use Psr\Http\Client\ClientExceptionInterface;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception\Deleted;
+use Scrub;
 
 /**
  * This controller acts as a proxy for OpenAI API.  It just appends the configured API key to the request in
@@ -28,122 +30,292 @@ use Schoolbox\Error\Mapper as ErrorMapper;
  */
 class Controller extends Base
 {
-    private const OPENAI_API_ENDPOINT = 'https://api.openai.com/v1/chat/completions';
-    private const AZURE_API_ENDPOINT = 'https://%s.openai.azure.com/openai/deployments/%s/chat/completions?api-version=2023-12-01-preview';
-
-
     /**
      * Controller constructor.
      */
-    public function __construct(private Client $client, private Log\Mapper $logMapper)
-    {
+    public function __construct(
+        private Client $client,
+        private \Schoolbox\Error\Mapper $errorMapper,
+        private Log\Mapper $logMapper,
+        private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper,
+    ) {
     }
 
-    public function postForward(): void
-    {
-        $openAiKey = $this->getConfigLoader()->get('openai_key');
-
-        if (!$openAiKey) {
-            $problem        = (new ApiProblem('OpenAI API key is unavailable'))
-                ->setStatus(404)
-                ->asArray();
-            $this->response = $this->responseAsJson($problem)
-                                   ->withStatus(404);
-            return;
-        }
-
-        /**
-         * @var Log\Model $log
-         */
-        $log = $this->logMapper->createModel();
-        $log->setUser($this->user);
-
-        try {
-            $prompt =  $this->request->getBody()->getContents();
-
-            $openAiRequest = new Request('POST', $this->getEndpoint(), array_merge(
-                $this->getAuthorization(),
-                ['Content-Type'  => 'application/json'],
-            ), $prompt);
-            $log->setPrompt($prompt);
-
-            $promise = $this->client->sendAsync($openAiRequest, ['stream' => true]);
-
-            // Handle the response when it arrives
-            $promise->then(
-                function ($response) use ($log): void {
-                    http_response_code(200);
-                    $log->setReturnCode(200);
-                    $log->setErrorMessage('');
-
-                    //header('X-Accel-Buffering: no');
-                    header('Content-Type: application/json');
-                    header('Content-Encoding: none');
-
-                    ob_implicit_flush(true);
-                    ob_end_flush();
-
-                    $stream = $response->getBody();
-
-                    // Read and proxy the data
-                    while (!$stream->eof()) {
-                        echo $stream->read(1024);
-                        //ob_flush();
-                        //flush();
-                    }
-                },
-                function ($reason) use ($log): void {
-                    /* @var ClientException $reason */
-                    http_response_code($reason->getCode());
-                    echo $reason->getMessage();
-
-                    $log->setReturnCode($reason->getCode());
-                    $log->setErrorMessage($reason->getMessage());
-                }
-            );
-
-            $promise->wait();
-        } catch (GuzzleException $e) {
-            $this->generateException(ErrorMapper::ERROR_DATABASE_UNAVAILABLE);
-        }
-
-        $this->logMapper->save($log);
-
-        die();
-    }
 
     /**
-     * Creates an endpoint URL string for the user selected endpoint.  They can choose between OpenAI and Azure.
+     * Generates a payload about lesson plans
      *
+     * @return void
+     * @throws ClientExceptionInterface
+     * @throws Deleted
+     * @throws Exception
+     * @throws \JsonException
      */
-    private function getEndpoint(): string
+    public function postLessonPlan(): void
     {
-        switch ($this->getConfigLoader()->get('openai_endpoint')) {
-            case 'OpenAI':
-                return self::OPENAI_API_ENDPOINT;
-            case 'Azure':
-                if (empty($this->getConfigLoader()->get('openai_azure_resource_name')) || empty($this->getConfigLoader()->get('openai_azure_deployment_id'))) {
-                    throw new \UnexpectedValueException('Azure resource name and deployment ID are required');
-                }
+        // No BTTF in this space
+        $this->setAllowBackToTheFuture(false);
 
-                return sprintf(
-                    self::AZURE_API_ENDPOINT,
-                    $this->getConfigLoader()->get('openai_azure_resource_name'),
-                    $this->getConfigLoader()->get('openai_azure_deployment_id')
-                );
+        try {
+            $helper = new Helper(
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_KEY)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_RESOURCE_NAME)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_DEPLOYMENT_ID)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_MODEL)),
+                $this->client,
+                $this->errorMapper,
+                $this->logMapper,
+            );
+
+            $payloadGenerator = (new Payload\LessonPlan(
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_MODEL)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_DEPLOYMENT_ID)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_SYSTEM_PROMPT)),
+                trim((string)$this->getConfigLoader()->get('spellcheck_language')),
+                $this->curriculumNodeMapper
+            ));
+
+            /* Generate a payload for ai, using the prompt pieces for System and User info
+             * From a POST payload
+             */
+            $inputs = [
+                'templateTitle' => $this->requestPost->get('templateTitle'),
+                'lessonPlanTitle' => $this->requestPost->get('lessonPlanTitle'),
+                'context' => $this->requestPost->get('context'),
+                'fields' => $this->requestPost->get('fields'),
+                'duration' => $this->requestPost->get('duration'),
+                'curriculumNodeIds' => $this->requestPost->get('curriculumNodeIds'),
+                'additionalContext' => $this->requestPost->get('additionalContext') ?? '',
+                'generateForField' => $this->requestPost->get('generateForField') ?? null,
+            ];
+
+//            $inputs = [
+//                'templateTitle' => 'MYP Unit Planner',
+//                'lessonPlanTitle' => 'Scott Science',
+//                'context' => 'Year 8 Science',
+//                'fields' => [
+//                    [
+//                        'id' => 'Learning Objectives',
+//                        'title' => 'Learning Objectives',
+//                        'description' => 'What students should learn from the lesson',
+//                        'visibility' => 'student',
+//                        'body' => '',
+//                        'selected' => true
+//                    ]
+//                ],
+//                'duration' => '17 minutes',
+//                'curriculumNodeIds' => [
+//                    4156, 4157, 4160
+//                ],
+//                'additionalContext' => '',
+//            ];
+
+            $payload = $payloadGenerator->generate(
+                $inputs['templateTitle'],
+                $inputs['lessonPlanTitle'],
+                $inputs['context'],
+                $inputs['fields'],
+                $inputs['duration'],
+                $inputs['curriculumNodeIds'],
+                $inputs['additionalContext'],
+                $inputs['generateForField'],
+            );
+
+            try {
+                /* Send it and decode the result (if any: sometimes it returns null)
+                 * and dodge around all its weird encoding business with a double-decode,
+                 * and ditching all its training markdown (lol) that it loves to use
+                 *
+                 * https://community.openai.com/t/json-returning-with-json/584818/6
+                 */
+                $data = $helper->request($this->getUser(), $payload, Helper::FEATURE_LESSONPLAN);
+            } catch (SchoolboxException $e) {
+                $problem = (new ApiProblem($e->getMessage()))
+                    ->setStatus($e->getCode())
+                    ->asArray();
+
+                $this->response = $this->responseAsJson($problem)
+                    ->withStatus($e->getCode());
+
+                return;
+            }
+            /* The actual output we requested is in this chain of objects, for now assume it'll only ever be one */
+            $newFieldData = json_decode($data['output'][0]['content'][0]['text'], true);
+
+            /* if this didn't decode correctly (i.e. null) then some weird response came from the AI
+             * send that on... so we can figure out what happened
+             */
+            if ($newFieldData === null) {
+                $returnCode = 500;
+
+                $this->response = $this->responseAsJson([
+                    'output' => $data["output"]
+                ])->withStatus($returnCode);
+
+                return;
+            }
+
+            /* Since we request the fields to be keyed by their title, not ID for AI reasons,
+             * translate it back to IDs for frontend sanity
+             */
+            $fields = [];
+            foreach ($inputs['fields'] as $field) {
+                // maybe the AI didn't return stuff for this field... if so, the frontend will handle that.
+                $fieldKey = $payloadGenerator->getPayloadFieldKey($inputs['fields'], $field['id']);
+                if (isset($newFieldData[$fieldKey])) {
+                    $fields[$field['id']] = Scrub::html($newFieldData[$fieldKey]);
+                }
+            }
+
+            /* if the AI didn't return anything, then we don't want to send an empty field back
+             * just send whatever on earth the AI sent back to us, it'll be wrong... but it'll be something
+             */
+            if (empty($fields)) {
+                $fields = $newFieldData;
+            }
+
+            $this->response = $this->responseAsJson($fields);
+
+            return;
+        } catch (\DomainException $e) {
+            /* Not configured? Not found
+             */
+            $returnCode = 404;
+
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus($returnCode);
+
+            return;
         }
-        throw new \UnexpectedValueException('Endpoint must be configured');
     }
 
-    private function getAuthorization(): array
-    {
-        switch ($this->getConfigLoader()->get('openai_endpoint')) {
-            case 'OpenAI':
-                return ['Authorization' => 'Bearer ' . $this->getConfigLoader()->get('openai_key')];
-            case 'Azure':
-                return ['api-key' => $this->getConfigLoader()->get('openai_key')];
-        }
 
-        throw new \UnexpectedValueException('Endpoint must be configured');
+    /**
+     * Generates an image as part of a conversation
+     *
+     * @return void
+     * @throws Exception
+     * @throws \JsonException
+     */
+    public function postImage(): void
+    {
+        // No BTTF in this space
+        $this->setAllowBackToTheFuture(false);
+
+        // some images may take quite some time, avoid the request stopping early
+        $this->extendExecutionTime();
+
+        try {
+            $helper = new Helper(
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_ENDPOINT)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_KEY)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_RESOURCE_NAME)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_DEPLOYMENT_ID)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_MODEL)),
+                $this->client,
+                $this->errorMapper,
+                $this->logMapper,
+            );
+
+            $payloadGenerator = (new Payload\ImageGeneration(
+                $helper->getModel(),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_SYSTEM_PROMPT)),
+                trim((string)($this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_OUTPUT_QUALITY) ?? 'low')),
+            ));
+
+            $payload = $payloadGenerator->generate(
+                $this->requestPost->get('userPrompt'),
+                $this->requestPost->get('attributes') ?? [],
+                $this->requestPost->get('imageUrl') ?? null,
+                $this->requestPost->get('previousResponseId') ?? null,
+            );
+
+            try {
+                $helper->request($this->getUser(), $payload, Helper::FEATURE_IMAGE);
+            } catch (SchoolboxException $e) {
+                $problem = (new ApiProblem($e->getMessage()))
+                    ->setStatus($e->getCode())
+                    ->asArray();
+
+                // If we've indicated that this is a streaming request, send it in the right format
+                if (headers_sent()) {
+                    echo sprintf("event: error\ndata: %s\n\n", json_encode($problem));
+                    die();
+                }
+
+                $this->response = $this->responseAsJson($problem)
+                    ->withStatus($e->getCode());
+
+                return;
+            }
+
+            return;
+        } catch (\DomainException $e) {
+            /* Not configured? Not found
+             */
+            $returnCode = 404;
+
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            // If we've indicated that this is a streaming request, send it in the right format
+            if (headers_sent()) {
+                echo sprintf("event: error\ndata: %s\n\n", json_encode($problem));
+                die();
+            }
+
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus($returnCode);
+
+            return;
+        }
+    }
+
+
+    /**
+     * This is used by ckeditor's Little Robot Dude ai assistant which posts
+     * to /openai route via some direct javascript thing
+     *
+     * @return void
+     * @throws Exception
+     * @throws \JsonException
+     */
+    public function postAiAssistant(): void
+    {
+        // No BTTF in this space
+        $this->setAllowBackToTheFuture(false);
+
+        try {
+            (new Helper(
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_KEY)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_RESOURCE_NAME)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_DEPLOYMENT_ID)),
+                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_MODEL)),
+                $this->client,
+                $this->errorMapper,
+                $this->logMapper,
+            ))->aiAssistantChat($this->getUser(), $this->request->getBody()->getContents(), trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_SYSTEM_PROMPT)));
+        } catch (\DomainException $e) {
+            /* Not configured? Not found
+             */
+            $returnCode = 404;
+
+            $problem = (new ApiProblem($e->getMessage()))
+                ->setStatus($returnCode)
+                ->asArray();
+
+            $this->response = $this->responseAsJson($problem)
+                ->withStatus($returnCode);
+
+            return;
+        }
     }
 }

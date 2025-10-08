@@ -360,12 +360,15 @@
                         top: $(window).scrollTop() + el.data("css-top") + "px",
                         opacity: 1,
                     };
-
                     return el
                         .css(css)
                         .animate(end_css, settings.animation_speed, "linear", function () {
                             context.locked = false;
                             el.trigger("opened.fndtn.reveal");
+                            // ensure the close button above the modal is always visible
+                            if (parseInt(el.css("top")) < 100) {
+                                el.css("top", "100px");
+                            }
                         })
                         .addClass("open");
                 }

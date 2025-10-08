@@ -345,7 +345,7 @@ class Controller extends Base
             }
         }
         try {
-            return $response->getBody()->getContents();
+            return json_decode($response->getBody()->getContents());
         } catch (RuntimeException $e) {
             return $e->getMessage();
         }

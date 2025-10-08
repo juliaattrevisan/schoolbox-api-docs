@@ -3,7 +3,6 @@
  */
 
 import { defineStore } from "pinia";
-import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import type { Activity } from "@schoolboxAssessment/Types/assessmentTypes";
 
@@ -47,7 +46,7 @@ export const useActivitiesListDeleteModalStore = defineStore("activitiesListDele
             return; // user does not have access to delete
         }
 
-        activate("Deleting...");
+        const toast = window.sbProps.toastActivate("Deleting...");
         isProcessing.value = true;
 
         try {
@@ -63,12 +62,12 @@ export const useActivitiesListDeleteModalStore = defineStore("activitiesListDele
                 throw new Error(await extractErrorMessage(response));
             }
         } catch (error) {
-            timeout({ text: error as string, isSuccess: false });
+            toast.timeout({ text: error as string, isSuccess: false });
             isProcessing.value = false;
             throw error;
         }
 
-        timeout({ text: "Activity Deleted", isSuccess: true });
+        toast.timeout({ text: "Activity Deleted", isSuccess: true });
 
         callbackOnDeleted.value();
         close();

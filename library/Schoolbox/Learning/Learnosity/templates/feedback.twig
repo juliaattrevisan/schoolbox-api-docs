@@ -38,6 +38,7 @@
             :mark-data="{{ markData|json_encode }}"
             :urls="{{ urls|json_encode }}"
             status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"
+            :editor-templates="{{ editorTemplates|json_encode }}"
         />
     </div>
 </div>
@@ -55,6 +56,7 @@ The grade below is inserted into the quiz-feedback Vue DOM structure then displa
                     participant: participant,
                     feedback:    feedback,
                     markScheme:  assessment.markScheme,
+                    useInstructorMark: false,
                     limit:       maxMarks,
                     tabIndex:    1,
                     errors:      errors,

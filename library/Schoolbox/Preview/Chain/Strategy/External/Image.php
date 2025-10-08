@@ -22,7 +22,7 @@ class Image extends Base
      *
      * @var string
      */
-    private $extensions = '/\.(jpg|pjpeg|gif|png|jpeg)$/';
+    private const IMAGE_EXTENSIONS = '/\.(jpg|jpeg|pjpeg|gif|png|svg|webp|bmp)$/';
 
     /**
      * Test the Content-Types
@@ -31,7 +31,7 @@ class Image extends Base
      */
     public function test(): ?array
     {
-        if (preg_match($this->getExtensions(), $this->getUrl())) {
+        if (preg_match(self::IMAGE_EXTENSIONS, $this->getUrl())) {
             return [
                 'type' => 'image',
                 'src' => $this->getUrl(),
@@ -39,18 +39,5 @@ class Image extends Base
         }
 
         return $this->testNext();
-    }
-
-    /* Getters/Setters
-     */
-
-    /**
-     * Get content types
-     *
-     * @return string
-     */
-    private function getExtensions()
-    {
-        return $this->extensions;
     }
 }

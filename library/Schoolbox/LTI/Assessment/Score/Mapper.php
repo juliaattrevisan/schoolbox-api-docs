@@ -103,6 +103,8 @@ class Mapper extends BaseMapper
         $this->uses('is_feedback', self::TYPE_BOOLEAN);
 
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeParticipationIfNecessary']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'insertParticipation']);
     }
 
     /**
@@ -182,5 +184,60 @@ class Mapper extends BaseMapper
             $this->interactionChecker->insertParticipationOnFirstInteraction($object->getStudent(), $assessment);
         }
         return true;
+    }
+
+    /**
+     * Remove the student's participant row if $student should no longer be a participant in $assessment.
+     *
+     * @param Model $object
+     * @return bool - Return true on success - whether or not a participation was removed.
+     *                This is the expected behaviour for callbacks registered with Schoolbox\Mapper.
+     */
+    public function removeParticipationIfNecessary(Model $object): bool
+    {
+        $student = $object->getStudent();
+        $ltiAssessment = $object->getLtiAssessment();
+
+        // If no score exists for the student, the student's participation can be removed.
+        // Note the response and feedback for LTI assessments are both stored in the lti_assessment_score table.
+        if ($this->getScoreCountForStudent($ltiAssessment->getId(), $student->getId()) === 0) {
+            $this->interactionChecker->removeParticipationFromDynamicPlan(
+                $student,
+                $ltiAssessment->getAssessmentModel()
+            );
+        }
+
+        return true;
+    }
+
+    /**
+     * Gets number of attempts this student has made on this assessment. Doesn't
+     * include deleted assessments.
+     *
+     * Note that this function expect `$studentId` to be int, but sometimes it might be string or other
+     * so make sure that you convert it to int before inputting
+     *
+     * @param int $ltiAssessmentId LTI assessment to check.
+     * @param int $studentId The student to check.
+     *
+     * @return int
+     */
+    public function getScoreCountForStudent(int $ltiAssessmentId, int $studentId): int
+    {
+        $query = "
+            SELECT COUNT(*) AS scores
+            FROM {$this->getTable()} AS ltias
+            WHERE ltias.lti_assessment_id = :lti_assessment_id
+            AND ltias.student_id = :student_id
+            AND ltias.deleted_at IS NULL
+        ";
+        $statement = $this->database->prepare($query);
+        $statement->bindValue('lti_assessment_id', $ltiAssessmentId, \PDO::PARAM_INT);
+        $statement->bindValue('student_id', $studentId, \PDO::PARAM_INT);
+        $statement->execute();
+        if ($row = $statement->fetch()) {
+            return intval($row['scores']);
+        }
+        return 0;
     }
 }

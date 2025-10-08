@@ -108,7 +108,7 @@ class Survey_Answer_Signature extends Evaluation_Answer_Signature
         /* In case someone saves with empty signature, which is
          * represented by an empty array []
          */
-        if (strlen($response['response']) > 2) {
+        if (isset($response['response']) && strlen($response['response']) > 2) {
             $data['response'] = 'Signed';
         } else {
             $data['response'] = 'Unsigned';

@@ -37,6 +37,20 @@ class Controller extends Base
     }
 
     /**
+     * Get curriculum nodes associated with a folder.
+     *
+     * @api GET /api/curriculum/usage/folder/{folderId}
+     * @since 25.0
+     *
+     * @param Folder\Model $folder
+     * @return void
+     */
+    public function getFolderUsage(Folder\Model $folder): void
+    {
+        $this->response = $this->buildResponse($folder);
+    }
+
+    /**
      * Set curriculum nodes associated with a folder.
      *
      * @api POST /api/curriculum/usage/folder/{folderId}

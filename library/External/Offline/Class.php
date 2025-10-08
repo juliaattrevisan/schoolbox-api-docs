@@ -10,7 +10,6 @@ use External\IOfflineConnector;
 
 class External_Offline_Class implements External_ClassInterface, IOfflineConnector
 {
-
     /**
      * @inheritdoc
      */
@@ -24,7 +23,7 @@ class External_Offline_Class implements External_ClassInterface, IOfflineConnect
     /**
      * @inheritdoc
      */
-    public function getTeachers(string $classCode, Alaress_Date_Format $date = null): array
+    public function getTeachers(string $classCode, ?Alaress_Date_Format $date = null): array
     {
         // Noop
         return [];

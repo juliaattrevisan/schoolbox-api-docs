@@ -209,7 +209,8 @@ var beforeAttemptingSubmit = function () {
         dueTime = $('input[name="dueTime"]'),
         closeDate = $('input[name="closeDate"]'),
         closeTime = $('input[name="closeTime"]'),
-        maxMark = $('input[name="maxMark"]');
+        maxMark = $('input[name="maxMark"]'),
+        instructorMaxMark = $('input[name="instructor-maxMark"]');
 
     var openVisible = openDate.is(":visible"),
         closeVisible = closeDate.is(":visible");
@@ -313,6 +314,28 @@ var beforeAttemptingSubmit = function () {
         };
 
         maxMark.rules("add", {
+            required: true,
+            number: true,
+            greaterThanZero: true,
+            messages: {
+                required: messageCallback,
+                number: messageCallback,
+                greaterThanZero: messageCallback,
+            },
+        });
+    }
+    // And do the same for instructor max mark, if it's visible
+    if (instructorMaxMark.is(":visible")) {
+        // The message is a little different when rubrics are in use,
+        // because the solution is a little different.
+        var messageCallback = function () {
+            if ($('input[name="useRubric"]').is(":checked")) {
+                return "If using Total Mark with rubrics, at least one descriptor must have a points value greater than zero.";
+            }
+            return "This field must be a number greater than zero.";
+        };
+
+        instructorMaxMark.rules("add", {
             required: true,
             number: true,
             greaterThanZero: true,

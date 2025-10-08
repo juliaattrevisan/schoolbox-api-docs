@@ -76,6 +76,11 @@ class Controller extends Base
     {
         $parsedUrl = parse_url($paperlyLink['url']);
 
+        $paperlyOpenInNewTab = $this->getConfigLoader()->get(ConfigMapper::NAME_PAPERLY_OPEN_IN_NEW_TAB);
+        if ($paperlyOpenInNewTab) {
+            return $paperlyLink['url'];
+        }
+
         $link = $this->base64Codec->encode(
             [
                 'pageTitle' => $paperlyLink['title'],

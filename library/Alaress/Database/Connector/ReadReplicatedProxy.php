@@ -514,7 +514,7 @@ class ReadReplicatedProxy implements IConnector
  * @return array|bool The row, or false if no row is found
  * @deprecated Replace with `$this->executeQuery($sql, $parameters)->fetch()`
  */
-    public function getRow(string $sql, array $parameters = null)
+    public function getRow(string $sql, ?array $parameters = null)
     {
         return $this->determineConnector($sql)->getRow($sql, $parameters);
     }
@@ -527,7 +527,7 @@ class ReadReplicatedProxy implements IConnector
      * @return mixed
      * @deprecated Replace with `$this->executeQuery($sql, $parameters)->fetchColumn()`
      */
-    public function getOne(string $sql, array $parameters = null)
+    public function getOne(string $sql, ?array $parameters = null)
     {
         return $this->determineConnector($sql)->getOne($sql, $parameters);
     }
@@ -540,7 +540,7 @@ class ReadReplicatedProxy implements IConnector
      * @return array
      * @deprecated Replace with `$this->executeQuery($sql, $parameters)->fetchAll()`
      */
-    public function getAll(string $sql, array $parameters = null): array
+    public function getAll(string $sql, ?array $parameters = null): array
     {
         return $this->determineConnector($sql)->getAll($sql, $parameters);
     }
@@ -553,7 +553,7 @@ class ReadReplicatedProxy implements IConnector
      * @return IIterator
      * @deprecated Replace with `$this->executeQuery($sql, $parameters)->getIterator()`
      */
-    public function getIterator(string $sql, array $parameters = null): IIterator
+    public function getIterator(string $sql, ?array $parameters = null): IIterator
     {
         return $this->determineConnector($sql)->getIterator($sql, $parameters);
     }
@@ -566,7 +566,7 @@ class ReadReplicatedProxy implements IConnector
      * @return IStatement
      * @deprecated Replace with `$this->executeQuery($sql, $parameters)`
      */
-    public function query(string $sql, array $parameters = null): IStatement
+    public function query(string $sql, ?array $parameters = null): IStatement
     {
         return $this->determineConnector($sql)->query($sql, $parameters);
     }

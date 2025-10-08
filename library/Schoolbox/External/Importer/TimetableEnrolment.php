@@ -119,7 +119,7 @@ class TimetableEnrolment extends AbstractImporter
 
                 $class = $this->classMapper->createModel()
                     ->setCode($classCode)
-                    ->setName(trim($row['Class Title']));
+                    ->setName(trim((string)($row['Class Title'] ?? '')));
             }
 
             $result[] = (new ClassInvolvement())

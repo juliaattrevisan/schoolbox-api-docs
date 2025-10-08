@@ -34,11 +34,10 @@ class PopulatorTool extends \Schoolbox\InstanceRegistry\Credentials\PopulatorToo
      * Configure the url we use to obtain credentials
      *
      * @param string $irUrl
-     * @param string $puppetCert
      * @param string $environment
      * @return string
      */
-    protected function generateEndpoint(string $irUrl, string $puppetCert, string $environment): string
+    protected function generateEndpoint(string $irUrl, string $environment): string
     {
         return sprintf(
             $this->credentialsEndpoint,

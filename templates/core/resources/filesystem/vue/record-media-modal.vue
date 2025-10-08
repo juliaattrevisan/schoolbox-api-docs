@@ -1,6 +1,7 @@
 <script>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
 /*
  * To record some media, sits within the SB modal window under 'Record'
@@ -13,7 +14,6 @@ import RecordCamera from "@schoolboxVue/components/record/record-camera";
 import RecordScreen from "@schoolboxVue/components/record/record-screen";
 import OverMediaModal from "@schoolboxVue/components/videojs-record/over-media-modal";
 import recordMediaTypes from "@js/record-media/recordMediaTypes";
-import axios from "axios";
 import { humanFileSize } from "@js/util/fileUtils";
 import { hasDeviceCapture } from "@js/util/featureDetectionUtils";
 import { isOfFileType, convertFilenameExtension } from "@js/util/fileUtils";
@@ -255,20 +255,53 @@ export default {
         },
 
         /**
+         * upload the media to SchoolBox, we wrap in a promise as XMLHttpRequest does not support async/await
+         * we use XMLHttpRequest as fetch does not support progress events to display upload progress
+         */
+        async uploadMedia() {
+            return new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                const formData = this.getFormData();
+                xhr.upload.addEventListener("progress", (progressEvent) => this.onUploadProgress(progressEvent));
+                xhr.open("POST", "/storage/asyncUpload.php");
+                xhr.addEventListener("load", () => {
+                    try {
+                        const response = JSON.parse(xhr.responseText); // Parse JSON response
+                        if (typeof response === "object" && "success" in response && response.success) {
+                            resolve(response);
+                        } else {
+                            reject(response);
+                        }
+                    } catch (error) {
+                        reject({
+                            message:
+                                "Sorry, there was an error during upload. Please refresh the page and try again. If the problem persists, contact your support.",
+                        });
+                    }
+                });
+                xhr.addEventListener("error", () =>
+                    reject({
+                        message:
+                            "Sorry, there was an error during upload. Please refresh the page and try again. If the problem persists, contact your support.",
+                    }),
+                );
+                xhr.send(formData);
+            });
+        },
+
+        /**
          * the video is ready, so upload it up to SchoolBox
          */
         async uploadMediaAndReturnResponse() {
             try {
                 this.isUploading = true;
                 this.uploadProgressRatio = "0%";
-                const response = await axios.post("/storage/asyncUpload.php", this.getFormData(), {
-                    onUploadProgress: (progressEvent) => this.onUploadProgress(progressEvent),
-                });
+                const response = await this.uploadMedia();
                 this.uploadProgressRatio = "100%";
                 this.isUploading = false;
-                return response.data;
+                return response;
             } catch (error) {
-                this.checkErrorMessage(error.response.data);
+                this.checkErrorMessage(error);
                 this.isUploading = false;
                 this.hasUploadError = true;
             }
@@ -298,7 +331,7 @@ export default {
         },
 
         /**
-         * try and grab known error messages to better inform of the error that's occured
+         * try and grab known error messages to better inform of the error that's occurred
          *
          * @params {Object}
          */
@@ -307,9 +340,12 @@ export default {
                 this.uploadErrorMessage = `Sorry, the recording of ${humanFileSize(
                     this.recordedData.size,
                 )} is over the allowed file size limit. Please try a shorter recording or request your administrator(s) to increase the allowed file size limit.`;
-            }
-            if (errorResponseData.hash?.includes("The specified filename exceeds the max length")) {
+            } else if (errorResponseData.hash?.includes("The specified filename exceeds the max length")) {
                 this.uploadErrorMessage = `Sorry, the specified filename is longer than the allowed length.\nPlease shorten the filename length.`;
+            } else if (errorResponseData.message) {
+                this.uploadErrorMessage = errorResponseData.message;
+            } else {
+                this.uploadErrorMessage = "Sorry, there was an unknown error while uploading.";
             }
         },
 
@@ -330,7 +366,7 @@ export default {
             this.hasUploaded = true;
             this.canUpload = false;
             setTimeout(() => {
-                //put a slight delay so user sees the upload successfull modal
+                //put a slight delay so user sees the upload successful modal
                 window.top.postMessage(JSON.stringify({ data: [data] }), location.origin);
                 this.hasUploaded = false;
             }, 1000);

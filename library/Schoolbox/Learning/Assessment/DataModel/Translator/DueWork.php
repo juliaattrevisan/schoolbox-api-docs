@@ -120,6 +120,19 @@ class DueWork implements IAssessmentTypeTranslator
             $dataModel->setMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_NONE));
         }
 
+        $instructorMarkScheme = $domainObject->getInstructorMarkScheme();
+        if ($instructorMarkScheme instanceof TotalMarkFractional) {
+            $dataModel->setInstructorMaxMark($instructorMarkScheme->getTotalMark());
+            $dataModel->setInstructorMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_TOTAL));
+        } elseif ($instructorMarkScheme instanceof Percentage) {
+            $dataModel->setInstructorMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_PERCENT));
+        } elseif ($instructorMarkScheme instanceof LetterGrade) {
+            $dataModel->setInstructorGradeGroup($instructorMarkScheme->getGradeGroup());
+            $dataModel->setInstructorMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_LETTER));
+        } elseif ($instructorMarkScheme instanceof None) {
+            $dataModel->setInstructorMarkType((new DueWorkModel\MarkType())->setId(DueWorkModel\MarkType::TYPE_NONE));
+        }
+
         // Translate files
         if ($domainObject->getAttachedFiles() !== null) {
             $dataModel->setAttachments(new GenericCollection(DueWorkModel\SingleFile\Model::class));
@@ -163,7 +176,9 @@ class DueWork implements IAssessmentTypeTranslator
         null === $dataModel->getSkipUnsubmitted()        || $domainObject->setShowSubmittedOnly($dataModel->getSkipUnsubmitted());
         null === $dataModel->getOwner()                  || $domainObject->setCreator($dataModel->getOwner());
         null === $dataModel->getMaxMark()                || $domainObject->setMaxMark($dataModel->getMaxMark());
+        null === $dataModel->getInstructorMaxMark()      || $domainObject->setInstructorMaxMark($dataModel->getInstructorMaxMark());
         null === $dataModel->getGradeGroup()             || $domainObject->setGradeGroup($dataModel->getGradeGroup());
+        null === $dataModel->getInstructorGradeGroup()   || $domainObject->setInstructorGradeGroup($dataModel->getInstructorGradeGroup());
         null === $dataModel->getMarkVisibility()         || $domainObject->setMarkVisibility($dataModel->getMarkVisibility());
         null === $dataModel->getSelfReviewability()      || $domainObject->setSelfReviewability($dataModel->getSelfReviewability());
         null === $dataModel->getSimilarityCheckEnabled() || $domainObject->setSimilarityCheckEnabled($dataModel->getSimilarityCheckEnabled());

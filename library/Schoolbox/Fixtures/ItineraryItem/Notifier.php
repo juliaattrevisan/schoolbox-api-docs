@@ -114,12 +114,12 @@ class Notifier extends AbstractModuleNotifier
      * This doesn't notify if the itinerary isn't meaningfully different to its
      * previous state.
      *
-     * @param Model $itinerary
-     * @param User  $effector
-     * @param array $diff
+     * @param Model      $itinerary
+     * @param User       $effector
+     * @param array|null $diff
      * @return Envelope
      */
-    public function notifyStudentUpdated(Model $itinerary, User $effector, array $diff = null)
+    public function notifyStudentUpdated(Model $itinerary, User $effector, ?array $diff = null)
     {
         if (!$this->isMeaningfullyDifferent($diff)) {
             return new Envelope();
@@ -145,12 +145,12 @@ class Notifier extends AbstractModuleNotifier
      * This doesn't notify if the itinerary isn't meaningfully different to its
      * previous state.
      *
-     * @param Model $itinerary
-     * @param User  $effector
-     * @param array $diff
+     * @param Model      $itinerary
+     * @param User       $effector
+     * @param array|null $diff
      * @return Envelope
      */
-    public function notifyParentUpdated(Model $itinerary, User $effector, array $diff = null)
+    public function notifyParentUpdated(Model $itinerary, User $effector, ?array $diff = null)
     {
         if (!$this->isMeaningfullyDifferent($diff)) {
             return new Envelope();
@@ -219,7 +219,7 @@ class Notifier extends AbstractModuleNotifier
      * @param array|null $diff The difference between the two states
      * @return bool
      */
-    private function isMeaningfullyDifferent(array $diff = null): bool
+    private function isMeaningfullyDifferent(?array $diff = null): bool
     {
         return !empty($diff['description']) || !empty($diff['startAt']);
     }

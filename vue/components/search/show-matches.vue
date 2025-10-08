@@ -17,6 +17,7 @@ interface Props {
     disabled?: boolean; // whether the element is disabled
     for?: string; // the for attribute
     preventDefault?: boolean; // whether to prevent the default action
+    dataTest?: string; // the data-test attribute
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -27,6 +28,7 @@ const props = withDefaults(defineProps<Props>(), {
     disabled: undefined,
     for: undefined,
     preventDefault: false,
+    dataTest: undefined,
 });
 
 /**
@@ -68,6 +70,7 @@ function onClicked(event: Event): void {
         :class="props.class ? props.class : false"
         :title="props.title ? props.title : undefined"
         :disabled="props.disabled ? props.disabled : undefined"
+        :data-test="props.dataTest ? props.dataTest : undefined"
         :for="props.for ? props.for : undefined"
         @click="onClicked"
         v-html="addMarks(props.text, queryWordList, props.allowPartialMatches)"
@@ -82,6 +85,7 @@ function onClicked(event: Event): void {
         :class="props.class ? props.class : false"
         :title="props.title ? props.title : undefined"
         :disabled="props.disabled ? props.disabled : undefined"
+        :data-test="props.dataTest ? props.dataTest : undefined"
         :for="props.for ? props.for : undefined"
         @click="onClicked"
         >{{ props.text }}</component

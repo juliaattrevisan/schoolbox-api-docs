@@ -21,14 +21,13 @@ use InvalidArgumentException;
  */
 class IsSimilarityCheckEnabled extends AbstractAssessableRule
 {
-
     /**
      * Determine whether Similarity Check was activated for the given $assessment
      *
      * @inheritdoc
      * @throws InvalidArgumentException If unable to locate required params in route args
      */
-    public function authorize(array $params = [], User $user = null)
+    public function authorize(array $params = [], ?User $user = null)
     {
         $assessment = $this->findAssessable($params);
 

@@ -22,7 +22,7 @@ class Assess_Answer_Fillgap extends Evaluation_Answer_Fillgap implements IAutoma
      */
     public function mark($currentResponse): void
     {
-        $response = unserialize($currentResponse['response']);
+        $response = unserialize($currentResponse['response'] ?? '');
         $answer = html_entity_decode($currentResponse['answer'], ENT_IGNORE | ENT_QUOTES);
 
         /* Pattern match spans to find answers

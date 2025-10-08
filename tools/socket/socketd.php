@@ -9,13 +9,12 @@
  * @link        https://schoolbox.com.au/
  */
 
-use Alaress\Redis;
-use Alaress\Redis\Async;
 use Alaress\WorkerCrew\Pooling\ConfigurationReader;
 use Alaress\WorkerCrew\Pooling\ConfiguredDispatchStrategyBuilder;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Ratchet\Server\IoServer;
+use Ratchet\Session\Serialize\PhpBinaryHandler;
 use Ratchet\Session\Serialize\PhpHandler;
 use React\EventLoop\LoopInterface;
 use React\Socket\SocketServer;
@@ -23,6 +22,7 @@ use Schoolbox\Application\Daemon;
 use Schoolbox\Application\Daemon\Kernel;
 use Schoolbox\MultiInstance;
 use Schoolbox\Realtime\Pipe\HttpServer;
+use Schoolbox\Realtime\Pipe\PhpSerializeSessionHandler;
 use Schoolbox\Realtime\Pipe\PipeManagerFactory;
 
 require_once __DIR__ . '/../../conf/core/require.php';
@@ -30,11 +30,24 @@ require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Daemon\Kernel('Socket', [Daemon\Kernel::OPTION_APP_SHORT_OPTS => 'p::c::']);
 
 // CREATE WEBSOCKET APP
-$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) use ($kernel) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) use ($kernel): void {
 
     $port = $opts['p'] ?? 9081;
     $conf = $opts['c'] ?? 'socketd.conf';
 
+    // Session serialize handler: depends on configuration
+    $sessionSerializeHandlerConfig = strtolower(ini_get('session.serialize_handler'));
+    $sessionSerializeHandler       = match ($sessionSerializeHandlerConfig) {
+        'php_serialize' => new PhpSerializeSessionHandler(),
+        'php'           => new PhpHandler(),
+        'php_binary'    => new PhpBinaryHandler(),
+        default         => throw new RuntimeException(
+            sprintf(
+                'No serialize handler available (session.serialize_handler: "%s")',
+                $sessionSerializeHandlerConfig,
+            ),
+        ),
+    };
 
     // Need the multi-instance repository
     /** @var MultiInstance\InstanceRepository $instanceRepository */
@@ -63,7 +76,7 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
 
     $pipeManager = (new PipeManagerFactory(
         $loop,
-        new PhpHandler(),
+        $sessionSerializeHandler,
         $log,
         $instanceRepository,
         $configRepository,

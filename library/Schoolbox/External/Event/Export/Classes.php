@@ -48,7 +48,7 @@ class Classes
         /* Header row
          */
         $fp = fopen('php://temp', 'w');
-        fputcsv($fp, $headings);
+        fputcsv($fp, $headings, escape: '');
 
         /* SUDS Timetable records
          */
@@ -67,7 +67,7 @@ class Classes
                 $row[$heading] = $timetableEvent[$column];
             }
 
-            fputcsv($fp, array_values($row));
+            fputcsv($fp, array_values($row), escape: '');
         }
 
         rewind($fp);

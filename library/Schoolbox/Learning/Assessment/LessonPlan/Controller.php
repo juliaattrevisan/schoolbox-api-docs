@@ -46,6 +46,28 @@ use Twig\Error\Error;
 
 class Controller extends Assessment\Controller
 {
+    /**
+     * @param UserMapper $userMapper
+     * @param ErrorMapper $errorMapper
+     * @param AssessmentMapperProxy $assessmentMapper
+     * @param WorkTypeMapper $workTypeMapper
+     * @param Access $access
+     * @param Transactor $transactor
+     * @param BreadcrumbFactory $bakery
+     * @param Term\Mapper $termMapper
+     * @param Participant\DataSource $participantDataSource
+     * @param CourseSpecification\Mapper $courseSpecificationMapper
+     * @param UnitSpecification\Mapper $unitSpecificationMapper
+     * @param RosettaStone $rosettaStone
+     * @param Replicator $replicator
+     * @param LatestViewMapper $latestViewMapper
+     * @param Project\ResultCache\Mapper $projectResultCacheMapper
+     * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
+     * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
+     * @param CourseImplementation\Mapper $courseImplementationMapper
+     * @param UnitImplementation\Mapper $unitImplementationMapper
+     * @param LinkedAssessmentsMapper $linkedAssessmentsMapper
+     */
     public function __construct(
         UserMapper $userMapper,
         ErrorMapper $errorMapper,
@@ -66,7 +88,7 @@ class Controller extends Assessment\Controller
         LessonPlanDataModelMapper $lessonPlanDataModelMapper,
         private CourseImplementation\Mapper $courseImplementationMapper,
         private UnitImplementation\Mapper $unitImplementationMapper,
-        private LinkedAssessmentsMapper $linkedAssessmentsMapper
+        private LinkedAssessmentsMapper $linkedAssessmentsMapper,
     ) {
         parent::__construct(
             $userMapper,
@@ -85,7 +107,7 @@ class Controller extends Assessment\Controller
             $latestViewMapper,
             $projectResultCacheMapper,
             $lessonPlanTemplateMapper,
-            $lessonPlanDataModelMapper
+            $lessonPlanDataModelMapper,
         );
     }
 
@@ -489,10 +511,11 @@ class Controller extends Assessment\Controller
      * @param string      $defaultReturnUrl
      * @param bool        $relocated
      * @param bool        $isCreate
+     * @param bool        $toParticipation
      * @return string
      * @throws RouteNotFound
      */
-    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '', bool $relocated = false, bool $isCreate = false): string
+    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '', bool $relocated = false, bool $isCreate = false, bool $toParticipation = false): string
     {
         /**
          * Always go to the summary screen when a lesson plan has been created,

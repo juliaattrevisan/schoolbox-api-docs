@@ -18,7 +18,7 @@
                     <dt class="small-4 medium-3 columns">{{ locale.severity.proper }}:</dt>
                     <dd class="small-8 medium-9 columns">
                         {% if severityColor %}
-                            <span class="label" style="background-color:{{ record.severity.color }};color:{{ severityColor }}">{{ record.severity.name }}</span>
+                            <sbx-label text="{{ record.severity.name }}" background-color="{{ record.severity.color }}" text-color="{{ severityColor }}"></sbx-label>
                         {% else %}
                             {{ record.severity.name }}
                         {% endif %}
@@ -50,11 +50,16 @@
                     <dd class="small-8 medium-9 columns">{{ record.updatedAtDisplay.long }}</dd>
                 {% endif %}
 
-
-
-                {% if record.points is not empty %}
+                {% if config.pastoral_point_enabled and record.points is not empty %}
                     <dt class="small-4 medium-3 columns">Points:</dt>
-                    <dd class="small-8 medium-9 columns">{{ record.points }}</dd>
+                    <dd class="small-8 medium-9 columns">
+                        <sbx-label-pastoral-points points="{{ record.points }}"></sbx-label-pastoral-points>
+                    </dd>
+                {% endif %}
+
+                {% if record.expiresAt is not empty %}
+                    <dt class="small-4 medium-3 columns">Expires At:</dt>
+                    <dd class="small-8 medium-9 columns">{{ record.expiresAt.longDateOnly }}</dd>
                 {% endif %}
             </dl>
 

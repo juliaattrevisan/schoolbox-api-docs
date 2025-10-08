@@ -58,7 +58,7 @@ class Replicator
      * @param IAssessable       $source             the assessment to replicate
      * @param AssessmentContext $destinationContext the location into which to replicate the assessment
      * @param User              $newOwner           who should own the newly created assessment
-     * @param null|int          $sequence           enable explicit sequence setting
+     * @param int|null          $sequence           enable explicit sequence setting
      * @return IAssessable if any part of the replication fails
      * @throws \InvalidArgumentException If Destination Quiz already has Sections
      * @throws \UnexpectedValueException
@@ -68,18 +68,20 @@ class Replicator
         IAssessable $source,
         AssessmentContext $destinationContext,
         User $newOwner,
-        int $sequence = null
+        ?int $sequence = null
     ): IAssessable {
         $newAssessment = $source->cloneForCopy();
         $newAssessment->setContext($destinationContext);
 
         // If copying the assessment into a spec: clear its dates
+        // also clear the connection to the original assessment if it's a customisation
         if ($destinationContext->isSpecificationContext()) {
             $newAssessment = $newAssessment
                 ->setPublishAt(null)
                 ->setOpenAt(null)
                 ->setDueAt(null)
-                ->setCloseAt(null);
+                ->setCloseAt(null)
+                ->setOriginalAssessmentId(null);
         }
 
         $destinationContext->getAssessables()->add($newAssessment);
@@ -94,7 +96,7 @@ class Replicator
         $destinationContext->getAssessables()->add($newAssessment);
 
         // Copy DueWork Rubrics
-        $this->replicateDueWorkRubric($source, $destinationContext, $newAssessment);
+        $this->replicateDueWorkRubric($source, $newAssessment, $destinationContext);
 
         // Copy Quiz Sections/Questions/Solutions
         $this->replicateQuizConstituents($source, $newAssessment, $newOwner);
@@ -179,16 +181,16 @@ class Replicator
      * Copy the rubric from `$source` into `$destination`.
      *
      * @param IAssessable $source
-     * @param AssessmentContext $assessmentContext
      * @param IAssessable $destination
+     * @param AssessmentContext $destinationContext
      * @return void
      * @throws MapperException
      */
-    private function replicateDueWorkRubric(IAssessable $source, AssessmentContext $assessmentContext, IAssessable $destination): void
+    private function replicateDueWorkRubric(IAssessable $source, IAssessable $destination, AssessmentContext $destinationContext): void
     {
         if (!($source instanceof DueWork && $destination instanceof DueWork)) {
             return;
         }
-        $this->rubricMapper->copyRubric($source->getId(), $assessmentContext, $destination->getId());
+        $this->rubricMapper->copyRubric($source->getId(), $destination->getId(), $destinationContext);
     }
 }

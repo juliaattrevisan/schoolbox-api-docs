@@ -32,37 +32,54 @@ $app    = new class extends CliTool\App {
         $this->s3Region     = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_REGION) ?? "");
         $this->s3Version    = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_VERSION) ?? "");
         $this->s3Bucket     = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_BUCKET) ?? "");
+        $altHost            = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_HOST) ?? "");
+        $altBucket          = trim($this->getConfig()->get(ConfigMapper::NAME_OTFS_S3_ALT_BUCKET) ?? "");
+
+        if (!empty($altHost) && !empty($altBucket)) {
+            $this->s3Bucket = $altBucket;
+        }
     }
 
     private function buildS3Client(): void
     {
-        $this->client = new S3Client([
-                                         'credentials' => [
-                                             'key'    => $this->s3CredKey,
-                                             'secret' => $this->s3CredSecret,
-                                         ],
-                                         'region'      => $this->s3Region,
-                                         'version'     => $this->s3Version,
-                                     ]);
+        $cfg = [
+            'credentials' => [
+                'key'    => $this->s3CredKey,
+                'secret' => $this->s3CredSecret,
+            ],
+            'region'      => $this->s3Region,
+            'version'     => $this->s3Version,
+        ];
+        $altHost = trim($this->getConfig()->get('otfs_s3_alt_host') ?? "");
+        $s3AltAccessKey = trim($this->getConfig()->get('otfs_s3_alt_access_key') ?? "");
+        $s3AltSecretAccessKey = trim($this->getConfig()->get('otfs_s3_alt_secret_key') ?? "");
+        $s3AltRegion = trim($this->getConfig()->get('otfs_s3_alt_region') ?? "");
+        if (!empty($altHost)) {
+            $cfg['endpoint'] = $altHost;
+            $cfg['credentials']['key'] = $s3AltAccessKey;
+            $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
+            $cfg['region'] = $s3AltRegion;
+        }
+        $this->client = new S3Client($cfg);
     }
 
     private function createBackupDirectoriesInS3(): void
     {
         $this->client->putObject([
-                                     'Bucket' => $this->s3Bucket,
-                                     'Key'    => self::DAILY_PREFIX,
-                                     'Body'   => '',
-                                 ]);
+            'Bucket' => $this->s3Bucket,
+            'Key'    => self::DAILY_PREFIX,
+            'Body'   => '',
+        ]);
         $this->client->putObject([
-                                     'Bucket' => $this->s3Bucket,
-                                     'Key'    => self::WEEKLY_PREFIX,
-                                     'Body'   => '',
-                                 ]);
+            'Bucket' => $this->s3Bucket,
+            'Key'    => self::WEEKLY_PREFIX,
+            'Body'   => '',
+        ]);
         $this->client->putObject([
-                                     'Bucket' => $this->s3Bucket,
-                                     'Key'    => self::MONTHLY_PREFIX,
-                                     'Body'   => '',
-                                 ]);
+            'Bucket' => $this->s3Bucket,
+            'Key'    => self::MONTHLY_PREFIX,
+            'Body'   => '',
+        ]);
     }
 
     private function generateDailyBackup(): array
@@ -71,7 +88,7 @@ $app    = new class extends CliTool\App {
         $filename = INSTANCE_ID . "_schoolbox_" . date("Y-m-d") . ".sql";
         $filepath = $this->getConfig()->get(ConfigMapper::NAME_BACKUP_DIR) . "/{$filename}";
         exec(
-            "mysqldump --single-transaction -f --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u {$dbUser} \
+            "mariadb-dump --single-transaction -f --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u {$dbUser} \
         -p{$dbPass} -h {$dbHost} {$dbSchema} > {$filepath}"
         );
         exec("gzip {$filepath}");
@@ -81,18 +98,18 @@ $app    = new class extends CliTool\App {
     private function uploadFileToS3($key, $sourceFile): void
     {
         $this->client->putObject([
-                                     'Bucket'     => $this->s3Bucket,
-                                     'Key'        => $key,
-                                     // e.g., backups/weekly/instanceId_schoolbox_2024-03-14.sql.gz
-                                     'SourceFile' => $sourceFile,
-                                     // e.g., /var/lib/schoolbox/instanceId/backups/weekly/instanceId_schoolbox_2024-03-14.sql.gz
-                                 ]);
+            'Bucket'     => $this->s3Bucket,
+            'Key'        => $key,
+            // e.g., backups/weekly/instanceId_schoolbox_2024-03-14.sql.gz
+            'SourceFile' => $sourceFile,
+            // e.g., /var/lib/schoolbox/instanceId/backups/weekly/instanceId_schoolbox_2024-03-14.sql.gz
+        ]);
         // check if file upload was successful
         try {
             $fileInS3 = $this->client->getObject([
-                                                     'Bucket' => $this->s3Bucket,
-                                                     'Key'    => $key,
-                                                 ]);
+                'Bucket' => $this->s3Bucket,
+                'Key'    => $key,
+            ]);
         } catch (Aws\S3\Exception\S3Exception) {
             $this->getLogger()->error("Failed to back up database of instance " . INSTANCE_ID . " to S3.");
             exit(1);
@@ -118,9 +135,9 @@ $app    = new class extends CliTool\App {
                 if ($backupDate < $cutoffDate) {
                     $this->getLogger()->info("Pruning old backup: {$file['Key']}.");
                     $this->client->deleteObject([
-                                                    'Bucket' => $this->s3Bucket,
-                                                    'Key'    => $file['Key'],
-                                                ]);
+                        'Bucket' => $this->s3Bucket,
+                        'Key'    => $file['Key'],
+                    ]);
                 }
             }
         }
@@ -141,7 +158,7 @@ $app    = new class extends CliTool\App {
         $this->setOTFSCredentials();
         $this->buildS3Client();
         $this->createBackupDirectoriesInS3();
-        $this->getLogger()->info("Backing up MySQL database for " . INSTANCE_ID);
+        $this->getLogger()->info("Backing up MariaDB database for " . INSTANCE_ID);
         [$filename, $filepath] = $this->generateDailyBackup();
         $this->getLogger()->info("Uploading daily backup to S3 bucket.");
         $this->uploadFileToS3(self::DAILY_PREFIX . $filename, $filepath);

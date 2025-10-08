@@ -71,7 +71,7 @@
 
                 /* A list of all the people who have publishable rows
                  */
-                assessmentList: $("#assessment-status"),
+                assessmentList: $("[data-assessment-status]"),
 
                 /* Buttons which control which rows are visible
                  */
@@ -188,15 +188,31 @@
         }
 
         /**
+         * Retrieve the comment box ID for a participant
+         * @param {jQuery} $participant - The participant element
+         * @returns {string} - The ID of the comment textarea
+         */
+        function getCommentBoxId($participant) {
+            const participantId = $participant.data("participant");
+            const assessmentId = $participant.closest("[data-assessment]").data("assessment");
+
+            // is there an assessmentId? If not, we assume the comment box only has a participantId
+            if (!assessmentId) {
+                return `comment-${participantId}`;
+            }
+
+            return `comment-${assessmentId}-${participantId}`;
+        }
+
+        /**
          * Set up actions to occur when Publishing Feedback
          */
         function setupPublishAction() {
             $(config.assessmentList).on("mousedown click", '[data-draft="publish"]', function (e) {
                 e.preventDefault();
 
-                var $participant = findParticipantElement($(this)),
-                    participantId = $participant.data("participant"),
-                    commentBoxId = "comment-" + participantId;
+                const $participant = findParticipantElement($(this));
+                const commentBoxId = getCommentBoxId($participant);
 
                 if (isCommentsEmpty(commentBoxId) && this.hasAttribute("data-has-empty-check")) {
                     emptyDialog.foundation("reveal", "open");
@@ -224,8 +240,9 @@
                 $actionBar = $participant.find("[data-action-bar]"),
                 $btnDrafted = $actionBar.find("[data-draft=drafted]"),
                 $btnPublish = $actionBar.find("[data-draft=publish]"),
-                participantId = $participant.data("participant"),
-                commentBoxId = "comment-" + participantId;
+                participantId = $participant.data("participant");
+
+            const commentBoxId = getCommentBoxId($participant);
 
             /**
              * Hide the publish button once the feedback has been published

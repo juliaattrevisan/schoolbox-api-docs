@@ -388,7 +388,7 @@ class Participant
 
 
     /**
-     * Calculate the authoritative human-readable mark - optionally filtered to just published marks.
+     * Calculate the authoritative human-readable learner mark - optionally filtered to just published marks.
      *
      * @param bool $publishedOnly Should we ignore draft marks?
      * @return null|string
@@ -397,6 +397,23 @@ class Participant
     {
         try {
             return $this->plan->getAssessable()->getHumanReadableMark($this, $publishedOnly);
+        } catch (DomainException $e) {
+            // Impossible to throw when calling $this->assessable($this)
+            trigger_error($e->getMessage(), E_USER_WARNING);
+            return null;
+        }
+    }
+
+    /**
+     * Calculate the authoritative human-readable instructor mark - optionally filtered to just published marks.
+     *
+     * @param bool $publishedOnly Should we ignore draft marks?
+     * @return null|string
+     */
+    public function generateHumanReadableInstructorMark($publishedOnly)
+    {
+        try {
+            return $this->plan->getAssessable()->getHumanReadableInstructorMark($this, $publishedOnly);
         } catch (DomainException $e) {
             // Impossible to throw when calling $this->assessable($this)
             trigger_error($e->getMessage(), E_USER_WARNING);
@@ -460,6 +477,31 @@ class Participant
         /* Non-projects just derive it the usual way it always did
          */
         return $this->generateHumanReadableMark($publishedOnly);
+    }
+
+
+    /**
+     * Retrieve authoritative human-readable instructor mark - optionally filtered to just published marks.
+     *
+     * For projects, it reads from a special schema table, project_results (to save you
+     * re-deriving it at runtime, we can recall an answer we calculated earlier)
+     *
+     * @param bool $publishedOnly Should we ignore draft marks?
+     * @return null|string
+     */
+    public function getHumanReadableInstructorMark(bool $publishedOnly): ?string
+    {
+        /* Only read Published project marks from the result cache
+         * Draft project marks get dynamically calculated
+         */
+        if ($publishedOnly && $this->plan->getAssessable() instanceof Project) {
+            // use the logic from getHumanReadableMark
+            return $this->getHumanReadableMark($publishedOnly);
+        }
+
+        /* Non-projects just derive it the usual way it always did
+         */
+        return $this->generateHumanReadableInstructorMark($publishedOnly);
     }
 
 

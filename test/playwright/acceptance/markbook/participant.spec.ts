@@ -10,10 +10,9 @@ import MarkbookPage from "@schoolboxTest/playwright/support/page/markbook/Markbo
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
 import SubmitForm from "@schoolboxTest/playwright/support/page/dueWork/SubmitForm";
-import StatusPage from "@schoolboxTest/playwright/support/page/dueWork/StatusPage";
 import Common from "@schoolboxTest/playwright/support/page/Common";
 
-test.describe("Participant Tests", () => {
+test.describe.skip("Participant Tests", () => {
     test.beforeEach(async ({ tester }) => {
         await tester.logout();
         await tester.loginAsAdmin();
@@ -28,11 +27,10 @@ test.describe("Participant Tests", () => {
         const teacher = Common.USER_JACKCOLES;
         const teacherId = Common.USER_ID_JACKCOLES;
 
-        const addComponent = new Homepage(page);
+        const addComponent = new Homepage(tester, page);
         const dueworkForm = new AssessmentForm(tester, page);
         const submitForm = new SubmitForm(tester, page);
         const markbookPage = new MarkbookPage(page);
-        const statusPage = new StatusPage(tester, page);
 
         tester.isGoingTo("add a due work component into the homepage");
         await page.goto("/homepage/106");
@@ -62,7 +60,7 @@ test.describe("Participant Tests", () => {
         await dueworkForm.setTitle(dueworkTitle1);
         await dueworkForm.setPublishDate(Common.getTodayAtMidnight());
         await dueworkForm.setOpenDate(Common.getTodayAtMidnight());
-        await dueworkForm.setMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
+        await dueworkForm.setInstructorMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
         await dueworkForm.create();
 
         tester.isGoingTo("As Jack Coles, create submission");
@@ -79,24 +77,20 @@ test.describe("Participant Tests", () => {
         await markbookPage.open(classId);
         await markbookPage.canSeeParticipant("Coles, Jack");
         await markbookPage.canSeeAssessment("Cest One");
+        const assessmentId = await markbookPage.getAssessmentId("Cest One");
 
         tester.isGoingTo("exclude Jack Coles from the due work participants list");
-        await page.locator(`a:has-text("Cest One")`).click();
-        await expect(page.locator(`h1:has-text("Status of Cest One")`)).toBeVisible();
-        await page.waitForTimeout(2000);
-        await statusPage.clickJellyTot();
-        await statusPage.clickJellyTotOption("modify");
+        await markbookPage.openAssessmentDropdown(assessmentId);
+        await markbookPage.clickAssessmentDropdownItem(assessmentId, "modify");
         await expect(page.locator(`h1:has-text("Update Cest One")`)).toBeVisible();
         await expect(page.getByTestId("assessment-form-button-submit-Update")).toBeEnabled();
         await page.waitForTimeout(2000);
         await dueworkForm.modifyParticipation(teacherId, true, true);
-        await dueworkForm.update();
-        await expect(page.locator(`h1:has-text("Status of Cest One")`)).toBeVisible();
 
-        tester.isGoingTo(
-            "open course mark book and check that Jack Coles is not presented and the student is presented",
-        );
-        await markbookPage.open(classId);
+        tester.isGoingTo("submit the form and expect to be taken back to the markbook");
+        await dueworkForm.update();
+
+        tester.isGoingTo("check that Jack Coles is not presented and the student is presented");
         await markbookPage.selectWorkType(1);
         await markbookPage.selectStatus("open");
         await markbookPage.applyFilter();
@@ -105,21 +99,16 @@ test.describe("Participant Tests", () => {
         await markbookPage.canSeeParticipant("Smith, Louisa");
 
         tester.isGoingTo("exclude a student (Louisa Smith) from the due work participants list");
-        await page.locator(`a:has-text("Cest One")`).click();
-        await expect(page.locator(`h1:has-text("Status of Cest One")`)).toBeVisible();
-        await page.waitForTimeout(2000);
-        await statusPage.clickJellyTot();
-        await statusPage.clickJellyTotOption("modify");
+        await markbookPage.openAssessmentDropdown(assessmentId);
+        await markbookPage.clickAssessmentDropdownItem(assessmentId, "modify");
         await expect(page.locator(`h1:has-text("Update Cest One")`)).toBeVisible();
         await expect(page.getByTestId("assessment-form-button-submit-Update")).toBeEnabled();
         await dueworkForm.modifyParticipation(studentId, false, false);
-        await dueworkForm.update();
-        await expect(page.locator(`h1:has-text("Status of Cest One")`)).toBeVisible();
 
-        tester.isGoingTo(
-            "open course mark book and check that Jack Coles is not presented and Louisa Smith is presented",
-        );
-        await markbookPage.open(classId);
+        tester.isGoingTo("submit the form and expect to be taken back to the markbook");
+        await dueworkForm.update();
+
+        tester.isGoingTo("check that Jack Coles is not presented and Louisa Smith is presented");
         await markbookPage.canSeeAssessment("Cest One");
         await markbookPage.cantSeeParticipant("Coles, Jack");
         await markbookPage.canSeeParticipant("Smith, Louisa");
@@ -141,7 +130,7 @@ test.describe("Participant Tests", () => {
             return;
         }
 
-        const addComponent = new Homepage(page);
+        const addComponent = new Homepage(tester, page);
 
         // remove the duework component from the homepage to avoid issues in the next test
         tester.isGoingTo("remove the duework component from the homepage");

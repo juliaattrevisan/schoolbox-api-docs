@@ -13,6 +13,7 @@ namespace Calendar\Event\Type\Submission\Renderer;
 
 use Schoolbox\Learning\Assessment\Redirect;
 use Scrub;
+use Schoolbox\Config\Loader as ConfigLoader;
 
 /**
  * Class Javascript
@@ -203,6 +204,15 @@ class Javascript extends Base
                     'student'      => $this->user,
                 ]
             ) . '?' . Redirect::RETURN_URL . '=' . Redirect::encode($returnUrl);
+            /**
+             * Prevent the parent of the student from setting the work details link
+             * if the restrict_student_submissions config setting is enabled
+             */
+            $isParentOfUser = $this->viewer->isParentOf($this->user);
+            $hideWorkDetailsFromParents = ConfigLoader::getInstance()->get('restrict_student_submissions');
+            if ($isParentOfUser && $hideWorkDetailsFromParents) {
+                $moreDetailsLink = null;
+            }
         }
 
         return [

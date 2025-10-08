@@ -6,6 +6,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Alaress\Authorizer\Rule;
 use InvalidArgumentException;
+use Schoolbox\User\Token\Mapper as TokenMapper;
 
 class Module extends BaseModule
 {
@@ -77,6 +78,16 @@ class Module extends BaseModule
         // TODO: $this->register('GET', '/audit/implementationTopMenuReport', 'implementationCalendarEventTypes', $isAlaress);
         $this->register('GET', '/audit/implementationSideMenuReport', 'implementationSideMenuReport', $isAlaress);
         $this->register('GET', '/audit/implementationAcademicPeriods', 'implementationAcademicPeriods', $isAlaress);
+        // Unit Planner Engagement Reports
+        $this->register('GET', '/audit/unitplannerFrameworks', 'unitplannerFrameworks', $isAlaress);
+        $this->register('GET', '/audit/unitplannerCourseTextboxes', 'unitplannerCourseTextboxes', $isAlaress);
+        $this->register('GET', '/audit/unitplannerUnitTextboxes', 'unitplannerUnitTextboxes', $isAlaress);
+        $this->register('GET', '/audit/unitplannerComponents', 'unitplannerComponents', $isAlaress);
+        $this->register('GET', '/audit/unitplannerAssessments', 'unitplannerAssessments', $isAlaress);
+        // OLCStats Reports
+        $this->register('GET', '/audit/olcstatsQuizAttempts', 'olcstatsQuizAttempts', $isAlaress);
+        $this->register('GET', '/audit/olcstatsTaskCompletions', 'olcstatsTaskCompletions', $isAlaress);
+        $this->register('GET', '/audit/olcstatsDueWorkSubmissions', 'olcstatsDueWorkSubmissions', $isAlaress);
     }
 
     /**
@@ -89,7 +100,8 @@ class Module extends BaseModule
             $this->getConfig(),
             $this->injector->get('router.generator'),
             $this->injector->get('taskd.messageFactory'),
-            $this->injector->get('taskd.messageProducer')
+            $this->injector->get('taskd.messageProducer'),
+            $this->getMapperFactory()->get(TokenMapper::class)
         );
     }
 }

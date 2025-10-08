@@ -5,6 +5,8 @@
  * @link        http://www.alaress.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Schoolbox\Geosnapshot\Component\Homepage;
 
 use Component_Homepage_ControllerAbstract;
@@ -25,8 +27,12 @@ class Controller extends Component_Homepage_ControllerAbstract
     /**
      * @var string|null
      */
-    private ?string $url;
+    private ?string $url = null;
 
+    /**
+     * @var int|null
+     */
+    private ?int $height = null;
 
     /**
      * Only render this component if Geosnapshot has been set up
@@ -38,8 +44,6 @@ class Controller extends Component_Homepage_ControllerAbstract
      */
     public function execute(): bool
     {
-        $this->url = null;
-
         /* If the component has a search term, ask Geosnapshot for an answer
          */
         if (
@@ -54,8 +58,11 @@ class Controller extends Component_Homepage_ControllerAbstract
              */
             try {
                 $api = new Api($this->getConfigLoader()->get('geosnapshot_api_key'));
-
-                $response = $api->retrieveEventPhotos($this->getConfig('eventName'), $this->getUser());
+                $response = $api->retrieveEventPhotos(
+                    trim((string)$this->getConfig('eventName')),
+                    trim((string)$this->getConfig('albumName')),
+                    $this->getUser()
+                );
             } catch (\RuntimeException | \DomainException $e) {
                 /* DomainException is thrown when json can't be decoded
                  */
@@ -65,6 +72,11 @@ class Controller extends Component_Homepage_ControllerAbstract
             /* Get the iframe and shank it into our component, if successful
              */
             $this->url = $response['url'];
+
+            /* Get the height set in the component's configuration settings, setting to a min of 500 if not set
+             */
+            $heightInPixels = $this->getConfig('height');
+            $this->height = (is_int($heightInPixels) || ctype_digit($heightInPixels)) ? (int)$heightInPixels : 500;
 
             return true;
         }
@@ -91,7 +103,8 @@ class Controller extends Component_Homepage_ControllerAbstract
     public function renderTemplate($templateHandle): bool
     {
         return $this->renderTwigTemplate($templateHandle, '@geosnapshotHomepage/component.twig', [
-            'url' => $this->url
+            'url' => $this->url,
+            'height' => $this->height
         ]);
     }
 }

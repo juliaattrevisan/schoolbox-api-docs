@@ -119,7 +119,7 @@ $app = new class extends CliTool\App {
     /**
      * This process needs to write to storage, thus it must run as `www-data`.
      */
-    public function getRequiredProcessUser(): ?string
+    public function getRequiredProcessUser(): string
     {
         return 'www-data';
     }

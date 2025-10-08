@@ -14,10 +14,6 @@ use Schoolbox\InstanceRegistry\InstanceRegistry;
 
 class Version
 {
-    public IConfigLoader $config;
-
-    public InstanceRegistry $instanceRegistry;
-
     public Section $section;
 
     public const SITE_ENVIRONMENT_CLIENT_HOSTED = 'client-hosted'; // Hosted on client's infrastructure, regardless
@@ -29,11 +25,9 @@ class Version
      *
      * @param IConfigLoader $config
      */
-    public function __construct(IConfigLoader $config)
+    public function __construct(private IConfigLoader $config)
     {
-        $this->config           = $config;
-        $this->instanceRegistry = new InstanceRegistry($this->config);
-        $this->section          = new Section($this->config->get('site_version'));
+        $this->section = new Section($this->config->get('site_version'));
     }
 
     /**
@@ -107,7 +101,13 @@ class Version
         return $this->config->get('site_environment') === self::SITE_ENVIRONMENT_CLOUD_SAAS;
     }
 
-    public function showUpgradeReminder(): bool
+    /**
+     * Should an upgrade reminder be shown?
+     *
+     * @param InstanceRegistry $instanceRegistry A connection to the instance registry API
+     * @return bool
+     */
+    public function showUpgradeReminder(InstanceRegistry $instanceRegistry): bool
     {
         /**
          * if the instance is not client hosted(cloud hosted), they dont need the reminder
@@ -120,7 +120,7 @@ class Version
          * if the instance is the same or ahead of the current latest release,
          * then they dont need the reminder
          */
-        $latestMajorVersion = $this->instanceRegistry->getLatestVersionMajor();
+        $latestMajorVersion = $instanceRegistry->getLatestVersionMajor();
         if ($this->getMajor() >= $latestMajorVersion) {
             return false;
         }

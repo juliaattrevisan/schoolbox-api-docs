@@ -142,8 +142,11 @@ switch ($this->arg[0]) {
                 if ($fallbackSelected == 'school-logo') {
                     $thumb = "/images/logo.php?logo=skin_logo_large&size=normal";
                 } else if ($fallbackSelected == 'author') {
-                    $avatarHash = $article->getAuthor()->getPortrait()->getHash();
-                    $thumb = "/storage/image.php?hash=$avatarHash&size=constrain200";
+                    $avatarHash = $article->getAuthor()->getPortrait()?->getHash();
+                    $thumb = $avatarHash ?
+                        "/storage/image.php?hash=$avatarHash&size=constrain200" :
+                        //This will show anonymous avatar as placeholder if no hash exists
+                        "/portrait.php?size=constrain200";
                 } else {
                     /** No fallback image, fill the empty space to maintain layout */
                     /** @var PrefixGenerator $prefixGenerator */

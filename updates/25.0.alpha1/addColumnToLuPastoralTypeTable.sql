@@ -1,0 +1,2 @@
+ALTER TABLE lu_pastoral_type ADD COLUMN pastoral_document_classification_confidential_id int(11) DEFAULT NULL AFTER pastoral_document_classification_id;
+ALTER TABLE lu_pastoral_type ADD CONSTRAINT fk_lu_pastoral_type_pastoral_document_classification_conf_id FOREIGN KEY (pastoral_document_classification_confidential_id) REFERENCES lu_pastoral_document_classification (id) ON DELETE NO ACTION ON UPDATE NO ACTION;

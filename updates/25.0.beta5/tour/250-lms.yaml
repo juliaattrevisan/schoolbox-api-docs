@@ -1,0 +1,31 @@
+tour:
+  title: '25.0 LMS Enhancements'
+  description: 'Introduce superusers and moderators to the new admin features of the 25.0 release'
+  roles:
+    - staff
+  trigger:
+    urlRegex: '^/$'
+    selector: body
+    event: tourReady
+  steps:
+    - step:
+        title: AI Lesson Plan Generator
+        type: modal
+        content: "<video id='feature_tour_video'
+                   controls
+                   loop
+                   preload='none'
+                   poster='{CDN_PREFIX}/images/tour/25.0/2_lesson_plan_generator.jpg'
+                   width='100%'
+                   style='max-width: 100%;'>
+                   <source src='{CDN_PREFIX}/images/tour/25.0/lessonplan.mp4' type='video/mp4'>
+                   </video><br />
+
+                  <h3>AI Lesson Plan Generator</h3>
+                  <p>
+                    A faster way to plan, with flexibility built in. The new AI-powered lesson plan templates help
+                    teachers quickly generate structured, curriculum-aligned lesson plans, then adapt them to suit their
+                    own style and classroom context.
+                  </p>
+                  <p>To learn more, see the <a href='/help/sso/send?returnUrl=/homepage/5362#component502144'>release notes</a>.</p>"
+        class: introjs-whatsnewmodal

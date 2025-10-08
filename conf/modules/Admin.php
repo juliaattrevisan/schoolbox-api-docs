@@ -104,6 +104,7 @@ class Admin extends ModuleLoader
 
         // Notifications
         $this->loadModule($di, \Schoolbox\Realtime\Admin\Module::class, '/adminv2/notifications');
+        $this->loadModule($di, \Schoolbox\Realtime\Admin\Config\Module::class, '/adminv2/notifications/config');
 
         // Filters
         $this->loadModule($di, FilterModule::class, '/adminv2/filters');
@@ -138,5 +139,21 @@ class Admin extends ModuleLoader
         $this->loadModule($di, \Schoolbox\Admin\Profile\Editor\Tab\Module::class, '/adminv2/profile-editor/tab');
         $this->loadModule($di, \Schoolbox\Admin\Profile\Editor\Field\Module::class, '/adminv2/profile-editor/field');
         $this->loadModule($di, \Schoolbox\Admin\Profile\Editor\Module::class, '/adminv2/profile-editor');
+
+        /* Calendar Import
+         */
+        $this->loadModule($di, \Schoolbox\Admin\CalendarImport\Module::class, '/adminv2/calendar');
+
+        /* Bulk Feedback Import
+         */
+        $this->loadModule($di, \Schoolbox\Admin\BulkFeedbackImport\Module::class, '/adminv2/bulk-feedback-import');
+
+        /* OpenAI
+         */
+        $this->loadModule($di, \Schoolbox\Admin\OpenAI\Module::class, '/adminv2/ai-services');
+
+        /* Editor Templates
+         */
+        $this->loadModule($di, \Schoolbox\Admin\Editor\Templates\Module::class, '/adminv2/editor-templates');
     }
 }

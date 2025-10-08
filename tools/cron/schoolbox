@@ -74,6 +74,9 @@ MAILTO="ist+cron@schoolbox.com.au"
 # SIS Data Importer (User-initiated) - every minute, compile it into the same log as the automated scheduler
 * * * * *	www-data	php /usr/share/schoolbox/tools/synchronise/userInitiated.php >> /var/log/schoolbox/sis-scheduler.log 2>&1
 
+# SIS Data Importer (Scheduled Timetable Daily Org) - every minute, compile it into the same log as the automated scheduler
+* * * * *	www-data	php /usr/share/schoolbox/tools/synchronise/dailyorg.php >> /var/log/schoolbox/sis-scheduler.log 2>&1
+
 # Calendar: pre-parse any vCal files every 2 hours
 35 */2 * * *    www-data    /usr/share/schoolbox/tools/calendar/preparseVcalSubscription.php -v >> /var/log/schoolbox/preparseVcalSubscription.log 2>&1
 
@@ -144,5 +147,9 @@ MAILTO="ist+cron@schoolbox.com.au"
 
 # clean up the now abandoned mobile app registrations at 1:03 on the 9th of each month
 3 1 9 * *    www-data    /usr/local/bin/jitter 300 php /usr/share/schoolbox/tools/digistorm/cleanUpAbandonedMobileAppRegistrations.php -p >> /var/log/schoolbox/schema-loginlog.log 2>&1
+
+# Garbage collection: every morning at around 2:00, I suppose?
+# Start logging in ultra-verbose mode for now, so the log contains exactly what was deleted.
+0 2 * * * www-data /usr/local/bin/jitter 300 php /usr/share/schoolbox/tools/gc-storage.php -vvvp -n10000 --batch=100 --max-time=10800 >> /var/log/schoolbox/garbage-collect.log 2>&1
 
 # End of file - do not delete

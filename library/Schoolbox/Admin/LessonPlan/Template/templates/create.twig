@@ -71,12 +71,19 @@
             let bodyId = 'field-body-' + newId;
             let bodyName = 'field[' + newId + '][body]';
 
+            let descriptionId = 'field-description-' + newId;
+            let descriptionName = 'field[' + newId + '][description]';
+
             let visibilityId = 'field-visibility-' + newId;
             let visibilityName = 'field[' + newId + '][visibility]';
 
             clone.find('input[id="field-title"]').attr('name', titleName);
             clone.find('input[id="field-title"]').attr('id', titleId);
             clone.find('label[for="field-title"]').attr('for', titleId);
+
+            clone.find('textarea[id="field-description"]').attr('name', descriptionName);
+            clone.find('textarea[id="field-description"]').attr('id', descriptionId);
+            clone.find('label[for="field-description"]').attr('for', descriptionId);
 
             clone.find('textarea[id="field-body"]').attr('name', bodyName);
             clone.find('textarea[id="field-body"]').attr('id', bodyId);
@@ -252,8 +259,13 @@
                                                         </div>
                                                     </div>
                                                     <div>
+                                                        <label for="field-description-{{ field.id }}">Field Description</label>
+                                                        <span class="meta">Provide an explanation for the intended use of this field within your lesson plan.</span>
+                                                        <textarea id="field-description-{{ field.id }}" name="field[{{ field.id }}][description]" rows="5" data-field-description>{{ field.description }}</textarea>
+                                                    </div>
+                                                    <div>
                                                         <label for="field-body-{{ field.id }}">Body</label>
-                                                        <textarea id="field-body-{{ field.id }}" name="field[{{ field.id }}][body]" rows="5">{{  field.body }}</textarea>
+                                                        <textarea id="field-body-{{ field.id }}" name="field[{{ field.id }}][body]" rows="5">{{ field.body }}</textarea>
                                                     </div>
                                                 </div>
                                             </section>
@@ -316,6 +328,11 @@
                         <label for="field-visibility" class="checkbox-label">Field visible to students</label>
                     </div>
                 </div>
+            </div>
+            <div>
+                <label for="field-description">Field Description</label>
+                <span class="meta">Provide an explanation for the intended use of this field within your lesson plan.</span>
+                <textarea id="field-description" rows="5"></textarea>
             </div>
             <div>
                 <label for="field-body">Body</label>

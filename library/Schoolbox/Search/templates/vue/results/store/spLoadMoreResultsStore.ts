@@ -14,31 +14,38 @@ export const useLoadMoreResultsStore = defineStore("spLoadMoreResults", () => {
     const isLoading = window.Vue.ref(false);
     const hasLoadError = window.Vue.ref(false);
 
+    const autoClickLoadMoreResults = window.Vue.ref(false);
+
     /**
      * load more results
+     * @param limit - Maximum number of records to fetch from server.
      */
-    async function loadMore(): Promise<void> {
+    async function loadMore(limit: number | null): Promise<void> {
         const resultsStore = useResultsStore();
         url.value = `${useStore().getEndpointWithParams()}&cursor=${resultsStore.latestResults.metadata.cursor.next}`;
         try {
             isLoading.value = true;
             hasLoadError.value = false;
-            const response = await fetch(url.value, {
+            const response = await fetch(url.value + (limit ? `&limit=${limit}` : ""), {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
                 },
             });
             const moreResults = (await response.json()) as Results;
-            if (moreResults.data.length === 0) {
+
+            resultsStore.setMoreResults(moreResults);
+
+            if (moreResults.metadata.cursor.next === null) {
                 resultsStore.hasLoadedAllResults = true;
-            } else {
-                resultsStore.setMoreResults(moreResults);
+                autoClickLoadMoreResults.value = false;
             }
         } catch (error) {
             hasLoadError.value = true;
+            autoClickLoadMoreResults.value = false;
         } finally {
             isLoading.value = false;
+            autoClickLoadMoreResults.value = false;
         }
     }
 
@@ -46,5 +53,6 @@ export const useLoadMoreResultsStore = defineStore("spLoadMoreResults", () => {
         isLoading,
         hasLoadError,
         loadMore,
+        autoClickLoadMoreResults,
     };
 });

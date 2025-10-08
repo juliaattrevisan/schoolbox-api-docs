@@ -276,7 +276,7 @@ class Profile implements IStrategy
 
             $medicalAlert = $this->findMedicalAlert($externalId);
             $mobile = trim((string)$student['general_details']['mobile_phone']);
-            $specialNeeds = trim($student['other_school_details']['learning_support'] ?? '') === self::SPECIAL_NEEDS;
+            $specialNeeds = trim((string)($student['other_school_details']['learning_support'] ?? '')) === self::SPECIAL_NEEDS;
             $studiesCode = $this->findStudiesCode($student);
             $title = '';
             $tutorGroup = trim((string)$student['school_details']['pc_tutor_group']);
@@ -896,6 +896,9 @@ class Profile implements IStrategy
             $teacher['category'] = self::TEACHER;
 
             if ('' !== (string)$teacher['employee_code']) {
+                /* Appending campus data to the teaching staff
+                 */
+                $teacher['campuses'] = $employeeSetDedupe[$teacher['employee_code']]['campuses'] ?? [];
                 unset($employeeSetDedupe[$teacher['employee_code']]);
 
                 $this->log->debug(sprintf(
@@ -953,6 +956,9 @@ class Profile implements IStrategy
                 'teacher_photo' => $teacherPhoto,
                 'position' => $position,
                 'work_phone' => '',
+                /* It is possible for the employee to not have the campuses key defined so we need to fallback to empty
+                 */
+                'campuses' => $employee['campuses'] ?? [],
             ];
         }
 
@@ -1056,7 +1062,11 @@ class Profile implements IStrategy
             }
 
             $building = '';
-            $campusName = '';
+            /* Multiple campuses will be converted to string with separated by commas
+             */
+            $campusName = isset($staff['campuses']) ?
+                implode(',', array_column($staff['campuses'], 'CAM_DESC'))
+                : '';
             $category = $staff['category'];
             $department = trim((string)$staff['department']);
 

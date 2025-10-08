@@ -1,5 +1,4 @@
-import type { ClassicEditor } from "@ckeditor/ckeditor5-editor-classic";
-import type { InlineEditor } from "@ckeditor/ckeditor5-editor-inline";
+import type { ClassicEditor, InlineEditor } from "ckeditor5";
 
 /**
  * The different types of editors that can be used
@@ -15,8 +14,18 @@ export enum EditorType {
 export enum EditorToolbar {
     DEFAULT = "default",
     COMMENT = "comment",
+    COMMENT_AI = "comment_ai",
     SIMPLE = "simple",
 }
+
+/**
+ * To add predefined templates to the editor
+ */
+export type Template = {
+    title: string; // the title of the template
+    body: string; // the data to insert into the content
+    description?: string; // a longer description of the template
+};
 
 /**
  * The config object for the editor
@@ -24,7 +33,7 @@ export enum EditorToolbar {
 export interface SbxEditorConfig {
     targetElements: (string | SbxEditorElement)[]; // the elements to target for the editor
     type: EditorType.CLASSIC | EditorType.INLINE; // the type of editor to use
-    toolbar: EditorToolbar.DEFAULT | EditorToolbar.COMMENT | EditorToolbar.SIMPLE; // the toolbar to use for the editor
+    toolbar: EditorToolbar; // the toolbar to use for the editor
     hasTokens?: boolean; // whether or not to enable the tokens plugin
     tokenList?: string[]; // the list of tokens to use for the ckeditor
     baseHref?: string; // the base url to be prepended to relative links or assets included in the ckeditor
@@ -34,6 +43,8 @@ export interface SbxEditorConfig {
     addMaxCharCountDefaultEventListeners?: boolean; // Whether to add the default event listeners for dealing with events relating to max char count.
     showWordCount?: boolean; // whether or not to show the word count
     fileBrowserCategoryId?: number; // to traverse directly to a specific folder in the Resources section of the resource modal
+    mirrorChangeEvents?: boolean; // whether or not to mirror the change events back to the source element
+    templates?: Template[]; // the list of templates to use for the editor
 }
 
 /**

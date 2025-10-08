@@ -19,10 +19,10 @@ use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
  *
  * @method Task createModel($id = null)
  * @method Task findById($identifierValue)
+ * @method Task hydrate(array $row, $alias = '', $callback = null)
  */
 class TaskMapper extends Schoolbox\Mapper
 {
-
     /**
      * Setup method. Implementing classes to define their SQL map here.
      *

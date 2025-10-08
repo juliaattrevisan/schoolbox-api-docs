@@ -149,7 +149,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
 
         $currentAnswer = $this->getByQuestionID($question_id);
 
-        if ($existing['response']) {
+        if (isset($existing['response']) && is_string($existing['response'])) {
             $existingAnswer = unserialize($existing['response']);
 
             /* Prepare a special way to show Fillgap answers. This replaces
@@ -287,7 +287,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
             ];
         }
 
-        $data = unserialize($response['response']);
+        $data = unserialize($response['response'] ?? '');
 
         if (is_array($data)) {
             if ($this->getLegendHTML() !== false) {
@@ -295,15 +295,21 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
             } else {
                 $data['response'] = strip_tags(implode(', ', $data));
             }
+        } else {
+            /* If this is a partial attempt and the student hasn't answered yet, $data will be set to false
+             * Make sure it's an array so we can continue on.
+             * Provide an empty 'response' key so it doesn't cause other warnings down the line.
+             */
+            $data = ['response' => ''];
         }
 
         /* Append commentary
          */
-        $data['comment'] = $response['comment'];
+        $data['comment'] = $response['comment'] ?? '';
 
         /* Append awarded mark
          */
-        $data['mark'] = $response['mark'];
+        $data['mark'] = $response['mark'] ?? '';
 
         return $data;
     }
@@ -336,7 +342,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
         /* If a question was added after the attempt was made by the student,
          * then $response['response'] might not even exist; return empty array
          */
-        if ($response) {
+        if (isset($response['response']) && is_string($response['response'])) {
             return unserialize($response['response']);
         }
 
@@ -375,7 +381,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
         $replace = " <span class='fillgap correct'>$1</span> ";
         $correctResponse = preg_replace($pattern, $replace, $decodedAnswer);
 
-        if ($existing['response']) {
+        if (isset($existing['response']) && is_string($existing['response'])) {
             $existingAnswer = unserialize($existing['response']);
 
             /* Prepare a special way to show Fillgap answers. This replaces
@@ -470,7 +476,7 @@ abstract class Evaluation_Answer_Fillgap extends Evaluation_Answer
             'ANSWER_ID' => $currentAnswer['answer_id'],
         ));
 
-        if ($existing['response']) {
+        if (isset($existing['response']) && is_string($existing['response'])) {
             $existingAnswer = unserialize($existing['response']);
 
             /* Prepare a special way to show Fillgap answers. This replaces

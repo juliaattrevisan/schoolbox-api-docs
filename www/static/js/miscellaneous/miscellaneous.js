@@ -225,6 +225,18 @@ $(function () {
     // Set a data-test-ready="true" attribute as a flag for playwright tests
     // to ensure that we've successfully added the listener to the profile drop (and other parts of this script have finished)
     profileDrop.attr("data-test-ready", "true");
+
+    // Override the default iconSprite reference and leave blank to avoid load error
+    // CSS is used to display the icons instead
+    // refer to https://github.com/mediaelement/mediaelement/blob/master/docs/api.md#configuration
+    const originalMediaElementPlayer = $.fn.mediaelementplayer;
+    $.fn.mediaelementplayer = function (options) {
+        const defaultOptions = {
+            iconSprite: ``,
+        };
+        const mergedOptions = $.extend(true, {}, defaultOptions, options);
+        return originalMediaElementPlayer.call(this, mergedOptions);
+    };
 });
 
 /**

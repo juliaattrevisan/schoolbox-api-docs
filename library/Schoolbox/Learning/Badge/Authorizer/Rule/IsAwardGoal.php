@@ -23,7 +23,7 @@ class IsAwardGoal implements IAuthorizationRule
      * @param User|null $user
      * @return bool
      */
-    public function authorize(array $params = [], User $user = null)
+    public function authorize(array $params = [], ?User $user = null)
     {
         if (
             isset($params['award'])

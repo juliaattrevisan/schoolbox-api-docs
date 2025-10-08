@@ -16,6 +16,7 @@ use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Resource\Storage\Sanitizer\ISanitizer;
 use Schoolbox\User;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 /**
  * Receiver for accepting files into the storage system.
@@ -32,6 +33,7 @@ class Receiver implements IReceiver
      * @param ISanitizer        $sanitizer              Sanitizer for file content of storage objects.
      * @param Filesystem        $tempFilesystem         Temporary file system: files will be extracted from here.
      * @param User|null         $currentUser            The current user: used to determine if the file is acceptable.
+     * @param Virus\IScanner    $virusScanner           Virus scanner, for live scanning of uploaded files.
      */
     public function __construct(
         private Mapper $storageMapper,
@@ -40,6 +42,7 @@ class Receiver implements IReceiver
         private ISanitizer $sanitizer,
         private Filesystem $tempFilesystem,
         private ?User $currentUser,
+        private Virus\IScanner $virusScanner,
     ) {
     }
 
@@ -56,7 +59,7 @@ class Receiver implements IReceiver
     ): Model {
         // This might seem hacky, but to ensure all the safety checks pass, this data needs to be a tempfile
         // (just like an upload)
-        $tempLocation = sb_tempnam('otfs');
+        $tempLocation = tempnam(sys_get_temp_dir(), 'otfs');
 
         /* Temporary location didn't get created. There might be a number of reasons why that might
          * be the case; no write access to the specified location, disk full, etc.
@@ -65,7 +68,7 @@ class Receiver implements IReceiver
          * If you ended up following a fatal from a cli tool, you should try running it with sudo
          * Otherwise your logged-in account might not have write access to $tempLocation
          */
-        if ('' === $tempLocation) {
+        if (false === $tempLocation) {
             throw new FileException("Temporary location couldn't be created; check sudo, perms, disk usage");
         }
 
@@ -118,7 +121,13 @@ class Receiver implements IReceiver
         }
         if ($requireSafety) {
             $validator = new ValidUploadableFile(Alaress_Date_Format::now());
-            $validator->isSatisfiedBy($storage);
+            try {
+                $validator->isSatisfiedBy($storage);
+            } catch (FileException $e) {
+                /* Throwing the FileException out with more user-friendly message
+                 */
+                throw new SchoolboxException($e->getMessage(), $e->getCode());
+            }
         } elseif (!$storage->getMimetype() instanceof Mimetype) {
             // For superusers only, we allow an unknown mimetype
             $storage->setMimetype($this->mimetypeMapper->getUnknownMime());
@@ -128,7 +137,7 @@ class Receiver implements IReceiver
         $storage->setPublic($public);
 
         // Run the virus scanner
-        (new Virus\Scanner($this->tempFilesystem))->scan($tempLocation);
+        $this->virusScanner->scan($tempLocation);
 
         $helper    = new Sanitizer\Helper($this->sanitizer);
         $sanitized = $helper->sanitize(

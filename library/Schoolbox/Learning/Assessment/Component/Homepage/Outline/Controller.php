@@ -19,6 +19,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\User as ExternalUser;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\Participant\AssessmentListMutator;
@@ -220,6 +221,8 @@ class Controller extends Component_Homepage_ControllerAbstract
 
             // And then add them to the displayed course impl
             $assessments = $assessments
+                ->map(fn(IAssessable $assessment) => $this->getAssessmentMapperProxy()
+                                                          ->loadCustomisationsIntoAssessment($assessment))
                 ->groupByCallback(function (IAssessable $assessment) {
                     return $assessment->getContext()->getId();
                 });

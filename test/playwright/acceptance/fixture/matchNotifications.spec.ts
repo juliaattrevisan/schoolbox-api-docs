@@ -8,8 +8,9 @@ test.describe("Fixture match notification tests", () => {
     test.beforeEach(async ({ tester }) => {
         tester.isGoingTo("clear all notifications");
         await tester.runShellCommand(
-            "cd /usr/share/schoolbox/tools/notif; sudo php /usr/share/schoolbox/test/socket/destroy-rabbit-data.php",
+            `cd /usr/share/schoolbox/tools/notif; sudo php /usr/share/schoolbox/test/socket/destroy-notification-redis-data.php`,
         );
+
         await tester.loginAsAdmin();
     });
 

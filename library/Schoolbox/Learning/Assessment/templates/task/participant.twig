@@ -1,0 +1,53 @@
+{% set latestFeedback    = participant.findMostRecentInstructorGivenFeedback %}
+    {% set latestResponse    = participant.findMostRecentSubmittedResponse %}
+    {% set multipleResponses = participant.allResponses | length > 1 %}
+
+    {% set isPublished  = latestFeedback and latestFeedback.published %}
+    {% set canPublish   = latestFeedback and not isPublished %}
+
+    {% set pStatusClass = participant.responseRequired ? statusIncomplete : (participant.feedbackRequired ? statusPending : statusReviewed) %}
+    {% set pTooltip     = participant.responseRequired ? labelIncomplete : (participant.feedbackRequired ? labelPending : labelReviewed) %}
+    {% set pStatusText  = pTooltip %}
+
+<li data-status="{{ pStatusClass }}" data-participant="{{ participant.user.id }}" data-participant-name="{{ participant.user.fullName }}">
+    <div>
+        <div class="expander{% if participant.allResponses | length %} icon-down-arrow{% endif %}"
+             data-collapser="user-completions-{{ participant.user.id }}"
+             {% if not participant.allResponses|length %}style="opacity:0;height:0;cursor:default"{% endif %}
+        ></div>
+        {% include '@learningAssessment/fragments/participantStatus.twig' with {
+            participant: participant,
+            statusClass: pStatusClass,
+            statusText:  pStatusText,
+            statusTip:   pTooltip,
+            cardSize:    "small-9 medium-10 xlarge-11"
+        } only %}
+
+        <div class="small-1">
+            {% include '@learningAssessment/fragments/progressTick.twig' with {
+                assessment:  participant.assessable,
+                student: participant.user
+            } only %}
+        </div>
+    </div>
+    <div class="small-12 column hide" data-collapse-state="collapsed" data-collapsable="user-completions-{{ participant.user.id }}">
+        <ul data-responses class="information-list">
+            {% for completion in participant.allResponses %}
+                {% if completion.completionStatus == 1 %}
+                    {% set completionLabel = labelIncomplete %}
+                    {% set completionClass = '' %}
+                {% elseif completion.completionStatus == 2 %}
+                    {% set completionLabel = labelPending %}
+                    {% set completionClass = statusPending %}
+                {% else %}
+                    {% set completionLabel = labelReviewed %}
+                    {% set completionClass = statusReviewed %}
+                {% endif %}
+                <li>{{ completion.submittedAt.local }} - {{ completion.submittedBy.fullName  }} marked as
+                    <span title="{{ completionLabel }}" class="progress-tick tiny {{ completionClass }}"></span>
+                    <span class="meta">{{ completionLabel }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</li>

@@ -10,6 +10,7 @@
         :is-super-user="{{ USER.isSuperuser ? "true" : "false" }}"
         :has-tagging="{{ curriculumTagging ? "true" : "false" }}"
         locale-unit="{{ locale.unit }}"
+        {% if parentFolderId is defined  and parentFolderId is not null %}:parent-folder-id="{{ parentFolderId }}"{% endif %}
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/overviewComponent.js?v={{ config.site_version }}"></script>

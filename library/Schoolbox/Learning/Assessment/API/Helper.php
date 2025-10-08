@@ -8,13 +8,11 @@
 namespace Schoolbox\Learning\Assessment\API;
 
 use Alaress\Web\Request\Values;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Application\Exception\NotFound as NotFound;
 use Schoolbox\Assessment\Component\SubmissionBox\Submission;
 use Schoolbox\GenericCollection;
 use Alaress\Database\Predicate\Builder;
 use PDO;
-use Schoolbox\Learning\Assessment\AssessmentType;
 use Schoolbox\Resource\Storage;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
 use Schoolbox\YearLevel\Model as YearLevelModel;
@@ -316,7 +314,7 @@ class Helper
         }
         if (array_key_exists('weighted', $filter)) {
             $where .= " AND assessment.weight ";
-            if ((new Values([$filter['weighted']]))->getBool(0) === true) {
+            if ((new Values(['key' => $filter['weighted']]))->getBool('key') === true) {
                 $where .= " != 0.00 ";
             } else {
                 $where .= " = 0.00 ";
@@ -473,7 +471,7 @@ class Helper
                 `aa1`.`reviewed_at`                     AS `completion_date`,
                 `aa1`.`comment`                         AS `comment`,
                 `aa1`.`mark`                            AS `mark`,
-                (`aa1`.`mark` / `aa1`.`max_mark` * 100) AS `norm_mark`,
+                `aa1`.`norm_mark`                       AS `norm_mark`,
                 $participantFields,
                 $reviewerFields
             from (
@@ -688,7 +686,7 @@ class Helper
                 `aa1`.`finish`                          AS `completion_date`,
                 `aa1`.`comment`                         AS `comment`,
                 `aa1`.`mark`                            AS `mark`,
-                (`aa1`.`mark` / `aa1`.`max_mark` * 100) AS `norm_mark`,
+                `aa1`.`norm_mark`                       AS `norm_mark`,
                 $participantFields,
                 $submitterFields
             from (
@@ -1064,116 +1062,5 @@ class Helper
         }
         $output['capabilities'] = array_values($output['capabilities']);
         return $output;
-    }
-
-    /**
-     * @param array $filter
-     * @return bool
-     */
-    public function validateFilter(array $filter): bool
-    {
-        $stringFields  = [
-            'title'       => true,
-            'folder'      => ['code'],
-            'subjectCode' => [],
-            'workType'    => ['name'],
-            'yearLevel'   => ['name'],
-        ];
-        $numericFields = [
-            'assessmentId' => true,
-            'folder'       => ['id'],
-            'workType'     => ['id'],
-            'yearLevel'    => ['id'],
-            'project'      => ['id'],
-        ];
-        $enumFields    = [
-            'assessmentType' => [
-                AssessmentType::TYPE_TASK,
-                AssessmentType::TYPE_QUIZ,
-                AssessmentType::TYPE_LTI_ASSESSMENT,
-                AssessmentType::TYPE_DUE_WORK,
-                AssessmentType::TYPE_PROJECT,
-                AssessmentType::TYPE_LESSON_PLAN
-            ],
-        ];
-        $dateFields    = [
-            'dueDate' => ['from', 'to'],
-        ];
-        $booleanFields = [
-            'weighted' => true,
-        ];
-        foreach ($filter as $filterName => $filterValue) {
-            $found = false;
-            // string
-            if (isset($stringFields[$filterName])) {
-                if (is_array($stringFields[$filterName])) {
-                    if (!is_array($filterValue)) {
-                        throw new SchoolboxException("Filter $filterName must be an array.");
-                    }
-                    foreach ($stringFields[$filterName] as $fieldAttribute) {
-                        if (isset($filterValue[$fieldAttribute]) && !is_string($filterValue[$fieldAttribute])) {
-                            throw new SchoolboxException("Filter $filterName - $filterValue[$fieldAttribute] must be a string.");
-                        }
-                    }
-                } elseif (!is_string($filterValue)) {
-                    throw new SchoolboxException("Filter $filterName - $filterName must be a string.");
-                }
-                $found = true;
-            }
-            // numeric
-            if (isset($numericFields[$filterName])) {
-                if (is_array($numericFields[$filterName])) {
-                    foreach ($numericFields[$filterName] as $fieldAttribute) {
-                        if (isset($filterValue[$fieldAttribute]) && !is_numeric($filterValue[$fieldAttribute])) {
-                            throw new SchoolboxException("Filter $filterName - $filterValue[$fieldAttribute] must be a number.");
-                        }
-                    }
-                } elseif (!is_numeric($filterValue)) {
-                    throw new SchoolboxException("Filter $filterName - $filterValue must be a number.");
-                }
-                $found = true;
-            }
-            // bool
-            if (isset($booleanFields[$filterName])) {
-                if (!is_bool((new Values([$filterValue]))->getBool(0))) {
-                    throw new SchoolboxException("Filter $filterName - $filterValue must be a boolean.");
-                }
-                $found = true;
-            }
-            // date
-            if (isset($dateFields[$filterName])) {
-                if (!is_array($filterValue)) {
-                    throw new SchoolboxException("Filter $filterName must be an array.");
-                }
-                foreach ($dateFields[$filterName] as $fieldAttribute) {
-                    if (!isset($filterValue[$fieldAttribute])) {
-                        continue;
-                    }
-                    if (!is_string($filterValue[$fieldAttribute])) {
-                        throw new SchoolboxException("Filter $filterName - $fieldAttribute must be a string.");
-                    }
-                    try {
-                        $date = new \Alaress_Date_Format($filterValue[$fieldAttribute], [
-                            DATE_RFC3339,
-                            DATE_RFC3339_EXTENDED,
-                        ]);
-                    } catch (\Exception $e) {
-                        throw new SchoolboxException("Failed to parse date from $filterName - {$filterValue[$fieldAttribute]}.");
-                    }
-                }
-                $found = true;
-            }
-            // enum
-            if (isset($enumFields[$filterName])) {
-                if (!in_array($filterValue, $enumFields[$filterName])) {
-                    throw new SchoolboxException("$filterValue must be one of " . implode(',', $enumFields[$filterName]));
-                }
-                $found = true;
-            }
-            if (!$found) {
-                throw new SchoolboxException("Unknown filter $filterName.");
-            }
-        }
-        return true;
     }
 }

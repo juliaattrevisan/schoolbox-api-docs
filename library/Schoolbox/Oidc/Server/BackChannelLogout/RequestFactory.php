@@ -15,7 +15,9 @@ use InvalidArgumentException;
 use Psr\Http\Message\RequestInterface;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\API\Token\JwtParser\IParser;
-use Schoolbox\Oidc\Server\RelyingParty\Model;
+use Schoolbox\Oidc\Server\RelyingParty\Grant\Mapper;
+use Schoolbox\Oidc\Server\RelyingParty\Grant\Model;
+use Schoolbox\Oidc\Server\Repository\Scope as ScopeRepository;
 use Schoolbox\User;
 
 /**
@@ -54,29 +56,47 @@ class RequestFactory
     }
 
     /**
-     * Generate a HTTP request for logging `$user` out of their session with
-     * `$client`, which may then be sent via a PSR-7 compatible HTTP client.
+     * Generate a HTTP request for logging `$user` out of their session granted
+     * in `$grant`, which may then be sent via a PSR-7 compatible HTTP client.
      *
-     * @param User   $user   The user to generate a logout request for.
-     * @param Model  $client The client for which to generate a logout request.
-     * @param string $jwtId  The JWT ID for the logout token.
+     * @param User   $user  The user to generate a logout request for.
+     * @param Model  $grant The permission which `$user` granted: contains a
+     *                      reference to the relying party to which permission
+     *                      was granted.
+     * @param string $jwtId The JWT ID for the logout token.
      * @return RequestInterface
      * @throws InvalidArgumentException if `$client` doesn't support logout
      */
-    public function build(User $user, Model $client, string $jwtId): RequestInterface
+    public function build(User $user, Model $grant, string $jwtId): RequestInterface
     {
+        $client = $grant->getRelyingParty();
         if (!$client->getBackChannelLogoutUri()) {
             throw new InvalidArgumentException('Client does not have a back-channel logout URI.');
         }
 
+        // Only add Schoolbox claims if they were granted by `$user`:
+        // this ensures that this information isn't shared if `$user` hasn't
+        // consented.
+        $claims = self::LOGOUT_TOKEN_BASE_CLAIM + [
+            IParser::CLAIM_AUD => $client->getClientId(),
+            IParser::CLAIM_IAT => Alaress_Date_Format::now()->getUnixTimeStamp(),
+        ];
+        foreach ($grant->getScopes() as $scope) {
+            if ($scope->getScope() === ScopeRepository::SCOPE_SCHOOLBOX) {
+                $claims += [
+                    ScopeRepository::SCOPE_SCHOOLBOX . '/id'          => $user->getId(),
+                    ScopeRepository::SCOPE_SCHOOLBOX . '/instance_id' => INSTANCE_ID,
+                    ScopeRepository::SCOPE_SCHOOLBOX . '/external_id' => $user->getExternalId(),
+                    ScopeRepository::SCOPE_SCHOOLBOX . '/role_type'   => $user->getRole()->getType(),
+                ];
+            }
+        }
+
         $logoutToken = $this->jwtBuilder->generate(
             $user,
-            Alaress_Date_Format::now()->addSeconds($this->expiry),
             $jwtId,
-            self::LOGOUT_TOKEN_BASE_CLAIM + [
-                IParser::CLAIM_AUD => $client->getClientId(),
-                IParser::CLAIM_IAT => Alaress_Date_Format::now()->getUnixTimeStamp(),
-            ],
+            Alaress_Date_Format::now()->addSeconds($this->expiry),
+            $claims,
         );
 
         return $this->psr17Factory

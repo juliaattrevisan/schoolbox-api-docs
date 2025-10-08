@@ -42,6 +42,15 @@ const sizeMap: Record<string, string> = {
 const computedSize = window.Vue.computed(() => {
     return sizeMap[props.size as string] || (props.size as string) || sizeMap.m;
 });
+
+/**
+ * Alert (in the console) that an icon name is invalid (to assist with debugging)
+ * @returns false, for template usage
+ */
+function alertInvalidIconName(): false {
+    console.error(`Invalid icon name: ${props.name}`);
+    return false;
+}
 </script>
 
 <template>
@@ -111,6 +120,18 @@ const computedSize = window.Vue.computed(() => {
                     d="M22 8v16c0 3.308-2.692 6-6 6s-6-2.692-6-6v-18c0-2.206 1.794-4 4-4s4 1.794 4 4v16c0 1.103-0.897 2-2 2s-2-0.897-2-2v-14h-2v14c0 2.2 1.8 4 4 4s4-1.8 4-4v-16c0-3.3-2.7-6-6-6s-6 2.7-6 6v18c0 4.4 3.6 8 8 8s8-3.6 8-8v-16h-2z"
                 ></path>
             </svg>
+            <svg
+                v-else-if="props.name === 'ai'"
+                class="sbx-icon__svg"
+                viewBox="0 0 32 32"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    d="M7.187 11.68H0V3.79h2.173v5.86h5.014v2.03zM32 28.21h-2.173v-5.86h-5.014v-2.03H32v7.89zM32 16h-2.173c0-7.63-6.197-13.827-13.827-13.827-5.92 0-11.106 3.714-13.12 9.162l-1.967-.77C4.3 4.134 9.75 0 16 0c8.837 0 16 7.163 16 16zM16 32C7.163 32 0 24.837 0 16h2.173c0 7.63 6.197 13.827 13.827 13.827 5.92 0 11.106-3.714 13.12-9.162l1.967.77C27.7 27.866 22.25 32 16 32zM17.093 23.998h-2.187c0-3.605-2.823-6.427-6.427-6.427v-2.187c3.605 0 6.427-2.823 6.427-6.427h2.187c0 3.605 2.823 6.427 6.427 6.427v2.187c-3.605 0-6.427 2.823-6.427 6.427zM12.933 16c1.218.686 2.226 1.693 2.913 2.913.686-1.218 1.693-2.226 2.913-2.913-1.218-.686-2.226-1.693-2.913-2.913-.686 1.218-1.693 2.226-2.913 2.913z"
+                    fill="currentColor"
+                />
+            </svg>
+
             <svg
                 v-else-if="props.name === 'audio'"
                 class="sbx-icon__svg"
@@ -268,7 +289,7 @@ const computedSize = window.Vue.computed(() => {
                 <path d="M28 0l-12 12-12-12-4 4 12 12-12 12 4 4 12-12 12 12 4-4-12-12 12-12z"></path>
             </svg>
             <svg
-                v-else-if="props.name === 'cloud'"
+                v-else-if="['cloud', 'cloudy'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -296,7 +317,7 @@ const computedSize = window.Vue.computed(() => {
                 <path d="M0 14h32v4h-32v-4z"></path>
             </svg>
             <svg
-                v-else-if="props.name === 'comment'"
+                v-else-if="['comment', 'blog'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -330,7 +351,7 @@ const computedSize = window.Vue.computed(() => {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'course-builder'"
+                v-else-if="['course-builder', 'course'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -472,7 +493,7 @@ const computedSize = window.Vue.computed(() => {
                 <path d="M18 10v-10h-14v32h10v-8h-6l8-8 8 8h-6v8h10v-22h-8zM20 0v8h8z"></path>
             </svg>
             <svg
-                v-else-if="props.name === 'dropdown'"
+                v-else-if="['dropdown', 'sort-down'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -480,7 +501,7 @@ const computedSize = window.Vue.computed(() => {
                 <path d="M32 8h-32l16 16z"></path>
             </svg>
             <svg
-                v-else-if="props.name === 'due-work'"
+                v-else-if="['due-work', 'import', 'submissions'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -710,7 +731,7 @@ const computedSize = window.Vue.computed(() => {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'group'"
+                v-else-if="['group', 'team'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -748,7 +769,7 @@ const computedSize = window.Vue.computed(() => {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'hidden'"
+                v-else-if="['hidden', 'view-hollow'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -771,7 +792,7 @@ const computedSize = window.Vue.computed(() => {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'home'"
+                v-else-if="['home', 'house'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -875,7 +896,7 @@ const computedSize = window.Vue.computed(() => {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'lesson-plan'"
+                v-else-if="['lesson-plan', 'learning-support'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -901,7 +922,7 @@ const computedSize = window.Vue.computed(() => {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'list'"
+                v-else-if="['list', 'itineraryitem'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -933,7 +954,7 @@ const computedSize = window.Vue.computed(() => {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'location'"
+                v-else-if="['location', 'venue'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1048,7 +1069,7 @@ const computedSize = window.Vue.computed(() => {
                 <path d="M6 0v32h20v-32h-20zM18 30h-4v-4h4v4zM24 24h-16v-20h16v20z"></path>
             </svg>
             <svg
-                v-else-if="props.name === 'modify-pen'"
+                v-else-if="['modify-pen', 'modify'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1074,7 +1095,7 @@ const computedSize = window.Vue.computed(() => {
                 <path d="M12 0h8v8h-8v-8zM12 12h8v8h-8v-8zM12 24h8v8h-8v-8z"></path>
             </svg>
             <svg
-                v-else-if="props.name === 'mostly-cloudy'"
+                v-else-if="['mostly-cloudy', 'weather'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1256,7 +1277,7 @@ const computedSize = window.Vue.computed(() => {
                 <path d="M8 0h16v8h-16v-8zM32 10h-32v16h4v6h24v-6h4v-16zM24 28h-16v-6h16v6zM28 18h-4v-4h4v4z"></path>
             </svg>
             <svg
-                v-else-if="props.name === 'progress'"
+                v-else-if="['progress', 'result', 'report'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1307,7 +1328,7 @@ const computedSize = window.Vue.computed(() => {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'reach'"
+                v-else-if="['reach', 'reach-logo'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1338,7 +1359,7 @@ const computedSize = window.Vue.computed(() => {
                 <path d="M32 14l-14-14v8c0 0-18 4-18 24h2c0 0 0-12 16-12v8l14-14z"></path>
             </svg>
             <svg
-                v-else-if="props.name === 'resource-booking'"
+                v-else-if="['resource-booking', 'camera'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1412,7 +1433,7 @@ const computedSize = window.Vue.computed(() => {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'showcase'"
+                v-else-if="['showcase', 'achievement', 'trophy'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1454,6 +1475,15 @@ const computedSize = window.Vue.computed(() => {
                 <path d="M0 24h32l-16-16z"></path>
             </svg>
             <svg
+                v-else-if="props.name === 'sortable'"
+                class="sbx-icon__svg"
+                viewBox="0 0 32 32"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path d="M0 12h32L16 0z" />
+                <path d="M32 18.25H0l16 12z" />
+            </svg>
+            <svg
                 v-else-if="props.name === 'sport'"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
@@ -1464,7 +1494,7 @@ const computedSize = window.Vue.computed(() => {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'staff'"
+                v-else-if="['staff', 'pastoral'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1474,7 +1504,7 @@ const computedSize = window.Vue.computed(() => {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'staff-students'"
+                v-else-if="['staff-students', 'player', 'user'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1484,7 +1514,7 @@ const computedSize = window.Vue.computed(() => {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'sun'"
+                v-else-if="['sun', 'sunny', 'clear'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1542,7 +1572,7 @@ const computedSize = window.Vue.computed(() => {
                 <path d="M0 0v32h32v-32h-32zM24 12h-2l-2-2h-2v12h2v2h-8v-2h2v-12h-2l-2 2h-2v-4h16v4z"></path>
             </svg>
             <svg
-                v-else-if="props.name === 'thunder'"
+                v-else-if="['thunder', 'storm'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1563,7 +1593,7 @@ const computedSize = window.Vue.computed(() => {
                 ></path>
             </svg>
             <svg
-                v-else-if="props.name === 'time-value'"
+                v-else-if="['time-value', 'hourglass'].includes(props.name)"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
                 xmlns="http://www.w3.org/2000/svg"
@@ -1646,6 +1676,23 @@ const computedSize = window.Vue.computed(() => {
                 <path d="M12 23.999h8v-12h8l-12-12-12 12h8zM28 28h-24l0 4h24z"></path>
             </svg>
             <svg
+                v-else-if="props.name === 'veracross'"
+                class="sbx-icon__svg"
+                viewBox="0 0 32 32"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path d="M23.3776 9.59985H8.57764V11.6443H23.3776V9.59985Z" fill="currentColor" />
+                <path
+                    d="M22.3554 13.1111H9.64426C8.04426 13.1111 6.75537 14.4 6.75537 16C6.75537 17.6 8.04426 18.8889 9.64426 18.8889V16.8444C9.15537 16.8444 8.79982 16.4444 8.79982 16C8.79982 15.5555 9.19982 15.1555 9.64426 15.1555H22.3554C22.8443 15.1555 23.1998 15.5555 23.1998 16C23.1998 16.4444 22.7998 16.8444 22.3554 16.8444V18.8889C23.9554 18.8889 25.2443 17.6 25.2443 16C25.2443 14.4 23.9554 13.1111 22.3554 13.1111Z"
+                    fill="currentColor"
+                />
+                <path
+                    d="M15.9999 3.46655C9.111 3.46655 3.46655 9.06655 3.46655 15.9999C3.46655 22.9332 9.06655 28.5332 15.9999 28.5332C22.9332 28.5332 28.5332 22.9332 28.5332 15.9999C28.5332 9.06655 22.8888 3.46655 15.9999 3.46655ZM20.9332 25.4666V16.8443H18.8888V26.2666C18.311 26.4443 17.6888 26.5332 17.0666 26.6221V16.8443H15.0221V26.6221C14.3999 26.5777 13.7777 26.4443 13.1999 26.2666V16.8443H11.1554V25.4666C7.73322 23.6888 5.42211 20.0888 5.42211 15.9999C5.42211 10.1332 10.2221 5.33322 16.0888 5.33322C21.9554 5.33322 26.7554 10.1332 26.7554 15.9999C26.7554 21.8666 24.3999 23.6888 21.0221 25.4666H20.9332Z"
+                    fill="currentColor"
+                />
+            </svg>
+
+            <svg
                 v-else-if="props.name === 'video'"
                 class="sbx-icon__svg"
                 viewBox="0 0 32 32"
@@ -1714,14 +1761,19 @@ const computedSize = window.Vue.computed(() => {
                     d="M16 5.333l4.944-4.55 1.325 6.587 6.675-0.775-2.8 6.108 5.855 3.296-5.855 3.296 2.8 6.108-6.675-0.775-1.325 6.587-4.944-4.55-4.944 4.55-1.325-6.587-6.675 0.775 2.8-6.108-5.855-3.296 5.855-3.296-2.8-6.108 6.675 0.775 1.325-6.587z"
                 ></path>
             </svg>
+            <template v-else-if="alertInvalidIconName()"></template>
         </slot>
     </span>
 </template>
 
 <style lang="scss" scoped>
 .sbx-icon {
+    align-items: center;
     color: v-bind(color);
     height: v-bind(computedSize);
+    vertical-align: middle; // Ensure the icon is vertically centered when used inline with text
+    display: flex;
+    justify-content: center;
     width: v-bind(computedSize);
     &__svg {
         fill: currentColor;

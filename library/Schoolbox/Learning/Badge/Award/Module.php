@@ -23,6 +23,9 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\NotFound;
 use Schoolbox\Role;
 use Schoolbox\UserMapper;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
+use Schoolbox\Editor\Templates\Mapper as EditorTemplateMapper;
+use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
 
 class Module extends BaseModule
 {
@@ -421,7 +424,12 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(FilterMapper::class),
             $this->getMapperFactory()->get(FilterSelectionMapper::class),
             $this->getMapperFactory()->get(UserMapper::class),
-            $this->injector->get('l10n'),
+            new EditorTemplateHelper(
+                $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                EditorTemplatesCategoryModel::BADGE_EVIDENCE,
+                $this->injector->get('user')
+            ),
+            $this->injector->get('l10n')
         );
     }
 }

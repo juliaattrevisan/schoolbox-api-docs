@@ -203,7 +203,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
         );
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateFolderCodes']);
-        $this->registerCallback(self::CALLBACK_PRESAVE, function (Model $model, Model $previous = null) {
+        $this->registerCallback(self::CALLBACK_PRESAVE, function (Model $model, ?Model $previous = null) {
             $this->validateCourse($model, $previous);
             return true;
         });
@@ -225,6 +225,9 @@ class Mapper extends AbstractFolderMapper implements ILocator
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCourseImplementations']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteAssessments']);
         $this->registerCallback(self::CALLBACK_PRESOFTDELETE, [$this, 'softDeleteFields']);
+
+        $this->registerCallback(self::CALLBACK_PRERESTORE, [$this, 'validateFolderCodes']);
+        $this->registerCallback(self::CALLBACK_PRERESTORE, [$this, 'validateActiveParent']);
 
         $this->registerPersistSearchIndexCallbacks();
     }
@@ -372,7 +375,11 @@ class Mapper extends AbstractFolderMapper implements ILocator
 
                 /** @var CourseSpecification\Model $courseSpecification */
                 $courseSpecification = CourseSpecification\Mapper::getInstance()->createModel();
-                ;
+
+                // grab the first course framework / template
+                $courseFrameworkMapper = \Schoolbox\Assessment\Course\Template\Mapper::getInstance();
+                $framework = $courseFrameworkMapper->findAll()->first();
+                $courseSpecification->setTemplate($framework);
                 $courseSpecification->setFolder($parent);
                 CourseSpecification\Mapper::getInstance()->save($courseSpecification);
 
@@ -619,12 +626,12 @@ class Mapper extends AbstractFolderMapper implements ILocator
     /**
      * PostSave callback to clear User- + Role-based permissions if they are now being inherited
      *
-     * @param Model $model
-     * @param null|Model $previous
+     * @param Model      $model
+     * @param Model|null $previous
      * @return bool
      * @throws DefinitionException If specified join not defined
      */
-    protected function updateInheritedPermissions(Model $model, Model $previous = null): bool
+    protected function updateInheritedPermissions(Model $model, ?Model $previous = null): bool
     {
         // If we are inheriting permissions delete any previously created group + user perms
         if ($previous && $model->getInherit()) {
@@ -654,7 +661,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
      * @throws PDOException
      * @throws UnexpectedValueException
      */
-    protected function updateFolderCodes(Model $model, Model $previous = null): bool
+    protected function updateFolderCodes(Model $model, ?Model $previous = null): bool
     {
         // Don't update if join not hydrated
         if ($model->getCodes() === null) {
@@ -1614,16 +1621,16 @@ class Mapper extends AbstractFolderMapper implements ILocator
      * Gets a collection of parents for the given category, starting from the
      * topmost parent first.
      *
-     * @param  Model $category
-     * @param  Model $stop_category If supplied, the parent list is truncated
+     * @param  Model     $category
+     * @param Model|null $stop_category If supplied, the parent list is truncated
      *                                 above this category.
-     * @param bool $cheaply If true, use the findCheaplyById() for speed
+     * @param bool       $cheaply       If true, use the findCheaplyById() for speed
      * @return Collection
      * @throws \OverflowException if `$category` is its own ancestor somehow
      * @throws MapperException    if a parent of `$category` is deleted or does
      *                            not exist
      */
-    public function findParents(Model $category, Model $stop_category = null, $cheaply = false)
+    public function findParents(Model $category, ?Model $stop_category = null, $cheaply = false)
     {
         /** @var Model[] $stack */
         $stack = array($category);
@@ -1954,12 +1961,12 @@ class Mapper extends AbstractFolderMapper implements ILocator
      * Folder is hydrated with:
      *  * folder codes
      *
-     * @param User $student
-     * @param null|Term $term
+     * @param User      $student
+     * @param Term|null $term
      * @return Collection|Model[]
      * @throws DefinitionException
      */
-    public function findFoldersWithResponsesByStudent(User $student, Term $term = null)
+    public function findFoldersWithResponsesByStudent(User $student, ?Term $term = null)
     {
         $whereParams = [
             ':userId' => $student->getId(),
@@ -1987,12 +1994,12 @@ class Mapper extends AbstractFolderMapper implements ILocator
      * Hydrated joins:
      * * folder code
      *
-     * @param User $student
+     * @param User      $student
      * @param Term|null $term
      * @return GenericCollection
      * @throws DefinitionException
      */
-    public function findFoldersWithFeedbackToStudent(User $student, Term $term = null)
+    public function findFoldersWithFeedbackToStudent(User $student, ?Term $term = null)
     {
         $whereParams = [
             ':userId' => $student->getId(),
@@ -2021,11 +2028,11 @@ class Mapper extends AbstractFolderMapper implements ILocator
      * Hydrated joins:
      *  * folder codes
      *
-     * @param User $student
+     * @param User      $student
      * @param Term|null $term
      * @return GenericCollection|Model[]
      */
-    public function findFoldersWithInteractionsForStudent(User $student, Term $term = null)
+    public function findFoldersWithInteractionsForStudent(User $student, ?Term $term = null)
     {
         $whereClause = "p.user_id = :userId";
         $whereParams = [
@@ -2055,11 +2062,11 @@ class Mapper extends AbstractFolderMapper implements ILocator
      * 3. assessments in Project directly on Folders
      * 4. assessments in Projects in UnitImpls on class Folders
      *
-     * @param User $teacher
+     * @param User      $teacher
      * @param Term|null $term
      * @return GenericCollection|Model[]
      */
-    public function findFoldersWithInteractionsForTeacher(User $teacher, Term $term = null)
+    public function findFoldersWithInteractionsForTeacher(User $teacher, ?Term $term = null)
     {
         $whereParams = [
             ':userId' => $teacher->getId(),
@@ -2453,6 +2460,43 @@ class Mapper extends AbstractFolderMapper implements ILocator
     {
         if (null === $model->getSequence()) {
             $model->setSequence(0);
+        }
+
+        return true;
+    }
+
+    /**
+     * Ensure business logic, and prevent folder being restored that have deleted parents
+     * The UI won't show folders like this, but the cli tool (tools/recursiveUndeleter.php) was allowing it
+     * Not anymore...
+     *
+     * @param Model $model
+     * @return bool
+     * @throws MapperException
+     * @throws MapperException\Deleted
+     */
+    protected function validateActiveParent(Model $model): bool
+    {
+        $parentId = $model->getParent()?->getId();
+
+        if ($parentId === null) {
+            // No parent, so validation fails.
+            // This should never happen due to folder.parent being non-nullable in the database.
+            // But AbstractFolder->getId() can return null, so this makes type checkers happy.
+            throw new UnexpectedValueException('Parent folder must exist.');
+        }
+
+        // No need to check for active parent if the folder is root
+        if ($parentId === IFolder::ROOT_ID) {
+            return true;
+        }
+
+        // Check that parent exists.  If not, return reason for validation failure.
+        // See requirements for callback functions in docblock for Schoolbox\Mapper->triggerCallbacks().
+        try {
+            $this->findById($parentId);
+        } catch (MapperException\NotFound | MapperException\Deleted) {
+            throw new UnexpectedValueException('Parent folder must exist and must not be deleted.');
         }
 
         return true;

@@ -48,7 +48,7 @@ class LazyCallback implements IAuthorizationRule
      *
      * @inheritdoc
      */
-    public function authorize(array $params = array(), User $user = null): void
+    public function authorize(array $params = array(), ?User $user = null): void
     {
         if (!$this->instantiatedRule) {
             $this->instantiatedRule = \call_user_func($this->createRuleCallback);

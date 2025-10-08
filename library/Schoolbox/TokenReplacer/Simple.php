@@ -77,7 +77,7 @@ class Simple
     {
         $body = $this->stripMentionAttribute($body);
         $sanitisedReplacements = array_map(
-            fn ($val) => $this->escapeStrategy->escape($val),
+            fn ($val) => $this->escapeStrategy->escape($val ?? ''),
             array_values($replacements),
         );
 

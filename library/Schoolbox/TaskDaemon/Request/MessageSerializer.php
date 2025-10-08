@@ -64,7 +64,7 @@ class MessageSerializer
             $return['task']['failureCallback'] = [
                 'url'    => $failureCallback,
                 'params' => $message->getFailureCallbackParams(),
-                'token'  => $message->getCallbackToken(),
+                'token'  => $message->getFailureCallbackToken(),
             ];
         }
 

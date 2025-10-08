@@ -7,6 +7,10 @@
     .excluded {
         background-color: #f9f9f9;
     }
+
+    .markbook-faded .excluded {
+        background-color: unset;
+    }
 }
 
 #report_content,
@@ -88,8 +92,19 @@
         // Prevent long names causing first column to be excessively wide.
         &.diagonal-headings-table tbody tr th.profile-cell {
             max-width: 200px;
+            width: 200px; // when zooming out max-width stops working, this ensures it's always 200px
             overflow: hidden;
             white-space: normal;
+
+            // Correctly clip long names in the first column
+            .profile-cell-clip {
+                overflow: hidden;
+
+                a {
+                    text-overflow: ellipsis;
+                    overflow: hidden;
+                }
+            }
         }
 
         // Table cells
@@ -105,13 +120,8 @@
             vertical-align: middle;
         }
 
-        select {
+        select:not(.letter-grade-select) {
             max-width: 3rem;
-        }
-
-        td.student-average a,
-        td.student-average a.meta {
-            color: $white;
         }
 
         td.gradient-none-bg a,
@@ -204,6 +214,14 @@
                 background-color: var(--content-ui-hover);
             }
         }
+
+        // When filling in feedback, the non-relevant rows are faded out
+        .markbook-faded {
+            opacity: 0.3;
+        }
+        tr.markbook-faded {
+            background-color: var(--body-background);
+        }
     }
 }
 
@@ -222,7 +240,7 @@
     /* This class needed because first child is a cell spanning multiple rows. */
     tbody th.fixed-left.second-child {
         @media #{$medium-up} {
-            left: 180px; /* 180px to match width of a .profile-cell table cell. */
+            left: 200px; /* 200px to match width of a .profile-cell table cell. */
         }
     }
 
@@ -234,7 +252,7 @@
 
     th:nth-child(1),
     td:nth-child(1) {
-        min-width: 180px; /* 180px to match width of a .profile-cell table cell. */
+        min-width: 200px; /* 200px to match width of a .profile-cell table cell. */
     }
 
     th.second-child,

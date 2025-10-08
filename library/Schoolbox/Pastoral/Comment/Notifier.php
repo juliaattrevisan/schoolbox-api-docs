@@ -262,7 +262,7 @@ class Notifier extends AbstractModuleNotifier
 
         /** @var Report $report */
         foreach ($reports as $report) {
-            $reportHref = NotifierHelper::getReportHref($report, $pastoral);
+            $reportHref = NotifierHelper::getRecordHref($pastoral, $model);
             $builder    = new Builder();
             $builder->setTitle($messageTitle)
                     ->setParam('record', new Param($recordName, $recordHref, ParameterInterface::STACKING_REPLACE))

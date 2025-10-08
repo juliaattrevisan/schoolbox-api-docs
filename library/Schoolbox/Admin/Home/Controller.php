@@ -71,12 +71,14 @@ class Controller extends Base
      * @param IConnector|null  $databaseExternal Will be NULL if external is disabled in config, or if unable to connect
      * @param ConfigMapper     $configMapper
      * @param ImportLogMapper  $importLogMapper
+     * @param InstanceRegistry $instanceRegistry The instance registry API
      */
     public function __construct(
         Database\Factory $databaseFactory,
         ?IConnector $databaseExternal,
         ConfigMapper $configMapper,
-        ImportLogMapper $importLogMapper
+        ImportLogMapper $importLogMapper,
+        private InstanceRegistry $instanceRegistry,
     ) {
         $this->databaseFactory  = $databaseFactory;
         $this->databaseExternal = ($databaseExternal instanceof NullConnector) ? null : $databaseExternal;
@@ -93,7 +95,7 @@ class Controller extends Base
     public function dismissUpgradeReminder()
     {
         if ($this->getUser()->isSuperuser()) {
-            $latestVersionMajor = (new InstanceRegistry($this->getConfigLoader()))->getLatestVersionMajor();
+            $latestVersionMajor = $this->instanceRegistry->getLatestVersionMajor();
             $configDismissUpgradeReminder = $this->configMapper->findOneByColumn('name', 'dismiss_version');
 
             //update the config item with the current instance major version
@@ -174,11 +176,11 @@ class Controller extends Base
                 'pageCurrent' => $this->routeGenerator->generate('adminHome.getIndex'),
                 'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminHome.getIndex')),
                 'usageInGraph' => $usageInGraph,
-                'showUpgradeReminder'  => $version->showUpgradeReminder(),
+                'showUpgradeReminder'  => $version->showUpgradeReminder($this->instanceRegistry),
                 'major_site_version'   => $version->getMajor(),
-                'major_latest_version' => (new InstanceRegistry($this->getConfigLoader()))->getLatestVersionMajor(),
+                'major_latest_version' => $this->instanceRegistry->getLatestVersionMajor(),
                 'disk_used' => $disk_used,
-            //                    'disk_used' => Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
+                //                    'disk_used' => Alaress_Byte_Format::bytesToString($disk_total - $disk_free),
                 'disk_total' => Alaress_Byte_Format::bytesToString($disk_total),
                 'disk_percentage' => Alaress_Byte_Format::bytesToString($disk_percentage),
                 'memory_used' => Alaress_Byte_Format::bytesToString($memory_used),
@@ -293,11 +295,16 @@ class Controller extends Base
     {
         $enabledData = [];
 
-        $s3AccessKey = trim($this->getConfigLoader()->get('otfs_s3_cred_key') ?? "");
-        $s3SecretKey = trim($this->getConfigLoader()->get('otfs_s3_cred_secret') ?? "");
-        $s3Region    = trim($this->getConfigLoader()->get('otfs_s3_region') ?? "");
-        $s3Version   = trim($this->getConfigLoader()->get('otfs_s3_version') ?? "");
-        $s3Bucket    = trim($this->getConfigLoader()->get('otfs_s3_bucket') ?? "");
+        $s3AccessKey          = trim($this->getConfigLoader()->get('otfs_s3_cred_key') ?? "");
+        $s3SecretKey          = trim($this->getConfigLoader()->get('otfs_s3_cred_secret') ?? "");
+        $s3Region             = trim($this->getConfigLoader()->get('otfs_s3_region') ?? "");
+        $s3Version            = trim($this->getConfigLoader()->get('otfs_s3_version') ?? "");
+        $s3Bucket             = trim($this->getConfigLoader()->get('otfs_s3_bucket') ?? "");
+        $s3AltHost            = trim($this->getConfigLoader()->get('otfs_s3_alt_host') ?? "");
+        $s3AltAccessKey       = trim($this->getConfigLoader()->get('otfs_s3_alt_access_key') ?? "");
+        $s3AltSecretAccessKey = trim($this->getConfigLoader()->get('otfs_s3_alt_secret_key') ?? "");
+        $s3AltBucket          = trim($this->getConfigLoader()->get('otfs_s3_alt_bucket') ?? "");
+        $s3AltRegion          = trim($this->getConfigLoader()->get('otfs_s3_alt_region') ?? "");
 
         $s3CredentialsMissing =
             $s3AccessKey === '' ||
@@ -362,21 +369,26 @@ class Controller extends Base
 
         $objectCount = (new CloudWatchMetrics($cloudWatchClient))->getNumberOfObjects($s3Bucket);
 
-        $s3Client = new S3Client(
-            [
-                'credentials' => [
-                    'key'    => $s3AccessKey,
-                    'secret' => $s3SecretKey,
-                ],
-                'region'      => $s3Region,
-                'version'     => $s3Version,
-                'http'        => [
-                    GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => FilesystemFactory::getConnectTimeout(),
-                ],
-            ]
-        );
+        $cfg = [
+            'credentials' => [
+                'key'    => $s3AccessKey,
+                'secret' => $s3SecretKey,
+            ],
+            'region'      => $s3Region,
+            'version'     => $s3Version,
+        ];
+
+        if (!empty($s3AltHost)) {
+            $cfg['endpoint'] = $s3AltHost;
+            $cfg['credentials']['key'] = $s3AltAccessKey;
+            $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
+            $cfg['region'] = $s3AltRegion;
+        }
+        $s3Client = new S3Client($cfg);
+
+        $finalBucket = !empty($s3AltHost) && !empty($s3AltBucket) ? $s3AltBucket : $s3Bucket;
         $objects = $s3Client->getIterator('ListObjects', [
-            'Bucket' => $s3Bucket,
+            'Bucket' => $finalBucket,
             'Prefix' => DisasterRecovery::PREFIX_BACKUPS,
         ]);
 

@@ -17,7 +17,8 @@
 
 {% set formField = 'rubric' %}
 {% set rubricId = 'rb-' ~ rubricGrid.assessment.id %}
-{% set markType = rubricGrid.assessment.markScheme.generateContext %}
+{% set markScheme = selfAssess or studentView ? rubricGrid.assessment.markScheme : rubricGrid.assessment.instructorMarkScheme %}
+{% set markType = markScheme.generateContext %}
 {% set showDescriptorValue = showDescriptorValue ? true : false %}
 {% set showGroupTotal = showGroupTotal ? true : false %}
 {% set showRubricTotal = showRubricTotal ? true : false %}
@@ -88,12 +89,12 @@
 
                             <td>
                                 {# This container displays rubric levels for the mobile view. #}
-                                <div class="rubric-levels-mobile l-pad-m"><p><b>{{ level.name | markdown }}</b><p></div>
+                                <div class="hide-for-large-up l-pad-m hide-on-print"><p><b>{{ level.name | markdown }}</b></p></div>
                                 {% include '@rubric/descriptor-markable.twig' %}
                             </td>
 
                         {% else %}
-                            <td class="rb-blank">&nbsp;</td>
+                            <td class="rb-blank hide-for-medium-down">&nbsp;</td>
                         {% endif %}
 
                     {% endfor %}
@@ -120,8 +121,11 @@
                 </span>
 
                 {# Self-Assessment: only show the mark if it's self graded, as if it's self-reflect only they never marked themselves #}
-                {% if selfAssessmentFeedback is not null and selfAssessmentFeedback.isSelfGrading %}
-                    ({{ selfAssessmentFeedback.humanReadableMark }} given in {{ locale.selfAssessment.proper }})
+                {% if selfAssessmentFeedback is not null and selfAssessmentFeedback.isSelfGrading and selfAssessmentFeedback.humanReadableInstructorMark %}
+                    {# Although the student entered the mark using the display mark type, we show it here using the input mark type so that
+                     # it matches what the instructor is currently entering so it can be easily compared.
+                     #}
+                    ({{ selfAssessmentFeedback.humanReadableInstructorMark }} given in {{ locale.selfAssessment.proper }})
                 {% endif %}
             </th>
         </tr>

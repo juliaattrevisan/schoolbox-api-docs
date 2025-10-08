@@ -15,6 +15,7 @@ use GuzzleHttp\RequestOptions;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\SimpleCache\CacheInterface;
 use Psr\SimpleCache\InvalidArgumentException;
+use Schoolbox\Application\Exception\Exception;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Url\Uri;
@@ -96,11 +97,8 @@ class CacheHelper
      * Retrieve Bearer Token from the OIDC
      *
      * @return string
-     * @throws ClientExceptionInterface if something went wrong fetching JWKS
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
-     * @throws \JsonException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function getToken(): string
     {
@@ -132,25 +130,28 @@ class CacheHelper
      * @param string|null $registerCode if exists only return this register
      * @param array|null  $registersConfig if we are returning only 1 register, then confirm it is in the admin approved list
      * @return ?array [register,adminConfig]
-     * @throws ClientExceptionInterface if something went wrong fetching JWKS
-     * @throws GuzzleException
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
-     * @throws \JsonException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function getRegisters(?string $registerCode = null, ?array $registersConfig = null): ?array
     {
         $registers = $this->cache->get(self::REGISTERS_CACHE_KEY);
         if (!isset($registers)) {
-            // Request 1: find registers
-            $apiResponseBody = $this->api->request(
-                '/Main/api/registers/',
-                'GET',
-                token: $this->getToken(),
-            );
-            $registers       = $apiResponseBody['registers'];
-            $this->cache->set(self::REGISTERS_CACHE_KEY, $registers, self::STORAGE_CACHE_DEFAULT_TTL);
+            try {
+                // Request 1: find registers
+                $apiResponseBody = $this->api->request(
+                    '/Main/api/registers/',
+                    'GET',
+                    token: $this->getToken(),
+                );
+                $registers = $apiResponseBody['registers'];
+                $this->cache->set(self::REGISTERS_CACHE_KEY, $registers, self::STORAGE_CACHE_DEFAULT_TTL);
+            } catch (ApiException $e) {
+                throw new Exception(sprintf(
+                    'Failed to retrieve registers from iSAMS: %s',
+                    $e->getMessage()
+                ), $e->getCode(), $e);
+            }
         }
         // not fetching a specific register, get everything
         if (null === $registerCode && null === $registersConfig) {
@@ -182,25 +183,28 @@ class CacheHelper
      * @param int         $registerId
      * @param string|null $reportingKey RecordCollection.reportingKey (optional)
      * @return array|null
-     * @throws ClientExceptionInterface if something went wrong fetching JWKS
-     * @throws GuzzleException
      * @throws InvalidArgumentException
-     * @throws \JsonException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function getRecordCollections(int $registerId, ?string $reportingKey = null): ?array
     {
         $recordCollections = $this->cache->get(sprintf(self::RECORD_COLLECTIONS_CACHE_KEY, $registerId));
 
         if (!isset($recordCollections)) {
-            // This ought to be cacheable for a lot longer than student data
-            $apiResponseBody = $this->api->request(
-                '/Main/api/registers/' . $registerId . '/recordCollections',
-                'GET',
-                token: $this->getToken(),
-            );
-            $recordCollections = $apiResponseBody['recordCollections'];
-            $this->cache->set(sprintf(self::RECORD_COLLECTIONS_CACHE_KEY, $registerId), $recordCollections, self::STORAGE_CACHE_DEFAULT_TTL);
+            try {
+                // This ought to be cacheable for a lot longer than student data
+                $apiResponseBody = $this->api->request(
+                    '/Main/api/registers/' . $registerId . '/recordCollections',
+                    'GET',
+                    token: $this->getToken(),
+                );
+                $recordCollections = $apiResponseBody['recordCollections'];
+                $this->cache->set(sprintf(self::RECORD_COLLECTIONS_CACHE_KEY, $registerId), $recordCollections, self::STORAGE_CACHE_DEFAULT_TTL);
+            } catch (ApiException $e) {
+                throw new Exception(sprintf(
+                    'Failed to retrieve registers from iSAMS: %s',
+                    $e->getMessage()
+                ), $e->getCode(), $e);
+            }
         }
 
         // not fetching a specific register, get everything
@@ -226,8 +230,6 @@ class CacheHelper
      * @return array|mixed
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
-     * @throws \JsonException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function getMetadataFields(int $registerId): mixed
     {
@@ -242,7 +244,7 @@ class CacheHelper
                     token: $this->getToken(),
                 );
                 $this->cache->set(sprintf(self::METADATA_CACHE_KEY, $registerId), $metadata, self::STORAGE_CACHE_DEFAULT_TTL);
-            } catch (ClientExceptionInterface $e) {
+            } catch (ApiException $e) {
                 // No metadata exists for this field: that's okay
                 return  [];
             }
@@ -258,8 +260,6 @@ class CacheHelper
      * @return array|mixed
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
-     * @throws \JsonException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function getStudentDateRanges(int $registerId, string $externalId): mixed
     {
@@ -274,7 +274,7 @@ class CacheHelper
                     token: $this->getToken(),
                 );
                 $this->cache->set(sprintf(self::STUDENT_DATES_CACHE_KEY, $registerId, $externalId), $dateRanges, self::STUDENT_CACHE_DEFAULT_TTL);
-            } catch (ClientExceptionInterface $e) {
+            } catch (ApiException $e) {
                 // No record exists for this student: that's okay
                 return [];
             }
@@ -290,8 +290,6 @@ class CacheHelper
      * @return array|mixed
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
-     * @throws \JsonException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function getStudentFields(int $registerId, string $externalId): mixed
     {
@@ -306,7 +304,7 @@ class CacheHelper
                     token: $this->getToken(),
                 );
                 $this->cache->set(sprintf(self::STUDENT_FIELDS_CACHE_KEY, $registerId, $externalId), $studentFields, self::STUDENT_CACHE_DEFAULT_TTL);
-            } catch (ClientExceptionInterface $e) {
+            } catch (ApiException $e) {
                 // No record exists for this student: that's okay
                 return [];
             }
@@ -320,10 +318,7 @@ class CacheHelper
      * @return array|mixed
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
-     * @throws \JsonException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      * @see                      self::getMetadataFields
-     *
      */
     public function getDataSource(string $dataSourceUrl): mixed
     {
@@ -337,7 +332,7 @@ class CacheHelper
                     token: $this->getToken(),
                 );
                 $this->cache->set(sprintf(self::DATASOURCE_FIELDS_CACHE_KEY, $dataSourceUrl), $dataSource, self::STORAGE_CACHE_DEFAULT_TTL);
-            } catch (ClientExceptionInterface $e) {
+            } catch (ApiException $e) {
                 // No metadata exists for this field: that's okay
                 return [];
             }
@@ -358,8 +353,6 @@ class CacheHelper
      * @return array|mixed
      * @throws InvalidArgumentException if key set or OIDC discovery couldn't be
      *                                  written to or read from cache
-     * @throws \JsonException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function getRecordCollectionsRecords(int $registerId, string $externalId, int $collectionId)
     {
@@ -374,7 +367,7 @@ class CacheHelper
                     token: $this->getToken(),
                 );
                 $this->cache->set(sprintf(self::RECORD_COLLECTION_STUDENT_CACHE_KEY, $registerId, $collectionId, $externalId), $recordCollections, self::STORAGE_CACHE_DEFAULT_TTL);
-            } catch (ClientExceptionInterface $e) {
+            } catch (ApiException $e) {
                 // No metadata exists for this field: that's okay
                 return  [];
             }

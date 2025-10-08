@@ -31,7 +31,7 @@ class Alaress_Date_NullDate extends Alaress_Date_Format
      * @param IClock|null $clock
      * @return Alaress_Date_NullDate
      */
-    public static function now(IClock $clock = null): Alaress_Date_Format
+    public static function now(?IClock $clock = null): Alaress_Date_Format
     {
         // No point caching and cloning this as this class's construction is light
         return new Alaress_Date_NullDate();
@@ -107,5 +107,15 @@ class Alaress_Date_NullDate extends Alaress_Date_Format
      */
     public function __clone()
     {
+    }
+
+    /**
+     * Null objects always serialize as null.
+     *
+     * @return string|null
+     */
+    public function jsonSerialize(): ?string
+    {
+        return null;
     }
 }

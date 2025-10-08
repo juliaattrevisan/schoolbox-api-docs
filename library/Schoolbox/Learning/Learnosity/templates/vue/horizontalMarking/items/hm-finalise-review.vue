@@ -4,7 +4,6 @@
  */
 
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
-import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { useStore } from "../store/horizontalMarkingStore";
 import { useItemsStore } from "../store/hmItemsStore";
 import { useStudentsStore } from "../store/hmStudentsStore";
@@ -63,22 +62,22 @@ function getFetches(): Promise<Response>[] {
  */
 async function submitFeedback(): Promise<void> {
     isFinalising.value = true;
-    activate("Finalising review...");
+    const toast = window.sbProps.toastActivate("Finalising review...");
     try {
         const feedbacks = await Promise.all(getFetches());
         const responses = feedbacks.map((response) => response.ok);
         const isAllResponsesOk = responses.every((response) => response === true);
         if (isAllResponsesOk) {
             window.location.href = store.statusPage;
-            timeout({ text: "Review successfully finalised" });
+            toast.timeout({ text: "Review successfully finalised" });
         } else {
-            timeout({
+            toast.timeout({
                 text: "Review could not be finalised, please contact your support if the problem persists",
                 isSuccess: false,
             });
         }
     } catch (error) {
-        timeout({
+        toast.timeout({
             text: "Review could not be finalised, please contact your support if the problem persists",
             isSuccess: false,
         });
@@ -140,4 +139,3 @@ function onCancelSelected(): void {
         </ul>
     </reveal-modal>
 </template>
-../../student/util/finaliseReviewUtils

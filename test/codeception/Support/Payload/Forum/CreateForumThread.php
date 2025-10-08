@@ -21,7 +21,7 @@ class CreateForumThread extends \Tests\Support\Payload\Request
      */
     public function __construct(int $categoryID, string $title, string $submitValue)
     {
-        $this->setReferer("/forum/modify/83");
+        $this->setReferer("/forum/modify/$categoryID");
         $this->setFormParam('categoryID', $categoryID);
         $this->setFormParam('threadID', '');
         $this->setFormParam('postID', '');

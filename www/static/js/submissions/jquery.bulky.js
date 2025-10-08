@@ -339,7 +339,10 @@
 
         var maxHeight = parseInt(($(window).height() / 5) * 4) - currentlyOpenModal.data("fixedContentHeight");
 
-        $("#" + currentlyOpenModal.data("listId")).css("maxHeight", maxHeight);
+        $("#" + currentlyOpenModal.data("listId"))
+            .css("maxHeight", maxHeight)
+            /* To prevent the list from scrolling if you click an input */
+            .css("position", "relative");
     }
 
     $.fn[pluginName] = function (options) {

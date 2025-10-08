@@ -61,6 +61,7 @@ use Schoolbox\Resource\Textbox\Mapper as TextBoxMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
+use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
 
 /**
@@ -99,6 +100,8 @@ class Api extends \Codeception\Module
 
     private NewsMapper $newsMapper;
 
+    private TokenMapper $tokenMapper;
+
     /**
      * HOOK: executed after configuration is loaded
      *
@@ -110,6 +113,7 @@ class Api extends \Codeception\Module
      * @throws \Aura\Di\Exception\ServiceNotObject
      * @throws \Schoolbox\External\Exception
      */
+    // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     public function _initialize(): void
     {
         parent::_initialize();
@@ -141,6 +145,7 @@ class Api extends \Codeception\Module
         $this->eventMapper          = EventMapper::getInstance();
         $this->eventTypeMapper      = EventTypeMapper::getInstance();
         $this->newsMapper           = NewsMapper::getInstance();
+        $this->tokenMapper          = TokenMapper::getInstance();
     }
 
     private array $users = [];
@@ -148,6 +153,7 @@ class Api extends \Codeception\Module
     /**
      * @throws MapperException
      */
+    // phpcs:ignore PSR2.Methods.MethodDeclaration.Underscore
     public function _before(TestInterface $test): void
     {
         parent::_before($test);
@@ -195,9 +201,10 @@ class Api extends \Codeception\Module
     public function getAdminToken(): string
     {
         $admin = $this->userMapper->findByUsername('alaress');
+        $token = $this->tokenMapper->generateForUser($admin, $admin, \Alaress_Date_Format::now()->addSeconds(JWT::API_JWT_TIMEOUT), User\Token\Model::TYPE_APITEST);
         /** @var Jwt $tokenBuilder */
         $tokenBuilder = $this->cliKernel->get('user.tokenBuilder');
-        return $tokenBuilder->generate($admin);
+        return $tokenBuilder->generate($admin, $token->getJwtId());
     }
 
     /**
@@ -484,6 +491,7 @@ class Api extends \Codeception\Module
             ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_NONE)
             ->setCreator($staff)
             ->setMarkScheme(new Percentage())
+            ->setInstructorMarkScheme(new Percentage())
             ->setOpenAt($now)
             ->setPublishAt($now)
             ->setDueAt($close)
@@ -542,9 +550,11 @@ class Api extends \Codeception\Module
             ->setMarkScheme(new Percentage())
             ->setOpenAt($now)
             ->setPublishAt($now)
-            ->setDueAt($close)
-            ->setCloseAt($close)
-            ->setMarkVisibility(SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT);
+            ->setDueAt($close);
+            // The function calls below have been commented out to get around a PHPStan warning:
+            // "Call to method Schoolbox\Learning\Assessment\Task\Model::setMarkVisibility() on a separate line has no effect."
+            //->setCloseAt($close)                                                      // Note Assessment\Task\Model->setCloseAt() doesn't actually do anything.
+            //->setMarkVisibility(SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT); // Note Assessment\Task\Model->setMarkVisibility() doesn't actually do anything.
 
         $context->getAssessables()->add($task);
         $this->assessmentDataSource->save($task, $staff);

@@ -19,27 +19,12 @@ use Schoolbox\External\Importer\Endpoint\IStrategy;
  */
 class Summary implements IStrategy
 {
-
-    /**
-     * @var LoggerInterface
-     */
-    protected LoggerInterface $log;
-
-
-    /**
-     * @var Registry
-     */
-    private Registry $registry;
-
-
     /**
      * @param LoggerInterface $log
      * @param Registry        $registry
      */
-    public function __construct(LoggerInterface $log, Registry $registry)
+    public function __construct(private LoggerInterface $log, private Registry $registry)
     {
-        $this->log = $log;
-        $this->registry = $registry;
     }
 
 
@@ -71,7 +56,7 @@ class Summary implements IStrategy
 
             /* If any event types are missing, tell someone
              */
-            if (\count($result[2])) {
+            if (is_array($result[2]) && \count($result[2])) {
                 $this->log->info("        There are missing event types in schoolbox which you should create before next calendar import.");
 
                 foreach ($result[2] as $brokenEventType) {

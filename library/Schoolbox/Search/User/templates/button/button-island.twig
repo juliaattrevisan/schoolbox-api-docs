@@ -30,7 +30,7 @@
 
     <ul class="f-dropdown" data-dropdown-content="" id="{{ identifier }}" aria-hidden="true">
 {% else %}
-    <ul class='flex-list flex-wrap buttons'>
+    <ul class='flex-list flex-wrap buttons' data-test="profile-buttons">
 {% endif %}
         {# Special constraints that further reduce the payload I built
          # It uses the exact same philosophy as additionalConstraints for
@@ -114,7 +114,7 @@
                     {% elseif button.type in ['documentmanagement'] %}
                         {% set route = routeLookupIfAuthorized('profileDocumentManagement.getIndex', {studentId: user.id}) %}
                     {% elseif button.type in ['geosnapshot'] %}
-                        {% set route = routeLookupIfAuthorized('geosnapshotApi.getStudentPhotos', {id: user.id}) %}
+                        {% set route = routeLookupIfAuthorized('geosnapshotApi.getPhotos', {id: user.id}) %}
                     {% endif %}
 
                     {% if route %}

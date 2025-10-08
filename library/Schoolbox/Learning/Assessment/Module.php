@@ -8,6 +8,7 @@
 
 namespace Schoolbox\Learning\Assessment;
 
+use Alaress\Authorizer\Failure\Unauthorized;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
@@ -30,6 +31,7 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\File\MimetypeMapper;
+use Schoolbox\Filter;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Participant\DataSource as ParticipantDataSource;
@@ -38,6 +40,7 @@ use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Authorizer\Rule\AssessmentNotDeleted;
+use Schoolbox\Learning\Authorizer\Rule\IsCustomParticipationEnabled;
 use Schoolbox\Learning\Authorizer\Rule\CanAcknowledgeAssessment;
 use Schoolbox\Learning\Authorizer\Rule\CanPreview;
 use Schoolbox\Learning\Authorizer\Rule\CanRespondToAssessment;
@@ -77,6 +80,9 @@ use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
+use Schoolbox\Editor\Templates\Mapper as EditorTemplateMapper;
+use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
 
 /**
  * Class Module
@@ -119,6 +125,9 @@ class Module extends BaseModule
         };
         $preloadLessonPlanAPI           = function ($params) {
             return $this->preloadLessonPlanAPI($params);
+        };
+        $preloadAssessmentForParticipant = function ($params) {
+            return $this->preloadAssessmentForParticipant($params);
         };
 
         // rules in use
@@ -169,6 +178,40 @@ class Module extends BaseModule
             new IsSafeExamBrowserRequired(),
         );
 
+        $canModifyCustomParticipation = new Rule\All(
+            /* Should only be accessible if the custom participation config is enabled
+             */
+            new Rule\IsConfigOn(ConfigMapper::NAME_CUSTOM_ASSESSMENT_PARTICIPATION, $this->getConfig()),
+            /* Check if the custom participation is available
+             */
+            new IsCustomParticipationEnabled(),
+            new Rule\Any(
+                $isSuper,
+                new Rule\All(
+                    $canWrite,
+                    new AssessmentNotDeleted(),
+                    new IsModifyUnLocked(new LockedChecker($this->getTermMapper())),
+                )
+            )
+        );
+
+        $canCopyAssessmentCustomParticipation = new Rule\All(
+            $canModifyCustomParticipation,
+            new Rule\Callback(function (array $param): void {
+                /* At the moment, we want to restrict the copying of custom participation
+                 * for LTI assessments and quizzes, which will be handled in the future, so
+                 * for the time being, we will leave it out.
+                 */
+                $assessmentType = AssessmentType::objectToString($param['assessment']);
+                if (
+                    AssessmentType::TYPE_LTI_ASSESSMENT === $assessmentType ||
+                    AssessmentType::TYPE_QUIZ === $assessmentType
+                ) {
+                    throw new Unauthorized(ErrorMapper::ERROR_PAGE_NOT_FOUND);
+                }
+            }),
+        );
+
         // pluralise for REST
         $contextTypes = AssessmentContextType::getStringValuesAsRegex(function ($name) {
             return $name . 's';
@@ -189,6 +232,7 @@ class Module extends BaseModule
         $this->register('POST', "$assListRoute", 'postCreateAssessment', $canWrite, $preloadContext); // a || c
         $this->register('POST', "$assListRoute/reorder", 'postReorderAssessments', $canWrite, $preloadContext); // a || c
         $this->register('GET', "$assListRoute/new", 'getCreateAssessmentForm', $canWrite, $preloadContext); // a || c
+        $this->register('GET', "$assRoute/clone", 'getCloneAssessmentForm', $canCopyAssessmentCustomParticipation, $preloadAssessment); // a || c
 
         $this->register('GET', "$assRoute", 'getAssessment', $loggedIn, $preloadAssessment);
         $this->register('POST', "$assRoute", 'postUpdateAssessment', $canWrite, $preloadAssessment); // a || c
@@ -201,6 +245,20 @@ class Module extends BaseModule
         $this->register('GET', "$assRoute/overview", 'getOverview', $canViewStatus, $preloadAssessment); // a || c
         $this->register('GET', "$assRoute/overview/export", 'downloadOverview', $canViewStatus, $preloadAssessment); // a || c
         $this->register('GET', "$assRoute/submissions/download", 'downloadSubmissions', $canViewStatus, $preloadAssessment); // a || c
+
+        /* Custom Participation
+         */
+        $this->register('GET', "$assRoute/participation", 'getAssessmentParticipationForm', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
+        $this->register('GET', "$assRoute/participation/new", 'getAssessmentParticipationLearningPlan', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
+        $this->register('POST', "$assRoute/participation/new", 'postCreateAssessmentParticipationLearningPlan', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
+        $this->register('GET', "$assRoute/participation/{planId:\d+}/modify", 'getUpdateAssessmentParticipationLearningPlan', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
+        $this->register('POST', "$assRoute/participation/{planId:\d+}/modify", 'postUpdateAssessmentParticipationLearningPlan', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
+        $this->register('POST', "$assRoute/participation/customisation/include", 'postExistingCustomisationInclude', $canModifyCustomParticipation, $preloadAssessmentForParticipant);
+
+        /* Rescore Feedbacks
+         */
+        $this->register('GET', "{$assRoute}/rescore", 'getRescore', $canWrite, $preloadAssessment);
+        $this->register('POST', "{$assRoute}/rescore", 'postRescore', $canWrite, $preloadAssessment);
 
         $this->register('GET', "$assRoute/$studentParam", 'getSummary', $canViewSummary, $preloadParticipant); // s || p
         $this->register('GET', "$assRoute/$studentParam/seb", 'getSummaryViaSeb', $canViewSummary, $preloadParticipant); // s || p
@@ -328,9 +386,11 @@ class Module extends BaseModule
 
         // Easy access participation endpoint
         // include user in assessment
-        $this->register('POST', "$assRoute/$studentParam/include", 'postInclude', $canModify, $preloadParticipant);
+        $this->register('POST', "$assRoute/$studentParam/include", 'postInclude', $canModifyCustomParticipation, $preloadParticipant);
         // exclude user from assessment
-        $this->register('POST', "$assRoute/$studentParam/exclude", 'postExclude', $canModify, $preloadParticipant);
+        $this->register('POST', "$assRoute/$studentParam/exclude", 'postExclude', $canModifyCustomParticipation, $preloadParticipant);
+
+        $this->register('GET', "$assRoute/$studentParam/info", 'getInfo', $canModify, $preloadParticipant);
 
         // Due work: Teacher interactive worksheet view
         $this->register(self::METHOD_GET, "$assRoute/worksheet", 'getWorksheet', $canModifyWorksheet, $preloadAssessment);
@@ -430,7 +490,7 @@ class Module extends BaseModule
      * Convert route params into an assessment object
      *
      * @param array     $params
-     * @param null|User $student If provided, only load this student's participation
+     * @param User|null $student If provided, only load this student's participation
      * @return array
      * @throws ApplicationException\Exception If assessment is not found
      * @throws DomainException If user has interaction but not participant record
@@ -439,7 +499,7 @@ class Module extends BaseModule
      * @throws Mapper\DefinitionException If a specified join mapper is not found
      * @throws UnexpectedValueException If unable to derive project participant collections
      */
-    protected function preloadAssessment(array $params, User $student = null): array
+    protected function preloadAssessment(array $params, ?User $student = null): array
     {
         try {
             $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], $student);
@@ -503,6 +563,68 @@ class Module extends BaseModule
     }
 
     /**
+     * Convert route params into an assessment object for participant
+     *
+     * @param array     $params
+     * @param User|null $student
+     * @return array
+     * @throws ContainerExceptionInterface
+     * @throws MapperException\Deleted
+     * @throws NotFoundExceptionInterface
+     */
+    protected function preloadAssessmentForParticipant(array $params, ?User $student = null): array
+    {
+        /* Module is switched off so no need to process further
+         */
+        if (!$this->getConfig()->get(ConfigMapper::NAME_CUSTOM_ASSESSMENT_PARTICIPATION)) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        try {
+            $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId'], $student);
+        } catch (MapperException\Deleted $e) {
+            throw new MapperException\Deleted(
+                'Sorry, the activity could not be updated. Please ensure the activity ' .
+                'still exists and contact your support if the problem persists.'
+            );
+        } catch (MapperException $e) {
+            // Possibly thrown by base findByOne() mapper call, but masked by overriding @method annotation
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        /* Only allow the assessment that can have custom participation have access
+         */
+        $assessmentType = AssessmentType::objectToString($assessment);
+        if (
+            AssessmentType::TYPE_PROJECT === $assessmentType ||
+            AssessmentType::TYPE_LESSON_PLAN === $assessmentType
+        ) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        /* Should only have custom participation for implementations
+         */
+        if ($assessment->getBaseContext()->isSpecificationContext()) {
+            throw $this->getErrorMapper()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        if (isset($params['planId'])) {
+            /** @var ParticipantDataSource $participantDataSource */
+            $participantDataSource = $this->injector->get('participantDataSource');
+            $planMapper = $participantDataSource->getPlanMapper();
+            $plan = $planMapper->findById($params['planId']);
+        }
+
+        // set the controller
+        $this->setControllerFromAssessment($assessment);
+
+        return [
+            'assessment' => $assessment,
+            'plan' => $plan ?? null
+        ];
+    }
+
+    /**
      * @inheritdoc
      */
     public function initTemplatePaths(IChainLoader $templateLoader)
@@ -538,6 +660,17 @@ class Module extends BaseModule
         $linkedAssessmentsMapper   = $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper::class);
         $courseImplementationMapper = $this->getMapperFactory()->get(CourseImplementationMapper::class);
         $unitImplementationMapper = $this->getMapperFactory()->get(UnitImplementationMapper::class);
+        $editorTemplateHelper = new EditorTemplateHelper(
+            $this->getMapperFactory()->get(EditorTemplateMapper::class),
+            EditorTemplatesCategoryModel::FEEDBACK,
+            $this->injector->get('user')
+        );
+
+        // used for the course level status page (and filtering from the markbook)
+        $filtersAssessmentIdFinder  = $this->injector->get('filters.assessmentIdFinder');
+        $filtersFactoryFactory      = $this->injector->get('filters.factoryFactory');
+        $filterMapper               = $this->getMapperFactory()->get(Filter\Mapper::class);
+        $filterSelectionMapper      = $this->getMapperFactory()->get(Filter\Selection\Mapper::class);
 
         /** @var AssessmentMapperProxy $assessmentDataSource */
         $assessmentDataSource = $this->injector->get('assessmentDataSource');
@@ -567,7 +700,11 @@ class Module extends BaseModule
                     $participantDataSource,
                     $this->getUnitSpecificationMapper(),
                     $this->injector->get('l10n'),
-                    $projectResultCacheMapper
+                    $projectResultCacheMapper,
+                    new \Schoolbox\Url\Factory($this->getConfig()),
+                    (string)$this->getConfig()->get('learnosity_version'),
+                    (string)$this->getConfig()->get('learnosity_consumer_key'),
+                    (string)$this->getConfig()->get('learnosity_consumer_secret'),
                 );
 
             case Assessment\DueWork\Controller::class:
@@ -613,6 +750,23 @@ class Module extends BaseModule
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
                     MimetypeMapper::getInstance(),
+                    $filtersAssessmentIdFinder,
+                    $filtersFactoryFactory,
+                    $filterMapper,
+                    $filterSelectionMapper,
+                    $courseImplementationMapper,
+                    $unitImplementationMapper,
+                    $this->getMapperFactory()->get(RubricDataSource::class),
+                    new EditorTemplateHelper(
+                        $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                        EditorTemplatesCategoryModel::LEARNING_ACTIVITY,
+                        $this->injector->get('user')
+                    ),
+                    new EditorTemplateHelper(
+                        $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                        EditorTemplatesCategoryModel::FEEDBACK,
+                        $this->injector->get('user')
+                    ),
                 );
 
             case Assessment\Project\Controller::class:
@@ -633,7 +787,18 @@ class Module extends BaseModule
                     $viewLatestMapper,
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
-                    $lessonPlanDataModelMapper
+                    $lessonPlanDataModelMapper,
+                    $filtersAssessmentIdFinder,
+                    $filtersFactoryFactory,
+                    $filterMapper,
+                    $filterSelectionMapper,
+                    $courseImplementationMapper,
+                    $unitImplementationMapper,
+                    new EditorTemplateHelper(
+                        $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                        EditorTemplatesCategoryModel::LEARNING_ACTIVITY,
+                        $this->injector->get('user')
+                    ),
                 );
 
             case Assessment\Quiz\Controller::class:
@@ -665,6 +830,22 @@ class Module extends BaseModule
                     (string)$this->getConfig()->get('learnosity_version'),
                     (string)$this->getConfig()->get('learnosity_consumer_key'),
                     (string)$this->getConfig()->get('learnosity_consumer_secret'),
+                    $filtersAssessmentIdFinder,
+                    $filtersFactoryFactory,
+                    $filterMapper,
+                    $filterSelectionMapper,
+                    $courseImplementationMapper,
+                    $unitImplementationMapper,
+                    new EditorTemplateHelper(
+                        $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                        EditorTemplatesCategoryModel::LEARNING_ACTIVITY,
+                        $this->injector->get('user')
+                    ),
+                    new EditorTemplateHelper(
+                        $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                        EditorTemplatesCategoryModel::FEEDBACK,
+                        $this->injector->get('user')
+                    ),
                 );
 
             case Assessment\Task\Controller::class:
@@ -686,7 +867,18 @@ class Module extends BaseModule
                     $viewLatestMapper,
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
-                    $lessonPlanDataModelMapper
+                    $lessonPlanDataModelMapper,
+                    $filtersAssessmentIdFinder,
+                    $filtersFactoryFactory,
+                    $filterMapper,
+                    $filterSelectionMapper,
+                    $courseImplementationMapper,
+                    $unitImplementationMapper,
+                    new EditorTemplateHelper(
+                        $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                        EditorTemplatesCategoryModel::LEARNING_ACTIVITY,
+                        $this->injector->get('user')
+                    ),
                 );
 
             case Assessment\Lti\Controller::class:
@@ -713,7 +905,18 @@ class Module extends BaseModule
                     $viewLatestMapper,
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
-                    $lessonPlanDataModelMapper
+                    $lessonPlanDataModelMapper,
+                    $filtersAssessmentIdFinder,
+                    $filtersFactoryFactory,
+                    $filterMapper,
+                    $filterSelectionMapper,
+                    $courseImplementationMapper,
+                    $unitImplementationMapper,
+                    new EditorTemplateHelper(
+                        $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                        EditorTemplatesCategoryModel::LEARNING_ACTIVITY,
+                        $this->injector->get('user')
+                    ),
                 );
 
             case Assessment\LessonPlan\Controller::class:
@@ -737,7 +940,7 @@ class Module extends BaseModule
                     $lessonPlanDataModelMapper,
                     $courseImplementationMapper,
                     $unitImplementationMapper,
-                    $linkedAssessmentsMapper
+                    $linkedAssessmentsMapper,
                 );
 
             default:

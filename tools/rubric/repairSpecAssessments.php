@@ -379,6 +379,7 @@ $kernel->run(new class extends App {
         $config        = $di->get('config');
         $this->fqdn    = trim($config->get('site_hostname') . "." . $config->get('site_domain'), ';.');
 
+        $this->deprecationNotice("SA-19334");
 
         // log perform / dry run
         if ($this->perform) {
@@ -465,6 +466,8 @@ $kernel->run(new class extends App {
         } else {
             $this->log->warning('No assessments affected');
         }
+
+        $this->deprecationNotice("SA-19334");
     }
 
 
@@ -929,5 +932,46 @@ $kernel->run(new class extends App {
                 $this->log->warning(self::indent(2) . $event);
             }
         }
+    }
+
+    /**
+     * Returns the filename of of the script that invoked this App, suitable for generating help output.
+     *
+     * The following should all return "./myTool.php"
+     * * "./relative/path/to/myTool.php"
+     * * "relative/path/to/myTool.php"
+     * * "./../relative/path/to/myTool.php"
+     * * "/absolute/path/to/myTool.php"
+     *
+     * @return string
+     */
+    public function getToolFilename(): string
+    {
+        $scriptName = $_SERVER['SCRIPT_NAME'];
+        $lastIndex  = strrpos($scriptName, DIRECTORY_SEPARATOR);
+        if ($lastIndex !== false) {
+            $scriptName = substr($scriptName, $lastIndex + 1);
+        }
+        return "./$scriptName";
+    }
+
+    /**
+     * Deprecation notice
+     *
+     * if you are still using this script, please add a comment of this scripts name into string $jiraNumber
+     * @param string $jiraNumber Jira ticket number to prevent deprecation
+     * @deprecated
+     */
+    public function deprecationNotice(string $jiraNumber): void
+    {
+        /**
+         * Deprecation notice
+         */
+        $this->log->error('/******************************************************************************************/');
+        $this->log->error('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
+        $this->log->error("/*    If you are running this, please add a comment of this scripts name into $jiraNumber    */");
+        $this->log->error(sprintf("Script file: %s", $this->getToolFilename()));
+        $this->log->error('/******************************************************************************************/');
+        $this->log->error('/******************************************************************************************/');
     }
 });

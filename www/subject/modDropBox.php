@@ -39,7 +39,7 @@ if (is_numeric($_GET['delete'] ?? false)) {
             error(5);
         }
 
-        if (!$file->getStorage()->getMimetype()->getInline() || ($_GET['save'] ?? false)) {
+        if ($_GET['save'] ?? false) {
             $attach = "attachment;";
         } else {
             $attach = "";

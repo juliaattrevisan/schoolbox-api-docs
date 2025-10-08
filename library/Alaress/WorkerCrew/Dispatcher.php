@@ -28,8 +28,8 @@ class Dispatcher implements DispatcherInterface
     /** @var LoopInterface */
     protected $loop;
 
-    /** @var Pool */
-    protected $pool;
+    /** @var Pool|null */
+    protected $pool = null;
 
     /** @var TimerInterface|null */
     protected $timer = null;
@@ -81,7 +81,7 @@ class Dispatcher implements DispatcherInterface
      */
     public function __destruct()
     {
-        unset($this->pool);
+        $this->pool = null;
     }
 
 

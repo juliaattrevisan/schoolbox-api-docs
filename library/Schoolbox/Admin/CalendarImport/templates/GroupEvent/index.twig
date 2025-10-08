@@ -1,0 +1,84 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="admin-container row">
+
+    {{ renderAdminNavigation(routeLookup('adminCalendarImport.getCalendarGroupEventsImportForm')) }}
+
+    <div class="admin-content">
+        <div class="small-12 columns">
+            <div class="row">
+                <div class="island small-12">
+                    <section>
+                        <div class="content">
+                            <h3>CSV</h3>
+                            <ol>
+                                <li>Download the template file using the link below.</li>
+                                <li>Edit the file in Microsoft Excel or equivalent editor.</li>
+                                <li>Save the file.</li>
+                                <li>Upload the file by clicking in the attachment area below or dragging and dropping the file.</li>
+                            </ol>
+                        </div>
+                        <div class="component-action">
+                            <section>
+                                <a href="{{ CDN_PREFIX }}/calendar/csv/groupEventsBulkImport.csv" class="button">Download Template</a>
+                            </section>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <h2 class="subheader">Select file</h2>
+
+            <div class="row">
+                <div class="small-12 island">
+                    <form method="post" enctype="multipart/form-data" name="form" id="importForm"
+                    action="{{ routeLookupIfAuthorized('adminCalendarImport.getCalendarGroupEventsImportForm') }}">
+                        <section>
+                            <fieldset class="content">
+                                <div class="small-12 columns">
+                                    {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                                    <input type="hidden" name="bulkadd-file" id="bulkadd-file" />
+                                </div>
+                                <div class="small-12 columns">
+                                    <label>
+                                        Fallback Event Owner
+                                        <p class="meta">The owner of the events.
+                                            This field is optional: it will only be used if the 'Event Owner ID' column is not included.
+                                            If the 'Event Owner ID' column is not included and no user is provided here, the current user will be used.</p>
+                                    </label>
+                                    <label>
+                                        <input name="name" id="name" type="text" placeholder="Search Users" />
+                                    </label>
+                                    <input name="userid" type="hidden" id="userid" size="6" maxlength="6" />
+                                </div>
+                            </fieldset>
+                        </section>
+
+                        <input type="submit" value="Preview" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
+<script type="text/javascript">
+    $(function() {
+        $('#name')
+                .userSelectizeSelector({
+                    ajax: {
+                        data:     {groupID: 0},
+                    }
+                })
+                .on('selectize.item_add', function(event, value) {
+                    $('#userid').val(value)
+                })
+                .on('selectize.item_remove', function() {
+                    $('#userid').val('')
+                });
+    });
+</script>
+{% include "@adminCalendarImport/zone_validation.twig" %}

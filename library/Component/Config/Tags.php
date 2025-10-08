@@ -12,7 +12,7 @@ class Component_Config_Tags extends Component_Config_Abstract
         $key,
         $keyblock,
         $configValue,
-        Component_ControllerAbstract $component = null
+        ?Component_ControllerAbstract $component = null
     ) {
         $page->setVar('COMPONENT_CONFIG_TAGS', $configValue);
     }

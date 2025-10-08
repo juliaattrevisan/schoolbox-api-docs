@@ -31,7 +31,7 @@ $kernel = new Kernel();
 $kernel->setupSentryTrace(__FILE__);
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_IMAGE_TIMEOUT);
 $kernel->getShutdownHandler()->registerFunction(
-    new ResourceLimitExceededHandler(function () use ($width, $height) {
+    new ResourceLimitExceededHandler(function () use ($width, $height): void {
         header('Cache-Control: no-store');
         SitePage::redirectToBrokenImageOfSize($width, $height, 504);
     }),

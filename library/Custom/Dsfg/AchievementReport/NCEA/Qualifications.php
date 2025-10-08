@@ -13,7 +13,6 @@ namespace Custom\Dsfg\AchievementReport\NCEA;
  */
 class Qualifications extends Base
 {
-
     /**
      * Returns data for twig rendering
      *
@@ -27,7 +26,7 @@ class Qualifications extends Base
 
         $query = '
             SELECT *
-            FROM dbo.uvSchoolBoxNCEAResults
+            FROM ' . $this->getDbTableName() . '
             WHERE id = :externalId
             ORDER BY StudentYear DESC
         ';

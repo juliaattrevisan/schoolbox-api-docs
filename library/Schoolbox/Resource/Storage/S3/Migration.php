@@ -112,10 +112,14 @@ class Migration extends CliTool\App
         $this->storageDir    = rtrim($this->getConfig()->get('storage_dir'), DIRECTORY_SEPARATOR);
         $this->byteFormat    = new Alaress_Byte_Format();
 
-        $client                = $this->buildS3ClientOrExit($this->getLogger(), $this->getConfig());
-        $s3Bucket              = trim($this->getConfig()->get('otfs_s3_bucket') ?? "");
-        $this->filesInS3       = $this->getFilesInS3($this->getLogger(), $client, $s3Bucket);
-        $this->fileSystemAwsS3 = new Filesystem(new AwsS3Adapter($client, $s3Bucket, FilesystemFactory::PREFIX_STORAGE));
+        $client = $this->buildS3ClientOrExit($this->getLogger(), $this->getConfig());
+        $s3AltHost = trim($this->getConfig()->get('otfs_s3_alt_host') ?? "");
+        $s3AltBucket = trim($this->getConfig()->get('otfs_s3_alt_bucket') ?? "");
+        $s3Bucket = trim($this->getConfig()->get('otfs_s3_bucket') ?? "");
+        $finalBucket = !empty($s3AltHost) && !empty($s3AltBucket) ? $s3AltBucket : $s3Bucket;
+
+        $this->filesInS3       = $this->getFilesInS3($this->getLogger(), $client, $finalBucket);
+        $this->fileSystemAwsS3 = new Filesystem(new AwsS3Adapter($client, $finalBucket, FilesystemFactory::PREFIX_STORAGE));
 
         $this->migrateFiles();
         $this->listFailedMigrationPaths();

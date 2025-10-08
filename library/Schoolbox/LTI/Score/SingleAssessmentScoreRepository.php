@@ -74,11 +74,27 @@ class SingleAssessmentScoreRepository implements ScoreRepositoryInterface
      */
     public function save(ScoreInterface $score): ScoreInterface
     {
+        /* Assuming LTI comments always get sent to us in plaintext, now that we render it
+         * as rich text, convert this comment to HTML as if it were typed in a rich text editor...
+         *
+         * Converts any html entities to their unicode equivalents, as we still want
+         * "Jana, make sure you place a <p> tag around the text" to show up correctly
+         * and not be rendered as an actual <p> tag.
+         */
+        $comment = \Scrub::linkifyText(\Scrub::text($score->getComment()));
+
+        /** For some reason linkifyText adds a new line at the end, so remove that
+         *  Then convert any remaining \n to <br> tags, as we want to keep the line breaks
+         *  and finally, surround it in an actual <p> tag so that it can be rendered as if ckeditor made it
+         */
+        $comment = nl2br(rtrim($comment, "\n"));
+        $comment = "<p>$comment</p>";
+
         // The easy stuff
         $ltiScore = $this->ltiScoreMapper->createModel()
             ->setScoreGiven($score->getScoreGiven())
             ->setScoreMaximum($score->getScoreMaximum() ?? $this->ltiAssessment->getLineItemScoreMaximum())
-            ->setComment($score->getComment())
+            ->setComment($comment)
             ->setSubmittedAt(
                 new Alaress_Date_Format($score->getTimestamp()->getTimestamp(), Alaress_Date_Format::TIMESTAMP)
             )

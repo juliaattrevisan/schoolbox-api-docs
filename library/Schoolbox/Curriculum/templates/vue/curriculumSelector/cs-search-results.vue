@@ -1,6 +1,7 @@
 <script setup>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
 /**
  * To list all the current search results, also include a select all
@@ -79,9 +80,17 @@ window.Vue.watch(
 
 <style lang="scss" scoped>
 .search-results-container {
-    height: 0; //will animate the results within with the window.Vue.watch() above
+    height: 0; // will animate the results within with the window.Vue.watch() above
     position: relative;
     overflow: hidden;
+}
+
+// as the margin has been removed from the search input when the results are visible, add a margin to the bottom of the results
+// ^foundation-fixes^ - inputs shouldn't have margins, they should always be controlled by a parent element
+.curriculum-selector:has(.search-results-container li) {
+    .search-results-container {
+        margin-bottom: 1rem;
+    }
 }
 
 .search-results {

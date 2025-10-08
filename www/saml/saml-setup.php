@@ -1,5 +1,7 @@
 <?php
 
+use Alaress\Http\Cache;
+use Schoolbox\Admin\Home\SamlCertHelper;
 use Wolfcast\BrowserDetection;
 use Symfony\Component\HttpFoundation\IpUtils;
 use OneLogin\Saml2\Constants;
@@ -51,15 +53,21 @@ try {
     $url = new \Schoolbox\Url\Uri(Config::get('saml_idp_metadata_url'));
     $idpMetadataUrl = (string)$url;
 
-    $cache = new Alaress_Saml_Cache();
-    $idpMetadata = $cache->init($idpMetadataUrl);
+    /** @var Cache $cache */
+    $cache       = $kernel->get('httpClient.cache');
+    $idpMetadata = $cache->request(
+        $idpMetadataUrl,
+        SamlCertHelper::SAML_CACHE_PREFIX,
+        [],
+        SamlCertHelper::SAML_CACHE_TIMEOUT,
+    );
 
     // if cache exists, update $setting info from cache
-    if (file_exists($idpMetadata->getCachedFile()) && !empty($idpMetadata->getStreamContents())) {
+    if (!empty($idpMetadata)) {
         try {
-            $settingsInfo = IdPMetadataParser::injectIntoSettings($settingsInfo, IdPMetadataParser::parseXML($idpMetadata->getStreamContents()));
+            $settingsInfo = IdPMetadataParser::injectIntoSettings($settingsInfo, IdPMetadataParser::parseXML($idpMetadata));
         } catch (Exception $e) {
-            $cache->invalidateCache();
+            $cache->invalidate($idpMetadataUrl);
             $logger->warning("Invalidating cache as we failed to get valid metadata from IDP");
         }
     }

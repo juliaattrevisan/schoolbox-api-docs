@@ -163,12 +163,35 @@ class IndexBuilder extends App
         // filled, and the search feature will not work as expected.  So here we set max_statement_time to 0 (no limit).
         // https://mariadb.com/kb/en/aborting-statements/
         $dbi->execute('SET SESSION max_statement_time = 0;');
-        $rows = $dbi->executeQuery("SHOW VARIABLES LIKE 'max_statement_time'")->fetchAll();
-        $maxStatementTime = $rows[0]['Value'];
-        $logger->info("Checking config: max_statement_time is $maxStatementTime.");
 
-        // Set this on the server as well: I'm not sure this makes a difference
-        $dbi->executeDirectly('SET MAX_STATEMENT_TIME=0');
+        // Set this on the server as well: I'm not sure this makes a difference.
+        // (It doesn't, but leaving this here because the mystery described below remains unsolved).
+        $dbi->executeDirectly('SET SESSION max_statement_time = 0');
+
+        // Debug info - This is included because there is still a mystery regarding the max_statement_time setting
+        // -------------------------------------------------------------------------------------------------------
+        // Errors like 'max_statement_time exceeded' were occurring despite session max_statement_time being set to 0,
+        // and despite efforts to ensure that the same database connection is used when setting max_statement_time and
+        // when running the queries in the IndexBuilders.  (See creation of $dbi above, and see calls to IndexBuilder
+        // constructors).  I suspect that the true value of session max_statement_time is the one reported by the
+        // 'SELECT @@session.max_statement_time', and that our methods of setting it are failing somehow.
+        //     To work around this problem, query-level max_statement_time has been set on the queries that were timing
+        // out.  See BaseBuilder::QUERY_LEVEL_MAX_STATEMENT_TIME.
+        $rows = $dbi->executeQuery("SHOW SESSION VARIABLES LIKE 'max_statement_time'")->fetchAll();
+        $sessionMaxStatementTime = $rows[0]['Value'];
+        $rows = $dbi->executeQuery("SHOW GLOBAL VARIABLES LIKE 'max_statement_time'")->fetchAll();
+        $globalMaxStatementTime = $rows[0]['Value'];
+        $logger->debug("Checking config via SHOW SESSION VARIABLES: global max_statement_time is $globalMaxStatementTime.");
+        $logger->debug("Checking config via SHOW SESSION VARIABLES: session max_statement_time is $sessionMaxStatementTime.");
+        $rows = $dbi->executeQuery("SELECT @@global.max_statement_time, @@session.max_statement_time")->fetchAll();
+        $globalMaxStatementTime = $rows[0]['@@global.max_statement_time'];
+        $sessionMaxStatementTime = $rows[0]['@@session.max_statement_time'];
+        $logger->debug("Checking config via SELECT @@global.max_statement_time: global max_statement_time is $globalMaxStatementTime.");
+        $logger->debug("Checking config via SELECT @@session.max_statement_time: session max_statement_time is $sessionMaxStatementTime.");
+        // Claude AI's explanation of why session max_statement_time can differ when reported by the two methods below:
+        //  * https://claude.ai/share/2e9f1f0e-998c-40ea-abb9-78a97f579c4a
+        // Uncomment the below line to test the max_statement_time setting.
+        //-- TEST --// $dbi->executeQuery('SELECT SLEEP(31)');
 
         // Clear indices if required
         if ($this->getOpt(self::OPT_LONG_CLEAR)) {

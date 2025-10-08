@@ -123,7 +123,7 @@ class Bulk_Folder
         $results = [];
 
         // Parse Header Row
-        $headerRow = fgetcsv($this->fp, 1000, ",");
+        $headerRow = fgetcsv($this->fp, 1000, ",", escape: '');
 
         if ($headerRow === false) {
             throw new UnexpectedValueException("Could not read CSV file.");
@@ -137,7 +137,7 @@ class Bulk_Folder
         $folderCodeColumns  = $this->determineColumnIndexes($headerRow, 'code');
         $yearLevelColumns   = $this->determineColumnIndexes($headerRow, 'year');
         $templateColumn     = $this->determineColumnIndex($headerRow, 'template', false);
-        $sequenceColumn        = $this->determineColumnIndex($headerRow, 'sequence', false);
+        $sequenceColumn     = $this->determineColumnIndex($headerRow, 'sequence', false);
 
         // Check no overlapping matches
         $this->assertColumnIndexesAreUnique([$parentColumn, $folderNameColumn], $folderCodeColumns, $yearLevelColumns);
@@ -149,7 +149,7 @@ class Bulk_Folder
         $this->folderMapper->unregisterCallback(\Schoolbox\Mapper::CALLBACK_POSTSAVE, 'refreshNotificationRedirects');
 
         $rowIdx = 2; // We have already processed the header in row 1
-        while (($row = fgetcsv($this->fp, 1000, ",")) !== false) {
+        while (($row = fgetcsv($this->fp, 1000, ",", escape: '')) !== false) {
             $results[] = $this->processCsvRow(
                 $rowIdx++,
                 $row,
@@ -215,9 +215,9 @@ class Bulk_Folder
         int $templateColumnIndex,
         int $sequenceColumnIndex
     ): array {
-
-        $parentId   = trim($row[$parentColumnIndex]);
-        $folderName = trim($row[$folderNameColumnIndex]);
+        // Note fgetcsv() can return rows containing null values, hence null-coalesces below.
+        $parentId   = trim($row[$parentColumnIndex] ?? '');
+        $folderName = trim($row[$folderNameColumnIndex] ?? '');
 
         // Parent folder and Import Folder name must exist
         if (($parentId === '') || ($folderName === '')) {
@@ -328,9 +328,13 @@ class Bulk_Folder
         }
 
         // Folder Sequence
-        $folderSequence = $sequenceColumnIndex >= 0 ? trim($row[$sequenceColumnIndex]) : '';
+        $folderSequence = $sequenceColumnIndex >= 0 ? trim($row[$sequenceColumnIndex] ?? '') : '';
+        if (!empty($folderSequence) && !ctype_digit($folderSequence)) {
+            $warnings[] = "Sequence value '$folderSequence' is not an integer";
+            $folderSequence = '';
+        }
         if (!empty($folderSequence)) {
-            $newFolder->setSequence($folderSequence);
+            $newFolder->setSequence((int)$folderSequence);
         }
 
         // Persist models to DB.

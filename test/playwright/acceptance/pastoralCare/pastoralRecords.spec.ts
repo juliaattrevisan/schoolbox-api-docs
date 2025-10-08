@@ -55,20 +55,20 @@ test.describe("Pastoral Records", () => {
      */
     test("Create Pastoral Record", async ({ tester, page }) => {
         const profilePage = new ProfilePage(tester, page);
-        const pastoralProfile = new PastoralProfile(tester, page);
-        const createPastoralRecord = new CreatePastoralRecord(tester, page);
-        const studentId = "25";
+        const pastoralProfile = new PastoralProfile(page);
+        const createPastoralRecord = new CreatePastoralRecord(page);
+        const studentId = 25;
         const pastoralTitle = "Automation Test Pastoral Record";
         const pastoralDescription = "This is an automation pastoral record";
         tester.isGoingTo("navigate to the student profile page");
         await profilePage.goto(studentId);
         tester.isGoingTo("click the pastoral care button");
-        await profilePage.clickButton("pastoral");
+        await profilePage.clickButton("Pastoral Care");
         tester.isGoingTo("click create pastoral record and create a pastoral record");
         await pastoralProfile.clickCreatePastoralRecord();
         await createPastoralRecord.typeTitle(pastoralTitle);
         await createPastoralRecord.clickTypeDropdown();
-        await createPastoralRecord.selectTypeSubType("1");
+        await createPastoralRecord.selectType("1");
         const body = page.locator(`#body_public`);
         await tester.fillCKEditorByLocator(body, pastoralDescription);
         await createPastoralRecord.clickVisibilityLink("Role");
@@ -89,8 +89,8 @@ test.describe("Pastoral Records", () => {
      */
 
     test("Comment Pastoral Record", async ({ tester, page, db }) => {
-        const pastoralProfile = new PastoralProfile(tester, page);
-        const studentId = "25";
+        const pastoralProfile = new PastoralProfile(page);
+        const studentId = 25;
         const pastoralComment = "This is an automation pastoral comment";
         tester.isGoingTo("navigate to the student pastoral profile page");
         await pastoralProfile.goto(studentId);
@@ -118,9 +118,9 @@ test.describe("Pastoral Records", () => {
      */
 
     test("Modify Pastoral Record", async ({ tester, page, db }) => {
-        const pastoralProfile = new PastoralProfile(tester, page);
-        const createPastoralRecord = new CreatePastoralRecord(tester, page);
-        const studentId = "25";
+        const pastoralProfile = new PastoralProfile(page);
+        const createPastoralRecord = new CreatePastoralRecord(page);
+        const studentId = 25;
         const pastoralTitle = "This is an automation pastoral record updated";
         tester.isGoingTo("navigate to the pastoral record and click the modify button");
         await pastoralProfile.goto(studentId);
@@ -133,7 +133,7 @@ test.describe("Pastoral Records", () => {
         tester.isGoingTo("get the pastoral record updated");
         await createPastoralRecord.typeTitle(pastoralTitle);
         await createPastoralRecord.clickTypeDropdown();
-        await createPastoralRecord.selectTypeSubType("2");
+        await createPastoralRecord.selectType("2");
         await createPastoralRecord.clickSave();
         tester.isGoingTo("ensure the record are properly updated");
         await pastoralProfile.goto(studentId);
@@ -148,8 +148,8 @@ test.describe("Pastoral Records", () => {
      * ensure the record is no longer presented
      */
     test("Delete Pastoral Record", async ({ tester, page, db }) => {
-        const pastoralProfile = new PastoralProfile(tester, page);
-        const studentId = "25";
+        const pastoralProfile = new PastoralProfile(page);
+        const studentId = 25;
         tester.isGoingTo("navigate to the pastoral profile page and delete a pastoral record");
         await pastoralProfile.goto(studentId);
         const pastoralTitle = "This is an automation pastoral record updated";
@@ -172,20 +172,20 @@ test.describe("Pastoral Records", () => {
 
     test("View Pastoral Record", async ({ tester, page, db }) => {
         const profilePage = new ProfilePage(tester, page);
-        const pastoralProfile = new PastoralProfile(tester, page);
-        const createPastoralRecord = new CreatePastoralRecord(tester, page);
-        const studentId = "25";
+        const pastoralProfile = new PastoralProfile(page);
+        const createPastoralRecord = new CreatePastoralRecord(page);
+        const studentId = 25;
         const pastoralTitle = "Automation Test View Pastoral Record";
         const pastoralDescription = "This is an automation pastoral record";
         tester.isGoingTo("navigate to the student profile page");
         await profilePage.goto(studentId);
         tester.isGoingTo("click the pastoral care button");
-        await profilePage.clickButton("pastoral");
+        await profilePage.clickButton("Pastoral Care");
         tester.isGoingTo("click create pastoral record and create a pastoral record  visible to parents and students");
         await pastoralProfile.clickCreatePastoralRecord();
         await createPastoralRecord.typeTitle(pastoralTitle);
         await createPastoralRecord.clickTypeDropdown();
-        await createPastoralRecord.selectTypeSubType("1");
+        await createPastoralRecord.selectType("1");
         const body = page.locator(`#body_public`);
         await tester.fillCKEditorByLocator(body, pastoralDescription);
         await createPastoralRecord.clickVisibilityLink("Role");
@@ -197,7 +197,7 @@ test.describe("Pastoral Records", () => {
         await pastoralProfile.goto(studentId);
         await expect(page.locator("#pastoralRecords")).toContainText(pastoralTitle);
         tester.isGoingTo("as a parent check the pastoral care records details");
-        await tester.impersonateViaModifyUserPage("Ms Jenni Reed");
+        await tester.impersonateViaUserProfilePage("Ms Jenni Reed");
         await pastoralProfile.goto(studentId);
         const recordId = (await db.grabFromDatabase("pastoral", "id", {
             deleted_at: null,
@@ -208,7 +208,7 @@ test.describe("Pastoral Records", () => {
         await expect(page.locator("#content")).toContainText("Academic");
         await expect(page.locator("#content")).toContainText("Award/Achievement");
         tester.isGoingTo("as a student check the pastoral care records details");
-        await tester.impersonateViaModifyUserPage("Ms Jana Reed");
+        await tester.impersonateViaUserProfilePage("Ms Jana Reed");
         await pastoralProfile.goto(studentId);
         await pastoralProfile.clickPastoralRecord(studentId, recordId);
         await expect(page.locator("#content")).toContainText("Automation Test View Pastoral Record");
@@ -219,7 +219,6 @@ test.describe("Pastoral Records", () => {
     /**
      * Soft deleting data to not impact the tests
      */
-
     test.afterAll(async ({ baseTester, db }) => {
         baseTester.isGoingTo(
             "update delete_at for the data created in this test so it does impact next suite of tests",
@@ -227,17 +226,12 @@ test.describe("Pastoral Records", () => {
         await db.updateInDatabase(
             "pastoral",
             { deleted_at: "2022-01-15 11:22:34" },
-            { heading: "Automation Test Pastoral Record%" },
+            { heading: "Automation Test View Pastoral Record" },
         );
         await db.updateInDatabase(
             "pastoral",
             { deleted_at: "2022-01-15 11:22:34" },
-            { heading: "Automation Test View Pastoral Record%" },
-        );
-        await db.updateInDatabase(
-            "pastoral",
-            { deleted_at: "2022-01-15 11:22:34" },
-            { heading: "This is an automation pastoral record updated%" },
+            { heading: "This is an automation pastoral record updated" },
         );
         await db.updateInDatabase("config", { value: 0 }, { name: "pastoral_student_access" });
     });

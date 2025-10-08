@@ -12,6 +12,10 @@
 
         var config = init(options, $(this));
 
+        const newCommentForm = document.querySelector(config.comment.newForm.id);
+        if (newCommentForm) {
+            setupRichTextEditor(newCommentForm.querySelector("textarea").id);
+        }
         setupSaveComment();
         setupModifyComment();
         setupDeleteComment();
@@ -74,6 +78,25 @@
             var merged = $.extend(defaults, derived, options);
 
             return merged;
+        }
+
+        /**
+         * Add the rich text editor to the main comment form or to an edit form
+         * @param targetId The ID of the <textarea> element to attach the editor to
+         */
+        function setupRichTextEditor(targetId) {
+            document.dispatchEvent(
+                new CustomEvent("EDITOR__CREATE", {
+                    detail: {
+                        targetElements: [`#${targetId}`],
+                        hasTokens: true,
+                        showWordCount: true,
+                        maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
+                        toolbar: "comment_ai",
+                        mirrorChangeEvents: true, // To keep jquery.alaressValidate.js in sync
+                    },
+                }),
+            );
         }
 
         /**
@@ -171,7 +194,16 @@
                         editForm.prepend($('<input type="hidden" />').attr("name", "commentId").val(commentId));
                         editForm.find("img").detach();
                         editForm.removeAttr("id");
-                        editForm.find("textarea").text(data.body);
+                        editForm
+                            .find("textarea")
+                            .val(data.body)
+                            // override the ID and ensure it's visible again (since ckeditor hides the source textarea)
+                            .attr("id", `edit-comment-${commentId}`)
+                            .show();
+
+                        // since we're cloning the form, we also end up cloning the ckeditor...
+                        // so we need to destroy it before we can re-initialize it properly
+                        editForm.find("div.ck").remove();
 
                         var button = editForm.find("[data-comment-post]");
                         button.html("Update");
@@ -210,6 +242,9 @@
                          */
                         row.find("article").addClass("hide").after(editForm);
                         row.find("[data-comment-form]").wrap("<article></article>");
+
+                        // re-initialize the ckeditor
+                        setupRichTextEditor(editForm.find("textarea").attr("id"));
                     },
                     error: function (xhr) {
                         //                        // on failure, indicate failure

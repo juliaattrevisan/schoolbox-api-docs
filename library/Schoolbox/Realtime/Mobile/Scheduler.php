@@ -15,13 +15,19 @@ use Alaress\Async\Notification\Cloud\RateLimitException;
 use Alaress\Async\Notification\Instance\Instance;
 use Alaress\Date\IClock;
 use Alaress\Jitter\IJitter;
+use Alaress\Redis\Async\Event\IEvent;
+use Alaress\Redis\Async\Event\Message;
+use Alaress\Redis\Async\EventListener;
 use Alaress\Scheduler\AbstractScheduler;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use Alaress\WorkerCrew\Pooling\DispatchStrategyInterface;
+use Alaress_Date_Format;
 use DateTime;
 use DateTimeInterface;
 use Psr\Log\LoggerInterface;
 use React\EventLoop\LoopInterface;
+use Schoolbox\Config\ConfigMapper;
+use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\MobileApp\ServiceManager;
 
@@ -29,8 +35,31 @@ use Schoolbox\MobileApp\ServiceManager;
  * The mobile app scheduler: responsible for forwarding notifications to mobile
  * apps.
  */
-class Scheduler extends AbstractScheduler implements IConsumer
+class Scheduler extends AbstractScheduler implements IConsumer, EventListener
 {
+    /**
+     * Is the blackout setting enabled?
+     *
+     * This controls the times during which mobile app notifications are sent:
+     * if this is disabled, notifications may be sent at any time.
+     */
+    private bool $blackoutEnabled = false;
+
+    /**
+     * If this is set, and `$this->blackoutEnabled`: notifications won't be sent
+     * after this time each day.
+     */
+    private ?string $blackoutStartTime = null;
+
+    /**
+     * If this is set, and `$this->blackoutEnabled`: notifications scheduled to
+     * be sent after `$this->blackoutStartTime` will be sent at this time.
+     *
+     * If this is before `$this->blackoutStartTime`, this will be interpreted as
+     * sending the notification at this time the next day.
+     */
+    private ?string $blackoutEndTime = null;
+
     /**
      * Constructor
      *
@@ -38,11 +67,14 @@ class Scheduler extends AbstractScheduler implements IConsumer
      * @param DispatchStrategyInterface $dispatchStrategy
      * @param LoggerInterface           $log
      * @param IClock                    $clock
-     * @param ServiceManager            $serviceManager   The mobile app service manager: used to send messages to
-     *                                                    mobile apps.
-     * @param IJitter                   $jitter           Jitter: used to determine how many times to retry send of a
-     *                                                    mobile notification, and also of how long to wait between
-     *                                                    retries.
+     * @param ServiceManager            $serviceManager    The mobile app service manager: used to send messages to
+     *                                                     mobile apps.
+     * @param IJitter                   $jitter            Jitter: used to determine how many times to retry send of a
+     *                                                     mobile notification, and also of how long to wait between
+     *                                                     retries.
+     * @param IConfigLoader             $config            Config loader: used to load blackout settings.
+     *                                                     These settings may be changed externally: in that case, the
+     *                                                     config will be reloaded.
      */
     public function __construct(
         private LoopInterface $loop,
@@ -51,8 +83,11 @@ class Scheduler extends AbstractScheduler implements IConsumer
         IClock $clock,
         private ServiceManager $serviceManager,
         private IJitter $jitter,
+        private IConfigLoader $config,
     ) {
         parent::__construct($this->loop, $dispatchStrategy, $log, $clock);
+        $this->log->notice('Loading blackout period settings');
+        $this->loadBlackoutSettings();
     }
 
     /**
@@ -91,7 +126,6 @@ class Scheduler extends AbstractScheduler implements IConsumer
                 sprintf(
                     'Message received payload is not a %s (received: %s): not retrying delivery',
                     Instance::class,
-                    /** @phpstan-ignore-next-line - just in case this is not an object at all **/
                     is_object($payload) ? get_class($payload) : gettype($payload),
                 ),
             );
@@ -135,6 +169,28 @@ class Scheduler extends AbstractScheduler implements IConsumer
     }
 
     /**
+     * Handle the given redis event
+     *
+     * @param IEvent $event
+     * @return void
+     */
+    public function handle(IEvent $event)
+    {
+        if (!$event instanceof Message) {
+            // ignore pings
+            return;
+        }
+
+        // comes in the form 'mobiled.vagrantx.reload'
+        [, , $action] = explode('.', $event->getChannel());
+        if ($action === 'refreshConfiguration') {
+            $this->log->notice('refreshConfiguration signal received: reloading blackout period settings');
+            $this->config->dropCache();
+            $this->loadBlackoutSettings();
+        }
+    }
+
+    /**
      * Internal method for attempting push of messages to service manager.
      *
      * @param string    $instanceId
@@ -156,6 +212,53 @@ class Scheduler extends AbstractScheduler implements IConsumer
                 $attemptNum,
             )
         );
+
+        // Delay delivery
+        if ($this->blackoutEnabled && $this->blackoutStartTime && $this->blackoutEndTime) {
+            if ($payload->retrieveDeliveryMethod() === Instance::DELIVERY_ALERT) {
+                $this->log->notice(
+                    sprintf(
+                        'Message %s:%s delivery type is alert: not attempting to delay',
+                        $payload->getBaseHash(),
+                        $payload->getParamHash(),
+                    )
+                );
+            } else {
+                /* generate the delay or null if not in quiet period
+                 */
+                // Is the current time within the quiet period?
+                $now         = Alaress_Date_Format::now();
+                $currentTime = $now->getUsingFormat('H:i');
+
+                [$delay, $jitter, $delayTimestamp] = (new DelayGen())->getQuietPeriod(
+                    $this->blackoutStartTime,
+                    $this->blackoutEndTime,
+                    $currentTime
+                );
+
+                if ($delay) {
+                    $this->log->notice(
+                        sprintf(
+                            'Message %s:%s delivery delayed until %ss after end of quiet period (%s-%s) (exact time: %s) (delaying: %s seconds)',
+                            $payload->getBaseHash(),
+                            $payload->getParamHash(),
+                            $jitter,
+                            $this->blackoutStartTime,
+                            $this->blackoutEndTime,
+                            Alaress_Date_Format::newFromTimestamp($delayTimestamp)->toRfc3339String(),
+                            $delay
+                        )
+                    );
+
+                    $this->loop->addTimer(
+                        $delay,
+                        fn () => $this->attemptPush($instanceId, $userId, $payload, $resolver, 0),
+                    );
+                    return;
+                }
+            }
+        }
+
         try {
             $this->serviceManager->push($userId, $payload);
             $resolver->acknowledge();
@@ -231,5 +334,79 @@ class Scheduler extends AbstractScheduler implements IConsumer
             $resolver->acknowledge();
             return;
         }
+    }
+
+    /**
+     * Load blackout settings from config
+     *
+     * @return void
+     */
+    private function loadBlackoutSettings(): void
+    {
+        $blackoutEnabled   = (bool)$this->config->get(ConfigMapper::NAME_NOTIFICATION_BLACKOUT_ENABLED);
+        $blackoutStartTime = $this->config->get(ConfigMapper::NAME_NOTIFICATION_BLACKOUT_START_TIME);
+        $blackoutEndTime   = $this->config->get(ConfigMapper::NAME_NOTIFICATION_BLACKOUT_END_TIME);
+
+        if ($blackoutEnabled) {
+            // Validate blackout start and end, clearing if invalid
+            if (!$this->validateTimeValue($blackoutStartTime)) {
+                $this->log->warning(
+                    sprintf(
+                        'Blackout start %s must be a HH:MM time: disabling blackout period',
+                        $blackoutStartTime
+                    ),
+                );
+                $blackoutStartTime = null;
+            }
+            if (!$this->validateTimeValue($blackoutEndTime)) {
+                $this->log->warning(
+                    sprintf(
+                        'Blackout end value %s must be a HH:MM time: disabling blackout period',
+                        $blackoutEndTime
+                    ),
+                );
+                $blackoutEndTime = null;
+            }
+
+            // If one of the above steps cleared blackout start or end,
+            // ensure both are cleared
+            if (!isset($blackoutStartTime, $blackoutEndTime)) {
+                $blackoutStartTime = null;
+                $blackoutEndTime   = null;
+            } else {
+                $this->log->notice(
+                    sprintf(
+                        'Blackout period enabled (start: %s, end: %s%s)',
+                        $blackoutStartTime,
+                        $blackoutEndTime,
+                        $blackoutEndTime < $blackoutStartTime ? ' next day' : '',
+                    ),
+                );
+            }
+        } else {
+            $this->log->notice('Blackout period not enabled');
+            $blackoutStartTime = null;
+            $blackoutEndTime   = null;
+        }
+
+        $this->blackoutEnabled   = $blackoutEnabled;
+        $this->blackoutStartTime = $blackoutStartTime;
+        $this->blackoutEndTime   = $blackoutEndTime;
+    }
+
+    /**
+     * Validates `$value` is a `HH:MM` time.
+     *
+     * @param string $value
+     * @return bool
+     */
+    private function validateTimeValue(string $value): bool
+    {
+        if (!preg_match('/^(?P<hour>\d+):(?P<minute>\d+)$/', $value, $matches)) {
+            return false;
+        }
+        $hour   = intval($matches['hour']);
+        $minute = intval($matches['minute']);
+        return ($hour >= 0 && $hour <= 23 && $minute >= 0 && $minute <= 59);
     }
 }

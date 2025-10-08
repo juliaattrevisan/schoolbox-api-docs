@@ -11,6 +11,12 @@ use Schoolbox\Permission\Access\UserAccess;
 
 class Component_Homepage_FolderListController extends Component_Homepage_ControllerAbstract
 {
+    /**
+     * Available sort fields for this component.
+     *
+     * @var string[]
+     */
+    protected $sortFields = ['Name', 'Sequence', 'Created'];
 
     /**
      * Prepares data for the render function. Business logic.
@@ -34,7 +40,7 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
      * @param String $templateHandle
      * @return boolean
      */
-    public function renderTemplate($templateHandle)
+    public function renderTemplate($templateHandle): bool
     {
         if (!parent::loadTemplate($templateHandle, 'folderList')) {
             return false;
@@ -55,9 +61,34 @@ class Component_Homepage_FolderListController extends Component_Homepage_Control
         );
 
         $allFolders = $treeBuilder->buildChildNodes($this->getSource()->getId());
-        \uasort($allFolders, function (array $a, array $b) {
-            return \strnatcasecmp($a['text'], $b['text']);
-        });
+        \uasort(
+            $allFolders,
+            function (array $a, array $b): int {
+                /** @var null|Alaress_Date_Format $createdAtA */
+                $createdAtA = $a['createdAt'];
+
+                /** @var null|Alaress_Date_Format $createdAtB */
+                $createdAtB = $b['createdAt'];
+
+                // Note cases below must match values in $this->sortFields.
+                $config = $this->getConfig();
+                $comparisonResult = match ($config['sort'] ?? 'Name') {
+                    'Name' => \strnatcasecmp($a['text'], $b['text']),
+                    'Sequence' => $a['sequence'] <=> $b['sequence'],
+                    'Created' => $createdAtA?->getDatabase() <=> $createdAtB?->getDatabase(),
+                    default => throw new InvalidArgumentException("Unknown sort method '{$config['sort']}'."),
+                };
+
+                if ($comparisonResult === 0) {
+                    // If folders compare equally on 1st sort field, sort on folder.id ascending.
+                    // This is done to match the default sort order used on the Modify Course page.
+                    $comparisonResult = $a['id'] <=> $b['id'];
+                }
+
+                // Expected values of $config['sortdir'] are 'asc' and 'desc'.  See Component/Config/Sortdir.php.
+                return $comparisonResult * (($config['sortdir'] ?? '') === 'asc' ? 1 : -1);
+            }
+        );
 
         //setup block for submission button
         $this->setVar('FOLDER_CAT_ID', $this->getSource()->getId());

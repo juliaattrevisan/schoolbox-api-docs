@@ -147,12 +147,17 @@ class FileNester extends CliTool\App
      */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
+
         $this->startTime = time();
         $this->getLogger()->info(sprintf("S3 File Copy/Move to top-level directory '/%s'", FilesystemFactory::PREFIX_STORAGE));
         $this->parseArgs();
         $this->buildDependencies();
         $this->processFiles();
         $this->printResults();
+
+        $this->deprecationNotice("SA-19334");
     }
 
 
@@ -181,7 +186,7 @@ class FileNester extends CliTool\App
         $this->getLogger()->log(
             $this->actionMode === self::ACTION_MOVE ? Logger::WARNING : Logger::NOTICE,
             "Action mode: '{$this->actionMode}' - original file will be " .
-            ($this->actionMode === self::ACTION_MOVE ? 'DELETED' : 'RETAINED')
+                ($this->actionMode === self::ACTION_MOVE ? 'DELETED' : 'RETAINED')
         );
     }
 
@@ -197,6 +202,11 @@ class FileNester extends CliTool\App
         $s3SecretKey = trim($this->getConfig()->get('otfs_s3_cred_secret') ?? "");
         $s3Region    = trim($this->getConfig()->get('otfs_s3_region') ?? "");
         $s3Version   = trim($this->getConfig()->get('otfs_s3_version') ?? "");
+        $s3AltHost   = trim($this->getConfig()->get('otfs_s3_alt_host') ?? "");
+        $s3AltAccessKey       = trim($this->getConfig()->get('otfs_s3_alt_access_key') ?? "");
+        $s3AltSecretAccessKey = trim($this->getConfig()->get('otfs_s3_alt_secret_key') ?? "");
+        $s3AltBucket         = trim($this->getConfig()->get('otfs_s3_alt_bucket') ?? "");
+        $s3AltRegion         = trim($this->getConfig()->get('otfs_s3_alt_region') ?? "");
         $this->bucketName = trim($this->getConfig()->get('otfs_s3_bucket') ?? "");
 
         $otfsAdapter = $this->getConfig()->get(ConfigMapper::NAME_OTFS_ADAPTER);
@@ -228,14 +238,24 @@ class FileNester extends CliTool\App
             }
         }
 
-        $this->s3Client = new S3Client([
+        $cfg = [
             'credentials' => [
                 'key'    => $s3AccessKey,
                 'secret' => $s3SecretKey,
             ],
             'region'      => $s3Region,
             'version'     => $s3Version,
-        ]);
+        ];
+
+        if (!empty($s3AltHost)) {
+            $cfg['endpoint'] = $s3AltHost;
+            $cfg['credentials']['key'] = $s3AltAccessKey;
+            $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
+            $cfg['region'] = $s3AltRegion;
+            $this->bucketName = !empty($s3AltBucket) ? $s3AltBucket : $this->bucketName;
+        }
+
+        $this->s3Client = new S3Client($cfg);
     }
 
 

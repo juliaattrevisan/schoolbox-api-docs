@@ -42,6 +42,9 @@ $app = new class extends CliTool\App {
             'guests_disabled'   => 'SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled <> 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "guest")',
             'guests_deleted'    => 'SELECT count(*) FROM user u WHERE u.deleted_at IS not NULL AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = "guest")',
             'superusers'        => 'SELECT count(*) FROM user u JOIN superusers s on u.id = s.id WHERE u.deleted_at IS NULL',
+            'students_junior'   => "SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled = 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = 'student') AND u.year_id IN ( SELECT id FROM lu_year_level WHERE REGEXP_REPLACE(name, '[^0-9]', '') != '' AND CAST(REGEXP_REPLACE(name, '[^0-9]', '') AS UNSIGNED) < 7 OR name LIKE 'ELC' OR name like 'Prep%' OR name like 'Kind%')",
+            'students_senior'   => "SELECT count(*) FROM user u WHERE u.deleted_at IS NULL AND enabled = 1 AND u.group_id IN (SELECT id FROM `groups` g WHERE g.group_type = 'student') AND u.year_id IN ( SELECT id FROM lu_year_level WHERE REGEXP_REPLACE(name, '[^0-9]', '') != '' AND CAST(REGEXP_REPLACE(name, '[^0-9]', '') AS UNSIGNED) > 6)",
+            'linked_users'      => 'SELECT count(*) FROM user_link',
 
             //Moderators
             'calendar_moderator'     => 'SELECT count(distinct u.id) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_CALENDAR . ' AND type=' . UserAccess::ACCESS_FULL, // distinct u.id, so we can see the count of humans, not service permissions.  A single human can have multiple Calendar service permissions.
@@ -57,18 +60,37 @@ $app = new class extends CliTool\App {
             'lms_moderator'          => 'SELECT count(*) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_LMS . ' AND type=' . UserAccess::ACCESS_FULL,
             'impersonator_moderator' => 'SELECT count(distinct u.id) FROM user u JOIN userAccess uA on u.id = uA.uid WHERE u.deleted_at is null and service = ' . UserAccess::SERVICE_IMPERSONATOR . ' AND type=' . UserAccess::ACCESS_FULL, // distinct u.id, so we can see the count of humans, not service permissions.  A single human can have multiple Impersonator service permissions.
 
-
             //Logins
             'unique_logins_yesterday' => "SELECT COUNT(DISTINCT username) FROM login_log WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 1 DAY) AND date < DATE(NOW())",
             'unique_logins_yesterday_student' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 1 DAY) AND date < DATE(NOW()) AND group_type = 'student'",
             'unique_logins_yesterday_staff' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 1 DAY) AND date < DATE(NOW()) AND group_type = 'staff'",
             'unique_logins_yesterday_parent' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 1 DAY) AND date < DATE(NOW()) AND group_type = 'parent'",
             'unique_logins_yesterday_guest' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 1 DAY) AND date < DATE(NOW()) AND group_type = 'guest'",
+            'unique_logins_week' => "SELECT COUNT(DISTINCT username) FROM login_log WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 7 DAY) AND date < DATE(NOW())",
+            'unique_logins_week_student' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 7 DAY) AND date < DATE(NOW()) AND group_type = 'student'",
+            'unique_logins_week_staff' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 7 DAY) AND date < DATE(NOW()) AND group_type = 'staff'",
+            'unique_logins_week_parent' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 7 DAY) AND date < DATE(NOW()) AND group_type = 'parent'",
+            'unique_logins_week_guest' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 7 DAY) AND date < DATE(NOW()) AND group_type = 'guest'",
+            'unique_logins_fortnight' => "SELECT COUNT(DISTINCT username) FROM login_log WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 14 DAY) AND date < DATE(NOW())",
+            'unique_logins_fortnight_student' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 14 DAY) AND date < DATE(NOW()) AND group_type = 'student'",
+            'unique_logins_fortnight_staff' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 14 DAY) AND date < DATE(NOW()) AND group_type = 'staff'",
+            'unique_logins_fortnight_parent' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 14 DAY) AND date < DATE(NOW()) AND group_type = 'parent'",
+            'unique_logins_fortnight_guest' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 14 DAY) AND date < DATE(NOW()) AND group_type = 'guest'",
+            'unique_logins_month' => "SELECT COUNT(DISTINCT username) FROM login_log WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 30 DAY) AND date < DATE(NOW())",
+            'unique_logins_month_student' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 30 DAY) AND date < DATE(NOW()) AND group_type = 'student'",
+            'unique_logins_month_staff' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 30 DAY) AND date < DATE(NOW()) AND group_type = 'staff'",
+            'unique_logins_month_parent' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 30 DAY) AND date < DATE(NOW()) AND group_type = 'parent'",
+            'unique_logins_month_guest' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 30 DAY) AND date < DATE(NOW()) AND group_type = 'guest'",
             'logins_guests'    => 'SELECT count(*) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON user.group_id = `groups`.id WHERE login = 1 and `groups`.group_type = "guest"',
             'logins_staff'    => 'SELECT count(*) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON user.group_id = `groups`.id WHERE login = 1 and `groups`.group_type = "staff"',
             'logins_parent'    => 'SELECT count(*) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON user.group_id = `groups`.id WHERE login = 1 and `groups`.group_type = "parent"',
             'logins_student'    => 'SELECT count(*) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON user.group_id = `groups`.id WHERE login = 1 and `groups`.group_type = "student"',
             'logins'            => 'SELECT count(*) FROM login_log l WHERE login = 1',
+            'unique_logins_yesterday_student_junior' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 1 DAY) AND date < DATE(NOW()) AND group_type = 'student' AND
+                                                            user.year_id IN ( SELECT id FROM lu_year_level WHERE REGEXP_REPLACE(name, '[^0-9]', '') != '' AND CAST(REGEXP_REPLACE(name, '[^0-9]', '') AS UNSIGNED) < 7 OR name LIKE 'ELC' OR name like 'Prep%' OR name like 'Kind%')",
+            'unique_logins_yesterday_student_senior' => "SELECT COUNT( DISTINCT login_log.username) FROM login_log JOIN user ON user.username = login_log.username JOIN `groups` ON group_id = `groups`.id WHERE login = 1 AND date >= SUBDATE(DATE(NOW()), INTERVAL 1 DAY) AND date < DATE(NOW()) AND group_type = 'student' AND
+                                                            user.year_id IN ( SELECT id FROM lu_year_level WHERE REGEXP_REPLACE(name, '[^0-9]', '') != '' AND CAST(REGEXP_REPLACE(name, '[^0-9]', '') AS UNSIGNED) > 6)",
+            'user_assume' => 'SELECT COUNT(*) FROM user_assume_log',
 
             //LMS
             'classes'           => 'SELECT count(f.id) from folder f JOIN folder_code fc ON f.id = fc.folder_id where f.deleted_at is null and fc.deleted_at is null',
@@ -82,6 +104,8 @@ $app = new class extends CliTool\App {
             'assessment_parent_views'     => 'SELECT COUNT(*) FROM assessment_view WHERE user_id != participant_id',
             'lti_response'      => 'SELECT COUNT(*) FROM lti_assessment_score WHERE deleted_at IS NULL AND is_response = 1',
             'lti_feedback'      => 'SELECT COUNT(*) FROM lti_assessment_score WHERE deleted_at IS NULL AND is_feedback = 1',
+            'quiz_attempts'     => 'SELECT COUNT(*) FROM assess_attempt WHERE deleted_at IS NULL AND learnosity_reference IS NOT NULL',
+            'quiz_feedback'     => 'SELECT COUNT(*) FROM quiz_feedback WHERE deleted_at IS NULL',
             'course_unit_implementations' => 'SELECT count(*) FROM course_unit_implementation ci WHERE ci.deleted_at IS NULL',
             'course_unit_specifications'  => 'SELECT count(*) FROM course_unit_specification cs WHERE cs.deleted_at IS NULL',
             'course_specifications'       => 'SELECT COUNT(*) FROM course_specification WHERE deleted_at IS NULL',
@@ -90,6 +114,7 @@ $app = new class extends CliTool\App {
             'course_quiz'       => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN assess ON assessment.id = assess.assessment_id WHERE assess.availability = "assess" AND assessment.deleted_at IS NULL',
             'course_tasks'      => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN task ON assessment.id = task.assessment_id WHERE assessment.deleted_at IS NULL',
             'course_projects'   => 'SELECT COUNT(*) FROM assessment JOIN assessment_course_unit_specification a on assessment.id = a.assessment_id JOIN project ON assessment.id = project.assessment_id WHERE assessment.deleted_at IS NULL',
+            'course_framework'  => 'SELECT count(*) FROM courseTemplates WHERE deleted_at IS NULL',
             'assessments'       => 'SELECT count(*) FROM assessment WHERE deleted_at IS NULL',
             'quizzes'           => 'SELECT count(*) FROM assess WHERE availability = "assess" AND deleted_at IS NULL',
             'due_works'         => 'SELECT count(*) FROM submission_box sb JOIN assessment a ON a.id = sb.assessment_id WHERE a.deleted_at IS NULL',
@@ -119,51 +144,10 @@ $app = new class extends CliTool\App {
             'turnitin_assessments' => 'SELECT COUNT(*) FROM turnitin_group WHERE status = "complete" AND deleted_at is null',
             'turnitin_errors'   => 'SELECT count(*) FROM turnitin_report WHERE status = "error" and deleted_at is null',
             'summative_report'  => 'SELECT count(*) FROM summative_report WHERE deleted_at is null',
+            'activity_plans'  => 'SELECT count(*) FROM participant_plan WHERE deleted_at is null AND is_dynamic = 0',
+            'plan_participants'  => 'SELECT count(*) FROM participant JOIN participant_plan ON participant.participant_plan_id = participant_plan.id WHERE excluded_at is null AND is_dynamic = 0 AND participant_plan.deleted_at is null',
+            'plan_excluded'  => 'SELECT count(*) FROM participant WHERE excluded_at is not null',
 
-            // Quiz info
-            'quiz_with_multiple_sections'   => 'SELECT COUNT(*) from (SELECT COUNT(*) AS numSections
-                                          FROM assess
-                                                   INNER JOIN assess_section ON assess.assess_id = assess_section.assess_id
-                                          where assess.deleted_at is null
-                                            and assess.availability = "assess"
-                                            and assess_section.deleted_at is null
-                                          GROUP BY assess.assess_id
-                                          having numSections > 1) as moreThan1;',
-            'quiz_questions_over_50'   => 'SELECT COUNT(*) from (select distinct count(*) as numQuestions
-                                          from assess
-                                                   inner join assess_section on assess.assess_id = assess_section.assess_id
-                                                   inner join assess_question on assess_section.section_id = assess_question.section_id
-                                          where assess.deleted_at is null
-                                            and assess.availability = "assess"
-                                            and assess_section.deleted_at is null
-                                            and assess_question.deleted_at is null
-                                          group by assess.assess_id
-                                          having numQuestions > 49) as numQuestions;',
-            'quiz_questions_over_100'   => 'SELECT COUNT(*) from (select distinct count(*) as numQuestions
-                                          from assess
-                                                   inner join assess_section on assess.assess_id = assess_section.assess_id
-                                                   inner join assess_question on assess_section.section_id = assess_question.section_id
-                                          where assess.deleted_at is null
-                                            and assess.availability = "assess"
-                                            and assess_section.deleted_at is null
-                                            and assess_question.deleted_at is null
-                                          group by assess.assess_id
-                                          having numQuestions > 99) as numQuestions;',
-            'quiz_random_sections'      => '
-                                        select distinct count(*) as num
-                                        from assess
-                                        inner join assess_section on assess.assess_id = assess_section.assess_id
-                                        where random != 0
-                                        and assess.deleted_at is null
-                                        and assess.availability = "assess"
-                                        and assess_section.deleted_at is null',
-            'quiz_sections'     => '
-                                    select count(*) as num
-                                    from assess
-                                    inner join assess_section on assess.assess_id = assess_section.assess_id
-                                    and assess.deleted_at is null
-                                    and assess.availability = "assess"
-                                    and assess_section.deleted_at is null',
 
             // More quiz info:
             // Quizzes which for some reason have no Learnosity reference
@@ -217,28 +201,6 @@ $app = new class extends CliTool\App {
                 AND deleted_at IS NULL
             ",
 
-            // Quizzes with titles that contain utf8 chars
-            // these if imported prior to SA-17115 (2024-02-05)
-            // they may be in a hidden failed state, where we have a learnosity ID, but they didn't save anything
-            'quiz_title_utf8' => "
-                SELECT COUNT(*) FROM assess
-                WHERE LENGTH(title) != CHAR_LENGTH(title)
-                AND availability = 'assess'
-                AND deleted_at IS NULL;
-            ",
-
-            // Quizzes with short question answers longer than 250 characters will make the field blank
-            'quiz_short_ans_250' => "
-                select count(*) from assess
-                join assess_section on (assess_section.assess_id = assess.assess_id AND assess_section.deleted_at IS NULL)
-                join assess_question on (assess_question.section_id = assess_section.section_id AND assess_question.deleted_at IS NULL)
-                join assess_answer on (assess_question.question_id = assess_answer.question_id AND assess_answer.deleted_at IS NULL)
-                join assess_luQuestionType on (assess_luQuestionType.type_id = assess_question.type_id AND assess_luQuestionType.moodle = 'shortanswer' AND assess_luQuestionType.availability = 'assess')
-                where CHAR_LENGTH(assess_answer.answer) > 250
-                  AND assess.availability = 'assess'
-                  AND assess.deleted_at IS NULL;
-            ",
-
             //Homepages
             'forum_posts'       => 'SELECT count(*) FROM `forumPost` WHERE `deleted_at` IS NULL',
             'forum_thread'      => 'SELECT count(*) FROM forumThread WHERE `deleted_at` IS NULL',
@@ -252,6 +214,8 @@ $app = new class extends CliTool\App {
             'chat'              => 'SELECT count(*) FROM chat',
             'blog'              => 'SELECT count(*) FROM blog WHERE deleted_at IS NULL',
             'etherpad'          => 'SELECT count(*) FROM etherpad_pad WHERE deleted_at IS NULL',
+            'google_file'       => 'SELECT count(*) FROM google_file WHERE deleted_at IS NULL',
+            'dropbox'           => 'SELECT count(*) FROM dropbox WHERE deleted_at IS NULL',
             'groups'            => 'SELECT COUNT(*) FROM userGroups JOIN folder f on userGroups.cid = f.id WHERE f.deleted_at is null',
             'groups_open'       => 'SELECT COUNT(*) FROM userGroups JOIN folder f on userGroups.cid = f.id WHERE userGroups.type = ' . \Schoolbox\Resource\Group::FREE_GROUP . ' AND f.deleted_at is null',
             'groups_moderated'  => 'SELECT COUNT(*) FROM userGroups JOIN folder f on userGroups.cid = f.id WHERE userGroups.type = ' . \Schoolbox\Resource\Group::MODERATED_GROUP . ' AND f.deleted_at is null',
@@ -300,6 +264,13 @@ $app = new class extends CliTool\App {
             'pastoral_actions_completed' => 'SELECT COUNT(*) FROM pastoral_record_action WHERE completed = 1 AND deleted_at IS NULL',
             'pastoral_comment'   => 'SELECT COUNT(*) FROM pastoral_comment WHERE deleted_at IS NULL',
             'pastoral_reports'    => 'SELECT COUNT(*) FROM pastoral_report WHERE deleted_at IS NULL',
+            'pastoral_record_view' => 'SELECT COUNT(*) FROM pastoral_audit WHERE pastoral_id IS NOT NULL',
+            'pastoral_user_view' => 'SELECT COUNT(*) FROM pastoral_audit WHERE pastoral_id IS NULL AND report_id is NULL AND search IS NULL',
+            'pastoral_report_view' => 'SELECT COUNT(*) FROM pastoral_audit WHERE report_id is NOT NULL',
+            'pastoral_records_active' => 'SELECT count(*) FROM `pastoral` WHERE (expires_at IS NULL OR expires_at > NOW()) and deleted_at IS NULL',
+            'pastoral_records_archived' =>  'SELECT count(*) FROM `pastoral` WHERE expires_at <= NOW() and deleted_at IS NULL',
+
+
 
             //EOTC
             'eotc_events'       => 'SELECT count(*) FROM eotc_event WHERE deleted_at IS NULL',
@@ -311,7 +282,11 @@ $app = new class extends CliTool\App {
             'curriculum_rubric_capability'  => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_rubric_capability cnfrc on curriculum_node.id = cnfrc.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
             'curriculum_folder'             => 'SELECT count(*) FROM curriculum_node JOIN curriculum_node_for_category cnfc on curriculum_node.id = cnfc.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
             'curriculum_badge'              => 'SELECT count(*) FROM curriculum_node JOIN curriculum_badge cb on curriculum_node.id = cb.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
-            'curriculum_evidence'           => 'SELECT count(*) FROM curriculum_node JOIN curriculum_evidence ce on curriculum_node.id = ce.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
+            /* This should be curriculum_moment at some point,
+             * to reflect that we're collecting usage about learning moments,
+             * not their evidence.
+             */
+            'curriculum_evidence'           => 'SELECT count(*) FROM curriculum_node JOIN curriculum_moment cm on curriculum_node.id = cm.curriculum_node_id WHERE curriculum_node.deleted_at IS NULL',
 
             //Mobile Users
             'mobile_registrations'      => 'SELECT count(*) FROM `mobile_app_registry` WHERE mobile_app_registry.deleted_at is null',
@@ -323,6 +298,7 @@ $app = new class extends CliTool\App {
             'mobile_firebase_browser'   => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Firebase") WHERE device_id = "Browser" AND mobile_app_registry.deleted_at is null',
             'mobile_firebase_ios'       => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Firebase") WHERE device_id = "iOS" AND mobile_app_registry.deleted_at is null',
             'mobile_tass_orbit'         => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "TassOrbit") WHERE mobile_app_registry.deleted_at is null',
+            'mobile_firebase_inklass'   => 'SELECT count(*) FROM `mobile_app_registry` JOIN mobile_app on (mobile_app_registry.app_id = mobile_app.id AND mobile_app.deleted_at IS NULL AND provider = "Firebase") WHERE device_id like "%Inklass%" AND mobile_app_registry.deleted_at is null',
 
             //Calendar
             'event_school'      => 'SELECT COUNT(*) FROM event WHERE type = ' . Schoolbox\Calendar\Event::ACCESS_CAMPUS . ' AND deleted_at IS NULL',
@@ -335,10 +311,11 @@ $app = new class extends CliTool\App {
             'files'             => 'SELECT COUNT(*) FROM file WHERE deleted_at IS NULL',
             'links'             => 'SELECT count(*) FROM link WHERE deleted_at IS NULL',
             'folders'           => 'SELECT count(*) FROM folder WHERE deleted_at IS NULL',
+            'myfile'            =>  'SELECT count(*) FROM myFile WHERE deleted_at IS NULL',
 
             //Learning Moments / Evidence
-            'evidence'          => 'SELECT count(*) FROM evidence WHERE deleted_at IS NULL',
-            'evidence_comments' => 'SELECT count(*) FROM evidence JOIN discussion_thread_comment dtc on evidence.discussion_thread_id = dtc.discussion_thread_id',
+            'evidence'          => 'SELECT count(*) FROM moment WHERE deleted_at IS NULL',
+            'evidence_comments' => 'SELECT count(*) FROM moment JOIN discussion_thread_comment dtc on moment.discussion_thread_id = dtc.discussion_thread_id',
 
             //Badges
             'badges'            => 'SELECT count(*) FROM badge WHERE deleted_at IS NULL',
@@ -353,6 +330,68 @@ $app = new class extends CliTool\App {
             //AI Usage
             'openai_success'    => 'SELECT COUNT(*) FROM openai_log WHERE return_code = 200',
             'openai_error'      => 'SELECT COUNT(*) FROM openai_log WHERE return_code != 200',
+            'openai_input_tokens' => 'SELECT SUM(input_tokens) FROM openai_log WHERE return_code = 200',
+            'openai_output_tokens' => 'SELECT SUM(output_tokens) FROM openai_log WHERE return_code = 200',
+            'openai_tokens' => 'SELECT SUM(output_tokens) + SUM(input_tokens) FROM openai_log WHERE return_code = 200',
+
+            //image tokens
+            'openai_input_tokens_image' => 'SELECT SUM(input_tokens) FROM openai_log WHERE return_code = 200 AND feature = "image"',
+            'openai_output_tokens_image' => 'SELECT SUM(output_tokens) FROM openai_log WHERE return_code = 200 AND feature = "image"',
+            'openai_tokens_image' => 'SELECT SUM(output_tokens) + SUM(input_tokens) FROM openai_log WHERE return_code = 200 AND feature = "image"',
+
+            // old ai metrics (not recording the ai feature (chat, lessonplan, image))
+            'openai_model_gpt-4o' => "SELECT count(*) FROM openai_log WHERE (model like 'gpt-4o%' and model not like '%mini%')",
+            'openai_model_gpt-4o-mini' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4o-mini%'",
+            'openai_model_gpt-41' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4.1%' and model not like '%mini%'",
+            'openai_model_gpt-41-mini' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4.1-mini%'",
+            'openai_model_unknown' => "
+                SELECT count(*) FROM openai_log WHERE
+                not (model like 'gpt-4o%') AND
+                not (model like 'gpt-4.1%') AND
+                not (model like 'gpt-4o-mini%') AND
+                not (model like 'gpt-4.1-mini%')",
+
+            // gpt-4o
+            'openai_model_gpt-4o_chat' => "SELECT count(*) FROM openai_log WHERE (model like 'gpt-4o%' and model not like '%mini%') AND feature = 'chat'",
+            'openai_model_gpt-4o_lessonplan' => "SELECT count(*) FROM openai_log WHERE (model like 'gpt-4o%' and model not like '%mini%') AND feature = 'lessonplan'",
+            'openai_model_gpt-4o_image' => "SELECT count(*) FROM openai_log WHERE (model like 'gpt-4o%' and model not like '%mini%') AND feature = 'image'",
+
+            // gpt-4o-mini
+            'openai_model_gpt-4o-mini_chat' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4o-mini%' AND feature = 'chat'",
+            'openai_model_gpt-4o-mini_lessonplan' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4o-mini%' AND feature = 'lessonplan'",
+            'openai_model_gpt-4o-mini_image' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4o-mini%' AND feature = 'image'",
+
+            // gpt-4.1
+            'openai_model_gpt-41_chat' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4.1%' and model not like '%mini%' AND feature = 'chat'",
+            'openai_model_gpt-41_lessonplan' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4.1%' and model not like '%mini%' AND feature = 'lessonplan'",
+            'openai_model_gpt-41_image' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4.1%' and model not like '%mini%' AND feature = 'image'",
+
+            // gpt-4.1-mini
+            'openai_model_gpt-41-mini_chat' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4.1-mini%' AND feature = 'chat'",
+            'openai_model_gpt-41-mini_lessonplan' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4.1-mini%' AND feature = 'lessonplan'",
+            'openai_model_gpt-41-mini_image' => "SELECT count(*) FROM openai_log WHERE model like 'gpt-4.1-mini%' AND feature = 'image'",
+
+            // model is not like the above (gpt-4o, gpt-4o-mini, gpt-4.1, gpt-4.1-mini) we may need to do some digging, or add these to the stats
+            'openai_model_unknown_chat' => "
+                SELECT count(*) FROM openai_log WHERE
+                not (model like 'gpt-4o%') AND
+                not (model like 'gpt-4.1%') AND
+                not (model like 'gpt-4o-mini%') AND
+                not (model like 'gpt-4.1-mini%') AND feature = 'chat'",
+            'openai_model_unknown_lessonplan' => "
+                SELECT count(*) FROM openai_log WHERE
+                not (model like 'gpt-4o%') AND
+                not (model like 'gpt-4.1%') AND
+                not (model like 'gpt-4o-mini%') AND
+                not (model like 'gpt-4.1-mini%') AND feature = 'lessonplan'",
+            'openai_model_unknown_image' => "
+                SELECT count(*) FROM openai_log WHERE
+                not (model like 'gpt-4o%') AND
+                not (model like 'gpt-4.1%') AND
+                not (model like 'gpt-4o-mini%') AND
+                not (model like 'gpt-4.1-mini%') AND feature = 'image'",
+            //Packages
+            'package_installed' => 'SELECT COUNT(*) FROM package WHERE installed = 1',
         ];
 
         $result['instance_id'] = INSTANCE_ID;
@@ -365,6 +404,7 @@ $app = new class extends CliTool\App {
         $db->executeDirectly('SET MAX_STATEMENT_TIME=300');
 
         foreach ($queryList as $name => $query) {
+            $this->getLogger()->debug($query);
             $statement = $db->executeQuery($query);
             $result[$name] = (int)$statement->fetchColumn(0);
         }

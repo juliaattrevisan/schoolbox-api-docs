@@ -1,21 +1,22 @@
 parameters:
     bootstrapFiles:
-        - %rootDir%/../../../conf/core/require.php
+        - %rootDir%/../../../test/bootstrap/unit.php
     level: 4
     parallel:
         processTimeout: 300.0
     paths:
         - conf
-        - dav
         - library
         - tools
         - test/codeception
     excludePaths:
         - test/*/_generated/*
     inferPrivatePropertyTypeFromConstructor: true
+    treatPhpDocTypesAsCertain: false
 
 rules:
     - Alaress\PhpStan\Rule\PhpUnitTestName
+    - Alaress\PhpStan\Rule\ForbidBacktickOperator
 services:
     -
         class: Alaress\PhpStan\Rule\PhpUnitTestName

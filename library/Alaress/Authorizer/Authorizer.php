@@ -15,7 +15,6 @@ use Schoolbox\User;
 
 class Authorizer extends PathMatcher
 {
-
     /**
      * @var User
      */
@@ -37,14 +36,14 @@ class Authorizer extends PathMatcher
     /**
      * Authorizes whether a user may access a given path.
      *
-     * @param string $path   The path to check. Often, this refers to a controller
+     * @param string    $path   The path to check. Often, this refers to a controller
      *                       name, which may have been determined by a route
      *                       matched by Aura\Router\Router->match().
-     * @param array  $params Any params to pass as part of the route.
-     * @param User   $user   The user to check.
+     * @param array     $params Any params to pass as part of the route.
+     * @param User|null $user   The user to check.
      * @throws \Alaress\Authorizer\Failure\Base if the request isn't authorized.
      */
-    public function authorizePathForUser($path, $params = array(), User $user = null)
+    public function authorizePathForUser($path, $params = array(), ?User $user = null)
     {
         $this->setUser($user);
         $this->check($path, $params);
@@ -71,13 +70,13 @@ class Authorizer extends PathMatcher
      * authorized - if you need that use authorizePathForUser() and catch the
      * exception it throws.
      *
-     * @see    $this->authorizePathForUser()
      * @param  string $path
      * @param  array  $params
-     * @param  User   $user
+     * @param  User|null   $user
      * @return bool
+     *@see    $this->authorizePathForUser()
      */
-    public function isPathAuthorizedForUser($path, $params = array(), User $user = null)
+    public function isPathAuthorizedForUser($path, $params = array(), ?User $user = null)
     {
         try {
             $this->authorizePathForUser($path, $params, $user);

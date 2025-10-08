@@ -8,6 +8,9 @@
     {# Title #}
     {# ----------------------------------------------------------- #}
     <label class="required" for="title">Title</label>
+    {% if customisedFor is defined %}
+        <p class="meta">The title cannot be the same as the original activity.</p>
+    {% endif %}
     <input type="text" name="title" id="title" value="{{ assessment.title }}" required maxlength="255"/>
 
     {# ----------------------------------------------------------- #}
@@ -20,6 +23,17 @@
             courseManaged: courseManaged
         } only
     %}
+
+    {# ----------------------------------------------------------- #}
+    {# Curriculum #}
+    {# ----------------------------------------------------------- #}
+    {% include '@learningAssessment/fragments/curriculumCodes.twig' with {
+        entityType: 'Task',
+        courseManagedReadonly: courseManaged.isReadonly,
+        excludeLegend: true,
+        hasTabs: true,
+        parentFolderId: parentFolderId ?? null,
+    } %}
 
     {# ----------------------------------------------------------- #}
     {# Description #}
@@ -108,14 +122,6 @@
 {% endif %}
 
 {# ----------------------------------------------------------- #}
-{# Curriculum #}
-{# ----------------------------------------------------------- #}
-{% include '@learningAssessment/fragments/curriculumCodes.twig' with {
-    entityType: 'Task',
-    courseManagedReadonly: courseManaged.isReadonly
-} %}
-
-{# ----------------------------------------------------------- #}
 {# Submit #}
 {# ----------------------------------------------------------- #}
 {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
@@ -132,6 +138,9 @@
                 maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                 targetElements: ['#assessment-description'],
                 fileBrowserCategoryId: {{ context.baseContext.folder.id ?? 0 }},
+                {% if editorTemplates is defined %}
+                    templates: {{ editorTemplates|json_encode|raw }},
+                {% endif %}
             }
         }));
     });

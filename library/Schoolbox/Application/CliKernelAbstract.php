@@ -13,6 +13,7 @@ use Aura\Di\Container;
 use Alaress\Exception\IO\IOException;
 use ErrorException;
 use PDOException;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerInterface;
 use RangeException;
@@ -24,6 +25,7 @@ use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Deprecation\Registry;
 use Sentry\Monolog\Handler as SentryHandler;
 use Sentry\State\HubInterface;
+use Throwable;
 
 /**
  * Common implementation for all Cli Kernels
@@ -93,7 +95,7 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
 
     /**
      * @inheritDoc
-     * @throws \Throwable
+     * @throws Throwable
      */
     protected function postInstallDependencies(bool $bypassMaintenanceModeCheck = false): void
     {
@@ -122,9 +124,10 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
 
 
     /**
-     * @param \Exception $e
+     * This exception handler just logs and exits after calling any exception
+     * callbacks.
      */
-    public function onException($e): void
+    protected function onException(Throwable $e): void
     {
         $this->callExceptionCallbacks($e);
         try {
@@ -175,21 +178,14 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
 
 
     /**
-     * @param int    $errNum
-     * @param string $errStr
-     * @param string $errFile
-     * @param int    $errLine
-     * @return bool
-     * @throws ErrorException
-     * @throws \Psr\Container\ContainerExceptionInterface|\Psr\Container\NotFoundExceptionInterface
+     * This error handler:
+     * * raises an exception if a recoverable error was thrown
+     * * may raise an exception on notice or warning
+     * * silences deprecation notices
+     * * otherwise, passes to the standard error handler
      */
-    public function onError($errNum, $errStr, $errFile, $errLine): ?bool
+    protected function onError(int $errNum, string $errStr, string $errFile, int $errLine): bool
     {
-        if (!(error_reporting() & $errNum)) {
-            // This error code is not included in error_reporting
-            return true;
-        }
-
         switch ($errNum) {
             case E_RECOVERABLE_ERROR:
                 // for any of these errors, we want an exception we can catch
@@ -204,7 +200,6 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
                 $this->onWarning($errNum, $errStr, $errFile, $errLine);
                 return true;
 
-            case E_STRICT:
             case E_DEPRECATED:
             case E_USER_DEPRECATED:
                 // Deprecation notices:
@@ -329,17 +324,6 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
 
 
     /**
-     * Register any out-the-top exception handling required
-     *
-     * @return void
-     */
-    protected function registerExceptionHandling(): void
-    {
-        \set_exception_handler([$this, 'onException']);
-    }
-
-
-    /**
      * Register any shutdown handling required
      *
      * @return void
@@ -349,17 +333,6 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
     {
         parent::registerShutdownHandling();
         $this->getShutdownHandler()->registerFunction([$this, 'onShutdown']);
-    }
-
-
-    /**
-     * Register any error handling required
-     *
-     * @return void
-     */
-    protected function registerErrorHandling(): void
-    {
-        \set_error_handler([$this, 'onError']);
     }
 
 
@@ -387,10 +360,18 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
      *
      * @param Lumberjack\Logger $logger
      * @return bool
-     * @throws \Psr\Container\NotFoundExceptionInterface|\Psr\Container\ContainerExceptionInterface
+     * @throws ContainerExceptionInterface if somehow Sentry client exists but can't be fetched
      */
     protected function addSentryHandler(Lumberjack\Logger $logger): bool
     {
+        // What if this error is raised before Sentry is even initialized?
+        // This could happen if a vendor library contains an error or
+        // deprecation notice.
+        if (!$this->getDependencyInjector()->has('sentry')) {
+            $logger->warning('Logger is being set up before Sentry is initialized: continuing, but this process will not log to Sentry');
+            return false;
+        }
+
         /** @var HubInterface $sentryClient */
         $sentryClient  = $this->getDependencyInjector()->get('sentry');
         $sentryHandler = new SentryHandler($sentryClient, Monolog\Logger::CRITICAL);
@@ -442,5 +423,46 @@ abstract class CliKernelAbstract extends \Alaress\Application\Kernel implements 
             3 => Monolog\Logger::DEBUG,     // max verbosity: EV-ER-Y-THING...
         ];
         return $limits[$threshold];
+    }
+
+    /**
+     * Returns the filename of of the script that invoked this App, suitable for generating help output.
+     *
+     * The following should all return "./myTool.php"
+     * * "./relative/path/to/myTool.php"
+     * * "relative/path/to/myTool.php"
+     * * "./../relative/path/to/myTool.php"
+     * * "/absolute/path/to/myTool.php"
+     *
+     * @return string
+     */
+    public function getToolFilename(): string
+    {
+        $scriptName = $_SERVER['SCRIPT_NAME'];
+        $lastIndex  = strrpos($scriptName, DIRECTORY_SEPARATOR);
+        if ($lastIndex !== false) {
+            $scriptName = substr($scriptName, $lastIndex + 1);
+        }
+        return "./$scriptName";
+    }
+
+    /**
+     * Deprecation notice
+     *
+     * if you are still using this script, please add a comment of this scripts name into string $jiraNumber
+     * @param string $jiraNumber Jira ticket number to prevent deprecation
+     * @deprecated
+     */
+    public function deprecationNotice(string $jiraNumber): void
+    {
+        /**
+         * Deprecation notice
+         */
+        $this->logger()->error('/******************************************************************************************/');
+        $this->logger()->error('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
+        $this->logger()->error("/*    If you are running this, please add a comment of this scripts name into $jiraNumber    */");
+        $this->logger()->error(sprintf("Script file: %s", $this->getToolFilename()));
+        $this->logger()->error('/******************************************************************************************/');
+        $this->logger()->error('/******************************************************************************************/');
     }
 }

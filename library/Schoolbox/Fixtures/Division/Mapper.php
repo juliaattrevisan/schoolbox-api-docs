@@ -20,6 +20,7 @@ use Schoolbox\Fixtures\Sport\Model as Sport;
 use Schoolbox\Fixtures\Season\Mapper as SeasonMapper;
 use Schoolbox\Fixtures\Season\Model as Season;
 use Schoolbox\Fixtures\Team\Mapper as TeamMapper;
+use Schoolbox\Fixtures\Matchup\Mapper as MatchMapper;
 
 /**
  * Class Mapper
@@ -50,10 +51,11 @@ class Mapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteTeams'));
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, array($this, 'deleteMatches'));
     }
 
     /**
-     * Delete all Teams associated with this Division
+     * Delete all Teams and its players associated with this Division
      * when it's being deleted
      *
      * @param Model $division
@@ -70,6 +72,17 @@ class Mapper extends BaseMapper
         $divisionUserMapper->delete($divisionUserMapper->findByColumn('division_id', $division->getId()));
     }
 
+    /**
+     * Delete all Matchups associated with this Division when it's being deleted
+     *
+     * @param Model $division
+     */
+    public function deleteMatches(Model $division): void
+    {
+        $allMatches = MatchMapper::getInstance()->findByColumn('division_id', $division->getId());
+
+        $allMatches->map(fn($matchup) => MatchMapper::getInstance()->delete($matchup));
+    }
 
 
     /**

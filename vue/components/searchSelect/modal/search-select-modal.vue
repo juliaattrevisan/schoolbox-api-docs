@@ -19,7 +19,7 @@ interface Props {
     labelId: string; // the label id
     title: string; // the title of the modal
     endpoint: string; // the search api endpoint
-    queryKey?: string; // the key to use for seaech
+    queryKey?: string; // the key to use for search
     manageSearchResponse?: boolean; // whether to manage the response internally, or dispatch an emit to manage it externally
     isSingleSelect?: boolean; // whether only one result can be selected
     allowPartialMatches?: boolean; // whether to allow partial matches, so can match part of a word

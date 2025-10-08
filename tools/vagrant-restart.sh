@@ -28,6 +28,7 @@ then
     sleep 5 && service schoolbox-cloud-socketd restart &
     sleep 5 && service schoolbox-cloud-digestd@vagrantx restart &
     sleep 5 && service schoolbox-cloud-scheduled@vagrantx restart &
+    sleep 5 && service schoolbox-cloud-mobiled@vagrantx restart &
 else
     echo "Unable to locate: $SITE_ROOT/tools/notif/syscheck.php";
 fi
@@ -47,7 +48,7 @@ if [[ -n $gotenberg_container_ids ]]; then
 fi
 
 echo "[SB][`date +%Y-%m-%d\ %X`] Installing and starting Gotenberg service";
-docker run -d --rm --network host --name schoolbox_vagrant_gotenberg gotenberg/gotenberg:7;
+docker run -d --rm --network host --name schoolbox_vagrant_gotenberg gotenberg/gotenberg:8;
 
 # Rebuild & restart task daemon
 # if `taskd_build_from_local` then build from the mounted taskd dir

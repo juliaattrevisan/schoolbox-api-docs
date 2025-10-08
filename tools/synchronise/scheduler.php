@@ -23,18 +23,8 @@ require_once __DIR__ . '/../../conf/core/require.php';
 /**
  * Profile/Timetable Importer
  *
- * Imports from an xml file and populates the following local sis tables:
- *   sis_user_profile
- *   sis_user_profile_staff
- *   sis_user_profile_student
- *   sis_user_profile_parent
- *   sis_user_profile_relation
- *   sis_class
- *   sis_class_period
- *   sis_class_user
- *   sis_timetable_campus
- *   sis_timetable_cycle
- *   sis_timetable_period
+ * Imports data from the sis into suds, a local data cache for profile and timetable data.
+ * This is a landing zone for UPS data.
  */
 $app = new class extends CliTool\App
 {
@@ -51,7 +41,7 @@ $app = new class extends CliTool\App
     }
 
     /** @inheritDoc */
-    public function getRequiredProcessUser(): ?string
+    public function getRequiredProcessUser(): string
     {
         return 'www-data';
     }
@@ -66,10 +56,8 @@ $app = new class extends CliTool\App
 
 cron variant of sisImporter.php
 
-Import user profile data from third party endpoint into local schema.
-This is used by UPS to create user accounts.
-
-This also imports timetable data from third party endpoint into local schema.
+Import user profile and timetable data from third party endpoint into local schema.
+This is used by UPS to create user accounts and timetable information.
 
 This also imports calendar events from a third party endpoint, if it exists
 
@@ -156,26 +144,49 @@ HELP;
 
         /* Used to shank a database instance
          */
-        $randomMapper = UserMapper::getInstance();
+        $logMapper = \Schoolbox\External\Connector\Log\Mapper::getInstance();
 
         // Queries should not be time-limited here
-        $randomMapper->getDatabase()->query('SET MAX_STATEMENT_TIME=0;');
+        $logMapper->getDatabase()->query('SET MAX_STATEMENT_TIME=0;');
+
+        /* Remember the current instance's version number right before we import.
+         * We encountered a scenario where an upgrade changed schema after the
+         * shadow tables started, causing it to restore the old schema when it
+         * finished, resulting in mysteriously-missing columns. We now detecct
+         * version changes before shadow tables commit themselves at the end.
+         */
+        $version = $this->getVersion();
 
         /* This identifier indicates that the two schedulers were part of this
          * script execution together
          */
         $runId = (new Guid())->generate();
 
+        /* Figure out which strats to import.
+         *
+         * If we have all the strats specified, then do a sub-optimisation that helps transaction
+         * performance by doing profiles first, then timetables, then calendars
+         */
+
         /* Split the transaction in half for suds connectors that can actually do that
          * Otherwise just import everything like it always did
          */
-        if (\in_array($type, [Factory::TASS_API, Factory::COMPASS], true)) {
+        if (\in_array($type, Factory::SPLITTABLE, true)) {
+            /* Split the transaction in half for suds connectors that can actually do that
+             * Otherwise just import everything like it always did
+             */
             $splitStrats = [
-                ValidStrats::FAMILIES . ',' . ValidStrats::STAFF,
-                ValidStrats::TIMETABLE
+                implode(',', [ValidStrats::FAMILIES, ValidStrats::STAFF]),
+                ValidStrats::TIMETABLE,
+                ValidStrats::CALENDAR
             ];
         } else {
-            $splitStrats = [''];
+            /* Otherwise, for every other connector, just do all of them in one big go
+             */
+            $splitStrats = [
+                implode(',', [ValidStrats::FAMILIES, ValidStrats::STAFF, ValidStrats::TIMETABLE]),
+                ValidStrats::CALENDAR,
+            ];
         }
 
         /* The time when both parts of the import ran
@@ -189,65 +200,76 @@ HELP;
         $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
 
         foreach ($splitStrats as $currentStrat) {
-            /* Importer strats can be defined by cli args
-             * null or empty string means "import everything"
-             *
-             * Otherwise, whatever you specified must fit within a known vocabulary
-             * and works in conjunction with whatever watchlists you have in place
-             *
-             * scheduler always runs all strats
-             * The cli option is hardcoded to empty str ''
+            /* Calendar strat gets its own special treatment
              */
-            $validStrats = new ValidStrats($currentStrat);
+            if (ValidStrats::CALENDAR === $currentStrat) {
+                /* Execute scheduler: calendar stuff
+                 * Not all connectivities contain a calendar importer, just some
+                 */
+                $calendarFactory = new Endpoint\CalendarFactory(
+                    $host,
+                    $key,
+                    $perform,
+                    $version,
+                    $this->getLogger()
+                );
 
-            /* Execute scheduler: sis stuff
-             */
-            $sisFactory = new Endpoint\Factory(
-                $host,
-                $key,
-                $perform,
-                $lissAdditiveMode,
-                $this->getLogger(),
-                [],
-                $validStrats,
-                $filesystemProxy
-            );
+                (new Endpoint\Scheduler(
+                    $frequency,
+                    $customHours,
+                    $calendarFactory,
+                    $type,
+                    $file,
+                    $this->getLogger(),
+                    $logMapper,
+                    $this->getDi()->get('sentry'),
+                ))->run($time, $runId, Endpoint\Scheduler::SCHEDULER_CALENDAR_SCRIPT_NAME);
+            } else {
+                /* Importer strats can be defined by cli args
+                 * null or empty string means "import everything"
+                 *
+                 * Otherwise, whatever you specified must fit within a known vocabulary
+                 * and works in conjunction with whatever watchlists you have in place
+                 *
+                 * scheduler always runs all strats
+                 * The cli option is hardcoded to empty str ''
+                 */
+                $validStrats = new ValidStrats($currentStrat);
 
-            /* Importer strat gets suffixed onto the end
-             */
-            $subtitle = '';
+                /* Execute scheduler: sis stuff
+                 */
+                $sisFactory = new Endpoint\Factory(
+                    $host,
+                    $key,
+                    $perform,
+                    $version,
+                    $lissAdditiveMode,
+                    $this->getLogger(),
+                    [],
+                    $validStrats,
+                    $filesystemProxy
+                );
 
-            if ('' !== $currentStrat) {
-                $subtitle = " ({$currentStrat})";
+                /* Importer strat gets suffixed onto the end
+                 */
+                $logTitle = sprintf(
+                    '%s - (%s)',
+                    Endpoint\Scheduler::SCHEDULER_SIS_SCRIPT_NAME,
+                    $currentStrat
+                );
+
+                (new Endpoint\Scheduler(
+                    $frequency,
+                    $customHours,
+                    $sisFactory,
+                    $type,
+                    $file,
+                    $this->getLogger(),
+                    $logMapper,
+                    $this->getDi()->get('sentry'),
+                ))->run($time, $runId, $logTitle);
             }
-
-            (new Endpoint\Scheduler(
-                $frequency,
-                $customHours,
-                $sisFactory,
-                $type,
-                $file,
-                $this->getLogger(),
-                \Schoolbox\External\Connector\Log\Mapper::getInstance(),
-                $this->getDi()->get('sentry'),
-            ))->run($time, $runId, Endpoint\Scheduler::SCHEDULER_SIS_SCRIPT_NAME . $subtitle);
         }
-
-        /* Execute scheduler: calendar stuff
-         * Not all connectivities contain a calendar importer, just some
-         */
-        $calendarFactory = new Endpoint\CalendarFactory($host, $key, $perform, $this->getLogger());
-
-        (new Endpoint\Scheduler(
-            $frequency,
-            $customHours,
-            $calendarFactory,
-            $type,
-            $file,
-            $this->getLogger(),
-            \Schoolbox\External\Connector\Log\Mapper::getInstance(),
-            $this->getDi()->get('sentry'),
-        ))->run($time, $runId, Endpoint\Scheduler::SCHEDULER_CALENDAR_SCRIPT_NAME);
 
         /* Announce lock release
          */

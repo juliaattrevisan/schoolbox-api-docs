@@ -50,6 +50,7 @@ use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\Resource\Storage\Receiver;
 use Schoolbox\Url\Uri;
 use Schoolbox\User;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 class Controller extends Base
 {
@@ -105,7 +106,8 @@ class Controller extends Base
         private FilesystemProxy $filesystemProxy,
         private ?Turnitin\File\Api $turnitinFileApi,
         private Receiver $filesystemReceiver,
-        private DueWorkFeedbackMapperProxy $feedbackMapperProxy
+        private DueWorkFeedbackMapperProxy $feedbackMapperProxy,
+        private EditorTemplateHelper $editorTemplateHelper
     ) {
         $this->errorMapper        = $errorMapper;
         $this->responseDataSource = $responseDataSource;
@@ -135,7 +137,7 @@ class Controller extends Base
     public function getParticularResponseBlind(
         DueWork $assessment,
         User $student,
-        Model $response = null
+        ?Model $response = null
     ): void {
         $this->getParticularResponse($assessment, $student, $response, true);
     }
@@ -163,7 +165,7 @@ class Controller extends Base
     public function getParticularResponse(
         DueWork $assessment,
         User $student,
-        Model $response = null,
+        ?Model $response = null,
         ?bool $blindMode = false
     ): void {
 
@@ -281,6 +283,7 @@ class Controller extends Base
             'studentView' => false,
             'selfAssess' => false,
             'selfReflect' => false,
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory()
         ];
 
         /* Rubrics data
@@ -299,6 +302,34 @@ class Controller extends Base
         }
 
         $this->response = $this->responseFromTemplate('@learningDueWorkResponse/inlineGrading/standard.twig', $data);
+    }
+
+    /**
+     * Redirect user to inline grader of the first participant in the assessment list
+     *
+     * @param DueWork $assessment
+     * @return void
+     * @throws \Aura\Router\Exception\RouteNotFound
+     */
+    public function getFirstParticipantResponse(
+        DueWork $assessment,
+    ) {
+        $participants = $assessment->getAllParticipants()->filter(fn($participant) => !$participant->isExcluded());
+        $firstParticipant = $participants->first()?->getUser();
+
+        if ($firstParticipant instanceof User) {
+            $this->response = $this->redirectFound(
+                $this->routeGenerator->generate('learningDueWorkResponse.getParticularResponse', [
+                    'assessmentId' => $assessment->getId(),
+                    'assessment' => $assessment,
+                    'studentId' => $firstParticipant->getId(),
+                ])
+            );
+            return;
+        }
+        /* If the participant list is empty, nothing can be shown
+         */
+        throw $this->errorMapper->generateException(ErrorMapper::ERROR_PAGE_NOT_FOUND);
     }
 
     /**
@@ -400,7 +431,7 @@ class Controller extends Base
      *
      * @param Kami\Model $kami
      * @throws Exception
-     * @throws Exception/Deleted
+     * @throws Exception\Deleted
      * @throws GuzzleException
      * @api POST /kami/{kamiId:\d+}/poll
      * @since 24.0
@@ -456,7 +487,7 @@ class Controller extends Base
      * @param DueWorkResponse|null $response
      * @param Feedback|null $feedback
      * @throws Exception
-     * @throws Exception/Deleted
+     * @throws Exception\Deleted
      * @throws GuzzleException
      * @throws \Schoolbox\File\Exception
      * @api POST /kami/{kamiId:\d+}/{action:\w+}/poll
@@ -465,6 +496,10 @@ class Controller extends Base
      */
     public function postKamiDownloadCallback(Kami\Model $kami, string $action, ?DueWork $assessment = null, ?User $student = null, ?DueWorkResponse $response = null, ?Feedback $feedback = null)
     {
+        if ($kami->getJobReference() === null) {
+            throw new \InvalidArgumentException("Kami job reference is null for document {$kami->getId()}.");
+        }
+
         // kami is ready to download
         $export = $this->kamiConnector->getExport($kami->getJobReference());
         $expiryAt = null;
@@ -706,7 +741,7 @@ class Controller extends Base
                 'fileContent' => $this->filesystemProxy->read($file),
             ],
         );
-        if (!$file->getMimetype()->getInline() || $this->requestQuery->get('save')) {
+        if ($this->requestQuery->get('save')) {
             $this->response = $this->response->withHeader(
                 'Content-Disposition',
                 sprintf('attachment; filename="%s"', $file->getBasename()),

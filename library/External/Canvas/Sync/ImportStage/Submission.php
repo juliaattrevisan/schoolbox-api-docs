@@ -107,6 +107,7 @@ class Submission extends SubmissionAbstract
             $syncedFeedbackIds = [];
 
             $markScheme = $markSchemaFactory->spawnMarkSchemeFor($assessmentImpl);
+            $instructorMarkScheme = $markSchemaFactory->spawnInstructorMarkSchemeFor($assessmentImpl);
 
             foreach ($assessmentImpl->getPlans() as $plan) {
                 foreach ($plan->getParticipants() as $participant) {
@@ -144,6 +145,7 @@ class Submission extends SubmissionAbstract
                             $canvasSubmission,
                             $existingFeedbacks,
                             $markScheme,
+                            $instructorMarkScheme,
                             $feedbackTime
                         );
                         if (!$feedback) {
@@ -185,6 +187,7 @@ class Submission extends SubmissionAbstract
      * @param array                           $canvasSubmission
      * @param GenericCollection               $existingFeedbacks
      * @param IMarkScheme                     $markScheme
+     * @param IMarkScheme|null                $instructorMarkScheme
      * @param string                          $feedbackTime
      * @return SubmissionBox\ReturnedWork|null
      * @throws Mapper\Exception
@@ -196,6 +199,7 @@ class Submission extends SubmissionAbstract
         array $canvasSubmission,
         GenericCollection $existingFeedbacks,
         IMarkScheme $markScheme,
+        ?IMarkScheme $instructorMarkScheme,
         string $feedbackTime
     ): ?SubmissionBox\ReturnedWork {
         /** @var SubmissionBox $submissionBox */
@@ -203,6 +207,7 @@ class Submission extends SubmissionAbstract
         $this->log->debug(sprintf('Processing marks for submission_box: box_id:%s student:%d', $submissionBox->getId(), $reviewee->getId()));
         $normMark     = $canvasSubmission['norm_mark'];
         $readableMark = $canvasSubmission['mark'];
+        $readableInstructorMark = $canvasSubmission['mark']; // Intentionally the same as readableMark as canvas doesn't have separate instructor marks
 
         if (
             $submissionBox->getMarkType()->getSlug() === SubmissionBox\MarkType::SLUG_LETTER
@@ -226,16 +231,31 @@ class Submission extends SubmissionAbstract
             $readableMark = $markScheme->getHumanReadableMark($normMark);
         }
 
+        // In case the asessment has been changed to have a different mark scheme for instructors, use that
+        if ($submissionBox->getInstructorMarkType()->getSlug() !== SubmissionBox\MarkType::SLUG_NONE) {
+            $readableInstructorMark = $instructorMarkScheme->getHumanReadableMark($normMark);
+        }
+
         /** @var SubmissionBox\ReturnedWork $existingFeedback */
         foreach ($existingFeedbacks as $existingFeedback) {
+            /* When checking the comment, compare both plaintext and html versions.
+             * Historically, comments were converted to plaintext before saving (SA-18750) but as of SA-19512
+             * we now support HTML feedback, so to avoid creating duplicates, we need to check both.
+             */
+            $plainComment = new Html2Text($canvasSubmission['comment']);
+
             // Check whether the rest are the same
             // Floating point precision in Schoolbox's getMark() is less than in canvas, so an exact match won't always work.
             // We have to test equality somewhat approximately, but with reasonable certainty.
             if (
                 $existingFeedback->getOwner()->getId() === $reviewee->getId()
                 && $existingFeedback->getMarker()->getId() === $reviewer->getId()
-                && (string)$existingFeedback->getComment() === (string)$canvasSubmission['comment']
+                && (
+                    (string)$existingFeedback->getComment() === (string)$plainComment->getText()
+                    || (string)$existingFeedback->getComment() === (string)$canvasSubmission['comment']
+                )
                 && (string)$existingFeedback->getHumanReadableMark() === (string)$readableMark
+                && (string)$existingFeedback->getHumanReadableInstructorMark() === (string)$readableInstructorMark
                 && (abs((float)$existingFeedback->getNormalizedMark() - (float)$normMark) < 0.0001)
             ) {
                 $this->log->debug(sprintf('Feedback already exists : submission_return_id:%s', $existingFeedback->getId()));
@@ -246,17 +266,15 @@ class Submission extends SubmissionAbstract
         // time string from Canvas is coming in UTC
         $feedbackTime = $this->convertTime($feedbackTime);
 
-        // convert to plaintext first as a precaution
-        $plainComment = new Html2Text($canvasSubmission['comment']);
-
         // Couldn't find. Creating a new feedback
         $feedback = $this->returnedWorkMapper->createModel();
         $feedback->setSubmissionBox($submissionBox)
                  ->setMarker($reviewer)
                  ->setOwner($reviewee)
                  ->setReviewRoute(SubmissionBox\ReturnedWork::REVIEW_ROUTE_INSTRUCTOR)
-                 ->setComment($plainComment->getText())
+                 ->setComment($canvasSubmission['comment'])
                  ->setHumanReadableMark($readableMark)
+                 ->setHumanReadableInstructorMark($readableInstructorMark)
                  ->setNormalizedMark($normMark)
                  ->setCreatedAt($feedbackTime)
                  ->setPublishedAt($feedbackTime)

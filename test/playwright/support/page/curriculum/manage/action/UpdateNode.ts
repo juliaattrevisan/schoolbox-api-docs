@@ -14,7 +14,7 @@ export default class UpdateNode {
 
     static readonly DESCRIPTION_FIELD = "description-";
 
-    static readonly DATATEST_UPDATE_BUTTON = "update-node";
+    static readonly DATA_TEST_UPDATE_BUTTON = "update-node";
 
     constructor(page: Page, tester: AcceptanceTester) {
         this.page = page;
@@ -59,6 +59,6 @@ export default class UpdateNode {
      * select the update button
      */
     async clickUpdateButton(): Promise<void> {
-        await this.page.getByTestId(UpdateNode.DATATEST_UPDATE_BUTTON).click();
+        await this.page.getByTestId(UpdateNode.DATA_TEST_UPDATE_BUTTON).click();
     }
 }

@@ -1,7 +1,6 @@
 # Directories.
 www/conf/* /etc/schoolbox/examples
 tools/logrotate/* /etc/logrotate.d
-dav /usr/share/schoolbox
 library /usr/share/schoolbox
 sql /usr/share/schoolbox
 templates /usr/share/schoolbox

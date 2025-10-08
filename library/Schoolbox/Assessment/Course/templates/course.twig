@@ -576,9 +576,10 @@ Usage:
                                     <div class="new-unit">
                                         <label for="newUnitName">{{ locale.unit.proper }} name</label>
                                         <div class="input-group">
-                                            <input type="text" value="" placeholder="New {{ locale.unit }} name" id="new-unit-name" name="newUnitName" maxlength="255" />
+                                            <input type="text" value="" placeholder="New {{ locale.unit }} name" id="new-unit-name" data-test="course-new-unit-name" name="newUnitName" maxlength="255" />
                                             <button name="spawn-unit"
                                                     class="button icon-add"
+                                                    data-test="course-new-unit-add"
                                                     data-mage-next="spawn-unit"
                                                     data-mage-working="Working..."
                                                     formaction="{{ routeLookup('course.newUnit', { id: courseSpec ? courseSpec.Id : 0 }) }}"

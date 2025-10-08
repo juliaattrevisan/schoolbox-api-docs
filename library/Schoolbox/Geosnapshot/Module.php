@@ -46,9 +46,9 @@ class Module extends BaseModule
             return $this->preloadUserAndUrl($params);
         };
 
-        $canGetStudentPhotos = $this->canGetStudentPhotosUrl();
+        $canGetPhotos = $this->canGetPhotosUrl();
 
-        $this->register('GET', '/user/{id}', 'getStudentPhotos', $canGetStudentPhotos, $preloadUserAndUrl);
+        $this->register('GET', '/user/{id}', 'getPhotos', $canGetPhotos, $preloadUserAndUrl);
     }
 
 
@@ -65,9 +65,9 @@ class Module extends BaseModule
         try {
             $user = $this->getUserMapper()->findById($params['id']);
 
-            /* Only students can be a viewee; parents and staff don't get pictures
+            /* Only students and staff can be a viewee; parents don't get pictures
              */
-            if (!$user->getRole()->isStudent()) {
+            if (!$user->getRole()->isStudent() && !$user->getRole()->isStaff()) {
                 throw new Failure\InvalidPath();
             }
             //hydrate parents on the $user so we can get them later
@@ -95,7 +95,7 @@ class Module extends BaseModule
      *
      * @return Rule\IAuthorizationRule
      */
-    private function canGetStudentPhotosUrl(): Rule\IAuthorizationRule
+    private function canGetPhotosUrl(): Rule\IAuthorizationRule
     {
         return new Rule\LazyCallback(function () {
             return new Rule\All(
@@ -115,7 +115,7 @@ class Module extends BaseModule
                      * One or more misconfigurations or access controls could have caused this
                      * but all result in nothing to see for the current user
                      */
-                    $isGeosnapshotAvailable = (new ValidStudentPhotosAvailable())
+                    $isGeosnapshotAvailable = (new ValidPhotosAvailable())
                         ->isSatisifiedBy(
                             $this->getConfig()->get('geosnapshot_api_key'),
                             $this->getConfig()->get('geosnapshot_enabled'),

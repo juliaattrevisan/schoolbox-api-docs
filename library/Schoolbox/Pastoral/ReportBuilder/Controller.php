@@ -10,8 +10,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Pastoral\ReportBuilder;
 
+use Alaress\Database\Exception as DatabaseException;
 use Alaress\Web\Controller\Base;
 use Alaress_Date_Format;
+use Aura\Router\Exception\RouteNotFound;
+use Crell\ApiProblem\ApiProblem;
 use HouseMapper;
 use Schoolbox\Assessment\Term;
 use Schoolbox\CampusMapper;
@@ -20,21 +23,25 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Pastoral\AccessLevelCensor;
 use Schoolbox\Pastoral\Audience\ColorHelper;
 use Schoolbox\Pastoral\Audit\Mapper as PastoralAuditMapper;
 use Schoolbox\Pastoral\Group\Mapper as PastoralGroupMapper;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
 use Schoolbox\Pastoral\Model as PastoralRecord;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
 use Schoolbox\Pastoral\Report\Access\Mapper as ReportAccessMapper;
 use Schoolbox\Pastoral\Report\Access\Model as ReportAccess;
 use Schoolbox\Pastoral\Report\Dashboard\Mapper as PastoralReportDashboardMapper;
 use Schoolbox\Pastoral\Report\Dashboard\Model as PastoralReportDashboard;
 use Schoolbox\Pastoral\Report\Mapper as PastoralReportMapper;
 use Schoolbox\Pastoral\Report\Model as PastoralReport;
+use Schoolbox\Pastoral\ReportBuilder\TabType\TabTypeInterface;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTag;
 use Schoolbox\Pastoral\Action\Mapper as ActionMapper;
+use Schoolbox\Pastoral\ReportBuilder\Translator\ModelToArray;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -43,8 +50,11 @@ use Schoolbox\Resource\Folder\Model as Folder;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
 use Schoolbox\User;
+use Schoolbox\User\Translator\Author\ModelToArray as UserTranslator;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
+use Schoolbox\Pastoral\ReportBuilder\Base as Cursor;
 
 class Controller extends Base
 {
@@ -70,6 +80,9 @@ class Controller extends Base
      * @param RoleMapper                    $roleMapper
      * @param UserAccessMapper              $userAccessMapper
      * @param RosettaStone                  $l10n
+     * @param ModelToArray                  $pastoralTranslator
+     * @param UserTranslator                $userTranslator
+     * @param PastoralMapper                $pastoralMapper
      */
     public function __construct(
         private ErrorMapper $errorMapper,
@@ -91,6 +104,10 @@ class Controller extends Base
         private RoleMapper $roleMapper,
         private UserAccessMapper $userAccessMapper,
         private RosettaStone $l10n,
+        private ModelToArray $pastoralTranslator,
+        private UserTranslator $userTranslator,
+        private PastoralMapper $pastoralMapper,
+        private AccessLevelCensor $accessLevelCensor,
     ) {
     }
 
@@ -300,6 +317,7 @@ class Controller extends Base
                 'moderatorIds'         => $this->userMapper->findByAccess(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)->getPropertyValues('id'),
                 'roles'                => $roles,
                 'orderFields'          => $orderFields,
+                'summaryTablesOptions' => PastoralReport::SUMMARY_TABLES_OPTIONS,
             ],
             'Pastoral Report',
         );
@@ -317,6 +335,14 @@ class Controller extends Base
         $showSeverity   = $this->getConfigLoader()->get('pastoral_severity');
         $severityColors = $showSeverity ? $this->getSeverityColors() : [];
 
+        $defaultSummaryOptions = [
+            ['title' => 'List', 'type' => 'list']
+        ];
+
+        $tabs = array_merge(
+            $defaultSummaryOptions,
+        );
+
         // And spit this thing out
 
         $this->response = $this->responseFromTemplate(
@@ -324,9 +350,12 @@ class Controller extends Base
             [
                 'title'          => "Records By Tag - {$tag->getName()}",
                 'export'         => false,
-                'results'        => $records,
+                'results'        => $records->map($this->pastoralTranslator),
                 'showSeverity'   => $showSeverity,
                 'severityColors' => $severityColors,
+                /* Summary tables tabs
+                 */
+                'tabs'           => $tabs,
             ],
             'Pastoral Tag Report',
         );
@@ -337,6 +366,7 @@ class Controller extends Base
      *
      * @param PastoralReport $report
      * @throws MapperException
+     * @throws RouteNotFound
      */
     public function getReportResults(PastoralReport $report): void
     {
@@ -354,6 +384,78 @@ class Controller extends Base
         $showSeverity   = $this->getConfigLoader()->get('pastoral_severity');
         $severityColors = $showSeverity ? $this->getSeverityColors() : [];
 
+        $defaultSummaryOptions = [
+            [
+                'title' => 'List',
+                'type' => 'list',
+                'key' => 'list',
+                '_links' => [
+                    'view' => $this->getRouteIfAuthorized(
+                        'pastoralReportBuilder.getReportByTabType',
+                        [
+                            'reportId' => $report->getId(),
+                            'report' => $report,
+                            'tabType' => 'list',
+                        ]
+                    ),
+                    'export' => $this->getRouteIfAuthorized(
+                        'pastoralReportBuilder.getReportResultsExport',
+                        [
+                            'reportId' => $report->getId(),
+                            'report' => $report,
+                        ]
+                    )
+                ]
+            ]
+        ];
+
+        /* Find the selected list of options
+         */
+        $checkedSummaryOptions = explode(',', $report->getSummaryTables() ?? '');
+        $selectedSummaryOptions = array_filter(
+            PastoralReport::SUMMARY_TABLES_OPTIONS,
+            function ($key) use ($checkedSummaryOptions) {
+                return in_array($key, $checkedSummaryOptions);
+            },
+            ARRAY_FILTER_USE_KEY
+        );
+
+        $mappedOptions = [];
+        foreach ($selectedSummaryOptions as $key => $option) {
+            $mappedOptions[] = [
+                'title' => $option['label'],
+                'type' => $option['type'],
+                'key' => $key,
+                '_links' => [
+                    'view' => $this->getRouteIfAuthorized(
+                        'pastoralReportBuilder.getReportByTabType',
+                        [
+                            'reportId' => $report->getId(),
+                            'report' => $report,
+                            'tabType' => $key,
+                        ]
+                    ),
+                    'scope' => $this->getRouteIfAuthorized(
+                        'pastoralReportBuilder.getReportByTabTypeScope',
+                        [
+                            'reportId' => $report->getId(),
+                            'report' => $report,
+                            'tabType' => $key,
+                        ]
+                    ),
+                    'scopeExport' => $this->getRouteIfAuthorized(
+                        'pastoralReportBuilder.getReportResultsInScopeExport',
+                        [
+                            'reportId' => $report->getId(),
+                            'report' => $report,
+                            'tabType' => $key,
+                        ]
+                    )
+                ]
+            ];
+        }
+
+        $tabs = array_merge($defaultSummaryOptions, $mappedOptions);
         // And spit this thing out
 
         $this->response = $this->responseFromTemplate(
@@ -361,22 +463,141 @@ class Controller extends Base
             [
                 'title'          => $report->getName(),
                 'export'         => true,
-                'results'        => $records,
+                'results'        => $records->map($this->pastoralTranslator),
                 'report'         => $report,
                 'showSeverity'   => $showSeverity,
                 'severityColors' => $severityColors,
+                /* Summary tables tabs
+                 */
+                'tabs'           => $tabs,
             ],
             $report->getName(),
         );
     }
 
     /**
-     * Exports report data
+     * Retrieve report of all pastoral records with the selected type
+     * to display in a table format
+     *
+     * @param string         $tabType
      * @param PastoralReport $report
      */
-    public function getReportResultsExport(PastoralReport $report): void
+    public function getReportByTabType(string $tabType, PastoralReport $report): void
     {
-        $records  = $this->getReportData($report);
+        try {
+            $limit = $this->requestQuery->getInt('limit', Cursor::LIMIT_DEFAULT);
+            $encodedCursor = $this->requestQuery->get('cursor');
+            $resultType = $this->requestQuery->get('selected', Cursor::RESULT_TYPE_RECORDS);
+            $sortBy = $this->requestQuery->get('sortBy');
+            $order = $this->requestQuery->get('order', Cursor::ORDER_DIRECTION_DEFAULT);
+
+            $factory = (new Factory(
+                $this->userTranslator,
+                $this->userMapper,
+                $this->pastoralMapper,
+                $this->pastoralTranslator,
+                $resultType,
+                $sortBy,
+                $order,
+                $limit
+            ))->produce(
+                new Helper(
+                    $this->prepareReportData($report),
+                    $this->pastoralMapper,
+                    $this->getConfigLoader(),
+                    $this->getUser(),
+                    $this->accessLevelCensor
+                ),
+                $tabType
+            );
+
+            if (null === $factory) {
+                throw new MapperException("Invalid type: $tabType has been given.");
+            }
+
+            $records        = $factory->retrieveResults($encodedCursor);
+            $records        = $factory->process($records, $encodedCursor);
+            $this->response = $this->responseAsJson($records, true);
+        } catch (\PDOException | DatabaseException $e) {
+            $problem = (new ApiProblem('Something has gone wrong, please contact your support if the problem persists'))
+                ->setStatus(500);
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus(500);
+        } catch (\Exception | \ValueError $e) {
+            $problem = new ApiProblem($e->getMessage());
+            $problem->setStatus($e->getCode());
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus($e->getCode());
+        }
+    }
+
+    /**
+     * Get the report list and able to filter down to specific cells
+     *
+     * @param string         $tabType
+     * @param PastoralReport $report
+     * @return void
+     */
+    public function getReportByTabTypeScope(string $tabType, PastoralReport $report): void
+    {
+        try {
+            $encodedCursor = $this->requestQuery->get('cursor');
+            $columnKey     = $this->requestQuery->get('column');
+            $rowKey        = $this->requestQuery->get('row');
+            $resultType    = $this->requestQuery->get('selected', Cursor::RESULT_TYPE_RECORDS);
+            $limit         = $this->requestQuery->getInt('limit', Cursor::LIMIT_DEFAULT);
+
+            $cursor = new \Schoolbox\Pastoral\ReportBuilder\ResultList\Cursor(
+                new Helper(
+                    $this->prepareReportData($report),
+                    $this->pastoralMapper,
+                    $this->getConfigLoader(),
+                    $this->getUser(),
+                    $this->accessLevelCensor,
+                ),
+                $this->pastoralMapper,
+                $tabType,
+                $resultType,
+                $columnKey,
+                $rowKey,
+                $limit,
+            );
+
+            $result = $cursor->retrieveResults($encodedCursor);
+            $this->response = $this->responseAsJson(
+                [
+                    'data'     => [
+                        'results' => $result->map($this->pastoralTranslator),
+                    ],
+                    'metadata' => [
+                        'count'  => $cursor->retrieveResultCount(),
+                        'cursor' => [
+                            'current' => $encodedCursor ?? $cursor->current($result),
+                            'next'    => $cursor->next($result) ?? null
+                        ]
+                    ]
+
+                ],
+                true
+            );
+        } catch (\PDOException | DatabaseException $e) {
+            $problem = (new ApiProblem('Something has gone wrong, please contact your support if the problem persists'))
+                ->setStatus(500);
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus(500);
+        } catch (\Exception | \ValueError $e) {
+            $problem = new ApiProblem($e->getMessage());
+            $problem->setStatus($e->getCode());
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus($e->getCode());
+        }
+    }
+
+    /**
+     * Export results to csv
+     *
+     * @param PastoralReport $report
+     * @param Collection     $records
+     * @return void
+     */
+    private function exportResultsToCSV(PastoralReport $report, Collection $records): void
+    {
         $exporter = new \Report_Exporter($report->getName());
         $headings = [
             'Pastoral ID'  => 'Pastoral ID',
@@ -393,9 +614,13 @@ class Controller extends Base
         if ($this->getConfigLoader()->get('pastoral_severity')) {
             $headings['Severity'] = 'Severity';
         }
+        $headings['Tags'] = 'Tags';
+
+        if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_POINT_ENABLED)) {
+            $headings['Points'] = 'Points';
+        }
+
         $headings = array_merge($headings, [
-            'Tags'         => 'Tags',
-            'Points'       => 'Points',
             'Body'         => 'Body',
             'Created Date' => 'Created Date',
             'Created By'   => 'Created By',
@@ -409,12 +634,68 @@ class Controller extends Base
     }
 
     /**
+     * Exporting results that's filtered to the column and row to CSV
+     *
+     * @param string         $tabType
+     * @param PastoralReport $report
+     * @return void
+     */
+    public function getReportResultsInScopeExport(string $tabType, PastoralReport $report): void
+    {
+        try {
+            $columnKey     = $this->requestQuery->get('column');
+            $rowKey        = $this->requestQuery->get('row');
+            $resultType    = $this->requestQuery->get('selected', Cursor::RESULT_TYPE_RECORDS);
+
+
+            $cursor = new \Schoolbox\Pastoral\ReportBuilder\ResultList\Cursor(
+                new Helper(
+                    $this->prepareReportData($report),
+                    $this->pastoralMapper,
+                    $this->getConfigLoader(),
+                    $this->getUser(),
+                    $this->accessLevelCensor,
+                ),
+                $this->pastoralMapper,
+                $tabType,
+                $resultType,
+                $columnKey,
+                $rowKey,
+                null,
+            );
+
+            $result = $cursor->retrieveResults(null);
+            $this->exportResultsToCSV($report, $result);
+        } catch (\PDOException | DatabaseException $e) {
+            $problem = (new ApiProblem('Something has gone wrong, please contact your support if the problem persists'))
+                ->setStatus(500);
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus(500);
+        } catch (\Exception | \ValueError $e) {
+            $problem = new ApiProblem($e->getMessage());
+            $problem->setStatus($e->getCode());
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus($e->getCode());
+        }
+    }
+
+    /**
+     * Exports report data
+     * @param PastoralReport $report
+     */
+    public function getReportResultsExport(PastoralReport $report): void
+    {
+        $records  = $this->getReportData($report);
+        $this->exportResultsToCSV($report, $records);
+    }
+
+    /**
      * Manipulator for exporting report
      * @param PastoralRecord $record
      * @return array
      */
     public function dataManipulator(PastoralRecord $record): array
     {
+        $points = trim((string)$record->getPoints());
+
         return [
             'Pastoral ID'  => $record->getId(),
             'Student Name' => $record->getStudent()->getFullName(),
@@ -427,7 +708,7 @@ class Controller extends Base
             'Sub-Type'     => $record->getSubType() ? $record->getSubType()->getName() : '',
             'Occurred On'  => $record->getOccurredOn()?->getDatabaseDate(),
             'Tags'         => implode(',', $record->getTags()->getPropertyValues('name')),
-            'Points'       => $record->getPoints() ?: '',
+            'Points'       => '' !== $points ? $points : '',
             'Severity'     => $record->getSeverity() ? $record->getSeverity()->getName() : '',
             'Body'         => $record->getBodyPublic(),
             'Created Date' => $record->getCreatedAt()->getDatabase(),
@@ -436,16 +717,13 @@ class Controller extends Base
     }
 
     /**
-     * Get pastoral report records
+     * Preparing the data readying for report filtering
      *
      * @param PastoralReport $report
-     *
-     * @return Collection
+     * @return array
      */
-    private function getReportData(PastoralReport $report): Collection
+    private function prepareReportData(PastoralReport $report): array
     {
-        // Get matching records
-
         // Special case for the current term relative date, which is not a strtotime-able thingy
         if (!$report->getUsesRelativeDate()) {
             $beforeDate = $report->getBeforeDate();
@@ -484,29 +762,70 @@ class Controller extends Base
 
         // if folder is set, but no users returned, we should not return any records
         if (($report->getFolders()->count() > 0) && ($students->count() === 0)) {
+            return [];
+        }
+
+        return [
+            'user' => $this->getUser(),
+            'beforeDate' => $beforeDate,
+            'afterDate' => $afterDate,
+            'severity' => $report->getSeverity(),
+            'types' => $report->getTypes(),
+            'subtypes' => $report->getSubTypes(),
+            'authors' => $report->getAuthors(),
+            'students' => $students,
+            'tags' => $report->getTags(),
+            'orders' => $report->getOrder(),
+            'involved' => $report->getInvolved(),
+            'years' => $report->getYears(),
+            'houses' => $report->getHouses(),
+            'campuses' => $report->getCampuses(),
+            'actions' => $report->getActions(),
+            'includeStudentsWithoutYear' => $report->getIncludeStudentsWithoutYear(),
+            'includeStudentsWithoutHouse' => $report->getIncludeStudentsWithoutHouse(),
+            'includeRecordsWithoutAction' => $report->getIncludeRecordsWithoutAction(),
+            'includeArchivedRecords' => $report->getIncludeArchivedRecords(),
+            'actionStatus' => $report->getActionStatus(),
+        ];
+    }
+
+    /**
+     * Get pastoral report records
+     *
+     * @param PastoralReport $report
+     *
+     * @return Collection
+     */
+    private function getReportData(PastoralReport $report): Collection
+    {
+        // Get matching records
+        $data = $this->prepareReportData($report);
+
+        if (empty($data)) {
             return $this->pastoralDataSource->createCollection();
         }
 
         return $this->pastoralDataSource->getReportData(
-            $this->getUser(),
-            $beforeDate,
-            $afterDate,
-            $report->getSeverity(),
-            $report->getTypes(),
-            $report->getSubTypes(),
-            $report->getAuthors(),
-            $students,
-            $report->getTags(),
-            $report->getOrder(),
-            $report->getInvolved(),
-            $report->getYears(),
-            $report->getHouses(),
-            $report->getCampuses(),
-            $report->getActions(),
-            $report->getIncludeStudentsWithoutYear(),
-            $report->getIncludeStudentsWithoutHouse(),
-            $report->getIncludeRecordsWithoutAction(),
-            $report->getActionStatus()
+            $data['user'],
+            $data['beforeDate'],
+            $data['afterDate'],
+            $data['severity'],
+            $data['types'],
+            $data['subtypes'],
+            $data['authors'],
+            $data['students'],
+            $data['tags'],
+            $data['orders'],
+            $data['involved'],
+            $data['years'],
+            $data['houses'],
+            $data['campuses'],
+            $data['actions'],
+            $data['includeStudentsWithoutYear'],
+            $data['includeStudentsWithoutHouse'],
+            $data['includeRecordsWithoutAction'],
+            $data['includeArchivedRecords'],
+            $data['actionStatus'],
         );
     }
 
@@ -580,6 +899,8 @@ class Controller extends Base
             }
         }
 
+        $report->setIncludeArchivedRecords($post->getBool('includeArchivedRecords', false));
+
         $report->setTypesCsv($this->getCsv($post->get('types')));
         $report->setSubTypesCsv($this->getCsv($post->get('subtypes')));
         $report->setAuthorsCsv($this->getCsv($post->get('authors')));
@@ -592,6 +913,9 @@ class Controller extends Base
 
         $report->setIncludeStudentsWithoutYear($post->getBool('includeStudentsWithoutYear', false));
         $report->setIncludeStudentsWithoutHouse($post->getBool('includeStudentsWithoutHouse', false));
+
+        // Saving the summary tables options
+        $report->setSummaryTables(implode(',', $post->get('summaryTables', [])));
 
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
             $report->setActionsCsv($this->getCsv($post->get('actions')));

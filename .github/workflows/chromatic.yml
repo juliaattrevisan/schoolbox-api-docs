@@ -6,16 +6,22 @@ name: 'Chromatic'
 # Event for the workflow
 on: push
 
+# Cancel on push to same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref || github.run_id }}
+  cancel-in-progress: true
+
 # List of jobs
 jobs:
   chromatic-deployment:
+    timeout-minutes: 15
     #Branch must contain -sb in the branch name
     if: ${{ contains(github.ref_name, '-sb') }}
     # Operating System
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     # Job steps
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v4
       - name: Install dependencies
         run: yarn
         # 👇 Adds Chromatic as a step in the workflow

@@ -6,104 +6,138 @@
  * with a new way to call the toast using document.dispatchEvent.
  */
 
-import type { ToastActivateEventDetail, ToastLink, ToastTimeoutEventDetail } from "./sbxToastEvent";
-import { ToastEvent } from "./sbxToastEvent";
-
-const STATE_HIDDEN = "hidden";
-const STATE_PENDING = "pending";
-const STATE_DONE = "done";
-const STATE_FAILED = "failed";
+import { ToastState } from "./sbxToastTypes";
+import type { Toast, ToastLink, ToastTimeoutDetail } from "./sbxToastTypes";
 
 const DEFAULT_FADE_DURATION = 3000;
 const DEFAULT_DISPLAY_DURATION_SUCCESSFUL = 3000;
 const DEFAULT_DISPLAY_DURATION_UNSUCCESSFUL = 5000;
 
-const text = window.Vue.ref("");
-const state = window.Vue.ref(STATE_HIDDEN);
-const link = window.Vue.ref<ToastLink | null>(null);
-const fadeDuration = window.Vue.ref(DEFAULT_FADE_DURATION);
-const hidden = window.Vue.ref(true);
+/**
+ * All toasts on the page
+ * Currently, we only support one toast at a time - but this makes it easy to change later
+ */
+const toasts = window.Vue.ref<Toast[]>([]);
 
 /**
- * Activate this toast.
- * @param $text - The text to put in it
- * @param $link - The link object, what it should say, where it should go
+ * Activate a toast
+ * @param toast - The toast instance
+ * @param text - The text to display in the toast
+ * @param link - An optional link for the toast to be clickable
+ * @returns The toast instance
  */
-function activate($text: string, $link: ToastLink | null): void {
-    link.value = $link;
-    text.value = $text;
-    state.value = STATE_PENDING;
-    hidden.value = false;
+function activate(toast: Toast, text: string, link?: ToastLink): Toast {
+    // dismiss any existing toast first (as currently there can only be one at a time)
+    toasts.value.filter((t) => !t.hidden).forEach((t) => t.timeout({ text: t.text, duration: 0 }));
+
+    toast.text = text;
+    toast.link = link ?? null;
+    toast.state = ToastState.PENDING;
+    toast.hidden = false;
+
+    toasts.value.push(toast);
+    return toast;
 }
 
 /**
- * Display this toast with a timeout.
- * @param $text - The text to put in it
- * @param [isSuccess] -  Was the operation that displays this toast
- * @param [$duration] - How long should the toast show?
- * @param [$fadeDuration] - How long to wait before the toast disappears? (in ms)
- * @param [timeoutCallback] If callable, call this
- *                        when the toast times out
+ * Timeout a toast
+ * @param toast - The toast instance
+ * @param _detail - The details of the timeout
+ * @returns The toast instance
  */
-function timeout(
-    $text: string,
-    isSuccess?: boolean,
-    $duration?: number,
-    $fadeDuration?: number,
-    timeoutCallback?: () => void,
-): void {
-    text.value = $text;
-    state.value = isSuccess || isSuccess === undefined ? STATE_DONE : STATE_FAILED;
-    let duration;
-    if ($duration === undefined) {
-        duration = isSuccess ? DEFAULT_DISPLAY_DURATION_SUCCESSFUL : DEFAULT_DISPLAY_DURATION_UNSUCCESSFUL;
-    } else {
-        duration = $duration;
-    }
-    if ($fadeDuration) {
-        fadeDuration.value = $fadeDuration;
-    }
-    setTimeout(() => {
-        state.value = STATE_HIDDEN;
-        hidden.value = true;
-        if (timeoutCallback instanceof Function) {
-            timeoutCallback();
+function timeout(toast: Toast, _detail?: ToastTimeoutDetail): Toast {
+    const detail: ToastTimeoutDetail = _detail ?? { text: toast.text };
+
+    /**
+     * If the toast was already told to timeout, clear that timeout
+     * and immediately run the old callback if there was one
+     */
+    if (toast.currentTimeout) {
+        window.clearTimeout(toast.currentTimeout.timeoutId);
+
+        if (toast.currentTimeout.callback instanceof Function) {
+            toast.currentTimeout.callback();
         }
-    }, duration);
+    }
+
+    toast.text = detail.text ?? toast.text;
+    toast.state = detail.isSuccess || detail.isSuccess === undefined ? ToastState.DONE : ToastState.FAILED;
+    toast.fadeDuration = detail.fadeDuration ?? DEFAULT_FADE_DURATION;
+
+    let duration: number;
+    if (toast.hidden) {
+        duration = 0; // If this toast is already hidden, immediately run the callback
+    } else if (detail.duration === undefined) {
+        duration = detail.isSuccess ? DEFAULT_DISPLAY_DURATION_SUCCESSFUL : DEFAULT_DISPLAY_DURATION_UNSUCCESSFUL;
+    } else {
+        duration = detail.duration;
+    }
+
+    toast.currentTimeout = {
+        timeoutId: window.setTimeout(() => {
+            toast.state = ToastState.HIDDEN;
+            toast.hidden = true;
+
+            // If there's a callback to run, run it
+            if (toast.currentTimeout && toast.currentTimeout.callback instanceof Function) {
+                toast.currentTimeout.callback();
+            }
+            toast.currentTimeout = null;
+        }, duration),
+        callback: detail.timeoutCallback,
+    };
+
+    return toast;
+}
+
+/**
+ * Create (and activate) a new toast
+ * Since we currently only support one toast at a time, this will dismiss any existing toast first
+ * @param text - The text to display in the toast
+ * @param link - An optional link for the toast to be clickable
+ * @returns The toast object
+ */
+function createToast(text: string, link?: ToastLink): Toast {
+    const toast: Toast = window.Vue.reactive({
+        text,
+        state: ToastState.PENDING,
+        link: null,
+        fadeDuration: DEFAULT_FADE_DURATION,
+        hidden: true,
+        currentTimeout: null,
+        activate: (_text: string, _link?: ToastLink) => activate(toast, _text, _link),
+        timeout: (_detail?: ToastTimeoutDetail) => timeout(toast, _detail),
+    });
+
+    return toast.activate(text, link);
 }
 
 /**
  * Listen for toast events
  */
 window.Vue.onMounted(() => {
-    document.addEventListener(ToastEvent.ACTIVATE, (event) => {
-        const eventDetail = (event as CustomEvent).detail as ToastActivateEventDetail;
-        activate(eventDetail.text, eventDetail.link ?? null);
-    });
-    document.addEventListener(ToastEvent.TIMEOUT, (event) => {
-        const eventDetail = (event as CustomEvent).detail as ToastTimeoutEventDetail;
-        timeout(
-            eventDetail.text,
-            eventDetail.isSuccess,
-            eventDetail.duration,
-            eventDetail.fadeDuration,
-            eventDetail.timeoutCallback,
-        );
-    });
+    window.sbProps.toastActivate = createToast;
 });
 </script>
 
 <template>
-    <div
-        v-if="state !== STATE_HIDDEN"
-        :class="{ pop: !hidden, toast: true, alert: state === STATE_FAILED, success: state === STATE_DONE }"
-        :style="{ opacity: 1 }"
-        data-test="toast"
-        :data-test-is-success="state === STATE_DONE"
-    >
-        {{ text }}
-        <a v-if="link !== null" :href="link.href">{{ link.text }}</a>
-    </div>
+    <template v-for="(toast, i) in toasts" :key="i">
+        <div
+            v-if="toast.state !== ToastState.HIDDEN"
+            class="toast"
+            :class="{
+                pop: !toast.hidden,
+                alert: toast.state === ToastState.FAILED,
+                success: toast.state === ToastState.DONE,
+            }"
+            :style="{ opacity: 1 }"
+            data-test="toast"
+            :data-test-is-success="toast.state === ToastState.DONE"
+        >
+            {{ toast.text }}
+            <a v-if="toast.link !== null" :href="toast.link.href">{{ toast.link.text }}</a>
+        </div>
+    </template>
 </template>
 
 <style scoped></style>

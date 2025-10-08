@@ -12,10 +12,16 @@
 
 {% set placeholder = 'Feedback for ' ~ participant.user.givenName %}
 
+{% set prefix = prefix is defined ? prefix ~ '-' : '' %}
+{% set textareaId = 'comment-' ~ prefix ~ participant.user.id %}
+
 <label>Comment
+    <p class="meta">Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details on creation.</p>
     <textarea
         tabindex="{{ tabIndex }}"
-        id="comment-{{ participant.user.id }}" name="comment"
+        id="{{ textareaId }}"
+        data-feedback-comment="{{ participant.user.id }}"
+        name="comment"
         placeholder="{{ placeholder }}"
         rows="3"
     >{{ feedback is not null ? feedback.comment : ''}}</textarea>

@@ -1,0 +1,43 @@
+{% if isICSImport is defined and isICSImport %}
+    <script>
+        //Checkbox validation
+        $('#importForm').alaressValidate({
+            rules: {
+                "campusList[]": {
+                    oneCheckbox: "campusList",
+                },
+                "userGroup[]": {
+                    oneCheckbox: "userGroup",
+                },
+                "bulkadd-file": {
+                    required: {
+                        depends: function () {
+                            return document.getElementById("bulkadd-zone").querySelector("[data-dz-previews]").children.length === 0;
+                        },
+                    },
+                }
+            },
+            messages: {
+                "bulkadd-file": "Pleaes add a file to import"
+            }
+        });
+    </script>
+{% else %}
+    <script>
+        //validation
+        $('#importForm').alaressValidate({
+            rules: {
+                "bulkadd-file": {
+                    required: {
+                        depends: function () {
+                            return document.getElementById("bulkadd-zone").querySelector("[data-dz-previews]").children.length === 0;
+                        },
+                    },
+                }
+            },
+            messages: {
+                "bulkadd-file": "Pleaes add a file to import"
+            }
+        });
+    </script>
+{% endif %}

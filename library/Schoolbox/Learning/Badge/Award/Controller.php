@@ -38,6 +38,7 @@ use UnexpectedValueException;
 use Schoolbox\Learning\Badge\Translator as BadgeTranslator;
 use Schoolbox\Resource\Storage;
 use Schoolbox\TokenReplacer;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 use function count;
 use function in_array;
@@ -79,6 +80,10 @@ class Controller extends Base
      */
     private UserMapper $userMapper;
 
+    /**
+     * Helper for editor templates.
+     */
+    private EditorTemplateHelper $editorTemplateHelper;
 
     /**
      * Constructor
@@ -89,6 +94,7 @@ class Controller extends Base
      * @param Filter\Mapper           $filterMapper
      * @param Filter\Selection\Mapper $filterSelectionMapper
      * @param UserMapper              $userMapper
+     * @param EditorTemplateHelper    $editorTemplateHelper
      */
     public function __construct(
         Mapper $mapper,
@@ -97,6 +103,7 @@ class Controller extends Base
         Filter\Mapper $filterMapper,
         Filter\Selection\Mapper $filterSelectionMapper,
         UserMapper $userMapper,
+        EditorTemplateHelper $editorTemplateHelper,
         private RosettaStone $l10n,
     ) {
         $this->badgeMapper           = $badgeMapper;
@@ -105,6 +112,7 @@ class Controller extends Base
         $this->filterMapper          = $filterMapper;
         $this->filterSelectionMapper = $filterSelectionMapper;
         $this->userMapper            = $userMapper;
+        $this->editorTemplateHelper  = $editorTemplateHelper;
     }
 
 
@@ -316,6 +324,7 @@ class Controller extends Base
                 'targetUserIds' => implode(',', $users->getPropertyValues('id')),
                 'returnUrl'     => $returnUrl,
                 'cancelUrl'     => $cancelUrl,
+                'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
             ],
             'Award Achievement'
         );
@@ -399,7 +408,7 @@ class Controller extends Base
      */
     public function getAwardedBadges(User $user, string $awardStatus): void
     {
-        $awards = $this->mapper->findRecentForUser($user, $awardStatus, Alaress_Date_Format::now());
+        $awards = $this->mapper->findForUser($user, $awardStatus, Alaress_Date_Format::now());
 
         $stack = [];
 
@@ -445,7 +454,7 @@ class Controller extends Base
 
             /* Init badge count
              *
-             * findRecentForUser() is listed reverse chronologically so the first
+             * findForUser() is listed reverse chronologically so the first
              * in the list is the most recently awarded
              */
             if (!isset($stack['categories'][$categoryId]['awards'][$badgeId])) {
@@ -798,6 +807,7 @@ class Controller extends Base
                 'award'     => $award,
                 'returnUrl' => $returnUrl,
                 'cancelUrl' => Redirect::decode($returnUrl),
+                'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
             ],
             'Edit award'
         );

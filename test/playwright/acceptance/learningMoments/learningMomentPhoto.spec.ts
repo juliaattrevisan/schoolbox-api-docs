@@ -11,7 +11,7 @@ test.describe("Learning Moment Photo Tests", () => {
     test.beforeAll(async ({ baseTester, db }) => {
         baseTester.isGoingTo("update delete_at so data does not impact the tests");
         await db.updateInDatabase(
-            "evidence",
+            "moment",
             { deleted_at: "2022-01-15 11:22:34" },
             { "body LIKE": "%his is a learning moment%" },
         );
@@ -32,10 +32,11 @@ test.describe("Learning Moment Photo Tests", () => {
 
         tester.isGoingTo("ensure I am able to delete the photo and then take the photo again");
         await learningMomentsPage.deletePhotoEvidence();
-        await learningMomentsPage.confirmDeletePhoto();
+        await learningMomentsPage.clickCameraIconButton();
         await learningMomentsPage.clickTakeAPhotoEvidence();
 
         tester.isGoingTo("write a description");
+        await learningMomentsPage.clickWriteSomethingButton();
         await learningMomentsPage.typeMediaEvidenceDescription("This is a learning moments test - take a photo");
         await learningMomentsPage.clickSubmit();
 
@@ -53,9 +54,7 @@ test.describe("Learning Moment Photo Tests", () => {
         await learningMomentsPage.clickShareLearningMomentLink();
         await learningMomentsPage.clickTakeAPhoto();
         await learningMomentsPage.clickTakeAPhotoEvidence();
-        await learningMomentsPage.deletePhotoEvidence();
-        await learningMomentsPage.confirmDeletePhoto();
-        await learningMomentsPage.clickTakeAPhotoEvidence();
+        await learningMomentsPage.clickWriteSomethingButton();
         await learningMomentsPage.typeMediaEvidenceDescription("This is a learning moments test to be commented");
         await learningMomentsPage.clickSubmit();
 
@@ -77,16 +76,14 @@ test.describe("Learning Moment Photo Tests", () => {
         await learningMomentsPage.clickShareLearningMomentLink();
         await learningMomentsPage.clickTakeAPhoto();
         await learningMomentsPage.clickTakeAPhotoEvidence();
-        await learningMomentsPage.deletePhotoEvidence();
-        await learningMomentsPage.confirmDeletePhoto();
-        await learningMomentsPage.clickTakeAPhotoEvidence();
+        await learningMomentsPage.clickWriteSomethingButton();
         await learningMomentsPage.typeMediaEvidenceDescription("This is a learning moments test to be modified");
         await learningMomentsPage.clickSubmit();
 
         tester.isGoingTo("check the learning moment is presented in the student activity feed and getting it updated");
 
         await learningMomentsPage.verifyEvidence("This is a learning moments test to be modified");
-        const evidenceId = (await db.grabFromDatabase("evidence", "id", {
+        const evidenceId = (await db.grabFromDatabase("moment", "id", {
             deleted_at: null,
             "body LIKE": "%This is a learning moments test to be modified%",
             user_id: 45,
@@ -99,7 +96,7 @@ test.describe("Learning Moment Photo Tests", () => {
             "This is a learning moments test to be modified updated",
         );
         await learningMomentsPage.deletePhotoEvidence();
-        await learningMomentsPage.confirmDeletePhoto();
+        await learningMomentsPage.clickCameraIconButton();
         await learningMomentsPage.clickTakeAPhotoEvidence();
         await learningMomentsPage.clickSubmit();
 
@@ -115,9 +112,7 @@ test.describe("Learning Moment Photo Tests", () => {
         await learningMomentsPage.clickShareLearningMomentLink();
         await learningMomentsPage.clickTakeAPhoto();
         await learningMomentsPage.clickTakeAPhotoEvidence();
-        await learningMomentsPage.deletePhotoEvidence();
-        await learningMomentsPage.confirmDeletePhoto();
-        await learningMomentsPage.clickTakeAPhotoEvidence();
+        await learningMomentsPage.clickWriteSomethingButton();
         await learningMomentsPage.typeMediaEvidenceDescription(
             "This is a learning moments test to get comments deleted",
         );
@@ -146,9 +141,7 @@ test.describe("Learning Moment Photo Tests", () => {
         await learningMomentsPage.clickShareLearningMomentLink();
         await learningMomentsPage.clickTakeAPhoto();
         await learningMomentsPage.clickTakeAPhotoEvidence();
-        await learningMomentsPage.deletePhotoEvidence();
-        await learningMomentsPage.confirmDeletePhoto();
-        await learningMomentsPage.clickTakeAPhotoEvidence();
+        await learningMomentsPage.clickWriteSomethingButton();
         await learningMomentsPage.typeMediaEvidenceDescription("This is a learning moments test to get deleted");
         await learningMomentsPage.clickSubmit();
 
@@ -156,7 +149,7 @@ test.describe("Learning Moment Photo Tests", () => {
         await learningMomentsPage.verifyEvidence("This is a learning moments test to get deleted");
 
         tester.isGoingTo("delete the learning moment");
-        const evidenceId = (await db.grabFromDatabase("evidence", "id", {
+        const evidenceId = (await db.grabFromDatabase("moment", "id", {
             deleted_at: null,
             "body LIKE": "%This is a learning moments test to get deleted%",
             user_id: 29,
@@ -178,27 +171,27 @@ test.describe("Learning Moment Photo Tests", () => {
             "update delete_at for the data created in this test so it does impact next suite of tests",
         );
         await db.updateInDatabase(
-            "evidence",
+            "moment",
             { deleted_at: "2022-01-15 11:22:34" },
             { "body LIKE": "%This is a learning moments test - take a photo%" },
         );
         await db.updateInDatabase(
-            "evidence",
+            "moment",
             { deleted_at: "2022-01-15 11:22:34" },
             { "body LIKE": "%This is a learning moments test to be commented%" },
         );
         await db.updateInDatabase(
-            "evidence",
+            "moment",
             { deleted_at: "2022-01-15 11:22:34" },
             { "body LIKE": "%This is a learning moments test to be modified%" },
         );
         await db.updateInDatabase(
-            "evidence",
+            "moment",
             { deleted_at: "2022-01-15 11:22:34" },
             { "body LIKE": "%This is a learning moments test to get comments deleted%" },
         );
         await db.updateInDatabase(
-            "evidence",
+            "moment",
             { deleted_at: "2022-01-15 11:22:34" },
             { "body LIKE": "%This is a learning moments test to get deleted%" },
         );

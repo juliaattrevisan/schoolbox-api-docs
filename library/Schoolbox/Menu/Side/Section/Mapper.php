@@ -38,7 +38,7 @@ class Mapper extends BaseMapper
         $config = new \Schoolbox\Config\Loader();
 
         return [
-            'subjects' => 'My Subjects',
+            'subjects' => 'My Classes',
             'menu' => $config->get('title'),
             'children' => 'My Students',
             'groups' => 'My favourite groups',

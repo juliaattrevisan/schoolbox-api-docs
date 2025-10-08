@@ -9,43 +9,51 @@ declare(strict_types=1);
 
 namespace Schoolbox\Calendar\Cache;
 
-use Calendar_Api_Cache;
+use Alaress\Http\Cache;
 use Calendar_Api_Config_Connector_Vcal as CalendarConfig;
 use DateTimeImmutable;
 use DateTimeZone;
+use GuzzleHttp\Exception\GuzzleException;
 use InvalidArgumentException;
 use Predis\ClientInterface as RedisClient;
+use Psr\SimpleCache\InvalidArgumentException as CacheInvalidArgumentException;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\InvalidDataException;
 use Sabre\VObject\ParseException;
 use Sabre\VObject\Reader;
+use Sabre\VObject\Writer;
 
 /**
  * Cache helper for vCal events.
  */
 class Vcal
 {
-    private const CACHE_KEY_BASE = 'vcal.%s';
+    private const CACHE_PREFIX   = 'vcal_';
+    private const CACHE_KEY_BASE = 'vcal:%s:%s';
 
 
-    // Cache expiry: 2 hours?
-    private const CACHE_EXPIRY = 7200;
-
-
-    /**
-     * @var RedisClient
+    // Cache expiry: 3 hours.. Ensure longer than cron refresh time
+    /* The crontab entry refers to preparseVcalSubscription.php
+     * You need to keep a cached calendar around longer than the crontab interval so that
+     * people can accessed the older cached version while the new one is being built.
+     * If you don't, you could allow people to request a dynamically calculated result
+     * set and suffer a potential performance hit.
      */
-    private $redis;
+    private const CACHE_EXPIRY = 10800;
 
 
     /**
      * Constructor
      *
-     * @param RedisClient $redis
+     * @param RedisClient $redis        Redis client, for cached events once loaded from the vCal file.
+     * @param Cache       $cache        HTTP cache, for caching the vCal file itself from its remote URL.
+     * @param int         $cacheTimeout Timeout for the HTTP cache.
      */
-    public function __construct(RedisClient $redis)
-    {
-        $this->redis = $redis;
+    public function __construct(
+        private RedisClient $redis,
+        private Cache $cache,
+        private int $cacheTimeout = self::CACHE_EXPIRY,
+    ) {
     }
 
 
@@ -66,7 +74,7 @@ class Vcal
             $this->redis->setex(
                 $this->determineCacheKey($config),
                 self::CACHE_EXPIRY,
-                serialize($this->convertSourceToEvents($source))
+                Writer::writeJson($this->convertSourceToEvents($source))
             );
         }
     }
@@ -82,16 +90,12 @@ class Vcal
     {
         $cacheKey = $this->determineCacheKey($config);
         if ($this->redis->exists($cacheKey)) {
-            /** issues with extracting the cached calendar, we should delete and re fetch */
-            set_error_handler(function () use ($cacheKey) {
+            $cal = Reader::readJson($this->redis->get($cacheKey));
+            if (!$cal instanceof VCalendar) {
                 // If we can't unserialize the data, delete it.
                 $this->redis->del($cacheKey);
                 return null;
-            }, E_ALL);
-            $cal =  unserialize($this->redis->get($cacheKey), [VCalendar::class]);
-
-            // go back to the usual error handler
-            restore_error_handler();
+            }
 
             return $cal;
         }
@@ -109,7 +113,6 @@ class Vcal
      */
     private function retrieveSource(CalendarConfig $config): ?string
     {
-        $cache   = new Calendar_Api_Cache();
         $headers = [];
         if ($config->getAuthorization()) {
             $headers = ['Authorization' => 'Bearer ' . $config->getAuthorization()];
@@ -119,15 +122,15 @@ class Vcal
         // (Use the cache class because it contains logic for handling proxy
         //  servers, failures, relative URLs and probably other stuff.)
         try {
-            $cache->init($config->getUrl(), $headers);
-        } catch (InvalidArgumentException $e) {
+            $source = $this->cache->request($config->getUrl(), self::CACHE_PREFIX, $headers, $this->cacheTimeout);
+        } catch (GuzzleException | CacheInvalidArgumentException $e) {
             // The cached calendar wasn't able to be loaded.
             // Maybe the config's URL was invalid or empty?
             return null;
         }
 
-        $source = $cache->getStreamContents();
-        $cache->invalidateCache();
+        // The old cache invalidated the source: is this required anymore?
+        $this->cache->invalidate($config->getUrl());
         return $source;
     }
 
@@ -185,6 +188,6 @@ class Vcal
     {
         // Can't use config's PK, as it doesn't exist in the encoded object.
         // We can only use its URL.
-        return sprintf(self::CACHE_KEY_BASE, hash('sha256', $config->getUrl()));
+        return sprintf(self::CACHE_KEY_BASE, INSTANCE_ID, hash('sha256', $config->getUrl()));
     }
 }

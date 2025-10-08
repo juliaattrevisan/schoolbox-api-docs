@@ -351,52 +351,52 @@ interface IConnector
     /**
      * Temporary implementation of `\MSSQL::getRow`, to ease transition.
      *
-     * @deprecated Replace with `$this->executeQuery($sql, $parameters)->fetch()`
      * @param string     $sql
      * @param array|null $parameters
      * @return array|bool The row, or false if no row is found
+          * @deprecated Replace with `$this->executeQuery($sql, $parameters)->fetch()`
      */
-    public function getRow(string $sql, array $parameters = null);
+    public function getRow(string $sql, ?array $parameters = null);
 
     /**
      * Temporary implementation of `\MSSQL::getOne`, to ease transition.
      *
-     * @deprecated Replace with `$this->executeQuery($sql, $parameters)->fetchColumn()`
      * @param string     $sql
      * @param array|null $parameters
      * @return mixed
+     *@deprecated Replace with `$this->executeQuery($sql, $parameters)->fetchColumn()`
      */
-    public function getOne(string $sql, array $parameters = null);
+    public function getOne(string $sql, ?array $parameters = null);
 
     /**
      * Temporary implementation of `\MSSQL::getAll`, to ease transition.
      *
-     * @deprecated Replace with `$this->executeQuery($sql, $parameters)->fetchAll()`
      * @param string     $sql
      * @param array|null $parameters
      * @return array
+     *@deprecated Replace with `$this->executeQuery($sql, $parameters)->fetchAll()`
      */
-    public function getAll(string $sql, array $parameters = null): array;
+    public function getAll(string $sql, ?array $parameters = null): array;
 
     /**
      * Temporary implementation of `\MSSQL::getIterator`, to ease transition.
      *
-     * @deprecated Replace with `$this->executeQuery($sql, $parameters)->getIterator()`
      * @param string     $sql
      * @param array|null $parameters
      * @return IIterator
+     *@deprecated Replace with `$this->executeQuery($sql, $parameters)->getIterator()`
      */
-    public function getIterator(string $sql, array $parameters = null): IIterator;
+    public function getIterator(string $sql, ?array $parameters = null): IIterator;
 
     /**
      * Temporary implementation of `\MSSQL::query`, to ease transition.
      *
-     * @deprecated Replace with `$this->executeQuery($sql, $parameters)`
      * @param string     $sql
      * @param array|null $parameters
      * @return IStatement
+     *@deprecated Replace with `$this->executeQuery($sql, $parameters)`
      */
-    public function query(string $sql, array $parameters = null): IStatement;
+    public function query(string $sql, ?array $parameters = null): IStatement;
 
     /**
      * Temporary implementation of `\MSSQL::prepareProcedure`, to ease transition.

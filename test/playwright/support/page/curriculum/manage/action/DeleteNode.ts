@@ -7,9 +7,9 @@ export default class DeleteNode {
 
     private tester: AcceptanceTester;
 
-    static readonly DATATEST_DELETE_BUTTON = "delete-nodes";
+    static readonly DATA_TEST_DELETE_BUTTON = "delete-nodes";
 
-    static readonly DATATEST_CONFIRM_BUTTON = "confirm-delete-node";
+    static readonly DATA_TEST_CONFIRM_BUTTON = "confirm-delete-node";
 
     constructor(page: Page, tester: AcceptanceTester) {
         this.page = page;
@@ -20,20 +20,20 @@ export default class DeleteNode {
      * Clicks the delete button for selected nodes
      */
     async clickDeleteButton(): Promise<void> {
-        await this.page.getByTestId(DeleteNode.DATATEST_DELETE_BUTTON).click();
+        await this.page.getByTestId(DeleteNode.DATA_TEST_DELETE_BUTTON).click();
     }
 
     /**
      * Waits for the confirmation modal to appear
      */
     async waitForConfirmModal(): Promise<void> {
-        await expect(this.page.getByTestId(DeleteNode.DATATEST_CONFIRM_BUTTON)).toBeVisible();
+        await expect(this.page.getByTestId(DeleteNode.DATA_TEST_CONFIRM_BUTTON)).toBeVisible();
     }
 
     /**
      * Clicks the confirm button to delete nodes
      */
     async clickConfirmButton(): Promise<void> {
-        await this.page.getByTestId(DeleteNode.DATATEST_CONFIRM_BUTTON).click();
+        await this.page.getByTestId(DeleteNode.DATA_TEST_CONFIRM_BUTTON).click();
     }
 }

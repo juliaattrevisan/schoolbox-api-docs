@@ -31,7 +31,7 @@ $foundation-breakpoint-map: (
     ),
     "large": (
         "breakpoint": $large-up,
-        "breakpoint-smaller-down": $mediumwide-down,
+        "breakpoint-smaller-down": $medium-down,
     ),
     "xlarge": (
         "breakpoint": $xlarge-up,
@@ -61,6 +61,10 @@ $foundation-size-array: map.keys($foundation-breakpoint-map);
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax($minColWidth, 1fr));
     width: 100%;
+
+    &--auto-fill {
+        grid-template-columns: repeat(auto-fill, minmax($minColWidth, 1fr));
+    }
 
     // If you need explicit column sizes... here;
     &--2-col {

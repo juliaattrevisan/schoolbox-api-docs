@@ -11,9 +11,16 @@ export default class SubmitForm {
 
     static readonly URL = "/learning/assessments/{assessment_id}/{user_id}/submit";
 
-    static readonly DATATEST_BUTTON_ASSESSMENT_CREATE_SUBMIT = "assessment-submission-create-submit";
+    static readonly DATA_TEST_BUTTON_ASSESSMENT_CREATE_SUBMIT = "assessment-submission-create-submit";
 
-    static readonly DATATEST_ASSESSMENT_SUMMARY_FILES_LIST_FILE = "assessment-summary-files-list-file";
+    static readonly DATA_TEST_ASSESSMENT_SUMMARY_FILES_LIST_FILE = "assessment-summary-files-list-file";
+
+    static readonly DATA_TEST_ASSESSMENT_SUMMARY_CREATE_BUTTON = "assessment-summary-create-button";
+
+    static readonly DATA_TEST_ASSESSMENT_SUBMISSION_CREATE_SUBMITTEDINPERSON =
+        "assessment-submission-create-submittedInPerson";
+
+    static readonly DATA_TEST_ASSESSMENT_SUBMISSION_INPUT_BODY = "assessment-submission-input-body";
 
     private filePath?: string;
 
@@ -62,13 +69,13 @@ export default class SubmitForm {
      */
     async submit(): Promise<void> {
         await this.page.waitForTimeout(1000); // Wait for auto-save to finish
-        await this.page.getByTestId(SubmitForm.DATATEST_BUTTON_ASSESSMENT_CREATE_SUBMIT).click();
+        await this.page.getByTestId(SubmitForm.DATA_TEST_BUTTON_ASSESSMENT_CREATE_SUBMIT).click();
         await expect(this.page.locator("h2.subheader").filter({ hasText: "SUBMISSION HISTORY" })).toBeVisible();
 
         // Verify if the contents are present
         if (this.contents) {
             await expect(
-                this.page.getByTestId(SubmitForm.DATATEST_ASSESSMENT_SUMMARY_FILES_LIST_FILE).filter({
+                this.page.getByTestId(SubmitForm.DATA_TEST_ASSESSMENT_SUMMARY_FILES_LIST_FILE).filter({
                     hasText: "Online Submission",
                 }),
             ).toBeVisible();
@@ -77,7 +84,7 @@ export default class SubmitForm {
         // Verify if the file is present
         if (this.filePath) {
             await expect(
-                this.page.getByTestId(SubmitForm.DATATEST_ASSESSMENT_SUMMARY_FILES_LIST_FILE).filter({
+                this.page.getByTestId(SubmitForm.DATA_TEST_ASSESSMENT_SUMMARY_FILES_LIST_FILE).filter({
                     hasText: path.basename(this.filePath).split(".")[0],
                 }),
             ).toBeVisible();

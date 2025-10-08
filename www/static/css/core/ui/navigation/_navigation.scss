@@ -174,7 +174,7 @@ $allow-sidebar-stash: $large-up;
 
     .right-small {
         width: $tabbar-height;
-        z-index: var(--sbx-depth-menu);
+        z-index: calc(var(--sbx-depth-menu) - 1); // -1 to avoid overlap with the side menus, which should sit on top
     }
 
     .tab-bar {

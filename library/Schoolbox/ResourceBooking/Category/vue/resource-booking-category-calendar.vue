@@ -1,18 +1,19 @@
 <script>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
 import FullCalendar from "@fullcalendar/vue3";
 import interactionPlugin from "@fullcalendar/interaction";
 import adaptivePlugin from "@fullcalendar/adaptive";
+import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
 import ViewEventModal from "@schoolboxVue/components/fullcalendar/view-event-modal";
 import CreateBookingModal from "@schoolboxVue/components/fullcalendar/resourceBooking/create-booking-modal";
 import ExportModal from "@schoolboxVue/components/fullcalendar/resourceBooking/export-booking-modal";
 import FilterModal from "@schoolboxVue/components/fullcalendar/resourceBooking/filter-modal";
 import FlatPickr from "@schoolboxVue/components/fullcalendar/flat-pickr";
-import axios from "axios";
 import fullCalendarHelper from "@schoolboxVue/components/fullcalendar/mixinFullCalendarHelper";
-import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
+import { getSearchString } from "@js/util/queryUtils";
 
 const URL_EVENT_EXPORT = "/calendar/export.php";
 
@@ -188,25 +189,30 @@ export default {
          * @param callback  A function to call with the list of events.
          */
         events(fetchInfo, callback) {
-            axios
-                .get(this.config.resourceBookingEndpoint, {
-                    headers: {
-                        "X-Requested-With": "XMLHttpRequest",
-                    },
-                    params: {
-                        start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
-                        end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
-                        status: this.config.selectedFilters,
-                    },
-                })
+            const toast = window.sbProps.toastActivate("Retrieving events...");
+            const params = {
+                start: Number((fetchInfo.start.getTime() / 1000).toFixed(0)),
+                end: Number((fetchInfo.end.getTime() / 1000).toFixed(0)),
+                status: this.config.selectedFilters,
+            };
+            fetch(`${this.config.resourceBookingEndpoint}?${getSearchString(params)}`, {
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                },
+            })
+                .then((response) => response.json())
                 .then((response) => {
                     callback(
-                        response.data.filter((v) => {
+                        response.filter((v) => {
                             return "start" in v;
                         }),
                     );
+                    toast.timeout({ text: "Events retrieved" });
+                })
+                .catch((error) => {
+                    console.error(error);
+                    toast.timeout({ text: "Events could not be retrieved", isSuccess: false });
                 });
-            // Fail callback: consider a message saying something failed
         },
 
         /**

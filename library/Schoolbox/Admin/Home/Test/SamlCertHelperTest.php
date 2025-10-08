@@ -9,8 +9,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\Home\Test;
 
+use Alaress\Http\Cache;
 use Alaress_Date_Format;
 use DateTimeZone;
+use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Psr7\Request;
 use PHPUnit\Framework;
 use Schoolbox\Admin\Home\SamlCertHelper;
 
@@ -93,71 +96,46 @@ class SamlCertHelperTest extends Framework\TestCase
 
     /**
      * Used for test cases where the metadata URL is empty, so we do not need to mock specific behaviour
-     * @return \Alaress_Saml_Cache (mocked)
+     * @return Cache (mocked)
      */
-    private function getDefaultCache(): \Alaress_Saml_Cache
+    private function getDefaultCache(): Cache
     {
-        return new \Alaress_Saml_Cache();
+        return $this->createMock(Cache::class);
     }
 
     /**
      * Mocks the cache's behaviour when a metadata URL is accessible, but we failed to parse its contents
-     * @return \Alaress_Saml_Cache (mocked)
+     * @return Cache (mocked)
      */
-    private function getMetadataUnparsableMock(): \Alaress_Saml_Cache
+    private function getMetadataUnparsableMock(): Cache
     {
-        $return = $this->createMock(\Alaress_Saml_Cache::class);
-        $return->method("getStreamContents")
-               ->willReturn(
-                   "Unparsable metadata cert"
-               );
-
-        $samlCache = $this->createMock(\Alaress_Saml_Cache::class);
-        $samlCache->method("init")
-                  ->willReturn(
-                      $return
-                  );
-        return $samlCache;
+        $cache = $this->createMock(Cache::class);
+        $cache->method("request")->willReturn("Unparsable metadata cert");
+        return $cache;
     }
 
     /**
      * Mocks the cache's behaviour when a metadata URL is offline
-     * @return \Alaress_Saml_Cache (mocked)
+     * @return Cache (mocked)
      */
-    private function getMetadataOfflineMock(): \Alaress_Saml_Cache
+    private function getMetadataOfflineMock(): Cache
     {
-        $return = $this->createMock(\Alaress_Saml_Cache::class);
-        $return->method("getStreamContents")
-               ->willReturn(
-                   null
-               );
-
-        $samlCache = $this->createMock(\Alaress_Saml_Cache::class);
-        $samlCache->method("init")
-                  ->willReturn(
-                      $return
-                  );
-        return $samlCache;
+        $cache = $this->createMock(Cache::class);
+        $cache->method("request")->willThrowException(
+            RequestException::create(new Request('GET', '')),
+        );
+        return $cache;
     }
 
     /**
      * Mocks the cache's behaviour when a valid cert can be returned
-     * @return \Alaress_Saml_Cache (mocked)
+     * @return Cache (mocked)
      */
-    private function getMetadataOkMock(): \Alaress_Saml_Cache
+    private function getMetadataOkMock(): Cache
     {
-        $return = $this->createMock(\Alaress_Saml_Cache::class);
-        $return->method("getStreamContents")
-               ->willReturn(
-                   self::METADATA_2027_04_26
-               );
-
-        $samlCache = $this->createMock(\Alaress_Saml_Cache::class);
-        $samlCache->method("init")
-                  ->willReturn(
-                      $return
-                  );
-        return $samlCache;
+        $cache = $this->createMock(Cache::class);
+        $cache->method("request")->willReturn(self::METADATA_2027_04_26);
+        return $cache;
     }
 
     public function testIdpCertEmptyMetadataUrlEmpty(): void

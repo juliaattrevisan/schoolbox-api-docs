@@ -39,7 +39,7 @@ interface External_ClassInterface extends External\IConnector
      *                                            No guarantee of being respected (only Synergetic for now)
      * @return string[]
      */
-    public function getTeachers(string $classCode, Alaress_Date_Format $date = null): array;
+    public function getTeachers(string $classCode, ?Alaress_Date_Format $date = null): array;
 
     /**
      * @return array

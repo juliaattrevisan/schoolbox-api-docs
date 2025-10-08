@@ -56,9 +56,10 @@ class GroupController extends Component_Dashboard_ControllerAbstract
      *
      * @return true
      */
-
     public function execute()
     {
+        $rerouteOverrideMapper = RerouteOverrideMapper::getInstance();
+
         /* Get Timetable colours to use as random colours for null set folders */
         $folderColours = new FolderColour(Timetable_ColourMapper::getInstance(), new ColorFactory());
         $userAccess  = array();
@@ -66,8 +67,16 @@ class GroupController extends Component_Dashboard_ControllerAbstract
         $allFolders = FolderMapper::getInstance()->findForUser($this->getUser(), false, UserAccess::ACCESS_READ, false, true);
         $filteredFolders = new Collection();
         foreach ($allFolders as $folder) {
-            $muted = RerouteOverrideMapper::getInstance()->isRouteMuted((string)$folder->getId(), $this->getUser()->getId());
-            if (!$muted) {
+            $muted = $rerouteOverrideMapper->isRouteMuted((string)$folder->getId(), $this->getUser()->getId());
+
+            if ($folder->getGroup()->getForceFollow()) {
+                /* If you muted this folder, but Force Follow was enabled,
+                 * include this folder - you're voluntold to know about it
+                 */
+                $filteredFolders->add($folder);
+            } elseif (!$muted) {
+                /* Otherwise, if you haven't muted it, include this folder
+                 */
                 $filteredFolders->add($folder);
             }
         }

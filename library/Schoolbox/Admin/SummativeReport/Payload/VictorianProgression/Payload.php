@@ -284,7 +284,7 @@ class Payload
                     $student,
                     $studentYearLevel,
                     $currentSemester,
-                    null,
+                    $folderId,
                     $aggregateAcademicPeriod['start'],
                     $aggregateAcademicPeriod['end'],
                     $data
@@ -296,9 +296,9 @@ class Payload
          * despite the ORDER BY statements; enforce an alphabetical order
          * upon the parent nodes. Also, for consistency between reports.
          */
-        usort($data, static function ($a, $b) {
-            return strnatcasecmp($a['name'], $b['name']);
-        });
+//        usort($data, static function ($a, $b) {
+//            return strnatcasecmp($a['name'], $b['name']);
+//        });
 
         /* The final payload; maybe add extra metadata here if you need it
          */
@@ -365,8 +365,15 @@ class Payload
         $params = [
             'workTypeId' => $this->workTypeId,
             'studentId' => $student->getId(),
-            'startDate' => $startDate->getDatabaseDate(),
-            'endDate' => $endDate->getDatabaseDate()
+            /* Go from the $startDate's start of day to the $endDate's end of day
+             * Without this, it'll infer '$startDate 00:00:00' to '$endDate 00:00:00'
+             * which natively excludes anything that happened after '$endDate 00:00:00',
+             * causing it to exclude stuff that happened on this last day.
+             *
+             * https://stackoverflow.com/questions/5080824/mysql-between-clause-not-inclusive
+             */
+            'startDate' => $startDate->getDatabaseDate() . ' 00:00:00',
+            'endDate' => $endDate->getDatabaseDate() . ' 23:59:59',
         ];
 
         /* Optional class filter (uses folderId)
@@ -375,13 +382,15 @@ class Payload
             $params['folderId'] = $folderId;
 
             $this->payloadFolderStatement->execute($params);
+            $statement = $this->payloadFolderStatement;
         } else {
             $this->payloadStatement->execute($params);
+            $statement = $this->payloadStatement;
         }
 
         /* Only find the most recent feedback per assessment, discarding ancient history
          */
-        while ($row = $this->payloadStatement->fetch(\PDO::FETCH_ASSOC)) {
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $parentNodeId = $row['parent_node_id'];
             $nodeId = $row['curriculum_node_id'];
 

@@ -10,7 +10,9 @@
 declare(strict_types=1);
 
 use Schoolbox\Application\CliTool;
+use Schoolbox\External\Connector\Log\Guid;
 use Schoolbox\External\Importer\Endpoint;
+use Schoolbox\UserMapper;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 
@@ -84,6 +86,7 @@ HELP;
         $customHours = [];
         $type = $this->getConfig()->get('schooldata_import_data_source');
         $file = $this->getOpt(self::OPT_LONG_FILE);
+        $timeout = (float)($this->getConfig()->get('schooldata_import_timeout') ?: Endpoint\Scheduler::DEFAULT_TIMEOUT);
 
         /* You haven't specified a SUDS Data Source in Admin.
          */
@@ -97,18 +100,67 @@ NULLTYPE;
             exit;
         }
 
+        /* SUDS imports can take a notoriously long time to complete based on sis etc.
+         * and the instances could start up a new import before the existing one
+         * has even finished. If you can't reserve this, then abort.
+         */
+        try {
+            $lock = $this->acquireLock(Endpoint\Scheduler::LOCK_NAME, $timeout);
+        } catch (\RuntimeException $e) {
+            exit(1);
+        }
+
+        /* SUDS imports sometimes take multiple hours to finish, even when they're
+         * not supposed to; we would normally implement a $lock->refresh() instead
+         * so that we're continually reserving an extra chunk of time while we're
+         * still working. But that would mean shoving a $lock down into the Endpoint
+         * Factory as an extra var, affecting the entire SUDS family.
+         *
+         * For now, we can presume a maximum execution time in case this process
+         * continues for too long. This implementation needs to change if you
+         * implement the $lock->refresh() as that has a very different meaning
+         */
+        $this->setMaxExecutionTime($timeout);
+
+        /* Announce some basic details
+         */
+        $this->getLogger()->debug(sprintf(
+            'Locking %s seconds for processing; max execution time is %s seconds',
+            $timeout,
+            $timeout
+        ));
+
         /* Accept perform param from opts
          */
         $perform = $this->perform();
 
-        /* This identifier indicates that the two schedulers were part of this
+        $logMapper = \Schoolbox\External\Connector\Log\Mapper::getInstance();
+
+        // Queries should not be time-limited here
+        $logMapper->getDatabase()->executeDirectly('SET MAX_STATEMENT_TIME=0;');
+
+        /* Remember the current instance's version number right before we import.
+         * We encountered a scenario where an upgrade changed schema after the
+         * shadow tables started, causing it to restore the old schema when it
+         * finished, resulting in mysteriously-missing columns. We now detecct
+         * version changes before shadow tables commit themselves at the end.
+         */
+        $version = $this->getVersion();
+
+        /* This identifier indicates that the scheduler(s) were part of this
          * script execution together
          */
-        $runId = (new \Schoolbox\External\Connector\Log\Guid())->generate();
+        $runId = (new Guid())->generate();
 
         /* Execute scheduler
          */
-        $factory = new Endpoint\CalendarFactory($host, $key, $perform, $this->getLogger());
+        $factory = new Endpoint\CalendarFactory(
+            $host,
+            $key,
+            $perform,
+            $version,
+            $this->getLogger()
+        );
 
         (new Endpoint\Scheduler(
             $frequency,
@@ -117,7 +169,7 @@ NULLTYPE;
             $type,
             $file,
             $this->getLogger(),
-            \Schoolbox\External\Connector\Log\Mapper::getInstance(),
+            $logMapper,
             $this->getDi()->get('sentry'),
         ))->run(time(), $runId, Endpoint\Scheduler::CALENDARIMPORTER_SCRIPT_NAME);
 
@@ -126,6 +178,12 @@ NULLTYPE;
         if (!$this->perform()) {
             $this->getLogger()->info('Planning finished.');
         }
+
+        /* Announce lock release
+         */
+        $this->getLogger()->debug('Releasing lock');
+
+        $lock->release();
     }
 };
 

@@ -60,6 +60,7 @@ use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserBulkMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\YearLevel\Mapper as YearLevelMapper;
+use Twig\Environment;
 use Twig\Error\Error;
 
 /**
@@ -77,14 +78,23 @@ class Controller extends ConfigController
      */
     public const SUMMATIVE_REPORT_STATUS_KEY = 'summativeReport_%s';
 
+    /**
+     * This file contains the footer for the summative reports, as well as
+     * customisable section that allows the school to add custom footer which
+     * are individualised per summative report
+     */
+    private const FOOTER_TWIG = '@adminSummativeReport/footer.twig';
 
     /**
-     * This file contains an html fragment that represents the footer
-     * for all the generated summative reports. Schools wanting a custom
-     * theme or layout for their reports will require customisation of almost
-     * everything inside the templates folder
+     * This file contains the default CSS styling for the footer for all the
+     * generated summative reports
      */
-    private const FOOTER_HTML = '/templates/footer.html';
+    private const FOOTER_CSS = '/templates/footer.css';
+
+    /**
+     * Default title of the report; used if the title field was 0-length
+     */
+    private const DEFAULT_TITLE = 'Summary of Curriculum Standards';
 
 
     /**
@@ -137,6 +147,7 @@ class Controller extends ConfigController
      * @param CacheInterface $oidcCache
      * @param \Schoolbox\External\User $externalUser
      * @param ImplementationMapper $implementationMapper
+     * @param Environment $twig
      */
     public function __construct(
         private \Schoolbox\Error\Mapper $errorMapper,
@@ -158,7 +169,8 @@ class Controller extends ConfigController
         Rebuilder $rebuilder,
         CacheInterface $oidcCache,
         private \Schoolbox\External\User $externalUser,
-        private ImplementationMapper $implementationMapper
+        private ImplementationMapper $implementationMapper,
+        private Environment $twig,
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
     }
@@ -230,6 +242,7 @@ class Controller extends ConfigController
         }
         $report = $this->reportMapper->createModel();
         $report->setFileName(Model::DEFAULT_FILENAME);
+        $report->setFooter(Model::DEFAULT_FOOTER);
         $this->response = $this->responseFromTemplate(
             '@adminSummativeReport/create.twig',
             [
@@ -240,7 +253,10 @@ class Controller extends ConfigController
                 'viewAs' => self::AVAILABLE_ROLETYPES,
                 'logoZone' => $logoZone->getTwigContext(),
                 'worktypesSummary' => $worktypes,
-                'worktypesClass' => $worktypes
+                'worktypesClass' => $worktypes,
+                'curriculumProgression' => [
+                    'title' => self::DEFAULT_TITLE
+                ]
             ]
         );
     }
@@ -308,6 +324,7 @@ class Controller extends ConfigController
                 'grades' => $payload['summary']['workType'][$summaryWorkType->getId()]['grades'] ?? false,
                 'comments' => $payload['summary']['workType'][$summaryWorkType->getId()]['comments'] ?? false,
                 'rubrics' => $payload['summary']['workType'][$summaryWorkType->getId()]['rubrics'] ?? false,
+                'graph' => $payload['summary']['workType'][$summaryWorkType->getId()]['graph'] ?? false,
                  // if we have seen this worktype in the payload, then set to show, and use it
                 'show' => isset($payload['summary']['workType'][$summaryWorkType->getId()]),
             ];
@@ -317,6 +334,7 @@ class Controller extends ConfigController
                 'grades' => $payload['class']['workType'][$summaryWorkType->getId()]['grades'] ?? false,
                 'comments' => $payload['class']['workType'][$summaryWorkType->getId()]['comments'] ?? false,
                 'rubrics' => $payload['class']['workType'][$summaryWorkType->getId()]['rubrics'] ?? false,
+                'graph' => $payload['class']['workType'][$summaryWorkType->getId()]['graph'] ?? false,
                 // if we have seen this worktype in the payload, then set to show, and use it
                 'show' => isset($payload['class']['workType'][$summaryWorkType->getId()]),
             ];
@@ -335,7 +353,10 @@ class Controller extends ConfigController
                 'viewAs' => self::AVAILABLE_ROLETYPES,
                 'logoZone' => $logoZone->getTwigContext(),
                 'worktypesSummary' => $worktypesSummary,
-                'worktypesClass' => $worktypesClass
+                'worktypesClass' => $worktypesClass,
+                'curriculumProgression' => [
+                    'title' => self::DEFAULT_TITLE
+                ]
             ]
         );
     }
@@ -408,7 +429,8 @@ class Controller extends ConfigController
             ->setIntroduction($postData['introduction'])
             ->setOptions(json_encode($options, JSON_THROW_ON_ERROR))
             ->setUpdatedBy($this->getUser())
-            ->setFileName($report->sanitiseFilename(trim((string)$postData['filename'])));
+            ->setFileName($report->sanitiseFilename(trim((string)$postData['filename'])))
+            ->setFooter(trim((string)$postData['footer']));
 
         /* If any Logo was provided, remember it
          * Otherwise clear it
@@ -676,7 +698,16 @@ class Controller extends ConfigController
              * Not sure what this does/did...?
              */
             foreach ($reports as $current) {
-                $messageFactory = $messageFactory->addPdfContent($current['filename'], $current['url']);
+                $messageFactory = $messageFactory->addPdfContent(
+                    $current['filename'],
+                    /* Having individualised footer
+                     */
+                    $this->twig->render(
+                        self::FOOTER_TWIG,
+                        ['customFooter' => $current['footer']]
+                    ),
+                    $current['url']
+                );
             }
 
             /* This is the filename for the zip that contains everything
@@ -688,30 +719,47 @@ class Controller extends ConfigController
                 $report->getTitle()
             ), 0, Payload\Url::FILENAME_MAX_LENGTH, 'UTF-8') . '.zip';
 
+            $callbackUrl    = (string)$urlBase
+                ->withPath(
+                    $this->routeGenerator->generate(
+                        'apiusernotify.apiUserNotify',
+                        ['userId' => $this->getUser()->getId()]
+                    )
+                );
+            $callbackUser   = call_user_func($userSerializer, $this->getUser());
+            $callbackParams = [
+                'from' => $callbackUser,
+                'to'   => $callbackUser,
+            ];
+
             /* This $message instance is the payload that we send to taskd
              * which it then unpacks, configures its Gotenberg client, and uses
              * to generate the pdfs. This is the bridge between the systems
              */
             $message = $messageFactory
                 ->setUser($this->getUser())
-                ->setCallbackUrl(
-                    (string)$urlBase
-                        ->withPath(
-                            $this->routeGenerator->generate(
-                                'apiusernotify.apiUserNotify',
-                                ['userId' => $this->getUser()->getId()]
-                            )
-                        )
+                ->setCallbackUrl($callbackUrl)
+                ->setCallbackParams(
+                    $callbackParams + [
+                        'message' => sprintf(
+                            'Your summative report %s is ready to download',
+                            $report->getTitle(),
+                        ),
+                    ]
                 )
-                ->setCallbackParams([
-                    'message' => sprintf(
-                        'Your summative report %s is ready to download',
-                        $report->getTitle(),
-                    ),
-                    'from'    => call_user_func($userSerializer, $this->getUser()),
-                    'to'      => call_user_func($userSerializer, $this->getUser()),
-                ])
-                ->setPdfFooter(file_get_contents(__DIR__ . self::FOOTER_HTML))
+                ->setFailureCallbackUrl($callbackUrl)
+                ->setFailureCallbackParams(
+                    $callbackParams + [
+                        'message' => sprintf(
+                            'Your summative report %s could not be downloaded (reason: :message)',
+                            $report->getTitle(),
+                        ),
+                        'messageParams' => [
+                            'message' => '{{response.message}}',
+                        ],
+                    ]
+                )
+                ->setPdfFooterStylesheet(file_get_contents(__DIR__ . self::FOOTER_CSS))
                 ->setOutfile($outfile)
                 ->build();
 
@@ -928,6 +976,16 @@ class Controller extends ConfigController
 
         // If the student does not have Comparitave graphs enabled for them, do not show the graph
         if ($student->getDisplayGradeGraph() || $viewer->getRole()->isStaff()) {
+            /* Compile a whitelist of worktypes that we want to include on the boxplots
+             */
+            $workTypeWhitelist = [];
+
+            foreach ($optionsPayload['summary']['workType'] as $worktypeId => $worktype) {
+                if ($worktype['graph'] ?? false) {
+                    $workTypeWhitelist[] = $worktypeId;
+                }
+            }
+
             if ($optionsPayload['summary']['cohort']) {
                 foreach ($folders as $folder) {
                     // if the folder is empty, then don't attempt to generate a graph for it
@@ -947,12 +1005,23 @@ class Controller extends ConfigController
                         $student,
                         $viewer,
                         $term,
-                        $gradeHelper
+                        $gradeHelper,
+                        $workTypeWhitelist
                     );
                 }
             }
 
             if ($optionsPayload['class']['cohort']) {
+                /* Compile a whitelist of worktypes that we want to include on the boxplots
+                 */
+                $workTypeWhitelist = [];
+
+                foreach ($optionsPayload['class']['workType'] as $worktypeId => $worktype) {
+                    if ($worktype['graph'] ?? false) {
+                        $workTypeWhitelist[] = $worktypeId;
+                    }
+                }
+
                 foreach ($folders as $folder) {
                     // if the folder is empty, then don't attempt to generate a graph for it
                     if (!isset($classAssessments[$folder->getId()])) {
@@ -971,7 +1040,8 @@ class Controller extends ConfigController
                         $student,
                         $viewer,
                         $term,
-                        $gradeHelper
+                        $gradeHelper,
+                        $workTypeWhitelist
                     );
                 }
             }
@@ -990,7 +1060,7 @@ class Controller extends ConfigController
              */
             'annotate' => (bool)$this->requestQuery->get('annotate', false),
             'summary' => null,
-            'class' => null
+            'class' => null,
         ];
 
         /* At least one of the Victorian Curriculum Progressions was enabled
@@ -1011,6 +1081,14 @@ class Controller extends ConfigController
                     (int)$optionsPayload['summary']['vicProgression']['workType'],
                     $vicProgression['annotate']
                 ))->generate($student, $academicPeriod, null);
+
+                /* Remember its customised title
+                 */
+                $vicProgression['summary']['title'] = self::DEFAULT_TITLE;
+
+                if ('' !== trim((string)($optionsPayload['summary']['vicProgression']['title'] ?? ''))) {
+                    $vicProgression['summary']['title'] = $optionsPayload['summary']['vicProgression']['title'];
+                }
             }
 
             /* The Class Version
@@ -1023,6 +1101,14 @@ class Controller extends ConfigController
                     (int)$optionsPayload['class']['vicProgression']['workType'],
                     $vicProgression['annotate']
                 );
+
+                /* Remember its customised title
+                 */
+                $vicProgression['class']['title'] = self::DEFAULT_TITLE;
+
+                if ('' !== trim((string)($optionsPayload['class']['vicProgression']['title'] ?? ''))) {
+                    $vicProgression['class']['title'] = $optionsPayload['class']['vicProgression']['title'];
+                }
 
                 /* Render a chart for each class in $folders, I suppose
                  */
@@ -1071,6 +1157,7 @@ class Controller extends ConfigController
             'summaryAssessmentFeedbacks' => $summaryAssessmentFeedbacks,
             'classAssessmentFeedbacks'   => $classAssessmentFeedbacks,
             'report'                     => $report,
+            'reportOptions'              => json_decode($report->getOptions()),
             'allGraphs'                  => $allGraphs,
             'showSummary'                => (bool)$optionsPayload['summary']['active'],
             'summaryHeading'             => trim((string)$optionsPayload['summary']['heading']),
@@ -1173,10 +1260,10 @@ class Controller extends ConfigController
     }
 
     /**
-     *  Generate standard cohort graph similar to the grades page
+     * Generate standard cohort graph similar to the grades page
      *
      * @param Collection $assessments
-     * @param Folder\Model $folder
+     * @param \Schoolbox\Resource\Folder\Model $folder
      * @param Markbook $filteredMarkbook
      * @param bool $lmsCohortComparison
      * @param bool $gradientEnable
@@ -1184,15 +1271,9 @@ class Controller extends ConfigController
      * @param User $viewer
      * @param Term\Model $term
      * @param Helper $gradeHelper
-     *
+     * @param array $workTypeWhitelist
      * @return array{graph: array, type: string}
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
      * @throws \JsonException
-     * @throws \LogicException
-     * @throws \PDOException
-     * @throws DefinitionException
-     * @throws \UnexpectedValueException
      */
     private function generateCohortGraph(
         Collection $assessments,
@@ -1203,7 +1284,8 @@ class Controller extends ConfigController
         User $student,
         User $viewer,
         Term\Model $term,
-        Helper $gradeHelper
+        Helper $gradeHelper,
+        array $workTypeWhitelist
     ): array {
         if ((new ValidUseCohortMarks())->isSatisfiedBy($lmsCohortComparison, $folder)) {
             $graphType = 'cohort';
@@ -1213,11 +1295,12 @@ class Controller extends ConfigController
                 $assessments,
                 $viewer,
                 $term,
-            ))->collate($student);
+            ))->collate($student, $workTypeWhitelist);
         } else {
             $graphType = 'class';
-            $graph = $gradeHelper->buildGraph($filteredMarkbook, $student, $viewer, $gradientEnable);
+            $graph = $gradeHelper->buildGraph($filteredMarkbook, $student, $viewer, $gradientEnable, $workTypeWhitelist);
         }
+
         return [
             'graph' => $graph,
             'type'  => $graphType,

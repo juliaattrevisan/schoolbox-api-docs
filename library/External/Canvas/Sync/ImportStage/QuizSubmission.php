@@ -159,6 +159,7 @@ class QuizSubmission extends SubmissionAbstract
                             $canvasSubmission,
                             $attempts,
                             $markScheme,
+                            null,
                             $feedbackTime
                         );
                         if (!$feedback) {
@@ -199,6 +200,7 @@ class QuizSubmission extends SubmissionAbstract
      * @param array                $canvasSubmission
      * @param GenericCollection    $existingFeedbacks
      * @param IMarkScheme          $markScheme
+     * @param ?IMarkScheme         $instructorMarkScheme
      * @param string               $feedbackTime
      * @return Quiz\Attempt\Model|null
      * @throws Mapper\Exception
@@ -210,6 +212,7 @@ class QuizSubmission extends SubmissionAbstract
         array $canvasSubmission,
         GenericCollection $existingFeedbacks,
         IMarkScheme $markScheme,
+        ?IMarkScheme $instructorMarkScheme, // This is unused for quiz, but here to match the interface
         string $feedbackTime
     ): ?Quiz\Attempt\Model {
         /** @var Quiz\Model $quiz */
@@ -239,6 +242,13 @@ class QuizSubmission extends SubmissionAbstract
         foreach ($existingFeedbacks as $attempt) {
             /** @var Quiz\Attempt\Answer\Model|null $response */
             $response = $responses->offsetGet($attempt->getId());
+
+            /* When checking the comment, compare both plaintext and html versions.
+             * Historically, comments were converted to plaintext before saving (SA-18750) but as of SA-19512
+             * we now support HTML feedback, so to avoid creating duplicates, we need to check both.
+             */
+            $plainComment = new Html2Text($canvasSubmission['comment']);
+
             // Check whether the rest are the same
             // Floating point precision in Schoolbox's getMark() is less than in canvas, so an exact match won't always work.
             // We have to test equality somewhat approximately, but with reasonable certainty.
@@ -247,7 +257,10 @@ class QuizSubmission extends SubmissionAbstract
                 && $attempt->getUser()->getId() === $reviewee->getId()
                 && $attempt->getReviewer()->getId() === $reviewer->getId()
                 && (abs($response->getMark() - (float)$normMark) < 0.0001)
-                && (string)$response->getComment() === (string)$canvasSubmission['comment']
+                && (
+                    (string)$response->getComment() === (string)$plainComment->getText()
+                    || (string)$response->getComment() === (string)$canvasSubmission['comment']
+                )
             ) {
                 $this->log->debug(sprintf('Feedback already exists for attempt: [%s]', $attempt->getId()));
                 return $attempt;
@@ -265,13 +278,10 @@ class QuizSubmission extends SubmissionAbstract
         $question = $section->getQuestions()?->first();
         $question->setSection($section);
 
-        // convert to plaintext first as a precaution
-        $plainComment = new Html2Text($canvasSubmission['comment']);
-
         $answers = $this->quizAnswerMapper->createCollection();
         $answer  = $this->quizAnswerMapper->createModel()
                                           ->setMark($normMark)
-                                          ->setComment($plainComment->getText())
+                                          ->setComment($canvasSubmission['comment'])
                                           ->setAutoMarked(false)
                                           ->setQuestion($question)
                                           ->setUpdatedAt($feedbackTime);

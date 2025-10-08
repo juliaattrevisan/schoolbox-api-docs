@@ -10,6 +10,7 @@
 namespace Schoolbox\Resource\Folder\Code;
 
 use Schoolbox\Collection;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -32,6 +33,8 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('code', self::TYPE_STRING);
         $this->joins('folder_id', FolderMapper::class, 'id', null, null, 'folder', 'folder');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback(self::CALLBACK_PRERESTORE, [$this, 'validateCodes']);
 
         $this->registerPersistSearchIndexCallbacks();
     }
@@ -84,7 +87,7 @@ class Mapper extends \Schoolbox\Mapper
      * @return void
      * @throws \UnexpectedValueException
      */
-    public function applyCodesToCategories(Collection $collection, callable $retrieveFunction = null): void
+    public function applyCodesToCategories(Collection $collection, ?callable $retrieveFunction = null): void
     {
         // Retrieve folder set
         $retrieveFunction = $retrieveFunction ?? static function ($item): Folder\Model {
@@ -122,5 +125,24 @@ class Mapper extends \Schoolbox\Mapper
     {
         // noop
         return false;
+    }
+
+    /**
+     * Validates that the code is not already active
+     *
+     * @param Model $model
+     * @return true
+     * @throws \Exception
+     */
+    protected function validateCodes(Model $model)
+    {
+        if ($model->getCode() === null) {
+            return true;
+        }
+        // If new folder has no codes, it can never collide.
+        if ($this->countByColumn('code', $model->getCode())) {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_CLASS_CODE_EXISTS);
+        }
+        return true;
     }
 }

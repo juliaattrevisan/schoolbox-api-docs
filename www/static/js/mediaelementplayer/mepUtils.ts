@@ -2,9 +2,15 @@
  * Based on our usage of MediaElementPlayer, this is not a complete type definition.
  * See https://github.com/mediaelement/mediaelement/blob/master/src/js/player.js
  */
-interface MediaElementPlayer {
+export interface MediaElementPlayer {
     node: HTMLElement;
+    pause(): void;
+    remove(): void;
+    paused: boolean;
     setPlayerSize: (width: number, height: number) => void;
+
+    // eslint-disable-next-line @typescript-eslint/no-misused-new -- to mimic the real class
+    new (selector: string | HTMLElement, options?: Record<string, unknown>): MediaElementPlayer;
 }
 
 /**
@@ -33,6 +39,11 @@ export function getConfigForVideo(overrideValueByKey?: object): {
          * See: https://github.com/mediaelement/mediaelement/blob/master/docs/api.md
          */
         stretching: "none",
+
+        // Override the default iconSprite reference and leave blank to avoid load error
+        // CSS is used to display the icons instead
+        // refer to https://github.com/mediaelement/mediaelement/blob/master/docs/api.md#configuration
+        iconSprite: ``,
 
         /**
          * @param media - the <mediaelementwrapper> DOM node (contains the <video> node)

@@ -9,33 +9,36 @@ declare(strict_types=1);
 
 namespace Schoolbox\API\Token\JwtParser\Test;
 
-use Cache\Adapter\PHPArray\ArrayCachePool;
-use Firebase\JWT\JWT;
 use GuzzleHttp\Client;
+use Monolog\Handler\HandlerInterface;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\API\Token\JwtParser\IParser;
 use Schoolbox\API\Token\JwtParser\OauthProviderIssued;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\ArrayLoader;
 use Schoolbox\UserMapper;
-use SensitiveParameter;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 
-#[\PHPUnit\Framework\Attributes\CoversClass(\Schoolbox\API\Token\JwtParser\OauthProviderIssued::class)]
+#[CoversClass(OauthProviderIssued::class)]
 class OauthProviderIssuedTest extends TestCase
 {
+    use CreateJwt;
+    use CreateLogger;
+
     /**
      * @param array $config
      * @param array $claims
      * @param bool  $expected
      * @return void
      */
-    #[\PHPUnit\Framework\Attributes\DataProvider('getTestAcceptsData')]
-    public function testAccepts(
-        array $config,
-        array $claims,
-        bool $expected,
-    ): void {
-        $this->assertSame($expected, $this->createParser($config)->accepts($this->createJwt($claims)));
+    #[DataProvider('getTestAcceptsData')]
+    public function testAccepts(array $config, array $claims, bool $expected): void
+    {
+        $handler = $this->createHandler();
+        $this->assertSame($expected, $this->createParser($handler, $config)->accepts($this->createJwt($claims)));
     }
 
     /**
@@ -186,31 +189,18 @@ class OauthProviderIssuedTest extends TestCase
     /**
      * Create a parser, with the provided config variables.
      *
-     * @param array $config
+     * @param HandlerInterface $handler
+     * @param array            $config
      * @return OauthProviderIssued
      */
-    private function createParser(array $config): OauthProviderIssued
+    private function createParser(HandlerInterface $handler, array $config): OauthProviderIssued
     {
         return new OauthProviderIssued(
             $this->createMock(UserMapper::class),
             new ArrayLoader($config),
+            $this->createLogger($handler),
             $this->createMock(Client::class),
-            new ArrayCachePool(null),
+            new Psr16Cache(new ArrayAdapter()),
         );
-    }
-
-    /**
-     * Create a mock JWT, with the provided payload.
-     *
-     * (This test doesn't care about the header or signature: only the payload.)
-     *
-     * @param array $payload
-     * @return string
-     */
-    private function createJwt(array $payload): string
-    {
-        // Just use the JWT library's encode methods:
-        // for this test we don't care about signing or anything
-        return sprintf('.%s.', JWT::urlsafeB64Encode(JWT::jsonEncode($payload)));
     }
 }

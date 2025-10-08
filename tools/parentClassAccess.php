@@ -106,7 +106,7 @@ $app = new class extends CliTool\App
 
         $handle = (new \Alaress\Csv\ValidCSV($handle))->skipBom();
 
-        while (($row = fgetcsv($handle)) !== false) {
+        while (($row = fgetcsv($handle, escape: '')) !== false) {
             if (count($row) > 1) {
                 if (!isset($classes[$row[0]])) {
                     $classes[$row[0]] = [];
@@ -200,21 +200,17 @@ $app = new class extends CliTool\App
                 if ($loadStudents) {
                     $students = $externalClass->getStudents($code);
 
-                    if (is_array($students)) {
-                        foreach ($students as $student) {
-                            $this->loadUserAccess($userMapper, $userAccessMapper, $student['synergy_id'], Role::STUDENT, $folderId);
-                        }
+                    foreach ($students as $student) {
+                        $this->loadUserAccess($userMapper, $userAccessMapper, $student['synergy_id'], Role::STUDENT, $folderId);
                     }
                 }
 
                 // Install parents
                 $parents = $this->getParents($code, $externalClass, $externalUser);
 
-                if (is_array($parents)) {
-                    foreach ($parents as $parent) {
-                        $this->loadUserAccess($userMapper, $userAccessMapper, $parent['StudentContactID'], Role::PARENT, $folderId);
-                        $this->loadUserAccess($userMapper, $userAccessMapper, $parent['StudentContactSpouseID'], Role::PARENT, $folderId);
-                    }
+                foreach ($parents as $parent) {
+                    $this->loadUserAccess($userMapper, $userAccessMapper, $parent['StudentContactID'], Role::PARENT, $folderId);
+                    $this->loadUserAccess($userMapper, $userAccessMapper, $parent['StudentContactSpouseID'], Role::PARENT, $folderId);
                 }
             }
         }
@@ -279,13 +275,11 @@ HELP;
 
         $contacts = [];
 
-        if (is_array($students)) {
-            foreach ($students as $student) {
-                $contactsCurrent = $externalUser->getStudentContactList([$student['synergy_id']]);
+        foreach ($students as $student) {
+            $contactsCurrent = $externalUser->getStudentContactList([$student['synergy_id']]);
 
-                foreach ($contactsCurrent as $contactCurrent) {
-                    $contacts[$contactCurrent['StudentContactID']] = $contactCurrent;
-                }
+            foreach ($contactsCurrent as $contactCurrent) {
+                $contacts[$contactCurrent['StudentContactID']] = $contactCurrent;
             }
         }
 

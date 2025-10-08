@@ -82,7 +82,7 @@ export type ReportOption = {
 /**
  * A curriculum node specific to curriculum coverage
  */
-export type CurriculumCoverageNode = Pick<Node, "id" | "name" | "code"> & {
+export type CurriculumCoverageNode = Pick<Node, "id" | "name" | "code" | "enabled"> & {
     children: CurriculumCoverageNode[] | null;
     usage: {
         courses: CourseWithCurriculumNodeUsage[];

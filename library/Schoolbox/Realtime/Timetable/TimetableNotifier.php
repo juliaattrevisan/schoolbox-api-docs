@@ -38,10 +38,10 @@ class TimetableNotifier extends WorkNotifier
     /**
      * @param IConfigLoader   $configLoader
      * @param LoggerInterface $log
-     * @param IClock          $clock
-     * @param IPublisher      $publisher
+     * @param IClock|null     $clock
+     * @param IPublisher|null $publisher
      */
-    public function __construct($configLoader = null, $log = null, IClock $clock = null, IPublisher $publisher = null)
+    public function __construct($configLoader = null, $log = null, ?IClock $clock = null, ?IPublisher $publisher = null)
     {
         parent::__construct($configLoader, $log);
 

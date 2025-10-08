@@ -13,30 +13,37 @@ use Exception;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Version\Section;
 
+/**
+ * Wrapper around instance registry
+ */
 class InstanceRegistry
 {
     /**
-     * Schoolbox configuration
-     */
-    private IConfigLoader $config;
-
-    /**
      * Constructor
      *
-     * @param IConfigLoader $config
+     * @param IConfigLoader $config    Schoolbox configuration
+     * @param ApiClient     $apiClient Instance Registry API client
      */
-    public function __construct(IConfigLoader $config)
-    {
-        $this->config = $config;
+    public function __construct(
+        private IConfigLoader $config,
+        private ApiClient $apiClient,
+    ) {
     }
 
+    /**
+     * Retrieve whatever the latest major version is from the
+     *
+     * @return string
+     */
     public function getLatestVersionMajor(): string
     {
         return (new Section($this->getLatestVersionFull()))->getMajor();
     }
 
     /**
-     * get a complete representation of this schoolbox instances version.
+     * Get a complete representation of this schoolbox instances version:
+     * * if able to retrieve from the instance registry API, does so;
+     * * otherwise, just uses the site version in config
      *
      * @example these would look something like:
      *  - 21.0.2-1
@@ -51,7 +58,7 @@ class InstanceRegistry
     public function getLatestVersionFull(): string
     {
         try {
-            return (new ApiClient($this->config))->getLatestRelease();
+            return $this->apiClient->getLatestRelease();
         } catch (Exception $e) {
             /**
              * we were unable to fetch the latest release version from the instance registry, so lets

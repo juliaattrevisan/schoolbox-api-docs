@@ -43,7 +43,7 @@ class AvailabilityChecker
         switch ($page) {
             case Model::PAGE_PENDING_ASSESSMENTS:
             case Model::PAGE_ASSESSMENT_CALENDAR:
-                return true;
+                return (bool)$this->config->get(ConfigMapper::NAME_LMS_ENABLED);
 
             case Model::PAGE_GRADES:
                 return (bool)$this->config->get(ConfigMapper::NAME_GRADES_ENABLED);
@@ -77,10 +77,6 @@ class AvailabilityChecker
 
     /**
      * Is any filter page available at all?
-     *
-     * Currently, this is always true as the pending assessments calendar and
-     * assessment calendar filters are always available. This may change at some
-     * point.
      *
      * @return bool
      */

@@ -8,7 +8,6 @@
  */
 class Component_Config_Date extends Component_Config_Abstract
 {
-
     /**
      * Coerce value to Y-m-d format before inserting into database.
      *
@@ -31,7 +30,7 @@ class Component_Config_Date extends Component_Config_Abstract
         return $dateObject->getDatabaseDate();
     }
 
-    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
+    public function parse(SitePage $page, $key, $keyblock, $configValue, ?Component_ControllerAbstract $component = null)
     {
         if (!empty($configValue)) {
             $date = new Alaress_Date_Format(

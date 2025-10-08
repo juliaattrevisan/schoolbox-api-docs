@@ -1,7 +1,7 @@
 import { defineStore } from "pinia";
 import { cloneDeep } from "lodash";
 import { until } from "@vueuse/core";
-import * as toast from "@schoolboxVue/components/toast/sbxToastEvent";
+import { keysOf } from "@js/util/arrayUtils";
 import { useProfileEditorStore } from "./profileEditorStore";
 import { fetchProfileEditorEndpoint } from "./profileEditorUtils";
 import type {
@@ -50,7 +50,7 @@ export const useProfileEditorTabsStore = defineStore("profileEditorTabsStore", (
         const currentTab = peStore.selectedRoleType.tabs.find((t) => t.id === tabId);
         if (!currentTab) throw new Error("Tab not found");
 
-        toast.activate(`Saving settings for ${currentTab.label}...`);
+        const toast = window.sbProps.toastActivate(`Saving settings for ${currentTab.label}...`);
 
         const endpoint = peStore.selectedRoleType._routes.postTabSettings.replace("{tabId}", tabId);
 
@@ -82,7 +82,7 @@ export const useProfileEditorTabsStore = defineStore("profileEditorTabsStore", (
         if (!peStore.selectedRoleType) throw new Error("No role type selected");
         if (!peStore.savedSelectedRoleType) throw new Error("No role type selected");
 
-        toast.activate("Resequencing tabs...");
+        const toast = window.sbProps.toastActivate("Resequencing tabs...");
 
         const endpoint = peStore.selectedRoleType._routes.postTabSequence;
         const sequence = peStore.selectedRoleType.tabs.map((f) => f.id);
@@ -228,7 +228,7 @@ export const useProfileEditorTabsStore = defineStore("profileEditorTabsStore", (
         if (activeTab === undefined || savedTab === undefined) return false;
 
         // Check if the tab settings are different, each setting list *should* be sorted, so we can compare them directly
-        return Object.keys(activeTab.tabSettings).some(
+        return keysOf(activeTab.tabSettings).some(
             (key) => JSON.stringify(activeTab.tabSettings[key]) !== JSON.stringify(savedTab.tabSettings[key]),
         );
     }

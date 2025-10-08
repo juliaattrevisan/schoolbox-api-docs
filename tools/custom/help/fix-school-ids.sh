@@ -30,7 +30,7 @@ fix_ids() {
   sql_pass=$(schoolbox-read-instances --option SQL_passwd);
   sql_db=$(schoolbox-read-instances --option SQL_db);
 
-  if ! mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -BNe "UPDATE user SET synergy_id = id WHERE COALESCE(synergy_id, '') = ''"; then
+  if ! mariadb -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_db" -BNe "UPDATE user SET synergy_id = id WHERE COALESCE(synergy_id, '') = ''"; then
     error "failed to set IDs"
   fi
 }

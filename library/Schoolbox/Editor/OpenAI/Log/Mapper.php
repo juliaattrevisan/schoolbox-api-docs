@@ -12,9 +12,22 @@ namespace Schoolbox\Editor\OpenAI\Log;
 
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
+use Schoolbox\GenericCollection;
 
+/**
+ * @method Model createModel($idValue = null)
+ * @method Model findById($identifierValue)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
+ * @method Model[]|GenericCollection findByColumn($columnName, $columnValue, $options = [])
+ * @method Model[]|GenericCollection createCollection($contents = [])
+ */
 class Mapper extends BaseMapper
 {
+    /**
+     * @inheritDoc
+     *
+     * @return void
+     */
     protected function mapping()
     {
         $this->hasTable('openai_log');
@@ -23,6 +36,12 @@ class Mapper extends BaseMapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER, 'id');
         $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'user');
         $this->uses('prompt', self::TYPE_STRING);
+        $this->uses('input_tokens', self::TYPE_INTEGER);
+        $this->uses('output_tokens', self::TYPE_INTEGER);
+        $this->uses('model', self::TYPE_STRING);
+        $this->uses('endpoint', self::TYPE_STRING);
+        $this->uses('feature', self::TYPE_STRING);
+        $this->uses('response', self::TYPE_STRING);
         $this->uses('return_code', self::TYPE_INTEGER);
         $this->uses('error_message', self::TYPE_STRING);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
@@ -30,6 +49,8 @@ class Mapper extends BaseMapper
 
 
     /**
+     * @inheritDoc
+     *
      * @throws BaseMapper\DefinitionException
      */
     protected function getSelectString(): string
@@ -45,6 +66,8 @@ class Mapper extends BaseMapper
 
 
     /**
+     * @inheritDoc
+     *
      * @throws BaseMapper\DefinitionException
      */
     protected function getFromString(): string
@@ -55,6 +78,13 @@ class Mapper extends BaseMapper
         ";
     }
 
+
+    /**
+     * @inheritDoc
+     *
+     * @param \PDOStatement $statement
+     * @return Model[]|GenericCollection
+     */
     protected function hydrateSelect(\PDOStatement $statement)
     {
         $userMapper = $this->getJoinMapper('user');

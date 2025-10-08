@@ -18,6 +18,7 @@ use Schoolbox\Assessment\Term;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\External\User as ExternalUser;
 use Schoolbox\GenericCollection;
+use Schoolbox\Filter;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
@@ -31,6 +32,8 @@ use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Mapper\Exception;
@@ -38,6 +41,7 @@ use Schoolbox\Permission\Access\Access;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 /**
  * Class Controller
@@ -46,6 +50,11 @@ use UnexpectedValueException;
  */
 class Controller extends Assessment\Controller
 {
+    /**
+     * Controller constructor.
+     *
+     * @param EditorTemplateHelper|null $editorTemplateHelper
+     */
     public function __construct(
         UserMapper $userMapper,
         ErrorMapper $errorMapper,
@@ -63,7 +72,14 @@ class Controller extends Assessment\Controller
         LatestViewMapper $latestViewMapper,
         protected Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
-        protected LessonPlanDataModelMapper $lessonPlanDataModelMapper
+        protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
+        protected ?Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder = null,
+        protected ?Filter\CompositeFactoryFactory $filtersFactoryFactory = null,
+        protected ?Filter\Mapper $filterMapper = null,
+        protected ?Filter\Selection\Mapper $filterSelectionMapper = null,
+        protected ?CourseImplementationMapper $courseImplementationMapper = null,
+        protected ?UnitImplementationMapper $unitImplementationMapper = null,
+        private ?EditorTemplateHelper $editorTemplateHelper = null,
     ) {
         parent::__construct(
             $userMapper,
@@ -82,7 +98,20 @@ class Controller extends Assessment\Controller
             $latestViewMapper,
             $this->projectResultCacheMapper,
             $lessonPlanTemplateMapper,
-            $lessonPlanDataModelMapper
+            $lessonPlanDataModelMapper,
+            $filtersAssessmentIdFinder,
+            $filtersFactoryFactory,
+            $filterMapper,
+            $filterSelectionMapper,
+            $courseImplementationMapper,
+            $unitImplementationMapper,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            $editorTemplateHelper
         );
     }
 
@@ -155,7 +184,6 @@ class Controller extends Assessment\Controller
      */
     public function getStatus(IAssessable $assessment): void
     {
-
         // Calculate summary totals for display purposes
         $participants = $assessment->getAllParticipants();
 
@@ -175,12 +203,49 @@ class Controller extends Assessment\Controller
             'baseContext'      => $assessment->getBaseContext(),
             'assessment'       => $assessment,
             'assessmentStats'  => $assessmentStats,
-            'participantStats' => $participantStats,
+            'aImpls'           => [],
             'returnUrl'        =>
-            $this->requestQuery->get(Redirect::RETURN_URL)
-                ? Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL))
-                : $this->getSession()->getHistory(),
+                $this->requestQuery->get(Redirect::RETURN_URL)
+                    ? Redirect::decode($this->requestQuery->get(Redirect::RETURN_URL))
+                    : $this->getSession()->getHistory(),
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ];
+
+        // impl assessments we can just grab the details, spec we need to get the unit assessments first
+        if (!$assessment->isSpecification()) {
+            $twigData['aImpls'][$assessment->getId()] = [
+                'assessment' => $assessment,
+                'participantStats' => $participantStats,
+            ];
+        } else {
+            $assessments = $this->getUnitAssessments($assessment);
+            /** @var Project $assessment */
+            foreach ($assessments as $assessment) {
+                // Calculate summary totals for display purposes
+                $participants = $assessment->getAllParticipants();
+
+                $participantStats = new GenericCollection(Assessment\ParticipantStatistics::class);
+                foreach ($participants as $participant) {
+                    $participantStats[$participant->getUser()->getId()] = new Assessment\ParticipantStatistics($participant);
+                }
+
+                $twigData['participantStats'][$assessment->getId()] = $participantStats;
+                $twigData['aImpls'][$assessment->getId()] = [
+                    'assessment' => $assessment,
+                    'participantStats' => $participantStats,
+                ];
+            }
+        }
+
+        /**
+         * somehow there is a hydration inside
+         * getUnitAssessments
+         * $assessments = $this->getAssessmentMapper()->findAllByIds($assessmentIds);
+         *
+         * which is causing deleted sub-assessments to appear in $assessment->getAssessables()
+         * lets just filter them out here
+         */
+        $twigData['assessment']->setAssessables($twigData['assessment']->getAssessables()->filterBy('deletedAt', null));
 
         $this->response = $this->responseFromTemplate(
             '@learningAssessment/project/status/staff.twig',
@@ -266,6 +331,7 @@ class Controller extends Assessment\Controller
             'assessment'      => $assessment,
             'transitions'     => $tickTransitions,
             'returnUrlSuffix' => '?' . Redirect::RETURN_URL . '=' . Redirect::encode($this->request->getUri()->getPath()),
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ];
 
         $this->response = $this->responseFromTemplate(
@@ -283,10 +349,11 @@ class Controller extends Assessment\Controller
      * @param string      $defaultReturnUrl
      * @param bool        $relocated
      * @param bool        $isCreate
+     * @param bool        $toParticipation
      * @return string
      * @throws RouteNotFound
      */
-    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '', bool $relocated = false, bool $isCreate = false): string
+    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '', bool $relocated = false, bool $isCreate = false, bool $toParticipation = false): string
     {
         /**
          * Always go to the status screen when a project has been created,

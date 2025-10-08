@@ -11,7 +11,7 @@
 namespace Alaress\Database\Iterator\Db2;
 
 use Alaress\Database\Iterator\Base;
-use Alaress\Database\Wrapper\Db2\PDOStatement;
+use PDOStatement;
 
 class Iterator extends Base
 {

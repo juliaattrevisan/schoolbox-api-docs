@@ -1,0 +1,129 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{% import "@learningAssessment/fragments/macro/date.twig" as dateForm %}
+
+{#
+# Modal for creating/modifying a custom learning plan on an assessment.
+# This is split out into a separate file in order to include this outside of the main form (this contains a form).
+#
+# @param bool      $acceptingResponses     a boolean is this assessment something students will attempt
+#}
+{{ bread.crumbsArray(breadcrumbs) }}
+<div class="row actions-small-1">
+    <div class="small-12 columns">
+        <h1>Modify Activity</h1>
+    </div>
+</div>
+<div class="small-12 column">
+    <ul class="meta">
+        <li>
+            {% include 'sub/userListMetadata.twig'
+                with {
+                users:   participants,
+                message: 'Customisation for '
+            } only
+            %}
+        </li>
+    </ul>
+</div>
+<div class="row">
+    <div class="small-12 columns island">
+        <form method="post" id="participation-plan-form">
+            <section>
+                <fieldset class="content">
+                    <div class="small-12 columns">
+                        <label for="plan-name" class="required">Title</label>
+                        <p class="meta">The title cannot be the same as the original activity.</p>
+                        <input
+                                type="text"
+                                name="plan-name"
+                                id="plan-name"
+                                data-test="participation-plan-customise-modal-input-name"
+                                maxlength="256"
+                                value="{{ plan is defined ? plan.name : '' }}"
+                        >
+                    </div>
+                    <div class="columns small-12">
+                        <label for="plan-desc" class="required">Description</label>
+                        <textarea name="plan-desc" id="plan-desc">
+                            {{ plan is defined ? plan.description : assessment.description }}
+                        </textarea>
+                    </div>
+                    <div class="columns small-12">
+                        {% set publishAt = plan is defined ? plan.publishDate : assessment.publishAt %}
+                        {% set openAt = plan is defined ? plan.openDate : assessment.openAt %}
+                        {% set dueAt = plan is defined ? plan.dueDate : assessment.dueAt %}
+                        {% set lateAt = plan is defined ? plan.closeDate : assessment.closeAt %}
+                        {% if acceptingResponses is defined and acceptingResponses %}
+                            {{ dateForm.dateField('Publish', 'planPublish', publishAt, '', '#planOpenDate' ) }}
+                            {{ dateForm.dateField('Open'   , 'planOpen'   , openAt, '#planPublishDate', '#planDueDate'  ) }}
+                            {{ dateForm.dateField('Due'    , 'planDue'    , dueAt, '#planOpenDate'   , '#planCloseDate') }}
+                            {{ dateForm.dateField('Late'   , 'planClose'  , lateAt, '#planDueDate'    , ''              ) }}
+                        {% else %}
+                            {{ dateForm.dateField('Publish', 'planPublish', publishAt, ''                , '#planDueDate'  ) }}
+                            {{ dateForm.dateField('Due'    , 'planDue'    , dueAt, '#planPublishDate', ''              ) }}
+                        {% endif %}
+                    </div>
+                    {% for participant in participants %}
+                        {% set user = participant.user %}
+                        {% set userInclude = (not participant.excludedAt) %}
+                        <input type="hidden" name="participant-include[{{ user.id }}]" id="participant-include-{{ user.id }}" value="{{ userInclude ? 1 : 0 }}">
+                        <input type="hidden" name="participant-plan[{{ user.id }}]" id="participant-plan-{{ user.id }}"
+                                value="{{ plan is not defined ? -1 : (participant.plan.id and not participant.plan.isDynamic) ? participant.plan.id : -1 }}">
+                    {% endfor %}
+                    <div class="columns small-12">
+                        <input type="hidden" name="plan-id" id="plan-id" value="{{ plan is defined ? plan.id : -1 }}">
+                        <input type="submit" value="Update" data-test="participation-plan-form-button-save">
+                    </div>
+                </fieldset>
+            </section>
+        </form>
+    </div>
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
+<script>
+    // Dispatch event to initialise CKEditor
+    document.dispatchEvent(
+        new CustomEvent("EDITOR__CREATE", {
+            detail: {
+                maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
+                targetElements: ["#plan-desc"],
+                fileBrowserCategoryId: {{ assessment.baseContext.folder.id ?? 0 }},
+                {% if editorTemplates is defined %}
+                    templates: {{ editorTemplates|json_encode|raw }},
+                {% endif %}
+            },
+        }),
+    );
+
+    $(function() {
+        // Validate plan form
+        $("#participation-plan-form").alaressValidate({
+            rules: {
+                "plan-name": {
+                    requiredNotBlank: true,
+                    cannotMatch: {
+                        value: "{{ assessment.title }}",
+                        message: "The title cannot be the same as the original activity"
+                    }
+                },
+                "plan-desc": "required",
+                planPublishDate: {
+                    required: true,
+                    datepickerDate: true,
+                },
+                planOpenDate: {
+                    required: true,
+                    datepickerDate: true,
+                },
+                planDueDate: {
+                    required: true,
+                    datepickerDate: true,
+                },
+                planCloseDate: {
+                    required: true,
+                    datepickerDate: true,
+                },
+            },
+        });
+    });
+</script>

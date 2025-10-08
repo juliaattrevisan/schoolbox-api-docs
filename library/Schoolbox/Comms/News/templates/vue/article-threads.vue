@@ -1,8 +1,9 @@
 <script>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
-import axios from "axios";
+import { getSearchString } from "@js/util/queryUtils";
 import MediaArticle from "@schoolboxVue/components/media-article";
 import toastMixin from "@schoolboxVue/components/toast-mixin";
 import RevealModal from "@schoolboxVue/components/reveal-modal";
@@ -83,20 +84,20 @@ export default {
                 this.showCommentsSection = this.isThreadCheckboxVisible;
                 return;
             }
-
-            axios
-                .get("/discussion/comms/" + this.articleId + "/threads/" + this.threadId + "/comments/", {
-                    params: {
-                        cursor: this.cursorNext,
-                    },
-                })
+            const params = {
+                cursor: this.cursorNext,
+            };
+            fetch(`/discussion/comms/${this.articleId}/threads/${this.threadId}/comments/?${getSearchString(params)}`, {
+                headers: {
+                    Accept: "application/json",
+                },
+            })
+                .then((response) => response.json())
                 .then((response) => {
-                    const responseData = response.data;
-
+                    const responseData = response;
                     responseData.data.forEach((data) => {
                         this.comments.push(data);
                     });
-
                     this.totalCommentsCount = responseData.metadata.count;
                     this.cursorNext = responseData.metadata.cursor.next;
 
@@ -154,8 +155,12 @@ export default {
                         changeThreadStatusEndpoint += "close";
                     }
 
-                    axios
-                        .put(changeThreadStatusEndpoint, {}, { headers: this.postHeaders })
+                    fetch(changeThreadStatusEndpoint, {
+                        method: "PUT",
+                        headers: {
+                            ...this.postHeaders,
+                        },
+                    })
                         .then(() => {
                             resolve();
                         })
@@ -169,10 +174,17 @@ export default {
                 // 2: associate it with this context
                 // 3: set this object's thread ID
                 changeThreadStatusAction = new Promise((resolve, reject) => {
-                    axios
-                        .post(this.createThreadEndpoint, { open: this.isThreadEnabled }, { headers: this.postHeaders })
+                    fetch(this.createThreadEndpoint, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            Accept: "application/json",
+                        },
+                        body: JSON.stringify({ open: this.isThreadEnabled }),
+                    })
+                        .then((response) => response.json())
                         .then((response) => {
-                            this.threadId = response.data.id;
+                            this.threadId = response.id;
                             resolve();
                         })
                         .catch(function (error) {
@@ -206,12 +218,17 @@ export default {
             this.isProcessing = true;
             this.toastActivate("Posting comment...");
 
-            axios
-                .post("/discussion/comms/" + this.articleId + "/threads/" + this.threadId + "/comments", {
-                    content: newComment,
-                })
+            fetch(`/discussion/comms/${this.articleId}/threads/${this.threadId}/comments`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: JSON.stringify({ content: newComment }),
+            })
+                .then((response) => response.json())
                 .then((response) => {
-                    this.comments.unshift(response.data);
+                    this.comments.unshift(response);
                     this.totalCommentsCount++;
 
                     this.toastSuccess("Comment has been added");
@@ -248,12 +265,12 @@ export default {
             const commentIdToDelete = this.comments[this.commentIndexToDelete].id;
 
             // Need the commentIdToDelete, so needs to be constructed manually?
-            axios
-                .delete(
-                    "/discussion/comms/" + this.articleId + "/comments/" + commentIdToDelete,
-                    {},
-                    { headers: this.postHeaders },
-                )
+            fetch(`/discussion/comms/${this.articleId}/comments/${commentIdToDelete}`, {
+                method: "DELETE",
+                headers: {
+                    ...this.postHeaders,
+                },
+            })
                 .then(() => {
                     this.comments.splice(this.commentIndexToDelete, 1);
                     this.totalCommentsCount--;
@@ -324,9 +341,7 @@ export default {
                     <div v-show="isThreadEnabled">
                         <template v-if="isPublished">
                             <add-comment-input
-                                :cdn-prefix="cdnPrefix"
                                 :is-processing="isProcessing"
-                                :site-version="siteVersion"
                                 @on-load-error="onLoadError"
                                 @on-post-comment="postComment"
                             />

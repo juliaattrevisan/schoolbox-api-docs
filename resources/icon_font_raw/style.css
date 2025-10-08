@@ -1,9 +1,9 @@
 @font-face {
   font-family: 'schoolbox';
   src:
-    url('fonts/schoolbox.ttf?ntgvjh') format('truetype'),
-    url('fonts/schoolbox.woff?ntgvjh') format('woff'),
-    url('fonts/schoolbox.svg?ntgvjh#schoolbox') format('svg');
+    url('fonts/schoolbox.ttf?fb3flg') format('truetype'),
+    url('fonts/schoolbox.woff?fb3flg') format('woff'),
+    url('fonts/schoolbox.svg?fb3flg#schoolbox') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -32,6 +32,9 @@
 }
 .icon-advanced-list:before {
   content: "\e601";
+}
+.icon-ai:before {
+  content: "\e933";
 }
 .icon-alert:before {
   content: "\e602";
@@ -441,6 +444,9 @@
 .icon-paperly:before {
   content: "\e92e";
 }
+.icon-paperly-details:before {
+  content: "\e932";
+}
 .icon-paperly-excursions:before {
   content: "\e92f";
 }
@@ -450,9 +456,6 @@
 .icon-paperly-pti:before {
   content: "\e931";
 }
-.icon-paperly-details:before {
-    content: "\e932";
-  }
 .icon-pause:before {
   content: "\e650";
 }
@@ -653,6 +656,9 @@
 }
 .icon-upload:before {
   content: "\e673";
+}
+.icon-veracross:before {
+  content: "\e934";
 }
 .icon-video:before {
   content: "\e674";

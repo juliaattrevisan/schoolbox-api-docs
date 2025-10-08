@@ -191,17 +191,17 @@ class EventMapper extends CalendarEventMapper
      * will spawn all events regardless of status (it will not skip
      * over any events)
      *
-     * @param array               $allowedStatus an array of EOTC\EventStatus ids
-     * @param Alaress_Date_Format $from
-     * @param Alaress_Date_Format $to
+     * @param array                    $allowedStatus an array of EOTC\EventStatus ids
+     * @param Alaress_Date_Format|null $from
+     * @param Alaress_Date_Format|null $to
      * @return ListGroup\Collection
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      */
     public function findAllByListGroups(
         array $allowedStatus = [],
-        Alaress_Date_Format $from = null,
-        Alaress_Date_Format $to = null
+        ?Alaress_Date_Format $from = null,
+        ?Alaress_Date_Format $to = null
     ): ListGroup\Collection {
         $authorMapper          = $this->getJoinMapper('author');
         $eventTypeMapper       = $this->getJoinMapper('eventType');

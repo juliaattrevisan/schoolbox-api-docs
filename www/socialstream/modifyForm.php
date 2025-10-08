@@ -9,8 +9,9 @@
 namespace SocialStream;
 
 use Schoolbox\Error\Mapper as ErrorMapper;
-use Schoolbox\Resource\Browser\NodeFactory;
+use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
+use SocialStream\Cache\CacheHashLoader;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
@@ -86,7 +87,15 @@ if (is_numeric($_GET['delete'] ?? false)) {
 
     /* Create new SocialStream Post
      */
-    $newPost = (new Post\Factory\Creational($data['url']))->produce($data);
+    $creational = new Post\Factory\Creational(
+        $data['url'],
+        new CacheHashLoader(
+            $kernel->get('httpClient'),
+            $postMapper,
+            $kernel->get('filesystem.receiver'),
+        ),
+    );
+    $newPost    = $creational->produce($data);
 
     /* Set up authentication
      * Put your permissions and stuff in here, just like ePortfolio v2

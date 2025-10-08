@@ -112,7 +112,7 @@ const hasContent = window.Vue.computed(() => hasUsage.value || props.node.descri
             <fieldset class="content">
                 <node-usage-details-description :node="props.node" />
                 <div v-if="hasUsage" class="usage-list-container">
-                    <h3>Total Usage</h3>
+                    <h2 class="">Total Usage</h2>
                     <div v-for="activeUsage in activeUsages" :key="activeUsage.title">
                         <h4>{{ activeUsage.title }} ({{ activeUsage.count }})</h4>
                         <ul class="usage-list">
@@ -141,7 +141,7 @@ const hasContent = window.Vue.computed(() => hasUsage.value || props.node.descri
     display: flex;
     flex-direction: column;
     gap: 1rem 0;
-    h3 {
+    h2 {
         margin-bottom: 0;
     }
     h4 {

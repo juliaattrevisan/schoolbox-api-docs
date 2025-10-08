@@ -24,6 +24,7 @@ class ModelToArray
         return [
             'id'                => $courseTemplate->getId(),
             'name'              => $courseTemplate->getName(),
+            'sequence'          => $courseTemplate->getSequence(),
             'courseTemplate'    => [
                 'id'        => $courseTemplate->getCourseTemplate()->getId(),
                 'name'      => $courseTemplate->getCourseTemplate()->getName(),

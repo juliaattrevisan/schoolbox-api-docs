@@ -78,7 +78,7 @@ class Model implements ISoftDeletable
      * Clears any Answers from the clone, and clones this Question's Solution
      * @return void
      */
-    function __clone()
+    public function __clone()
     {
         // clear ID
         $this->id = null;
@@ -196,10 +196,10 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param array $config
+     * @param array|null $config
      * @return static
      */
-    public function setConfig(array $config = null)
+    public function setConfig(?array $config = null)
     {
         $this->config = $config;
         return $this;
@@ -236,7 +236,7 @@ class Model implements ISoftDeletable
      * @param QuizSolution|null $solution
      * @return static
      */
-    public function setSolution(QuizSolution $solution = null)
+    public function setSolution(?QuizSolution $solution = null)
     {
         $this->solution = $solution;
         return $this;

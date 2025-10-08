@@ -44,7 +44,7 @@ async function createLessonPlanTemplate(
 ): Promise<void> {
     const templates = new CreateLessonPlanTemplate(page, tester);
     const templateList = new LessonPlanTemplateList(tester, page);
-    const createFolder = new CreateFolder(page);
+    const createFolder = new CreateFolder(tester, page);
     const manageGroup = new ManageGroup(page);
     const resources = new Resources(page);
 
@@ -63,20 +63,24 @@ async function createLessonPlanTemplate(
     tester.isGoingTo("Check the lesson pan template is presented in the template list");
     await expect(page.locator("div.admin-content")).toContainText(templateName);
 
-    tester.isGoingTo("Create a homepage");
-    await createFolder.goto();
-    await page.waitForLoadState("domcontentloaded");
     const homepageTemplateOption = "Blank";
-    tester.isGoingTo("type a folder name, select a template option and set access permissions");
-    await createFolder.typeName(folderName);
-    await createFolder.setHomepageTemplate(homepageTemplateOption);
-    await createFolder.setAccessPermission(1, "write");
-    await createFolder.setAccessPermission(2, "write");
-    await createFolder.setAccessPermission(3, "read");
-    await createFolder.setAccessPermission(4, "read");
-    await createFolder.setAccessPermission(5, "read");
-    await createFolder.setAccessPermission(6, "read");
-    await createFolder.submit();
+    const schoolCode = "";
+
+    // sets write access permission for Administration and Teacher, read access permission for senior student, parent, junior student and middle student
+    await createFolder.createFolder(
+        folderName,
+        homepageTemplateOption,
+        db,
+        [
+            [1, "write"],
+            [2, "write"],
+            [3, "read"],
+            [4, "read"],
+            [5, "read"],
+            [6, "read"],
+        ],
+        schoolCode,
+    );
 
     tester.isGoingTo("Navigate to the homepage");
     await page.goto("https://vagrant.dev.schoolbox.cloud/resources/");
@@ -121,40 +125,6 @@ test.describe("Lesson Plan Activity", () => {
     });
 
     /**
-     * Soft deleting data to not impact the tests
-     */
-
-    test.beforeAll(async ({ baseTester, db }) => {
-        baseTester.isGoingTo("update delete_at for the folder and lesson plan table so it does not impact the tests");
-        await db.updateInDatabase(
-            "lesson_plan_template_field",
-            { deleted_at: "2022-01-15 11:22:34" },
-            { "title like": "Automation Field%" },
-        );
-        await db.updateInDatabase(
-            "lesson_plan_template",
-            { deleted_at: "2022-01-15 11:22:34" },
-            { "title like": "Automation Template%" },
-        );
-        await db.updateInDatabase(
-            "lesson_plan_field",
-            { deleted_at: "2022-01-15 11:22:34" },
-            { "title like": "Automation Field%" },
-        );
-        await db.updateInDatabase("lesson_plan", { deleted_at: "2022-01-15 11:22:34" }, { created_by: "1" });
-        await db.updateInDatabase(
-            "assessment",
-            { deleted_at: "2022-01-15 11:22:34" },
-            { "title like": "Lesson Plan Automation Test%" },
-        );
-        await db.updateInDatabase(
-            "folder",
-            { deleted_at: "2022-01-15 11:22:34" },
-            { "name like": "Test Class Homepage Lesson Plan%" },
-        );
-    });
-
-    /**
      * create a lesson plan template with a field visible to student and a field that is not visible to students
      * create  lesson plan using the lesson plan template above
      */
@@ -178,7 +148,7 @@ test.describe("Lesson Plan Activity", () => {
         tester.isGoingTo("click the arrow down for Romeo and Juliet unit");
         await courseModify.clickUnitArrow(15);
         tester.isGoingTo("click New Lesson PLan button to create a lesson plan");
-        await courseModify.clickNewLessonPlanButton("lesson-plan");
+        await courseModify.clickNewActivityButton("lesson-plan");
         await page.waitForLoadState("domcontentloaded");
         const lessonPlanTemplateId = (await db.grabFromDatabase("lesson_plan_template", "id", {
             deleted_at: null,
@@ -247,7 +217,7 @@ test.describe("Lesson Plan Activity", () => {
         await expect(page.locator('ul[class="information-list"]')).toContainText("Romeo and Juliet");
         await expect(page.locator('ul[class="information-list"]')).toContainText(lessonPlanName);
         tester.isGoingTo("as a student view the lesson plan");
-        await tester.impersonateViaModifyUserPage(student);
+        await tester.impersonateViaUserProfilePage(student);
         await page.goto(`/homepage/${folderId}`);
         await page.waitForTimeout(3000);
         await page.click("a[title='Lesson Plan']");
@@ -260,7 +230,7 @@ test.describe("Lesson Plan Activity", () => {
             "Automation Field 2 not visible to students",
         );
         tester.isGoingTo("as a teacher view the lesson plan");
-        await tester.impersonateViaModifyUserPage(teacher);
+        await tester.impersonateViaUserProfilePage(teacher);
         await page.goto(`/homepage/${folderId}`);
         await page.waitForTimeout(3000);
         await page.click("a[title='Lesson Plan']");
@@ -272,8 +242,7 @@ test.describe("Lesson Plan Activity", () => {
     /**
      * Soft deleting data to not impact the tests
      */
-
-    test.afterAll(async ({ baseTester, db }) => {
+    test.afterAll(async ({ baseTester, db, api }) => {
         baseTester.isGoingTo("update delete_at for the folder and lesson plan table so it does not impact the tests");
         await db.updateInDatabase(
             "lesson_plan_template_field",
@@ -296,10 +265,7 @@ test.describe("Lesson Plan Activity", () => {
             { deleted_at: "2022-01-15 11:22:34" },
             { "title like": "Lesson Plan Automation Test%" },
         );
-        await db.updateInDatabase(
-            "folder",
-            { deleted_at: "2022-01-15 11:22:34" },
-            { "name like": "Test Class Homepage Lesson Plan%" },
-        );
+
+        await api.deleteFoldersByName(db, "Test Class Homepage Lesson Plan%");
     });
 });

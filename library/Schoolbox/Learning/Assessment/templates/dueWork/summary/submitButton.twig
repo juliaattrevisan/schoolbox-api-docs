@@ -35,6 +35,7 @@ Data:
                 {% if USER.id == student.id %}
                     {% set requiresReflection = assessment.isSelfAssessable %}
                     <button class="submit"
+                            data-test="assessment-summary-self-acknowledge-button"
                             data-action-self-reflect
                             data-confirm-dialog-header="Have you submitted your work?"
                             data-confirm-dialog-text="

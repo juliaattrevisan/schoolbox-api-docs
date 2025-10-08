@@ -137,7 +137,7 @@ class Factory
         }
 
         if ($assessable instanceof DueWork) {
-            return $this->spawnForDueWork($assessable);
+            return $this->spawnForDueWork($assessable, false);
         }
 
         if ($assessable instanceof LtiAssessment) {
@@ -153,6 +153,33 @@ class Factory
         }
 
         throw new InvalidArgumentException('Unknown IAssessable class: ' . \get_class($assessable));
+    }
+
+
+    /**
+     * @param IAssessable $assessable
+     * @return null|IMarkScheme
+     * @throws DomainException If MarkType is invalid for the assessment
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws RangeException
+     * @throws Mapper\Exception
+     */
+    public function spawnInstructorMarkSchemeFor(IAssessable $assessable): ?IMarkScheme
+    {
+        // only due work has instructor mark type for now
+        // when we eventually add more, we can add more cases here
+        if (!($assessable instanceof DueWork)) {
+            throw new InvalidArgumentException('Unknown IAssessable class: ' . \get_class($assessable));
+        }
+
+        $markType = $assessable->getInstructorMarkType();
+
+        if (null === $markType) {
+            return null;
+        }
+
+
+        return $this->spawnForDueWork($assessable, true);
     }
 
 
@@ -194,25 +221,47 @@ class Factory
 
     /**
      * @param DueWork    $dueWork
-     * @param float|null $totalMark
+     * @param bool       $isInstructor - Whether to spawn the mark scheme for viewing as an instructor or learner
      * @return IMarkScheme
      * @throws RangeException
      * @throws DomainException
      */
-    protected function spawnForDueWork(DueWork $dueWork, ?float $totalMark = null): IMarkScheme
+    protected function spawnForDueWork(DueWork $dueWork, bool $isInstructor): IMarkScheme
     {
-        switch ($dueWork->getMarkType()->getId()) {
+        /* There are two types of mark types (input and display), this determines which function
+         * to use from the DueWork object to get the mark type based on if we need the instructor or learner mark
+         */
+        $methods = [
+            'markType' => [
+                'learner' => 'getMarkType',
+                'instructor' => 'getInstructorMarkType',
+            ],
+            'maxMark' => [
+                'learner' => 'getMaxMark',
+                'instructor' => 'getInstructorMaxMark',
+            ],
+            'gradeGroup' => [
+                'learner' => 'getGradeGroup',
+                'instructor' => 'getInstructorGradeGroup',
+            ],
+        ];
+
+        // The key to the methods array for the user type to use
+        $userType = $isInstructor ? 'instructor' : 'learner';
+
+        $markType = $dueWork->{$methods['markType'][$userType]}();
+        switch ($markType->getId()) {
             case MarkType::TYPE_PERCENT:
                 return new Percentage();
             case MarkType::TYPE_NONE:
                 return new None();
             case MarkType::TYPE_TOTAL:
-                $maxMark = $totalMark ?? $dueWork->getMaxMark();
+                $maxMark = $dueWork->{$methods['maxMark'][$userType]}();
                 return new TotalMarkFractional($maxMark);
             case MarkType::TYPE_LETTER:
-                return new LetterGrade($dueWork->getGradeGroup());
+                return new LetterGrade($dueWork->{$methods['gradeGroup'][$userType]}());
             default:
-                throw new DomainException('Invalid MarkType for DueWork: ' . $dueWork->getMarkType()->getName());
+                throw new DomainException('Invalid MarkType for DueWork: ' . $markType->getName());
         }
     }
 

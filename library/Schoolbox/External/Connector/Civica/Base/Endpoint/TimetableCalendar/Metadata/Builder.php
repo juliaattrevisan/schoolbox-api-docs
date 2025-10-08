@@ -12,12 +12,6 @@ namespace Schoolbox\External\Connector\Civica\Base\Endpoint\TimetableCalendar\Me
 class Builder
 {
     /**
-     * Apparently everyone is going to be using this
-     */
-    private const HOST = 'https://cetas-test.civica.education/TeacherToolkit/attendance';
-
-
-    /**
      * Apparently this is hardcoded too - we only use
      * TeachingGroup (1)
      *
@@ -34,7 +28,7 @@ class Builder
     /**
      * Constructor
      */
-    public function __construct()
+    public function __construct(private string $externalStaffPortal)
     {
     }
 
@@ -108,8 +102,8 @@ class Builder
         $fromIframe = 'true';
 
         return sprintf(
-            '%s/%s?attendance=%s&type=%s&session=%s&date=%s&singlesession=%s&schoolContextId=%s&fromIframe=%s',
-            self::HOST,
+            '%s/TeacherToolkit/attendance/%s?attendance=%s&type=%s&session=%s&date=%s&singlesession=%s&schoolContextId=%s&fromIframe=%s',
+            $this->externalStaffPortal,
             $teachingGroupId,
             $hasAttendance,
             $type,

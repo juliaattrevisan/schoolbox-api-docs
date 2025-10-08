@@ -76,9 +76,16 @@ class IndexBuilder extends BaseBuilder
             }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
         }
+        // Set max_statement_time at the query level to ensure no timeouts even if global max_statement_time is set.
+        // The query will not work as expected without the CAST, even though a float value is supplied.
+        $queryString = "SET STATEMENT max_statement_time = CAST(:maxStatementTime AS DECIMAL(4,4)) FOR\n$queryString";
+        $params['maxStatementTime'] = BaseBuilder::QUERY_LEVEL_MAX_STATEMENT_TIME;
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding blog posts...');
+        $t0 = microtime(true);
         $query->execute($params);
+        $t1 = microtime(true);
+        $this->logger->debug('Done.  Time taken: ' . round($t1 - $t0, 4) . ' seconds.');
         $this->logger->info(sprintf('Building search indices for %d blog posts', $query->rowCount()));
         foreach ($query as $row) {
             $index = $this->buildIndex(
@@ -100,24 +107,28 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
-        $queryString = "SELECT
-            b.id
-            FROM blog b
+        // Select all search_index rows linked to deleted blogs.
+        // Note if the parent folder is deleted, the blog is considered to be deleted also regardless of its own deleted_at value.
+        $queryString = '
+            SELECT si.identifier AS id, si.type
+            FROM search_index si
+            JOIN blog b ON si.identifier = b.id
             JOIN folder f ON b.folder_id = f.id
-            WHERE COALESCE(b.deleted_at, f.deleted_at) IS NOT NULL
-        ";
-        $params      = [];
+            WHERE si.type = "' . Hydrator::BASE_TYPE . '"
+            AND COALESCE(b.deleted_at, f.deleted_at) IS NOT NULL
+        ';
+        $params = [];
         if ($fromDate) {
-            $queryString        .= ' AND COALESCE(b.deleted_at, f.deleted_at) >= :fromDate';
+            $queryString .= ' AND COALESCE(b.deleted_at, f.deleted_at) >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
         }
         if ($toDate) {
-            $queryString      .= ' AND COALESCE(b.deleted_at, f.deleted_at) <= :toDate';
+            $queryString .= ' AND COALESCE(b.deleted_at, f.deleted_at) <= :toDate';
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
             if (!$this->accepts($subject, BuildType::DELETE)) {
-                return;
+                return null;
             }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::DELETE, $queryString, $params);
         }

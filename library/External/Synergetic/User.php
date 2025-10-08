@@ -314,10 +314,13 @@ class External_Synergetic_User implements External_UserInterface
                         vStudentsAll.EnglishSecondFlag,
                         vStudentsAll.StudentGovernmentStudentNumber,
                         vStudentsAll.StudentStudiesCode,
-                        AlertMessage,
+                        CASE WHEN AlertCategoryCode != ''
+                            THEN CONCAT(AlertCategoryCode,': ',AlertMessage)
+                            ELSE AlertMessage
+                         END AS AlertMessage,
                         vStudentsAll.LegalCourtOrderType AS CourtOrderType,
                         vStudentsAll.LegalParentsSeparatedFlag AS ParentsSeparatedFlag,
-                        vStudentsAll.StudentBoarder,
+                        luBoarder.Description AS StudentBoarder,
                         vStudentsAll.StudentsComment as Comment,
                         '' AS StudentEnrolmentDate,
                         '' AS StudentLeavingDate,
@@ -354,6 +357,7 @@ class External_Synergetic_User implements External_UserInterface
                             Semester.FileSemester = vStudentsAll.FileSemester AND
                             Semester.FileYear = vStudentsAll.FileYear AND
                             Semester.SystemCurrentFlag = 1
+            LEFT JOIN luBoarder ON luBoarder.Code = vStudentsAll.StudentBoarder
             WHERE       vStudentsAll.StudentID = :externalId
         ";
 
@@ -375,7 +379,7 @@ class External_Synergetic_User implements External_UserInterface
 
                 /* Forcibly re-evaluate boarderlyness using this connector's specific interpretation
                  */
-                $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
+                // $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
 
                 /* Initialise stacks
                  */
@@ -1151,14 +1155,6 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function getCampusFromTimetable(string $staffID): array
     {
-        // Was unable to hit this in testing, but running in isolation returned
-        //
-        //    /usr/share/schoolbox/library/External/Synergetic/User.php:440:
-        //    array (size=1)
-        //      0 =>
-        //          array (size=1)
-        //              'campus' => string 'S' (length=1)
-
         if (!$this->isExternalIdValid($staffID)) {
             return [];
         }
@@ -1185,14 +1181,7 @@ class External_Synergetic_User implements External_UserInterface
      */
     public function determineBoarderType(?string $boarderValue): string
     {
-        if (empty($boarderValue)) {
-            return '';
-        }
-
-        return $this->getConnector()->executeQuery(
-            "SELECT Description FROM luBoarder WHERE Code = :code",
-            ['code' => $boarderValue]
-        )->fetchColumn() ?: '';
+        return '';
     }
 
     /**
@@ -1377,7 +1366,7 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * {@inheritdoc}
      */
-    public function getCurrentSemester(string $externalUserId = null): string
+    public function getCurrentSemester(?string $externalUserId = null): string
     {
         $fileSemester = $this->findFileYearAndSemester($externalUserId)['semester'] ?? null;
 
@@ -1387,7 +1376,7 @@ class External_Synergetic_User implements External_UserInterface
     /**
      * {@inheritdoc}
      */
-    public function getCurrentYear(string $externalUserId = null): string
+    public function getCurrentYear(?string $externalUserId = null): string
     {
         $fileYear = $this->findFileYearAndSemester($externalUserId)['year'] ?? null;
 

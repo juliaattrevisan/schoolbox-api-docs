@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * @copyright Copyright 2023, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
 declare(strict_types=1);
 
 namespace Schoolbox\Resource\Storage\Virus;
@@ -8,11 +13,10 @@ use Schoolbox\File\Exception as FileException;
 use League\Flysystem\Filesystem;
 
 /**
- * @copyright Copyright 2023, Schoolbox Pty Ltd
- * @link      https://schoolbox.com.au/
+ * Virus scanner implementation, which uses a locally available `clamdscan`
+ * instance for scanning.
  */
-
-class Scanner
+class Scanner implements IScanner
 {
     /**
      * We use clamdscan to pass file to already running daemon of clamd
@@ -27,14 +31,9 @@ class Scanner
      */
     private const TEST_CLAMSCAN_COMMAND = 'clamdscan --fdpass /etc/clamav/clamd.conf';
 
-
     /**
-     * This is the quarantine location, it sits under the system temp directory and will be automatically created
-     */
-    private const VIRUS_QUARANTINE = '/quarantine/';
-
-
-    /**
+     * Constructor
+     *
      * @param Filesystem $tempFileSystem
      * @throws \League\Flysystem\FilesystemException
      * @throws \League\Flysystem\UnableToCheckExistence
@@ -49,15 +48,9 @@ class Scanner
 
 
     /**
-     * Will scan a file for virus and throw and exception if one is found
-     * The file will also be moved to the quarantine directory
-     *
-     * @param string $filelocation Path to temporary file on disk to be scanned
-     * @return void
-     * @throws DaemonException
-     * @throws FileException
+     * @inheritdoc
      */
-    public function scan(string $filelocation): void
+    public function scan(string $fileLocation): void
     {
         $output = [];
         $resultCode = null;
@@ -68,7 +61,7 @@ class Scanner
             // The message does not give any more information than the 127 return code.
             self::CLAMSCAN_COMMAND . ' 2>&1',
             sys_get_temp_dir() . self::VIRUS_QUARANTINE,
-            $filelocation
+            $fileLocation,
         ), $output, $resultCode);
 
         // From clamdscan's man page:
@@ -94,6 +87,9 @@ class Scanner
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     public function checkExists(): string
     {
         $output = [];
@@ -113,14 +109,14 @@ class Scanner
 
         // Virus scanner not available
         if (127 === $resultCode) {
-            return 'unavailable';
+            return self::STATUS_UNAVAILABLE;
         }
 
         /* clamd not currently running or accessible. Might have died due to OOM or not installed properly  */
         if (2 === $resultCode) {
-            return 'offline';
+            return self::STATUS_OFFLINE;
         }
 
-        return 'online';
+        return self::STATUS_ONLINE;
     }
 }

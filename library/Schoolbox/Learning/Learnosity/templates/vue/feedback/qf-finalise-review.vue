@@ -4,7 +4,6 @@
  */
 
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
-import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { useStore } from "./store/quizFeedbackStore";
 import { useStudentStore } from "./store/qfStudentStore";
 import { getFinaliseReviewFormData } from "../student/util/finaliseReviewUtils";
@@ -54,7 +53,7 @@ window.Vue.watch(
  */
 async function submitFeedback(): Promise<void> {
     isFinalising.value = true;
-    activate("Finalising review...");
+    const toast = window.sbProps.toastActivate("Finalising review...");
     try {
         const response = await fetch(`${studentStore.student.urls?.postFinaliseAttempt}`, {
             method: "POST",
@@ -65,15 +64,15 @@ async function submitFeedback(): Promise<void> {
         });
         if (response.ok) {
             window.location.href = store.statusPage;
-            timeout({ text: "Review successfully finalised" });
+            toast.timeout({ text: "Review successfully finalised" });
         } else {
-            timeout({
+            toast.timeout({
                 text: "Review could not be finalised, please contact your support if the problem persists",
                 isSuccess: false,
             });
         }
     } catch (error) {
-        timeout({
+        toast.timeout({
             text: "Review could not be finalised, please contact your support if the problem persists",
             isSuccess: false,
         });
@@ -134,4 +133,3 @@ function onCancelSelected(): void {
         </ul>
     </reveal-modal>
 </template>
-../student/util/finaliseReviewUtils

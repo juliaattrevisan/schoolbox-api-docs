@@ -26,27 +26,67 @@ class ValidStrats
     public const STUDENT = 'student';
     public const FAMILIES = 'families';
     public const TIMETABLE = 'timetable';
+    public const CALENDAR = 'calendar';
+
+
+    /**
+     * This represents the full synchronisation of all data
+     */
+    public const STRATS_FULL = [
+        self::FAMILIES,
+        self::STAFF,
+        self::TIMETABLE,
+        self::CALENDAR,
+    ];
+
+
+    /**
+     * These strats fulfil everyone's profile data
+     */
+    public const STRATS_PROFILE = [
+        self::FAMILIES,
+        self::STAFF,
+    ];
+
+
+    /**
+     * These strats fulfil everyone's timetable data
+     * Note that the Daily Org strats will probably appear here
+     */
+    public const STRATS_TIMETABLE = [
+        self::TIMETABLE,
+    ];
+
+
+    /**
+     * This is normally not a heavily-used diagnostic
+     */
+    public const STRATS_CALENDAR = [
+        self::CALENDAR,
+    ];
+
 
     /**
      * These are valid as csv values in the arg
      */
-    private const STRATS = [
+    private const STRATS_WHITELIST = [
         /* Loads staff profiles
          */
-        'staff',
+        self::STAFF,
 
         /* Loads students' profiles only, excluding parents
          */
-        'student',
+        self::STUDENT,
 
         /* Loads student+parent profiles together
          */
-        'families',
+        self::FAMILIES,
 
         /* Loads all timetable-related stuff
          */
-        'timetable'
+        self::TIMETABLE,
     ];
+
 
     /**
      * After processing $csvArgs we remember what was valid
@@ -69,7 +109,7 @@ class ValidStrats
 
     /**
      * Decide what values of the csv string $csvArgs are valid strats
-     * Anything outside of self::STRATS is ignored
+     * Anything outside of self::STRATS_WHITELIST is ignored
      *
      * You can end up with an empty set which is assumed to mean
      * "import everything"
@@ -97,10 +137,10 @@ class ValidStrats
          */
         $temp = array_map('trim', $temp);
 
-        /* Remove anything that doesn't also appear in self::STRATS
+        /* Remove anything that doesn't also appear in self::STRATS_WHITELIST
          * and ignore those
          */
-        $temp = array_intersect(self::STRATS, $temp);
+        $temp = array_intersect(self::STRATS_WHITELIST, $temp);
 
         /* Return only the valid strats chosen
          * Each factory interprets this as desired

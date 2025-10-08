@@ -7,6 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
@@ -34,7 +35,12 @@ class Component_Homepage_RSSController extends Component_Homepage_ControllerAbst
             $noConfig   = true;
         } else {
             // Initialise feed
-            $rss = new Alaress_Rss_Stream($this->getConfig('url'));
+            // Get the DI container out of SitePage I guess?
+            $rss = new Alaress_Rss_Stream(
+                $this->getConfig('url'),
+                $this->getSitePage()->getDi()->get('httpClient.cache'),
+                (int)$this->getConfigLoader()->get(ConfigMapper::NAME_XML_CACHE_TIMEOUT),
+            );
             $rss->setLimit($this->getConfig('size'));
 
             try {

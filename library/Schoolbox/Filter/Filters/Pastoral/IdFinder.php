@@ -116,6 +116,29 @@ class IdFinder extends AbstractIdFinder
             $pb = $pb->in('p.student_id', $studentSelection);
         }
 
+        // Archived Record selection
+        $archivedSelection = $completeFilters[Archived\Definition::class] ?? null;
+        if (isset($archivedSelection) && count($archivedSelection) > 0) {
+            $archivedBuilderPb = $this->getMapper()->getPredicateBuilder();
+            if ($archivedSelection->offsetExists(Archived\Definition::KEY_INCLUDE_ACTIVE_RECORDS)) {
+                $archivedBuilderPb->any(
+                    $this->getMapper()->getPredicateBuilder()
+                         ->isNull('p.expires_at')
+                         ->greaterThanOrEqualTo('p.expires_at', \Alaress_Date_Format::now()->getDatabaseDate())
+                );
+            }
+
+            if ($archivedSelection->offsetExists(Archived\Definition::KEY_INCLUDE_ARCHIVED_RECORDS)) {
+                $archivedBuilderPb->any(
+                    $this->getMapper()->getPredicateBuilder()
+                         ->lessThan('p.expires_at', \Alaress_Date_Format::now()->getDatabaseDate())
+                );
+            }
+            /* Note this will include all expires_at in WHERE condition, but it should be cleaner than
+             * having to add an extra condition to check if both options exists
+             */
+            $pb->any($archivedBuilderPb);
+        }
         $query = "SELECT DISTINCT p.id FROM pastoral p";
         if (count($joins)) {
             $query .= ' ' . implode(' ', $joins);

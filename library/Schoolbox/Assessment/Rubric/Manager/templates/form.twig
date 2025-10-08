@@ -7,6 +7,7 @@ $(function() {
     var form           = $('form[data-role="rubric-criteria-form"]');
     var groupMaxId     = Number('{{ maxGroupId }}');
     var criterionMaxId = Number('{{ maxCritId }}');
+    var parentFolderId = Number('{{ folder.id }}');
 
     // If there are no dropdowns at all on initial load; they must be reapplied
     // If there are any; they must not be reapplied. Go figure
@@ -66,7 +67,7 @@ $(function() {
 
                     idInput.attr('name', 'crits['+groupId+'][items]['+criterionId+'][id]');
 
-                    container.find('div.list-item').append("<div data-cs-container> <curriculum-selector :is-read-only=false :selected-nodes=[] data-endpoint='{{ routeLookup('curriculumApi.searchNode') }}' form-value-name='crits["+groupId+"][items]["+criterionId+"][curriculumCode][]' :include-children='true' /> </div>");
+                    container.find('div.list-item').append(`<div data-cs-container> <curriculum-selector :is-read-only=false :selected-nodes=[] data-endpoint='{{ routeLookup('curriculumApi.searchNode') }}' form-value-name='crits[${groupId}][items][${criterionId}][curriculumCode][]' :include-children='true' :has-tabs='true' :parent-folder-id='${parentFolderId}' /> </div>`);
 
                     deleteButton.removeClass('hide');
                 }
@@ -85,7 +86,7 @@ $(function() {
                     idInput.attr('name', 'crits['+groupId+'][id]');
 
                     {% if config.curriculum_tagging_enabled %}
-                    container.find('div.list-item').first().append("<div data-cs-container> <curriculum-selector :is-read-only=false :selected-nodes=[] data-endpoint='{{ routeLookup('curriculumApi.searchNode') }}' form-value-name='crits["+groupId+"][curriculumCode][]' :include-children='true' /> </div>");
+                    container.find('div.list-item').first().append(`<div data-cs-container> <curriculum-selector :is-read-only=false :selected-nodes=[] data-endpoint='{{ routeLookup('curriculumApi.searchNode') }}' form-value-name='crits[${groupId}][curriculumCode][]' :include-children='true' :has-tabs='true' :parent-folder-id='${parentFolderId}' /> </div>`);
                     {% endif %}
                 }
                 {% if config.curriculum_tagging_enabled %}
@@ -253,6 +254,7 @@ $(function() {
                                     group:                    group,
                                     allowModifyUsed:          allowModifyUsed,
                                     curriculumTaggingEnabled: curriculumTaggingEnabled,
+                                    parentFolderId:           folder.id,
                                 } only %}
                             </ul>
                         </div>
@@ -267,6 +269,7 @@ $(function() {
                                         criterion:                criterion,
                                         allowModifyUsed:          allowModifyUsed,
                                         curriculumTaggingEnabled: curriculumTaggingEnabled,
+                                        parentFolderId:           folder.id,
                                     } only %}
                                 {% endfor %}
 
@@ -276,6 +279,7 @@ $(function() {
                                     criterion:                null,
                                     allowModifyUsed:          allowModifyUsed,
                                     curriculumTaggingEnabled: curriculumTaggingEnabled,
+                                    parentFolderId:           folder.id,
                                 } only %}
                             </ul>
                         </div>
@@ -291,6 +295,7 @@ $(function() {
                                 group:                    null,
                                 allowModifyUsed:          allowModifyUsed,
                                 curriculumTaggingEnabled: curriculumTaggingEnabled,
+                                parentFolderId:           folder.id,
                             } only %}
                         </ul>
                     </div>
@@ -303,6 +308,7 @@ $(function() {
                                 criterion:                null,
                                 allowModifyUsed:          allowModifyUsed,
                                 curriculumTaggingEnabled: curriculumTaggingEnabled,
+                                parentFolderId:           folder.id,
                             } only %}
                         </ul>
                     </div>

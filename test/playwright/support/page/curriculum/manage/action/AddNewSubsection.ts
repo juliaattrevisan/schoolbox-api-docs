@@ -64,6 +64,6 @@ export default class AddNewSubsection {
      * @param name - The name to check
      */
     async seeSubsectionExists(name: string): Promise<void> {
-        await expect(this.page.getByTestId(ManageCurriculum.DATATEST_MC_VIEW_NODES_LIST)).toContainText(name);
+        await expect(this.page.getByTestId(ManageCurriculum.DATA_TEST_MC_VIEW_NODES_LIST)).toContainText(name);
     }
 }

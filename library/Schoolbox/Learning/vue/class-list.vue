@@ -1,12 +1,11 @@
 <script>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
-import PastoralCountBadge from "@schoolboxLibrary/Pastoral/Count/vue/pastoral-count-badge";
 
 export default {
     name: "class-list",
-    components: { PastoralCountBadge },
     props: {
         /**
          * The title of the subject for which the class list is shown, including
@@ -372,6 +371,10 @@ export default {
                 let url = new URL(this.href);
                 url.pathname = self.getCreateLearningMomentFormEndpoint;
                 url.searchParams.append("userIds", self.selectedStudentLearningMomentsEnabledIds.join(","));
+                /* This is going to preset associated Classes And Groups when creating for multiple people,
+                 * creating a moment_folder relationship between this folder and all the recipients
+                 */
+                url.searchParams.append("folderId", self.folderId);
                 this.href = url.href;
             });
 
@@ -450,7 +453,9 @@ export default {
     },
     computed: {
         showCheckboxes: function () {
-            return this.learningMomentsEnabled || this.mailEnabled;
+            return (
+                this.learningMomentsEnabled || this.badgesEnabled || this.pastoralEnabled || this.currentUserCanEmail
+            );
         },
         allStudentIds: function () {
             let ids = [],
@@ -549,7 +554,7 @@ export default {
                 </dd>
             </dl>
 
-            <section class="content">
+            <section v-if="showCheckboxes" class="content">
                 <ul class="flex-list flex-wrap buttons">
                     <li v-if="learningMomentsEnabled">
                         <a
@@ -610,14 +615,14 @@ export default {
                                 <input type="checkbox" id="select-all" v-model="allSelected" />
                                 <label for="select-all" class="checkbox-label"></label>
                             </th>
-                            <th width="84"></th>
+                            <td></td>
                             <th>Name</th>
                             <th class="show-for-large-up">{{ yearLevelLabel }}</th>
                             <th class="show-for-large-up" v-if="showTutorGroupColumn">Tutor Group</th>
                             <th class="show-for-medium-up" v-if="showCoreGroupColumn">Core Group</th>
                             <th class="show-for-medium-up" v-if="showHouseColumn">{{ houseLabel }}</th>
                             <th class="show-for-medium-up">Last Visited</th>
-                            <th></th>
+                            <td></td>
                         </tr>
                     </thead>
                     <tbody>
@@ -660,16 +665,20 @@ export default {
                                 </template>
 
                                 <span class="meta">({{ student.synergy_id }})</span>
-                                <span class="show-for-print"><br />{{ student.email }}</span
-                                ><br />
-
-                                <p class="meta inline-container">
-                                    <pastoral-count-badge
+                                <span class="show-for-print"><br />{{ student.email }}</span>
+                                <br />
+                                <div class="l-flex l-gap-xs l-pad-s--vert">
+                                    <sbx-label
                                         v-for="studentBadge in studentPastoralCounts[student.id]"
-                                        :key="studentBadge.id"
-                                        v-bind="studentBadge"
-                                    ></pastoral-count-badge>
-                                </p>
+                                        :key="`badge-${studentBadge.typeId}-${studentBadge.subtypeId}`"
+                                        :title="studentBadge.title"
+                                        :text="studentBadge.count.toString()"
+                                        :icon="studentBadge.icon"
+                                        :background-color="studentBadge.bgColor"
+                                        :text-color="studentBadge.fgColor"
+                                        :href="studentBadge.destinationUrl"
+                                    />
+                                </div>
 
                                 <p class="meta inline-container">
                                     <slot name="student-meta" v-bind:student="student">

@@ -39,6 +39,7 @@ function getLabelKeyForOption(fieldSettingOption: ProfileEditorFieldSettingOptio
 function getMetaTextForOption(fieldSettingOption: ProfileEditorFieldSettingOption): string | null {
     if (!peStore.selectedRoleType) return null;
     if (!fieldSettingOption.meta) return null;
+    if (typeof fieldSettingOption.meta === "string") return fieldSettingOption.meta;
     return fieldSettingOption.meta[peStore.selectedRoleType.roleType] || null;
 }
 
@@ -47,6 +48,25 @@ function getMetaTextForOption(fieldSettingOption: ProfileEditorFieldSettingOptio
  */
 const fieldSettingDefinition = window.Vue.computed(() => {
     return peStore.fieldSettings[props.fieldSettingKey];
+});
+
+/**
+ * The available options for the current field setting
+ */
+const availableFieldSettingOptions = window.Vue.computed(() => {
+    if (fieldSettingDefinition.value === undefined) {
+        return [];
+    }
+    return fieldSettingDefinition.value.options.filter((option) => {
+        const availability = props.field.availableFieldSettings[props.fieldSettingKey];
+        if (availability === undefined) {
+            return false;
+        }
+        if (typeof availability === "boolean") {
+            return availability;
+        }
+        return availability[option.id];
+    });
 });
 
 /**
@@ -60,20 +80,27 @@ function onFieldSettingOptionChange(fieldSettingOption: ProfileEditorFieldSettin
 
 window.Vue.onMounted(() => {
     // @ts-expect-error -- When a setting is added after the page is loaded, we need to tell foundation to fix the tooltips
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- foundation isn't typed, see above
     $(document).foundation("tooltip", "reflow");
 });
 </script>
 
 <template>
-    <div class="l-flex__item--1-grow">
+    <div v-if="fieldSettingDefinition && availableFieldSettingOptions.length" class="l-flex__item--1-grow">
         <label>
             {{ fieldSettingDefinition.displayAs }}
-            <span data-tooltip class="has-tip tip-top hint" :title="fieldSettingDefinition.tooltip"> ? </span>
+            <span
+                v-if="fieldSettingDefinition.tooltip"
+                data-tooltip
+                class="has-tip tip-top hint"
+                :title="fieldSettingDefinition.tooltip"
+            >
+                ?
+            </span>
         </label>
         <div class="checklist">
             <ul class="option-list">
-                <li v-for="fieldSettingOption in fieldSettingDefinition.options" :key="fieldSettingOption.id">
+                <li v-for="fieldSettingOption in availableFieldSettingOptions" :key="fieldSettingOption.id">
                     <input
                         :id="getLabelKeyForOption(fieldSettingOption)"
                         type="checkbox"

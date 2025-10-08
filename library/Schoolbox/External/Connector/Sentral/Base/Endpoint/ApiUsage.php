@@ -18,13 +18,12 @@ namespace Schoolbox\External\Connector\Sentral\Base\Endpoint;
  */
 class ApiUsage
 {
-
     /**
      * A list of (endpoint, count) tuples
      *
      * @var array
      */
-    private $usage = [];
+    private array $usage = [];
 
 
     /**

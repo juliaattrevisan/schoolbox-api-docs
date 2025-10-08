@@ -1,7 +1,10 @@
 import { expect } from "@playwright/test";
-import type { Page } from "@playwright/test";
+import type { Locator, Page } from "@playwright/test";
+import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 
 export default class Homepage {
+    private tester: AcceptanceTester;
+
     private page: Page;
 
     static readonly URL = "/homepage/{id}";
@@ -34,7 +37,7 @@ export default class Homepage {
 
     static readonly ELEMENT_EDIT_COLUMNS_TAB = "#tabs-2";
 
-    static readonly DATATEST_LINK_MENU_BUTTON = "sbx-pop-out-tab-control-button";
+    static readonly DATA_TEST_LINK_MENU_BUTTON = "sbx-pop-out-tab-control-button";
 
     static readonly ELEMENT_COMPONENT_LAYOUT = "#component-layout";
 
@@ -62,7 +65,18 @@ export default class Homepage {
 
     static readonly REMOVE_BUTTON_CONFIRMATION_MESSAGE = "Remove";
 
-    constructor(page: Page) {
+    static readonly DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU = "sbx-pop-out-duework-options";
+
+    static readonly DATA_TEST_ASSESSMENT_COMPONENT_TITLE = "component-assessment-title-";
+
+    static readonly ASSESSMENT_COMPONENT_TOT_MENU_MODIFY = "a.icon-modify";
+
+    static readonly DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU_DELETE = "component-assessment-actions-delete-";
+
+    static readonly DATA_TEST_HOMEPAGE_COMPONENT_TITLEBAR_NAME = "homepage-component-titlebar-name";
+
+    constructor(tester: AcceptanceTester, page: Page) {
+        this.tester = tester;
         this.page = page;
     }
 
@@ -97,6 +111,7 @@ export default class Homepage {
 
         // Click to add the component
         const componentSectionEl = this.page.locator(componentSection);
+        await expect(componentSectionEl.getByText(componentName)).toBeVisible();
         await componentSectionEl.getByText(componentName).click();
 
         // Wait for it to load
@@ -112,6 +127,20 @@ export default class Homepage {
      */
     public static locateComponent(layout: string, position: number): string {
         return `${layout} ${Homepage.ELEMENT_COMPONENT}:nth-child(${position})`;
+    }
+
+    /**
+     * Create a locator for a component by its name
+     * @param componentName - The name of the component
+     * @returns - the Locator for the component (or components)
+     */
+    public locateComponentByName(componentName: string): Locator {
+        const titleBar = this.page
+            .getByTestId(Homepage.DATA_TEST_HOMEPAGE_COMPONENT_TITLEBAR_NAME)
+            .filter({ hasText: componentName });
+
+        const components = this.page.locator("[data-component]");
+        return components.filter({ has: titleBar });
     }
 
     /**
@@ -155,8 +184,19 @@ export default class Homepage {
      * @param position - The position of the component (1-indexed)
      */
     async clickComponentActionBarButton(button: string, layout: string, position: number): Promise<void> {
+        await this.componentActionBarButton(button, layout, position).click();
+    }
+
+    /**
+     * Returns a component action bar button
+     * @param button - The button to click (as a queryselector)
+     * @param layout - The layout of the component
+     * @param position - The position of the component (1-indexed)
+     * @returns - Locator of the button
+     */
+    componentActionBarButton(button: string, layout: string, position: number): Locator {
         const componentLocator = Homepage.locateComponent(layout, position);
-        await this.page.locator(`${componentLocator} ${Homepage.ELEMENT_COMPONENT_ACTION_BAR}`).locator(button).click();
+        return this.page.locator(`${componentLocator} ${Homepage.ELEMENT_COMPONENT_ACTION_BAR}`).locator(button);
     }
 
     /**
@@ -172,7 +212,7 @@ export default class Homepage {
      * @param tab - The tab to click
      */
     async clickComponentsTab(tab: string): Promise<void> {
-        await this.page.click(tab);
+        await this.page.locator(tab).click();
     }
 
     /**
@@ -191,10 +231,10 @@ export default class Homepage {
     }
 
     /**
-     * Click the component settings
+     * @param component - The locator of the component to check
      */
-    async clickComponentSettings(): Promise<void> {
-        await this.page.click(Homepage.ELEMENT_COMPONENT_SETTINGS);
+    public static async clickComponentSettings(component: Locator): Promise<void> {
+        await component.locator(Homepage.ELEMENT_COMPONENT_SETTINGS).click();
     }
 
     /**
@@ -237,5 +277,47 @@ export default class Homepage {
      */
     async clickRemoveConfirmationMessage(): Promise<void> {
         await this.page.locator(`a:text("${Homepage.REMOVE_BUTTON_CONFIRMATION_MESSAGE}")`).first().click();
+    }
+
+    /**
+     * Click the assessment component TOT menu
+     * @param assessmentId - The assessment ID.
+     */
+    async clickAssessmentComponentTOTMenu(assessmentId: number): Promise<void> {
+        await this.page.getByTestId(`${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU}${assessmentId}`).click();
+    }
+
+    /**
+     * Click the assessment component title
+     * @param assessmentId - The assessment ID.
+     */
+    async clickAssessmentComponentTitle(assessmentId: number): Promise<void> {
+        await this.page.getByTestId(`${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TITLE}${assessmentId}`).click();
+    }
+
+    /**
+     * click Modify Settings via Quiz Component
+     * @param modifyButtonName - The modify button name: for Due work it is "Modify", for Quizzes it is "Modify Settings"
+     */
+    async clickModifyViaAssessmentComponent(modifyButtonName: string): Promise<void> {
+        await this.page.locator(Homepage.ASSESSMENT_COMPONENT_TOT_MENU_MODIFY).getByText(modifyButtonName).click();
+    }
+
+    /**
+     * click Delete Settings via Quiz Component
+     * @param assessmentId - The assessment ID.
+     * .
+     */
+    async clickDeleteViaAssessmentComponent(assessmentId: number): Promise<void> {
+        await this.page
+            .getByTestId(`${Homepage.DATA_TEST_ASSESSMENT_COMPONENT_TOT_MENU_DELETE}${assessmentId}`)
+            .click();
+    }
+
+    /**
+     * Open the link menu for the homepage
+     */
+    async openLinkMenu(): Promise<void> {
+        await this.page.getByTestId(Homepage.DATA_TEST_LINK_MENU_BUTTON).click();
     }
 }

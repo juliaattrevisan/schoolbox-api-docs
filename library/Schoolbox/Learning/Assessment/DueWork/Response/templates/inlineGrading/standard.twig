@@ -166,7 +166,7 @@ Usage:
         {% endblock %}
 
         {# Grading logic and structure #}
-        <div class="row mark-scheme" id="assessment-status" data-participant="{{ participant.user.id }}">
+        <div class="row mark-scheme" data-assessment-status data-participant="{{ participant.user.id }}">
             <div class="small-12 island">
                 <form method="post" data-feedback-form="{{ participant.user.id }}" action="{{ routeLookupIfAuthorized('learningDueWorkFeedback.postResponseFeedback', {
                     assessmentId: assessment.id,
@@ -251,7 +251,7 @@ Usage:
                                                                     {% endif %}
                                                                 </div>
                                                                 {% if selfAssessmentFeedback.comment|length %}
-                                                                    <article>{{ selfAssessmentFeedback.comment|nl2br }}</article>
+                                                                    <article>{{ selfAssessmentFeedback.comment|purify }}</article>
                                                                 {% else %}
                                                                     <article><span class="meta">{{ locale.selfReflection.proper }} comment not provided</span></article>
                                                                 {% endif %}
@@ -259,8 +259,9 @@ Usage:
                                                         </ul>
                                                     </li>
                                                 </ul>
+                                                {# Use the display mark type here to align with what the student actually gave themselves #}
                                                 {% if selfAssessmentFeedback.humanReadableMark|length %}
-                                                    <div class="grade {{ urgency.marks(selfAssessmentFeedback.normalisedMark) }}-bg">
+                                                    <div class="grade {{ urgency.marks(selfAssessmentFeedback.normalisedMark) }}-bg" data-test="assessment-feedback-self-assessment-mark">
                                                         <span>{{ selfAssessmentFeedback.humanReadableMark }}</span>
                                                     </div>
                                                 {% endif %}
@@ -274,13 +275,14 @@ Usage:
                         {# The little grades input combobox #}
                         <fieldset class="content">
                             {% block gradeValue %}
-                                {% if '' != assessment.markScheme.template %}
+                                {% if '' != assessment.instructorMarkScheme.template %}
                                     <div class="small-12 medium-3 column">
                                         <label>{{ locale.grades.proper }}
-                                            {% include '@learningMarkScheme/'~assessment.markScheme.template~'.twig' with {
+                                            {% include '@learningMarkScheme/'~assessment.instructorMarkScheme.template~'.twig' with {
                                                 participant: participant,
                                                 feedback: feedback,
-                                                markScheme: assessment.markScheme,
+                                                markScheme: assessment.instructorMarkScheme,
+                                                useInstructorMark: true,
                                                 tabIndex: 1,
                                                 errors: errors,
                                                 readonly: readonly,
@@ -300,7 +302,7 @@ Usage:
 
                             {# Feedback comment textarea #}
                             {% block comment %}
-                                <div class="small-12{% if '' != assessment.markScheme.template %} medium-9{% endif %} column">
+                                <div class="small-12{% if '' != assessment.instructorMarkScheme.template %} medium-9{% endif %} column">
                                     {% include '@learningAssessment/dueWork/comment.twig' with {
                                         participant: participant,
                                         feedback: feedback,
@@ -308,7 +310,9 @@ Usage:
                                         readonly: readonly,
                                         selfAssessment: selfAssess,
                                         selfReflection: selfReflect,
-                                        blindMode: blindMode ?? false
+                                        blindMode: blindMode ?? false,
+                                        isRichText: true,
+                                        editorTemplates: editorTemplates ?? [],
                                     } only %}
 
                                     {# Resubmission required checkbox #}

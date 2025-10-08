@@ -96,10 +96,7 @@ const columnConfig: Record<ColumnType, ColumnConfig> = {
     [ColumnType.UNIT]: { label: "Unit", fixedLeft: true },
     [ColumnType.OVERVIEW]: { label: null, fixedLeft: false }, // The label is set by the textbox keys
     [ColumnType.CURRICULUM_OVERVIEW]: { label: null, fixedLeft: false }, // The label is set by the curriculum component headings
-    [ColumnType.ACTIVITIES]: {
-        label: `Learning ${locale.activity.properPlural()}`,
-        fixedLeft: false,
-    },
+    [ColumnType.ACTIVITIES]: { label: null, fixedLeft: false }, // The label is set by the Course Builder component headings
     [ColumnType.RUBRIC_CAPABILITIES]: {
         label: `Rubric ${locale.rubricGroup.properPlural()}`,
         fixedLeft: false,
@@ -177,6 +174,10 @@ export function createTabs(template: UnitTemplate): Tab[] {
             }
             if (columnTypeID === ColumnType.CURRICULUM_OVERVIEW) {
                 getColumns(tabColumns, newColumnBase, columnTypeID, template.curriculum);
+                return;
+            }
+            if (columnTypeID === ColumnType.ACTIVITIES) {
+                getColumns(tabColumns, newColumnBase, columnTypeID, template.activities);
                 return;
             }
             tabColumns.push(newColumnBase);

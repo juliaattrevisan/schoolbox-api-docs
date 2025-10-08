@@ -238,7 +238,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function isDraft(Alaress_Date_Format $now = null): bool
+    public function isDraft(?Alaress_Date_Format $now = null): bool
     {
         return self::STATE_DRAFT === $this->getDiscreteState($now);
     }
@@ -248,7 +248,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function isAwaitingModeration(Alaress_Date_Format $now = null): bool
+    public function isAwaitingModeration(?Alaress_Date_Format $now = null): bool
     {
         return self::STATE_AWAITING_MODERATION === $this->getDiscreteState($now);
     }
@@ -260,7 +260,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function isRejected(Alaress_Date_Format $now = null): bool
+    public function isRejected(?Alaress_Date_Format $now = null): bool
     {
         return self::STATE_REJECTED === $this->getDiscreteState($now);
     }
@@ -270,7 +270,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function isAwaitingPublication(Alaress_Date_Format $now = null): bool
+    public function isAwaitingPublication(?Alaress_Date_Format $now = null): bool
     {
         return self::STATE_AWAITING_PUBLICATION === $this->getDiscreteState($now);
     }
@@ -282,7 +282,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function isPublished(Alaress_Date_Format $now = null): bool
+    public function isPublished(?Alaress_Date_Format $now = null): bool
     {
         return self::STATE_PUBLISHED === $this->getDiscreteState($now);
     }
@@ -294,7 +294,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function isExpired(Alaress_Date_Format $now = null): bool
+    public function isExpired(?Alaress_Date_Format $now = null): bool
     {
         return self::STATE_EXPIRED === $this->getDiscreteState($now);
     }
@@ -307,7 +307,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function isApproved(Alaress_Date_Format $now = null): bool
+    public function isApproved(?Alaress_Date_Format $now = null): bool
     {
         return ($this->getDiscreteState($now) & self::STATE_APPROVED) !== 0;
     }
@@ -319,7 +319,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function isSubmitted(Alaress_Date_Format $now = null): bool
+    public function isSubmitted(?Alaress_Date_Format $now = null): bool
     {
         return ($this->getDiscreteState($now) & self::STATE_SUBMITTED) !== 0;
     }
@@ -335,7 +335,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function isPublic(Alaress_Date_Format $now = null): bool
+    public function isPublic(?Alaress_Date_Format $now = null): bool
     {
         return ($this->getDiscreteState($now) & self::STATE_PUBLIC) !== 0;
     }
@@ -351,7 +351,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      * @param Alaress_Date_Format|null $now
      * @return int
      */
-    private function getDiscreteState(Alaress_Date_Format $now = null): int
+    private function getDiscreteState(?Alaress_Date_Format $now = null): int
     {
         // Needed to compensate for AlaressNullDate object/null duality
         $submittedAt = $this->submittedAt ?? null;
@@ -402,7 +402,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      * @param Alaress_Date_Format|null $now
      * @return string
      */
-    public function getStatus(Alaress_Date_Format $now = null): string
+    public function getStatus(?Alaress_Date_Format $now = null): string
     {
         $map = [
             self::STATE_DRAFT                => 'Drafted',
@@ -423,7 +423,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function canBeSubmitted(Alaress_Date_Format $now = null): bool
+    public function canBeSubmitted(?Alaress_Date_Format $now = null): bool
     {
         return ($this->getDiscreteState($now) & self::VALID_STATES_TO_SUBMIT) !== 0;
     }
@@ -435,7 +435,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function canBeUnSubmitted(Alaress_Date_Format $now = null): bool
+    public function canBeUnSubmitted(?Alaress_Date_Format $now = null): bool
     {
         return ($this->getDiscreteState($now) & self::VALID_STATES_TO_UN_SUBMIT) !== 0;
     }
@@ -447,7 +447,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function canBeApproved(Alaress_Date_Format $now = null): bool
+    public function canBeApproved(?Alaress_Date_Format $now = null): bool
     {
         return ($this->getDiscreteState($now) & self::VALID_STATES_TO_APPROVE) !== 0;
     }
@@ -459,7 +459,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function canBeRejected(Alaress_Date_Format $now = null): bool
+    public function canBeRejected(?Alaress_Date_Format $now = null): bool
     {
         return ($this->getDiscreteState($now) & self::VALID_STATES_TO_REJECT) !== 0;
     }
@@ -471,7 +471,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function canBeArchived(Alaress_Date_Format $now = null): bool
+    public function canBeArchived(?Alaress_Date_Format $now = null): bool
     {
         return ($this->getDiscreteState($now) & self::VALID_STATES_TO_ARCHIVE) !== 0;
     }
@@ -483,7 +483,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      * @param Alaress_Date_Format|null $now
      * @throws InvalidTransitionException If transition is invalid for some reason
      */
-    public function submit(Alaress_Date_Format $now = null): void
+    public function submit(?Alaress_Date_Format $now = null): void
     {
         $now          = $now ?? Alaress_Date_Format::now();
         $currentState = $this->getDiscreteState($now);
@@ -540,7 +540,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      * @param Alaress_Date_Format|null $now
      * @throws InvalidTransitionException
      */
-    public function approve(User $effector, Alaress_Date_Format $now = null): void
+    public function approve(User $effector, ?Alaress_Date_Format $now = null): void
     {
         $now          = $now ?? Alaress_Date_Format::now();
         $currentState = $this->getDiscreteState($now);
@@ -579,7 +579,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      * @param Alaress_Date_Format|null $now
      * @throws InvalidTransitionException
      */
-    public function reject(User $effector, string $reason = null, Alaress_Date_Format $now = null): void
+    public function reject(User $effector, ?string $reason = null, ?Alaress_Date_Format $now = null): void
     {
         $now          = $now ?? Alaress_Date_Format::now();
         $currentState = $this->getDiscreteState($now);
@@ -614,7 +614,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      * @param Alaress_Date_Format|null $now
      * @throws InvalidTransitionException
      */
-    public function publish(Alaress_Date_Format $publishAt = null, Alaress_Date_Format $now = null)
+    public function publish(?Alaress_Date_Format $publishAt = null, ?Alaress_Date_Format $now = null)
     {
         $now          = $now ?? Alaress_Date_Format::now();
         $currentState = $this->getDiscreteState($now);
@@ -648,7 +648,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      * @param Alaress_Date_Format|null $now
      * @throws InvalidTransitionException
      */
-    public function archive(Alaress_Date_Format $expireAt = null, Alaress_Date_Format $now = null)
+    public function archive(?Alaress_Date_Format $expireAt = null, ?Alaress_Date_Format $now = null)
     {
         $now          = $now ?? Alaress_Date_Format::now();
         $currentState = $this->getDiscreteState($now);
@@ -679,7 +679,7 @@ class Model implements ISoftDeletable, \Alaress\Json\Serializable, Linkable, Thr
      * @param Alaress_Date_Format|null $now
      * @return Alaress_Date_Format|null
      */
-    public function getStatusDate(Alaress_Date_Format $now = null): ?Alaress_Date_Format
+    public function getStatusDate(?Alaress_Date_Format $now = null): ?Alaress_Date_Format
     {
         switch ($this->getDiscreteState($now)) {
             case self::STATE_PUBLISHED:

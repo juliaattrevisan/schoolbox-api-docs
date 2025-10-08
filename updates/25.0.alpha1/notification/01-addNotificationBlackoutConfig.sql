@@ -1,0 +1,53 @@
+INSERT INTO `config` (
+    `name`,
+    `value`,
+    `title`,
+    `description`,
+    `options`,
+    `field_id`,
+    `type_id`,
+    `editable`,
+    `hidden`,
+    `required`,
+    `module`,
+    `sequence`
+) VALUES (
+    'notification_blackout_enabled',
+    '0',
+    'Enable Notification Blackout',
+    'If enabled, mobile and browser notifications will be blacked out between the Notification Blackout Start and End Time each day.  (Emails, panel notifications and priority news are not affected, and are always delivered immediately.)',
+    '',
+    (SELECT id FROM lu_config_field WHERE field = 'boolean'),
+    null,
+    'true',
+    'true',
+    'false',
+    'settings',
+    (SELECT c.sequence + 1 FROM config c WHERE c.module = 'settings' LIMIT 1)
+), (
+    'notification_blackout_start_time',
+    '',
+    'Notification Blackout Start Time',
+    'If Notification Blackout is enabled, mobile and browser notifications raised between this and Notification Blackout End Time will be delayed until shortly after the end time.',
+    '',
+    (SELECT id FROM lu_config_field WHERE field = 'timepicker'),
+    null,
+    'true',
+    'true',
+    'false',
+    'settings',
+    (SELECT c.sequence + 1 FROM config c WHERE c.module = 'settings' LIMIT 1)
+), (
+    'notification_blackout_end_time',
+    '',
+    'Notification Blackout End Time',
+    'If Notification Blackout is enabled, mobile and browser notifications raised between Notification Blackout Start Time and this will be delayed until shortly after this time.',
+    '',
+    (SELECT id FROM lu_config_field WHERE field = 'timepicker'),
+    null,
+    'true',
+    'true',
+    'false',
+    'settings',
+    (SELECT c.sequence + 1 FROM config c WHERE c.module = 'settings' LIMIT 1)
+);

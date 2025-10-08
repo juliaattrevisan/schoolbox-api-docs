@@ -191,10 +191,9 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
         // normalise the birth date: change YYYY-mm-dd to timestamp
         $student['STUDENTBIRTHDATE'] = strtotime($student['STUDENTBIRTHDATE']);
 
-        /* Assign alert messages to the right places and filter out empty values
-         * There can only be one AlertMessage in this connector per user
+        /* There are no alert messages in edumate, just initialise the stacks
          */
-        $student['AlertMessage'] = AllMeaningfulValues::find([$student['AlertMessage']]);
+        $student['AlertMessage'] = [];
         $student['AlertLegal'] = [];
 
         return $this->normaliseFields($student, $caseSensitiveFields);
@@ -228,7 +227,8 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
             'StudentContactSpouseMobilePhone',
             'StudentContactSpouseOccupPhone',
             'StudentContactSpouseDefaultEmail',
-            'StudentContactType'
+            'StudentContactType',
+            'StudentContactRelation',
         );
 
         $stmt = $this->getConnection()->prepareQuery("
@@ -265,7 +265,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     /**
      * @inheritdoc
      */
-    public function getCurrentSemester(string $externalUserId = null): ?string
+    public function getCurrentSemester(?string $externalUserId = null): ?string
     {
         $stmt = $this->getConnection()->prepareQuery("
             SELECT REPORT_PERIOD
@@ -288,7 +288,7 @@ class External_Edumate_User extends External_Edumate_Connection implements Exter
     /**
      * @inheritdoc
      */
-    public function getCurrentYear(string $externalUserId = null): ?string
+    public function getCurrentYear(?string $externalUserId = null): ?string
     {
         return date('Y');
     }

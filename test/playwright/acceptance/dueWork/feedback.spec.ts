@@ -23,6 +23,7 @@ test.describe("Feedback Tests", () => {
         const className = Common.CLASS_9AENG;
         const classId = Common.CLASS_ID_9AENG;
         const student = Common.USER_LOUISASMITH;
+        const studentId = Common.USER_ID_LOUISASMITH;
         const teacher = Common.USER_JACKCOLES;
         const dueworkTitle1 = `Cest One ${Common.genText(6)}`;
         const filename = path.join(__dirname, "../../support/file/test-80x80.png");
@@ -41,11 +42,11 @@ test.describe("Feedback Tests", () => {
         await dueworkForm.setTitle(dueworkTitle1);
         await dueworkForm.setPublishDate(Common.getTodayAtMidnight());
         await dueworkForm.setOpenDate(Common.getTodayAtMidnight());
-        await dueworkForm.setMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
+        await dueworkForm.setInstructorMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
         await dueworkForm.create();
 
         tester.isGoingTo("As Louisa Smith, check notification");
-        await tester.impersonateViaModifyUserPage(student);
+        await tester.impersonateViaUserProfilePage(student);
         const assessmentNotificationLouisa = await tester.common.findNotification(
             `Assessment Task ${dueworkTitle1} opened in ${className}`,
             true,
@@ -54,7 +55,7 @@ test.describe("Feedback Tests", () => {
         tester.isGoingTo("Go to submit page");
         await assessmentNotificationLouisa.getByText(dueworkTitle1).click();
         await page.getByTestId(SELECTOR_ASSESSMENT_SUMMARY_CREATE_BUTTON).click();
-        await expect(page.locator("#assessment-status h1").first()).toHaveText(dueworkTitle1);
+        await expect(page.locator("[data-assessment-status] h1").first()).toHaveText(dueworkTitle1);
 
         tester.isGoingTo("create submission");
         const submitForm = new SubmitForm(tester, page);
@@ -80,12 +81,12 @@ test.describe("Feedback Tests", () => {
         const grade = Math.floor(Math.random() * 50) + 50; // Random grade between 50 and 100
 
         const feedbackForm = new FeedbackForm(tester, page);
-        await feedbackForm.setGrade(grade);
-        await feedbackForm.setComment(Common.genText(200));
+        await feedbackForm.setGrade(grade, studentId);
+        await feedbackForm.setComment(Common.genText(200), studentId);
         await feedbackForm.publish();
 
         tester.isGoingTo("As Louisa Smith, check notification");
-        await tester.impersonateViaModifyUserPage(student);
+        await tester.impersonateViaUserProfilePage(student);
         const assessmentNotificationLuisa2 = await tester.common.findNotification(
             `${teacher} has marked your work for ${dueworkTitle1} in ${className}`,
             true,
@@ -121,11 +122,11 @@ test.describe("Feedback Tests", () => {
         await dueworkForm.setTitle(dueworkTitle2);
         await dueworkForm.setPublishDate(Common.getTodayAtMidnight());
         await dueworkForm.setOpenDate(Common.getTodayAtMidnight());
-        await dueworkForm.setMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
+        await dueworkForm.setInstructorMarkType(AssessmentForm.MARK_TYPE_PERCENTAGE);
         await dueworkForm.create();
 
         tester.isGoingTo("As Louisa Smith, check notification");
-        await tester.impersonateViaModifyUserPage(student);
+        await tester.impersonateViaUserProfilePage(student);
         const assessmentNotificationLouisa = await tester.common.findNotification(
             `Assessment Task ${dueworkTitle2} opened in ${className}`,
             true,
@@ -134,7 +135,7 @@ test.describe("Feedback Tests", () => {
         tester.isGoingTo("Go to the submit page");
         await assessmentNotificationLouisa.getByText(dueworkTitle2).click();
         await page.getByTestId(SELECTOR_ASSESSMENT_SUMMARY_CREATE_BUTTON).click();
-        await expect(page.locator("#assessment-status h1").first()).toHaveText(dueworkTitle2);
+        await expect(page.locator("[data-assessment-status] h1").first()).toHaveText(dueworkTitle2);
 
         tester.isGoingTo("create submission");
         const submitForm = new SubmitForm(tester, page);
@@ -167,7 +168,7 @@ test.describe("Feedback Tests", () => {
         );
 
         tester.isGoingTo("As Louisa, check notification");
-        await tester.impersonateViaModifyUserPage(student);
+        await tester.impersonateViaUserProfilePage(student);
         const assessmentNotificationLuisa2 = await tester.common.findNotification(
             `${teacher} has marked your work for ${dueworkTitle2} in ${className}`,
             true,

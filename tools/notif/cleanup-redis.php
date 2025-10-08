@@ -28,7 +28,9 @@ $kernel = new Daemon\Kernel(
     ]
 );
 
-$kernel->run(function (ContainerInterface $di, LoopInterface $loop, Logger $log, array $opts) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, Logger $log, array $opts) use ($kernel): void {
+    $kernel->deprecationNotice("SA-19334");
+
     $perform = \array_key_exists('perform', $opts);
 
     if ($perform) {
@@ -85,4 +87,6 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, Logger $log,
         $redis->del(array_keys($deletions));
         $log->error('Data deletion successful');
     }
+
+    $kernel->deprecationNotice("SA-19334");
 });

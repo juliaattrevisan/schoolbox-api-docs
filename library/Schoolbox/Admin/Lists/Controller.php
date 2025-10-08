@@ -13,39 +13,40 @@ namespace Schoolbox\Admin\Lists;
 use Alaress\Diff\Differ;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
+use Component_DefinitionMapper;
 use Exception;
 use External_Pastoral;
 use External_Timetable;
+use HouseMapper;
+use HouseResidentialMapper;
+use ReflectionClass;
 use ReflectionException;
-use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use ReflectionProperty;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Assessment\Component\SubmissionBox\GradeLevel\Group\Mapper as GradeLevelGroupMapper;
+use Schoolbox\Calendar\EventTypeMapper;
+use Schoolbox\CampusMapper;
+use Schoolbox\Comms\News\Topic;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Learning\Moment\Evidence\Tag\Mapper as LearningMomentEvidenceTag;
+use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
+use Schoolbox\Learning\DueWork\StateMapper;
+use Schoolbox\Learning\Moment\Tag\Mapper as LearningMomentEvidenceTag;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\MapperFactory;
-use Schoolbox\Role;
-use Schoolbox\RoleMapper;
-use Schoolbox\CampusMapper;
-use Component_DefinitionMapper;
-use Schoolbox\Learning\DueWork\StateMapper;
-use HouseMapper;
-use HouseResidentialMapper;
-use ReflectionClass;
-use ReflectionProperty;
-use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
-use Schoolbox\Calendar\EventTypeMapper;
-use Schoolbox\Comms\News\Topic;
-use Schoolbox\Sequential;
-use Schoolbox\WebDav\Mapper as WebDavMapper;
+use Schoolbox\Pastoral;
+use Schoolbox\Pastoral\DocumentClassification\Mapper as PastoralDocumentClassificationMapper;
+use Schoolbox\Pastoral\DocumentClassification\Model as PastoralDocumentClassificationModel;
 use Schoolbox\Pastoral\Severity\Mapper as PastoralSeverityMapper;
+use Schoolbox\Pastoral\SubType\Mapper as PastoralCategoryMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Pastoral\Type\Model as PastoralTypeModel;
-use Schoolbox\Pastoral\SubType\Mapper as PastoralCategoryMapper;
-use Schoolbox\Pastoral\DocumentClassification\Mapper as PastoralDocumentClassificationMapper;
-use Schoolbox\Pastoral;
+use Schoolbox\Role;
+use Schoolbox\RoleMapper;
+use Schoolbox\Sequential;
+use Schoolbox\WebDav\Mapper as WebDavMapper;
 use Schoolbox\YearLevel;
 use Timetable_ColourMapper;
 use Twig\Error\Error;
@@ -529,6 +530,10 @@ class Controller extends Base
                     // Some setters expect objects as parameters.  For those cases we need to create objects.
                     $valueToSet = match ($setter) {
                         'setPastoralType' => (new PastoralTypeModel())->setId($value[$currentIndex]),
+                        'setDocumentClassification',
+                        'setDocumentClassificationConfidential' => (
+                            (new PastoralDocumentClassificationModel())->setId($value[$currentIndex])
+                        ),
                         default => $value[$currentIndex],
                     };
 
@@ -1179,18 +1184,27 @@ class Controller extends Base
                     ],
                     'name'          => [
                         'caption'   => 'Name',
-                        'width'     => 6,
+                        'width'     => 4,
                         'maxLength' => 100,
                         'mandatory' => true,
                         'default'   => '',
                     ],
                     'documentClassification' => [
                         'getter'    => 'getDocumentClassification',
-                        'caption'   => 'SIS Document Classification',
+                        'caption'   => 'General SIS Document Classification',
                         'lookup'    => $luDocumentClassifications,
                         'nullable'  => true,
-                        'nullable_label' => 'No Document Classification',
-                        'width'     => 3,
+                        'nullable_label' => 'No General Document Classification',
+                        'width'     => 2,
+                        'tooltip'   => 'This is document classification code that will be assigned to uploaded documents in your SIS for records of this type. These are defined in the Pastoral Document Classifications list.',
+                    ],
+                    'documentClassificationConfidential' => [
+                        'getter'    => 'getDocumentClassificationConfidential',
+                        'caption'   => 'Confidential SIS Document Classification',
+                        'lookup'    => $luDocumentClassifications,
+                        'nullable'  => true,
+                        'nullable_label' => 'No Confidential Document Classification',
+                        'width'     => 2,
                         'tooltip'   => 'This is document classification code that will be assigned to uploaded documents in your SIS for records of this type. These are defined in the Pastoral Document Classifications list.',
                     ],
                     'externalCode' => [
@@ -1428,7 +1442,7 @@ class Controller extends Base
                     'popOutList' => 'displayOptions',
                 ],
                 'displayGradePage'         => [
-                    'caption'    => 'Display Grade Page',
+                    'caption'    => 'Display Class Grades Page',
                     'checkbox'   => true,
                     'mandatory'  => true,
                     'default'    => false,
@@ -1494,6 +1508,14 @@ class Controller extends Base
                     'default'    => false,
                     'popOutList' => 'displayOptions',
                 ],
+                'learningMomentsModeration' => [
+                    'caption'    => 'Learning Moments Moderation',
+                    'tooltip'    => 'If toggled to ‘ON’, a student’s learning moments will require moderation before it appears on the activity feed for parents.',
+                    'checkbox'   => true,
+                    'mandatory'  => true,
+                    'default'    => false,
+                    'popOutList' => 'displayOptions',
+                ],
             ],
         ];
         if ($this->getConfigLoader()->get(ConfigMapper::NAME_QR_LOGIN_ENABLED)) {
@@ -1507,6 +1529,15 @@ class Controller extends Base
                     'popOutList' => 'displayOptions',
                 ];
         }
+
+        $return['year-levels']['fields']['birthdayCelebrationEnabled'] = [
+            'caption'    => 'Birthday Celebration Enabled',
+            'tooltip'    => 'If toggled \'ON\', displays a celebration on the users\' Birthday.',
+            'checkbox'   => true,
+            'mandatory'  => true,
+            'default'    => false,
+            'popOutList' => 'displayOptions',
+        ];
 
         $return['evidence-tag'] = [
             'title'             => 'Learning Moments',

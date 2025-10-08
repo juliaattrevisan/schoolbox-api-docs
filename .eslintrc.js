@@ -37,6 +37,7 @@ module.exports = {
         "@typescript-eslint",
         // for eslint to be using typescript-eslint
         "eslint-plugin-jsdoc", // to lint jsdocs
+        "eslint-plugin-eslint-comments", // to avoid unnecessary eslint-disable comments
     ],
 
     root: true,
@@ -92,6 +93,14 @@ module.exports = {
                 prefer: "type-imports",
             },
         ],
+        // avoid unnecessary eslint-disable comments and enforce descriptions for them
+        "eslint-comments/disable-enable-pair": "error",
+        "eslint-comments/no-aggregating-enable": "error",
+        "eslint-comments/no-duplicate-disable": "error",
+        "eslint-comments/no-unlimited-disable": "error",
+        "eslint-comments/no-unused-disable": "error",
+        "eslint-comments/no-unused-enable": "error",
+        "eslint-comments/require-description": "warn",
     },
     settings: {
         "import/parsers": {

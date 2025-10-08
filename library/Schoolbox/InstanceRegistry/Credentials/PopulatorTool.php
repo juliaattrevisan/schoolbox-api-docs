@@ -83,7 +83,7 @@ abstract class PopulatorTool extends App
         /* Obtain instance registry configuration vars,
          * cold exiting upon any failures
          */
-        [$irUrl, $irApiKey, $puppetCert] = (new Config($this->getLogger()))->fetch($siteType);
+        [$irUrl, $irApiKey] = (new Config($this->getLogger()))->fetch($siteType);
 
         /* Obtain learnosity credentials from instance registry in a set of key-value tuples,
          * remapping siteType into something Instance Registry understands
@@ -95,7 +95,7 @@ abstract class PopulatorTool extends App
             );
             exit(CliKernelAbstract::EXIT_STATUS_APP_ERROR);
         }
-        $configTuples = $this->fetchCredentials($irUrl, $irApiKey, $puppetCert, $environment);
+        $configTuples = $this->fetchCredentials($irUrl, $irApiKey, $environment);
 
         /* Shank them into our config table
          */
@@ -114,7 +114,6 @@ abstract class PopulatorTool extends App
      *
      * @param string $irUrl
      * @param string $irApiKey
-     * @param string $puppetCert
      * @param string $environment
      * @return array
      * @throws GuzzleException
@@ -122,13 +121,13 @@ abstract class PopulatorTool extends App
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    private function fetchCredentials(string $irUrl, string $irApiKey, string $puppetCert, string $environment): array
+    private function fetchCredentials(string $irUrl, string $irApiKey, string $environment): array
     {
         $client = new Client(['curl' => Server::getInstance()->buildCurlOptions()]);
 
         /* This endpoint is listed here: https://manage.schoolbox.cloud/api/documentation
          */
-        $endpoint = $this->generateEndpoint($irUrl, $puppetCert, $environment);
+        $endpoint = $this->generateEndpoint($irUrl, $environment);
 
         /* Get the credentials from this special endpoint
          */
@@ -164,14 +163,13 @@ abstract class PopulatorTool extends App
 
 
     /**
-     * Configure the url we use to botain credentials
+     * Configure the url we use to obtain credentials
      *
      * @param string $irUrl
-     * @param string $puppetCert
      * @param string $environment
      * @return string
      */
-    abstract protected function generateEndpoint(string $irUrl, string $puppetCert, string $environment): string;
+    abstract protected function generateEndpoint(string $irUrl, string $environment): string;
 
 
     /**

@@ -36,7 +36,7 @@
                         item: function (data, escape) {
                             var klass   = "item",
                                 title   = '',
-                                hasUser = ('user' in data && 'id' in data.user && data.user.id);
+                                hasUser = data.user?.id ?? false;
                             if (!hasUser) {
                                 // Not a SB user: put some icon there
                                 klass += ' icon-info';

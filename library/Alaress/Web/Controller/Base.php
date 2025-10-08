@@ -10,6 +10,9 @@
 
 namespace Alaress\Web\Controller;
 
+use Alaress\Lock\InstanceLockFactory;
+use Alaress\Lock\LockRefreshException;
+use Alaress\Lumberjack\Logger;
 use Alaress\Module\Registry;
 use Alaress\Specification\ISpecification;
 use Alaress\Web\Output;
@@ -23,14 +26,20 @@ use Alaress\Authorizer\Authorizer;
 use Closure;
 use Crell\ApiProblem\ApiProblem;
 use LogicException;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamInterface;
+use Psr\Log\LoggerInterface;
 use Schoolbox\IConfigLoader;
 use Schoolbox\User;
 use Sentry\State\HubInterface;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\LockInterface;
 use Throwable;
 use Schoolbox\Url\Uri;
 use Twig\Error\Error as TwigError;
@@ -454,14 +463,14 @@ abstract class Base
      * Attempts to authorize a route for a user. Returns the URL for that route
      * if authorized, and false if not.
      *
-     * @param  string $name   The name of the route to authorize and generate.
-     * @param  array  $params Any params to pass to the route generator.
-     * @param  User   $user   The user to authorize the route for. Defaults to
+     * @param  string   $name   The name of the route to authorize and generate.
+     * @param  array    $params Any params to pass to the route generator.
+     * @param User|null $user   The user to authorize the route for. Defaults to
      *                        currently authenticated user.
      * @return string|bool    The URL for the route if authorized, false if not.
      * @throws \Aura\Router\Exception\RouteNotFound
      */
-    public function getRouteIfAuthorized($name, array $params = array(), User $user = null)
+    public function getRouteIfAuthorized($name, array $params = array(), ?User $user = null)
     {
         if (!($user instanceof User)) {
             $user = $this->getUser();
@@ -528,11 +537,12 @@ abstract class Base
      *                      `json_encode`, for memory efficiency and
      *                      compatibility with generators (`yield` statements
      *                      and callables) in `$data`.
+     * @param string|null $filename  If specified, downloads the json content as a file
      * @return ResponseInterface
      */
-    protected function responseAsJson(mixed $data, bool $buffer = false): ResponseInterface
+    protected function responseAsJson(mixed $data, bool $buffer = false, ?string $filename = null): ResponseInterface
     {
-        return $this->responseFactory->buildJson($data, $buffer);
+        return $this->responseFactory->buildJson($data, $buffer, $filename);
     }
 
     /**
@@ -856,13 +866,13 @@ abstract class Base
 
     /**
      * Create an error exception that can be thrown and output by the kernel
-     * @param int|null        $errorCode
+     * @param int|null       $errorCode
      * @param Throwable|null $previous
-     * @param string          $additionalInfo
-     * @param int             $httpStatusCode
+     * @param string         $additionalInfo
+     * @param int            $httpStatusCode
      * @return \Exception
      */
-    protected function generateException(?int $errorCode, Throwable $previous = null, string $additionalInfo = '', int $httpStatusCode = 400)
+    protected function generateException(?int $errorCode, ?Throwable $previous = null, string $additionalInfo = '', int $httpStatusCode = 400)
     {
         return $this->eg->generateException($errorCode, $previous, $additionalInfo, $httpStatusCode);
     }
@@ -925,5 +935,98 @@ abstract class Base
         if ($currentLimit !== 0) {
             set_time_limit($seconds);
         }
+    }
+
+    /* Lock Acquisition
+     * cloned from cli land because we can perhaps give user feedback here
+     */
+
+    /**
+     * Acquires and returns a lock object.
+     *
+     * DI is used to get the lock factory.
+     *
+     * @param LoggerInterface $logger
+     * @param string          $lockName The name of the lock to acquire.
+     *                                  Will be automatically made unique across
+     *                                  separate instances.
+     * @param float|null      $timeout  The amount of time (in seconds) to hold the
+     *                                  lock for.
+     * @return LockInterface
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
+     * @throws \RuntimeException
+     */
+    protected function acquireLock(LoggerInterface $logger, string $lockName, ?float $timeout): LockInterface
+    {
+        /** @noinspection PhpUnhandledExceptionInspection */
+        /** @var InstanceLockFactory $lockFactory */
+        $lockFactory = $this->getDi()->get('lockFactory');
+        $lock        = $lockFactory->createLock($lockName, $timeout);
+
+        // Try to acquire this lock
+        try {
+            $acquired = $lock->acquire();
+        } catch (\Exception $e) {
+            /* Any weird exception being thrown here - lock-related or otherwise -
+             * is going to preclude a proper lock acquisition and you should be
+             * prevented from doing whatever you're doing
+             */
+            $message = 'This process is already running for this instance: trusting it will self-terminate on timeout';
+
+            $logger->warning($message);
+
+            throw new \RuntimeException($message);
+        }
+
+        /* You didn't die, but you also couldn't acquire a lock
+         * Drop a nice message because this is an intended behaviour
+         */
+        if (!$acquired) {
+            $message = sprintf(
+                'Could not acquire %s lock',
+                $lockName
+            );
+
+            $logger->warning($message);
+
+            throw new \RuntimeException($message);
+        }
+
+        return $lock;
+    }
+
+    /**
+     * An alias to refresh a lock but captures the exception thrown
+     * when a lock expires
+     *
+     * @param Logger $logger // log to inform the user of failed refresh
+     * @param LockInterface $lock // the lock to refresh
+     * @return void
+     * @throws LockRefreshException
+     */
+    protected function refreshLock(LoggerInterface $logger, LockInterface $lock): void
+    {
+        try {
+            $lock->refresh();
+        } catch (LockConflictedException | LockAcquiringException $e) {
+            $message = 'Could not refresh lock; perhaps expired';
+
+            $logger->warning($message);
+
+            throw new LockRefreshException($message);
+        }
+    }
+
+    /**
+     * Spawn a Logger instance, for the lock mechanism
+     *
+     * @param string $module // the module name to log under, this will show in STDOUT
+     * @return Logger
+     */
+    protected function spawnLogger(string $module): Logger
+    {
+        return new Logger(STDOUT, STDOUT, \Monolog\Logger::INFO, [], true, $module);
     }
 }

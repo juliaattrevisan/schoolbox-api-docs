@@ -16,6 +16,7 @@ use Schoolbox\Resource\Storage\Mapper;
 use Schoolbox\Resource\Storage\Model as StorageModel;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use SocialStream\Cache\CacheHashLoader;
 use SocialStream\UrlDetection;
 
 /**
@@ -50,9 +51,10 @@ class Creational extends AbstractFactory
     /**
      * Constructor
      *
-     * @param string $url
+     * @param string          $url
+     * @param CacheHashLoader $cacheHashLoader For loading post's cache hash from its thumbnail.
      */
-    public function __construct($url)
+    public function __construct(string $url, private CacheHashLoader $cacheHashLoader)
     {
         $this->setUrl(trim($url));
         $this->urlDetection = new UrlDetection($url);
@@ -64,14 +66,14 @@ class Creational extends AbstractFactory
      * Populate it with the information from $_POST etc
      * Spawn metadata and thumbnails where appropriate
      *
-     * @param array $data
+     * @param array|null $data
      * @return \SocialStream_Post_Abstract
      * @throws \DomainException
      * @throws \InvalidArgumentException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    public function produce(array $data = null): \SocialStream_Post_Abstract
+    public function produce(?array $data = null): \SocialStream_Post_Abstract
     {
 
         // if data contains an attachment
@@ -399,16 +401,17 @@ class Creational extends AbstractFactory
              * but don't cache icons
              */
             if (!preg_match('/^icon:/', $chain->getResult())) {
-                $cache = new \SocialStream\Cache\Original();
-                $cache->initPost($this->product);
+//                $cache = new \SocialStream\Cache\Original();
+//                $cache->initPost($this->product);
+                $this->cacheHashLoader->load($this->product);
 
                 /* Thumbnail metadata was found, but thumbnail itself
                  * isn't there (broken link)
                  */
 
-                if (!$cache->hasThumbnail()) {
-                    $this->product->setThumbnail('');
-                }
+//                if (!$cache->hasThumbnail()) {
+//                    $this->product->setThumbnail('');
+//                }
             }
         }
     }
@@ -452,8 +455,9 @@ class Creational extends AbstractFactory
 
             /* Save the original in the cache location
              */
-            $cache = new \SocialStream\Cache\Original();
-            $cache->initPost($this->product);
+//            $cache = new \SocialStream\Cache\Original();
+//            $cache->initPost($this->product);
+            $this->cacheHashLoader->load($this->product);
         } else {
             /* Set up storage stream location and its icon thumbnails
              */
@@ -508,8 +512,9 @@ class Creational extends AbstractFactory
 
             /* Save the original in the cache location
              */
-            $cache = new \SocialStream\Cache\Original();
-            $cache->initPost($this->product);
+//            $cache = new \SocialStream\Cache\Original();
+//            $cache->initPost($this->product);
+            $this->cacheHashLoader->load($this->product);
         } else {
             /* Set up icon thumbnails
              */

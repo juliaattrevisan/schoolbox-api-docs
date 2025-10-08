@@ -8,11 +8,16 @@
  * @link        https://schoolbox.com.au/
  */
 
+use GuzzleHttp\Client;
+use Proxy\Server;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Engagement\Login;
+use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\LogMapper;
 use Schoolbox\Admin\Home\SamlCertHelper;
+use Schoolbox\Resource\Storage\Virus\IScanner;
 
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\BasicRequest\Kernel();
@@ -21,6 +26,26 @@ $kernel->setupSentryTrace(__FILE__);
 /** @var SitePage $page */
 $page = $kernel->get('sitePage');
 $page->initSession();
+
+/** @var \Schoolbox\User $user */
+$user = $_SESSION['user'];
+$hasAccess =
+    $user->isSuperuser() ||
+    $user->hasServicePermission(UserAccess::SERVICE_CMS, UserAccess::ACCESS_FULL) ||
+    $user->hasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL) ||
+    $user->hasServicePermission(UserAccess::SERVICE_CALENDAR, UserAccess::ACCESS_FULL) ||
+    $user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_FULL) ||
+    $user->hasServicePermission(UserAccess::SERVICE_LMS, UserAccess::ACCESS_FULL) ||
+    $user->hasServicePermission(UserAccess::SERVICE_BADGE, UserAccess::ACCESS_FULL) ||
+    $user->hasServicePermission(UserAccess::SERVICE_DESIGN, UserAccess::ACCESS_FULL) ||
+    $user->hasServicePermission(UserAccess::SERVICE_TIMETABLE, UserAccess::ACCESS_FULL);
+
+/**
+ * only super or service moderators
+ */
+if (!$hasAccess) {
+    throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+}
 
 $output = array();
 
@@ -35,7 +60,8 @@ $config = $kernel->get('config');
 switch ($_POST['module']) {
     // cases mirror categories listed
     case 'users':
-        if ($_SESSION['user']->isSuperuser()) {
+        // only superusers can see this, not other moderators
+        if ($user->isSuperuser()) {
             $login      = new Login($kernel->get('databaseInternal'), $config->get('session_length'));
             $summary    = $login->userSummary(null);
             $totalUser  = 0;
@@ -204,7 +230,11 @@ switch ($_POST['module']) {
     case 'rss':
         /** @var IConfigLoader $config */
         $config = $kernel->get('config');
-        $rss = new Alaress_Rss_Stream($config->get('release_notes_url'));
+        $rss = new Alaress_Rss_Stream(
+            $config->get('release_notes_url'),
+            $kernel->get('httpClient.cache'),
+            (int)$config->get(ConfigMapper::NAME_XML_CACHE_TIMEOUT),
+        );
         $rss->stream();
         $output = $rss->getOutput();
         break;
@@ -235,7 +265,8 @@ switch ($_POST['module']) {
         $output = ['diff' => abs($timestamp - time())];
         break;
     case 'logs':
-        if ($_SESSION['user']->isSuperuser()) {
+        // only superusers can see this, not other moderators
+        if ($user->isSuperuser()) {
             $logsRecent = LogMapper::getInstance()->findRecent();
 
             foreach ($logsRecent as $log) {
@@ -295,14 +326,18 @@ switch ($_POST['module']) {
             ];
         break;
     case 'ssl_cert':
-        if (!exec(sprintf("INSTANCE_ID=%s schoolbox-read-instances --option hostnames", INSTANCE_ID), $execOutput, $resultCode)) {
+        // Parse config.ini instead of executing schoolbox-read-instances:
+        // that script isn't in the image, and isn't really necessary
+        $instances = parse_ini_file("/etc/schoolbox/instances.ini", true);
+        $hostnames = $instances[INSTANCE_ID]['hostnames'] ?? [];
+        if (empty($hostnames)) {
             $output = [
                 'error_code'    => 1,
                 'error_message' => "Unable to derive instance hostnames",
             ];
         } else {
             $output = [];
-            foreach ($execOutput as $host) {
+            foreach ($hostnames as $host) {
                 // Is this an IP address rather than hostname?
                 if (preg_match("/^\d+\.\d+\.\d+\.\d+$/", $host)) {
                     continue;
@@ -382,7 +417,9 @@ switch ($_POST['module']) {
         ];
         break;
     case 'service_saml_cert':
-        $samlCertHelper = new SamlCertHelper();
+        $samlCertHelper = new SamlCertHelper(
+            $kernel->get('httpClient.cache'),
+        );
 
         $samlWidget = $samlCertHelper->buildWidget(
             $config->get('saml_idp_certificate') ?? "",
@@ -394,7 +431,8 @@ switch ($_POST['module']) {
         ];
         break;
     case 'virus':
-        $virusScanner = new Schoolbox\Resource\Storage\Virus\Scanner($kernel->get('filesystem.temp'));
+        /** @var IScanner $virusScanner */
+        $virusScanner = $kernel->get('virus.scanner');
         $status = $virusScanner->checkExists();
 
         $output['virus_status'] = $status;
@@ -408,6 +446,70 @@ switch ($_POST['module']) {
                 break;
             case 'unavailable':
                 $output['virus_light'] = 'warning';
+        }
+        break;
+    case 'cluster_info':
+        $cacheDir = $config->get('stream_dir');
+        $cacheFile = $cacheDir . '/cluster_info_cache_' . md5(INSTANCE_ID) . '.json';
+        $cacheExpiry = 86400; // 1 day cache
+
+        // Check if cache exists and is still valid
+        if (file_exists($cacheFile) && (time() - filemtime($cacheFile)) < $cacheExpiry) {
+            $cachedData = json_decode(file_get_contents($cacheFile), true);
+            $output['cluster_info_status'] = $cachedData['cluster_name'];
+            $output['cluster_info_light'] = $cachedData['light'];
+        } else {
+            // Cache miss or expired - fetch from API
+            $client = new Client(['curl' => Server::getInstance()->buildCurlOptions()]);
+            $irApiKey = exec('/usr/local/bin/schoolbox-instance-registry --api-key 2>/dev/null');
+            $irUrl = exec('/usr/local/bin/schoolbox-instance-registry --url 2>/dev/null');
+            // Sanitize and validate API key
+            $irApiKey = trim($irApiKey);
+            if (!preg_match('/^[A-Za-z0-9\-_.]+$/', $irApiKey)) {
+                throw new \RuntimeException('Invalid API key format');
+            }
+            // Sanitize and validate URL
+            $irUrl = trim($irUrl);
+            if (!filter_var($irUrl, FILTER_VALIDATE_URL)) {
+                throw new \RuntimeException('Invalid URL format');
+            }
+
+            $endpoint = rtrim($irUrl, '/') . '/api/instance/cluster/';
+
+            try {
+                $response = $client->post($endpoint, [
+                    'headers' => [
+                        'Authorization' => "Bearer {$irApiKey}",
+                        'Content-Type'  => 'application/json',
+                    ],
+                    'json' => [
+                        'instance_id' => INSTANCE_ID,
+                    ],
+                ]);
+
+                if ($response->getStatusCode() == 200) {
+                    $json = json_decode($response->getBody()->getContents());
+                    if ($json !== null && json_last_error() === JSON_ERROR_NONE && isset($json->cluster_name)) {
+                        $clusterName = $json->cluster_name;
+                        $output['cluster_info_status'] = $clusterName;
+                        $output['cluster_info_light'] = 'success';
+                        // Cache the successful result
+                        $cacheData = [
+                            'cluster_name' => $clusterName,
+                            'light' => 'success'
+                        ];
+                        file_put_contents($cacheFile, json_encode($cacheData), LOCK_EX);
+                    } else {
+                        $output['cluster_info_status'] = 'Unknown';
+                        $output['cluster_info_light'] = 'warning';
+                        // Don't cache error responses
+                    }
+                }
+            } catch (Exception $e) {
+                $output['cluster_info_status'] = 'Unknown';
+                $output['cluster_info_light'] = 'warning';
+                // Don't cache error responses
+            }
         }
         break;
     default:

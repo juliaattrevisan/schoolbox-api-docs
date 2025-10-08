@@ -1,68 +1,75 @@
 <?php
 
 /**
- *
- * @author      Matt Day <matt.day@alaress.com.au>
- * @copyright   Copyright 2019, Schoolbox Pty Ltd
- * @link        https://schoolbox.com.au/
+ * @copyright Copyright 2025, Schoolbox Pty Ltd
+ * @link      https://schoolbox.education/
  */
 
 namespace Schoolbox\Resource\Storage\GC;
 
+use Alaress_Date_Format;
 use League\Flysystem\FilesystemException as FlysystemException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\GC\Check\Check;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 
+/**
+ * Garbage collector: uses a set of checks to determine if a storage record is
+ * still in use, and if it isn't will attempt to delete it.
+ *
+ * The garbage collector does not attempt to clean up rows which expire on their
+ * own: see `\Schoolbox\Resource\Storage\Cli\ExpiryTool` for a tool which does
+ * that.
+ */
 class GarbageCollector
 {
-    /** @var Check[] */
-    protected $checks = [];
-
-    /** @var StorageMapper */
-    protected $mapper;
-
-    /** @var LoggerInterface */
-    protected $log;
-
-    /** @var array */
-    protected $list;
-
-    /** @var int */
-    protected $limit;
-
-    /** @var bool */
-    protected $perform;
-
+    /**
+     * The list of garbage collection checks to perform.
+     *
+     * @var array<Check>
+     */
+    private array $checks = [];
 
     /**
-     * @param Check[]         $checks
-     * @param StorageMapper   $mapper
-     * @param LoggerInterface $log
-     * @param int             $limit
-     * @param bool            $perform
+     * The list of storage hashes to be checked by this garbage collector.
+     *
+     * @var array<string>
      */
-    public function __construct(array $checks, StorageMapper $mapper, LoggerInterface $log, int $limit = 200, $perform = false)
-    {
-        foreach ($checks as $c) {
-            $this->addCheck($c);
-        }
+    private array $list;
 
-        $this->mapper  = $mapper;
-        $this->log     = $log;
-        $this->limit   = $limit;
-        $this->perform = $perform;
-
-        $this->log->debug("Starting GC");
+    /**
+     * Constructor
+     *
+     * @param StorageMapper            $mapper        Storage mapper: used for fetching and deleting records.
+     * @param LoggerInterface          $log           Logger
+     * @param bool                     $perform       If true, actually delete storage records and update the last
+     *                                                processed time: otherwise, only output what would've been deleted.
+     * @param int                      $batchSize     The maximum number of results to process per batch.
+     * @param int|null                 $limit         Maximum number of storage records to process: null if no limit.
+     * @param int|null                 $maxTime       Maximum amount of time to run for, in seconds: null if no limit.
+     * @param Alaress_Date_Format|null $thresholdDate Do not process any storage records which were last processed more
+     *                                                recently than this date.
+     */
+    public function __construct(
+        private StorageMapper $mapper,
+        private LoggerInterface $log,
+        private bool $perform,
+        private int $batchSize,
+        private ?int $limit = null,
+        private ?int $maxTime = null,
+        private ?Alaress_Date_Format $thresholdDate = null,
+    ) {
     }
 
 
     /**
+     * Add a check to the garbage collector.
+     *
      * @param Check $check
-     * @return self
+     * @return static
      */
-    public function addCheck(Check $check)
+    public function addCheck(Check $check): static
     {
         $this->checks[] = $check;
         return $this;
@@ -71,58 +78,139 @@ class GarbageCollector
 
     /**
      * Returns a list of hashes that are considered stale.
-     * Main class logic.
-     * @var string $hash       If set, target this specific hash for cleanup
-     * @return array
+     *
+     * @param string|null $hash If set, target this specific hash for cleanup.
+     * @return array<string>
      */
-    public function getStale($hash = null)
+    public function getStale(?string $hash = null): array
     {
-        $query = 'SELECT `hash` FROM `storage` WHERE';
+        // Build the query
+        $this->log->info('Restricting garbage collection to:');
+        $this->log->info(sprintf('  hashes per batch: %d', $this->batchSize));
+        if (isset($this->limit)) {
+            $this->log->info(sprintf('  max hashes: %d', $this->limit));
+        }
+        if (isset($this->maxTime)) {
+            $this->log->info(sprintf('  max execution time: %d s', $this->maxTime));
+        }
 
+        $this->log->info('Filtering hashes to:');
+        $this->log->info('  expired_at: null');
+        $pb = $this->mapper->getPredicateBuilder()
+            ->isNull('expired_at');
         if ($hash) {
-            $query .= ' `hash` = :hash';
-            $statement = $this->mapper->getDatabase()->prepare($query);
-            $statement->bindValue(':hash', $hash);
-        } else {
-            $query .= ' `expired_at` IS NULL ORDER BY `last_accessed` ASC LIMIT 0, :limit';
-            $statement = $this->mapper->getDatabase()->prepare($query);
-            $statement->bindValue(':limit', $this->limit, \PDO::PARAM_INT);
+            $this->log->info(sprintf('  hash: "%s"', $hash));
+            $pb = $pb->equals('hash', $hash);
+        }
+        if ($this->thresholdDate) {
+            $thresholdDate = $this->thresholdDate->getDatabase();
+            $this->log->info(
+                sprintf('  last_gc_at: null or before "%s"', $thresholdDate),
+            );
+            $pb = $pb->any(
+                $this->mapper->getPredicateBuilder()
+                    ->isNull('last_gc_at')
+                    ->lessThanOrEqualTo('last_gc_at', $thresholdDate)
+            );
         }
 
-        $statement->execute();
+        // Find the records
+        $queryOptions = [
+            'order'  => [
+                'last_gc_at' => 'asc',
+                'hash'       => 'asc',
+            ],
+        ];
+        if (isset($this->limit)) {
+            $queryOptions['limit']  = $this->limit;
+            $queryOptions['offset'] = 0;
+        }
+        $this->list = $this->mapper->findScalarByPredicates('hash', $pb, $queryOptions);
 
-        $this->list = [];
+        $this->log->notice('Starting with ' . count($this->list) . ' hashes');
 
-        // start by populating with all hashes
-        while ($hash = $statement->fetchColumn()) {
-            $this->list[] = $hash;
+        // Split stale list into batches before checking
+        $batches        = array_chunk($this->list, $this->batchSize);
+        $i              = 1;
+        $staleList      = [];
+        $startTime      = microtime(true);
+        $totalProcessed = 0;
+        foreach ($batches as $batch) {
+            $batchStartTime = microtime(true);
+            $this->log->notice(
+                sprintf(
+                    'Processing hash batch %d/%d (%d hashes)',
+                    $i,
+                    count($batches),
+                    count($batch),
+                ),
+            );
+
+            // iterate the checks, and retain the intersection each time
+            $staleBatch = $batch;
+            foreach ($this->checks as $check) {
+                $this->log->info('Applying ' . get_class($check));
+                $staleBatch = $check->getStale($staleBatch);
+                $this->log->info('Retained ' . count($staleBatch) . ' stale');
+            }
+            $staleList = array_merge($staleList, $staleBatch);
+
+            // Log time spent in this batch
+            $batchEndTime = microtime(true);
+            $this->log->notice(
+                sprintf(
+                    'Batch %d processed: %0.2fs (%d/%d stale)',
+                    $i,
+                    $batchEndTime - $batchStartTime,
+                    count($staleBatch),
+                    count($batch),
+                ),
+            );
+
+            // Log time spent across all batches thus far
+            $totalRuntime   = $batchEndTime - $startTime;
+            $totalProcessed += count($batch);
+            $this->log->notice(
+                sprintf(
+                    'Total runtime: %0.2fs (%d/%d stale)',
+                    $totalRuntime,
+                    count($staleList),
+                    $totalProcessed,
+                ),
+            );
+
+            // If total runtime exceeds max time: stop processing
+            if (isset($this->maxTime) && $totalRuntime > $this->maxTime) {
+                $this->log->notice(
+                    sprintf(
+                        'Max runtime of %ds exceeded: finishing processing and moving on to deletion',
+                        $this->maxTime,
+                    ),
+                );
+                break;
+            }
+
+            $i++;
         }
 
-        $this->log->info('Starting with ' . count($this->list) . ' files');
-
-        // iterate the checks, and retain the intersection each time
-        foreach ($this->checks as $check) {
-            $this->log->notice('Applying ' . get_class($check), ['char' => '+']);
-            $this->list = $check->getStale($this->list);
-            $this->log->info('Retained ' . count($this->list) . ' stale');
-        }
-
-        return $this->list;
+        return $staleList;
     }
 
 
     /**
-     * Delete all stale hashes
-     * @var string $hash       If set, target this specific hash for cleanup
+     * Delete all stale hashes.
+     *
+     * @param string|null $hash If set, target this specific hash for cleanup.
      * @return int
      */
-    public function purge($hash = null)
+    public function purge(?string $hash = null): int
     {
+        $this->log->debug("Starting GC");
         $purge = $this->getStale($hash);
         $this->preserve(array_diff($this->list, $purge));
 
         if (!count($purge)) {
-            $this->log->notice("No files to delete", ['char' => '-']);
+            $this->log->notice("No hashes to delete", ['char' => '-']);
             return 0;
         }
 
@@ -131,9 +219,9 @@ class GarbageCollector
             try {
                 $this->removeFromStorage($hash);
             } catch (MapperException $e) {
-                $this->log->error("Could not delete storage file '$hash' due to a database issue: " . $e->getMessage());
+                $this->log->error("Could not delete storage hash '$hash' due to a database issue: " . $e->getMessage());
             } catch (FlysystemException $e) {
-                $this->log->error("Could not delete storage file '$hash' due to filesystem issue: " . $e->getMessage());
+                $this->log->error("Could not delete storage hash '$hash' due to filesystem issue: " . $e->getMessage());
             }
         }
 
@@ -142,32 +230,44 @@ class GarbageCollector
 
 
     /**
-     * @param array $hashes
+     * Mark this set of storage hashes as having been processed by the garbage
+     * collector, so that `$this->thresholdDate` is respected for future garbage
+     * collector runs.
+     *
+     * @param array<string> $hashes
      */
-    protected function preserve(array $hashes)
+    private function preserve(array $hashes): void
     {
         if (!$this->perform) {
             return;
         }
 
-        // update all the survivors' last-touch dates to current time
-        $stmt = $this->mapper->getDatabase()->prepare("UPDATE `storage` SET `last_accessed` = NOW() WHERE `hash` = ?");
+        // update all the survivors' last garbage collect dates to current time
+        $stmt = $this->mapper->getDatabase()->prepare("
+            UPDATE {$this->mapper->getDatabase()->getQuoter()->quoteIdentifier($this->mapper->getTable())}
+            SET `last_gc_at` = :now
+            WHERE `hash` = :hash
+        ");
 
+        $now = Alaress_Date_Format::now()->getDatabase();
         foreach ($hashes as $hash) {
-            $stmt->execute([$hash]);
+            $stmt->execute(['now' => $now, 'hash' => $hash]);
         }
     }
 
     /**
+     * Completely delete this storage hash, from both the database and from
+     * Schoolbox's file system.
+     *
      * @param string $hash
      * @throws MapperException
-     * @throws FlysystemException if the storage file can't be deleted from the
-     *                            filesystem.
+     * @throws FlysystemException if the file could not be deleted from
+     *                            Schoolbox's file system.
      */
-    protected function removeFromStorage($hash)
+    private function removeFromStorage(string $hash): void
     {
         if ($this->perform) {
-            $this->mapper->actualDelete($this->mapper->findByHash($hash));
+            $this->mapper->hardDelete($this->mapper->findByHash($hash));
             $this->log->debug("Deleted $hash");
         } else {
             $this->log->debug("Would have deleted $hash");

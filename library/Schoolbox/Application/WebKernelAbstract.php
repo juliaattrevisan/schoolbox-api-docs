@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Application;
 
 use Alaress\Application\WrongSapiException;
+use Alaress\Database\Exception as DatabaseException;
 use Alaress\Sentry\Tracing\Tracer;
 use Alaress\Session\Session;
 use Alaress\Web\Response\Factory as ResponseFactory;
@@ -35,6 +36,11 @@ use Throwable;
  */
 abstract class WebKernelAbstract extends \Alaress\Application\Kernel
 {
+    /**
+     * The following error types will cause the shutdown handler to be called.
+     */
+    private const FATAL_ERROR_TYPES = E_USER_ERROR | E_ERROR | E_CORE_ERROR | E_RECOVERABLE_ERROR | E_COMPILE_ERROR | E_PARSE;
+
     /**
      * Output a "Cache-Control" response header.
      *
@@ -99,8 +105,8 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
     /**
      * Shutdown handler for either exceptions or fatal errors
      *
-     * @param \Exception|array $e
-     * @param array            $stack
+     * @param Throwable|array $e
+     * @param array           $stack
      * @return bool
      */
     public function shutdownSafely($e = null, $stack = null): bool
@@ -133,10 +139,7 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
         if ($error !== null) {
             // if it was a fatal error or exception that triggered our sudden but inevitable demise...
             $errorType = ((int)$error['type']);
-            if (
-                $isException
-                || ($errorType & (E_ERROR | E_CORE_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_RECOVERABLE_ERROR))
-            ) {
+            if ($isException || ($errorType & self::FATAL_ERROR_TYPES)) {
                 // RedisException extends RuntimeException: occurs when Redis
                 // session management isn't working for whatever reason.
                 $code = 400;
@@ -173,6 +176,19 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
                 } elseif ($e instanceof \PDOException) {
                     $code    = 500;
                     $message = 'Schoolbox is currently experiencing internal problems with its database. This issue has been logged.';
+                    if (str_contains($e->getMessage(), "SQL Server")) {
+                        $message = "An error occurred while Schoolbox attempted to access your SIS's database. Please wait a minute before refreshing the page. If this persists, please contact your IT department to let them know.";
+                        $code    = 429;
+                        $info    = $e->getMessage();
+                    }
+                } elseif ($e instanceof DatabaseException) {
+                    $code    = 599;
+                    $message = 'Schoolbox is currently experiencing internal problems with its database. This issue has been logged.';
+                    if (str_contains($e->getMessage(), "SQL Server")) {
+                        $message = "An error occurred while Schoolbox attempted to access your SIS's database. Please wait a minute before refreshing the page. If this persists, please contact your IT department to let them know.";
+                        $code    = 429;
+                        $info    = $e->getMessage();
+                    }
                 } elseif ($e instanceof RuntimeException) {
                     $code    = 500;
                     $message = 'Schoolbox is currently down due to an internal service being inactive.';
@@ -224,35 +240,35 @@ abstract class WebKernelAbstract extends \Alaress\Application\Kernel
     }
 
     /**
-     * @inheritdoc
+     * This error handler displays a shutdown message if a fatal error was
+     * raised, otherwise silences the error.
      */
-    protected function registerErrorHandling(): void
+    protected function onError(int $errNum, string $errStr, string $errFile, int $errLine): bool
     {
-        // Temporarily handle deprecation warnings, so that they may be
-        // temporarily ignored.
-        // We cannot catch 'em all (yet).
-        set_error_handler(
-            function ($code, $message, $file, $line) {
-                return $this->shutdownSafely(
-                    [
-                        'type'    => $code,
-                        'message' => $message,
-                        'file'    => $file,
-                        'line'    => $line
-                    ],
-                    debug_backtrace(),
-                );
-            },
-            E_USER_ERROR | E_ERROR | E_CORE_ERROR | E_RECOVERABLE_ERROR | E_DEPRECATED | E_USER_DEPRECATED,
-        );
+        // Shutdown for fatal errors only
+        if ($errNum & self::FATAL_ERROR_TYPES) {
+            return $this->shutdownSafely(
+                [
+                    'type'    => $errNum,
+                    'message' => $errStr,
+                    'file'    => $errFile,
+                    'line'    => $errLine
+                ],
+                debug_backtrace(),
+            );
+        }
+
+        // didn't catch the in the above or previous error handler, let php handle as it would normally
+        // this is probably going to echo to the screen and log to the error log (which we had previously)
+        return false;
     }
 
     /**
-     * @inheritdoc
+     * This exception handler just defers to `$this->shutdownSafely`.
      */
-    protected function registerExceptionHandling(): void
+    protected function onException(Throwable $e): void
     {
-        set_exception_handler([$this, 'shutdownSafely']);
+        $this->shutdownSafely($e);
     }
 
     /**

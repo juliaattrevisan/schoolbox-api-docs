@@ -374,7 +374,7 @@ class Controller extends Base
                     && $this->getUser()->getRole()->getAccessEvidence(),
                 'badgesEnabled'          =>
                     $this->getConfigLoader()->get(ConfigMapper::NAME_BADGES_ENABLED)
-                    && $this->getUser()->getRole()->getCreateBadges(),
+                    && $this->getUser()->isStaffWithBadgeAccess(),
                 'emailGroups'            => $this->getClassListsEmailGroups(),
                 'folder'                 => $folder,
                 'returnUrlName'          => Assessment\Redirect::RETURN_URL,
@@ -389,10 +389,6 @@ class Controller extends Base
     {
         // LABEL_VALUE must match createMail
         $availableEmailGroups = [
-            'email_all_parents'  => [
-                self::LABEL_KEY   => 'Parents of selected students',
-                self::LABEL_VALUE => 'parents_of',
-            ],
             'email_housemasters' => [
                 self::LABEL_KEY   => 'Head of House for selected students',
                 self::LABEL_VALUE => 'housemasters_of',
@@ -403,12 +399,21 @@ class Controller extends Base
             ],
         ];
 
+        // Selected students is always available and checked by default
         $result[] = [
             self::LABEL_KEY     => 'Selected students',
             self::LABEL_VALUE   => 'self',
             self::ISCHECKED_KEY => true,
         ];
 
+        // Parents of selected students is always available
+        $result[] = [
+            self::LABEL_KEY   => 'Parents of selected students',
+            self::LABEL_VALUE => 'parents_of',
+            self::ISCHECKED_KEY => false,
+        ];
+
+        // The rest are based on config
         foreach ($availableEmailGroups as $key => $settings) {
             if ($this->getConfigLoader()->get($key)) {
                 $settings[self::ISCHECKED_KEY] = false;

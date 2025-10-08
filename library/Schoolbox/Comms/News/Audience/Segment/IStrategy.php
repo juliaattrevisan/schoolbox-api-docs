@@ -16,7 +16,6 @@ use Schoolbox\User;
  */
 interface IStrategy
 {
-
     /**
      * Returns this implementation's entityType
      *
@@ -66,13 +65,13 @@ interface IStrategy
      *
      * Note this is a inherent validity concern, not an authorisation concern.
      *
-     * @param string|null $entityMeta    If $entityMeta is provided, it must always return a subset of when $entityMeta
+     * @param string|null $entityMeta If $entityMeta is provided, it must always return a subset of when $entityMeta
      * is null. Otherwise the validation will break. This is because when the form is posted, the selections are
      * validated prior to save, but the validation step does not provide any meta
      *
      * @return string[]
      */
-    public function getValidRelationshipModifiers(string $entityMeta = null): array;
+    public function getValidRelationshipModifiers(?string $entityMeta = null): array;
 
 
     /**

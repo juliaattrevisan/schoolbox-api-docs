@@ -28,7 +28,7 @@ readonly PRESERVED_CONFIG=(
   "redis_ephemeral_url" "redis_url" "taskd_redis_url"
 
   # External DB Config
-  "external_db_host" "external_db_user" "external_db_passwd" "external_db_db" "external_portal"
+  "external_db_host" "external_db_user" "external_db_passwd" "external_db_db" "external_portal" "external_db_encryption"
 
   # SAML Config
   "saml_sso_url" "saml_idp_metadata_url" "saml_enabled" "saml_slo_enabled" "saml_slo_url" "saml_logout_url" "saml_private_cert" "saml_public_cert" "saml_idp_certificate" "saml_entityid" "saml_sp_entityid"
@@ -37,7 +37,7 @@ readonly PRESERVED_CONFIG=(
   "ldap_enable" "ldap_host" "ldap_user" "ldap_pass" "ldap_base" "ldap_host_alt" "ldap_user_alt" "ldap_base_alt" "ldap_username"
 
   # OTFS config
-  "otfs_adapter" "otfs_s3_cred_key" "otfs_s3_cred_secret" "otfs_verify_previous_file"
+  "otfs_adapter" "otfs_s3_cred_key" "otfs_s3_cred_secret" "otfs_verify_previous_file" "otfs_s3_alt_host" "otfs_s3_alt_bucket" "otfs_s3_alt_region" "otfs_s3_alt_bucket" "otfs_s3_alt_access_key" "otfs_s3_alt_secret_key"
 
   # DR S3 backups
   "aws_s3_dr_backup_enabled" "aws_s3_dr_backup_visibility" "aws_s3_dr_sync_status"
@@ -47,6 +47,18 @@ readonly PRESERVED_CONFIG=(
 
   # Geosnapshot
   "geosnapshot_api_key" "geosnapshot_enabled"
+
+  # Intellischools
+  "intellischool_jwt_private_key" "intellischool_jwt_private_key_signing_algorithm" "intellischool_deployment_id" "intellischool_learner_dashboard_base_url" "intellischool_cohort_dashboard_base_url" "intellischool_deployment_secret"
+
+  # Paperly
+  "paperly_iframe_api_host" "paperly_iframe_api_key" "paperly_agent_ip_whitelist" "paperly_agent_secret" "paperly_agent_external_db_host_override" "paperly_agent_external_db_user_override" "paperly_agent_external_db_password_override" "paperly_agent_external_db_name_override" "paperly_open_in_new_tab"
+
+  # Cloudwork
+  "cloudwork_oauth_identity_provider" "cloudwork_oauth_client_id" "cloudwork_oauth_client_secret" "cloudwork_oauth_identifying_claims"
+
+  # Other OAuth
+  "oauth_issuer" "oauth_enable_sso" "oauth_response_type" "oauth_scopes"
 
   # Others
   "xml_dir" "file_dir" "api_key" "schooldata_import_frequency" "maintenance_mode"
@@ -211,15 +223,15 @@ read_ini() {
 
 readsqlver() {
 	# Retrive the Schoolbox version from MySQL using provided credentials
-	tempsqlver=`mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='site_version'" 2>/dev/null`;
+	tempsqlver=`mariadb -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "SELECT value FROM config WHERE name='site_version'" 2>/dev/null`;
 }
 
 readsqlconfig() {
   local config_value;
   local sql_command;
   for config_name in "${PRESERVED_CONFIG[@]}"; do
-    sql_command="SELECT value FROM config WHERE name='$config_name'"
-    if ! config_value=$(mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "$sql_command" 2>/dev/null); then
+    sql_command="SELECT ifnull(value, '') FROM config WHERE name='$config_name'"
+    if ! config_value=$(mariadb -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "$sql_command" 2>/dev/null); then
       echo "Unable to fetch value for config '$config_name'" >&2
       exit 1
     fi
@@ -227,7 +239,7 @@ readsqlconfig() {
     sql_config[$config_name]="$(echo -n $config_value | base64)"
   done
   sql_command="SELECT password FROM user WHERE username = 'alaress' AND deleted_at IS NULL"
-  if ! alaress_password=$(mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "$sql_command" 2>/dev/null); then
+  if ! alaress_password=$(mariadb -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "$sql_command" 2>/dev/null); then
     echo "Unable to fetch alaress password'" >&2
     exit 1
   fi
@@ -238,33 +250,29 @@ setsqlconfig() {
   for config_name in "${!sql_config[@]}"; do
     #config values are in array as base64 values
     sql_command="UPDATE config SET value=FROM_BASE64('${sql_config[$config_name]}') WHERE name='$config_name'"
-    if ! mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "$sql_command"; then
+    if ! mariadb -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "$sql_command"; then
       echo "Unable to set value for config '$config_name' to '${sql_config[$config_name]}'" >&2
     fi
   done
   for config_name in "${DISABLED_CONFIG[@]}"; do
     sql_command="UPDATE config SET editable='false' where name='$config_name'"
-    if ! mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "$sql_command"; then
+    if ! mariadb -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "$sql_command"; then
       echo "Unable to set editable for config '$config_name' to false" >&2
     fi
   done
   sql_command="UPDATE user SET password = '$alaress_password' WHERE username = 'alaress' AND deleted_at IS NULL"
-  if ! mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "$sql_command"; then
+  if ! mariadb -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "$sql_command"; then
     echo "Unable to set alaress_password'" >&2
   fi
 
 }
 
 truncateTables() {
-    mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "TRUNCATE mobile_app_registry";
+    mariadb -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "TRUNCATE mobile_app_registry";
 }
 
 webCrawlerOff() {
-    mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='0' WHERE name='web_crawlers_enabled'";
-}
-
-intellischoolSyncDisable() {
-    mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value = '' WHERE name = 'intellischool_deployment_secret'";
+    mariadb -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe "UPDATE config SET value='0' WHERE name='web_crawlers_enabled'";
 }
 
 liveCheck() {
@@ -272,7 +280,7 @@ liveCheck() {
 
   temp_ini_file="/etc/schoolbox/instances.ini"
   read_ini "$destination_instance_id"
-  destination_site_type=$(mysql -h"$tempsqlhost" -u"$tempsqluser" -p"$tempsqlpasswd" "$tempsqldb" -sse "SELECT value FROM config WHERE name = 'site_type'")
+  destination_site_type=$(mariadb -h"$tempsqlhost" -u"$tempsqluser" -p"$tempsqlpasswd" "$tempsqldb" -sse "SELECT value FROM config WHERE name = 'site_type'")
 
   if [[ $destination_site_type == 'dev' ]]; then
     echo "Looks like it is a vagrant instance. Ok." >&2
@@ -336,7 +344,7 @@ echo -e "* Details of this install *";
 echo "Using db credentials from: "`readlink -f $conffile`;
 echo "SQL Version: $sqlver";
 echo "Install Directory: $instdir";
-conf_backup_dir=$(mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SELECT value FROM config WHERE name='backup_dir'");
+conf_backup_dir=$(mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SELECT value FROM config WHERE name='backup_dir'");
 if [ -z "$conf_backup_dir" ]; then
   errmsg="Unable to locate data directory in database";
   error;
@@ -356,13 +364,13 @@ fi
 echo -e "\n* Checking Permissions *";
 
 ## Check database permissions
-mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "CREATE TABLE testpermtest (a INT)";
+mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "CREATE TABLE testpermtest (a INT)";
 if [ $? -ne 0 ];
 then
 	errmsg="Testing database permissions: Unable to create table";
 	error;
 fi
-mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "DROP TABLE IF EXISTS testpermtest";
+mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "DROP TABLE IF EXISTS testpermtest";
 if [ $? -ne 0 ];
 then
 	errmsg="Testing database permissions: Unable to drop table";
@@ -408,7 +416,7 @@ for other_instance in $(schoolbox-read-instances --option instance-list | grep -
   fi
   read_ini "$other_instance"
   readsqlver;
-  tempfiledir=$(mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "SELECT value FROM config WHERE name='backup_dir'");
+  tempfiledir=$(mariadb -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "SELECT value FROM config WHERE name='backup_dir'");
   if [ -n "$tempfiledir" ]; then
     tempdatadirlist=$(ls -1 $tempfiledir/../{*-*-*-*_*-*-*.sql,*-*-*-*_*-*-*.sql.gz,backups/*/*/schoolbox*_*-*-*.sql.gz} 2>/dev/null);
     for i in $tempdatadirlist; do
@@ -445,14 +453,14 @@ for host in $sshlist; do
     fi
 
     if [[ $remote_found == '1' ]]; then
-      sql_ver=$(ssh "$host" "mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe \"SELECT value FROM config WHERE name='site_version'\"" 2>/dev/null);
+      sql_ver=$(ssh "$host" "mariadb -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe \"SELECT value FROM config WHERE name='site_version'\"" 2>/dev/null);
       if [[  "$(echo -e "20.1.alpha1\n${sql_ver}" | sort -V | head -n 1)" != "20.1.alpha1"  ]]; then
         backup_dir='file_dir';
       else
         backup_dir='backup_dir';
       fi
 
-      tempfiledir=`ssh $host "mysql -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe \"SELECT value FROM config WHERE name='${backup_dir}'\"" 2>/dev/null`
+      tempfiledir=`ssh $host "mariadb -u $tempsqluser -p$tempsqlpasswd -h $tempsqlhost $tempsqldb -BNe \"SELECT value FROM config WHERE name='${backup_dir}'\"" 2>/dev/null`
       if [ ! -z $tempfiledir ]; then
         tempdatadirlist=`ssh $host "ls -1 $tempfiledir/../{*-*-*-*_*-*-*.sql,backups/*/*/schoolbox_*-*-*.sql.gz} 2>/dev/null"`;
         for i in $tempdatadirlist; do
@@ -748,7 +756,7 @@ fi
 echo -e "\nStarting restore of the database";
 ## Backup the current DB config separately
 config_table_dump_file=/tmp/"$sqldb"-config-"$(date -I)".sql
-if ! mysqldump --single-transaction --allow-keywords --default-character-set=utf8mb4 -i -e -q -a --skip-extended-insert -c -u "$sqluser" -p"$sqlpasswd" -h "$sqlhost" "$sqldb" config > "$config_table_dump_file"; then
+if ! mariadb-dump --single-transaction --allow-keywords --default-character-set=utf8mb4 -i -e -q -a --skip-extended-insert -c -u "$sqluser" -p"$sqlpasswd" -h "$sqlhost" "$sqldb" config > "$config_table_dump_file"; then
   echo "Unable to backup config table from current database" >&2
   exit 1
 fi
@@ -765,9 +773,9 @@ fi
 rm /etc/cron.d/sbc_schoolbox_$destination_instance_id
 
 ## Drop existing DB and reload just config table
-mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "SET MAX_STATEMENT_TIME=0; DROP DATABASE $sqldb;";
-mysql -u $sqluser -p$sqlpasswd -h $sqlhost -e "CREATE DATABASE $sqldb CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';";
-mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < "$config_table_dump_file";
+mariadb -u $sqluser -p$sqlpasswd -h $sqlhost -e "SET MAX_STATEMENT_TIME=0; DROP DATABASE $sqldb;";
+mariadb -u $sqluser -p$sqlpasswd -h $sqlhost -e "CREATE DATABASE $sqldb CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';";
+mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb < "$config_table_dump_file";
 ## Unpack if gzipped
 gzipdb=`echo "$sourcedb" | grep '.gz' | wc -l`;
 if [ "$gzipdb" == "1" ];
@@ -778,7 +786,7 @@ then
 fi
 echo "Restoring database '$sourcedb'";
 ## Restore specified database (commenting out VIEW DEFINER clause on the fly)
-if ! (echo 'SET MAX_STATEMENT_TIME=0; '; cat "$sourcedb") | pv -s "$(du -b "$sourcedb" | cut -f 1)" | sed -E "s/^\/\*!50013 DEFINER=.+\*\//\/\* Fallback to default DEFINER \*\//g" | mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb; then
+if ! (echo 'SET MAX_STATEMENT_TIME=0; '; cat "$sourcedb") | pv -s "$(du -b "$sourcedb" | cut -f 1)" | sed -E "s/^\/\*!50013 DEFINER=.+\*\//\/\* Fallback to default DEFINER \*\//g" | mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb; then
   error "Unable to import database from backup file. Exiting."
 fi
 
@@ -799,7 +807,7 @@ fi
 if [ "$sourceloc" = '[B]' ];
 then
 	echo -e "\nMoving data files to the correct location";
-	sourcefiledir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SELECT value FROM config WHERE name='backup_dir'" | cut -d'/' -f2-100`;
+	sourcefiledir=`mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe "SELECT value FROM config WHERE name='backup_dir'" | cut -d'/' -f2-100`;
 	sourcefiledir=${sourcefiledir%/*};
 	mv -f $thisdatadir/restoredata/$sourcefiledir/* $thisdatadir/;
 	$instdir/tools/create-data-dirs.sh $thisdatadir;
@@ -828,22 +836,22 @@ function restore_pre_v20.1_config_dirs(){
     else
       xml_dir="$thisdatadir/cache/xml"
     fi;
-    mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "UPDATE config SET value='$xml_dir' WHERE name='xml_dir'";
+    mariadb -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "UPDATE config SET value='$xml_dir' WHERE name='xml_dir'";
 
     if [[ -n "${sql_config[file_dir]}" ]]; then
       file_dir="${sql_config[file_dir]}"
     else
       file_dir="$thisdatadir/files"
     fi;
-    mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "UPDATE config SET value='$file_dir' WHERE name='file_dir'";
+    mariadb -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "UPDATE config SET value='$file_dir' WHERE name='file_dir'";
   fi
 }
 restore_pre_v20.1_config_dirs;
 
 ## Fix SQL config paths to data directory
-"$instdir"/tools/generate-dir-sql.sh "$thisdatadir" | mysql -u "$sqluser" -p"$sqlpasswd" -h "$sqlhost" "$sqldb"
+"$instdir"/tools/generate-dir-sql.sh "$thisdatadir" | mariadb -u "$sqluser" -p"$sqlpasswd" -h "$sqlhost" "$sqldb"
 
-mysql -h"$sqlhost" -u"$sqluser" -p"$sqlpasswd" "$sqldb" -e "UPDATE config SET value = '/var/log/schoolbox/$destination_instance_id' WHERE name = 'logs_dir'"
+mariadb -h"$sqlhost" -u"$sqluser" -p"$sqlpasswd" "$sqldb" -e "UPDATE config SET value = '/var/log/schoolbox/$destination_instance_id' WHERE name = 'logs_dir'"
 
 echo -e "\nEnsuring data dirs exist on disk"
 "$instdir"/tools/site/create-data-dirs.sh --instance "$destination_instance_id"
@@ -868,17 +876,17 @@ set +o pipefail
 
 ## Change the site title to include [Dev] or [Vagrant] if known
 updatetitle () {
-	tempsqltitle=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe  "SELECT value FROM config WHERE name='title'" 2>/dev/null`;
+	tempsqltitle=`mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -BNe  "SELECT value FROM config WHERE name='title'" 2>/dev/null`;
 	newtitle="$titleprefix $tempsqltitle";
-	mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "update config set value=\"$newtitle\" where name='title'";
+	mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "update config set value=\"$newtitle\" where name='title'";
 }
 setmailcatcher () {
-  mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "UPDATE config SET value='127.0.0.1' WHERE name='mail_smtp_host'";
-  mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "UPDATE config SET value='1025' WHERE name='mail_smtp_port'";
-  mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "UPDATE config SET value='1' WHERE name='mail_enable'";
+  mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "UPDATE config SET value='127.0.0.1' WHERE name='mail_smtp_host'";
+  mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "UPDATE config SET value='1025' WHERE name='mail_smtp_port'";
+  mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "UPDATE config SET value='1' WHERE name='mail_enable'";
 }
 setdebugstacktrace () {
-  mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "UPDATE config SET value='1' WHERE name='debug_show_stack_trace'";
+  mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "UPDATE config SET value='1' WHERE name='debug_show_stack_trace'";
 }
 titleprefix='';
 if [ "$destination_site_type" = 'dev' ]; then
@@ -889,7 +897,6 @@ if [ "$destination_site_type" = 'dev' ]; then
 	setdebugstacktrace;
 	truncateTables;
 	webCrawlerOff;
-	intellischoolSyncDisable;
 fi
 if [ "$destination_site_type" = 'stg' ]; then
 	titleprefix='[Staging]';
@@ -899,21 +906,20 @@ if [ "$destination_site_type" = 'stg' ]; then
 	setdebugstacktrace;
 	truncateTables;
 	webCrawlerOff;
-	intellischoolSyncDisable;
 fi
 
 # Truncate storage_transform table if it is a DB only sync
 if [ "$sourcetype" != '[A]' ];
 then
   echo "DB-only restore. Truncating 'storage_transform' table" >&2
-  mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "SET MAX_STATEMENT_TIME=0; TRUNCATE storage_transform";
+  mariadb -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "SET MAX_STATEMENT_TIME=0; TRUNCATE storage_transform";
 fi
 
 # If a shared host, need to truncate etherpad to prevent updates/deletes from staging destroying production data
 # (First test is old single-instance arch, second test is new multi-instance arch)
 if { [ -f /usr/share/schoolbox/www/index.php ] && [ -f /usr/share/schoolboxdev/www/index.php ]; } || { [ -f /etc/schoolbox/instances.ini ] && [[ $(schoolbox-read-instances --option instance-list | wc -l) -gt 1 ]] ;}; then
   echo "Shared stg/prd host detected, truncating 'etherpad_pad' table";
-  mysql -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "SET MAX_STATEMENT_TIME=0; TRUNCATE etherpad_pad";
+  mariadb -u "$tempsqluser" -p"$tempsqlpasswd" -h "$tempsqlhost" "$tempsqldb" -BNe "SET MAX_STATEMENT_TIME=0; TRUNCATE etherpad_pad";
 fi
 
 # Restart nginx
@@ -933,6 +939,9 @@ fi
 # Sync plan-type with instance registry
 get_plan_type_from_instance_registry() {
   local -r instance_registry_url="$(schoolbox-instance-registry --url)";
+
+  # Note: the Puppet cert is currently required to derive the plan type.
+  # Ideally, the IR query would require only the destination instance ID.
   local -r puppet_cert="$(schoolbox-instance-registry --puppet-cert)";
   local -r api_key="$(schoolbox-instance-registry --api-key)";
 
@@ -973,7 +982,7 @@ umount $backup_dir 2>/dev/null;
 
 echo -e "\nManual Task Reminders:";
 echo -e "* check all the following config settings in the config table";
-mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT name,value FROM config WHERE name in ('site_hostname','site_domain','external_db_host','external_portal','amqp_vhost','amqp_user','amqp_pass','title')";
+mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT name,value FROM config WHERE name in ('site_hostname','site_domain','external_db_host','external_portal','amqp_vhost','amqp_user','amqp_pass','title')";
 echo "";
 
 exit;

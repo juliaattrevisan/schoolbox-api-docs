@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Import\Profile;
 
 use Alaress\Database\Connector\IConnector;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Profile;
 use Schoolbox\Mapper\DefinitionException;
@@ -49,7 +50,6 @@ class Importer
      * campus name  db limit
      */
     public const CAMPUS_DB_LIMIT = 255;
-
 
     /**
      * Upload type
@@ -331,7 +331,11 @@ class Importer
              *  but I think the answer is going to be in alaress date format
              */
             if ($row['Date of Birth']) {
-                $dob = new \Alaress_Date_Format($row['Date of Birth'], \Alaress_Date_Format::DATABASE_DATE_FORMAT);
+                try {
+                    $dob = new \Alaress_Date_Format($row['Date of Birth'], \Alaress_Date_Format::DATABASE_DATE_FORMAT);
+                } catch (InvalidArgumentException $e) {
+                    $this->log("Invalid 'Date of Birth' format in row {$i}. Please use YYYY-MM-DD format", self::LOG_ERROR);
+                }
             }
 
             $campus = $row['Campus'];

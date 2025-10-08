@@ -26,7 +26,7 @@ $kernel = new Daemon\Kernel(
     ]
 );
 
-$kernel->run(function ($di, $loop, $log, $opts) {
+$kernel->run(function ($di, $loop, $log, $opts): void {
     /**
      * @var ContainerInterface $di
      * @var LoopInterface $loop
@@ -49,9 +49,9 @@ $kernel->run(function ($di, $loop, $log, $opts) {
 
     // mappers
     $workMap = Component\SubmissionBoxMapper::getInstance();
-    $workMap->setSessionData(['user' => $zsmith]);
+    $workMap->setSessionDataOverride(['user' => $zsmith]);
     $rtnMap  = Component\SubmissionBox\ReturnedWorkMapper::getInstance();
-    $rtnMap->setSessionData(['user' => $zsmith]);
+    $rtnMap->setSessionDataOverride(['user' => $zsmith]);
 
     // "jerry springer show"
     $work = $workMap->findById(54);

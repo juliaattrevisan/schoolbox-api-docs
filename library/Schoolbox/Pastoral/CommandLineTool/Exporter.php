@@ -159,22 +159,23 @@ class Exporter extends CliTool\App
                 }
 
                 // Otherwise sync
-                $log->debug("Syncing pastoral record (Pastoral ID #{$pastoralRecord->getId()})...");
                 if ($this->perform()) {
                     try {
                         $syncSucceeded = $externalPastoral->syncPastoral($pastoralRecord, $this->getConfig()->get('external_pastoral_title_include'));
                     } catch (\Exception $e) {
-                        $log->debug("Could not sync pastoral record (Pastoral ID #{$pastoralRecord->getId()}).  Error: {$e->getMessage()}");
+                        $log->debug("Pastoral record with id #{$pastoralRecord->getId()}, external_id " . ($pastoralRecord->getExternalId() ?? 'null') . " could not be synced - Error: {$e->getMessage()}");
                         $failedPastoralIds[] = $pastoralRecord->getId();
                         continue;
                     }
 
                     if (!$syncSucceeded) {
-                        $log->debug("Pastoral record with external ID {$pastoralRecord->getExternalId()} could not be synced.");
+                        $log->debug("Pastoral record with id #{$pastoralRecord->getId()}, external_id " . ($pastoralRecord->getExternalId() ?? 'null') . " could not be synced");
                         $failedPastoralIds[] = $pastoralRecord->getId();
                         continue;
                     }
-                    $log->debug("Pastoral record synced with external ID {$pastoralRecord->getExternalId()} was synced.");
+                    $log->debug("Pastoral record with id #{$pastoralRecord->getId()}, external_id " . ($pastoralRecord->getExternalId() ?? 'null') . " was synced.");
+                } else {
+                    $log->debug("Would have attempted to sync pastoral record with id #{$pastoralRecord->getId()}, external_id " . ($pastoralRecord->getExternalId() ?? 'null') . " if in perform mode");
                 }
 
                 $nRecordsExported++;
@@ -184,18 +185,14 @@ class Exporter extends CliTool\App
                     continue;
                 }
 
-                // Note that only public attachments get synced
-                $attachments = $pastoralAttachmentMapper->findByColumnList([
-                    'pastoral_id' => $pastoralRecord->getId(),
-                    'private'     => false,
-                ]);
+                // Note that both public and private attachments get synced.
+                // Private attachments get different permissions in the external system (Synergetic only)
+                // due to lu_pastoral_type.pastoral_document_classification_confidential_id.
+                $attachments = $pastoralAttachmentMapper->findByColumnList(['pastoral_id' => $pastoralRecord->getId()]);
                 if (count($attachments)) {
-                    $log->debug(sprintf("Syncing %d pastoral record attachments", count($attachments)));
+                    $log->debug(' * Found ' . count($attachments) . ' rows in pastoral_attachment');
                     foreach ($attachments as $attachment) {
-                        $log->debug(
-                            sprintf('Syncing pastoral record attachment "%s"', $attachment->getStorage()->getBasename())
-                        );
-
+                        $attachment->setPastoral($pastoralRecord); // Ensure pastoral is hydrated in $attachment.
                         if ($this->perform()) {
                             // Only re-sync if it's not already in the Q
                             $queueCount = $pastoralUploadQueueMapper->countByColumnList([
@@ -203,8 +200,16 @@ class Exporter extends CliTool\App
                                 'hash'        => $attachment->getStorage()->getHash(),
                             ]);
                             if ($queueCount === 0) {
-                                $pastoralAttachmentMapper->syncToPastoralUploadQueue($attachment, null);
+                                if ($pastoralAttachmentMapper->syncToPastoralUploadQueue($attachment)) {
+                                    $log->debug(" * Attachment '{$attachment->getStorage()->getBasename()}' added to pastoral_upload_queue");
+                                } else {
+                                    $log->debug(" * Attachment '{$attachment->getStorage()->getBasename()}' was not added to pastoral_upload_queue");
+                                }
+                            } else {
+                                $log->debug(" * Attachment '{$attachment->getStorage()->getBasename()}' is already in pastoral_upload_queue");
                             }
+                        } else {
+                            $log->debug(" * Would have attempted to add attachment '{$attachment->getStorage()->getBasename()}' to sync queue if in perform mode");
                         }
                     }
                 }
@@ -217,10 +222,12 @@ class Exporter extends CliTool\App
             }
         }
 
-        $log->info("$nRecordsExported pastoral records exported successfully.");
+        if ($this->perform()) {
+            $log->info("$nRecordsExported pastoral records exported successfully.");
 
-        if (count($failedPastoralIds) > 0) {
-            $log->info("PastoralIds that failed to export: " . implode(', ', $failedPastoralIds));
+            if (count($failedPastoralIds) > 0) {
+                $log->info("PastoralIds that failed to export: " . implode(', ', $failedPastoralIds));
+            }
         }
     }
 
@@ -266,7 +273,7 @@ OPTIONS
         If provided, only attempt to export records which have been recorded as exported to the external pastoral care system, but don't exist within it:
         this attempts to repair exports which might have worked only partially.
 
-        Mutually exclusive with $yellow--unsynced-only$white.
+        Mutually exclusive with $yellow--unexported-only$white: if neither is provided, all records will be exported.
 
     $yellow--from=FROM_DATE$white
         If provided, only export records created from {$yellow}FROM_DATE{$white} onward.

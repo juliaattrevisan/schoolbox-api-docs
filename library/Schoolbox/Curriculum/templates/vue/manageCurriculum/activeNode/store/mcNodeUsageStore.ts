@@ -2,11 +2,10 @@
  * To request further details on a nodes usage
  */
 
-/* eslint-disable import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
-
 import { defineStore } from "pinia";
 import { ActivityTypes } from "@schoolboxCurriculum/types/Node";
 import type { Node, Usage } from "@schoolboxCurriculum/types/Node";
+/* eslint-disable-next-line import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
 import { useActiveNodeStore } from "./mcActiveNodeStore";
 
 export const useNodeUsageStore = defineStore("mcNodeUsage", () => {

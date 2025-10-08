@@ -19,7 +19,7 @@ class BasicGetPartTest extends TestCase
 {
     use MockDateObject;
 
-    protected function getTestDateObject(DateTimeZone $timezone = null)
+    protected function getTestDateObject(?DateTimeZone $timezone = null)
     {
         return self::buildDateObject('2015-03-05 08:01:03', Alaress_Date_Format::DATABASE_FORMAT, $timezone);
     }

@@ -1,0 +1,68 @@
+{#
+ # Handles the switcher logic for changing between student/staff view
+ # of the marks showing on the grades page
+ #
+ # This is designed to be used withing a dropdown menu
+ # It also targets a <li data-has-student-view-meta class="icon-teacher">Teacher view</li>
+ # which should be placed in the meta section of the header
+ #}
+
+<li class="separator" data-has-student-view-separator>You are viewing instructor grades</li>
+<li><a class="icon-view" data-has-student-view="staff">View Student Grades</a></li>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const viewSwitcher = document.querySelector('[data-has-student-view]');
+        const viewSwitcherMeta = document.querySelector('[data-has-student-view-meta]');
+        const viewSwitcherSeparator = document.querySelector('[data-has-student-view-separator]');
+
+        const iconTeacher = 'icon-teacher';
+        const iconStaffStudents = 'icon-staff-students';
+
+        /**
+            * Enable student view of all the marks
+            */
+        function switchToStudentView() {
+            viewSwitcherSeparator.textContent = 'You are viewing student grades';
+            viewSwitcherMeta.textContent = 'Viewing student grades';
+            viewSwitcherMeta.classList.remove(iconTeacher);
+            viewSwitcherMeta.classList.add(iconStaffStudents);
+
+            viewSwitcher.textContent = 'View Instructor Grades';
+            viewSwitcher.classList.remove(iconStaffStudents);
+            viewSwitcher.classList.add(iconTeacher);
+            viewSwitcher.setAttribute('data-has-student-view', 'student');
+
+            const marks = document.querySelectorAll('[data-learner-mark], [data-instructor-mark]');
+            marks.forEach(mark => mark.style.display = mark.hasAttribute('data-instructor-mark') ? 'none' : '');
+        }
+
+
+        /**
+            * Enable staff view of all the marks
+            */
+        function switchToStaffView() {
+            viewSwitcherSeparator.textContent = 'You are viewing instructor grades';
+            viewSwitcherMeta.textContent = 'Viewing instructor grades';
+            viewSwitcherMeta.classList.remove(iconStaffStudents);
+            viewSwitcherMeta.classList.add(iconTeacher);
+
+            viewSwitcher.textContent = 'View Student Grades';
+            viewSwitcher.classList.remove(iconTeacher);
+            viewSwitcher.classList.add(iconStaffStudents);
+            viewSwitcher.setAttribute('data-has-student-view', 'staff');
+
+            const marks = document.querySelectorAll('[data-learner-mark], [data-instructor-mark]');
+            marks.forEach(mark => mark.style.display = mark.hasAttribute('data-instructor-mark') ? '' : 'none');
+        }
+
+        switchToStaffView();
+
+        viewSwitcher.addEventListener('click', function() {
+            if (viewSwitcher.getAttribute('data-has-student-view') === 'staff') {
+                switchToStudentView();
+            } else {
+                switchToStaffView();
+            }
+        });
+    });
+</script>

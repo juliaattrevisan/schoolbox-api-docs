@@ -10,7 +10,11 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\Profile;
 
+use Alaress\Image\TransformFormat;
 use Alaress_Date_Format;
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\BadResponseException;
+use GuzzleHttp\Exception\GuzzleException;
 use PDOException;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
@@ -21,8 +25,10 @@ use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\EmergencyContact
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Health;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Household;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Language;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Photo;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Relationship;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\ValueListConverter;
+use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\Profile\Mapper;
@@ -54,6 +60,7 @@ class Profile implements IStrategy
      * relationships:list
      * staff_faculty:list
      * contact_info:list
+     * person_photos:list
      */
     public const SCOPE = '
         students:list
@@ -64,7 +71,15 @@ class Profile implements IStrategy
         relationships:list
         staff_faculty:list
         contact_info:list
+        person_photos:list
     ';
+
+
+    /**
+     * How long to wait if we're trying to access a veracross-generated url
+     * for profile pics
+     */
+    private const TIMEOUT = 15;
 
 
     /**
@@ -85,28 +100,52 @@ class Profile implements IStrategy
 
 
     /**
+     * A list of people's profile pics and where to grab them
+     *
+     * @var Photo
+     */
+    private Photo $photoLookup;
+
+
+    /**
+     * A dedicated guzzle client purely to access a veracross-generated url
+     *
+     * @var Client
+     */
+    private Client $client;
+
+
+    /**
      * Profile constructor.
      *
-     * @param ValidStrats                     $validStrats
-     * @param LoggerInterface                 $log
-     * @param bool                            $perform
-     * @param IApi                            $api
-     * @param Mapper                          $baseProfileMapper
-     * @param UserProfile\Student\Mapper      $studentProfileMapper
-     * @param UserProfile\Parent\Mapper       $parentProfileMapper
-     * @param UserProfile\Staff\Mapper        $staffProfileMapper
+     * @param ValidStrats $validStrats
+     * @param LoggerInterface $log
+     * @param bool $perform
+     * @param IApi $api
+     * @param Watchlist $watcher
+     * @param array $watchlist
+     * @param bool $includePhoto
+     * @param Mapper $baseProfileMapper
+     * @param UserProfile\Student\Mapper $studentProfileMapper
+     * @param UserProfile\Parent\Mapper $parentProfileMapper
+     * @param UserProfile\Staff\Mapper $staffProfileMapper
      * @param UserProfile\Relationship\Mapper $relationshipMapper
+     * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
      */
     public function __construct(
         private ValidStrats $validStrats,
         private LoggerInterface $log,
         private bool $perform,
         private IApi $api,
+        private Watchlist $watcher,
+        private array $watchlist,
+        private bool $includePhoto,
         private UserProfile\Mapper $baseProfileMapper,
         private UserProfile\Student\Mapper $studentProfileMapper,
         private UserProfile\Parent\Mapper $parentProfileMapper,
         private UserProfile\Staff\Mapper $staffProfileMapper,
-        private UserProfile\Relationship\Mapper $relationshipMapper
+        private UserProfile\Relationship\Mapper $relationshipMapper,
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
     ) {
         /* Profile Chandler that saves a subset of profile records' columns
          * to minimise changes to the db, due to db ignoring the indexes
@@ -122,6 +161,19 @@ class Profile implements IStrategy
         /* Shared lookups
          */
         $this->contactInfoLookup = new ContactInfo($this->api);
+
+        /* Students might have profile pics;
+         * Staff might have profile pics
+         */
+        $this->photoLookup = (new Photo($this->baseProfileMapper, $this->api, $this->watcher, $this->watchlist));
+
+        /* A random guzzle client with no special configuration,
+         * used purely to access a url Veracross has generated for us.
+         */
+        $this->client = new Client([
+            'timeout' => self::TIMEOUT,
+            'http_errors' => true,
+        ]);
     }
 
 
@@ -138,7 +190,6 @@ class Profile implements IStrategy
 
             $this->importStudents();
         }
-
         /* Import staff profile data
          */
         if ($this->validStrats->isStaffStratEnabled()) {
@@ -157,12 +208,20 @@ class Profile implements IStrategy
         /* Prefetch a list of medically-afflicted dudes
          */
         $this->log->debug('Prefetching medicals...');
-        $medicalLookup = (new Health($this->api))->generate();
+        $medicalLookup = (new Health($this->api, $this->watchlist))->generate();
 
         /* Prefetch a list of language usages
          */
         $this->log->debug('Prefetching languages...');
-        $languageLookup = (new Language($this->api))->generate();
+        $languageLookup = (new Language($this->api, $this->watchlist))->generate();
+
+        /* Optionally process profile pics
+         */
+        $photoLookup = null;
+
+        if ($this->includePhoto) {
+            $photoLookup = $this->photoLookup->generate();
+        }
 
         /* Only available when Families strat is enabled
          */
@@ -207,9 +266,19 @@ class Profile implements IStrategy
 
             foreach ($studentPage['data'] as $student) {
                 $externalId = trim((string)$student['id']);
+
+                /* Only import for specific users
+                 */
+                if (!($this->watcher)->isOnWatchlist($externalId, $this->watchlist)) {
+                    continue;
+                }
+
                 $academicHouse = '';
                 $boardingStatus = false;
-                $campusName = '';
+
+                /* Maybe the campus node exists...not sure if it ALWAYS exists, or just sometimes.
+                 */
+                $campusName = $student['campus']['description'] ?? '';
 
                 $dob = trim((string)$student['birthday']);
                 $email = trim((string)$student['email_1']);
@@ -253,7 +322,7 @@ class Profile implements IStrategy
 
                 /* Flags
                  */
-                $esl = (bool)($languageLookup[$externalId]['eal'] ?? true);
+                $esl = (bool)($languageLookup[$externalId] ?? false);
                 $ib = false;
                 $ilp = false;
 
@@ -359,6 +428,12 @@ class Profile implements IStrategy
                     ->setFirstname($firstname)
                     ->setFirstnamePreferred($firstnamePreferred)
                     ->setLastname($lastname);
+
+                /* Find their profile pic and assign it, if applicable
+                 */
+                if ($this->includePhoto) {
+                    $this->importPhoto($studentBaseProfile, $photoLookup);
+                }
 
                 /* Then save it
                  */
@@ -680,6 +755,14 @@ class Profile implements IStrategy
         $this->log->debug('Prefetching contact info...');
         $contactInfoLookup = $this->contactInfoLookup->generate();
 
+        /* Optionally process profile pics
+         */
+        $photoLookup = null;
+
+        if ($this->includePhoto) {
+            $photoLookup = $this->photoLookup->generate();
+        }
+
         /* Get ready to remember an indexed set of Value Lists for Students
          */
         $staffLookupConverter = new ValueListConverter();
@@ -693,6 +776,12 @@ class Profile implements IStrategy
 
             foreach ($staffPage['data'] as $staff) {
                 $externalId = trim((string)$staff['id']);
+
+                /* Only import for specific users
+                 */
+                if (!($this->watcher)->isOnWatchlist($externalId, $this->watchlist)) {
+                    continue;
+                }
 
                 $firstname = trim((string)$staff['first_name']);
                 $firstnamePreferred = trim((string)$staff['preferred_name']);
@@ -740,6 +829,12 @@ class Profile implements IStrategy
                     ->setFirstnamePreferred($firstnamePreferred)
                     ->setLastname($lastname);
 
+                /* Find their profile pic and assign it, if applicable
+                 */
+                if ($this->includePhoto) {
+                    $this->importPhoto($staffBaseProfile, $photoLookup);
+                }
+
                 /* Then save it
                  */
                 if ($this->perform) {
@@ -772,6 +867,112 @@ class Profile implements IStrategy
                     $this->profileHandler->saveStaffProfile($staffProfile, $oldStaffProfile);
                 }
             }
+        }
+    }
+
+
+    /**
+     * Import a profile picture for the given profile
+     *
+     * @param UserProfile\Model $baseProfile
+     * @param array|null $photoLookup
+     * @return void
+     * @throws GuzzleException
+     */
+    private function importPhoto(UserProfile\Model $baseProfile, ?array $photoLookup): void
+    {
+        $externalId = $baseProfile->getExternalId();
+
+        /* This person doesn't have a photo,
+         * or, their existing picture doesn't need changing.
+         * Exit early
+         */
+        if (null === ($photoLookup[$externalId] ?? null)) {
+            $this->log->debug(sprintf(
+                'Not fetching a portrait for user %s; they already have the latest, or no pic exists',
+                $externalId
+            ));
+            return;
+        }
+
+        /* Start the part where we save the image
+         */
+        $this->log->info(sprintf(
+            'Downloading profile picture for %s %s (%s)',
+            $baseProfile->getFirstname(),
+            $baseProfile->getLastname(),
+            $baseProfile->getExternalId()
+        ));
+
+        /* Only try to persist images if perform mode is activated
+         */
+        if (!$this->perform) {
+            return;
+        }
+
+        /* Otherwise, all the parts are here and valid; continue with the persistence
+         * to storage and assignation to the $baseProfile by reference
+         */
+        try {
+            /* Inspect $response for useful status codes. These can successfully fail, even though we're
+             * accessing a static resource whose url is generated by veracross itself. Can veracross
+             * provide a broken url? Presumably so, though I haven't encountered it personally yet
+             */
+            $response = $this->client->request('GET', $photoLookup[$externalId]);
+
+            /* TODO Maybe implement a retry system here, even though this seems to be a static resource?
+             *  Not sure how reliable this part of veracross is, but pics aren't exactly supercritical
+             *  unlike the rest of their user data. Let's add it if they're not reliable enough
+             */
+
+            $fileContents = $response->getBody()->getContents();
+
+            /* For deciding an extension based on a mime type
+             */
+            $mime = $response->getHeader('Content-Type')[0];
+
+            $ext = (new TransformFormat($mime))->getFormat();
+
+            $filename = sprintf(
+                '%s.%s',
+                $baseProfile->getExternalId(),
+                $ext
+            );
+
+            $this->log->debug(sprintf(
+                'Determined image extension %s from content type %s for profile photo file %s',
+                $ext,
+                $mime,
+                $filename
+            ));
+
+            $portrait = $this->storageMapper->acceptStream($filename, $fileContents);
+
+            /* You get a picture if any of the following occur:
+             *     - you don't have a portrait yet; you can get one added
+             *     - your existing picture is different to the one we just got; update it
+             */
+            if (!$baseProfile->getPortrait() || ($baseProfile->getPortrait()->getHash() !== $portrait->getHash())) {
+                $baseProfile->setPortrait($portrait);
+            }
+        } catch (BadResponseException $e) {
+            // HTTP 4xx/5xx errors - these have response objects with status codes
+            $statusCode = $e->getResponse()->getStatusCode();
+            $errorMessage = $e->getResponse()->getReasonPhrase();
+
+            $this->log->warning(sprintf(
+                'Failed to retrieve profile picture for user %s: HTTP error %s - %s ',
+                $baseProfile->getExternalId(),
+                $statusCode,
+                $errorMessage,
+            ));
+        } catch (\Exception $e) {
+            // noop, but warn the cli that something unusual has transpired
+            $this->log->warning(sprintf(
+                'Failed to retrieve profile picture for user %s: exception thrown. %s',
+                $baseProfile->getExternalId(),
+                $e->getMessage()
+            ));
         }
     }
 }

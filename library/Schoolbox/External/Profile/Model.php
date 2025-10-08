@@ -57,6 +57,21 @@ class Model
 
 
     /**
+     * A json string corresponding to usually-idiosyncratic connector-specific data
+     * (stuff like random misc ids, etc)
+     *
+     * At the moment nobody needed this except sentral to store an identifier, but
+     * I am expecting that every connector will end up needing its own structured
+     * and predictable json payload. At the moment I'm letting each connector just
+     * slap an associative array in here, in whatever way it wants, with no real
+     * assertion about its actual structure. That might be enough.
+     *
+     * @var array|null
+     */
+    private ?array $metadata = null;
+
+
+    /**
      * @return string $externalId
      */
     public function getExternalId(): string
@@ -172,6 +187,26 @@ class Model
     public function setPortrait(?Storage\Model $portrait): self
     {
         $this->portrait = $portrait;
+        return $this;
+    }
+
+
+    /**
+     * @return array|null
+     */
+    public function getMetadata(): ?array
+    {
+        return $this->metadata;
+    }
+
+
+    /**
+     * @param array|null $metadata
+     * @return Model
+     */
+    public function setMetadata(?array $metadata): self
+    {
+        $this->metadata = $metadata;
         return $this;
     }
 }

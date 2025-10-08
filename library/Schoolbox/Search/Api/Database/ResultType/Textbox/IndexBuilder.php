@@ -27,6 +27,10 @@ use Schoolbox\Search\Api\Database\Index\BuildType;
  */
 class IndexBuilder extends BaseBuilder
 {
+    /**
+     * This is a cache, so repeated calls to accepts() do not cause repeated database queries to look up the value.
+     * @var int|null
+     */
     private ?int $textboxComponentConfigDefinitionId = null;
 
     /**
@@ -54,8 +58,7 @@ class IndexBuilder extends BaseBuilder
         }
 
         if ($subject instanceof Component_Config) {
-            // Need to lookup component config definition,
-            // to determine if it is actually a textbox.
+            // Need to look up the component config definition to determine if $subject is relevant.
             $this->textboxComponentConfigDefinitionId ??= $this->getTextboxComponentConfigDefinitionId();
             return $this->textboxComponentConfigDefinitionId === $subject->getConfigDefinitionId();
         }
@@ -95,6 +98,10 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
+        if ($subject !== null && !$this->accepts($subject, BuildType::UPDATE)) {
+            return;
+        }
+
         // Pass 1: textboxes within a component
         //  * A similar query exists in library/Schoolbox/Assessment/Course/Plan/Controller.php.
         //  * The displayed heading of a textbox component on a homepage will be:
@@ -154,14 +161,18 @@ class IndexBuilder extends BaseBuilder
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
-            if (!$this->accepts($subject, BuildType::UPDATE)) {
-                return;
-            }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
         }
+        // Set max_statement_time at the query level to ensure no timeouts even if global max_statement_time is set.
+        // The query will not work as expected without the CAST, even though a float value is supplied.
+        $queryString = "SET STATEMENT max_statement_time = CAST(:maxStatementTime AS DECIMAL(4,4)) FOR\n$queryString";
+        $params['maxStatementTime'] = BaseBuilder::QUERY_LEVEL_MAX_STATEMENT_TIME;
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding text boxes (with components)...');
+        $t0 = microtime(true);
         $query->execute($params);
+        $t1 = microtime(true);
+        $this->logger->debug('Done.  Time taken: ' . round($t1 - $t0, 4) . ' seconds.');
         $this->logger->info(sprintf('Building search indices for %d text boxes (with components)', $query->rowCount()));
         foreach ($query as $row) {
             $index = $this->buildIndex(
@@ -217,9 +228,16 @@ class IndexBuilder extends BaseBuilder
             }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
         }
+        // Set max_statement_time at the query level to ensure no timeouts even if global max_statement_time is set.
+        // The query will not work as expected without the CAST, even though a float value is supplied.
+        $queryString = "SET STATEMENT max_statement_time = CAST(:maxStatementTime AS DECIMAL(4,4)) FOR\n$queryString";
+        $params['maxStatementTime'] = BaseBuilder::QUERY_LEVEL_MAX_STATEMENT_TIME;
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding text boxes (without components)...');
+        $t0 = microtime(true);
         $query->execute($params);
+        $t1 = microtime(true);
+        $this->logger->debug('Done.  Time taken: ' . round($t1 - $t0, 4) . ' seconds.');
         $this->logger->info(sprintf('Building search indices for %d text boxes (without components)', $query->rowCount()));
         foreach ($query as $row) {
             $index = $this->buildIndex(
@@ -253,6 +271,10 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
+        if ($subject !== null && !$this->accepts($subject, BuildType::DELETE)) {
+            return null;
+        }
+
         // Examine and clean up every search index for textboxes
         $searchIndexQueryString = "
             SELECT identifier
@@ -261,7 +283,8 @@ class IndexBuilder extends BaseBuilder
         ";
         $searchIndexParams = ['type' => Hydrator::BASE_TYPE];
 
-        // Also add subject filters here, in a convoluted way
+        // Since search_index.identifier has the format "$textboxId-$componentId-$folderId", a different
+        // LIKE condition can be used to filter rows of search_index depending on the type of $subject.
         if ($subject instanceof Textbox\Model) {
             $searchIndexQueryString .= ' AND identifier LIKE :textboxIdentifier';
             $searchIndexParams['textboxIdentifier'] = $subject->getId() . '-%';
@@ -271,8 +294,8 @@ class IndexBuilder extends BaseBuilder
         } elseif ($subject instanceof Component_Config) {
             $searchIndexQueryString .= ' AND identifier LIKE :componentIdentifier';
             $searchIndexParams['componentIdentifier'] = '%-' . $subject->getInstanceId() . '-%';
-        } else {
-            return;
+        } elseif ($subject !== null) { // Note $subject will be null when this is run from tools/search/buildIndex.php
+            return null;
         }
         $searchIndexQuery = $this->connector->prepareQuery($searchIndexQueryString);
 
@@ -294,12 +317,13 @@ class IndexBuilder extends BaseBuilder
             AND   ccd.key   = :key
         ");
         $componentExistsCache = [];
+        $nIndicesRemoved = 0;
 
         $searchIndexQuery->execute($searchIndexParams);
-        $this->logger->info(sprintf('Examining and cleaning up %d text box search indices', $searchIndexQuery->rowCount()));
+        $this->logger->info(sprintf('Examining %d text box search indices', $searchIndexQuery->rowCount()));
         foreach ($searchIndexQuery->fetchColumnArray('identifier') as $identifier) {
             $removeIndex = false;
-            [$textboxId, $componentId] = explode('-', $identifier);
+            [$textboxId, $componentId, $folderIgnored] = Hydrator::explodeTextboxInstanceId($identifier);
 
             // Check if this textbox exists:
             // if not, delete its index
@@ -308,9 +332,7 @@ class IndexBuilder extends BaseBuilder
                 $textboxExistsCache[$textboxId] = $textboxExistsQuery->rowCount() > 0;
             }
             if (!$textboxExistsCache[$textboxId]) {
-                $this->logger->debug(
-                    sprintf('Textbox %d no longer exists: removing index', $textboxId),
-                );
+                $this->logger->debug("Textbox $textboxId no longer exists.  Removing index '$identifier'.");
                 $removeIndex = true;
             } else {
                 // Does this index have an associated component?
@@ -321,15 +343,13 @@ class IndexBuilder extends BaseBuilder
                     ]);
                     $componentExistsCache[$textboxId] = $componentExistsQuery->fetchColumnArray('component_instance_id');
                 }
-                if ($componentId === '') {
+                if ($componentId === null) {
                     // This index has no component:
                     // remove it if any components exist for this textbox
                     if (!empty($componentExistsCache[$textboxId])) {
                         $this->logger->debug(
-                            sprintf(
-                                'Textbox %d is associated with a component: removing componentless index',
-                                $textboxId,
-                            ),
+                            "Textbox $textboxId is associated with a component." .
+                            "  Removing componentless index '$identifier'."
                         );
                         $removeIndex = true;
                     }
@@ -338,11 +358,8 @@ class IndexBuilder extends BaseBuilder
                     // remove it if it is not associated with that component
                     if (!in_array($componentId, $componentExistsCache[$textboxId])) {
                         $this->logger->debug(
-                            sprintf(
-                                'Textbox %d is no longer associated with component %d: removing index',
-                                $textboxId,
-                                $componentId,
-                            ),
+                            "Textbox $textboxId is no longer associated with component $componentId." .
+                            "  Removing index '$identifier'."
                         );
                         $removeIndex = true;
                     }
@@ -359,8 +376,11 @@ class IndexBuilder extends BaseBuilder
                     null,
                     null,
                 );
+                $nIndicesRemoved++;
             }
         }
+
+        $this->logger->info("Deleting search indices for $nIndicesRemoved textboxes");
     }
 
     /**

@@ -2,8 +2,9 @@ import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
 import { ScrollToPlugin } from "gsap/all";
 import { defineStore } from "pinia";
+import type { Template as EditorTemplate } from "@js/editor/types/editorTypes";
 import type { Column } from "../unitPlannerConfig";
-import type { CurriculumOverviewComponent, Unit, UnitTemplate } from "../unitPlannerTypes";
+import type { CourseBuilderComponent, CurriculumOverviewComponent, Unit, UnitTemplate } from "../unitPlannerTypes";
 
 gsap.registerPlugin(Draggable);
 gsap.registerPlugin(ScrollToPlugin);
@@ -16,17 +17,25 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
     const units = window.Vue.ref<Unit[]>([]);
     const unitCount = window.Vue.computed(() => units.value.length); // The number of units in the course
     const template = window.Vue.ref<UnitTemplate | null>(null); // the course framework template that units are linked to
+    const editorTemplates = window.Vue.ref<EditorTemplate[]>([]); // the editor templates available for insertion into textboxes
 
     /**
      * store any passed through properties
      * @param $courseId - the course ID
      * @param $units - the units to store
      * @param $template - the unit template
+     * @param $editorTemplates - the editor templates available for insertion into textboxes
      */
-    function init($courseId: number, $units: Unit[], $template: UnitTemplate): void {
+    function init(
+        $courseId: number,
+        $units: Unit[],
+        $template: UnitTemplate,
+        $editorTemplates: EditorTemplate[],
+    ): void {
         courseId.value = $courseId;
         units.value = $units;
         template.value = $template;
+        editorTemplates.value = $editorTemplates;
     }
 
     const orderedUnits = window.Vue.computed<Unit[]>(() => {
@@ -174,6 +183,19 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         matchedUnit.curriculum.components.push(component);
     }
 
+    /**
+     * Add a newly created Course Builder component to a unit
+     * @param unitId - to find the unit to add the component to
+     * @param component - the component to add
+     */
+    function addCourseBuilderComponent(unitId: number, component: CourseBuilderComponent): void {
+        const matchedUnit = units.value.find((unit) => unit.id === unitId);
+        if (!matchedUnit) {
+            return;
+        }
+        matchedUnit.activities.components.push(component);
+    }
+
     return {
         init,
         unexpandedUnitHeight,
@@ -182,6 +204,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         units,
         unitCount,
         template,
+        editorTemplates,
         dragCurrentUnit,
         dragCurrentUnitNextTick,
         orderedUnits,
@@ -193,5 +216,6 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         setUnitContentHeight,
         unitRowDisplayHeights,
         addCurriculumComponent,
+        addCourseBuilderComponent,
     };
 });

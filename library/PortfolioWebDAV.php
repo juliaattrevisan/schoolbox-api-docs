@@ -10,6 +10,7 @@
 
 use Alaress\File\Remote\FetcherInterface;
 use Sabre\HTTP\ClientHttpException;
+use DAV\ExtendedClient;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Collection;
 use Schoolbox\Error\Mapper as ErrorMapper;
@@ -27,7 +28,7 @@ use Schoolbox\WebDav\Model as WebDav;
 
 class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, FetcherInterface
 {
-    /** @var DAV_ExtendedClient */
+    /** @var ExtendedClient */
     private $client;
 
     /** @var array Stores collection results so files and directories can be returned separately */
@@ -54,11 +55,11 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
     protected $errorMapper;
 
     /**
-     * @param DAV_ExtendedClient $client
+     * @param ExtendedClient $client
      * @param array $paths List of paths from the baseUri to access
      * @param bool $lite
      */
-    public function __construct(DAV_ExtendedClient $client, array $paths = ['/'], $lite = false)
+    public function __construct(ExtendedClient $client, array $paths = ['/'], $lite = false)
     {
         $this->client = $client;
         $this->rootPaths = $paths;
@@ -168,6 +169,14 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
                 $userYear = $user->getYear() ? $user->getYear()->getName() : '';
 
                 $path = $dav->getPath();
+
+                if ('' === (string)$path) {
+                    /* Given that we do not want the path to become a required field, we are assuming that if not path
+                     * assigned, it is pointing to the root
+                     */
+                    $path = "/";
+                }
+
                 $path = str_replace("{:username}", $user->getUsername(), $path);
                 $path = str_replace("{:yearlevel}", $userYear, $path);
                 $path = str_replace("{:calendaryear}", (int) date("Y"), $path);
@@ -192,7 +201,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
             throw new DomainException("Drives is not configured");
         }
 
-        $client = new DAV_ExtendedClient($settings);
+        $client = new ExtendedClient($settings);
 
         self::$instance = new self($client, $paths, $lite);
         return self::$instance;
@@ -409,7 +418,7 @@ class PortfolioWebDAV implements FileLocatorInterface, FolderLocatorInterface, F
         $chunk_size = 10000000;
         $properties = $this->client->propFind($_SESSION['portfolioIdPathMap'][$id], ['{DAV:}getcontentlength']);
         $file_size = $properties['{DAV:}getcontentlength'];
-        $temp = sb_tempnam('dav');
+        $temp = tempnam(sys_get_temp_dir(), 'dav');
         if ($file_size <= $chunk_size) {
             $response = $this->client->request('GET', $_SESSION['portfolioIdPathMap'][$id]);
             file_put_contents($temp, $response['body'], LOCK_EX);

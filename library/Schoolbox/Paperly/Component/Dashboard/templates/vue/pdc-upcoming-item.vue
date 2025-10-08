@@ -7,6 +7,7 @@ import type { UpcomingItem } from "../js/types/UpcomingItem";
 
 interface Props {
     item: UpcomingItem; // The upcoming item to display
+    openItemsInNewTab: boolean; // Whether to open the Paperly items in a new tab
 }
 const props = defineProps<Props>();
 
@@ -21,7 +22,13 @@ function getDate(): string {
 
 <template>
     <div class="item l-flex-col l-gap-xs l-pad-m--horiz l-pad-s--vert">
-        <a :href="props.item.url" :title="`View ${props.item.title}`">{{ props.item.title }}</a>
+        <a
+            :href="props.item.url"
+            :title="`View ${props.item.title}`"
+            :target="props.openItemsInNewTab ? '_blank' : undefined"
+        >
+            {{ props.item.title }}
+        </a>
         <p v-if="props.item.due || props.item.status" class="meta f-no-margins">
             <template v-if="props.item.status">{{ props.item.status }}</template>
             <template v-if="props.item.status && props.item.due"> - </template>

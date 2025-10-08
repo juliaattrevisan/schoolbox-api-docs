@@ -1,10 +1,11 @@
 <script>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
+import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import AudiencesModal from "./audiences-modal";
 import MediaArticle from "@schoolboxVue/components/media-article";
-import debounce from "lodash/debounce";
 
 /* Path aliases like @schoolboxCalendarEvent are defined in webpack.common.js
  */
@@ -12,18 +13,6 @@ import { ATTENDANCE_STATUS } from "@schoolboxCalendarEvent/attendance-status";
 import { ATTENDANCE_LEVELS } from "@schoolboxCalendarEvent/attendance-levels";
 import { ENDPOINTS } from "@schoolboxCalendarEvent/endpoints";
 import checks from "@schoolboxCalendarEvent/checks";
-
-/* Vue select
- */
-import vSelect from "vue-select";
-import "vue-select/dist/vue-select.css";
-
-/* Render custom template for Deselect icon/button
- * It's not well documented, but you can trawl through closed PRs to figger out how
- * https://github.com/sagalbot/vue-select/issues/994
- */
-import Deselect from "@schoolboxVue/components/selectize/Deselect";
-vSelect.props.components.default = () => ({ Deselect });
 
 const FORMAT_LONG_DATE = "dddd, MMMM DD, YYYY"; // Monday, October 01, 2019
 const FORMAT_LONG_DATE_WITH_TIME = "dddd, MMMM DD, YYYY h:mma"; // Monday, October 01, 2019 02:30pm
@@ -36,7 +25,7 @@ export default {
     components: {
         AudiencesModal,
         MediaArticle,
-        vSelect,
+        SearchSelect,
     },
 
     /* All props form a one-way-down binding between the child property and the parent one:
@@ -119,9 +108,12 @@ export default {
     },
 
     watch: {
-        selected: function () {
-            if (this.selected.id) {
-                this.rsvpCreate(this.selected.id, this.selected.first_name + " " + this.selected.last_name);
+        guests() {
+            this.filterSearchResults(this.options);
+        },
+        selected() {
+            if (this.selected.length > 0) {
+                this.rsvpCreate(this.selected[0].id, `${this.selected[0].first_name} ${this.selected[0].last_name}`);
             }
         },
     },
@@ -143,6 +135,16 @@ export default {
 
     methods: {
         /**
+         * Get the endpoint for the user search
+         * @returns {String} - The endpoint for the user search
+         */
+        getEndpoint() {
+            const searchUrl = new URL(this.ENDPOINTS.URL_SELECTIZE, window.location.href).toString();
+            const searchParams = new URLSearchParams({ groupID: 0 }).toString();
+            return `${searchUrl}?${searchParams}&`;
+        },
+
+        /**
          * Update attendance counts from Payload data
          *
          * @param payload  Payload instance
@@ -152,6 +154,27 @@ export default {
             this.numPending = payload.attendees.pending;
             this.numAccepted = payload.attendees.accepted;
             this.numDeclined = payload.attendees.declined;
+        },
+
+        /**
+         * Filter search results by excluding already added guests
+         * @param results - the raw search results
+         */
+        filterSearchResults(results) {
+            const guestIds = this.guests.map((guest) => guest.id);
+            this.options = results.filter((result) => !guestIds.includes(result.id));
+        },
+
+        /**
+         * To handle the search results, filter out the selected users,
+         * and return the filtered list.
+         * @param json - the returned json
+         * @returns {Array} - filtered list of users
+         */
+        onSearchResponse(json) {
+            if (Array.isArray(json) && json.length > 0) {
+                this.filterSearchResults(json);
+            }
         },
 
         /**
@@ -423,36 +446,6 @@ export default {
             return this.event.attendance.level.current === ATTENDANCE_LEVELS.NONE;
         },
 
-        /**
-         * Start searching for keyword
-         *
-         * @param query
-         * @param loading
-         */
-        onSearch(query, loading) {
-            loading(true);
-            this.search(loading, query, this);
-        },
-
-        /**
-         * Perform async request and load results into component
-         */
-        search: debounce(function (loading, query, vm) {
-            fetch(
-                ENDPOINTS.URL_SELECTIZE +
-                    "?" +
-                    new URLSearchParams({
-                        query: query,
-                        groupID: 0,
-                    }),
-            )
-                .then((response) => response.json())
-                .then((data) => {
-                    vm.options = data;
-                    loading(false);
-                });
-        }, 350),
-
         showAudiencesModal() {
             this.$refs.audiencesModal.open();
         },
@@ -594,25 +587,22 @@ export default {
                         </span>
 
                         <template v-if="canInviteAttendees()">
-                            <v-select
-                                id="createAttendanceForm"
-                                :options="options"
-                                @search="onSearch"
-                                label="name"
-                                placeholder="Search for people to invite"
-                                v-model="selected"
+                            <search-select
+                                v-model:selected="selected"
+                                v-model:results="options"
+                                :is-single-select="true"
+                                :endpoint="getEndpoint()"
+                                label="Invite Guests"
+                                label-id="userInvite"
+                                placeholder=""
+                                :manage-search-response="true"
+                                :show-selected="false"
+                                @search-response="onSearchResponse"
                             >
-                                <template #option="option">
-                                    <div class="d-center">
-                                        {{ option.name }}
-                                    </div>
+                                <template #meta>
+                                    <div class="meta">Search for people to invite</div>
                                 </template>
-                                <template #selected-option="option">
-                                    <div class="selected d-center">
-                                        {{ option.name }}
-                                    </div>
-                                </template>
-                            </v-select>
+                            </search-select>
                         </template>
                     </div>
 

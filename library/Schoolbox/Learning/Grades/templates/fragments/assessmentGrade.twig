@@ -4,6 +4,7 @@
  # Params:
  # * assessment:  IAssessable - The assessment object
  # * student:     User        - The user record for the student
+ # * canViewInstructorMarks: bool - Whether the user can view instructor marks
  #}
 {% import '@learning/macro/dueDate.twig' as dueDate %}
 {% import '@learning/macro/urgency.twig' as urgency %}
@@ -55,16 +56,30 @@
     </div>
 
     {% if participant and assessment.isFeedbackVisibleToUser(USER) %}
-        {% set grade = participant.humanReadableMark(true) %}
         {% if assessment is task %}
             {% include '@learningAssessment/fragments/progressTick.twig' with {
                 assessment: assessment,
                 student:    student
             } only %}
-        {% elseif grade %}
-            <div class="grade {{ urgency.marks(participant.normalisedMark(true)) }}-bg">
-                <span>{{ grade }}</span>
-            </div>
+        {% else %}
+            {# learners and instructors can view the display mark, only instructors can see the instructor mark #}
+            {% set grade = participant.humanReadableMark(true) %}
+            {% set instructorGrade = canViewInstructorMarks ?? false ? participant.humanReadableInstructorMark(true) : null %}
+
+            {% if grade %}
+                <div data-learner-mark class="grade {{ urgency.marks(participant.normalisedMark(true)) }}-bg"
+                    {# If there's an instructor grade available, then hide this by default #}
+                    {% if instructorGrade %}style="display: none"{% endif %}
+                >
+                    <span>{{ grade }}</span>
+                </div>
+            {% endif %}
+
+            {% if instructorGrade %}
+                <div data-instructor-mark class="grade {{ urgency.marks(participant.normalisedMark(true)) }}-bg">
+                    <span>{{ instructorGrade }}</span>
+                </div>
+            {% endif %}
         {% endif %}
     {% endif %}
 </div>
@@ -72,7 +87,7 @@
     {% set feedback = participant.findAuthoritativeVisibleFeedback(USER) %}
     {% if feedback and feedback.comment   %}
         <div class="content">
-            <blockquote>{{ feedback.comment | linkify | nl2br }}</blockquote>
+            <blockquote>{{ feedback.comment | purify }}</blockquote>
             {% if assessment is dueWork and (assessment.useRubric or feedback.allFiles | length) and summaryRoute %}
                 <a href="{{ summaryRoute }}{{ returnUrlSuffix is defined ? returnUrlSuffix : '' }}">
                     View assessment details</a>

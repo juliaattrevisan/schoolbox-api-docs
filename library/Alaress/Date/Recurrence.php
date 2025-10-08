@@ -43,23 +43,23 @@ class Recurrence
      * Creates a DatePeriod or other traversable list of DateTime objects that
      * corresponds to a list of event recurrences.
      *
-     * @param DateTime $startTime      The event that is to recur.
-     * @param string   $recurrenceRule The recurrence rule:
+     * @param DateTime    $startTime      The event that is to recur.
+     * @param string      $recurrenceRule The recurrence rule:
      *                                 "daily", "weekly", "fortnightly",
      *                                 "monthly" or "timetable".
      *                                 Anything else is treated as a single
      *                                 event.
-     * @param DateTime $repeatUntil    The day to expand this event to.
-     * @param Campus      $campus      The campus to use when determining when a
+     * @param DateTime    $repeatUntil    The day to expand this event to.
+     * @param Campus|null $campus         The campus to use when determining when a
      *                                 timetable day recurs.
-     * @throws InvalidArgumentException
      * @return DateTime[]
+     *@throws InvalidArgumentException
      */
     public function getRecurrencePeriod(
         DateTime $startTime,
         $recurrenceRule,
         DateTime $repeatUntil,
-        Campus $campus = null
+        ?Campus $campus = null
     ) {
         switch ($recurrenceRule) {
             case self::RECURRENCE_DAILY:

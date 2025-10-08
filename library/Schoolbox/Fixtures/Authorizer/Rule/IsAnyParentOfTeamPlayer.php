@@ -45,7 +45,7 @@ class IsAnyParentOfTeamPlayer implements IAuthorizationRule
     /**
      * {@inheritdoc}
      */
-    public function authorize(array $params = array(), User $user = null)
+    public function authorize(array $params = array(), ?User $user = null)
     {
         /* Players in the Team specified
          */

@@ -125,7 +125,6 @@ class Feed
                     f.description as name,
                     realname,
                     af.description as type,
-                    inline,
                     c.name as cat_name,
                     c.id as cat_id
                 FROM file f

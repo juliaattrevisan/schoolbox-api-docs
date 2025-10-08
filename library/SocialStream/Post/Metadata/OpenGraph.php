@@ -12,7 +12,6 @@ namespace SocialStream\Post\Metadata;
 
 class OpenGraph extends Metadata
 {
-
     /**
      * Fetch information out of the meta tags
      *
@@ -23,7 +22,7 @@ class OpenGraph extends Metadata
         $this->analyseTitle();
         $this->analyseDescription();
 
-        if (strlen($this->getTitle())) {
+        if (strlen((string)$this->getTitle())) {
             return $this;
         }
 
@@ -36,8 +35,10 @@ class OpenGraph extends Metadata
 
     /**
      * Find the title
+     *
+     * @return void
      */
-    private function analyseTitle()
+    private function analyseTitle(): void
     {
         $query = "//meta[@property='og:title']";
 
@@ -46,8 +47,10 @@ class OpenGraph extends Metadata
 
     /**
      * Find the description
+     *
+     * @return void
      */
-    private function analyseDescription()
+    private function analyseDescription(): void
     {
         $query = "//meta[@property='og:description']";
 

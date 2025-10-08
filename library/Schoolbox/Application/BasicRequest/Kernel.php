@@ -8,18 +8,19 @@
 
 namespace Schoolbox\Application\BasicRequest;
 
-use Alaress\Codec\Json\Base64;
+use Alaress\Database\Connector\IConnector;
 use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Alaress\Image\ProcessorFactory;
-use Alaress\Redis\Cache\ItemPool;
-use Alaress\Redis\Cache\KeyGenerator;
+use Alaress\Lumberjack\Logger;
 use Alaress\Sentry\Tracing\GuzzleTracingMiddleware;
 use Alaress\Sentry\Tracing\Tracer;
-use Cache\Bridge\SimpleCache\SimpleCacheBridge;
 use enshrined\svgSanitize\Sanitizer as BaseSvgSanitizer;
 use GuzzleHttp;
+use Http\Discovery\Psr17Factory;
 use League\Flysystem\Filesystem;
+use Monolog\Level;
 use Proxy\Server as ProxyServer;
+use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Psr\SimpleCache\CacheInterface;
 use Schoolbox\API\Token\Jwt;
@@ -32,7 +33,6 @@ use Schoolbox\Collection;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Config\Loader as ConfigLoader;
 use Schoolbox\Database\Factory as SchoolboxDatabaseFactory;
-use Alaress\Database\Factory as AlaressDatabaseFactory;
 use Alaress\Redis;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\Instance;
@@ -57,9 +57,10 @@ use Schoolbox\TaskDaemon\Request\MessageFactory;
 use Schoolbox\User\Token\Mapper as TokenMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\Version\Version;
-use Sentry\Tracing\SpanStatus;
-use Sentry\Tracing\TransactionSource;
+use Sentry\SentrySdk;
 use SitePage;
+use Symfony\Component\Cache\Adapter\RedisAdapter;
+use Symfony\Component\Cache\Psr16Cache;
 use Twig\Environment;
 use Alaress\Twig\Method as TwigMethod;
 use Twig\Extension\DebugExtension;
@@ -107,6 +108,22 @@ class Kernel extends WebKernelAbstract
         Redis::aliasInstance(Redis::INSTANCE_CACHE, Redis::INSTANCE_SIGNAL_QUEUE);
         $di->set('redis.signalQueue.pub', Redis::getSignalQueueClientInstance());
 
+        // Enable mappers to be injectable, but instantiated only when required
+        $mapperFactory = new MapperFactory($di);
+        $di->set('mapperFactory', $mapperFactory);
+
+        /* Stolen from superclass lol
+         */
+        // PSR-17 compliant request factory: implements all of the interfaces
+        // defined in that PSR.
+        // TODO consider hand-building instead of relying upon discovery?
+        //      The reason I'm using discovery is because the discovery class
+        //      provides a convenient createServerRequestFromGlobals method.
+        $di->set(
+            'httpFactory',
+            $di->lazyNew(Psr17Factory::class)
+        );
+
         // User token generator
         $di->set(
             'user.tokenBuilder',
@@ -135,6 +152,7 @@ class Kernel extends WebKernelAbstract
                 [
                     'instance'     => $di->lazyGet('instance'),
                     'tokenBuilder' => $di->lazyGet('user.tokenBuilder'),
+                    'tokenMapper' => $mapperFactory->getLazy(TokenMapper::class),
                 ],
             )
         );
@@ -182,9 +200,7 @@ class Kernel extends WebKernelAbstract
         $di->set(
             'databaseFactory',
             function () use ($di) {
-                return new SchoolboxDatabaseFactory(
-                    new AlaressDatabaseFactory()
-                );
+                return SchoolboxDatabaseFactory::getInstance();
             }
         );
 
@@ -255,10 +271,6 @@ class Kernel extends WebKernelAbstract
             $di->lazyNew(PrefixGenerator::class, ['config' => $di->lazyGet('config')])
         );
 
-        // Enable mappers to be injectable, but instantiated only when required
-        $mapperFactory = new MapperFactory($di);
-        $di->set('mapperFactory', $mapperFactory);
-
         $di->set(
             'proxyServer',
             $di->lazyNew(
@@ -289,24 +301,47 @@ class Kernel extends WebKernelAbstract
             ),
         );
 
+        // Cache wrappers around HTTP clients
+        $di->set(
+            'httpClient.internalCache',
+            $di->lazy(
+                function () use ($di) {
+                    return new Psr16Cache(
+                        new RedisAdapter(
+                            $di->get('redis.cache'),
+                            'httpClient.' . INSTANCE_ID,
+                        )
+                    );
+                }
+            ),
+        );
+        $di->set(
+            'httpClient.cache',
+            $di->lazyNew(
+                \Alaress\Http\Cache::class,
+                [
+                    'httpClient'      => $di->lazyGet('httpClient'),
+                    'internalCache'   => $di->lazyGet('httpClient.internalCache'),
+                    'defaultLifetime' => null,
+                    'baseUrl'         => $di->lazyGet('baseUrl'),
+                ]
+            )
+        );
+
+        // Base URL: finally add this to DI
+        $di->set(
+            'baseUrl',
+            $di->lazy(
+                function () use ($config) {
+                    return (new \Schoolbox\Url\Factory($config))->buildFullyQualified();
+                }
+            )
+        );
+
         // add sentry to the DI
         $di->set(
             'sentry',
-            $di->lazy(
-                static function () use ($di, $config) {
-                    $sentryToken   = defined('SENTRY_TOKEN') ? SENTRY_TOKEN : null;
-                    $sentryProject = defined('SENTRY_PROJECT') ? SENTRY_PROJECT : null;
-                    /** @var Instance $sb */
-                    $sb = $di->get('instance');
-                    return (new \Alaress\Sentry\Factory())->build(
-                        $sb,
-                        Instance::APPLICATION_NAME,
-                        $sentryToken,
-                        $sentryProject,
-                        $config,
-                    );
-                }
-            )
+            $di->lazy(SentrySdk::getCurrentHub(...)),
         );
 
         // JWT parser
@@ -315,21 +350,40 @@ class Kernel extends WebKernelAbstract
             $di->lazy(
                 function () use ($di, $config, $mapperFactory) {
                     /** @var GuzzleHttp\Client $httpClient */
-                    $httpClient             = $di->get('httpClient');
+                    $httpClient         = $di->get('httpClient');
                     /** @var CacheInterface $oidcCache */
-                    $oidcCache              = $di->get('oidc.cache');
-                    $userMapper             = $mapperFactory->get(UserMapper::class);
-                    $tokenMapper            = $mapperFactory->get(TokenMapper::class);
-                    $relyingPartyMapper     = $mapperFactory->get(RelyingPartyMapper::class);
+                    $oidcCache          = $di->get('oidc.cache');
+                    /** @var LoggerInterface $logger */
+                    $logger             = $di->get('user.jwtParser.logger');
+                    $userMapper         = $mapperFactory->get(UserMapper::class);
+                    $tokenMapper        = $mapperFactory->get(TokenMapper::class);
+                    $relyingPartyMapper = $mapperFactory->get(RelyingPartyMapper::class);
                     return new JwtParser\Composite(
-                        new JwtParser\OtherInstanceIssued($userMapper, $config),
-                        new JwtParser\SelfIssued($userMapper, $config, $tokenMapper),
-                        new JwtParser\OauthProviderIssued($userMapper, $config, $httpClient, $oidcCache),
-                        new JwtParser\InstanceRegistryIssued($userMapper, $config),
-                        new JwtParser\OauthClientHeld($userMapper, $config, $relyingPartyMapper),
+                        $logger,
+                        new JwtParser\OtherInstanceIssued($userMapper, $config, $logger),
+                        new JwtParser\SelfIssued($userMapper, $config, $logger, $tokenMapper),
+                        new JwtParser\OauthProviderIssued($userMapper, $config, $logger, $httpClient, $oidcCache),
+                        new JwtParser\InstanceRegistryIssued($userMapper, $config, $logger, (string)INSTANCE_ID),
+                        new JwtParser\OauthClientHeld($userMapper, $config, $logger, $relyingPartyMapper),
                     );
                 }
             )
+        );
+
+        // Logger for JWT parsing
+        $di->set(
+            'user.jwtParser.logger',
+            $di->lazyNew(
+                Logger::class,
+                [
+                    STDOUT,
+                    null,
+                    $config->get(ConfigMapper::NAME_OAUTH_DEBUG_MODE) ? Level::Debug : Level::Info,
+                    [],
+                    true,
+                    'jwtParser.' . INSTANCE_ID,
+                ],
+            ),
         );
 
         $di->set(
@@ -489,11 +543,10 @@ class Kernel extends WebKernelAbstract
             'oidc.cache',
             $di->lazy(
                 function () use ($di) {
-                    return new SimpleCacheBridge(
-                        new ItemPool(
+                    return new Psr16Cache(
+                        new RedisAdapter(
                             $di->get('redis.cache'),
-                            new Base64(),
-                            new KeyGenerator(CacheHelper::BASE_CLIENT_KEY, INSTANCE_ID),
+                            CacheHelper::BASE_CLIENT_KEY . '.' . INSTANCE_ID,
                         )
                     );
                 }
@@ -505,11 +558,10 @@ class Kernel extends WebKernelAbstract
             'component.homepage.clickview.cache',
             $di->lazy(
                 function () use ($di) {
-                    return new SimpleCacheBridge(
-                        new ItemPool(
+                    return new Psr16Cache(
+                        new RedisAdapter(
                             $di->get('redis.cache'),
-                            new Base64(),
-                            new KeyGenerator('component.homepage.clickview', INSTANCE_ID),
+                            'component.homepage.clickview.' . INSTANCE_ID,
                         )
                     );
                 }
@@ -520,11 +572,10 @@ class Kernel extends WebKernelAbstract
             'paperly.cache',
             $di->lazy(
                 function () use ($di) {
-                    return new SimpleCacheBridge(
-                        new ItemPool(
+                    return new Psr16Cache(
+                        new RedisAdapter(
                             $di->get('redis.cache'),
-                            new Base64(),
-                            new KeyGenerator('paperly', INSTANCE_ID),
+                            'paperly.' . INSTANCE_ID,
                         )
                     );
                 }
@@ -546,11 +597,15 @@ class Kernel extends WebKernelAbstract
                 function () use ($di, $config) {
                     /** @var Filesystem $storage */
                     $storage = $di->get('filesystem.storage');
+                    $adapter = $config->get(ConfigMapper::NAME_OTFS_ADAPTER);
+                    $isLocal = $adapter === FilesystemFactory::FILE_SYSTEM_ADAPTER_LOCAL;
                     return new FilesystemProxy(
                         $storage,
                         new HashGenerator(),
                         $config->get(ConfigMapper::NAME_OTFS_VERIFY_PREVIOUS_FILE),
-                        FilesystemFactory::buildDefaultVisibility($config->get(ConfigMapper::NAME_OTFS_ADAPTER)),
+                        FilesystemFactory::buildDefaultVisibility($adapter),
+                        $isLocal,
+                        $isLocal ? $config->get('storage_dir') : $config->get('stream_dir'),
                     );
                 }
             )
@@ -567,6 +622,7 @@ class Kernel extends WebKernelAbstract
                     'tempFilesystem'         => $di->lazyGet('filesystem.temp'),
                     // CLI scripts have no current user, thus this is null
                     'currentUser'            => (PHP_SAPI === 'cli' ? null : $di->lazyGet('user')),
+                    'virusScanner'           => $di->lazyGet('virus.scanner'),
                 ],
             )
         );
@@ -589,16 +645,29 @@ class Kernel extends WebKernelAbstract
             ),
         );
 
+        // Virus scanner
+        $di->set(
+            'virus.scannerFactory',
+            $di->lazyNew(
+                \Schoolbox\Resource\Storage\Virus\ScannerFactory::class,
+                [
+                    'config'         => $config,
+                    'tempFileSystem' => $di->lazyGet('filesystem.temp'),
+                ]
+            )
+        );
+        $di->set(
+            'virus.scanner',
+            $di->lazyGetCall('virus.scannerFactory', 'build'),
+        );
+
         // Search dependencies
         $di->set(
             'search.indexBuilder',
             $di->lazy(
                 function () use ($di) {
-                    /** @var SchoolboxDatabaseFactory $dbFactory */
-                    $dbFactory = $di->get('databaseFactory');
-
-                    // Should this return write database always?
-                    $dbi = $dbFactory->getInternalDatabase();
+                    /** @var IConnector $dbi */
+                    $dbi = $di->get('databaseInternal');
 
                     // What sort of logger should this use?
                     // The CLI variant should use the kernel's logger:

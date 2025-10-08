@@ -23,6 +23,7 @@
  # @param array      $folders       A list of available and selected Folders
  # @param array      $campuses      A list of available and selected Campuses
  # @param string     $returnUrl     A Redirect-encoded string (you go here after saving the form)
+   editorTemplates array Retrieve any pre-existing editor templates to insert into the 'Body' rich text editor
  #}
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/calendar/jquery.eventModify.js?v={{ config.site_version }}"></script>
@@ -34,6 +35,9 @@
             detail: {
                 maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                 targetElements: ['#event-detail'],
+                {% if editorTemplates is defined %}
+                    templates: {{ editorTemplates|json_encode|raw }},
+                {% endif %}
             }
         }));
 

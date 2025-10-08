@@ -18,6 +18,7 @@ use Schoolbox\Assessment\Component\SubmissionBox\Submission\SingleFile\Model as 
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWork;
 use Schoolbox\Assessment\Component\SubmissionBox\ReturnedWorkMapper;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentDataSource;
 use Schoolbox\Learning\Assessment\DueWork;
 use Schoolbox\Learning\Assessment\DueWork\Response\ValidSelfAssessable;
@@ -32,6 +33,7 @@ use Schoolbox\Learning\Assessment\Project\ResultCache\Mapper;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Learning\InlineGrader\Kami\Connector;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\TokenReplacer;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
@@ -176,55 +178,80 @@ class Controller extends Base
         $draftFeedbackIds = $this->requestPost->get('drafts', []);
         $now              = Alaress_Date_Format::now();
         $results = [];
+        $projectCache = (new Project\ResultCache\ResultCache($this->projectResultCacheMapper));
+
+        /* if this is a spec assessment, we want all implementation children assessments,
+         * with hydrated participants so we can publish all the users quickly and easily.
+         *
+         * we should be using filters, so we aren't hydrating all participation for all time....
+        */
+        $aImpls = new GenericCollection(DueWork\Model::class);
+        if ($assessment->isSpecification()) {
+            $aImpls = $this->assessmentDataSource
+                ->findAllImplementationsBySpecificationId($assessment->getId())
+                ->indexBy('id');
+
+            // hydrate participants
+            $this->assessmentDataSource->loadParticipantsIntoAssessmentCollection($aImpls, null, true);
+        } else {
+            $aImpls->add($assessment)->indexBy('id');
+        }
 
         foreach ($draftFeedbackIds as $draftFeedbackId) {
             // Verify that this return is for this assessment
             $submissionReturn = $this->returnedWorkMapper->findById($draftFeedbackId);
             $publishSuccess   = false;
 
-            if ($submissionReturn->getSubmissionBox()->getAssessmentModel()->getId() === $assessment->getId()) {
-                $submissionReturn->setPublishedAt($now);
+            // hydrate the duework assessment, not just the feedback joined assessment minimal modal.
+            /** @var \Schoolbox\Learning\Assessment\DueWork\Model $assessment */
+            $aImpl = $aImpls->getBy('id', $submissionReturn->getSubmissionBox()->getAssessmentModel()->getId());
 
-                try {
-                    $this->returnedWorkMapper->save($submissionReturn);
-                    $publishSuccess = true;
+            if (!$aImpl) {
+                $results[$draftFeedbackId] = ['publishSuccess' => false, 'error' => 'Assessment not found'];
+                continue;
+            }
 
-                    // Find the Kami worksheet (if it exists)
-                    if ($submissionReturn->getSubmission()) {
-                        $responses = $this->responseDataSource->findForAssessment($assessment, $submissionReturn->getSubmission()->getOwner());
-                        if (0 !== $responses->count()) {
-                            $response = null;
-                            foreach ($responses as $responseCurrent) {
-                                if ($responseCurrent->getId() == $submissionReturn->getSubmission()->getId()) {
-                                    $response = $responseCurrent;
-                                    break;
-                                }
-                            }
+            $submissionReturn->setPublishedAt($now);
 
-                            // attempt to clean as we go
-                            unset($responses);
+            try {
+                $this->returnedWorkMapper->save($submissionReturn);
+                $publishSuccess = true;
 
-                            /** @var ?DueWork\Response\Model $response */
-                            $kamiModel = $response?->getAllFiles()->filter(function (SubmissionFile $file) {
-                                return $file->getIsWorksheet();
-                            })->first()?->getKami();
-                            if ($kamiModel) {
-                                // Save the kami doc to the feedback object
-                                $this->kamiConnector->initiatePollingForKamiDownload(
-                                    $kamiModel,
-                                    'feedback',
-                                    $this->getUser(),
-                                );
+                // Find the Kami worksheet (if it exists)
+                if ($submissionReturn->getSubmission()) {
+                    $responses = $this->responseDataSource->findForAssessment($aImpl, $submissionReturn->getSubmission()->getOwner());
+                    if (0 !== $responses->count()) {
+                        $response = null;
+                        foreach ($responses as $responseCurrent) {
+                            if ($responseCurrent->getId() == $submissionReturn->getSubmission()->getId()) {
+                                $response = $responseCurrent;
+                                break;
                             }
                         }
-                    }
 
-                    /* Update project result cache when Publish All is used
-                     */
-                    (new Project\ResultCache\ResultCache($this->projectResultCacheMapper))->refresh($this->assessmentDataSource, $assessment, $submissionReturn->getOwner());
-                } catch (PDOException | \DomainException | \InvalidArgumentException | \LogicException | \UnexpectedValueException$e) {
-                    $publishSuccess = false;
+                        // attempt to clean as we go
+                        unset($responses);
+
+                        /** @var ?DueWork\Response\Model $response */
+                        $kamiModel = $response?->getAllFiles()->filter(function (SubmissionFile $file) {
+                            return $file->getIsWorksheet();
+                        })->first()?->getKami();
+                        if ($kamiModel) {
+                            // Save the kami doc to the feedback object
+                            $this->kamiConnector->initiatePollingForKamiDownload(
+                                $kamiModel,
+                                'feedback',
+                                $this->getUser(),
+                            );
+                        }
+                    }
                 }
+
+                /* Update project result cache when Publish All is used
+                 */
+                $projectCache->refresh($this->assessmentDataSource, $aImpl, $submissionReturn->getOwner());
+            } catch (PDOException | \DomainException | \InvalidArgumentException | \LogicException | \UnexpectedValueException $e) {
+                $publishSuccess = false;
             }
 
             $results[$draftFeedbackId] = ['publishSuccess'   => $publishSuccess];
@@ -349,8 +376,8 @@ class Controller extends Base
         Participant $participant,
         array $postVars,
         string $reviewRoute,
-        IFeedback $mostRecentFeedback = null,
-        IResponse $response = null
+        ?IFeedback $mostRecentFeedback = null,
+        ?IResponse $response = null
     ): Model {
 
         // Check whether new rubric data and/or attachments are being passed through
@@ -365,13 +392,17 @@ class Controller extends Base
             $hasRubric = true;
         }
 
+        // Replace any tokens in the comment with the relevant details
+        $comment = (new TokenReplacer\Student(new TokenReplacer\Simple()))
+            ->replace(trim((string)$postVars['comment']), $participant->getUser());
+
         $dueWorkFeedbackFactory = new DueWork\Feedback\Factory(
             $this->getFeedbackDataSource(),
             $participant,
             $this->getUser(),
             $postVars['mark'] ?? null,
             (bool)($postVars['resubmissionRequired'] ?? false),
-            $postVars['comment'] ?? '',
+            $comment,
             $postVars['publish'] ?? null,
             $postVars['attachment'] ?? null,
             $fromInlineGrader,
@@ -411,10 +442,30 @@ class Controller extends Base
             $this->getFeedbackDataSource()->save($feedback);
         }
 
+        /**
+         * We need to retrieve the new plan below, but it won't have been hydrated into $participant yet
+         * Force re-hydration so that we can get the actual plan
+         */
+        $this->participantDataSource->loadParticipationIntoAssessment(
+            $feedback->getAssessable(),
+            $participant->getUser()
+        );
+
+        $plan = $feedback->getAssessable()->getParticipantIfExtant($participant->getUser())->getPlan();
+
         $data = [
             'success' => true,
             'message' => 'OK',
             'id'      => $feedback->getId(),
+            /* these extra fields are currently used by the Markbook to keep things responsive */
+            'normalisedMark'              => $feedback->getNormalisedMark(),
+            'humanReadableMark'           => $feedback->getHumanReadableMark(),
+            'humanReadableInstructorMark' => $feedback->getHumanReadableInstructorMark(),
+            'plan' => [
+                'isDynamic' => $plan->getIsDynamic(),
+                'name' => $plan->getName(),
+                'dueDate' => $plan->getDueDate()?->getShort() ?? null,
+            ],
         ];
 
         $this->respond('', $data);
@@ -523,9 +574,9 @@ class Controller extends Base
             ->refresh($this->assessmentDataSource, $assessment, $student);
 
         // Find the Kami worksheet (if it exists)
-        /** @var DueWork\Response\Model $response */
+        /** @var DueWork\Response\Model|null $response */
         $response = $feedback->getResponse();
-        $kamiModel = $response->getAllFiles()->filter(function (SubmissionFile $file) {
+        $kamiModel = $response?->getAllFiles()->filter(function (SubmissionFile $file) {
             return $file->getIsWorksheet();
         })->first()?->getKami();
         if ($kamiModel) {

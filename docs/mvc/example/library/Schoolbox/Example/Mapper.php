@@ -12,6 +12,7 @@ namespace Schoolbox\Example;
 
 use Schoolbox\GenericCollection;
 use Schoolbox\UserMapper;
+use UnexpectedValueException;
 
 /**
  * Class Mapper
@@ -33,9 +34,25 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasTable('example');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->joins('user_id', UserMapper::class, 'id', null, null, 'userId', 'userId');
+        $this->joins('user_id', UserMapper::class, 'id', null, null, 'user', 'userId');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
+
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'validateUserId']);
+    }
+
+    /**
+     * Example pre-save validation.
+     *
+     * @param Model $model
+     * @return bool
+     */
+    public function validateUserId(Model $model): bool
+    {
+        if ($model->getUser()->getId() > 100) {
+            throw new UnexpectedValueException('User cannot have an ID above 100');
+        }
+        return true;
     }
 }

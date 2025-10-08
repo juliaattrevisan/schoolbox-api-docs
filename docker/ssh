@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+# Always run within root folder
+cd "$(dirname "$0")/.." || exit 1
+
+# Open a shell in the schoolbox-cli container
+docker exec -it schoolbox-cli /bin/bash --login

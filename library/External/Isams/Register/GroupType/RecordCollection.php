@@ -17,7 +17,6 @@ class RecordCollection extends GroupTypeBase
      * @throws GuzzleException
      * @throws InvalidArgumentException
      * @throws \JsonException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      *
      */
     protected function retrieveRecords(): ?array
@@ -42,7 +41,6 @@ class RecordCollection extends GroupTypeBase
      * @throws GuzzleException
      * @throws InvalidArgumentException
      * @throws \JsonException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     public function process(array $out): array
     {

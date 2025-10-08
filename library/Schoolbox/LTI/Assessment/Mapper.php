@@ -17,6 +17,7 @@ use Schoolbox\Mapper as BaseMapper;
  * LTI assessment mapper.
  *
  * @method Model createModel($idValue = null)
+ * @method Model hydrate(array $row, $alias = '', $callback = null)
  */
 class Mapper extends BaseMapper
 {

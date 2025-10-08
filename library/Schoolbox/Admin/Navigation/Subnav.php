@@ -223,10 +223,20 @@ class Subnav
                         'visible'     => true,
                         'description' => 'A tool to bulk or individually remove events from personal or group calendars.',
                     ],
-                    '/adminv2/calendar/Import' => [
-                        'name'        => 'Import',
+                    '/adminv2/calendar/import/school-events' => [
+                        'name'        => 'Import School Events',
                         'visible'     => true,
-                        'description' => 'Import events into the school calendar via ICS or CSV.',
+                        'description' => 'Import school events into the calendar via CSV.',
+                    ],
+                    '/adminv2/calendar/import/group-events' => [
+                        'name'        => 'Import Group Events',
+                        'visible'     => true,
+                        'description' => 'Import group events into the calendar via CSV.',
+                    ],
+                    '/adminv2/calendar/import/icalendar-events' => [
+                        'name'        => 'Import iCalendar Events',
+                        'visible'     => true,
+                        'description' => 'Import school events into the calendar via ICS.',
                     ],
                     '/adminv2/lists/calendar/event-type' => [
                         'name'        => 'Lists - Event Types',
@@ -236,7 +246,7 @@ class Subnav
                     '/adminv2/calendar/Subscribe' => [
                         'name'        => 'Subscribe',
                         'visible'     => true,
-                        'description' => 'Control which additional calendars are included into a users calendar. This includes VCAL events, modules and the SIS.',
+                        'description' => 'Control which additional calendars are included into a users calendar. This includes iCal, vCal or ics events, modules and the SIS.',
                     ],
                 ],
             ],
@@ -249,6 +259,11 @@ class Subnav
                         'name'        => 'Dashboard Templates',
                         'visible'     => true,
                         'description' => 'Configure the layout of the initial landing page when you first login for each role.',
+                    ],
+                    '/adminv2/editor-templates' => [
+                        'name'        => 'Editor Templates',
+                        'visible'     => true,
+                        'description' => 'Add predefined content structures to the rich text editor.',
                     ],
                     '/adminv2/lists/design/timetable-colour' => [
                         'name'        => 'Lists - Timetable Colours',
@@ -360,6 +375,11 @@ class Subnav
                         'name'        => 'Academic Period',
                         'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED),
                         'description' => 'Configure the blocks of time that assessments will be visible within, often called terms or semesters.',
+                    ],
+                    '/adminv2/bulk-feedback-import' => [
+                        'name'        => 'Bulk Feedback Import',
+                        'visible'     => (bool)$this->configLoader->get(ConfigMapper::NAME_LMS_ENABLED) && $userIsSuperuser,
+                        'description' => 'Import multiple feedbacks per assessment with a csv file.',
                     ],
                     '/adminv2/bulkCourseImport' => [
                         'name'        => 'Bulk Course Import',
@@ -658,7 +678,7 @@ class Subnav
                     ],
                     '/adminv2/restore' => [
                         'name'        => 'Restore',
-                        'visible'     => true,
+                        'visible'     => $userIsSuperuser,
                         'description' => 'Undelete pages, folders and assessments that were accidentally deleted recently.',
                     ],
                     '/adminv2/setting/cms/Resources' => [
@@ -721,10 +741,15 @@ class Subnav
                         'visible'     => count($enabledConfigs[ConfigMapper::TYPE_3RD] ?? []) > 0,
                         'description' => 'Enable and configure API connectivity between your platform and many other integrated services.',
                     ],
-                    '/adminv2/setting/AI' => [
-                        'name'        => 'AI Services',
-                        'visible'     => count($enabledConfigs[ConfigMapper::TYPE_3RD] ?? []) > 0,
+                    /* OpenAI needs its own page because Azure has a special usage of th config fields
+                     * Also, we provide some more information here than just input fields
+                     */
+                    '/adminv2/ai-services' => [
+                        'name' => 'AI Services',
+                        'visible' => true,
                         'description' => 'Enable and configure OpenAI integration to enable AI services to be made available to users.',
+                        'searchable' => true,
+                        'children' => []
                     ],
                     '/adminv2/setting/Debugging' => [
                         'name'        => 'Debugging',
@@ -827,6 +852,11 @@ class Subnav
                         'visible'     => true,
                         'description' => 'Setup a new user account for use in the platform.',
                     ],
+                    '/adminv2/reports/impersonation/all' => [
+                        'name'        => 'Impersonation Log',
+                        'visible'     => true,
+                        'description' => 'View a log of all users who have impersonated other users.',
+                    ],
                     '/adminv2/import/userAccount' => [
                         'name'        => 'Import CSV',
                         'visible'     => true,
@@ -917,6 +947,12 @@ class Subnav
                         ],
                     ],
                 ],
+            ],
+            'https://my.schoolbox.education' => [
+                'name'        => 'My Schoolbox',
+                'visible'     => $userIsSuperuser,
+                'description' => 'My Schoolbox subscription management portal login',
+                'children'    => [],
             ],
         ];
     }

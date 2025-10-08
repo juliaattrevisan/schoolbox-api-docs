@@ -58,7 +58,7 @@ class IsInvolvedInClass extends All
     /**
      * {@inheritdoc}
      */
-    public function authorizeMethod(array $params = array(), User $user = null)
+    public function authorizeMethod(array $params = array(), ?User $user = null)
     {
         if ($user instanceof User) {
             // Get the class code source

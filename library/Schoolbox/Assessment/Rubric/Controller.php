@@ -318,6 +318,15 @@ class Controller extends BaseController
                 $assessment->setGradeGroup($this->gradeGroupMapper->findById($gradeGroupId));
             }
 
+            $instructorMarkTypeId = $post->get('instructorMarkTypeId');
+            if ($instructorMarkTypeId) {
+                $assessment->setInstructorMarkType($this->markTypeMapper->findById($instructorMarkTypeId));
+            }
+            $instructorGradeGroupId = $post->get('instructorGradeGroupId');
+            if ($instructorGradeGroupId) {
+                $assessment->setInstructorGradeGroup($this->gradeGroupMapper->findById($instructorGradeGroupId));
+            }
+
             // attempt to build the grid
             $maxLevels = (int)$this->getDi()->get('config')->get('rubric_max_levels');
             $this->mapper->importGridFromCsv($file, $assessment, $maxLevels);
@@ -520,7 +529,7 @@ class Controller extends BaseController
         $fp = fopen('php://temp', 'r+b');
         foreach ($array as $row) {
             $row = array_map(fn ($x) => trim($x ?? ''), $row);
-            fputcsv($fp, $row);
+            fputcsv($fp, $row, escape: '');
         }
         rewind($fp);
         $result = stream_get_contents($fp);

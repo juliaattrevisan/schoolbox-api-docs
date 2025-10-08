@@ -44,6 +44,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('name', self::TYPE_STRING);
         $this->joins('courseTemplateId', HomepageTemplateMapper::class, 'id', null, null, 'courseTemplate', 'courseTemplate');
         $this->joins('unitTemplateId', HomepageTemplateMapper::class, 'id', null, null, 'unitTemplate', 'unitTemplate');
+        $this->uses('sequence', self::TYPE_INTEGER);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'verifyActualTemplate']);
@@ -90,6 +91,12 @@ class Mapper extends \Schoolbox\Mapper
             $templates->add($template);
         }
         return $templates;
+    }
+
+    /** @inheritDoc */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['sequence' => 'ASC'];
     }
 
     /**

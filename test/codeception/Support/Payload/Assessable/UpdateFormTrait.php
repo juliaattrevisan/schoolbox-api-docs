@@ -52,10 +52,15 @@ trait UpdateFormTrait
         if ($assessable instanceof DueWork\Model) {
             $this->setFormParam('self_reviewable', $assessable->getSelfReviewability());
             $this->setFormParam('maxMark', $assessable->getMaxMark());
+            $this->setFormParam('instructor-maxMark', $assessable->getInstructorMaxMark());
         }
         $this->setFormParam('visibility', $assessable->getMarkVisibility());
         $this->setFormParam('markType', $assessable->getMarkType()->getId());
         $this->setFormParam('gradingScheme', $assessable->getGradeGroup() ? $assessable->getGradeGroup()->getId() : 1);
+        if ($assessable instanceof DueWork\Model) {
+            $this->setFormParam('instructor-markType', $assessable->getInstructorMarkType()->getId());
+            $this->setFormParam('instructor-gradingScheme', $assessable->getInstructorGradeGroup() ? $assessable->getInstructorGradeGroup()->getId() : 1);
+        }
         $this->setFormParam('resultSet', 1);
 
         foreach ($assessable->getPlans() as $plan) {

@@ -1,0 +1,275 @@
+{% import '@learning/macro/urgency.twig' as urgency %}
+
+{% set latestResponse    = participant.findMostRecentResponse %}
+    {% set latestFeedback    = latestResponse ? latestResponse.findMostRecentInstructorGivenFeedback : null %}
+    {% set multipleResponses = participant.allResponses | length > 1 %}
+
+    {# Tot actions are derived from access to the Attempt History route
+     # By default this empty, hiding the tot
+    #}
+    {% set pActionSummary = latestResponse ? routeLookupIfAuthorized('learningAssessment.getSummary', routeArgs) : null %}
+
+    {% set pActionCount = (pActionSummary ? 1 : 0) %}
+
+    {# A discriminator for tabindexes #}
+    {% set inputNo = 1 %}
+
+    {# Progress icon
+     # One of [ '', 'pending', 'complete' ] to denote the action status of this participation
+     # The green dot/grey square/oj diamond
+    #}
+    {% set pStatusClass %}
+        {%- apply spaceless %}
+            {% if participant.responseRequired %}
+                {{ statusIncomplete }}
+            {% elseif participant.reviewComplete %}
+                {{ statusReviewed }}
+            {% else %}
+                {{ statusPending }}
+            {% endif %}
+        {% endapply -%}
+    {% endset %}
+
+    {# Progress icon tool tip
+     # A tooltip explaining the status marker
+     # This is the tooltip that appears when you hover over the green dot/grey square/oj diamond
+    #}
+    {% set pTooltip %}
+        {%- apply spaceless %}
+            {% if latestResponse and not latestResponse.isSubmitted %}
+                Review will be required when this attempt is finished
+            {% elseif participant.responseRequired %}
+                Not Attempted
+            {% elseif participant.reviewComplete %}
+                Reviewed
+            {% else %}
+                Review required
+            {% endif %}
+        {% endapply -%}
+    {% endset %}
+
+    {# The description to output under the user's name
+     # This is the text that appears next to the green dot/grey square/oj diamond
+    #}
+    {% set pStatusText %}
+        {%- apply spaceless %}
+            {% if not latestResponse %}
+                Not attempted
+            {% elseif not latestResponse.submittedAt %}
+                Attempt in progress
+            {% else %}
+                {% if multipleResponses %}
+                    Reattempted
+                {% else %}
+                    Attempted
+                {% endif %}
+
+                {% if participant.getDueDate and latestResponse.submittedOnTime %}
+                    on time
+                {% else %}
+                    late
+                {% endif %}
+            {% endif %}
+        {% endapply -%}
+    {% endset %}
+
+<li data-status="{{ pStatusClass }}" data-participant-external-id="{{ participant.user.externalId }}" data-participant="{{ participant.user.id }}" data-participant-name="{{ participant.user.fullName }}">
+    <div class="flex-grade">
+        <div class="{{ cardSize ?? 'small-12' }} card sibling">
+            <a href="/search/user/{{ participant.user.id }}" title="View Profile">
+                {% include 'include/portrait.twig' with {user: participant.user} only %}
+            </a>
+            {% if not participant.user.deleted %}
+                <h3>
+                    <a href="/search/user/{{ participant.user.id }}" title="View Profile" data-participant-name>{{ participant.user.fullName }}</a>
+                    {% if not participant.plan.isDynamic %}
+                        <span class="individualisation has-tip tip-top" data-tooltip title="{{ participant.plan.name }} ({{ participant.plan.duedate.short }})">i</span>
+                    {% endif %}
+                </h3>
+            {% else %}
+                <h3 data-participant-name>{{ participant.user.fullName }}</h3>
+            {% endif %}
+            <p class="meta">
+                <span title="{{ pTooltip }}" data-status class="progress-tick tiny {{ pStatusClass }}"></span>
+                <span data-status-label>{{ pStatusText }}</span>
+                {% if pActionSummary %}<span class="pipe meta"><a href="{{ pActionSummary }}" title="View {{ participant.user.givenName }}'s history">View {{ responseHistory }}</a></span>{% endif %}
+            </p>
+        </div>
+        {% if participant.allResponses | length %}
+            {% if latestResponse.submitted and latestResponse.learnosityReference %}
+                <div class="txt">
+                    <p>Finished <time title="{{ latestResponse.submittedAt.local }}"><strong>{{ latestResponse.submittedAt.relativeTime }}</strong></time> in <strong>{{ latestResponse.duration.hms }}</strong></p>
+                    {% if multipleResponses %}({{ participant.allResponses | length - 1 }} previous attempts){% endif %}
+                </div>
+            {% elseif latestResponse.submitted %}
+                <div class="txt">
+                    <p>Published <time title="{{ latestResponse.submittedAt.local }}"><strong>{{ latestResponse.submittedAt.relativeTime }}</strong></time></p>
+                </div>
+            {% endif %}
+
+            {% set urgencyClass = latestFeedback ? urgency.marks(latestFeedback.normalisedMark) : '' %}
+        {% endif %}
+
+        {# Quiz Attempts could be in either Learnosity, or our legacy quiz system
+             # Legacy Quiz attempts are not going to be in learnosity
+             #
+             # So if we have a learnosity_reference, make a link to learnosity feedback screen
+             # Otherwise, prohibit the link; users won't be able to see legacy attempts anymore.
+             # We might make a "museum" for these old attempts one day
+        #}
+        {% if latestResponse %}
+            {% if latestResponse.learnosityReference %}
+                {% if latestResponse.submitted %}
+                    {% if not latestFeedback %}
+                        <div class="grade review">
+                            <span>Awaiting Review</span>
+                        </div>
+                    {% elseif latestFeedback.normalisedMark|length %}
+                        <div class="grade {{ urgencyClass }}-bg">
+                            <span>{{ latestFeedback.humanReadableMark }}</span>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="grade in-progress">
+                        <span>In Progress</span>
+                    </div>
+                {% endif %}
+            {% else %}
+
+                {# Legacy quiz attempts are rendered here
+                     # mostly synonymously with learnosity
+                     # except for the things you can't action here (ie. to be reviewed)
+                     # hence the mark will be hidden from the screen
+                #}
+                {% if latestResponse.submitted %}
+                    {% if latestFeedback and latestFeedback.humanReadableMark|length %}
+                        <div class="grade {{ urgencyClass }}-bg">
+                            <span>{{ latestFeedback.humanReadableMark }}</span>
+                        </div>
+                    {% endif %}
+                {% endif %}
+            {% endif %}
+        {% endif %}
+    </div>
+
+    {##
+         # Action Bar at the bottom of each participant's row
+    #}
+    {% set canFinish  = latestResponse and not latestResponse.submitted %}
+
+    {# If you have made an attempt, it's officially submitted, you can publish a feedback
+         # The existing feedback, if it exists, gets updated with the new grade and comment;
+         # otherwise, a new one spawns
+    #}
+    {% set canPublish = latestResponse and latestResponse.submitted %}
+    {% set canDelete  = latestResponse and (not latestFeedback or not latestFeedback.published) %}
+
+    {# Only show if there's an existing learnosity attempt, otherwise we'll show when there's a change to grade/comment #}
+    {% set actionStyle = latestResponse.learnosityReference ?? null ? 'display: block' : 'display: none' %}
+
+    {# The most recent feedback, supposedly #}
+    {% set latestFeedback = participant.findMostRecentInstructorGivenFeedback %}
+
+    {# Decide if the Save And Publish buton is visible #}
+    {% set publishStyle = 'display: none' %}
+
+    {% if (latestFeedback ?? null) and not latestFeedback.published %}
+        {% set publishStyle = 'display: block' %}
+    {% endif %}
+
+    {# Mass/Bulk actions #}
+    {% set massActions = '' %}
+    {% if canPublish %}{% set massActions = massActions ~ ' data-mass-review' %}{% endif %}
+    {% if canDelete %}{% set massActions = massActions ~ ' data-mass-delete' %}{% endif %}
+
+    {# Buttons #}
+    {% apply spaceless %}
+        {% set buttons %}
+            {# Quiz Attempts could be in either Learnosity, or our legacy quiz system
+                 # Legacy Quiz attempts are not going to be in learnosity
+                 #
+                 # So if we have a learnosity_reference, make a link to learnosity feedback screen
+                 # Otherwise, prohibit the link; users won't be able to see legacy attempts anymore.
+                 # We might make a "museum" for these old attempts one day
+            #}
+            {% if latestResponse.learnosityReference ?? null %}
+                {% if canDelete %}<a class="button" data-interaction-delete="{{ latestResponse.id }}" href="{{ routeLookupIfAuthorized('learnosity.postDeleteAttempts', {assessment: assessment, assessmentId: assessment.id }) }}">Delete Attempt</a>{% endif %}
+                {% if canFinish %}<a class="button" data-interaction-finish="{{ latestResponse.id }}" data-interaction-finish-reference="{{ latestResponse.learnosityReference }}" href="{{ routeLookupIfAuthorized('learnosity.postCompleteAttempt', {assessment: assessment, assessmentId: assessment.id, studentId: latestResponse.submittedBy.id}) }}">Finish Attempt</a>{% endif %}
+
+                {% if canPublish or canFinish %}
+                    <a
+                            {% if not canPublish %}style="display:none"{% endif %}
+                            class="button"
+                            data-interaction-review="{{ latestResponse.id }}"
+                            href="{{ routeLookupIfAuthorized('learnosity.getFeedback', {assessment: assessment, assessmentId: assessment.id, studentId: participant.user.id, learnositySessionReference: latestResponse.learnosityReference}) }}"
+                    >
+                        Review Attempt
+                    </a>
+                {% endif %}
+            {% endif %}
+
+            {# You can always publish a new feedback...even if the student never attempted it #}
+            <a class="button" style="{{ publishStyle }}" data-draft="publish" data-interaction-publish="{{ participant.user.id }}" href="#save-and-publish">Save and Publish</a>
+        {% endset %}
+    {% endapply %}
+
+    {# Quizzes now support Submission States #}
+    <div class="small-12 column">
+        <form data-feedback-form="{{ participant.user.id }}" method="post" action="{{ routeLookupIfAuthorized('learningQuizAttempt.postModify', {assessment: assessment, assessmentId: assessment.id, studentId: participant.user.id }) }}">
+            {# Maximum available marks for this guy. Total Mark required a learnosity interrogation.
+                 # Everything else can be assumed to be out of 100, since that is already hardcoded in each
+                 # MarkScheme template already, for whatever reason; this nullsafe operator is syntactic only
+                 #
+                 # In the absence of any learnosity-derived specific maxMarks values, use the template's
+                 # defaulted hardcoded value of 100.
+            #}
+            {% set maxMarks = maxMarks[participant.user.id] ?? latestResponse.marksAvailable ?? null %}
+
+            <input type="hidden" name="responseId" value="{{ latestResponse.id ?? '' }}"/>
+            <input type="hidden" name="maxMarks" value="{{ maxMarks }}" />
+
+            <div class="row">
+                {# Quiz always has a Mark Type (it's mandatory) #}
+                <div class="small-12 medium-3 column">
+                    <label>{{ locale.grades.proper }}
+                        {# For quizzes, each person's attempt can vary from other attempts, which occurs
+                             # when the content of quiz changes halfway through everyone doing it. This means
+                             # the $limit param can't be derived from the assessment's markScheme instance,
+                             # which would apply the same limit to everyone. This necessitates a $maxMark
+                             # lookup for each person, and in the absence of an attempt, ask Learnosity for
+                             # what's available at the moment.
+                        #}
+                        {% include '@learningMarkScheme/'~assessment.markScheme.template~'.twig' with {
+                            assessment:  assessment,
+                            participant: participant,
+                            feedback:    latestFeedback,
+                            markScheme:  assessment.markScheme,
+                            useInstructorMark: false,
+                            limit:       maxMarks,
+                            tabIndex:    loop.index0 + inputNo,
+                            errors:      errors,
+                            readonly:    false,
+                        } only %}
+                        {% set inputNo = inputNo + 1 %}
+                    </label>
+                </div>
+                <div class="small-12 medium-9 column">
+                    {% include '@learningAssessment/quiz/comment.twig' with {
+                        feedback:       latestFeedback,
+                        participant:    participant,
+                        tabIndex:       loop.index0 + inputNo,
+                        prefix:         assessment.id,
+                    } only %}
+                    {% set inputNo = inputNo + 1 %}
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {% include '@learningAssessment/fragments/actionBar.twig' with {
+        actionStyle:  actionStyle,
+        massActions:  massActions,
+        buttons:      buttons,
+        participant:  participant
+    } only %}
+</li>

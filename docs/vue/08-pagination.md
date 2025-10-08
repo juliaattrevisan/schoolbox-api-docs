@@ -36,7 +36,7 @@ data () {
 },
 ```
 
-Underneath your `axios` request to obtain a payload, we can add a little thing which manages the browser's history to simulate Back button behaviour while paginating. You don't need to think too much about this; it should mostly _just work_.
+Underneath your `fetch` request to obtain a payload, we can add a little thing which manages the browser's history to simulate Back button behaviour while paginating. You don't need to think too much about this; it should mostly _just work_.
 
 ```js
 /* Set up listener for window history state, for pagination refresh
@@ -80,7 +80,7 @@ The `Paginate` component requires a couple more computed methods. Add these to t
 
 /**
  * The total number of pages available for the data set obtained
- * 
+ *
  * @returns { Number }
  */
 pageCount () {
@@ -90,7 +90,7 @@ pageCount () {
 
 /**
  * Calculate the paginated subset of all data
- * 
+ *
  * @returns { Number }
  */
 users () {
@@ -144,12 +144,12 @@ At the bottom of `user-list.vue` w can add the `Paginate` component which will d
     <vuejs-paginate
         v-model="page"
         :page-count="pageCount"
-        :container-class="'pagination'"
-        :prev-text="'‹'"
-        :next-text="'›'"
-        :prev-link-class="'arrow'"
-        :next-link-class="'arrow'"
-        :disabled-class="'unavailable'"
+        container-class="pagination"
+        prev-text="‹"
+        next-text="›"
+        prev-link-class="arrow"
+        next-link-class="arrow"
+        disabled-class="unavailable"
         :click-handler="onPaginate"
     ></vuejs-paginate>
 </div>
@@ -158,4 +158,3 @@ At the bottom of `user-list.vue` w can add the `Paginate` component which will d
 Recompile and reload; you'll have an asynchronously-powered paginated data set that is fully navigable and simulates browser history, along with user-friendly indicators for loading data and a snappy perceived response because we loaded everything and now it's rendering data locally in the browser. Data is produced by a highly-cohesive decoupled class which can be both unit tested and used in a different context (e.g. phplib/twig instead of vue) without having to copypaste a lot.
 
 > Don't forget to dress it up so it looks nice by using our regular styles and so on.
-

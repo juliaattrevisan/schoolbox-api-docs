@@ -66,6 +66,8 @@ class InstanceIdManager extends CliTool\App
      */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         $this->redis = $this->getDi()->get('redis.cache');
 
         $newInstanceId = $this->getValidNewInstanceIdOrExit();
@@ -83,6 +85,8 @@ class InstanceIdManager extends CliTool\App
         $this->restartDaemons();
 
         $this->getLogger()->notice('INSTANCE_ID update successful');
+
+        $this->deprecationNotice("SA-19334");
     }
 
     /**
@@ -174,7 +178,7 @@ class InstanceIdManager extends CliTool\App
             $this->getLogger()->debug("Renaming '$oldKey' to '$newKey'");
 
             // If a set, we may need to rename the key and the members
-            if ($this->redis->type($oldKey)->getPayload() === 'set') {
+            if ($this->redis->type($oldKey) === 'set') {
                 // Special case, create a new set with modified members
                 $members = $this->redis->smembers($oldKey);
                 foreach ($members as $idx => $member) {
@@ -214,6 +218,9 @@ class InstanceIdManager extends CliTool\App
 
     /**
      * Renames a bunch of lock files on disk
+     *
+     * @deprecated This should no longer be required, as process locks are now
+     *             stored in Redis.
      *
      * @param string $oldInstanceId
      * @param string $newInstanceId

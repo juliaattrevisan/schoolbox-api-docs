@@ -73,10 +73,10 @@ interface IDefinition
      * eg, if an option represents a Term that is deleted from the system
      *
      * @param Page\Model  $pageFilter
-     * @param null|string $roleTypeFilter
+     * @param string|null $roleTypeFilter
      * @return GenericCollection|Page\Option\Model[]
      */
-    public function normalisePageOptions(Page\Model $pageFilter, string $roleTypeFilter = null): GenericCollection;
+    public function normalisePageOptions(Page\Model $pageFilter, ?string $roleTypeFilter = null): GenericCollection;
 
 
     /**

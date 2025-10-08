@@ -259,7 +259,7 @@ class Hydrator extends BaseHydrator
         } elseif ($assessment instanceof Assessment\LessonPlan\Model) {
             return $this->getConcatenationOfLessonPlanFieldTitlesAndBodies($assessment);
         } else {
-            return $assessment->getDescription();
+            return $assessment->getDescription() ?? ''; // Note assessment.description is nullable.
         }
     }
 

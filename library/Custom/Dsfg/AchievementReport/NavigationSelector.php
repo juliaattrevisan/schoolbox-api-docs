@@ -21,13 +21,13 @@ class NavigationSelector
      * Navigation keys
      */
     public const STANDARDISEDTEST_KEY = 'standardisedTest';
+    public const YEAR11_KEY = 'year11';
     public const SCHOOLGRADES_KEY = 'schoolGrades';
     public const NCEA_KEY = 'ncea';
     public const IB_KEY = 'ib';
     public const COMMENTS_KEY = 'comments';
     public const COCURRICULAR_KEY = 'coCurricular';
     public const MYP_KEY = 'myp';
-
 
     /**
      * MSSQL db handler
@@ -120,20 +120,18 @@ class NavigationSelector
 
         /* Everyone else gets an evaluation based on the year string from lu_year_level
          */
-        if (($this->user->getYear()->getName() >= 1) && ($this->user->getYear()->getName() <= 6)) {
+        if ($this->user->getYear()->getName() == 11) {
+            if ($this->hasYear11()) {
+                $this->defaultReport = self::YEAR11_KEY;
+            } else {
+                $this->defaultReport = ['error' => 'Year 11 student has no data in the database view for Year 11.'];
+            }
+        } elseif (($this->user->getYear()->getName() >= 1) && ($this->user->getYear()->getName() <= 6)) {
             $this->defaultReport = self::STANDARDISEDTEST_KEY;
         } elseif ($this->hasMYP()) {
             $this->defaultReport = self::MYP_KEY;
         } elseif (($this->user->getYear()->getName() >= 9) && ($this->user->getYear()->getName() <= 10)) {
             $this->defaultReport = self::SCHOOLGRADES_KEY;
-        } elseif ($this->user->getYear()->getName() == 11) {
-            /* NCEA for year 11 specifically
-             */
-            if ($this->hasNcea()) {
-                $this->defaultReport = self::NCEA_KEY;
-            } else {
-                $this->defaultReport = ['error' => 'Year 11 student not in NCEA.'];
-            }
         } elseif (($this->user->getYear()->getName() >= 12) && ($this->user->getYear()->getName() <= 13)) {
             /* Need to decide whether this is an IB or an NCEA student
              */
@@ -161,9 +159,12 @@ class NavigationSelector
      */
     private function navigationData(): void
     {
+        $userYear = $this->user->getYear()?->getName();
+
         $availableNavigation = [];
 
-        if ($this->hasMYP()) {
+        // For year 11 students only, the MYP tab changes position from its regular place here, to its new place below.
+        if ($userYear !== '11' && $this->hasMYP()) {
             $availableNavigation[self::MYP_KEY] = [
                 'url' => $this->routeGenerator->generate('achievementreport.getMyp', [
                     'externalUserId' => $this->externalUser['StudentID'],
@@ -173,8 +174,11 @@ class NavigationSelector
         }
 
         /* Conditionally add NCEA option
+         *
+         * Note the NCEA report is not shown for Year 11 students because all
+         * the NCEA data for Year 11 students is now included in the Year 11 tab.
          */
-        if ($this->hasNcea()) {
+        if ($userYear !== '11' && $this->hasNcea()) {
             $availableNavigation[self::NCEA_KEY] = [
                 'url' => $this->routeGenerator->generate('achievementreport.getNcea', [
                     'externalUserId' => $this->externalUser['StudentID'],
@@ -194,6 +198,17 @@ class NavigationSelector
             ];
         }
 
+        /* Conditionally add Year 11 option
+         */
+        if ($this->hasYear11()) {
+            $availableNavigation[self::YEAR11_KEY] = [
+                'url' => $this->routeGenerator->generate('achievementreport.getYear11', [
+                    'externalUserId' => $this->externalUser['StudentID'],
+                ]),
+                'label' => 'Year 11'
+            ];
+        }
+
         /* Conditionally add School Grades option
          */
         if ($this->hasSchoolGrades()) {
@@ -202,6 +217,16 @@ class NavigationSelector
                     'externalUserId' => $this->externalUser['StudentID'],
                 ]),
                 'label' => 'School Grades'
+            ];
+        }
+
+        // For year 11 students only, the MYP tab changes position from its regular place above, to its new place here.
+        if ($userYear === '11' && $this->hasMYP()) {
+            $availableNavigation[self::MYP_KEY] = [
+                'url' => $this->routeGenerator->generate('achievementreport.getMyp', [
+                    'externalUserId' => $this->externalUser['StudentID'],
+                ]),
+                'label' => 'MYP',
             ];
         }
 
@@ -317,11 +342,42 @@ class NavigationSelector
 
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
-            FROM dbo.uvSchoolBoxNCEAResults
+            FROM " . NCEA\Base::MAIN_DB_TABLE_NCEA . "
             WHERE ID = :externalId
         ";
 
         return (bool)$this->db->getOne($query, $params);
+    }
+
+
+    /**
+     * Find out if they are in the NCEA table
+     *
+     * @return bool
+     */
+    private function hasYear11(): bool
+    {
+        if (!isset($this->externalUser['StudentID'])) {
+            return false;
+        }
+
+        $params = [
+            'externalId' => $this->externalUser['StudentID'],
+        ];
+
+        $query = "
+            SELECT TOP 1 COUNT(*) AS 'computed'
+            FROM " . NCEA\Base::MAIN_DB_TABLE_YEAR11 . "
+            WHERE ID = :externalId
+        ";
+
+        try {
+            $hasYear11 = (bool)$this->db->getOne($query, $params);
+        } catch (\Exception) {
+            $hasYear11 = false;
+        }
+
+        return $hasYear11;
     }
 
 
@@ -367,7 +423,7 @@ class NavigationSelector
 
         $query = "
             SELECT TOP 1 COUNT(*) AS 'computed'
-            FROM uvSchoolBoxCoCurricularClasses
+            FROM dbo.uvSchoolBoxCoCurricularClasses
             WHERE StudentID = :externalId
         ";
 
@@ -404,11 +460,24 @@ class NavigationSelector
      */
     private function hasMYP(): bool
     {
+        // We do not check whether the student has data in the MYP view here because getting data from that view is
+        // extremely slow.  Checking whether data exists for the student in the MYP view here (using the same method as
+        // is used for other functions in this file) added about 10 seconds to page load times when testing on the
+        // staging server.
+        //
+        // Note there are some edge cases where this function will return true, but the student is not expected to have
+        // any data in the MYP view.  For example, if the student started at the school at a senior year level, they
+        // will have missed the MYP (Middle Years Program), and so will not have any data in the MYP view.  In that
+        // situation, this function will say that the student has MYP data, but when the MYP page is loaded no data will
+        // be found.  DSFG are aware of this edge case and are okay with it.
         $currentYear = (int)date('Y');
         return
-            $this->user->getYear()->getName() == 7
-            || $this->user->getYear()->getName() == 8
-            || ($this->user->getYear()->getName() == 9 && $currentYear >= 2023)
-            || ($this->user->getYear()->getName() == 10 && $currentYear >= 2024);
+            $this->user->getYear()?->getName() === '7'
+            || $this->user->getYear()?->getName() === '8'
+            || ($this->user->getYear()?->getName() === '9' && $currentYear >= 2023)
+            || ($this->user->getYear()?->getName() === '10' && $currentYear >= 2024)
+            || ($this->user->getYear()?->getName() === '11' && $currentYear >= 2025)
+            || ($this->user->getYear()?->getName() === '12' && $currentYear >= 2026)
+            || ($this->user->getYear()?->getName() === '13' && $currentYear >= 2027);
     }
 }

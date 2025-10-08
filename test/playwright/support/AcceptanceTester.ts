@@ -87,15 +87,13 @@ export default class AcceptanceTester extends BaseTester {
      * Impersonate a user via the modify screen by passing their title and fullname
      * @param fullname - The full name of the user to impersonate
      */
-    async impersonateViaModifyUserPage(fullname: string): Promise<void> {
+    async impersonateViaUserProfilePage(fullname: string): Promise<void> {
         this.isGoingTo(`impersonate a user by the name of ${fullname}`);
         await this.logout();
         await this.loginAsAdmin();
 
         await this.searchForUser(fullname);
         await this.common.waitForPageLoad();
-
-        await this.page.getByTestId("user-profile-modify").click();
 
         this.isGoingTo("click the options button and impersonate the user");
         await this.page.getByTestId("sbx-pop-out-header-options-button").click();

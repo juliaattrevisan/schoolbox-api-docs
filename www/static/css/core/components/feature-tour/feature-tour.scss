@@ -96,6 +96,12 @@ $tooltip-padding: 1rem;
 .introjs-whatsnewmodal {
     min-width: 40rem;
     padding: 0;
+
+    // Override introjs's margin-top as it can't respond to an image loading inside the modal causing
+    // the modal to become off-centred, instead just use -50% translateY as that's always accurate
+    margin-top: 0px !important;
+    transform: translateY(-50%);
+
     .introjs-tooltiptext {
         padding-right: 0;
     }

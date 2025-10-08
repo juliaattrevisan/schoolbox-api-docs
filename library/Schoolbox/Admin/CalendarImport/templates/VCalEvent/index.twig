@@ -1,0 +1,107 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="admin-container row">
+
+    {{ renderAdminNavigation(routeLookup('adminCalendarImport.getCalendarVcalImportForm')) }}
+
+    <div class="admin-content">
+        <div class="small-12 columns">
+            <div class="row">
+                <div class="island small-12">
+                    <section class="content">
+                        <h3>iCalendar</h3>
+                        <ol>
+                            <li>Open your calendar application.</li>
+                            <li>Look for an Export or Save As option.</li>
+                            <li>If available, choose iCalendar (.ics) as the file format.</li>
+                            <li>If available, select Full Details to include all event information.</li>
+                            <li>Save the file to your device.</li>
+                            <li>Upload using the Select file area below.</li>
+                        </ol>
+                        <div class="alert-box highlight f-no-margins">
+                            Note: Event imports are not supported for dates more than 12 months in the future.
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <h2 class="subheader">Select file</h2>
+
+            <div class="row">
+                <div class="small-12 island">
+                    <form method="post" enctype="multipart/form-data" name="form" id="importForm"
+                    action="{{ routeLookupIfAuthorized('adminCalendarImport.postCalendarVcalImportForm') }}">
+                        <section>
+                            <fieldset class="content">
+                                <div class="small-12 columns">
+                                    {% include 'sub/attachzone.twig' with {attachzone: attachzone} %}
+                                    <input type="hidden" name="bulkadd-file" id="bulkadd-file" />
+                                </div>
+                                <div class="small-12 medium-6 columns">
+                                    <label class="required">
+                                        Campus
+                                        <span class="hint has-tip tip-right" data-tooltip title="Select the campuses that will be able to view these events">?</span>
+                                    </label>
+                                    <ul class="option-list">
+                                        {% for campus in campusList %}
+                                        <li>
+                                            <input id="campus-{{ campus.id }}" type="checkbox" name="campusList[]" data-checkbox-group="campusList" value="{{ campus.id }}" />
+                                            <label for="campus-{{ campus.id }}" class="checkbox-label">{{ campus.name }}</label>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                <div class="small-12 medium-6 columns">
+                                    <label class="required">
+                                        Roles
+                                        <span class="hint has-tip tip-right" data-tooltip title="Select the roles that will be able to view these events">?</span>
+                                    </label>
+                                    <ul class="option-list">
+                                        {% for role in roleList %}
+                                        <li>
+                                            <input id="role-{{ role.id }}" type="checkbox" name="userGroup[]" data-checkbox-group="userGroup" value="{{ role.id }}" />
+                                            <label for="role-{{ role.id }}" class="checkbox-label">{{ role.name }}</label>
+                                        </li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                                <div class="small-12 columns">
+                                    <label>Fallback Event Owner</label>
+                                    <p class="meta">The owner of the events.
+                                        This field is optional: if no user is provided here, the current user will be used.</p>
+                                    <label>
+                                        <input name="name" id="name" type="text" placeholder="Search Users" />
+                                    </label>
+                                    <input name="userid" type="hidden" id="userid" size="6" maxlength="6" />
+                                </div>
+                            </fieldset>
+                        </section>
+
+                        <input type="submit" value="Preview" />
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
+<script type="text/javascript">
+    $(function() {
+        $('#name')
+                .userSelectizeSelector({
+                    ajax: {
+                        data:     {groupID: 0},
+                    }
+                })
+                .on('selectize.item_add', function(event, value) {
+                    $('#userid').val(value)
+                })
+                .on('selectize.item_remove', function() {
+                    $('#userid').val('')
+                });
+    });
+</script>
+{% include "@adminCalendarImport/zone_validation.twig" with { 'isICSImport': true } %}

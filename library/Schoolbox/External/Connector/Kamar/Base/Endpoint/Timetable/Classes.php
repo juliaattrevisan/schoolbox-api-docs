@@ -19,6 +19,7 @@ use Schoolbox\External\ClassInvolvement;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriod;
 use Schoolbox\External\ClassPeriodMapper;
+use Schoolbox\External\Connector\ClassCode;
 use Schoolbox\External\Connector\Kamar\Base\Endpoint\Batchxml;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\TimetablePeriod;
@@ -385,7 +386,7 @@ class Classes implements IStrategy
         } catch (Exception $e) {
             /** @var ClassEntry $timetableClass */
             $timetableClass = $this->classEntryMapper->createModel()
-                ->setCode($subject['class']['code'])
+                ->setCode((new ClassCode($this->log))->generate(trim((string)$subject['class']['code'])))
                 ->setName($subject['class']['name']);
 
             $this->log->info(sprintf(

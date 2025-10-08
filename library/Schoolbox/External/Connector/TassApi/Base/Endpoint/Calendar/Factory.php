@@ -20,7 +20,6 @@ use Schoolbox\External\Connector\TassApi\Base\Endpoint\Codec\DSN;
 use Schoolbox\External\Connector\TassApi\Base\Endpoint\Exception\MissingModule;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\GenericCollection;
-use Schoolbox\RoleMapper;
 use SensitiveParameter;
 
 /**
@@ -49,87 +48,7 @@ class Factory
     /**
      * Collect events to this many months in the future
      */
-    private const TO = 12;
-
-
-    /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
-     *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var string
-     */
-    private string $host;
-
-
-    /**
-     * @var string
-     */
-    private string $key;
-
-
-    /**
-     * @var \Schoolbox\External\Profile\Student\Mapper
-     */
-    private \Schoolbox\External\Profile\Student\Mapper $studentProfileMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Profile\Staff\Mapper
-     */
-    private \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper;
-
-
-    /**
-     * @var CampusMapper
-     */
-    private \Schoolbox\CampusMapper $campusMapper;
-
-
-    /**
-     * @var EventTypeMapper
-     */
-    private \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Mapper
-     */
-    private \Schoolbox\External\Event\Mapper $eventMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Roletype\Mapper
-     */
-    private \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Campus\Mapper
-     */
-    private \Schoolbox\External\Event\Campus\Mapper $campusRelationMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\User\Mapper
-     */
-    private \Schoolbox\External\Event\User\Mapper $userRelationMapper;
-
-
-    /**
-     * @var RoleMapper
-     */
-    private RoleMapper $roleMapper;
+    private const TO = 6;
 
 
     /**
@@ -147,36 +66,21 @@ class Factory
      * @param \Schoolbox\External\Event\Roletype\Mapper  $roletypeRelationMapper
      * @param \Schoolbox\External\Event\Campus\Mapper    $campusRelationMapper
      * @param \Schoolbox\External\Event\User\Mapper      $userRelationMapper
-     * @param RoleMapper                                 $roleMapper
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        string $host,
-        #[SensitiveParameter] string $key,
-        \Schoolbox\External\Profile\Student\Mapper $studentProfileMapper,
-        \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper,
-        \Schoolbox\CampusMapper $campusMapper,
-        \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
-        \Schoolbox\External\Event\Mapper $eventMapper,
-        \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper,
-        \Schoolbox\External\Event\Campus\Mapper $campusRelationMapper,
-        \Schoolbox\External\Event\User\Mapper $userRelationMapper,
-        RoleMapper $roleMapper
+        private LoggerInterface $log,
+        private bool $perform,
+        private string $host,
+        #[SensitiveParameter] private string $key,
+        private \Schoolbox\External\Profile\Student\Mapper $studentProfileMapper,
+        private \Schoolbox\External\Profile\Staff\Mapper $staffProfileMapper,
+        private \Schoolbox\CampusMapper $campusMapper,
+        private \Schoolbox\Calendar\EventTypeMapper $eventTypeMapper,
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private \Schoolbox\External\Event\Roletype\Mapper $roletypeRelationMapper,
+        private \Schoolbox\External\Event\Campus\Mapper $campusRelationMapper,
+        private \Schoolbox\External\Event\User\Mapper $userRelationMapper,
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->host = $host;
-        $this->key = $key;
-        $this->studentProfileMapper = $studentProfileMapper;
-        $this->staffProfileMapper = $staffProfileMapper;
-        $this->campusMapper = $campusMapper;
-        $this->eventTypeMapper = $eventTypeMapper;
-        $this->eventMapper = $eventMapper;
-        $this->roletypeRelationMapper = $roletypeRelationMapper;
-        $this->campusRelationMapper = $campusRelationMapper;
-        $this->userRelationMapper = $userRelationMapper;
-        $this->roleMapper = $roleMapper;
     }
 
 
@@ -294,8 +198,8 @@ class Factory
                 $this->userRelationMapper,
                 self::SOURCE_NAME,
                 $registry,
-                $from,
-                $to
+                \Alaress_Date_Format::now()->startOfWeek()->addWeeks(EDiary::FROM),
+                \Alaress_Date_Format::now()->startOfWeek()->addWeeks(EDiary::TO)
             ));
         }
 
@@ -308,7 +212,6 @@ class Factory
             $this->eventMapper,
             $this->roletypeRelationMapper,
             $this->campusRelationMapper,
-            $this->roleMapper,
             self::SOURCE_NAME,
             $registry,
             $from,
@@ -323,7 +226,6 @@ class Factory
             $this->eventMapper,
             $this->roletypeRelationMapper,
             $this->campusRelationMapper,
-            $this->roleMapper,
             self::SOURCE_NAME,
             $registry,
             $from,
@@ -338,7 +240,6 @@ class Factory
             $this->eventMapper,
             $this->roletypeRelationMapper,
             $this->campusRelationMapper,
-            $this->roleMapper,
             self::SOURCE_NAME,
             $registry,
             $from,
@@ -353,7 +254,6 @@ class Factory
             $this->eventMapper,
             $this->roletypeRelationMapper,
             $this->campusRelationMapper,
-            $this->roleMapper,
             self::SOURCE_NAME,
             $registry,
             $from,
@@ -368,7 +268,6 @@ class Factory
             $this->eventMapper,
             $this->roletypeRelationMapper,
             $this->campusRelationMapper,
-            $this->roleMapper,
             self::SOURCE_NAME,
             $registry,
             $from,
@@ -383,7 +282,6 @@ class Factory
             $this->eventMapper,
             $this->roletypeRelationMapper,
             $this->campusRelationMapper,
-            $this->roleMapper,
             self::SOURCE_NAME,
             $registry,
             $from,

@@ -58,9 +58,12 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
                         '' AS StudentMobilePhone,
                         uvStudents.StudentSpecialNeedsFlag,
                         uvStudents.StudentStudiesCode,
-                        AlertMessage,
+                        CASE WHEN AlertCategoryCode != ''
+                            THEN CONCAT(AlertCategoryCode,': ',AlertMessage)
+                            ELSE AlertMessage
+                        END AS AlertMessage,
                         '' AS CourtOrderType,
-                        uvStudents.StudentBoarder,
+                        luBoarder.Description AS StudentBoarder,
                         uvStudents.StudentsComment as Comment,
                         '' AS StudentEnrolmentDate,
                         '' AS StudentLeavingDate,
@@ -96,6 +99,7 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
                             Semester.FileSemester = uvStudents.FileSemester AND
                             Semester.FileYear = uvStudents.FileYear AND
                             Semester.SystemCurrentFlag = 1
+            LEFT JOIN luBoarder ON luBoarder.Code = uvStudents.StudentBoarder
             WHERE       uvStudents.StudentID = :externalId
         ";
 
@@ -117,7 +121,7 @@ class External_Synergetic_Smcs_User extends External_Synergetic_User
 
                 /* Forcibly re-evaluate boarderlyness using this connector's specific interpretation
                  */
-                $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
+                // $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
 
                 /* Initialise stacks
                  */

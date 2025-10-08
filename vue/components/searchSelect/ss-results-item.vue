@@ -125,6 +125,7 @@ const { isActive } = useActiveIndex(
                 :text="props.result.name"
                 :query="props.query"
                 :allow-partial-matches="props.allowPartialMatches"
+                :data-test="`ss-results-item-label-${props.result.id}`"
                 class="f-no-margins"
             />
         </div>

@@ -192,7 +192,7 @@ class Model implements ISoftDeletable
      * @param Team|null $homeTeam
      * @return static
      */
-    public function setHomeTeam(Team $homeTeam = null)
+    public function setHomeTeam(?Team $homeTeam = null)
     {
         $this->homeTeam = $homeTeam;
         return $this;
@@ -210,7 +210,7 @@ class Model implements ISoftDeletable
      * @param Team|null $awayTeam
      * @return static
      */
-    public function setAwayTeam(Team $awayTeam = null)
+    public function setAwayTeam(?Team $awayTeam = null)
     {
         $this->awayTeam = $awayTeam;
         return $this;
@@ -228,7 +228,7 @@ class Model implements ISoftDeletable
      * @param School|null $awaySchool
      * @return static
      */
-    public function setAwaySchool(School $awaySchool = null)
+    public function setAwaySchool(?School $awaySchool = null)
     {
         $this->awaySchool = $awaySchool;
         return $this;
@@ -246,7 +246,7 @@ class Model implements ISoftDeletable
      * @param School|null $homeSchool
      * @return static
      */
-    public function setHomeSchool(School $homeSchool = null)
+    public function setHomeSchool(?School $homeSchool = null)
     {
         $this->homeSchool = $homeSchool;
         return $this;

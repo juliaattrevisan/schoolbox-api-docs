@@ -54,7 +54,7 @@ class EventObjectList extends AbstractList
         foreach ($idList as $key) {
             if ($useUnlink) {
                 try {
-                    $this->redis->executeCommand(new RawCommand(['UNLINK', $key]));
+                    $this->redis->executeCommand(new RawCommand('UNLINK', [$key]));
                 } catch (ServerException $e) {
                     $useUnlink = false;
                     $this->redis->del([$key]);
@@ -67,7 +67,7 @@ class EventObjectList extends AbstractList
         // delete this set
         if ($useUnlink) {
             try {
-                $this->redis->executeCommand(new RawCommand(['UNLINK', $this->getRedisSetKey()]));
+                $this->redis->executeCommand(new RawCommand('UNLINK', [$this->getRedisSetKey()]));
             } catch (ServerException $e) {
                 $this->redis->del([$this->getRedisSetKey()]);
             }

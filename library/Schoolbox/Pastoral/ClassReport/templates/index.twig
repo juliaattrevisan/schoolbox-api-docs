@@ -36,6 +36,7 @@
             <pastoral-class-report
                 get-report-data-route="{{ routeLookupIfAuthorized('pastoralClassReportModule.getReportDataForAllStudents', {folderId: folder.id, folder: folder}) }}"
                 :severity-enabled="{{ config.pastoral_severity ? 'true' : 'false' }}"
+                :pastoral-point-enabled="{{ config.pastoral_point_enabled ? 'true' : 'false' }}"
             >
             </pastoral-class-report>
         </div>

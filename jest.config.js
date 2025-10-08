@@ -3,12 +3,15 @@ module.exports = {
         "vue-jest": {
             hideStyleWarn: true,
             experimentalCSSCompile: true,
+            compilerOptions: {
+                isCustomElement: (tag) => tag.startsWith("sbx-"),
+            },
         },
     },
     moduleFileExtensions: ["vue", "js", "ts"], // An array of file extensions your modules use. If you require modules without specifying a file extension, these are the extensions Jest will look for, in left-to-right order.
     moduleNameMapper: {
         // map any required webpack aliases across
-        "^@schoolboxLearningMomentEvidence(.*)$": "<rootDir>/library/Schoolbox/Learning/Moment/Evidence/vue$1",
+        "^@schoolboxLearningMomentEvidence(.*)$": "<rootDir>/library/Schoolbox/Learning/Moment/vue$1",
         "^@schoolboxCurriculum(.*)$": "<rootDir>/library/Schoolbox/Curriculum/templates$1",
         "^@schoolboxBadge(.*)$": "<rootDir>/library/Schoolbox/Learning/Badge$1",
         "^@schoolboxAssessment(.*)$": "<rootDir>/library/Schoolbox/Assessment$1",

@@ -47,15 +47,20 @@
             var $element = $(this);
             var $assessmentRow = $element.closest("[data-assessment]");
             $element.confirmDialog({
-                text: "Are you sure you wish to delete this activity? You will be unable to import this activity to classes.",
+                text: `Are you sure you wish to delete this ${window.sbProps.l10n.dictionary.activity.singular()}? You will be unable to import this ${window.sbProps.l10n.dictionary.activity.singular()} to classes.`,
                 confirmEvent: function () {
-                    $toastFeedback.toastActivate({ text: "Deleting activity..." });
+                    $toastFeedback.toastActivate({
+                        text: `Deleting ${window.sbProps.l10n.dictionary.activity.singular()}...`,
+                    });
 
                     $.ajax({
                         method: "POST",
                         url: $element.attr("href"),
                         success: function () {
-                            $toastFeedback.toastTimeout({ text: "Activity deleted.", css: "success" });
+                            $toastFeedback.toastTimeout({
+                                text: `${window.sbProps.l10n.dictionary.activity.proper()} deleted.`,
+                                css: "success",
+                            });
                             $assessmentRow.fadeOut({
                                 done: function () {
                                     // If no Assessments remaining, display empty-state

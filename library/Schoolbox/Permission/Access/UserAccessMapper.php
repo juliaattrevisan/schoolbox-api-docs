@@ -143,7 +143,14 @@ class UserAccessMapper extends Mapper
     }
 
     /**
-     * Returns all the UserAccess associated with the given user
+     * Returns all the UserAccess associated with the given user. This includes UserAccess instances across
+     * all the services such as news, lms, pastoral, cms, etc. so it's very inclusive across all contexts
+     * of the schoolbox app.
+     *
+     * To limit this to a particular service identifier (such as all folders, or all news moderators, etc.)
+     * you currently have to postprocess the result set of findAllForUser()
+     *
+     * TODO add third param $serviceIdentifier to natively do this
      *
      * @param User $user
      * @param bool $includeSynergy
@@ -398,6 +405,8 @@ class UserAccessMapper extends Mapper
         $roleMapper     = $this->getJoinMapper('user.role');
         /** @var User\Pronoun\Mapper $pronounMapper */
         $pronounMapper  = $this->getJoinMapper('user.pronoun');
+        /** @var \Schoolbox\YearLevel\Mapper $yearMapper */
+        $yearMapper     = $this->getJoinMapper('user.year');
         $userCollection = $userMapper->createCollection();
 
         // Performance testing appears to indicate there is no material difference between:
@@ -463,11 +472,13 @@ class UserAccessMapper extends Mapper
             SELECT
                 {$userMapper->getColumnString('u')},
                 {$roleMapper->getColumnString('g')},
-                {$pronounMapper->getColumnString('p')}
+                {$pronounMapper->getColumnString('p')},
+                {$yearMapper->getColumnString('y')}
             FROM
                 {$userMapper->getTable()} u
                 INNER JOIN {$userMapper->getJoinSql('role','u', 'g', true)}
                 LEFT JOIN {$userMapper->getJoinSql('pronoun','u', 'p')}
+                LEFT JOIN {$userMapper->getJoinSql('year','u', 'y')}
                 {$userAccessJoinType} JOIN {$this->table} ua ON ua.uid = u.id
             WHERE {$whereClause}
             ORDER BY ua.type DESC, u.lastname, u.chosen_name
@@ -483,6 +494,7 @@ class UserAccessMapper extends Mapper
             if (!$userCollection->keyExists($userId)) {
                 $userCollection[$r['u.id']] = $userMapper->hydrate($r, 'u')
                                                          ->setRole($roleMapper->hydrate($r, 'g'))
+                                                         ->setYear($yearMapper->hydrate($r, 'y'))
                                                          ->setPronoun($pronounMapper->hydrate($r, 'p'));
             }
         }
@@ -510,6 +522,7 @@ class UserAccessMapper extends Mapper
     {
         $userMapper = $this->getJoinMapper('user');
         $roleMapper = $userMapper->getJoinMapper('role');
+        $campusMapper = $userMapper->getJoinMapper('userCampus');
 
         $pb = new Builder($userMapper->getDatabase()->getQuoter(), 'u');
         $pb->equals('ua.service', $service);
@@ -526,7 +539,8 @@ class UserAccessMapper extends Mapper
         $query = "
             SELECT
                 {$this->getJoinColumnString('user', 'u')},
-                {$roleMapper->getColumnString( 'r')}
+                {$roleMapper->getColumnString( 'r')},
+                ua.sid AS serviceId
             FROM
                 `{$this->getTable()}` ua
             INNER JOIN {$this->getJoinSql('user', 'ua', 'u')}
@@ -538,12 +552,33 @@ class UserAccessMapper extends Mapper
         $stmt = $this->getDatabase()->prepare($query);
         $stmt->execute($pb->getParams());
 
+        if (UserAccess::SERVICE_CALENDAR === $service) {
+            $campusIds = $campusMapper->findAllIds();
+        }
+
+        if (UserAccess::SERVICE_IMPERSONATOR === $service) {
+            $roleIds = $roleMapper->findAllIds();
+        }
+
         $userCollection = $this->getJoinMapper('user')->createCollection();
         foreach ($stmt as $row) {
             $role = $roleMapper->hydrate($row, 'r');
             $user = $this->hydrateJoin($row, 'user', 'u');
             $user->setRole($role);
 
+            /* If the role or campus don't exist or deleted. skip it.
+             */
+            if (
+                UserAccess::SERVICE_CALENDAR === $service &&
+                !in_array($row['serviceId'], $campusIds ?? [])
+            ) {
+                continue;
+            } else if (
+                UserAccess::SERVICE_IMPERSONATOR === $service &&
+                !in_array($row['serviceId'], $roleIds ?? [])
+            ) {
+                continue;
+            }
             $userCollection->add($user);
         }
         return $userCollection;

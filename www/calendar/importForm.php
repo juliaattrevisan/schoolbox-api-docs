@@ -61,7 +61,7 @@ if ($groupHandler->getPermission($_POST['homepageId']) < UserAccess::ACCESS_WRIT
         // Ensure the file is available locally
         /** @var FilesystemProxy $filesystemProxy */
         $filesystemProxy = $this->getDi()->get('filesystem.storageProxy');
-        $file            = sb_tempnam('cal');
+        $file            = tempnam(sys_get_temp_dir(), 'cal');
         $fp              = fopen($file, 'wb');
         stream_copy_to_stream($filesystemProxy->readStream($result), $fp);
         fclose($fp);

@@ -1,6 +1,7 @@
 <script>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
 /**
  * Bulk modify selected users
@@ -132,6 +133,16 @@ export default {
                                 return this.collator.compare(a.year, b.year);
                             } else {
                                 return this.collator.compare(b.year, a.year);
+                            }
+                        };
+                    },
+                    external_id: (ascending) => {
+                        // Sort external_id naturally
+                        return (a, b) => {
+                            if (ascending) {
+                                return this.collator.compare(a.external_id, b.external_id);
+                            } else {
+                                return this.collator.compare(b.external_id, a.external_id);
                             }
                         };
                     },

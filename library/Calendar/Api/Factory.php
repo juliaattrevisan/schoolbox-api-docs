@@ -14,7 +14,9 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Http\Cache;
 use Calendar\Api\ModuleChecker;
+use Predis\ClientInterface;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Alaress\Database\Connector\IConnector;
 use Schoolbox\External\Connector\Factory as ExternalConnectorFactory;
@@ -32,44 +34,25 @@ class Calendar_Api_Factory
      */
     private ?array $allTypes = null;
 
-    /**
-     * A data source for assessments.
-     *
-     * @var Assessment\MapperProxy
-     */
-    private $assessmentDataSource;
-
-    /** @var null|IConnector */
-    private $databaseExternal;
-
-    /** @var IConfigLoader */
-    private $configLoader;
-
-    /**
-     * @var ModuleChecker
-     */
-    private ModuleChecker $moduleChecker;
-
 
     /**
      * Constructor
      *
-     * @param Assessment\MapperProxy $assessmentDataSource
-     * @param ModuleChecker          $moduleChecker
-     * @param IConfigLoader          $config
-     * @param null|IConnector        $databaseExternal
+     * @param Assessment\MapperProxy $assessmentDataSource A data source for assessments.
+     * @param ModuleChecker          $moduleChecker        Calendar module checker, for checking if calendar is enabled.
+     * @param IConfigLoader          $configLoader         Schoolbox configuration.
+     * @param null|IConnector        $databaseExternal     External database, if supported.
+     * @param ClientInterface        $redis                Redis instance: required by vCal calendar.
+     * @param Cache                  $cache                HTTP cache: required by vCal calendar.
      */
     public function __construct(
-        Assessment\MapperProxy $assessmentDataSource,
-        ModuleChecker $moduleChecker,
-        IConfigLoader $config,
-        IConnector $databaseExternal = null
+        private Assessment\MapperProxy $assessmentDataSource,
+        private ModuleChecker $moduleChecker,
+        private IConfigLoader $configLoader,
+        private ?IConnector $databaseExternal,
+        private ClientInterface $redis,
+        private Cache $cache,
     ) {
-        $this->assessmentDataSource = $assessmentDataSource;
-        $this->databaseExternal = $databaseExternal;
-        $this->configLoader = $config;
-        $this->moduleChecker = $moduleChecker;
-
         $this->generateAvailableSubscriptions();
     }
 
@@ -258,6 +241,63 @@ class Calendar_Api_Factory
 
 
     /**
+     * Only show the Timetable related subscriptions except for TimetableDays_External_Default
+     * This is used when we only want actual scheduled events and not the days, e.g. for determining
+     * a physical location that a user is scheduled to be at.
+     *
+     * This factory retrieves subscriptions whether or not they exist or are
+     * enabled: this is because the timetable calendar shouldn't depend on the
+     * standard calendar subscription status.
+     *
+     * @param User $user
+     * @param User $viewer
+     * @return Calendar_Api_EventType_Interface
+     * @throws PDOException
+     * @throws UnexpectedValueException
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    public function produceForTimetableEvents(User $user, User $viewer): Calendar_Api_EventType_Interface
+    {
+        $composite = new Calendar_Api_Composite();
+
+        /* Combine all the timetable-related sources of data all together
+         * This means you could potentially run both Schedule and Cyclic
+         * timetable data sets concurrently. Wild.
+         */
+        $composite->add(
+            new Calendar_Api_EventType_SudsTimetable_Schoolbox_Default(
+                Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                $user,
+                $viewer,
+                null,
+                $this->configLoader,
+                \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                \Schoolbox\External\ClassEntryMapper::getInstance(),
+                \Schoolbox\External\ClassInvolvementMapper::getInstance(),
+                \Schoolbox\External\Event\Mapper::getInstance(),
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance(),
+                \Timetable_ColourMapper::getInstance(),
+                \Schoolbox\External\Profile\Staff\Mapper::getInstance(),
+                Access::getInstance()
+            )
+        );
+
+        $composite->add(
+            new Calendar_Api_EventType_Timetable_ExternalConstrained_Default(
+                Calendar_Api_Config_Mapper::CONFIGURATION_NONE,
+                $user,
+                $viewer,
+                $this->configLoader,
+                \Schoolbox\Calendar\EventTypeMapper::getInstance(),
+                Access::getInstance(),
+            )
+        );
+
+        return $composite;
+    }
+
+
+    /**
      * Handle unique construction logic for each variant of the calendar connector.
      *
      * @param Calendar_Api_Config_Record $config
@@ -291,7 +331,7 @@ class Calendar_Api_Factory
             case Calendar_Api_EventType_Event_Schoolbox_Type::class:
                 return new Calendar_Api_EventType_Event_Schoolbox_Type($connectorId, $user, $viewer);
             case Calendar_Api_EventType_Event_Vcal_Default::class:
-                return new Calendar_Api_EventType_Event_Vcal_Default($connectorId, $user, $viewer);
+                return new Calendar_Api_EventType_Event_Vcal_Default($connectorId, $user, $viewer, $this->redis, $this->cache);
             case Calendar_Api_EventType_ResourceBooking_Booking_Default::class:
                 return new Calendar_Api_EventType_ResourceBooking_Booking_Default($connectorId, $user, $viewer);
             case Calendar_Api_EventType_ResourceBooking_Moderation_Default::class:

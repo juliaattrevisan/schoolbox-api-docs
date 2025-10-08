@@ -168,7 +168,9 @@ class Generator
         // Build a grid that uses the row set
         $this->dueWork = (new DueWork())
             ->setMarkType((new MarkType())->setId(MarkType::TYPE_TOTAL))
-            ->setMaxMark(100);
+            ->setInstructorMarkType((new MarkType())->setId(MarkType::TYPE_TOTAL))
+            ->setMaxMark(100)
+            ->setInstructorMaxMark(100);
     }
 
 

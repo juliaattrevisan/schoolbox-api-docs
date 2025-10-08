@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\Index;
 
 use Alaress_Date_Format;
+use Alaress\Database\Exception as DatabaseException;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -42,8 +43,16 @@ class CompositeBuilder implements IBuilder
         ?object $subject,
     ): iterable {
         foreach ($this->builders as $builder) {
-            foreach ($builder->buildUpdates($fromDate, $toDate, $subject) as $item) {
-                yield $item;
+            /** @var BaseBuilder $builder */
+            try {
+                foreach ($builder->buildUpdates($fromDate, $toDate, $subject) as $item) {
+                    yield $item;
+                }
+            } catch (DatabaseException $e) {
+                $builder->getLogger()->error(
+                    'Could not build updates using ' . get_class($builder) . '.  Exception message: ' . $e->getMessage()
+                );
+                continue;
             }
         }
     }
@@ -57,8 +66,16 @@ class CompositeBuilder implements IBuilder
         ?object $subject,
     ): iterable {
         foreach ($this->builders as $builder) {
-            foreach ($builder->buildDeletes($fromDate, $toDate, $subject) as $item) {
-                yield $item;
+            /** @var BaseBuilder $builder */
+            try {
+                foreach ($builder->buildDeletes($fromDate, $toDate, $subject) as $item) {
+                    yield $item;
+                }
+            } catch (DatabaseException $e) {
+                $builder->getLogger()->error(
+                    'Could not build deletes using ' . get_class($builder) . '.  Exception message: ' . $e->getMessage()
+                );
+                continue;
             }
         }
     }

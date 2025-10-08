@@ -35,7 +35,7 @@ if [[ -z $sql_host ]] || [[ -z $sql_user ]] || [[ -z $sql_pass ]] || [[ -z $sql_
 fi
 
 # Fetch data dir definitions from DB
-data_dirs_config=$(mysql -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_name" -ss -e "SELECT value from config WHERE name = 'data_dirs_defaults'")
+data_dirs_config=$(mariadb -h "$sql_host" -u "$sql_user" -p"$sql_pass" "$sql_name" -ss -e "SELECT value from config WHERE name = 'data_dirs_defaults'")
 IFS=';' read -r -a array <<< "$data_dirs_config"
 
 # While technically we can probably share some of these directories across all instances on a site,

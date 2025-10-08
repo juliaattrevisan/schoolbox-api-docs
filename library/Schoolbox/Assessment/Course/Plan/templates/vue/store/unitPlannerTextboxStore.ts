@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import type { Column } from "../unitPlannerConfig";
 import { useUnitPlannerStore } from "./unitPlannerStore";
@@ -78,7 +77,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
             return; // The textbox already exists, no action required
         }
 
-        activate("Creating text box...");
+        const toast = window.sbProps.toastActivate("Creating text box...");
 
         try {
             // First create a new component if it doesn't already exist
@@ -136,9 +135,9 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
                 },
             };
 
-            timeout({ text: "Text box created successfully" });
+            toast.timeout({ text: "Text box created successfully" });
         } catch (error) {
-            timeout({ text: (error as Error).message, isSuccess: false });
+            toast.timeout({ text: (error as Error).message, isSuccess: false });
         }
     }
 
@@ -171,7 +170,7 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
             return;
         }
 
-        activate("Saving...");
+        const toast = window.sbProps.toastActivate("Saving...");
 
         try {
             const response = await fetch(selectedTextbox._links.update, {
@@ -194,9 +193,9 @@ export const useUnitPlannerTextboxStore = defineStore("unitPlannerTextboxStore",
             selectedTextbox.body = content;
             delete unsavedTextboxes.value[unitId][column.id];
 
-            timeout({ text: "Text box saved successfully" });
+            toast.timeout({ text: "Text box saved successfully" });
         } catch (error) {
-            timeout({ text: (error as Error).message, isSuccess: false });
+            toast.timeout({ text: (error as Error).message, isSuccess: false });
         }
     }
 

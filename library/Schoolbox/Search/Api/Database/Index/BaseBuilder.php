@@ -20,6 +20,13 @@ use Schoolbox\Search\Index;
 abstract class BaseBuilder implements IBuilder
 {
     /**
+     * Setting the query-level max_statement_time is necessary to override any global-level max_statement_time that
+     * may have been set.  To apply this to a $query, do the following:
+     * "SET STATEMENT max_statement_time=:queryLevelMaxStatementTime FOR $query"
+     */
+    protected const QUERY_LEVEL_MAX_STATEMENT_TIME = 0;
+
+    /**
      * Regular expression for normalising space characters: sequences of space
      * characters are replaced with actual spaces.
      */
@@ -34,12 +41,12 @@ abstract class BaseBuilder implements IBuilder
     /**
      * Strategy for adding an index from HTML content.
      */
-    protected const INDEX_STRATEGY_HTML = 'html';
+    public const INDEX_STRATEGY_HTML = 'html';
 
     /**
      * Strategy for adding an index from standard text content.
      */
-    protected const INDEX_STRATEGY_TEXT = 'text';
+    public const INDEX_STRATEGY_TEXT = 'text';
 
     /**
      * Maximum length of the fulltext index.
@@ -65,6 +72,14 @@ abstract class BaseBuilder implements IBuilder
     {
         $this->logger = $logger;
         return $this;
+    }
+
+    /**
+     *
+     */
+    public function getLogger(): LoggerInterface
+    {
+        return $this->logger;
     }
 
     /**
@@ -116,7 +131,7 @@ abstract class BaseBuilder implements IBuilder
         if (!isset($content)) {
             return $index;
         }
-        $content = $this->normaliseContent($content, $strategy);
+        $content = self::normaliseContent($content, $strategy);
         if ($content === '') {
             return $index;
         }
@@ -147,11 +162,11 @@ abstract class BaseBuilder implements IBuilder
      * @param self::INDEX_STRATEGY_* $strategy
      * @return string
      */
-    private function normaliseContent(string $content, string $strategy): string
+    public static function normaliseContent(string $content, string $strategy): string
     {
         return match ($strategy) {
-            self::INDEX_STRATEGY_TEXT => $this->normaliseAsText($content),
-            self::INDEX_STRATEGY_HTML => $this->normaliseAsHtml($content),
+            self::INDEX_STRATEGY_TEXT => self::normaliseAsText($content),
+            self::INDEX_STRATEGY_HTML => self::normaliseAsHtml($content),
         };
     }
 
@@ -164,9 +179,18 @@ abstract class BaseBuilder implements IBuilder
      * @param string $content
      * @return string
      */
-    private function normaliseAsHtml(string $content): string
+    private static function normaliseAsHtml(string $content): string
     {
-        return $this->normaliseAsText(htmlspecialchars_decode(strip_tags($content)));
+        // Add a space before each tag before stripping tags.
+        // This will ensure that word breaks are preserved when the tags are stripped in situations like this:
+        // <div>These<br/>are</div><div>separate</div>words.
+        $text = strip_tags(str_replace('<', ' <', $content));
+
+        // Decode any special characters.
+        $text = html_entity_decode($text);
+
+        // Remove multiple spaces and trim.
+        return self::normaliseAsText($text);
     }
 
     /**
@@ -176,7 +200,7 @@ abstract class BaseBuilder implements IBuilder
      * @param string $content
      * @return string
      */
-    private function normaliseAsText(string $content): string
+    private static function normaliseAsText(string $content): string
     {
         return trim(
             preg_replace(

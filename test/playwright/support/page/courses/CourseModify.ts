@@ -1,3 +1,4 @@
+import { expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 
@@ -16,6 +17,10 @@ export default class CourseModify {
 
     static readonly SELECTOR_SAVE_COURSE = "#update-course-form [type=submit][value='Save Course']";
 
+    static readonly DATATEST_COURSE_NEW_UNIT_NAME = "course-new-unit-name";
+
+    static readonly DATATEST_COURSE_NEW_UNIT_ADD = "course-new-unit-add";
+
     constructor(page: Page, tester: AcceptanceTester) {
         this.page = page;
         this.tester = tester;
@@ -27,6 +32,21 @@ export default class CourseModify {
      */
     async goto(courseId: number): Promise<void> {
         await this.page.goto(CourseModify.URL.replace(CourseModify.URL_ID_FRAGMENT, courseId.toString()));
+    }
+
+    /**
+     * Clicks a unit 3-dot menu
+     * @param unitNumber - The unit number to click
+     */
+    async clickUnitMenu(unitNumber: number): Promise<void> {
+        await this.page.getByTestId(`sbx-pop-out-unit-${unitNumber}-modify-button`).click();
+    }
+
+    /**
+     * Clicks the import unit to classes button under the open 3-dot menu
+     */
+    async clickImportUnitToClasses(): Promise<void> {
+        await this.page.locator(`.f-dropdown a[data-action="import-unit"]:visible`).click();
     }
 
     /**
@@ -42,17 +62,16 @@ export default class CourseModify {
      * @param assessmentNumber - The assessment number to click
      */
     async clickExportIcon(assessmentNumber: number): Promise<void> {
-        await this.page.click(
-            `a[href="/learning/export/assessment/${assessmentNumber}?returnUrl=L2NvdXJzZS9tb2RpZnkvNiMxNQ%3D%3D"]`,
-        );
+        await this.page.click(`a[href^="/learning/export/assessment/${assessmentNumber}"]`);
     }
 
     /**
-     * Clicks the new lesson plan button by passing the button name: lesson-plan,quz,due-work,task,project
+     * Clicks the new activity button by passing the button name: lesson-plan,quz,due-work,task,project
      * @param buttonName - The name of the button to click
      */
-    async clickNewLessonPlanButton(buttonName: string): Promise<void> {
-        await this.page.click(`a.button.icon-${buttonName}`);
+    async clickNewActivityButton(buttonName: string): Promise<void> {
+        // there may be a few, so find the visible one
+        await this.page.locator(`a.button.icon-${buttonName}:visible`).click();
     }
 
     /**
@@ -60,5 +79,24 @@ export default class CourseModify {
      */
     async clickSelectLocation(): Promise<void> {
         await this.page.locator(CourseModify.SELECTOR_LOCATION).click();
+    }
+
+    /**
+     * Creates a new unit with a specified name
+     * @param unitName - The name of the unit to create
+     * @returns The unitSpecId of the newly created unit
+     */
+    async createNewUnit(unitName: string): Promise<number> {
+        await this.page.getByTestId(CourseModify.DATATEST_COURSE_NEW_UNIT_NAME).fill(unitName);
+
+        const addButton = this.page.getByTestId(CourseModify.DATATEST_COURSE_NEW_UNIT_ADD);
+        await addButton.click();
+
+        // Wait for a moment for the new unit to appear as .last() won't wait for it
+        await expect(addButton).toBeEnabled();
+        await this.page.waitForTimeout(500);
+
+        const unitSpecId = await this.page.locator("li[data-unit-spec]").last().getAttribute("data-unit-spec");
+        return Number(unitSpecId);
     }
 }

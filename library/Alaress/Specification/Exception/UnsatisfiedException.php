@@ -21,7 +21,6 @@ use UnexpectedValueException;
  */
 class UnsatisfiedException extends UnexpectedValueException
 {
-
     /**
      * The entity that failed the spec.
      *
@@ -44,7 +43,7 @@ class UnsatisfiedException extends UnexpectedValueException
      * @param int            $code
      * @param Throwable|null $previous
      */
-    public function __construct($candidate, ISpecification $specification, string $message = "", int $code = 0, Throwable $previous = null)
+    public function __construct($candidate, ISpecification $specification, string $message = "", int $code = 0, ?Throwable $previous = null)
     {
         $this->candidate     = $candidate;
         $this->specification = $specification;

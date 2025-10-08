@@ -1,0 +1,87 @@
+{##
+ # Preview
+ #
+ # @param array $settings  A (worktype, user, sourceFile) struct representing identification method, feedback author and uploaded csv
+ # @param array $outcoem   A list of log messages
+ #}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 island">
+            <h2 class="subheader">Summary</h2>
+            <section>
+                <div class="content">
+                    <ul>
+                        <li><strong>{{ locale.dueWork.proper }} Title:</strong> {{ settings.assessmentTitle }}</li>
+                        <li><strong>Work Type:</strong> {{ settings.worktype.name }}</li>
+                        <li><strong>Feedback Author:</strong>
+                            {% if settings.feedbackAuthor.deleted %}
+                                {{ settings.feedbackAuthor.fullname }}
+                            {% else %}
+                                <a href="/search/user/{{ settings.feedbackAuthor.id }}" target="_blank" title="{{ settings.feedbackAuthor.fullname }}">{{ settings.feedbackAuthor.fullname }}</a>
+                            {% endif %}
+                        </li>
+                        <li><strong>Source File:</strong> <a href="/storage/fetch.php?hash={{ settings.sourceFile.hash }}">{{ settings.sourceFile.filename }}</a></li>
+                    </ul>
+                </div>
+            </section>
+
+            {% if outcome|length %}
+                <h2 class="subheader">Preview</h2>
+                <section class="content">
+                    <div>
+                        <ul class="information-list">
+                            {% for row in outcome.messages %}
+                                <li>
+                                    {% if row.type == 'warning' %}
+                                        <span style="color:red">{{ row.message }}</span>
+                                    {% else %}
+                                        {{ row.message }}
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </section>
+            {% endif %}
+        </div>
+
+        {# The existence of a single problem prevents schools from continuing with a mass import
+         # that might be devastatingly wrong somehow. All warnings are considered error states
+         # and their causes must be repaired first before schools can continue.
+         #}
+        <div class="small-12 columns">
+            {% if not outcome.errors %}
+                <div data-alert class="alert-box alert">
+                    <strong>Warning:</strong> This action is permanent and cannot be undone. Please review your changes carefully before proceeding.
+                </div>
+            {% endif %}
+            <ul class="flex-list buttons">
+                <li><a href="{{ routeLookupIfAuthorized('adminBulkFeedbackImport.getIndex') }}">Back</a></li>
+                <li>
+                    {% if not outcome.errors %}
+                        {# Recycle the form params for immediate effect #}
+                        {% set formRoute = routeLookupIfAuthorized('adminBulkFeedbackImport.postPerform') %}
+
+                        <form action="{{ formRoute }}" method="post">
+                            <input type="hidden" name="assessmentTitle" value="{{ settings.assessmentTitle }}" />
+                            <input type="hidden" name="worktypeId" value="{{ settings.worktype.id }}" />
+                            <input type="hidden" name="attachment" value="{{ settings.sourceFile.hash }}" />
+                            <input type="hidden" name="userId" value="{{ settings.feedbackAuthor.id }}" />
+                            <input type="submit" value="Perform Import" />
+                        </form>
+                    {% else %}
+                        <input type="submit" value="Perform Import" disabled />
+                    {% endif %}
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

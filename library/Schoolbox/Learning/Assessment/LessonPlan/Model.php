@@ -102,6 +102,13 @@ class Model extends AbstractAssessment
      */
     private ?GenericCollection $linkedAssessments = null;
 
+
+    /**
+     * @var string|null
+     */
+    private ?string $duration = null;
+
+
     /**
      * Creates a clone of this assessment.
      *
@@ -256,7 +263,7 @@ class Model extends AbstractAssessment
      * @param AssessmentModel|null $assessmentModel
      * @return static
      */
-    public function setAssessmentModel(AssessmentModel $assessmentModel = null): self
+    public function setAssessmentModel(?AssessmentModel $assessmentModel = null): self
     {
         $this->assessmentModel = $assessmentModel;
         return $this;
@@ -572,5 +579,25 @@ class Model extends AbstractAssessment
     public function getLinkedAssessments(): ?GenericCollection
     {
         return $this->linkedAssessments;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getLessonPlanDuration(): ?string
+    {
+        return $this->duration;
+    }
+
+
+    /**
+     * @param string|null $duration
+     * @return $this
+     */
+    public function setLessonPlanDuration(?string $duration): self
+    {
+        $this->duration = $duration;
+        return $this;
     }
 }

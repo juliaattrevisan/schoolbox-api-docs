@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\Admin\Settings;
 
 use Alaress\Redis;
+use Alaress_Byte_Format;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Admin\Navigation\Subnav;
@@ -35,7 +36,7 @@ class Controller extends ConfigController
      * @since 18.1
      * @api   GET /adminv2/setting/{typeLabel}
      */
-    public function getSettings(string $typeLabel = null): void
+    public function getSettings(?string $typeLabel = null): void
     {
         $typeLabel  = $typeLabel ? urldecode($typeLabel) : 'Site';
 
@@ -131,10 +132,17 @@ class Controller extends ConfigController
            ->notEquals('module', 'custom');
         $foundConfig = $this->getConfigMapper()->findByPredicates($pb);
 
+        /** @var Config $config */
         foreach ($foundConfig as $config) {
-            /** @var Config $config */
-
             $module = $config->getModule();
+
+            /* Special case for OpenAI settings since they have their own module
+             * based on them being for Text AI and Image AI
+             */
+            if (in_array($module, [ConfigMapper::MODULE_OPENAI_TEXT, ConfigMapper::MODULE_OPENAI_IMAGE])) {
+                $module = ConfigMapper::MODULE_OPENAI_AI_SERVICES;
+            }
+
             $type = $config->getType() ? $config->getType()->getType() : '';
             $url = $this->getSettingsPageUrl($module, $type);
 
@@ -179,6 +187,7 @@ class Controller extends ConfigController
         // Do any changed settings necessitate a reload of any processes?
         $reloadRouteDaemon    = false;
         $reloadScheduleDaemon = false;
+        $reloadMobileDaemon   = false;
         $rebuildModules       = false;
         $clearOidcCache       = false;
 
@@ -192,6 +201,14 @@ class Controller extends ConfigController
             $valueSerializer = $this->getFieldStrategyFactory()->makeValueSerializer($existingConfig->getFieldId());
             $newValue        = $valueSerializer->serializeValue($value, $existingConfig);
 
+            if ($name === ConfigMapper::NAME_MAX_FILE_SIZE) {
+                $maxMaxFileSize = $this::getMaxUploadFileSizeInBytes();
+
+                if ($newValue > $maxMaxFileSize) {
+                    $newValue = $maxMaxFileSize;
+                }
+            }
+
             if ($newValue !== $existingConfig->getValue()) {
                 if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_ROUTED, true)) {
                     $reloadRouteDaemon = true;
@@ -199,24 +216,30 @@ class Controller extends ConfigController
                 if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_SCHEDULED, true)) {
                     $reloadScheduleDaemon = true;
                 }
+                if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_MOBILED, true)) {
+                    $reloadMobileDaemon = true;
+                }
                 if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_MODULES, true)) {
                     $rebuildModules = true;
                 }
                 if (\in_array($name, ConfigMapper::SETTINGS_AFFECTING_OAUTH, true)) {
                     $clearOidcCache = true;
                 }
-                $existingConfig->setValue(trim($newValue));
+                $existingConfig->setValue(trim((string)$newValue));
                 $this->getConfigMapper()->save($existingConfig);
             }
         }
 
-        if ($reloadRouteDaemon || $reloadScheduleDaemon) {
+        if ($reloadRouteDaemon || $reloadScheduleDaemon || $reloadMobileDaemon) {
             $redisClient = Redis::getSignalQueueClientInstance();
             if ($redisClient && $reloadRouteDaemon) {
                 $redisClient->publish('scheduled.' . INSTANCE_ID . '.reload', '');
             }
             if ($redisClient && $reloadScheduleDaemon) {
                 $redisClient->publish('scheduled.' . INSTANCE_ID . '.refreshConfiguration', '');
+            }
+            if ($redisClient && $reloadMobileDaemon) {
+                $redisClient->publish('mobiled.' . INSTANCE_ID . '.refreshConfiguration', '');
             }
         }
         if ($rebuildModules) {
@@ -366,6 +389,9 @@ class Controller extends ConfigController
             case 'schoolData':
                 return '/adminv2/import/schoolDataImport';
 
+            case 'openai':
+                return '/adminv2/ai-services';
+
             default:
                 return "/adminv2/$module"; // E.g. /adminv2/lti
         }
@@ -405,7 +431,7 @@ class Controller extends ConfigController
                 };
 
             case 'comms':
-                // This is for the settings in 'Admin -> News -> Settings / Policy'.
+                // This is for the settings in 'Admin -> News -> Policy'.
                 return $user->hasServicePermission(UserAccess::SERVICE_NEWS, UserAccess::ACCESS_FULL);
 
             case 'schoolData':
@@ -471,5 +497,20 @@ class Controller extends ConfigController
             'Skin Config' => 'Design',
             default => '',
         };
+    }
+
+    /**
+     * Returns the maximum size of an uploaded file as configured in php.ini.
+     * This function was copied from vendor/symfony/http-foundation/File/UploadedFile->getMaxFilesize(), then modified
+     * to use the Alaress stringToBytes() function.
+     *
+     * @return int The maximum size of an uploaded file in bytes.
+     */
+    private static function getMaxUploadFileSizeInBytes(): int
+    {
+        $sizePostMax = Alaress_Byte_Format::stringToBytes(\ini_get('post_max_size'));
+        $sizeUploadMax = Alaress_Byte_Format::stringToBytes(\ini_get('upload_max_filesize'));
+
+        return min($sizePostMax ?: \PHP_INT_MAX, $sizeUploadMax ?: \PHP_INT_MAX);
     }
 }

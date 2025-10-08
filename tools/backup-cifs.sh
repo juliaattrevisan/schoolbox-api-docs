@@ -13,6 +13,13 @@
 #
 #
 
+# Deprecation notice
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m"
+echo -e "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+
 ################# Config Options ##################
 # Please set these config options in /etc/schoolbox-backup-cifs.conf
 
@@ -191,7 +198,7 @@ then
 
 	# Backup SQL
 	echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Starting backup of MySQL DB" >> $logfile;
-	mysqldump --single-transaction --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u $sql_user -p$sql_pass $sql_db 2>>$logfile > $targetdir/$sql_db-$DAY0.sql;
+	mariadb-dump --single-transaction --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u $sql_user -p$sql_pass $sql_db 2>>$logfile > $targetdir/$sql_db-$DAY0.sql;
 	if [ $? -ne 0 ];
 	then
 		echo -e "Error: SQL Backup Failed" >> $logfile;
@@ -271,3 +278,10 @@ else
 fi
 
 echo -e "[`date +%Y-%m-%d\ %H:%M:%S`] Backup Completed" >> $logfile;
+
+# Deprecation notice
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m"
+echo -e "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"

@@ -38,13 +38,13 @@ class IsExternalUser implements IAuthorizationRule
     /**
      * Validate whether the user has the same user id as the given parameter.
      * When 'participant' is passed as the parameter key, this validate the user against the participant object.
-     * @param  array $params Any parameters passed as part of the route.
-     * @param  User  $user   The user to authorize, if any. Null value assumes
+     * @param  array    $params Any parameters passed as part of the route.
+     * @param User|null $user   The user to authorize, if any. Null value assumes
      *                       that no user is logged in.
      * @return true If the request is authorized.
      * @throws Base if the request isn't authorized.
      */
-    public function authorize(array $params = array(), User $user = null)
+    public function authorize(array $params = array(), ?User $user = null)
     {
         // You misconfigured or misapplied your route
         if (!array_key_exists($this->paramsKey, $params)) {

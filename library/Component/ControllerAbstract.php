@@ -6,6 +6,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Alaress\Sentry\Tracing\Tracer;
 use Aura\Router\Generator;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\IConfigLoader;
@@ -195,6 +196,24 @@ abstract class Component_ControllerAbstract
     public function execute()
     {
         return true;
+    }
+
+    /**
+     * Executes this component within a performance tracing span.
+     *
+     * @return bool
+     */
+    public function executeWithinSpan(): bool
+    {
+        return Tracer::getDefaultTrace()->runWithinSpan(
+            $this->execute(...),
+            'component:' . get_class($this),
+            'app.component.execute',
+            'auto.http.component.execute',
+            [
+                'component.id' => $this->getInstance()->getId(),
+            ],
+        );
     }
 
     /**
@@ -927,7 +946,6 @@ abstract class Component_ControllerAbstract
      */
     public function isSourceRenderable()
     {
-        /** @phpstan-ignore-next-line */
         if (!$this->hasReadAccess() || ($this->isUsingAltSource() && ($this->getSource()->isDeleted() || $this->getSource()->getId() === null))) {
             return false;
         }

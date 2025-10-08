@@ -12,21 +12,21 @@ abstract class BaseCurriculum implements IPackageInstall
     /**
      * Safety mechanism to avoid infinite loops
      */
-    private const MAX_CALLS = 100;
+    protected const MAX_CALLS = 100;
 
 
     /**
      * Some kind of export includes this word for a column with
      * the datatype null, instead of leaving it empty
      */
-    private const NULL_STRING = 'NULL';
+    protected const NULL_STRING = 'NULL';
 
     /**
      * A list of (csv row id, model id) tuples
      *
      * @var array
      */
-    private array $parentLookup = [];
+    protected array $parentLookup = [];
 
     /**
      * list of packages this depends on existing in the system
@@ -51,7 +51,7 @@ abstract class BaseCurriculum implements IPackageInstall
      *
      * @param Mapper|null $curriculumMapper // Spawn this class with a mapper, or it will do it for you... either way one is needed
      */
-    public function __construct(private ?Node\Mapper $curriculumMapper = null)
+    public function __construct(protected ?Node\Mapper $curriculumMapper = null)
     {
         if (null === $this->curriculumMapper) {
             $this->curriculumMapper = Node\Mapper::getInstance();
@@ -136,7 +136,7 @@ abstract class BaseCurriculum implements IPackageInstall
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function importAncestors(array $graph, array $row): void
+    protected function importAncestors(array $graph, array $row): void
     {
         $next = $row['curriculum_node_parent_id'];
 
@@ -152,11 +152,13 @@ abstract class BaseCurriculum implements IPackageInstall
         for ($i = 0; $next && $i < self::MAX_CALLS; $i++) {
             if (!isset($this->parentLookup[$next])) {
                 $uuid = $parent['uuid'] ?? null;
+
                 /* check if uuid is empty string, if set it to null
                  */
                 if ($uuid === '') {
                     $uuid = null;
                 }
+
                 $parent = $graph[$row['curriculum_node_parent_id']];
 
                 $node = $this->getCurriculumMapper()->createModel()
@@ -194,7 +196,7 @@ abstract class BaseCurriculum implements IPackageInstall
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
      */
-    private function importNode(array $row): void
+    protected function importNode(array $row): void
     {
         /* $row might have been imported by importAncestors()
          *
@@ -215,6 +217,7 @@ abstract class BaseCurriculum implements IPackageInstall
         }
 
         $uuid = $row['uuid'] ?? null;
+
         /* check if uuid is empty string, if set it to null
          */
         if ($uuid === '') {

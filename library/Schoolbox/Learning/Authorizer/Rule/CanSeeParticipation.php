@@ -63,7 +63,7 @@ class CanSeeParticipation extends AbstractParticipationRule
      * @inheritdoc
      * @throws InvalidArgumentException If unable to find a student and assessable in route params
      */
-    public function authorize(array $params = [], User $user = null)
+    public function authorize(array $params = [], ?User $user = null)
     {
         if (null === $user) {
             throw new InvalidArgumentException("Cannot check auth, user not provided");

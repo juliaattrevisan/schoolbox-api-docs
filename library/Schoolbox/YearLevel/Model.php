@@ -94,6 +94,14 @@ class Model implements ISoftDeletable, Sequential, ValueLabelInterface
     private bool $qrcodeEnabled = false;
 
     /**
+     * Birthday celebration confetti
+     * @var bool
+     */
+    private bool $birthdayCelebrationEnabled = false;
+
+    private bool $learningMomentsModeration = false;
+
+    /**
      * @return string
      */
     public function getName(): ?string
@@ -327,6 +335,42 @@ class Model implements ISoftDeletable, Sequential, ValueLabelInterface
     public function setQrcodeEnabled(bool $qrcodeEnabled): self
     {
         $this->qrcodeEnabled = $qrcodeEnabled;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getBirthdayCelebrationEnabled(): bool
+    {
+        return $this->birthdayCelebrationEnabled;
+    }
+
+    /**
+     * @param bool $birthdayCelebrationEnabled
+     * @return static
+     */
+    public function setBirthdayCelebrationEnabled(bool $birthdayCelebrationEnabled): self
+    {
+        $this->birthdayCelebrationEnabled = $birthdayCelebrationEnabled;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getLearningMomentsModeration(): bool
+    {
+        return $this->learningMomentsModeration;
+    }
+
+    /**
+     * @param bool $learningMomentsModeration
+     * @return static
+     */
+    public function setLearningMomentsModeration(bool $learningMomentsModeration): self
+    {
+        $this->learningMomentsModeration = $learningMomentsModeration;
         return $this;
     }
 

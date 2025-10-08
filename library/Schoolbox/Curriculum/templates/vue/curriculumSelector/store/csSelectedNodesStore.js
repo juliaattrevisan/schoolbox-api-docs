@@ -45,7 +45,7 @@ export const useSelectedNodesStore = defineStore(`csSelectedNodes`, {
         /**
          * just return an array of ids, used to compare if a node is selected or not
          *
-         * @return { array }
+         * @return { number[] }
          */
         nodesIds() {
             return this.nodes.map((node) => node.id);

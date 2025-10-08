@@ -28,7 +28,6 @@ use Schoolbox\Assessment\Participant;
  */
 class SubmissionMapper extends BaseMapper
 {
-
     /**
      * @var Participant\Plan\InteractionIntegrityChecker
      */
@@ -43,6 +42,7 @@ class SubmissionMapper extends BaseMapper
             Participant\Mapper::getInstance()
         );
     }
+
 
     /**
      * @return void
@@ -62,12 +62,14 @@ class SubmissionMapper extends BaseMapper
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
         $this->joinsReverseMulti('student_submission_id', SubmissionFileMapper::class, 'files', 'files');
 
-        $this->registerCallback(self::CALLBACK_POSTSAVE, [ $this, 'persistFiles' ]);
-        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [ $this, 'softDeleteSubmissionFiles']);
+        $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'persistFiles']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteSubmissionFiles']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeParticipationIfNecessary']);
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
-        $this->registerCallback(self::CALLBACK_POSTRESTORE, [ $this, 'restoreSubmissionFiles']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreSubmissionFiles']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'insertParticipation']);
     }
 
 
@@ -78,7 +80,7 @@ class SubmissionMapper extends BaseMapper
      * @throws BaseMapper\DefinitionException
      * @throws Participant\Plan\InvalidState
      */
-    public function canParticipate(Submission $object, Submission $previous = null): bool
+    public function canParticipate(Submission $object, ?Submission $previous = null): bool
     {
         if ($previous) {
             // If an update, assume the system is still valid
@@ -99,7 +101,7 @@ class SubmissionMapper extends BaseMapper
      * @throws \UnexpectedValueException
      * @throws Participant\Plan\InvalidState
      */
-    public function insertParticipation(Submission $object, Submission $previous = null): bool
+    public function insertParticipation(Submission $object, ?Submission $previous = null): bool
     {
         if ($previous) {
             // If an update, assume the participation record already exists
@@ -107,6 +109,56 @@ class SubmissionMapper extends BaseMapper
         }
         $assessment = $this->getSubmissionBoxMapper()->findById($object->getSubmissionBox()->getId())->getAssessmentModel();
         return $this->interactionChecker->insertParticipationOnFirstInteraction($object->getOwner(), $assessment);
+    }
+
+
+    /**
+     * Remove the student's participant row if the student should no longer be a participant in $assessment.
+     * @see ReturnedWorkMapper->removeParticipationIfNecessary() (similar function).
+     *
+     * @param Submission $object
+     * @return bool - Return true on success - whether or not a participation was removed.
+     *                This is the expected behaviour for callbacks registered with Schoolbox\Mapper.
+     */
+    public function removeParticipationIfNecessary(Submission $object): bool
+    {
+        $student = $object->getOwner();
+        $submissionBox = $object->getSubmissionBox();
+        $submissionBoxMapper = $this->getSubmissionBoxMapper();
+
+        // Get response and feedback counts for this student on this assessment.
+        // In this case:
+        //  * the response is stored in the student_submission table
+        //  * the feedback is stored in the submission_return table.
+        $submissionCountByBoxId = $submissionBoxMapper->findSubmissionCountsForSubmissionBoxes(
+            [$submissionBox->getId()],
+            $student->getId()
+        );
+        $feedbackCountByBoxId = $submissionBoxMapper->findReturnedWorkCountsForSubmissionBoxes(
+            [$submissionBox->getId()],
+            $student->getId()
+        );
+        $submissionCountForThisBox = $submissionCountByBoxId[$submissionBox->getId()] ?? 0;
+        $feedbackCountForThisBox = $feedbackCountByBoxId[$submissionBox->getId()] ?? 0;
+
+        // If no (non-deleted) response or feedback exists, the student's participation can be removed.
+        if ($submissionCountForThisBox == 0 && $feedbackCountForThisBox == 0) {
+            // The SubmissionBox obtained by $object->getSubmissionBox() will not be hydrated (but it will have an id).
+            // Get a hydrated SubmissionBox so $submissionBox->getAssessmentModel() will return an object with an id.
+            try {
+                $submissionBox = $submissionBoxMapper->findById($object->getSubmissionBox()->getId());
+            } catch (MapperException) {
+                // Can't get a $submissionBox - assume the student should still be a participant.
+                return true;
+            }
+
+            $this->interactionChecker->removeParticipationFromDynamicPlan(
+                $student,
+                $submissionBox->getAssessmentModel()
+            );
+        }
+
+        return true;
     }
 
 
@@ -202,35 +254,74 @@ class SubmissionMapper extends BaseMapper
      * Post-save callback.
      *
      * Persists all files that have been attached to this submission.
+     * This handles added, removed, and updated files.
      *
-     * @param Submission $object
-     * @param Submission $previous
+     * @param Submission      $object
+     * @param Submission|null $previous (present because this function is used as a post-save callback).
      * @throws BaseMapper\DefinitionException
-     * @throws \PDOException
+     * @throws \PDOException|MapperException
      */
-    public function persistFiles(Submission $object, Submission $previous = null)
+    public function persistFiles(Submission $object, ?Submission $previous = null)
     {
-        if ($object->getFiles() === null) {
+        $submittedFiles = $object->getFiles();
+
+        if ($submittedFiles === null) {
             // Join not hydrated, nothing to do.
             return;
         }
+
         $joinMapper = $this->getJoinMapper('files');
-
-        // Delete files that were attached but aren't now
         $existingFiles = $joinMapper->findByColumn('student_submission_id', $object->getId());
-        $removedFiles  = $existingFiles->diffBy($object->getFiles(), 'hash');
-        $addedFiles    = $object->getFiles()->diffBy($existingFiles, 'hash');
-        $joinMapper->hardDelete($removedFiles);
 
-        /* Save only files that are new
-         */
-        foreach ($addedFiles as $file) {
+        // Note updated files must be handled separately.  Otherwise, the same file could
+        // appear in both $addedFiles and $removedFiles below, and problems would result.
+        // Example:
+        //  * assume one existing file: {id: 1, hash: 'abcd'}.
+        //  * assume one submitted file: {id: 1, hash: 'efgh'}.
+        //  * if removedFiles = existingFiles->diffBy(submittedFiles, 'hash'),
+        //    then the existing file will be identified as removed.
+        //  * if addedFiles = submittedFiles->diffBy(existingFiles, 'hash'),
+        //    then the submitted file will be identified as added.
+        //  * But these are the same file! (they have the same id).
+        //  * (A situation like this occurs when this function is called from the 'submission' case in function
+        //     DueWork/Response/Controller->postKamiDownloadCallback().  To reproduce, make a submission to a due work
+        //     with 'interactive worksheet' enabled.)
+        //  ---
+        //  Then problems would result as follows:
+        //  We would have two objects that refer to the same file, one marked for removal and marked one for addition.
+        //  Confusion would ensue with post-save and post-soft-delete callbacks, and we would be left with linked
+        //  database rows incorrectly remaining soft-deleted.
+        //  ---
+        //  To avoid the situation described above, we treat updated files separately.
+
+        // Updated files are all the submitted files whose ids match existing files.
+        $updatedFiles = $submittedFiles->intersect(
+            $existingFiles,
+            function ($a, $b) {
+                return $a->getId() === $b->getId();
+            }
+        );
+
+        // Since we are dealing with the updated files separately, remove them from the existing and submitted lists.
+        $remainingExistingFiles = $existingFiles->diffBy($updatedFiles, 'id');
+        $remainingSubmittedFiles = $submittedFiles->diffBy($updatedFiles, 'id');
+
+        // Now that updated files have been removed, identifying removed and added files is straightforward.
+        $removedFiles = $remainingExistingFiles->diffBy($remainingSubmittedFiles, 'hash');
+        $addedFiles = $remainingSubmittedFiles->diffBy($remainingExistingFiles, 'hash');
+
+        // Soft-delete removed files.
+        $joinMapper->softDelete($removedFiles);
+
+        // Save added and updated files.
+        $addedAndUpdatedFiles = $addedFiles->union($updatedFiles);
+        foreach ($addedAndUpdatedFiles as $file) {
             $file->setSubmission($object);
         }
-        $joinMapper->save($addedFiles);
+        $joinMapper->save($addedAndUpdatedFiles);
 
         // Set IDs on files that are not new
-        foreach ($object->getFiles() as $file) {
+        foreach ($submittedFiles as $file) {
             if (!$file->getId()) {
                 foreach ($existingFiles as $existingFile) {
                     if ($file->getStorage()->getHash() == $existingFile->getStorage()->getHash()) {
@@ -295,40 +386,6 @@ class SubmissionMapper extends BaseMapper
         ]);
     }
 
-    /**
-     * Retrieves the number of submissions that have been made on each box in a
-     * list.
-     *
-     * @param array $box_ids
-     * @param int   $user_id
-     *
-     * @return array The submission box ID as the key, the count as the value.
-     */
-    public function findCountsForSubmissionBoxes($box_ids, $user_id)
-    {
-        // Retrieve count of submission IDs from a list of IDs for a user
-        if (empty($box_ids)) {
-            return array();
-        }
-        $query = "
-            SELECT ss.box_id, COUNT(DISTINCT submitted_at) as submission_count
-            FROM {$this->getTable()} ss
-            WHERE ss.owner = :user_id
-            AND ss.box_id IN {$this->getArrayPlaceholders($box_ids, 'sb')}
-            AND ss.submitted_at IS NOT NULL
-            GROUP BY ss.box_id
-        ";
-        $statement = $this->database->prepare($query);
-        $params = $this->getArrayParameters($box_ids, 'sb');
-        $params['user_id'] = $user_id;
-        $statement->execute($params);
-
-        $return = array();
-        foreach ($statement as $row) {
-            $return[$row['box_id']] = $row['submission_count'];
-        }
-        return $return;
-    }
 
     /**
      * @return BaseMapper|SubmissionBoxMapper

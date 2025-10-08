@@ -272,10 +272,19 @@ class Processor
         }
 
         /* Ask learnosity about the questions in this quiz
+         *
+         * Despite the docs saying we can request up to 1000 sessions at once https://help.learnosity.com/hc/en-us/articles/18356498582557-sessions-endpoints-Data-API
+         * Learnosity will actually drop all the data for anything except the last 50 sessions you specify :(
+         * As such, we have to make multiple requests to get all the data
          */
-        $results = $this->api->dataGetRequest('/sessions/responses', [
-            'session_id' => $learnosityReferences
-        ])['data'] ?? [];
+        $results = [];
+
+        foreach (array_chunk($learnosityReferences, 50) as $chunk) {
+            $resultsChunk = $this->api->dataGetRequest('/sessions/responses', [
+                'session_id' => $chunk
+            ])['data'] ?? [];
+            $results = array_merge($results, $resultsChunk);
+        }
 
         /* Index by learnosity reference, for a quick correlation
          */
@@ -407,7 +416,7 @@ class Processor
 
             $row[] = $attempt->getReviewed()?->getShort();
 
-            fputcsv($output, $row, ',', '"');
+            fputcsv($output, $row, ',', '"', escape: '');
         }
     }
 

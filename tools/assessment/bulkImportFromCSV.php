@@ -94,6 +94,8 @@ HELP;
      */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         // Help output
         if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
             $this->outputHelp();
@@ -146,6 +148,8 @@ HELP;
             /** @var \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model $unitImpl */
             $this->getLogger()->debug(sprintf("%s, %s", $unitImpl->getSpecification()->getTitle(), $unitImpl->getFolder()->getName()));
         }
+
+        $this->deprecationNotice("SA-19334");
     }
 };
 

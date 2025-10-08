@@ -158,13 +158,18 @@ HELP;
 
     private function cleanUpS3(): void
     {
-        $client                = $this->buildS3ClientOrExit($this->getLogger(), $this->getConfig());
-        $s3Bucket              = trim($this->getConfig()->get('otfs_s3_bucket') ?? "");
-        $filesInS3             = $this->getFilesInS3($this->getLogger(), $client, $s3Bucket);
-        $this->fileSystemAwsS3 = new Filesystem(new AwsS3Adapter($client, $s3Bucket, FilesystemFactory::PREFIX_STORAGE));
+        $client = $this->buildS3ClientOrExit($this->getLogger(), $this->getConfig());
+
+        $s3AltHost = trim($this->getConfig()->get('otfs_s3_alt_host') ?? "");
+        $s3AltBucket = trim($this->getConfig()->get('otfs_s3_alt_bucket') ?? "");
+        $s3Bucket = trim($this->getConfig()->get('otfs_s3_bucket') ?? "");
+        $finalBucket = !empty($s3AltHost) && !empty($s3AltBucket) ? $s3AltBucket : $s3Bucket;
+
+        $filesInS3 = $this->getFilesInS3($this->getLogger(), $client, $finalBucket);
+        $this->fileSystemAwsS3 = new Filesystem(new AwsS3Adapter($client, $finalBucket, FilesystemFactory::PREFIX_STORAGE));
 
         foreach ($filesInS3 as $key => $fileSize) {
-            $path     = preg_replace('#^storage/#', '', $key);
+            $path = preg_replace('#^storage/#', '', (string)$key);
             $fileName = basename($path);
             if ($this->needsToBeRetained($fileName)) {
                 continue;

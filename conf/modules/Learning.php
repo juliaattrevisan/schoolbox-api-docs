@@ -18,6 +18,7 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\File\Module as DueworkFeedbac
 use Schoolbox\Learning\Assessment\DueWork\Feedback\Module as DueworkFeedbackModule;
 use Schoolbox\Learning\Assessment\DueWork\Response\Module as DueworkResponseModule;
 use Schoolbox\Learning\Assessment\Exporter\Module as AssessmentExporterModule;
+use Schoolbox\Learning\Assessment\LessonPlan\Activities\Module as LessonPlanActivitiesModule;
 use Schoolbox\Learning\Assessment\Module as AssessmentModule;
 use Schoolbox\Learning\Assessment\Timeline\Module as TimelineModule;
 use Schoolbox\Learning\Badge\Award\Module as BadgeAwardModule;
@@ -28,17 +29,16 @@ use Schoolbox\Learning\Learnosity\Module as LearnosityModule;
 use Schoolbox\Learning\Markbook\Module as MarkbookModule;
 use Schoolbox\Learning\MarkScheme;
 use Schoolbox\Learning\Module as LearningModule;
-use Schoolbox\Learning\Moment\Evidence\Discussion\Comment\Module as EvidenceCommentModule;
-use Schoolbox\Learning\Moment\Evidence\Discussion\Thread\Module as EvidenceThreadModule;
-use Schoolbox\Learning\Moment\Evidence\Module as EvidenceModule;
+use Schoolbox\Learning\Moment\Discussion\Comment\Module as EvidenceCommentModule;
+use Schoolbox\Learning\Moment\Discussion\Thread\Module as EvidenceThreadModule;
+use Schoolbox\Learning\Moment\Module as EvidenceModule;
 use Schoolbox\Learning\Moment\Feed\Module as FeedModule;
 use Schoolbox\Learning\Moment\StudentToolkit\Module as StudentToolkitModule;
-use Schoolbox\Learning\Quiz\Module as QuizModule;
 use Schoolbox\Learning\Quiz\Attempt\Module as QuizAttemptModule;
-use Schoolbox\Learning\Turnitin\Module as TurnitinModule;
+use Schoolbox\Learning\Quiz\Module as QuizModule;
 use Schoolbox\Learning\Student\Module as StudentCourseModule;
+use Schoolbox\Learning\Turnitin\Module as TurnitinModule;
 use Schoolbox\Learning\Upcoming;
-use Schoolbox\Learning\Assessment\LessonPlan\Activities\Module as LessonPlanActivitiesModule;
 
 class Learning extends ModuleLoader
 {
@@ -55,7 +55,7 @@ class Learning extends ModuleLoader
         // TODO - split 'LearningModule' into ClassModule + PendingModule
         $this->loadModule($di, LearningModule::class, "/{$namespace}");
 
-        // LMS module required plan (Basic,Pro,Elite)
+        // LMS module required plan (Learning-Essentials,Learning-Enhanced)
         if ($config->get(ConfigMapper::NAME_LMS_ENABLED)) {
             $this->loadModule($di, Grades\Module::class, "/{$namespace}/grades");
             $this->loadModule($di, AssessmentModule::class, "/{$namespace}");

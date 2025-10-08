@@ -15,7 +15,6 @@ use Alaress\Authorizer\Failure\Unauthorized;
 
 class HasRole extends All
 {
-
     /**
      * The role to check against.
      *
@@ -43,7 +42,7 @@ class HasRole extends All
     /**
      * {@inheritdoc}
      */
-    public function authorizeMethod(array $params = array(), User $user = null)
+    public function authorizeMethod(array $params = array(), ?User $user = null)
     {
         if ($user instanceof User) {
             if ($user->getRole()->getType() == $this->role) {

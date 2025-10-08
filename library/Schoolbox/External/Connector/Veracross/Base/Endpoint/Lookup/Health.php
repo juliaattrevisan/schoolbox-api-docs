@@ -11,6 +11,7 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup;
 
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Profile\Profile;
+use Schoolbox\External\Connector\Watchlist;
 
 /**
  * Grab all the Health everywhere
@@ -29,8 +30,9 @@ class Health
      * Constructor
      *
      * @param IApi $api
+     * @param array $watchlist
      */
-    public function __construct(private IApi $api)
+    public function __construct(private IApi $api, private array $watchlist)
     {
     }
 
@@ -53,14 +55,20 @@ class Health
                 /* Avengers Assemble!
                  */
                 foreach ($page['data'] as $record) {
+                    $externalId = trim((string)$record['id']);
+
+                    /* Only import for specific users
+                     */
+                    if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                        continue;
+                    }
+
                     /* Overwrite with lookupped values
                      * If any of the following fields has contents, then they have a Medical Alert
                      */
-                    $this->lookup[$record['id']] = false;
-
                     foreach (['allergies_symptoms', 'current_medications', 'general_medical_notes'] as $field) {
                         if ('' !== trim((string)$record[$field])) {
-                            $this->lookup[$record['id']] = true;
+                            $this->lookup[$externalId] = true;
                         }
                     }
                 }

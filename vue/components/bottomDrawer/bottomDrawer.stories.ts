@@ -26,7 +26,7 @@ const meta: Meta<typeof BottomDrawer> = {
             return { args };
         },
         // @ts-expect-error -- For now, args.default doesn't match Meta<typeof BottomDrawer>, but we want to show it as a slot
-        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions -- see above
         template: `<bottom-drawer v-bind="args">${args.default}</bottom-drawer>`,
     }),
     argTypes: {

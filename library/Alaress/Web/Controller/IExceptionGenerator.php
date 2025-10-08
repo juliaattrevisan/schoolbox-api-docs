@@ -24,7 +24,7 @@ interface IExceptionGenerator
      */
     public function generateException(
         ?int $errorCode,
-        \Throwable $previous = null,
+        ?\Throwable $previous = null,
         string $additionalInfo = '',
         int $httpStatusCode = 400
     ): \Exception;

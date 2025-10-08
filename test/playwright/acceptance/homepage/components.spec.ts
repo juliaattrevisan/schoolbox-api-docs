@@ -10,7 +10,7 @@ test.describe("Homepage Components Tests", () => {
     });
 
     test("Homepage Components", async ({ tester, page }) => {
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         await homepage.goto(83);
 
         tester.isGoingTo("click the add component icon");
@@ -21,7 +21,7 @@ test.describe("Homepage Components Tests", () => {
 
         await expect(homepageTabsEl).toContainText("Information (7)");
         await expect(homepageTabsEl).toContainText("Collaboration (10)");
-        await expect(homepageTabsEl).toContainText("Learning (12)");
+        await expect(homepageTabsEl).toContainText("Learning (13)");
         await expect(homepageTabsEl).toContainText("Multimedia (9)");
         await expect(homepageTabsEl).toContainText("Resources (4)");
         await expect(homepageTabsEl).toContainText("Feeds (5)");
@@ -106,6 +106,9 @@ test.describe("Homepage Components Tests", () => {
 
         await expect(homepageTabsEl).toContainText("Due Work");
         await homepage.checkComponentIcon("Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller");
+
+        await expect(homepageTabsEl).toContainText("Learning Moments");
+        await homepage.checkComponentIcon("Schoolbox_Learning_Component_Homepage_LearningMomentsController");
 
         await expect(homepageTabsEl).toContainText("File Drop Box");
         await homepage.checkComponentIcon("Component_Homepage_DropBoxController");

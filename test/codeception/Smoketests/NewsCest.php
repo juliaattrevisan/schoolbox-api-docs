@@ -53,7 +53,7 @@ class NewsCest
 
         $draftArticle = $i->grabNewsArticleByTitle($title);
 
-        $i->sendGET("https://vagrant.dev.schoolbox.cloud/news/{$draftArticle->getId()}");
+        $i->sendGET("/news/{$draftArticle->getId()}");
         $i->seeResponseCodeIs(200);
     }
 

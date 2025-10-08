@@ -67,7 +67,7 @@ $app = new class extends CliTool\App {
     private function deleteVcalCache(ClientInterface $redis): void
     {
         $this->getLogger()->notice('Starting cleanup of vcal cache');
-        $search = new Keyspace($redis, 'vcal.*');
+        $search = new Keyspace($redis, 'vcal:' . INSTANCE_ID . ':*');
         foreach ($search as $key) {
             // Show some progress every N keys...
             if ($this->countVcalCacheDeleted % self::PROGRESS_INCREMENTS === 0 && $this->countVcalCacheDeleted) {

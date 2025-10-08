@@ -9,11 +9,11 @@ require_once __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App
 {
-
-
     /** @inheritDoc */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         global $argv, $argc;
 
         if (count($argv) < 2) {
@@ -40,6 +40,8 @@ $app = new class extends CliTool\App
         } else {
             $this->getLogger()->info("\n" . print_r($output, true));
         }
+
+        $this->deprecationNotice("SA-19334");
     }
 };
 

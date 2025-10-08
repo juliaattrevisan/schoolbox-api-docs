@@ -137,18 +137,13 @@ class External_Doublefirst_Helper
         $week = (int)$term['StartTimeTableWeek'];
         $day  = date("w", strtotime($term['StartDate']));
 
-        // We convert the date fo julian so we can iterate days easily in a for loop.
-
-        $current = gregoriantojd($date->getMonth(), $date->getDay(), $date->getYear());
-        $start = gregoriantojd($start->getMonth(), $start->getDay(), $start->getYear());
-
         // Work out which day/week we ware in
 
         $query = "SELECT TimetableWeekLength FROM TimetableParameters WHERE AcademicYear = {$year}";
         $weekLength = $this->getDatabase()->getRow($query);
 
-
-        for ($i = $start; $i <= $current; $i++) {
+        $today = clone $start;
+        while ($today->lte($date)) {
             $day++;
 
             // Roll over weeks each Sunday
@@ -164,6 +159,7 @@ class External_Doublefirst_Helper
                     $week = 1;
                 }
             }
+            $today = $today->addDays(1);
         }
 
         return (($week - 1) * 5) + $day - 1;

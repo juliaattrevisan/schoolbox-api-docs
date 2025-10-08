@@ -15,6 +15,15 @@ use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use DomainException;
 use InvalidArgumentException;
+use Schoolbox\Filter\Codec;
+use Schoolbox\Filter;
+use Schoolbox\Filter\CompositeFactoryFactory;
+use Schoolbox\Filter\Filters\Assessment\IdFinder;
+use Schoolbox\Learning\Assessment\Translator\ParticipationPlans;
+use Schoolbox\Learning\Assessment\Translator\Participations;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use LearnositySdk\Utils\Uuid;
 use LogicException;
 use Schoolbox\Admin\LessonPlan\Template\Mapper as LessonPlanTemplateMapper;
@@ -37,11 +46,12 @@ use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Learnosity\Api;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
-use Schoolbox\Learning\MarkScheme\IMarkScheme;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Attachment\Zone;
+use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\Url\Factory;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
 use Schoolbox\Assessment\Term;
@@ -51,7 +61,12 @@ use Twig\Error\Error;
 use UnexpectedValueException;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
+use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
+use Schoolbox\Assessment\Participant\Plan\Model as PlanModel;
+use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 /**
  * Class Controller
@@ -67,23 +82,36 @@ abstract class Controller extends ListController implements IAssessmentControlle
     /**
      * Controller constructor.
      *
-     * @param UserMapper                 $userMapper
-     * @param ErrorMapper                $errorMapper
-     * @param MapperProxy                $assessmentMapper
-     * @param WorkTypeMapper             $workTypeMapper
-     * @param Access                     $access
-     * @param Transactor                 $transactor
-     * @param BreadcrumbFactory          $bakery
-     * @param Mapper                     $termMapper
-     * @param DataSource                 $participantDataSource
-     * @param CourseSpecificationMapper  $courseSpecificationMapper
-     * @param UnitSpecificationMapper    $unitSpecificationMapper
-     * @param RosettaStone               $rosettaStone
-     * @param Replicator                 $replicator
-     * @param LatestViewMapper           $latestViewMapper
+     * @param UserMapper $userMapper
+     * @param ErrorMapper $errorMapper
+     * @param MapperProxy $assessmentMapper
+     * @param WorkTypeMapper $workTypeMapper
+     * @param Access $access
+     * @param Transactor $transactor
+     * @param BreadcrumbFactory $bakery
+     * @param Mapper $termMapper
+     * @param DataSource $participantDataSource
+     * @param CourseSpecificationMapper $courseSpecificationMapper
+     * @param UnitSpecificationMapper $unitSpecificationMapper
+     * @param RosettaStone $rosettaStone
+     * @param Replicator $replicator
+     * @param LatestViewMapper $latestViewMapper
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
-     * @param LessonPlanTemplateMapper   $lessonPlanTemplateMapper
-     * @param LessonPlanDataModelMapper  $lessonPlanDataModelMapper
+     * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
+     * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
+     * @param IdFinder|null $filtersAssessmentIdFinder
+     * @param CompositeFactoryFactory|null $filtersFactoryFactory
+     * @param Filter\Mapper|null $filterMapper
+     * @param Filter\Selection\Mapper|null $filterSelectionMapper
+     * @param CourseImplementationMapper|null $courseImplementationMapper
+     * @param UnitImplementationMapper|null $unitImplementationMapper
+     * @param null|Factory $urlFactory
+     * @param null|string $learnosityVersion
+     * @param null|string $learnosityConsumerKey
+     * @param null|string $learnosityConsumerSecret
+     * @param MimetypeMapper|null $mimetypeMapper
+     * @param RubricDataSource $rubricDataSource
+     * @param EditorTemplateHelper|null $editorTemplateHelper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -103,9 +131,35 @@ abstract class Controller extends ListController implements IAssessmentControlle
         protected Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
+        private ?Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder = null,
+        private ?Filter\CompositeFactoryFactory $filtersFactoryFactory = null,
+        private ?Filter\Mapper $filterMapper = null,
+        private ?Filter\Selection\Mapper $filterSelectionMapper = null,
+        private ?CourseImplementationMapper $courseImplementationMapper = null,
+        private ?UnitImplementationMapper $unitImplementationMapper = null,
+        ?\Schoolbox\Url\Factory $urlFactory = null,
+        ?string $learnosityVersion = null,
+        #[\SensitiveParameter] ?string $learnosityConsumerKey = null,
+        #[\SensitiveParameter] ?string $learnosityConsumerSecret = null,
         protected ?MimetypeMapper $mimetypeMapper = null,
+        protected ?RubricDataSource $rubricDataSource = null,
+        private ?EditorTemplateHelper $editorTemplateHelper = null,
     ) {
-        parent::__construct($userMapper, $errorMapper, $assessmentMapper, $access, $transactor, $participantDataSource, $unitSpecificationMapper, $rosettaStone, $this->projectResultCacheMapper);
+        parent::__construct(
+            $userMapper,
+            $errorMapper,
+            $assessmentMapper,
+            $access,
+            $transactor,
+            $participantDataSource,
+            $unitSpecificationMapper,
+            $rosettaStone,
+            $this->projectResultCacheMapper,
+            $urlFactory,
+            $learnosityVersion,
+            $learnosityConsumerKey,
+            $learnosityConsumerSecret,
+        );
     }
 
 
@@ -185,7 +239,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             ]
         );
         $defaultUrl .= '?' . http_build_query([Payload::SEB_KEY => '']);
-        $content    = $this->responseFromTemplateUnthemed('@learningAssessment/seb.twig', [
+        $content    = $this->responseFromTemplate('@learningAssessment/seb.twig', [
             'url' => $defaultUrl,
         ]);
         $this->response = $content;
@@ -227,9 +281,42 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $data = $this->getAssessmentAsTwigArray($context, $assessment);
 
-        /* Curriculum Codes prefilled from those associated with context folder
+        /* Loading the data of the source/parent assessment
          */
-        $data['curriculumNodes'] = $context->getFolder()->getViewableCurriculumNodes();
+        $originalAssessmentId = $this->requestQuery->get('customisedFor');
+        if (null !== $originalAssessmentId) {
+            $student = json_decode($this->requestQuery->get('student', ''), true);
+            $originalAssessment = $this->getAssessmentMapper()->findById($originalAssessmentId);
+            $originalAssessment = $this->participantDataSource->loadParticipationIntoAssessment($originalAssessment);
+            $data['customisedFor'] = $originalAssessmentId;
+            $data['participants'] = $originalAssessment
+                ->getAllParticipants()
+                ->filter(fn($participant) => in_array($participant->getUser()->getId(), array_column($student, 'id')))
+                ->map(function (Participant $participant) {
+                    $student = $participant->getUser();
+                    return [
+                        'id'         => $student->getId(),
+                        'fullName'   => $participant->getUser()->getFullName(),
+                        'excludedAt' => $participant->getExcludedAt(),
+                        'user'       => $student,
+                        'plan'       => $participant->getPlan(),
+                    ];
+                });
+        } else {
+            $data['participants'] = $assessment->getAllParticipants()->map(function (Participant $participant) {
+                $student = $participant->getUser();
+                return [
+                    'id'         => $student->getId(),
+                    'fullName'   => $participant->getUser()->getFullName(),
+                ];
+            });
+        }
+        /* When creating a new assessment, no curriculum nodes are selected by default
+         *
+         * At a future point, we may want to "suggest" nodes to select based on the context,
+         * to retrieve those nodes, we can use $context->getFolder()->getViewableCurriculumNodes()->reindex(); and pass them down with a new key
+         */
+        $data['curriculumNodes'] = [];
 
         /* Default Visibility comes from an LMS Policy setting in config
          */
@@ -259,6 +346,10 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'isMutable' => $courseManagedFields->isMutable(),
             'isReadonly' => $courseManagedFields->isReadonly(),
         ];
+
+        if ($this->editorTemplateHelper !== null) {
+            $data['editorTemplates'] = $this->editorTemplateHelper->getTemplatesForCategory();
+        }
 
         if (AssessmentType::TYPE_DUE_WORK === $type) {
             // To be able to view the current student policy if enabling within the submission type
@@ -358,16 +449,30 @@ abstract class Controller extends ListController implements IAssessmentControlle
                     }
                 }
             } else {
-                /* Customise the selected LPT
+                /* Customise the selected LPT - even it was deleted after this lesson plan was made
                  */
-                $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findById((int)$templateId);
+                $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findOneByColumn('id', (int)$templateId, ['deleted' => true]);
 
-                $data['lessonPlanMeta']['template'] = $lessonPlanTemplate->getId();
+                $data['lessonPlanMeta']['template'] = $lessonPlanTemplate;
 
                 /* Field list contains the ones from the Lesson Plan Template when creating
                  * When updating, it's actually fields from the Lesson Plan instance itself
+                 *
+                 * To pass into Vue, we need fields to be in a json-encodable format,
+                 * so grab all the attributes we need and put them into an array
                  */
-                $data['lessonPlanMeta']['fields'] = $lessonPlanTemplate->getFields();
+                foreach ($lessonPlanTemplate->getFields() as $field) {
+                    if ($field->isDeleted()) {
+                        continue; // Exclude fields that have been deleted when creating a new lesson plan
+                    }
+                    $data['lessonPlanMeta']['fields'][] = [
+                        'id' => $field->getId(),
+                        'title' => $field->getTitle(),
+                        'body' => $field->getBody(),
+                        'description' => trim((string)$field->getDescription()),
+                        'visibility' => $field->getVisibility(),
+                    ];
+                }
 
                 if ($this->isXhrRequest()) {
                     $content = $this->responseFromTemplateUnthemed(sprintf(
@@ -379,26 +484,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 }
             }
         } else {
-            /* Legacy Quiz XML Import
-             */
-            if (AssessmentType::TYPE_QUIZ === $type) {
-                $data['attachzone'] = (new Zone('xmlImport'))
-                    /* XML Imports should have an expiry date so they can be automatically removed
-                     * to save space. While this would be nice to have as a "backup for users" the
-                     * number of times they've asked us for a copy of their own data is basically 0
-                     */
-                    ->setExpiryDate(\Alaress_Date_Format::now()->addHours(1))
-                    ->setMulti(false)
-                    ->setAttachPrompt('Attach a legacy xml')
-                    ->setAttachmentsLabel('')
-                    ->setMimeFilter('text/xml,application/xml')
-                    ->setFilesystemContext('xml')
-                    ->getTwigContext();
-            }
-
             // either output the fragment to the mage, or use the synchronous form
             if ($this->isXhrRequest()) {
-                $content = $this->responseFromTemplateUnthemed("@learningAssessment/$type/create.twig", $data);
+                $content = $this->responseFromTemplateUnthemed("@learningAssessment/{$type}/create.twig", $data);
             } else {
                 $content = $this->responseFromTemplate('@learningAssessment/create.twig', $data);
             }
@@ -407,6 +495,107 @@ abstract class Controller extends ListController implements IAssessmentControlle
         $this->response = $content;
     }
 
+    /**
+     * Get form for creating a copy for customising the assessment
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws Error
+     * @throws MapperException
+     * @throws RouteNotFound
+     */
+    public function getCloneAssessmentForm(IAssessable $assessment): void
+    {
+        /* Creating a new clone copy
+         */
+        $assessment = $assessment->setTitle('');
+        $clonedAssessment = $assessment->cloneForCopy();
+
+        $data = $this->getAssessmentAsTwigArray($clonedAssessment->getContext(), $clonedAssessment);
+
+        $data['customisedFor'] = $assessment->getId();
+        $data['assessment'] = $assessment;
+
+        $breadcrumbs = $this->getBakery()->produceFromAssessment($clonedAssessment, $this->getUser())->add([$clonedAssessment->getTitle()]);
+        $data['breadcrumbs'] = $breadcrumbs;
+
+        $data['returnUrlName'] = Redirect::RETURN_URL;
+        $data['returnUrl'] = $this->requestQuery->get(Redirect::RETURN_URL);
+
+        /* Course Managed Field and associated checkbox in the ui
+         */
+        $courseManagedFields = new CourseManagedFields($this->getUser(), $assessment);
+        /* Creating the new clone assessment as a new individual assessment in the class, so it is no longer course managed
+         */
+        $data['courseManaged'] = [
+            'isVisible' => false,
+            'isMutable' => false,
+            'isReadonly' => false,
+        ];
+
+        /* Curriculum Codes prefilled from those associated with the assessment itself
+         * hide nodes with no codes
+         */
+        $data['curriculumNodes'] = $clonedAssessment->getViewableCurriculumNodes()->reindex();
+        $data['canRelocate'] = $clonedAssessment->isSpecification();
+
+        $data['selfAssessmentEnabled'] = $this->getConfigLoader()->get('self_assessment_enabled');
+        $data['defaultGradeGroup'] = $this->getConfigLoader()->get('default_grade_group');
+        $data['custom_assessment_participation'] = $this->getConfigLoader()->get('custom_assessment_participation');
+        $data['editorTemplates'] = $this->editorTemplateHelper !== null
+            ? $this->editorTemplateHelper->getTemplatesForCategory()
+            : [];
+
+        if ($clonedAssessment instanceof DueWork\Model) {
+            // To be able to view the current student policy if enabling within the submission type
+            $data['lmsStudentPolicy'] = $this->getConfigLoader()->get('lms_student_policy');
+
+            // To determine whether to display the interactive worksheet option
+            $data['kami_enabled'] = $this->getConfigLoader()->get(ConfigMapper::NAME_KAMI_ENABLED);
+
+            $kamiFiles = $this->mimetypeMapper
+                ->findMimeTypesFromExtensions(
+                    array_keys(KamiModel::ALLOWED_FILE_TYPES)
+                );
+
+            $zone = (new Zone('worksheet'))
+                ->setMulti(false)
+                ->setAttachPrompt('Attach a worksheet')
+                ->setAttachmentsLabel('')
+                ->setMimeFilter(implode(",", $kamiFiles))
+                ->setFilesystemContext('worksheet')
+                ->setReadOnly($courseManagedFields->isReadonly()) //
+                ->setFileVar('worksheet');
+            if ($clonedAssessment->getWorksheetTemplate()) {
+                $zone = $zone->attachFiles([$clonedAssessment->getWorksheetTemplate()]);
+            }
+            $data['attachzoneWorksheet'] = $zone->getTwigContext();
+
+            /* Retrieves the grid with assessment id reset to empty so it can be applied to the new assessment
+             * and only apply it when the rubric is being used in the original assessment
+             */
+            if ($assessment instanceof DueWork\Model && $assessment->getUseRubric()) {
+                $data['rubricGrid'] = $this->rubricDataSource->retrieveGrid($assessment, true, true);
+            }
+        }
+
+        $student = explode(',', $this->requestQuery->get('student', ''));
+        $data['participants'] = $assessment->getAllParticipants()
+            ->filter(fn(Participant $participant) => in_array($participant->getUser()->getId(), $student))
+            ->map(function (Participant $participant) {
+                $student = $participant->getUser();
+                return [
+                    'id'         => $student->getId(),
+                    'fullName'   => $participant->getUser()->getFullName(),
+                    'excludedAt' => $participant->getExcludedAt(),
+                    'user'       => $student,
+                    'plan'       => $participant->getPlan(),
+                ];
+            });
+
+
+        $this->response = $this->responseFromTemplate("@learningAssessment/create.twig", $data);
+    }
 
     /**
      * Get the form to update an existing Assessment's details
@@ -423,6 +612,9 @@ abstract class Controller extends ListController implements IAssessmentControlle
     public function getUpdateAssessmentForm(IAssessable $assessment): void
     {
         $data = $this->getAssessmentAsTwigArray($assessment->getContext(), $assessment);
+        $data['editorTemplates'] = $this->editorTemplateHelper !== null
+            ? $this->editorTemplateHelper->getTemplatesForCategory()
+            : [];
 
         $breadcrumbs = $this->getBakery()->produceFromAssessment($assessment, $this->getUser())->add([$assessment->getTitle()]);
 
@@ -464,17 +656,40 @@ abstract class Controller extends ListController implements IAssessmentControlle
              */
             $lessonPlan = $this->lessonPlanDataModelMapper->findOneByColumn('assessment_id', $assessment->getId());
 
+            /* Customise the selected LPT - even it was deleted after this lesson plan was made
+             */
+            $lessonPlanTemplate = $this->lessonPlanTemplateMapper->findOneByColumn('id', (int)$lessonPlan->getLessonPlanTemplate(), ['deleted' => true]);
+
             $data['lessonPlanMeta'] = [
                 'newKeyword' => LessonPlan\Decorator\Decorator::NEW_KEYWORD,
                 'consts' => [
                     'student' => \Schoolbox\Role::STUDENT
                 ],
-                'template' => $lessonPlan->getLessonPlanTemplate(),
-                'fields' => $lessonPlan->getFields(),
+                'template' => $lessonPlanTemplate,
+                'fields' => [],
                 'type' => AssessmentType::TYPE_LESSON_PLAN,
                 'mageAsync' => false,
                 'includeBreadcrumbs' => false
             ];
+
+            /* Field list contains the ones from the Lesson Plan Template when creating
+             * When updating, it's actually fields from the Lesson Plan instance itself
+             *
+             * To pass into Vue, we need fields to be in a json-encodable format,
+             * so grab all the attributes we need and put them into an array
+             */
+            foreach ($lessonPlan->getFields() as $field) {
+                // this notably includes deleted template fields as well since they are still part of the existing lesson plan
+                $data['lessonPlanMeta']['fields'][] = [
+                    'id' => $field->getId(),
+                    'title' => $field->getTitle(),
+                    'body' => $field->getBody(),
+                    'description' => trim((string)$field->getDescription()),
+                    'visibility' => $field->getVisibility(),
+                    // this key only exists when modifying an existing lesson plan:
+                    'lessonPlanTemplateField' => $field->getLessonPlanTemplateField(),
+                ];
+            }
         }
 
         $data['courseManaged'] = [
@@ -495,23 +710,36 @@ abstract class Controller extends ListController implements IAssessmentControlle
                     array_keys(KamiModel::ALLOWED_FILE_TYPES)
                 );
 
-
             $zone = (new Zone('worksheet'))
                 ->setMulti(false)
                 ->setAttachPrompt('Attach a worksheet')
                 ->setAttachmentsLabel('')
                 ->setMimeFilter(implode(",", $kamiFiles))
                 ->setFilesystemContext('worksheet')
-                ->setReadOnly($courseManagedFields->isReadonly()) //
+                 // Disallow modification of existing worksheet templates.
+                ->setReadOnly($assessment->getWorksheetTemplate() !== null)
                 ->setFileVar('worksheet');
             if ($assessment->getWorksheetTemplate()) {
                 $zone = $zone->attachFiles([$assessment->getWorksheetTemplate()]);
             }
             $data['attachzoneWorksheet'] = $zone->getTwigContext();
         }
+        $data['participants'] = $assessment
+            ->getAllParticipants()
+            ->filter(fn($participant) => !$participant->isExcluded())
+            ->map(
+                fn($participant) => [
+                    'id' => $participant->getUser()->getId(),
+                    'fullName' => $participant->getUser()->getFullName(),
+                ]
+            );
+
+        if (null !== $assessment->getOriginalAssessmentId()) {
+            $data['customisedFor'] = $assessment->getOriginalAssessmentId();
+        }
+
         $this->response = $this->responseFromTemplate("@learningAssessment/update.twig", $data);
     }
-
 
     /**
      * Save the data when creating a specific kind of Assessment
@@ -529,6 +757,22 @@ abstract class Controller extends ListController implements IAssessmentControlle
      */
     public function postUpdateAssessment(IAssessable $assessment): void
     {
+        // If we are dealing with a due work, and it already has a worksheet template attached...
+        if ($assessment instanceof DueWork\Model && $assessment->getWorksheetTemplate()) {
+            // Add (or replace) 'worksheet' info to $this->requestPost.
+            // Note 'worksheet' will only be included in the form submission from the Modify due work page if no
+            // worksheet template already exists on the due work.  (This is because modification or replacement of the
+            // worksheet template is forbidden once it has been added and the due work has been created).
+            // The $this->persistAssessment() function expects 'worksheet' data to always be supplied.  So if the due
+            // work has a worksheet template attached, add it to the form submission data.
+            /** @var IStorage $existingWorksheetTemplate */
+            $existingWorksheetTemplate = $assessment->getWorksheetTemplate();
+            $this->requestPost->offsetSet(
+                'worksheet',
+                'store:' . $existingWorksheetTemplate->getHash() . ':' . $existingWorksheetTemplate->getBasename()
+            );
+        }
+
         /* Regular update while you're creating the assessment, otherwise
          */
         try {
@@ -538,7 +782,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 $assessment
             );
         } catch (DomainException | InvalidArgumentException $e) {
-            $this->sendError('Could not save assessment. ', [$e->getMessage()]);
+            $this->sendError('Could not save activity. ', [$e->getMessage()]);
 
             /* Return Early to let mage deal with error messages
              */
@@ -739,6 +983,20 @@ abstract class Controller extends ListController implements IAssessmentControlle
 
         $contextType = AssessmentContextType::objectToString($context) . 's';
 
+        /**
+         * Get the parent folder id to use in the curriculum browser,
+         * so it can display curriculum assigned to the unit when available
+         */
+        if ($assessment->isImplementation() && $assessment->getBaseContext() instanceof UnitImplementation\Model) { // check if the assessment's on a class page and linked to a unit
+            /** @var UnitImplementation\Model $unitImpl */
+            $unitImpl = $assessment->getBaseContext();
+            $parentFolderId = $unitImpl->getSpecification()->getFolder()->getId();
+        } else if ($assessment->getBaseContext() instanceof UnitSpecification) { // otherwise it's on a unit page
+            $parentFolderId = $assessment->getBaseContext()->getFolder()->getId();
+        } else { // or it can't be linked to a unit (for example created from the Due work component on a class page)
+            $parentFolderId = null;
+        }
+
         /* The usual info everything requires
          */
         $data = [
@@ -748,6 +1006,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
             'breadcrumbs'              => $this->getBakery()->produceFromContext($context, $assessment, $this->getUser()),
             'assessment'               => $assessment,
             'folder'                   => $context->getFolder(),
+            'isSpecFolder'             => $context->getFolder()->isSpecFolder(),
             'assessmentType'           => AssessmentType::objectToString($assessment),
             'markVisibility'           => $assessment->getMarkVisibility(),
             'availableVisibilities'    => FeedbackVisibility::getAvailableVisibilities($this->getConfigLoader()->get('submission_visibility_max')),
@@ -757,7 +1016,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
              * so we don't need a different method than the existing getAllMarkTypes
              */
             'capabilityMarkTypes'      => $this->getAllMarkTypes($assessment),
-            'capabilityGradingSchemes' => $this->getAllGradeSchemes()
+            'capabilityGradingSchemes' => $this->getAllGradeSchemes(),
+            'parentFolderId'           => $parentFolderId,
         ];
 
         $data = array_merge($data, $this->getAssessmentTwigData($assessment));
@@ -826,16 +1086,25 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param string      $defaultReturnUrl
      * @param bool        $relocated
      * @param bool        $isCreate
+     * @param bool        $toParticipation
      * @return string
      * @throws RouteNotFound
      */
-    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '', bool $relocated = false, bool $isCreate = false): string
+    public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '', bool $relocated = false, bool $isCreate = false, bool $toParticipation = false): string
     {
         /**
-         * First priority is a the post return URL
+         * First priority is the toParticipation flag,
+         * which is set when the user is creating a new implementation assessment
+         * Second priority is the post return URL
          * Then if this is in a project, and if so then go to project status
          * Otherwise go to default return url
          */
+        if ($toParticipation) {
+            return $this->routeGenerator->generate('learningAssessment.getAssessmentParticipationForm', [
+                'assessmentId' => $assessment->getId(),
+                'assessment' => $assessment,
+            ]);
+        }
         if ($postReturnUrl) {
             $returnUrl = Redirect::decode($postReturnUrl);
             if ($relocated && strpos($returnUrl, '/homepage/') === 0) {
@@ -856,5 +1125,268 @@ abstract class Controller extends ListController implements IAssessmentControlle
     protected function getTermMapper(): \Schoolbox\Assessment\Term\Mapper
     {
         return $this->termMapper;
+    }
+
+    /**
+     * Student custom participation page
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws Error
+     * @throws RouteNotFound
+     */
+    public function getAssessmentParticipationForm(IAssessable $assessment): void
+    {
+        $assessment = $this->participantDataSource->loadParticipationIntoAssessment($assessment);
+
+        $data = $this->getAssessmentAsTwigArray($assessment->getContext(), $assessment);
+
+        $breadcrumbs = $this->getBakery()
+                            ->produceFromAssessment(
+                                $assessment,
+                                $this->getUser()
+                            )->add([$assessment->getTitle()]);
+
+        $data['breadcrumbs'] = $breadcrumbs;
+        $data['returnUrlName'] = Redirect::RETURN_URL;
+        $data['returnUrl'] = $this->requestQuery->get(Redirect::RETURN_URL);
+
+        $data['pastoralEnabled'] =
+            $this->getConfigLoader()->get('pastoral_enabled') && $this->getUser()->isStaffWithPastoralAccess();
+
+        $data['studentsPastoralCountsUrl'] = $this->getRouteIfAuthorized('pastoral.getStudentsCount');
+
+        /* Load customisation to the participant
+         */
+        $customisedAssessments = $this->getAssessmentMapper()->findAllCustomisedAssessment($assessment);
+        $planTranslator = new ParticipationPlans(
+            $this->getRouteGenerator(),
+            $this->getAuthorizer(),
+            $this->getUser(),
+        );
+        $participationModelToArray = new Participations(
+            $this->getRouteGenerator(),
+            $this->getAuthorizer(),
+            $this->getUser(),
+            $planTranslator,
+            $customisedAssessments,
+        );
+
+        $data['allParticipants'] = $assessment->getAllParticipants()->map($participationModelToArray)->reindex();
+        $data['learningPlanNew'] = $this->getRouteIfAuthorized('learningAssessment.getAssessmentParticipationLearningPlan', [
+            'assessment' => $assessment,
+            'assessmentId' => $assessment->getId(),
+        ]);
+        $data['assessment'] = $assessment;
+
+        $context = $assessment->getContext();
+
+        $data['contextType'] = AssessmentContextType::objectToString($context) . 's';
+        /* Getting all existing customisations
+         */
+        $customisationPlans = $customisedAssessments->map(fn(IAssessable $customised) => call_user_func($planTranslator, $customised->getPlans()->first()));
+        $data['customisations'] = $customisationPlans->merge($assessment->getPlans()->filter(fn(Plan $plan) => !$plan->getIsDynamic())->map($planTranslator));
+        $data['editorTemplates'] = $this->editorTemplateHelper !== null
+            ? $this->editorTemplateHelper->getTemplatesForCategory()
+            : [];
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/participation/update.twig',
+            $data
+        );
+    }
+
+    /**
+     * Get the learning plan participation page for a specific assessment
+     *
+     * @param IAssessable $assessment
+     * @throws Error
+     * @throws RouteNotFound
+     */
+    public function getAssessmentParticipationLearningPlan(IAssessable $assessment): void
+    {
+        $student = explode(',', $this->requestQuery->get('student', ''));
+
+        $breadcrumbs = $this->getBakery()
+                            ->produceFromAssessment(
+                                $assessment,
+                                $this->getUser()
+                            )->add([
+                               "Update " . $assessment->getTitle() . " Participation",
+                               $this->getRouteIfAuthorized('learningAssessment.getAssessmentParticipationForm', [
+                                   'assessmentId' => $assessment->getId(),
+                                   'assessment' => $assessment,
+                               ])])->add([$assessment->getTitle() . ' Modify Activity', '']);
+
+        $participant = $assessment
+            ->getAllParticipants()
+            ->filter(fn ($participant) => in_array($participant->getUser()->getId(), $student))
+            ->map(function (Participant $participant) {
+                $student = $participant->getUser();
+                return [
+                    'id' =>  $student->getId(),
+                    'fullName' => $participant->getUser()->getFullName(),
+                    'excludedAt' => $participant->getExcludedAt(),
+                    'user' => $student,
+                    'plan' => $participant->getPlan(),
+                ];
+            })->reindex();
+
+        $assessmentData = $this->getAssessmentTwigData($assessment);
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/participation/learningPlan/learningPlan.twig',
+            [
+                'breadcrumbs' => $breadcrumbs,
+                'assessment' => $assessment,
+                'participants' => $participant,
+                'acceptingResponses' => $assessmentData['acceptingResponses'] ?? false,
+                'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
+            ]
+        );
+    }
+
+    /**
+     * Get the form to update an existing Assessment's participation learning plan
+     *
+     * @param IAssessable $assessment
+     * @param PlanModel   $plan
+     * @throws Error
+     * @throws RouteNotFound
+     */
+    public function getUpdateAssessmentParticipationLearningPlan(IAssessable $assessment, PlanModel $plan): void
+    {
+        $breadcrumbs = $this->getBakery()
+                            ->produceFromAssessment(
+                                $assessment,
+                                $this->getUser()
+                            )->add([
+                              "Update " . $assessment->getTitle() . " Participation",
+                              $this->getRouteIfAuthorized('learningAssessment.getAssessmentParticipationForm', [
+                                  'assessmentId' => $assessment->getId(),
+                                  'assessment' => $assessment,
+                              ])])->add([$assessment->getTitle() . ' Modify Activity', '']);
+
+
+        $participant = $assessment
+            ->getAllParticipants()
+            ->filter(fn ($participant) => $plan->getParticipants()->keyExists($participant->getUser()->getId()))
+            ->map(function (Participant $participant) {
+                $student = $participant->getUser();
+                return [
+                    'id' =>  $student->getId(),
+                    'fullName' => $participant->getUser()->getFullName(),
+                    'excludedAt' => $participant->getExcludedAt(),
+                    'user' => $student,
+                    'plan' => $participant->getPlan(),
+                ];
+            })->reindex();
+
+        $assessmentData = $this->getAssessmentTwigData($assessment);
+
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/participation/learningPlan/learningPlan.twig',
+            [
+                'breadcrumbs' => $breadcrumbs,
+                'assessment' => $assessment,
+                'participants' => $participant,
+                'plan' => $plan,
+                'acceptingResponses' => $assessmentData['acceptingResponses'] ?? false,
+                'editorTemplates' => $this->editorTemplateHelper !== null ? $this->editorTemplateHelper->getTemplatesForCategory() : [],
+            ]
+        );
+    }
+
+    /**
+     * @see \Schoolbox\Assessment\Course\Markbook\Controller::convertRequestToFilters
+     * @param CourseSpec\Model $courseSpec
+     * @param array            $request  Indexed by filter.id, option.key
+     * @param bool             $saveToDB Should we persist these selections to the DB ?
+     * @return array
+     * @throws \Alaress\Database\Predicate\InvalidColumnException
+     * @throws \DomainException If this class has not defined what entity it is filtering
+     * @throws \InvalidArgumentException If unable to find the filter mapper class
+     * @throws \Schoolbox\Mapper\DefinitionException If join $name isn't on this mapper
+     * @throws \Schoolbox\Mapper\Exception If an alias is incorrect
+     * @throws \UnderflowException
+     * @throws \UnexpectedValueException
+     */
+    private function convertRequestToFilters(CourseSpec\Model $courseSpec, array $request, bool $saveToDB): array
+    {
+        $page            = Filter\Page\Model::PAGE_COURSE_MARK_BOOK;
+        $codec           = new Codec($this->filterMapper, $this->filterSelectionMapper);
+
+        // Convert Request to Selection models
+        $selectionsPerFilter = $codec->convertRequestToSelections($this->getUser(), $page, $request);
+        if ($saveToDB) {
+            $this->filterSelectionMapper->updateSelections($this->getUser(), $page, $selectionsPerFilter);
+        }
+
+        $filters = $this->filtersFactoryFactory->convertSelectionsToFilters($selectionsPerFilter, $this->getUser(), $page);
+
+        // Ensure that assessments are:
+        // * not Assessment Specs
+        // * Are inside unitImpls that belong to courseImpls that were imported from the courseSpec
+        $courseImpls = $this->courseImplementationMapper->findAllByCourseSpecificationId($courseSpec->getId());
+        if ($courseImpls->count()) {
+            $pb          = $this->unitImplementationMapper->getPredicateBuilder()->in('course_implementation_id', $courseImpls->getPropertyValues('id'));
+            $unitImplIds = $this->unitImplementationMapper->findIdsByPredicates($pb);
+        } else {
+            $unitImplIds = [];
+        }
+        $filters = array_merge($filters, [
+            Filter\Filters\Assessment\NullableContext\UnitSpec\Definition::class => [],
+            Filter\Filters\Assessment\NullableContext\UnitImpl\Definition::class => array_combine($unitImplIds, $unitImplIds),
+        ]);
+
+        return [$filters, $codec, $selectionsPerFilter];
+    }
+
+    /**
+     * get all assessments for a spec assessment (filtered from the markbook url params)
+     *
+     * @param IAssessable $assessment
+     * @return array|Collection
+     * @throws MapperException
+     */
+    protected function getUnitAssessments(IAssessable $assessment): array|Collection
+    {
+        $assessments = [];
+        if ($assessment->isSpecification()) {
+            // This report may take a while
+            $this->extendExecutionTime();
+
+            /**
+             * we are assuming the links to this page have been appended with
+             * 'queryArgs'               => $codec->convertSelectionsToQueryString($selectionsPerFilter),
+             */
+
+            /* create tmp vars, to keep stan happy */
+            /** @var UnitSpecification $unitSpec */
+            $unitSpec = $assessment->getBaseContext();
+            $courseSpec = $unitSpec->getCourse();
+            $queryArgs = $this->requestQuery->getArrayCopy();
+
+            // never save filters to the db (there is no way to update them from this page, and it we bookmark it, and load it will alter the filters saved...)
+            [$filters,] = $this->convertRequestToFilters($courseSpec, $queryArgs, false);
+            $assessmentIds  = $this->filtersAssessmentIdFinder->findIdsByFilters($filters, $this->getUser());
+
+            // Fetch assessments
+            $assessments = $this->getAssessmentMapper()->findAllByIds($assessmentIds);
+
+            // tmp var to make it easier to filter (the loop and the spec passed through)
+            $assessmentSpec = $assessment;
+            // filter to only the assessment we are looking for (those that match the filter and are children of the assessment spec)
+            $assessments = $assessments->filter(static function (IAssessable $assessment) use ($assessmentSpec) {
+                return $assessment->getSpecificationAssessment()?->getId() === $assessmentSpec->getId();
+            });
+
+            // sort the assessments in a standard order (class page name naturally) which appears to be the same as the main markbook screen
+            $assessments = $assessments->sortByCallback(function (IAssessable $a, IAssessable $b) {
+                return strnatcasecmp($a->getBaseContext()->getFolder()->getTitle(), $b->getBaseContext()->getFolder()->getTitle());
+            });
+
+            // hydrate participants
+            $this->getAssessmentMapper()->loadParticipantsIntoAssessmentCollection($assessments, null, true);
+        }
+        return $assessments;
     }
 }

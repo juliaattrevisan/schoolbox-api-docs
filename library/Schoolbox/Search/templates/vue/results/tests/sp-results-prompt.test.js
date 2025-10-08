@@ -19,6 +19,7 @@ beforeEach(() => {
                 endDate: "2023-01-01T19:43:20+11:00",
             },
             filterCreator: null,
+            resultPageSize: 20,
         },
     });
 });

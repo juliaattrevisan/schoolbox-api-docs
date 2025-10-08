@@ -12,12 +12,12 @@
     desc[levelOff]      = 'off';
     desc[levelDigest]   = 'digest';
     desc[levelInstant]  = 'instant';
-    desc[levelPush]     = 'mobile';
+    desc[levelPush]     = 'device';
     desc[levelEmail]    = 'email';
 
     $(function () {
 
-        let ii, configurator;
+        let configurator;
 
         configurator = $('#configurator').msgconfig({
             sourceSelector: '[data-source]',
@@ -28,29 +28,32 @@
             persist: function () {
                 let form = this.closest('form[method=post]');
 
-                // clear any previous cache-timeout
-                if (ii) {
-                    clearTimeout(ii);
-                }
+                const toast = window.sbProps.toastActivate("Saving...");
 
-                ii = setTimeout(function () {
+                // Disable all inputs within the same set while it's saving
+                form.find('input').prop('disabled', true);
 
-                    // Disable all inputs while it's saving
-                    form.find('input').prop('disabled', true);
+                // Serialize the form
+                let formSerialized = form.serializeArray();
 
-                    // Serialize the form
-                    let formSerialized = form.serializeArray();
+                // Go through disabled inputs and add selected to the serialized form
+                form.find('input[disabled]').each(function() {
+                    if ($(this).is(':checked')) {
+                        formSerialized.push({name: $(this).attr('name'), value: $(this).val()});
+                    }
+                });
 
-                    // Go through disabled inputs and add selected to the serialized form
-                    form.find('input[disabled]').each(function() {
-                        if ($(this).is(':checked')) {
-                            formSerialized.push({name: $(this).attr('name'), value: $(this).val()});
-                        }
+                $.post(form.attr('action'), formSerialized)
+                    .done((data) => {
+                        toast.timeout({ text: "Saved" });
+                        customiserCallback(data);
+                    })
+                    .fail(() => {
+                        toast.timeout({
+                            text: "Save failed, please contact your support if the problem persists",
+                            isSuccess: false
+                        });
                     });
-
-                    $.post(form.attr('action'), formSerialized).done(customiserCallback);
-
-                }, 1000);
 
             },
             describe: function () {
@@ -151,10 +154,66 @@
         });
 
         $('[data-collapser]').collapsable();
+
+        // Show/hide blackout input container
+        $('#blackoutEnabledInput').on('change', function () {
+            let $blackoutInputContainer = $('#blackoutInputContainer');
+            $blackoutInputContainer
+                .stop()
+                .removeClass('hide')
+                .slideUp(1);
+
+            if (this.checked) {
+                $blackoutInputContainer.slideDown();
+            } else {
+                $blackoutInputContainer.addClass('hide')
+            }
+        });
+
+        // Show/hide next day if blackout start time is before end time:
+        // it's assumed that this means the blackout starts the evening before,
+        // and ends at the end time the next morning.
+        let $blackoutStartTimeInput     = $('#blackoutStartTimeInput'),
+            $blackoutEndTimeInput       = $('#blackoutEndTimeInput'),
+            $blackoutDescriptionNextDay = $('#blackoutDescriptionNextDay'),
+            blackoutTimeChange          = function () {
+                let blackoutStartTime      = $blackoutStartTimeInput.val(),
+                    blackoutEndTime        = $blackoutEndTimeInput.val(),
+                    showNextDayDescription =
+                        blackoutStartTime && blackoutEndTime && blackoutStartTime > blackoutEndTime;
+                $blackoutDescriptionNextDay.toggleClass('hide', !showNextDayDescription);
+            };
+        $blackoutStartTimeInput.on('change', blackoutTimeChange);
+        $blackoutEndTimeInput.on('change', blackoutTimeChange);
+
+        // Save blackout form
+        let $toast       = $('#toast'),
+            blackoutForm = document.getElementById('blackoutForm'),
+            formSubmit   = async function () {
+                $toast.toastActivate();
+                let response = await fetch(
+                    blackoutForm.action,
+                    {
+                        method:  blackoutForm.method,
+                        body:    new FormData(blackoutForm),
+                    }
+                );
+                if (response.ok) {
+                    $toast.toastTimeout({
+                        text: "Settings saved",
+                        css:  "success",
+                    });
+                } else {
+                    $toast.toastTimeout({
+                        text: "Could not save settings",
+                        css:  "alert",
+                    });
+                }
+            };
+        $(blackoutForm).on('change', ':input', _.debounce(formSubmit, 1000));
     });
 
     function customiserCallback(data) {
-
         $.each(data, function (slug, sources) {
 
             let $ns = $('#configurator').find('[data-namespace=' + slug + ']');
@@ -190,6 +249,9 @@
             });
         });
     }
+
+
+
 </script>
 
 {% import 'sub/breadcrumbs.twig' as bread %}
@@ -222,8 +284,94 @@
                             <li>
                                 To hide a notification source from members of a role, lock that source to Muted
                             </li>
+                            <li>
+                                To apply updated settings to existing users for a feature, you can use the 'Apply default settings' button in the three dot menu. Note - performing this action will override a users current settings.
+                            </li>
                         </ul>
                     </section>
+
+                    <div class="row">
+                        <div class="small-12 columns">
+                            <h2 class="subheader">Device Notification Pause</h2>
+
+                            <form id="blackoutForm"
+                                  method="post"
+                                  action="{{ routeLookupIfAuthorized('adminNotificationsConfig.postConfig') }}"
+                            >
+                                <div class="switch">
+                                    <input name="notification_blackout_enabled" value="0" type="hidden">
+                                    <input id="blackoutEnabledInput"
+                                           name="notification_blackout_enabled"
+                                           {% if blackoutEnabled %}checked="checked"{% endif %}
+                                           value="1"
+                                           type="checkbox"
+                                    />
+                                    <label for="blackoutEnabledInput">
+                                        <span>On</span>
+                                        <span>Off</span>
+                                    </label>
+                                </div>
+
+                                <section class="content {% if not blackoutEnabled %}hide{% endif %}" id="blackoutInputContainer">
+                                    <p>
+                                        Notifications triggered after
+                                        <input id="blackoutStartTimeInput"
+                                               type="time"
+                                               name="notification_blackout_start_time"
+                                               value="{{ blackoutStartTime }}"
+                                               list="blackoutTimeSteps"
+                                               style="width: auto; display: inline-block"
+                                        />
+                                        each day will be delayed until
+                                        <input id="blackoutEndTimeInput"
+                                               type="time"
+                                               name="notification_blackout_end_time"
+                                               value="{{ blackoutEndTime }}"
+                                               list="blackoutTimeSteps"
+                                               style="width: auto; display: inline-block"
+                                        />
+
+                                        {##
+                                         # Hide next day label if:
+                                         # * either blackout start or end time are unset, or:
+                                         # * both are set, and start < end
+                                         #}
+                                        <span id="blackoutDescriptionNextDay"
+                                              {% if (not blackoutStartTime) or (not blackoutEndTime) or (blackoutStartTime < blackoutEndTime) %}class="hide"{% endif %}
+                                        >the next day</span>.
+
+                                        <datalist id="blackoutTimeSteps">
+                                            {% for hour in 0..23 %}
+                                                {% for minute in [0, 15, 30, 45] %}
+                                                    {% set value = '%02d:%02d' | format(hour, minute) %}
+                                                    <option value="{{ value }}">{{ value }}</option>
+                                                {% endfor %}
+                                            {% endfor %}
+                                        </datalist>
+                                    </p>
+
+                                    <ul>
+                                        <li>
+                                            Both a valid start and end time must be set, otherwise notifications will
+                                            not be delayed.
+                                        </li>
+                                        <li>
+                                            This affects only the sending of notifications sent to a device,
+                                            either via a web app or a <a href="{{ routeLookup('adminNotifications.getApps') }}">delivery provider</a>:
+                                            it does not affect digest, side panel or email notifications.
+                                        </li>
+                                        <li>
+                                            Priority news functionality is unaffected by this setting.
+                                        </li>
+                                        <li>
+                                            If this setting is changed, any notifications which were already delayed due to this setting will still
+                                            be sent at the end of the previous pause period, rather than the new time.
+                                        </li>
+                                    </ul>
+                                </section>
+                            </form>
+                        </div>
+                    </div>
 
                     <div class="actions-small-1 row">
                         <div class="list-item">
@@ -244,11 +392,35 @@
                         {% endfor %}
                     </ul>
 
+                    {% set roletype = filters.options[filters.selected] %}
+                    {% set plural = (roletype == "parent" or roletype == "student") ? "s" : "" %}
+                    {% set roletypeFormatted = (roletype == "all") ? "users" : roletype ~ plural %}
+
                     {% if config|length  %}
                     <div id="configurator">
                         {% for namespace in msgConfig %}
                             {% if ns[namespace.id] is defined %}
-                            <h3 class="subheader">{{ locale.translateSentence(ns[namespace.id].label) }}</h3>
+                            <div class="actions-small-1">
+                                <h3 class="subheader f-no-margins">{{ locale.translateSentence(ns[namespace.id].label) }}</h3>
+                                <nav>
+                                    <sbx-pop-out content-id="feature-pop-out-{{ namespace.id }}"></sbx-pop-out>
+                                </nav>
+                                <ul id="feature-pop-out-{{ namespace.id }}" class="f-dropdown" data-dropdown-content>
+                                    <li>
+                                        <a
+                                            class="icon-export"
+                                            href="#apply-default-settings"
+                                            data-apply-default-button
+                                            data-reveal-id="default-settings-modal"
+                                            data-roletype-formatted="{{ roletypeFormatted }}"
+                                            data-namespace="{{ locale.translateSentence(ns[namespace.id].slug) }}"
+                                            data-namespace-formatted="{{ locale.translateSentence(ns[namespace.id].label) | capitalize }}"
+                                        >
+                                            Apply default settings to all {{ roletypeFormatted }}...
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
                             <section data-namespace="{{ ns[namespace.id].slug }}">
                                 {% for source in namespace.sources %}
                                     {% include '@notifications/source.twig' with { source: source } %}
@@ -257,6 +429,91 @@
                             {% endif %}
                         {% endfor %}
                     </div>
+                    <div data-reveal id="default-settings-modal" class="reveal-modal">
+                        <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+                        <h2>Please confirm</h2>
+                        <p>Are you sure you wish to apply default <span id="default-settings-namespace"></span> settings to all <span id="default-settings-roletype"></span>?</p>
+                        <div id="default-settings-error-message" class="alert-box alert" hidden></div>
+                        <ul class="flex-list buttons">
+                            <li>
+                                <a id="confirm-default-settings" class="button submit">Yes</a>
+                            </li>
+                            <li>
+                                <a id="cancel-default-settings" class="button">Cancel</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <script type="text/javascript">
+                        {% autoescape 'js' %}
+                        /**
+                        * Update the confirmation modal text with the relevant context,
+                        * filling in the empty spans to provide the appropriate details
+                        */
+                        const namespaceSpan = document.getElementById("default-settings-namespace");
+                        const roletypeSpan = document.getElementById("default-settings-roletype");
+                        let currentNamespace = "";
+                        const applyDefaultButtons = document.querySelectorAll("[data-apply-default-button]");
+                        applyDefaultButtons.forEach((applyDefaultButton) => {
+                            applyDefaultButton.addEventListener("click", () => {
+                                currentNamespace = applyDefaultButton.getAttribute("data-namespace");
+                                namespaceSpan.innerText = applyDefaultButton.getAttribute("data-namespace-formatted");
+                                roletypeSpan.innerText = applyDefaultButton.getAttribute("data-roletype-formatted");
+                            });
+                        });
+                        /**
+                        * Confirm the application of default settings
+                        */
+                        const confirmButton = document.getElementById("confirm-default-settings");
+                        confirmButton.addEventListener("click", () => {
+                            // prevent multiple submissions
+                            if (confirmButton.getAttribute("data-is-processing") === "true") {
+                                return;
+                            }
+                            confirmButton.setAttribute("data-is-processing", "true");
+                            confirmButton.innerHTML = "Applying...";
+                            /**
+                             * send through the apply default settings request
+                             */
+                            const toast = window.sbProps.toastActivate("Applying...");
+                            fetch("{{routeLookup('adminNotifications.postApplyDefaultSettings') }}", {
+                                method: "POST",
+                                body: JSON.stringify({
+                                    roletype: "{{ roletype }}",
+                                    namespace: currentNamespace
+                                }),
+                                headers: { "Content-Type": "application/json" },
+                            }).then((response) => {
+                                if (response.ok) {
+                                    $("#default-settings-modal").foundation("reveal", "close");
+                                    toast.timeout({ text: "Settings applied successfully." });
+                                } else {
+                                    return response.json().then((data) => {
+                                        throw new Error(data.message);
+                                    });
+                                }
+                            }).catch((error) => {
+                                /**
+                                 * Display an error message to the user, attempting to retrieve the error message from the response
+                                 */
+                                const errorMessage = error.message || "Sorry, there was an unknown error. Please try again and contact your support if the problem persists.";
+                                const errorElement = document.getElementById("default-settings-error-message");
+                                errorElement.innerHTML = errorMessage;
+                                errorElement.hidden = false;
+                                toast.timeout({ text: "Settings not applied.", isSuccess: false });
+                            }).finally(() => {
+                                confirmButton.setAttribute("data-is-processing", "false");
+                                confirmButton.innerHTML = "Yes";
+                            });
+
+                        });
+                        /**
+                        * Close the default settings modal
+                        */
+                        document.getElementById("cancel-default-settings").addEventListener("click", () => {
+                            $("#default-settings-modal").foundation("reveal", "close");
+                        });
+                        {% endautoescape %}
+                    </script>
                     {% else %}
                     <div class="empty-state">
                         <p>No roles exist with this role type</p>
@@ -274,3 +531,5 @@
 
     <a class="close-reveal-modal">&#215;</a>
 </div>
+
+<div id="toast" class="toast"></div>

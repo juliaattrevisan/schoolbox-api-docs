@@ -20,7 +20,7 @@ class Component_Config_LayoutId extends Component_Config_Abstract
         $key,
         $keyblock,
         $configValue,
-        Component_ControllerAbstract $component = null
+        ?Component_ControllerAbstract $component = null
     ): void {
         $page->setBlock($keyblock, 'layout_select', 'layout_select_block');
         $page->setBlock('layout_select', 'layout_option', 'layout_option_block');

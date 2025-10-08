@@ -23,7 +23,7 @@
                         <!-- BEGIN image -->
                         <li>
                             <div class="list-item">
-                                <div class="card small-12">
+                                <div class="card small-12" data-max-width-height>
                                     <div style="text-align:{IMAGE_ALIGN};">
                                         <img src="{PREVIEW_IMAGE_URL}" alt="{PREVIEW_IMAGE_DESC}" title="{PREVIEW_IMAGE_DESC}" />
                                     </div>
@@ -31,7 +31,15 @@
                             </div>
                         </li>
                     </ul>
-                        <!-- END image -->
+                    <style>
+                        /* ensure the 'Max width/height' component setting is respected */
+                        [data-max-width-height] img {
+                            max-height: {PIXEL}px;
+                            max-width: {PIXEL}px;
+                            width: auto;
+                        }
+                    </style>
+                    <!-- END image -->
                 </div>
                 <!-- BEGIN modify_button -->
                 <div class="component-action">

@@ -8,15 +8,28 @@ export type ProfileEditorFieldSettingOption = {
     id: number | string;
     name: string;
     type: string; // currently unused, e.g. "campus" or "role"
-    meta: Record<ProfileEditorRoleType["roleType"], string> | null; // additional explanation about the option, if required
+    meta: Record<ProfileEditorRoleType["roleType"], string> | string | null; // additional explanation about the option, if required
 };
 
-export type ProfileEditorFieldSettingKey = string;
+// The available field setting keys, as per Profile/Editor/Payload.php
+export enum ProfileEditorFieldSettingKey {
+    AVAILABILITY = "availability",
+    VISIBILITY = "visibility",
+    ADDITIONAL_SETTINGS = "additional",
+}
+
 export type ProfileEditorFieldSettingDefinition = {
     displayAs: string;
-    tooltip: string;
+    tooltip: string | null;
     options: ProfileEditorFieldSettingOption[];
 };
+
+type ProfileEditorFieldSettings = Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingOption["id"][]>;
+
+type ProfileEditorAvailableFieldSettings = Record<
+    ProfileEditorFieldSettingKey,
+    boolean | Record<ProfileEditorFieldSettingOption["id"], boolean>
+>;
 
 // #endregion
 
@@ -29,6 +42,10 @@ export type ProfileEditorAvailableField = {
     css: string | null;
     terminology: string | null; // The terminology key for the field, if it exists - maps to l10n
     category: string; // The category to show the field under (these are the tabs at the top of the field palette)
+    // The default field settings for the field for when it gets selected
+    defaultFieldSettings: ProfileEditorFieldSettings;
+    // Whether each field setting is available (should display) for the field
+    availableFieldSettings: ProfileEditorAvailableFieldSettings;
 };
 
 export type ProfileEditorSelectedField = {
@@ -38,7 +55,9 @@ export type ProfileEditorSelectedField = {
     css: string | null;
     terminology: string | null; // The terminology key for the field, if it exists - maps to l10n
     // A map of each field setting key relevant to the field to an array of the ids of each selected option
-    fieldSettings: Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingOption["id"][]>;
+    fieldSettings: ProfileEditorFieldSettings;
+    // Whether each field setting is available (should display) for the field
+    availableFieldSettings: ProfileEditorAvailableFieldSettings;
 };
 
 export type ProfileEditorMandatoryField = {
@@ -48,7 +67,9 @@ export type ProfileEditorMandatoryField = {
     css: string | null;
     terminology: string | null; // The terminology key for the field, if it exists - maps to l10n
     // A map of each field setting key relevant to the field to an array of the ids of each selected option
-    fieldSettings: Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingOption["id"][]>;
+    fieldSettings: ProfileEditorFieldSettings;
+    // Whether each field setting is available (should display) for the field
+    availableFieldSettings: ProfileEditorAvailableFieldSettings;
 };
 
 // An "Active" field is one that is currently shown on the profile page,
@@ -79,13 +100,19 @@ export type ProfileEditorTabSettingOption = {
     id: number | string;
     name: string;
     type: string; // currently unused, e.g. "campus" or "role"
-    meta: Record<ProfileEditorRoleType["roleType"], string> | null; // additional explanation about the option, if required
+    meta: Record<ProfileEditorRoleType["roleType"], string> | string | null; // additional explanation about the option, if required
 };
 
-export type ProfileEditorTabSettingKey = string;
+// The available tab setting keys, as per Profile/Editor/Payload.php
+export enum ProfileEditorTabSettingKey {
+    AVAILABILITY = "availability",
+    VISIBILITY = "visibility",
+    ADDITIONAL_SETTINGS = "additional",
+}
+
 export type ProfileEditorTabSettingDefinition = {
     displayAs: string;
-    tooltip: string;
+    tooltip: string | null;
     options: ProfileEditorFieldSettingOption[];
 };
 
@@ -95,6 +122,11 @@ export type ProfileEditorTab = {
     label: string;
     // A map of each tab setting key relevant to the tab to an array of the ids of each selected option
     tabSettings: Record<ProfileEditorTabSettingKey, ProfileEditorTabSettingOption["id"][]>;
+    // Whether each tab setting is available (should display) for the tab
+    availableTabSettings: Record<
+        ProfileEditorTabSettingKey,
+        boolean | Record<ProfileEditorTabSettingOption["id"], boolean>
+    >;
 };
 
 // #endregion
@@ -152,8 +184,8 @@ export type ProfileEditorPayload = {
     data: {
         roleTypes: ProfileEditorRoleType[];
         // A map of each field setting key to its definition (display name and options)
-        fieldSettings: Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingDefinition>;
+        fieldSettings: Partial<Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingDefinition>>;
         // A map of each tab setting key to its definition (display name and options)
-        tabSettings: Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingDefinition>;
+        tabSettings: Partial<Record<ProfileEditorFieldSettingKey, ProfileEditorFieldSettingDefinition>>;
     };
 };

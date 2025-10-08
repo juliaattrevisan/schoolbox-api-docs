@@ -8,7 +8,7 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
-        <div class="small-12 island">
+        <div class="small-12 island" id="academic-period-list-container" {% if 0 == terms|length %}style="display:none"{% endif %}>
             <section>
                 <ul class="action-list">
                     {% for term in terms %}
@@ -16,7 +16,13 @@
                     {% endfor %}
                 </ul>
             </section>
+
             <a href="#" class="button submit" data-reveal-id="addTermModal">Add Academic Period</a>
+        </div>
+
+        <div class="empty-state" id="empty-state" {% if 0 != terms|length %}style="display:none"{% endif %}>
+            <i class="icon-list"></i>
+            <p>There aren't any academic periods. <a href="#" data-reveal-id="addTermModal">Add an academic period</a>.</p>
         </div>
     </div>
 </div>
@@ -91,9 +97,25 @@
                     // Delete: remove completely
                     $.post(el.data('postAction'))
                         .done(function(data) {
+                            console.log(action);
                             switch (action) {
                                 case 'delete':
-                                    term.fadeOut({ done: term.remove });
+                                    term.fadeOut({
+                                        done: function() {
+                                            term.remove();
+
+                                            let numItems = $('#academic-period-list-container').find('[data-term]').length;
+
+                                            if (numItems) {
+                                                $('#empty-state').hide();
+                                                $('#academic-period-list-container').show();
+                                            } else {
+                                                $('#empty-state').show();
+                                                $('#academic-period-list-container').hide();
+                                            }
+                                        }
+                                    });
+
                                     break;
                                 case 'archive':
                                 case 'restore':

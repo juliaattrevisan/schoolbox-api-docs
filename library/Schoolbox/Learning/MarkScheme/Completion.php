@@ -34,7 +34,7 @@ class Completion extends AbstractMarkScheme
     /**
      * @inheritdoc
      */
-    public function getHumanReadableMark($normalisedMark, IResponse $response = null): ?string
+    public function getHumanReadableMark($normalisedMark, ?IResponse $response = null): ?string
     {
         // Does the response not exist, or is not submitted, or explicitly marked as incomplete?
         if (!$response || !$response->isSubmitted() || ($response instanceof TaskResponse && !$response->getMarkedComplete())) {
@@ -50,7 +50,7 @@ class Completion extends AbstractMarkScheme
      * @param IResponse|null $response
      * @return float|null
      */
-    public function getNormalisedMark($humanReadableMark, IResponse $response = null): ?float
+    public function getNormalisedMark($humanReadableMark, ?IResponse $response = null): ?float
     {
         if (null === $response || ($response instanceof TaskResponse && !$response->getMarkedComplete())) {
             return self::NORMALISED_MARK_MIN;

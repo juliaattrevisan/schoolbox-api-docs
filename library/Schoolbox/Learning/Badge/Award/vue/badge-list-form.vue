@@ -1,6 +1,7 @@
 <script>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
 import RevealModal from "@schoolboxVue/components/reveal-modal";
 import BadgeImage from "../../vue/badge-image";
@@ -373,18 +374,23 @@ export default {
             this.isProcessing = true;
 
             Promise.all(
-                this.selectedBadges.map((badge) => {
+                this.selectedBadges.map(async (badge) => {
                     /* Construct each payload for each badge uniquely
                      */
-                    const payload = this.awardToSelfOnly ? null : { users: this.users };
+                    const payload = this.awardToSelfOnly ? {} : { users: this.users };
 
-                    fetch(badge._links[this.postAwardRouteLookup], {
+                    const resp = await fetch(badge._links[this.postAwardRouteLookup], {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json",
                         },
                         body: JSON.stringify(payload),
                     });
+
+                    if (!resp.ok) {
+                        console.error(`Failed to award badge`, await resp.text());
+                        throw new Error(`Failed to award badge`);
+                    }
                 }),
             )
                 .then(() => {

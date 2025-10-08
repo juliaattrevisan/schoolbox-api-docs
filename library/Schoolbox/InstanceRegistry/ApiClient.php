@@ -28,15 +28,12 @@ class ApiClient
      */
     private const API_LATEST_RELEASE_URL = '/api/releases/schoolbox/latest';
 
+    private const CACHE_PREFIX = 'ir_';
+
     /**
      * @var int duration in seconds to cache responses
      */
     private int $cachedTime;
-
-    /**
-     * Schoolbox configuration
-     */
-    private IConfigLoader $config;
 
     /**
      * @var string
@@ -46,11 +43,11 @@ class ApiClient
     /**
      * ApiClient constructor.
      *
-     * @param IConfigLoader $config
+     * @param IConfigLoader       $config Schoolbox configuration
+     * @param \Alaress\Http\Cache $cache  Cache for HTTP requests
      */
-    public function __construct(IConfigLoader $config)
+    public function __construct(private IConfigLoader $config, private \Alaress\Http\Cache $cache)
     {
-        $this->config     = $config;
         $this->apiUrl     = $this->config->get('instance_registry_url');
         $this->cachedTime = (int)$this->config->get('instance_registry_api_caching');
     }
@@ -88,9 +85,12 @@ class ApiClient
     {
         // Cache the request
         try {
-            $cache = new Cache($this->cachedTime);
-            $cache->init("{$this->apiUrl}{$requestUrl}");
-            $response = $cache->getStreamContents();
+            $response = $this->cache->request(
+                "{$this->apiUrl}{$requestUrl}",
+                self::CACHE_PREFIX,
+                [],
+                $this->cachedTime,
+            );
         } catch (InvalidArgumentException $e) {
             throw new DomainException('Invalid Instance Registry API endpoint');
         }

@@ -610,13 +610,13 @@ class EventMapper extends Schoolbox\Mapper implements Schoolbox\IHomepageCleanab
 
 
     /**
-     * @param int                 $seriesId
-     * @param Alaress_Date_Format $now
+     * @param int                      $seriesId
+     * @param Alaress_Date_Format|null $now
      * @return Event
      * @throws MapperException
      * @throws PDOException
      */
-    public function findNextInSeries($seriesId, Alaress_Date_Format $now = null)
+    public function findNextInSeries($seriesId, ?Alaress_Date_Format $now = null)
     {
         $now = $now ?: Alaress_Date_Format::now();
 

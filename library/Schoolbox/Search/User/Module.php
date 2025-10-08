@@ -59,7 +59,6 @@ class Module extends BaseModule
             $this->injector->get('externalClass'),
             $this->getMapperFactory()->get(ProfileButtonMapper::class),
             $this->getMapperFactory()->get(\Timetable_ColourMapper::class),
-            $this->getMapperFactory()->get(\Schoolbox\ProfessionalDevelopment\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Pastoral\Type\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Pastoral\SubType\Mapper::class),
             $this->injector->get('pastoralDataSource'),
@@ -72,6 +71,8 @@ class Module extends BaseModule
             ),
             $this->getMapperFactory()->get(\Schoolbox\Admin\Profile\Editor\Field\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Admin\Profile\Editor\Tab\Mapper::class),
+            $this->injector->get('calendarApiFactory'),
+            $this->injector->get('l10n'),
         );
     }
 

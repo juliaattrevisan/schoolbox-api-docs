@@ -5,7 +5,6 @@
 
 import { slideDownOnEnter, slideUpOnLeave } from "@schoolboxVue/transitions/transitions";
 import PeTabsTabEditSetting from "./pe-tabs-tab-edit-setting.vue";
-import { useProfileEditorStore } from "./store/profileEditorStore";
 import { useProfileEditorTabsStore } from "./store/profileEditorTabsStore";
 import type { ProfileEditorTab } from "./types/profileEditorTypes";
 
@@ -15,17 +14,8 @@ interface Props {
 }
 
 const props = defineProps<Props>();
-const peStore = useProfileEditorStore();
 const peTabsStore = useProfileEditorTabsStore();
 const emit = defineEmits(["close"]);
-
-/**
- * A list of all the tab setting keys that are valid for the current tab
- */
-const validTabSettingKeys = window.Vue.computed(() => {
-    const validKeysForTab = Object.keys(props.tab.tabSettings);
-    return Object.keys(peStore.tabSettings).filter((tabSettingKey) => validKeysForTab.includes(tabSettingKey));
-});
 
 const isUpdating = window.Vue.ref(false);
 
@@ -47,7 +37,7 @@ async function onUpdateClicked(): Promise<void> {
     <Transition @enter="slideDownOnEnter" @leave="slideUpOnLeave">
         <div v-if="props.isOpen" class="column content small-12">
             <pe-tabs-tab-edit-setting
-                v-for="tabSettingKey in validTabSettingKeys"
+                v-for="(_, tabSettingKey) in props.tab.availableTabSettings"
                 :key="tabSettingKey"
                 :tab="props.tab"
                 :tab-setting-key="tabSettingKey"
@@ -56,6 +46,7 @@ async function onUpdateClicked(): Promise<void> {
                 type="submit"
                 :value="isUpdating ? 'Updating...' : 'Update'"
                 :disabled="isUpdating"
+                :data-test="`${peTabsStore.getTabIdentifier(props.tab.id)}-settings-confirm`"
                 @click="onUpdateClicked"
             />
         </div>

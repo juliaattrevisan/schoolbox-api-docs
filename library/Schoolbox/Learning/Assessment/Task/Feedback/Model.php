@@ -226,10 +226,10 @@ class Model extends AbstractFeedback
     }
 
     /**
-     * @param IResponse|TaskResponse $response
+     * @param IResponse|null $response
      * @return static
      */
-    public function setResponse(IResponse $response = null)
+    public function setResponse(?IResponse $response = null)
     {
         if (is_null($response)) {
             throw new \InvalidArgumentException('TaskFeedbacks must always link to a TaskResponse');

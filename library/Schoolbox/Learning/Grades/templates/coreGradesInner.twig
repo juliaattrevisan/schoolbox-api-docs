@@ -8,6 +8,7 @@
         'folders'                Folder[]         All folders available in filter panel
         'markbook'               Markbook         Filtered markbook
         'canSeeGraph'            bool
+        'canSeeInstructorMarks'  bool
         'graph'                  array
         'returnUrlSuffix'        string
         'conversationsPerFolder' Conversation[]   Conversations of selected folders, indexed by folder.id
@@ -15,7 +16,6 @@
         'transitions'            array            Used by progressTickForm.
 #}
 
-<script type="text/javascript" src="{{ CDN_PREFIX }}/js/submissions/task/jquery.progressTickForm.js?v={{ config.site_version }}"></script>
 <script type="text/javascript">
     $(function () {
         $('[data-collapser="true"]').collapsable({
@@ -60,15 +60,18 @@
 {% endblock %}
 {% if markbook.assessments | length %}
 <script type="text/javascript">
-    $(function() {
-        // Save form for task completion
-        $('form[data-progress-tick-form]').progressTickForm({
-            transitions: {
-                incomplete:      '{{ transitions['incomplete'] }}',
-                selfAssessed:    '{{ transitions['selfAssessed'] }}',
-                teacherAssessed: '{{ transitions['teacherAssessed'] }}'
-            }
-        });
+    window.sbProps.injectScriptsIfNotLoaded({
+        srcList: ["{{ CDN_PREFIX }}/js/submissions/task/jquery.progressTickForm.js?v={{ config.site_version }}"],
+        onComplete: () => {
+            // Save form for task completion
+            $('form[data-progress-tick-form]').progressTickForm({
+                transitions: {
+                    incomplete:      '{{ transitions['incomplete'] }}',
+                    selfAssessed:    '{{ transitions['selfAssessed'] }}',
+                    teacherAssessed: '{{ transitions['teacherAssessed'] }}'
+                }
+            });
+        }
     });
 </script>
 <div class="row">
@@ -77,6 +80,8 @@
             <script type="text/javascript">
                 $(function () {
                     $('[data-collapser]').collapsable();
+                    // As this can be loaded asynchonously, we need to reinitialise any media players inside the report
+                    $.fn.schoolboxResource_ProxyReplacement('.activity-list');
                 });
             </script>
 
@@ -98,14 +103,16 @@
                                 <li class="project">
                                     {% include '@learningGrades/fragments/assessmentGrade.twig' with {
                                         assessment:  assessment.assessment,
-                                        student:     student
+                                        student:     student,
+                                        canViewInstructorMarks: canViewInstructorMarks
                                     } only %}
                                     <ul>
                                         {% for projectAssessment in assessment.assessments %}
                                         <li class="assessment">
                                             {% include '@learningGrades/fragments/assessmentGrade.twig' with {
                                                 assessment:  projectAssessment,
-                                                student:     student
+                                                student:     student,
+                                                canViewInstructorMarks: canViewInstructorMarks
                                             } only %}
                                         </li>
                                         {% endfor %}
@@ -115,7 +122,8 @@
                                 <li class="assessment">
                                     {% include '@learningGrades/fragments/assessmentGrade.twig' with {
                                         assessment:  assessment.assessment,
-                                        student:     student
+                                        student:     student,
+                                        canViewInstructorMarks: canViewInstructorMarks
                                     } only %}
                                 </li>
                                 {% endif %}
@@ -138,4 +146,3 @@
     </div>
 </div>
 {% endif %}
-

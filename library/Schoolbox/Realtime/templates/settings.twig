@@ -33,35 +33,25 @@
                     formdata = $('<form/>').append($input.clone()).serialize(),
                     sourceId = $input.data(dataField) || dataField;
 
-            if (iiCache[sourceId]) {
-                clearTimeout(iiCache[sourceId]);
+            const toast = window.sbProps.toastActivate("Saving...");
+            try {
+                $.post(action, formdata)
+                    .done(() => {
+                        toast.timeout({ text: "Saved" });
+                    })
+                    .fail(() => {
+                        toast.timeout({
+                            text: "Save failed, please contact your support if the problem persists",
+                            isSuccess: false
+                        });
+                    })
+            } catch (error) {
+                toast.timeout({
+                    text: "Save failed, please contact your support if the problem persists",
+                    isSuccess: false
+                });
             }
-
-            iiCache[sourceId] = setTimeout(function () {
-                document.dispatchEvent(new CustomEvent("TOAST__ACTIVATE", {
-                    detail: { text: "Saving..." }
-                }));
-                try {
-                    $.post(action, formdata)
-                        .done(() => {
-                            document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
-                                detail: { text: "Saved" }
-                            }));
-                        })
-                        .fail(() => {
-                            document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
-                                detail: { text: "Save failed, please contact your support if the problem persists", isSuccess: false }
-                            }));
-                        })
-                } catch (error) {
-                    document.dispatchEvent(new CustomEvent("TOAST__TIMEOUT", {
-                        detail: { text: "Save failed, please contact your support if the problem persists", isSuccess: false }
-                    }));
-                }
-            }
-            , 500);
         }
-
     });
 </script>
 
@@ -71,31 +61,8 @@
     </div>
 </div>
 <form method="post" action="{{ routeLookup('notifications.saveConfig') }}" id="msg-settings" class="row">
-    {% if config.messaging_enabled %}
-        {% set installGoogle = config.digistorm_google_play_store_link ?? '' %}
-        {% set installApple = config.digistorm_apple_app_store_link ?? '' %}
-        {% if config.pwa_enable or config.web_push_notifications_enabled or installGoogle is not empty or installApple is not empty %}
-        <div data-pwa="settingsPrompt" class="hide">
-            <div class="small-12 columns">
-                <div class="row actions-small-1">
-                    <div class="list-item">
-                        <div class="small-12 columns">
-                            <h2 class="subheader">Setup {{ config.title }} web app</h2>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="small-12 island">
-                <section class="content">
-                    {% include '@notifications/pwa.twig' with { notifButton : 'notifOnSettings', pwaPage: 'settings' } %}
-                    {% if config.web_push_notifications_enabled %}
-                        <p class="notifNote"><strong>Note:</strong> If you want to receive push notifications on multiple devices, you must enable notifications on all your devices.</p>
-                    {% endif %}
-                </section>
-            </div>
-        </div>
-        {% endif %}
-    {% endif %}
+    {% include '@notifications/pwa.twig' with { pwaPage: 'settings' } %}
+
     <div class="small-12 columns">
         <div class="row actions-small-1">
             <div class="list-item">

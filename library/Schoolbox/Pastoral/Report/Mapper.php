@@ -49,7 +49,11 @@ class Mapper extends BaseMapper
         $this->uses('relative_date_string', self::TYPE_STRING);
         $this->uses('before_date', self::TYPE_DATETIME);
         $this->uses('after_date', self::TYPE_DATETIME);
+        $this->uses('include_archived_records', self::TYPE_BOOLEAN);
         $this->uses('involved', self::TYPE_BOOLEAN);
+
+        // Summary table options
+        $this->uses('summary_tables', self::TYPE_STRING);
 
         // Filter criteria CSV strings
 

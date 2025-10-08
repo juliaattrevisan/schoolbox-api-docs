@@ -18,6 +18,9 @@
 {# ----------------------------------------------------------- #}
 <fieldset>
     <label class="required" for="title">Title</label>
+    {% if customisedFor is defined %}
+        <p class="meta">The title cannot be the same as the original activity.</p>
+    {% endif %}
     <input type="text" name="title" id="title" data-test="assessment-form-input-title" value="{{ assessment.title }}" required maxlength="255" {% if courseManaged.isReadonly %}readonly{% endif %} />
 
     <div class="row">
@@ -66,6 +69,17 @@
         </div>
         {% endif %}
     </div>
+
+    {# ----------------------------------------------------------- #}
+    {# Curriculum #}
+    {# ----------------------------------------------------------- #}
+    {% include '@learningAssessment/fragments/curriculumCodes.twig' with {
+        entityType: locale.dueWork.proper,
+        courseManagedReadonly: courseManaged.isReadonly,
+        excludeLegend: true,
+        hasTabs: true,
+        parentFolderId: parentFolderId ?? null,
+    } %}
 
     <label for="assessment-description">Description</label>
     <textarea name="description" id="assessment-description" data-test="assessment-form-input-description">{{ assessment.description }}</textarea>
@@ -133,9 +147,12 @@
                 {% if kami_enabled %}
                 <li {% if not config.kami_worksheets_enabled %}style="display:none"{% endif %}>
                     <input id="worksheet" {% if courseManaged.isReadonly %} readonly {% endif %} type="checkbox" {{ assessment.getEnableWorksheet ? 'checked' : '' }} name="submissionOptions[]" value="enableWorksheet" data-type-group>
-                    <label for="worksheet" class="checkbox-label">Interactive Worksheet </label>
-                    <span class="hint has-tip tip-top" data-tooltip title="This provides students with one interactive worksheet per due work that they can interact with online. As a teacher, you can monitor and provide in-line feedback as the student progresses. ">?</span>
-                    <div id="worksheetDropzone" {{ assessment.getEnableWorksheet ? '' : 'style="display:none"' }}>  {% include 'sub/attachzone.twig' with {attachzone: attachzoneWorksheet} only %} </div>
+                    <label for="worksheet" class="checkbox-label" data-test="assessment-form-submission-type-interactive_worksheet">Interactive Worksheet </label>
+                    <span class="hint has-tip tip-top" data-tooltip title="This provides students with one interactive worksheet per {{ locale.dueWork.proper }} that they can interact with online. As a teacher, you can monitor and provide in-line feedback as the student progresses. ">?</span>
+                    <div id="worksheetDropzone" {{ assessment.getEnableWorksheet ? '' : 'style="display:none"' }}>
+                        <p class="meta">You can't edit or replace the template after the {{ locale.dueWork.proper }} has been created and the template has been added.  Please upload only when it's final.</p>
+                        {% include 'sub/attachzone.twig' with {attachzone: attachzoneWorksheet} only %}
+                    </div>
                     <input type="hidden" name="worksheet-file" id="worksheet-file" />
 
                     {# Forcibly untick this checkbox to fool the validator
@@ -153,7 +170,7 @@
                 <li>
                     <input id="allow-offline" {% if courseManaged.isReadonly %} readonly {% endif %} type="checkbox" {{ assessment.getEnableOffline ? 'checked' : '' }} name="submissionOptions[]" value="enableOffline" data-type-group>
                     <label for="allow-offline" class="checkbox-label" data-test="assessment-form-submission-type-allow-offline">Submit in person</label>
-                    <span class="hint has-tip tip-top" data-tooltip title="This will allow students who submit their due work in person to acknowledge that it has been completed.">?</span>
+                    <span class="hint has-tip tip-top" data-tooltip title="This will allow students who submit their {{ locale.dueWork.proper }} in person to acknowledge that it has been completed.">?</span>
                 </li>
                 <li>
                     <input id="text-editor" {% if courseManaged.isReadonly %} readonly {% endif %} type="checkbox" {{ assessment.getEnableText ? 'checked' : '' }} name="submissionOptions[]" value="enableText" data-type-group>
@@ -163,13 +180,13 @@
                 <li>
                     <input id="files" {% if courseManaged.isReadonly %} readonly {% endif %} type="checkbox" {{ assessment.getEnableFiles ? 'checked' : '' }} name="submissionOptions[]" value="enableFiles" data-type-group>
                     <label for="files" class="checkbox-label" data-test="assessment-form-submission-type-files">File Upload</label>
-                    <span class="hint has-tip tip-top" data-tooltip title="This will allow students to upload files as part of their due work submission.">?</span>
+                    <span class="hint has-tip tip-top" data-tooltip title="This will allow students to upload files as part of their {{ locale.dueWork.proper }} submission.">?</span>
                 </li>
             </ul>
             {% if lmsStudentPolicy | length %}
                 <input type="hidden" name="enablePolicy" value="{% if courseManaged.isReadonly and assessment.getEnablePolicy %}on{% else %}0{% endif %}" />
                 <label for="declaration" class="inline-block">Student Authenticity Declaration Terms</label>
-                <span class="hint has-tip tip-top" data-tooltip title="This will require students to agree to the terms of the student authenticity declaration when they submit due work.">?</span>
+                <span class="hint has-tip tip-top" data-tooltip title="This will require students to agree to the terms of the student authenticity declaration when they submit {{ locale.dueWork.proper }}.">?</span>
                 </br><aside class="meta"><a class="link" data-reveal-id="policyDialog">View Authenticity Declaration Terms</a></aside>
                 <div class="switch">
                     <input name="enablePolicy" id="declaration" type="checkbox" {% if assessment.getEnablePolicy %}checked="checked"{% endif %} {% if courseManaged.isReadonly %}disabled{% endif %} />
@@ -208,7 +225,7 @@
 
     {% if selfAssessmentEnabled %}
         <label>{{ locale.selfReflection.proper }} <span data-tooltip class="hint has-tip tip-top"  title="Enabling '{{ locale.selfReflection.proper }}' allows students to reflect on their work with a comment, and rubric if provided. Also enabling '{{ locale.selfAssessment.proper }}' gives students the ability to provide themselves a grade.">?</span>
-            <select name="self_reviewable" {% if courseManaged.isReadonly %}readonly{% endif %}>
+            <select name="self_reviewable" {% if courseManaged.isReadonly %}readonly{% endif %} data-test="assessment-form-select-selfReflection">
                 {% for selfReviewType in selfReviewTypes %}
                     <option value="{{ selfReviewType.value }}"
                         {% if assessment.selfReviewability == selfReviewType.value %}
@@ -234,16 +251,14 @@
     {% set markTypeTotalMark = 3 %}
     {% set markTypeNone = 6 %}
 
-    {% include '@learningAssessment/fragments/markType.twig' with {
-        context: '',
+    {% include '@learningAssessment/fragments/dualMarkTypes.twig' with {
         assessment: assessment,
         allMarkTypes: allMarkTypes,
         allGradeSchemes: allGradeSchemes,
-        selectedMarkType: assessment.markType.id ?? null,
-        selectedGradeGroup: assessment.gradeGroup.id ?? null,
+        selectedMaxMark: assessment.instructorMaxMark ?? null,
+        selectedMarkType: assessment.instructorMarkType.id ?? null,
+        selectedGradeGroup: assessment.instructorGradeGroup.id ?? null,
         defaultGradeGroup: defaultGradeGroup,
-        renderMaxMark: true,
-        markTypeLabel: 'Mark Type',
         courseManagedReadonly: courseManaged.isReadonly
     } %}
 
@@ -270,14 +285,6 @@
 {% endif %}
 
 {# ----------------------------------------------------------- #}
-{# Curriculum #}
-{# ----------------------------------------------------------- #}
-{% include '@learningAssessment/fragments/curriculumCodes.twig' with {
-    entityType: locale.dueWork.proper,
-    courseManagedReadonly: courseManaged.isReadonly
-} %}
-
-{# ----------------------------------------------------------- #}
 {# Submit #}
 {# ----------------------------------------------------------- #}
 {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
@@ -295,6 +302,9 @@
                 maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                 targetElements: ['#assessment-description'],
                 fileBrowserCategoryId: {{ context.baseContext.folder.id ?? 0 }},
+                 {% if editorTemplates is defined %}
+                    templates: {{ editorTemplates|json_encode|raw }},
+                {% endif %}
             }
         }));
 
@@ -381,7 +391,8 @@
          * Initializes the rubric grid.
          */
         function initRubricGrid() {
-            var $maxMarkInput = $('#maxMark');
+            var $maxMarkInput = $('#maxMark'); // The display (learner) max mark
+            var $maxMarkInputInstructor = $('#instructor-maxMark'); // The input (instructor) max mark
             var $useRubricSwitch = $('#useRubric');
 
             /**
@@ -390,6 +401,7 @@
              */
             function disableMaxMark() {
                 $maxMarkInput.prop('readonly', true);
+                $maxMarkInputInstructor.prop('readonly', true);
             }
 
             /**
@@ -397,6 +409,7 @@
              */
             function enableMaxMark() {
                 $maxMarkInput.prop('readonly', false);
+                $maxMarkInputInstructor.prop('readonly', false);
             }
 
             /**
@@ -412,6 +425,7 @@
 
                     // Need to validate the max mark
                     $maxMarkInput.valid();
+                    $maxMarkInputInstructor.valid();
                 }
             }
 
@@ -607,6 +621,9 @@
 
                 // Set and validate the max mark
                 $('#maxMark').val(max).valid();
+
+                // Set and validate the instructor max mark
+                $('#instructor-maxMark').val(max).valid();
             }
 
             function calculateGroupTotal(groupIdentifier) {

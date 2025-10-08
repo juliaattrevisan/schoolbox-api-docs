@@ -3,8 +3,6 @@
  * To manage Curriculum nodes, being able to view the entire node tree and
  * CRUD individual nodes
  */
-
-import * as toast from "@schoolboxVue/components/toast/sbxToastEvent";
 import { getEmptyNode } from "@schoolboxCurriculum/js/nodeUtils";
 import { useStore } from "./store/manageCurriculumStore";
 import { useNodesStore } from "./store/mcNodesStore";
@@ -54,8 +52,7 @@ function initErrorListener(): void {
             onError((error) => {
                 console.error(error);
                 const errorMessage = (error as Error).message;
-                toast.activate(errorMessage);
-                toast.timeout({ text: errorMessage, isSuccess: false });
+                window.sbProps.toastActivate(errorMessage).timeout({ text: errorMessage, isSuccess: false });
             });
         }
     });

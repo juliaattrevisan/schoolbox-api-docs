@@ -40,7 +40,7 @@ const saveText = window.Vue.computed(() => (props.savedSelected.length === 0 ? "
     <ul class="flex-list buttons">
         <li><button type="button" class="button" :disabled="false" @click.prevent="onCancel">Cancel</button></li>
         <li>
-            <button type="button" class="button submit" @click.prevent="onSelect">
+            <button type="button" class="button submit" data-test="ssm-footer-save-button" @click.prevent="onSelect">
                 {{ saveText }}
             </button>
         </li>

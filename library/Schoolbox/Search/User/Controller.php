@@ -13,6 +13,7 @@ use Alaress\Color\ColorFactory;
 use Alaress\Web\Controller\Base as BaseController;
 use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
+use Calendar_Api_Factory;
 use Custom;
 use Eportfolio_Authenticator;
 use External_ClassInterface;
@@ -20,7 +21,9 @@ use External_UserInterface;
 use Schoolbox\Admin\Profile\Editor\Field\Mapper;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
 use Schoolbox\Config\ConfigMapper;
-use Schoolbox\Geosnapshot\ValidStudentPhotosAvailable;
+use Schoolbox\Geosnapshot\ValidPhotosAvailable;
+use Schoolbox\L10n\RosettaStone;
+use Schoolbox\Learning\Moment\Moderation\ModerationRequired;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral\Count\Helper as PastoralCountHelper;
 use Schoolbox\Pastoral\DataSource as PastoralDataSource;
@@ -28,12 +31,11 @@ use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
-use Schoolbox\ProfessionalDevelopment\Mapper as ProfessionalDevelopmentMapper;
 use Schoolbox\Profile\Button\Mapper as ProfileButtonMapper;
 use Schoolbox\Profile\ValidDetailsVisible;
 use Schoolbox\Profile\ValidEmailVisible;
-use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Resource\Folder\Code\ClassCodeMatchFactory;
+use Schoolbox\Resource\Folder\Code\Model as FolderCode;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Role;
 use Schoolbox\RoleMapper;
@@ -43,6 +45,7 @@ use Schoolbox\UserMapper;
 use Timetable_ColourManager;
 use Timetable_ColourMapper;
 use Twig\Environment;
+use Twig\Error\Error;
 
 /**
  * The controller for the mock version of the search API.
@@ -65,7 +68,6 @@ class Controller extends BaseController
      * @param External_ClassInterface                    $externalClass
      * @param ProfileButtonMapper                        $profileButtonMapper
      * @param Timetable_ColourMapper                     $timetableColourMapper
-     * @param ProfessionalDevelopmentMapper              $professionalDevelopmentMapper
      * @param PastoralTypeMapper                         $pastoralTypeMapper
      * @param PastoralSubTypeMapper                      $pastoralSubTypeMapper
      * @param PastoralDataSource                         $pastoralDataSource
@@ -73,6 +75,7 @@ class Controller extends BaseController
      * @param \Schoolbox\External\User                   $userRelationHydrator
      * @param Mapper                                     $fieldMapper
      * @param \Schoolbox\Admin\Profile\Editor\Tab\Mapper $tabMapper
+     * @param Calendar_Api_Factory                         $calendarApiFactory
      */
     public function __construct(
         private UserMapper $userMapper,
@@ -83,7 +86,6 @@ class Controller extends BaseController
         private External_ClassInterface $externalClass,
         private ProfileButtonMapper $profileButtonMapper,
         private Timetable_ColourMapper $timetableColourMapper,
-        private ProfessionalDevelopmentMapper $professionalDevelopmentMapper,
         private PastoralTypeMapper $pastoralTypeMapper,
         private PastoralSubTypeMapper $pastoralSubTypeMapper,
         private PastoralDataSource $pastoralDataSource,
@@ -91,6 +93,8 @@ class Controller extends BaseController
         private \Schoolbox\External\User $userRelationHydrator,
         private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper,
         private \Schoolbox\Admin\Profile\Editor\Tab\Mapper $tabMapper,
+        private Calendar_Api_Factory $calendarApiFactory,
+        private RosettaStone $rosettaStone,
     ) {
     }
 
@@ -163,7 +167,6 @@ class Controller extends BaseController
         }
 
         $pastoralCountHelper = null;
-        $pastoralCountPeriod = null;
 
         if ($showPastoral) {
             $pastoralCountHelper = (new PastoralCountHelper(
@@ -173,8 +176,6 @@ class Controller extends BaseController
                 $this->pastoralDataSource,
                 $this->termMapper
             ));
-
-            $pastoralCountPeriod = (int)$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_FLAG_COUNT_PERIOD);
         }
 
         /* Full Payload Construction
@@ -183,19 +184,20 @@ class Controller extends BaseController
          * Note this uses a callback to inject some data halfway through the compilation algorithm
          * to service this extra widgety thing, Pastoral Counts
          */
-        $externalUser = (new \Schoolbox\Profile\Field\Factory($this->fieldMapper, $this->userMapper, $this->externalUser))
-            ->produce($student, $this->getUser(), [
+        $externalUser = (new \Schoolbox\Profile\Field\Factory(
+            $this->fieldMapper,
+            $this->userMapper,
+            $this->externalUser,
+            $this->calendarApiFactory,
+        ))->produce($student, $this->getUser(), [
                 /* Inject pastoral counts so it executes in proper place deeper in the Factory
                  * ...but only if Pastoral Counts were a renderable field, as per admin
                  */
-                'pastoralCounts' => static function () use ($pastoralCountHelper, $pastoralCountPeriod, $viewee, $viewer) {
+                'pastoralCounts' => static function () use ($pastoralCountHelper, $viewee, $viewer) {
                     if ($pastoralCountHelper) {
                         return $pastoralCountHelper->countStudentEventsByTypes(
                             $viewer,
                             $viewee,
-                            null,
-                            null,
-                            $pastoralCountHelper->getStartDate($pastoralCountPeriod)
                         );
                     }
 
@@ -211,6 +213,11 @@ class Controller extends BaseController
          */
         $tabs = $this->tabMapper->findRenderable($student, $this->getUser());
 
+        /* Whether Learning Moment Moderation was required for this student; this forces their
+         * learning moment posts to be moderated by a staff before being pushed into the world
+         */
+        $globalConfig = (bool)$this->getConfigLoader()->get(ConfigMapper::NAME_LEARNING_MOMENTS_MODERATION_ENABLED);
+        $moderationRequired = (new ModerationRequired())->isSatisfiedBy($globalConfig, $this->getUser()->getYear());
 
         /* Old implementation below
          */
@@ -448,18 +455,6 @@ class Controller extends BaseController
         }
         $allTeacherIds = array_unique(array_filter($allTeacherIds));
 
-        $pd = null;
-        if (strtolower($this->getConfigLoader()->get('site_school_code')) === 'help') {
-            /* Load Professional Development details if they exist
-             */
-            try {
-                $pd = $this->professionalDevelopmentMapper->findOneByColumn('user_id', $student->getId());
-            } catch (MapperException $e) {
-                // noop
-            }
-        }
-
-
         $showDetails   = (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($student, $this->getUser());
         $showEmails    = (new ValidEmailVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($student, $this->getUser());
 
@@ -489,7 +484,7 @@ class Controller extends BaseController
         /* Decide whether View Photos (Geosnapshots) is available for this student
          * If you're allowed to make this request...
          */
-        $isGeosnapshotAvailable = (new ValidStudentPhotosAvailable())
+        $isGeosnapshotAvailable = (new ValidPhotosAvailable())
             ->isSatisifiedBy(
                 $this->getConfigLoader()->get('geosnapshot_api_key'),
                 $this->getConfigLoader()->get('geosnapshot_enabled'),
@@ -513,6 +508,68 @@ class Controller extends BaseController
         // Eventually: this will likely be made a config setting with wider
         // scope (e.g. search results, grades).
         $sharedCampuses = $this->getUser()->getCampusCollection()->intersect($student->getCampusCollection());
+
+
+        /* Further restrict access to profile tabs more than just by availability and visibility (which is what $tabs is right now)
+         */
+        $hasEmergencyContacts = count($externalUser['data']['roleTypes']['tabs']['emergencyContacts']) > 0;
+
+        /* (For all role types) If any of these fail, the tab should never exist */
+        $tabConstraintsBase = [
+            /* unless the tab is known in this list, it should not be shown */
+            '_default'     => false,
+            'activity'     => ($this->getConfigLoader()->get('learning_moments_enabled') && $student->getLearningMomentsEnabled())
+                || $this->getConfigLoader()->get('badges_enabled')
+                || $this->getConfigLoader()->get('grades_enabled'),
+            'goals'        => $this->getConfigLoader()->get('badges_enabled'),
+            'achievements' => $this->getConfigLoader()->get('badges_enabled'),
+            'classes'      => $student->isShowTimetable(),
+            'groups'       => true,
+            /**
+             * TODO: Check this for if it actually should differ between role types
+             * (from the twig) contacts: users must have showContacts truthy and have at least one contact
+             * or the viewer is a primary carer and the viewee has at least one
+             * emergency contact. This is really particular.
+             *
+             * See tabConstraintsRoleType
+             */
+            'contacts'     => true,
+        ];
+
+        /* (For specific role types) If any of these fail, the tab should never exist */
+        $tabConstraintsRoleType = [
+            'student' => [
+                /* only a student can view their own profile tabs, this is checked by $tabs already so fall back to true */
+                '_default' => true,
+                'contacts' => (($student->isShowContacts() || $isPrimaryCarer) && (count($contacts) > 0 || $hasEmergencyContacts)),
+            ],
+            'parent'  => [
+                /* only parents of a student can view the contacts tab, this is checked by $tabs already so fall back to true */
+                '_default' => true,
+                'contacts' => (($student->isShowContacts() || $isPrimaryCarer) && (count($contacts) > 0 || $hasEmergencyContacts)),
+            ],
+            'staff'   => [
+                /* staff can view a student's profile tabs if their role has viewStudentProfile enabled */
+                '_default' => $this->getUser()->getRole()->getViewStudentProfile(),
+                'contacts' => $this->getUser()->getRole()->getViewStudentProfile()
+                    && (($student->isShowContacts() && count($contacts) > 0) || ($isPrimaryCarer && $hasEmergencyContacts)),
+            ],
+        ];
+
+        /* deactivate any tab if it doesn't meet the additional constraints above */
+        $tabs = $tabs->filter(function ($tab) use ($tabConstraintsBase, $tabConstraintsRoleType) {
+            $roleTypeConstraints = $tabConstraintsRoleType[$this->getUser()->getRole()->getType()];
+
+            if (($roleTypeConstraints[$tab->getTab()] ?? $roleTypeConstraints['_default']) === false) {
+                return false;
+            }
+
+            if (($tabConstraintsBase[$tab->getTab()] ?? $tabConstraintsBase['_default']) === false) {
+                return false;
+            }
+
+            return true;
+        });
 
         $this->response = $this->responseFromTemplate(
             'user/student.twig',
@@ -545,7 +602,7 @@ class Controller extends BaseController
                  * custom buttons, as far as the end user is concerned
                  */
                 'buttons' => $buttons,
-                /* A sequenced list of tabs
+                /* A sequenced list of tabs that the user can see
                  */
                 'possibleTabs' => $tabs,
                 /* Retain this old check
@@ -573,14 +630,17 @@ class Controller extends BaseController
                 /* The current user session - sadly a superglobal for portability reasons
                  */
                 'session' => $_SESSION,
-
+                /* Links to be displayed in the 3-dot menu.
+                 */
+                'linksInfo' => $this->getProfileThreeDotMenuLinksInfo($viewer, $student),
+                /* Learning Moment Moderation requirement for this student
+                 */
+                'moderationRequired' => $moderationRequired,
 
                 /* Old implementation
                  */
                 'subjects'                 => $subjects,
                 'groups'                   => $groups,
-                'pdStates'                 => $this->professionalDevelopmentMapper->getStates(),
-                'pd'                       => $pd,
                 'travelLogs'               => $travelLogs,
                 'learningMomentCanComment' => $learningMomentCanComment,
                 'canEmailStaff'            => $canEmailStaff,
@@ -596,8 +656,7 @@ class Controller extends BaseController
      * @param User $staff
      * @return void
      * @throws MapperException
-     * @throws \DomainException
-     * @throws \UnexpectedValueException
+     * @throws Error
      */
     private function renderStaff(User $staff): void
     {
@@ -607,14 +666,29 @@ class Controller extends BaseController
          * Note this uses a callback to inject some data halfway through the compilation algorithm
          * to service this extra widgety thing, Pastoral Counts
          */
-        $externalUser = (new \Schoolbox\Profile\Field\Factory($this->fieldMapper, $this->userMapper, $this->externalUser))
-            ->produce($staff, $this->getUser());
+        $externalUser = (new \Schoolbox\Profile\Field\Factory(
+            $this->fieldMapper,
+            $this->userMapper,
+            $this->externalUser,
+            $this->calendarApiFactory,
+        ))->produce($staff, $this->getUser());
 
         try {
             $buttons = $this->profileButtonMapper->findButtonsForUser($staff, $this->getUser());
         } catch (MapperException $e) {
             $buttons = [];
         }
+
+        /* Decide whether View Photos (Geosnapshots) is available for this student
+         * If you're allowed to make this request...
+         */
+        $isGeosnapshotAvailable = (new ValidPhotosAvailable())
+            ->isSatisifiedBy(
+                $this->getConfigLoader()->get('geosnapshot_api_key'),
+                $this->getConfigLoader()->get('geosnapshot_enabled'),
+                $this->getUser(),
+                $staff
+            );
 
         $this->response = $this->responseFromTemplate(
             'user/staff.twig',
@@ -632,6 +706,12 @@ class Controller extends BaseController
                  * custom buttons, as far as the end user is concerned
                  */
                 'buttons'  => $buttons,
+                /* Decides if the Geosnapshot button could be accessed
+                 */
+                'isGeosnapshotAvailable' => $isGeosnapshotAvailable,
+                /* Links to be displayed in the 3-dot menu.
+                 */
+                'linksInfo'      => $this->getProfileThreeDotMenuLinksInfo($this->getUser(), $staff),
 
                 /* Old implementation
                  */
@@ -663,8 +743,12 @@ class Controller extends BaseController
          * Note this uses a callback to inject some data halfway through the compilation algorithm
          * to service this extra widgety thing, Pastoral Counts
          */
-        $externalUser = (new \Schoolbox\Profile\Field\Factory($this->fieldMapper, $this->userMapper, $this->externalUser))
-            ->produce($parent, $this->getUser());
+        $externalUser = (new \Schoolbox\Profile\Field\Factory(
+            $this->fieldMapper,
+            $this->userMapper,
+            $this->externalUser,
+            $this->calendarApiFactory,
+        ))->produce($parent, $this->getUser());
 
         try {
             $buttons = $this->profileButtonMapper->findButtonsForUser($parent, $this->getUser());
@@ -691,6 +775,9 @@ class Controller extends BaseController
                  * custom buttons, as far as the end user is concerned
                  */
                 'buttons'  => $buttons,
+                /* Links to be displayed in the 3-dot menu.
+                 */
+                'linksInfo'      => $this->getProfileThreeDotMenuLinksInfo($this->getUser(), $parent),
 
                 /* Old implementation
                  */
@@ -702,6 +789,66 @@ class Controller extends BaseController
                 'showDetails'    => (new ValidDetailsVisible($this->externalUser, $this->getConfigLoader()))->isSatisfiedBy($parent, $this->getUser()),
                 'sharedCampuses' => $this->getUser()->getCampusCollection()->intersect($parent->getCampusCollection()),
             ]
+        );
+    }
+
+    /**
+     * Return an array containing information about the links to be displayed in the 3-dot menu at the top-right of the
+     * profile page.  Links not accessible by the user are filtered out in the returned array.
+     */
+    private function getProfileThreeDotMenuLinksInfo(User $viewer, User $viewee): array
+    {
+        // Get URLs for routes, while handling RouteNotFound exceptions.
+        $routeParamsByName = [
+            'adminUser.getModify' => ['userId' => $viewee->getId(), 'user' => $viewee],
+            'user.impersonate' => ['userId' => $viewee->getId(), 'user' => $viewee],
+            'pastoral.getStudentRecordInsertForm' => ['studentId' => $viewee->getId(), 'student' => $viewee],
+        ];
+        $urlByRouteName = [];
+        foreach ($routeParamsByName as $routeName => $routeParams) {
+            try {
+                $url = $this->getRouteIfAuthorized($routeName, $routeParams);
+            } catch (RouteNotFound) {
+                $url = false;
+            }
+            $urlByRouteName[$routeName] = $url;
+        }
+
+        return array_filter(
+            [
+                [
+                    'title' => 'Modify User',
+                    'url' => $urlByRouteName['adminUser.getModify'],
+                    'iconClass' => 'icon-modify',
+                    'disabled' => false,
+                    'mouseoverText' => 'Modify User',
+                    'dataTest' => 'user-profile-modify'
+                ],
+                [
+                    'title' => 'Impersonate',
+                    'url' => ($viewer->getId() === $viewee->getId()) ? false : $urlByRouteName['user.impersonate'],
+                    'iconClass' => 'icon-staff-students',
+                    'disabled' => $viewee->isDeleted(),
+                    'mouseoverText' => $viewee->isDeleted() ? 'Account Disabled' : 'Login as user',
+                    'dataTest' => $viewee->isDeleted() ? '' : 'admin-user-modify-impersonate'
+                ],
+                [
+                    'title' => 'Create ' . $this->rosettaStone->translate('pastoral', false, true) . ' Record',
+                    'url' => (
+                        // Only show the 'Create pastoral record' link if the viewee is a student.
+                        // Note cannot use permission check to decide whether to show the link, because route
+                        // permissions allow creation of pastoral records on non-student users.
+                        $viewee->getRole()->isStudent()
+                        ? $urlByRouteName['pastoral.getStudentRecordInsertForm']
+                        : false
+                    ),
+                    'iconClass' => 'icon-pastoral',
+                    'disabled' => false,
+                    'mouseoverText' => 'Create Pastoral Record',
+                    'dataTest' => ''
+                ]
+            ],
+            fn ($item) => $item['url'] !== false
         );
     }
 }

@@ -3,7 +3,6 @@ import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
 import { ScrollToPlugin } from "gsap/all";
 import { defineStore } from "pinia";
-import { activate, timeout } from "@schoolboxVue/components/toast/sbxToastEvent";
 import { extractErrorMessage } from "@js/util/sbx/fetchUtils";
 import type { Unit } from "../unitPlannerTypes";
 import { useUnitPlannerStore } from "./unitPlannerStore";
@@ -151,7 +150,7 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
             return; // User does not have access to resequence
         }
 
-        activate("Saving...");
+        const toast = window.sbProps.toastActivate("Saving...");
         try {
             const currentSequence = unitPlannerStore.orderedUnits.map((u) => u.folderId);
             const response = await fetch(routeFolderSequence.value, {
@@ -169,9 +168,9 @@ export const useUnitPlannerDragStore = defineStore("unitPlannerDragStore", () =>
                 throw new Error(await extractErrorMessage(response));
             }
 
-            timeout({ text: "Unit order saved successfully" });
+            toast.timeout({ text: "Unit order saved successfully" });
         } catch (error) {
-            timeout({ text: error as string, isSuccess: false });
+            toast.timeout({ text: error as string, isSuccess: false });
         }
     }
 

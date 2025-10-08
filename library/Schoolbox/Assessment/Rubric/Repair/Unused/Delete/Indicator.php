@@ -179,6 +179,8 @@ class Indicator extends CliTool\App
      */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         $db        = $this->getDatabaseInternal();
         $this->now = Alaress_Date_Format::now()->getDatabaseDate();
 
@@ -222,6 +224,8 @@ class Indicator extends CliTool\App
             $db->rollBack();
             throw $e;
         }
+
+        $this->deprecationNotice("SA-19334");
     }
 
 

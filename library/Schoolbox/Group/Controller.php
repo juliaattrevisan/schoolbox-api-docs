@@ -34,6 +34,8 @@ class Controller extends BaseController
      * constructor for dependency injection
      */
     public function __construct(
+        \Alaress\Authorizer\Authorizer $authorizer,
+        \Aura\Router\Generator $routeGenerator,
         GroupMapper $groupMapper,
         UserAccessMapper $userAccessMapper,
         FolderMapper $folderMapper,
@@ -43,6 +45,8 @@ class Controller extends BaseController
         $this->groupMapper      = $groupMapper;
         $this->userAccessMapper = $userAccessMapper;
         $this->groupsHelper     = new GroupsHelper(
+            $authorizer,
+            $routeGenerator,
             $groupMapper,
             $userAccessMapper,
             $folderMapper,

@@ -22,6 +22,16 @@ class Instance
     public const SITE_TYPE_TRIAL        = 'trial';
 
     /**
+     * A list of instance IDs which are commonly used by development instances.
+     */
+    public const DEVELOPMENT_INSTANCE_IDS = [
+        'vagrantx',
+        'vagrantx2',
+        'docker',
+        'docker2',
+    ];
+
+    /**
      * @var string
      */
     private string $id;

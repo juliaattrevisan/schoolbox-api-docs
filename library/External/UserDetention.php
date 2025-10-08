@@ -41,7 +41,7 @@ class External_UserDetention extends CachingConnectorAbstract implements Externa
     /**
      * @inheritDoc
      */
-    public function getDetentions(string $externalId, DateTime $fromDate = null, DateTime $toDate = null): array
+    public function getDetentions(string $externalId, ?DateTime $fromDate = null, ?DateTime $toDate = null): array
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }
@@ -49,7 +49,7 @@ class External_UserDetention extends CachingConnectorAbstract implements Externa
     /**
      * @inheritDoc
      */
-    public function getAbsences(string $externalId, DateTime $fromDate = null, DateTime $toDate = null): array
+    public function getAbsences(string $externalId, ?DateTime $fromDate = null, ?DateTime $toDate = null): array
     {
         return $this->getCachedResult(__FUNCTION__, func_get_args());
     }

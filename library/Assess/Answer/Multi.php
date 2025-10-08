@@ -22,8 +22,8 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi implements IAutomarkab
      */
     public function mark($currentResponse): void
     {
-        $response = unserialize($currentResponse['response']);
-        $answer = unserialize($currentResponse['answer']);
+        $response = unserialize($currentResponse['response'] ?? '');
+        $answer = unserialize($currentResponse['answer'] ?? '');
 
         /* Find out how much each correct answer is worth
          *
@@ -107,7 +107,7 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi implements IAutomarkab
         $existingAnswer = false;
 
         if ($existing) {
-            $existingAnswer = unserialize($existing['response']);
+            $existingAnswer = unserialize($existing['response'] ?? '');
             // Treat single answers as a single multiple response
             if (!is_array($existingAnswer)) {
                 $existingAnswer = array($existingAnswer);
@@ -117,7 +117,7 @@ class Assess_Answer_Multi extends Evaluation_Answer_Multi implements IAutomarkab
         $answerGroup = $this->getByQuestionID($question_id);
 
         if ($answerGroup) {
-            $allAnswers = unserialize($answerGroup['answer']);
+            $allAnswers = unserialize($answerGroup['answer'] ?? '');
 
             $page->setVar(array(
                 'ANSWER_ID' => $answerGroup['answer_id'],

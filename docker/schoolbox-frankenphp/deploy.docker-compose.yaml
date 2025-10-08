@@ -1,0 +1,35 @@
+# This FrankenPHP container contains Schoolbox's code within its image, thus
+# changes made to the local file system will not propagate to the FrankenPHP
+# container.
+# This container is intended for testing of deployments.
+
+services:
+  schoolbox-frankenphp:
+    restart: always
+    build:
+      context: ./schoolbox-frankenphp
+      dockerfile: deploy-image.Dockerfile
+      additional_contexts:
+        - code=../
+      args:
+        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
+        PHP_MAJOR_VERSION: ${PHP_MAJOR_VERSION}
+        BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
+    scale: 2
+    deploy:
+      mode: replicated
+      replicas: 2
+    healthcheck:
+        test: [ "CMD", "curl", "http://localhost/health" ]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+    volumes:
+      - storage:/var/lib/schoolbox/docker/storage
+      - schoolbox-config:/etc/schoolbox
+    # After building: create data dirs, and make mount writable by www-data
+    post_start:
+      - command: /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox/docker/
+        user: root
+      - command: /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox/docker/ www-data
+        user: root

@@ -2,7 +2,7 @@ import { nextTick } from "vue";
 import { mount } from "@vue/test-utils";
 import CsSelectedNodes from "../cs-selected-nodes";
 import { createTestingPinia } from "@pinia/testing";
-import { useStore } from "../store/curriculumSelectorStore";
+import { useSharedStore } from "../store/csSharedStore";
 import { useSelectedNodesStore } from "../store/csSelectedNodesStore";
 
 let wrapper; //so we don't need to pass it into every test
@@ -16,7 +16,7 @@ beforeEach(() => {
 });
 
 test("should not display when there is no codes", () => {
-    expect(wrapper.find("[data-test-nodes-container]").exists()).toBe(false);
+    expect(wrapper.find("[data-test='cs-selected-nodes-container']").exists()).toBe(false);
 });
 
 test("should display when there is codes", async () => {
@@ -39,8 +39,8 @@ test("should display when there is codes", async () => {
 });
 
 test("should not display when had codes but has been emptied", async () => {
-    const store = useStore();
-    store.$patch({ isReadOnly: false });
+    const sharedStore = useSharedStore();
+    sharedStore.$patch({ isReadOnly: false });
     const selectedNodesStore = useSelectedNodesStore();
     await selectedNodesStore.add({
         id: 1,

@@ -14,6 +14,7 @@ namespace Schoolbox\Pastoral;
 
 use Alaress\Web\Controller\Base;
 use Alaress\Web\Request\Values;
+use Alaress_Date_Format;
 use Aura\Router\Exception\RouteNotFound;
 use Exception;
 use External_Pastoral;
@@ -48,6 +49,8 @@ use Schoolbox\Pastoral\SubType\Mapper as PastoralSubTypeMapper;
 use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Action\Mapper as PastoralActionMapper;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
+use Schoolbox\Pastoral\Mapper as PastoralMapper;
+use Schoolbox\Pastoral\Type\TypeAbstract;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Zone;
 use Schoolbox\Resource\Storage\FilesystemProxy;
@@ -92,6 +95,7 @@ class Controller extends Base
      * @param FilesystemProxy                 $filesystemProxy
      * @param \Schoolbox\External\User        $externalUser
      * @param RecordProcessor                 $recordProcessor
+     * @param PastoralMapper                  $pastoralMapper
      */
     public function __construct(
         private IConfigLoader $config,
@@ -118,6 +122,7 @@ class Controller extends Base
         private FilesystemProxy $filesystemProxy,
         private \Schoolbox\External\User $externalUser,
         private RecordProcessor $recordProcessor,
+        private PastoralMapper $pastoralMapper,
     ) {
     }
 
@@ -192,9 +197,6 @@ class Controller extends Base
         $output              = $pastoralCountHelper->countStudentsEventsByTypes(
             $this->getUser(),
             $students,
-            null,
-            null,
-            $pastoralCountHelper->getStartDate((int)$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_FLAG_COUNT_PERIOD))
         );
 
         $this->response = $this->responseAsJson($output);
@@ -223,6 +225,7 @@ class Controller extends Base
 
         $typeId    = (isset($get['type']) && is_numeric($get['type'])) ? (int)$get['type'] : null;
         $subtypeId = (isset($get['subtype']) && is_numeric($get['subtype'])) ? (int)$get['subtype'] : null;
+        $showArchived = $get->getBool('showArchived', false);
 
         // Limit the number of pastoral records to display on each page of pastoral records
         $resultsPerPage = (int)$this->config->get('pastoral_page_size');
@@ -230,7 +233,7 @@ class Controller extends Base
         // Set the current page number
         $pageCurrent = isset($get['pageCurrent']) && is_numeric($get['pageCurrent']) ? (int)$get['pageCurrent'] : 1;
 
-        $recordCount = $this->pastoralDataSource->countRecords($user, $student, $typeId, $subtypeId);
+        $recordCount = $this->pastoralDataSource->countRecords($user, $student, $typeId, $subtypeId, $showArchived);
 
         $maxPage = (int)ceil($recordCount / $resultsPerPage);
         if ($maxPage < 1) {
@@ -243,7 +246,7 @@ class Controller extends Base
             $pageCurrent = 1;
         }
         // populate related records
-        $pageRecords = $this->pastoralDataSource->findRecords($user, $student, $typeId, $subtypeId, ($pageCurrent - 1) * $resultsPerPage, $resultsPerPage, null);
+        $pageRecords = $this->pastoralDataSource->findRecords($user, $student, $typeId, $subtypeId, ($pageCurrent - 1) * $resultsPerPage, $resultsPerPage, null, $showArchived);
 
         $pastoralCountHelper = new PastoralCountHelper(
             $this->routeGenerator,
@@ -270,6 +273,7 @@ class Controller extends Base
                 ],
                 'typeSelected'        => $typeId,
                 'subtypeSelected'     => $subtypeId,
+                'showArchived'        => $showArchived ? 1 : 0,
                 'resultsPerPage'      => $resultsPerPage,
                 'pagesToDisplay'      => $maxPage,
             ],
@@ -516,19 +520,36 @@ class Controller extends Base
             ];
         }
 
+        //Helper for loading default expiry date
+        $expiryHelper = new ExpiryHelper(
+            $this->pastoralMapper,
+            $this->termMapper
+        );
+
         // Render this thing out
 
         $this->response = $this->responseFromTemplate(
             '@pastoral/modify.twig',
             $templateData + [
-                'record'            => $record,
-                'canCreate'         => $this->getConfigLoader()->get('pastoral_create_tag_enable'),
-                'moderator'         => $moderator,
-                'attachzonePublic'  => $this->getAttachZone(self::ATTACHZONE_PUBLIC, $record),
-                'attachzonePrivate' => $this->getAttachZone(self::ATTACHZONE_PRIVATE, $record),
-                'students'          => json_encode($students),
-                'returnUrlName'     => Redirect::RETURN_URL,
-                'encodedReturnUrl'  => $this->requestQuery->get(Redirect::RETURN_URL),
+                'record'                => $record,
+                'calculatedExpiresAt' => array_map(fn($expiry) => $expiryHelper->calculateExpireDate(
+                    $record->getCreatedAt() ?? Alaress_Date_Format::now(),
+                    $expiry,
+                    $record->getStudent()?->getYear()
+                )?->getUsingFormat('d/m/Y'), TypeAbstract::PASTORAL_EXPIRY),
+                'canCreate'             => $this->getConfigLoader()->get('pastoral_create_tag_enable'),
+                // only pastoral moderators with 'write' access or above can modify default expiry
+                'canModifyExpiresAt'     => $this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE),
+                // if default points aren't enabled, any user can modify,
+                // otherwise only pastoral moderators with 'write' access or above can modify point settings
+                'canModifyPoints'     => !$this->config->get(ConfigMapper::NAME_PASTORAL_DEFAULT_POINTS_ENABLED) ||
+                                            $this->user->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_WRITE),
+                'moderator'             => $moderator,
+                'attachzonePublic'      => $this->getAttachZone(self::ATTACHZONE_PUBLIC, $record),
+                'attachzonePrivate'     => $this->getAttachZone(self::ATTACHZONE_PRIVATE, $record),
+                'students'              => json_encode($students),
+                'returnUrlName'         => Redirect::RETURN_URL,
+                'encodedReturnUrl'      => $this->requestQuery->get(Redirect::RETURN_URL),
             ],
             'Pastoral Record',
         );
@@ -704,7 +725,7 @@ class Controller extends Base
      * @return GenericCollection
      * @throws MapperException
      */
-    private function processPastoralRecords(int $primaryStudentId, Values $post, array $duplicateStudentIds = [], PastoralModel $parent = null): GenericCollection
+    private function processPastoralRecords(int $primaryStudentId, Values $post, array $duplicateStudentIds = [], ?PastoralModel $parent = null): GenericCollection
     {
         return $this->recordProcessor->processPastoralRecords($this->getUser(), $primaryStudentId, $post, $duplicateStudentIds, $parent);
     }
@@ -788,12 +809,6 @@ class Controller extends Base
      */
     public function getStudentRecordAttachment(PastoralAttachmentModel $attachment): void
     {
-        if (!$attachment->getStorage()->getMimetype()->getInline()) {
-            $attach = "attachment;";
-        } else {
-            $attach = "";
-        }
-
         // Send headers
 
         if ($attachment->getStorage()->getMime()) {
@@ -807,7 +822,7 @@ class Controller extends Base
         header("Pragma: ");
         header("Cache-control: private");
         header("Content-Ranges: none");
-        header("Content-Disposition: $attach filename=\"$basename\"");
+        header("Content-Disposition: filename=\"$basename\"");
         header("Content-Length: " . $this->filesystemProxy->fileSize($attachment->getStorage()));
         fpassthru($this->filesystemProxy->readStream($attachment->getStorage()));
 

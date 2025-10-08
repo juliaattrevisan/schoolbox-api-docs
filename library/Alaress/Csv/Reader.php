@@ -51,13 +51,6 @@ class Reader implements \Iterator
     protected $enclosure = '"';
 
     /**
-     * Field escaper for the CSV file
-     *
-     * @var string
-     */
-    protected $escape = '\\';
-
-    /**
      * Are empty cells filled with the first non-empty value above them?
      *
      * @var bool
@@ -183,7 +176,7 @@ class Reader implements \Iterator
     {
         if (is_resource($this->fp)) {
             fclose($this->fp);
-            unset($this->fp);
+            $this->fp = null;
         }
         $this->current_key = 0;
         $this->current_row = [];
@@ -196,7 +189,7 @@ class Reader implements \Iterator
      */
     protected function loadRow()
     {
-        return fgetcsv($this->fp, 0, $this->getDelimiter(), $this->getEnclosure(), $this->getEscape());
+        return fgetcsv($this->fp, 0, $this->getDelimiter(), $this->getEnclosure(), escape: '');
     }
 
 
@@ -307,24 +300,6 @@ class Reader implements \Iterator
     public function getEnclosure()
     {
         return $this->enclosure;
-    }
-
-    /**
-     * @param string $escape
-     * @return $this
-     */
-    public function setEscape($escape)
-    {
-        $this->escape = $escape;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getEscape()
-    {
-        return $this->escape;
     }
 
     /**

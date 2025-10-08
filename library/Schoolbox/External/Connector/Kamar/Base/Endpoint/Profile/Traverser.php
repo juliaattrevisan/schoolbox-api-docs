@@ -23,7 +23,6 @@ use SimpleXMLElement;
  */
 class Traverser
 {
-
     /**
      * Maximum number of emergency contacts we've permitted (3 by default)
      */
@@ -162,7 +161,7 @@ class Traverser
         $contacts = [];
         $n = 0;
 
-        foreach ($student->emergencycontacts->contact as $emergencyContact) {
+        foreach ($student->emergencycontacts->contact ?? [] as $emergencyContact) {
             if ($n < self::MAX_EMERGENCY_CONTACTS) {
                 $fullname = trim((string)$emergencyContact->name);
                 $relation = trim((string)$emergencyContact->relationship);

@@ -8,30 +8,34 @@
  # Padding-bottom (height): 100/column_count*aspectRatioY/aspectRatioX
  #}
 {% if layout.aspectRatioY > 0 and layout.aspectRatioX > 0 %}
+    {% set aspectRatio = (layout.aspectRatioY/layout.aspectRatioX) %}
+{% else %}
+    {% set aspectRatio = 1 %}
+{% endif %}
 <style>
 #tileList-{{ layout.id }}.tileList .tile {
-    {% set aspectRatio = (layout.aspectRatioY/layout.aspectRatioX) %}
+    {# Guard against these variables not being set correctly in the database #}
+    {% set gridWidth = layout.gridWidth > 0 ? layout.gridWidth : layout.DEFAULT_GRID_WIDTH %}
+    {% set columnCount = layout.columnCount > 0 ? layout.columnCount : layout.DEFAULT_COLUMN_COUNT %}
 
-    {% if layout.isGridLayoutType and layout.gridWidth > 0 %}
-        width: {{ layout.gridWidth|e('css') }}px;
+    {% if layout.isGridLayoutType %}
+        width: {{ gridWidth|e('css') }}px;
         margin: {{ layout.getGridPadding|e('css') }}px;
-        {% set paddingBottom = layout.gridWidth * aspectRatio ~ "px" %}
-    {% endif %}
-
-    {% if layout.isColumnLayoutType and layout.columnCount > 0 %}
-        {% set baseColumnWidth   = (100 / layout.columnCount) %}
+        {% set paddingBottom = gridWidth * aspectRatio ~ "px" %}
+    {% else %}
+        {# Assume layout isColumnLayoutType since there are only two types (and guard against bad data in tile_layout.layout_type). #}
+        {% set baseColumnWidth   = (100 / columnCount) %}
         {% set paddingPercentage = (layout.columnPadding / 100) %}
         {% set tilePadding       = baseColumnWidth * paddingPercentage %}
         {% set tileWidth         = baseColumnWidth - tilePadding %}
         width: {{ tileWidth }}%;
-        margin: {{ tilePadding / 2 }}%;
+        margin: {{ (tilePadding / 2) }}%;
         {% set paddingBottom = tileWidth * aspectRatio ~ "%" %}
     {% endif %}
 
     padding-bottom: {{ paddingBottom }};
 }
 </style>
-{% endif %}
 
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/tiles/jquery.tile-resize.js?v={{ config.site_version }}"></script>
 

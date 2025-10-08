@@ -13,6 +13,7 @@ namespace Schoolbox\Curriculum;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Curriculum\Node\Model;
+use Scrub;
 
 class Controller extends Base
 {
@@ -293,19 +294,18 @@ class Controller extends Base
     {
         $node = $this->nodeMapper->loadDescendants($item, 'parent', 'children');
 
-        $filename = sprintf(
-            "CurriculumExport-%s-%s-%s.csv",
-            $item->getName(),
-            $this->getConfigLoader()->get(ConfigMapper::NAME_SITE_SCHOOL_CODE),
+        $filename = Scrub::filename(sprintf(
+            "CurriculumExport--%s--%s.csv",
+            substr($item->getName(), 0, 50),
             \Alaress_Date_Format::now()->toIso8601String()
-        );
+        ));
 
         $fp = fopen('php://temp', 'w');
 
         $this->response = $this->responseFromStream(new \GuzzleHttp\Psr7\Stream($fp), $filename, 'text/csv; charset=utf-8');
 
         // output headers
-        fputcsv($fp, ['id', 'curriculum_node_parent_id', 'name', 'code', 'order', 'description', 'uuid']);
+        fputcsv($fp, ['id', 'curriculum_node_parent_id', 'name', 'code', 'order', 'description', 'uuid'], escape: '');
 
         $this->csvChildren($fp, $node, true);
     }
@@ -330,7 +330,7 @@ class Controller extends Base
             $node->getOrder(),
             $node->getDescription(),
             $node->getUuid(),
-        ]);
+        ], escape: '');
 
         /**
          * for each of this node's children, csv output its children recursively

@@ -85,19 +85,23 @@ class Helper
      * corresponding to the roletypes specified in $roleType
      *
      * @param array $roleType
+     * @param bool $includeDeleted - Whether to include deleted roles
      * @return array
      */
-    public function fetchRoleIds(array $roleType): array
+    public function fetchRoleIds(array $roleType, bool $includeDeleted = true): array
     {
         $ids = [];
 
         $placeholders = Builder::getArrayPlaceholders($roleType, 'roletype');
         $params = Builder::getArrayParameters($roleType, 'roletype');
 
+        $includeDeletedString = $includeDeleted ? '' : ' AND deleted_at IS NULL';
+
         $statement = $this->db->prepare("
             SELECT id
             FROM groups
             WHERE group_type IN {$placeholders}
+            $includeDeletedString
         ");
 
         $statement->execute($params);
@@ -352,7 +356,7 @@ class Helper
             SET enabled = 0
             WHERE roletype = :roletype
             AND field = :field
-            LIMIT 1            
+            LIMIT 1
         ");
 
         foreach ($tuples as $roletype => $fields) {
@@ -393,5 +397,42 @@ class Helper
             'plural' => $plural,
             'term' => $term
         ]);
+    }
+
+
+    /**
+     * Arbitrarily spawn a button into Profile Buttons
+     *
+     * @param array $button
+     * @return void
+     */
+    public function createButton(array $button): void
+    {
+        $this->logger->info(sprintf(
+            'Creating %s button: %s',
+            $button['roletype'],
+            $button['text']
+        ));
+
+        $statement = $this->db->prepare("
+            INSERT IGNORE INTO profile_button
+            (roletype, type, sort_order, self_enabled, title, text, icon, url)
+            VALUES (
+                :roletype,
+                :type,
+                (
+                    SELECT MAX(sort_order)+1
+                    FROM profile_button pb
+                    WHERE roletype = :roletype
+                ),
+                :selfEnabled,
+                :title,
+                :text,
+                :icon,
+                :url
+            )
+        ");
+
+        $statement->execute($button);
     }
 }

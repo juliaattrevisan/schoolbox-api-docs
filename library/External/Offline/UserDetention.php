@@ -23,7 +23,7 @@ class External_Offline_UserDetention implements External_UserDetentionInterface,
     /**
      * @inheritDoc
      */
-    public function getDetentions(string $externalId, DateTime $fromDate = null, DateTime $toDate = null): array
+    public function getDetentions(string $externalId, ?DateTime $fromDate = null, ?DateTime $toDate = null): array
     {
         return array();
     }
@@ -31,7 +31,7 @@ class External_Offline_UserDetention implements External_UserDetentionInterface,
     /**
      * @inheritDoc
      */
-    public function getAbsences(string $externalId, DateTime $fromDate = null, DateTime $toDate = null): array
+    public function getAbsences(string $externalId, ?DateTime $fromDate = null, ?DateTime $toDate = null): array
     {
         return array();
     }

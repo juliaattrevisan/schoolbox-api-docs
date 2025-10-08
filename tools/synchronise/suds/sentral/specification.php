@@ -21,7 +21,6 @@ require_once __DIR__ . '/../../../../conf/core/require.php';
  */
 $app = new class extends CliTool\App
 {
-
     /**
      * --help
      *
@@ -46,6 +45,8 @@ $app = new class extends CliTool\App
      */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
@@ -68,6 +69,8 @@ HELP;
         $renderer = new CliRenderer($this->getLogger());
 
         $renderer->render($specification->check());
+
+        $this->deprecationNotice("SA-19334");
     }
 };
 

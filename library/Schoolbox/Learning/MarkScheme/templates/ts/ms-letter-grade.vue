@@ -1,0 +1,138 @@
+<script setup lang="ts">
+/**
+ * Text-input for 'percentage' markScheme
+ */
+
+import locale from "@js/terminology/rosettaStone";
+import MsTextInput from "./ms-text-input.vue";
+import type { MarkSchemeLetterGrade, SubmissionErrorStates } from "./markScheme";
+
+const LIMIT = 100;
+
+interface Props {
+    markScheme: MarkSchemeLetterGrade;
+    submissionErrorStates: SubmissionErrorStates;
+    participant: {
+        user: {
+            id: number;
+        };
+    };
+    tabIndex?: number;
+    studentView?: boolean;
+    /**
+     * Should this form input be rendered as readonly?
+     */
+    readonly?: boolean;
+    /**
+     * The target for alaressValidate, if left blank then it will use the input itself
+     */
+    alaressValidateTarget?: string;
+}
+
+const props = defineProps<Props>();
+const mark = defineModel<string | null>("mark", { required: true });
+</script>
+
+<template>
+    <ms-text-input
+        v-if="props.readonly"
+        v-model:mark="mark"
+        :participant="props.participant"
+        :submission-error-states="props.submissionErrorStates"
+        :tab-index="props.tabIndex"
+        :placeholder="props.readonly ? '(no mark given)' : '(no grade)'"
+        :limit="LIMIT"
+        :max-length="48"
+        input-title=""
+        :readonly="props.readonly"
+        :alaress-validate-target="props.alaressValidateTarget"
+        :alaress-validate-options="{
+            rules: {
+                mark: {
+                    withinLetterGradeRange: true,
+                },
+            },
+            messages: {
+                mark: {
+                    withinLetterGradeRange: `Please select one of the available grade options.`,
+                },
+            },
+        }"
+    />
+
+    <select
+        v-else
+        class="letter-grade-select"
+        :data-test="`assessment-feedback-mark-select-${props.participant.user.id}`"
+        data-mark-input
+        name="mark"
+        :tabindex="props.tabIndex"
+        :title="`Select a ${locale.grades.proper()}`"
+        @change="(e) => (mark = (e.target as HTMLSelectElement).value)"
+    >
+        <!-- If humanReadableMark is null, there isn't an existing mark; this is a new draft
+         Select No Grade. Otherwise we need to find out whether the humanReadableMark exists
+         in one of the other places that might match
+         -->
+        <option :value="null" disabled :selected="mark === null">(no grade)</option>
+
+        <optgroup
+            v-if="props.markScheme.context.conf.length === 0"
+            :label="`Original ${locale.grades.properPlural()} Deleted`"
+        >
+            <option selected value="-1" disabled>empty</option>
+        </optgroup>
+        <!-- If humanReadableMark has a value, look for it among the current Grade Group dropdown options.
+         If it's not here, then it might be one of the Submission States
+         -->
+        <optgroup v-else :label="locale.grades.properPlural()">
+            <option
+                v-for="(level, i) in props.markScheme.context.conf"
+                :key="i"
+                :value="level.caption"
+                :selected="mark === level.caption"
+            >
+                {{ level.caption }}
+            </option>
+        </optgroup>
+
+        <!-- If it didn't exist in the Grade Group, it might have been one of the Submission States
+         like Submitted/Absent/Pending etc. so look there as well
+         -->
+        <optgroup v-if="!props.studentView" label="States">
+            <option
+                v-for="state in props.submissionErrorStates"
+                :key="state.id"
+                :value="state.name"
+                :selected="mark === state.name"
+            >
+                {{ state.name }}
+            </option>
+        </optgroup>
+
+        <!-- If it still hasn't been found, then the humanReadableMark needs amendment by the teacher because:
+            a) it's a value from a different mark scheme than what the assessment currently uses; or
+            b) it's a value from a Grade Group option that no longer exists; or
+            c) it's a value from a Submission State option that no longer exists; or
+            d) some other unknown value under some other unknown circumstance
+
+        Use -1 as an illegal value flag so alaressValidate can understand that this selected option
+        should be changed to an actual option
+        -->
+
+        <!-- this covers the scenario where the grade level has been deleted -->
+        <optgroup
+            v-if="
+                mark !== null &&
+                mark.length &&
+                props.markScheme.context.conf.find((level) => level.caption === mark) === undefined &&
+                props.submissionErrorStates.find((state) => state.name === mark) === undefined
+            "
+            label="Original Deleted Grade"
+        >
+            <option selected value="-1" disabled>
+                {{ mark }}
+            </option>
+        </optgroup>
+    </select>
+</template>

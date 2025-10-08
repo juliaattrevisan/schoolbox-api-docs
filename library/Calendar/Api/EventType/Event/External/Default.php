@@ -104,7 +104,11 @@ class Calendar_Api_EventType_Event_External_Default extends Calendar_Api_EventTy
 
         try {
             $externalEvents = $this->externalEvents->getExternalEvents($this->getUser(), $startTimestamp, $endTimestamp);
-        } catch (InvalidArgumentException $e) {
+        } catch (InvalidArgumentException | \Alaress\Database\Exception $e) {
+            /* Alaress\Database\Exception is thrown when databaseExternal is a NullConnector which occurs
+             * when you can't access the live connector for a sis, like synergetic or tass. In such cases
+             * these are beyond our control: simply return an empty set instead of dying in sentry.
+             */
             return $stack;
         }
 

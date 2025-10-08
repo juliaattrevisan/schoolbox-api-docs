@@ -5,6 +5,7 @@ Expected data items:
  - filterDateRangeValues: An object containing 'startDate' and 'endDate' for populating the form.
  - filterCreatorValue: An object containing 'id' and 'name' for populating the form.
  - filterTypesValues: An array of filter type strings for populating the form.
+ - resultPageSize: The maximum number of search results per page.
  #}
 
 <div id="search-page-container" class="f-container">
@@ -14,6 +15,7 @@ Expected data items:
         :filter-types-selected="{{ filterTypesValues|json_encode }}"
         :filter-date-range="{{ filterDateRangeValues|json_encode }}"
         :filter-creator="{{ filterCreatorValue|json_encode }}"
+        :result-page-size="{{ resultPageSize }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/searchPage.js?v={{ config.site_version }}"></script>

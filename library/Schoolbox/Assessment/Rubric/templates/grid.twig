@@ -79,7 +79,7 @@
                         <td data-header="{{ level.name }}" {% if isMarkDisplayed %}class="rb-selected"{% endif %}>
                             <div>
                                 {# This container displays rubric levels for the mobile view. #}
-                                <div class="rubric-levels-mobile l-pad-m"><p><b>{{ level.name | markdown }}</b><p></div>
+                                <div class="hide-for-large-up l-pad-m hide-on-print"></p><b>{{ level.name | markdown }}</b></p></div>
                                 <span class="rb-description markdown">
                                     {# Self-Assessment #}
                                     {% if selfAssessmentIndicatorMark and selfAssessmentIndicatorMark.descriptor.id == descriptor.id %}
@@ -107,7 +107,7 @@
                         </td>
 
                     {% else %}
-                        <td class="rb-blank">&nbsp;</td>
+                        <td class="rb-blank hide-for-medium-down">&nbsp;</td>
                     {% endif %}
 
                 {% endfor %}
@@ -144,7 +144,7 @@
                 {{ rubricMarkedGrid.retrieveHumanReadableMark }}
 
                 {# Self-Assessment: only show the mark if it's self graded, as if it's self-reflect only they never marked themselves #}
-                {% if selfAssessmentFeedback and selfAssessmentFeedback.isSelfGrading %}
+                {% if selfAssessmentFeedback and selfAssessmentFeedback.isSelfGrading and selfAssessmentFeedback.humanReadableMark %}
                     ({{ selfAssessmentFeedback.humanReadableMark }} given in {{ locale.selfAssessment }})
                 {% endif %}
             </th>

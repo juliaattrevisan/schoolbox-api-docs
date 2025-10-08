@@ -29,6 +29,7 @@ class Model implements ISoftDeletable
 
     public const TYPE_API    = 'api';
     public const TYPE_QRCODE = 'qrcode';
+    public const TYPE_APITEST = 'apitest';
 
     /**
      * @var string|null

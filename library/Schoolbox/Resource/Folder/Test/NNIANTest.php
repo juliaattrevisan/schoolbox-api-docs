@@ -360,7 +360,7 @@ class NNIANTest extends TestCase
      * @throws ReflectionException
      * @throws UnexpectedValueException
      */
-    public function newNnian(array $folderData = null, bool $isCacheEnabled = null): Folder\NNIAN
+    public function newNnian(?array $folderData = null, ?bool $isCacheEnabled = null): Folder\NNIAN
     {
         $this->resetNnianInstance();
 
@@ -386,11 +386,11 @@ class NNIANTest extends TestCase
 
 
     /**
-     * @param null|array $folderData
+     * @param array|null $folderData
      * @return GenericCollection
      * @throws UnexpectedValueException
      */
-    private static function getFolders(array $folderData = null): GenericCollection
+    private static function getFolders(?array $folderData = null): GenericCollection
     {
         $folderData = $folderData ?? self::FOLDER_DATA;
         $folders    = \Schoolbox\Resource\Folder\Mapper::getInstance()->createCollection();

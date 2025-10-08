@@ -34,13 +34,6 @@ class Writer
     protected $enclosure = '"';
 
     /**
-     * Field escaper for the CSV file
-     *
-     * @var string
-     */
-    protected $escape = '\\';
-
-    /**
      * A writable resource. Possibilities: a file pointer, stdin
      *
      * @var resource
@@ -62,15 +55,13 @@ class Writer
      * @param array[]  $dataset   A dataset to write
      * @param string   $delimiter Field delimiter
      * @param string   $enclosure Field enclosing character
-     * @param string   $escape    Field escape
      */
-    public function __construct($fp, $dataset, $delimiter = ',', $enclosure = '"', $escape = '\\')
+    public function __construct($fp, $dataset, $delimiter = ',', $enclosure = '"')
     {
         $this->fp        = $fp;
         $this->dataset   = $dataset;
         $this->delimiter = $delimiter;
         $this->enclosure = $enclosure;
-        $this->escape    = $escape;
     }
 
     /**
@@ -83,7 +74,7 @@ class Writer
             // First row determines the columns
             if ($rowCount === 0) {
                 $this->columns = array_keys($row);
-                fputcsv($this->fp, $this->columns, $this->delimiter, $this->enclosure, $this->escape);
+                fputcsv($this->fp, $this->columns, $this->delimiter, $this->enclosure, escape: '');
             }
 
             // Build row to output. If columns are missing, raise a notice
@@ -103,7 +94,7 @@ class Writer
                 trigger_error(E_USER_NOTICE, sprintf('Row %d has excess column "%s"', $rowCount, $excessColumn));
             }
 
-            fputcsv($this->fp, $outputRow, $this->delimiter, $this->enclosure, $this->escape);
+            fputcsv($this->fp, $outputRow, $this->delimiter, $this->enclosure, escape: '');
             $rowCount++;
         }
     }

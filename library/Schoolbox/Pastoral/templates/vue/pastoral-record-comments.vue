@@ -1,6 +1,7 @@
 <script>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
 /**
  * To add and view/delete comments on an existing pastoral record
@@ -173,9 +174,7 @@ export default {
                     <p class="comment-count">{{ commentHeading }} Comments ({{ comments.length }})</p>
 
                     <add-comment-input
-                        :cdn-prefix="cdnPrefix"
                         :is-processing="isProcessing"
-                        :site-version="siteVersion"
                         :preset-unique-id="recordType"
                         @on-load-error="onLoadError"
                         @on-post-comment="postComment"

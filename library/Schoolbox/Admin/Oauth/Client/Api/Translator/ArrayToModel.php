@@ -21,11 +21,11 @@ class ArrayToModel extends Base
     /**
      * Convert `$array` to a model.
      *
-     * @param array      $array
-     * @param Model|null $model
+     * @param array       $array
+     * @param object|null $model
      * @return Model
      */
-    public function __invoke(array $array, object $model = null): object
+    public function __invoke(array $array, ?object $model = null): object
     {
         $model ??= new Model();
         $model = $this->setScalar($array, 'name', $model, 'setName');

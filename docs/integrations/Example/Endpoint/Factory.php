@@ -14,6 +14,7 @@ use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\ClassPeriodMapper;
 use Schoolbox\External\Connector\ValidStrats;
+use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Importer\Endpoint\IStrategy;
 use Schoolbox\External\Profile as UserProfile;
 use Schoolbox\External\Profile\Mapper;
@@ -119,6 +120,10 @@ class Factory
          */
         $api = null;
 
+        /* A Watchlist instance that we'll reuse when diagnosing stuff
+         */
+        $watcher = new Watchlist();
+
         $bus = new GenericCollection(IStrategy::class);
 
         if ($this->validStrats->isProfileStratEnabled()) {
@@ -139,6 +144,7 @@ class Factory
                     $this->log,
                     $this->perform,
                     $api,
+                    $watcher,
                     $this->watchlist,
                     $this->baseProfileMapper,
                     $this->studentProfileMapper,
@@ -175,6 +181,7 @@ class Factory
                     $this->log,
                     $this->perform,
                     $api,
+                    $watcher,
                     $this->watchlist,
                     $this->eventMapper,
                     $this->overridesMapper,

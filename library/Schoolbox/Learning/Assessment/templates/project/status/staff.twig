@@ -4,7 +4,10 @@ Data:
     'baseContext'       AssessmentContext
     'assessment'        IAssessable
     'assessmentStats'   Assessment\Statistics[] Indexed by assessment.id
-    'participantStats'  ParticipantStatistics[] Indexed by user.id
+    'aImpls'            [
+        'assessment'       IAssessable
+        'participantStats' ParticipantStatistics[] Indexed by user.id
+    ][]
     'returnUrl'         string
 #}
 
@@ -33,7 +36,7 @@ Data:
             var element = $(this);
 
             $(this).confirmDialog({
-                header: 'Are you sure you wish to delete this activity?',
+                header: 'Are you sure you wish to delete this {{ locale.activity }}?',
 
                 {# When you're managing activities in a Course Specification context
                  # there is nothing to delete like responses/feedback/marks, so just don't
@@ -109,11 +112,7 @@ Data:
 </div>
 
 <div class="row">
-    {% if assessment.baseContext is unitSpecification %}
-    <div class="small-12 island">
-    {% else %}
-    <div class="small-12 large-6 island">
-        {% endif %}
+    <div class="small-12 {% if aImpls | length %}large-6 {% endif %}island">
         <h2 class="subheader">{{ locale.activity.properPlural }}</h2>
 
         {% if assessment.assessables | length %}
@@ -141,6 +140,7 @@ Data:
                         {% set hasActions = statusRoute or modifyRoute or deleteRoute %}
                         {% set similarityReportRoute = routeLookupIfAuthorized('learningAssessment.getSimilarityReport', {assessmentId: assessable.id, assessment: assessable}) %}
                         {% set worksheetClassView = routeLookupIfAuthorized('learningAssessment.getWorksheet', {assessmentId: assessable.id, assessment: assessable}) %}
+                        {% set horizontalMarkingRoute = routeLookupIfAuthorized('learnosity.getHorizontalMarking', {assessment: assessable, assessmentId: assessable.id}) %}
 
                         <li data-assessment="{{ assessable.id }}" data-assessment-title="{{ assessable.title }}">
                             <div{% if hasActions %} class="actions-small-1"{% endif %}>
@@ -170,6 +170,22 @@ Data:
                                     </nav>
                                     <ul data-dropdown-content class="f-dropdown" id="project-options{{ assessable.id }}">
                                         {% if statusRoute and assessable.isImplementation %}<li><a href="{{ statusRoute }}" class="icon-progress">View Status</a></li>{% endif %}
+                                        {% if assessable is dueWork %}
+                                            {% set viewGradeRoute = routeLookupIfAuthorized('learningDueWorkResponse.getFirstParticipantResponse', {
+                                                assessmentId: assessable.id,
+                                                assessment: assessable,
+                                            }) %}
+                                            {% if viewGradeRoute and assessable.isImplementation %}
+                                                <li><a class="icon-task" href="{{ viewGradeRoute }}" >View and {{ locale.grades }} submissions</a></li>
+                                            {% endif %}
+                                        {% endif %}
+                                        {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
+                                            assessmentId: assessable.id,
+                                            assessment: assessable
+                                        }) %}
+                                         {% if viewCustomParticipationRoute and assessable.isImplementation and (assessable is dueWork or assessable is quiz or assessable is task) %}
+                                            <li><a class="icon-group" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
+                                        {% endif %}
                                         {% if assessable is dueWork and assessable.enableWorksheet and assessable.kamiWorksheetTemplate and worksheetClassView %}
                                             <li>
                                                 <a id="kamiWorksheet" class="icon-surveys" href="{{ worksheetClassView }}">Class View</a>
@@ -181,6 +197,9 @@ Data:
                                         {# Learnosity Quiz has two parts: Modify Quiz and Modify Contents #}
                                         {% if assessable is quiz %}
                                             {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessment: assessable, assessmentId: assessable.id}) %}
+                                             {% if horizontalMarkingRoute %}
+                                                <li><a class="icon-class-list" href="{{ horizontalMarkingRoute }}">Review horizontally</a></li>
+                                            {% endif %}
                                             <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" title="Modify this {{ locale.activity }} settings">Modify Settings</a></li>
                                             <li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}" title="Modify this {{ locale.activity }} contents">Modify Contents</a></li>
                                         {% else %}
@@ -209,52 +228,98 @@ Data:
         <div id='assessment-list-empty-state' class="empty-state {% if assessment.assessables|length %}hide{% endif %}">
             {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id, context: assessment }) %}
             <i class="icon-project"></i>
-            <p>This {{ locale.project }} currently has no {{ locale.activity.plural }}.<br />To start assessing students you should <a href="{{ createRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">create an {{ locale.activity }}</a> next.</p>
+            <p>This {{ locale.project }} currently has no {{ locale.activity.plural }}.<br />To start assessing students you should <a data-test="project-create-activity-link" href="{{ createRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">create an {{ locale.activity }}</a> next.</p>
         </div>
     </div>
-    {% if assessment.baseContext is not unitSpecification %}
+    {% if aImpls | length %}
     <div class="small-12 large-6 island">
         <h2 class="subheader">Students</h2>
+        {% set showGroups = assessment.baseContext is unitSpecification %}
 
-        {% if assessment.allParticipants | length %}
-            <section>
-                <ul class="information-list">
-                    {% for participant in assessment.allParticipants %}
-                        <li>
-                            <div class="flex-grade">
-                                <div class="small-12 compact card columns">
-                                    {# cache to prevent repeated traversals #}
-                                    <a href="{{ routeLookup('learningAssessment.getSummary', { assessmentId: assessment.id, studentId: participant.user.id}) }}">
-                                        {% include 'include/portrait.twig' with {user: participant.user} only %}
-                                        <p>
-                                            {{ participant.user.formatName }}
-                                            <span class="pipe meta">
-                                                {% set stats = participantStats[participant.user.id] %}
-                                                {{ stats.countAssessments - stats.countResponseRequired }}/{{ stats.countAssessments }} activities completed
-                                            </span>
-                                        </p>
-                                    </a>
+        {% for aImpl in aImpls %}
+            {% if showGroups %}
+            <div class="component-container">
+                <div class="row">
+                    <div class="small-12 columns">
+                        <div class="component-titlebar">
+                            <div class="actions-small-1">
+                                <div class="list-item">
+                                    <h2>
+                                        <a href="/homepage/{{ aImpl.assessment.getBaseContext.getFolder.id }}">
+                                            {{ aImpl.assessment.getBaseContext.getFolder.getTitle }}
+                                        </a>
+                                    </h2>
                                 </div>
-
-                                {% set publishedHumanReadableMark = participant.humanReadableMark(true) ?? null %}
-
-                                {% if publishedHumanReadableMark is not null %}
-                                    <div class="grade {{ urgency.marks( participant.normalisedMark(true)) }}-bg">
-                                        <span>{{ publishedHumanReadableMark }}</span>
-                                    </div>
-                                {% endif %}
+                                <nav>
+                                    <a
+                                        data-collapser="collap-{{ aImpl.assessment.id }}"
+                                        href="#"
+                                        class="icon-up-arrow collapse"
+                                        title="Expand/collapse content"
+                                    ></a>
+                                </nav>
                             </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </section>
-        {% else %}
-            {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: assessment.id, context: assessment }) %}
-            <div class="empty-state">
-                <i class="icon-group"></i>
-                <p>There are no students currently undertaking this {{ locale.project }}.</p>
-                <p>As you <a href="{{ createRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">add {{ locale.activity.plural }}</a>, the participating students will appear here. </p>
-            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if aImpl.assessment.allParticipants | length %}
+                <section
+                    {% if showGroups %}
+                    data-collapse-state="uncollapsed"
+                    data-collapsable="collap-{{ aImpl.assessment.id }}"
+                    {% endif %}
+                >
+                    <ul class="information-list">
+                        {% for participant in aImpl.assessment.allParticipants %}
+                            <li>
+                                <div class="flex-grade">
+                                    <div class="small-12 compact card columns">
+                                        {# cache to prevent repeated traversals #}
+                                        <a href="{{ routeLookup('learningAssessment.getSummary', { assessmentId: aImpl.assessment.id, studentId: participant.user.id}) }}">
+                                            {% include 'include/portrait.twig' with {user: participant.user} only %}
+                                            <p>
+                                                {{ participant.user.formatName }}
+                                                <span class="pipe meta">
+                                                    {% set stats = aImpl.participantStats[participant.user.id] %}
+                                                    {{ stats.countAssessments - stats.countResponseRequired }}/{{ stats.countAssessments }} activities completed
+                                                </span>
+                                            </p>
+                                        </a>
+                                    </div>
+
+                                    {% set publishedHumanReadableMark = participant.humanReadableMark(true) ?? null %}
+
+                                    {% if publishedHumanReadableMark is not null %}
+                                        <div class="grade {{ urgency.marks( participant.normalisedMark(true)) }}-bg">
+                                            <span>{{ publishedHumanReadableMark }}</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            {% else %}
+                {% set createRoute = routeLookup('learningAssessment.getCreateAssessmentForm', {contextType: 'projects', contextId: aImpl.assessment.id, context: aImpl.assessment }) %}
+                <div class="empty-state">
+                    <i class="icon-group"></i>
+                    <p>There are no students currently undertaking this {{ locale.project }}.</p>
+                    <p>As you <a href="{{ createRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">add {{ locale.activity.plural }}</a>, the participating students will appear here. </p>
+                </div>
+            {% endif %}
+            {% if showGroups %}
+                </div>
+            {% endif %}
+        {% endfor %}
+
+        {% if showGroups %}
+            <script type="text/javascript">
+                $(function () {
+                    $('[data-collapser]').collapsable();
+                });
+            </script>
         {% endif %}
     </div>
     {% endif %}

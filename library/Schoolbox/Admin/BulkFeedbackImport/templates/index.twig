@@ -1,0 +1,141 @@
+{##
+ # Bulk Feedback Import configuration
+ #
+ # @param string $pageCurrent    The current page we're on
+ # @param array $allBreadcrumbs  A set of breadcrumb nodes, as defined by Admin Subnav
+ # @param Collection $worktypes  A list of Work Type instances, ordered by sequence
+ #}
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
+
+<script>
+    $(function() {
+        let bulkFeedbackImportForm = $('#bulkFeedbackImport');
+
+        bulkFeedbackImportForm.find('input[data-selectizeuser]')
+            .userSelectizeSelector({
+                ajax: {
+                    data: {roleTypeID: '{{ roletypeStaff }}'},
+                }
+            });
+
+        bulkFeedbackImportForm.alaressValidate({
+            rules: {
+                'userId': {
+                    'required': true
+                },
+                'assessmentTitle': {
+                    'required': true
+                },
+                "sourceFile-file": {
+                    required: {
+                        depends: function () {
+                            return document.getElementById("sourceFile-zone").querySelector("[data-dz-previews]").children.length === 0;
+                        },
+                    },
+                },
+            },
+            messages: {
+                'userId': {
+                    'required': 'You must specify a feedback author before you can proceed'
+                },
+                "sourceFile-file-file": "Please attach a csv file",
+            },
+        });
+
+        // Remove the error message when a worksheet file is uploaded
+        $('#sourceFile-zone').on('success.attachzone', () => {
+            $('#sourceFile-file-error').remove();
+        });
+    });
+</script>
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 island">
+            <section>
+                <div class="content">
+                    <p>Before you begin:</p>
+
+                    <ul>
+                        <li>Use the exact {{ locale.dueWork.proper }} title from class pages.</li>
+                        <li>Match Work Type and Class Codes exactly.</li>
+                        <li>Add feedback using Student External IDs.</li>
+                        <li>Normalised marks must be between 0-100.</li>
+                        <li>Comments must follow formatting rules.</li>
+                        <li>Publish Date must be in the <a href="/adminv2/setting/Localisation#date_local">Numerical Date Format</a> or just leave it empty to use the current datetime.</li>
+                        <li>Download and complete the CSV template.</li>
+                        <li>Upload and preview the file.</li>
+                    </ul>
+
+                    <div class="alert-box highlight f-no-margins">
+                        Note: Errors may occur if class codes or student IDs don't match, or if marks are out of range.
+                        <br>
+                        Read full import instructions <a href="/help/sso/send?returnUrl=/homepage/2725#component502080" target="_blank">here</a>.
+                    </div>
+                </div>
+                <div class="component-action">
+                    <section>
+                        <a href="{{ CDN_PREFIX }}/adminv2/bulk-feedback-import/bulkFeedbackImportTemplate.csv" class="button">Download Template</a>
+                    </section>
+                </div>
+            </section>
+        </div>
+        <div class="small-12 island">
+            {% set formRoute = routeLookupIfAuthorized('adminBulkFeedbackImport.postPreview') %}
+
+            <form action="{{ formRoute }}" method="post" id="bulkFeedbackImport">
+                <section>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label for="assessmentTitle">
+                                <span class="required-with-tip">{{ locale.dueWork.proper }} Title</span>
+                                <span class="hint has-tip tip-top" data-tooltip title="Enter a clear and concise title for the {{ locale.dueWork.proper }}. This will be visible to students and staff.">?</span>
+                            </label>
+                            <input id="assessmentTitle" type="text" name="assessmentTitle" value='' />
+                        </div>
+
+                        <div class="small-12 columns">
+                            <label for="worktype">
+                                <span class="required-with-tip">Work Type</span>
+                                <span class="hint has-tip tip-top" data-tooltip title="Select the assessment work type from the drop-down list (e.g., learning activity, assignment, formative or summative assessment task).">?</span>
+                            </label>
+
+                            <select id="worktype" name="worktypeId">
+                                {% for worktype in worktypes %}
+                                    <option value="{{ worktype.id }}">{{ worktype.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div class="small-12 columns">
+                            <label for="userId">
+                                <span class="required-with-tip">Feedback Author</span>
+                                <span class="hint has-tip tip-top" data-tooltip title="Indicates the person who provided the feedback for this assessment.">?</span>
+                            </label>
+                            <input id="userId" data-selectizeuser type="text" name="userId" placeholder="Search Users">
+                        </div>
+
+                        <div class="small-12 columns">
+                            <label>
+                                <span class="required-with-tip">Source File</span>
+                                <span class="hint has-tip tip-top" data-tooltip title="Specifies the bulk import source file associated with this assessment.">?</span>
+                            </label>
+                            {% include 'sub/attachzone.twig' with { attachzone: sourceFileZone } %}
+                            <input type="hidden" name="sourceFile-file" id="sourceFile-file" />
+                        </div>
+                    </fieldset>
+                </section>
+
+                <input type="submit" value="Preview" />
+            </form>
+        </div>
+    </div>
+</div>

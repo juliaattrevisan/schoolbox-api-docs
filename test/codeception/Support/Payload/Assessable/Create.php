@@ -69,6 +69,10 @@ class Create extends Request
         $this->setFormParam('visibility', IAssessable::MARK_VISIBILITY_PARENT_STUDENT);
         $this->setFormParam('markType', 1);
         $this->setFormParam('gradingScheme', 1);
+        if ($assessableType === AssessmentType::TYPE_DUE_WORK) {
+            $this->setFormParam('instructor-markType', 1);
+            $this->setFormParam('instructor-gradingScheme', 1);
+        }
         $this->setFormParam('resultset', 1);
         $this->setFormParam('useRubric', 0);
         // 6 - none

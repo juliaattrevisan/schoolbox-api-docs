@@ -111,10 +111,13 @@
                 <ul class="activity-list">
                     {% for assessable in assessment.assessables %}
                     <li>
+                        {# instructor marks are not available on this page #}
+                        {% set canViewInstructorMarks = false %}
                         {% include '@learningGrades/fragments/assessmentGrade.twig' with {
                             assessment: assessable,
                             student: student,
-                            returnUrlSuffix: returnUrlSuffix
+                            returnUrlSuffix: returnUrlSuffix,
+                            canViewInstructorMarks: canViewInstructorMarks
                         } only %}
                     </li>
                     {% endfor %}

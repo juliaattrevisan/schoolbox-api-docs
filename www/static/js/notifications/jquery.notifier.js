@@ -76,7 +76,7 @@
                 conn.onclose = onClose;
 
                 if (settings.debug) {
-                    console.log("Created new socket connection");
+                    console.debug("Created new socket connection");
                 }
             }
 
@@ -89,13 +89,13 @@
                     );
 
                     if (settings.debug) {
-                        console.log("Polling for connection, attempt #" + backoff + ", waiting " + jitter + "ms");
+                        console.debug("Polling for connection, attempt #" + backoff + ", waiting " + jitter + "ms");
                     }
 
                     setTimeout(establishConnection, jitter);
                 } else {
                     if (settings.debug) {
-                        console.log("Poll timeout exceeded. Giving up.");
+                        console.debug("Poll timeout exceeded. Giving up.");
                     }
                     $(settings.list).children(".footer").children("a").html("Could not connect");
                 }
@@ -108,12 +108,12 @@
             function send(data) {
                 if (conn) {
                     if (settings.debug) {
-                        console.log("Sending data to server");
+                        console.debug("Sending data to server");
                     }
                     conn.send(JSON.stringify(data));
                 } else {
                     if (settings.debug) {
-                        console.log("No connection: not sending data");
+                        console.debug("No connection: not sending data");
                     }
                 }
             }
@@ -123,7 +123,7 @@
              */
             function updateDOM() {
                 if (settings.debug) {
-                    console.log("Updating DOM");
+                    console.debug("Updating DOM");
                 }
 
                 // do the following on every DOM update request
@@ -345,7 +345,7 @@
              */
             var onOpen = function () {
                 if (settings.debug) {
-                    console.log("onOpen() triggered");
+                    console.debug("onOpen() triggered");
                 }
 
                 // reset backoff counter
@@ -366,7 +366,7 @@
              */
             var onError = function (e) {
                 if (settings.debug) {
-                    console.log("onError() triggered");
+                    console.debug("onError() triggered");
                 }
                 $(self).removeClass("connected").data("connected", false);
                 var data;
@@ -381,25 +381,32 @@
 
             this.autoUnread = function (data) {
                 if (settings.debug) {
-                    console.log("auto unread called.");
+                    console.debug("auto unread called.");
                 }
                 /* On page load, if the url path matches the path of the unread notifications, we should mark that as read
                  *
                  * originally this matched the exact notif href, but some of those have specific tabs, or references  / anchors,
                  * that are not navigated to when using the interface. so we need to match on path instead.
                  */
-                const href = document.location.pathname;
+                const documentPathname = document.location.pathname;
                 document.querySelectorAll("[data-msgitem-href]").forEach((element) => {
                     if (!settings.autoReadNotif) {
+                        // Is this a link to the base anchor?
+                        // If so, then this should be considered an alert which always displays?
+                        let elementHref = element.getAttribute("href");
+                        if (elementHref === "#") {
+                            return;
+                        }
+
                         // no page found yet, keep looping
-                        let elmHref = new URL(element.getAttribute("href"), window.location.href);
-                        if (elmHref.pathname === href) {
+                        let elementUrl = new URL(elementHref, window.location.href);
+                        if (elementUrl.pathname === documentPathname) {
                             // get parent where we could mark as read
                             let message = element.closest("[data-msgitem]");
                             // if this is unread, mark as read, and exit
                             if ("unread" === message.dataset.status) {
                                 if (settings.debug) {
-                                    console.log("found message to mark as read.");
+                                    console.debug("found message to mark as read.");
                                 }
                                 var msgId = message.getAttribute("id").split("-")[1];
                                 send({ ack: msgId });
@@ -417,7 +424,7 @@
              */
             var onMessage = function (e) {
                 if (settings.debug) {
-                    console.log("onMessage() triggered");
+                    console.debug("onMessage() triggered");
                 }
                 var data;
                 try {
@@ -456,7 +463,7 @@
              */
             var onClose = function (e) {
                 if (settings.debug) {
-                    console.log("onClose() triggered");
+                    console.debug("onClose() triggered");
                 }
                 $(self).removeClass("connected").data("connected", false);
                 pollReconnect();
@@ -481,7 +488,7 @@
                 // check the titles match; discard the new one if they don't
                 if (messages[msgId].body != amqpMsg.body) {
                     if (settings.debug) {
-                        console.log("Messages with matching IDs have conflicting titles");
+                        console.debug("Messages with matching IDs have conflicting titles");
                     }
                     return;
                 }
@@ -529,7 +536,7 @@
              */
             this.pipeSubscribe = function (data) {
                 if (settings.debug) {
-                    console.log("Message from server: parsing subscribe");
+                    console.debug("Message from server: parsing subscribe");
                 }
                 // don't try a fetch if the subscription came back false
                 if (data === true) {
@@ -545,7 +552,7 @@
              */
             this.pipeFetch = function (data) {
                 if (settings.debug) {
-                    console.log("Message from server: parsing fetch");
+                    console.debug("Message from server: parsing fetch");
                 }
                 $.each(data, function (msgId, amqpMsg) {
                     storeMessage(msgId, amqpMsg, "fetch");
@@ -562,7 +569,7 @@
              */
             this.pipePush = function (data) {
                 if (settings.debug) {
-                    console.log("Message from server: parsing push");
+                    console.debug("Message from server: parsing push");
                 }
                 $.each(data, function (msgId, amqpMsg) {
                     storeMessage(msgId, amqpMsg, "push");
@@ -579,7 +586,7 @@
              */
             this.pipeMarkAsRead = function (data) {
                 if (settings.debug) {
-                    console.log("Message from server: parsing mark_as_read");
+                    console.debug("Message from server: parsing mark_as_read");
                 }
                 $.each(data, function (i, msgId) {
                     // if we haven't seen this message, ignore this notification
@@ -597,7 +604,7 @@
 
             this.pipeAlert = function (data) {
                 if (settings.debug) {
-                    console.log("Message from server: parsing alert");
+                    console.debug("Message from server: parsing alert");
                 }
                 // while there will always only be one, it follows the same data structure as the others
                 $.each(data, function (msgId, amqpMsg) {
@@ -647,7 +654,7 @@
              */
             this.pipeError = function (data) {
                 if (settings.debug) {
-                    console.log("Message from server: parsing error");
+                    console.debug("Message from server: parsing error");
                 }
                 $(self).data("connected", false);
                 switch (data.code) {
@@ -665,7 +672,7 @@
 
             /* constructor method execution starts here */
             if (settings.debug) {
-                console.log("Constructing Notifier on", this);
+                console.debug("Constructing Notifier on", this);
             }
 
             var self = this;

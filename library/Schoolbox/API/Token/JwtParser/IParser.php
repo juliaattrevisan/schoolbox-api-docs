@@ -151,6 +151,7 @@ interface IParser
      * @throws Exception\Rejected        if the JWT is properly formed, but is rejected before evaluating the user which
      *                                   it identifies.
      * @throws Exception\InvalidIdentity if the JWT is accepted, but does not identify a valid user.
+     * @throws Exception\Base            covers all of the above cases
      */
     public function determineUser(#[SensitiveParameter] string $jwt): User;
 

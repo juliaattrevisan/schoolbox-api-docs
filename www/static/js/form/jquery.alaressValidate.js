@@ -1,5 +1,5 @@
 (function ($) {
-    "use strict";
+    ("use strict");
 
     $.alaressValidate = {};
 
@@ -78,6 +78,24 @@
 
         return getDateFromString(dateDisplayFormats.dayjs, date, hour, minute, 0);
     };
+
+    /**
+     * Date format validation method - works with a datepicker
+     * and uses the dateDisplayFormats.dayjs format from System Settings › Localisation
+     * to validate the date.
+     */
+    $.validator.addMethod(
+        "numericalDateFormat",
+        function (value, element) {
+            const expectedFormat = window.dateDisplayFormats.dayjs; // format from System Settings › Localisation
+            const date = dayjs(value, expectedFormat, true);
+            return this.optional(element) || date.isValid();
+        },
+        function (params, element) {
+            // Using a function so the error message reflects any runtime format changes
+            return `Please enter a date in the format: ${window.dateDisplayFormats.dayjs}`;
+        },
+    );
 
     /**
      * Custom email validation method: allow any non-ASCII character
@@ -280,6 +298,21 @@
     );
 
     /**
+     * Use to ensure a field cannot match a restricted value.
+     */
+    $.validator.addMethod(
+        "cannotMatch",
+        function (value, element, params) {
+            var restrictedValue = typeof params === "string" ? params : params.value;
+            return $(element).val().toLowerCase() !== restrictedValue.toLowerCase();
+        },
+        function (params, element) {
+            var message = typeof params === "string" ? "Cannot be the same" : params.message;
+            return message || "Cannot be the same";
+        },
+    );
+
+    /**
      * oneCheckbox extension - checks that at least one checkbox has been selected in a group
      * Set a checkbox as in a group with data-checkbox-group="GROUPNAME"
      */
@@ -458,7 +491,6 @@
         },
         "Descriptor values must be an ascending or descending sequence",
     );
-
     /**
      * Default error placement method.
      *

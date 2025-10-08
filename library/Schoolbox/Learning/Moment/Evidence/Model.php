@@ -1,307 +1,55 @@
 <?php
 
 /**
- * @copyright Copyright 2020, Schoolbox Pty Ltd
- * @link      https://schoolbox.com.au/
+ * @author      Steve Chan <steve.chan@alaress.com.au>
+ * @copyright   Copyright 2025, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
  */
 
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Moment\Evidence;
 
-use Schoolbox\Discussion\Thread\Context\IThreadLocation;
-use Schoolbox\Discussion\Thread\Model as ThreadModel;
-use Schoolbox\GenericCollection;
-use Schoolbox\ISoftDeletable;
-use Schoolbox\Mapper\Traits\Model as ModelTraits;
-use Schoolbox\Resource\Storage\IStorage;
+use Schoolbox\Mapper\Traits\Model as ModelTrait;
+use Schoolbox\Resource\File\IFile;
+use Schoolbox\Resource\File\StorableTrait;
 use Schoolbox\User;
 
-/**
- * Class Model
- */
-class Model implements ISoftDeletable, IThreadLocation
+class Model implements IFile
 {
-    use ModelTraits\Id;
-    use ModelTraits\CreatedAtDate;
-    use ModelTraits\UpdatedAtDate;
-    use ModelTraits\DeletedAtDate;
+    use StorableTrait;
+    use ModelTrait\CreatedAtDate;
 
     /**
-     * The types of evidence
+     * @var \Schoolbox\Learning\Moment\Model|null
      */
-    public const MOMENT_TYPE_TEXT   = 'text';
-    public const MOMENT_TYPE_UPLOAD = 'upload';
-    public const MOMENT_TYPE_PHOTO  = 'photo';
-    public const MOMENT_TYPE_AUDIO  = 'audio';
-    public const MOMENT_TYPE_VIDEO  = 'video';
-
-    /**
-     * The file content (if any) that was uploaded to the learning moment.
-     *
-     * @var IStorage|null
-     */
-    private ?IStorage $storage = null;
-
-
-    /**
-     * The filename (if any) that was uploaded to the learning moment.
-     *
-     * @var string|null
-     */
-    private ?string $filename = null;
-
-
-    /**
-     * The text box (if any) that was uploaded to the learning moment.
-     *
-     * @var string|null
-     */
-    private ?string $body = null;
-
-
-    /**
-     * The discussion thread for the learning moment, if it has one.
-     *
-     * @var ThreadModel|null
-     */
-    private ?ThreadModel $discussionThread = null;
-
-
-    /**
-     * The recipient of the learning moment.
-     *
-     * (the Evidence being obtained is about the Recipient)
-     *
-     * @var User
-     */
-    private User $recipient;
-
-
-    /**
-     * The user which created the learning moment.
-     *
-     * @var User
-     */
-    private User $creator;
-
-    /**
-     * The type of evidence: photo/text/upload/video/audio
-     */
-    private string $type;
-
-    /**
-     * @var GenericCollection|null
-     */
-    private ?GenericCollection $curriculumNodes = null;
-
-
-    /**
-     * @var GenericCollection|null
-     */
-    private ?GenericCollection $tags = null;
-
-
-    /**
-     * @return IStorage|null
-     */
-    public function getStorage(): ?IStorage
-    {
-        return $this->storage;
-    }
-
-
-    /**
-     * @param IStorage|null $storage
-     * @return static
-     */
-    public function setStorage(?IStorage $storage): self
-    {
-        $this->storage = $storage;
-        return $this;
-    }
-
-
-    /**
-     * @return string|null
-     */
-    public function getFilename(): ?string
-    {
-        return $this->filename;
-    }
-
-
-    /**
-     * @param string|null $filename
-     * @return static
-     */
-    public function setFilename(?string $filename): self
-    {
-        $this->filename = $filename;
-        return $this;
-    }
-
-
-    /**
-     * @return string|null
-     */
-    public function getBody(): ?string
-    {
-        return $this->body;
-    }
-
-
-    /**
-     * @param string|null $body
-     * @return static
-     */
-    public function setBody(?string $body): self
-    {
-        $this->body = $body;
-        return $this;
-    }
-
-
-    /**
-     * @return ThreadModel|null
-     */
-    public function getDiscussionThread(): ?ThreadModel
-    {
-        return $this->discussionThread;
-    }
-
-
-    /**
-     * @param ThreadModel|null $discussionThread
-     * @return static
-     */
-    public function setDiscussionThread(?ThreadModel $discussionThread): self
-    {
-        $this->discussionThread = $discussionThread;
-        return $this;
-    }
-
+    private ?\Schoolbox\Learning\Moment\Model $moment = null;
 
     /**
      * @return User
      */
-    public function getRecipient(): User
+    public function getOwner(): User
     {
-        return $this->recipient;
+        return $this->moment->getCreator();
     }
 
 
     /**
-     * @param User $recipient
-     * @return static
+     * @return \Schoolbox\Learning\Moment\Model|null
      */
-    public function setRecipient(User $recipient): self
+    public function getMoment(): ?\Schoolbox\Learning\Moment\Model
     {
-        $this->recipient = $recipient;
-        return $this;
+        return $this->moment;
     }
 
 
     /**
-     * @return User
-     */
-    public function getCreator(): User
-    {
-        return $this->creator;
-    }
-
-
-    /**
-     * @param User $creator
-     * @return static
-     */
-    public function setCreator(User $creator): self
-    {
-        $this->creator = $creator;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType(): string
-    {
-        return $this->type;
-    }
-
-    /**
-     * @param string $type
+     * @param \Schoolbox\Learning\Moment\Model|null $moment
      * @return $this
      */
-    public function setType(string $type): self
+    public function setMoment(?\Schoolbox\Learning\Moment\Model $moment): self
     {
-        $this->type = $type;
+        $this->moment = $moment;
         return $this;
-    }
-
-    /**
-     * @return GenericCollection|null
-     */
-    public function getCurriculumNodes(): ?GenericCollection
-    {
-        return $this->curriculumNodes;
-    }
-
-
-    /**
-     * @param GenericCollection $curriculumNodes
-     * @return static
-     */
-    public function setCurriculumNodes(GenericCollection $curriculumNodes): self
-    {
-        $this->curriculumNodes = $curriculumNodes;
-        return $this;
-    }
-
-
-    /**
-     * Returns just the Curriculum nodes that do not have an empty code.
-     * usually these are parent objects, or titles
-     *
-     * @return GenericCollection|null
-     */
-    public function getViewableCurriculumNodes(): ?GenericCollection
-    {
-        return $this->curriculumNodes?->filter(
-            function ($node) {
-                if ($node->getCode() !== '') {
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        );
-    }
-    /**
-     * @return GenericCollection|null
-     */
-    public function getTags(): ?GenericCollection
-    {
-        return $this->tags;
-    }
-
-
-    /**
-     * @param GenericCollection $tags
-     * @return static
-     */
-    public function setTags(GenericCollection $tags): self
-    {
-        $this->tags = $tags;
-        return $this;
-    }
-
-
-    /**
-     * @inheritdoc
-     */
-    public function getCommentNotifier(): ?string
-    {
-        return Discussion\Comment\Notifier::class;
     }
 }

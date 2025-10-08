@@ -38,6 +38,8 @@ class DupeDetectorTool extends CliTool\App
      */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
@@ -87,6 +89,7 @@ HELP;
         }
 
         $this->getLogger()->info('');
+        $this->deprecationNotice("SA-19334");
     }
 
 

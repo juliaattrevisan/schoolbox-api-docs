@@ -266,13 +266,13 @@ abstract class Mapper implements IMapper
     protected $config_loader;
 
     /**
-     * Session data.
+     * An override for the session data
      *
      * TODO decouple the dependency between mappers and session
      *
-     * @var array
+     * @var array|null
      */
-    protected $sessionData = [];
+    protected array|null $sessionDataOverride = null;
 
     /**
      * A cache of the results of `SELECT` statements which this mapper executes.
@@ -342,11 +342,9 @@ abstract class Mapper implements IMapper
 
         // only functional in development
 
-        // This line raises an error on CI, where INSTANCE_ID is always "ci":
-        // it doesn't raise an error on Vagrant where INSTANCE_ID comes from
-        // an external config, so ignore the "no error to ignore" message here.
-        /* @phpstan-ignore-next-line */
-        self::$perfmon = (INSTANCE_ID === 'vagrantx' && self::isWithinWebRequest())
+        // This line used to raise a CI error when it was a string compare:
+        // I guess PHPStan doesn't find it if it's an in_array check.
+        self::$perfmon = (in_array(INSTANCE_ID, Instance::DEVELOPMENT_INSTANCE_IDS) && self::isWithinWebRequest())
             ? new DevMonitor(DebugBar::getInstance())
             : new LiveMonitor()
         ;
@@ -426,8 +424,6 @@ abstract class Mapper implements IMapper
         $this->setColumnFactory(self::$columnFactory ?: new ColumnFactory());
         $this->setMonitor(self::$perfmon ?: new LiveMonitor());
 
-        // Need to add session data so that notifiers can do their thing
-        $this->setSessionData($_SESSION ?? []);
         $this->mapping();
 
         $this->monitor->cacheIndices($this);
@@ -719,19 +715,34 @@ abstract class Mapper implements IMapper
     }
 
     /**
-     * @param array $sessionData
+     * @param array|null $sessionDataOverride
      */
-    public function setSessionData($sessionData)
+    public function setSessionDataOverride(array|null $sessionDataOverride): void
     {
-        $this->sessionData = $sessionData;
+        $this->sessionDataOverride = $sessionDataOverride;
     }
 
     /**
+     * @return array|null
+     */
+    public function getSessionDataOverride(): array|null
+    {
+        return $this->sessionDataOverride;
+    }
+
+
+    /**
+     * Returns the current data from $_SESSION, unless overridden by sessionDataOverride
+     *
      * @return array
      */
-    public function getSessionData()
+    public function getSessionData(): array
     {
-        return $this->sessionData;
+        if ($this->sessionDataOverride) {
+            return $this->sessionDataOverride;
+        }
+
+        return $_SESSION ?? [];
     }
 
 
@@ -742,7 +753,7 @@ abstract class Mapper implements IMapper
      */
     public function getSessionUser(): ?User
     {
-        return $this->sessionData['user'] ?? null;
+        return $this->getSessionData()['user'] ?? null;
     }
 
 
@@ -826,10 +837,10 @@ abstract class Mapper implements IMapper
     }
 
     /**
-     * @param IPropagator $propagator
+     * @param IPropagator|null $propagator
      * @return static
      */
-    public function setEventPropagator(IPropagator $propagator = null)
+    public function setEventPropagator(?IPropagator $propagator = null)
     {
         $this->propagator = $propagator;
         return $this;
@@ -1814,7 +1825,8 @@ abstract class Mapper implements IMapper
     /**
      * Restores one or more models that were soft deleted.
      *
-     * @param object|Collection $object Model or collection of models to restore
+     * @param object|Collection $object Model or collection of models to restore.
+     *                                  All models in the collection should have the same type.
      *
      * @return bool
      */
@@ -1823,14 +1835,47 @@ abstract class Mapper implements IMapper
         if (!isset($this->soft_delete_column)) {
             return false;
         }
-        return $this->updateAll(
-            $object,
-            $this->soft_delete_column,
-            $this->soft_delete_undeleted_value,
-            self::CALLBACK_PRERESTORE,
-            self::CALLBACK_POSTRESTORE,
-            self::METHOD_CREATE
-        );
+
+        // Some objects exist have parent/child relationships that result in a tree of connected objects (e.g. folders).
+        // In a tree of connected objects, every descendent of a soft-deleted object must also be soft-deleted.
+        // We can't tell from here which objects exist in trees, so we treat all collections as potential trees.
+        if ($object instanceof Collection) {
+            // Update the items one at a time, in the order they were supplied.
+            // This is done so that parent objects will always be restored before child objects, and so the requirement
+            // that every folder to be restored must have a non-deleted parent will not be violated.
+            // (see for example Folder\Mapper->validateActiveParent())
+            // Note this works because objects are supplied in parent-first order, due to the way the object tree is
+            // traversed in RecursiveUndeleterCli->getDataStructureForAllRootModels().
+            foreach ($object as $model) {
+                $success = $this->updateAll(
+                    $model,
+                    $this->soft_delete_column,
+                    $this->soft_delete_undeleted_value,
+                    self::CALLBACK_PRERESTORE,
+                    self::CALLBACK_POSTRESTORE,
+                    self::METHOD_CREATE
+                );
+
+                if (!$success) {
+                    return false;
+                }
+            }
+        } else {
+            $success = $this->updateAll(
+                $object,
+                $this->soft_delete_column,
+                $this->soft_delete_undeleted_value,
+                self::CALLBACK_PRERESTORE,
+                self::CALLBACK_POSTRESTORE,
+                self::METHOD_CREATE
+            );
+
+            if (!$success) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**

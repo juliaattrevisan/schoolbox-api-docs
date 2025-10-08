@@ -168,7 +168,8 @@ export function getFilteredCourseColumnCount(
     course: CourseWithCurriculumNodeUsage,
     includeChildren: boolean,
 ): number {
-    const key = `column-${node.id}-${course.id}-${includeChildren}-${useFiltersStore().selectedReportOptionsKey}`;
+    const filtersStore = useFiltersStore();
+    const key = `column-${node.id}-${course.id}-${includeChildren}-${filtersStore.selectedReportOptionsKey}-${filtersStore.showDisabled}`;
     if (node.storedUsages[key]) {
         return node.storedUsages[key];
     }
@@ -176,15 +177,25 @@ export function getFilteredCourseColumnCount(
      * When the node has children and is not expanded, we want to show the usage count inclusive of children
      * to show how many usages are linked to the node and its children
      */
+    // no need to count at all if the node is disabled and the filter is set to hide
+    if (!node.enabled && !filtersStore.showDisabled) {
+        node.storedUsages[key] = 0;
+        return node.storedUsages[key];
+    }
     if (includeChildren && node.children) {
         const onChildrenCount = node.children.reduce((acc, child) => {
             return acc + getFilteredCourseColumnCount(child, getChildCourseUsage(child, course), true);
         }, 0);
-        node.storedUsages[key] = course.usage.course.count + onChildrenCount;
+        // only need to check for course usage on the course column
+        node.storedUsages[key] = filtersStore.selectedReportOptions.includes(ReportOptionValues.COURSE)
+            ? course.usage.course.count + onChildrenCount
+            : 0;
         return node.storedUsages[key];
     }
     // only need to check for course usage on the course column
-    node.storedUsages[key] = course.usage.course.count;
+    node.storedUsages[key] = filtersStore.selectedReportOptions.includes(ReportOptionValues.COURSE)
+        ? course.usage.course.count
+        : 0;
     return node.storedUsages[key];
 }
 
@@ -202,11 +213,17 @@ export function getFilteredUnitColumnCount(
     unit: UnitWithCurriculumNodeUsage,
     includeChildren: boolean,
 ): number {
-    const key = `unit-${node.id}-${course.id}-${unit.id}-${includeChildren}-${useFiltersStore().selectedReportOptionsKey}`;
+    const filtersStore = useFiltersStore();
+    const key = `unit-${node.id}-${course.id}-${unit.id}-${includeChildren}-${filtersStore.selectedReportOptionsKey}-${filtersStore.showDisabled}`;
     if (node.storedUsages[key]) {
         return node.storedUsages[key];
     }
-    const onNodeCount = useFiltersStore().selectedReportOptions.reduce((acc, option) => {
+    // no need to count at all if the node is disabled and the filter is set to hide
+    if (!node.enabled && !filtersStore.showDisabled) {
+        node.storedUsages[key] = 0;
+        return node.storedUsages[key];
+    }
+    const onNodeCount = filtersStore.selectedReportOptions.reduce((acc, option) => {
         // always skip course as it can't be assigned within a unit
         if (option === ReportOptionValues.COURSE) return acc;
         return acc + unit.usage[option].count;
@@ -239,7 +256,8 @@ export function getFilteredCourseCount(
     course: CourseWithCurriculumNodeUsage,
     includeChildren: boolean,
 ): number {
-    const key = `course-total-${node.id}-${course.id}-${includeChildren}-${useFiltersStore().selectedReportOptionsKey}`;
+    const filtersStore = useFiltersStore();
+    const key = `course-total-${node.id}-${course.id}-${includeChildren}-${filtersStore.selectedReportOptionsKey}-${filtersStore.showDisabled}`;
     if (node.storedUsages[key]) {
         return node.storedUsages[key];
     }
@@ -259,7 +277,8 @@ export function getFilteredCourseCount(
  * @returns the total node usage count
  */
 export function getFilteredTotalCount(node: CurriculumCoverageNode, includeChildren: boolean): number {
-    const key = `total-${node.id}-${includeChildren}-${useFiltersStore().selectedReportOptionsKey}`;
+    const filtersStore = useFiltersStore();
+    const key = `total-${node.id}-${includeChildren}-${filtersStore.selectedReportOptionsKey}-${filtersStore.showDisabled}`;
     if (node.storedUsages[key]) {
         return node.storedUsages[key];
     }

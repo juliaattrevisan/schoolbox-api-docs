@@ -9,24 +9,16 @@
 {% set isSuperuser = session.user.isSuperUser() %}
 {% set isStaff = isSuperuser or session.user.getRole().isStaff() %}
 {% set isSelf = session.user.getId() == user.getId() %}
+{% set canImpersonate = routeLookupIfAuthorized('user.impersonate', { user: user, userId: user.id }) %}
 
-<div class="actions-small-{{ isSuperuser ? 1 : 0 }} row">
-    <div class="list-item">
-        <div class="small-12 column">
-            <h1 data-test="user-profile-name">{{ user.formatName(nameFormat) }}</h1>
-        </div>
-    </div>
-    <nav>
-        {% if routeLookupIfAuthorized('adminUser.getModify') %}
-            <a
-                href="{{ routeLookup('adminUser.getModify', {'userId': user.id}) }}"
-                class="icon-modify"
-                title="Modify User"
-                data-test="user-profile-modify"
-            ></a>
-        {% endif %}
-    </nav>
-</div>
+{% include '@searchUser/heading/heading.twig' with {
+    user: user,
+    isSuperuser: isSuperuser,
+    canImpersonate: canImpersonate,
+    nameFormat: nameFormat,
+    linksInfo: linksInfo,
+} only %}
+
 <div class="row">
     <div class="small-12 island">
         <section class="no-pad">
@@ -98,6 +90,15 @@
                                                 #}
                                             *{{ selectedField.value }}*
                                         </dd>
+                                    {% elseif selectedField.field in ['currentLocation'] %}
+                                        {# The value of this field is a list of objects representing each event the user could be at.
+                                         # This is notably unlike other fields where the value is usually a string or list of strings
+                                         #}
+                                        {% include '@searchUser/field/currentLocation.twig' with {
+                                            fieldName: macro.fieldName(selectedField),
+                                            user: user,
+                                            currentEvents: selectedField.value,
+                                        } only %}
                                     {% else %}
                                         {# A generic tuple (key, value) pair
                                          #
@@ -120,22 +121,27 @@
                 </div>
             </div>
             {% block buttons_island %}
-                <ul class='flex-list flex-wrap buttons'>
+                <ul class='flex-list flex-wrap buttons' data-test="profile-buttons">
                     {% block buttons %}
                         {# Special constraints that further reduce the payload I built
                          # It uses the exact same philosophy as additionalConstraints for
                          # rendering profile fields.
+                         #
+                         # Geosnapshot isn't available for parents/students viewing staff
                          #}
                         {% set additionalConstraints = {
                             'student': {
                                 '_default': true,
+                                'geosnapshot': false,
                             },
                             'parent': {
                                 '_default': true,
+                                'geosnapshot': false,
                             },
                             'staff': {
                                 '_default': true,
                                 'eportfolio': eportfolioAuth,
+                                'geosnapshot': isGeosnapshotAvailable,
                             },
                         } %}
 

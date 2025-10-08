@@ -1,0 +1,66 @@
+{##
+ # Preview
+ #
+ # @param array $settings  A (publish date, user, sourceFile) struct representing identification method, feedback author and uploaded csv
+ # @param array $outcome   A list of log messages and an error count
+ #}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 island">
+            <h2 class="subheader">Summary</h2>
+            <section>
+                <div class="content">
+                    <ul>
+                        <li><strong>{{ locale.dueWork.proper }} Title:</strong> {{ settings.assessmentTitle }}</li>
+                        <li><strong>Work Type:</strong> {{ settings.worktype.name }}</li>
+                        <li><strong>Feedback Author:</strong>
+                            {% if settings.feedbackAuthor.deleted %}
+                                {{ settings.feedbackAuthor.fullname }}
+                            {% else %}
+                                <a href="/search/user/{{ settings.feedbackAuthor.id }}" target="_blank" title="{{ settings.feedbackAuthor.fullname }}">{{ settings.feedbackAuthor.fullname }}</a>
+                            {% endif %}
+                        </li>
+                        <li><strong>Source File:</strong> <a href="/storage/fetch.php?hash={{ settings.sourceFile.hash }}">{{ settings.sourceFile.filename }}</a></li>
+                        <li><strong>Publish Date:</strong> <span title="{{ settings.publishAt.database }}">{{ settings.publishAt.short }}</span></li>
+                    </ul>
+                </div>
+            </section>
+
+            {% if outcome|length %}
+                <h2 class="subheader">Results</h2>
+                <section class="content">
+                    <div>
+                        <ul class="information-list">
+                            {% for row in outcome.messages %}
+                                <li>
+                                    {% if row.type == 'warning' %}
+                                        <span style="color:red">{{ row.message }}</span>
+                                    {% else %}
+                                        {{ row.message }}
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </section>
+
+                <h2 class="subheader">View Imported Feedback</h2>
+                <section class="content">
+                    <ul class="information-list">
+                        {% for folderTitle, assessmentData in outcome.links %}
+                            <li><a href="{{ routeLookup('learningAssessment.getStatus', {assessmentId: assessmentData.id}) }}" target="_blank">Status for {{ assessmentData.title }} in folder {{ folderTitle }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </section>
+            {% endif %}
+        </div>
+    </div>
+</div>

@@ -124,16 +124,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     private $linkedUser;
 
     /**
-     * The hash value is actually a digest key and it will change
-     * with the username and password and should not be exposed
-     * publically as it is an actual security token for the purposes
-     * of webdav auth.
-     *
-     * @var string
-     */
-    private $hash = '';
-
-    /**
      * Portrait images are stored in storage now
      *
      * @var Storage\Model|null
@@ -603,27 +593,6 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         $this->preferredName = $preferredName;
         return $this;
     }
-
-
-    /**
-     * @param string $hash
-     * @return self
-     */
-    public function setHash($hash)
-    {
-        $this->hash = $hash;
-        return $this;
-    }
-
-
-    /**
-     * @return string
-     */
-    public function getHash()
-    {
-        return $this->hash;
-    }
-
 
     /**
      * @return Storage\Model|null
@@ -1330,6 +1299,7 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
             'givenName',
             'lastname',
             'fullName',
+            'role'
         ];
     }
 
@@ -1417,6 +1387,31 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     }
 
     /**
+     * Checks Staff Access to badges:
+     * Badge Moderator Write+
+     * Superuser
+     * Role with Create Badges
+     *
+     * @return bool
+     */
+    public function isStaffWithBadgeAccess(): bool
+    {
+        if (!$this->getRole()->isStaff()) {
+            return false;
+        }
+        // superuser can always work with badges
+        if ($this->isSuperuser()) {
+            return true;
+        }
+        foreach ($this->getAccessList() as $access) {
+            if ($access->getService() === UserAccess::SERVICE_BADGE && $access->getAccessLevel() >= UserAccess::ACCESS_WRITE) {
+                return true;
+            }
+        }
+        return $this->getRole()->getCreateBadges();
+    }
+
+    /**
      * Note this function deliberately does not check whether the user is a staff member.
      *
      * @param int $servicePermission - One of UserAccess::SERVICE_NEWS, UserAccess::SERVICE_CALENDAR, etc.
@@ -1436,6 +1431,27 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
         }
 
         return false;
+    }
+
+    /**
+     * Note this function deliberately does not check whether the user is a staff member.
+     *
+     * @param int $servicePermission - One of UserAccess::SERVICE_NEWS, UserAccess::SERVICE_CALENDAR, etc.
+     * @param ?int $sId - Required for some service permissions (see Schoolbox/Permission/Access/README.md).
+     * @return int
+     */
+    public function getServicePermissionAccessLevel(int $servicePermission, ?int $sId = null): int
+    {
+        $accessList = $this->getAccessList();
+
+        foreach ($accessList->filterBy('service', $servicePermission) as $access) {
+            /** @var UserAccess $access */
+            if ($sId === null || $access->getServiceIdentifier() === $sId) {
+                return $access->getAccessLevel();
+            }
+        }
+
+        return UserAccess::ACCESS_DENY;
     }
 
     /**
@@ -1468,5 +1484,41 @@ class User implements Serializable, Linkable, ISoftDeletable, IModel
     public function getPronoun(): ?Model
     {
         return $this->pronoun;
+    }
+
+    /**
+     * Check if the celebration confetti required
+     *
+     * @param string|null $birthdateTimestamp
+     * @return bool
+     */
+    public function isBirthday(?string $birthdateTimestamp): bool
+    {
+        /* No birthday found in the system or if empty, no confetti
+         */
+        if ('' === (string)$birthdateTimestamp) {
+            return false;
+        }
+
+        /* Unfortunately, Only students get to celebrate their birthday =(
+         */
+        if (!$this->getRole()->isStudent()) {
+            return false;
+        }
+
+        /* The celebration is not enabled for this year level =(
+         */
+        if (!$this->getYear()?->getBirthdayCelebrationEnabled()) {
+            return false;
+        }
+        $dob = \Alaress_Date_Format::newFromTimestamp($birthdateTimestamp);
+
+        /* Not the time for celebrations yet.
+         */
+        if (!$dob->isBirthday()) {
+            return false;
+        }
+
+        return true;
     }
 }

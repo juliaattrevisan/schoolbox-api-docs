@@ -162,13 +162,13 @@ class Mapper extends BaseMapper
     /**
      * Find all tours relevant to a particular user and the supplied URL
      *
-     * @param User   $user The user for whom we are retrieving the tours
-     * @param string $url  The URL to be used to filter the returned tours
+     * @param User $user The user for whom we are retrieving the tours
+     * @param string $url The URL to be used to filter the returned tours
+     * @param string|null $version Filter to a particular tour(s)
      * @param boolean $repeat Determines whether we should retrieve tours that have already started
      * @return GenericCollection
-     * @throws BaseMapper\DefinitionException
      */
-    public function findByUserForUrl(User $user, string $url, bool $repeat = false): GenericCollection
+    public function findByUserForUrl(User $user, string $url, ?string $version, bool $repeat = false): GenericCollection
     {
         $userQuery = $this->getUserFilterQuery($user);
 
@@ -177,19 +177,27 @@ class Mapper extends BaseMapper
 
         $sql = "
             {$this->getSelectString()}
-            WHERE       {$userQuery['query']} AND
-                        :url REGEXP `t`.`url_regex` AND
-                        `{$this->getTable()}`.`active` = 1
+            WHERE {$userQuery['query']} AND
+            :url REGEXP `t`.`url_regex` AND
+            `{$this->getTable()}`.`active` = 1
         ";
+
+        /* Match a particular version number
+         */
+        if (null !== $version) {
+            $sql .= "
+                AND tour.title LIKE '{$version}%'
+            ";
+        }
 
         if (!$repeat) {
             $userQuery['bindings']['user_id'] = $user->getId();
 
-            $sql = $sql . "AND
-                            tour.uuid NOT IN (
-                            SELECT tour_uuid
-                            FROM tour_status
-                            WHERE user_id = :user_id)";
+            $sql .= "
+                AND tour.uuid NOT IN (
+                    SELECT tour_uuid
+                    FROM tour_status
+                    WHERE user_id = :user_id)";
         }
 
         $sql .= ' ORDER BY updated_at';
@@ -243,7 +251,7 @@ class Mapper extends BaseMapper
         // ...
 
         // --------------------------------------------------------------------------------------------------------
-        // Concatenate all of the predicates into an OR query and return the SQL in an array along with bindings
+        // Concatenate all the predicates into an OR query and return the SQL in an array along with bindings
         // --------------------------------------------------------------------------------------------------------
 
         $query = "({$tourNotDeletedClause} AND (" . implode(" OR ", $predicates) . "))";
@@ -297,5 +305,33 @@ class Mapper extends BaseMapper
         $tourStepMapper->deleteByColumn('tour_uuid', $model->getUuid());
         $triggerMapper->deleteByColumn('tour_uuid', $model->getUuid());
         return true;
+    }
+
+    /**
+     * Return an array of comma-separated role names, indexed by tour UUID.
+     *
+     * @return array<string, string>
+     */
+    public function getAudienceRoleNamesCommaSeparatedByUuid(): array
+    {
+        return $this->database->executeQuery(
+            // This query deliberately includes inactive rows because both inactive (disabled) and
+            // active (enabled) tours need to be displayed on the Admin > Modules > Feature Tours page.
+            'SELECT t.uuid, GROUP_CONCAT(DISTINCT g.name SEPARATOR ", ") AS groupNames
+            FROM tour_audience_role tar
+            JOIN groups g ON tar.role_id = g.id
+            JOIN tour t ON tar.tour_uuid = t.uuid
+            WHERE t.deleted_at IS NULL
+            AND g.deleted_at IS NULL
+            GROUP BY t.uuid'
+        )->fetchColumnArray('groupNames', 'uuid');
+    }
+
+    /**
+     * @inheritDoc
+     */
+    protected function getDefaultOrderByParams(): array
+    {
+        return ['title' => 'ASC', 'uuid' => 'ASC']; // Note uuid is included so sort order is always consistent.
     }
 }

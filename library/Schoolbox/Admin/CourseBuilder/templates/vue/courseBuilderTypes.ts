@@ -10,6 +10,7 @@ export type CourseTemplate = {
     courseTemplate: PageTemplate;
     unitTemplate: PageTemplate;
     nameHasValidationError?: true;
+    sequence: number;
 };
 
 export type Role = {

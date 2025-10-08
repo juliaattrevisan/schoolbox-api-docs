@@ -1,0 +1,83 @@
+{##
+ # Create Editor Templates
+ #
+ # @param Category/Model $category The category to create the template in
+ # @param Boolean $hasTokens Whether the category has tokens
+ # @param Editor/Templates/Model $template The current template being edited
+ #}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {# Shared navigation menu #}
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 island">
+            {% if template and template.id %}
+                {% set formAction = routeLookupIfAuthorized('adminEditorTemplates.postUpdate', { template: template, templateId: template.id }) %}
+            {% else %}
+                {% set formAction = routeLookupIfAuthorized('adminEditorTemplates.postCreate', { categoryId: category.id }) %}
+            {% endif %}
+            <form id="editor-template-form" action="{{ formAction }}" method="post">
+                <section>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label for="template-title" class="required">Title</label>
+                            {# This maxlength corresponds to the schema field length #}
+                            <input type="text" id="template-title" name="title" maxlength="255" value="{{ template.title ?? ''}}" />
+                        </div>
+                        <div class="small-12 columns">
+                            <label for="template-description">Description <span data-tooltip class="hint has-tip tip-top" title="To provide more context for when the template should be used.">?</span></label>
+                            {# This maxlength corresponds to the schema field length #}
+                            <input type="text" id="template-description" name="description" maxlength="255" value="{{ template.description ?? ''}}" />
+                        </div>
+                        <div class="small-12 columns">
+                            <label for="template-body" class="required">Body</label>
+                            {% if hasTokens %}
+                            <p class="meta">Student detail tokens can be viewed when you press [. Tokens will be substituted with the students details on creation.</p>
+                            {% endif %}
+                            <textarea id="template-body" name="body" rows="5">{{ template.body ?? '' }}</textarea>
+                        </div>
+                    </fieldset>
+                </section>
+                <input type="submit" value="Save">
+            </form>
+        </div><!-- small-12 island -->
+    </div><!-- admin-content -->
+</div><!-- admin-container -->
+
+<script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
+<script>
+
+/**
+ * Initialise the body editor
+ */
+document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+    detail: {
+        targetElements: ['#template-body'],
+        {% if hasTokens %}
+        hasTokens: true
+        {% endif %}
+    }
+}));
+
+$(function() {
+    /**
+     * Ensure title and body are not blank
+     */
+    $('#editor-template-form').alaressValidate({
+        rules: {
+            title: {
+                requiredNotBlank: true
+            },
+            body: {
+                requiredNotBlank: true
+            }
+        }
+    });
+});
+
+</script>

@@ -3,7 +3,6 @@
  * To be able to enabled a node on confirmation
  */
 
-import * as toast from "@schoolboxVue/components/toast/sbxToastEvent";
 import RevealModal from "@schoolboxVue/components/reveal-modal.vue";
 import { useSelectedNodesStore } from "./store/mcSelectedNodesStore";
 import { useEnableNodesStore } from "./store/mcEnableNodesStore";
@@ -40,7 +39,7 @@ async function onEnableSelected(): Promise<void> {
  */
 enableNodesStore.$onAction(({ name, after, onError }) => {
     if (name === "enable") {
-        toast.activate("Processing...");
+        const toast = window.sbProps.toastActivate("Processing...");
 
         after((result) => {
             toast.timeout({ text: result, isSuccess: true });

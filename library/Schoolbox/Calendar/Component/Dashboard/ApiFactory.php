@@ -24,30 +24,11 @@ use Schoolbox\User;
  */
 class ApiFactory
 {
-
-    /**
-     * @var \Calendar_Api_Factory
-     */
-    private \Calendar_Api_Factory $factory;
-
-
     /**
      * Constructor
      */
-    public function __construct(
-        Assessment\MapperProxy $assessmentDataSource,
-        ModuleChecker $moduleChecker,
-        IConfigLoader $config,
-        IConnector $databaseExternal = null
-    ) {
-        /* Utilises the behaviours of the existing Calendar Api Factory
-         */
-        $this->factory = new \Calendar_Api_Factory(
-            $assessmentDataSource,
-            $moduleChecker,
-            $config,
-            $databaseExternal
-        );
+    public function __construct(private \Calendar_Api_Factory $factory)
+    {
     }
 
 

@@ -10,6 +10,9 @@ declare(strict_types=1);
 namespace Schoolbox\Search\Api\Database\ResultType\Tile;
 
 use Alaress_Date_Format;
+use Component_Config;
+use Component_Config_Componentname;
+use Component_Instance;
 use Schoolbox\Resource\Folder;
 use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 use Schoolbox\Search\Api\Database\Index\BuildType;
@@ -21,9 +24,16 @@ use Schoolbox\Tile;
 class IndexBuilder extends BaseBuilder
 {
     /**
+     * This is a cache, so repeated calls to accepts() do not cause repeated database queries to look up the value.
+     * @var int|null
+     */
+    private ?int $tileComponentConfigDefinitionId = null;
+
+    /**
      * This builder works with:
      * * tile objects
-     * * tile layouts
+     * * tile components
+     * * component configs, if it is for a tile
      * * folders, when they are deleted
      *
      * @param object    $subject
@@ -32,12 +42,28 @@ class IndexBuilder extends BaseBuilder
      */
     protected function accepts(object $subject, BuildType $buildType): bool
     {
-        if ($subject instanceof Tile\Model || $subject instanceof Tile\Layout\Model) {
+        if ($subject instanceof Tile\Model) {
             return true;
         }
+
+        if (
+            $subject instanceof Component_Instance
+            /** @phpstan-ignore-next-line - $subject->getDefinition can return null */
+            && $subject->getDefinition()?->getClass() === self::getComponentClass()
+        ) {
+            return true;
+        }
+
+        if ($subject instanceof Component_Config) {
+            // Need to look up the component config definition to determine if $subject is relevant.
+            $this->tileComponentConfigDefinitionId ??= $this->getTileLayoutIdComponentConfigDefinitionId();
+            return $this->tileComponentConfigDefinitionId === $subject->getConfigDefinitionId();
+        }
+
         if ($buildType === BuildType::DELETE && $subject instanceof Folder\Model) {
             return true;
         }
+
         return false;
     }
 
@@ -52,13 +78,19 @@ class IndexBuilder extends BaseBuilder
                 $baseParams + ['id' => $subject->getId()],
             ];
         }
-        if ($subject instanceof Tile\Layout\Model) {
+        if ($subject instanceof Component_Instance) {
             return [
-                $baseQuery . ' AND tl.id = :id',
+                $baseQuery . ' AND ci.id = :id',
                 $baseParams + ['id' => $subject->getId()],
             ];
         }
-        if ($subject instanceof Folder\Model) {
+        if ($subject instanceof Component_Config) {
+            return [
+                $baseQuery . ' AND ci.id = :id',
+                $baseParams + ['id' => $subject->getInstanceId()],
+            ];
+        }
+        if ($buildType === BuildType::DELETE && $subject instanceof Folder\Model) {
             return [
                 $baseQuery . ' AND f.id = :id',
                 $baseParams + ['id' => $subject->getId()],
@@ -72,28 +104,54 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildUpdates(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
+        if ($subject !== null && !$this->accepts($subject, BuildType::UPDATE)) {
+            return;
+        }
+
         // Notes:
         // * Tiles without a title should not appear in search results (AC for SA-8841)
         // * Only tiles in homepages should be included in the index (not dashboards, not templates)
         // * Tiles only in deleted folders should not be indexed
-        // * Check the related query in buildDeletes() after making changes to this query.
+        // * Check the related code in buildDeletes() after making changes to this query.
         $queryString = "
             SELECT
-                t.id,
-                t.title_text,
-                t.link,
-                t.modified_at,
-                tlf.folder_id
-            FROM tile t
-            JOIN tile_layout tl ON tl.id=t.tile_layout_id
-            JOIN tile_layout_for_folder tlf ON tlf.tile_layout_id=tl.id
-            JOIN folder f ON tlf.folder_id=f.id
-            WHERE t.deleted_at IS NULL
-            AND tl.deleted_at IS NULL
+            CONCAT(t.id, '-', ci.id, '-', f.id) AS id,
+            t.title_text,
+            t.link,
+            t.modified_at,
+            f.id AS folder_id
+            FROM component_definition cd
+            JOIN component_instance ci ON ci.component_definition_id = cd.id
+            JOIN folder f ON f.id = ci.identifier
+            JOIN component_config_definition ccd_layoutId ON (
+                ccd_layoutId.component_definition_id = cd.id AND
+                ccd_layoutId.key = :homepageComponentKey
+            )
+            LEFT JOIN component_config_instance cci_layoutId ON (
+                cci_layoutId.component_config_definition_id = ccd_layoutId.id AND
+                cci_layoutId.component_instance_id = ci.id
+            )
+            JOIN tile_layout tl ON (CAST(tl.id AS NCHAR) = cci_layoutId.value)
+            JOIN tile t ON t.tile_layout_id = tl.id
+            JOIN component_config_definition ccd_componentname ON (
+                ccd_componentname.component_definition_id = cd.id AND
+                ccd_componentname.key = :componentConfigComponentNameKey
+            )
+            LEFT JOIN component_config_instance cci_componentname ON (
+                cci_componentname.component_config_definition_id = ccd_componentname.id AND
+                cci_componentname.component_instance_id = ci.id
+            )
+            WHERE cd.`class` = :componentClass
             AND f.deleted_at IS NULL
+            AND tl.deleted_at IS NULL
+            AND t.deleted_at IS NULL
             AND t.title_text<>''
         ";
-        $params = [];
+        $params = [
+            'homepageComponentKey'            => Tile\Layout\Mapper::HOMEPAGE_COMPONENT_KEY,
+            'componentConfigComponentNameKey' => Component_Config_Componentname::KEY,
+            'componentClass'                  => self::getComponentClass(),
+        ];
         if ($fromDate) {
             $queryString .= ' AND t.modified_at >= :fromDate';
             $params['fromDate'] = $fromDate->getDatabase();
@@ -103,9 +161,6 @@ class IndexBuilder extends BaseBuilder
             $params['toDate'] = $toDate->getDatabase();
         }
         if ($subject) {
-            if (!$this->accepts($subject, BuildType::UPDATE)) {
-                return;
-            }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
         }
         $query = $this->connector->prepareQuery($queryString);
@@ -130,74 +185,151 @@ class IndexBuilder extends BaseBuilder
     /**
      * @inheritdoc
      */
-    public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
-    {
-        // What database updates could cause a tile that was included
-        // in the buildUpdates() query to be excluded from that query?
-        //  * tl  row could be deleted or updated so it no longer links -+- No need to consider these cases because rows
-        //  * tlf row could be deleted or updated so it no longer links  |  from these tables are never hard-deleted by
-        //  * f   row could be deleted or updated so it no longer links /   the application or updated in such a way
-        //  * tile.deleted_at        could be set to non-null               that would break the links.
-        //  * tile_layout.deleted_at could be set to non-null
-        //  * folder.deleted_at      could be set to non-null
-        //  * tile.title_text        could be set to blank
-        $queryString = "
-            SELECT t.id
-            FROM tile t
-            JOIN tile_layout tl ON tl.id=t.tile_layout_id
-            JOIN tile_layout_for_folder tlf ON tlf.tile_layout_id=tl.id
-            JOIN folder f ON tlf.folder_id=f.id
-            WHERE (COALESCE(t.deleted_at, tl.deleted_at, f.deleted_at) IS NOT NULL OR t.title_text='')
+    public function buildDeletes(
+        ?Alaress_Date_Format $fromDate,
+        ?Alaress_Date_Format $toDate,
+        ?object $subject
+    ): iterable {
+        if ($subject !== null && !$this->accepts($subject, BuildType::DELETE)) {
+            return null;
+        }
+
+        // Examine and clean up every search index for tiles.
+        $searchIndexQueryString = "
+            SELECT identifier
+            FROM search_index
+            WHERE type = :type
         ";
-        $params = [];
-        if ($fromDate && $toDate) {
-            $queryString .= (
-                ' AND (
-                    t.deleted_at BETWEEN :fromDate AND :toDate OR
-                    tl.deleted_at BETWEEN :fromDate AND :toDate OR
-                    f.deleted_at BETWEEN :fromDate AND :toDate
-                )'
-            );
-            $params['fromDate'] = $fromDate->getDatabase();
-            $params['toDate'] = $toDate->getDatabase();
-        } elseif ($fromDate) {
-            $queryString .= (
-                ' AND (
-                    t.deleted_at >= :fromDate OR
-                    tl.deleted_at >= :fromDate OR
-                    f.deleted_at >= :fromDate
-                )'
-            );
-            $params['fromDate'] = $fromDate->getDatabase();
-        } elseif ($toDate) {
-            $queryString .= (
-                ' AND (
-                    t.deleted_at <= :toDate OR
-                    tl.deleted_at <= :toDate OR
-                    f.deleted_at <= :toDate
-                )'
-            );
-            $params['toDate'] = $toDate->getDatabase();
+        $searchIndexParams = ['type' => Hydrator::BASE_TYPE];
+
+        // Since search_index.identifier has the format "$textboxId-$componentId-$folderId", a different
+        // LIKE condition can be used to filter rows of search_index depending on the type of $subject.
+        if ($subject instanceof Tile\Model) {
+            $searchIndexQueryString .= ' AND identifier LIKE :tileIdentifier';
+            $searchIndexParams['tileIdentifier'] = $subject->getId() . '-%';
+        } elseif ($subject instanceof Component_Instance) {
+            $searchIndexQueryString .= ' AND identifier LIKE :componentIdentifier';
+            $searchIndexParams['componentIdentifier'] = '%-' . $subject->getId() . '-%';
+        } elseif ($subject instanceof Component_Config) {
+            $searchIndexQueryString .= ' AND identifier LIKE :componentIdentifier';
+            $searchIndexParams['componentIdentifier'] = '%-' . $subject->getInstanceId() . '-%';
+        } elseif ($subject instanceof Folder\Model) {
+            $searchIndexQueryString .= ' AND identifier LIKE :componentIdentifier';
+            $searchIndexParams['componentIdentifier'] = '%-' . $subject->getId();
+        } elseif ($subject !== null) { // Note $subject will be null when this is run from tools/search/buildIndex.php
+            return null;
         }
-        if ($subject) {
-            if (!$this->accepts($subject, BuildType::DELETE)) {
-                return;
+        $searchIndexQuery = $this->connector->prepareQuery($searchIndexQueryString);
+
+        // Set up getTileLayoutId and componentExists queries.
+        $tileLayoutIdByTileId = $this->connector->executeQuery(
+            "SELECT t.id AS tileId, tl.id AS tileLayoutId
+            FROM tile t
+            JOIN tile_layout tl ON tl.id = t.tile_layout_id
+            WHERE t.deleted_at IS NULL
+            AND tl.deleted_at IS NULL"
+        )->fetchColumnArray('tileLayoutId', 'tileId');
+
+        $componentExistsQuery = $this->connector->prepareQuery(
+            "SELECT cci.component_instance_id
+            FROM component_config_instance cci
+            INNER JOIN component_config_definition ccd ON cci.component_config_definition_id = ccd.id
+            WHERE cci.value = :tileLayoutId
+            AND   ccd.key   = :key"
+        );
+        $componentExistsCache = [];
+        $nIndicesRemoved = 0;
+
+        $searchIndexQuery->execute($searchIndexParams);
+        $this->logger->info("Examining {$searchIndexQuery->rowCount()} tile search indices.");
+        foreach ($searchIndexQuery->fetchColumnArray('identifier') as $identifier) {
+            $removeIndex = false;
+            [$tileId, $componentId, $folderIdIgnored] = Hydrator::explodeTileInstanceId($identifier);
+
+            // Check if this tile/tile_layout exists.  If not, delete its index.
+            if (!isset($tileLayoutIdByTileId[$tileId])) {
+                $this->logger->debug("Tile '$identifier' or its linked tile_layout no longer exists. removing index.");
+                $removeIndex = true;
+            } else {
+                $tileLayoutId = $tileLayoutIdByTileId[$tileId];
+
+                // Does this index have an associated component?
+                if (!isset($componentExistsCache[$tileId])) {
+                    $componentExistsQuery->execute([
+                        'tileLayoutId' => $tileLayoutId,
+                        'key' => Tile\Layout\Mapper::HOMEPAGE_COMPONENT_KEY,
+                    ]);
+                    $componentExistsCache[$tileId] = (
+                        $componentExistsQuery->fetchColumnArray('component_instance_id')
+                    );
+                }
+                if ($componentId === null) {
+                    // This index has no component.  Remove it if any components exist for this tile.
+                    if (!empty($componentExistsCache[$tileId])) {
+                        $this->logger->debug(
+                            "Tile $tileId is associated with a component.  Removing componentless index '$identifier'."
+                        );
+                        $removeIndex = true;
+                    }
+                } else {
+                    // This index does have a component.  Remove it if it is not associated with that component.
+                    if (!in_array($componentId, $componentExistsCache[$tileId])) {
+                        $this->logger->debug(
+                            "Tile $tileId is no longer associated with component $componentId." .
+                            "  Removing index '$identifier'."
+                        );
+                        $removeIndex = true;
+                    }
+                }
             }
-            [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::DELETE, $queryString, $params);
+
+            if ($removeIndex) {
+                yield $this->buildIndex(
+                    $identifier,
+                    null,
+                    Hydrator::BASE_TYPE,
+                    null,
+                    true,
+                    null,
+                    null,
+                );
+                $nIndicesRemoved++;
+            }
         }
-        $query = $this->connector->prepareQuery($queryString);
-        $query->execute($params);
-        $this->logger->info(sprintf('Deleting search indices for %d tiles', $query->rowCount()));
-        foreach ($query as $row) {
-            yield $this->buildIndex(
-                (string)$row['id'],
-                null,
-                Hydrator::BASE_TYPE,
-                null,
-                true,
-                null,
-                null,
-            );
-        }
+
+        $this->logger->info("Deleting search indices for $nIndicesRemoved tiles");
+    }
+
+    /**
+     * Find the config definition ID for tiles.
+     *
+     * @return int|null
+     */
+    private function getTileLayoutIdComponentConfigDefinitionId(): ?int
+    {
+        // Look it up if not yet set
+        $componentConfigDefinitionId = $this->connector->executeQuery(
+            "SELECT ccd.id
+            FROM component_config_definition ccd
+            INNER JOIN component_definition cd ON ccd.component_definition_id = cd.id
+            WHERE ccd.key = :homepageComponentKey
+            AND   cd.class = :class",
+            [
+                'class' => self::getComponentClass(),
+                'homepageComponentKey' => Tile\Layout\Mapper::HOMEPAGE_COMPONENT_KEY
+            ]
+        )->fetchColumn();
+
+        return filter_var($componentConfigDefinitionId, FILTER_VALIDATE_INT, FILTER_NULL_ON_FAILURE);
+    }
+
+    /**
+     * Retrieve and trim the homepage component class name, for use in queries.
+     *
+     * @return string
+     */
+    private static function getComponentClass(): string
+    {
+        return trim(Tile\Component\HomepageTileController::class, '\\');
     }
 }

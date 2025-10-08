@@ -127,7 +127,8 @@ class Controller extends Base
             'resource_category_id',
             $category->getId(),
             ['order' => ['name' => 'asc']]
-        );
+        )->filter(fn($item) => false !== $this->getRouteIfAuthorized("resourceItem.read", ['item' => $item]))
+         ->reindex();
 
         foreach ($resources->getAll() as $resource) {
             /** @var \Schoolbox\ResourceBooking\Item\Model $resource */

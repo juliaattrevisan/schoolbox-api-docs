@@ -8,28 +8,15 @@
 {# Permissions #}
 {% set isSuperuser = session.user.superUser %}
 {% set isStaffWhoCanView = isSuperuser or (USER.role.staff and USER.role.viewStudentProfile) %}
+{% set canImpersonate = routeLookupIfAuthorized('user.impersonate', { user: user, userId: user.id }) %}
 {# Leaving isStaff for extended custom templates #}
 {% set isStaff = isSuperuser or USER.role.staff %}
 {% set isSelf = session.user.id == user.id %}
 
-{# Emergency Contact Information, due to non-normalisation, must be manually inspected
- # for contents in three possible places; name, phone, phone alt. Information can exist
- # in any one, or more, of those fields per emergency contact
- #
- # Using a defined() check isn't enough. It needs to contain useful information.
- # Therefore check for string length in each of name, phone, phone alt to decide
- #
- # tbh I think that you need both a name and at least one phone number for this section
- # to be even remotely useful, but anyway I'll go with what was previously here...
+{# Emergency Contact Information. Due to non-normalised in the connectors we had to compile them
+ # separately, and specially, in this new customisable payload.
  #}
-{% set hasEmergencyContacts = false %}
-{% for i in 1..3 %}
-    {% set index = (i == 1 ? '' : i) %}
-
-    {% if (externalUser["StudentEmergency#{index}Name"] is defined and externalUser["StudentEmergency#{index}Name"]|length) %}
-        {% set hasEmergencyContacts = true %}
-    {% endif %}
-{% endfor %}
+{% set hasEmergencyContacts = externalUser.data.roleTypes.tabs.emergencyContacts|length %}
 
 {% set shareLearningMomentUrl = routeLookupIfAuthorized(
     'learningMomentEvidence.getCreateForm',
@@ -63,20 +50,13 @@
     });
 </script>
 
-<div class="actions-small-{{ isSuperuser ? 1 : 0 }} row">
-    <div class="list-item">
-        <div class="small-12 column">
-            {% block profileHeading %}
-                <h1 data-test="user-profile-name">{{ user.formatName(nameFormat) }}</h1>
-            {% endblock %}
-        </div>
-    </div>
-    <nav>
-        {% if routeLookupIfAuthorized('adminUser.getModify') %}
-            <a href="{{ routeLookup('adminUser.getModify', {'userId': user.id}) }}" class="icon-modify" title="Modify User" data-test="user-profile-modify"></a>
-        {% endif %}
-    </nav>
-</div>
+{% include '@searchUser/heading/heading.twig' with {
+    user: user,
+    isSuperuser: isSuperuser,
+    canImpersonate: canImpersonate,
+    nameFormat: nameFormat,
+    linksInfo: linksInfo,
+} only %}
 
 <div class="row">
     <div class="small-12 island">
@@ -180,14 +160,14 @@
                                                             # This is often a set of strings that need to be output sequentially
                                                             #}
                                                             {% for message in selectedField.value %}
-                                                                {{ message|nl2br }}
+                                                                {{ message|nl2br }}<br />
                                                             {% endfor %}
                                                         {% elseif selectedField.field in ['StudentMedicalAlert'] %}
                                                             {# A string with a special prefix that displays in a flag #}
-                                                            Medical Note: {{ selectedField.value }}
+                                                            Medical Note: {{ selectedField.value|nl2br }}
                                                         {% elseif selectedField.field in ['Comment'] %}
                                                             {# A string that displays on its own in a flag#}
-                                                            {{ selectedField.value }}
+                                                            {{ selectedField.value|nl2br }}
                                                         {% elseif selectedField.field in ['ParentsSeparatedFlag'] %}
                                                             {% block parentsSeparated %}
                                                                 {# A special flag that has a hardcoded text string #}
@@ -211,7 +191,7 @@
                                                 <dt class="full-width">
                                                     <div class="pastoral-flags">
                                                         {% for pastoralCount in selectedField.value %}
-                                                            <a href="{{ pastoralCount.destinationUrl }}">
+                                                            <a href="{{ pastoralCount.destinationUrl }}" data-test="student-profile-pastoral-flag-{{ pastoralCount.typeId }}-{{ pastoralCount.subtypeId ?? 0 }}"
                                                             <span class="label neutral icon-{{ pastoralCount.icon }} pastoral-flag-in-profile"
                                                                 data-tooltip title="{{ pastoralCount.title }}"
                                                                 style="color: {{ pastoralCount.fgColor }}; background-color: {{ pastoralCount.bgColor }}"
@@ -252,6 +232,15 @@
                                                          #}
                                                         *{{ selectedField.value }}*
                                                     </dd>
+                                                {% elseif selectedField.field in ['currentLocation'] %}
+                                                    {# The value of this field is a list of objects representing each event the user could be at.
+                                                    # This is notably unlike other fields where the value is usually a string or list of strings
+                                                    #}
+                                                    {% include '@searchUser/field/currentLocation.twig' with {
+                                                        fieldName: macro.fieldName(selectedField),
+                                                        user: user,
+                                                        currentEvents: selectedField.value,
+                                                    } only %}
                                                 {% else %}
                                                     {# A generic tuple (key, value) pair
                                                      #
@@ -337,55 +326,14 @@
             });
         </script>
 
-        {# These are all the possible tabs that could exist
-         # and the booleans which determine if they're currently available
-         #
-         # The first tab in the list is always selected by default
-         # activeTab setting will override it later if appropriate to do so
-         # based on the anchor in the url via javascript
-         #
-         # contacts: users must have showContacts truthy and have at least one contact
-         #           or the viewer is a primary carer and the viewee has at least one
-         #           emergency contact. This is really particular.
-         #}
-        {% set additionalConstraints = {
-            'student': {
-                '_default': true,
-                'activity': (config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled,
-                'goals': config.badges_enabled,
-                'achievements': config.badges_enabled,
-                'classes': user.isShowTimetable,
-                'contacts': (user.showContacts or isPrimaryCarer) and (contacts|length or hasEmergencyContacts)
-            },
-            'parent': {
-                '_default': true,
-                'activity': (config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled,
-                'goals': config.badges_enabled,
-                'achievements': config.badges_enabled,
-                'classes': user.isShowTimetable,
-                'contacts': (user.showContacts or isPrimaryCarer) and (contacts|length or hasEmergencyContacts)
-            },
-            'staff': {
-                '_default': USER.role.viewStudentProfile,
-                'activity': USER.role.viewStudentProfile and ((config.learning_moments_enabled and user.learningMomentsEnabled) or config.badges_enabled or config.grades_enabled),
-                'goals': USER.role.viewStudentProfile and config.badges_enabled,
-                'achievements': USER.role.viewStudentProfile and config.badges_enabled,
-                'classes': USER.role.viewStudentProfile and user.isShowTimetable,
-                'contacts': USER.role.viewStudentProfile and ((user.showContacts and contacts|length) or (isPrimaryCarer and hasEmergencyContacts))
-            },
-        } %}
-
         {# Out of all the tabs that could possibly exist here, figure out
          # which one is currently active by default and remember it
          #}
         {% set activeTab = null %}
 
         {% for tab in possibleTabs %}
-            {# Check additionalConstraints to really know if this tab should be on-screen #}
-            {% if additionalConstraints[USER.role.type][tab.tab] ?? additionalConstraints[USER.role.type]['_default'] %}
-                {% if not activeTab %}
-                    {% set activeTab = 'tab-' ~ tab.tab %}
-                {% endif %}
+            {% if not activeTab %}
+                {% set activeTab = 'tab-' ~ tab.tab %}
             {% endif %}
         {%  endfor %}
 
@@ -405,34 +353,33 @@
                 {% set defaultCss = 'active' %}
 
                 {% for tab in possibleTabs %}
-                    {% if additionalConstraints[USER.role.type][tab.tab] ?? additionalConstraints[USER.role.type]['_default'] %}
-                        <dd class="{{ defaultCss }}"><a href="#tab-{{ tab.tab }}">{{ tab.displayAs }}</a></dd>
+                    <dd class="{{ defaultCss }}"><a href="#tab-{{ tab.tab }}">{{ tab.displayAs }}</a></dd>
 
-                        {# All subsequent tabs are not active by default #}
-                        {% set defaultCss = '' %}
-                    {% endif %}
+                    {# All subsequent tabs are not active by default #}
+                    {% set defaultCss = '' %}
                 {% endfor %}
             </dl>
-        {% endif %}
 
-        <div class="profile-tabs tabs-content">
-            {% if additionalConstraints[USER.role.type]['activity'] ?? additionalConstraints[USER.role.type]['_default'] %}
+            {% set possibleTabNames = possibleTabs|column('tab') %}
+            <div class="profile-tabs tabs-content">
+            {% if 'activity' in possibleTabNames %}
                 <div class="content no-pad {% if activeTab == 'activity' %}active{% endif %}" id="tab-activity">
                     <div id="activity-feed">
                         <activity-feed
                                 cdn-prefix="{{ CDN_PREFIX }}"
                                 site-version="{{ config.site_version }}"
-                                :config-grade-gradient-enabled={{ config.grade_gradient_enable == 1 ? 'true' : 'false' }}
                                 :show-learning-moments="{{ config.learning_moments_enabled ? 'true' : 'false' }}"
                                 :show-goals="{{ config.badges_enabled ? 'true' : 'false' }}"
                                 :show-achievements="{{ config.badges_enabled ? 'true' : 'false' }}"
                                 :show-feedback="{{ config.activity_feed_feedback_enabled ? 'true' : 'false' }}"
+                                :moderation-required="{{ moderationRequired ? 'true' : 'false' }}"
+                                :evidence-parent-create="{{ config.evidence_parent_create ? 'true' : 'false' }}"
                         />
                     </div>
                 </div>
             {% endif %}
 
-            {% if additionalConstraints[USER.role.type]['goals'] ?? additionalConstraints[USER.role.type]['_default'] %}
+            {% if 'goals' in possibleTabNames %}
                 <div class="content no-pad {% if activeTab == 'goals' %}active{% endif %}" id="tab-goals">
                     <div id="goal-feed" class="goals-achievements">
                         <goal-feed
@@ -443,7 +390,7 @@
                 </div>
             {% endif %}
 
-            {% if additionalConstraints[USER.role.type]['achievements'] ?? additionalConstraints[USER.role.type]['_default'] %}
+            {% if 'achievements' in possibleTabNames %}
                 <div class="content no-pad {% if activeTab == 'achievements' %}active{% endif %}" id="tab-achievements">
                     <div id="achievement-feed" class="goals-achievements">
                         <achievement-feed
@@ -504,7 +451,7 @@
             {% endautoescape %}
             <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/userProfileFeeds.js?v={{ config.site_version }}"></script>
 
-            {% if additionalConstraints[USER.role.type]['classes'] ?? additionalConstraints[USER.role.type]['_default'] %}
+            {% if 'classes' in possibleTabNames %}
                 {% if subjects|length %}
                     <div class="content no-pad {% if activeTab == 'classes' %}active{% endif %}" id="tab-classes">
                     <section>
@@ -666,7 +613,7 @@
                 {% endif %}
             {% endif %}
 
-            {% if additionalConstraints[USER.role.type]['groups'] ?? additionalConstraints[USER.role.type]['_default'] %}
+            {% if 'groups' in possibleTabNames %}
                 {% if groups|length %}
                     <div class="content no-pad {% if activeTab == 'groups' %}active{% endif %}" id="tab-groups">
                         <section>
@@ -762,7 +709,7 @@
                 {% endif %}
             {% endif %}
 
-            {% if additionalConstraints[USER.role.type]['contacts'] ?? additionalConstraints[USER.role.type]['_default'] %}
+            {% if 'contacts' in possibleTabNames %}
                 {# Only show this tab if there's any content here:
                  # Viewee must allow you to see their main contacts,
                  # or they have emergency contacts
@@ -939,40 +886,39 @@
                                     <h2 class="subheader">Emergency Contact Information</h2>
                                     <section>
                                         <ul class="information-list expandable-card">
-                                            {% for i in 1..3 %}
-                                                {% set index = (i == 1 ? '' : i) %}
-                                                {% if externalUser["StudentEmergency#{index}Name"] %}
-                                                    <li>
-                                                        <!-- Expander -->
-                                                        <div>
-                                                            <div class="expander" data-collapser="collap-emergency-{{ i }}"></div>
-                                                            <div class="content small-12">
-                                                                {{ externalUser["StudentEmergency#{index}Name"] }}
+                                            {% set i = 0 %}
+                                            {% for emergencyContact in externalUser.data.roleTypes.tabs.emergencyContacts %}
+                                                {% set i = i + 1 %}
+                                                <li>
+                                                    <!-- Expander -->
+                                                    <div>
+                                                        <div class="expander" data-collapser="collap-emergency-{{ i }}"></div>
+                                                        <div class="content small-12">
+                                                            {{ emergencyContact.name }}
+                                                        </div>
+                                                    </div>
+
+                                                    <!-- Collapseable content -->
+                                                    <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-emergency-{{ i }}">
+                                                        <div class="row">
+                                                            <div class="column small-12 medium-5"><strong>Primary Phone: </strong></div>
+                                                            <div class="column small-12 medium-7">
+                                                                <a href="tel:{{ emergencyContact.phone }}">
+                                                                    {{ emergencyContact.phone }}
+                                                                </a>
                                                             </div>
                                                         </div>
 
-                                                        <!-- Collapseable content -->
-                                                        <div class="small-12 column content hide" data-collapse-state="collapsed" data-collapsable="collap-emergency-{{ i }}">
-                                                            <div class="row">
-                                                                <div class="column small-12 medium-5"><strong>Primary Phone: </strong></div>
-                                                                <div class="column small-12 medium-7">
-                                                                    <a href="tel:{{ externalUser["StudentEmergency#{index}Phone"] }}">
-                                                                        {{ externalUser["StudentEmergency#{index}Phone"] }}
-                                                                    </a>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="row">
-                                                                <div class="column small-12 medium-5"><strong>Alternate Phone: </strong></div>
-                                                                <div class="column small-12 medium-7">
-                                                                    <a href="tel:{{ externalUser["StudentEmergency#{index}PhoneAlt"] }}">
-                                                                        {{ externalUser["StudentEmergency#{index}PhoneAlt"] }}
-                                                                    </a>
-                                                                </div>
+                                                        <div class="row">
+                                                            <div class="column small-12 medium-5"><strong>Alternate Phone: </strong></div>
+                                                            <div class="column small-12 medium-7">
+                                                                <a href="tel:{{ emergencyContact.phoneAlt }}">
+                                                                    {{ emergencyContact.phoneAlt }}
+                                                                </a>
                                                             </div>
                                                         </div>
-                                                    </li>
-                                                {% endif %}
+                                                    </div>
+                                                </li>
                                             {% endfor %}
                                         </ul>
                                     </section>
@@ -982,13 +928,10 @@
                     </section>
                 </div>
             {% endif %}
-        </div>
+            </div>
+        {% endif %}
     </div>
 </div>
-
-
-{% block pd %}
-{% endblock pd %}
 
 {# TODO: Where to pus this?
  # https://stackoverflow.com/questions/23569705/zurb-foundation-prevent-empty-column-collapsing-to-zero-width

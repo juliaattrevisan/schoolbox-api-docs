@@ -367,10 +367,12 @@ class Controller extends Base
         $calendar = new Renderer(
             new Api(
                 $student,
+                $this->getUser(),
                 $this->assessmentDataSource,
                 $visibility,
                 $this->assessmentIdFinder,
-                $filterByClassName
+                $filterByClassName,
+                $this->getConfigLoader()->get('restrict_parent_lesson_plan_access')
             ),
             $start,
             $end,

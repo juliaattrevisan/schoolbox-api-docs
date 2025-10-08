@@ -167,10 +167,10 @@ class DataSource
      * @param int|null $subtypeId Filter the records with a pastoral subtype, if provided
      * @return int
      */
-    public function countRecords(User $viewer, User $student, ?int $typeId, ?int $subtypeId): int
+    public function countRecords(User $viewer, User $student, ?int $typeId, ?int $subtypeId, ?bool $showArchived): int
     {
         $where = $this->getPermissionClause($viewer, $student, $typeId, $subtypeId);
-        return $this->countRecordsFromWhere($where['where'], $where['params']);
+        return $this->countRecordsFromWhere($where['where'], $where['params'], $showArchived);
     }
 
     /**
@@ -180,9 +180,13 @@ class DataSource
      * @param array  $params
      * @return int
      */
-    private function countRecordsFromWhere(string $where, array $params): int
+    private function countRecordsFromWhere(string $where, array $params, ?bool $showArchived = true): int
     {
         $sql  = "SELECT count(*) FROM pastoral p WHERE {$where}";
+
+        if (!$showArchived) {
+            $sql .= " AND (p.expires_at >= CURDATE() OR p.expires_at IS NULL)";
+        }
         $stmt = $this->mapper->getDatabase()->query($sql, $params);
         return (int)$stmt->fetchColumn();
     }
@@ -194,10 +198,9 @@ class DataSource
      * @param User $student
      * @param array $typeIds
      * @param array $subtypeIds
-     * @param Alaress_Date_Format|null $startDate
      * @return array
      */
-    public function countRecordsByType(User $viewer, User $student, array $typeIds, array $subtypeIds, ?Alaress_Date_Format $startDate): array
+    public function countRecordsByType(User $viewer, User $student, array $typeIds, array $subtypeIds): array
     {
         if (empty($typeIds) && empty($subtypeIds)) {
             return [];
@@ -205,7 +208,7 @@ class DataSource
 
         $typeWheres     = [];
         $typeParams     = [];
-        $startDateWhere = $startDate ? ' AND COALESCE(`p`.`occurred_on`, `p`.`created_at`) >= :startDate ' : '';
+        $archiveWhere = " AND (expires_at >= CURDATE() OR expires_at IS NULL) ";
 
         if (!empty($typeIds)) {
             $typeBindings = Builder::getBindings($typeIds, 'typeId');
@@ -227,7 +230,7 @@ class DataSource
                 FROM pastoral p
         WHERE ({$where['where']})
         AND ({$typeWhere})
-        {$startDateWhere}
+        {$archiveWhere}
         GROUP BY p.type_id, p.subtype_id
         ";
 
@@ -235,9 +238,6 @@ class DataSource
             $typeParams,
             $where['params']
         );
-        if ($startDate) {
-            $params = array_merge($params, ['startDate' => $startDate->getDatabaseDate()]);
-        }
 
         $stmt = $this->mapper->getDatabase()->query($sql, $params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -283,9 +283,9 @@ class DataSource
      * @param User|null $linkedStudent Returns the records linked to this student only, if provided
      * @return GenericCollection
      */
-    public function findRecords(User $viewer, User $student, ?int $typeId, ?int $subtypeId, int $offset, int $limit, ?User $linkedStudent): GenericCollection
+    public function findRecords(User $viewer, User $student, ?int $typeId, ?int $subtypeId, int $offset, int $limit, ?User $linkedStudent, ?bool $showArchived = true): GenericCollection
     {
-        return $this->findRawRecords($viewer, $student, $typeId, $subtypeId, $offset, $limit, $linkedStudent, null);
+        return $this->findRawRecords($viewer, $student, $typeId, $subtypeId, $offset, $limit, $linkedStudent, null, $showArchived);
     }
 
 
@@ -334,13 +334,21 @@ class DataSource
      * @param array|null $linkedRecordIds Find records linked to these records only, if provided
      * @return GenericCollection<Model>
      */
-    private function findRawRecords(User $viewer, ?User $student, ?int $typeId, ?int $subtypeId, ?int $offset, ?int $limit, ?User $linkedStudent, ?array $linkedRecordIds): GenericCollection
+    private function findRawRecords(User $viewer, ?User $student, ?int $typeId, ?int $subtypeId, ?int $offset, ?int $limit, ?User $linkedStudent, ?array $linkedRecordIds, ?bool $showArchived = true): GenericCollection
     {
         $permissionClause = $this->getPermissionClause($viewer, $student, $typeId, $subtypeId);
         $pb = $this->getPredicateBuilder()->rawWhere($permissionClause['where'], $permissionClause['params']);
         if (null !== $linkedRecordIds || null !== $linkedStudent) {
             $linkedClause = $this->getLinkedClause($viewer, $linkedStudent, $linkedRecordIds);
             $pb = $pb->rawWhere($linkedClause['where'], $linkedClause['params']);
+        }
+
+        if (!$showArchived) {
+            $pb->any(
+                $this->getPredicateBuilder()
+                     ->any($this->getPredicateBuilder()->greaterThanOrEqualTo('p.expires_at', \Alaress_Date_Format::now()->getDatabaseDate()))
+                     ->any($this->getPredicateBuilder()->isNull('p.expires_at'))
+            );
         }
 
         $records = $this->findRawRecordsByPredicates($pb, [], $offset, $limit);
@@ -695,6 +703,7 @@ class DataSource
         bool $includeStudentsWithoutYear,
         bool $includeStudentsWithoutHouse,
         bool $includeReportsWithoutAction,
+        bool $includeArchivedRecords,
         ?string $actionStatus
     ): Collection {
         // The mapper method is user-sensitive,
@@ -719,6 +728,7 @@ class DataSource
                 $includeStudentsWithoutYear,
                 $includeStudentsWithoutHouse,
                 $includeReportsWithoutAction,
+                $includeArchivedRecords,
                 $actionStatus
             ),
             $currentUser

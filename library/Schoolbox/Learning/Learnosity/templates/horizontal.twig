@@ -30,7 +30,7 @@
 
 <div id="horizontal-marking-container">
     <horizontal-marking
-        :title="'{{ assessment.title }}'"
+        title="{{ assessment.title }}"
         :items="{{ itemReferences|json_encode }}"
         :students="{{ students|json_encode }}"
         :item-responses="{{ itemResponses|json_encode }}"
@@ -39,6 +39,7 @@
         :report-payloads="{{ reportPayloads }}"
         :mark-data="{{ markData|json_encode }}"
         status-page="{{ routeLookup("learningAssessment.getStatus", {assessmentId: assessment.id}) }}"
+        :editor-templates="{{ editorTemplates|json_encode }}"
     />
 </div>
 <script src="{{ CDN_PREFIX }}/js/bundle/horizontalMarking.js?v={{ config.site_version }}"></script>
@@ -56,6 +57,7 @@ The grades below are inserted into the horizontal-marking Vue DOM structure then
                     participant: data.participant,
                     feedback:    data.feedback,
                     markScheme:  assessment.markScheme,
+                    useInstructorMark: false,
                     limit:       data.maxMarks,
                     tabIndex:    1,
                     errors:      errors,

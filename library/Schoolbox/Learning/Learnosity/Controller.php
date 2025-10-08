@@ -19,10 +19,12 @@ use DebugBar\DebugBarException;
 use Http\Discovery\Psr17Factory;
 use Interop\Queue\Exception\InvalidDestinationException;
 use Interop\Queue\Exception\InvalidMessageException;
+use League\Flysystem\FilesystemException;
 use LearnositySdk\Exceptions\ValidationException;
 use LearnositySdk\Utils\Uuid;
 use Random\RandomException;
 use Schoolbox\Application\Exception\Exception;
+use Schoolbox\Assessment\Component\SubmissionBox\MarkTypeMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
@@ -36,6 +38,7 @@ use Schoolbox\Learning\Learnosity\Api\Duplicator;
 use Schoolbox\Learning\Learnosity\Cli\RescoreProcessor;
 use Schoolbox\Learning\Learnosity\Codec\UserIdentifier;
 use Schoolbox\Learning\Learnosity\Export\Csv\Processor;
+use Schoolbox\Learning\Learnosity\Export\Json\Exporter;
 use Schoolbox\Learning\Learnosity\Feedback\SanitiseScores;
 use Schoolbox\Learning\Learnosity\Importer\Cli\CopyMissingQuizException;
 use Schoolbox\Learning\Learnosity\Importer\Cli\SourceAssociationException;
@@ -45,6 +48,7 @@ use Schoolbox\Learning\Quiz\Model as Quiz;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Mapper\Exception\NotFound;
+use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\HttpRequest\MessageFactory;
 use Schoolbox\TaskDaemon\Request\DownloadPages\MessageFactory as DownloadPagesMessageFactory;
@@ -54,6 +58,7 @@ use Schoolbox\User;
 use Schoolbox\User\Translator\Author\ModelToArray;
 use Schoolbox\UserMapper;
 use Twig\Error\Error;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 class Controller extends Base
 {
@@ -93,7 +98,7 @@ class Controller extends Base
      * correspond to stuff that you can see on screen.
      */
     private const LEARNOSITY_QUESTION_GROUP_PLANS = [
-        'elite' => [
+        'learning-enhanced' => [
             'question_type_groups' => [
                 ['reference' => 'mcq'],
                 ['reference' => 'cloze'],
@@ -199,11 +204,13 @@ class Controller extends Base
      * @param Feedback\Mapper $feedbackMapper
      * @param UserMapper $userMapper
      * @param StateMapper $stateMapper
+     * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
+     * @param FilesystemProxy $filesystemProxy
      * @param Psr17Factory $httpFactory for creating HTTP requests
      * @param MessageFactory $messageFactory for creating messages to send to taskd
      * @param Producer $messageProducer for sending messages to taskd
      * @param DownloadPagesMessageFactory $downloadMessageFactory for creating download page messages to send to taskd
-     * @throws \DomainException
+     * @param EditorTemplateHelper $editorTemplateHelper
      */
     public function __construct(
         \Schoolbox\Url\Factory $urlFactory,
@@ -219,10 +226,13 @@ class Controller extends Base
         private \Schoolbox\Learning\Learnosity\Feedback\Mapper $feedbackMapper,
         private \Schoolbox\UserMapper $userMapper,
         private StateMapper $stateMapper,
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
+        private FilesystemProxy $filesystemProxy,
         private Psr17Factory $httpFactory,
         private MessageFactory $messageFactory,
         private Producer $messageProducer,
         private DownloadPagesMessageFactory $downloadMessageFactory,
+        private EditorTemplateHelper $editorTemplateHelper,
     ) {
         /* Probably inject this one day, but for now,
          * I want to avoid dumping Yet Another Thing into the kernel
@@ -1111,7 +1121,8 @@ class Controller extends Base
                 $this->stateMapper->findAll(),
                 $assessment->getMarkType(),
                 $assessment->getGradeGroup()
-            ))->convert()
+            ))->convert(),
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ], sprintf(
             'Feedback for %s in %s',
             $student->getFullName(),
@@ -1173,11 +1184,21 @@ class Controller extends Base
             $key = self::REPORT_HORIZONTAL_MARKING_PREFIX . $attempt->getUser()->getId();
 
             if (!isset($users[$key]) && $attempt->isFinished()) {
+                /* The user who made the attempt might no longer be a participant in the assessment:
+                 * their user account might have been deleted...which means it never hydrates and thus
+                 * omitted from the participant stack.
+                 */
+                try {
+                    $participantUser = $assessment->getParticipant($attempt->getUser());
+                } catch (\UnexpectedValueException $e) {
+                    continue;
+                }
+
                 $sessions[$attempt->getUser()->getId()] = $attempt->getLearnosityReference();
 
                 /* Find this attempt's MapperProxy equivalent from something we already obtained
                 */
-                $feedback = $assessment->getParticipant($attempt->getUser())
+                $feedback = $participantUser
                     ->getAllFeedbacks()
                     ->filter(static function ($model) use ($attempt) {
                         return $model->getResponse()->getLearnosityReference() === $attempt->getLearnosityReference();
@@ -1407,7 +1428,7 @@ class Controller extends Base
             'assessment' => $assessment,
             'breadcrumbs' => $breadcrumbs,
             'reportPayloads' => json_encode($reportPayloads, JSON_THROW_ON_ERROR),
-            'itemReferences' => $itemReferences,
+            'itemReferences' => $itemReferences ?? [],
             'students' => $students,
             'itemResponses' => $itemResponses,
             'attemptResponses' => $attemptResponses,
@@ -1424,6 +1445,7 @@ class Controller extends Base
             /* This list of learnosity references is used for the finalisation step
              */
             'sessions' => json_encode($learnositySessions, JSON_THROW_ON_ERROR),
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ], sprintf(
             'Horizontal Marking for %s',
             $assessment->getTitle()
@@ -1820,9 +1842,84 @@ class Controller extends Base
      * @throws \RuntimeException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \UnexpectedValueException
+     * @throws \JsonException
      */
     public function postCopyQuizConstituents(QuizDomainObject $source, QuizDomainObject $destination): void
     {
+
+        /* Decide how loudly to announce lock acquisition failure
+         *
+         * Simply using $lock = $this->acquireLock() will keep you safe, even if you don't
+         * specifically check for acquisition
+         */
+        $logger = $this->spawnLogger('learnosity_restore_web');
+        try {
+            $lock = $this->acquireLock($logger, Helper::LEARNOSITY_ACTIVITY_RESTORE_TOOL_NAME, Helper::LEARNOSITY_ACTIVITY_RESTORE_LOCK_TTL);
+        } catch (\RuntimeException $e) {
+            /* taskd interprets http 202 as "not yet ready" and gets ready to try it again later.
+             * This is implemented in taskd HttpRequest:114
+             *
+               if ($responseCode === 202) {
+                   // Not yet ready: wait a little longer
+             *
+             * Getting locked is essentially "not yet ready" because some other quiz is currently
+             * being propagated. This was the cause of SA-20163 where a quiz will randomly never
+             * be ready until a cron repairs a pending task.
+             */
+            $this->response = $this->responseEmpty(202);
+            return;
+        }
+
+        /**
+         * check and restore both source and destination quizzes
+         */
+        $helper = (new Helper($this->api, $logger));
+        $candidates[$source->getLearnosityReference()] = [
+            /* These get updated as we discover information/facts from Learnosity itself
+             */
+            'status' => Helper::LEARNOSITY_STATUS_UNKNOWN,
+        ];
+
+        $result = $this->api->dataGetRequest('/itembank/activities', ['references' => [$source->getLearnosityReference(), $destination->getLearnosityReference()]]);
+
+        /* The data from learnosity... we should in theory only get 1 result, but let's be safe, and iterate through the 'single' result
+         * it may also be malformed, so check for safety
+         */
+        foreach (($result['data'] ?? []) as $learnosityQuiz) {
+            $this->refreshLock($logger, $lock);
+            $candidates[$learnosityQuiz['reference']]['status'] = $learnosityQuiz['status'];
+
+            /* If a quiz is already in the state requested, nothing to change
+            */
+            if (Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED === $candidates[$learnosityQuiz['reference']]['status']) {
+                $logger->info(sprintf(
+                    '    This quiz status is already "%s"; nothing to change. Skipping',
+                    Helper::LEARNOSITY_ITEM_STATUS_PUBLISHED
+                ));
+
+                continue;
+            }
+
+            /* We can't...really restore quizzes learnosity doesn't understand.
+             * I'm not sure why it exists: might only be in vagrant demo data
+             */
+            if (Helper::LEARNOSITY_STATUS_UNKNOWN === $candidates[$learnosityQuiz['reference']]['status']) {
+                $logger->info('    Learnosity cannot figure out this quiz. Skipping');
+
+                continue;
+            }
+
+            // by this time we should have already confirmed the quiz is not published, and that learnosity does know it exists...
+            // lets restore it
+            $logger->info('Restoring quiz', $candidates[$learnosityQuiz['reference']]);
+            if ($learnosityQuiz['reference'] !== null) {
+                $helper->restore($learnosityQuiz['reference']);
+            }
+        }
+
+        $lock->release();
+        //now that things are restored, we can start the duplication process
+
         // Start duplicating and polling status of duplication
         $duplicator = $this->buildDuplicator();
         try {
@@ -2367,5 +2464,34 @@ class Controller extends Base
         /* Send it to task for async processing
          */
         $this->messageProducer->send($message);
+    }
+
+
+    /**
+     * This exports a schoolbox quiz and its learnosity content into a json struct,
+     * dumping it into a text file so you can port it around between instances.
+     *
+     * I can't think of a nice name for this that doesn't already collide with the
+     * legacy import/export mechanism, other than relating it by its data type.
+     *
+     * TODO Maybe have a think about this and rename it again later.
+     * TODO Maybe belongs in a different controller?
+     *
+     * @param QuizDomainObject $assessment
+     * @return void
+     * @throws FilesystemException
+     */
+    public function getExportToJson(QuizDomainObject $assessment): void
+    {
+        /* Start generating output to stream
+         */
+        $filename = sprintf(
+            'quiz_%s.json',
+            $assessment->getId()
+        );
+
+        $struct = (new Exporter($this->storageMapper, $this->filesystemProxy, $this->api))->generate($assessment);
+
+        $this->response = $this->responseAsJson(data: $struct, filename: $filename);
     }
 }

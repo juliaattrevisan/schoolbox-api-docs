@@ -44,11 +44,11 @@ class AssessmentPair
     private $parentPair;
 
     /**
-     * @param IAssessable|null $spec
-     * @param IAssessable|null $impl
-     * @param GenericCollection|AssessmentPair[]|null $subPairs
+     * @param IAssessable|null       $spec
+     * @param IAssessable|null       $impl
+     * @param GenericCollection|null $subPairs
      */
-    public function __construct(IAssessable $spec = null, IAssessable $impl = null, GenericCollection $subPairs = null)
+    public function __construct(?IAssessable $spec = null, ?IAssessable $impl = null, ?GenericCollection $subPairs = null)
     {
         // Ensure at least one is present
         if (is_null($spec) && is_null($impl)) {

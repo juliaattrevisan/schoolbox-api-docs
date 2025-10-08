@@ -12,6 +12,7 @@ import { useEditor } from "@schoolboxVue/composables/editor/useEditor";
 import MediaArticle from "@schoolboxVue/components/media-article.vue";
 import type { Student } from "@schoolboxLearnosity/js/types/Student";
 import type { StudentItem } from "@schoolboxLearnosity/js/types/StudentItem";
+import { useStudentItemStore } from "./store/studentItemStore";
 
 interface Props {
     student: Student; // the student to display
@@ -26,6 +27,7 @@ const comment = props.isReadOnly
     : useEditor(props.item.questions[0].response?.comment ?? "", `#${editorId}`, {
           targetElements: [`#${editorId}`],
           hasTokens: true,
+          templates: useStudentItemStore().editorTemplates,
       }); // Use a ckeditor for the comments field
 const isSaving = window.Vue.ref(false);
 const hasSaved = window.Vue.ref(false);
@@ -147,6 +149,7 @@ window.Vue.onUnmounted(async () => {
             </div>
         </template>
         <template v-else-if="!props.isReadOnly">
+            <label :for="editorId">Comment</label>
             <p class="meta">
                 Student detail tokens can be viewed when you press [. Tokens will be substituted with the students
                 details on creation.
@@ -170,6 +173,7 @@ window.Vue.onUnmounted(async () => {
 
 .save-container {
     grid-template-rows: v-bind(saveContainerHeight);
+    margin-top: -1rem; /* offset the margin so it can butt up against the bottom of the editor */
     transition: grid-template-rows 300ms;
     &__inner-container {
         overflow: hidden;

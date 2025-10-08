@@ -108,12 +108,6 @@ $table-margin-bottom: rem-calc(($base-font-size - 2));
             padding: $table-row-padding;
             text-align: $default-float;
         }
-
-        &.even,
-        &.alt,
-        &:nth-of-type(even) {
-            background: $table-even-row-bg;
-        }
     }
 
     thead tr th,
@@ -151,7 +145,7 @@ table {
         }
     }
     .profile-cell {
-        min-width: 180px !important; /* 180px matches 'left' value used when making next column sticky for purpose of horizontal scrolling. */
+        min-width: 200px !important; /* 200px matches 'left' value used when making next column sticky for purpose of horizontal scrolling. */
         padding: 0;
 
         .card img {
@@ -186,7 +180,8 @@ tr.sub-row {
 }
 
 // Table Skeleton
-table.skeleton {
+table.skeleton,
+tbody.skeleton {
     tr {
         height: 2rem;
     }
@@ -280,6 +275,9 @@ $rotate-span-width: 11rem;
                 padding: 0 !important;
                 letter-spacing: 0.1ex;
 
+                /* The original divs that aren't skewed will block users from clicking anything on the skewed divs, this lets those actions pass through */
+                pointer-events: none;
+
                 // Prevent data showing under fixed cells when scrolling horizontally.
                 &:has(div:empty) {
                     background-color: $body-bg;
@@ -297,6 +295,9 @@ $rotate-span-width: 11rem;
                     top: 0;
                     left: $rotate-width + 0.5;
                     filter: none !important;
+
+                    /* undo the pointer-events: none from above */
+                    pointer-events: auto;
 
                     &:not(:empty) {
                         background-color: $white;
@@ -362,7 +363,7 @@ $rotate-span-width: 11rem;
 
     th.fixed-left:nth-child(2) {
         @media #{$medium-up} {
-            left: 180px; /* 180px to match width of a .profile-cell table cell. */
+            left: 200px; /* 200px to match width of a .profile-cell table cell. */
         }
     }
 
@@ -483,4 +484,45 @@ table.attempts-table {
 
 .u-border-right {
     border-right: 1px solid var(--body-background);
+}
+
+/* make a table <th> sticky */
+.u-sticky-left {
+    background: #ffffff; /* Also needs a background to prevent the sticky from being transparent */
+    left: 0;
+    position: sticky;
+    z-index: var(--sbx-depth-ui-sticky);
+}
+
+/* make a table <td> sticky, minus 1 z-index so it scrolls underneath the <th> */
+.u-sticky-left--row {
+    z-index: calc(var(--sbx-depth-ui-sticky) - 1);
+    &:hover {
+        background-color: #f4f3f3; /* to help legibility */
+    }
+}
+
+/* to accommodate an absolute positioned child */
+td:has(.u-td-button) {
+    padding: 0; // padding is handled by the button instead
+}
+
+/* if position: sticky is already set we don't need to add position: relative */
+td:has(.u-td-button):not(.u-sticky-left) {
+    position: relative;
+}
+
+/* a <button> inside a <td>, to be able to select the entire cell */
+.u-td-button {
+    background: none;
+    display: flex; // to align the text to the top left
+    height: 100%;
+    margin: 0;
+    padding: 0.625rem;
+    position: absolute; // make the button fill the entire td cell
+    text-align: left;
+    width: 100%;
+    &:hover {
+        background: var(--accent-background);
+    }
 }

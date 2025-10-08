@@ -22,7 +22,7 @@ class Component_Dashboard_ChildSubjectController extends Component_Dashboard_Con
      */
     public function execute()
     {
-        if ($this->getUser()->getChildren()->count()) {
+        if ($this->getUser()->getChildren()?->count()) {
             $this->children = $this->getUser()->getChildren();
             return true;
         }

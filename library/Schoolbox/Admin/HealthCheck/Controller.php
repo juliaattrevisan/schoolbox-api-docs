@@ -2,14 +2,18 @@
 
 namespace Schoolbox\Admin\HealthCheck;
 
+use Alaress\Database\Predicate\Builder;
 use Alaress\Web\Controller\Base;
 use Aura\Router\Generator;
+use Component_Config_Componentname;
 use Schoolbox\API\Token\Jwt;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\IConfigLoader;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\TaskDaemon\Producer;
 use Schoolbox\TaskDaemon\Request\MessageFactory;
+use Schoolbox\Resource\Textbox;
+use Schoolbox\User\Token\Mapper as TokenMapper;
 
 class Controller extends Base
 {
@@ -24,23 +28,27 @@ class Controller extends Base
      * If you need to run a specific audit use the following;
      *      /adminv2/health-check-export/audit?report=uxui
      *      /adminv2/health-check-export/audit?report=uxui,lms,community
+     *
+     * Current options for this are: assessment, uxui, user, lms, community, sva, implementation, unitplanner, olcstats
      */
 
     /**
      * Constructor
      *
-     * @param Jwt            $tokenBuilder
-     * @param IConfigLoader  $config
-     * @param Generator      $routeGenerator
+     * @param Jwt $tokenBuilder
+     * @param IConfigLoader $config
+     * @param Generator $routeGenerator
      * @param MessageFactory $messageFactory
-     * @param Producer       $producer
+     * @param Producer $producer
+     * @param TokenMapper $tokenMapper
      */
     public function __construct(
         Jwt $tokenBuilder,
         IConfigLoader $config,
         Generator $routeGenerator,
         MessageFactory $messageFactory,
-        Producer $producer
+        Producer $producer,
+        TokenMapper $tokenMapper
     ) {
         $this->tokenBuilder = $tokenBuilder;
 
@@ -49,7 +57,8 @@ class Controller extends Base
             $config,
             $routeGenerator,
             $messageFactory,
-            $producer
+            $producer,
+            $tokenMapper
         );
     }
 
@@ -94,7 +103,7 @@ class Controller extends Base
                     break;
                 case 'uxui':
                     /**
-                     * list of reports for uxui
+                     * list of reports for UX/UI Engagement
                      */
                     $this->taskDHelper->addSource('uxui', 'topMenuReport');
                     $this->taskDHelper->addSource('uxui', 'sideMenuReport');
@@ -103,7 +112,7 @@ class Controller extends Base
                     break;
                 case 'user':
                     /**
-                     * list of reports for user management audit
+                     * list of reports for User Management Engagement
                      */
                     $this->taskDHelper->addSource('user', 'listOfRoles');
                     $this->taskDHelper->addSource('user', 'listOfCampuses');
@@ -115,7 +124,7 @@ class Controller extends Base
                     break;
                 case 'lms':
                     /**
-                     * list of reports for LMS Fundamentals Audit
+                     * list of reports for LMS Fundamentals Engagement
                      */
                     $this->taskDHelper->addSource('lms', 'gradeGroups');
                     $this->taskDHelper->addSource('lms', 'academicPeriods');
@@ -127,7 +136,7 @@ class Controller extends Base
                     break;
                 case 'community':
                     /**
-                     * list of reports for Community Engagement Audit
+                     * list of reports for Community Engagement
                      */
                     $this->taskDHelper->addSource('community', 'newsTopics');
                     $this->taskDHelper->addSource('community', 'newsServicePermissions');
@@ -160,7 +169,7 @@ class Controller extends Base
                     break;
                 case 'implementation':
                     /**
-                     * list of reports for implementation reports
+                     * list of reports for Implementation Engagement
                      */
                     $this->taskDHelper->addSource('', 'implementationServicePermissions');
                     $this->taskDHelper->addSource('', 'implementationRoleList');
@@ -173,6 +182,24 @@ class Controller extends Base
                     // TODO: $this->taskDHelper->addSource('', 'implementationTopMenuReport');
                     $this->taskDHelper->addSource('', 'implementationSideMenuReport');
                     $this->taskDHelper->addSource('', 'implementationAcademicPeriods');
+                    break;
+                case 'unitplanner':
+                    /**
+                     * list of reports for Unit Planner Engagement
+                     */
+                    $this->taskDHelper->addSource('', 'unitplannerFrameworks');
+                    $this->taskDHelper->addSource('', 'unitplannerCourseTextboxes');
+                    $this->taskDHelper->addSource('', 'unitplannerUnitTextboxes');
+                    $this->taskDHelper->addSource('', 'unitplannerComponents');
+                    $this->taskDHelper->addSource('', 'unitplannerAssessments');
+                    break;
+                case 'olcstats':
+                    /**
+                     * list of reports for OLC Reporting Stats
+                     */
+                    $this->taskDHelper->addSource('', 'olcstatsQuizAttempts');
+                    $this->taskDHelper->addSource('', 'olcstatsTaskCompletions');
+                    $this->taskDHelper->addSource('', 'olcstatsDueWorkSubmissions');
                     break;
                 default:
                     throw new SchoolboxException("Report '{$report}' Does not exist.");
@@ -199,8 +226,8 @@ class Controller extends Base
             ORDER BY
                 name ASC; ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'HomepageTemplates.csv');
+
+        (new Helper())->queryToCSV($statement, 'HomepageTemplates.csv');
     }
 
     /**
@@ -238,8 +265,8 @@ class Controller extends Base
         ORDER BY
             sort_order asc; ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'TopMenuReport.csv');
+
+        (new Helper())->queryToCSV($statement, 'TopMenuReport.csv');
     }
 
     /**
@@ -285,8 +312,7 @@ class Controller extends Base
             ms.title,'Campus';
             ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'SideMenuReport.csv');
+        (new Helper())->queryToCSV($statement, 'SideMenuReport.csv');
     }
 
     /**
@@ -335,8 +361,8 @@ class Controller extends Base
             f.deleted_at IS NULL;
             ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'ResourceBrowser.csv');
+
+        (new Helper())->queryToCSV($statement, 'ResourceBrowser.csv');
     }
 
     /**
@@ -362,8 +388,8 @@ class Controller extends Base
             g.NAME;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'listOfRoles.csv');
+
+        (new Helper())->queryToCSV($statement, 'listOfRoles.csv');
     }
 
     /**
@@ -389,8 +415,8 @@ class Controller extends Base
             c.NAME;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'listOfCampuses.csv');
+
+        (new Helper())->queryToCSV($statement, 'listOfCampuses.csv');
     }
 
     /**
@@ -416,8 +442,7 @@ class Controller extends Base
             lyl.NAME;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'listOfYearLevels.csv');
+        (new Helper())->queryToCSV($statement, 'listOfYearLevels.csv');
     }
 
     /**
@@ -443,8 +468,7 @@ class Controller extends Base
             h.house;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'listOfHouses.csv');
+        (new Helper())->queryToCSV($statement, 'listOfHouses.csv');
     }
 
     /**
@@ -486,8 +510,7 @@ class Controller extends Base
             ua.service,ua.type,ua.sid,u.id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'servicePermissions.csv');
+        (new Helper())->queryToCSV($statement, 'servicePermissions.csv');
     }
 
     /**
@@ -508,8 +531,7 @@ class Controller extends Base
             u.deleted_at IS NULL;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'listOfSuperusers.csv');
+        (new Helper())->queryToCSV($statement, 'listOfSuperusers.csv');
     }
 
     /**
@@ -531,8 +553,7 @@ class Controller extends Base
             submission_grade_group sgg ON sg.submission_grade_group_id = sgg.id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'gradeGroups.csv');
+        (new Helper())->queryToCSV($statement, 'gradeGroups.csv');
     }
 
     /**
@@ -552,8 +573,7 @@ class Controller extends Base
             term;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'academicPeriods.csv');
+        (new Helper())->queryToCSV($statement, 'academicPeriods.csv');
     }
 
     /**
@@ -576,8 +596,7 @@ class Controller extends Base
             sequence ASC;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'workTypes.csv');
+        (new Helper())->queryToCSV($statement, 'workTypes.csv');
     }
 
     /**
@@ -600,8 +619,7 @@ class Controller extends Base
             sequence ASC;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'submissionStates.csv');
+        (new Helper())->queryToCSV($statement, 'submissionStates.csv');
     }
 
     /**
@@ -681,8 +699,7 @@ class Controller extends Base
             c.sequence;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'lmsSettings.csv');
+        (new Helper())->queryToCSV($statement, 'lmsSettings.csv');
     }
 
     /**
@@ -718,8 +735,7 @@ class Controller extends Base
             BY sequence ASC;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'yearLevelPermissions.csv');
+        (new Helper())->queryToCSV($statement, 'yearLevelPermissions.csv');
     }
 
     /**
@@ -741,8 +757,7 @@ class Controller extends Base
             sequence;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'newsTopics.csv');
+        (new Helper())->queryToCSV($statement, 'newsTopics.csv');
     }
 
     /**
@@ -769,8 +784,7 @@ class Controller extends Base
           service = '3';
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'newsServicePermissions.csv');
+        (new Helper())->queryToCSV($statement, 'newsServicePermissions.csv');
     }
 
     /**
@@ -804,8 +818,7 @@ class Controller extends Base
           sequence;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'newsSettings.csv');
+        (new Helper())->queryToCSV($statement, 'newsSettings.csv');
     }
 
     /**
@@ -828,8 +841,7 @@ class Controller extends Base
                 sequence ASC;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'eventTypes.csv');
+        (new Helper())->queryToCSV($statement, 'eventTypes.csv');
     }
 
     /**
@@ -863,8 +875,7 @@ class Controller extends Base
                   ua.uid;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'calendarServicePermissions.csv');
+        (new Helper())->queryToCSV($statement, 'calendarServicePermissions.csv');
     }
 
     /**
@@ -894,8 +905,7 @@ class Controller extends Base
             g.id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'parentNewsNotifications.csv');
+        (new Helper())->queryToCSV($statement, 'parentNewsNotifications.csv');
     }
 
     // ===============================================================================================
@@ -927,8 +937,7 @@ class Controller extends Base
           ll.username,month;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaMonthlyLogins.csv');
+        (new Helper())->queryToCSV($statement, 'svaMonthlyLogins.csv');
     }
 
     /**
@@ -954,8 +963,7 @@ class Controller extends Base
             article_id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaNewsArticleViews.csv');
+        (new Helper())->queryToCSV($statement, 'svaNewsArticleViews.csv');
     }
     /**
      * SVA
@@ -989,8 +997,7 @@ class Controller extends Base
             article_id,role_id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaNewsArticleViewsPerRolePerArticle.csv');
+        (new Helper())->queryToCSV($statement, 'svaNewsArticleViewsPerRolePerArticle.csv');
     }
     /**
      * SVA
@@ -1026,8 +1033,7 @@ class Controller extends Base
             cnas.article_id, month;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaNewsArticleViewsPerMonthBySKC.csv');
+        (new Helper())->queryToCSV($statement, 'svaNewsArticleViewsPerMonthBySKC.csv');
     }
     /**
      * SVA
@@ -1063,8 +1069,7 @@ class Controller extends Base
             cnas.article_id, month;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaNewsArticleViewsPerMonthByActiveAlumni.csv');
+        (new Helper())->queryToCSV($statement, 'svaNewsArticleViewsPerMonthByActiveAlumni.csv');
     }
     // ===============================================================================================
     // =================== TO DO: ADD 'News Article Views (Specific)' Here ===========================
@@ -1093,8 +1098,7 @@ class Controller extends Base
             cna.created_at;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaNewsCreatedBySVATeam.csv');
+        (new Helper())->queryToCSV($statement, 'svaNewsCreatedBySVATeam.csv');
     }
     /**
      * SVA
@@ -1123,8 +1127,7 @@ class Controller extends Base
             hv.date,hv.category_id,hv.user_group_id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaHomepageViewsByKSC.csv');
+        (new Helper())->queryToCSV($statement, 'svaHomepageViewsByKSC.csv');
     }
     /**
      * SVA
@@ -1151,8 +1154,7 @@ class Controller extends Base
             hv.date,hv.category_id,hv.user_group_id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaHomepageViewsByAllPerRolePerMonth.csv');
+        (new Helper())->queryToCSV($statement, 'svaHomepageViewsByAllPerRolePerMonth.csv');
     }
     // ===============================================================================================
     // ====================== TO DO: ADD 'Homepage views per user' Here ==============================
@@ -1184,8 +1186,7 @@ class Controller extends Base
             hv.date,hv.category_id,hv.user_group_id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaHomepageViewsForCommunityForumsPage.csv');
+        (new Helper())->queryToCSV($statement, 'svaHomepageViewsForCommunityForumsPage.csv');
     }
     /**
      * SVA
@@ -1214,8 +1215,7 @@ class Controller extends Base
             hv.date,hv.category_id,hv.user_group_id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaHomepageViewsForOpportunitiesPage.csv');
+        (new Helper())->queryToCSV($statement, 'svaHomepageViewsForOpportunitiesPage.csv');
     }
     /**
      * SVA
@@ -1248,8 +1248,7 @@ class Controller extends Base
             hv.user_group_id,hv.category_id,hv.date;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaHomepageViewsForProfessionalReadingPage.csv');
+        (new Helper())->queryToCSV($statement, 'svaHomepageViewsForProfessionalReadingPage.csv');
     }
     /**
      * SVA
@@ -1278,8 +1277,7 @@ class Controller extends Base
             hv.date,hv.category_id,hv.user_group_id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaHomepageViewsForEvaluationPage.csv');
+        (new Helper())->queryToCSV($statement, 'svaHomepageViewsForEvaluationPage.csv');
     }
     /**
      * SVA
@@ -1312,8 +1310,7 @@ class Controller extends Base
             hv.user_group_id,hv.category_id,hv.date;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaHomepageViewsForActiveAlumniPage.csv');
+        (new Helper())->queryToCSV($statement, 'svaHomepageViewsForActiveAlumniPage.csv');
     }
     /**
      * SVA
@@ -1346,8 +1343,7 @@ class Controller extends Base
             hv.user_group_id,hv.category_id,hv.date;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaHomepageViewsForRrrHubSchoolsPage.csv');
+        (new Helper())->queryToCSV($statement, 'svaHomepageViewsForRrrHubSchoolsPage.csv');
     }
     /**
      * SVA
@@ -1371,8 +1367,7 @@ class Controller extends Base
             f.name,ft.date;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaForumThreadsViews.csv');
+        (new Helper())->queryToCSV($statement, 'svaForumThreadsViews.csv');
     }
     /**
      * SVA
@@ -1397,8 +1392,7 @@ class Controller extends Base
             ft.threadID,ft.date;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'svaForumReplies.csv');
+        (new Helper())->queryToCSV($statement, 'svaForumReplies.csv');
     }
     // ===============================================================================================
     // ============= TO DO: ADD 'Social Stream Posts (per month, per page)' Here =====================
@@ -1445,9 +1439,13 @@ class Controller extends Base
             u.deleted_at IS NULL;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'implementationServicePermissions.csv');
+        (new Helper())->queryToCSV($statement, 'implementationServicePermissions.csv');
     }
+
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
     /**
      * IMPLEMENTATION
      * implementationRoleList.csv
@@ -1471,9 +1469,13 @@ class Controller extends Base
             g.NAME;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'implementationRoleList.csv');
+        (new Helper())->queryToCSV($statement, 'implementationRoleList.csv');
     }
+
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
     /**
      * IMPLEMENTATION
      * implementationCampusList.csv
@@ -1497,9 +1499,13 @@ class Controller extends Base
             c.NAME;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'implementationCampusList.csv');
+        (new Helper())->queryToCSV($statement, 'implementationCampusList.csv');
     }
+
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
     /**
      * IMPLEMENTATION
      * implementationHouseList.csv
@@ -1523,9 +1529,13 @@ class Controller extends Base
             h.house;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'implementationHouseList.csv');
+        (new Helper())->queryToCSV($statement, 'implementationHouseList.csv');
     }
+
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
     /**
      * IMPLEMENTATION
      * implementationYearLevels.csv
@@ -1549,9 +1559,13 @@ class Controller extends Base
             lyl.NAME;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'implementationYearLevels.csv');
+        (new Helper())->queryToCSV($statement, 'implementationYearLevels.csv');
     }
+
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
     /**
      * IMPLEMENTATION
      * implementationNewsTopics.csv
@@ -1570,9 +1584,13 @@ class Controller extends Base
             sequence;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'implementationNewsTopics.csv');
+        (new Helper())->queryToCSV($statement, 'implementationNewsTopics.csv');
     }
+
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
     /**
      * IMPLEMENTATION
      * implementationCalendarEventTypes.csv
@@ -1593,9 +1611,13 @@ class Controller extends Base
                 sequence ASC;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'implementationCalendarEventTypes.csv');
+        (new Helper())->queryToCSV($statement, 'implementationCalendarEventTypes.csv');
     }
+
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
     /**
      * IMPLEMENTATION
      * implementationNotificationSettings.csv
@@ -1624,8 +1646,7 @@ class Controller extends Base
             ms.description,g.id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'implementationNotificationSettings.csv');
+        (new Helper())->queryToCSV($statement, 'implementationNotificationSettings.csv');
     }
     /**
      * IMPLEMENTATION
@@ -1655,8 +1676,7 @@ class Controller extends Base
           menu_side_section mss;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'implementationSideMenuReport.csv');
+        (new Helper())->queryToCSV($statement, 'implementationSideMenuReport.csv');
     }
     /**
      * IMPLEMENTATION
@@ -1680,7 +1700,981 @@ class Controller extends Base
             lu_year_level lyl on tyl.year_level_id = lyl.id;
         ");
         $statement->execute();
-        $help = new Helper();
-        $help->queryToCSV($statement, 'implementationAcademicPeriods.csv');
+        (new Helper())->queryToCSV($statement, 'implementationAcademicPeriods.csv');
     }
+    // ===============================================================================================
+    // =============================== END IMPLEMENTATION REPORTS ====================================
+    // ===============================================================================================
+
+    // ===============================================================================================
+    // =============================== START UNIT PLANNER REPORTS ====================================
+    // ===============================================================================================
+
+    /**
+     * UNIT PLANNER
+     * unitplannerFrameworks.csv
+     */
+    public function unitplannerFrameworks()
+    {
+        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            cs.id AS 'Course ID',
+            fcs.name AS 'Course Name',
+            cs.subject_code AS 'Subject Code',
+            '' AS 'New Subject Code',
+            cs.template_id AS 'Framework ID',
+            ct.name AS 'Framework',
+            '' AS 'New Framework ID',
+            '' AS 'New Framework Name',
+            CONCAT(:URL,'/course/modify/',cs.id) AS 'Course Link'
+        FROM
+            course_specification cs
+        JOIN
+            folder fcs ON cs.folder_id = fcs.id AND fcs.deleted_at IS NULL
+        LEFT JOIN
+            courseTemplates ct ON cs.template_id = ct.id
+        WHERE
+            cs.deleted_at IS NULL;
+        ");
+        $statement->execute(['URL' => $urlBase]);
+        (new Helper())->queryToCSV($statement, 'unitplannerFrameworks.csv');
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * UNIT PLANNER
+     * unitplannerCourseTextboxes.csv
+     * @api   GET /adminv2/health-check-export/audit/unitplannerCourseTextboxes
+     * @since 24.1
+     */
+    public function unitplannerCourseTextboxes()
+    {
+
+        $database = FolderMapper::getInstance()->getDatabase();
+        $courses = [];
+
+        //build the csv
+        $rowHeadings = [
+            'Course Title',
+            'Subject Code',
+            'Course Homepage ID',
+            'Course ID',
+            'Course Framework',
+            'Edit Link',
+            'Textbox Component Name',
+            'Textbox Component ID',
+            'Textbox Title',
+            'New Textbox Title',
+            'Textbox ID',
+            'Textbox Content (empty string, empty state)'
+        ];
+
+        // base filename with school code and date
+        $filename = sprintf("unit-audit-%s-%s.csv", $this->getConfigLoader()->get('site_school_code'), \Alaress_Date_Format::now()->toIso8601String());
+        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+
+        // fetch all courses
+        $courseQuery = $database->prepareQuery("
+        SELECT
+            courseFolder.name AS 'course.name',
+            course_specification.subject_code AS 'course.subject_code',
+            courseFolder.id AS 'course.id',
+            course_specification.id AS 'course_specification.id',
+            courseTemplates.name AS 'framework'
+        FROM course_specification
+        JOIN courseTemplates ON course_specification.template_id = courseTemplates.id
+        JOIN folder courseFolder ON course_specification.folder_id = courseFolder.id
+        WHERE course_specification.deleted_at IS NULL
+        AND courseFolder.deleted_at IS NULL;
+        ");
+
+        $courseQuery->execute();
+        while ($row = $courseQuery->fetch(\PDO::FETCH_ASSOC)) {
+            $courses[$row['course.id']] = $row;
+        }
+
+        $coursePlaceHolder = Builder::getArrayPlaceholders(array_keys($courses), 'courses');
+
+        // fetch all textboxes with components from these courses
+        // clone with extension from \Schoolbox\Search\Api\Database\ResultType\Textbox\IndexBuilder::buildUpdates
+        $compTextQuery = $database->prepareQuery("SELECT
+            tb.textBoxID AS id,
+            f.id AS folder_id,
+            cci_componentname.value AS 'componentName',
+            ci.id AS 'componentId',
+            tb.heading AS 'textboxHeading',
+            tb.updated_at AS date,
+            tb.updated_by AS updated_by,
+            tb.body AS textboxBody
+        FROM component_definition cd
+                 JOIN component_instance ci ON ci.component_definition_id = cd.id and ci.module = 'homepage'
+                 JOIN folder f ON f.id = ci.identifier
+                 JOIN component_config_definition ccd_textbox ON (
+            ccd_textbox.component_definition_id = cd.id AND
+            ccd_textbox.key = :homepageComponentKey
+            )
+                 LEFT JOIN component_config_instance cci_textbox ON (
+            cci_textbox.component_config_definition_id = ccd_textbox.id AND
+            cci_textbox.component_instance_id = ci.id
+            )
+                 LEFT JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci_textbox.value
+                 JOIN component_config_definition ccd_componentname ON (
+            ccd_componentname.component_definition_id = cd.id AND
+            ccd_componentname.key = :componentConfigComponentNameKey
+            )
+                 LEFT JOIN component_config_instance cci_componentname ON (
+            cci_componentname.component_config_definition_id = ccd_componentname.id AND
+            cci_componentname.component_instance_id = ci.id
+            )
+        WHERE cd.`class` = 'Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller'
+          AND f.deleted_at IS NULL
+          AND tb.deleted_at IS NULL
+        AND f.id in {$coursePlaceHolder};
+        ");
+
+
+        header('Content-type: text/csv; charset=utf-8');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+
+        $fp = fopen("php://output", 'w');
+        fputcsv($fp, $rowHeadings, escape: '');
+
+        /**
+         * $rowHeadings = [
+         * 'Course Title',
+         * 'Subject Code',
+         * 'Course Homepage ID',
+         * 'Course Specification ID',
+         * 'Course Framework',
+         * 'Edit Link',
+         * 'Textbox Component Name',
+         * 'Textbox Component ID',
+         * 'Textbox Title',
+         * 'New Textbox Title',
+         * 'Textbox ID',
+         * 'Textbox Content (empty string, empty state)'
+         * ];
+         */
+        $compTextQuery->execute(array_merge(
+            [
+                'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY,
+                'componentConfigComponentNameKey' => Component_Config_Componentname::KEY,
+            ],
+            Builder::getArrayParameters(array_keys($courses), 'courses')
+        ));
+        while ($row = $compTextQuery->fetch(\PDO::FETCH_ASSOC)) {
+            $componentName = $row['componentName'] ?? 'NULL';
+            // if component is empty string, use the system default
+            if (trim($componentName) === '') {
+                $componentName = Textbox\Component\Homepage\Controller::DEFAULT_COMPONENT_HEADING;
+            }
+            //build the row and send
+            fputcsv($fp, [
+                $courses[$row['folder_id']]['course.name'],
+                $courses[$row['folder_id']]['course.subject_code'],
+                $courses[$row['folder_id']]['course.id'],
+                $courses[$row['folder_id']]['course_specification.id'],
+                $courses[$row['folder_id']]['framework'],
+                $urlBase->withPath(sprintf("/homepage/%s", $courses[$row['folder_id']]['course.id']))->withFragment(sprintf("component%s", $row['componentId'])),
+                $componentName,
+                $row['componentId'] ?? 'NULL',
+                $row['textboxHeading'] ?? 'NULL',
+                '',
+                $row['id'] ?? 'NULL',
+                $row['textboxBody'] ?? 'NULL',
+            ], escape: '');
+        }
+
+        // fetch all textboxes with no component from these units
+        // clone with extension from \Schoolbox\Search\Api\Database\ResultType\Textbox\IndexBuilder::buildUpdates
+        $textQuery = $database->prepareQuery("SELECT
+            tb2.textBoxID AS id,
+            tb2.heading AS 'textboxHeading',
+            tb2.updated_at AS date,
+            tb2.updated_by AS updated_by,
+            tb2.body AS textboxBody,
+            tb2.categoryID AS folderId
+        FROM textBox tb2
+                 LEFT JOIN component_config_instance cci2 ON (
+            cci2.component_config_definition_id = (
+                SELECT id
+                FROM component_config_definition ccd2
+                WHERE ccd2.key = :homepageComponentKey
+            ) AND
+            cci2.value = CAST(tb2.textBoxID AS NCHAR)
+            )
+        WHERE tb2.deleted_at IS NULL
+          AND cci2.id IS NULL
+          AND tb2.categoryID in {$coursePlaceHolder}
+        ");
+
+        /**
+         * $rowHeadings = [
+         * 'Course Title',
+         * 'Subject Code',
+         * 'Course Homepage ID',
+         * 'Course ID',
+         * 'Course Framework',
+         * 'Edit Link',
+         * 'Textbox Component Name',
+         * 'Textbox Component ID',
+         * 'Textbox Title',
+         * 'New Textbox Title',
+         * 'Textbox ID',
+         * 'Textbox Content (empty string, empty state)'
+         * ];
+         */
+        $textQuery->execute(array_merge(
+            [
+                'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY
+            ],
+            Builder::getArrayParameters(array_keys($courses), 'courses')
+        ));
+        while ($row = $textQuery->fetch(\PDO::FETCH_ASSOC)) {
+            //build the row and send
+            fputcsv($fp, [
+                $courses[$row['folderId']]['course.name'],
+                $courses[$row['folderId']]['course.subject_code'],
+                $courses[$row['folderId']]['course.id'],
+                $courses[$row['folderId']]['course_specification.id'],
+                $courses[$row['folderId']]['framework'],
+                $urlBase->withPath(sprintf("/textbox/folder/%s", $courses[$row['folderId']]['course.id'])),
+                'No Component',
+                'No Component',
+                $row['textboxHeading'] ?? 'NULL',
+                '',
+                $row['id'] ?? 'NULL',
+                $row['textboxBody'] ?? 'NULL',
+            ], escape: '');
+        }
+
+        fclose($fp);
+
+        exit(1);
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * UNIT PLANNER
+     * unitplannerComponents.csv
+     * @api GET /adminv2/health-check-export/audit/unitplannerComponents
+     * @since 24.1
+     */
+    public function unitplannerComponents()
+    {
+        $units = [];
+        $database = FolderMapper::getInstance()->getDatabase();
+
+
+        //build the csv
+        $rowHeadings = [
+            'Course Title',
+            'Subject Code',
+            'Course Homepage ID',
+            'Course ID',
+            'Course Framework',
+            'Unit Title',
+            'Unit Homepage ID',
+            'Edit Link',
+            'Component Type',
+            'Component Title',
+            'Curriculum Overview Tree Filter',
+            'File Count',
+            'Link Count',
+        ];
+
+        // base filename with school code and date
+        $filename = sprintf("unit-audit-%s-%s.csv", $this->getConfigLoader()->get('site_school_code'), \Alaress_Date_Format::now()->toIso8601String());
+        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+
+        // fetch all units/courses
+        $courseUnitQuery = $database->prepareQuery("
+        SELECT
+            courseFolder.name AS 'course.name',
+            course_specification.subject_code AS 'course.subject_code',
+            courseFolder.id AS 'course.id',
+            course_specification.id AS 'course_specification.id',
+            unitFolder.name AS 'unit.name',
+            unitFolder.id AS 'unit.id',
+            courseTemplates.name AS 'framework'
+        FROM course_specification
+        JOIN courseTemplates ON course_specification.template_id = courseTemplates.id
+        JOIN folder courseFolder ON course_specification.folder_id = courseFolder.id
+        JOIN course_unit_specification ON course_specification.id = course_unit_specification.course_specification_id
+        JOIN folder unitFolder ON course_unit_specification.folder_id = unitFolder.id
+        WHERE course_specification.deleted_at IS NULL
+        AND course_unit_specification.deleted_at IS NULL
+        ");
+
+        $courseUnitQuery->execute();
+        while ($row = $courseUnitQuery->fetch(\PDO::FETCH_ASSOC)) {
+            $units[$row['unit.id']] = $row;
+        }
+
+        $unitPlaceHolder = Builder::getArrayPlaceholders(array_keys($units), 'units');
+
+        // fetch all textboxes with components from these units
+        // clone with extension from \Schoolbox\Search\Api\Database\ResultType\Textbox\IndexBuilder::buildUpdates
+        $curricOverviewQuery = $database->prepareQuery("SELECT
+            f.id AS 'folder.id',
+            cci_title.value AS 'component.name',
+            ci.id AS 'component.id',
+            cn.name AS 'tree.filter',
+            cn.code AS 'tree.filter_code'
+        FROM component_definition cd
+                JOIN component_instance ci ON ci.component_definition_id = cd.id and ci.module = 'homepage'
+                JOIN folder f ON f.id = ci.identifier
+                JOIN        component_config_definition ccd_title ON
+                            (
+                            ccd_title.component_definition_id = cd.id AND
+                            ccd_title.key = 'componentname'
+                            )
+                LEFT JOIN   component_config_instance cci_title ON (
+                            cci_title.component_config_definition_id = ccd_title.id AND
+                            cci_title.component_instance_id = ci.id
+                            )
+                JOIN        component_config_definition ccd_tree ON
+                            (
+                            ccd_tree.component_definition_id = cd.id AND
+                            ccd_tree.key = 'curriculumTreeFilter'
+                            )
+                LEFT JOIN   component_config_instance cci_tree ON (
+                            cci_tree.component_config_definition_id = ccd_tree.id AND
+                            cci_tree.component_instance_id = ci.id
+                            )
+                LEFT JOIN   curriculum_node cn ON cci_tree.value = cn.id AND cn.deleted_at IS NULL
+        WHERE cd.`class` = 'Schoolbox\\\Curriculum\\\Component\\\CurriculumOverviewController'
+        AND f.deleted_at IS NULL
+        AND f.id in {$unitPlaceHolder};
+        ");
+
+
+        header('Content-type: text/csv; charset=utf-8');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+
+        $fp = fopen("php://output", 'w');
+        fputcsv($fp, $rowHeadings, escape: '');
+
+        /**
+         * $rowHeadings = [
+         * 'Course Title',
+         * 'Subject Code',
+         * 'Course Homepage ID',
+         * 'Course ID',
+         * 'Course Framework',
+         * 'Unit Title',
+         * 'Unit Homepage ID',
+         * 'Edit Link',
+         * 'Component Type',
+         * 'Component Title',
+         * 'Curriculum Overview Tree Filter',
+         * 'File Count',
+         * 'Link Count',
+        * ];
+         */
+        $curricOverviewQuery->execute(
+            Builder::getArrayParameters(array_keys($units), 'units')
+        );
+
+        while ($row = $curricOverviewQuery->fetch(\PDO::FETCH_ASSOC)) {
+            $componentName = $row['componentName'] ?? 'NULL';
+            // if component IS empty string, use the system default
+            if (trim($componentName) === '') {
+                $componentName = \Schoolbox\Curriculum\Component\CurriculumOverviewController::DEFAULT_COMPONENT_HEADING;
+            }
+
+            $curricCode = trim((string)$row['tree.filter_code']);
+            $curricFilter = trim((string)$row['tree.filter']);
+
+            if ('' !== $curricCode) {
+                $curricFilter .= " [$curricCode]";
+            }
+
+            //build the row and send
+            fputcsv($fp, [
+                $units[$row['folder.id']]['course.name'],
+                $units[$row['folder.id']]['course.subject_code'],
+                $units[$row['folder.id']]['course.id'],
+                $units[$row['folder.id']]['course_specification.id'],
+                $units[$row['folder.id']]['framework'],
+                $units[$row['folder.id']]['unit.name'],
+                $units[$row['folder.id']]['unit.id'],
+                $urlBase->withPath(sprintf("/homepage/%s", $units[$row['folder.id']]['unit.id']))->withFragment(sprintf("component%s", $row['component.id'])),
+                'Curriculum Overview',
+                $componentName,
+                $curricFilter,
+                null,
+                null,
+            ], escape: '');
+        }
+
+        $unitPlaceHolder = Builder::getArrayPlaceholders(array_keys($units), 'units');
+
+        // fetch all textboxes with components from these units
+        // clone with extension from \Schoolbox\Search\Api\Database\ResultType\Textbox\IndexBuilder::buildUpdates
+        $fileQuery = $database->prepareQuery("SELECT
+            f.id AS 'folder.id',
+            cci_title.value AS 'component.name',
+            ci.id AS 'component.id',
+            cn.name AS 'tree.filter',
+            cn.code AS 'tree.filter_code'
+        FROM component_definition cd
+                JOIN component_instance ci ON ci.component_definition_id = cd.id and ci.module = 'homepage'
+                JOIN folder f ON f.id = ci.identifier
+                JOIN        component_config_definition ccd_title ON
+                            (
+                            ccd_title.component_definition_id = cd.id AND
+                            ccd_title.key = 'componentname'
+                            )
+                LEFT JOIN   component_config_instance cci_title ON (
+                            cci_title.component_config_definition_id = ccd_title.id AND
+                            cci_title.component_instance_id = ci.id
+                            )
+                JOIN        component_config_definition ccd_tree ON
+                            (
+                            ccd_tree.component_definition_id = cd.id AND
+                            ccd_tree.key = 'curriculumTreeFilter'
+                            )
+                LEFT JOIN   component_config_instance cci_tree ON (
+                            cci_tree.component_config_definition_id = ccd_tree.id AND
+                            cci_tree.component_instance_id = ci.id
+                            )
+                LEFT JOIN   curriculum_node cn ON cci_tree.value = cn.id AND cn.deleted_at IS NULL
+        WHERE cd.`class` = 'Schoolbox\\\Curriculum\\\Component\\\CurriculumOverviewController'
+        AND f.deleted_at IS NULL
+        AND f.id in {$unitPlaceHolder};
+        ");
+
+        /**
+         * $rowHeadings = [
+         * 'Course Title',
+         * 'Subject Code',
+         * 'Course Homepage ID',
+         * 'Course ID',
+         * 'Course Framework',
+         * 'Unit Title',
+         * 'Unit Homepage ID',
+         * 'Edit Link',
+         * 'Component Type',
+         * 'Component Title',
+         * 'Curriculum Overview Tree Filter',
+         * 'File Count',
+         * 'Link Count',
+        * ];
+         */
+        $fileQuery->execute(
+            Builder::getArrayParameters(array_keys($units), 'units')
+        );
+
+        while ($row = $fileQuery->fetch(\PDO::FETCH_ASSOC)) {
+            $componentName = $row['component.name'] ?? 'NULL';
+            // if component IS empty string, use the system default
+            if (trim($componentName) === '') {
+                $componentName = \Schoolbox\Curriculum\Component\CurriculumOverviewController::DEFAULT_COMPONENT_HEADING;
+            }
+
+            //build the row and send
+            fputcsv($fp, [
+                $units[$row['folder.id']]['course.name'],
+                $units[$row['folder.id']]['course.subject_code'],
+                $units[$row['folder.id']]['course.id'],
+                $units[$row['folder.id']]['course_specification.id'],
+                $units[$row['folder.id']]['framework'],
+                $units[$row['folder.id']]['unit.name'],
+                $units[$row['folder.id']]['unit.id'],
+                $urlBase->withPath(sprintf("/homepage/%s", $units[$row['folder.id']]['unit.id']))->withFragment(sprintf("component%s", $row['component.id'])),
+                'File Component',
+                $componentName,
+                null,
+                'File Count',
+                null,
+            ], escape: '');
+        }
+
+        fclose($fp);
+
+        exit(1);
+    }
+
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * UNIT PLANNER
+     * unitplannerAssessments.csv
+     * @api GET /adminv2/health-check-export/audit/unitplannerAssessments
+     * @since 24.1
+    */
+    public function unitplannerAssessments()
+    {
+
+        $database = FolderMapper::getInstance()->getDatabase();
+        $units = [];
+
+        //build the csv
+        $rowHeadings = [
+            'Course Title',
+            'Subject Code',
+            'Course Homepage ID',
+            'Course ID',
+            'Course Framework',
+            'Unit Title',
+            'Unit Homepage ID',
+            'Unit ID',
+            'Assessment Type',
+            'Work Type',
+            'Count'
+        ];
+
+        // base filename with school code and date
+        $filename = sprintf("unit-audit-%s-%s.csv", $this->getConfigLoader()->get('site_school_code'), \Alaress_Date_Format::now()->toIso8601String());
+        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+
+        // fetch all courses & units & folders of them
+        $courseQuery = $database->prepareQuery("
+        SELECT
+            courseFolder.name AS 'course.name',
+            course_specification.subject_code AS 'course.subject_code',
+            courseFolder.id AS 'course.id',
+            course_specification.id AS 'course_specification.id',
+            unitFolder.name AS 'unit.name',
+            unitFolder.id AS 'unit.folder.id',
+            courseTemplates.name AS 'framework',
+            course_unit_specification.id AS 'unit.id'
+        FROM course_specification
+        JOIN courseTemplates ON course_specification.template_id = courseTemplates.id
+        JOIN folder courseFolder ON course_specification.folder_id = courseFolder.id
+        JOIN course_unit_specification ON course_specification.id = course_unit_specification.course_specification_id
+        JOIN folder unitFolder ON course_unit_specification.folder_id = unitFolder.id
+        WHERE course_specification.deleted_at IS NULL
+        AND course_unit_specification.deleted_at IS NULL;
+        ");
+
+        $courseQuery->execute();
+        while ($row = $courseQuery->fetch(\PDO::FETCH_ASSOC)) {
+            $units[$row['unit.id']] = $row;
+        }
+
+        $coursePlaceHolder = Builder::getArrayPlaceholders(array_keys($units), 'units');
+
+        // fetch all Assessments ON Unit pages within a Course
+        $assessmentQuery = $database->prepareQuery("SELECT
+            COALESCE(
+                    IF(task.id, 'task', NULL),
+                    IF(assess.assessment_id, 'quiz', NULL),
+                    IF(lti_assessment.assessment_id, 'LTI', NULL),
+                    IF(submission_box.id, 'dueWork', NULL),
+                    IF(project.id, 'project', NULL),
+                    IF(lesson_plan.id, 'lessonPlan', NULL)
+            ) AS `assessment.type`,
+            lu_work_type.name AS `work.type.name`,
+            count(assessment.id) AS count,
+            mv_assessment_relation.folder_id AS `folder_id`
+        FROM mv_assessment_relation
+                 JOIN assessment ON mv_assessment_relation.assessment_id = assessment.id
+                 LEFT JOIN lu_work_type ON assessment.work_type_id = lu_work_type.id
+                 LEFT JOIN task ON assessment.id = task.assessment_id
+                 LEFT JOIN assess ON assessment.id = assess.assessment_id
+                 LEFT JOIN lti_assessment ON assessment.id = lti_assessment.assessment_id
+                 LEFT JOIN project ON assessment.id = project.assessment_id
+                 LEFT JOIN submission_box ON assessment.id = submission_box.assessment_id
+                 LEFT JOIN project projectParent ON projectParent.id = mv_assessment_relation.project_assessment_id
+                 LEFT JOIN lesson_plan ON assessment.id = lesson_plan.assessment_id
+                 JOIN      course_unit_specification ON mv_assessment_relation.course_unit_specification_id = course_unit_specification.id
+        WHERE
+            course_unit_specification.folder_id IN {$coursePlaceHolder}
+        GROUP BY `assessment.type`, lu_work_type.id;
+        ");
+
+
+        header('Content-type: text/csv; charset=utf-8');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+
+        $fp = fopen("php://output", 'w');
+        fputcsv($fp, $rowHeadings, escape: '');
+
+        /**
+         * $rowHeadings = [
+         * 'Course Title',
+         * 'Course Homepage ID',
+         * 'Course ID',
+         * 'Course Framework',
+         * 'Unit Title',
+         * 'Unit Homepage ID',
+         * 'Unit ID',
+         * 'Assessment Type',
+         * 'Work Type',
+         * 'Count'
+         * ];
+         */
+        $assessmentQuery->execute(
+            Builder::getArrayParameters(array_keys($units), 'units')
+        );
+        while ($row = $assessmentQuery->fetch(\PDO::FETCH_ASSOC)) {
+            //build the row and send
+            fputcsv($fp, [
+                $units[$row['folder_id']]['course.name'],
+                $units[$row['folder_id']]['course.subject_code'],
+                $units[$row['folder_id']]['course.id'],
+                $units[$row['folder_id']]['course_specification.id'],
+                $units[$row['folder_id']]['framework'],
+                $units[$row['folder_id']]['unit.name'],
+                $units[$row['folder_id']]['unit.folder.id'],
+                $units[$row['folder_id']]['unit.id'],
+                $row['assessment.type'] ?? 'NULL',
+                $row['work.type.name'] ?? 'NULL',
+                $row['count'] ?? 'NULL',
+            ], escape: '');
+        }
+
+        fclose($fp);
+
+        exit(1);
+    }
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+    /**
+     * UNIT PLANNER
+     * unitplannerUnitTextboxes.csv
+     * @api   GET /adminv2/health-check-export/audit/unitplannerUnitTextboxes
+     * @since 24.1
+     */
+    public function unitplannerUnitTextboxes()
+    {
+
+        $database = FolderMapper::getInstance()->getDatabase();
+        $courses = [];
+
+        //build the csv
+        $rowHeadings = [
+            'Course Title',
+            'Subject Code',
+            'Course Homepage ID',
+            'Course ID',
+            'Course Framework',
+            'Unit Title',
+            'Unit Homepage ID',
+            'Unit ID',
+            'Edit Link',
+            'Textbox Component Name',
+            'Textbox Component ID',
+            'Textbox Title',
+            'New Textbox Title',
+            'Textbox ID',
+            'Textbox Content (empty string, empty state)'
+        ];
+
+        // base filename with school code and date
+        $filename = sprintf("unit-audit-%s-%s.csv", $this->getConfigLoader()->get('site_school_code'), \Alaress_Date_Format::now()->toIso8601String());
+        $urlBase = (new \Schoolbox\Url\Factory($this->getConfigLoader()))->buildFullyQualified();
+
+        // fetch all courses & units that aren't deleted
+        $courseQuery = $database->prepareQuery("
+        SELECT
+            courseFolder.name AS 'course.name',
+            course_specification.subject_code AS 'course.subject_code',
+            courseFolder.id AS 'course.id',
+            course_specification.id AS 'course_specification.id',
+            course_unit_specification.id AS 'unit_specification.id',
+            unitFolder.name AS 'unit.name',
+            unitFolder.id AS 'unit.id',
+            courseTemplates.name AS 'framework'
+        FROM course_specification
+        JOIN courseTemplates ON course_specification.template_id = courseTemplates.id
+        JOIN folder courseFolder ON course_specification.folder_id = courseFolder.id
+        JOIN course_unit_specification ON course_specification.id = course_unit_specification.course_specification_id
+        JOIN folder unitFolder ON course_unit_specification.folder_id = unitFolder.id
+        WHERE course_specification.deleted_at IS NULL
+        AND course_unit_specification.deleted_at IS NULL
+        ");
+
+        $courseQuery->execute();
+        while ($row = $courseQuery->fetch(\PDO::FETCH_ASSOC)) {
+            $courses[$row['unit.id']] = $row;
+        }
+
+        $coursePlaceHolder = Builder::getArrayPlaceholders(array_keys($courses), 'courses');
+
+        // fetch all textboxes with components from these courses
+        // clone with extension from \Schoolbox\Search\Api\Database\ResultType\Textbox\IndexBuilder::buildUpdates
+        $compTextQuery = $database->prepareQuery("SELECT
+            tb.textBoxID AS id,
+            f.id AS folder_id,
+            cci_componentname.value AS 'componentName',
+            ci.id AS 'componentId',
+            tb.heading AS 'textboxHeading',
+            tb.updated_at AS date,
+            tb.updated_by AS updated_by,
+            tb.body AS textboxBody
+        FROM component_definition cd
+                 JOIN component_instance ci ON ci.component_definition_id = cd.id and ci.module = 'homepage'
+                 JOIN folder f ON f.id = ci.identifier
+                 JOIN component_config_definition ccd_textbox ON (
+            ccd_textbox.component_definition_id = cd.id AND
+            ccd_textbox.key = :homepageComponentKey
+            )
+                 LEFT JOIN component_config_instance cci_textbox ON (
+            cci_textbox.component_config_definition_id = ccd_textbox.id AND
+            cci_textbox.component_instance_id = ci.id
+            )
+                 LEFT JOIN textBox tb ON CAST(tb.textBoxID AS NCHAR)=cci_textbox.value
+                 JOIN component_config_definition ccd_componentname ON (
+            ccd_componentname.component_definition_id = cd.id AND
+            ccd_componentname.key = :componentConfigComponentNameKey
+            )
+                 LEFT JOIN component_config_instance cci_componentname ON (
+            cci_componentname.component_config_definition_id = ccd_componentname.id AND
+            cci_componentname.component_instance_id = ci.id
+            )
+        WHERE cd.`class` = 'Schoolbox\\\Resource\\\Textbox\\\Component\\\Homepage\\\Controller'
+          AND f.deleted_at IS NULL
+          AND tb.deleted_at IS NULL
+        AND f.id in {$coursePlaceHolder};
+        ");
+
+        // Make sure this is being outputted as CSV and to be an attachment and not load inline
+        header('Content-type: text/csv; charset=utf-8');
+        header("Content-Disposition: attachment; filename=\"$filename\"");
+
+        $fp = fopen("php://output", 'w');
+        fputcsv($fp, $rowHeadings, escape: '');
+
+        /**
+         * $rowHeadings = [
+         * 'Course Title',
+         * 'Subject Code',
+         * 'Course Homepage ID',
+         * 'Course ID',
+         * 'Course Framework',
+         * 'Unit Title',
+         * 'Unit Homepage ID',
+         * 'Unit ID',
+         * 'Edit Link',
+         * 'Textbox Component Name',
+         * 'Textbox Component ID',
+         * 'Textbox Title',
+         * 'New Textbox Title',
+         * 'Textbox ID',
+         * 'Textbox Content (empty string, empty state)'
+         * ];
+         */
+        $compTextQuery->execute(array_merge(
+            [
+                'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY,
+                'componentConfigComponentNameKey' => Component_Config_Componentname::KEY,
+            ],
+            Builder::getArrayParameters(array_keys($courses), 'courses')
+        ));
+        while ($row = $compTextQuery->fetch(\PDO::FETCH_ASSOC)) {
+            $componentName = $row['componentName'] ?? 'NULL';
+            // if component is empty string, use the system default
+            if (trim($componentName) === '') {
+                $componentName = Textbox\Component\Homepage\Controller::DEFAULT_COMPONENT_HEADING;
+            }
+            //build the row and send
+            fputcsv($fp, [
+                $courses[$row['folder_id']]['course.name'],
+                $courses[$row['folder_id']]['course.subject_code'],
+                $courses[$row['folder_id']]['course.id'],
+                $courses[$row['folder_id']]['course_specification.id'],
+                $courses[$row['folder_id']]['framework'],
+                $courses[$row['folder_id']]['unit.name'],
+                $courses[$row['folder_id']]['unit.id'],
+                $courses[$row['folder_id']]['unit_specification.id'],
+                $urlBase->withPath(sprintf("/homepage/%s", $courses[$row['folder_id']]['unit.id']))->withFragment(sprintf("component%s", $row['componentId'])),
+                $componentName,
+                $row['componentId'] ?? 'NULL',
+                $row['textboxHeading'] ?? 'NULL',
+                '',
+                $row['id'] ?? 'NULL',
+                $row['textboxBody'] ?? 'NULL',
+            ], escape: '');
+        }
+
+        // fetch all textboxes not currently housed in a component on the page
+        // clone with extension from \Schoolbox\Search\Api\Database\ResultType\Textbox\IndexBuilder::buildUpdates
+        $textQuery = $database->prepareQuery("SELECT
+            tb2.textBoxID AS id,
+            tb2.heading AS 'textboxHeading',
+            tb2.updated_at AS date,
+            tb2.updated_by AS updated_by,
+            tb2.body AS textboxBody,
+            tb2.categoryID AS folderId
+        FROM textBox tb2
+                 LEFT JOIN component_config_instance cci2 ON (
+            cci2.component_config_definition_id = (
+                SELECT id
+                FROM component_config_definition ccd2
+                WHERE ccd2.key = :homepageComponentKey
+            ) AND
+            cci2.value = CAST(tb2.textBoxID AS NCHAR)
+            )
+        WHERE tb2.deleted_at IS NULL
+          AND cci2.id IS NULL
+          AND tb2.categoryID in {$coursePlaceHolder}
+        ");
+
+        /**
+         * $rowHeadings = [
+         * 'Course Title',
+         * 'Subject Code',
+         * 'Course Homepage ID',
+         * 'Course ID',
+         * 'Course Framework',
+         * 'Unit Title',
+         * 'Unit Homepage ID',
+         * 'Unit ID',
+         * 'Edit Link',
+         * 'Textbox Component Name',
+         * 'Textbox Component ID',
+         * 'Textbox Title',
+         * 'New Textbox Title',
+         * 'Textbox ID',
+         * 'Textbox Content (empty string, empty state)'
+         * ];
+         */
+        $textQuery->execute(array_merge(
+            [
+                'homepageComponentKey' => Textbox\Mapper::HOMEPAGE_COMPONENT_KEY
+            ],
+            Builder::getArrayParameters(array_keys($courses), 'courses')
+        ));
+        while ($row = $textQuery->fetch(\PDO::FETCH_ASSOC)) {
+            //build the row and send
+            fputcsv($fp, [
+                $courses[$row['folderId']]['course.name'],
+                $courses[$row['folderId']]['course.subject_code'],
+                $courses[$row['folderId']]['course.id'],
+                $courses[$row['folderId']]['course_specification.id'],
+                $courses[$row['folderId']]['framework'],
+                $courses[$row['folderId']]['unit.name'],
+                $courses[$row['folderId']]['unit.id'],
+                $courses[$row['folderId']]['unit_specification.id'],
+                $urlBase->withPath(sprintf("/textbox/folder/%s", $courses[$row['folderId']]['course.id'])),
+                'No Component',
+                'No Component',
+                $row['textboxHeading'] ?? 'NULL',
+                '',
+                $row['id'] ?? 'NULL',
+                $row['textboxBody'] ?? 'NULL',
+            ], escape: '');
+        }
+
+        fclose($fp);
+
+        exit(1);
+    }
+
+    // ===============================================================================================
+    // ================================ END UNIT PLANNER REPORTS =====================================
+    // ===============================================================================================
+
+    // ===============================================================================================
+    // ================================ START OLC STATS REPORTS ======================================
+    // ===============================================================================================
+
+    /**
+     * OLCSTATS
+     * olcstatsQuizAttempts.csv
+     */
+
+    public function olcstatsQuizAttempts()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            concat((YEAR(aa.start)),' ',MONTHNAME(aa.start)) AS 'Month',
+            count(*) AS 'Quiz Attempts'
+        FROM
+            course_implementation ci
+        JOIN
+            mv_assessment_relation mvar ON ci.id = mvar.course_implementation_id AND ci.course_specification_id = '34'
+        JOIN
+            assess a ON mvar.assessment_id = a.assessment_id
+        JOIN
+            assess_attempt aa ON a.assess_id = aa.assess_id AND aa.deleted_at is NULL AND aa.finish IS NOT NULL
+        GROUP BY     YEAR(aa.start),MONTHNAME(aa.start)
+        ORDER BY     YEAR(aa.start),MONTH(aa.start);
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'olcstatsQuizAttempts.csv');
+    }
+
+    /**
+     * OLCSTATS
+     * olcstatsTaskCompletions.csv
+     */
+
+    public function olcstatsTaskCompletions()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT
+            concat((YEAR(tc.completion_date)),' ',MONTHNAME(tc.completion_date)) AS 'Month',
+            count(*) AS 'Quiz Attempts'
+        FROM
+            course_implementation ci
+        JOIN
+            mv_assessment_relation mvar ON ci.id = mvar.course_implementation_id AND ci.course_specification_id = '34'
+        JOIN
+            task t ON mvar.assessment_id = t.assessment_id
+        JOIN
+            task_completion tc ON t.id = tc.task_id and tc.completion_status = '3'
+        GROUP BY
+            YEAR(tc.completion_date),MONTHNAME(tc.completion_date)
+        ORDER BY
+            YEAR(tc.completion_date),MONTH(tc.completion_date);
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'olcstatsTaskCompletions.csv');
+    }
+
+    /**
+     * OLCSTATS
+     * olcstatsDueWorkSubmissions.csv
+     */
+
+    public function olcstatsDueWorkSubmissions()
+    {
+        $database = FolderMapper::getInstance()->getDatabase();
+        $statement = $database->prepare("
+        SELECT concat((YEAR(ss.submitted_at)),' ',MONTHNAME(ss.submitted_at)) as 'Month',
+            count(*) as 'Submissions'
+        FROM
+            course_implementation ci
+        JOIN
+            mv_assessment_relation mvar on ci.id = mvar.course_implementation_id and ci.course_specification_id = '34'
+        JOIN
+            submission_box sb on mvar.assessment_id = sb.assessment_id
+        JOIN
+            student_submission ss on sb.id = ss.box_id and ss.submitted_at is NOT NULL
+        JOIN
+            assessment a on sb.assessment_id = a.id and a.deleted_at is NULL
+        GROUP BY
+            YEAR(ss.submitted_at),MONTHNAME(ss.submitted_at)
+        ORDER BY
+            YEAR(ss.submitted_at),MONTH(ss.submitted_at);
+        ");
+        $statement->execute();
+        $help = new Helper();
+        $help->queryToCSV($statement, 'olcstatsDueWorkSubmissions.csv');
+    }
+
+    // ===============================================================================================
+    // ================================= END OLC STATS REPORTS =======================================
+    // ===============================================================================================
 }

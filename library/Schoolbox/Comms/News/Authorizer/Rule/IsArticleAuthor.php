@@ -18,7 +18,6 @@ use UnexpectedValueException;
  */
 class IsArticleAuthor extends ArticleAttribute
 {
-
     /**
      * Checks whether a user is the author of the article in $params
      *
@@ -27,7 +26,7 @@ class IsArticleAuthor extends ArticleAttribute
      * @throws Unauthorized
      * @throws UnexpectedValueException
      */
-    public function authorize(array $params = [], User $user = null): void
+    public function authorize(array $params = [], ?User $user = null): void
     {
         $article = $this->findArticleInParams($params);
 

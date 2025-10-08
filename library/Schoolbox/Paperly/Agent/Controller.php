@@ -32,6 +32,7 @@ class Controller extends Base
         private array $ipWhitelist,
         private string $secret,
         private Handler $handler,
+        private Proxy $proxy,
     ) {
     }
 
@@ -81,9 +82,87 @@ class Controller extends Base
         try {
             $this->response = $this->responseAsJson($this->handler->handle($data));
         } catch (OutOfBoundsException $e) {
-            $this->sendJsonError($e->getMessage(), Response::HTTP_NOT_FOUND);
+            $this->sendJsonError($e->getMessage(), Response::HTTP_BAD_REQUEST);
+        } catch (AlaressDatabaseException | \Exception $e) {
+            //Catching external database exception and return useful message in json
+            $this->sendJsonError($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    /**
+     * @api   POST /paperly/agent/proxy
+     * @since 25.0.0
+     *
+     * @return void
+     */
+    public function postAgentProxyRequest(): void
+    {
+        $this->handlePaperlyProxyRequest($this->request->getParsedBody());
+    }
+
+    /**
+     * Handle paperly SQL queries
+     *
+     * @param array $data
+     * @return void
+     */
+    private function handlePaperlyProxyRequest(array $data): void
+    {
+        // Check IP address
+        if (!IpUtils::checkIp(Session::getIP(), $this->ipWhitelist)) {
+            $this->sendJsonError('Access denied', Response::HTTP_UNAUTHORIZED);
+            return;
+        }
+
+        $sql = $data['sql'] ?? null;
+        $params = $data['params'] ?? null;
+
+        if ($sql === null) {
+            $this->sendJsonError(
+                'Payload malformed. Query missing.',
+                Response::HTTP_BAD_REQUEST
+            );
+            return;
+        }
+
+        // Checking hash to make sure the sql request matches with hash
+        $hash = $data['hash'] ?? null;
+        if (!isset($hash) || !$this->proxy->isValidRequest($hash, $sql, $params, $this->secret)) {
+            $this->sendJsonError('Access denied', Response::HTTP_UNAUTHORIZED);
+            return;
+        }
+
+        if (!is_array($params) && !is_null($params)) {
+            $this->sendJsonError(
+                'Payload malformed. Params must be of type array.',
+                Response::HTTP_BAD_REQUEST
+            );
+            return;
+        }
+
+        try {
+            $response = [];
+            $shouldReturn = $this->proxy->shouldReturnResults($sql);
+            $stmt = $this->proxy->executeQuery($sql, $params);
+
+            if ($shouldReturn) {
+                $response = $this->proxy->retrieveResults($stmt);
+            } else {
+                $response = [
+                    'success' => true
+                ];
+            }
+            $this->response = $this->responseAsJson(
+                $response,
+                true
+            );
         } catch (AlaressDatabaseException $e) {
             //Catching external database exception and return useful message in json
+            $this->sendJsonError($e->getMessage(), Response::HTTP_BAD_REQUEST);
+        } catch (OutOfBoundsException $e) {
+            $this->sendJsonError($e->getMessage(), Response::HTTP_METHOD_NOT_ALLOWED);
+        } catch (\Exception $e) {
             $this->sendJsonError($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

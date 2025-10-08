@@ -15,21 +15,24 @@ use Alaress\Database\Exception;
 use Alaress\Database\Iterator\Db2\Iterator;
 use Alaress\Database\Statement\FunctionCall\Db2\FunctionCall;
 use Alaress\Database\Statement\StoredProcedure\Db2\StoredProcedure;
-use Alaress\Database\Wrapper\Db2\PDO;
 use Alaress\DebugBar\Instance as DebugBar;
 use DebugBar\DataCollector\DataCollectorInterface;
+use PDO;
 
 class Broker extends Base
 {
-    // These return DB2 specific statement objects
+    /**
+     * Name of the driver to use.
+     */
+    private const ODBC_DRIVER = '{IBM DB2 ODBC DRIVER}';
 
     /**
      * @inheritdoc
      */
     public static function isAvailable()
     {
-        // DB2 is loaded as a PHP extension, not a PDO module
-        return extension_loaded('ibm_db2');
+        // DB2 now uses ODBC: can only assume that the driver actually exists.
+        return in_array('ibm', PDO::getAvailableDrivers(), true);
     }
 
     /**
@@ -75,7 +78,15 @@ class Broker extends Base
             $portString = "PORT={$this->connector->getPort()};";
         }
 
-        return "DATABASE={$this->connector->getDatabase()};HOSTNAME={$this->connector->getHostname()};{$portString}PROTOCOL=TCPIP;UID={$this->connector->getUsername()};PWD={$this->connector->getPassword()};";
+        return sprintf(
+            "ibm:DRIVER=%s;DATABASE=%s;HOSTNAME=%s;%sPROTOCOL=TCPIP;UID=%s;PWD=%s;",
+            self::ODBC_DRIVER,
+            $this->connector->getDatabase(),
+            $this->connector->getHostname(),
+            $portString,
+            $this->connector->getUsername(),
+            $this->connector->getPassword(),
+        );
     }
 
     /**
@@ -86,7 +97,7 @@ class Broker extends Base
     public function connect($options = [])
     {
         // Close any existing connection (this seems a bit flaky- why is there no close function?)
-        unset($this->pdo);
+        $this->pdo = null;
 
         if ($options['schema'] ?? null) {
             $this->postConnectQueries = ['SET SCHEMA ' . $options['schema']];

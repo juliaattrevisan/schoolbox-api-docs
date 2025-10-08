@@ -1,9 +1,8 @@
 /**
- * To extend imageBlock and imageInline to allow for additional data attributes
- * and add the toggleFullWidth command to the editor
+ * To add the toggleFullWidth command to the editor
  */
 
-import { Plugin } from "@ckeditor/ckeditor5-core";
+import { Plugin } from "ckeditor5";
 import ToggleFullWidthCommand from "./ToggleFullWidthCommand";
 
 export default class FullWidthEditing extends Plugin {

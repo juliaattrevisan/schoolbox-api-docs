@@ -2,10 +2,9 @@
  * Enable/disable the currently selected nodes
  */
 
-/* eslint-disable import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
-
 import { defineStore } from "pinia";
 import { capitalizeFirstLetter } from "@js/util/stringUtils";
+/* eslint-disable-next-line import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
 import { useSelectedNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/selectedNodes/store/mcSelectedNodesStore";
 
 export const useEnableNodesStore = defineStore("mcEnableNodes", () => {

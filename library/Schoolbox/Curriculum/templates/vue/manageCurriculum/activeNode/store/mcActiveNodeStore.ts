@@ -8,11 +8,11 @@
  * which is used to bulk enable or delete MULTIPLE nodes
  */
 
-/* eslint-disable import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
-
 import { defineStore } from "pinia";
+/* eslint-disable-next-line import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
 import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
 import { UNSET_ID, getEmptyNode, sortNodes } from "@schoolboxCurriculum/js/nodeUtils";
+/* eslint-disable-next-line import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
 import { useViewNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/viewNodes/store/mcViewNodesStore";
 import type { Node, NodeToUpdate } from "@schoolboxCurriculum/types/Node";
 

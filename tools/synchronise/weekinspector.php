@@ -28,7 +28,6 @@ require_once __DIR__ . '/../../conf/core/require.php';
  *     Example: php example.php 2> log.txt
  */
 $app = new class extends CliTool\App {
-
     /**
      * --help
      *
@@ -82,6 +81,8 @@ $app = new class extends CliTool\App {
      */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
@@ -245,6 +246,8 @@ HELP;
                 $path
             ));
         }
+
+        $this->deprecationNotice("SA-19334");
     }
 
 

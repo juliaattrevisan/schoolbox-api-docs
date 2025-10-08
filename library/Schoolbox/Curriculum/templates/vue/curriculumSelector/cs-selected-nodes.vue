@@ -1,18 +1,22 @@
 <script setup>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
 /**
  * To list all the currently selected Curriculum codes
  */
 
 import { useStore } from "./store/curriculumSelectorStore";
+import { useSharedStore } from "./store/csSharedStore";
 import { useSelectedNodesStore } from "./store/csSelectedNodesStore";
 import CsSelectedNode from "./cs-selected-node.vue";
 
 const store = useStore();
+const sharedStore = useSharedStore();
 const selectedNodesStore = useSelectedNodesStore();
 const selectEl = window.Vue.ref(null);
+const inputEl = window.Vue.useTemplateRef("inputEl");
 
 /**
  * to listen for any clears of the selected codes from outside the Vue app
@@ -50,19 +54,27 @@ window.Vue.watch(
             //nextTick to ensure the dom has updated so we can access with the latest changes
             const event = new Event("change");
             selectEl.value.dispatchEvent(event);
+            inputEl.value.dispatchEvent(event);
         });
     },
 );
 </script>
 
 <template>
-    <div v-if="selectedNodesStore.hasNodes" class="selected-nodes-container" data-test-nodes-container>
+    <div v-if="selectedNodesStore.hasNodes" class="selected-nodes-container" data-test="cs-selected-nodes-container">
         <cs-selected-node v-for="node in selectedNodesStore.nodes" :key="node.id" :node="node" data-test-node />
     </div>
-    <div v-else-if="selectedNodesStore.hasNoNodes && store.isReadOnly" class="selected-nodes-container">
+    <div v-else-if="selectedNodesStore.hasNoNodes && sharedStore.isReadOnly" class="selected-nodes-container">
         <aside class="meta no-codes-note">No Curriculum Codes have been selected</aside>
     </div>
-    <input :id="store.formValueName" :name="store.formValueName" type="hidden" tabindex="-1" :value="ids" />
+    <input
+        ref="inputEl"
+        :id="store.formValueName"
+        :name="store.formValueName"
+        type="hidden"
+        tabindex="-1"
+        :value="ids"
+    />
     <select
         ref="selectEl"
         :id="`${store.formValueName}[]`"

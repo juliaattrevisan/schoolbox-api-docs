@@ -9,6 +9,12 @@ beforeEach(() => {
     wrapper = mount(McViewNodeName, {
         global: {
             plugins: [createTestingPinia({ stubActions: false })], //By default, all actions are mocked and therefore not executed. This allows you to unit test your store and components separately.
+            stubs: {
+                // just stub <sbx-icon> to prevent console errors
+                "sbx-icon": {
+                    template: "<i />",
+                },
+            },
         },
         props: {
             node: {

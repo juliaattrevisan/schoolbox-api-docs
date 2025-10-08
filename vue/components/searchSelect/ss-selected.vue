@@ -47,7 +47,7 @@ function onRemoveItem(item: SearchSelectItem): void {
 </script>
 
 <template>
-    <div v-if="props.selected.length > 0" class="selected l-flex-row l-gap-s l-pad-s">
+    <div v-if="props.selected.length > 0" class="selected l-flex-row l-gap-s l-pad-s" data-test="ss-selected">
         <ss-selected-item
             v-for="item in props.selected"
             :key="item.id"

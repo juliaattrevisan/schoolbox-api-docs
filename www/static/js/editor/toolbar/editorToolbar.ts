@@ -3,8 +3,8 @@
  * groups of buttons with a drop down to access provided
  */
 
-import type { ToolbarConfig, ToolbarConfigItem } from "@ckeditor/ckeditor5-core";
-import { EditorType, EditorToolbar } from "@js/editor/types/editorTypes";
+import type { ToolbarConfig, ToolbarConfigItem } from "ckeditor5";
+import { EditorToolbar } from "@js/editor/types/editorTypes";
 import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
 
 /**
@@ -13,7 +13,7 @@ import type { SbxEditorConfig } from "@js/editor/types/editorTypes";
  * @returns - the toolbar display
  */
 function getToolbarAI(): string[] {
-    if (window.sbProps.hasEditorAI) {
+    if (window.sbProps.hasAIFeatures) {
         return ["|", "aiCommands", "aiAssistant"];
     }
     return [];
@@ -30,6 +30,8 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
 
     if (config.toolbar === EditorToolbar.SIMPLE) {
         items = [
+            // if there are templates defined in the config, add the insertTemplate button
+            ...(config.templates && config.templates.length > 0 ? ["insertTemplate", "|"] : []),
             "bold",
             "italic",
             "underline",
@@ -44,14 +46,17 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
             "numberedList",
             "bulletedList",
         ];
-    } else if (config.toolbar === EditorToolbar.COMMENT) {
+    } else if (config.toolbar === EditorToolbar.COMMENT || config.toolbar === EditorToolbar.COMMENT_AI) {
         items = [
+            ...(config.templates && config.templates.length > 0 ? ["insertTemplate", "|"] : []),
             "bold",
             "italic",
             "underline",
             "strikethrough",
             "blockQuote",
             "removeFormat",
+            // If using the COMMENT_AI toolbar, add the AI commands and assistant in the right spot
+            ...(config.toolbar === EditorToolbar.COMMENT_AI ? getToolbarAI() : []),
             "|",
             "link",
             "|",
@@ -64,6 +69,10 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
         ];
     } else {
         items = [
+            "fullscreen",
+            "|",
+            // if there are templates defined in the config, add the insertTemplate button
+            ...(config.templates && config.templates.length > 0 ? ["insertTemplate", "|"] : []),
             "bold",
             "italic",
             {
@@ -91,6 +100,8 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
             ...getToolbarAI(),
             "|",
             "link",
+            "bookmark",
+            "|",
             "resource",
             "mediaEmbed",
             "emoji",
@@ -107,10 +118,17 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
             {
                 label: "Other",
                 icon: "threeVerticalDots",
-                items: ["specialCharacters", "eqneditor5Button", "horizontalLine", "findAndReplace", "sourceEditing"],
+                items: [
+                    "specialCharacters",
+                    "eqneditor5Button",
+                    "horizontalLine",
+                    "findAndReplace",
+                    "sourceEditingEnhanced",
+                ],
             },
         ];
     }
+
     /**
      * remove any individual plugins for specific use cases
      * refer to removeItems at: https://ckeditor.com/docs/ckeditor5/latest/features/toolbar/toolbar.html
@@ -119,13 +137,7 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
     if (config.removeFromToolbar) {
         removeItems = config.removeFromToolbar;
     }
-    /**
-     * Source Editing is currently only available in the classic editor
-     * https://ckeditor.com/docs/ckeditor5/latest/features/source-editing.html#installation
-     */
-    if (config.type !== EditorType.CLASSIC) {
-        removeItems = [...removeItems, "sourceEditing"];
-    }
+
     /**
      * add any individual plugins for specific use cases for example
      * the Blank plugin for Quiz cloze questions
@@ -137,5 +149,6 @@ export function getToolbar(config: SbxEditorConfig): ToolbarConfig {
     return {
         items,
         removeItems,
+        shouldNotGroupWhenFull: true, // the toolbar will stop grouping items and let them wrap to the next line when there is not enough space to display them in a single row.
     };
 }

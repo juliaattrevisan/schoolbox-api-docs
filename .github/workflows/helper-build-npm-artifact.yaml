@@ -1,0 +1,45 @@
+name: Build NPM artifact
+
+on:
+  workflow_call:
+
+jobs:
+  build-npm-artifact:
+    timeout-minutes: 15
+    runs-on: onprem-k3s
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup node+npm
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Load npm ci cache
+        uses: actions/cache@v4
+        id: cache-npm-ci
+        with:
+          path: node_modules
+          key: npm-ci-${{ runner.os }}-${{ hashFiles('**/npm-shrinkwrap.json') }}
+      - run: npm ci
+        if: steps.cache-npm-ci.outputs.cache-hit != 'true'
+
+      # Cache based on any buildable files changing:
+      # that includes JS, TS, Vue, CSS, SCSS.
+      # Not perfect as not all JS and CSS files are compiled, but it will do.
+      - name: Load npm publish cache
+        uses: actions/cache@v4
+        id: cache-npm-publish
+        with:
+          path: www/static/js/bundle
+          key: npm-publish-${{ runner.os }}-${{ hashFiles('package.json', 'npm-shrinkwrap.json', 'babel.config.js', 'tsconfig.json', 'webpack*.js', '**/*.js', '**/*.ts', '**/*.vue', '**/*.css', '**/*.scss', '.eslintignore', '.eslintrc.js') }}
+      - run: npm run publish
+        if: steps.cache-npm-publish.outputs.cache-hit != 'true'
+
+      - name: Upload npm artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: schoolbox-npm
+          path: www/static/js/bundle
+          retention-days: 1

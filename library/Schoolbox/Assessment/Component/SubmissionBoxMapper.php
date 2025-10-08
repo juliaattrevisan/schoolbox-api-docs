@@ -23,8 +23,6 @@ use Schoolbox\Learning\Assessment\DataModel\ExternalMarkbook\Adapter as Markbook
 use Schoolbox\Learning\Assessment\DataModel\Mapper as AssessmentMapper;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Resource\Storage;
-use Schoolbox\Resource\Folder\Mapper as FolderMapper;
-use Schoolbox\User;
 
 /**
  * Class SubmissionBoxMapper
@@ -78,6 +76,7 @@ class SubmissionBoxMapper extends BaseMapper
         $this->uses('enable_files', self::TYPE_BOOLEAN, null, 'enableFiles');
         $this->uses('enable_policy', self::TYPE_BOOLEAN, null, 'enablePolicy');
         $this->uses('max_mark', self::TYPE_DECIMAL);
+        $this->uses('instructor_max_mark', self::TYPE_DECIMAL);
         $this->uses('use_rubric', self::TYPE_BOOLEAN);
         $this->joins('rubric_capability_mark_type_id', SubmissionBox\MarkTypeMapper::class, 'mark_type_id', null, null, 'capabilityMarkType');
         $this->joins('rubric_capability_grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'capabilityGradeGroup');
@@ -90,7 +89,9 @@ class SubmissionBoxMapper extends BaseMapper
 
         $this->joins('owner', Schoolbox\UserMapper::class);
         $this->joins('mark_type', SubmissionBox\MarkTypeMapper::class, 'mark_type_id');
+        $this->joins('instructor_mark_type', SubmissionBox\MarkTypeMapper::class, 'mark_type_id');
         $this->joins('submission_grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'gradeGroup', 'grade_group');
+        $this->joins('submission_instructor_grade_group_id', SubmissionBox\GradeLevel\Group\Mapper::class, 'id', null, null, 'instructorGradeGroup', 'instructor_grade_group');
         $this->joins('assessment_id', AssessmentMapper::class, 'id', null, null, 'assessmentModel', 'assessmentModel');
 
         // Unmapped join onto individual files
@@ -331,9 +332,11 @@ class SubmissionBoxMapper extends BaseMapper
         $query = "
 			SELECT
 				{$this->getColumnString('sb')},
-				{$marktype_mapper->getColumnString('mt')}
+				{$marktype_mapper->getColumnString('mt')},
+				{$marktype_mapper->getColumnString('imt')}
 			FROM {$this->getTable()} sb
 			LEFT JOIN {$this->getJoinSql('mark_type', 'sb', 'mt')}
+            LEFT JOIN {$this->getJoinSql('instructor_mark_type', 'sb', 'imt')}
 			WHERE sb.id=?
 		";
         $statement = $this->database->prepare($query);
@@ -345,6 +348,7 @@ class SubmissionBoxMapper extends BaseMapper
             if (!($submission_box instanceof SubmissionBox)) {
                 $submission_box = $this->hydrate($row, 'sb');
                 $submission_box->setMarkType($marktype_mapper->hydrate($row, 'mt'));
+                $submission_box->setInstructorMarkType($marktype_mapper->hydrate($row, 'imt'));
                 try {
                     $submission_box->setAssessmentModel($this->getJoinMapper('assessmentModel')->findById($row['sb.assessment_id'])); // I despise the necessity of this
                 } catch (Schoolbox\Mapper\Exception\Deleted $e) {
@@ -639,6 +643,83 @@ class SubmissionBoxMapper extends BaseMapper
 
         return true;
     }
+
+
+    /**
+     * Retrieves the number of returns that have been made on each box in a list.
+     *
+     * @param array $boxIds
+     * @param int   $userId
+     *
+     * @return array The submission box ID as the key, the count as the value.
+     */
+    public function findReturnedWorkCountsForSubmissionBoxes(array $boxIds, int $userId): array
+    {
+        // Retrieve count of submission IDs from a list of IDs for a user
+        if (empty($boxIds)) {
+            return [];
+        }
+        $query = "
+			SELECT sr.box_id, COUNT(*) as submission_count
+			FROM submission_return sr
+			WHERE sr.owner = :user_id
+			AND sr.box_id IN {$this->getArrayPlaceholders($boxIds, 'sb')}
+			AND sr.deleted_at IS NULL
+			GROUP BY sr.box_id
+		";
+        $statement         = $this->database->prepare($query);
+        $params            = $this->getArrayParameters($boxIds, 'sb');
+        $params['user_id'] = $userId;
+        $statement->execute($params);
+
+        $return = [];
+        foreach ($statement as $row) {
+            $return[$row['box_id']] = $row['submission_count'];
+        }
+        return $return;
+    }
+
+
+    /**
+     * Retrieves the number of submissions that have been made on each box in a list.
+     *
+     * @param array $boxIds
+     * @param int   $userId
+     * @param bool  $includeUnsubmitted
+     *
+     * @return array The submission box ID as the key, the count as the value.
+     */
+    public function findSubmissionCountsForSubmissionBoxes(
+        array $boxIds,
+        int $userId,
+        bool $includeUnsubmitted = true,
+        bool $includeDeleted = false
+    ): array {
+        // Retrieve count of submission IDs from a list of IDs for a user
+        if (empty($boxIds)) {
+            return array();
+        }
+        $query = "
+            SELECT ss.box_id, COUNT(DISTINCT submitted_at) as submission_count
+            FROM student_submission ss
+            WHERE ss.owner = :user_id
+            AND ss.box_id IN {$this->getArrayPlaceholders($boxIds, 'sb')}
+            " . ($includeUnsubmitted ? '' : "AND ss.submitted_at IS NOT NULL") . "
+            " . ($includeDeleted ? '' : "AND ss.deleted_at IS NULL") . "
+            GROUP BY ss.box_id
+        ";
+        $statement = $this->database->prepare($query);
+        $params = $this->getArrayParameters($boxIds, 'sb');
+        $params['user_id'] = $userId;
+        $statement->execute($params);
+
+        $return = array();
+        foreach ($statement as $row) {
+            $return[$row['box_id']] = $row['submission_count'];
+        }
+        return $return;
+    }
+
 
     /**
      * Any notifications related to assessments must be deferred until all

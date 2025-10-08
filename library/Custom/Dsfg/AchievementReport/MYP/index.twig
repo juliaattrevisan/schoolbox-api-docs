@@ -12,10 +12,9 @@
     <div class="row">
         <div class="small-12 columns">
             <ul id="historical" class="sub-nav">
-                <li data-year id="data-{{ year }}" class="active"><a>{{ year }}</a>
-                </li>
-                {% for year, data in historical | filter(data => (data.subjects.data | length) > 0 ) %}
-                    <li data-year id="data-{{ year }}"><a>{{ year }}</a>
+                {% for yearInner, data in historical | filter(data => (data.subjects.data | length) > 0 ) %}
+                    <li data-year id="data-{{ yearInner }}"{% if yearInner == year %} class="active"{% endif %}>
+                        <a>{{ yearInner }}</a>
                     </li>
                 {% endfor %}
             </ul>

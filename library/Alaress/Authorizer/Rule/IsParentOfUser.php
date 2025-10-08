@@ -70,7 +70,7 @@ class IsParentOfUser implements IAuthorizationRule
     /**
      * {@inheritdoc}
      */
-    public function authorize(array $params = [], User $user = null)
+    public function authorize(array $params = [], ?User $user = null)
     {
         if ($user) {
             // May need to load children into user, as they are not guaranteed

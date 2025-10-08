@@ -423,7 +423,9 @@
     .summative-graph-type::first-letter {
         text-transform: uppercase;
     }
-
+    .hide-on-print {
+        display: none !important;
+    }
     /* Apply measured margins to report. You can adjust those to suit
      * tested printouts to ensure you don't print over edges and stuff
      */
@@ -487,8 +489,12 @@
             display: inline-table;
         }
     }
-
-    {{ customReportStyle ?? '' }}
+    /* We are applying raw filter here so that the double-quotes don't get escaped, specifically for things like the
+     * content properties in the :before or :after element, we are aware that this might make the custom css become
+     * susceptible to malicious attack, but since this should only be accessible to super admins, the risk should
+     * be low
+     */
+    {{ (customReportStyle ?? '') | raw }}
 </style>
 
 <div class="summative-report">
@@ -582,10 +588,14 @@
         {% endfor %}
 
         {# Victorian Curriculum Progression: Summary #}
-        {% include '@adminSummativeReport/VictorianProgression.twig' with {
-            payload: vicProgression.summary,
-            annotate: vicProgression.annotate
-        } only %}
+        {% if reportOptions.summary.active %}
+            {% include '@adminSummativeReport/VictorianProgression.twig' with {
+                identifier: 'curriculumProgression-summary',
+                payload: vicProgression.summary,
+                annotate: vicProgression.annotate,
+                title: vicProgression.summary.title ?? null
+            } only %}
+        {% endif %}
     </div>
     {% endif %}
 
@@ -594,71 +604,75 @@
         {% for folder in folders %}
             {# if there are no filtered assessments for this folder, ignore the folder #}
             {% if (classAssessments[folder.id] ?? [])| length %}
-            {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
-            {% set weightedMean = studentGrade.weightedMean %}
-            <div class="folder-title class-page summative-content">
-                <div class="left">
-                    {% block classFolderTitle %}
-                        {% if classOptions.classCode is not defined or classOptions.classCode %}
-                            <h4>{{ folder.title }}</h4>
-                        {% else %}
-                            <h4>{{ folder.name }}</h4>
-                        {% endif %}
-                    {% endblock %}
-                    {% for teacher in folder.teachers %}
-                        <div class="card compact">
-                            <img src="/portrait.php?id={{ teacher.id }}&size=square32" />
-                            <h5>{{ teacher.fullname }}</h5>
+                {% set studentGrade = markbooks[folder.id].studentStatistics[student.id] %}
+                {% set weightedMean = studentGrade.weightedMean %}
+                <div class="folder-title class-page summative-content">
+                    <div class="left">
+                        {% block classFolderTitle %}
+                            {% if classOptions.classCode is not defined or classOptions.classCode %}
+                                <h4>{{ folder.title }}</h4>
+                            {% else %}
+                                <h4>{{ folder.name }}</h4>
+                            {% endif %}
+                        {% endblock %}
+                        {% for teacher in folder.teachers %}
+                            <div class="card compact">
+                                <img src="/portrait.php?id={{ teacher.id }}&size=square32" />
+                                <h5>{{ teacher.fullname }}</h5>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if showClassOverallGrade and weightedMean %}
+                        <div>
+                            <p class="grade">{{ weightedMean ?? '' }}</p>
                         </div>
-                    {% endfor %}
+                    {% endif %}
                 </div>
-                {% if showClassOverallGrade and weightedMean %}
-                    <div>
-                        <p class="grade">{{ weightedMean ?? '' }}</p>
+
+                {% if subjectOverviews[folder.id] is defined and subjectOverviews[folder.id] is not empty %}
+                    <div data-subject-overview-homepage="{{ folder.id }}">
+                        {% for course in subjectOverviews[folder.id] %}
+                            <div data-subject-overview-course="{{ course.title }}">
+                            {% if course.textboxes is not empty %}
+                                {% if subjectOverviews[folder.id] |length > 1 %}
+                                    <h2 class="subject-overview-course">{{ course.title }}</h2>
+                                {% endif %}
+                                {% for textbox in course.textboxes %}
+                                    <div class="content">
+                                        <article class="course-overview-textbox" id="textBoxBody{{ textbox.textboxID }}">{{ textbox.textboxBody | purify }}</article>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                            </div>
+                        {% endfor %}
                     </div>
                 {% endif %}
-            </div>
-            {% if subjectOverviews[folder.id] is defined and subjectOverviews[folder.id] is not empty %}
-                <div data-subject-overview-homepage="{{ folder.id }}">
-                    {% for course in subjectOverviews[folder.id] %}
-                        <div data-subject-overview-course="{{ course.title }}">
-                        {% if course.textboxes is not empty %}
-                            {% if subjectOverviews[folder.id] |length > 1 %}
-                                <h2 class="subject-overview-course">{{ course.title }}</h2>
-                            {% endif %}
-                            {% for textbox in course.textboxes %}
-                                <div class="content">
-                                    <article class="course-overview-textbox" id="textBoxBody{{ textbox.textboxID }}">{{ textbox.textboxBody | purify }}</article>
-                                </div>
-                            {% endfor %}
-                        {% endif %}
-                        </div>
-                    {% endfor %}
-                </div>
-            {% endif %}
                 {% if allGraphs['class'][folder.id] is defined %}
                     {% include '@learningGrades/fragments/summativeGraph.twig' with { graph: allGraphs['class'][folder.id].graph, graphId: 'class_' ~ folder.id, folderType: allGraphs['class'][folder.id].type, location: 'class' } only %}
                 {% endif %}
-            <div class="summative-content">
-                {% for assessment in classAssessments[folder.id] %}
-                    {% include '@adminSummativeReport/assessmentReport.twig' with
-                        {
-                            student: student,
-                            assessment: assessment,
-                            feedback: classAssessmentFeedbacks[assessment.id] ?? null,
-                            page: 'subject',
-                            options: classOptions
-                        } only %}
-                {% endfor %}
-            </div>
-            {% endif %}
+                <div class="summative-content">
+                    {% for assessment in classAssessments[folder.id] %}
+                        {% include '@adminSummativeReport/assessmentReport.twig' with
+                            {
+                                student: student,
+                                assessment: assessment,
+                                feedback: classAssessmentFeedbacks[assessment.id] ?? null,
+                                page: 'subject',
+                                options: classOptions
+                            } only %}
+                    {% endfor %}
+                </div>
 
-            {# Victorian Curriculum Progression: Class #}
-            {% if vicProgression.class[folder.id] ?? false %}
-                {% include '@adminSummativeReport/VictorianProgression.twig' with {
-                    payload: vicProgression.class[folder.id],
-                    annotate: vicProgression.annotate
-                } only %}
+                {# Victorian Curriculum Progression: Class #}
+
+                {% if reportOptions.class.active and (vicProgression.class[folder.id] ?? false) %}
+                    {% include '@adminSummativeReport/VictorianProgression.twig' with {
+                        identifier: 'curriculumProgression-class-' ~ folder.id,
+                        payload: vicProgression.class[folder.id],
+                        annotate: vicProgression.annotate,
+                        title: vicProgression.class.title ?? null
+                    } only %}
+                {% endif %}
             {% endif %}
         {% endfor %}
     {% endif %}

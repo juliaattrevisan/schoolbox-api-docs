@@ -56,9 +56,12 @@ class External_Synergetic_Srcl_User extends External_Synergetic_User
                 vStudents.StudentSpecialNeedsFlag,
                 vStudents.StudentStudiesCode,
                 vStudents.StudentGovernmentStudentNumber,
-                AlertMessage,
+                CASE WHEN AlertCategoryCode != ''
+                    THEN CONCAT(AlertCategoryCode,': ',AlertMessage)
+                    ELSE AlertMessage
+                END AS AlertMessage,
                 vStudents.LegalCourtOrderType AS CourtOrderType,
-                vStudents.StudentBoarder,
+                luBoarder.Description AS StudentBoarder,
                 vStudents.StudentsComment as Comment,
                 '' AS StudentEnrolmentDate,
                 '' AS StudentLeavingDate,
@@ -71,7 +74,7 @@ class External_Synergetic_Srcl_User extends External_Synergetic_User
                 (
                     SELECT    COUNT(*)
                     FROM      dbo.IndividualPlans IEP
-                    WHERE     IEP.ID = vStudentsAll.ID AND
+                    WHERE     IEP.ID = vStudents.ID AND
                     StartDate <= CURRENT_TIMESTAMP AND
                     (EndDate >= CURRENT_TIMESTAMP OR EndDate IS NULL)
                 ) AS countIndividualEducationPlans
@@ -101,6 +104,7 @@ class External_Synergetic_Srcl_User extends External_Synergetic_User
                             Semester.SystemCurrentFlag = 1
             LEFT JOIN   uStudentProgressiveAbsenceCount ON uStudentProgressiveAbsenceCount.ID = vStudents.StudentID
                             AND uStudentProgressiveAbsenceCount.FileYear = vStudents.FileYear
+            LEFT JOIN luBoarder ON luBoarder.Code = vStudents.StudentBoarder
             WHERE       vStudents.StudentID = :externalId
         ";
 
@@ -122,7 +126,7 @@ class External_Synergetic_Srcl_User extends External_Synergetic_User
 
                 /* Forcibly re-evaluate boarderlyness using this connector's specific interpretation
                  */
-                $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
+                // $student['StudentBoarder'] = $this->determineBoarderType((string)$student['StudentBoarder']);
 
                 /* Initialise stacks
                  */

@@ -240,7 +240,7 @@ abstract class AbstractNotificationTestCase extends AbstractTestCase
      */
     protected function weaponsToMaximum()
     {
-        `mysql schoolbox < /usr/share/schoolbox/sql/notifications-all-instant.sql 2>&1`;
+        shell_exec("mariadb schoolbox < /usr/share/schoolbox/sql/notifications-all-instant.sql 2>&1");
         $this->log->notice('Weapons to maximum');
     }
 
@@ -251,7 +251,7 @@ abstract class AbstractNotificationTestCase extends AbstractTestCase
     protected function clearRedis()
     {
         $this->log->notice(
-            trim(`redis-cli keys "msg:vagrantx:*" | xargs redis-cli del 2>&1`) . ' redis queues cleared'
+            trim(shell_exec("redis-cli keys \"msg:vagrantx:*\" | xargs redis-cli del 2>&1")) . ' redis queues cleared'
         );
     }
 
@@ -264,7 +264,7 @@ abstract class AbstractNotificationTestCase extends AbstractTestCase
         $queuesToClear = [ INSTANCE_ID . '.sb.sched', 'sb.schedule' ];
 
         foreach ($queuesToClear as $q) {
-            `rabbitmqadmin get queue=$q count=10000 requeue=false`;
+            shell_exec("rabbitmqadmin get queue=$q count=10000 requeue=false");
         }
 
         $this->log->notice('Rabbit schedule queue cleared');

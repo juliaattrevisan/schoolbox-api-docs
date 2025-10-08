@@ -21,6 +21,17 @@
     %}
 
     {# ----------------------------------------------------------- #}
+    {# Curriculum #}
+    {# ----------------------------------------------------------- #}
+    {% include '@learningAssessment/fragments/curriculumCodes.twig' with {
+        entityType: '3rd party assessment',
+        courseManagedReadonly: courseManaged.isReadonly,
+        excludeLegend: true,
+        hasTabs: true,
+        parentFolderId: parentFolderId ?? null,
+    } %}
+
+    {# ----------------------------------------------------------- #}
     {# Description #}
     {# ----------------------------------------------------------- #}
     <label for="assessment-description">
@@ -304,14 +315,6 @@
 {% endif %}
 
 {# ----------------------------------------------------------- #}
-{# Curriculum #}
-{# ----------------------------------------------------------- #}
-{% include '@learningAssessment/fragments/curriculumCodes.twig' with {
-    entityType: '3rd party assessment',
-    courseManagedReadonly: courseManaged.isReadonly
-} %}
-
-{# ----------------------------------------------------------- #}
 {# Submit #}
 {# ----------------------------------------------------------- #}
 {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}
@@ -328,6 +331,9 @@
                 maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                 targetElements: ['textarea[name="description"]'],
                 fileBrowserCategoryId: {{ context.baseContext.folder.id ?? 0 }},
+                {% if editorTemplates is defined %}
+                    templates: {{ editorTemplates|json_encode|raw }},
+                {% endif %}
             }
         }));
     });

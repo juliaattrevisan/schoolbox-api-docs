@@ -14,6 +14,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\Connector\ClassCode;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Factory;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Users;
@@ -66,22 +67,24 @@ class Classes implements IStrategy
     /**
      * Constructor.
      *
-     * @param LoggerInterface                            $log
-     * @param bool                                       $perform
-     * @param IApi                                       $api
-     * @param array                                      $watchlist
-     * @param Mapper                                     $eventMapper
+     * @param LoggerInterface $log
+     * @param bool $perform
+     * @param IApi $api
+     * @param Watchlist $watcher
+     * @param array $watchlist
+     * @param Mapper $eventMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
-     * @param ClassEntryMapper                           $classEntryMapper
-     * @param ClassInvolvementMapper                     $classInvolvementMapper
-     * @param \DateTimeZone                              $timezone
-     * @param \Alaress_Date_Format                       $fromDate
-     * @param \Alaress_Date_Format                       $toDate
+     * @param ClassEntryMapper $classEntryMapper
+     * @param ClassInvolvementMapper $classInvolvementMapper
+     * @param \DateTimeZone $timezone
+     * @param \Alaress_Date_Format $fromDate
+     * @param \Alaress_Date_Format $toDate
      */
     public function __construct(
         private LoggerInterface $log,
         private bool $perform,
         private IApi $api,
+        private Watchlist $watcher,
         private array $watchlist,
         private \Schoolbox\External\Event\Mapper $eventMapper,
         private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
@@ -131,7 +134,7 @@ class Classes implements IStrategy
         foreach ($userLookup as $externalId => $user) {
             /* Only import for specific users
              */
-            if (!(new Watchlist())->isOnWatchlist((string)$externalId, $this->watchlist)) {
+            if (!$this->watcher->isOnWatchlist((string)$externalId, $this->watchlist)) {
                 continue;
             }
 
@@ -153,10 +156,10 @@ class Classes implements IStrategy
                  * appear again in the classes index. You can use the numeric
                  * class id instead if that helps
                  */
-//                if (!(new Watchlist())->isOnWatchlist((string)$enrolment['internal_class_id']['id'], $this->watchlist)) {
+//                if (!$this->watcher->isOnWatchlist((string)$enrolment['internal_class_id']['id'], $this->watchlist)) {
 //                    continue;
 //                }
-//                if (!(new Watchlist())->isOnWatchlist((string)$enrolment['internal_class_id']['class_id'], $this->watchlist)) {
+//                if (!$this->watcher->isOnWatchlist((string)$enrolment['internal_class_id']['class_id'], $this->watchlist)) {
 //                    continue;
 //                }
 
@@ -218,7 +221,7 @@ class Classes implements IStrategy
     ): Model {
         /* Fill in these vars as usual
          */
-        $classCode = trim((string)$class['class_id']);
+        $classCode = (new ClassCode($this->log))->generate(trim((string)$class['class_id']));
         $day = trim((string)$classInstance['day']['name']);
         $detail = null;
 
@@ -258,17 +261,42 @@ class Classes implements IStrategy
             $classInstance['end']
         ));
 
+        /* There is an omega bug in Veracross where they send us UTC timestamps
+         * but they aren't actually UTC values lol...for example, they send this:
+         *
+            [start] => 2025-09-02T14:30:00Z
+            [end] => 2025-09-02T15:25:00Z
+
+         * ...but that means it should display at 2:30pm-3:25pm in the timetable.
+         * We can glitch around this by simply str_replace T and Z out (?!!!?)
+         * until they figure out how to repair their api.
+         */
+//        $startAt = (new \Alaress_Date_Format(
+//            $classInstance['start'],
+//            \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
+//            new \DateTimeZone('UTC')
+//        ))->setTimezone($this->timezone);
+//
+//        $finishAt = (new \Alaress_Date_Format(
+//            $classInstance['end'],
+//            \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
+//            new \DateTimeZone('UTC')
+//        ))->setTimezone($this->timezone);
+
+        /* Weird hacky version for now. Revert when veracross repairs their data.
+         */
+        $tempStart = trim(str_replace(['T', 'Z'], ' ', $classInstance['start']));
+        $tempEnd = trim(str_replace(['T', 'Z'], ' ', $classInstance['end']));
+
         $startAt = (new \Alaress_Date_Format(
-            $classInstance['start'],
-            \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
-            new \DateTimeZone('UTC')
-        ))->setTimezone($this->timezone);
+            $tempStart,
+            \Alaress_Date_Format::DATABASE_DATE_FORMAT,
+        ));
 
         $finishAt = (new \Alaress_Date_Format(
-            $classInstance['end'],
-            \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
-            new \DateTimeZone('UTC')
-        ))->setTimezone($this->timezone);
+            $tempEnd,
+            \Alaress_Date_Format::DATABASE_DATE_FORMAT,
+        ));
 
         /* Try to recycle based on guid
          */
@@ -309,6 +337,7 @@ class Classes implements IStrategy
             ->setStartAt($startAt)
             ->setFinishAt($finishAt)
             ->setType($type)
+            ->setMetadata((new Metadata\Builder())->build($this->api->getCredentials(), $class))
             ->setClassification(Model::CLASSIFICATION_TIMETABLE)
             ->setGuid($guid)
             ->setSource(Factory::SOURCE_NAME);

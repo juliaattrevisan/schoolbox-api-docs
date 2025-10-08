@@ -4,7 +4,7 @@
  */
 
 import { toRef, useTemplateRef } from "vue";
-import { onClickOutside, useFocusWithin, useMousePressed } from "@vueuse/core";
+import { vOnClickOutside } from "@vueuse/components";
 import { useSelected } from "@schoolboxVue/composables/selected/useSelected";
 import { useQuerySearch } from "@schoolboxVue/composables/search/useQuerySearch";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
@@ -17,7 +17,7 @@ interface Props {
     label: string; // the label text
     labelId: string; // the label id
     endpoint: string; // the search api endpoint, expects an endpoint without a `query` parameter, which will be added via useQuerySearch
-    queryKey?: string; // the key to use for seaech
+    queryKey?: string; // the key to use for search
     manageSearchResponse?: boolean; // whether to manage the response internally, or dispatch an emit to manage it externally
     isRequired?: boolean; // whether the input requires a value
     defaultResults?: SearchSelectItem[]; // show selection options when the search input is empty
@@ -32,6 +32,7 @@ interface Props {
     hasButton?: boolean; // whether to show a button next to the input
     buttonIcon?: string; // the icon to display on the button
     buttonTitle?: string; // the title of the button
+    showSelected?: boolean; // whether to show the selected items
 }
 const props = withDefaults(defineProps<Props>(), {
     defaultResults: undefined,
@@ -41,6 +42,7 @@ const props = withDefaults(defineProps<Props>(), {
     buttonIcon: "",
     buttonTitle: "Browse",
     queryKey: "query",
+    showSelected: true,
 });
 
 const emit = defineEmits<{
@@ -125,29 +127,9 @@ function closeResults(): void {
 /**
  * To close the search results when clicking outside the search select
  */
-window.Vue.onMounted(async () => {
-    await window.Vue.nextTick();
-    onClickOutside(searchSelectEl, () => {
-        closeResults();
-    });
-});
-
-/**
- * To track the last mouse/touch press on the search select
- * This is used with useFocusWithin to determine if the search results should be closed
- */
-const { pressed } = useMousePressed({ target: searchSelectEl });
-
-/**
- * To close the search results when the search select is not focused
- */
-const { focused } = useFocusWithin(searchSelectEl);
-window.Vue.watch(focused, ($focused) => {
-    // also need to ensure that focus was not lost due to a mouse/touch press
-    if (!$focused && !pressed.value) {
-        closeResults();
-    }
-});
+function onClickOutside(): void {
+    closeResults();
+}
 
 // #endregion
 
@@ -207,11 +189,12 @@ function onButtonSelected(): void {
 </script>
 
 <template>
-    <div ref="searchSelectEl">
+    <div ref="searchSelectEl" v-on-click-outside="onClickOutside" :data-test="`search-select-${props.labelId}`">
         <label :for="props.labelId" :class="`${props.isRequired ? 'required' : ''}`">{{ props.label }}</label>
         <slot name="meta"></slot>
         <label v-if="props.hasError" class="error" :for="props.labelId">{{ errorMessage }}</label>
         <ss-selected
+            v-if="props.showSelected"
             :selected="selected"
             :form-value-name="props.formValueName"
             :is-single-select="props.isSingleSelect"
@@ -233,6 +216,7 @@ function onButtonSelected(): void {
                 v-if="props.hasButton"
                 type="button"
                 :class="`button ${props.buttonIcon}`"
+                :data-test="`search-select-button-${props.labelId}`"
                 @click.prevent="onButtonSelected"
             >
                 {{ props.buttonTitle }}

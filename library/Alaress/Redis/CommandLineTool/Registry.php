@@ -10,101 +10,126 @@ declare(strict_types=1);
 namespace Alaress\Redis\CommandLineTool;
 
 use Alaress\Redis;
+use External\Isams\Register\CacheHelper as IsamsCacheHelper;
 use Schoolbox\Oidc\CacheHelper;
 
 class Registry
 {
+    /**
+     * Set key for old cache
+     *
+     * @deprecated This will eventually be removed
+     */
+    private const SET_KEY = '__set';
+
+    /**
+     * Template var for instance ID: this will match any instance ID in a Redis
+     * key.
+     */
+    public const INSTANCE_ID_MATCH = '(?P<instanceId>\\w+)';
+
     /**
      * Recognised key patterns in Redis
      */
     public const KEY_PATTERNS = [
         // Cache-only patterns go here
         Redis::INSTANCE_CACHE   => [
-            // Old and new scrub
-            '^scrub.html:',
-            '^scrub.htmlAbsoluteUri:',
-            '^fc:' . INSTANCE_ID . ':scrub.html:',
-            '^fc:' . INSTANCE_ID . ':scrub.htmlAbsoluteUri:',
+            // Ccrub
+            '^fc:' . self::INSTANCE_ID_MATCH . ':scrub.html:',
+            '^fc:' . self::INSTANCE_ID_MATCH . ':scrub.htmlAbsoluteUri:',
 
-            // Old and new Verso API
-            '^verso_api',
-            '^fc:' . INSTANCE_ID . ':verso_api:',
+            // Verso API
+            '^fc:' . self::INSTANCE_ID_MATCH . ':verso_api:',
 
-            // Old and new external
-            "^External_.+",
-            '^fc:' . INSTANCE_ID . ':External_',
+            // External
+            '^fc:' . self::INSTANCE_ID_MATCH . ':External_',
 
-            // vCal cache: not partitioned by instance ID
-            // (it may need to be one day)
-            "^vcal.[0-9a-f]{64}",
+            // vCal cache
+            "^vcal:" . self::INSTANCE_ID_MATCH . ":[0-9a-f]{64}",
 
             // Locks
-            '^lock:' . INSTANCE_ID . ':',
+            '^lock:' . self::INSTANCE_ID_MATCH . ':',
 
             // Atlas API?
-            '^atlasApi:' . INSTANCE_ID . '.',
+            '^atlasApi:' . self::INSTANCE_ID_MATCH . '.',
 
             // Aura route and module caches
-            'routeCache:' . INSTANCE_ID,
-            'moduleCache:' . INSTANCE_ID,
+            'routeCache:' . self::INSTANCE_ID_MATCH,
+            'moduleCache:' . self::INSTANCE_ID_MATCH,
 
             // OIDC client cache, used for caching:
             // * OpenID configuration and JWKS responses from the configured
             //   oAuth/OIDC provider
-            CacheHelper::BASE_CLIENT_KEY . ':' . INSTANCE_ID . ':isams_registers',
-            CacheHelper::BASE_CLIENT_KEY . ':' . INSTANCE_ID . ':' . Redis\Cache\ItemPool::SET_KEY,
-            CacheHelper::BASE_CLIENT_KEY . ':' . INSTANCE_ID . ':',
+            CacheHelper::BASE_CLIENT_KEY . '\\.' . self::INSTANCE_ID_MATCH . ':' . IsamsCacheHelper::REGISTERS_CACHE_KEY,
+            CacheHelper::BASE_CLIENT_KEY . '\\.' . self::INSTANCE_ID_MATCH . ':',
+            // Old keys: will eventually be removed
+            CacheHelper::BASE_CLIENT_KEY . ':' . self::INSTANCE_ID_MATCH . ':isams_registers',
+            CacheHelper::BASE_CLIENT_KEY . ':' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
+            CacheHelper::BASE_CLIENT_KEY . ':' . self::INSTANCE_ID_MATCH . ':',
 
             // ClickView (Homepage Component) cache
-            'component.homepage.clickview:' . INSTANCE_ID . ':',
+            'component\\.homepage\\.clickview\\.' . self::INSTANCE_ID_MATCH . ':',
+            // Old key
+            'component.homepage.clickview:' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
+            'component.homepage.clickview:' . self::INSTANCE_ID_MATCH . ':',
 
             // Paperly cache
-            'paperly' . ':' . INSTANCE_ID . ':paperly_dashboard_user',
-            'paperly' . ':' . INSTANCE_ID . ':' . Redis\Cache\ItemPool::SET_KEY,
+            'paperly\\.' . self::INSTANCE_ID_MATCH . ':paperly_dashboard_user',
+            // Old key
+            'paperly' . ':' . self::INSTANCE_ID_MATCH . ':paperly_dashboard_user',
+            'paperly' . ':' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
 
             // Storage cache
-            '^fc:' . INSTANCE_ID . ':system_usage_',
+            '^fc:' . self::INSTANCE_ID_MATCH . ':system_usage_',
+
+            // HTTP client cache
+            'httpClient\\.' . self::INSTANCE_ID_MATCH . ':',
+            // Old key
+            'httpClient:' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
+            'httpClient:' . self::INSTANCE_ID_MATCH . ':',
         ],
         // Storage-only patterns go here
         Redis::INSTANCE_STORAGE => [
             // Sessions
-            '^PHPREDIS_SESSION:',
+            '^PHPREDIS_SESSION:' . self::INSTANCE_ID_MATCH . ':',
 
-            // Old and new remember me
-            "^[0-9a-f]{40}$",
-            "^remember:" . INSTANCE_ID . ":[0-9a-f]{40}$",
+            // Remember me
+            "^remember:" . self::INSTANCE_ID_MATCH . ":[0-9a-f]{40}$",
 
             // Message instance, detailing the content of a message
             // (an `\Alaress\Async\Notification\Instance\Instance` instance)
-            '^msg:' . INSTANCE_ID . ':m:.+',
+            '^msg:' . self::INSTANCE_ID_MATCH . ':m:.+',
 
             // Message trigger, detailing when, how and why of a message
             // (a `\Schoolbox\Realtime\Schedule\Trigger\TriggerInterface`
             //  instance)
-            '^msg:' . INSTANCE_ID . ':s:.+',
+            '^msg:' . self::INSTANCE_ID_MATCH . ':s:.+',
 
             // Set of message keys relating to a particular object
-            '^msg:' . INSTANCE_ID . ':q:\D.+',
+            '^msg:' . self::INSTANCE_ID_MATCH . ':q:\D.+',
 
             // Set of message keys relating to a particular user
-            '^msg:' . INSTANCE_ID . ':q:\d+:unread',
-            '^msg:' . INSTANCE_ID . ':q:\d+:listed',
-            '^msg:' . INSTANCE_ID . ':q:\d+:digest',
-            '^msg:' . INSTANCE_ID . ':q:\d+:mobile',
+            '^msg:' . self::INSTANCE_ID_MATCH . ':q:\d+:unread',
+            '^msg:' . self::INSTANCE_ID_MATCH . ':q:\d+:listed',
+            '^msg:' . self::INSTANCE_ID_MATCH . ':q:\d+:digest',
+            '^msg:' . self::INSTANCE_ID_MATCH . ':q:\d+:mobile',
             // Not sure if the below are used
-            //            '^msg:' . INSTANCE_ID . ':q:\d+:push',
-            //            '^msg:' . INSTANCE_ID . ':q:\d+:alert',
+            //            '^msg:' . self::INSTANCE_ID_MATCH . ':q:\d+:push',
+            //            '^msg:' . self::INSTANCE_ID_MATCH . ':q:\d+:alert',
 
             // Message route cache
-            "^m:" . INSTANCE_ID . ":routes",
+            "^m:" . self::INSTANCE_ID_MATCH . ":routes",
 
             // Scheduled triggers?
             // (Don't know if this is even used, or where it should be if it is)
-            "^schedule:" . INSTANCE_ID . ":index",
-            "^schedule:" . INSTANCE_ID . ":[0-9a-f]{40}",
+            "^schedule:" . self::INSTANCE_ID_MATCH . ":index",
+            "^schedule:" . self::INSTANCE_ID_MATCH . ":[0-9a-f]{40}",
 
             // Access tokens for LTI assessments
-            '^accessToken:' . INSTANCE_ID . ':.+',
+            '^accessToken\\.' . self::INSTANCE_ID_MATCH . ':.+',
+            // Old key
+            '^accessToken:' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
+            '^accessToken:' . self::INSTANCE_ID_MATCH . ':.+',
 
             // Etherpad patterns
             '^pad:g\.',
@@ -120,22 +145,25 @@ class Registry
             '^group:g\.',
             '^session:s\.',
             "^groups$",
+            '^expressSessionSecrets:',
 
             // OIDC server cache, used for caching:
             // * auth codes
             // * access tokens
             // * nonces
             // * refresh tokens
-            CacheHelper::BASE_SERVER_KEY . ':' . INSTANCE_ID . ':' . Redis\Cache\ItemPool::SET_KEY,
-            CacheHelper::BASE_SERVER_KEY . ':' . INSTANCE_ID . ':',
+            CacheHelper::BASE_SERVER_KEY . '\\.' . self::INSTANCE_ID_MATCH . ':',
+            // Old keys
+            CacheHelper::BASE_SERVER_KEY . ':' . self::INSTANCE_ID_MATCH . ':' . self::SET_KEY,
+            CacheHelper::BASE_SERVER_KEY . ':' . self::INSTANCE_ID_MATCH . ':',
         ],
         // Queue patterns go here
         // (Note that queue is the same instance as cache, so it's not an issue
         //  if queue patterns are found in cache and v.v.)
         //        Redis::INSTANCE_SIGNAL_QUEUE => [
         //            // Signal queues
-        //            'scheduled.' . INSTANCE_ID . '.*',
-        //            'routed.' . INSTANCE_ID . '.*',
+        //            'scheduled.' . self::INSTANCE_ID_MATCH . '.*',
+        //            'routed.' . self::INSTANCE_ID_MATCH . '.*',
         //        ],
     ];
 }

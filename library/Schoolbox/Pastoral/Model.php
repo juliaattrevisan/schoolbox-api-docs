@@ -77,8 +77,8 @@ class Model implements ISoftDeletable, IModel
 
     private User $modifiedBy;
 
-    /** @var GenericCollection<Access\Model>|null */
-    private ?GenericCollection $access;
+    /** @var GenericCollection<Access\Model> */
+    private GenericCollection $access;
 
     /** @var GenericCollection<Comment\Model> */
     private GenericCollection $comments;
@@ -99,6 +99,7 @@ class Model implements ISoftDeletable, IModel
     private GenericCollection $revisions;
 
     private ?Alaress_Date_Format $occurredOn = null;
+    private ?Alaress_Date_Format $expiresAt = null;
 
     /**
      * Model constructor
@@ -363,11 +364,11 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @param null|PastoralSubType $subtype
+     * @param PastoralSubType|null $subtype
      *
      * @return self
      */
-    public function setSubType(PastoralSubType $subtype = null): self
+    public function setSubType(?PastoralSubType $subtype = null): self
     {
         $this->subtype = $subtype;
 
@@ -383,11 +384,11 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @param null|Model $parent
+     * @param Model|null $parent
      *
      * @return self
      */
-    public function setParent(Model $parent = null): self
+    public function setParent(?Model $parent = null): self
     {
         $this->parent = $parent;
 
@@ -403,11 +404,11 @@ class Model implements ISoftDeletable, IModel
     }
 
     /**
-     * @param null|PastoralSeverity $severity
+     * @param PastoralSeverity|null $severity
      *
      * @return self
      */
-    public function setSeverity(PastoralSeverity $severity = null): self
+    public function setSeverity(?PastoralSeverity $severity = null): self
     {
         $this->severity = $severity;
 
@@ -564,6 +565,34 @@ class Model implements ISoftDeletable, IModel
     {
         $this->occurredOn = $occurredOn;
         return $this;
+    }
+
+    /**
+     * @return Alaress_Date_Format|null
+     */
+    public function getExpiresAt(): ?Alaress_Date_Format
+    {
+        return $this->expiresAt;
+    }
+
+    /**
+     * @param Alaress_Date_Format|null $expiresAt
+     * @return static
+     */
+    public function setExpiresAt(?Alaress_Date_Format $expiresAt): self
+    {
+        $this->expiresAt = $expiresAt;
+        return $this;
+    }
+
+    /**
+     * Return if the record is archived
+     *
+     * @return bool
+     */
+    public function isArchived(): bool
+    {
+        return $this->getExpiresAt() !== null && $this->getExpiresAt()->endOfDay()->isPast();
     }
 
     /**

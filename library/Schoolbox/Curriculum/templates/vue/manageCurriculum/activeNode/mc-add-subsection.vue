@@ -3,7 +3,6 @@
  * to show further info in a modal on a code that's been selected
  */
 
-import * as toast from "@schoolboxVue/components/toast/sbxToastEvent";
 import { getButtonTextDisabledDueToStorageLimitSuffix } from "@js/editor/settings/wordCountSettings";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
 import { useAddSubsectionStore } from "./store/mcAddSubsectionStore";
@@ -88,7 +87,7 @@ async function onAddSubsectionSelected(): Promise<void> {
  */
 addSubsectionStore.$onAction(({ name, after, onError }) => {
     if (name === "add") {
-        toast.activate("Adding...");
+        const toast = window.sbProps.toastActivate("Adding...");
 
         after((result) => {
             toast.timeout({ text: result.message, isSuccess: true });

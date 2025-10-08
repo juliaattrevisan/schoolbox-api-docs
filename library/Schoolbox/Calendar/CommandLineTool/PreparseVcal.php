@@ -34,7 +34,10 @@ class PreparseVcal extends CliTool\App
      */
     public function run(): void
     {
-        $this->cache = new VcalCache($this->getDi()->get('redis.cache'));
+        $this->cache = new VcalCache(
+            $this->getDi()->get('redis.cache'),
+            $this->getDi()->get('httpClient.cache'),
+        );
 
         // Find every active vCal config
         /** @var iterable&Calendar_Api_Config_Record[] $configs */

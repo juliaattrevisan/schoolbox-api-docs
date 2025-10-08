@@ -2,6 +2,7 @@
     <div id="paperly-dashboard-component-container">
         <paperly-dashboard-component
             get-paperly-view-endpoint="{{ routeLookup('paperly.getPaperlyLinks') }}"
+            :open-items-in-new-tab="{{ config.paperly_open_in_new_tab ? 'true' : 'false' }}"
         />
     </div>
 </div>

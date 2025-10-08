@@ -31,9 +31,19 @@ trait DueWorkTrait
     protected $markType;
 
     /**
+     *@var int
+     */
+    protected $instructorMarkType;
+
+    /**
      * @var int
      */
     protected $gradingScheme;
+
+    /**
+     * @var int
+     */
+    protected $instructorGradingScheme;
 
     /**
      * @var bool
@@ -78,6 +88,13 @@ trait DueWorkTrait
      * @var float
      */
     private $maxMark;
+
+    /**
+     * Only relevant if this DueWork's MarkType is 'TotalMark'
+     *
+     * @var float
+     */
+    protected $instructorMaxMark;
 
     /**
      * @var bool
@@ -152,6 +169,24 @@ trait DueWorkTrait
     }
 
     /**
+     * @return int
+     */
+    protected function getInstructorMarkType()
+    {
+        return $this->instructorMarkType;
+    }
+
+    /**
+     * @param int $instructorMarkType
+     * @return $this
+     */
+    protected function setInstructorMarkType($instructorMarkType)
+    {
+        $this->instructorMarkType = $instructorMarkType;
+        return $this;
+    }
+
+    /**
      * @return int|null
      */
     protected function getGradingScheme(): ?int
@@ -166,6 +201,24 @@ trait DueWorkTrait
     protected function setGradingScheme(?int $gradingScheme): static
     {
         $this->gradingScheme = $gradingScheme;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    protected function getInstructorGradingScheme(): ?int
+    {
+        return $this->instructorGradingScheme;
+    }
+
+    /**
+     * @param int|null $instructorGradingScheme
+     * @return static
+     */
+    protected function setInstructorGradingScheme(?int $instructorGradingScheme): static
+    {
+        $this->instructorGradingScheme = $instructorGradingScheme;
         return $this;
     }
 
@@ -259,6 +312,22 @@ trait DueWorkTrait
     }
 
     /**
+     * @return float|null
+     */
+    protected function getInstructorMaxMark()
+    {
+        return $this->instructorMaxMark;
+    }
+
+    /**
+     * @param float|null $instructorMaxMark
+     */
+    protected function setInstructorMaxMark($instructorMaxMark)
+    {
+        $this->instructorMaxMark = $instructorMaxMark;
+    }
+
+    /**
      * @return array|null $rubricData
      */
     protected function getRubricData()
@@ -270,7 +339,7 @@ trait DueWorkTrait
      * @param array|null $rubricData
      * @return static
      */
-    protected function setRubricData(array $rubricData = null)
+    protected function setRubricData(?array $rubricData = null)
     {
         $this->rubricData = $rubricData;
         return $this;

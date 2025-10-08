@@ -2,7 +2,7 @@
  * To enforce an image to be 100% width of the editor window
  */
 
-import { Plugin } from "@ckeditor/ckeditor5-core";
+import { Plugin } from "ckeditor5";
 import FullWidthUI from "./FullWidthUI";
 import FullWidthEditing from "./FullWidthEditing";
 

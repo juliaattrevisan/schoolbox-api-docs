@@ -1,0 +1,22 @@
+{# Learning Moments Cohort Report #}
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbs([folder.name, '/homepage/' ~ folder.id], ['Cohort Learning Moments']) }}
+
+{% set endpoint = routeLookup(
+    'learningMomentEvidence.getCohortReportPayload',
+    { folder: folder, folderId: folder.id }
+) %}
+<div id="learning-moments-evidence-cohort-report-container">
+    <cohort-report
+        endpoint-get-report="{{ endpoint }}"
+        endpoint-put-bulk-reject="{{ routeLookup('learningMomentEvidence.putBulkReject') }}"
+        endpoint-put-bulk-publish="{{ routeLookup('learningMomentEvidence.putBulkPublish') }}"
+        endpoint-get-evidence-tags="{{ routeLookup('learningMomentEvidence.getTags') }}"
+        endpoint-get-cohort-folder-list="{{ routeLookup('learningMomentEvidence.getCohortFolderList', { folderId: folder.id, folder: folder }) }}"
+        endpoint-delete-bulk-evidence="{{ routeLookup('learningMomentEvidence.deleteBulkDelete') }}"
+    />
+</div>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/learningMomentsEvidenceCohortReport.js?v={{ config.site_version }}"></script>

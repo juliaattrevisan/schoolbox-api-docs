@@ -27,7 +27,8 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Bell');
 
 
 // CREATE BELL APP
-$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) use ($kernel): void {
+    $kernel->deprecationNotice("SA-19334");
 
     try {
         /** @var IConfigLoader $conf */
@@ -49,4 +50,5 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
         $n->alert('RabbitMQ is offline');
         throw $e;
     }
+    $kernel->deprecationNotice("SA-19334");
 });

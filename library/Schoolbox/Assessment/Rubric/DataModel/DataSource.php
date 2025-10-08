@@ -55,12 +55,14 @@ use Schoolbox\Learning\Assessment\DueWork\Feedback\Model as DueWorkFeedbackModel
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWorkModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\IFeedback;
+use Schoolbox\Learning\Assessment\ISelfAssessableFeedback;
 use Schoolbox\Learning\Assessment\Participant;
 use Schoolbox\Learning\AssessmentContext;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Model as UnitSpecification;
 use Schoolbox\Learning\MarkScheme\Factory as MarkSchemeFactory;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 use Schoolbox\User;
@@ -353,10 +355,13 @@ class DataSource
      *
      * @param DueWorkModel $assessment
      * @param bool         $getUsages
+     * @param bool $cloneNewRubric if true, it should then return a copy of the rubric grid
+     *                             without the identifier, and can be used to create a clone assessment
+     *
      * @return Grid
      * @throws MapperException
      */
-    public function retrieveGrid(DueWorkModel $assessment, bool $getUsages): Grid
+    public function retrieveGrid(DueWorkModel $assessment, bool $getUsages, bool $cloneNewRubric = false): Grid
     {
         // Build the rowset first
         $grid = new Grid($assessment, $this->retrieveRowSet($assessment->getContext(), $getUsages));
@@ -407,8 +412,9 @@ class DataSource
         foreach ($descriptorModels as $descriptorModel) {
             $levelId     = $descriptorModel->getLevel()->getId();
             $indicatorId = $descriptorModel->getIndicator()->getId();
+            $descriptorId = $cloneNewRubric ? null : $descriptorModel->getId();
             $descriptor  = (new \Schoolbox\Assessment\Rubric\Grid\Descriptor())
-                ->setId($descriptorModel->getId())
+                ->setId($descriptorId)
                 ->setDescription($descriptorModel->getDescription())
                 ->setMaxValue($descriptorModel->getMaxValue());
 
@@ -419,7 +425,7 @@ class DataSource
 
         // Add levels
         foreach ($levelModels as $levelModel) {
-            $levelId = $levelModel->getId();
+            $levelId = $cloneNewRubric ? null : $levelModel->getId();
             $level   = (new \Schoolbox\Assessment\Rubric\Grid\Level())
                 ->setId($levelId)
                 ->setName($levelModel->getName());
@@ -477,6 +483,14 @@ class DataSource
             $grid->getCapabilityUsages()[$capabilityId] = $capabilityUsage;
         }
 
+        /* Reset the assessment id in rubric grid for the cloned copy
+         */
+        if ($cloneNewRubric) {
+            /* Cloning to preserve the id of the original assessment
+             */
+            $cloneAssessment = clone $assessment;
+            $grid = $grid->setAssessment($cloneAssessment->setId(null));
+        }
         return $grid;
     }
 
@@ -654,12 +668,19 @@ class DataSource
      */
     public function retrieveMarkedGrid(IFeedback $feedback): MarkedGrid
     {
-        $grid       = $this->retrieveGrid($feedback->getAssessable(), false);
+        $assessable = $feedback->getAssessable();
+
+        $grid       = $this->retrieveGrid($assessable, false);
         $rowSet     = $grid->getRowSet();
 
+        // Get the mark scheme for the grid, instructor mark scheme only exists for due work
         $markSchemeFactory = new MarkSchemeFactory();
-        $gridMarkScheme    = $feedback->getAssessable()->getMarkScheme();
-
+        $gridMarkScheme = $assessable->getMarkScheme();
+        // If this is a due work and not a self-assessment, use the instructor mark scheme
+        $isSelfAssessment = $feedback instanceof ISelfAssessableFeedback && $feedback->isSelfAssessment();
+        if (!$isSelfAssessment && $assessable instanceof DueWorkModel) {
+            $gridMarkScheme = $assessable->getInstructorMarkScheme();
+        }
         $markedGrid = new MarkedGrid($feedback, $grid, $gridMarkScheme);
 
         // What goes in the grid?
@@ -1353,14 +1374,13 @@ class DataSource
      * * Usages are copied from srcBox + srcIndicator to dstBox + dstIndicator
      *
      * @param int $sourceAssessmentId
-     * @param AssessmentContext $assessmentContext
      * @param int $destinationAssessmentId
-     *
+     * @param AssessmentContext $destinationContext
      * @return bool Whether a new Rubric was created.
      * @throws MapperException
-     * @throws MapperException\Deleted
+     * @throws Deleted
      */
-    public function copyRubric($sourceAssessmentId, AssessmentContext $assessmentContext, $destinationAssessmentId)
+    public function copyRubric($sourceAssessmentId, $destinationAssessmentId, AssessmentContext $destinationContext)
     {
         // TODO extract this entire monstrosity elsewhere
 
@@ -1385,7 +1405,7 @@ class DataSource
         }
 
         $dstBox = $boxMapper->findOneByColumn('assessment_id', $destinationAssessmentId);
-        $dstBox->getAssessmentModel()->setContextFolder($assessmentContext->getFolder());
+        $dstBox->getAssessmentModel()->setContextFolder($destinationContext->getFolder());
 
         $dstFolder = $dstBox->getAssessmentModel()->getContextFolder();
 

@@ -7,11 +7,11 @@ export default class SearchNodes {
 
     private tester: AcceptanceTester;
 
-    static readonly DATATEST_SEARCH_FIELD = "search-input";
+    static readonly DATA_TEST_SEARCH_FIELD = "search-input";
 
-    static readonly DATATEST_SEARCH_RESULTS = "[data-test-node]";
+    static readonly DATA_TEST_SEARCH_RESULTS = "[data-test-node]";
 
-    static readonly DATATEST_TOGGLE_SHOW_DISABLED_NODES = "show-only-enabled";
+    static readonly DATA_TEST_TOGGLE_SHOW_DISABLED_NODES = "show-only-enabled";
 
     constructor(page: Page, tester: AcceptanceTester) {
         this.page = page;
@@ -23,7 +23,7 @@ export default class SearchNodes {
      * @param value - The value to search for
      */
     async fillSearch(value: string): Promise<void> {
-        await this.page.getByTestId(SearchNodes.DATATEST_SEARCH_FIELD).fill(value);
+        await this.page.getByTestId(SearchNodes.DATA_TEST_SEARCH_FIELD).fill(value);
     }
 
     /**
@@ -31,13 +31,20 @@ export default class SearchNodes {
      * @param count - The expected number of search results
      */
     async seeResultsMatch(count: number): Promise<void> {
-        await expect(this.page.locator(SearchNodes.DATATEST_SEARCH_RESULTS)).toHaveCount(count);
+        await expect(this.page.locator(SearchNodes.DATA_TEST_SEARCH_RESULTS)).toHaveCount(count);
     }
 
     /**
      * hide disabled nodes
      */
     async uncheckShowDisabledNodes(): Promise<void> {
-        await this.page.getByTestId(SearchNodes.DATATEST_TOGGLE_SHOW_DISABLED_NODES).uncheck();
+        await this.page.getByTestId(SearchNodes.DATA_TEST_TOGGLE_SHOW_DISABLED_NODES).uncheck();
+    }
+
+    /**
+     * show disabled nodes
+     */
+    async checkShowDisabledNodes(): Promise<void> {
+        await this.page.getByTestId(SearchNodes.DATA_TEST_TOGGLE_SHOW_DISABLED_NODES).check();
     }
 }

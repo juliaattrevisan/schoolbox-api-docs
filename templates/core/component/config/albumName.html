@@ -1,0 +1,27 @@
+<input id="component{COMPONENT_INSTANCE_ID}-albumname" type="text" name="albumName" value="{COMPONENT_CONFIG_ALBUM_NAME}" />
+<script>
+    // Add a tooltip to the albumName field to explain that it only has effect if eventName is also specified.
+    (function() {
+        const albumNameInput = document.querySelector('#component{COMPONENT_INSTANCE_ID} input[name="albumName"]');
+        if (!albumNameInput) {
+            return;
+        }
+        albumNameInput.parentNode.insertAdjacentHTML('beforeBegin',
+            `<span
+                class="hint has-tip tip-top"
+                data-tooltip title="Enter this to show only photos from a particular album within an event.  Note Event Name must also be entered."
+            >?</span>`
+        )
+
+    })();
+
+    // As we are adding a new tooltip, we need to trigger foundation to find the new one (more info in pixel.html).
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", () => {
+            $(document).foundation('tooltip', 'reflow');
+        });
+    } else {
+        // Document is already loaded, so we can trigger the tooltip reflow immediately
+        $(document).foundation('tooltip', 'reflow');
+    }
+</script>

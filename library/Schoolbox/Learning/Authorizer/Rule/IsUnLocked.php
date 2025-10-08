@@ -42,7 +42,7 @@ abstract class IsUnLocked extends AbstractAssessableRule
      * @throws InvalidArgumentException If assessment's due date is null
      * @throws Unauthorized If assessment is locked
      */
-    public function authorize(array $params = [], User $user = null)
+    public function authorize(array $params = [], ?User $user = null)
     {
         if ($this->isLocked($this->findAssessable($params))) {
             throw new Unauthorized();

@@ -20,7 +20,6 @@ use Schoolbox\User;
  */
 class IsSchoolboxConnector implements IAuthorizationRule
 {
-
     /**
      * @var IConfigLoader
      */
@@ -39,7 +38,7 @@ class IsSchoolboxConnector implements IAuthorizationRule
     /**
      * {@inheritdoc}
      */
-    public function authorize(array $params = array(), User $user = null): bool
+    public function authorize(array $params = array(), ?User $user = null): bool
     {
         return (new IsConfigSetTo('external_type', 'schoolbox', $this->configLoader))->authorize($params, $user);
     }

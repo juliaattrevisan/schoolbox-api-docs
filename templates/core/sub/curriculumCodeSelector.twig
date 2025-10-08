@@ -2,16 +2,34 @@
  # Curriculum code selector
  #
  # @param bool courseManagedReadonly
+ # @param ?bool $vueSlot - Whether this is being rendered as a vue slot,
+ #                         if so, the relevant createApp() must have CurriculumSelector included as an available component
+ #                         Otherwise, this will render it as an independent vue app
+ # @param bool $hasTabs - Whether the curriculum code selector should have tabs
+ # @param int|null $parentFolderId - The folder ID to use for the current curriculum selector tab
  #}
 {% if courseManagedReadonly is not defined %}
     {% set courseManagedReadonly = false %}
 {% endif %}
-<div data-cs-container>
+
+{% if hasTabs is not defined %}
+    {% set hasTabs = false %}
+{% endif %}
+
+{% set vueSlot = vueSlot ?? null %}
+{% if not vueSlot %}
+    <div data-cs-container>
+{% endif %}
     <curriculum-selector
+        {# these props are passed to either the curriculum-selector component, or the slot - which expects the same props #}
         :is-read-only="{{ courseManagedReadonly ? 'true' : 'false' }}"
         :selected-nodes="{{ codeList|json_encode }}"
         data-endpoint="{{ routeLookup('curriculumApi.searchNode') }}"
         :include-children="true"
+        :has-tabs="{{ hasTabs ? 'true' : 'false' }}"
+        {% if parentFolderId is defined and parentFolderId is not null %}:parent-folder-id="{{ parentFolderId }}"{% endif %}
     />
-</div>
-<script src="{{ CDN_PREFIX }}/js/bundle/curriculumSelector.js?v={{ config.site_version }}"></script>
+{% if not vueSlot %}
+    </div>
+    <script src="{{ CDN_PREFIX }}/js/bundle/curriculumSelector.js?v={{ config.site_version }}"></script>
+{% endif %}

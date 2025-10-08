@@ -57,7 +57,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
 
         $stmt = $this->getConnection()->prepareQuery(
             '
-            SELECT PERIOD "desc", START_TIME "start", END_TIME "end", PERIOD_NUMBER "number", 1 "sequence"
+            SELECT PERIOD AS DESC, START_TIME AS START, END_TIME AS END, PERIOD_NUMBER AS NUMBER, 1 AS SEQUENCE
             FROM SCHOOLBOX_TIMETABLE_DEFINITION TD
             WHERE TD.DAY_NUMBER = :day
             AND TD.CAMPUS = :campus
@@ -75,11 +75,11 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
         );
 
         while ($r = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $definition['desc'][]     = $r['desc'];
-            $definition['start'][]    = $this->parseTime($r['start']);
-            $definition['end'][]      = $this->parseTime($r['end']);
-            $definition['number'][]   = $r['number'];
-            $definition['sequence'][] = $r['sequence'];
+            $definition['desc'][]     = $r['DESC'];
+            $definition['start'][]    = $this->parseTime($r['START']);
+            $definition['end'][]      = $this->parseTime($r['END']);
+            $definition['number'][]   = $r['NUMBER'];
+            $definition['sequence'][] = $r['SEQUENCE'];
             ++$periodCount;
         }
 
@@ -121,6 +121,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
             WHERE TIMETABLE_ID = :campus
             AND START_DATE <= :startDate
             AND END_DATE >= :endDate
+            ORDER BY START_DATE ASC, END_DATE ASC
             FETCH FIRST 1 ROW ONLY
         ');
 
@@ -232,7 +233,7 @@ class External_Edumate_Timetable extends External_Edumate_Connection implements 
      * @inheritDoc
      * @throws Exception
      */
-    public function getPeriodNumber(Campus $campus, $now = 0, \Schoolbox\User $user = null): array
+    public function getPeriodNumber(Campus $campus, $now = 0, ?\Schoolbox\User $user = null): array
     {
         $now = date('g:ia', $now ?: time());
 

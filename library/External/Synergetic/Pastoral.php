@@ -8,6 +8,7 @@
 
 use Alaress\Database\Exception as DatabaseException;
 use Alaress\Database\Predicate\Builder as PredicateBuilder;
+use External\Synergetic\Utils as SynergeticUtils;
 use Html2Text\Html2Text;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\External\Exception as ExternalException;
@@ -121,7 +122,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
     const CHARACTER_ENCODING = 'UTF-8';
 
     /** @var Html2Text $htmlConverter */
-    protected $htmlConverter;
+    protected Html2Text $htmlConverter;
 
     /**
      * Constructor
@@ -132,7 +133,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
 
         $this->setupDatabase();
 
-        $this->htmlConverter = new Html2Text();
+        $this->htmlConverter = new Html2Text('', ['width' => 0]); // Set width to 0 to disable line-wrapping.
 
         $externalPing = new External_Ping();
 
@@ -1020,6 +1021,12 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             return false;
         }
 
+        $this->htmlConverter->setHtml($comment->getBody());
+        $commentText = $this->htmlConverter->getText();
+
+        // Synergetic will ignore Unix-style line endings, so must convert to Dos-style before exporting.
+        $commentText = SynergeticUtils::convertLineEndingsUnixToDos($commentText);
+
         $query =
             "
             INSERT INTO PastoralCareComments
@@ -1047,7 +1054,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
             $this->connector->executeQuery($query, [
                 'externalId' => $pastoral->getExternalId(),
                 'externalId2' => $pastoral->getExternalId(),
-                'comment' => $comment->getBody(),
+                'comment' => $commentText,
                 'createdDate' => $comment->getCreatedAt()->getDatabase(),
                 'createdOwnerId' => $comment->getOwner()->getExternalId(),
                 'modifiedDate' => $comment->getCreatedAt()->getDatabase(),
@@ -1189,11 +1196,18 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
         $pastoral = $this->pastoralMapper->findById($upload->getPastoral()->getId());
         $storage = $upload->getStorage();
 
-        $documentClassification = null;
-        if ($pastoral->getType()->getDocumentClassification() instanceof PastoralDocumentClassification) {
+        $pastoralAttachment = $this->pastoralAttachmentMapper->findById($upload->getPastoralAttachmentId());
+        $documentClassification = (
+            $pastoralAttachment->getPrivate()
+            ? $pastoral->getType()->getDocumentClassificationConfidential() // Note this object will not be hydrated.
+            : $pastoral->getType()->getDocumentClassification() // Note this object will not be hydrated.
+        );
+
+        if ($documentClassification instanceof PastoralDocumentClassification) {
             try {
+                // Replace unhydrated object with hydrated object.
                 $documentClassification = $this->pastoralDocumentClassificationMapper->findById(
-                    $pastoral->getType()->getDocumentClassification()->getId()
+                    $documentClassification->getId()
                 );
             } catch (BaseMapper\Exception $e) {
                 // noop: leave document classification as null
@@ -1515,7 +1529,7 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
                         ->findById(
                             $pastoral->getType()->getDocumentClassification()->getId()
                         );
-                    $documentClassificationCode = $documentClassification->getExternalCode();
+                    $documentClassificationCode = $documentClassification->getExternalCode() ?? '';
                 } catch (MapperException $e) {
                     $documentClassificationCode = '';
                 }
@@ -1529,13 +1543,19 @@ class External_Synergetic_Pastoral implements External_PastoralInterface
          * some schools aren't; hence, a per-school configuration as per SA-16383
          */
         if ($prependTitle) {
-            $bodyPublicText = $pastoral->getHeading() . "\r\n" . $this->htmlConverter->getText();
+            // Add double line break to separate title from body.
+            // Note we are converting Unix line endings to Dow below, so "\n" is fine here.
+            $bodyPublicText = $pastoral->getHeading() . "\n\n" . $this->htmlConverter->getText();
         } else {
             $bodyPublicText = $this->htmlConverter->getText();
         }
 
         $this->htmlConverter->setHtml($pastoral->getBodyPrivate());
         $bodyPrivateText = $this->htmlConverter->getText();
+
+        // Synergetic will ignore Unix-style line endings, so must convert to Dos-style before exporting.
+        $bodyPublicText = SynergeticUtils::convertLineEndingsUnixToDos($bodyPublicText);
+        $bodyPrivateText = SynergeticUtils::convertLineEndingsUnixToDos($bodyPrivateText);
 
         // Return an array containing the parameters for the insert/update query
 

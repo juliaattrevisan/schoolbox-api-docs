@@ -8,7 +8,6 @@
  */
 class Component_Config_Src extends Component_Config_Abstract
 {
-
     /**
      * Strips /homepage/ prefix from $value if it's there.
      *
@@ -28,13 +27,13 @@ class Component_Config_Src extends Component_Config_Abstract
     /**
      * Parse
      *
-     * @param SitePage $page
-     * @param string $key
-     * @param string $keyblock
-     * @param mixed $configValue
-     * @param Component_ControllerAbstract $component
+     * @param SitePage                          $page
+     * @param string                            $key
+     * @param string                            $keyblock
+     * @param mixed                             $configValue
+     * @param Component_ControllerAbstract|null $component
      */
-    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
+    public function parse(SitePage $page, $key, $keyblock, $configValue, ?Component_ControllerAbstract $component = null)
     {
         $vars = array(
             'COMPONENT_CONFIG_SRC_ID'   => '',

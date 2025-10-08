@@ -409,7 +409,7 @@ class External_Tass_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getCurrentSemester(string $externalUserId = null): ?string
+    public function getCurrentSemester(?string $externalUserId = null): ?string
     {
         $query = "
             SELECT curr_sem
@@ -424,7 +424,7 @@ class External_Tass_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getCurrentYear(string $externalUserId = null): ?string
+    public function getCurrentYear(?string $externalUserId = null): ?string
     {
         $query = "
             SELECT curr_year

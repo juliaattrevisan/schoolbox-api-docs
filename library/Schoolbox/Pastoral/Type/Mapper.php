@@ -32,7 +32,9 @@ class Mapper extends BaseMapper
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->joins('pastoral_document_classification_id', DocumentClassificationMapper::class, 'id', null, null, 'documentClassification', 'documentClassification');
+        $this->joins('pastoral_document_classification_confidential_id', DocumentClassificationMapper::class, 'id', null, null, 'documentClassificationConfidential', 'documentClassificationConfidential');
         $this->uses('name', self::TYPE_STRING);
+        $this->uses('entry_tip', self::TYPE_STRING);
         $this->uses('template', self::TYPE_STRING);
         $this->uses('template_private', self::TYPE_STRING);
         $this->uses('color', self::TYPE_COLOR);
@@ -40,6 +42,8 @@ class Mapper extends BaseMapper
         $this->uses('external_code', self::TYPE_STRING);
         $this->uses('visibility_locked', self::TYPE_BOOLEAN);
         $this->uses('sentiment', self::TYPE_STRING, self::COLUMN_ENUM, null, Model::SENTIMENT_VALUES);
+        $this->uses('default_points', self::TYPE_DECIMAL);
+        $this->uses('default_expiry', self::TYPE_STRING);
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->uses('updated_by', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);

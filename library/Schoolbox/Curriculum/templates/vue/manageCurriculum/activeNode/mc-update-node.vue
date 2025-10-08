@@ -3,7 +3,6 @@
  * to be able to update a nodes name, code and description
  */
 
-import * as toast from "@schoolboxVue/components/toast/sbxToastEvent";
 import { getButtonTextDisabledDueToStorageLimitSuffix } from "@js/editor/settings/wordCountSettings";
 import { useActiveNodeStore } from "./store/mcActiveNodeStore";
 import { useDescriptionEditor } from "../composable/useDescriptionEditor";
@@ -90,7 +89,7 @@ async function onUpdateSelected(): Promise<void> {
  */
 updateNodeStore.$onAction(({ name, after, onError }) => {
     if (name === "update") {
-        toast.activate("Updating...");
+        const toast = window.sbProps.toastActivate("Updating...");
         after((result) => {
             toast.timeout({ text: result.message, isSuccess: true });
         });

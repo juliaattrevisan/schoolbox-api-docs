@@ -17,6 +17,7 @@ use Schoolbox\Learning\Assessment\Quiz\Model as QuizDomainObject;
 use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\MarkScheme\TotalMarkFractional;
 use Schoolbox\Learning\Quiz\Model as Quiz;
+use Schoolbox\TokenReplacer;
 use Schoolbox\User;
 
 class Controller extends Base
@@ -159,9 +160,13 @@ class Controller extends Base
              */
         }
 
+        // Replace any tokens in the comment with the relevant details
+        $comment = (new TokenReplacer\Student(new TokenReplacer\Simple()))
+            ->replace(trim((string)$postData['comment']), $student);
+
         /* Update the deets and save it
          */
-        $attempt->setComment(trim((string)$postData['comment']))
+        $attempt->setComment($comment)
             ->setMark($humanReadableMark)
             ->setMaxMark($maxMark)
             ->setNormalisedMark($normalisedMark)
@@ -178,6 +183,10 @@ class Controller extends Base
             'success' => true,
             'message' => 'OK',
             'id'      => $attempt->getId(),
+            /* these extra fields are currently used by the Markbook to keep things responsive */
+            'normalisedMark'              => $attempt->getNormalisedMark(),
+            'humanReadableMark'           => $attempt->getMark(),
+            'humanReadableInstructorMark' => $attempt->getMark(), /* for compatibility with due work */
         ];
 
         $this->response = $this->responseDependentOnRequest('', $data)->withStatus(200);

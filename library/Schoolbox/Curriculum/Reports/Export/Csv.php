@@ -55,11 +55,13 @@ class Csv
         bool $includeRubric,
         bool $includeInUseRubric,
     ): void {
-        $this->outputHeaderRows($fp, $structure);
+        $isMultipleCourse = $structure->count() > 1;
+        $this->outputHeaderRows($fp, $structure, $isMultipleCourse);
         foreach ($usage as $node) {
             $this->outputCurriculumNodeRows(
                 $fp,
                 $structure,
+                $isMultipleCourse,
                 $node,
                 $includeCourse,
                 $includeUnit,
@@ -76,13 +78,14 @@ class Csv
      *
      * @param resource   $fp
      * @param Collection $structure
+     * @param bool       $isMultipleCourse Whether we have multiple courses in the report
      *
      * @return void
      */
-    private function outputHeaderRows($fp, Collection $structure): void
+    private function outputHeaderRows($fp, Collection $structure, bool $isMultipleCourse): void
     {
-        $headerRows    = [''];
-        $subheaderRows = ['Curriculum'];
+        $headerRows    = ['', ''];
+        $subheaderRows = ['Curriculum', 'Total'];
         foreach ($structure as $course) {
             $headerRows[]    = 'Course';
             $subheaderRows[] = $course['name'];
@@ -92,9 +95,13 @@ class Csv
                 $subheaderRows[] = $unit['name'];
                 $unitRowOutput   = true;
             }
+            if ($isMultipleCourse) {
+                $headerRows[] = '';
+                $subheaderRows[] = 'Course Total';
+            }
         }
-        fputcsv($fp, $headerRows);
-        fputcsv($fp, $subheaderRows);
+        fputcsv($fp, $headerRows, escape: '');
+        fputcsv($fp, $subheaderRows, escape: '');
     }
 
     /**
@@ -102,6 +109,7 @@ class Csv
      *
      * @param resource   $fp
      * @param Collection $structure
+     * @param bool       $isMultipleCourse   Whether we have multiple courses in the report
      * @param array      $usage              The data structure which contains the usages to output.
      * @param bool       $includeCourse
      * @param bool       $includeUnit
@@ -116,6 +124,7 @@ class Csv
     private function outputCurriculumNodeRows(
         $fp,
         Collection $structure,
+        bool $isMultipleCourse,
         array $usage,
         bool $includeCourse,
         bool $includeUnit,
@@ -132,18 +141,19 @@ class Csv
         if ($depth > 0) {
             $curriculumName = sprintf('%s %s', str_repeat('*', $depth), $curriculumName);
         }
-        $row = [$curriculumName];
-
+        $row = [];
+        $courseCount = [];
         // Not assuming that courses in usage are in same order as in structure:
         // instead, iterate the structure and extract usages from `$usage`
         foreach ($structure as $course) {
+            $partRow = [];
             $courseUsage = $usage['usage']['courses']->filter(fn ($c) => $course['id'] === $c['id'])->first();
 
             // Calculate course usage count
             $courseUsageCount = $includeCourse
                 ? ($courseUsage['usage']['course']['count'] ?? 0)
                 : 0;
-            $row[] = $courseUsageCount;
+            $partRow[] = $courseUsageCount;
 
             // Calculate unit usage count, dependent on selected filters
             foreach ($course['units'] as $unit) {
@@ -164,16 +174,26 @@ class Csv
                 if ($includeInUseRubric) {
                     $unitUsageCount += ($unitUsage['usage']['inUseRubric']['count'] ?? 0);
                 }
-                $row[] = $unitUsageCount;
+                $partRow[] = $unitUsageCount;
             }
+            $count = array_sum($partRow);
+            $courseCount[] = $count;
+            if ($isMultipleCourse) {
+                $partRow[] = $count;
+            }
+            $row = array_merge($row, $partRow);
         }
-        fputcsv($fp, $row);
+        // Calculate the total usage count
+        $totalCount = array_sum($courseCount);
+        $row = array_merge([$curriculumName, $totalCount], $row);
+        fputcsv($fp, $row, escape: '');
 
         // And output usage for child nodes
         foreach ($usage['children'] ?? [] as $childNode) {
             $this->outputCurriculumNodeRows(
                 $fp,
                 $structure,
+                $isMultipleCourse,
                 $childNode,
                 $includeCourse,
                 $includeUnit,

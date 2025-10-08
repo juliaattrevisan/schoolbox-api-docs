@@ -28,7 +28,7 @@ export default window.Vue.defineComponent({
             isLoaded: false,
             hasLoadError: false,
             query: "",
-            minQueryLength: 3,
+            minQueryLength: 2,
             resultsShownLimit: 6,
             activeIndex: 0, // to track which index is selected
         };
@@ -351,7 +351,7 @@ export default window.Vue.defineComponent({
             >
                 <li
                     v-for="(result, index) in resultsList"
-                    :key="result.name"
+                    :key="`${result.name}-${index}`"
                     ref="searchResultListItems"
                     :data-index="index"
                 >

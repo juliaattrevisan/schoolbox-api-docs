@@ -17,6 +17,7 @@ use Schoolbox\Collection;
 use Schoolbox\File\Mimetype;
 use Schoolbox\File\MimetypeMapper;
 use Schoolbox\GenericCollection;
+use Schoolbox\Instance;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\User;
@@ -37,6 +38,11 @@ class Mapper extends BaseMapper implements IReceiver
      * Max length for filenames: anything longer causes issues on upload.
      */
     public const FILENAME_MAX_LENGTH = 250;
+
+    /**
+     * Is deletion of files from the file system allowed from staging instances?
+     */
+    private bool $allowStagingDeleteStorage = false;
 
     /**
      * @return void
@@ -62,6 +68,8 @@ class Mapper extends BaseMapper implements IReceiver
 
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'preventExpiredAtDecrement']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'postSave']);
+        $this->registerCallback(self::CALLBACK_PREDELETE, [$this, 'deleteStorageTransforms']);
+        $this->registerCallback(self::CALLBACK_PREDELETE, [$this, 'deleteVideoQueues']);
         $this->registerCallback(self::CALLBACK_POSTDELETE, [$this, 'deleteStorage']);
     }
 
@@ -102,15 +110,51 @@ class Mapper extends BaseMapper implements IReceiver
     }
 
     /**
-     * Post-delete callback
+     * Pre-delete callback: delete any storage transform rows, before deleting
+     * the storage record itself.
      *
-     * TODO this shouldn't be necessary: storage files should be cleaned up by
-     *      another process
+     * @param Model $storage
+     * @return true
+     */
+    public function deleteStorageTransforms(Model $storage): bool
+    {
+        $transformMapper = Transform\Mapper::getInstance();
+        $transformMapper->deleteByColumn('hash', $storage->getHash());
+        return true;
+    }
+
+    /**
+     * Pre-delete callback: delete any video queue rows, before deleting the
+     * storage record itself.
+     *
+     * @param Model $storage
+     * @return true
+     */
+    public function deleteVideoQueues(Model $storage): bool
+    {
+        $transformMapper = QueueMapper::getInstance();
+        $transformMapper->deleteByColumn('hash', $storage->getHash());
+        return true;
+    }
+
+    /**
+     * Post-delete callback: delete the file and any transforms or transcodes
+     * from the filesystem.
+     *
+     * This will refuse to delete files if this is a staging instance, unless
+     * `$this->allowStagingDeleteStorage` is true: this is because filesystems
+     * may be shared between staging and production, and thus deleting from
+     * staging could delete from production.
      *
      * @param Model $storage
      */
     public function deleteStorage(Model $storage)
     {
+        /** @var Instance $instance */
+        $instance = self::getDi()->get('instance');
+        if ($instance->isStaging() && !$this->allowStagingDeleteStorage) {
+            return;
+        }
         $this->getStorageFilesystemProxy()->delete($storage);
     }
 
@@ -336,5 +380,23 @@ class Mapper extends BaseMapper implements IReceiver
     public function getStorageFilesystemProxy()
     {
         return self::getDi()->get('filesystem.storageProxy');
+    }
+
+    /**
+     * @return bool
+     */
+    public function getAllowStagingDeleteStorage(): bool
+    {
+        return $this->allowStagingDeleteStorage;
+    }
+
+    /**
+     * @param bool $allowStagingDeleteStorage
+     * @return $this
+     */
+    public function setAllowStagingDeleteStorage(bool $allowStagingDeleteStorage): self
+    {
+        $this->allowStagingDeleteStorage = $allowStagingDeleteStorage;
+        return $this;
     }
 }

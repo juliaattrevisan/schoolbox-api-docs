@@ -17,7 +17,6 @@ use function count;
  */
 class Permutations
 {
-
     /**
      * Generates and returns all permutations of an array.
      *
@@ -43,7 +42,7 @@ class Permutations
      * @param callable|null $equals Method to determine if items are equal, defaults to ===
      * @return array
      */
-    public function generateDistinct(array $items, callable $equals = null): array
+    public function generateDistinct(array $items, ?callable $equals = null): array
     {
         $permutations = $this->generateRecursive(count($items), $items);
         $equals       = $equals ?? static function ($a, $b): bool {

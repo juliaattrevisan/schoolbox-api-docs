@@ -13,6 +13,7 @@ use Alaress\Database\Connector\IConnector;
 use OutOfBoundsException;
 use InvalidArgumentException;
 use Exception;
+use Alaress\Database\Exception as AlaressDatabaseException;
 
 /**
  * Handler for the various actions the Paperly agent may perform.
@@ -62,6 +63,8 @@ class Handler
                 return $this->handleGetStudentsMedicalRequest($data);
             case 'getStudentsFromParent':
                 return $this->handleGetStudentsFromParentRequest($data);
+            case 'getStudentDetailsData':
+                return $this->handleGetStudentDetailsData($data);
             case 'allParents':
                 return $this->handleAllParentsRequest($data);
             case 'getDetailsData':
@@ -139,8 +142,16 @@ class Handler
             $params       = array_merge($params, $codes);
         }
 
-        $stmt = $this->externalDb->executeQuery($sql, $params);
-        foreach ($stmt as $row) {
+        $statement = $this->externalDb->prepareQuery($sql, $params);
+        $stmt = $statement->execute();
+
+        if ($stmt === false) {
+            throw new AlaressDatabaseException(
+                print_r($this->externalDb->errorInfo(), true)
+            );
+        }
+
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $yearLevelArr[] = [
                 "Code"        => $row["Code"],
                 "Description" => $row["Description"],
@@ -241,16 +252,28 @@ class Handler
      */
     public function handleAllStaffsRequest(array $data): array
     {
-        $stfArr = [];
         $params = [];
         $selectedView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_ALL_STAFF);
+
+        /* Check we need to use YearLevelCode column or NormalYearLevel/NormalYearLevel2 columns instead
+         */
+        $useYearLevelCode = $this->columnExists("YearLevelCode", $selectedView);
+        /* Some school is not using certain Paperly module hence they have different script(s) running on their synergetic
+         * database, hence they have different columns, and we need to accommodate that until Paperly shift to use proxy
+         */
+        if ($useYearLevelCode) {
+            $customSelectColumn = "ClassCode, ClassDescription, YearLevelCode ";
+            $customFromColumn = "ClassDescription, YearLevelCode ";
+        } else {
+            $customSelectColumn = "NormalYearLevel, NormalYearLevel2 ";
+            $customFromColumn = "NormalYearLevel, NormalYearLevel2 ";
+        }
         $sql = "SELECT
                     StaffID,
                     StaffPreferred,
                     StaffSurname,
                     StaffEmail,
-                    NormalYearLevel,
-                    NormalYearLevel2
+                    {$customSelectColumn}
                 FROM (
                     SELECT
                         StaffID,
@@ -258,13 +281,12 @@ class Handler
                         StaffSurname,
                         StaffEmail,
                         ClassCode,
-                        NormalYearLevel,
-                        NormalYearLevel2
+                        {$customFromColumn}
                     FROM {$selectedView} WHERE 1=1
                 ";
 
         if (isset($data['id'])) {
-            $ids          = is_array($data['id']) ? $data['id'] : explode(',', $data['id']);
+            $ids          = is_array($data['id']) ? $data['id'] : explode(',', (string)$data['id']);
             $placeholders = implode(',', array_fill(0, count($ids), '?'));
             $sql          .= " AND StaffID IN ($placeholders)";
             $params       = array_merge($params, $ids);
@@ -278,9 +300,14 @@ class Handler
         if (isset($data['year_level'])) {
             $yls = is_array($data['year_level']) ? $data['year_level'] : explode(',', $data['year_level']);
             $placeholders = implode(',', array_fill(0, count($yls), '?'));
-            $params = array_merge($params, $yls, $yls);
+            $params = array_merge($params, $yls);
 
-            $sql .= " AND NormalYearLevel IN ($placeholders) OR NormalYearLevel2 IN ($placeholders)";
+            $params = array_merge($params, $yls, $yls);
+            if ($useYearLevelCode) {
+                $sql .= " AND YearLevelCode IN ($placeholders)";
+            } else {
+                $sql .= " AND (NormalYearLevel IN ($placeholders) OR NormalYearLevel2 IN ($placeholders))";
+            }
         }
 
         if (isset($data['class_code'])) {
@@ -291,23 +318,56 @@ class Handler
         }
 
         $sql .= " ) filtered_results
-                GROUP BY StaffID, StaffPreferred, StaffSurname, StaffEmail, NormalYearLevel, NormalYearLevel2
+                GROUP BY StaffID, StaffPreferred, StaffSurname, StaffEmail, {$customSelectColumn}
                 ORDER BY StaffSurname";
 
-        $stmt = $this->externalDb->executeQuery($sql, $params);
+        $statement = $this->externalDb->prepareQuery($sql, $params);
+        $stmt = $statement->execute();
+
+        if ($stmt === false) {
+            throw new AlaressDatabaseException(
+                print_r($this->externalDb->errorInfo(), true)
+            );
+        }
+
         $staffs = [];
-        foreach ($stmt as $row) {
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
             $staffId = $row["StaffID"];
 
-            if (!isset($staffs[$staffId])) {
-                $staffs[$staffId] = [
-                    "ID"               => $row["StaffID"] ?? null,
-                    "Preferred"        => $row["StaffPreferred"] ?? null,
-                    "Surname"          => $row["StaffSurname"] ?? null,
-                    "Email"            => $row["StaffEmail"] ?? null,
-                    "NormalYearLevel"  => $row["NormalYearLevel"] ?? null,
-                    "NormalYearLevel2" => $row["NormalYearLevel2"] ?? null,
-                ];
+            if ($useYearLevelCode) {
+                if (!isset($staffs[$staffId])) {
+                    $staffs[$staffId] = [
+                        "ID"               => $row["StaffID"] ?? null,
+                        "Preferred"        => $row["StaffPreferred"] ?? null,
+                        "Surname"          => $row["StaffSurname"] ?? null,
+                        "Email"            => $row["StaffEmail"] ?? null,
+                        "Classes" => [
+                            [
+                                "ClassCode" => $row["ClassCode"] ?? null,
+                                "ClassDescription" => $row["ClassDescription"] ?? null,
+                                "YearLevelCode" => $row["YearLevelCode"] ?? null,
+
+                            ]
+                        ]
+                    ];
+                } else {
+                    $staffs[$staffId]["Classes"][] = [
+                        "ClassCode" => $row["ClassCode"] ?? null,
+                        "ClassDescription" => $row["ClassDescription"] ?? null,
+                        "YearLevelCode" => $row["YearLevelCode"] ?? null,
+                    ];
+                }
+            } else {
+                if (!isset($staffs[$staffId])) {
+                    $staffs[$staffId] = [
+                        "ID"               => $row["StaffID"] ?? null,
+                        "Preferred"        => $row["StaffPreferred"] ?? null,
+                        "Surname"          => $row["StaffSurname"] ?? null,
+                        "Email"            => $row["StaffEmail"] ?? null,
+                        "NormalYearLevel"  => $row["NormalYearLevel"] ?? null,
+                        "NormalYearLevel2" => $row["NormalYearLevel2"] ?? null,
+                    ];
+                }
             }
         }
 
@@ -338,7 +398,7 @@ class Handler
         $sql    = "SELECT * FROM {$selectedView} WHERE 1=1";
 
         if (isset($data['id'])) {
-            $ids          = is_array($data['id']) ? $data['id'] : explode(',', $data['id']);
+            $ids          = is_array($data['id']) ? $data['id'] : explode(',', (string)$data['id']);
             $placeholders = implode(',', array_fill(0, count($ids), '?'));
             $sql          .= " AND StudentID IN ($placeholders)";
             $params       = array_merge($params, $ids);
@@ -432,7 +492,7 @@ class Handler
         $sql = "SELECT DISTINCT ID, {$columnToUse} FROM {$selectedView} WHERE 1=1";
 
         if (isset($data['id'])) {
-            $ids          = is_array($data['id']) ? $data['id'] : explode(',', $data['id']);
+            $ids          = is_array($data['id']) ? $data['id'] : explode(',', (string)$data['id']);
             $placeholders = implode(',', array_fill(0, count($ids), '?'));
             $sql          .= " AND ID IN ($placeholders)";
             $params       = array_merge($params, $ids);
@@ -470,7 +530,7 @@ class Handler
         $sql = "SELECT * FROM {$selectedView} WHERE 1=1";
 
         if (isset($data['id'])) {
-            $ids          = is_array($data['id']) ? $data['id'] : explode(',', $data['id']);
+            $ids          = is_array($data['id']) ? $data['id'] : explode(',', (string)$data['id']);
             $placeholders = implode(',', array_fill(0, count($ids), '?'));
             $sql          .= " AND ID IN ($placeholders)";
             $params       = array_merge($params, $ids);
@@ -530,6 +590,109 @@ class Handler
     }
 
     /**
+     * Handle request for fetching students and their parents' details
+     *
+     * @param array $data `$data['id']` must be a student ID(s).
+     * @return array
+     *
+     * @throws OutOfBoundsException if `$data['id']` is not provided
+     *
+     */
+    public function handleGetStudentDetailsData(array $data): array
+    {
+        $id = $data['id'] ?? null;
+        if (!isset($id)) {
+            throw new OutOfBoundsException('Student ID is not provided');
+        }
+
+        $stuIDs = is_array($data['id']) ? $data['id'] : explode(',', (string)$data['id']);
+        $placeholders = implode(',', array_fill(0, count($stuIDs), '?'));
+
+        $studentView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_ALL_STUDENTS);
+        $parentView = $this->viewSelector->getView(ViewSelector::PAPERLY_VIEW_ALL_PARENTS);
+
+        $sql = "SELECT
+            s.StudentID, s.StudentPreferred, s.StudentSurname, s.StudentYearLevel, s.StudentYearLevelDescription,
+            s.StudentBoarder, s.StudentTutor, s.StudentHouse, s.StudentHouseDescription, s.StudentGender,
+            s.StudentEmail, s.StudentBirthDate,
+            s.ContactID, s.ContactRelationship,
+            p.Gender AS ContactGender, p.Surname AS ContactSurname, p.Preferred AS ContactPreferred, p.Given1 AS ContactGiven1,
+            p.Address1 AS ContactAddress, p.Address2 AS ContactAddress2, p.Address3 AS ContactAddress3,
+            p.Suburb AS ContactSuburb, p.State AS ContactState, p.Postcode AS ContactPostcode,
+            p.Phone AS ContactHomePhone, p.MobilePhone AS ContactMobile, p.Email AS ContactEmail
+        FROM $studentView s
+        LEFT JOIN $parentView p ON s.ContactID = p.ID
+        WHERE s.StudentID IN ($placeholders)";
+
+        $params = $stuIDs;
+        $statement = $this->externalDb->prepareQuery($sql, $params);
+        $stmt = $statement->execute();
+
+        if ($stmt === false) {
+            throw new AlaressDatabaseException(
+                print_r($this->externalDb->errorInfo(), true)
+            );
+        }
+
+        $students = array();
+        while ($row = $statement->fetch(\PDO::FETCH_ASSOC)) {
+            $studentId = $row["StudentID"] ?? null;
+            $birthDate = $row["StudentBirthDate"] ?? null;
+
+            $formattedBirthDate = ($birthDate !== null)
+                ? (\Alaress_Date_Format::newFromTimestamp(strtotime($birthDate)))->getUsingFormat('Y-m-d')
+                : null;
+
+            if (!isset($students[$studentId])) {
+                $students[$studentId] = [
+                    "ID" => $row["StudentID"] ?? null,
+                    "Preferred" => $row["StudentPreferred"] ?? null,
+                    "Surname" => $row["StudentSurname"] ?? null,
+                    "YearLevelCode" => $row["StudentYearLevel"] ?? null,
+                    "YearLevelDescription" => $row["StudentYearLevelDescription"] ?? null,
+                    "Boarder" => $row["StudentBoarder"] ?? null,
+                    "RollGroup" => $row["StudentTutor"] ?? null,
+                    "HouseCode" => $row["StudentHouse"] ?? null,
+                    "HouseDescription" => $row["StudentHouseDescription"] ?? null,
+                    "Gender" => $row["StudentGender"] ?? null,
+                    "Email" => $row["StudentEmail"] ?? null,
+                    "BirthDate" => $formattedBirthDate,
+                    "Contact1Data" => [],
+                    "Contact2Data" => [],
+                ];
+            }
+
+            $contact = [
+                "ID" => $row["ContactID"] ?? null,
+                "Relationship" => $row["ContactRelationship"] ?? null,
+                "Gender" => $row["ContactGender"] ?? null,
+                "Surname" => $row["ContactSurname"] ?? null,
+                "Preferred" => $row["ContactPreferred"] ?? null,
+                "Given1" => $row["ContactGiven1"] ?? null,
+                "Address" => $row["ContactAddress"] ?? null,
+                "Address2" => $row["ContactAddress2"] ?? null,
+                "Address3" => $row["ContactAddress3"] ?? null,
+                "Suburb" => $row["ContactSuburb"] ?? null,
+                "State" => $row["ContactState"] ?? null,
+                "Postcode" => $row["ContactPostcode"] ?? null,
+                "HomePhone" => $row["ContactHomePhone"] ?? null,
+                "Mobile" => $row["ContactMobile"] ?? null,
+                "Email" => $row["ContactEmail"] ?? null,
+            ];
+
+            if (!empty($row["ContactID"])) {
+                if (empty($students[$studentId]["Contact1Data"])) {
+                    $students[$studentId]["Contact1Data"] = $contact;
+                } elseif (empty($students[$studentId]["Contact2Data"])) {
+                    $students[$studentId]["Contact2Data"] = $contact;
+                }
+            }
+        }
+
+        return array_values($students);
+    }
+
+    /**
      * Handle request for fetching parents
      *
      * @param array  $data
@@ -544,7 +707,7 @@ class Handler
         $sql       = "SELECT * FROM {$selectedView} WHERE 1=1";
 
         if (isset($data['id'])) {
-            $ids          = is_array($data['id']) ? $data['id'] : explode(',', $data['id']);
+            $ids          = is_array($data['id']) ? $data['id'] : explode(',', (string)$data['id']);
             $placeholders = implode(',', array_fill(0, count($ids), '?'));
             $sql          .= " AND ID IN ($placeholders)";
             $params       = array_merge($params, $ids);
@@ -1146,10 +1309,6 @@ class Handler
 
             foreach ($stmt as $sturow) {
                 $studentID = $sturow['StudentID'];
-                if ($sturow["LegalParentsSeparatedFlag"] == 1 || $sturow["LegalCourtOrderType"] !== '') {
-                    $authArr[$studentID] = ["Type" => "BLOCK"];
-                    continue;
-                }
 
                 $birthDate          = $sturow['StudentBirthDate'];
                 $formattedBirthDate = ($birthDate !== null)
@@ -1576,17 +1735,18 @@ class Handler
                 }
                 return is_numeric($value) && $value >= -180 && $value <= 180;
             },
-            'Phone' => function ($value) {
+            'PhoneActual' => function ($value) {
                 if (empty($value) || $value == 'null') {
                     return true;
                 }
-                return is_numeric($value);
+                return is_numeric(str_replace(' ', '', $value));
             },
             'MobilePhone' => function ($value) {
                 if (empty($value) || $value == 'null') {
                     return true;
                 }
-                return is_numeric($value) && strlen($value) <= 15;
+                $cleanValue = str_replace(' ', '', $value);
+                return is_numeric($cleanValue) && strlen($cleanValue) <= 15;
             },
             'Email' => function ($value) {
                 return filter_var($value, FILTER_VALIDATE_EMAIL) && strlen($value) <= 100;
@@ -1613,7 +1773,8 @@ class Handler
                 if (empty($value) || $value == 'null') {
                     return true;
                 }
-                return is_numeric($value) && strlen($value) <= 15;
+                $cleanValue = str_replace(' ', '', $value);
+                return is_numeric($cleanValue) && strlen($cleanValue) <= 15;
             },
             'OccupEmail' => function ($value) {
                 if (empty($value) || $value == 'null') {
@@ -1732,7 +1893,8 @@ class Handler
                 if (empty($value) || $value == 'null') {
                     return true;
                 }
-                return is_numeric($value) && strlen($value) <= 15;
+                $cleanValue = str_replace(' ', '', $value);
+                return is_numeric($cleanValue) && strlen($cleanValue) <= 15;
             },
             'DoctorAddress' => function ($value) {
                 if (empty($value) || $value == 'null') {
@@ -1750,7 +1912,8 @@ class Handler
                 if (empty($value) || $value == 'null') {
                     return true;
                 }
-                return is_numeric($value) && strlen($value) <= 15;
+                $cleanValue = str_replace(' ', '', $value);
+                return is_numeric($cleanValue) && strlen($cleanValue) <= 15;
             },
             'DentistAddress' => function ($value) {
                 if (empty($value) || $value == 'null') {
@@ -1774,13 +1937,15 @@ class Handler
                 if (empty($value) || $value == 'null') {
                     return true;
                 }
-                return is_numeric($value) && strlen($value) <= 15;
+                $cleanValue = str_replace(' ', '', $value);
+                return is_numeric($cleanValue) && strlen($cleanValue) <= 15;
             },
             'EmergencyPhoneAlt' => function ($value) {
                 if (empty($value) || $value == 'null') {
                     return true;
                 }
-                return is_numeric($value) && strlen($value) <= 15;
+                $cleanValue = str_replace(' ', '', $value);
+                return is_numeric($cleanValue) && strlen($cleanValue) <= 15;
             },
             'EmergencyRelat' => function ($value) {
                 if (empty($value) || $value == 'null') {
@@ -1804,13 +1969,15 @@ class Handler
                 if (empty($value) || $value == 'null') {
                     return true;
                 }
-                return is_numeric($value) && strlen($value) <= 15;
+                $cleanValue = str_replace(' ', '', $value);
+                return is_numeric($cleanValue) && strlen($cleanValue) <= 15;
             },
             'Emergency2PhoneAlt' => function ($value) {
                 if (empty($value) || $value == 'null') {
                     return true;
                 }
-                return is_numeric($value) && strlen($value) <= 15;
+                $cleanValue = str_replace(' ', '', $value);
+                return is_numeric($cleanValue) && strlen($cleanValue) <= 15;
             },
             'Emergency2Relat' => function ($value) {
                 if (empty($value) || $value == 'null') {
@@ -1834,13 +2001,15 @@ class Handler
                 if (empty($value) || $value == 'null') {
                     return true;
                 }
-                return is_numeric($value) && strlen($value) <= 15;
+                $cleanValue = str_replace(' ', '', $value);
+                return is_numeric($cleanValue) && strlen($cleanValue) <= 15;
             },
             'Emergency3PhoneAlt' => function ($value) {
                 if (empty($value) || $value == 'null') {
                     return true;
                 }
-                return is_numeric($value) && strlen($value) <= 15;
+                $cleanValue = str_replace(' ', '', $value);
+                return is_numeric($cleanValue) && strlen($cleanValue) <= 15;
             },
             'Emergency3Relat' => function ($value) {
                 if (empty($value) || $value == 'null') {
@@ -1951,6 +2120,7 @@ class Handler
             'HomeAddressDPID',
             'HomeAddressLatitude',
             'HomeAddressLongitude',
+            'PhoneActual'
         ];
         foreach ($addressKeys as $key) {
             if (isset($data[$key])) {
@@ -1978,7 +2148,7 @@ class Handler
 
             $stmt = $this->externalDb->prepareQuery($sql, $params)->execute();
             if ($stmt === false) {
-                throw new Exception(
+                throw new AlaressDatabaseException(
                     print_r($this->externalDb->errorInfo(), true)
                 );
             }
@@ -2008,7 +2178,7 @@ class Handler
 
             $stmt = $this->externalDb->prepareQuery($primaryCommunitySQL, $params)->execute();
             if ($stmt === false) {
-                throw new Exception(
+                throw new AlaressDatabaseException(
                     print_r($this->externalDb->errorInfo(), true)
                 );
             }
@@ -2241,7 +2411,7 @@ class Handler
             $updateSQL = "UPDATE Community SET $updateFields WHERE ID = ?";
             $stmt = $this->externalDb->prepareQuery($updateSQL, $params)->execute();
             if ($stmt === false) {
-                throw new Exception(
+                throw new AlaressDatabaseException(
                     print_r($this->externalDb->errorInfo(), true)
                 );
             }
@@ -2267,7 +2437,7 @@ class Handler
             $updateSQL = "UPDATE Students SET $updateFields WHERE ID = ?";
             $stmt = $this->externalDb->prepareQuery($updateSQL, $params)->execute();
             if ($stmt === false) {
-                throw new Exception(
+                throw new AlaressDatabaseException(
                     print_r($this->externalDb->errorInfo(), true)
                 );
             }
@@ -2296,7 +2466,7 @@ class Handler
             $updateSQL = "UPDATE CommunityLegal SET $updateFields, ModifiedBy = ?, ModifiedDate = ? WHERE ID = ?";
             $stmt = $this->externalDb->prepareQuery($updateSQL, $params)->execute();
             if ($stmt === false) {
-                throw new Exception(
+                throw new AlaressDatabaseException(
                     print_r($this->externalDb->errorInfo(), true)
                 );
             }
@@ -2320,7 +2490,7 @@ class Handler
                 $statement = $this->externalDb->prepareQuery($checkSQL, [$studentID, $apiSeqId]);
                 $stmt = $statement->execute();
                 if ($stmt === false) {
-                    throw new Exception(
+                    throw new AlaressDatabaseException(
                         print_r($this->externalDb->errorInfo(), true)
                     );
                 }
@@ -2333,7 +2503,7 @@ class Handler
                         WHERE MedicalConditionSeq = ?";
                     $stmt = $this->externalDb->prepareQuery($deleteSQL, [$apiSeqId])->execute();
                     if ($stmt === false) {
-                        throw new Exception(
+                        throw new AlaressDatabaseException(
                             print_r($this->externalDb->errorInfo(), true)
                         );
                     }
@@ -2379,7 +2549,7 @@ class Handler
                 $params = [$studentID, $code, $details, $severity, $modifiedBy];
                 $stmt = $this->externalDb->prepareQuery($insertSQL, $params)->execute();
                 if ($stmt === false) {
-                    throw new Exception(
+                    throw new AlaressDatabaseException(
                         print_r($this->externalDb->errorInfo(), true)
                     );
                 }
@@ -2415,7 +2585,7 @@ class Handler
                 $statement = $this->externalDb->prepareQuery($checkSQL, [$studentID, $consentSeq]);
                 $stmt = $statement->execute();
                 if ($stmt === false) {
-                    throw new Exception(
+                    throw new AlaressDatabaseException(
                         print_r($this->externalDb->errorInfo(), true)
                     );
                 }
@@ -2431,7 +2601,7 @@ class Handler
                     $params = [$consentGivenBy, $modifiedBy, $consentSeq];
                     $stmt = $this->externalDb->prepareQuery($deleteSQL, $params)->execute();
                     if ($stmt === false) {
-                        throw new Exception(
+                        throw new AlaressDatabaseException(
                             print_r($this->externalDb->errorInfo(), true)
                         );
                     }
@@ -2469,7 +2639,7 @@ class Handler
                 $statement = $this->externalDb->prepareQuery($checkSQL, [$consentCode, $studentID]);
                 $stmt = $statement->execute();
                 if ($stmt === false) {
-                    throw new Exception(
+                    throw new AlaressDatabaseException(
                         print_r($this->externalDb->errorInfo(), true)
                     );
                 }
@@ -2491,7 +2661,7 @@ class Handler
                             $params = [$consentGivenBy, $modifiedBy, $row["ConsentSeq"]];
                             $stmt = $this->externalDb->prepareQuery($updateSQL, $params)->execute();
                             if ($stmt === false) {
-                                throw new Exception(
+                                throw new AlaressDatabaseException(
                                     print_r($this->externalDb->errorInfo(), true)
                                 );
                             }
@@ -2514,7 +2684,7 @@ class Handler
                     $params = [$studentID, $consentCode, $consentGivenBy, $modifiedBy];
                     $stmt = $this->externalDb->prepareQuery($insertSQL, $params)->execute();
                     if ($stmt === false) {
-                        throw new Exception(
+                        throw new AlaressDatabaseException(
                             print_r($this->externalDb->errorInfo(), true)
                         );
                     }

@@ -7,6 +7,7 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\File\Mimetype;
 use Schoolbox\Permission\Access\UserAccess;
 
@@ -34,7 +35,11 @@ class Component_Homepage_PodcastController extends Component_Homepage_Controller
             $noConfig   = true;
         } else {
             try {
-                $xml = new Xml($this->getConfig('url'));
+                $xml = new Xml(
+                    $this->getConfig('url'),
+                    $this->getSitePage()->getDi()->get('httpClient.cache'),
+                    (int)$this->getConfigLoader()->get(ConfigMapper::NAME_XML_CACHE_TIMEOUT),
+                );
                 if (!$xml->channel || !count($xml->channel->item)) {
                     $emptyState = true;
                 }

@@ -322,5 +322,34 @@ button.submit {
     min-height: 0.75rem;
     display: inline-block;
     vertical-align: middle;
-    margin-left: 0.4rem;
+    margin: 0 0.4rem;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+.sbx-icon-only-button {
+    align-items: center;
+    background: none;
+    display: flex;
+    justify-content: center;
+    min-height: 40px;
+    min-width: 40px;
+    &:hover {
+        background: var(--content-ui-hover);
+    }
+    &:focus {
+        background: none;
+    }
+}
+
+// a button that displays similar to a link
+.sbx-link-button {
+    background: none;
+    min-height: auto;
+    padding: 0;
+    &:hover,
+    &:active,
+    &:focus {
+        background: none;
+    }
 }

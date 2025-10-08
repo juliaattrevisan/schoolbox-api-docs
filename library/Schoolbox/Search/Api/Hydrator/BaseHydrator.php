@@ -13,6 +13,7 @@ use Alaress\Image\Transformation\Storage;
 use Psr\Http\Message\UriInterface;
 use Schoolbox\Resource\Storage\IStorage;
 use Schoolbox\Search\Api\Cursor\RawResult;
+use Schoolbox\Search\Api\Database\Index\BaseBuilder;
 use Schoolbox\Url\Uri;
 use Schoolbox\User;
 
@@ -89,7 +90,7 @@ abstract class BaseHydrator implements IHydrator
         // Simplicity is better here.  Previously more elaborate methods of converting HTML to text were used here,
         // but the result was more complexity and more problematic edge-cases, with little benefit.
         // See https://github.com/alaress/schoolbox/pull/29275
-        return strip_tags(html_entity_decode($html));
+        return BaseBuilder::normaliseContent($html, BaseBuilder::INDEX_STRATEGY_HTML);
     }
 
     /**

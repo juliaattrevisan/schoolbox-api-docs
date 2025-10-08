@@ -21,9 +21,9 @@ use Alaress_Date_Format;
 class ValidActiveEnrolment
 {
     /**
-     * @var Alaress_Date_Format|null
+     * @var Alaress_Date_Format
      */
-    private ?Alaress_Date_Format $now;
+    private Alaress_Date_Format $now;
 
 
     /**

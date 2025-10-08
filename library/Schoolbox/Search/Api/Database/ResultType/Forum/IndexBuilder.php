@@ -88,9 +88,16 @@ class IndexBuilder extends BaseBuilder
             }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::UPDATE, $queryString, $params);
         }
+        // Set max_statement_time at the query level to ensure no timeouts even if global max_statement_time is set.
+        // The query will not work as expected without the CAST, even though a float value is supplied.
+        $queryString = "SET STATEMENT max_statement_time = CAST(:maxStatementTime AS DECIMAL(4,4)) FOR\n$queryString";
+        $params['maxStatementTime'] = BaseBuilder::QUERY_LEVEL_MAX_STATEMENT_TIME;
         $query = $this->connector->prepareQuery($queryString);
         $this->logger->info('Finding forum posts...');
+        $t0 = microtime(true);
         $query->execute($params);
+        $t1 = microtime(true);
+        $this->logger->debug('Done.  Time taken: ' . round($t1 - $t0, 4) . ' seconds.');
         $this->logger->info(sprintf('Building search indices for %d forum posts', $query->rowCount()));
         foreach ($query as $row) {
             $index = $this->buildIndex(
@@ -112,12 +119,16 @@ class IndexBuilder extends BaseBuilder
      */
     public function buildDeletes(?Alaress_Date_Format $fromDate, ?Alaress_Date_Format $toDate, ?object $subject): iterable
     {
-        $queryString = "SELECT
-            fp.postID as id
-            FROM forumThread ft
-            LEFT JOIN forumPost fp ON fp.threadID = ft.threadID
-            WHERE COALESCE(fp.deleted_at, ft.deleted_at) IS NOT NULL
-        ";
+        // Select all search_index rows linked to deleted forum posts.
+        // Note if the parent forumThread is deleted, the forumPost is considered to be deleted also regardless of its own deleted_at value.
+        $queryString = '
+            SELECT si.identifier AS id, si.type
+            FROM search_index si
+            JOIN forumPost fp ON si.identifier = fp.postID
+            JOIN forumThread ft ON fp.threadID = ft.threadID
+            WHERE si.type = "' . Hydrator::BASE_TYPE . '"
+            AND COALESCE(fp.deleted_at, ft.deleted_at) IS NOT NULL
+        ';
         $params = [];
         if ($fromDate) {
             $queryString .= ' AND COALESCE(fp.deleted_at, ft.deleted_at) >= :fromDate';
@@ -129,7 +140,7 @@ class IndexBuilder extends BaseBuilder
         }
         if ($subject) {
             if (!$this->accepts($subject, BuildType::DELETE)) {
-                return;
+                return null;
             }
             [$queryString, $params] = $this->augmentQueryParams($subject, BuildType::DELETE, $queryString, $params);
         }

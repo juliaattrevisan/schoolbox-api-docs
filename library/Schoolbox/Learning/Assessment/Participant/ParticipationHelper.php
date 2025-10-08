@@ -14,7 +14,11 @@ use Schoolbox\Assessment\Participant\Model as ParticipantModel;
 use Schoolbox\Assessment\Participant\Plan\Model as PlanModel;
 use Schoolbox\Collection;
 use Schoolbox\GenericCollection;
+use Schoolbox\Learning\Assessment\DataModel\MapperProxy;
 use Schoolbox\Learning\Assessment\DataModel\Model as AssessmentDataModel;
+use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\Participant;
+use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\Mapper\DefinitionException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\UserMapper;
@@ -26,8 +30,12 @@ class ParticipationHelper
      */
     private ?Collection $existingParticipationPerUser = null;
 
-    public function __construct(private AssessmentDataModel $assessment, private DataSource $participantDataSource, private UserMapper $userMapper)
-    {
+    public function __construct(
+        private AssessmentDataModel $assessment,
+        private DataSource $participantDataSource,
+        private UserMapper $userMapper,
+        private MapperProxy $mapperProxy,
+    ) {
     }
 
     /**
@@ -159,6 +167,15 @@ class ParticipationHelper
                     $participantMapper->save($existingParticipation);
                     $keepExistingParticipation = true;
                 }
+
+                $customisedPlan = $this->getCustomisedParticipation($userId);
+                /* If the student has a customised plan, exclude them from the customised plan after adding back to
+                 * the original assessment plan.
+                 */
+                if (null !== $customisedPlan) {
+                    $customisedPlan->setExcludedAt(\Alaress_Date_Format::now());
+                    $participantMapper->save($customisedPlan);
+                }
             }
 
             if (!$keepExistingParticipation) {
@@ -183,5 +200,34 @@ class ParticipationHelper
     {
         $planMapper = $this->participantDataSource->getPlanMapper();
         return $planMapper->findOneByColumnList(['assessment_id' => $this->assessment->getId(), 'is_dynamic' => true]);
+    }
+
+    /**
+     * Find the participation of the student in the customised assessment.
+     *
+     * @param int $userId
+     * @return Participant|null
+     * @throws MapperException
+     */
+    private function getCustomisedParticipation(int $userId): ?Participant
+    {
+        $user = $this->userMapper->createModel($userId);
+        $customisation = $this->mapperProxy->findAllCustomisedAssessment($this->mapperProxy->translateToDomainModel($this->assessment));
+        /* Find the customised plan that the user is part of and return it
+         */
+        $plan = null;
+        foreach ($customisation as $customisedAssessment) {
+            if ($customisedAssessment instanceof IAssessable === false) {
+                continue;
+            }
+            $plan = $customisedAssessment->getParticipantIfExtant($user);
+            /* Exit early after it found the first plan that contains the student
+             * as the student should only be included in one of the plan from either original or customised
+             */
+            if (null !== $plan) {
+                break;
+            }
+        }
+        return $plan;
     }
 }

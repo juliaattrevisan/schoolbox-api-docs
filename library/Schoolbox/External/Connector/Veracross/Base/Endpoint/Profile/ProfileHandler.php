@@ -261,7 +261,7 @@ class ProfileHandler
         /* Some part of $newObject is different to $oldObject somehow
          *
          * Avoid nuking every column via mapper save by piecing it together manually
-         * just like we used to do in the previous millenium
+         * just like we used to do in the previous millennium
          */
         $pieces = [];
 
@@ -302,9 +302,21 @@ class ProfileHandler
                 if (self::BASE_PROFILE_PROPERTY === $property) {
                     $params[$property] = $identifierValue;
                 } else if ($mapping[$property]['hydrator'] instanceof Date) {
-                    $params[$property] = $newObject->$getter()->getDatabase();
+                    /* A date field might be null, esp. when those dates are optional
+                     * Prime examples are enrolment dates, leaving dates, employment dates etc.
+                     */
+                    $params[$property] = $newObject->$getter()?->getDatabase();
                 } else {
-                    $params[$property] = $newObject->$getter();
+                    $val = $newObject->$getter();
+
+                    /* Co-erce bools to ints universally: our orm uses bools,
+                     * but we persist them as int 1 or int 0 in the db schema.
+                     */
+                    if (is_bool($val)) {
+                        $val = $val ? 1 : 0;
+                    }
+
+                    $params[$property] = $val;
                 }
             }
         }

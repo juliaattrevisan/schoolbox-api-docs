@@ -1,0 +1,10 @@
+UPDATE config SET value='tcp://redis-storage:6379' WHERE name='redis_url';
+UPDATE config SET value='tcp://redis-cache:6379' WHERE name='redis_ephemeral_url';
+UPDATE config SET value='tcp://redis-storage:6379' WHERE name='taskd_redis_url';
+UPDATE config SET value='rabbitmq' WHERE name='amqp_host';
+UPDATE config SET value='http://schoolbox-gotenberg:3000' WHERE name='gotenberg_host';
+UPDATE config SET value='docker' WHERE name='site_hostname';
+UPDATE config SET value='dev.schoolbox.cloud' WHERE name='site_domain';
+UPDATE config SET value='http://schoolbox-etherpad:9001' WHERE name='etherpad_host';
+UPDATE config SET value='test' WHERE name='etherpad_api_token';
+UPDATE config SET value=REPLACE(value, '/vagrantx', '/docker') WHERE name LIKE '%dir%';

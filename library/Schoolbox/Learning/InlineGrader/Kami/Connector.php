@@ -64,7 +64,7 @@ class Connector implements IConnector
     /**
      * Kami API host: defaults to `self::DEFAULT_BASE_URI` if empty.
      */
-    private ?string $apiHost;
+    private string $apiHost;
 
     /**
      * Shared by all schoolbox instances. There is an alternative api-key available for testing to keep

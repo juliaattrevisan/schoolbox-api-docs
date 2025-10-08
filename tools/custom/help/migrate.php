@@ -31,7 +31,7 @@ $app = new class extends CliTool\App {
     }
 
     /** @inheritdoc */
-    public function getRequiredProcessUser(): ?string
+    public function getRequiredProcessUser(): string
     {
         return 'www-data';
     }

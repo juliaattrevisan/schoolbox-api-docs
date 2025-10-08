@@ -30,7 +30,7 @@ sqlhost=$(schoolbox-conf --conf="$conffile" --option=SQL_host);
 sqldb=$(schoolbox-conf --conf="$conffile" --option=SQL_db);
 
 # Collect current SQL version
-sqlver=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='site_version' \G;" | grep 'value' | cut -d' ' -f2`;
+sqlver=`mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='site_version' \G;" | grep 'value' | cut -d' ' -f2`;
 
 if [ -z $sqlver ];
 then
@@ -38,12 +38,12 @@ then
 	exit;
 fi
 
-backupdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='backup_dir' \G;" | grep 'value' | cut -d' ' -f2`;
+backupdir=`mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='backup_dir' \G;" | grep 'value' | cut -d' ' -f2`;
 backupdir=`readlink -f $backupdir/../`
 backupfile="$backupdir/$sqlver-`date +%Y-%m-%d_%H-%M-%S`.sql";
 
 mkdir -p $backupdir;
-mysqldump --single-transaction -f --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile 2>&1;
+mariadb-dump --single-transaction -f --allow-keywords --default-character-set=utf8mb4 -i -e -q -a -c -u $sqluser -p$sqlpasswd $sqldb > $backupfile 2>&1;
 
 echo "Backup of database at version $sqlver located at: $backupfile";
 exit;

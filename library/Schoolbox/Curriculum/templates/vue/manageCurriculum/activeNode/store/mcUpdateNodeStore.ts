@@ -2,9 +2,8 @@
  * Handles the store to disband the group
  */
 
-/* eslint-disable import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
-
 import { defineStore } from "pinia";
+/* eslint-disable-next-line import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
 import { useActiveNodeStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcActiveNodeStore";
 import type { Node, NodeToUpdate } from "@schoolboxCurriculum/types/Node";
 

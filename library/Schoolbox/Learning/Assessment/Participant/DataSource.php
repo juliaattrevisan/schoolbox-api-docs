@@ -18,7 +18,6 @@ use Schoolbox\Learning\Assessment\IFeedback;
 use Schoolbox\Learning\Assessment\Participant as ParticipantObject;
 use Schoolbox\Learning\Assessment\Plan as PlanObject;
 use Schoolbox\Assessment\Participant;
-use Schoolbox\Learning\Assessment\Plan;
 use Schoolbox\Learning\Assessment\Project;
 use Schoolbox\Learning\Assessment\Response\DataSource as ResponseDataSource;
 use Schoolbox\Mapper\DefinitionException;
@@ -193,13 +192,13 @@ class DataSource
      * This is a union of:
      * * any students in the context's folder's class
      * * any read-level members of the context's folder's group
-     * * anyone who has submitted a Response for this assessment
-     * * anyone who has been given Feedback for this assessment
+     * * anyone who has submitted a (non-deleted) Response for this assessment
+     * * anyone who has been given (non-deleted) Feedback for this assessment
      *
      * This method sets the participants into each $assessment
      *
      * @param IAssessable[]|GenericCollection $assessments         Indexed by assessment.id
-     * @param null|User                       $user                If specified, only load this user's interactions
+     * @param User|null                       $user                If specified, only load this user's interactions
      * @param bool                            $removeExcluded      if true, exclude excluded non-member participants
      * @param bool                            $assumeParticipation if true, assume $user is a participant in the
      *                                                             assessment without checking the assessment's folder.
@@ -210,7 +209,7 @@ class DataSource
      */
     protected function findForAssessmentCollection(
         GenericCollection $assessments,
-        User $user = null,
+        ?User $user = null,
         bool $removeExcluded = false,
         bool $assumeParticipation = false,
         array $options = []
@@ -269,7 +268,7 @@ class DataSource
      */
     private function loadDynamicPlanParticipants(
         GenericCollection $dynamicPlans,
-        User $user = null,
+        ?User $user = null,
         bool $assumeParticipation = false
     ): void {
         // Load dynamic participants into dynamic plans

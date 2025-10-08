@@ -2,6 +2,7 @@ import { expect } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import Common from "@schoolboxTest/playwright/support/page/Common";
+import type DatabaseHelper from "@schoolboxTest/playwright/support/DatabaseHelper";
 
 export default class AssessmentForm {
     private tester: AcceptanceTester;
@@ -19,6 +20,8 @@ export default class AssessmentForm {
 
     static readonly SELECTOR_WORKTYPE = "assessment-form-select-workType";
 
+    static readonly DATA_TEST_SELF_REFLECTION = "assessment-form-select-selfReflection";
+
     static readonly SELECTOR_WEIGHT = "assessment-form-input-weight";
 
     static readonly SELECTOR_VISIBILITY = "assessment-form-select-visibility";
@@ -31,15 +34,23 @@ export default class AssessmentForm {
 
     static readonly SELECTOR_DUE_DATE = "assessment-form-input-date-due";
 
-    static readonly SELECTOR_MARK_TYPE = "assessment-form-select-markType";
+    static readonly DATA_TEST_MARK_TYPE = "assessment-form-select-markType";
+
+    static readonly DATA_TEST_INSTRUCTOR_MARK_TYPE = "assessment-form-select-instructor-markType";
+
+    static readonly DATA_TEST_DUAL_MARK_TYPES = "assessment-form-checkbox-dualMarkTypes";
 
     static readonly SELECTOR_BUTTON_CREATE = "assessment-form-button-submit-Create";
 
     static readonly SELECTOR_BUTTON_UPDATE = "assessment-form-button-submit-Update";
 
-    static readonly DATATEST_SUBMISSION_TYPE_CONTAINER = "assessment-form-submission-type-container";
+    static readonly DATA_TEST_SUBMISSION_TYPE_CONTAINER = "assessment-form-submission-type-container";
 
-    static readonly DATATEST_SUBMISSION_TYPE_LABEL = "assessment-form-submission-type"; // Append "-[submissionType]"
+    static readonly DATA_TEST_SUBMISSION_TYPE_LABEL = "assessment-form-submission-type"; // Append "-[submissionType]"
+
+    static readonly DATA_TEST_USE_RUBRIC = "assessment-form-use-rubric";
+
+    static readonly DATA_TEST_RUBRIC_SPAWN_LEVEL = "rubric-spawn-level";
 
     static readonly SELECTOR_PARTICIPATION_BUTTON_SAVE = "participation-plan-form-button-save";
 
@@ -59,9 +70,13 @@ export default class AssessmentForm {
 
     static readonly SELECTOR_CONFIRM_DIALOG_BUTTON_CONFIRM = "confirm-dialog-confirm-button";
 
+    static readonly SELECTOR_CONFIRM_DIALOG_BUTTON_CANCEL = "confirm-dialog-cancel-button";
+
     static readonly SELECTOR_HOMEPAGE_TABS = "homepage-tabs";
 
-    static readonly DATATEST_MODIFY_PLANS = "sbx-pop-out-plan-options-button";
+    static readonly DATA_TEST_MODIFY_PLANS = "sbx-pop-out-plan-options-button";
+
+    static readonly SELECTOR_WORKSHEET_ATTACHMENT_ZONE = "#WorksheetZone";
 
     // Work type constants
     static readonly WORKTYPE_ASSESSMENT_TASK = 1;
@@ -73,13 +88,20 @@ export default class AssessmentForm {
     static readonly WORKTYPE_NONE = 7;
 
     // Mark type constants
-    static readonly MARK_TYPE_NONE = 0;
+    static readonly MARK_TYPE_NONE = 6;
 
     static readonly MARK_TYPE_PERCENTAGE = 1;
 
     static readonly MARK_TYPE_TOTAL_MARK = 3;
 
     static readonly MARK_TYPE_LETTER_GRADE = 2;
+
+    // Self reflection constants
+    static readonly SELF_REFLECTION_NONE = "none";
+
+    static readonly SELF_REFLECTION_REFLECT_ONLY = "reflect-only";
+
+    static readonly SELF_REFLECTION_FULL = "full";
 
     // Visibility constants
     // NOTE: The PHP implementation referenced Schoolbox\Assessment\Component\SubmissionBox
@@ -104,6 +126,8 @@ export default class AssessmentForm {
 
     static readonly TYPE_FILES = "files";
 
+    static readonly INTERACTIVE_WORKSHEET = "interactive_worksheet";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -118,12 +142,37 @@ export default class AssessmentForm {
     }
 
     /**
-     * Submits this form to create a duework
+     * Submits this form to create a duework - by default it skips the participation prompt by clicking Later
+     * if you want to navifate to the participation plan page, set toParticipation to true eg: create(true, true);
      * Verifies that the homepage is visible after submission
+     * @param hasParticipationPrompt - Whether the participation prompt is expected to be shown (should be when creating a new class/project duework/task)
+     * @param toParticipation - Whether to navigate to the participation page
      */
-    async create(): Promise<void> {
+    async create(hasParticipationPrompt: boolean = true, toParticipation: boolean = false): Promise<void> {
         await this.page.getByTestId(AssessmentForm.SELECTOR_BUTTON_CREATE).click();
-        await expect(this.page.getByTestId(AssessmentForm.SELECTOR_HOMEPAGE_TABS)).toHaveCount(1);
+
+        if (hasParticipationPrompt && toParticipation) {
+            // If the participation prompt is shown, and we wish to navigate to the participation page
+            const confirmDialogConfirm = this.page.getByTestId(AssessmentForm.SELECTOR_CONFIRM_DIALOG_BUTTON_CONFIRM);
+            await confirmDialogConfirm.click();
+        } else if (hasParticipationPrompt && !toParticipation) {
+            // Otherwise, if the participation prompt is shown but we wish to skip participation editing
+            const confirmDialogCancel = this.page.getByTestId(AssessmentForm.SELECTOR_CONFIRM_DIALOG_BUTTON_CANCEL);
+            await confirmDialogCancel.click();
+        }
+
+        const homepageTabs = this.page.getByTestId(AssessmentForm.SELECTOR_HOMEPAGE_TABS);
+        const courseModifyPage = this.page.locator("h1").filter({ hasText: "Modify Course" });
+
+        // either of the above should be visible
+        await expect(homepageTabs.or(courseModifyPage)).toHaveCount(1);
+    }
+
+    /**
+     * Submits this form to create a duework
+     */
+    async clickCreate(): Promise<void> {
+        await this.page.getByTestId(AssessmentForm.SELECTOR_BUTTON_CREATE).click();
     }
 
     /**
@@ -143,12 +192,39 @@ export default class AssessmentForm {
     }
 
     /**
-     * Sets mark type
+     * Sets display mark type
      * @param markType - The mark type to set
      */
     async setMarkType(markType: number): Promise<void> {
-        const markTypeSelectEl = this.page.getByTestId(AssessmentForm.SELECTOR_MARK_TYPE);
+        const markTypeSelectEl = this.page.getByTestId(AssessmentForm.DATA_TEST_MARK_TYPE);
         await markTypeSelectEl.selectOption({ value: markType.toString() });
+    }
+
+    /**
+     * Sets instructor mark type
+     * @param markType - The mark type to set
+     */
+    async setInstructorMarkType(markType: number): Promise<void> {
+        const markTypeSelectEl = this.page.getByTestId(AssessmentForm.DATA_TEST_INSTRUCTOR_MARK_TYPE);
+        await markTypeSelectEl.selectOption({ value: markType.toString() });
+    }
+
+    /**
+     * Enable the "Use dual mark types" option (and expect that it's not currently checked)
+     */
+    async enableDualMarkTypes(): Promise<void> {
+        const dualMarkTypesSwitch = this.page.getByTestId(AssessmentForm.DATA_TEST_DUAL_MARK_TYPES);
+        await expect(dualMarkTypesSwitch).not.toBeChecked();
+        await dualMarkTypesSwitch.check();
+    }
+
+    /**
+     * Disable the "Use dual mark types" option (and expect that it's currently checked)
+     */
+    async disableDualMarkTypes(): Promise<void> {
+        const dualMarkTypesSwitch = this.page.getByTestId(AssessmentForm.DATA_TEST_DUAL_MARK_TYPES);
+        await expect(dualMarkTypesSwitch).toBeChecked();
+        await dualMarkTypesSwitch.uncheck();
     }
 
     /**
@@ -157,6 +233,20 @@ export default class AssessmentForm {
      */
     async setWeight(weight: number): Promise<void> {
         await this.page.getByTestId(AssessmentForm.SELECTOR_WEIGHT).fill(weight.toString());
+    }
+
+    /**
+     * Sets work type
+     * @param option - The self-reflection option to set
+     */
+    async setSelfReflection(
+        option:
+            | typeof AssessmentForm.SELF_REFLECTION_NONE
+            | typeof AssessmentForm.SELF_REFLECTION_REFLECT_ONLY
+            | typeof AssessmentForm.SELF_REFLECTION_FULL,
+    ): Promise<void> {
+        const selfReflectionSelectEl = this.page.getByTestId(AssessmentForm.DATA_TEST_SELF_REFLECTION);
+        await selfReflectionSelectEl.selectOption({ value: option });
     }
 
     /**
@@ -183,13 +273,14 @@ export default class AssessmentForm {
      */
     async checkSubmissionAllowed(
         submissionType:
+            | typeof AssessmentForm.INTERACTIVE_WORKSHEET
             | typeof AssessmentForm.ALLOW_OFFLINE
             | typeof AssessmentForm.TEXT_EDITOR
             | typeof AssessmentForm.TYPE_FILES,
     ): Promise<void> {
-        const submissionTypeContainer = this.page.getByTestId(AssessmentForm.DATATEST_SUBMISSION_TYPE_CONTAINER);
+        const submissionTypeContainer = this.page.getByTestId(AssessmentForm.DATA_TEST_SUBMISSION_TYPE_CONTAINER);
         await expect(submissionTypeContainer).toContainText("Select the type of submission allowed");
-        await this.page.getByTestId(`${AssessmentForm.DATATEST_SUBMISSION_TYPE_LABEL}-${submissionType}`).click();
+        await this.page.getByTestId(`${AssessmentForm.DATA_TEST_SUBMISSION_TYPE_LABEL}-${submissionType}`).click();
     }
 
     /**
@@ -280,6 +371,61 @@ export default class AssessmentForm {
      * Modify a learning plan
      */
     async clickModifyLearningPlan(): Promise<void> {
-        await this.page.getByTestId(AssessmentForm.DATATEST_MODIFY_PLANS).click();
+        await this.page.getByTestId(AssessmentForm.DATA_TEST_MODIFY_PLANS).click();
+    }
+
+    /**
+     * Sets attachment in the interactive worksheet zone
+     * @param db - The DatabaseHelper instance
+     * @param filePath - The file to attach
+     */
+    async worksheetAttachment(db: DatabaseHelper, filePath: string): Promise<void> {
+        const attachZone = this.page.locator(AssessmentForm.SELECTOR_WORKSHEET_ATTACHMENT_ZONE);
+        await this.tester.dragAndDropFile(db, attachZone, filePath);
+    }
+
+    /**
+     * Toggles the use rubric option
+     */
+    async toggleUseRubric(): Promise<void> {
+        const useRubricInputId = await this.page.getByTestId(AssessmentForm.DATA_TEST_USE_RUBRIC).getAttribute("id");
+        const useRubricLabel = this.page.locator(`.switch label[for="${useRubricInputId}"]`);
+        await useRubricLabel.click();
+    }
+
+    /**
+     * Adds a new rubric indicator level
+     */
+    async addRubricLevel(): Promise<void> {
+        await this.page.getByTestId(AssessmentForm.DATA_TEST_RUBRIC_SPAWN_LEVEL).click();
+    }
+
+    /**
+     * Toggle a given rubric indicator
+     * @param capabilityId - The capability ID
+     * @param indicatorId - The indicator ID
+     */
+    async toggleRubricIndicator(capabilityId: number, indicatorId: number): Promise<void> {
+        const rubricIndicator = this.page.locator(`label[for="rb[${capabilityId}][criterion][${indicatorId}][on]"]`);
+        await rubricIndicator.click();
+    }
+
+    /**
+     * Fill in points for a given criterion
+     * @param capabilityId - The capability ID
+     * @param indicatorId - The indicator ID
+     * @param criterionId - The criterion ID
+     * @param value - The value to set
+     */
+    async fillRubricCriterionPoints(
+        capabilityId: number,
+        indicatorId: number,
+        criterionId: number,
+        value: string | number,
+    ): Promise<void> {
+        const pointsInput = this.page.locator(
+            `input[name="rb[${capabilityId}][descriptor][${indicatorId}][${criterionId}][points]"]`,
+        );
+        await pointsInput.fill(value.toString());
     }
 }

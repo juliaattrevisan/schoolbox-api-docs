@@ -39,7 +39,7 @@ class ApnService extends AbstractService
      *
      * (Created automatically on calling `$this->propagate`.)
      */
-    private ?ProtocolInterface $protocol;
+    private ?ProtocolInterface $protocol = null;
 
     /**
      * The app's title, usually from `config.title`.
@@ -70,7 +70,7 @@ class ApnService extends AbstractService
         string $appIdentifier,
         string $appTitle,
         string $certPath,
-        string $passPhrase = null
+        ?string $passPhrase = null
     ) {
         parent::__construct($registryMapper, $appIdentifier);
         $this->appTitle   = $appTitle;

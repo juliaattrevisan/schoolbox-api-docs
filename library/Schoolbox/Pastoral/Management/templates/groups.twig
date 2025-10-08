@@ -16,74 +16,75 @@
 </div>
 {% endif %}
 
-<div class="row actions-small-1">
-    <div class="list-item">
-        <div class="small-12 columns">
+
+<div class="small-12 columns">
+    <div class="actions-small-1">
+        <div class="list-item">
             <h2 class="subheader">Your Groups</h2>
         </div>
+        <nav>
+            {# Pastoral moderators can manage pastoral groups #}
+            {% if isRouteAuthorized('pastoralManagement.getGroupsModify') %}
+                <a href="{{ routeLookup('pastoralManagement.getGroupsModify') }}" class="icon-add" title="Add {{ locale.pastoral.proper }} Group"></a>
+            {% endif %}
+        </nav>
     </div>
-    <nav>
-        {# Pastoral moderators can manage pastoral groups #}
-        {% if isRouteAuthorized('pastoralManagement.getGroupsModify') %}
-            <a href="{{ routeLookup('pastoralManagement.getGroupsModify') }}" class="icon-add" title="Add {{ locale.pastoral.proper }} Group"></a>
-        {% endif %}
-    </nav>
 </div>
 
-<div class="row">
-    <div class="small-12 island">
-        {% if groups is not empty %}
-            <section>
-                <ul class="action-list">
-                    {% for group in groups %}
-                        <li class="actions-small-2">
-                            <div class="list-item">
-                                <div class="card small-12">
-                                    <a href='{{ profile.link(group.user) }}'>
-                                        {{ profile.imageSquare64(group.user) }}
-                                    </a>
-                                    <a href="{{ routeLookup('pastoralManagement.getGroupsModify', {groupId: group.id}) }}">
-                                        <h3>
-                                            {{ group.name }}
-                                            {% if group.membersWithPermission | length %}
-                                                ({{ group.membersWithPermission | length }} Member{% if group.members | length %}s{% endif %})
-                                            {% endif %}
-                                        </h3>
-                                    </a>
-                                    <p class="meta">
-                                        Created by
-                                        {% if not group.user.deletedAt %}
-                                            <a href="{{ profile.link(group.user) }}">{{ group.user.fullName }}</a>
-                                        {% else %}
-                                            {{ group.user.fullName }}
+
+<div class="small-12 island">
+    {% if groups is not empty %}
+        <section>
+            <ul class="action-list">
+                {% for group in groups %}
+                    <li class="actions-small-2">
+                        <div class="list-item">
+                            <div class="card small-12">
+                                <a href='{{ profile.link(group.user) }}'>
+                                    {{ profile.imageSquare64(group.user) }}
+                                </a>
+                                <a href="{{ routeLookup('pastoralManagement.getGroupsModify', {groupId: group.id}) }}">
+                                    <h3>
+                                        {{ group.name }}
+                                        {% if group.membersWithPermission | length %}
+                                            ({{ group.membersWithPermission | length }} Member{% if group.members | length %}s{% endif %})
                                         {% endif %}
-                                    </p>
-                                </div>
+                                    </h3>
+                                </a>
+                                <p class="meta">
+                                    Created by
+                                    {% if not group.user.deletedAt %}
+                                        <a href="{{ profile.link(group.user) }}">{{ group.user.fullName }}</a>
+                                    {% else %}
+                                        {{ group.user.fullName }}
+                                    {% endif %}
+                                </p>
                             </div>
-                            <nav>
-                                <a class="icon-modify no-text"
-                                   href="{{ routeLookup('pastoralManagement.getGroupsModify', {groupId: group.id}) }}"
-                                   title="Edit Group"></a>
-                                <a href="#" data-delete="{{ group.id }}" class="icon-delete"
-                                   title="Delete {{ locale.pastoral.proper }} Group"></a>
-                            </nav>
-                        </li>
-                    {% endfor %}
-                </ul>
-            </section>
-        {% else %}
-            <div class="empty-state">
-                <i class="icon-group"></i>
-                <p>No {{ locale.pastoral }} groups have been created.</p>
-                {% if isRouteAuthorized('pastoralManagement.getGroupsModify') %}
-                    <p>{{ locale.pastoral.proper }} groups can be used to dynamically audience {{ locale.pastoral }}
-                        records. Do you want to <a href="{{ routeLookup('pastoralManagement.getGroupsModify') }}">create
-                            a {{ locale.pastoral }} group</a>?</p>
-                {% endif %}
-            </div>
-        {% endif %}
-    </div>
+                        </div>
+                        <nav>
+                            <a class="icon-modify no-text"
+                                href="{{ routeLookup('pastoralManagement.getGroupsModify', {groupId: group.id}) }}"
+                                title="Edit Group"></a>
+                            <a href="#" data-delete="{{ group.id }}" class="icon-delete"
+                                title="Delete {{ locale.pastoral.proper }} Group"></a>
+                        </nav>
+                    </li>
+                {% endfor %}
+            </ul>
+        </section>
+    {% else %}
+        <div class="empty-state">
+            <i class="icon-group"></i>
+            <p>No {{ locale.pastoral }} groups have been created.</p>
+            {% if isRouteAuthorized('pastoralManagement.getGroupsModify') %}
+                <p>{{ locale.pastoral.proper }} groups can be used to dynamically audience {{ locale.pastoral }}
+                    records. Do you want to <a href="{{ routeLookup('pastoralManagement.getGroupsModify') }}">create
+                        a {{ locale.pastoral }} group</a>?</p>
+            {% endif %}
+        </div>
+    {% endif %}
 </div>
+
 
 {% if showAdminNavMenu %}
     </div>

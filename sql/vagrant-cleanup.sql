@@ -40,3 +40,10 @@ UPDATE config SET value='' WHERE name = 'office365_immersive_reader_name';
 UPDATE config SET value='' WHERE name = 'office365_secret';
 UPDATE config SET value='' WHERE name = 'office365_tenant';
 UPDATE config SET value='' WHERE name = 'office365_tenant_id';
+UPDATE config SET value='local' WHERE name = "otfs_adapter";
+UPDATE user SET password='$2y$10$LhHqvE7IZpPQfIpZ21wtmeK5TUBgFzJCa1NejhuMYcc225j4QiVJG' WHERE username='alaress';
+
+## clear all passwords (other than paperly)
+UPDATE user
+SET password = null
+WHERE username NOT IN ('paperly', 'rwhite', 'trialuser');

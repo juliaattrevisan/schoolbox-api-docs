@@ -40,6 +40,7 @@ use Schoolbox\User;
 use Schoolbox\User\Translator\ModelToArray as UserTranslator;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 /**
  * Class Controller
@@ -109,6 +110,12 @@ class Controller extends Base
 
 
     /**
+     * Helper for editor templates.
+     */
+    private EditorTemplateHelper $editorTemplateHelper;
+
+
+    /**
      * Controller constructor.
      *
      * @param Error\Mapper      $errorMapper
@@ -121,6 +128,7 @@ class Controller extends Base
      * @param Attendance\Mapper $attendanceMapper
      * @param FolderAccess      $folderAccess
      * @param Validator         $validator
+     * @param EditorTemplateHelper    $editorTemplateHelper
      */
     public function __construct(
         Error\Mapper $errorMapper,
@@ -133,6 +141,7 @@ class Controller extends Base
         Attendance\Mapper $attendanceMapper,
         FolderAccess $folderAccess,
         Validator $validator,
+        EditorTemplateHelper $editorTemplateHelper,
     ) {
         $this->errorMapper = $errorMapper;
         $this->roleMapper = $roleMapper;
@@ -144,6 +153,7 @@ class Controller extends Base
         $this->attendanceMapper = $attendanceMapper;
         $this->folderAccess = $folderAccess;
         $this->validator = $validator;
+        $this->editorTemplateHelper = $editorTemplateHelper;
     }
 
 
@@ -303,6 +313,7 @@ class Controller extends Base
 
             'guests' => [],
             'returnUrl' => Redirect::queryStringEncodedParam($this->requestQuery->get('returnUrl') ?? Redirect::encode('/')),
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ], 'Create event');
     }
 
@@ -395,6 +406,7 @@ class Controller extends Base
 
             'guests' => $this->attendanceMapper->findAttendances($event),
             'returnUrl' => Redirect::queryStringEncodedParam($this->requestQuery->get('returnUrl') ?? Redirect::encode('/')),
+            'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
         ], "Modify {$event->getTitle()}");
     }
 
@@ -723,9 +735,10 @@ class Controller extends Base
         try {
             // Unlike the other dates, until date is currently always a date and
             // not a date+time.
+            // need to match the formats in \Schoolbox\Calendar\Event\Validator::getValidFormatsForDateField, or this will do nothing...
             $untilDate = (new Alaress_Date_Format(
                 $validRequestPost['repeat_until'] ?? $endDate->getDatabaseDate(),
-                [$locale->localShortFormat(), Alaress_Date_Format::DATABASE_DATE_FORMAT],
+                [$locale->localShortFormat(), Alaress_Date_Format::DATABASE_DATE_FORMAT, Alaress_Date_Format::FORMAT_DATE_ALT],
             ))->endOfDay();
         } catch (InvalidArgumentException) {
             $untilDate = (clone $endDate)->endOfDay();
@@ -836,14 +849,14 @@ class Controller extends Base
                     'allDay' => ($event->getAllDay() === 1), // Convert from int to boolean.
                     'efficacy' => $efficacy,
                     'title' => $event->getTitle(),
-                    'startDate' => $event->getStartDateTime()->getJson(),
-                    'endDate' => $event->getEndDateTime()->getJson(),
+                    'startDate' => $event->getStartDateTime()->toRfc3339String(),
+                    'endDate' => $event->getEndDateTime()->toRfc3339String(),
                     'repeat' => $repeat,
-                    'repeat_until' => $untilDate->getJson(),
+                    'repeat_until' => $untilDate->toRfc3339String(),
                     'type' => $event->getType(),
                     'location' => $event->getLocation(),
                     'detail' => $event->getDetail(),
-                    'publishDate' => $event->getPublishDateTime()->getJson(),
+                    'publishDate' => $event->getPublishDateTime()->toRfc3339String(),
                     'level' => $accessLevel,
                     'roles' => $this->translateRoleModelsToArrays(
                         $this->roleMapper->findByColumn('id', $event->getRoleCollection())
@@ -972,7 +985,7 @@ class Controller extends Base
             ]);
         } else {
             if ($this->isJsonRequest()) {
-                $this->response = $this->responseAsJson('')->withStatus(204); // HTTP status 204 means 'No Content'.
+                $this->response = $this->responseEmpty()->withStatus(204); // HTTP status 204 means 'No Content'.
             } else {
                 $this->response = $this->redirectFound($redirect);
             }

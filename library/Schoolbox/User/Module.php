@@ -15,6 +15,7 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Oidc\Server\RelyingParty\Mapper as RelyingPartyMapper;
+use Schoolbox\Oidc\Server\RelyingParty\Grant\Mapper as RelyingPartyGrantMapper;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Permission\Access\UserAccessMapper;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
@@ -37,6 +38,9 @@ class Module extends BaseModule
         $impersonatePermission = new Rule\Any(
             new Rule\IsSuperuser(),
             new Rule\Callback(
+                /*
+                 * User-to-impersonate is linked to logged-in-user.
+                 */
                 function ($params, User $user) {
                     // Do not allow unlinked users to switch
                     foreach ($user->getLinkedUsers() as $linkedUser) {
@@ -48,19 +52,18 @@ class Module extends BaseModule
                 }
             ),
             new Rule\Callback(
-                function ($params, User $user) {
+                /*
+                 * User-to-impersonate's role is impersonateable by logged-in-user AND
+                 * User-to-impersonate is not a superuser AND
+                 * User-to-impersonate (
+                 *    is not a pastoral moderator at any level of access OR
+                 *    is a pastoral moderator at an equal or lower level than logged-in-user
+                 * )
+                 */
+                function ($params, User $user): void {
+                    // In this function, the logged-in user is a non-superuser (because of Rule\Any(Rule\isSuperuser, ..., [thisRule]).
+
                     $userToImpersonate = $params['user'];
-
-                    if ($userToImpersonate->isSuperuser()) {
-                        // Superusers may not be impersonated by non-superusers.
-                        // Note this function should be called only if the logged-in user is not a superuser.
-                        throw new Unauthorized();
-                    }
-
-                    if ($userToImpersonate->getRole()->getId() === null) {
-                        // If the user to impersonate does not have a role (perhaps due to a hydrating problem), deny.
-                        throw new Unauthorized();
-                    }
 
                     if (
                         !$user->hasServicePermission(
@@ -70,6 +73,27 @@ class Module extends BaseModule
                         )
                     ) {
                         throw new Unauthorized();
+                    }
+
+                    if ($userToImpersonate->isSuperuser()) {
+                        // Superusers may not be impersonated by non-superusers.
+                        throw new Unauthorized();
+                    }
+
+                    if ($userToImpersonate->hasServicePermission(UserAccess::SERVICE_PASTORAL, UserAccess::ACCESS_READ)) {
+                        // Only allow impersonation if the non-superuser impersonator has equal or higher access on the pastoral service permission.
+
+                        $userAccessLevel = (
+                            $user->getServicePermissionAccessLevel(UserAccess::SERVICE_PASTORAL)
+                        );
+                        $userToImpersonateAccessLevel = (
+                            $userToImpersonate->getServicePermissionAccessLevel(UserAccess::SERVICE_PASTORAL)
+                        );
+
+                        if ($userAccessLevel < $userToImpersonateAccessLevel) {
+                            // Pastoral moderators may not be impersonated by non-superusers who have lower level pastoral access.
+                            throw new Unauthorized();
+                        }
                     }
                 }
             )
@@ -114,7 +138,7 @@ class Module extends BaseModule
         return new Controller(
             $this->getMapperFactory()->get(UserAccessMapper::class),
             $this->getMapperFactory()->get(Logger\Mapper::class),
-            $this->getMapperFactory()->get(RelyingPartyMapper::class),
+            $this->getMapperFactory()->get(RelyingPartyGrantMapper::class),
             $this->injector->get('user.logout.requestFactory'),
             $this->injector->get('httpClient'),
         );

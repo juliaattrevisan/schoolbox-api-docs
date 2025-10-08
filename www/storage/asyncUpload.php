@@ -32,12 +32,12 @@ if ($user) {
 /** @var PrefixGenerator $prefixGenerator */
 $prefixGenerator = $kernel->get('cdnPrefixGenerator');
 
-$result = array(
+$result = [
     'success' => false,
-    'error'   => 500,
+    'error'   => 400,
     'message' => 'Unknown Error',
     'hash'    => '',
-);
+];
 if (!($_SESSION['id'] ?? false)) {
     $result['message'] = 'Unauthorized';
     $result['error']   = 403;
@@ -55,16 +55,19 @@ if (!($_SESSION['id'] ?? false)) {
     }
 
     if (is_array($meta['name'])) {
-        $hashes = array();
-        $metas = array();
+        $hashes   = [];
+        $metas    = [];
+        $messages = [];
         for ($i = 0; $i < count($meta['name']); ++$i) {
             try {
-                $result = attemptStorage(getFileAtIndex($meta, $i), $prefixGenerator, true, $expiryAt);
-                $hashes[] = $result['hash'];
-                $metas[]  = $result['meta'];
+                $result     = attemptStorage(getFileAtIndex($meta, $i), $prefixGenerator, true, $expiryAt);
+                $hashes[]   = $result['hash'];
+                $metas[]    = $result['meta'];
+                $messages[] = $result['message'];
             } catch (Exception $e) {
-                $hashes[] = 'exception:' . $e->getMessage();
-                $metas[]  = array();
+                $hashes[]   = 'exception:' . $e->getMessage();
+                $metas[]    = [];
+                $messages[] = $e->getMessage();
             }
         }
         $result['hash'] = $hashes;
@@ -73,8 +76,9 @@ if (!($_SESSION['id'] ?? false)) {
         try {
             $result = attemptStorage($meta, $prefixGenerator, true, $expiryAt);
         } catch (Exception $e) {
-            $result['hash'] = 'exception:' . $e->getMessage();
-            $result['meta'] = array();
+            $result['hash']    = 'exception:' . $e->getMessage();
+            $result['meta']    = [];
+            $result['message'] = $e->getMessage();
         }
     }
 }
@@ -87,12 +91,12 @@ die(json_encode($result));
 
 /**
  * @param array $meta
- * @param int $i
+ * @param int   $i
  * @return array
  */
 function getFileAtIndex($meta, $i)
 {
-    $rtn = array();
+    $rtn = [];
     foreach (array_keys($meta) as $field) {
         $rtn[$field] = $meta[$field][$i];
     }
@@ -135,7 +139,7 @@ function attemptStorage(array $fileData, PrefixGenerator $prefixGenerator, bool 
             'type' => $storage->getMimetype()->getMime(),
             'size' => $storage->getSize(),
             'name' => $fileData['name'],
-            'file' => $modelToArray($storage)
-        ]
+            'file' => $modelToArray($storage),
+        ],
     ];
 }

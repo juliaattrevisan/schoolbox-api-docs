@@ -18,9 +18,9 @@ import type { Unit } from "./unitPlannerTypes";
 import UpUnitCellTextboxContent from "./up-unit-cell-textbox-content.vue";
 import UpUnitCellTextboxAction from "./up-unit-cell-textbox-action.vue";
 import UpUnitCellTextboxEmpty from "./up-unit-cell-textbox-empty.vue";
+import UpUnitCellActivitiesListAction from "./up-unit-cell-activities-list-action.vue";
 import UpUnitCellActivitiesListContent from "./up-unit-cell-activities-list-content.vue";
-import ActivitiesListAction from "./activities-list/activities-list-action.vue";
-import ActivitiesListEmpty from "./activities-list/activities-list-empty.vue";
+import UpUnitCellActivitiesListEmpty from "./up-unit-cell-activities-list-empty.vue";
 import UpUnitCellRubricCapabilitiesContent from "./up-unit-cell-rubric-capabilities-content.vue";
 import UpUnitCellRubricCapabilitiesAction from "./up-unit-cell-rubric-capabilities-action.vue";
 import UpUnitCellRubricCapabilitiesEmpty from "./up-unit-cell-rubric-capabilities-empty.vue";
@@ -174,6 +174,8 @@ function onContentClicked(event: MouseEvent): void {
 
 const extraCurriculumComponents = props.unit.curriculum.components.filter((component) => !component.inTemplate).length; // Number of extra components in the template
 
+const extraActivitiesComponents = props.unit.activities.components.filter((component) => !component.inTemplate).length; // Number of extra components in the template
+
 /**
  * To detect when the dimensions of the cell changes,
  * like when a different tab is selected
@@ -274,6 +276,10 @@ const isFirstUnit = window.Vue.computed(() => {
                                     extraCurriculumComponents === 1 ? "" : "s"
                                 }}
                             </li>
+                            <li v-if="extraActivitiesComponents > 0" class="meta">
+                                Includes {{ extraActivitiesComponents }} additional Course Builder component
+                                {{ extraActivitiesComponents === 1 ? "" : "s" }}
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -332,7 +338,10 @@ const isFirstUnit = window.Vue.computed(() => {
                     @modify-clicked="textboxContentComponent?.focusEditor"
                     @create-clicked="textboxActionComponent?.onCreateClicked"
                 />
-                <activities-list-empty v-else-if="props.column.type === ColumnType.ACTIVITIES" />
+                <up-unit-cell-activities-list-empty
+                    v-else-if="props.column.type === ColumnType.ACTIVITIES"
+                    :unit="props.unit"
+                />
                 <up-unit-cell-rubric-capabilities-empty
                     v-else-if="props.column.type === ColumnType.RUBRIC_CAPABILITIES"
                     :unit="props.unit"
@@ -352,8 +361,10 @@ const isFirstUnit = window.Vue.computed(() => {
                     :column="props.column"
                     @modify-clicked="textboxContentComponent?.focusEditor"
                 />
-                <activities-list-action
+                <up-unit-cell-activities-list-action
                     v-else-if="props.column.type === ColumnType.ACTIVITIES"
+                    :unit="props.unit"
+                    :column="props.column"
                     :activities-list-store-id="`${props.unit.id}-${props.column.id}`"
                 />
                 <up-unit-cell-rubric-capabilities-action

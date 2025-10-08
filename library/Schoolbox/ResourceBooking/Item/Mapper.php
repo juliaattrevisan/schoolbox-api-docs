@@ -10,12 +10,14 @@
 
 namespace Schoolbox\ResourceBooking\Item;
 
+use Alaress\Database\Predicate\Builder;
 use PDO;
 use PDOStatement;
 use Schoolbox\Collection;
 use Schoolbox\File\Mimetype;
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
+use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Storage;
 use Schoolbox\ResourceBooking\Booking;
 use Schoolbox\ResourceBooking\Category;
@@ -71,11 +73,11 @@ class Mapper extends BaseMapper
                 'other_key' => 'resource_id',
                 'multiple'  => true,
                 // Better M2M joins:
-            //                'mapper'    => '\\Schoolbox\\User',
-            //                'this_key'  => 'id',
-            //                'other_key' => 'id',
-            //                'multiple'  => true,
-            //                'through'   => '\\Schoolbox\\ResourceBooking\\Item\\Moderator\\Mapper',
+                //                'mapper'    => '\\Schoolbox\\User',
+                //                'this_key'  => 'id',
+                //                'other_key' => 'id',
+                //                'multiple'  => true,
+                //                'through'   => '\\Schoolbox\\ResourceBooking\\Item\\Moderator\\Mapper',
             ]
         );
         $this->hasJoin(
@@ -201,7 +203,7 @@ class Mapper extends BaseMapper
     protected function getSelectString()
     {
         return "
-            SELECT
+            SELECT DISTINCT
                 {$this->getColumnString()},
                 {$this->getJoinColumnString('category', 'c')},
                 {$this->getJoinColumnString('image', 'i')},
@@ -221,6 +223,8 @@ class Mapper extends BaseMapper
         return "
             FROM $table
             LEFT JOIN {$this->getJoinSql('category', '', 'c', true)}
+            LEFT JOIN {$this->getJoinSql('role', '', 'role')}
+            LEFT JOIN {$this->getJoinSql('moderator', '', 'm')}
             LEFT JOIN {$this->getJoinSql('image', '', 'i', true)}
             LEFT JOIN {$this->getJoinSql('image.allowedFileExtension', 'i', 'im', true)}
         ";
@@ -341,77 +345,88 @@ class Mapper extends BaseMapper
     /**
      * Searches for a resource that matches a search term.
      *
-     * @param  string $keyword
-     * @param  int    $offset
-     * @param  int    $limit
-     * @param  string $sort_by  Sort field, defaults to 'name' but can be 'modified_at'
-     * @param  string $sort_dir Sort direction, defaults to 'ASC'
+     * @param string  $keyword
+     * @param User    $user
+     * @param ?string $category
+     * @param int     $offset
+     * @param int     $limit
+     * @param string  $sort_by  Sort field, defaults to 'name' but can be 'modified_at'
+     * @param string  $sort_dir Sort direction, defaults to 'ASC'
      * @return Collection
      */
-    public function search($keyword, $offset = 0, $limit = 20, $sort_by = 'name', $sort_dir = 'ASC')
+    public function search($keyword, $user, $category = null, $offset = 0, $limit = 20, $sort_by = 'name', $sort_dir = 'ASC'): Collection
     {
-        // Ordering
-        switch (strtolower($sort_by)) {
-            case 'modified_at':
-                $order = '`re`.`modified_at`';
-                break;
-            case 'name':
-            default:
-                $order = '`re`.`name`';
-                break;
-        }
-        switch (strtolower($sort_dir)) {
-            case 'desc':
-                $order .= ' DESC ';
-                break;
-            case 'asc':
-            default:
-                $order .= ' ASC ';
-                break;
-        }
-
-        $query     = "
-            SELECT {$this->getColumnString('re')}
-            FROM {$this->getTable()} `re`
-            WHERE
-              (`re`.`name` LIKE :searchLike OR `re`.`description` LIKE :searchLike OR `re`.`room_code` = :search)
-              AND {$this->getSoftDeleteFilterSql('re')}
-            ORDER BY $order
-            LIMIT :limit OFFSET :offset
-        ";
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->bindValue('search', $keyword);
-        $statement->bindValue('searchLike', '%' . $this->getDatabase()->getQuoter()->escapeForLike($keyword) . '%');
-        $statement->bindValue('limit', intval($limit), \PDO::PARAM_INT);
-        $statement->bindValue('offset', intval($offset), \PDO::PARAM_INT);
-        $statement->execute();
-        return $this->hydrateList($statement, 're');
+        return $this->findByPredicates(
+            $this->buildSearchPredicate($keyword, $user, $category),
+            [
+                'order' => [$sort_by => $sort_dir],
+                'limit' => intval($limit),
+                'offset' => intval($offset),
+            ]
+        );
     }
 
 
     /**
      * Gets count for a resource that matches a search term.
      *
-     * @param string $keyword
+     * @param string  $keyword
+     * @param User    $user
+     * @param ?string $category
      * @return int
      * @throws \PDOException
      */
-    public function searchCount($keyword)
+    public function searchCount($keyword, $user, $category = null): int
     {
-        $query     = "
-            SELECT COUNT(*)
-            FROM {$this->getTable()} `re`
-            WHERE
-              (`re`.`name` LIKE :searchLike OR `re`.`description` LIKE :searchLike OR `re`.`room_code` = :search)
-              AND {$this->getSoftDeleteFilterSql('re')}
-        ";
-        $statement = $this->getDatabase()->prepare($query);
-        $statement->bindValue('search', $keyword);
-        $statement->bindValue('searchLike', '%' . $this->getDatabase()->getQuoter()->escapeForLike($keyword) . '%');
-        $statement->execute();
-        return $statement->fetchColumn();
+        return $this->countByPredicates(
+            $this->buildSearchPredicate($keyword, $user, $category)
+        );
     }
 
+    /**
+     * Setting up the predicate builder for searching resources
+     *
+     * @param string      $keyword
+     * @param User        $user
+     * @param string|null $category
+     * @return Builder
+     */
+    private function buildSearchPredicate(string $keyword, User $user, ?string $category = null): Builder
+    {
+        $pb = $this->getPredicateBuilder();
+
+        $hasAdminPermission =
+            $user->isSuperuser() ||
+            $user->hasServicePermission(UserAccess::SERVICE_RESOURCE_BOOKING, UserAccess::ACCESS_FULL);
+
+        if ('' !== $keyword) {
+            $likeKeyword = "%" . $this->database->getQuoter()->escapeForLike($keyword) . "%";
+            $pb->any(
+                $this->getPredicateBuilder()
+                     ->like('name', $likeKeyword)
+                     ->like('description', $likeKeyword)
+                     ->equals('room_code', $keyword)
+            );
+        }
+
+        if (!$hasAdminPermission) {
+            $pb->any(
+                $this->getPredicateBuilder()
+                     ->all(
+                         $this->getPredicateBuilder()
+                              ->equals('role.role_id', $user->getRole()->getId())
+                              ->equals('role.allowed', 1)
+                     )
+                     ->equals('m.moderator_id', $user->getId())
+            );
+        }
+
+        if (null != $category) {
+            $pb->equals('c.id', $category);
+        }
+
+        return $pb;
+    }
 
     /**
      * Is the user a moderator of this item?

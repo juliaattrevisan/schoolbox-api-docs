@@ -104,6 +104,8 @@ class TrimmerTool extends CliTool\App
      */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         if ($this->getOpt(self::OPT_LONG_HELP)) {
             echo <<<HELP
 
@@ -224,6 +226,8 @@ HELP;
         if (!$this->perform()) {
             $this->getLogger()->info('Planning finished.');
         }
+
+        $this->deprecationNotice("SA-19334");
     }
 
 

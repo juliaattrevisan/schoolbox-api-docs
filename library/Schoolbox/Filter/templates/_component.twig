@@ -12,7 +12,7 @@
         filterName: the label for the component in the panel
         userOptions: how is each available option in the component rendered?
 #}
-{% set isDisabled = (isUserConfigurable and 1 == roleSelections | length) %}
+{% set isDisabled = (isUserConfigurable and 1 == roleSelections | length) %} {# Disabled if only one option #}
 {% set isEmpty    = (isUserConfigurable and 0 == roleSelections | length) %}
 {% set hasOptions = roleSelections | length > 0 %}
 

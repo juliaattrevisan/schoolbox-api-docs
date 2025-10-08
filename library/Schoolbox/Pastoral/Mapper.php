@@ -88,6 +88,7 @@ class Mapper extends BaseMapper
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('occurred_on', self::TYPE_DATETIME);
+        $this->uses('expires_at', self::TYPE_DATE);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->joinsReverseMulti('pastoral_id', PastoralAccessMapper::class, 'access', 'access');
@@ -841,6 +842,7 @@ class Mapper extends BaseMapper
         bool $includeStudentsWithoutYear,
         bool $includeStudentsWithoutHouse,
         bool $includeReportsWithoutAction,
+        bool $includeArchivedRecords,
         ?string $actionStatus
     ) {
         $this->bindings = [];
@@ -976,6 +978,10 @@ class Mapper extends BaseMapper
 
         if (!empty($criteriaParts)) {
             $criteriaSql .= ' AND ' . implode(' AND ', $criteriaParts);
+        }
+
+        if (!$includeArchivedRecords) {
+            $criteriaSql .= ' AND (pastoral.expires_at >= CURDATE() OR pastoral.expires_at IS NULL) ';
         }
 
         // Execute SQL

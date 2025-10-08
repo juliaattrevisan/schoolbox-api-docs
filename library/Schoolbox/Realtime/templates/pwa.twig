@@ -1,111 +1,33 @@
 {#
     pwaPage: string to define where this was included, if in chrome (messages sidebar) or in the notifications setting page
     config: ConfigMapper to git and grab the settings from admin > 3rd Party
-    notifButton: string identifier for the checkbox/toggle for allow notifications to display correctly when there are multiple on the page
 #}
-<div class="l-flex-col l-gap-m f-no-margins" data-pwa-page="{{ pwaPage }}">
-    {# Hide everything by default, then JS will reveal depending on device/pwa state/etc #}
-    <div class="l-flex-col l-gap-s f-no-margins hide" data-pwa="install">
+
+{% if config.messaging_enabled %}
+    <div data-vue-app="pwa-menu">
         {# Install PWA if not any of the following:
             config.digistorm_store_link* is not set
             config.digistorm_store_link* is set, but the current user is not in a sepcified role type in config.digistorm_role_type
         #}
-        {% set installGoogle = config.digistorm_google_play_store_link ?? '' %}
-        {% set installApple = config.digistorm_apple_app_store_link ?? '' %}
+        {% set installGoogle = config.digistorm_google_play_store_link ?? null %}
+        {% set installApple = config.digistorm_apple_app_store_link ?? null %}
 
-        {% if config.pwa_enable or config.web_push_notifications_enabled or installGoogle is not empty or installApple is not empty %}
-            <p>To receive push notifications and enjoy a better experience, install the {{ config.title }} web app on your device.</p>
-        {% endif %}
-
-        {% if config.digistorm_role_install_prompt ?? [] is empty %}
-            {# All users are redirected to the store link #}
-            {% if installApple is not empty %}
-                <a data-pwa-action="installApple" class="button hide" href="{{ installApple }}">Install</a>
-            {% endif %}
-            {% if installGoogle is not empty %}
-                <a data-pwa-action="installGoogle" class="button hide" href="{{ installGoogle }}">Install</a>
-            {% endif %}
-        {% else %}
-            {# ensure the user is in the specified role #}
-            {% if (USER.role.type | capitalize) in config.digistorm_role_install_prompt %}
-                {% if installApple is not empty %}
-                    <a data-pwa-action="installApple" class="button hide" href="{{ installApple }}">Install</a>
-                {% endif %}
-                {% if installGoogle is not empty %}
-                    <a data-pwa-action="installGoogle" class="button hide" href="{{ installGoogle }}">Install</a>
-                {% endif %}
+        {# If the prompt has been restricted, ensure the user is in the specified role.
+        otherwise all users are redirected to the store link
+        #}
+        {% if (config.digistorm_role_install_prompt ?? []) is not empty %}
+            {% if (USER.role.type | capitalize) not in config.digistorm_role_install_prompt %}
+                {% set installGoogle = null %}
+                {% set installApple = null %}
             {% endif %}
         {% endif %}
 
-        {% if config.pwa_enable %}
-        <a data-pwa-action="installPWA" class="button hide" href="#">Install</a>
-        <a data-pwa-action="installPWAiOS" data-reveal-id="PWAiOSAddToHomescreenReveal-{{ pwaPage }}" class="button hide">Install</a>
-
-        <div data-reveal id="PWAiOSAddToHomescreenReveal-{{ pwaPage }}" class="reveal-modal">
-            <h1>Add the {{ config.title }} web app to your home screen</h1>
-            <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-            <p>To receive push notifications and enjoy a better experience, install the {{ config.title }} web app on your Apple device.<p>
-
-            <ol>
-                <li>
-                    Select the
-                    <strong>
-                        <sbx-icon>
-                            <svg viewBox="0 0 50 50" xmlns="http://www.w3.org/2000/svg">
-                                <path
-                                    d="M 32.703 11.773 L 25 4.07 L 17.297 11.773 L 15.262 9.738 L 25 0 L 34.738 9.738 L 32.703 11.773 Z"
-                                    style="fill: rgb(6, 121, 254)"
-                                />
-                                <path
-                                    d="M 23.547 2.035 L 26.453 2.035 L 26.453 32.558 L 23.547 32.558 L 23.547 2.035 Z"
-                                    style="fill: rgb(6, 121, 254)"
-                                />
-                                <path
-                                    d="M 39.535 50 L 10.465 50 C 7.994 50 6.105 48.11 6.105 45.64 L 6.105 19.477 C 6.105 17.006 7.994 15.116 10.465 15.116 L 20.64 15.116 L 20.64 18.023 L 10.465 18.023 C 9.593 18.023 9.012 18.605 9.012 19.477 L 9.012 45.64 C 9.012 46.512 9.593 47.093 10.465 47.093 L 39.535 47.093 C 40.407 47.093 40.988 46.512 40.988 45.64 L 40.988 19.477 C 40.988 18.605 40.407 18.023 39.535 18.023 L 29.36 18.023 L 29.36 15.116 L 39.535 15.116 C 42.006 15.116 43.895 17.006 43.895 19.477 L 43.895 45.64 C 43.895 48.11 42.006 50 39.535 50 Z"
-                                    style="fill: rgb(6, 121, 254)"
-                                />
-                            </svg>
-                        </sbx-icon>
-                        Share
-                    </strong>
-                    button in the menu bar of your browser.
-                </li>
-                <li>
-                    From the list of options, select <strong>Add to Home Screen</strong>.
-                </li>
-            </ol>
-
-            <p>
-                If 'Add to Home Screen' option doesn't exist, you can scroll down the list and select <strong>Edit Actions</strong>
-                and then <strong>Add to Home Screen</strong>.
-            </p>
-
-            <p>Once you've added the {{ config.title }} web app to your home screen, you must then go to the web app on your home screen to enable notifications.</p>
-            <p>If you're still unable to add it to your home screen, please contact your support team.</p>
-        </div>
-        {% endif %}
+        <pwa-menu
+            page="{{ pwaPage }}"
+            :install-google="{{ installGoogle | json_encode }}"
+            :install-apple="{{ installApple | json_encode }}"
+            :pwa-enabled="{{ config.pwa_enable | json_encode }}"
+            :notifications-enabled="{{ config.web_push_notifications_enabled | json_encode }}"
+        />
     </div>
-    {% if config.web_push_notifications_enabled %}
-    <div data-pwa-notif="iOSHomePrompt" class="alert-box warning hide">
-        To enable notifications on your iOS device, you must install the {{ config.title }} web app on your device and add it to your device's home screen.
-    </div>
-
-    <div data-pwa-notif="notifBlocked" class="alert-box warning hide">
-        You've blocked notifications on this device. To enable notifications, you must go to your device settings and set <b>Allow notifications</b>.
-        <a data-pwa-action="retryNotifPrompt" href="#">Try again</a>
-    </div>
-
-    <div data-pwa-notif="notifDisabledImpersonate" class="alert-box warning hide">
-        Device notifications are disabled while impersonating another user.
-    </div>
-
-    <div data-pwa-notif="notifEnabledMessage" class="alert-box success hide">
-        You have notifications enabled for this device
-    </div>
-
-    <div data-pwa-notif="enableNotifPrompt" class="l-flex-col l-gap-s f-no-margins hide">
-        <p>Enable notifications on your device:</p>
-        <a data-pwa-action="enableNotif" class="button" href="#">Enable Notifications</a>
-    </div>
-    {% endif %}
-</div>
+{% endif %}

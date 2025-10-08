@@ -19,6 +19,7 @@ use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
 use Schoolbox\Mapper\Traits\Model\UpdatedAtDate;
+use Schoolbox\Pastoral\ReportBuilder\Factory;
 use Schoolbox\Pastoral\SubType as PastoralSubType;
 use Schoolbox\Pastoral\Severity\Model as PastoralSeverity;
 use Schoolbox\Pastoral\Tag as PastoralTag;
@@ -52,6 +53,11 @@ class Model implements ISoftDeletable
     public const ORDER_AUTHOR      = 'author';
     public const ORDER_HOUSE       = 'house';
     public const ORDER_CAMPUS      = 'campus';
+    public const ORDER_STUDENT_LASTNAME = self::ORDER_STUDENT . 'LastName';
+    public const ORDER_STUDENT_CHOSEN_NAME = self::ORDER_STUDENT . 'ChosenName';
+    public const ORDER_AUTHOR_LASTNAME = self::ORDER_AUTHOR . 'LastName';
+    public const ORDER_AUTHOR_CHOSEN_NAME = self::ORDER_AUTHOR . 'ChosenName';
+    public const ORDER_PASTORAL_ID  = 'id';
 
     public const ORDER_FIELDS = [
         self::ORDER_CREATED_AT  => 'Created Date',
@@ -91,6 +97,30 @@ class Model implements ISoftDeletable
         self::PAST_FORTNIGHT   => 'Past fortnight',
         self::PAST_WEEK        => 'Past week',
         self::TODAY            => 'Today',
+    ];
+
+    // Mapping for the summary table options
+    public const SUMMARY_TABLES_OPTIONS = [
+        Factory::STUDENT_BY_TYPE => [
+            'label' => 'Student by Type',
+            'type' => 'table',
+        ],
+        Factory::TYPE_BY_MONTH => [
+            'label' => 'Type by Month',
+            'type' => 'table',
+        ],
+        Factory::TYPE_BY_WEEK => [
+            'label' => 'Type by Week',
+            'type' => 'table',
+        ],
+        Factory::STUDENT_BY_MONTH => [
+            'label' => 'Student by Month',
+            'type' => 'table',
+        ],
+        Factory::STUDENT_BY_WEEK => [
+            'label' => 'Student by Week',
+            'type' => 'table',
+        ],
     ];
 
     /** @var bool $dashboard */
@@ -134,6 +164,8 @@ class Model implements ISoftDeletable
 
     /** @var User $owner */
     private User $owner;
+
+    private bool $includeArchivedRecords = false;
 
     // These are the filters stored as CSV strings
 
@@ -206,6 +238,9 @@ class Model implements ISoftDeletable
     /** Actions */
     private GenericCollection $actions;
 
+    /** Summary Tables */
+    private ?string $summaryTables = null;
+
     /**
      * Will be null if severity is turned off in admin config
      *
@@ -266,14 +301,17 @@ class Model implements ISoftDeletable
 
         // This is a collection of groups that have access to this report
         $this->access = new GenericCollection(Access\Model::class);
+
+        // Turn all the frequency tables on by default
+        $this->summaryTables = implode(',', array_keys(self::SUMMARY_TABLES_OPTIONS));
     }
 
     /**
-     * @param null|PastoralSeverity $value
+     * @param PastoralSeverity|null $value
      *
      * @return static
      */
-    public function setSeverity(PastoralSeverity $value = null): self
+    public function setSeverity(?PastoralSeverity $value = null): self
     {
         $this->severity = $value;
 
@@ -560,10 +598,10 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param null|string $relativeDateString
+     * @param string|null $relativeDateString
      * @return self
      */
-    public function setRelativeDateString(string $relativeDateString = null): self
+    public function setRelativeDateString(?string $relativeDateString = null): self
     {
         $this->relativeDateString = $relativeDateString;
 
@@ -579,11 +617,11 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param null|Alaress_Date_Format $beforeDate
+     * @param Alaress_Date_Format|null $beforeDate
      *
      * @return self
      */
-    public function setBeforeDate(Alaress_Date_Format $beforeDate = null): self
+    public function setBeforeDate(?Alaress_Date_Format $beforeDate = null): self
     {
         $this->beforeDate = $beforeDate;
 
@@ -599,14 +637,32 @@ class Model implements ISoftDeletable
     }
 
     /**
-     * @param null|Alaress_Date_Format $afterDate
+     * @param Alaress_Date_Format|null $afterDate
      *
      * @return self
      */
-    public function setAfterDate(Alaress_Date_Format $afterDate = null): self
+    public function setAfterDate(?Alaress_Date_Format $afterDate = null): self
     {
         $this->afterDate = $afterDate;
 
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getIncludeArchivedRecords(): bool
+    {
+        return $this->includeArchivedRecords;
+    }
+
+    /**
+     * @param bool $includeArchivedRecords
+     * @return static
+     */
+    public function setIncludeArchivedRecords(bool $includeArchivedRecords): self
+    {
+        $this->includeArchivedRecords = $includeArchivedRecords;
         return $this;
     }
 
@@ -1039,5 +1095,23 @@ class Model implements ISoftDeletable
     {
         $this->foldersCsv = $foldersCsv;
         return $this;
+    }
+
+    /**
+     * @param string|null $summaryTables
+     * @return $this
+     */
+    public function setSummaryTables(?string $summaryTables = null): self
+    {
+        $this->summaryTables = $summaryTables;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getSummaryTables(): ?string
+    {
+        return $this->summaryTables;
     }
 }

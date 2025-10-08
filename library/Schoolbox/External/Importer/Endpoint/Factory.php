@@ -92,11 +92,26 @@ class Factory implements IFactory
 
 
     /**
+     * A list of splittable suds connectors.
+     *
+     * These can, in one way or another, support importing just profile data or just timetable data.
+     */
+    public const SPLITTABLE = [
+        Factory::ISAMS,
+        Factory::SENTRAL,
+        Factory::TASS_API,
+        Factory::COMPASS,
+        Factory::VERACROSS
+    ];
+
+
+    /**
      * Factory constructor.
      *
      * @param string $host
      * @param string $key
      * @param bool $perform
+     * @param string $version
      * @param bool $lissAdditiveMode
      * @param LoggerInterface $logger
      * @param array $watchlist
@@ -107,6 +122,7 @@ class Factory implements IFactory
         private string $host,
         #[SensitiveParameter] private string $key,
         private bool $perform,
+        private string $version,
         private bool $lissAdditiveMode,
         private LoggerInterface $logger,
         private array $watchlist,
@@ -196,6 +212,7 @@ class Factory implements IFactory
                 $this->host,
                 $this->key,
                 $this->watchlist,
+                Loader::getInstance()->get('photo_sis_import'),
                 /* Profile pieces
                  */
                 UserProfile\Mapper::getInstance()->disableCache(),
@@ -210,7 +227,8 @@ class Factory implements IFactory
                 ClassInvolvementMapper::getInstance()->disableCache(),
                 ClassPeriodMapper::getInstance()->disableCache(),
                 TimetablePeriodMapper::getInstance()->disableCache(),
-                \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache()
+                \Schoolbox\External\Event\Overrides\Mapper::getInstance()->disableCache(),
+                StorageMapper::getInstance()->disableCache(),
             ))->produce(),
 
             self::TASS_API => (new TassApiEndpoint\Factory(
@@ -251,6 +269,7 @@ class Factory implements IFactory
                 $this->host,
                 $this->key,
                 Loader::getInstance()->get('photo_sis_import'),
+                Loader::getInstance()->get('guzzle_custom_user_agent'),
                 /* Profile pieces
                  */
                 UserProfile\Mapper::getInstance()->disableCache(),
@@ -300,6 +319,7 @@ class Factory implements IFactory
                 $this->host,
                 $this->key,
                 $this->watchlist,
+                Loader::getInstance()->get('photo_sis_import'),
                 Loader::getInstance()->get('date_timezone'),
                 /* Profile pieces
                  */
@@ -308,6 +328,7 @@ class Factory implements IFactory
                 UserProfile\Parent\Mapper::getInstance()->disableCache(),
                 UserProfile\Staff\Mapper::getInstance()->disableCache(),
                 UserProfile\Relationship\Mapper::getInstance()->disableCache(),
+                \Schoolbox\Resource\Storage\Mapper::getInstance()->disableCache(),
                 /* Timetable pieces
                  */
                 \Schoolbox\External\Event\Mapper::getInstance()->disableCache(),
@@ -325,6 +346,7 @@ class Factory implements IFactory
                 $this->host,
                 $this->key,
                 $this->watchlist,
+                trim((string)Loader::getInstance()->get('external_staff_portal')),
                 /* Profile pieces
                  */
                 UserProfile\Mapper::getInstance()->disableCache(),
@@ -398,6 +420,7 @@ class Factory implements IFactory
                 new ShadowTable\All\Disable(
                     $this->logger,
                     $this->perform,
+                    $this->version,
                     UserProfile\Mapper::getInstance()->disableCache(),
                     UserProfile\Student\Mapper::getInstance()->disableCache(),
                     UserProfile\Parent\Mapper::getInstance()->disableCache(),

@@ -15,6 +15,7 @@ use Schoolbox\Collection;
 use Schoolbox\Learning\Analytics\BoxPlot\Summary;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\User;
+use Scrub;
 
 /**
  * Class ClassResults
@@ -177,18 +178,12 @@ class ClassResults
      * using $viewee's results as scatter plot values
      *
      * @param User $viewee
+     * @param array $workTypeWhitelist A set of worktype ids that you want to include on the boxplot.
      * @return array
-     * @throws \DomainException
-     * @throws \InvalidArgumentException
-     * @throws \LogicException
-     * @throws \Schoolbox\Mapper\DefinitionException
-     * @throws \UnexpectedValueException
-     * @throws \PDOException
      * @throws \JsonException
      */
-    public function collate(User $viewee): array
+    public function collate(User $viewee, array $workTypeWhitelist): array
     {
-
         /* Get all the assessments we need to analyse
          */
         $assessmentMarks = $this->getCohortAssessmentSet();
@@ -253,6 +248,12 @@ class ClassResults
         $specsWithPublishedMarks = array_values($this->tuples);
 
         foreach ($this->assessments as $assessment) {
+            /* If the assessment does not have a work type, or the work type is not in the whitelist, skip it.
+             */
+            if (!in_array($assessment->getWorkType()?->getId(), $workTypeWhitelist, true)) {
+                continue;
+            }
+
             /* Skip assessments which weren't spawned from a course
              * $assessment could be a homepage-specific assessment because this data set
              * also informs the markbook. We have to skip them as we go.
@@ -318,7 +319,7 @@ class ClassResults
                     $graphInfo[$specificationId] = [
                         'displayMark'  => $humanReadableMark,
                         'gradientMark' => $this->gradeGradientEnabled ? (int)($normalisedMark / 10) : 'none',
-                        'info'         => $comment ?? '',
+                        'info'         => Scrub::text(Scrub::html2text($comment)),
                     ];
                 } else {
                     /* Otherwise, nothing to show
@@ -405,10 +406,10 @@ class ClassResults
          * This is used by Grades/templates/fragments/graph.twig
          */
         return [
-            'info' => json_encode($statistics['graphInfo'], JSON_THROW_ON_ERROR),
-            'assessments' => json_encode($statistics['graphAssessments'], JSON_THROW_ON_ERROR),
-            'data' => json_encode($statistics['graphData'], JSON_THROW_ON_ERROR),
-            'scatter' => json_encode($statistics['graphScatter'], JSON_THROW_ON_ERROR),
+            'info' => $statistics['graphInfo'],
+            'assessments' => $statistics['graphAssessments'],
+            'data' => $statistics['graphData'],
+            'scatter' => $statistics['graphScatter'],
         ];
     }
 }

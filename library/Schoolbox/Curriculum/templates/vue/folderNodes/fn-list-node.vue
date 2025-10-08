@@ -76,7 +76,8 @@ function onRemoveSelected(): void {
 <template>
     <li>
         <div class="node l-flex-row l-flex--justify-space l-flex--center l-flex--no-wrap l-pad-xs--vert">
-            <div class="l-flex-row l-flex--no-wrap l-gap-xs">
+            <div class="l-flex-row l-flex--no-wrap l-flex--align-center l-gap-xs">
+                <sbx-icon v-if="!props.node.enabled" name="hidden" title="This outcome is disabled" />
                 <a
                     v-if="hasCode"
                     class="node__code f-no-margins l-flex__item--0-shrink"
@@ -91,6 +92,7 @@ function onRemoveSelected(): void {
                 class="node__remove f-no-icon-button icon-close l-flex-row l-flex--center l-flex__item--0-shrink"
                 :aria-label="`Remove [${props.node.code}] ${props.node.name}`"
                 :title="`Remove [${props.node.code}] ${props.node.name}`"
+                :data-test="`fn-list-node-remove-${props.node.id}`"
                 @click.prevent="onRemoveSelected"
             ></button>
         </div>

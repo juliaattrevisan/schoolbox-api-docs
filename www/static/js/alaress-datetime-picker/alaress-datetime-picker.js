@@ -592,10 +592,10 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
             // Make the field readonly
             $(t).prop("readonly", true);
 
-            var timestamp = parseTime(t.value);
+            const newDate = dayjs.parseNatural(t.value);
 
             // If it couldn't parse a date - show a validation error on the form
-            if (timestamp === false) {
+            if (newDate === false) {
                 if (!$fieldError.length) {
                     // don't create multiple errors
 
@@ -616,8 +616,6 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
                     $fieldError.show();
                 }
             } else {
-                var newDate = dayjs.unix(timestamp);
-
                 // If field has all day switch data param and is end or start of day - make all day
                 var state = (newDate.format("HHmm") == "0000" || newDate.format("HHmm") == "2359") && opts.allDaySwitch;
 
@@ -663,53 +661,5 @@ $.fn.alaressDateTimePicker = function (optionsOverride) {
             // Fire a custom event for change of this value
             $(t).trigger("datepickerChange");
         }
-    }
-
-    /**
-     * JS port of /ajax/strtotime.php.
-     *
-     * @param text
-     * @returns {*}
-     */
-    function parseTime(text) {
-        return $.fn.strtotime(denaturalize(text));
-    }
-
-    /**
-     * Smooth out formats so strtotime digests times more easily
-     *
-     * @param text
-     * @returns {string}
-     */
-    function denaturalize(text) {
-        // normalise any whitespace
-        // remove "^in " and " from now$"
-        // replace all word-numbers with number-numbers
-        // known limitation: 23:00am fails to parse
-        // replace / with - so that strtotime recognises D/M/Y instead of heretical M/D/Y format
-        return text
-            .trim()
-            .toLowerCase()
-            .replace(/\s+/g, " ")
-            .replace(/^in\s+/g, "")
-            .replace(/\s+from\s+now$/g, "")
-            .replace(/\s+at\s+/g, "")
-            .replace(/\s+on\s+/g, "")
-            .replace(/,\s/g, "")
-            .replace(/zero/g, "0")
-            .replace(/one/g, "1")
-            .replace(/two/g, "2")
-            .replace(/three/g, "3")
-            .replace(/four/g, "4")
-            .replace(/five/g, "5")
-            .replace(/six/g, "6")
-            .replace(/seven/g, "7")
-            .replace(/eight/g, "8")
-            .replace(/nine/g, "9")
-            .replace(/ten/g, "10")
-            .replace(/eleven/g, "11")
-            .replace(/twelve/g, "12")
-            .replace(/\//g, "-")
-            .replace(/\s+/g, " ");
     }
 };

@@ -59,6 +59,7 @@ class Model implements ISoftDeletable
      * default filename, to be kept in a common place.
      */
     public const DEFAULT_FILENAME = "[externalId]/Semester Report - [firstname] [surname]";
+    public const DEFAULT_FOOTER = "[reportTitle] - [firstname] [surname]";
 
     private ?string $title = null;
     private ?string $introduction = null;
@@ -66,6 +67,7 @@ class Model implements ISoftDeletable
     private ?string $options = null;
     private ?\Schoolbox\User $updatedBy = null;
     private ?string $fileName = null;
+    private ?string $footer = null;
 
 
     /**
@@ -240,5 +242,24 @@ class Model implements ISoftDeletable
             $filename = substr($filename, 0, -4);
         }
         return $filename;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getFooter(): ?string
+    {
+        return $this->footer;
+    }
+
+    /**
+     * Set the custom footer structure to allow the user to specify the format for the reports.
+     * @param null|string $footer
+     * @return $this
+     */
+    public function setFooter(?string $footer): self
+    {
+        $this->footer = $footer;
+        return $this;
     }
 }

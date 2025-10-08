@@ -20,21 +20,13 @@ use Schoolbox\External\Importer\Endpoint\Specification\ISpecification;
  */
 class Specification
 {
-
-    /**
-     * @var IApi
-     */
-    private IApi $api;
-
-
     /**
      * Specification constructor.
      *
      * @param IApi $api
      */
-    public function __construct(IApi $api)
+    public function __construct(private IApi $api)
     {
-        $this->api = $api;
     }
 
 

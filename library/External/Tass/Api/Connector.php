@@ -155,8 +155,6 @@ class Connector
     /**
      * Returns a standard UD data for a student, or Extended UD data for the UD area specified.
      *
-     * @todo UD = 'User-Defined'? Maybe? If so, name all such usages explicitly
-     *
      * @param string   $studentCode
      * @param int|null $areaCode
      * @return Models\StudentUD
@@ -164,8 +162,10 @@ class Connector
      * @throws InvalidArg If method args are invalid
      * @throws ResponseDecodeException If unable to decode API response
      * @throws UdParseException If cannot parse UD data
+     *@todo UD = 'User-Defined'? Maybe? If so, name all such usages explicitly
+     *
      */
-    public function getStudentUD(string $studentCode, int $areaCode = null): Models\StudentUD
+    public function getStudentUD(string $studentCode, ?int $areaCode = null): Models\StudentUD
     {
         $methodArgs = [
             'studcode' => $studentCode,
@@ -181,13 +181,13 @@ class Connector
      * Returns all student addresses based on Communication Rules, or for a specific communication type if specified.
      *
      * @param string      $studentCode
-     * @param null|string $commType
+     * @param string|null $commType
      * @return Models\StudentAddresses
      * @throws Unauthorised If credentials are incorrect
      * @throws InvalidArg If method args are invalid
      * @throws ResponseDecodeException If unable to decode API response
      */
-    public function getStudentAddresses(string $studentCode, string $commType = null): Models\StudentAddresses
+    public function getStudentAddresses(string $studentCode, ?string $commType = null): Models\StudentAddresses
     {
         $methodArgs = [
             'studcode' => $studentCode,
@@ -325,7 +325,7 @@ class Connector
      * @throws ResponseDecodeException If unable to decode API response
      * @throws UdParseException If cannot parse UD data
      */
-    public function getClassStudentList(string $subjectCode, string $yearGroup = null): GenericCollection
+    public function getClassStudentList(string $subjectCode, ?string $yearGroup = null): GenericCollection
     {
         $params = [
             'subcode' => $subjectCode,
@@ -349,7 +349,7 @@ class Connector
      * @throws ResponseDecodeException If unable to decode API response
      * @throws UdParseException If cannot parse UD data
      */
-    public function getClassTeacherList(string $subjectCode, string $classCode, string $yearGroup = null): GenericCollection
+    public function getClassTeacherList(string $subjectCode, string $classCode, ?string $yearGroup = null): GenericCollection
     {
         $params = [
             'subcode' => $subjectCode,
@@ -428,7 +428,7 @@ class Connector
      *
      * @param string                   $teacherCode
      * @param Alaress_Date_Format|null $date
-     * @return Models\TeacherTimetable[][]
+     * @return array<int|string, array<Models\StudentTimetable>> Should be TeacherTimetable, but StudentTimetable is actually used.
      * @throws Unauthorised If credentials are incorrect
      * @throws InvalidArg If method args are invalid
      * @throws ResponseDecodeException If unable to decode API response
@@ -455,7 +455,7 @@ class Connector
      * @throws InvalidArg If method args are invalid
      * @throws ResponseDecodeException If unable to decode API response
      */
-    public function getDayNumber(Alaress_Date_Format $date, int $timeTableId = null): Models\DayNumber
+    public function getDayNumber(Alaress_Date_Format $date, ?int $timeTableId = null): Models\DayNumber
     {
         $params = [
             'date' => $date->getUsingFormat(self::TASS_DATE_FORMAT),

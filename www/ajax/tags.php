@@ -25,11 +25,8 @@ $di = $this->getDi();
 
 /* Note: Insert new tag types here. */
 $registry = [
-    'sport_position' => $di->lazyNew(PositionMapper::class),
-    'sport_coach'    => $di->lazyNew(Coach\TagCloud::class, [
-        'mapper'     => $di->lazy([Coach\Mapper::class, 'getInstance']),
-        'userMapper' => $di->lazy([UserMapper::class, 'getInstance']),
-    ]),
+    'sport_position' => PositionMapper::getInstance(),
+    'sport_coach'    => new Coach\TagCloud(Coach\Mapper::getInstance(), UserMapper::getInstance())
 ];
 
 // Validate params
@@ -48,7 +45,8 @@ if ($errors) {
     http_response_code(400);
 } else {
     /** @var \Schoolbox\Mapper\UsableAsTagSource $mapper */
-    $mapper = $registry[$this->arg[0]]();
+    $mapper = $registry[$this->arg[0]];
+
     if ($mapper instanceof \Schoolbox\Mapper\UsableAsTagSource) {
         /* Optionally provide a column name by which to sort
          */

@@ -107,6 +107,8 @@ HELP;
      */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         // Help output
         if ($this->getOpt(self::OPT_SHORT_HELP) || $this->getOpt(self::OPT_LONG_HELP)) {
             $this->outputHelp();
@@ -138,6 +140,8 @@ HELP;
         if ($failureCount > 0) {
             $this->getLogger()->error(sprintf('%d orphaned assessments could not be deleted', $failureCount));
         }
+
+        $this->deprecationNotice("SA-19334");
     }
 
 

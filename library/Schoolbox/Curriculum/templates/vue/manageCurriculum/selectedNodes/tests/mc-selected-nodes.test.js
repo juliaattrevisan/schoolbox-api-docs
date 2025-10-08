@@ -21,8 +21,8 @@ test("should not display when there is no codes", () => {
 test("should display when there is codes", async () => {
     await useSelectedNodesStore().$patch({
         nodes: [
-            { id: 1, code: "C1", name: "Code 1" },
-            { id: 2, code: "C2", name: "Code 2" },
+            { id: 1, code: "C1", name: "Code 1", enabled: true },
+            { id: 2, code: "C2", name: "Code 2", enabled: true },
         ],
     });
     expect(wrapper.findAll("[data-test-node]")).toHaveLength(2); //should be two items in the dom now
@@ -31,8 +31,8 @@ test("should display when there is codes", async () => {
 test("should not display when had codes but has been emptied", async () => {
     await useSelectedNodesStore().$patch({
         nodes: [
-            { id: 1, code: "C1", name: "Code 1" },
-            { id: 2, code: "C2", name: "Code 2" },
+            { id: 1, code: "C1", name: "Code 1", enabled: true },
+            { id: 2, code: "C2", name: "Code 2", enabled: true },
         ],
     });
     const selectedNodes = wrapper.findAllComponents("[data-test-node]");

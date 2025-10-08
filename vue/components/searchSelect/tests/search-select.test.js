@@ -209,3 +209,18 @@ test("query input is not shown if isReadOnly is true", async () => {
     });
     expect(wrapper.find(`[data-test="ss-query-input"]`).exists()).toBe(false);
 });
+
+test("selected results are not visible when show-selected is false", async () => {
+    const wrapper = mount(SearchSelect, {
+        props: {
+            ...defaultProps,
+            selected: [
+                { id: 1, name: "Item 1" },
+                { id: 2, name: "Item 2" },
+                { id: 3, name: "Item 3" },
+            ],
+            showSelected: false,
+        },
+    });
+    expect(wrapper.find(`[data-test="ss-selected"]`).exists()).toBe(false);
+});

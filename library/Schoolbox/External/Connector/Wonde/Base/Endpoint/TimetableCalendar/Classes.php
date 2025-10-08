@@ -13,6 +13,7 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\ClassEntry;
 use Schoolbox\External\ClassEntryMapper;
 use Schoolbox\External\ClassInvolvementMapper;
+use Schoolbox\External\Connector\ClassCode;
 use Schoolbox\External\Connector\Wonde\Base\Endpoint\Factory;
 use Schoolbox\External\Connector\Wonde\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Wonde\Base\Endpoint\Lookup\IdToMisId;
@@ -38,68 +39,6 @@ class Classes implements IStrategy
      * The maximum is an unwritten 200 or so, apparently
      */
     private const NUM_PER_PAGE = 200;
-
-
-    /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
-     *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var IApi
-     */
-    private IApi $api;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Mapper
-     */
-    private \Schoolbox\External\Event\Mapper $eventMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Overrides\Mapper
-     */
-    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
-
-
-    /**
-     * @var ClassEntryMapper
-     */
-    private ClassEntryMapper $classEntryMapper;
-
-
-    /**
-     * @var ClassInvolvementMapper
-     */
-    private ClassInvolvementMapper $classInvolvementMapper;
-
-
-    /**
-     * @var \DateTimeZone
-     */
-    private \DateTimeZone $timezone;
-
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    private \Alaress_Date_Format $fromDate;
-
-
-    /**
-     * @var \Alaress_Date_Format
-     */
-    private \Alaress_Date_Format $toDate;
 
 
     /**
@@ -142,27 +81,17 @@ class Classes implements IStrategy
      * @param \Alaress_Date_Format                       $toDate
      */
     public function __construct(
-        LoggerInterface $log,
-        bool $perform,
-        IApi $api,
-        \Schoolbox\External\Event\Mapper $eventMapper,
-        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
-        ClassEntryMapper $classEntryMapper,
-        ClassInvolvementMapper $classInvolvementMapper,
-        \DateTimeZone $timezone,
-        \Alaress_Date_Format $fromDate,
-        \Alaress_Date_Format $toDate
+        private LoggerInterface $log,
+        private bool $perform,
+        private IApi $api,
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
+        private ClassEntryMapper $classEntryMapper,
+        private ClassInvolvementMapper $classInvolvementMapper,
+        private \DateTimeZone $timezone,
+        private \Alaress_Date_Format $fromDate,
+        private \Alaress_Date_Format $toDate
     ) {
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->api = $api;
-        $this->eventMapper = $eventMapper;
-        $this->overridesMapper = $overridesMapper;
-        $this->classEntryMapper = $classEntryMapper;
-        $this->classInvolvementMapper = $classInvolvementMapper;
-        $this->timezone = $timezone;
-        $this->fromDate = $fromDate;
-        $this->toDate = $toDate;
     }
 
 
@@ -241,10 +170,8 @@ class Classes implements IStrategy
      *
      * @param array $class
      * @return void
-     * @throws \InvalidArgumentException
-     * @throws \PDOException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \UnexpectedValueException
+     * @throws Exception
+     * @throws \DateInvalidTimeZoneException
      */
     private function processClass(array $class): void
     {
@@ -255,7 +182,7 @@ class Classes implements IStrategy
          *
          * Every other school should presume usage of $class['code']
          */
-        $class['code'] = $class['code'] ?? $class['mis_id'];
+        $class['code'] = (new ClassCode($this->log))->generate($class['code'] ?? $class['mis_id']);
 
         foreach ($class['lessons']['data'] as $lesson) {
             /* Decide if we need to process this lesson

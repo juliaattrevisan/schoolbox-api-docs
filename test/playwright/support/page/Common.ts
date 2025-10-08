@@ -21,6 +21,8 @@ export default class Common {
 
     static readonly USER_JANAREED = "Jana Reed";
 
+    static readonly USER_JENNIREED = "Jenni Reed";
+
     static readonly CLASS_9AENG = "9A English";
 
     static readonly CLASS_ID_9AENG = 83;
@@ -49,7 +51,7 @@ export default class Common {
     /**
      * Search icon selector
      */
-    static readonly DATATEST_SEARCH_ICON = "search-input-button";
+    static readonly DATA_TEST_SEARCH_ICON = "search-input-button";
 
     /**
      * Search field selector; used as a text input for site searches.
@@ -215,9 +217,9 @@ export default class Common {
      */
     async search(text: string): Promise<void> {
         await this.waitForPageLoad(); // When using the search bar, ensure it's interactable first
-        await this.page.getByTestId(Common.DATATEST_SEARCH_ICON).click();
+        await this.page.getByTestId(Common.DATA_TEST_SEARCH_ICON).click();
         await this.page.locator(Common.SELECTOR_SEARCH).fill(text);
-        await this.page.getByTestId(Common.DATATEST_SEARCH_ICON).click();
+        await this.page.getByTestId(Common.DATA_TEST_SEARCH_ICON).click();
     }
 
     /**
@@ -371,6 +373,20 @@ export default class Common {
     }
 
     /**
+     * Asserts that a file download is triggered by a button
+     * @param downloadButtonId - the id of the button to trigger the download
+     * @param expectedFileName - the expected downloaded file name
+     */
+    async assertFileDownload(downloadButtonId: string, expectedFileName: string): Promise<void> {
+        const [download] = await Promise.all([
+            this.page.waitForEvent("download"), // Wait for the file to be downloaded
+            this.page.getByTestId(downloadButtonId).click(), // Click the download button
+        ]);
+        const fileName = download.suggestedFilename();
+        expect(fileName).toBe(expectedFileName); // Confirm the file name
+    }
+
+    /**
      * Get today's date at 11:59 PM
      * @returns - the date object
      */
@@ -381,56 +397,85 @@ export default class Common {
     }
 
     /**
-     * Convert a Date object to a string in the format "dd/mm/yyyy" or "dd/mm/yyyy h:mm[am/pm]"
-     * This is the expected format for date inputs around schoolbox
-     * @param date - the date to convert
-     * @param includeTime - whether to include the time in the string
-     * @returns - the formatted date/datetime string
+     * Get today's date at 00:00 AM
+     * @returns - the date object
+     */
+    static getTodayAtMidnightAM(): Date {
+        const today = new Date();
+        today.setHours(0, 0, 1, 999);
+        return today;
+    }
+
+    /**
+     * Format a date into a string
+     * @param date - the date to format
+     * @param includeTime - whether to include the time in the formatted date
+     * @returns - the formatted date
      */
     static formatDate(date: Date, includeTime: boolean): string {
-        const zeroPad = (num: number): string => num.toString().padStart(2, "0");
+        const options: Intl.DateTimeFormatOptions = {
+            timeZone: "Australia/Melbourne",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: includeTime ? "numeric" : undefined,
+            minute: includeTime ? "numeric" : undefined,
+            hour12: true,
+        };
 
-        const day = zeroPad(date.getDate());
-        const month = zeroPad(date.getMonth() + 1); // getMonth() returns 0-11
-        const year = date.getFullYear();
+        const formatter = new Intl.DateTimeFormat("en-AU", options);
+        const parts = formatter.formatToParts(date).reduce(
+            (acc, part) => {
+                if (part.type !== "literal") {
+                    acc[part.type] = part.value;
+                }
+                return acc;
+            },
+            {} as Record<Intl.DateTimeFormatPartTypes, string>,
+        );
 
-        let formattedDate = `${day}/${month}/${year}`;
+        let formattedDate = `${parts.day}/${parts.month}/${parts.year}`;
 
         if (includeTime) {
-            const hours = date.getHours() % 12 || 12;
-            const minutes = zeroPad(date.getMinutes());
-            const ampm = date.getHours() >= 12 ? "pm" : "am";
-
-            const formattedTime = `${hours}:${minutes}${ampm}`;
-            formattedDate += ` ${formattedTime}`;
+            formattedDate += ` ${parts.hour}:${parts.minute}${parts.dayPeriod}`;
         }
 
         return formattedDate;
     }
 
     /**
-     * Convert a Date object to a string in the format "dd-mm-yyyy" or "dd-mm-yyyy HH:mm:ss"
-     * This is the expected format for the database of schoolbox
-     * @param date - the date to convert
-     * @param includeTime - whether to include the time in the string
-     * @returns - the formatted date/datetime string
+     * Format a date into a string db format
+     * @param date - the date to format
+     * @param includeTime - whether to include the time in the formatted date
+     * @returns - the formatted date in db format
      */
     static formatDateDB(date: Date, includeTime: boolean): string {
-        const zeroPad = (num: number): string => num.toString().padStart(2, "0");
+        const options: Intl.DateTimeFormatOptions = {
+            timeZone: "Australia/Melbourne",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: includeTime ? "2-digit" : undefined,
+            minute: includeTime ? "2-digit" : undefined,
+            second: includeTime ? "2-digit" : undefined,
+            hourCycle: "h23", // to avoid 12am appearing as something like "24:33:00"
+        };
 
-        const day = zeroPad(date.getDate());
-        const month = zeroPad(date.getMonth() + 1); // getMonth() returns 0-11
-        const year = date.getFullYear();
+        const formatter = new Intl.DateTimeFormat("en-AU", options);
+        const parts = formatter.formatToParts(date).reduce(
+            (acc, part) => {
+                if (part.type !== "literal") {
+                    acc[part.type] = part.value;
+                }
+                return acc;
+            },
+            {} as Record<Intl.DateTimeFormatPartTypes, string>,
+        );
 
-        let formattedDate = `${year}-${month}-${day}`;
+        let formattedDate = `${parts.year}-${parts.month}-${parts.day}`;
 
         if (includeTime) {
-            const hours = zeroPad(date.getHours());
-            const minutes = zeroPad(date.getMinutes());
-            const seconds = zeroPad(date.getSeconds());
-
-            const formattedTime = `${hours}:${minutes}:${seconds}`;
-            formattedDate += ` ${formattedTime}`;
+            formattedDate += ` ${parts.hour}:${parts.minute}:${parts.second}`;
         }
 
         return formattedDate;

@@ -3,6 +3,7 @@
 <script src="{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/select-all/attacher.select-all.js?v={{ config.site_version }}"></script>
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/chained/jquery.chained.min.js?v={{ config.site_version }}"></script>
+<script type="text/javascript" src="{{ CDN_PREFIX }}/js/form/jquery.alaressValidate.js?v={{ config.site_version }}"></script>
 {% autoescape('js') %}
 <script type="text/javascript">
     $(function () {
@@ -186,7 +187,9 @@
 
         $.validator.addMethod("duplicateIdSelected", function () {
             return $('#duplicateIds').val() !== '';
-        }, $.validator.format("You must select at least one student before you can proceed"));
+        },
+
+        $.validator.format("You must select at least one student before you can proceed"));
 
         form.alaressValidate({
             ignore: ':disabled',
@@ -202,6 +205,18 @@
                         },
                     },
                 },
+                 occurredOn: {
+                     numericalDateFormat: true,
+                },
+                expiresAt: {
+                     numericalDateFormat: true,
+
+                },
+                points: {
+                    number: true,
+                    max: 1000000,
+                    min: -1000000
+                }
             },
 
             messages: {
@@ -354,8 +369,60 @@
          */
         const subtypesIndex = {{ subtypesIndex|json_encode|raw }};
         const subtypesIndexPrivate = {{ subtypesIndexPrivate|json_encode|raw }};
+        const subtypesIndexDefaultPoints = {{ subtypesIndexDefaultPoints|json_encode|raw }};
         const typesIndex = {{ typesIndex|json_encode|raw }};
         const typesIndexPrivate = {{ typesIndexPrivate|json_encode|raw }};
+        const typesIndexDefaultPoints = {{ typesIndexDefaultPoints|json_encode|raw }};
+
+        const isPointsEnabled = {% if config.pastoral_point_enabled and config.pastoral_enabled %}true{% else %}false{% endif %};
+        const isDefaultPointsEnabled = {% if config.pastoral_point_enabled and config.pastoral_default_points_enabled %}true{% else %}false{% endif %};
+        const isExistingRecord = {{ record.id != '' ? "true" : "false"  }};
+        const currentPoints = '{{ record.points ? record.points : null }}';
+
+        /**
+         * When the points has manually changed, this takes precedence and
+         * any further changes when type/sub-type is changed will not update the points.
+         * Rather conveniently, the jQuery .onChange will not trigger when the points.value is changed within
+         * the updatePoints method, so we don't need to worry about this being triggered when it shouldn't be.
+         */
+        let hasManualPointsInput = false;
+        $("#points").on("change", function () {
+            hasManualPointsInput = true;
+        });
+
+        /**
+         * Check if the points can be updated when the type/sub-type is changed
+         * We prevent updating the points if points are not enabled,
+         * default points are not enabled (so we don't need to change on type/subtype change),
+         * the record is existing, the points is set,
+         * or if there is a manual input for the points
+         * @returns boolean
+         */
+        function canUpdatePoints() {
+            return isPointsEnabled && isDefaultPointsEnabled && !isExistingRecord && currentPoints === "" && !hasManualPointsInput;
+        }
+
+        /**
+         * Update the points based on the current type / subtype selection
+         * @param points
+         */
+        function updatePoints (points) {
+            if (!canUpdatePoints()) {
+                return;
+            }
+            // ensure points actually exists before setting the value
+            const pointsElement = document.getElementById("points");
+            if (pointsElement === null) {
+                return;
+            }
+            // if the new type/sub-type points is empty, clear the previously set value and return
+            if (points === null || points === "") {
+                pointsElement.value = "";
+                return;
+            }
+            // otherwise set the points based on the default points that was set
+            pointsElement.value = points;
+        }
 
         /* Some convenient selectors
          */
@@ -378,12 +445,13 @@
         function init(typeVal, subtypeVal) {
             if (null !== subtypeVal) {
 
-                /* If subtypeId != null, load its template html iff the General Template's
+                /* If subtypeId != null, load its template html if the General Template's
                  * current value is the same as the Subtype template or if the General
                  * Template's current value is empty string
                  * same above with the Confidential Templates
                  */
                 replaceTemplate($.trim(subtypesIndex[subtypeVal]), $.trim(subtypesIndexPrivate[subtypeVal]));
+                updatePoints($.trim(subtypesIndexDefaultPoints[subtypeVal]));
             } else {
 
                 /* If subtypeId == null, look at the parent typeId. load its template
@@ -392,12 +460,13 @@
                  * same above with the Confidential Templates
                  */
                 replaceTemplate($.trim(typesIndex[typeVal]), $.trim(typesIndexPrivate[typeVal]));
+                updatePoints($.trim(typesIndexDefaultPoints[typeVal]));
             }
         }
 
-
         /**
          * Put a Subtype template html into General and Confidential
+         * and display an entry tip if one is set
          *
          * @param template
          * @param templatePrivate
@@ -438,7 +507,9 @@
                     privateEditorIsTemplate = true;
                 }
             }
+
         }
+
     });
 </script>
 {% endautoescape %}

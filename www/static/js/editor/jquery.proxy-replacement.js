@@ -26,12 +26,19 @@ import { getConfigForVideo } from "@js/mediaelementplayer/mepUtils.ts";
         let count = 0;
 
         $.each(selector.find("[data-schoolboxresource-type]"), function (index, element) {
-            // Only replace the placeholder if it doesn't already have a replacement
-            if ($(element).next(`[data-schoolboxmedia-replacement-container]`).length === 0) {
-                const replaced = $.fn.schoolboxResource_ReplaceOne(element);
-                if (replaced) {
-                    count++;
-                }
+            // Don't re-replace something that already has a replacement
+            if ($(element).next(`[data-schoolboxmedia-replacement-container]`).length > 0) {
+                return;
+            }
+
+            // Don't replace if the placeholder is inside a CKEditor, otherwise it becomes invisible
+            if ($(element).closest(".ck.ck-editor__editable").length > 0) {
+                return;
+            }
+
+            const replaced = $.fn.schoolboxResource_ReplaceOne(element);
+            if (replaced) {
+                count++;
             }
         });
 

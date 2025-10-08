@@ -11,9 +11,43 @@
 use Schoolbox\External\Exception as ExternalException;
 use Schoolbox\Error\Mapper as ErrorMapper;
 
-// Ensure parameters are correct
+// Ensure online attendance is enabled.
+if (!Config::get('external_attendance')) {
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+}
 
+/* This only works with the Synergetic connector.
+ * An alternative to 404 would be errors:
+ *  210 Cannot get attendance list. Please contact system administrator.
+ *  169 Access to this module is denied
+ *  19 You do not have permission to view this page.
+ *
+ * ...but none of those really fit the context as to why you'd be unable to access this place.
+ */
+if (\External\IConnector::EXTERNAL_TYPE_SYNERGETIC !== Config::get('external_type')) {
+    error(ErrorMapper::ERROR_PERM_PAGE_VIEW);
+}
+
+/* Synergetic has an External_Synergetic_Class which can spawn via the factory,
+ * but it has a special method not defined in External_ClassInterface, breaking
+ * its contract: getClass()
+ *
+ * This inevitably forces you to spawn it directly instead.
+ * $externalClass = new External_Class();
+ */
 $externalClass = new External_Synergetic_Class();
+
+/* This is a POST only page
+ * the 3 params are required and we should go back if they are not.
+ * $_POST['classCode'], $_POST['fileType'], $_POST['timetableGroup']
+ *
+ * we need to throw an error to inform the user of an issue, rather than redirect and them assume it succeeded
+ *
+ * There are other POST params but some of those have their own validation
+ */
+if (!isset($_POST['classCode'], $_POST['fileType'], $_POST['timetableGroup'])) {
+    error(ErrorMapper::ERROR_INFORMATION_MISSING);
+}
 
 $class = $externalClass->getClass($_POST['classCode'], $_SESSION['user'], null, null, $_POST['fileType']);
 
@@ -21,7 +55,8 @@ if (!$class) {
     error(ErrorMapper::ERROR_CLASS_CODE_NOT_FOUND);
 }
 
-if (!strlen($_POST['attendanceDate'])) {
+// harden the check for $_POST['attendanceDate']
+if (!isset($_POST['attendanceDate']) || !strlen($_POST['attendanceDate'])) {
     error(ErrorMapper::ERROR_PERIOD_NUMBER_INVALID);
 }
 
@@ -86,7 +121,15 @@ foreach ($attendancePeriods as $attendancePeriod) {
     /** @var External_Synergetic_Attendance $attendanceHandler */
     $periodDefinition = $attendanceHandler->getAttendanceMaster()->findTimetablePeriod();
     $periodStart      = Alaress_Date_Format::newFromTimestamp(strtotime($periodDefinition['TimeFrom']))->getDatabaseTime();
-    $periodEnd        = Alaress_Date_Format::newFromTimestamp(strtotime($periodDefinition['TimeTo']))->getDatabaseTime();
+    $timeTo           = strtotime((string)$periodDefinition['TimeTo']);
+    $periodEnd        = Alaress_Date_Format::newFromTimestamp($timeTo);
+    if (false === $timeTo) {
+        /* If the period end is not defined (ie NULL), we are assuming that the period will end at the end of the day as
+         * we can not determine the actual end of period
+         */
+        $periodEnd = $periodEnd->endOfDay();
+    }
+    $periodEnd = $periodEnd->getDatabaseTime();
 
     // Create everyone's attendance initially
 
@@ -105,9 +148,10 @@ foreach ($attendancePeriods as $attendancePeriod) {
             $data = [
                 'AttendanceMasterSeq' => $attendanceHandler->getAttendanceMaster()->getAttendanceMasterSeq(),
                 'ID' => $studentId,
-                'PossibleAbsenceCode' => trim($_POST['PossibleAbsenceCode'][$i]),
-                'PossibleReasonCode' => trim($_POST['PossibleReasonCode'][$i]),
-                'PossibleDescription' => trim($_POST['PossibleReasonDescription'][$i]),
+                // some schools purge these fields from the form, so we need to make sure they're not empty
+                'PossibleAbsenceCode' => trim($_POST['PossibleAbsenceCode'][$i] ?? ''),
+                'PossibleReasonCode' => trim($_POST['PossibleReasonCode'][$i] ?? ''),
+                'PossibleDescription' => trim($_POST['PossibleReasonDescription'][$i] ?? ''),
                 'AttendedFlag' => in_array($studentId, $attending) ? 0 : 1,
 
                 /* dbo.wkAttendances lets the EarlyDepartureTime and LateArrivalTime be null
@@ -122,11 +166,18 @@ foreach ($attendancePeriods as $attendancePeriod) {
             ];
 
             // Arrival/Departure for multi-period classes
-            if ($_POST['LateArrivalTime'][$i]) {
+            if ($_POST['LateArrivalTime'][$i] ?? false) {
                 // if this period starts after the late arrival,
                 // don't mark them as late
                 $arrival     = Alaress_Date_Format::newFromTimestamp(strtotime(trim($_POST['LateArrivalTime'][$i])));
                 $arrivalTime = $arrival->getDatabaseTime();
+
+                /* periodEnd might actually be null from the synergetic stored proc.
+                 * This probably means some kind of broken data or weird nonstandard configuration,
+                 * but we interpret here as "this period never ends"
+                 *
+                 * This means you can't ever arrive after the period ends: it never does.
+                 */
                 if ($arrivalTime > $periodEnd) {
                     $data['AttendedFlag'] = 0;
                 } elseif ($arrivalTime >= $periodStart) {
@@ -135,7 +186,7 @@ foreach ($attendancePeriods as $attendancePeriod) {
                 }
             }
 
-            if ($_POST['EarlyDepartureTime'][$i]) {
+            if ($_POST['EarlyDepartureTime'][$i] ?? false) {
                 // if this period starts before the early departure,
                 // don't mark them as leaving early
                 $departure     = Alaress_Date_Format::newFromTimestamp(strtotime(trim($_POST['EarlyDepartureTime'][$i])));
@@ -143,6 +194,12 @@ foreach ($attendancePeriods as $attendancePeriod) {
                 if ($departureTime < $periodStart) {
                     $data['AttendedFlag'] = 0;
                 } elseif ($departureTime <= $periodEnd) {
+                    /* periodEnd might actually be null from the synergetic stored proc.
+                     * This probably means some kind of broken data or weird nonstandard configuration,
+                     * but we interpret here as "this period never ends"
+                     *
+                     * This means you can't ever arrive after the period ends: it never does.
+                     */
                     $data['EarlyDepartureFlag'] = 1;
                     $data['EarlyDepartureTime'] = $departure->getDatabase();
                 }

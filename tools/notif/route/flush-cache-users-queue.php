@@ -32,7 +32,9 @@ $kernel = new Daemon\Kernel(
     ]
 );
 
-$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts) use ($kernel): void {
+    $kernel->deprecationNotice("SA-19334");
+
     // If no instance ID is provided, fall back to default if it exists
     $instanceId = $opts['instance'] ?? INSTANCE_ID;
 
@@ -40,4 +42,6 @@ $kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterf
     $cache = $di->get('subscriptionCache');
     $cache->setLog($log);
     $cache->flushCacheUsersQueue($instanceId);
+
+    $kernel->deprecationNotice("SA-19334");
 });

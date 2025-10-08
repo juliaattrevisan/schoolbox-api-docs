@@ -2,21 +2,20 @@
 @import "@css/core/base/_settings";
 
 /* Hide the Tags */
-.lrn-list-view-meta {
+.lrn-author-list-view-meta {
     display: none;
 }
 
 /* Hide the published/archived status  */
-.lrn-list-view-status {
+.lrn-author-list-view-status {
     display: none;
 }
 
 /* Reconfigure column dimensioning lol (rude) */
-.lrn.lrn-author.lrn-sm .lrn-col-sm-9 {
+.lrn.lrn-author.lrn-sm .lrn-author-col-sm-9 {
     width: 100%;
 }
-
-.lrn.lrn-author.lrn-sm .lrn-col-sm-3 {
+.lrn.lrn-author.lrn-sm .lrn-author-col-sm-3 {
     display: none !important;
 }
 
@@ -30,7 +29,7 @@
     box-shadow: none;
     width: auto;
 }
-.lrn .lrn-author-ui .lrn-author-widget-sidebar li button [class^="lrn-i-"] {
+.lrn .lrn-author-ui .lrn-author-widget-sidebar li button [class^="lrn-author-i-"] {
     border-top-color: transparent;
     color: var(--content-ui-foreground);
 }
@@ -55,7 +54,7 @@
 .lrn .lrn-author-ui .lrn-author-save-button-group {
     background: transparent;
 }
-button.lrn-btn-save-dropdown {
+button.lrn-author-btn-save-dropdown {
     display: none;
 }
 .lrn-author-item-nav-left {
@@ -63,35 +62,34 @@ button.lrn-btn-save-dropdown {
     position: relative;
     vertical-align: middle;
 }
-.lrn .lrn-author-ui .lrn-btn-default[data-authorapi-selector="back"]:not([aria-disabled="true"]):hover {
+.lrn .lrn-author-ui .lrn-author-btn-default[data-authorapi-selector="back"]:not([aria-disabled="true"]):hover {
     background-color: var(--content-ui-hover) !important;
     color: var(--content-ui-foreground) !important;
     padding-left: 30px;
     text-decoration: none !important;
 }
-.lrn.lrn-author .lrn-author-item-nav .lrn-btn {
+button.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-author-btn-default.lrn-author-btn-default-legacy.lrn-author-btn-icon-left,
+button.lrn-author-btn-save.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-author-btn-primary.lrn-author-btn-primary-legacy,
+button.lrn-author-btn-save.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-author-btn-success {
     text-transform: none;
-}
-.lrn .lrn-author-ui .lrn-btn-save:hover:enabled .lrn-i-save:before {
-    transform: none;
 }
 .lrn .lrn-author-ui .lrn-author-save-button-group {
     width: 100%;
 }
-.lrn-author-save-button-group > .lrn-btn-save {
+.lrn-author-save-button-group > .lrn-author-btn-save {
     min-height: 2.5rem !important;
     padding: 0.5rem !important;
     width: 100% !important;
 }
-.lrn-author-save-button-group > .lrn-btn-save.lrn-btn.lrn-btn-primary,
-.lrn .lrn-author-ui .lrn-btn-success[disabled],
-.lrn .lrn-author-ui .lrn-btn-success[disabled]:hover,
-.lrn .lrn-author-ui .lrn-btn-success[disabled]:focus {
+.lrn-author-save-button-group > .lrn-author-btn-save.lrn-btn.lrn-author-btn-primary,
+.lrn .lrn-author-ui .lrn-author-btn-success[disabled],
+.lrn .lrn-author-ui .lrn-author-btn-success[disabled]:hover,
+.lrn .lrn-author-ui .lrn-author-btn-success[disabled]:focus {
     background-color: var(--content-ui-submit-background);
     color: var(--content-ui-submit-foreground);
 }
-.lrn .lrn-author-ui .lrn-btn-save:not([disabled]):hover,
-.lrn .lrn-author-ui .lrn-btn-save:not([disabled]):focus {
+.lrn .lrn-author-ui .lrn-author-btn-save:not([disabled]):hover,
+.lrn .lrn-author-ui .lrn-author-btn-save:not([disabled]):focus {
     background-color: rgba(
         calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
         calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
@@ -102,19 +100,21 @@ button.lrn-btn-save-dropdown {
 }
 
 /* hide tags from questions list */
-.lrn .lrn-author-ui .lrn-list-unstyled.lrn-list-view-labels {
+.lrn .lrn-author-ui .lrn-list-unstyled.lrn-author-list-view-labels {
     display: none;
 }
-.lrn-list-view-alternative-reference.lrn-ellipses {
+.lrn-author-list-view-alternative-reference.lrn-ellipses {
     display: none;
 }
+
 .lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="adaptive"] .lrn-list-details,
 .lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="items"] .lrn-list-details,
 .lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="templateDragAndDrop"] .lrn-list-details,
 .lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="details"] .lrn-list-details {
     border: none;
 }
-ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
+
+ul.lrn-author-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
     background: #fff;
     border-bottom: 1px solid var(--body-background) !important;
     list-style: none;
@@ -150,6 +150,7 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
 .lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="details"] .lrn-list-divider > li {
     margin-bottom: 1px;
 }
+
 .lrn.lrn-author .lrn-author-item-nav-left,
 .lrn.lrn-author .lrn-author-item-nav-right {
     display: flex;
@@ -160,16 +161,16 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
 }
 
 /* replace icons with sb icons */
-.lrn-i-preview::before {
+.lrn-author-i-preview::before {
     color: var(--content-ui-foreground);
     content: "\e901";
     font-family: "schoolbox";
 }
-.lrn .lrn-author-ui .lrn-list-view-item .lrn-btn-default {
+.lrn .lrn-author-ui .lrn-author-list-view-item .lrn-author-btn-default {
     background: transparent;
     border: none;
 }
-.lrn-i-drag::before {
+.lrn-author-i-drag::before {
     content: "\e62f";
     font-family: "schoolbox";
     color: var(--content-ui-foreground);
@@ -185,7 +186,7 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
 }
 
 /* hide the resources section */
-.lrn-author-activity-resource-item.lrn-col-xs-12.lrn-col-sm-12.lrn-col-md-4 {
+.lrn-author-activity-resource-item.lrn-author-col-xs-12.lrn-author-col-sm-12.lrn-author-col-md-4 {
     display: none;
 }
 
@@ -206,23 +207,24 @@ ul.lrn-list-view.lrn-list-unstyled.lrn-list-divider.lrn-author-draggable > li {
 }
 
 /* author primary and secondary and disabled button styles */
-.lrn .lrn-author-ui .lrn-btn-primary,
-.lrn .lrn-author-ui .lrn-btn-sec {
+.lrn .lrn-author-ui .lrn-author-btn-primary,
+.lrn .lrn-author-ui .lrn-author-btn-sec,
+.lrn .lrn-author-ui .lrn-author-activity-button:not(.lrn-author-btn-primary):not(.lrn-author-btn-sec) {
     background: var(--content-ui-background);
     border-radius: 0px !important;
     border: none;
     color: var(--content-ui-foreground);
     font-size: 1rem !important;
 }
-.lrn .lrn-author-ui .lrn-btn-primary:hover,
-.lrn .lrn-author-ui .lrn-btn-sec:hover,
-.lrn .lrn-author-ui .lrn-author-activity-button:not(.lrn-btn-primary):not(.lrn-btn-sec):hover {
+.lrn .lrn-author-ui .lrn-author-btn-primary:hover,
+.lrn .lrn-author-ui .lrn-author-btn-sec:hover,
+.lrn .lrn-author-ui .lrn-author-activity-button:not(.lrn-author-btn-primary):not(.lrn-author-btn-sec):hover {
     background-color: var(--content-ui-hover);
     color: var(--content-ui-foreground);
     text-decoration: none !important;
     font-size: 1rem !important;
 }
-button.lrn-author-activity-button.lrn-btn-i-xs.lrn-col-xs-none.lrn-col-sm-none.lrn-author-disabled {
+button.lrn-author-activity-button.lrn-author-btn-i-xs.lrn-author-col-xs-none.lrn-author-col-sm-none.lrn-author-disabled {
     background-color: var(--content-ui-background);
     border-color: transparent;
     border-radius: 0px;
@@ -232,19 +234,13 @@ button.lrn-author-activity-button.lrn-btn-i-xs.lrn-col-xs-none.lrn-col-sm-none.l
     opacity: 0.5;
     font-size: 1rem;
 }
-.lrn .lrn-author-ui .lrn-author-activity-button:not(.lrn-btn-primary):not(.lrn-btn-sec) {
-    background: var(--content-ui-background);
-    border: none !important;
-    color: var(--content-ui-foreground);
-    font-size: 1rem;
-}
 
 /* Save button styles */
-.lrn .lrn-author-ui .lrn-author-save-button-group.lrn-btn-save-dropdown-active .lrn-btn-save {
+.lrn .lrn-author-ui .lrn-author-save-button-group.lrn-author-btn-save-dropdown-active .lrn-author-btn-save {
     color: var(--content-ui-submit-foreground);
     background-color: var(--content-ui-submit-background);
 }
-.lrn .lrn-author-ui .lrn-author-save-button-group.lrn-btn-save-dropdown-active .lrn-btn-save:hover {
+.lrn .lrn-author-ui .lrn-author-save-button-group.lrn-author-btn-save-dropdown-active .lrn-author-btn-save:hover {
     background-color: rgba(
         calc(var(--content-ui-submit-background-r) + (255 - var(--content-ui-submit-background-r)) * 0.2),
         calc(var(--content-ui-submit-background-g) + (255 - var(--content-ui-submit-background-g)) * 0.2),
@@ -261,7 +257,7 @@ ul.lrn-author-nav.lrn-author-nav-tabs.lrn-author-ui-no-preview {
 }
 
 /* hide setting button in questions */
-button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-outline.lrn-btn-icon-left.lrn-btn-responsive.lrn-btn-i-xs.lrn-btn {
+button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-outline.lrn-author-btn-icon-left.lrn-author-btn-responsive.lrn-author-btn-i-xs.lrn-btn {
     display: none;
 }
 .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-toolbar-toggle .lrn-qe-toggle-right,
@@ -308,9 +304,7 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 }
 
 /* hide warning message */
-.lrn-author-message.lrn-author-message-warning.lrn-author-dependent-count-warning-wrapper {
-    display: none;
-}
+.lrn-author-message.lrn-author-message-warning.lrn-author-dependent-count-warning-wrapper,
 .lrn-author-message.lrn-author-message-warning {
     display: none;
 }
@@ -324,8 +318,9 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
     border-radius: 0px;
     border: 0px;
     color: var(--content-ui-foreground);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
-        Arial, sans-serif !important;
+    font-family:
+        -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial,
+        sans-serif !important;
     font-size: 1rem;
     font-weight: 400;
 }
@@ -361,9 +356,7 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
 }
 
 /* hide source and help button from edit question */
-[aria-label="View widget source"] {
-    display: none;
-}
+[aria-label="View widget source"],
 [aria-label="View widget help"] {
     display: none;
 }
@@ -393,8 +386,9 @@ button.lrn-author-title-menu-element.lrn-author-toolbar-button.lrn-author-btn-ou
     border-radius: 0px;
     border: none;
     color: var(--content-ui-foreground) !important;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
-        Arial, sans-serif !important;
+    font-family:
+        -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial,
+        sans-serif !important;
     font-size: 1rem;
     font-weight: 400;
     line-height: unset;
@@ -470,63 +464,35 @@ span.lrn-qe-i-trash {
 }
 
 /*hide layout and selection, extra and more options, sections */
-[data-lrn-qe-section="layout.heading"] {
+[data-lrn-qe-section="layout.heading"],
+[data-lrn-qe-section="details.heading"],
+[data-lrn-qe-label-path="metadata.acknowledgements"],
+[data-lrn-qe-input-path="metadata.acknowledgements"],
+[data-lrn-qe-label-path="metadata.rubric_reference"],
+[data-lrn-qe-input-path="metadata.rubric_reference"],
+[data-lrn-qe-input-path="metadata.distractor_rationale"],
+[data-lrn-qe-label-path="stimulus_review"],
+[data-lrn-qe-input-path="stimulus_review"],
+[data-lrn-qe-label-path="instructor_stimulus"],
+[data-lrn-qe-input-path="instructor_stimulus"],
+[data-lrn-qe-label-path="metadata.distractor_rationale"],
+[data-lrn-qe-label-path="metadata.distractor_rationale_response_level"],
+[data-lrn-qe-action-add-path="metadata.distractor_rationale_response_level"],
+[data-lrn-qe-layout-wrapper="is_math"] {
     display: none;
 }
 [data-lrn-qe-section="layout.content"] {
     display: none !important;
 }
-[data-lrn-qe-label-path="metadata.acknowledgements"] {
-    display: none;
-}
-[data-lrn-qe-input-path="metadata.acknowledgements"] {
-    display: none;
-}
-[data-lrn-qe-label-path="metadata.rubric_reference"] {
-    display: none;
-}
-[data-lrn-qe-input-path="metadata.rubric_reference"] {
-    display: none;
-}
-[data-lrn-qe-input-path="metadata.distractor_rationale"] {
-    display: none;
-}
-[data-lrn-qe-label-path="stimulus_review"] {
-    display: none;
-}
-[data-lrn-qe-input-path="stimulus_review"] {
-    display: none;
-}
-[data-lrn-qe-label-path="instructor_stimulus"] {
-    display: none;
-}
-[data-lrn-qe-input-path="instructor_stimulus"] {
-    display: none;
-}
-[data-lrn-qe-label-path="metadata.distractor_rationale"] {
-    display: none;
-}
-[data-lrn-qe-label-path="metadata.distractor_rationale_response_level"] {
-    display: none;
-}
-[data-lrn-qe-action-add-path="metadata.distractor_rationale_response_level"] {
-    display: none;
-}
-[data-lrn-qe-layout-wrapper="is_math"] {
-    display: none;
-}
-[data-lrn-qe-section="details.heading"] {
-    display: none;
-}
 
 /* added right border to the items row */
 .lrn.lrn-author
     .lrn-item-for-activity-list.lrn-item-for-activity-list-edit
-    .lrn-list-view-item
-    .lrn-list-view-col-first {
+    .lrn-author-list-view-item
+    .lrn-author-list-view-col-first {
     border-right: 1px solid var(--body-background);
 }
-.lrn.lrn-author .lrn-item-for-activity-list .lrn-check-box-wrapper .lrn-check-box-span {
+.lrn.lrn-author .lrn-author-item-for-activity-list .lrn-author-check-box-wrapper .lrn-author-check-box-span {
     background: none;
     border: 1px solid var(--form-border-color);
     border-radius: 0px;
@@ -545,6 +511,7 @@ span.lrn-qe-i-trash {
     + .lrn-check-box-span:hover {
     background-color: var(--form-border-color);
 }
+
 .lrn
     .lrn-author-ui
     .lrn-author-activity-edit
@@ -568,16 +535,16 @@ span.lrn-qe-i-trash {
 }
 
 /* change create and find card positions */
-button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-sec.lrn-col-xs-none.lrn-col-sm-none {
+button.lrn-author-activity-button.lrn-author-activity-button-legacy.lrn-author-btn-i-xs.lrn-author-btn-sec.lrn-author-btn-sec-legacy.lrn-author-col-xs-none.lrn-author-col-sm-none {
     position: absolute;
     right: 150px;
-    top: 65px;
+    top: 50px;
     z-index: var(--sbx-depth-default);
 }
-button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-primary.lrn-col-xs-none.lrn-col-sm-none {
+button.lrn-author-activity-button.lrn-author-btn-i-xs.lrn-author-btn-primary.lrn-author-col-xs-none.lrn-author-col-sm-none {
     position: absolute;
     right: 0px;
-    top: 65px;
+    top: 50px;
     z-index: var(--sbx-depth-default);
 }
 span.lrn-author-name-wrapper {
@@ -610,7 +577,7 @@ span.lrn-author-name-wrapper {
 }
 
 /* search pages styles */
-li.lrn-list-view-item.lrn-flyout-wrapper {
+li.lrn-author-list-view-item.lrn-author-flyout-wrapper {
     background: #fff;
     border-bottom: 1px solid var(--body-background) !important;
     list-style: none;
@@ -623,53 +590,50 @@ li.lrn-list-view-item.lrn-flyout-wrapper {
 [data-authorapi-view="tags-all"] {
     display: none !important;
 }
-.lrn.lrn-author .lrn-tool-panel {
+.lrn.lrn-author .lrn-author-tool-panel {
     background: transparent;
 }
-.lrn.lrn-author .lrn-tool-panel-search {
+.lrn.lrn-author .lrn-author-tool-panel-search {
     padding: 0px;
 }
-.lrn.lrn-author .lrn-item-for-activity-list .lrn-item-for-activity-pagination-top .lrn-pagination ul {
+.lrn.lrn-author .lrn-item-for-activity-list .lrn-author-item-for-activity-pagination-top .lrn-author-pagination ul {
     background: var(--body-background);
 }
 .lrn.lrn-author
     .lrn-item-for-activity-list
-    .lrn-item-for-activity-pagination-top
-    .lrn-pagination
+    .lrn-author-item-for-activity-pagination-top
+    .lrn-author-pagination
     ul
     > li
-    > button.lrn-btn.lrn-pagination-btn {
+    > button.lrn-btn.lrn-author-pagination-btn {
     display: none;
 }
-.lrn-pagination-sort-wrapper {
+.lrn-author-pagination-sort-wrapper {
     margin-bottom: 10px;
 }
 .lrn .lrn-author-ui .lrn-form-control-padded,
 .lrn .lrn-author-ui .lrn-form-control {
     border: 1px solid var(--form-border-color);
-    border-color: var(--form-border-color);
 }
-.lrn .lrn-author-ui .lrn-input-group-lg .lrn-input-group-btn {
+.lrn .lrn-author-ui .lrn-author-input-group-lg .lrn-author-input-group-btn {
     border: 1px solid var(--form-border-color);
-    border-color: var(--form-border-color);
     padding: 0.5rem 1rem;
 }
-.lrn .lrn-author-ui .lrn-input-group .lrn-form-control {
+.lrn .lrn-author-ui .lrn-author-input-group-lg .lrn-author-form-control {
+    background-color: #fff;
     border: 1px solid var(--form-border-color);
     border-color: var(--form-border-color);
     padding: 0.5rem;
 }
-.lrn .lrn-author-ui .lrn-btn-save.lrn-btn-saving {
+.lrn .lrn-author-ui .lrn-author-btn-save.lrn-author-btn-saving {
     color: var(--content-ui-foreground);
 }
-.lrn-i-cross::before {
+.lrn-author-i-cross::before {
     color: var(--content-ui-foreground);
 }
 
 /* removed min-height for add question section */
-.lrn.lrn-author {
-    min-height: unset !important;
-}
+.lrn.lrn-author,
 .lrn.lrn-author .lrn-author-item-edit {
     min-height: unset !important;
 }
@@ -698,13 +662,13 @@ li.lrn-list-view-item.lrn-flyout-wrapper {
     border-color: var(--form-border-color);
     color: #000000;
 }
-.lrn .lrn-author-ui .lrn-sort-button {
+.lrn .lrn-author-ui .lrn-sort-author-button {
     border: 1px solid var(--form-border-color);
     border-color: var(--form-border-color);
 }
 
 /* update search button text transformation from uppercase to unset  */
-.lrn.lrn-author .lrn-tool-panel-search .lrn-btn-lg {
+.lrn.lrn-author .lrn-author-tool-panel-search .lrn-author-btn-lg {
     text-transform: unset;
 }
 
@@ -714,8 +678,9 @@ li.lrn-list-view-item.lrn-flyout-wrapper {
 .lrn .lrn-author-ui-no-preview button,
 .lrn-author-toolbar-toggle .lrn-author-toggle-part,
 .lrn-author-activity-button {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica,
-        Arial, sans-serif !important;
+    font-family:
+        -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Droid Sans", "Helvetica Neue", Helvetica, Arial,
+        sans-serif !important;
     font-size: 1rem;
     font-weight: 400;
 }
@@ -726,14 +691,14 @@ li.lrn-list-view-item.lrn-flyout-wrapper {
 }
 
 /* update the pagination styles */
-.lrn .lrn-author-ui .lrn-pagination ul {
+.lrn .lrn-author-ui .lrn-author-pagination ul {
     background: var(--body-background);
     border-bottom: none;
     border-top: none;
 }
-span.lrn-pagination-btn-txt,
-span.lrn-i-previous,
-span.lrn-i-next {
+span.lrn-author-pagination-btn-txt,
+span.lrn-author-i-previous,
+span.lrn-author-i-next {
     color: var(--content-ui-foreground);
 }
 
@@ -741,24 +706,24 @@ span.lrn-i-next {
 .lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="items"] .lrn-item-for-activity-list {
     margin-top: 10px;
 }
-span.lrn-list-view-empty-label {
+span.lrn-author-list-view-empty-label {
     display: none;
 }
-.lrn .lrn-author-ui .lrn-list-view-empty-img {
+.lrn .lrn-author-ui .lrn-author-list-view-empty-img {
     background-image: unset;
 }
-.lrn .lrn-author-ui .lrn-list-view-empty {
+.lrn .lrn-author-ui .lrn-author-list-view-empty {
     font-size: 1rem;
 }
-.lrn .lrn-author-ui .lrn-activity-view-empty-img::after,
-.lrn .lrn-author-ui .lrn-list-view-empty-img::after {
+.lrn .lrn-author-ui .lrn-author-activity-view-empty-img::after,
+.lrn .lrn-author-ui .lrn-author-list-view-empty-img::after {
     content: "\e658";
     font-family: "schoolbox";
     font-size: 3rem;
     display: block;
     margin-bottom: 0.5rem;
 }
-.lrn-list-view-empty.lrn-author-ui-no-preview {
+.lrn-author-list-view-empty.lrn-author-ui-no-preview {
     background-color: #ddd;
     color: #999;
     font-size: 1rem;
@@ -785,53 +750,35 @@ span.lrn-list-view-empty-label {
 .lrn-author-widget-wrapper-inner {
     overflow: visible !important;
 }
-.lrn .lrn-author-ui .lrn-activity-view-empty-img,
-.lrn .lrn-author-ui .lrn-list-view-empty-img {
+.lrn .lrn-author-ui .lrn-author-activity-view-empty-img,
+.lrn .lrn-author-ui .lrn-author-list-view-empty-img {
     background-image: unset;
     font-style: normal !important;
     height: auto;
     margin: 0 auto;
     width: auto;
 }
-.lrn-list-view-empty.lrn-author-ui-no-preview::after {
+.lrn-author-list-view-empty.lrn-author-ui-no-preview::after {
     content: "\A You have no items yet. An item is a single question or a collection of questions in a quiz.You need items to create a quiz.\A Select Find items or Create item to proceed.";
-}
-
-/* fixed right alignment */
-.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="adaptive"] .lrn-item-for-activity-list,
-.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="items"] .lrn-item-for-activity-list,
-.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="templateDragAndDrop"] .lrn-item-for-activity-list,
-.lrn .lrn-author-ui .lrn-author-activity-edit [data-tab-content="details"] .lrn-item-for-activity-list {
-    margin-right: 0px;
-}
-.lrn .lrn-author-ui .lrn-author-item-toolbar-right,
-.lrn .lrn-author-ui .lrn-author-activity-toolbar-right {
-    padding-right: 0px;
-}
-
-/* removed horizontal scroll on question view */
-.lrn-author-widget-wrapper-inner {
-    overflow: visible !important;
+    white-space: pre;
 }
 
 /* Hide reference from the search options */
-.lrn-itemlist-general-search > div:nth-of-type(2) {
-    display: none !important;
-}
+.lrn-itemlist-general-search > div:nth-of-type(2),
 .lrn-itemlist-general-search > .lrn-form-tags-section {
-    display: none;
+    display: none !important;
 }
 
 /* fixed search button in the drop down */
-button.lrn-btn.lrn-btn-sec.lrn-btn-search.lrn-i-search.lrn-col-xs-2:after {
+button.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-author-btn-sec.lrn-author-btn-sec-legacy.lrn-author-btn-search.lrn-author-i-search.lrn-author-col-xs-2:after {
     content: "Search";
     visibility: visible;
     margin-left: 0.5em;
 }
-button.lrn-btn.lrn-btn-sec.lrn-btn-search.lrn-i-search.lrn-col-xs-2:before {
+button.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-author-btn-sec.lrn-author-btn-sec-legacy.lrn-author-btn-search.lrn-author-i-search.lrn-author-col-xs-2:before {
     float: none !important;
 }
-.lrn.lrn-author .lrn-tool-panel-search .lrn-btn-search {
+.lrn.lrn-author .lrn-author-tool-panel-search .lrn-author-btn-search {
     width: 100% !important;
 }
 
@@ -847,35 +794,35 @@ form.lrn-form.lrn-form-list-search
 .lrn .lrn-author-ui a.lrn-btn {
     padding: 0.5rem !important;
 }
-.lrn.lrn-author .lrn-tool-panel-search .lrn-btn-lg [class^="lrn-i-"] {
+.lrn.lrn-author .lrn-author-tool-panel-search .lrn-author-btn-lg [class^="lrn-author-i-"] {
     font-size: 1rem;
 }
-.lrn .lrn-author-ui .lrn-btn-default {
+.lrn .lrn-author-ui .lrn-author-btn-default {
     background: var(--content-ui-background);
     border-radius: 0px !important;
     border: none;
     color: var(--content-ui-foreground);
     font-size: 1rem;
 }
-.lrn .lrn-author-ui .lrn-btn-default:hover {
+.lrn .lrn-author-ui .lrn-author-btn-default:hover {
     color: var(--content-ui-foreground) !important;
     background-color: var(--content-ui-hover) !important;
     text-decoration: none !important;
 }
-.lrn-list-view-loaded > .lrn-list-view-empty.lrn-author-ui-no-preview::after {
+.lrn-author-list-view-loaded > .lrn-author-list-view-empty.lrn-author-ui-no-preview::after {
     content: "Your search did not return any items." !important;
     white-space: pre;
 }
-button.lrn-btn.lrn-btn-default.lrn-btn-full-width::before {
+button.lrn-btn.lrn-author-btn-default.lrn-author-btn-full-width::before {
     content: "\e60d" !important;
     font-family: "schoolbox";
     margin-right: 0.5em;
 }
 
 /* update Add items button styles */
-.lrn .lrn-author-ui .lrn-btn-primary[disabled],
-.lrn .lrn-author-ui .lrn-btn-primary[disabled]:hover,
-.lrn .lrn-author-ui .lrn-btn-primary[disabled]:focus {
+.lrn .lrn-author-ui .lrn-author-btn-primary[disabled],
+.lrn .lrn-author-ui .lrn-author-btn-primary[disabled]:hover,
+.lrn .lrn-author-ui .lrn-author-btn-primary[disabled]:focus {
     background-color: var(--content-ui-background);
     border-color: transparent;
     border-radius: 0px;
@@ -887,7 +834,7 @@ button.lrn-btn.lrn-btn-default.lrn-btn-full-width::before {
 }
 
 /* horizontally aligned the icon and text In add new item */
-span.lrn-author-widget-icon.lrn-i-plus::before {
+span.lrn-author-widget-icon.lrn-author-i-plus::before {
     display: none;
 }
 .lrn .lrn-author-ui .lrn-author-widget-text::before {
@@ -897,7 +844,19 @@ span.lrn-author-widget-icon.lrn-i-plus::before {
 }
 
 /* Updated empty state preview - when there are no items */
-.lrn-empty-activity-wrapper {
+.lrn-author-activity-view-empty-img {
+    background-color: #ddd;
+    color: #999;
+    font-size: 1rem !important;
+    font-style: italic;
+    margin-bottom: 0rem !important;
+    margin-top: 0rem !important;
+    min-height: unset !important;
+    padding: 0rem !important;
+    text-align: center;
+    width: 100%;
+}
+.lrn-author-empty-activity-wrapper {
     background-color: #ddd;
     color: #999;
     font-size: 1rem !important;
@@ -909,10 +868,11 @@ span.lrn-author-widget-icon.lrn-i-plus::before {
     text-align: center;
     width: 100%;
 }
-.lrn-empty-activity-wrapper > span {
+
+.lrn-author-empty-activity-wrapper > span {
     display: none;
 }
-.lrn-empty-activity-wrapper::after {
+.lrn-author-empty-activity-wrapper::after {
     content: "\A No items to preview. Select Edit to proceed.";
     white-space: pre;
 }
@@ -923,7 +883,7 @@ span.lrn-author-widget-icon.lrn-i-plus::before {
 }
 
 /* Change the style for disabled buttons to make it clear to the user the button is disabled */
-.lrn .lrn-author-ui .lrn-pagination-btn[aria-disabled="true"] > span {
+.lrn .lrn-author-ui .lrn-author-pagination-btn[aria-disabled="true"] > span {
     opacity: 0.5;
 }
 
@@ -937,21 +897,20 @@ span.lrn-author-widget-icon.lrn-i-plus::before {
 }
 
 /* Made item titles foreground color to make it more clear it is clickable */
-button.lrn-h3.lrn-list-view-heading.lrn-ellipses.lrn-author-editable-item {
+button.lrn-h3.lrn-author-list-view-heading.lrn-ellipses.lrn-author-editable-item {
     color: var(--content-ui-foreground) !important;
 }
 
 /* Updated the save button border color to match with new submit button color */
-.lrn .lrn-author-ui .lrn-btn-success {
+.lrn .lrn-author-ui .lrn-author-btn-success {
     border: 1px solid var(--content-ui-submit-background);
 }
 
 /* Fixed the preview icon hover color and positions */
-.lrn.lrn-author .lrn-item-for-activity-list .lrn-list-view-item .lrn-btn-default:hover {
+.lrn.lrn-author .lrn-item-for-activity-list .lrn-author-list-view-item .lrn-author-btn-default:hover {
     background: #ccc !important;
 }
-
-.lrn.lrn-author .lrn-item-for-activity-list .lrn-list-view-item .lrn-btn-default.lrn-close-preview {
+.lrn.lrn-author .lrn-item-for-activity-list .lrn-author-list-view-item .lrn-author-btn-default.lrn-close-preview {
     font-size: 1rem;
 }
 .lrn.lrn-author
@@ -966,12 +925,12 @@ button.lrn-h3.lrn-list-view-heading.lrn-ellipses.lrn-author-editable-item {
 }
 
 /* Fixed the Find items and create item buttons to stay on right hand across all devices */
-button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-primary {
+button.lrn-author-activity-button.lrn-author-activity-button-legacy.lrn-btn-primary.lrn-btn-primary-legacy {
     position: absolute;
     right: 0px;
     top: 65px;
 }
-button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-sec {
+button.lrn-author-activity-button.lrn-author-btn-i-xs.lrn-author-btn-sec {
     position: absolute;
     right: 50px;
     top: 65px;
@@ -994,19 +953,13 @@ button.lrn-author-activity-button.lrn-btn-i-xs.lrn-btn-sec {
 .lrn .lrn-author-ui .lrn-dl-inline dt {
     margin-left: 0px;
 }
-.lrn.lrn-author.lrn-res .lrn-search-txt {
-    display: inline-block !important;
+.lrn-author-flex-toolbar-item.lrn-author-flex-toolbar-item-lg.lrn-author-col-lg-only {
+    display: none !important;
 }
-button.lrn-btn.lrn-btn-sec.lrn-btn-full-width.lrn-btn-lg.lrn-main-search-button,
-button.lrn-btn.lrn-btn-default.lrn-btn-full-width {
-    float: right;
-    margin-bottom: 1rem;
-    width: 230px;
-}
-.lrn-row.lrn-row-narrow.lrn-tool-state > .lrn-col-xs-10 {
+.lrn-row.lrn-row-narrow.lrn-tool-state > .lrn-author-col-xs-10 {
     width: 100%;
 }
-.lrn-row.lrn-row-narrow.lrn-tool-state > .lrn-col-xs-2 {
+.lrn-row.lrn-row-narrow.lrn-tool-state > .lrn-author-col-xs-2 {
     width: 100%;
 }
 
@@ -1020,12 +973,73 @@ button.lrn-btn.lrn-btn-default.lrn-btn-full-width {
     margin-top: 10px;
 }
 
+li.lrn-item-for-activity-list.lrn-col-xs-10.lrn-col-md-11 {
+    display: none;
+}
+
+.lrn-author-list-view-col.lrn-author-col-xs-2.lrn-author-col-md-1.lrn-author-list-view-col-first.lrn-author-ui-no-preview {
+    position: relative;
+}
+.lrn-author-col-xs-10.lrn-author-col-md-11.lrn-author-ui-no-preview.lrn-author-list-details.lrn-author-flex {
+    border: none !important;
+}
+.lrn-author .lrn-author-ui .lrn-author-list-unstyled.lrn-author-list-view-labels {
+    display: none;
+}
+.lrn-author-list-view-alternative-reference.lrn-author-ellipses {
+    display: none;
+}
+
+ul.lrn-author-list-view.lrn-author-list-unstyled.lrn-author-list-divider.lrn-author-draggable {
+    background: #fff;
+    border-bottom: 1px solid var(--body-background) !important;
+    list-style: none;
+    max-width: none;
+    overflow: visible;
+    position: relative;
+    transition: background-color 0.3s ease-in;
+    width: auto;
+}
+.lrn-author-list-view-col.lrn-author-col-xs-2.lrn-author-col-md-1.lrn-author-list-view-col-first.lrn-author-ui-no-preview {
+    border-right: 1px solid var(--body-background);
+}
+.lrn-author.lrn-author .lrn-author-list-activity-item-view-extended .lrn-author-activity-preview {
+    overflow: hidden;
+}
+.lrn-author .lrn-author-ui .lrn-author-activity-edit [data-tab-content="items"] .lrn-author-list-divider > li {
+    margin-bottom: 1px;
+    border-bottom: 1px solid var(--body-background) !important;
+}
+.lrn-author.lrn-author
+    .lrn-author-item-for-activity-list
+    .lrn-author-item-for-activity-pagination-top
+    .lrn-author-pagination
+    ul {
+    background-color: transparent;
+}
+.lrn-author-flex-toolbar-item.lrn-author-flex-toolbar-item-lg.lrn-author-col-lg-only {
+    display: none !important;
+}
+button.lrn-author-btn-old.lrn-author-btn-old-legacy.lrn-author-btn-sec.lrn-author-btn-sec-legacy.lrn-author-btn-full-width.lrn-author-btn-lg.lrn-author-btn-lg-legacy.lrn-author-main-search-button {
+    float: right;
+    margin-bottom: 1rem;
+    width: 230px;
+    padding: 0.5rem !important;
+}
+.lrn-author .lrn-author-ui .lrn-author-list-view-col:not(.lrn-author-list-view-select-col):first-child {
+    padding-left: 1.9rem;
+    padding-right: 1.2rem;
+}
+.lrn-author .lrn-author-ui .lrn-author-list-view-col {
+    padding: 1rem 0.5rem;
+}
+.lrn-author .lrn-author-ui .lrn-author-btn-old-legacy:focus,
+.lrn-author .lrn-author-ui a.lrn-author-btn-old-legacy:focus {
+    outline: none;
+}
 /* Fixed the mobile version for the search page */
 @media #{$small-only} {
-    .lrn .lrn-author-ui .lrn-list-view-col:not(.lrn-list-view-select-col):first-child {
-        padding-left: 0.25rem !important;
-    }
-    .lrn .lrn-author-ui .lrn-list-view-heading-wrapper {
+    .lrn .lrn-author-ui .lrn-author-list-view-heading-wrapper {
         margin-right: 3rem !important;
     }
 
@@ -1043,6 +1057,7 @@ button.lrn-btn.lrn-btn-default.lrn-btn-full-width {
     .lrn-qe .lrn-qe-ui .lrn-qe-toolbar .lrn-qe-toolbar-controls .lrn-qe-viewstack-item > div {
         margin-left: 0px;
     }
+
     /* Made sort list question vertically on the small screens */
     .lrn_widget.lrn_sortlist .lrn_sortlist_column {
         display: unset;

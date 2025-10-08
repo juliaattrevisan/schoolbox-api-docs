@@ -3,13 +3,15 @@
  * those filtered by both <select> and also the search <input>
  */
 
-/* eslint-disable import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
-
 import { defineStore } from "pinia";
+/* eslint-disable-next-line import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
 import { useNodesStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcNodesStore";
+/* eslint-disable-next-line import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
 import { useSearchStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcSearchStore";
+/* eslint-disable-next-line import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
 import { useAddSubsectionStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcAddSubsectionStore";
 import { useUpdateNodeStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcUpdateNodeStore";
+/* eslint-disable-next-line import/no-cycle -- Disable dependency cycle warning temporarily [SA-18428] */
 import { useAddCurriculumStore } from "@schoolboxCurriculum/vue/manageCurriculum/store/mcAddCurriculumStore";
 import { useNodeUsageStore } from "@schoolboxCurriculum/vue/manageCurriculum/activeNode/store/mcNodeUsageStore";
 import { UNSET_ID, findById } from "@schoolboxCurriculum/js/nodeUtils";
@@ -33,7 +35,7 @@ export const useViewNodesStore = defineStore("mcViewNodes", () => {
     const idList = window.Vue.ref<number[]>([]); // ids of the selected nodes
     const currentDepth = window.Vue.ref(0); // track how far down the tree we are
     const currentDirection = window.Vue.ref(DIRECTION.FORWARDS); // which direction we are currently travelling in the tree
-    const showDisabled = window.Vue.ref(true); // whether only enabled nodes should appear
+    const showDisabled = window.Vue.ref(false); // whether disabled nodes are shown in the tree
     const isBrowserAction = window.Vue.ref(false); // whether the current action is a browser action (backward or forward press)
 
     /**

@@ -3,7 +3,6 @@
  */
 
 const path = require("path");
-const { styles } = require("@ckeditor/ckeditor5-dev-utils"); // https://www.npmjs.com/package/@ckeditor/ckeditor5-dev-utils
 
 module.exports = {
     entry: {
@@ -43,7 +42,7 @@ module.exports = {
             "./www/static/js/editor/jquery.proxy-replacement.js",
 
             // DateTime
-            "./www/static/js/vendors/dayjs/dayjsWithPlugins.ts",
+            "./www/static/js/dayjs/dayjsWithPlugins.ts",
 
             // Files And Resource Browser
             "./www/static/js/socialstream/browser/browser.js",
@@ -73,9 +72,6 @@ module.exports = {
             "./www/static/js/alaress-datetime-picker/attacher.datepicker.js",
             "./www/static/js/alaress-datetime-picker/alaress-datetime-picker.js",
             "./www/static/js/alaress-datetime-picker/alaress-datetime-modal.js",
-
-            // This is a Webpack-built module for strtotime
-            "./www/static/js/strtotime/strtotime.bundle.js",
 
             // Allow deference of form submit actions
             "./www/static/js/form/jquery.stallSubmit.js",
@@ -109,13 +105,15 @@ module.exports = {
         // Libraries
         intellischools: "./www/static/js/intellischools/schoolboxIntellischools.js",
         clipboard: "./www/static/js/clipboard/clipboard.js",
-        strtotime: "./www/static/js/alaress-datetime-picker/strtotime.js",
         highcharts: "./www/static/js/vendors/highcharts/highcharts.js",
         highchartsMore: "./www/static/js/vendors/highcharts/highchartsMore.js",
 
         // Search
         headerSearch: "./templates/core/include/vue/headerSearch.ts",
         searchPage: "./library/Schoolbox/Search/templates/vue/searchPage.ts",
+
+        // PWA
+        pwa: "./www/static/js/pwa/pwa.ts",
 
         // Toast
         sbxToast: "./vue/components/toast/sbxToast.ts",
@@ -142,18 +140,24 @@ module.exports = {
         newsRssLink: "./library/Schoolbox/Comms/News/vue/newsRssLink.ts",
 
         // Learning
-        learningMomentsEvidenceDetail:
-            "./library/Schoolbox/Learning/Moment/Evidence/vue/learningMomentsEvidenceDetail.ts",
+        learningMomentForm: "./library/Schoolbox/Learning/Moment/vue/form/learningMomentForm.ts",
+        learningMomentsEvidenceCohortReport:
+            "./library/Schoolbox/Learning/Moment/vue/cohortReport/learningMomentsEvidenceCohortReport.ts",
+        learningMomentsEvidenceDetail: "./library/Schoolbox/Learning/Moment/vue/learningMomentsEvidenceDetail.ts",
         userProfileFeeds: "./library/Schoolbox/Learning/vue/user-profile/userProfileFeeds.ts",
         badgeList: "./library/Schoolbox/Learning/Badge/vue/badgeList.ts",
         badgeListForm: "./library/Schoolbox/Learning/Badge/Award/vue/badgeListForm.ts",
         badgeReport: "./library/Schoolbox/Learning/Badge/Award/vue/badgeReport.ts",
         awardWithEvidenceBadgeList: "./library/Schoolbox/Learning/Badge/Award/vue/awardWithEvidenceBadgeList.ts",
-        evidenceMediaRecording: "./library/Schoolbox/Learning/Moment/Evidence/vue/evidenceMediaRecording.ts",
-        checkShareWorkButtons: "./library/Schoolbox/Learning/Moment/Evidence/templates/js/checkShareWorkButtons.js",
+        evidenceMediaRecording: "./library/Schoolbox/Learning/Moment/vue/evidenceMediaRecording.ts",
+        checkShareWorkButtons: "./library/Schoolbox/Learning/Moment/templates/js/checkShareWorkButtons.js",
         similarityReport:
             "./library/Schoolbox/Learning/Assessment/templates/dueWork/vue/similarityReport/similarityReport.ts",
-        linkedActivities: "./library/Schoolbox/Learning/Assessment/templates/lessonPlan/vue/linkedActivities.ts",
+        linkedActivities:
+            "./library/Schoolbox/Learning/Assessment/templates/lessonPlan/vue/linkedActivities/linkedActivities.ts",
+        lessonPlanner:
+            "./library/Schoolbox/Learning/Assessment/templates/lessonPlan/vue/lessonPlanner/lessonPlanner.ts",
+        activityStatusPage: "./library/Schoolbox/Learning/Assessment/templates/status/activityStatusPage.ts",
 
         // Assessment
         unitPlanner: "./library/Schoolbox/Assessment/Course/Plan/templates/vue/unitPlanner.ts",
@@ -161,6 +165,8 @@ module.exports = {
             "./library/Schoolbox/Learning/Learnosity/templates/vue/horizontalMarking/horizontalMarking.ts",
         quizFeedback: "./library/Schoolbox/Learning/Learnosity/templates/vue/feedback/quizFeedback.ts",
         quizContent: "./library/Schoolbox/Learning/Learnosity/templates/js/quizContent.ts",
+        customParticipation:
+            "./library/Schoolbox/Learning/Assessment/templates/participation/vue/customParticipation.ts",
 
         // Textboxes
         textboxList: "./library/Schoolbox/Resource/Textbox/vue/textboxList.ts",
@@ -180,12 +186,19 @@ module.exports = {
         courseBuilder: "./library/Schoolbox/Admin/CourseBuilder/templates/vue/courseBuilder.ts",
         oauthClientList: "./library/Schoolbox/Admin/Oauth/Client/vue/oauthClientList.ts",
         profileEditor: "./library/Schoolbox/Admin/Profile/Editor/templates/vue/profileEditor.ts",
+        editorTemplates: "./library/Schoolbox/Admin/Editor/Templates/templates/vue/editorTemplates.ts",
 
         //Vue component to display data in a table
         dataTable: "./vue/components/dataTable/dataTable.ts",
 
         // Record Media Modal
         recordMediaModal: "./templates/core/resources/filesystem/vue/recordMediaModal.ts",
+
+        // Image Generator
+        imageGenerator: "./templates/core/resources/filesystem/vue/imageGenerator/imageGenerator.ts",
+
+        // Basic file drop
+        fileDrop: "./www/static/js/resource/fileDrop.ts",
 
         // Class
         classList: "./library/Schoolbox/Learning/vue/classList.ts",
@@ -209,6 +222,7 @@ module.exports = {
         pastoralRecordCommentsPublic: "./library/Schoolbox/Pastoral/templates/vue/pastoralRecordCommentsPublic.ts",
         pastoralRecordCommentsPrivate: "./library/Schoolbox/Pastoral/templates/vue/pastoralRecordCommentsPrivate.ts",
         pastoralClassReport: "./library/Schoolbox/Pastoral/ClassReport/vue/pastoralClassReport.ts",
+        pastoralReport: "./library/Schoolbox/Pastoral/ReportBuilder/templates/vue/pastoralReport.ts",
 
         // Resource
         googleFiles: "./library/Schoolbox/Resource/GoogleFile/templates/component/js/googleFiles.js",
@@ -246,15 +260,11 @@ module.exports = {
         // Colour Picker
         colourPicker: "./www/static/js/colour-picker/colour-picker.ts",
 
-        // Markbook Pop Out
-        popOutMenuMarkbook: "./vue/components/menu/popOutMenuMarkbook.ts",
+        // Markbook
+        markbookOuter: "./library/Schoolbox/Learning/Markbook/templates/vue/markbookOuter.ts",
 
         // Birthday pop up
         birthdaySurprise: "./vue/components/birthday/birthdaySurprise.ts",
-
-        // Firebase
-        firebaseInit: "./www/static/js/firebase/firebase-init.ts",
-        firebaseMessaging: "./www/static/js/firebase/firebase-messaging.ts",
 
         //Sass (leave at the bottom)
         core: "./www/static/css/core/core.scss",
@@ -309,7 +319,6 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                exclude: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/, // ensure ckeditor5 related styling setup below isn't applied elsewhere
                 use: [
                     { loader: "vue-style-loader" },
                     {
@@ -319,32 +328,6 @@ module.exports = {
                         },
                     },
                     { loader: "css-loader" },
-                ],
-            },
-            {
-                test: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/,
-                use: [
-                    {
-                        loader: "style-loader",
-                        options: {
-                            injectType: "singletonStyleTag", // applies all styles within in <style> tag
-                            attributes: {
-                                "data-cke": true, // adds data-cke attribute to the <style> tag
-                            },
-                        },
-                    },
-                    "css-loader",
-                    {
-                        loader: "postcss-loader",
-                        options: {
-                            postcssOptions: styles.getPostCssConfig({
-                                themeImporter: {
-                                    themePath: require.resolve("@ckeditor/ckeditor5-theme-lark"),
-                                },
-                                minify: true,
-                            }),
-                        },
-                    },
                 ],
             },
             {
@@ -391,8 +374,8 @@ module.exports = {
                 ],
             },
             {
-                // to process svg files in the ckeditor5/theme/icons folder as well as the @caspingus/lt/src/authoring/extensions/ui/imageUploader/assets/ folder (for the Learnosity image uploader extension)
-                test: /(ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$)|(@caspingus[/\\]lt[/\\]src[/\\]authoring[/\\]extensions[/\\]ui[/\\]imageUploader[/\\]assets[/\\][^/\\]+\.svg$)/,
+                // to process svg files in the @caspingus/lt/src/authoring/extensions/ui/imageUploader/assets/ folder (for the Learnosity image uploader extension)
+                test: /(@caspingus[/\\]lt[/\\]src[/\\]authoring[/\\]extensions[/\\]ui[/\\]imageUploader[/\\]assets[/\\][^/\\]+\.svg$)/,
                 use: ["raw-loader"],
             },
         ],
@@ -407,10 +390,7 @@ module.exports = {
             "@schoolboxLibrary": path.resolve(__dirname, "library/Schoolbox"),
             "@schoolboxCalendarEvent": path.resolve(__dirname, "library/Schoolbox/Calendar/Event/templates/vue"),
             "@schoolboxCommsNews": path.resolve(__dirname, "library/Schoolbox/Comms/News"),
-            "@schoolboxLearningMomentEvidence": path.resolve(
-                __dirname,
-                "library/Schoolbox/Learning/Moment/Evidence/vue",
-            ),
+            "@schoolboxLearningMomentEvidence": path.resolve(__dirname, "library/Schoolbox/Learning/Moment/vue"),
             "@schoolboxCurriculum": path.resolve(__dirname, "library/Schoolbox/Curriculum/templates/"),
             "@schoolboxBadge": path.resolve(__dirname, "library/Schoolbox/Learning/Badge/"),
             "@schoolboxAssessment": path.resolve(__dirname, "library/Schoolbox/Assessment/"),

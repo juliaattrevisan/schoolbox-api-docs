@@ -23,6 +23,19 @@
                         <input type="text" class='required suds-crypto' name="dsn[wonde][token]" value="{{ token ?? ''}}" />
                     </div>
                 </div>
+
+                <hr />
+
+                <h4 class="no-margin">Future Families</h4>
+                <p class="meta">If enabled, we will also look for students and their parents who have yet to commence their enrolment.</p>
+
+                <div class="row">
+                    <div class="small-12 columns">
+                        <input type="hidden" name="dsn[wonde][options][futurefamilies]" value="0" />
+                        <input id="futurefamilies" type="checkbox" name="dsn[wonde][options][futurefamilies]" value="1" {% if options.futurefamilies ?? false %}checked="checked"{% endif %} />
+                        <label for="futurefamilies" class="checkbox-label">Enable processing of future families</label>
+                    </div>
+                </div>
             </div>
         </fieldset>
     </section>

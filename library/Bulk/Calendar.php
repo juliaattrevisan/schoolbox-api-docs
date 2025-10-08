@@ -61,13 +61,14 @@ class Bulk_Calendar extends Bulk_Abstract
 
     /**
      * Wrapper for uploading a calendar file which could be in either format
+     * @param bool $perform
      *
      * @return array
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function addCalendar()
+    public function addCalendar(bool $perform = true)
     {
         if (is_file($this->getFile())) {
             /* Calendar Owner overrideco
@@ -90,7 +91,7 @@ class Bulk_Calendar extends Bulk_Abstract
              */
             $factory = new \Calendar\Import\Factory($user, $author, $this->categoryList, $this->groupList, $this->campusList, \Schoolbox\Calendar\Event::ACCESS_CAMPUS, $this->getFile(), $this->source);
             $strategy = $factory->build();
-            $strategy->load();
+            $strategy->load($perform);
 
             return $strategy->getOutput();
         }

@@ -1,9 +1,11 @@
 <script>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
-import MediaArticle from "@schoolboxVue/components/media-article";
 import articleListMixin from "./article-list-mixin";
+import MediaArticle from "@schoolboxVue/components/media-article";
+import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time.vue";
 
 export default {
     name: "layout-list",
@@ -22,7 +24,7 @@ export default {
         "articles-loading",
         "current-articles",
     ],
-    components: { MediaArticle },
+    components: { RelativeTime, MediaArticle },
     data() {
         return {};
     },
@@ -56,6 +58,12 @@ export default {
                             />
                             <img
                                 v-else
+                                :srcset="
+                                    article.featureImage._links.image.href +
+                                    '&size=constrain200, ' +
+                                    article.featureImage._links.image.href +
+                                    '&size=constrain300 1.5x'
+                                "
                                 :src="article.featureImage._links.image.href + '&size=constrain200'"
                                 alt="feature image"
                             />
@@ -111,8 +119,8 @@ export default {
                         </span>
                         <span>
                             &mdash;
-                            <time :title="article.publishAt.long">{{ article.publishAt.relativeTime }}</time></span
-                        >
+                            <relative-time :datetime="article.publishAt" full-diff></relative-time>
+                        </span>
                         <span v-if="article.topics.length">
                             in
                             <template v-for="(topic, index) in article.topics">

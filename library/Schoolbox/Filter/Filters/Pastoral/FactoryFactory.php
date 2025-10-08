@@ -58,6 +58,11 @@ class FactoryFactory extends AbstractFactoryFactory
                 $this->getDefaultsMapper(),
                 $this->getSelectionMapper(),
             ),
+            Archived\Definition::class => new Archived\Factory(
+                $this->getOptionMapper(),
+                $this->getDefaultsMapper(),
+                $this->getSelectionMapper(),
+            ),
             default => throw new InvalidArgumentException(
                 'No filter factory registered for class: ' . $filterDefinitionClass
             ),

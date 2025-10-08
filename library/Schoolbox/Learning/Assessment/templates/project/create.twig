@@ -11,6 +11,9 @@
                 maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
                 targetElements: ['textarea[name="description"]'],
                 fileBrowserCategoryId: {{ context.baseContext.folder.id ?? 0 }},
+                {% if editorTemplates is defined %}
+                    templates: {{ editorTemplates|json_encode|raw }},
+                {% endif %}
             }
         }));
     });
@@ -29,6 +32,13 @@
         courseManaged: courseManaged
     } only
 %}
+
+{% include '@learningAssessment/fragments/curriculumCodes.twig' with {
+    entityType: locale.project.proper,
+    excludeLegend: true,
+    hasTabs: true,
+    parentFolderId: parentFolderId ?? null,
+} %}
 
 <label for="description">Description</label>
 <textarea id="description" name="description">{{ assessment.description }}</textarea>
@@ -135,13 +145,12 @@
     assessment: assessment,
     allMarkTypes: allMarkTypes,
     allGradeSchemes: allGradeSchemes,
+    selectedMaxMark: assessment.maxMark ?? '',
     selectedMarkType: assessment.markType.id ?? '',
     selectedGradeGroup: assessment.gradeGroup.id ?? '',
     defaultGradeGroup: defaultGradeGroup,
     renderMaxMark: true,
     markTypeLabel: 'Mark Type',
 } %}
-
-{% include '@learningAssessment/fragments/curriculumCodes.twig' with {entityType: locale.project.proper} %}
 
 {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}

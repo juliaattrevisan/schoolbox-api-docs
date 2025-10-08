@@ -54,7 +54,7 @@ try {
         }
 
         $kernel->getShutdownHandler()->registerFunction(
-            new ResourceLimitExceededHandler(function () use ($size) {
+            new ResourceLimitExceededHandler(function () use ($size): void {
                 header('Cache-Control: no-store');
                 \SitePage::redirectToBrokenImageWithTransform('storage', $size, 504);
             }),

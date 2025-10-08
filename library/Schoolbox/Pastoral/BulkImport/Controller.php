@@ -11,7 +11,9 @@ namespace Schoolbox\Pastoral\BulkImport;
 
 use Alaress\Paginator;
 use Alaress\Web\Controller\Base;
+use Alaress\Web\Controller\Exception as WebControllerException;
 use Alaress_Date_Format;
+use Aura\Router\Exception\RouteNotFound;
 use League\Flysystem\FilesystemException;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
 use Schoolbox\Config\ConfigMapper;
@@ -19,8 +21,10 @@ use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Pastoral;
+use Schoolbox\Pastoral\ExpiryHelper;
 use Schoolbox\Pastoral\TemplateDataHelper;
 use Schoolbox\Pastoral\Translator\VisibilityTranslator;
+use Schoolbox\Pastoral\Type\TypeAbstract;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Attachment\Zone;
@@ -89,7 +93,9 @@ class Controller extends Base
         private Storage\FilesystemProxy $filesystemProxy,
         private Storage\Receiver $receiver,
         private Pastoral\RecordProcessor $recordProcessor,
-        private RosettaStone $rosettaStone
+        private RosettaStone $rosettaStone,
+        private Pastoral\Mapper $pastoralMapper,
+        private \Schoolbox\Assessment\Term\Mapper $termMapper,
     ) {
     }
 
@@ -219,6 +225,13 @@ class Controller extends Base
                 ["Create", null],
             ];
         }
+
+        //Helper for loading default expiry date
+        $expiryHelper = new ExpiryHelper(
+            $this->pastoralMapper,
+            $this->termMapper
+        );
+
         $this->response = $this->responseFromTemplate(
             '@pastoralBulkImport/form.twig',
             $templateData + [
@@ -238,6 +251,23 @@ class Controller extends Base
                     ->setMulti(false)
                     ->useImportExpiryDate()
                     ->getTwigContext(),
+                // only pastoral moderators with 'write' access or above can modify default expiry
+                'canModifyExpiresAt' => $this->user->hasServicePermission(
+                    UserAccess::SERVICE_PASTORAL,
+                    UserAccess::ACCESS_WRITE
+                ),
+                // if default points aren't enabled, any user can modify,
+                // otherwise only pastoral moderators with 'write' access or above can modify point settings
+                'canModifyPoints' => !$this->getConfigLoader()->get(ConfigMapper::NAME_PASTORAL_DEFAULT_POINTS_ENABLED) ||
+                    $this->user->hasServicePermission(
+                        UserAccess::SERVICE_PASTORAL,
+                        UserAccess::ACCESS_WRITE
+                    ),
+                'calculatedExpiresAt' => array_map(fn($expiry) => $expiryHelper->calculateExpireDate(
+                    Alaress_Date_Format::now(),
+                    $expiry,
+                    null
+                )?->getUsingFormat('d/m/Y'), TypeAbstract::PASTORAL_EXPIRY),
                 'moderator'        => $this->getUser()->hasServicePermission(
                     UserAccess::SERVICE_PASTORAL,
                     UserAccess::ACCESS_READ,
@@ -285,6 +315,18 @@ class Controller extends Base
             }
         }
 
+        $expiresAt = $this->requestPost->get('expiresAt');
+        if ('' !== (string)$expiresAt) {
+            try {
+                $expiresAt = \Alaress_Date_Format::newLocalShort($expiresAt)->startOfDay();
+            } catch (\Exception $e) {
+                $locale = new \Alaress_Date_Locale_Config();
+                throw new SchoolboxException("Expires At must be in the format of {$locale->localShortFormat()}");
+            }
+        } else {
+            $expiresAt = null;
+        }
+
         $import = $this->pastoralBulkImportMapper->createModel()
             ->setOwner($this->getUser())
             ->setZip($zipStorage)
@@ -300,6 +342,7 @@ class Controller extends Base
             ->setBodyPublic($this->requestPost->get('body_public'))
             ->setPoints($this->requestPost->getFloat('points'))
             ->setImportedAt(null)
+            ->setExpiresAt($expiresAt)
         ;
 
         // Create tags
@@ -446,18 +489,23 @@ class Controller extends Base
             return;
         }
 
-        // Save imported by/at immediately,
-        // so that mashing the import button doesn't create multiple imports.
-        $import = $import
-            ->setImportedBy($this->getUser())
-            ->setImportedAt(Alaress_Date_Format::now());
-        $this->pastoralBulkImportMapper->save($import);
+        // Pastoral imports can be long-running, so extend the execution time.
+        $this->extendExecutionTime(3600);
 
-        // Load the Zip file's contents, cleaning up only once all files have
-        // been extracted from the ZIP.
-        $zipArchive       = null;
-        $localZipFilename = null;
         try {
+            // Save imported by/at immediately,
+            // so that mashing the import button doesn't create multiple imports.
+            $import = $import
+                ->setImportedBy($this->getUser())
+                ->setImportedAt(Alaress_Date_Format::now());
+            $this->pastoralBulkImportMapper->save($import);
+        } catch (MapperException $e) {
+            throw new SchoolboxException('Could not create pastoral bulk import.  Error: ' . $e->getMessage());
+        }
+
+        try {
+            // Load the Zip file's contents, cleaning up only once all files have
+            // been extracted from the ZIP.
             $zipStorage = $import->getZip();
             if (!$zipStorage) {
                 $this->sendError(
@@ -470,7 +518,11 @@ class Controller extends Base
             $localZipFilename = $this->createLocalZipFile($zipStorage);
             $zipArchive       = $this->createZipArchive($localZipFilename);
             $importLog        = $this->generateImportLog($zipArchive, $import->getFilePathTemplate());
+        } catch (FilesystemException | WebControllerException $e) {
+            throw new SchoolboxException('Could not create log for pastoral bulk import.  Error: ' . $e->getMessage());
+        }
 
+        try {
             // Create the records
             $tokenReplacer = new TokenReplacer\Student(new TokenReplacer\Simple());
             foreach ($importLog['known'] as $i => $pastoralRecord) {
@@ -489,6 +541,7 @@ class Controller extends Base
                     ->setBodyPublic($tokenReplacer->replace($import->getBodyPublic(), $student))
                     ->setBodyPrivate('')
                     ->setExternalId(null)
+                    ->setExpiresAt($import->getExpiresAt())
                 ;
 
                 // Create access
@@ -530,6 +583,8 @@ class Controller extends Base
                     $this->pastoralTagMapper->assignToRecord($record, $tag);
                 }
             }
+        } catch (\Exception $e) {
+            $importLog['error'] = $e->getMessage();
         } finally {
             $this->cleanup($zipArchive, $localZipFilename);
         }
@@ -554,6 +609,9 @@ class Controller extends Base
      *
      * @param Model $import
      * @return void
+     * @throws MapperException
+     * @throws RouteNotFound
+     * @throws WebControllerException
      */
     public function postUndoImport(Model $import): void
     {
@@ -562,14 +620,22 @@ class Controller extends Base
             return;
         }
 
+        // Pastoral import undo operations can be long-running, so extend the execution time.
+        $this->extendExecutionTime(3600);
+
         // Investigate the log to find what was created:
         // delete all of these.
         foreach ($import->getImportLog()['known'] as $item) {
             $recordId = $item['record']['id'] ?? null;
             if (isset($recordId)) {
-                $this->pastoralDataSource->delete(
-                    $this->pastoralDataSource->findById($this->getUser(), $recordId),
-                );
+                try {
+                    $this->pastoralDataSource->delete(
+                        $this->pastoralDataSource->findById($this->getUser(), $recordId),
+                    );
+                } catch (MapperException) {
+                    // The pastoral record was either already deleted or not found.
+                    // Since we are trying to delete it, this error can be ignored.
+                }
             }
         }
 

@@ -129,7 +129,7 @@ interface IAssessable extends ISoftDeletable
      * @param Alaress_Date_Format|null $now
      * @return bool
      */
-    public function isPublished(?User $student, Alaress_Date_Format $now = null): bool;
+    public function isPublished(?User $student, ?Alaress_Date_Format $now = null): bool;
 
 
     /**
@@ -138,28 +138,28 @@ interface IAssessable extends ISoftDeletable
      * Note this includes the overdue period.
      *
      * @param User                     $student
-     * @param null|Alaress_Date_Format $now Optional value of now for testing
+     * @param Alaress_Date_Format|null $now Optional value of now for testing
      * @return bool
      */
-    public function isOpen(User $student, Alaress_Date_Format $now = null): bool;
+    public function isOpen(User $student, ?Alaress_Date_Format $now = null): bool;
 
 
     /**
      * Are we past the due date and before the close date?
      *
-     * @param null|Alaress_Date_Format $now  Optional value of now for testing
+     * @param Alaress_Date_Format|null $now Optional value of now for testing
      * @return bool
      */
-    public function isOverdue(Alaress_Date_Format $now = null);
+    public function isOverdue(?Alaress_Date_Format $now = null);
 
 
     /**
      * Are we after the close date? (does not consider if we are before open date)
      *
-     * @param null|Alaress_Date_Format $now  Optional value of now for testing
+     * @param Alaress_Date_Format|null $now Optional value of now for testing
      * @return bool
      */
-    public function isPastClose(Alaress_Date_Format $now = null);
+    public function isPastClose(?Alaress_Date_Format $now = null);
 
 
     /**
@@ -199,7 +199,7 @@ interface IAssessable extends ISoftDeletable
      * @param IAssessable|null $specification
      * @return static
      */
-    public function setSpecificationAssessment(IAssessable $specification = null);
+    public function setSpecificationAssessment(?IAssessable $specification = null);
 
     /**
      * Is this assessment a specification?
@@ -296,9 +296,10 @@ interface IAssessable extends ISoftDeletable
      * including the case where the participant is excluded or the user is deleted
      *
      * @param User $user
+     * @param bool $removeExcluded - If this is true, participants with isExcluded() true will be treated as non-extant.
      * @return Participant|null
      */
-    public function getParticipantIfExtant(User $user);
+    public function getParticipantIfExtant(User $user, $removeExcluded = true);
 
     /**
      * Removes the specified user's participation from this IAssessment.
@@ -329,6 +330,18 @@ interface IAssessable extends ISoftDeletable
      * @throws DomainException If participant assessment is not this assessment
      */
     public function getHumanReadableMark(Participant $participant, $publishedOnly);
+
+
+    /**
+     * Gets the normalised instructor mark, transformed into human-readable form by this assessment's instructor MarkScheme
+     * Currently only used for due work, but will fall back to getHumanReadableMark
+     *
+     * @param Participant $participant
+     * @param bool        $publishedOnly
+     * @return string|null
+     * @throws DomainException If participant assessment is not this assessment
+     */
+    public function getHumanReadableInstructorMark(Participant $participant, $publishedOnly);
 
 
     /**
@@ -716,6 +729,17 @@ interface IAssessable extends ISoftDeletable
      */
     public function setSebEnabled(?bool $sebEnabled): self;
 
+    /**
+     * @return int|null
+     */
+    public function getOriginalAssessmentId(): ?int;
+
+    /**
+     * @param int|null $originalAssessmentId
+     * @return self
+     */
+    public function setOriginalAssessmentId(?int $originalAssessmentId): self;
+
 
     /**
      * Get the weight
@@ -771,7 +795,7 @@ interface IAssessable extends ISoftDeletable
      * @param null|WorkType\Model $workType
      * @return static
      */
-    public function setWorkType(WorkType\Model $workType = null);
+    public function setWorkType(?WorkType\Model $workType = null);
 
     /**
      * @return GradeGroup|null
@@ -850,6 +874,8 @@ interface IAssessable extends ISoftDeletable
      */
     public function getDynamicPlan(): ?Plan;
 
+    public function setCustomisedAssessments(GenericCollection $customisedAssessments): self;
+    public function getCustomisedAssessments(): GenericCollection;
 
     /**
      * Returns whether this assessment has a dynamic plan

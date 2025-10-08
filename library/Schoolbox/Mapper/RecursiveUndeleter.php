@@ -29,7 +29,8 @@ use Alaress\Lumberjack\Logger;
 use Alaress_Date_Format;
 use Component\Eportfolio as ComponentEportfolio;
 use Eportfolio;
-use Schoolbox\Learning\Moment\Evidence\Model;
+use Schoolbox\Learning\Moment\Model;
+use SocialStream\PostMapper;
 use UnexpectedValueException;
 use OutOfBoundsException;
 use Psr\Log\LoggerInterface;
@@ -273,7 +274,7 @@ class RecursiveUndeleter
         ],
         Discussion\Comment\Mapper::class    => [],
         Eportfolio\PageMapper::class        => [],
-        Evidence\Mapper::class              => [],
+        \Schoolbox\Learning\Moment\Mapper::class              => [],
         Blog\Homepage\Post\Mapper::class                => [
             Blog\Homepage\Comment\Mapper::class,
             Blog\Homepage\Image\Mapper::class,
@@ -322,6 +323,9 @@ class RecursiveUndeleter
         Forum\PostMapper::class                         => [],
         News\Mapper::class                              => [],
         \Schoolbox\User\Token\Mapper::class => [],
+        PostMapper::class => [
+            PostMapper::class => 'parent_id'
+        ]
     ];
 
 
@@ -423,16 +427,16 @@ class RecursiveUndeleter
      * @param IMapper                  $childMapper
      * @param string                   $foreignKeyColumn
      * @param int[]                    $parentIds
-     * @param null|Alaress_Date_Format $deletedAfter
-     * @param null|Alaress_Date_Format $deletedBefore
+     * @param Alaress_Date_Format|null $deletedAfter
+     * @param Alaress_Date_Format|null $deletedBefore
      * @return GenericCollection|ISoftDeletable[]
      */
     private function findDeletedChildModels(
         IMapper $childMapper,
         $foreignKeyColumn,
         array $parentIds,
-        Alaress_Date_Format $deletedAfter = null,
-        Alaress_Date_Format $deletedBefore = null
+        ?Alaress_Date_Format $deletedAfter = null,
+        ?Alaress_Date_Format $deletedBefore = null
     ) {
         $childModels = $childMapper
             ->findByColumn($foreignKeyColumn, $parentIds, ['deleted' => true])
@@ -447,7 +451,7 @@ class RecursiveUndeleter
                 return $deletedAt->between($deletedAfter, $deletedBefore);
             });
         }
-        $this->logger->info(sprintf("%d deleted child models found", $childModels->count()));
+        $this->logger->debug(sprintf("%d deleted child models found", $childModels->count()));
         return $childModels;
     }
 
@@ -603,21 +607,21 @@ class RecursiveUndeleter
      *
      * @param IMapper                  $parentMapper
      * @param Collection               $deletedParentModels
-     * @param null|Alaress_Date_Format $after
-     * @param null|Alaress_Date_Format $before
+     * @param Alaress_Date_Format|null $after
+     * @param Alaress_Date_Format|null $before
      */
     private function recursiveFindDeletedModels(
         IMapper $parentMapper,
         Collection $deletedParentModels,
-        Alaress_Date_Format $after = null,
-        Alaress_Date_Format $before = null
+        ?Alaress_Date_Format $after = null,
+        ?Alaress_Date_Format $before = null
     ): void {
         $mapperClass = get_class($parentMapper);
         $this->checkRegistry($mapperClass);
 
         $childMappers = self::$softDeleteRegistry[$mapperClass];
         $parentIds    = $deletedParentModels->getPropertyValues($parentMapper->getIdentifierProperty());
-        $this->logger->info(sprintf("Finding children of mapper '%s' with ids %s", $mapperClass, $this->getIdsString($parentIds)));
+        $this->logger->debug("Finding children using mapper '$mapperClass' and parentIds " . $this->getIdsString($parentIds));
 
         // For each child entity of this parent entity
         foreach ($childMappers as $key => $val) {
@@ -627,7 +631,6 @@ class RecursiveUndeleter
              */
             [$childMapper, $foreignKeyColumn] = $this->getMapperClassAndForeignKeyFromRegistryPair($parentMapper, $key, $val);
             $mapperClass = get_class($childMapper);
-            $this->logger->info(sprintf("Fetching children from mapper '%s'", $mapperClass));
 
             $deletedChildModels = $this->findDeletedChildModels($childMapper, $foreignKeyColumn, $parentIds, $after, $before);
 
@@ -638,11 +641,11 @@ class RecursiveUndeleter
             $childModelIdentifier = $childMapper->getIdentifierColumn();
             if (!$childModelIdentifier) {
                 $this->checkNoIdentifier($val);
-                $this->logger->info(sprintf("Mapper '%s' does not have an identifier, therefore cannot have children", $val));
+                $this->logger->debug(sprintf("Mapper '%s' does not have an identifier, therefore cannot have children", $val));
                 continue;
             }
 
-            $this->logger->info(sprintf("Child mapper identifier column '%s'", $childModelIdentifier));
+            $this->logger->debug(sprintf("Child mapper identifier column '%s'", $childModelIdentifier));
             $childModelIds = $deletedChildModels->getPropertyValues($childMapper->getIdentifierProperty());
             $this->logger->debug(sprintf('Child model IDs: %s', $this->getIdsString($childModelIds)));
 

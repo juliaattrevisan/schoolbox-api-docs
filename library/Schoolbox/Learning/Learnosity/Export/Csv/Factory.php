@@ -41,11 +41,10 @@ class Factory
             'orderlist' => new Orderlist(),
             'sortlist' => new Orderlist(),
             /* Written and Recorded
-             * We aren't going to render audio/video media in a csv, plus, consciously skip
-             * responses that are likely to be massive csv-breaking slabs of text
+             * We aren't going to render audio/video media in a csv
              */
-            'longtextV2' => new NotApplicable(),
-            'plaintext' => new NotApplicable(),
+            'longtextV2' => new LongtextV2(),
+            'plaintext' => new Plaintext(),
             'shorttext' => new Shorttext(),
             'audio' => new NotApplicable(),
             'video' => new NotApplicable(),

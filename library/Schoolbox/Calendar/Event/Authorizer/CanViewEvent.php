@@ -35,7 +35,7 @@ class CanViewEvent implements IAuthorizationRule
      * @param User|null $user
      * @throws \Schoolbox\Mapper\Exception
      */
-    public function authorize(array $params = [], User $user = null): void
+    public function authorize(array $params = [], ?User $user = null): void
     {
         if (!array_key_exists('event', $params)) {
             throw new \InvalidArgumentException("Expected array key 'event' does not exist.");

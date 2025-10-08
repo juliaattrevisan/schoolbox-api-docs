@@ -1,0 +1,247 @@
+#!/usr/bin/env bash
+
+# Always run within root folder
+cd "$(dirname "$0")/.." || exit 1
+
+declare PHP_MAJOR_VERSION
+declare MARIADB_MAJOR_VERSION
+declare REDIS_MAJOR_VERSION
+declare RABBITMQ_MAJOR_VERSION
+declare MARIADB_PUBLISHED_PORT
+declare MARIADB_PUBLISHED_PORT
+declare REDIS_STORAGE_PUBLISHED_PORT
+declare REDIS_CACHE_PUBLISHED_PORT
+declare BASE_PHP_IMAGE_BUILD_FROM_LOCAL
+declare TASKD_BUILD_FROM_LOCAL
+declare PRIVATE_CONTAINER_REGISTRY_TYPE
+declare PRIVATE_CONTAINER_REGISTRY_DOCKERHUB_USERNAME
+declare PRIVATE_CONTAINER_REGISTRY_ECR_ACCOUNT_ID
+declare PRIVATE_CONTAINER_REGISTRY_ECR_REGION
+declare DEFAULT_INSTANCE_ID
+declare AWS_REGION
+declare AWS_START_URL
+declare PHPSTORM_SERVER_NAME
+
+declare private_container_registry
+declare base_php_image
+declare docker_compose_args
+
+# Log to stderr
+function log() {
+    echo "$@" >&2
+}
+
+function verify_executables() {
+    log "Verifying Docker installed..."
+    if ! which docker > /dev/null; then
+        log "Docker not installed. Visit either:"
+        log "* https://docs.docker.com/engine/install/ for instructions on installing the Docker CLI tools only"
+        log "* https://www.docker.com/products/docker-desktop/ for instructions on installing the Docker Desktop application"
+        exit 1
+    fi
+
+    log "Verifying current user has permission to run Docker..."
+    if ! docker info > /dev/null 2>&1; then
+        log "Current user does not have permission to run Docker. Either:"
+        log "* run as \`sudo\`"
+        log "* add the current user to the \`docker\` group: https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user"
+        exit 1
+    fi
+
+    log "Verifying AWS CLI installed..."
+    if ! which aws > /dev/null; then
+        log "AWS CLI not installed."
+        log "Visit https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html for instructions on installation."
+        exit 1
+    fi
+}
+
+function output_help() {
+    if [[ "$*" =~ '--help' ]] || [[ "$*" =~ '-h' ]] ; then
+        docker compose up --help;
+        exit;
+    fi
+}
+
+function create_dirs() {
+    # ensure that the AWS folder exists
+    mkdir -p .aws
+
+    # ensure that the storage folder exists
+    mkdir -p ./data/docker/storage
+
+    # ensure the ssl cert folder exists (schoolbox-cli / caddy share):
+    # schoolbox-cli must download them so that the Caddy container can use them.
+    mkdir -p ./data/docker/ssl
+}
+
+function load_config() {
+    source ./docker.default.env
+    if [ -f ./docker.env ]; then
+        source ./docker.env
+    fi
+}
+
+function login_to_aws() {
+    # Preconfigure an AWS profile and SSO session, just for this script.
+    # it's not possible to pass `aws configure sso` a region or start URL, so
+    # that needs to be in the pre-configured AWS config.
+    aws_profile='schoolbox-docker'
+    echo "
+    [default]
+    sso_session = ${aws_profile}
+    sso_account_id = ${AWS_ACCOUNT_ID}
+    sso_role_name = ${AWS_ROLE_NAME}
+    region = ${AWS_REGION}
+
+    [sso-session ${aws_profile}]
+    sso_region = ${AWS_REGION}
+    sso_start_url = ${AWS_START_URL}" > .aws/config
+
+    # Then log in to AWS, if not already logged in
+    log "Testing if logged in to AWS (region: ${AWS_REGION})..."
+    if ! AWS_CONFIG_FILE=.aws/config aws configure list > /dev/null; then
+        log "Not logged in to AWS: logging in"
+        AWS_CONFIG_FILE=.aws/config aws sso login --no-browser --use-device-code
+    else
+        log "Logged in to AWS: continuing"
+    fi
+}
+
+function login_to_container_registry() {
+    # Log into whatever repository, as long as not already logged into it
+    test_image='taskd'
+    case "${PRIVATE_CONTAINER_REGISTRY_TYPE}" in
+        dockerhub )
+            private_container_registry="docker.io/${PRIVATE_CONTAINER_REGISTRY_DOCKERHUB_USERNAME}"
+            # Test if logged into repo by fetching the test image manifest:
+            # if not, then login
+            log "Testing if logged in to private container registry ${private_container_registry}..."
+            docker manifest inspect "${private_container_registry}/${test_image}" > /dev/null
+            if [ ! $? -eq 0 ]; then
+                log "Not logged in to private container registry: logging in"
+                docker login -u "${PRIVATE_CONTAINER_REGISTRY_DOCKERHUB_USERNAME}"
+            else
+                log "Logged in to private container registry: continuing"
+            fi
+            ;;
+        ecr )
+            private_container_registry="${PRIVATE_CONTAINER_REGISTRY_ECR_ACCOUNT_ID}.dkr.ecr.${PRIVATE_CONTAINER_REGISTRY_ECR_REGION}.amazonaws.com"
+            # As with the Dockerhub variant:
+            # test if logged in by fetching an image manifest, if not then login
+            log "Testing if logged in to private container registry ${private_container_registry}..."
+            docker manifest inspect "${private_container_registry}/${test_image}" > /dev/null
+            if [ ! $? -eq 0 ]; then
+                log "Not logged in to private container registry: logging in"
+                AWS_CONFIG_FILE=.aws/config aws ecr get-login-password --region "${PRIVATE_CONTAINER_REGISTRY_ECR_REGION}" \
+                    | docker login -u AWS --password-stdin "${private_container_registry}"
+            else
+                log "Logged in to private container registry: continuing"
+            fi
+            ;;
+        * )
+            log "Invalid PRIVATE_CONTAINER_REGISTRY_TYPE value ${PRIVATE_CONTAINER_REGISTRY_TYPE}: must be dockerhub or ecr" >&2
+            exit 1
+            ;;
+    esac
+
+    # Also determine base image
+    case "${BASE_PHP_IMAGE_BUILD_FROM_LOCAL}" in
+        1 | true | yes | on)
+            base_php_image="php-frankenphp"
+            ;;
+        *)
+            base_php_image="${private_container_registry}/frankenphp-base:latest-php${PHP_MAJOR_VERSION}-dev"
+            ;;
+    esac
+}
+
+function build_docker_compose_env() {
+    # Put private repository and AWS credentials into an env file for docker compose
+    aws_credentials=$(AWS_CONFIG_FILE=.aws/config aws configure export-credentials --format=env-no-export)
+    echo "# Do not edit this file: autogenerated by docker/up
+    PHP_MAJOR_VERSION=\"${PHP_MAJOR_VERSION}\"
+    MARIADB_MAJOR_VERSION=\"${MARIADB_MAJOR_VERSION}\"
+    REDIS_MAJOR_VERSION=\"${REDIS_MAJOR_VERSION}\"
+    MARIADB_PUBLISHED_PORT=\"${MARIADB_PUBLISHED_PORT}\"
+    REDIS_STORAGE_PUBLISHED_PORT=\"${REDIS_STORAGE_PUBLISHED_PORT}\"
+    REDIS_CACHE_PUBLISHED_PORT=\"${REDIS_CACHE_PUBLISHED_PORT}\"
+    RABBITMQ_MAJOR_VERSION=\"${RABBITMQ_MAJOR_VERSION}\"
+    PRIVATE_CONTAINER_REGISTRY=\"${private_container_registry}\"
+    INSTANCE_ID=\"${DEFAULT_INSTANCE_ID}\"
+    PHPSTORM_SERVER_NAME=\"${PHPSTORM_SERVER_NAME}\"
+    USER_ID=\"$(id -u)\"
+    GROUP_ID=\"$(id -g)\"
+    BASE_PHP_IMAGE=\"${base_php_image}\"
+    ${aws_credentials}" > .docker-compose.env
+}
+
+function build_docker_compose_args() {
+    # Currently, this is simply the list of parameters from the CLI:
+    # future versions may be more sophisticated in what they allow.
+    docker_compose_args="$*"
+}
+
+function start_containers() {
+    # Build base image locally if required
+    case "${BASE_PHP_IMAGE_BUILD_FROM_LOCAL}" in
+        1 | true | yes | on)
+            # Build frankenphp image before starting default env,
+            # as containers now rely upon it
+            docker build --progress=plain \
+                -t "${base_php_image}" \
+                --build-arg "ENV=dev" \
+                --build-arg "PHP_MAJOR_VERSION=${PHP_MAJOR_VERSION}" \
+                "docker/base-images/php-frankenphp/"
+            ;;
+        *)
+            ;;
+    esac
+
+    # Which task daemon compose file is used?
+    # A different one is used when using a locally built container, vs. using
+    # one pulled from the private container registry.
+    taskd_compose_file=''
+    case "${TASKD_BUILD_FROM_LOCAL}" in
+        1 | true | yes | on)
+            taskd_compose_file="docker/schoolbox-taskd/dev.docker-compose.yaml"
+            ;;
+        *)
+            taskd_compose_file="docker/schoolbox-taskd/deploy.docker-compose.yaml"
+            ;;
+    esac
+
+    # For now this is hardcoded:
+    # eventually, this may allow loading the deployable variant of the
+    # FrankenPHP container.
+    frankenphp_compose_file="docker/schoolbox-frankenphp/dev.docker-compose.yaml"
+
+    # start default environment:
+    # this has Schoolbox's code folder mounted as a local mount, thus changes
+    # made locally are available immediately within the container.
+    docker compose --progress plain \
+        -f "docker/base.docker-compose.yaml" \
+        -f "${frankenphp_compose_file}" \
+        -f "${taskd_compose_file}" \
+        --env-file .docker-compose.env \
+        up -d $docker_compose_args
+
+    # start cron in schoolbox-cli container, so that cron tasks actually run:
+    # even though this is in a post_start in docker/base.docker-compose.yaml,
+    # it is not guaranteed to run on docker/up
+    docker exec -it schoolbox-cli sudo /etc/init.d/cron start
+}
+
+function main() {
+    verify_executables
+    output_help "$@"
+    create_dirs
+    load_config
+    login_to_aws
+    login_to_container_registry
+    build_docker_compose_args "$@"
+    build_docker_compose_env
+    start_containers "$@"
+}
+
+main "$@"

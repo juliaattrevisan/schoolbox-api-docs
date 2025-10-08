@@ -30,6 +30,8 @@ $app = new class extends CliTool\App
     /** @inheritDoc */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         // get teacher
         $roleMapper = new RoleMapper();
         $staffRoles = $roleMapper->findByColumn('group_type', 'staff');
@@ -148,6 +150,8 @@ $app = new class extends CliTool\App
                 // noop
             }
         }
+
+        $this->deprecationNotice("SA-19334");
     }
 
     /**

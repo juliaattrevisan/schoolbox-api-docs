@@ -124,27 +124,27 @@ class Access
      *
      * The dependencies *SHOULD* be injected, but not enforced yet to enable backwards compatibility
      *
-     * @param UserAccessMapper|null            $userAccessMapper
-     * @param RoleAccessMapper|null            $roleAccessMapper
-     * @param Folder\Mapper|null               $folderMapper
-     * @param Folder\Code\Mapper|null          $folderCodeMapper
-     * @param External_UserInterface|null      $externalUser
-     * @param IConfigLoader|null               $config
-     * @param Folder\Code\IClassMatcher|null   $classMatcher
-     * @param bool|null                        $enableCache
-     * @param Folder\NNIAN|null                $folderNnian
+     * @param UserAccessMapper|null          $userAccessMapper
+     * @param RoleAccessMapper|null          $roleAccessMapper
+     * @param Folder\Mapper|null             $folderMapper
+     * @param Folder\Code\Mapper|null        $folderCodeMapper
+     * @param External_UserInterface|null    $externalUser
+     * @param IConfigLoader|null             $config
+     * @param Folder\Code\IClassMatcher|null $classMatcher
+     * @param bool|null                      $enableCache
+     * @param Folder\NNIAN|null              $folderNnian
      * @return static
      */
     public static function getInstance(
-        UserAccessMapper $userAccessMapper = null,
-        RoleAccessMapper $roleAccessMapper = null,
-        Folder\Mapper $folderMapper = null,
-        Folder\Code\Mapper $folderCodeMapper = null,
-        External_UserInterface $externalUser = null,
-        IConfigLoader $config = null,
-        Folder\Code\IClassMatcher $classMatcher = null,
-        bool $enableCache = null,
-        Folder\NNIAN $folderNnian = null
+        ?UserAccessMapper $userAccessMapper = null,
+        ?RoleAccessMapper $roleAccessMapper = null,
+        ?Folder\Mapper $folderMapper = null,
+        ?Folder\Code\Mapper $folderCodeMapper = null,
+        ?External_UserInterface $externalUser = null,
+        ?IConfigLoader $config = null,
+        ?Folder\Code\IClassMatcher $classMatcher = null,
+        ?bool $enableCache = null,
+        ?Folder\NNIAN $folderNnian = null
     ): Access {
         if (!self::$instance) {
             $config         = $config ?? new Config\Loader();

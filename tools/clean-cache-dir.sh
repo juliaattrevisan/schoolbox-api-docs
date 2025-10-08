@@ -30,10 +30,10 @@ sqlhost=$(schoolbox-conf --conf="$conffile" --option=SQL_host);
 sqldb=$(schoolbox-conf --conf="$conffile" --option=SQL_db);
 
 # Collect minify cache dir location
-zipdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='zip_dir' \G;" | grep 'value' | cut -d' ' -f2`
-purifierdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='purifier_cache_dir' \G;" | grep 'value' | cut -d' ' -f2`
-streamdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='stream_dir' \G;" | grep 'value' | cut -d' ' -f2`
-twigdir=`mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='twig_cache_dir' \G;" | grep 'value' | cut -d' ' -f2`
+zipdir=`mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='zip_dir' \G;" | grep 'value' | cut -d' ' -f2`
+purifierdir=`mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='purifier_cache_dir' \G;" | grep 'value' | cut -d' ' -f2`
+streamdir=`mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='stream_dir' \G;" | grep 'value' | cut -d' ' -f2`
+twigdir=`mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb -e "SELECT value FROM config WHERE name='twig_cache_dir' \G;" | grep 'value' | cut -d' ' -f2`
 
 if [ -z $zipdir ];
 then

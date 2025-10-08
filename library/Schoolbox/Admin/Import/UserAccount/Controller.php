@@ -176,7 +176,7 @@ class Controller extends Base
      * @return Zone
      * @throws \UnexpectedValueException
      */
-    protected function getAttachzone(string $hash = null, bool $readonly = false): Zone
+    protected function getAttachzone(?string $hash = null, bool $readonly = false): Zone
     {
         $zone = (new Zone('import'))
             ->setModalTitle('Select CSV')

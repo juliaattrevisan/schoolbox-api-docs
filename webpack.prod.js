@@ -35,6 +35,8 @@ module.exports = merge(common, {
                     "./node_modules/flatpickr/dist/flatpickr.min.js",
                     // For feature tours
                     "./node_modules/intro.js/minified/intro.min.js",
+                    // For FullCalendar within the date picker ONLY
+                    "./www/static/js/fullcalendar/schoolbox-fullcalendar.min.js",
                 ],
                 "dataTables.js": [
                     // DataTables

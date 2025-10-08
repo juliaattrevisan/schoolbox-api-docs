@@ -109,17 +109,17 @@ class Module
     /**
      * Shorthand for all the things you can configure on a route
      *
-     * @todo does not yet support repetition quantifiers in route, eg 'year:\d{4}'
-     * @see \Alaress\Module\Test\RouterParserTest
-     *
-     * @param string             $httpMethod            typically one of 'GET' or 'POST', but any HTTP method is okay here
-     * @param string             $path                  parameterised form of the URL that accepts tokens in-line
+     * @param string                  $httpMethod           typically one of 'GET' or 'POST', but any HTTP method is okay here
+     * @param string                  $path                 parameterised form of the URL that accepts tokens in-line
      *                                                   - the notation for setting a token is {param:regex}
-     * @param string             $controllerMethodName  the method on the controller to which this route points
-     * @param IAuthorizationRule $permissions           an optional rule to use to define the permissions allowed on this route
-     * @param callable           $preload               an optional callable used to preload this route
+     * @param string                  $controllerMethodName the method on the controller to which this route points
+     * @param IAuthorizationRule|null $permissions          an optional rule to use to define the permissions allowed on this route
+     * @param callable|null           $preload              an optional callable used to preload this route
+     *@see \Alaress\Module\Test\RouterParserTest
+          *
+     * @todo does not yet support repetition quantifiers in route, eg 'year:\d{4}'
      */
-    protected function register($httpMethod, $path, $controllerMethodName, IAuthorizationRule $permissions = null, callable $preload = null)
+    protected function register($httpMethod, $path, $controllerMethodName, ?IAuthorizationRule $permissions = null, ?callable $preload = null)
     {
         // index the route
         $this->routeIndex[$controllerMethodName] = array_merge([$httpMethod], $this->getRouterParser()->parse($path));
@@ -186,7 +186,7 @@ class Module
             }
 
             // no need that no more
-            unset($this->routeIndex);
+            $this->routeIndex = [];
 
             // manual route init
             $this->initRoutes($basePath);
@@ -223,7 +223,7 @@ class Module
             $this->addRoutePreload($this->getPathMatcher(), $regex, $preload);
         }
         // no need that no more
-        unset($this->preloadIndex);
+        $this->preloadIndex = [];
 
         // configure pre-registered permissions
         foreach ($this->permissionIndex as [$rule, $methods]) {
@@ -232,7 +232,7 @@ class Module
             $this->addRoutePermission($this->getAuthorizer(), $regex, $rule);
         }
         // no need that no more
-        unset($this->permissionIndex);
+        $this->permissionIndex = [];
 
         // manual preloads
         $this->initRoutePreloads($this->getPathMatcher());

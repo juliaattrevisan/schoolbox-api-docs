@@ -19,8 +19,10 @@
         --right-bg-primary:   {right_bg_primary};
     }
 </style>
+<!-- BEGIN google_script -->
 <!-- Google Identity Service see https://developers.google.com/identity/oauth2/web/guides/migration-to-gis#gis-and-gapi -->
 <script src="https://accounts.google.com/gsi/client"></script>
+<!-- END google_script -->
 <script type="text/javascript">
     var colours = {}; //the PhpLib below adds original, pickers, and default objects to colours, each with the colour variables below
     // <!-- BEGIN colour_list -->
@@ -224,6 +226,12 @@
                         <a href="/rubric/manager/{ID}" class="icon-criteria">Manage Rubric {TPL_LOCAL_RUBRICGROUP_PLURAL_PC}</a>
                     </li>
                     <!-- END manage_criteria -->
+
+                    <!-- BEGIN cohort_report_link -->
+                    <li>
+                        <a href="{COHORT_REPORT_LINK}" class="icon-share">Cohort Learning Moments</a>
+                    </li>
+                    <!-- END cohort_report_link -->
 
                     <!-- BEGIN award_list_link -->
                     <li>

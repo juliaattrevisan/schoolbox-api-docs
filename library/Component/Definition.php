@@ -334,7 +334,7 @@ class Component_Definition
      * @param NS|null $namespace
      * @return self
      */
-    public function setNamespace(NS $namespace = null)
+    public function setNamespace(?NS $namespace = null)
     {
         $this->namespace = $namespace;
         return $this;

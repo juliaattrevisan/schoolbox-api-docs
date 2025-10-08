@@ -160,24 +160,44 @@ class MessageFactory
             // Add this participant's submission history
             $messageFactory = $messageFactory->addPdfContent(
                 $this->generateParticipantSubmissionHistoryFileName($participant),
+                null,
                 $this->generateParticipantSubmissionHistoryUrl($participant),
             );
         }
 
         // Build the message to send
-        $zipFilename = $this->generateZipFilename($dueWork);
+        $zipFilename    = $this->generateZipFilename($dueWork);
+        $callbackUrl    = $this->generateCallbackUrl($viewer);
+        $callbackUser   = call_user_func($this->userTranslator, $viewer);
+        $callbackParams = [
+            'from' => $callbackUser,
+            'to'   => $callbackUser,
+        ];
         return $messageFactory
             ->setUser($viewer)
-            ->setCallbackUrl($this->generateCallbackUrl($viewer))
-            ->setCallbackParams([
-                'from'    => call_user_func($this->userTranslator, $viewer),
-                'to'      => call_user_func($this->userTranslator, $viewer),
-                'message' => sprintf(
-                    'Feedback and submissions for %s "%s" are ready to download',
-                    $this->rosettaStone->translate('dueWork'),
-                    $zipFilename,
-                ),
-            ])
+            ->setCallbackUrl($callbackUrl)
+            ->setCallbackParams(
+                $callbackParams + [
+                    'message' => sprintf(
+                        'Feedback and submissions for %s "%s" are ready to download',
+                        $this->rosettaStone->translate('dueWork'),
+                        $zipFilename,
+                    ),
+                ]
+            )
+            ->setFailureCallbackUrl($callbackUrl)
+            ->setFailureCallbackParams(
+                $callbackParams + [
+                    'message' => sprintf(
+                        'Feedback and submissions for %s "%s" could not be downloaded (reason: :message)',
+                        $this->rosettaStone->translate('dueWork'),
+                        $zipFilename,
+                    ),
+                    'messageParams' => [
+                        'message' => '{{response.message}}',
+                    ],
+                ]
+            )
             ->setOutfile($zipFilename)
             ->build();
     }

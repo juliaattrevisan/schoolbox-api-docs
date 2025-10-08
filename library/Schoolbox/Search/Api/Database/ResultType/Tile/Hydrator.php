@@ -9,14 +9,15 @@ declare(strict_types=1);
 
 namespace Schoolbox\Search\Api\Database\ResultType\Tile;
 
+use Component_Config_Collapse;
+use Component_Config_ShowComponentTitle;
+use InvalidArgumentException;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\Resource\Folder\Mapper as FolderMapper;
 use Schoolbox\Tile\Model as TileModel;
 use Schoolbox\Tile\Mapper as TileMapper;
-use Schoolbox\Tile\Layout\Mapper as TileLayoutMapper;
-use Schoolbox\Search\Api\Cursor\RawResult;
 use Schoolbox\Search\Api\Hydrator\BaseHydrator;
 use Schoolbox\Search\Api\Hydrator\FullResult;
 use Schoolbox\Search\Api\SearchFilter;
@@ -36,13 +37,11 @@ class Hydrator extends BaseHydrator
      * Constructor
      *
      * @param TileMapper       $tileMapper       Used to fetch tiles for hydration.
-     * @param TileLayoutMapper $tileLayoutMapper Used to fetch tileLayouts to help with tile hydration.
      * @param FolderMapper     $folderMapper     Used to fetch folders to help with tile hydration.
      * @param Access           $access           Used to determine if the current user may view this page.
      */
     public function __construct(
         private TileMapper $tileMapper,
-        private TileLayoutMapper $tileLayoutMapper,
         private FolderMapper $folderMapper,
         private Access $access,
     ) {
@@ -53,82 +52,187 @@ class Hydrator extends BaseHydrator
      */
     public function hydrate(string $keyword, SearchFilter\DataObject $filter, array $matches, User $viewer): array
     {
-        // Find all links that match $matches.
+        // Find all tiles that match $matches.
         $acceptedMatches = array_filter($matches, [$this, 'accepts']);
 
-        $ids = array_map(fn (RawResult $match) => $match->id, $acceptedMatches);
-        if (empty($ids)) {
+        if (count($acceptedMatches) === 0) {
             return [];
         }
 
+        // Get arrays of tileIds and componentInstanceIds.
+        $tileIds = [];
+        $componentInstanceIds = [];
+        foreach ($acceptedMatches as $match) {
+            [$tileId, $componentInstanceId, $folderId] = self::explodeTileInstanceId($match->id);
+            $tileIds[] = $tileId;
+            $componentInstanceIds[] = $componentInstanceId;
+        }
+
         // Find the matching tiles.
-        $tiles = $this->tileMapper->findByColumn('id', $ids);
+        $tiles = $this->tileMapper->findByColumn('id', $tileIds);
 
-        // Get tileLayouts, indexed by tileLayoutId.  This is necessary because tileLayout info is not hydrated in $tiles.
-        // By getting this info here we avoid having to run many queries inside the loop.
-        $tileLayoutById = $this->tileLayoutMapper->findByColumn('id', $tiles->map(fn ($tile) => $tile->getTileLayout()->getId()));
+        // Get config info for each component instance for later lookup.
+        $configByComponentInstanceId = $this->getConfigByComponentInstanceId($componentInstanceIds);
 
-        // And map to a full result.
-        $fullResults = array_map(
-            function (RawResult $match) use ($tiles, $viewer, $tileLayoutById) {
-                $tile = $tiles->getBy('id', $match->id);
-                if (!($tile instanceof TileModel)) {
-                    return null;
-                }
+        $fullResults = [];
 
-                $tileLayout = $tileLayoutById[$tile->getTileLayout()->getId()];
-                $folderId = $tileLayout->getFolder()->getId();
+        foreach ($acceptedMatches as $key => $match) {
+            [$tileId, $componentInstanceId, $folderId] = self::explodeTileInstanceId($match->id);
 
-                if ($folderId === null) {
-                    // This tile is not linked to a folder, so it is of no interest.
-                    return null;
-                }
+            if ($componentInstanceId === null) {
+                // This tile is not used in any homepage component, so it is of no interest.
+                continue;
+            }
 
-                try {
-                    // Check if the user has access to the tile's folder.
-                    $tileAccess = $this->access->getFolderAccess($viewer, $folderId);
-                    if ($tileAccess < UserAccess::ACCESS_READ) {
-                        return null;
-                    }
+            $tile = $tiles->getBy('id', $tileId);
+            if (!($tile instanceof TileModel)) {
+                continue;
+            }
 
-                    $tileFolder = $this->folderMapper->findById($folderId);
-                } catch (MapperException $e) {
-                    // Tile folder could not be found for some reason.
-                    // This is a slightly different situation to situation where tile is not linked to folder.
-                    // In this case the result might be of interest, so return a result but with tileFolder null.
-                    $tileFolder = null;
-                }
+            // Which folder should be used (from search index or from tile layout)?
+            // ------------------------------------------------------------------------
+            // The folderId from tile->getTileLayout()->getFolder() will normally match the folderId obtained via
+            // $match->id above (from the search_index table).  However, for tiles in alt-sourced components,
+            // $tile->getTileLayout()->getFolder() will be the folder of the tile in its original location.  We want
+            // the folder from the new location, so we continue to use the $folderId from $match->id.
 
-                $titleText = trim($tile->getTitleText());
+            if ($folderId === null) {
+                // This tile is not linked to a folder, so it is of no interest.
+                continue;
+            }
 
-                if ($titleText === '') {
-                    // Tiles without a title should not appear in search results (AC for SA-8841).
-                    return null;
-                }
+            // Check if the user has access to the tile's folder.
+            try {
+                $tileAccess = $this->access->getFolderAccess($viewer, $folderId);
+            } catch (MapperException) {
+                $tileAccess = UserAccess::ACCESS_DENY;
+            }
 
-                return new FullResult(
-                    $match,
-                    $match->id,
-                    $titleText,
-                    $tile->getLink(),
-                    $match->type,
-                    'Tile',
-                    $match->relevance,
-                    $tile->getModifiedAt(),
-                    $tileFolder,
-                    null,
-                    $tile->getBackgroundImage() ? $this->buildStorageImageUrl($tile->getBackgroundImage())->__toString() : null,
-                    'tiles',
-                    null,
-                    null,
-                    ($tileFolder === null) ? [] : [$tileFolder],
-                    [],
-                );
-            },
-            $matches
-        );
+            if ($tileAccess < UserAccess::ACCESS_READ) {
+                continue;
+            }
 
-        // Filter out anything missing.
-        return array_filter($fullResults, fn (?FullResult $x) => isset($x));
+            try {
+                $tileFolder = $this->folderMapper->findById($folderId);
+            } catch (MapperException $e) {
+                // The tile's folder could not be found for some reason.
+                // This is a slightly different situation to situation where tile is not linked to folder.
+                // In this case the result might be of interest, so return a result but with tileFolder null.
+                $tileFolder = null;
+            }
+
+            $titleText = trim($tile->getTitleText());
+
+            if ($titleText === '') {
+                // Tiles without a title should not appear in search results (AC for SA-8841).
+                continue;
+            }
+
+            // $componentConfig (if not null) will be an array with the following optional keys:
+            //  * Component_Config_Collapse::KEY,
+            //  * Component_Config_ShowComponentTitle::KEY
+            $componentConfig = $configByComponentInstanceId[$componentInstanceId] ?? null;
+
+            // Get relevant component config values.
+            // Note Component_Config_ShowComponentTitle is poorly named.  The UI makes clear that this option applies
+            // only to read-only users.  To confirm, go to a homepage, and edit the configuration of a tile component.
+            // The checkbox label is 'Show Title to Read-Only Users'.
+            $componentIsCollapsed = (bool)($componentConfig[Component_Config_Collapse::KEY] ?? 0); // Default is not collapsed.
+            $showTitleToReadOnlyUsers = (bool)($componentConfig[Component_Config_ShowComponentTitle::KEY] ?? 1); // Default is to show title.
+
+            // Tiles that have been hidden to read-only users (by having title hidden and body collapsed)
+            // should appear in search results only for users with write access.
+            if (!$showTitleToReadOnlyUsers && $componentIsCollapsed && $tileAccess < UserAccess::ACCESS_WRITE) {
+                continue;
+            }
+
+            $fullResults[$key] = new FullResult(
+                $match,
+                $match->id,
+                $titleText,
+                $tile->getLink(),
+                $match->type,
+                'Tile',
+                $match->relevance,
+                $tile->getModifiedAt(),
+                $tileFolder,
+                null,
+                (
+                    $tile->getBackgroundImage()
+                    ? $this->buildStorageImageUrl($tile->getBackgroundImage())->__toString()
+                    : null
+                ),
+                'tiles',
+                null,
+                null,
+                ($tileFolder === null) ? [] : [$tileFolder],
+                [],
+            );
+        }
+
+        return $fullResults;
+    }
+
+    /**
+     * @param string $tileInstanceId - Expected to be a string like "$tileId-$componentInstanceId-$folderId".
+     * @return array
+     */
+    public static function explodeTileInstanceId(string $tileInstanceId): array
+    {
+        $tokens = explode('-', $tileInstanceId);
+
+        if (count($tokens) !== 3) {
+            throw new InvalidArgumentException('String $tileInstanceId is in unexpected format.');
+        }
+
+        return [
+            '' === $tokens[0] ? null : (int)$tokens[0], // tileId,
+            '' === $tokens[1] ? null : (int)$tokens[1], // componentInstanceId,
+            '' === $tokens[2] ? null : (int)$tokens[2]  // folderId.
+        ];
+    }
+
+    /**
+     * Return an array containing config key:value pairs, for each component instance, indexed by componentInstanceId.
+     * E.g.
+     * [
+     *     3823 => [
+     *         'collapse' => '0',
+     *         'showComponentTitle' => '1'
+     *     ],
+     *     ...
+     * ]
+     * @param array $componentInstanceIds
+     * @return array<int, array<string, string>>
+     */
+    private function getConfigByComponentInstanceId(array $componentInstanceIds): array
+    {
+        $db = $this->tileMapper->getDatabase();
+
+        $rows = $db->executeQuery(
+            'SELECT cci.component_instance_id, ccd.key, cci.value
+            FROM component_config_instance cci
+            LEFT JOIN component_config_definition ccd ON ccd.id=cci.component_config_definition_id
+            WHERE cci.component_instance_id IN (' . implode(',', array_map('intval', $componentInstanceIds)) . ')
+            AND ccd.key IN (:configCollapseKey, :showComponentTitleKey)',
+            [
+                ':configCollapseKey' => Component_Config_Collapse::KEY,
+                ':showComponentTitleKey' => Component_Config_ShowComponentTitle::KEY,
+            ]
+        )->fetchAll();
+
+        $configByComponentInstanceId = [];
+
+        foreach ($rows as $row) {
+            $componentInstanceId = $row['component_instance_id'];
+
+            if (!array_key_exists($componentInstanceId, $configByComponentInstanceId)) {
+                $configByComponentInstanceId[$componentInstanceId] = [];
+            }
+
+            $configByComponentInstanceId[$componentInstanceId][$row['key']] = $row['value'];
+        }
+
+        return $configByComponentInstanceId;
     }
 }

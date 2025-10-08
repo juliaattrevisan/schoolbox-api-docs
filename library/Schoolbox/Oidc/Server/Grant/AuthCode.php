@@ -26,7 +26,7 @@ class AuthCode extends AuthCodeGrant
     /**
      * @inheritdoc
      */
-    public function canRespondToAuthorizationRequest(ServerRequestInterface $request)
+    public function canRespondToAuthorizationRequest(ServerRequestInterface $request): bool
     {
         return
             isset($request->getQueryParams()['client_id'])

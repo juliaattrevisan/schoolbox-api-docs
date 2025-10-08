@@ -17,7 +17,6 @@ use Schoolbox\Pastoral\Access\Mapper as PastoralAccessMapper;
 require_once __DIR__ . '/../../../conf/core/require.php';
 
 $app = new class extends CliTool\App {
-
     private const OPT_LONG_FILE = 'file:';
 
     private array $groupNameIdMap = [];
@@ -64,11 +63,11 @@ $app = new class extends CliTool\App {
         // populate year name - id map
         $this->setYearNameIdMap();
 
-        $headers = fgetcsv($handle, 1000, ",");
+        $headers = fgetcsv($handle, 1000, ",", escape: '');
         $headers = array_flip($headers);
 
         /* Iterate over each csv row */
-        while (($row = fgetcsv($handle, 1000, ",")) !== false) {
+        while (($row = fgetcsv($handle, 1000, ",", escape: '')) !== false) {
             /* GET OLD_GROUP */
 
             $oldGroupName = $row[$headers['Old Group Name']];

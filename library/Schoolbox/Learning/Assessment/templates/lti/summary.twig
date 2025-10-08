@@ -132,7 +132,7 @@
                         {% if currentInteraction.comment %}
                             <li class="child">
                                 <div class="content">
-                                    {{ currentInteraction.comment | nl2br }}
+                                    {{ currentInteraction.comment|purify }}
                                 </div>
                             </li>
                         {% endif %}

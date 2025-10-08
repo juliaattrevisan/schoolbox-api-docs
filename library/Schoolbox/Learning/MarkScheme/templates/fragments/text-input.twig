@@ -10,11 +10,12 @@
         inputTitle:   string         the tooltip to display on this input
         errors:       string[]       Admin-configured submission states
         readonly:     bool           Should this form input be rendered as readonly?
+        useInstructorMark: bool      Should the instructor mark be used? (only relevant for due works)
     ]
 #}
 
 {% if feedback %}
-    {% set humanReadableMark = feedback.humanReadableMark(false) %}
+    {% set humanReadableMark = useInstructorMark ? feedback.humanReadableInstructorMark(false) : feedback.humanReadableMark(false) %}
 {% else %}
     {% set humanReadableMark = '' %}
 {% endif %}

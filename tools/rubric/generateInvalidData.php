@@ -35,7 +35,6 @@ $kernel = new Schoolbox\Application\Daemon\Kernel('Generate invalid data');
  * This is to simulate invalid rubric data
  */
 $app = new class extends CliTool\App {
-
     /** @var FolderMapper */
     private $folderMapper;
 
@@ -72,6 +71,8 @@ $app = new class extends CliTool\App {
     /** @inheritDoc */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         $configMapper = ConfigMapper::getInstance();
         $configMapper->getDatabase()->query("UPDATE config SET value = 0 WHERE name = 'external_markbook'");
 
@@ -137,6 +138,7 @@ $app = new class extends CliTool\App {
                                                    ->setCategory($unitSpecC->getFolder())
                                                    ->setName('test')
                                                    ->setMarkType($this->markTypeMapper->findAll()->first())
+                                                   ->setInstructorMarkType($this->markTypeMapper->findAll()->first())
                                                    ->setSelfReviewability(SubmissionBox::SELF_REVIEWABILITY_FULL)
                                                    ->setUseRubric(1);
         $this->submissionBoxMapper->save($submissionBox);
@@ -149,6 +151,8 @@ $app = new class extends CliTool\App {
         $this->createIndicator($capCD, "{$suffix} D Course Indicator");
         $capUD = $this->createCapability($unitSpecD->getFolder(), "{$suffix} D Capability\r\n");
         $this->createIndicator($capUD, "{$suffix} D Unit Indicator");
+
+        $this->deprecationNotice("SA-19334");
     }
 
     /**

@@ -15,6 +15,7 @@ const modalSelectedNodesStore = useModalSelectedNodesStore();
  * Close the modal
  */
 function onCancelled(): void {
+    (document.activeElement as HTMLElement)?.blur(); // Remove focus from the button to avoid browser ARIA warning
     modalStore.cancel();
 }
 
@@ -23,6 +24,7 @@ function onCancelled(): void {
  * and insert into the current nodes
  */
 function onSelected(): void {
+    (document.activeElement as HTMLElement)?.blur(); // Remove focus from the button to avoid browser ARIA warning
     modalStore.select();
 }
 
@@ -43,9 +45,15 @@ const isSaveDisabled = window.Vue.computed(() => selectedNodesStore.hasNoNodes &
 
 <template>
     <ul class="flex-list buttons">
-        <li><button type="button" class="button" :disabled="false" @click.prevent="onCancelled">Cancel</button></li>
+        <li><button type="button" class="button" @click.prevent="onCancelled">Cancel</button></li>
         <li>
-            <button type="button" class="button submit" :disabled="isSaveDisabled" @click.prevent="onSelected">
+            <button
+                type="button"
+                class="button submit"
+                :disabled="isSaveDisabled"
+                data-test="cs-modal-footer-save-button"
+                @click.prevent="onSelected"
+            >
                 {{ saveText }}
             </button>
         </li>

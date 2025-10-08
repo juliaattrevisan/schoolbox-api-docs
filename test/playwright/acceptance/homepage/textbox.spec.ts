@@ -19,34 +19,31 @@ test.describe("Textbox Tests", () => {
     });
 
     /**
-     * Soft deleting the homepage with certain name to not impact the test
-     */
-    test.beforeAll(async ({ baseTester, db }) => {
-        baseTester.isGoingTo("update delete_at for the textbox (folder table) so it does not impact the news tests");
-        await db.updateInDatabase("folder", { deleted_at: "2022-01-15 11:22:34" }, { name: "Test TextBox Homepage%" });
-    });
-
-    /**
      * create a homepage
      */
 
-    test("create a homepage", async ({ tester, page }) => {
-        const createFolder = new CreateFolder(page);
+    test("create a homepage", async ({ tester, page, db }) => {
+        const createFolder = new CreateFolder(tester, page);
         const folderName = "Test TextBox Homepage";
         const homepageTemplateOption = "Blank";
-        tester.isGoingTo("create a homepage folder");
-        await tester.loginAsAdmin();
-        await createFolder.goto();
-        tester.isGoingTo("type a folder name, select a template option and set access permissions");
-        await createFolder.typeName(folderName);
-        await createFolder.setHomepageTemplate(homepageTemplateOption);
-        await createFolder.setAccessPermission(1, "write");
-        await createFolder.setAccessPermission(2, "write");
-        await createFolder.setAccessPermission(3, "read");
-        await createFolder.setAccessPermission(4, "read");
-        await createFolder.setAccessPermission(5, "read");
-        await createFolder.setAccessPermission(6, "read");
-        await createFolder.submit();
+        const schoolCode = "";
+
+        // sets write access permission for Administration and Teacher, read access permission for senior student, parent, junior student and middle student
+        await createFolder.createFolder(
+            folderName,
+            homepageTemplateOption,
+            db,
+            [
+                [1, "write"],
+                [2, "write"],
+                [3, "read"],
+                [4, "read"],
+                [5, "read"],
+                [6, "read"],
+            ],
+            schoolCode,
+        );
+
         tester.isGoingTo("navigate to the resources page and check the new homepage folder is presented");
         await createFolder.gotoResources();
         await expect(page.locator("#container")).toContainText(folderName);
@@ -59,10 +56,10 @@ test.describe("Textbox Tests", () => {
     // */
 
     test("create a textbox", async ({ tester, page, db }) => {
-        const createFolder = new CreateFolder(page);
+        const createFolder = new CreateFolder(tester, page);
         const resources = new Resources(page);
         const manageAll = new ManageAllTextbox(tester, page);
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         const textbox = new TextboxForm(tester, page);
         const folderName = "Test TextBox Homepage";
         const heading = "Test Text Box Title";
@@ -127,7 +124,7 @@ test.describe("Textbox Tests", () => {
         const folderName = "Test TextBox Homepage";
         const manageAll = new ManageAllTextbox(tester, page);
         const searchPage = new SearchPage(page);
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         const textbox = new TextboxForm(tester, page);
 
         tester.isGoingTo("As Jack Coles search for a  textbox and ensure it is presented in the search results grid");
@@ -178,7 +175,8 @@ test.describe("Textbox Tests", () => {
         await page.goto(`https://vagrant.dev.schoolbox.cloud/homepage/${homepageId}`);
         tester.isGoingTo("Unlock the components and edit the textbox settings");
         await homepage.clickLockToggle();
-        await homepage.clickComponentSettings();
+        const component = page.locator(Homepage.locateComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1));
+        await Homepage.clickComponentSettings(component);
         await homepage.typeTextBoxHeading("Jana to be hidden");
         tester.isGoingTo("Hide the textbox title from read only users");
         const componentId = (await db.grabFromDatabase("component_instance", "id", {
@@ -224,11 +222,13 @@ test.describe("Textbox Tests", () => {
     /**
      * Soft deleting data to not impact the tests
      */
-    test.afterAll(async ({ baseTester, db }) => {
+    test.afterAll(async ({ baseTester, db, api }) => {
         baseTester.isGoingTo(
             "update delete_at for the data created in this test so it does impact next suite of tests",
         );
-        await db.updateInDatabase("folder", { deleted_at: "2022-01-15 11:22:34" }, { name: "Test TextBox Homepage" });
+
+        await api.deleteFoldersByName(db, "Test TextBox Homepage");
+
         await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Test Text Box Title" });
         await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Second Text Box" });
         await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Third Text Box" });

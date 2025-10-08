@@ -39,7 +39,7 @@ function getLabelKeyForOption(tabSettingOption: ProfileEditorTabSettingOption): 
 function getMetaTextForOption(tabSettingOption: ProfileEditorTabSettingOption): string | null {
     if (!peStore.selectedRoleType) return null;
     if (!tabSettingOption.meta) return null;
-
+    if (typeof tabSettingOption.meta === "string") return tabSettingOption.meta;
     return tabSettingOption.meta[peStore.selectedRoleType.roleType] || null;
 }
 
@@ -48,6 +48,25 @@ function getMetaTextForOption(tabSettingOption: ProfileEditorTabSettingOption): 
  */
 const tabSettingDefinition = window.Vue.computed(() => {
     return peStore.tabSettings[props.tabSettingKey];
+});
+
+/**
+ * The available options for the current tab setting
+ */
+const availableTabSettingOptions = window.Vue.computed(() => {
+    if (tabSettingDefinition.value === undefined) {
+        return [];
+    }
+    return tabSettingDefinition.value.options.filter((option) => {
+        const availability = props.tab.availableTabSettings[props.tabSettingKey];
+        if (availability === undefined) {
+            return false;
+        }
+        if (typeof availability === "boolean") {
+            return availability;
+        }
+        return availability[option.id];
+    });
 });
 
 /**
@@ -61,20 +80,27 @@ function onTabSettingOptionChange(tabSettingOption: ProfileEditorTabSettingOptio
 
 window.Vue.onMounted(() => {
     // @ts-expect-error -- When a setting is added after the page is loaded, we need to tell foundation to fix the tooltips
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call -- foundation isn't typed, see above
     $(document).foundation("tooltip", "reflow");
 });
 </script>
 
 <template>
-    <div>
+    <div v-if="tabSettingDefinition">
         <label>
             {{ tabSettingDefinition.displayAs }}
-            <span data-tooltip class="has-tip tip-top hint" :title="tabSettingDefinition.tooltip"> ? </span>
+            <span
+                v-if="tabSettingDefinition.tooltip"
+                data-tooltip
+                class="has-tip tip-top hint"
+                :title="tabSettingDefinition.tooltip"
+            >
+                ?
+            </span>
         </label>
         <div class="checklist">
             <ul class="option-list">
-                <li v-for="tabSettingOption in tabSettingDefinition.options" :key="tabSettingOption.id">
+                <li v-for="tabSettingOption in availableTabSettingOptions" :key="tabSettingOption.id">
                     <input
                         :id="getLabelKeyForOption(tabSettingOption)"
                         type="checkbox"

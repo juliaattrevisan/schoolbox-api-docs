@@ -26,6 +26,11 @@ use Schoolbox\Tile\Mapper as TileMapper;
  */
 class Mapper extends BaseMapper
 {
+    /**
+     * Homepage uses "layoutId" component config name to specify the tileLayoutId.
+     */
+    public const HOMEPAGE_COMPONENT_KEY = 'layoutId';
+
     public function mapping()
     {
         $this->hasTable('tile_layout');

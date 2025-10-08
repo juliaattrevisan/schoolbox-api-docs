@@ -19,10 +19,10 @@ class Model extends TypeAbstract
     private GenericCollection $subTypes;
 
     /**
-     * TODO: this should accept DocumentClassification only - SA-14908
-     * @var DocumentClassification|int|null
+     * @var DocumentClassification|null
      */
-    protected int | DocumentClassification | null $documentClassification = null;
+    protected DocumentClassification | null $documentClassification = null;
+    protected DocumentClassification | null $documentClassificationConfidential = null;
 
     public function __construct()
     {
@@ -50,21 +50,40 @@ class Model extends TypeAbstract
     }
 
     /**
-     * @param int|DocumentClassification|null $documentClassification
+     * @param DocumentClassification|null $documentClassification
      *
      * @return self
      */
-    public function setDocumentClassification(DocumentClassification | int | null $documentClassification): self
+    public function setDocumentClassification(DocumentClassification | null $documentClassification): self
     {
         $this->documentClassification = $documentClassification;
         return $this;
     }
 
     /**
-     * @return DocumentClassification|int|null
+     * @return DocumentClassification|null
      */
-    public function getDocumentClassification(): DocumentClassification | int | null
+    public function getDocumentClassification(): DocumentClassification | null
     {
         return $this->documentClassification;
+    }
+
+    /**
+     * @return DocumentClassification|null
+     */
+    public function getDocumentClassificationConfidential(): DocumentClassification | null
+    {
+        return $this->documentClassificationConfidential;
+    }
+
+    /**
+     * @param DocumentClassification|null $documentClassification
+     *
+     * @return self
+     */
+    public function setDocumentClassificationConfidential(DocumentClassification | null $documentClassification): self
+    {
+        $this->documentClassificationConfidential = $documentClassification;
+        return $this;
     }
 }

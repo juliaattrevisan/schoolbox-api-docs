@@ -32,6 +32,7 @@ use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTagsModel;
 use Schoolbox\Pastoral\Translator\VisibilityTranslator;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
+use Schoolbox\Pastoral\Type\TypeAbstract;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\TokenReplacer;
@@ -97,7 +98,7 @@ class RecordProcessor
         int $primaryStudentId,
         Values $post,
         array $duplicateStudentIds = [],
-        PastoralModel $parent = null
+        ?PastoralModel $parent = null
     ): GenericCollection {
         $heading = trim((string)$post->get('heading'));
         if (empty($heading)) {
@@ -246,11 +247,28 @@ class RecordProcessor
                         $record->setOccurredOn($occurredOn);
                     } catch (\Exception $e) {
                         $locale = new \Alaress_Date_Locale_Config();
-                        throw new SchoolboxException("occurredOn must be in the format of {$locale->localShortFormat()}");
+                        throw new SchoolboxException("Occurred On must be in the format of {$locale->localShortFormat()}");
                     }
                 }
             }
-            if ($post->get('points')) {
+
+            if ($post->offsetExists('expiresAt')) {
+                if ((string)$post->get('expiresAt') === '') {
+                    $record->setExpiresAt(null);
+                } else {
+                    try {
+                        $expiresAt = \Alaress_Date_Format::newLocalShort($post->get('expiresAt'))->startOfDay();
+                        $record->setExpiresAt($expiresAt);
+                    } catch (\Exception $e) {
+                        $locale = new \Alaress_Date_Locale_Config();
+                        throw new SchoolboxException("Expires At must be in the format of {$locale->localShortFormat()}");
+                    }
+                }
+            }
+
+            if ($post->getFloat('points') === null) {
+                $record->setPoints(null);
+            } else {
                 $points = $post->getFloat('points');
                 if (!is_numeric($post->get('points')) || $points < -1000000 || $points > 1000000) {
                     throw new SchoolboxException('Points must be a float between -1000000 and 1000000');

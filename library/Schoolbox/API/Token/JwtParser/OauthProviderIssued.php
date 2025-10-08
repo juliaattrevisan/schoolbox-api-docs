@@ -11,6 +11,7 @@ namespace Schoolbox\API\Token\JwtParser;
 
 use Firebase\JWT as JwtLibrary;
 use GuzzleHttp\Client;
+use Psr\Log\LoggerInterface;
 use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Oidc\CacheHelper;
 use Schoolbox\Config\ConfigMapper;
@@ -22,6 +23,10 @@ use SensitiveParameter;
 
 /**
  * Parser for configured oAuth provider-issued JWTs.
+ *
+ * These JWTs are issued by an external oAuth provider, such as Cloudwork or
+ * Google: usually, they will be requested by a third-party application, such as
+ * Digistorm's app, and then forwarded to Schoolbox.
  */
 class OauthProviderIssued extends Base
 {
@@ -40,18 +45,20 @@ class OauthProviderIssued extends Base
     /**
      * Constructor
      *
-     * @param UserMapper     $userMapper Mapper for retrieving users once the user in the JWT is identified.
-     * @param IConfigLoader  $config     Standard configuration store.
-     * @param Client         $httpClient HTTP client: required for retrieving JWKS from oAuth provider
-     * @param CacheInterface $oidcCache  Required for caching discovery response and keys
+     * @param UserMapper      $userMapper Mapper for retrieving users once the user in the JWT is identified.
+     * @param IConfigLoader   $config     Standard configuration store.
+     * @param LoggerInterface $log       Logger
+     * @param Client          $httpClient HTTP client: required for retrieving JWKS from oAuth provider
+     * @param CacheInterface  $oidcCache  Required for caching discovery response and keys
      */
     public function __construct(
         UserMapper $userMapper,
         IConfigLoader $config,
+        LoggerInterface $log,
         private Client $httpClient,
         private CacheInterface $oidcCache,
     ) {
-        parent::__construct($userMapper, $config);
+        parent::__construct($userMapper, $config, $log);
     }
 
     /**
@@ -67,15 +74,32 @@ class OauthProviderIssued extends Base
             return false;
         }
 
+        $oauthIssuer = trim((string)($this->config->get(ConfigMapper::NAME_OAUTH_ISSUER) ?? ''));
+        $jwtIssuer   = trim((string)($claims[self::CLAIM_ISS] ?? ''));
+        $this->log->debug(
+            sprintf(
+                'Checking JWT %s "%s" against config %s "%s"',
+                self::CLAIM_ISS,
+                $jwtIssuer,
+                ConfigMapper::NAME_OAUTH_ISSUER,
+                $oauthIssuer,
+            )
+        );
+
         // If no issuer is provided: always return true
         // TODO remove this in 23.0: issuer must be provided, and match JWT
-        $oauthIssuer = trim((string)($this->config->get(ConfigMapper::NAME_OAUTH_ISSUER) ?? ''));
         if ($oauthIssuer === '') {
+            $this->log->warning(
+                sprintf(
+                    'Config "%s" is empty: accepting regardless of JWT claim "%s". (This should be removed in the future)',
+                    ConfigMapper::NAME_OAUTH_ISSUER,
+                    self::CLAIM_ISS,
+                )
+            );
             return true;
         }
 
         // If the issuer is provided: it must match the issuer in the JWT
-        $jwtIssuer = trim((string)($claims[self::CLAIM_ISS] ?? ''));
         return $jwtIssuer === $oauthIssuer;
     }
 
@@ -87,6 +111,12 @@ class OauthProviderIssued extends Base
         // Determine JWKS for this provider
         $oauthIdp        = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTITY_PROVIDER);
         $candidateClaims = explode(',', $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_IDENTIFYING_CLAIMS));
+        $this->log->info(
+            sprintf(
+                'Searching for users which match candidate claims "%s"',
+                implode(',', $candidateClaims),
+            )
+        );
 
         $cache = new CacheHelper($this->httpClient, $this->oidcCache);
         $jwks  = $cache->retrieveJsonWebKeySet(new Uri($oauthIdp));
@@ -102,12 +132,6 @@ class OauthProviderIssued extends Base
             $sessionLength,
         );
 
-        if (!$this->claimAudienceMatchesConfiguredClientId($claims)) {
-            throw new Exception\Rejected(
-                sprintf('JWT "%s" claim does not match configured client ID', self::CLAIM_AUD)
-            );
-        }
-
         // The identification in the token seems to be in one of two claims:
         // * "preferred_username" matches a Schoolbox username
         // * "https://cloudwork.id/claims/sis_id" matches an external ID
@@ -116,23 +140,21 @@ class OauthProviderIssued extends Base
         foreach ($candidateClaims as $candidateClaim) {
             $candidateClaim = trim($candidateClaim);
             if (isset($claims[$candidateClaim])) {
+                $this->log->debug(sprintf('Checking JWT %s "%s" matches username', $candidateClaim, $claims[$candidateClaim]));
                 try {
                     return $this->findUser($claims[$candidateClaim], $candidateClaim);
                 } catch (Exception\InvalidIdentity $e) {
                     $failureMessage = $e->getMessage();
                 }
             } else {
-                $failureMessage = sprintf(
-                    'JWT "%s" claim is empty',
-                    $candidateClaim
-                );
+                $failureMessage = sprintf('JWT "%s" claim is empty', $candidateClaim);
             }
             $messages[] = $failureMessage;
         }
 
         // Candidate claims found no user: can't use it
         throw new Exception\InvalidIdentity(
-            sprintf('JWT contains no claim matching a user (%s)', implode('; ', $messages))
+            sprintf('JWT contains no claim matching a user (%s)', implode('; ', $messages)),
         );
     }
 
@@ -146,6 +168,15 @@ class OauthProviderIssued extends Base
     {
         $audiences     = (array)($claims[self::CLAIM_AUD] ?? []);
         $oauthClientId = $this->config->get(ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID);
+        $this->log->debug(
+            sprintf(
+                'Checking JWT %s "%s" against config %s "%s"',
+                self::CLAIM_AUD,
+                implode(',', $audiences),
+                ConfigMapper::_CLOUDWORK_OAUTH_CLIENT_ID,
+                $oauthClientId,
+            )
+        );
         return in_array($oauthClientId, $audiences, true);
     }
 }

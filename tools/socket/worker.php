@@ -18,7 +18,7 @@ use Schoolbox\Realtime\MessageList\MultiInstance\ListFactory;
 require_once __DIR__ . '/../../conf/core/require.php';
 $kernel = new Daemon\Kernel("Worker", [Daemon\Kernel::OPTION_ERRORS => E_ALL]);
 
-$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts): void {
 
     // use the default strat
     $strat = new \Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy();

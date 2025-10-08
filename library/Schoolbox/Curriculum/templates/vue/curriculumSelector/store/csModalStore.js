@@ -5,6 +5,7 @@
 import { defineStore } from "pinia";
 import { useModalSelectedNodesStore } from "./csModalSelectedNodesStore";
 import { useModalViewNodesStore } from "./csModalViewNodesStore";
+import { useModalSearchStore } from "./csModalSearchStore";
 
 export const useModalStore = defineStore(`csModal`, {
     state: () => ({
@@ -52,6 +53,7 @@ export const useModalStore = defineStore(`csModal`, {
         closed() {
             this.isOpen = false;
             useModalSelectedNodesStore().empty();
+            useModalSearchStore().clear(); // clear the search input so it's empty when the modal is opened next time
         },
 
         /**

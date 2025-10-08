@@ -11,7 +11,7 @@ class Component_Config_ShowClosed extends Component_Config_Abstract
     /**
      * @inheritdoc
      */
-    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
+    public function parse(SitePage $page, $key, $keyblock, $configValue, ?Component_ControllerAbstract $component = null)
     {
 
         if ($configValue == '1') {

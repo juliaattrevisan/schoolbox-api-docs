@@ -327,7 +327,7 @@ class External_Pcschools_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getCurrentSemester(string $externalUserId = null): ?string
+    public function getCurrentSemester(?string $externalUserId = null): ?string
     {
         return date('m') < 6 ? '1' : '2';
     }
@@ -335,7 +335,7 @@ class External_Pcschools_User implements External_UserInterface
     /**
      * @inheritDoc
      */
-    public function getCurrentYear(string $externalUserId = null): ?string
+    public function getCurrentYear(?string $externalUserId = null): ?string
     {
         return date('Y');
     }
@@ -348,7 +348,10 @@ class External_Pcschools_User implements External_UserInterface
             $query                 = "SELECT TIME_PERIOD, SUBJECT_PD FROM dbo.SYSFILE";
             $altPeriod             = $this->getDatabase()->getRow($query);
             $period['TIME_PERIOD'] = (int)$period['TIME_PERIOD'] ?: $altPeriod['TIME_PERIOD'];
-            $period['SUB_PERIOD']  = (int)$period['SUB_PERIOD'] ?: $altPeriod['SUBJECT_PD'];
+            /* imho you could explore the possibility of::wq
+             * (int)($period['SUB_PERIOD'] ?? $altPeriod['SUBJECT_PD'] ?? null);
+             */
+            $period['SUB_PERIOD']  = (int)($period['SUB_PERIOD'] ?? 0) ?: $altPeriod['SUBJECT_PD'];
         }
 
         // Annoyingly the `time_period` gets retrieved by the PDO driver without the trailing zeros that are required.

@@ -36,7 +36,7 @@ class PropertyDecorator implements IDecorator
      * @param array|null $map
      * @param IDecorator ...$decorators
      */
-    public function __construct(array $map = null, IDecorator ...$decorators)
+    public function __construct(?array $map = null, IDecorator ...$decorators)
     {
         $this->map = $map;
         $this->decorators = $decorators;

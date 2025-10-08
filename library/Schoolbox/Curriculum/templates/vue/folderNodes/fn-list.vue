@@ -18,7 +18,7 @@ const store = useStore(props.folderId, props.componentInstanceId);
 </script>
 
 <template>
-    <ul v-if="store().hasLoaded" class="nodes l-flex-col">
+    <ul v-if="store().hasLoaded" class="nodes l-flex-col" data-test="fn-list-container">
         <fn-list-node
             v-for="node in store().filteredNodes"
             :key="node.id"

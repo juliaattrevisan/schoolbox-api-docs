@@ -20,7 +20,6 @@ require __DIR__ . '/../../conf/core/require.php';
 $kernel = new CliTool\Kernel(
     new class extends CliTool\App
     {
-
         // --help: print help
         private const OPT_LONG_HELP = 'help';
         // --file:       CSV file that matches the schoolbox calendar template located in Admin->Calendar
@@ -67,6 +66,8 @@ $kernel = new CliTool\Kernel(
         /** @inheritdoc */
         public function run(): void
         {
+            $this->deprecationNotice("SA-19334");
+
             $log = $this->getLogger();
 
             if ($this->getOpt(self::OPT_LONG_HELP) || !$this->parseAppOptions()) {
@@ -101,6 +102,8 @@ HELP;
                 $log->error("One of the supplied roles was not found, unable to load events.\n");
                 exit(1);
             }
+
+            $this->deprecationNotice("SA-19334");
         }
 
         /**

@@ -1,0 +1,44 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{{ bread.crumbsArray(breadcrumbs) }}
+
+{#{% set hasCustomisation = false %}#}
+{#{% for participant in assessment.allParticipants  %}#}
+{#    {% if participant.excludedAt or participant.plan.name %}#}
+{#        {% set hasCustomisation = true %}#}
+{#    {% endif %}#}
+{#{% endfor %}#}
+<div class="actions-small-1 row">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Student Participation - {{ assessment.title }}</h1>
+        </div>
+    </div>
+</div>
+<div id="custom-participation-container" class="f-container">
+    <custom-participation
+    :all-participants="{{ (allParticipants ?? []) | json_encode }}"
+    get-students-pastoral-counts-url="{{ routeLookup('pastoral.getStudentsCount') }}"
+    get-learning-plan-new-url="{{ learningPlanNew }}"
+    get-assessment-participation="{{ routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
+        assessmentId: assessment.id,
+        assessment: assessment
+    }) }}"
+    get-assessment-participation-new-activity="{{ routeLookupIfAuthorized('learningAssessment.getCreateAssessmentForm', {
+        contextType: contextType,
+        contextId: assessment.context.id,
+        context: assessment.context
+    }) }}"
+    :assessment-id="{{ assessment.id }}"
+    :customisations="{{ (customisations ?? []) | json_encode }}"
+    include-in-existing-customisation="{{ routeLookupIfAuthorized('learningAssessment.postExistingCustomisationInclude', {
+        assessmentId: assessment.id,
+        assessment: assessment,
+    }) }}"
+    get-assessment-participation-copy-activity="{{ routeLookupIfAuthorized('learningAssessment.getCloneAssessmentForm', {
+        assessmentId: assessment.id,
+        assessment: assessment,
+    }) }}"
+    />
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/customParticipation.js?v={{ config.site_version }}"></script>

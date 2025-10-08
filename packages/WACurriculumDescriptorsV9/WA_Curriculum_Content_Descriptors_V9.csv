@@ -1,0 +1,1063 @@
+id,curriculum_node_parent_id,name,code,order,description,uuid
+10870,,WA Curriculum Content Descriptors (v9),,0,,136b01fb-768d-4aff-9638-602f32c9c5c5
+10871,10870,English,,0,,412e1230-5e66-4899-a15d-53e5598b20ee
+11313,10871,Pre-primary,,0,,d319ae7f-e141-454b-88c2-10f717061d6f
+11318,11313,Language,,0,,aab3d89f-5af0-4122-a5a0-6400b09647ca
+11328,11318,Language for expressing and developing ideas,,0,,20bf0ca8-5176-42bf-9e65-a79e095ed902
+11329,11328,Recognise that sentences are key units for expressing ideas,WAPELALA1,0,,d623d081-a99e-43da-b131-a1de5611a460
+11330,11328,Recognise that sentences are made up of groups of words that work together in particular ways to make meaning,WAPELALA2,0,,0d8311d4-f678-4f07-a5f9-7240283d11e5
+11331,11328,Explore the contribution of images and words to meaning in stories and informative texts,WAPELALA3,0,,1d3f00fe-8655-4dc2-a91d-8684f884336c
+11332,11328,"Recognise and develop awareness of vocabulary used in familiar contexts related to everyday experiences, personal interests and topics taught at school",WAPELALA4,0,,0d10b6e2-b69e-4413-a97d-6f439b16bf2d
+11333,11328,"Identify punctuation as a feature of written text different from letters; recognise that capital letters are used for names, and that capital letters also signal the beginning of sentences while punctuation marks signal the end",WAPELALA5,0,,05ffa603-28da-4f81-a224-e8232bbb9fee
+11321,11318,Language for interacting with others,,0,,130f3a82-4480-493a-af8e-7971b897ecde
+11322,11321,Language for interacting with others,WAPELAI1,0,,a21ff3fb-3a9e-40b0-badb-3068b778a35e
+11323,11321,"Explore different ways of using language to express opinions, likes and dislikes",WAPELAI2,0,,850d8ae0-743a-409c-a3d0-ab690b23bea6
+11334,11318,Phonic and word knowledge,,0,,c1f5b7fa-1b62-4dd9-b4ae-1cd40016321b
+11335,11334,"Recognise and generate rhyming words, alliteration patterns, syllables and sounds (phonemes) in spoken words (phonological awareness)",WAPELAP1,0,,e4708fc7-b089-4a68-8a39-af8979b12312
+11336,11334,"Segment sentences into individual words and orally blend and segment single-syllable spoken words; isolate, blend and manipulate phonemes in single-syllable words (phonological awareness)",WAPELAP2,0,,e9138b0e-8b55-409c-8912-57647b23cf61
+11337,11334,Recognise and name all upper- and lower‑case letters (graphs) and know the most common sound that each letter represents,WAPELAP3,0,,205bf276-1e4c-4eb9-bad1-bd1fbf08f807
+11338,11334,"Write consonant–vowel–consonant (CVC) words by representing sounds with the appropriate letters, and blend sounds associated with letters when reading CVC words",WAPELAP4,0,,21c25339-2876-4601-b57e-b1f060954caf
+11339,11334,Use knowledge of letters and sounds to spell words,WAPELAP5,0,,1c839f64-06a5-43bd-aa6e-5333772c4386
+11340,11334,Read and write some high‑frequency words and other familiar words,WAPELAP6,0,,82875d2e-e234-4b7a-b60f-1ec2c8212354
+11341,11334,Explore how words are units of meaning and can be made of more than one meaningful part,WAPELAP7,0,,e1ffd30d-585e-4879-889f-8f0445a8246e
+11324,11318,"Text structure, organisation and features",,0,,c67d1f63-0e44-46ee-9637-171aa0ef1f45
+11325,11324,"Understand that texts can take many forms, such as signs, books and digital texts",WAPELAT1,0,,5f9c3ef8-b95f-41da-8a26-e9ef871153fd
+11326,11324,Recognise that some language in written texts is unlike everyday spoken language,WAPELAT2,0,,32d3ef08-39b4-4c2e-bf46-371d4b0c25eb
+11327,11324,"Explore conventions of print and screen, including how books and simple digital texts are usually organised",WAPELAT3,0,,057a5f07-5cac-4a69-8211-c95d47b385a3
+11320,11313,Literacy,,0,,725929e7-ba67-42ba-aa14-939e8e8f12d1
+11355,11320,"Analysing, interpreting and evaluating",,0,,2ced30e6-86e1-423a-a55f-77990887caa9
+11356,11355,Identify some differences between imaginative and informative texts,WAPELYA1,0,,610839ff-6c8b-454f-94dd-928af30c6727
+11357,11355,"Read decodable and authentic texts using developing phonic and word knowledge, and monitor meaning using context and emerging grammatical knowledge",WAPELYA2,0,,ad65a72a-961c-4a88-bef1-ca0c85d6ecd7
+11358,11355,"Explore comprehension strategies, such as visualising, predicting, connecting, summarising, monitoring and questioning to understand and discuss texts listened to, viewed or read",WAPELYA3,0,,e7cf840a-fc5c-4954-b1c4-ff53f1d8049a
+11359,11320,Creating texts,,0,,92a1e108-a4d3-4fea-b5db-687681ad6d43
+11360,11359,"Create written and multimodal texts for a range of purposes, including:  giving a message; expressing an opinion; sending a greeting; recounting an experience",WAPELYC1,0,,9be302c4-0afe-4d46-bea6-1a080bdf9d97
+11361,11359,"Create and deliver short spoken texts to report ideas and events (real or imagined) to peers, using features, such as appropriate voice modulation",WAPELYC2,0,,70d6845e-ff39-4a8a-acd0-5ca7851103c7
+11362,11359,Form most lower- and upper-case letters using learnt letter formations and correct starting points and directionality,WAPELYC3,0,,3cfd1b05-bf00-4bf2-be61-d22e1ba12596
+11363,11359,Explore the use of digital tools to create or add to a visual or spoken text,WAPELYC4,0,,402dc7b9-f128-4260-8635-2d9359acd9a4
+11353,11320,Interacting with others,,0,,9eea2bf3-7264-45cd-b078-7ffaefedf60c
+11354,11353,"Interact in informal and structured situations by listening while others speak, including turn-taking and using features of voice, including volume levels",WAPELYI1,0,,d02507ec-fe57-4eda-85a8-6580cacf1f78
+11351,11320,Texts in context,,0,,f64909d3-3c25-4070-8925-d95f86e8c10f
+11352,11351,"Identify some familiar texts, such as stories and informative texts, and their purposes",WAPELYT1,0,,e617049d-e669-419f-b92d-128d231b8aca
+11319,11313,Literature,,0,,6240f523-1e92-4dd3-ab44-0c6d302ded90
+11349,11319,Creating literature,,0,,7e0b8450-f08b-46f2-a7bf-525239e3feb4
+11350,11349,Retell and adapt literary texts through play and performance,WAPELICR1,0,,e58e47b2-25f6-4b13-8b0f-2795ff9120cf
+11344,11319,Engaging with and responding to literature,,0,,8e5caf92-2955-440f-9c2b-d9798b9df4ab
+11345,11344,"Respond to stories and share feelings and thoughts about their settings, events and characters",WAPELIEN1,0,,4e7cc33b-2cc5-43a0-a558-84182e088f05
+11346,11319,Examining literature,,0,,c423806e-0358-4d9e-9042-24e66d49a6bc
+11347,11346,"Recognise different types of literary texts and identify features, including setting, events, characters, and beginnings and endings",WAPELIEX1,0,,2947abec-d4e3-4af0-82d8-51da49e6c1a0
+11348,11346,"Explore and replicate the rhythms and sound patterns of literary texts, such as stories, poems, chants, rhymes and songs",WAPELIEX2,0,,c631531d-a9c0-4c0d-b29f-098eba06c908
+11342,11319,Literature and contexts,,0,,4126a2c1-430e-44ba-8162-82e291d016d6
+11343,11342,"Share ideas about stories, poems and images in literature, reflecting on experiences that are similar or different to their own by engaging with texts by Aboriginal and Torres Strait Islander, wide-ranging Australian and world authors and illustrators",WAPELICO1,0,,4046fe8e-ae5f-4c5e-9b88-36ff65a6acee
+11314,10871,Stage A,,0,,61e1f061-7963-4a76-af50-06579f6a5183
+11409,11314,Language,,0,,c72c3d8c-5fad-4c35-bcc5-4926d5ceb24d
+11412,11409,Reading and viewing,,0,,042c6a3c-706d-4082-a43a-bc97bee1b675
+11413,11412,"Encounter various forms of communication and respond to sounds, text, symbols, images or objects in their environment",ACELA1430a,0,,39376daa-b1c3-4b23-971e-70fa3c83c644
+11417,11412,"Encounter books, print and digital texts and respond to images in the text",ACELA1433a,0,,fb2cdf55-b2e2-48b4-8c89-2c41e071a80c
+11415,11412,Respond to words and groups of words and objects in texts and in the environment,ACELA1434a,0,,13359a45-3dd0-4ff5-822f-695d3f9b2c0d
+11414,11412,"Experience sentences being used to express ideas and information and responds to different words, sounds and noise",ACELA1435a,0,,945b62d7-1074-4b8a-bab8-22d2c10bbf85
+11418,11412,Encounter words and writing within the environment and respond to spoken words in familiar environments,ACELA1440a,0,,b8cc81f0-ea78-4d95-821a-8bcae2605ae8
+11416,11412,Respond to images and words in texts,ACELA1786a,0,,766f2d24-50a3-46d0-978f-0f4b45b71c5b
+11424,11409,Speaking and Listening,,0,,6c52d784-3640-44de-b53c-e7721172518f
+11425,11424,Use sounds and facial expressions to affect familiar others,ACELA1426a,0,,44fa3bf7-79fd-479d-b14a-5c508396ba1c
+11426,11424,Respond to a familiar person and engage with them,ACELA1428a,0,,88e17764-1c0f-4eb1-85b4-aadb324c183a
+11427,11424,"Explore how sound, facial expression and actions can cause a change",ACELA1429a,0,,1fdf9117-a665-4187-abdf-d18830d72a19
+11428,11424,Respond to vocabulary used in everyday experiences,ACELA1437a,0,,0441deb4-e323-43f1-97fd-ab9ef07f14a9
+11429,11424,Respond to different sounds and words used in everyday experiences,ACELA1439a,0,,c41f2b47-0b19-408c-82f5-e7c6b72376c6
+11419,11409,Writing,,0,,89ff29b9-a9fa-4af7-979b-41462ddc4895
+11420,11419,"Respond to images, objects and the spoken word",ACELA1431a,0,,9da40733-df9d-4e10-b0be-dfd7e2edfc9b
+11422,11419,"React to different sounds, and words; and respond to visual text",ACELA1432a,0,,1a8510c3-81a8-45f6-adf1-a1ddf7193bad
+11423,11419,Reacting to familiar voices and preferred sounds,ACELA1438a,0,,dfc9f23a-3878-45b4-ae68-0287390aa1ec
+11421,11419,Experience people speaking and communicating,ACELA1758a,0,,11f49417-b7f7-406e-886b-9a7c228016f1
+11411,11314,Literacy,,0,,99234019-b4b0-49b0-bf74-1e5d7c81d059
+11440,11411,Reading and viewing,,0,,301f541f-42e1-4f16-96c5-093bf0d5ccac
+11441,11440,Respond to texts within the everyday environment,ACELY1645a,0,,25809122-99aa-4a67-a1d6-9648f88a40c4
+11442,11440,React to a variety of imaginative and informative texts,ACELY1648a,0,,19922fc2-dfe0-42bc-b176-fe667520f5f2
+11443,11440,"Reacting to a range of texts including visual, audio and print text",ACELY1649a,0,,83ae260c-a2e3-4899-8f7f-d0c874b3492b
+11444,11440,Experience and respond to different forms of communication and texts being read or viewed,ACELY1650a,0,,d5c2c741-d17c-4a6a-b933-6075c2e974ac
+11450,11411,Speaking and Listening,,0,,faba19c0-3c42-4081-8d8d-a361b226e4d6
+11451,11450,Respond to various types of communication,ACELY1646a,0,,24bd9d44-6271-4972-afa8-f1ec773dc138
+11453,11450,React to others sharing and delivering a presentation on a personally or culturally relevant event,ACELY1647a,0,,c61123fb-b3f9-4cc3-b702-e3f231803077
+11452,11450,Respond to interaction and reactions of others,ACELY1784a,0,,0c03a998-1e14-4bbb-a8d8-726542e8e173
+11445,11411,Writing,,0,,ee4a4f1d-9d2e-481f-bce2-b6dbcbb42b4c
+11446,11445,React to the construction of text that reflects everyday events and activities,ACELY1651a,0,,d67f7710-55d4-4198-a3b6-f5d0b371167c
+11447,11445,Respond to group text and personalised text being edited,ACELY1652a,0,,de22e524-a95a-42cd-b8d2-fa0fe99b2e85
+11448,11445,Encounter a variety of objects and textures and hold objects for a short period of time,ACELY1653a,0,,8e48ba66-f07b-476b-852a-1f792f2185dd
+11449,11445,React to software being used to construct texts that reflect everyday events and activities,ACELY1654a,0,,bed9bf88-7186-47a2-afad-c00d8027eb42
+11410,11314,Literature,,0,,65f73d4c-28af-41ab-b3b8-df86b91d8d00
+11430,11410,Reading and viewing,,0,,445bd4bb-26e9-43d9-b235-5902486fcc65
+11432,11430,"React to texts, related to personal experience and familiar events",ACELT1575a,0,,3131672b-743a-4785-a892-fcb3c67a8ea9
+11433,11430,"Experience texts with different features, events and characters and respond to different literary texts",ACELT1578a,0,,b6828129-9471-42e0-afe0-ee7904043e76
+11431,11430,Experience and respond to different types of literary texts in various modes,ACELT1785a,0,,6576725f-fea3-4590-94fc-8061b3a53813
+11436,11410,Speaking and Listening,,0,,a63aa0a4-0b1e-4d47-af9c-a2c3811b79c6
+11437,11436,"Respond to images, sounds or actions within a multimodal text",ACELT1577a,0,,50c19360-0207-4470-8fd3-b9bfba68117f
+11439,11436,"Respond to the use of rhythms and sound patterns in stories, rhymes, songs and poems from a range of cultures",ACELT1579a,0,,2870b351-99bc-4300-b234-4b2cf7e29744
+11438,11436,"Respond to texts listened to, viewed or read",ACELT1783a,0,,5d363558-9722-4f1e-8f4c-17d3f13824fe
+11434,11410,Writing,,0,,eff79819-a829-437b-a1f0-2326dbd4dc9b
+11435,11434,Encounter literature being created for various reasons and purposes and react to the retelling of a literary text,ACELT1580a,0,,13ae0611-c5ff-410f-a8dd-7139530be2f3
+11315,10871,Stage B,,0,,a3c75870-7ff1-4ecc-b376-4837d2a02fe8
+11456,11315,Language,,0,,b699f3d5-4f82-420a-8821-545ec96932f5
+11481,11456,Reading and viewing,,0,,8d6445fe-9b1b-4e41-911e-3254bb55e221
+11482,11481,"Recognise that texts and communication can have images, objects and symbols",ACELA1430b,0,,22a96044-2810-46cc-9ac6-1ec36f8796fc
+11486,11481,Recognise and attend to images in texts and on the screen,ACELA1433b,0,,f5598859-d50e-4bed-9612-5c9433c47c3d
+11484,11481,"Recognise an object when named, signed or shown in an image",ACELA1434b,0,,2dba0d5e-524b-4176-a3e9-5480fd110353
+11483,11481,Know that an object has a name,ACELA1435b,0,,0638ae0c-5b99-41f0-9b23-401aabf2103d
+11487,11481,"Explore the concept of difference through matching letters, images, shapes and familiar words",ACELA1440b,0,,71a2a057-f8ce-42ca-8de7-ed560833005f
+11485,11481,Recognise familiar objects and images in stories and informative texts,ACELA1786b,0,,a069435f-aea0-496f-a3aa-1af0a55b63a8
+11494,11456,Speaking and Listening,,0,,ac39445e-8c15-4317-8982-437c811cf8a1
+11495,11494,"Use sounds, gestures, images and facial expressions to communicate",ACELA1426b,0,,cba477f3-3539-42a7-846d-ac3da936ca55
+11496,11494,Recognise ways to gain and maintain attention,ACELA1428b,0,,7c95a9ba-55ea-48ff-a27b-833979b035a7
+11497,11494,Demonstrate a number of ways to indicate a choice,ACELA1429b,0,,9e9e8637-acc7-45ff-91d9-8087f0973a1b
+11498,11494,"Recognise the connection between words, images, sounds and everyday objects",ACELA1437b,0,,fa32ab25-83f5-4c4f-9f97-7d786ca4f73b
+11499,11494,Connecting sounds and words and matching them to objects,ACELA1439b,0,,861d15df-1717-4698-861b-83c305b39544
+11488,11456,Writing,,0,,99919630-8d6f-4517-8bc5-89fe0638393a
+11491,11488,Recognise that text can be attached to images,,0,,07cf350b-9eb9-4f03-aaba-d1e130c6a432
+11489,11488,"Recognise the connection between an object, image and spoken word",ACELA1431b,0,,54d1db2e-ccba-4799-818d-e8771b5e94ee
+11492,11488,Recognising that people pause when talking and communicating,ACELA1432b,0,,bb86b4a1-d21a-4d46-b953-8d59cac1da76
+11493,11488,Recognise different sounds and words and their connection to objects and people,ACELA1438b,0,,1cc7b24d-62d4-41a8-9ffb-eeb9ebf41463
+11490,11488,Reproduce speech sounds to communicate basic wants,ACELA1758b,0,,18b3f0da-d738-491c-8efa-1c5d1cae1669
+11455,11315,Literacy,,0,,f5a06f52-74ec-4637-9ad2-48826491cbe6
+11457,11455,Reading and viewing,,0,,263b6869-2ba5-4f22-84d0-50c02dc30fed
+11458,11457,Attend to texts that have a variety of contexts,ACELY1645b,0,,53a74aca-a808-46cb-91db-917372de0751
+11459,11457,Attend to imaginative and informative texts including visual schedules in everyday experiences,ACELY1648b,0,,3ef293e6-8c36-4588-b5dc-1b4cc56b1a3d
+11460,11457,Use images to obtain meaning from shared texts,ACELY1649b,0,,eb86666b-2029-4f0f-b481-631213c74ee0
+11461,11457,Attend to images while listening to and viewing texts,ACELY1650b,0,,b03d7148-0b71-46c7-93b5-8a2f0d20202e
+11467,11455,Speaking and Listening,,0,,c69198b5-6a17-452a-9962-855889dd5eb4
+11468,11467,Listen to and respond to simple instructions,ACELY1646b,0,,00504eb1-273a-41ca-b1b9-2471e504bac2
+11470,11467,Respond to a presentation on an everyday experience,ACELY1647b,0,,f6aba4e8-1933-4cd2-bbc9-23dd6d5b0c5f
+11469,11467,Respond to significant others as part of familiar and routine interactions,ACELY1784b,0,,72a41367-48ca-4de3-b05a-30910f9c8777
+11462,11455,Writing,,0,,a88d2189-61c1-4135-ae30-5b93d61352b3
+11463,11462,Select image to be used in a short text about a special event,ACELY1651b,0,,80a5e3cd-f488-4d7c-8996-d62a49ab4b68
+11464,11462,Make simple choices during shared construction of personalised multimodal text,ACELY1652b,0,,6aea63eb-f89d-4e5f-a85f-0f6b32e21b8e
+11465,11462,Grasp and move objects within and between their hands,ACELY1653b,0,,2293715e-2cda-4508-8122-4ac0e6d192c7
+11466,11462,Use software or applications to select images and sounds for shared texts,ACELY1654b,0,,60cb24fc-c752-49c7-ac11-f2035cdcef14
+11454,11315,Literature,,0,,3dc54877-1315-40e7-acef-ab0338419dcf
+11471,11454,Reading and viewing,,0,,62c41b02-b9de-4beb-9d57-87221fde3bdb
+11473,11471,Respond to texts which reflect personal and family experiences,ACELT1575b,0,,75da3708-56e0-49d4-a96c-3f41518f1f89
+11474,11471,Recognise a familiar event or character during shared reading or viewing of text,ACELT1578b,0,,a15f5f3e-2e60-48b6-aa57-bc2ae0edd145
+11472,11471,"Attend to features of literary texts such as images, rhyme and refrains",ACELT1785b,0,,92825f6b-9c82-480e-9887-acd73a5681dd
+11477,11454,Speaking and Listening,,0,,da36eb15-c72a-4728-923f-e0f134751be5
+11478,11477,Identify a preferred text,ACELT1577b,0,,ac82ccb0-e61f-41ea-9b0b-fffed0814af4
+11480,11477,Participate in rhymes and songs from a range of cultures and echo some familiar rhythms and sound patterns,ACELT1579b,0,,e7832cba-9ed8-4f26-a363-a6056f84021b
+11479,11477,Respond to familiar images or sounds during shared reading/viewing of texts,ACELT1783b,0,,a817a855-4a0b-4e66-a3fb-2817d11544ae
+11475,11454,Writing,,0,,af78dc14-3380-4d8c-91af-da26189a4bf1
+11476,11475,Select an image and illustration to represent a familiar literary text or recent event,ACELT1580b,0,,926df23c-e5ea-4df4-b782-540fb5c101e3
+11316,10871,Stage C,,0,,c2bd24ec-b00c-407c-95f5-c28026e5d2c2
+11500,11316,Language,,0,,2472ca6e-9ea0-4f58-9dc8-a5208675ead2
+11527,11500,Reading and viewing,,0,,d82b25ab-c972-4dd9-bc28-7166131a2647
+11528,11527,Recognise that texts and communication can take various forms including multimodal and picture books,ACELA1430c,0,,3a5a9a97-fcb8-4fac-aba5-cd2a2190347e
+11532,11527,Know that successive pages or images in a book or on a screen present a story in sequence,ACELA1433c,0,,99f64b41-5fa6-4a18-bdf4-6f975186cd12
+11530,11527,"Know how to use the connection between the object, its name, image or sign",ACELA1434c,0,,2b8bdf71-92e2-4856-9e96-5e4f1e40acf8
+11529,11527,Recognise that a group of words can communicate a message,ACELA1435c,0,,6936c312-deb5-4000-8fa9-2ae39efdaf47
+11533,11527,Explore similarities and differences between letters by shape and size,ACELA1440c,0,,0fa6da60-22f5-4901-9bf0-30cd5263326b
+11531,11527,"Recognise the use of images to represent an event, object or idea",ACELA1786c,0,,122bfdfb-d91e-4a7d-bec0-b5c6d2f61220
+11539,11500,Speaking and Listening,,0,,f458e776-fe52-4b7d-bf0a-53c0cd387b34
+11540,11539,"Recognise that words, images and actions have the same meaning across environments",ACELA1426c,0,,99842790-22a3-46f3-944d-40344fd03417
+11541,11539,Recognise ways to greet and interact with familiar people,ACELA1428c,0,,6a3fd17e-018b-4bcb-a7e8-3b9156b11394
+11542,11539,"Recognise different ways to communicate needs, likes and dislikes",ACELA1429c,0,,582c39df-ab9c-4d52-8cd1-5e8a91c75e3b
+11543,11539,"Use words and images to make a request, indicate a choice, recount information, and express a feeling",ACELA1437c,0,,3d1320a1-02d0-4d42-8215-a36dfc6efbe6
+11544,11539,Recognise the beginning sounds of familiar words,ACELA1439c,0,,1042b2d9-227d-4f13-83f1-e7a733b442c0
+11534,11500,Writing,,0,,e51784a6-84f6-4532-89bf-5d0c4910211d
+11535,11534,"Know that symbols, words and images can communicate needs",ACELA1431c,0,,77e10dfc-4b6b-43ee-bdad-0132b6eeeba9
+11537,11534,Know their written name (as a grapheme) and match the letters in their name,ACELA1432c,0,,22529c98-a1a3-40a9-ba9c-7b5145b2610f
+11538,11534,Know the beginning sounds of familiar words,ACELA1438c,0,,89da1726-8c5c-445f-9544-c4c09237583a
+11536,11534,"Use spoken words, sign or Augmentative Alternative Communication System to communicate",ACELA1758c,0,,b9850f30-8ed5-4a66-870e-33d3e102d9e1
+11501,11316,Literacy,,0,,4b813d0d-2b23-44dd-8cf0-d6b1f25385ec
+11503,11501,Reading and viewing,,0,,d7ea27e4-b14d-4d57-9eed-ab2db2732a21
+11504,11503,Explore some familiar texts and images used in the community,ACELY1645c,0,,1b08cc71-5837-468d-a291-e671d81ee1b2
+11505,11503,"Use simple visual schedules, select imaginative and informative texts for viewing",ACELY1648c,0,,4cff87cd-90c0-4584-859a-48ba117050c9
+11506,11503,"Recognise that images, words and symbols convey meaning",ACELY1649c,0,,94f0700e-219a-4bb4-9fd6-ee7f19e991f7
+11507,11503,Use images within text to identify key objects and events,ACELY1650c,0,,4c889941-25f6-40d3-b783-c475277a700e
+11513,11501,Speaking and Listening,,0,,24f3c16d-9369-49d4-9a62-03ef2cb2d6a4
+11514,11513,Listen to and respond to the communication from an adult in classroom situations,ACELY1646c,0,,79de1f20-9b3c-433d-babf-bc9285c2fb1e
+11516,11513,Deliver some comment to a small group,ACELY1647c,0,,893b510c-b134-406e-bfb9-a2c68fcf11d9
+11515,11513,Recognise when others are speakingin group situations,ACELY1784c,0,,297202f3-6cd9-4757-a971-2d7928e55a23
+11508,11501,Writing,,0,,722e9512-5177-46fb-ade4-db6449e7ecf3
+11509,11508,Create simple texts by labelling images from an event with own ‘writing’,ACELY1651c,0,,4bb4a56f-6227-46fe-a5a8-a616c40bcb83
+11510,11508,Review choices made during shared construction of personalised multimodal texts during shared review,ACELY1652c,0,,dc6b4c6d-07e6-45be-a168-39303c312255
+11511,11508,Trace patterns and letters,ACELY1653c,0,,a3843ecb-d8fa-446e-80c8-f17e4547209c
+11512,11508,Use software or application by selecting images and typing to ‘label’ images,ACELY1654c,0,,0613a86e-baeb-4da6-9b29-ef6f50723e6f
+11502,11316,Literature,,0,,07663150-ba24-4071-915d-8d02d2341cc3
+11517,11502,Reading and viewing,,0,,55d17125-34d3-4278-a695-5afe3976eb3f
+11519,11517,Recognise key events in texts which reflect personal and familiar experiences,ACELT1575c,0,,2e0e68f0-5c80-40db-aac1-9f75fddf47f4
+11520,11517,Recognise familiar texts which share the same character or similar topic or event,ACELT1578c,0,,2a65843a-130f-456b-82c2-0db3cf74baf6
+11518,11517,Identify characteristics of familiar literary texts including poetry,ACELT1785c,0,,68799ffb-12e0-439a-9cf3-97ef2118a8bb
+11523,11502,Speaking and Listening,,0,,9d26e552-76bc-4ff5-ad24-daa1894a35ec
+11524,11523,"Identify a preferred aspect of text, such as image, refrain within a multimodal text",ACELT1577c,0,,999e002f-1e3d-4fe5-997a-252de229c4f1
+11526,11523,Repeat and follow rhythms and sound patterns in familiar rhymes and songs from a range of cultures,ACELT1579c,0,,fcf42b60-6d5a-4ccf-a457-e49f17dbb767
+11525,11523,Identify favourite character or event within a story,ACELT1783c,0,,eee19fa1-13b1-4e33-a55a-515f500aa9e6
+11521,11502,Writing,,0,,c97b7607-a3b0-4d4c-b76c-0963a07cb05e
+11522,11521,Retell an event or familiar text through images and illustrations,ACELT1580c,0,,14e4a3bd-b5e9-4dbc-93a6-a98a1e92916d
+11317,10871,Stage D,,0,,9ea6f526-ba9a-4998-a684-92633ce3a597
+11364,11317,Language,,0,,8892055e-7d44-42a5-aa19-8a36adaa9827
+11367,11364,Reading and viewing,,0,,a3b2ed40-c99e-4e82-ac1b-be9c300d1ae8
+11368,11367,"Know that words can be spoken, written, signed and represented using symbols and communication devices",ACELA1430d,0,,eaa0e67b-5df1-45ce-83a7-e73628a3d7d7
+11372,11367,Identify some of the features of text such as digital /screen layout or the features of a book cover,ACELA1433d,0,,3d2d3579-f18d-4211-90e2-bed339847c13
+11370,11367,Recognise how a group of words can represent an object or image,ACELA1434d,0,,37382459-6f7e-44f5-b695-d4e2135e07cd
+11369,11367,Understand how to make a statement or ask a question,ACELA1435d,0,,8dfb174d-201a-4978-9c8f-8245e8be74ad
+11373,11367,"Knowing that a letter can be the same but look different, for example capital and lower-case letters",ACELA1440d,0,,525450a9-2ad7-44e6-9727-0eb8ddf2faf3
+11371,11367,"Explore connection between words, objects and images in stories and informative texts",ACELA1786d,0,,e4a20e44-fa5f-45e6-a45f-10b2804d73ca
+11379,11364,Speaking and Listening,,0,,8f66b8ce-ab71-4fc0-839a-703838e47783
+11380,11379,Understand that people communicate in different ways,ACELA1426d,0,,c9509b82-651f-48a3-8d8a-a8e0f52c5be4
+11381,11379,Know how to greet and maintain a short interaction with others,ACELA1428d,0,,8c54ccba-7169-49c9-a04c-215408f51572
+11382,11379,"Use different ways to express needs, likes and dislikes",ACELA1429d,0,,e79b73e3-3abd-4bc2-86eb-b9f1ff68082f
+11383,11379,"Use vocabulary in the form of short phrases for a variety of purposes such as to request an object, communicate a need, recount information, or express a feeling",ACELA1437d,0,,7fdbabc6-38d8-4739-bf1d-95611a671203
+11384,11379,Identify the sounds within familiar words,ACELA1439d,0,,0c46db43-aa54-4fdf-9c26-562c0519a334
+11374,11364,Writing,,0,,d32cdaff-a6a8-412a-a356-8d8b1d8b61f1
+11375,11374,Understand that language can be represented as written text,ACELA1431d,0,,a0d496b9-8c1d-4239-96ad-4aaf13a78aa6
+11377,11374,Copy own name and recognise some of the letters within it. Understand that pausing is presented in written text as a full stop,ACELA1432d,0,,269b7319-8cb8-488c-a2b4-becaf59cf535
+11378,11374,Identify the beginning sounds of familiar words and some words that sound the same,ACELA1438d,0,,a278777b-54b3-4f7e-bd36-362585cc4235
+11376,11374,"Use, communicate or articulate high frequency words and reproduce familiar sounds",ACELA1758d,0,,27860371-5142-4267-893a-dc09681990c8
+11366,11317,Literacy,,0,,4ccadaf7-1c8c-4738-9e75-dbefa21ed20b
+11395,11366,Reading and viewing,,0,,896b129c-f703-49df-ad54-c097b7b8f487
+11396,11395,Identify some familiar texts and their use in the community,ACELY1645d,0,,160309e1-1e0a-42ad-9dae-f0bbec034836
+11397,11395,Identify familiar informative and imaginary texts,ACELY1648d,0,,c299d0ae-fcbf-4282-8bfa-c09196418b0c
+11398,11395,Read a simple sentence or pictorial representation of a sentence,ACELY1649d,0,,ee7e599e-f489-4638-a2f3-8f9bc43ba337
+11399,11395,Use images to retell or comment on a familiar text listened to and viewed,ACELY1650d,0,,b6c95e18-633e-4282-8ae6-5428208a5037
+11405,11366,Speaking and Listening,,0,,20cec923-23b9-4fd8-aae1-123a83c54089
+11406,11405,Listen and respond to communication of others in classroom situations and routines,ACELY1646d,0,,5a535bba-9d9e-4a4a-a24a-e4c856a8ee3d
+11408,11405,Deliver short oral presentation about an object or event of interest that identifies some of its key characteristics,ACELY1647d,0,,263529b4-b75a-4b46-a39d-ae803e0120f0
+11407,11405,"Use turn taking, simple questions and other behaviours related to class discussions",ACELY1784d,0,,55ad35ce-3535-4aab-94c9-0a239a40cd9f
+11400,11366,Writing,,0,,a1104706-5545-4d0a-9e52-a385673fc9fe
+11401,11400,"Use symbols, letters and words to create a simple statement about an idea or event",ACELY1651d,0,,cd54f65f-14b8-4275-aa4c-5e63726cf187
+11402,11400,Review own text and make changes during shared editing,ACELY1652d,0,,0b1df652-e7dd-4c6f-8661-ceadf901a805
+11403,11400,"Copy and write letters, symbols and numbers",ACELY1653d,0,,200b0081-8da8-4c93-8594-cfb788b4d915
+11404,11400,Use software or application by selecting images and suggesting simple sentences to accompany the image,ACELY1654d,0,,9a12eb19-21df-4eed-959a-73a363f06b1c
+11365,11317,Literature,,0,,897cd339-e5a4-4af7-b8b2-bb8433d1a27d
+11385,11365,Reading and viewing,,0,,1601985b-a5c6-47e7-9ea6-2aaaf6b7f159
+11387,11385,Identify topic and key events in texts that reflect personal and familiar experiences,ACELT1575d,0,,23997ebd-d662-4aa1-b808-c5b411a63125
+11388,11385,"Identify the characters, events and setting in a literary text",ACELT1578d,0,,58986ecd-bad8-45ca-b388-fb972eacc5f7
+11386,11385,"Know some characteristics and features of literary texts, such as characters, beginning and ending in stories and rhyme in poetry",ACELT1785d,0,,b23a3052-ddb0-4c7a-bc96-b74042fd1435
+11391,11365,Speaking and Listening,,0,,3b7bbdae-5000-468f-b26e-27281d8cb48b
+11392,11391,Identify favourite texts topic and character,ACELT1577d,0,,a531bf2c-15f3-44ed-837a-d1ed70e4ae9c
+11394,11391,"Identify and copy the rhythms and sound patterns in stories, rhymes and songs from a range of cultures",ACELT1579d,0,,c41fb676-9b43-4a7b-a72a-4ff44295f34e
+11393,11391,Express likes or dislikes about characters and events in a text,ACELT1783d,0,,402e0e38-1d1e-4ed7-b70b-15c2a9752dba
+11389,11365,Writing,,0,,763358c3-81cd-4c98-873c-b2671a34773e
+11390,11389,Retell familiar text or event by sequencing images and simple statements,ACELT1580d,0,,a5d733fb-7996-4085-adf3-8b34bda86df0
+10882,10871,Year 1,,0,,310051c0-090c-41bc-b3dd-a69b71fb4841
+11267,10882,Language,,0,,cc681e9b-adae-4ab0-a20d-f489b73689e5
+11277,11267,Language for expressing and developing ideas,,0,,6d66b6a3-b381-4092-a263-35e8ae0ce6ad
+11278,11277,Understand that a simple sentence consists of a single independent clause representing a single event or idea,WA1ELALA1,0,,edf531f6-a6b2-42bb-9683-e9a475033c98
+11279,11277,"Understand that words can represent people, places and things (nouns, including pronouns), happenings and states (verbs), qualities (adjectives) and details, such as when, where and how (adverbs)",WA1ELALA2,0,,538b942c-7d74-4ac2-b707-4235ed945b78
+11280,11277,Compare how images in different types of texts contribute to meaning,WA1ELALA3,0,,5758278d-2dc6-4ade-a21f-045f4ee307c7
+11281,11277,Recognise the vocabulary in everyday contexts as well as learning area topics,WA1ELALA4,0,,3ec69e55-9646-4d40-8131-7f01dd6f9be9
+11282,11277,"Understand that written language uses punctuation, such as full stops, question marks and exclamation marks, and uses capital letters for familiar proper nouns",WA1ELALA5,0,,bacc27b0-77a4-4db8-ba28-5146fbdbc9d6
+11270,11267,Language for interacting with others,,0,,7844445b-84ff-4e7e-ba32-03394da4d13e
+11271,11270,"Explore how language, facial expressions and gestures are used to interact with others when asking for and providing information, making offers, exclaiming, requesting and giving commands",WA1ELAI1,0,,5e144656-c6e6-495f-b8e4-1d0f144a8f14
+11272,11270,"Explore language to provide reasons for likes, dislikes and preferences",WA1ELAI2,0,,50eccb02-d757-4463-a1b2-c57e69781d66
+11283,11267,Phonic and word knowledge,,0,,c164489d-84b1-43e0-93e8-88bc5320e0f1
+11284,11283,"Segment words into separate phonemes (sounds), including consonant blends or clusters at the beginnings and ends of words (phonological awareness)",WA1ELAP1,0,,e20495be-d18a-49ad-a49b-1c60db0d8356
+11285,11283,"Orally manipulate phonemes in spoken words by addition, deletion and substitution of initial, medial and final phonemes to generate new words (phonological awareness)",WA1ELAP2,0,,9e832b4e-1113-4e92-91a8-1eb5342e0fe1
+11286,11283,"Use short vowels, common long vowels, consonant blends and digraphs to write words, and blend these to read one- and two-syllable words",WA1ELAP3,0,,8d97e652-4250-4c8a-afb2-1091f21c864c
+11287,11283,Understand that a letter can represent more than one sound and that a syllable must contain a vowel sound,WA1ELAP4,0,,1cc3fd1b-c931-449a-b2c3-32c25e164114
+11288,11283,Spell one‑ and two‑syllable words with common letter patterns,WA1ELAP5,0,,5c6f98f8-00ba-46ac-bb2f-50653f58f8af
+11289,11283,Read and write an increasing number of high‑frequency words,WA1ELAP6,0,,1d94a57d-9104-4f13-9a3d-be514549fb3a
+11290,11283,Recognise and know how to use grammatical morphemes to create word families,WA1ELAP7,0,,0e198db6-7374-4dad-93bf-c8a819c42f9b
+11273,11267,"Text structure, organisation and features",,0,,3cd866df-c16d-49d9-bf24-9f48745d8c01
+11274,11273,"Explore how texts are organised according to their purpose, such as to recount, narrate, express opinion, inform, report and explain",WA1ELAT1,0,,af04d97a-db74-4b9e-b00b-33dd88350d24
+11275,11273,"Explore how repetition, rhyme and rhythm create cohesion in simple poems, chants and songs",WA1ELAT2,0,,c5ce7af9-c0d4-4216-80ab-994bd6849f46
+11276,11273,"Explore how print and digital texts are organised using features, such as page numbers, table of contents, headings and titles, navigation buttons, swipe screens, verbal commands, links and images",WA1ELAT3,0,,8fecddf5-23d0-4de3-a62f-d2af6d24a777
+11269,10882,Literacy,,0,,a2a1e09f-f933-479c-b066-c5ba432bea41
+11304,11269,"Analysing, interpreting and evaluating",,0,,74f293d7-7430-4e4d-a55a-89c9ced2ec76
+11305,11304,"Describe some similarities and differences between imaginative, informative and persuasive texts",WA1ELYA1,0,,b2939a07-386e-457f-b4c6-c40e84a56c4a
+11306,11304,"Read decodable and authentic texts using developing phonic and word knowledge, phrasing and fluency, and monitor meaning using context and grammatical knowledge",WA1ELYA2,0,,d602ddb9-e1d3-4298-a881-156d7dde8862
+11307,11304,"Use comprehension strategies, such as visualising, predicting, connecting, summarising, monitoring and questioning when listening, reading and viewing to build literal and inferred meaning in texts by drawing on vocabulary and growing knowledge of context and text structures",WA1ELYA3,0,,0202bd80-5224-47be-9e5a-4014a4c63b94
+11308,11269,Creating texts,,0,,8cd78d4b-30be-4443-9f1d-33e24f7790d2
+11309,11308,"Create, re-read and co-edit short written and/or multimodal texts to report on a topic, express an opinion, or recount a real or imagined event or experience, and use imagination to tell, retell or adapt a story, using grammatically correct simple sentences, some topic-specific vocabulary, sentence boundary punctuation and correct spelling of some one‑ and two‑syllable words",WA1ELYC1,0,,88de893a-1072-4c0b-8c54-c2808310e097
+11310,11308,"Create and deliver short oral and/or multimodal presentations on personal and learnt topics, which include an opening, middle and concluding statement, some topic-specific vocabulary and appropriate gesture, volume and pace",WA1ELYC2,0,,c353270b-3cfb-4df0-84f4-55333b2b4939
+11311,11308,Write words using unjoined lower- and upper‑case letters,WA1ELYC3,0,,4108b72a-f805-4746-9d48-9ff976d86131
+11312,11308,Explore features of familiar digital tools to create or add to texts,WA1ELYC4,0,,b0223efe-1a9f-486f-aa02-f16cf97cae20
+11302,11269,Interacting with others,,0,,e08d3373-ea5e-4074-b644-362f00b8528c
+11303,11302,"Use interaction skills, including turn-taking, speaking clearly, using active listening behaviours and responding to the contributions of others, and contributing ideas and questions",WA1ELYI1,0,,8d9af094-3987-447e-907b-7b33771a2b2e
+11300,11269,Texts in context,,0,,6738718f-5a5f-47c8-b37f-a72e3092aa7b
+11301,11300,Discuss different texts and identify some features that indicate their purposes,WA1ELYT1,0,,01c5fe88-1641-4420-9a7a-e764accefdbc
+11268,10882,Literature,,0,,4b31bba9-60b2-413b-887e-6c1ae47b1bb0
+11298,11268,Creating literature,,0,,a2f693e9-b433-42b0-a575-12c04100b153
+11299,11298,"Retell or adapt a story using plot and characters, language features, including vocabulary, and structure of a familiar text through spoken texts, role-play, writing, drawing or digital tools",WA1ELICR1,0,,1401445e-8c06-4e33-8ffe-3fab3311c29d
+11293,11268,Engaging with and responding to literature,,0,,b63c46cd-8f10-4b30-801c-7aa9a10ba7ac
+11294,11293,Discuss literary texts and share responses by making connections with children’s own experiences,WA1ELIEN1,0,,c03dc09d-65d6-495d-b68c-bd2001a2e68c
+11295,11268,Examining literature,,0,,e3a31091-534d-478b-aec0-bc89efc08c05
+11296,11295,"Discuss plot, character and setting in stories",WA1ELIEX1,0,,62cf32e2-f6ab-42dd-8a88-9da6ac0d5334
+11297,11295,"Listen to, discuss and perform literary texts, including stories, poems, chants, rhymes and songs, and imitate and invent sound patterns, including alliteration and rhyme",WA1ELIEX2,0,,12725682-f221-4c59-a0b3-108ab1a92f48
+11291,11268,Literature and contexts,,0,,5f33f275-0579-4722-8f91-72b2ccc54998
+11292,11291,"Discuss how language and images are used to create characters, settings and events in literature by Aboriginal and Torres Strait Islander, wide‑ranging Australian and world authors and illustrators",WA1ELICO1,0,,73914906-595a-466c-8354-cac47854e466
+10873,10871,Year 10,,0,,d63fd505-df0a-4f41-bf85-aae4306eb34f
+10888,10873,Language,,0,,75c1fe8a-f062-4596-afc0-5c5c0b4a93d2
+10895,10888,Language for expressing and developing ideas,,0,,d4c194d6-7f66-4d59-a96f-339c363d2edf
+10896,10895,Analyse and evaluate the effectiveness of particular sentence structures to express and craft ideas,WA10ELALA1,0,,2557f727-45ab-42e1-b0db-32eabf9b0eb7
+10897,10895,Analyse how meaning and style are achieved through syntax,WA10ELALA2,0,,3a4be02b-d066-46f2-b0d0-0f748bd60e8c
+10898,10895,"Evaluate the features of visual and multimodal texts, and the effects of those choices on representations",WA10ELALA3,0,,5d9835aa-cb11-49dd-9e63-4f8155d903b4
+10899,10895,Use an expanded technical and academic vocabulary for precision when writing academic texts,WA10ELALA4,0,,42ca1f08-6be2-4cc2-891e-6be7c34ffae1
+10900,10895,Understand how authors use and experiment with punctuation,WA10ELALA5,0,,a0cf630b-5c7a-490a-9988-112eb4ef5d34
+10889,10888,Language for interacting with others,,0,,00a3ab7d-6f87-4989-b5fa-4876f3313bc6
+10890,10889,"Understand how language can have inclusive and exclusive social effects, and can empower or disempower people",WA10ELAI1,0,,4511fef7-69d4-42ee-b170-9b0469d8721b
+10891,10889,"Understand that language used to evaluate, implicitly or explicitly, reveals an individual’s values",WA10ELAI2,0,,88683d4c-1864-450c-b75f-783d0eefa114
+10892,10888,"Text structure, organisation and features",,0,,992f8fff-0b87-412d-9688-3dab12bfb6c6
+10893,10892,Analyse text structures and language features and evaluate their effectiveness in achieving their purpose,WA10ELAT1,0,,c3967597-14e7-4587-be3c-58a6db6e8649
+10894,10892,"Understand how paragraph structure can be varied to create cohesion, and paragraphs and visual features can be integrated for different purposes",WA10ELAT2,0,,335d3d22-4e53-49c9-8d37-11480a16a49d
+10901,10888,Word knowledge,,0,,88480759-6b68-4e32-9554-2460c0fabad0
+10902,10901,Use word knowledge to maintain conventional spelling and to manipulate standard spelling for particular effects,WA10ELAW1,0,,fd413713-49af-497b-aa8e-7752e327419d
+10916,10873,Literacy,,0,,20f31aab-67ea-41c5-8444-8433cf4d056e
+10921,10916,"Analysing, interpreting and evaluating",,0,,82d2d4d0-e0e7-428f-8156-20e93cb67d04
+10922,10921,"Analyse and evaluate how language features are used to implicitly or explicitly represent values, beliefs and attitudes",WA10ELYA1,0,,84830227-b963-46af-b1c7-0a2261f1e874
+10923,10921,Analyse and evaluate how authors and creators use text structures to organise ideas and achieve a purpose,WA10ELYA2,0,,4f5de504-dbe5-4f0b-910d-b8bf43ff5d80
+10924,10921,"Integrate comprehension strategies, such as visualising, predicting, connecting, summarising, monitoring, questioning and inferring, to analyse and interpret complex and abstract ideas when listening, reading and viewing",WA10ELYA3,0,,e2318ad3-492d-44df-9b99-fd0281e33435
+10925,10916,Creating texts,,0,,f726f79e-6fb5-4998-a2d1-17c972bf3ad3
+10926,10925,"Plan, create, edit and publish written and multimodal texts, organising, expanding and developing ideas through experimenting with text structures, language features, literary devices and multimodal features for specific purposes and audiences in ways that may be imaginative, reflective, informative, persuasive, analytical and/or critical",WA10ELYC1,0,,0705cfc6-d990-42ac-8d40-a7e7d63a31bd
+10927,10925,"Plan, create, rehearse and deliver spoken and multimodal presentations by experimenting with rhetorical devices, and the organisation and development of ideas, to engage audiences for different purposes in ways that may be imaginative, reflective, informative, persuasive, analytical and/or critical",WA10ELYC2,0,,ca05788c-deb6-422e-8b9f-7391b248885d
+10928,10925,"Consolidate a personal handwriting style that is legible, fluent and automatic and supports writing for extended periods in relevant required contexts",WA10ELYC3,0,,2a8914ff-8317-48bb-b85b-932ac5729823
+10929,10925,"Select, adapt and experiment with features of digital tools to create texts for a range of purposes and audiences",WA10ELYC4,0,,86d0a4f5-cbb1-4b00-ba8f-bd1509aa2802
+10919,10916,Interacting with others,,0,,cff288bb-933e-4742-85d0-560f847c22a4
+10920,10919,"Listen to spoken texts and explain the purposes and effects of text structures and language features, and use interaction skills to discuss and present an opinion about these texts",WA10ELYI1,0,,33619b34-273e-4dc7-adf3-26e7aa0a2593
+10917,10916,Texts in context,,0,,f90b7664-a077-4a39-aedd-3503875a7c7f
+10918,10917,"Analyse and evaluate how people, places, events and concepts are represented in texts and relate to contexts",WA10ELYT1,0,,e66aae03-87cf-4466-9cc4-3e2d3d8f8345
+10903,10873,Literature,,0,,18e87e02-ad63-4341-8f39-73c0ecd73821
+10914,10903,Creating literature,,0,,e89f3f66-b43d-4d80-8f58-130f6d03aca9
+10915,10914,"Create and edit literary texts with a sustained ‘voice’, selecting and adapting text structures, literary devices, and language, auditory and visual features for purposes and audiences",WA10ELICR1,0,,6eb9ea4d-8b30-45ea-9078-ad61be0dcee3
+10906,10903,Engaging with and responding to literature,,0,,d554bddc-e7a2-4869-9481-1c0959694ae6
+10907,10906,Reflect on and extend others’ interpretations of and responses to literary texts,WA10ELIEN1,0,,9e88d3ac-d798-4ef0-a12f-e070f1c7598f
+10908,10906,"Analyse how the aesthetic qualities associated with text structures, language features, literary devices and visual features, and the context in which these texts are experienced, influence audience response",WA10ELIEN2,0,,1e52e6aa-61f1-4de1-93dc-d691d20f9a3f
+10909,10906,"Evaluate the social, moral or ethical perspectives represented in literary texts",WA10ELIEN3,0,,2f45729c-cd3f-4b74-bea4-8e04d3cb2cc2
+10910,10903,Examining literature,,0,,31bc388e-c578-4b95-a89a-980e5a42155e
+10911,10910,"Analyse how text structure, language features, literary devices and intertextual connections shape interpretations of texts",WA10ELIEX1,0,,1cd76ebe-76e7-4f2a-997d-20297a670f43
+10912,10910,"Compare and evaluate how ‘voice’ as a literary device is used in different types of texts, such as poetry, novels and film, to evoke emotional responses",WA10ELIEX2,0,,59510dca-d37e-487a-9929-b7fabb559cbe
+10913,10910,Analyse and evaluate the aesthetic qualities of texts,WA10ELIEX3,0,,75905e76-e676-4c31-a7c3-0b5393d69755
+10904,10903,Literature and contexts,,0,,37a4595b-08b9-459a-99f2-87705128badb
+10905,10904,"Analyse representations of individuals, groups and places and evaluate how they relate to contexts in literary texts by Aboriginal and Torres Strait Islander, wide-ranging Australian and world authors and creators",WA10ELICO1,0,,a7bca6e8-6055-4993-953c-08342d9c3bbd
+10881,10871,Year 2,,0,,adb82192-21e7-429c-9e94-f3913d20ace1
+11222,10881,Language,,0,,83cae638-678e-4850-9456-e6ce220b89de
+11232,11222,Language for expressing and developing ideas,,0,,454772cd-dc48-456e-9beb-e592035402c7
+11233,11232,Understand that connections can be made between ideas by using a compound sentence with two or more independent clauses usually linked by a coordinating conjunction,WA2ELALA1,0,,be8cc270-f3ec-4d30-9322-72bf709d26e8
+11234,11232,"Understand that, in sentences, nouns may be extended into noun groups using articles and adjectives, and verbs may be expressed as verb groups",WA2ELALA2,0,,717cce77-f292-4bbf-a9c6-c6922b7342ba
+11235,11232,Understand that images add to or multiply the meanings of a text,WA2ELALA3,0,,d854136d-0192-4c5d-b1a3-bcbed6107394
+11236,11232,"Experiment with and begin to make conscious choices of vocabulary to suit the topic, situation or context",WA2ELALA4,0,,47a256fe-a3e3-4d1e-a26e-3411b6b7c1b9
+11237,11232,Recognise that capital letters are used in titles and commas are used to separate items in lists,WA2ELALA5,0,,8bbbc676-3c87-4596-8b09-f6c4c6dc745f
+11225,11222,Language for interacting with others,,0,,de77a726-b4a6-4ca4-9a87-d883efeba00c
+11226,11225,"Investigate how interpersonal language choices vary depending on the context, including the different roles taken on in interactions",WA2ELAI1,0,,b2cfbbaa-221d-47a3-b8d0-f79cff189e45
+11227,11225,Explore how language can be used for appreciating texts and providing reasons for preferences,WA2ELAI2,0,,05fa3302-3764-4e2b-96e4-0ca9afa54557
+11238,11222,Phonic and word knowledge,,0,,806e9c02-dab1-409c-af66-09bab7d2b2c3
+11239,11238,"Manipulate more complex sounds in spoken words and use knowledge of blending, segmenting, phoneme deletion and phoneme substitution to read and write words",WA2ELAP1,0,,7e746a82-2b14-427f-af1f-e6491024792d
+11240,11238,"Use phoneme–grapheme (sound–letter) relationships and patterns, when blending and segmenting to read and write words of one or more syllables",WA2ELAP2,0,,cbabefc1-8d82-41b5-9b52-e0bc3878a075
+11241,11238,Understand that a sound can be represented by various letter combinations,WA2ELAP3,0,,3030cfca-1bd8-4bf7-99d9-a818e1ba1dc0
+11242,11238,"Use phoneme–grapheme (sound–letter) matches, including vowel digraphs, less common long vowel patterns, consonant clusters and silent letters, when reading and writing words of one or more syllables, including compound words",WA2ELAP4,0,,827d7b51-f1c9-438e-88bf-2ba753ce3061
+11243,11238,"Use knowledge of spelling patterns and morphemes to read and write words whose spelling is not completely predictable from their sounds, including high-frequency words",WA2ELAP5,0,,b994038e-28e9-4f96-b5fc-9a81e0e2f39b
+11244,11238,Build morphemic word families using knowledge of prefixes and suffixes,WA2ELAP6,0,,62d90eea-003a-4a77-9480-955a799775ad
+11228,11222,"Text structure, organisation and features",,0,,aca98a5a-c903-49be-af2b-487d37722268
+11229,11228,Explore how texts across learning areas are organised differently and use language features depending on purposes,WA2ELAT1,0,,7ca1a1e0-8f6d-4e1b-8555-d070ec22d014
+11230,11228,Understand how texts are made cohesive by using personal and possessive pronouns and by omitting words that can be inferred,WA2ELAT2,0,,5ba3c3ed-76fd-425f-ba8c-a69e1cba7d34
+11231,11228,"Navigate print and digital texts using chapters, table of contents, indexes, sidebar menus, drop-down menus or links",WA2ELAT3,0,,7914c395-4d38-407d-babd-2a90ce12dd17
+11224,10881,Literacy,,0,,f05ef4b9-a35c-4bd9-a017-a486cdf7f3f0
+11258,11224,"Analysing, interpreting and evaluating",,0,,357e5bc5-7285-4bd8-b369-6a4131ed4882
+11259,11258,"Identify the purpose and audience of imaginative, informative and persuasive texts",WA2ELYA1,0,,96d63fd4-8cd4-4f6b-8a23-89680f9c3742
+11260,11258,"Read texts with phrasing and fluency combining phonic, word and grammatical knowledge, and monitor meaning using text processing strategies",WA2ELYA2,0,,0033661c-4c0b-460b-a931-2d01d731bd29
+11261,11258,"Use comprehension strategies, such as visualising, predicting, connecting, summarising, monitoring and questioning when listening, reading and viewing to build literal and inferred meaning in a range of texts for different purposes",WA2ELYA3,0,,de128b07-e054-41d5-9662-9c4278717f06
+11262,11224,Creating texts,,0,,39b50040-f760-4ae8-9637-a8d06315edfb
+11263,11262,"Plan, create and edit short imaginative, informative and persuasive written and/or multimodal texts for familiar audiences, using text structure appropriate to purpose, simple and compound sentences, noun groups and verb groups, topic-specific vocabulary, simple punctuation and correct spelling of some common two-syllable words",WA2ELYC1,0,,502051a7-3493-4f01-b4ff-c72c09f91284
+11264,11262,"Create, rehearse and deliver short oral and/or multimodal presentations to inform or tell stories for familiar audiences and purposes, using text structure appropriate to purpose and topic-specific vocabulary, and varying tone, volume and pace",WA2ELYC2,0,,5109e424-33b6-4bf2-b61e-eb337be388b6
+11265,11262,Write words legibly and with growing fluency using unjoined lower‑ and upper-case letters,WA2ELYC3,0,,19bb9568-c82e-445d-9cc6-d6b437fecfbf
+11266,11262,Use features of digital tools to create or add to texts,WA2ELYC4,0,,ee506823-6268-48a8-8e6d-baf36cdfec1c
+11256,11224,Interacting with others,,0,,9bc3bb02-59ff-4a00-b837-87b0153650a6
+11257,11256,"Use interaction skills when engaging with topics, actively listening to others, receiving instructions and extending own ideas, speaking appropriately, expressing and responding to opinions, making statements, and giving instructions",WA2ELYI1,0,,08d7e78d-2969-433f-8f8e-9a2b48172f5a
+11254,11224,Texts in context,,0,,0a35c08a-03ac-4681-9d98-f92fab3fa5e4
+11255,11254,Identify how similar topics and information are presented in different types of texts,WA2ELYT1,0,,5cd577cb-60b0-4268-b284-ace90c54fa2b
+11223,10881,Literature,,0,,015d610c-8a38-489f-820a-1e267f0245d7
+11252,11223,Creating literature,,0,,bdb47a1f-156c-44cc-8ae5-b6d7dfde2539
+11253,11252,"Create and edit literary texts by adapting structures and language features of literary texts through drawing, writing, performance and digital tools",WA2ELICR1,0,,de09d66b-757b-4299-96dd-248af67511e1
+11247,11223,Engaging with and responding to literature,,0,,10da4fb6-84de-4636-981b-25af722f71dc
+11248,11247,"Identify features of literary texts, such as characters, events and settings, and give reasons for personal preferences",WA2ELIEN1,0,,99ba9d5a-877e-46ac-bb26-6142568c837b
+11249,11223,Examining literature,,0,,905970cb-62bd-428f-bb8a-bb816b5c2de2
+11250,11249,"Discuss the characters, settings and events of a range of texts and identify how language is used to present these features in different ways",WA2ELIEX1,0,,dc0d1171-c612-4677-8135-b52e6f654314
+11251,11249,"Identify, reproduce and experiment with rhythmic sound and word patterns in literary texts, including stories, poems, chants, rhymes and songs",WA2ELIEX2,0,,1e7c8c05-cb7b-4315-bf83-00234f0ace2a
+11245,11223,Literature and contexts,,0,,353e1fb1-30fd-4a94-8500-960ac72b7a50
+11246,11245,"Discuss how characters, events and settings are connected in literature created by Aboriginal and Torres Strait Islander, wide-ranging Australian and world authors and illustrators",WA2ELICO1,0,,89919fe5-98d2-4972-b7f7-61af969981ec
+10880,10871,Year 3,,0,,3ac82d98-2bd7-4479-a6df-2a57594d2bce
+11178,10880,Language,,0,,2bdd4d62-6f50-46ff-b0b9-464a9f8829b0
+11210,11178,Language for expressing and developing ideas,,0,,062a183e-bb89-4f95-b181-ad4711d84fb6
+11211,11210,"Understand that sentences are usually made up of clauses, and the subject and verb within the clauses need to agree",WA3ELALA1,0,,46f2e911-286a-4d9e-b83e-9f92d21f594b
+11212,11210,"Understand how verbs represent different processes for doing, feeling, thinking, saying and relating",WA3ELALA2,0,,da76ba0c-cd1e-4374-85f0-612c33bbfe30
+11213,11210,Understand that verbs are anchored in time through tense,WA3ELALA3,0,,3cd9a830-84d0-4bc5-b18e-a6543428a001
+11214,11210,"Identify the effect on audiences of techniques, such as shot size, vertical camera angle and layout in picture books, advertisements and film segments",WA3ELALA4,0,,b03524fb-2b3a-4824-9c31-5b7bd0c875de
+11215,11210,Extend topic-specific and technical vocabulary and know that words can have different meanings in different contexts,WA3ELALA5,0,,b5f257bb-19df-4c31-b820-f849ef183a68
+11216,11210,"Understand that apostrophes signal missing letters in contractions, and apostrophes are used to show singular and plural possession",WA3ELALA6,0,,ea9bc075-62c3-468c-8693-0cb1c1b3631c
+11203,11178,Language for interacting with others,,0,,9c7507ee-04c7-425a-ac9d-9d29aad8b128
+11204,11203,"Understand that cooperation with others depends on shared understanding of social conventions, including turn‑taking language, which vary according to the degree of formality",WA3ELAI1,0,,80c0f253-bd01-4023-9901-4634308fcee5
+11205,11203,"Understand how the language of evaluation and emotion, such as modal verbs, can be varied to be more or less forceful",WA3ELAI2,0,,9a72e714-2f33-4f4a-acde-9b4302c01792
+11217,11178,Phonic and word knowledge,,0,,38c9bc2e-c49e-456d-b7b9-93c025057097
+11218,11217,"Understand how to apply knowledge of phoneme–grapheme (sound–letter) relationships, syllables, and blending and segmenting to fluently read and write multisyllabic words with more complex letter patterns",WA3ELAP1,0,,de7020fa-0b49-41c9-8aff-de5d6d63b8e2
+11219,11217,Use phoneme–grapheme (sound–letter) relationships and less common letter patterns to spell words,WA3ELAP2,0,,e7d41522-18a6-4854-bc7c-552b233c5acc
+11220,11217,"Recognise and know how to write most high-frequency words, including some homophones",WA3ELAP3,0,,d467939b-3244-410e-a32a-f0cd0babb286
+11221,11217,"Understand how to apply knowledge of common base words, prefixes, suffixes and generalisations for adding a suffix to a base word to read and comprehend new multimorphemic words",WA3ELAP4,0,,45fe4e99-6eef-4082-809f-39f8ada9bd2e
+11206,11178,"Text structure, organisation and features",,0,,8e7a1bbc-d112-4966-bab3-67473051e109
+11207,11206,Describe how texts across learning areas are organised into stages and use language features relevant to their purpose,WA3ELAT1,0,,98f8677a-b6e8-4fb1-975a-e7021c35e33f
+11208,11206,"Understand that paragraphs are a key organisational feature of the stages of written texts, grouping related information together",WA3ELAT2,0,,1b54a802-9529-41fa-83c7-b57804cd58af
+11209,11206,"Identify the purpose of layout features in print and digital texts, and the words and symbols used for navigation",WA3ELAT3,0,,f7ac44be-71f5-492f-b8dd-f13534056549
+11180,10880,Literacy,,0,,52179618-1f8a-4015-9fe8-cf47a65187a4
+11185,11180,"Analysing, interpreting and evaluating",,0,,9d49029c-874b-493d-8b8b-ada2c91a5c2a
+11186,11185,"Identify the purpose and audience of some language features and/or images in imaginative, informative and persuasive texts",WA3ELYA1,0,,5911e7dc-b672-49c4-91b7-b24222223861
+11187,11185,"Read a range of texts combining phonic, semantic and grammatical knowledge to read accurately and fluently, re‑reading and self‑correcting when required",WA3ELYA2,0,,2417e041-29bd-4cf8-bc1a-1c7fd025800c
+11188,11185,"Use comprehension strategies, such as visualising, predicting, connecting, summarising, monitoring and questioning when listening, reading and viewing to build literal and inferred meaning, and begin to evaluate texts by drawing on a growing knowledge of context, text structures and language features",WA3ELYA3,0,,1b4d6fe1-f4f4-426f-b928-41bec58e968d
+11189,11180,Creating texts,,0,,50209a32-c76b-4335-86d2-5b7cec80dea1
+11190,11189,"Plan, create, edit and publish imaginative, informative and persuasive written and multimodal texts, using visual features, appropriate form and layout, with ideas grouped in simple paragraphs, mostly correct tense, topic‑specific vocabulary and correct spelling of most high‑frequency and phonetically regular words",WA3ELYC1,0,,e8b813b7-5b8b-444d-a6b8-e40a083a73bc
+11191,11189,"Plan, create, rehearse and deliver short oral and/or multimodal presentations to inform, express opinions or tell stories, using a clear structure, details to elaborate ideas, topic‑specific and precise vocabulary, visual features, and appropriate tone, pace, pitch and volume",WA3ELYC2,0,,94b7fd57-9b7f-4ba1-8e87-eba298b69f71
+11192,11189,Write words using joined letters that are clearly formed and consistent in size,WA3ELYC3,0,,94fac762-2029-4679-a24d-56d12a43ad15
+11193,11189,Use features of digital tools to create or add to texts for a purpose,WA3ELYC4,0,,04e4f518-3c59-40e4-943c-84990caa5842
+11183,11180,Interacting with others,,0,,a4be9b45-2dc1-40c7-b065-f2688acf6f4d
+11184,11183,"Use interaction skills to contribute to conversations and discussions to share information and ideas, recognising the value of others’ contributions and responding through comments, recounts and summaries of information",WA3ELYI1,0,,a39ee03a-84e8-4985-9785-c2b1f08d224c
+11181,11180,Texts in context,,0,,dc0d78ec-9da4-477c-8870-83c641718582
+11182,11181,Recognise how texts can be created for similar purposes but different audiences,WA3ELYT1,0,,40ed9ea7-2f00-4ee4-8c91-8a7ddffb2b28
+11179,10880,Literature,,0,,a0222e7c-1462-42bc-b4d9-482ddfc86dd4
+11201,11179,Creating literature,,0,,54a7e7d9-eef6-41e9-b7a1-f7252242b6a4
+11202,11201,"Create and edit imaginative texts, using or adapting language features, characters, settings, plot structures and ideas encountered in literary texts",WA3ELICR1,0,,61cfc499-9eb3-4a32-bdcc-0a0d59de4a19
+11196,11179,Engaging with and responding to literature,,0,,9c2f4f43-f669-489c-b9bf-fa8eb3093e6d
+11197,11196,Discuss connections between personal experiences and character experiences in literary texts and share personal preferences,WA3ELIEN1,0,,3325406b-d669-4492-9e8c-2eb9f7438843
+11198,11179,Examining literature,,0,,d87cdea0-31ce-4730-bd64-4a322b96e921
+11199,11198,"Discuss how an author uses language and illustrations to portray characters and settings in texts, and explore how the settings and events influence the mood of the narrative",WA3ELIEX1,0,,fac1913c-d929-496a-963f-5421a2cc70f0
+11200,11198,"Discuss the effects of some literary devices used to enhance meaning and shape the reader’s reaction, such as rhythm and onomatopoeia in literary texts, including poetry and prose",WA3ELIEX2,0,,921cbeeb-130b-4fb0-9e6c-6cb6433f61fd
+11194,11179,Literature and contexts,,0,,41c4cf99-895c-4b31-999e-e6125e794e52
+11195,11194,"Discuss characters, events and settings in different contexts in literature by Aboriginal and Torres Strait Islander, wide‑ranging Australian and world authors and illustrators",WA3ELICO1,0,,231b48a5-73b3-41f0-8ce2-9a21bbb61fe0
+10879,10871,Year 4,,0,,9568f35b-ca43-4942-a5e5-22fdfcf68009
+11134,10879,Language,,0,,b39e1ca2-517d-4df2-8310-27c667e3dc2c
+11144,11134,Language for expressing and developing ideas,,0,,44571568-9b96-42a0-9a88-f9015dbbbe81
+11145,11144,"Understand that complex sentences contain one independent clause and at least one dependent clause typically joined by a subordinating conjunction to create relationships, such as time and causality",WA4ELALA1,0,,788ee9e1-39ea-4fe2-a680-9fd561364222
+11146,11144,Investigate how quoted (direct) and reported (indirect) speech are used,WA4ELALA2,0,,13d00ad2-d28b-4400-8413-0688fd62508a
+11147,11144,Understand how adverb groups/phrases and prepositional phrases work in different ways to provide circumstantial details,WA4ELALA3,0,,b2cfbfd9-64fe-492b-b16a-ea102c8780f3
+11148,11144,"Understand past, present and future tenses and their impact on meaning in a sentence",WA4ELALA4,0,,2c3f8232-4139-4c74-a017-d740bed52416
+11149,11144,"Explore the effect of choices when framing an image, placement of elements in the image and salience on composition of still and moving images in texts",WA4ELALA5,0,,bc4c0c87-bc4c-4130-b099-4081ef3c5a79
+11150,11144,"Expand vocabulary by exploring a range of synonyms and antonyms, using words encountered in a range of sources",WA4ELALA6,0,,3dd9daa2-25f4-47e0-8151-b4f1fd6cd5bb
+11151,11144,"Understand that punctuation signals dialogue through quotation marks and that dialogue follows conventions for the use of capital letters, commas and boundary punctuation",WA4ELALA7,0,,c53946a9-a662-4edf-ad03-65c70a7d158f
+11137,11134,Language for interacting with others,,0,,666cf400-92af-4b38-85b2-8d39a8e69ef0
+11138,11137,Explore language used to develop relationships in formal and informal situations,WA4ELAI1,0,,1bef92de-39d2-4948-94dd-3a74e04f590b
+11139,11137,"Identify the subjective language of opinion and feeling, and the objective language of factual reporting",WA4ELAI2,0,,c4b753c7-a134-4095-98ab-0b933f1ab338
+11152,11134,Phonic and word knowledge,,0,,03f9a6f8-085e-4e51-bd83-af7ecbfa841c
+11153,11152,"Understand how to use and apply phonological and morphological knowledge to read and write multisyllabic words with more complex letter combinations, including a variety of vowel sounds and known prefixes and suffixes",WA4ELAP1,0,,c569c6c3-b4e2-4e9e-ada1-62079e86e887
+11154,11152,"Understand how to use knowledge of letter patterns, including double letters, spelling generalisations, morphological word families, common prefixes and suffixes, and word origins, to spell more complex words",WA4ELAP2,0,,04147cc0-b670-42be-b71f-c2a8695b3656
+11155,11152,"Read and write high‑frequency words, including homophones, and know how to use context to identify correct spelling",WA4ELAP3,0,,24e37f05-7cf2-4285-b04c-a738c0aad9cb
+11140,11134,"Text structure, organisation and features",,0,,cd9f3790-a374-4efc-b45e-608ccf2b2d72
+11141,11140,Identify how texts across learning areas are typically organised into stages and phases and use language features appropriate to purpose,WA4ELAT1,0,,232a40dc-ac9f-4ff1-98c6-51ea557e33fa
+11142,11140,"Identify how text connectives, including temporal and conditional words, and topic word associations, are used to sequence and connect ideas",WA4ELAT2,0,,083efef9-6204-4319-b531-8e48929d6621
+11143,11140,"Identify text navigation features of print and digital texts that enhance readability, including headlines, drop-down menus, links, graphics and layout",WA4ELAT3,0,,52bd5499-b04d-4382-ad19-b6fc5d53ace3
+11135,10879,Literacy,,0,,9be146d8-fbba-4fdc-9eaf-257b8868816c
+11169,11135,"Analysing, interpreting and evaluating",,0,,b3d21729-2d46-4418-9ebd-02e615667b3d
+11170,11169,"Identify the characteristic features used in imaginative, informative and persuasive texts to meet the purpose of the text",WA4ELYA1,0,,04a76ef4-4fc4-47fd-8c1b-c18827f0209c
+11171,11169,"Read different types of texts, integrating phonic, semantic and grammatical knowledge to read accurately and fluently, re-reading and self-correcting when needed",WA4ELYA2,0,,46a8873d-b13b-4048-b4eb-7efa0ac9c0ce
+11172,11169,"Use comprehension strategies, such as visualising, predicting, connecting, summarising, monitoring and questioning when listening, reading and viewing to build literal and inferred meaning to expand topic knowledge and ideas, and evaluate texts",WA4ELYA3,0,,a1910695-9ada-4b6f-b887-b5da0b2a9ed1
+11173,11135,Creating texts,,0,,b3607053-5aef-4534-bbd6-8caf7d87e039
+11174,11173,"Plan, create, edit and publish written and multimodal imaginative, informative and persuasive texts, using visual features, relevant ideas linked in paragraphs, complex sentences, appropriate tense, synonyms and antonyms, correct spelling of multisyllabic words and simple punctuation",WA4ELYC1,0,,528822ed-a4da-4a09-a602-06af58471db5
+11175,11173,"Plan, create, rehearse and deliver structured oral and/or multimodal presentations to report on a topic, tell a story, recount events or present an argument using subjective and objective language, complex sentences, visual features, tone, pace, pitch and volume",WA4ELYC2,0,,c3be13ce-4559-4198-a3ab-dc718486c079
+11176,11173,"Write words using clearly formed joined letters, with developing fluency and automaticity",WA4ELYC3,0,,77d79737-be31-4e24-91f6-e80801a8416e
+11177,11173,Use features of digital tools to create or add to texts for a variety of purposes,WA4ELYC4,0,,84eb53c8-52db-445a-a83c-47a2f24d7324
+11167,11135,Interacting with others,,0,,c7dc5f72-5466-4b1b-af37-623fa0df0fba
+11168,11167,"Listen for key points and information to carry out tasks and use interaction skills to contribute to discussions, acknowledging another opinion, linking a response to the topic, and sharing and extending ideas and information",WA4ELYI1,0,,95be3d6c-ff57-49ab-8cff-ef6091033273
+11165,11135,Texts in context,,0,,4a16066d-6d00-4def-9fda-d415dd6c48ce
+11166,11165,Compare texts from different times with similar purposes and audiences to identify similarities and differences in their depictions of events,WA4ELYT1,0,,fe41ab3e-a6d9-4805-82f6-84d7205079cf
+11136,10879,Literature,,0,,6989f0ad-1bb8-4dde-877e-16a2b0e7c023
+11163,11136,Creating literature,,0,,d0f0ccb9-a9d7-4076-97cc-a51da843fede
+11164,11163,"Create and edit literary texts by developing storylines, characters and settings",WA4ELICR1,0,,02aa28ef-7d93-40c7-9054-f3d99949702f
+11158,11136,Engaging with and responding to literature,,0,,20b2de55-2a41-4aab-aa55-de314bc574a2
+11159,11158,Describe the effects of text structures and language features in literary texts when responding to and sharing opinions,WA4ELIEN1,0,,bd35d6dc-563d-4789-80ab-d206c6e2a634
+11160,11136,Examining literature,,0,,28dd0820-1b5e-45ea-9779-c3a2349820dc
+11161,11160,"Discuss how authors and illustrators make stories engaging by the way they develop character, setting and plot tensions",WA4ELIEX1,0,,c62a6cc9-ca75-49d2-a5a0-31ddcb70035c
+11162,11160,"Examine the use of literary devices and deliberate word play in literary texts, including poetry to shape meaning",WA4ELIEX2,0,,2bb19aec-29fe-4b68-aa80-8db34f976655
+11156,11136,Literature and contexts,,0,,dc58ba07-2237-4eac-bfa8-d9945496e124
+11157,11156,"Recognise similar storylines, ideas and relationships in different contexts in literary texts by Aboriginal and Torres Strait Islander, wide‑ranging Australian and world authors",WA4ELICO1,0,,c3604494-657e-4ddf-b90e-48d1e11fa1f2
+10878,10871,Year 5,,0,,147fce00-06be-46fb-b8c6-da2831200f5f
+11091,10878,Language,,0,,2ba36a51-20f2-484e-82bf-b8e3ed411e5f
+11100,11091,Language for expressing and developing ideas,,0,,583101e1-8f6d-4e0b-a5d9-dba82e23d860
+11101,11100,"Understand that the structure of a complex sentence includes an independent clause and at least one dependent clause, and understand how writers can use this structure for effect",WA5ELALA1,0,,3f3cc62d-f899-48f1-9592-9823af1e4a93
+11102,11100,"Understand how noun groups can be expanded in a variety of ways to provide a fuller description of a person, place, thing or idea",WA5ELALA2,0,,b06f2521-a7fb-44e8-88de-83dd5df637a6
+11103,11100,"Explain how the sequence of images in print, digital and film texts has an effect on meaning",WA5ELALA3,0,,e192aaac-acd4-43c3-9320-1f64e6462e65
+11104,11100,"Understand how vocabulary is used to express greater precision of meaning, including through the use of specialist and technical terms, and explore the history of words",WA5ELALA4,0,,c6cf05bb-93eb-4e60-bf22-e701ba512c53
+11105,11100,"Use commas to indicate prepositional phrases, and apostrophes where there is multiple possession",WA5ELALA5,0,,69357aae-5eb6-45ae-a7de-67885d32c4a8
+11094,11091,Language for interacting with others,,0,,b022906f-e4ee-45f7-a917-cb9705574597
+11095,11094,Understand that language is selected for social contexts and that it helps to signal social roles and relationships,WA5ELAI1,0,,f63cfee0-fbc4-41d9-a438-ad13fc97ba76
+11096,11094,Understand how to move beyond making bare assertions by taking account of differing ideas or opinions and authoritative sources,WA5ELAI2,0,,bf96e7fe-06d2-4974-a65e-a95c9713f4a2
+11106,11091,Phonic and word knowledge,,0,,416f1100-ef0e-465f-9c31-fdc3f931e26e
+11107,11106,"Use phonic, morphemic and vocabulary knowledge to read and spell words that share common letter patterns but have different pronunciations",WA5ELAP1,0,,eea8e578-a337-4c97-8a30-6cfb2dab6007
+11108,11106,"Build and spell new words from knowledge of known words, base words, prefixes and suffixes, word origins, letter patterns and spelling generalisations",WA5ELAP2,0,,bf8e32cc-50e5-4673-bffd-845fa108d479
+11109,11106,"Explore less common plurals, and understand how a suffix changes the meaning or grammatical form of a word",WA5ELAP3,0,,dbc98fde-0e50-4024-8761-b54569700c3e
+11097,11091,"Text structure, organisation and features",,0,,8ee74d2c-8513-4d75-82ae-fddd964f4f78
+11098,11097,Compare how texts across learning areas are typically organised into characteristic stages and phases and use language features depending on purposes in texts,WA5ELAT1,0,,65166eac-b7e0-40f3-b487-b376bf48628e
+11099,11097,Understand how texts can be made cohesive by using the starting point of a sentence or paragraph to give prominence to the message and to guide the reader through the text,WA5ELAT2,0,,7af2a453-5b88-40ac-a7cb-1fbdec3bad88
+11093,10878,Literacy,,0,,cdd4428c-998d-4f39-aa0f-6c4d6514fbda
+11124,11093,"Analysing, interpreting and evaluating",,0,,7b09d59f-c790-4394-9ef5-86726067d239
+11125,11124,"Explain characteristic features used in imaginative, informative and persuasive texts to meet the purpose of the text",WA5ELYA1,0,,fa954554-7d38-47d8-b040-be9d83d33565
+11126,11124,"Navigate and read texts for specific purposes, monitoring meaning using strategies, such as skimming, scanning and confirming",WA5ELYA2,0,,1985892d-2637-4b22-9074-0dbdc7a236e0
+11127,11124,"Use comprehension strategies, such as visualising, predicting, connecting, summarising, monitoring and questioning when listening, reading and viewing to build literal and inferred meaning to evaluate information and ideas",WA5ELYA3,0,,5711b960-2183-479f-a3e2-1302818c36b6
+11129,11093,Creating texts,,0,,36d91786-5c7d-4342-811e-39adfae2778e
+11130,11129,"Plan, create, edit and publish written and multimodal texts whose purposes may be imaginative, informative and persuasive, developing ideas using visual features, text structure appropriate to the topic and purpose, text connectives, expanded noun groups, specialist and technical vocabulary, and punctuation, including dialogue punctuation",WA5ELYC1,0,,ded9e0a9-6d98-4856-857e-ece4e396fe42
+11131,11129,"Plan, create, rehearse and deliver spoken and multimodal presentations that include relevant, elaborated ideas, sequencing ideas and using complex sentences, specialist and technical vocabulary, pitch, tone, pace, volume, and visual and digital features",WA5ELYC2,0,,5fba526b-2115-4c77-94df-74a6a444cd12
+11132,11129,"Develop a handwriting style that is becoming legible, fluent and automatic",WA5ELYC3,0,,109e577d-55b6-49ca-9c2e-b2494332014d
+11133,11129,Use features of digital tools to create or add to texts for a purpose and audience,WA5ELYC4,0,,f2d37c20-49ae-4374-89d4-51e7c3249c4d
+11122,11093,Interacting with others,,0,,c182f455-e041-49ad-8594-23150ba6e7a4
+11123,11122,"Use appropriate interaction skills, including paraphrasing and critical literacy questioning to clarify meaning, make connections to own experience, and present and justify an opinion or idea",WA5ELYI1,0,,3f46bfe3-b4fd-4aed-8567-253b981ea99b
+11120,11093,Texts in context,,0,,3c6e82ac-aaaa-4b38-8521-ad964fd92152
+11121,11120,Describe the ways in which a text reflects the time and place in which it was created,WA5ELYT1,0,,f211883d-79ab-49f1-b3fd-28e7e51e9a52
+11092,10878,Literature,,0,,03bc1556-bcf0-4dbf-bfb8-013ef59b00b8
+11118,11092,Creating literature,,0,,f8ea8423-2b60-4f5d-ba72-a014168df041
+11119,11118,"Create and edit literary texts, experimenting with figurative language, storylines, characters and settings from texts students have experienced",WA5ELICR1,0,,f448efb4-fb12-41c2-831c-7ce6982b2b2c
+11113,11092,Engaging with and responding to literature,,0,,9d7e23aa-b04a-4621-9f7f-7ec9ae51f092
+11114,11113,"Present an opinion on a literary text using specific terms about literary devices, text structures and language features, and reflect on the viewpoints of others",WA5ELIEN1,0,,c9c9d104-07a7-4564-982f-453a323bb772
+11115,11092,Examining literature,,0,,cdb0f502-7ea9-4c4f-863b-0b68c7ef0afa
+11116,11115,Recognise that the point of view in a literary text influences how readers interpret and respond to events and characters,WA5ELIEX1,0,,97bbf678-6e0a-4f5d-a42f-906ad07505ae
+11117,11115,"Examine the effects of imagery, including simile, metaphor and personification, and sound devices in literary texts, such as narratives, poetry and songs",WA5ELIEX2,0,,0aea6761-69c5-49e7-84df-163794c0c0ff
+11110,11092,Literature and contexts,,0,,6faab10a-8573-4c29-a201-289691edae2e
+11111,11110,"Identify aspects of literary texts that represent details or information about historical, social and cultural contexts in literature by Aboriginal and Torres Strait Islander, wide‑ranging Australian and world authors",WA5ELICO1,0,,e5a0e672-19f3-4524-bc4a-965e149f5718
+10877,10871,Year 6,,0,,d340d66b-a50c-46af-afcc-97216f31466e
+11051,10877,Language,,0,,ecc9deb2-e303-4040-a411-8457d1c3cd8c
+11082,11051,Language for expressing and developing ideas,,0,,6527693d-a1dc-45a3-82f3-4754ae6236ae
+11083,11082,"Understand how embedded clauses can expand the variety of complex sentences to elaborate, extend and explain ideas",WA6ELALA1,0,,c9f76f15-896b-4a25-9696-d8eac7ea9b24
+11084,11082,"Understand how ideas can be expanded and sharpened through careful choice of verbs, elaborated tenses and a range of adverb groups",WA6ELALA2,0,,ae5094af-7ad0-45b1-a9e7-8f6827f9cd47
+11085,11082,"Identify and explain how images, figures, tables, diagrams, maps and graphs contribute to meaning",WA6ELALA3,0,,dc8b5d6a-6bb6-456a-97f2-84c6e8ebcada
+11086,11082,"Identify authors’ use of vivid, emotive vocabulary, such as metaphors, similes, personification, idioms, imagery and hyperbole",WA6ELALA4,0,,64fad90f-2e7e-49b0-aada-13a4b5cbaf6f
+11087,11082,"Understand how to use a comma for lists, to separate a dependent clause from an independent clause, and in dialogue",WA6ELALA5,0,,c81fd34c-bb1b-4f9c-a37c-2e0f6eb17755
+11076,11051,Language for interacting with others,,0,,239182fd-03fe-4a42-b188-dee0df1a3225
+11077,11076,Understand that language varies as levels of formality and social distance increase,WA6ELAI1,0,,744e44f6-0919-4f55-b087-cbd6e3b75d4c
+11078,11076,"Understand the uses of objective and subjective language, and identify bias",WA6ELAI2,0,,c2b043fb-5904-463f-a6bc-459464f38fd6
+11088,11051,Phonic and word knowledge,,0,,eb4ba240-41b8-4a3c-8c8b-219697e69749
+11089,11088,Use phonic knowledge of common and less common grapheme–phoneme relationships to read and write increasingly complex words,WA6ELAP1,0,,c62eff35-614b-4727-b5a7-efb233cceaae
+11090,11088,"Use knowledge of known words, word origins, including some Latin and Greek roots, base words, prefixes, suffixes, letter patterns and spelling generalisations to spell new words, including technical words",WA6ELAP2,0,,ce009544-cab6-4e05-91dc-ed9af9b05d39
+11079,11051,"Text structure, organisation and features",,0,,44f66bc7-58c3-4188-be31-ca69e9c944e6
+11080,11079,"Explain how texts across learning areas are typically organised into characteristic stages and phases depending on purposes, recognising how authors often adapt text structures and language features",WA6ELAT1,0,,60766817-2197-4d66-af70-33c96d3cbdc9
+11081,11079,"Understand that cohesion can be created by the intentional use of repetition, and the use of word associations",WA6ELAT2,0,,dfd86872-16a1-411f-bde2-2c881c894bcd
+11052,10877,Literacy,,0,,19f6e5e8-3210-42b1-88d5-d215251fc3f0
+11058,11052,"Analysing, interpreting and evaluating",,0,,f0e3fc74-a7c2-4af0-a1a9-039ed3439654
+11059,11058,Analyse how text structures and language features work together to meet the purpose of a text and engage and influence audiences,WA6ELYA1,0,,41d352c4-b02e-4172-8b9b-d96613826dfa
+11060,11058,"Select, navigate and read texts for a range of purposes, monitoring meaning and evaluating the use of structural features, such as a table of contents, glossary, chapters, headings and subheadings",WA6ELYA2,0,,162b3d22-9cbc-48a7-9c29-0a01df027b76
+11061,11058,"Use comprehension strategies, such as visualising, predicting, connecting, summarising, monitoring and questioning when listening, reading and viewing to build literal and inferred meaning, and to connect and compare content from a variety of sources",WA6ELYA3,0,,0c891211-b778-47f5-9668-fc47662c3200
+11062,11052,Creating texts,,0,,1ec6542c-b8f8-4737-b59f-d15591ccfe2c
+11063,11062,"Plan, create, edit and publish written and multimodal texts whose purposes may be imaginative, informative and persuasive, using paragraphs, a variety of complex sentences, expanded verb groups, tense, topic‑specific and vivid vocabulary, punctuation, spelling and visual features",WA6ELYC1,0,,d3de9506-a938-443b-9f6b-d9b182178814
+11064,11062,"Plan, create, rehearse and deliver spoken and multimodal presentations that include information, arguments and details that develop a theme or idea, organising ideas using precise topic‑specific and technical vocabulary, pitch, tone, pace, volume, and visual and digital features",WA6ELYC2,0,,e50bec6b-6fd8-4365-aac3-79194eff6873
+11065,11062,"Develop a handwriting style that is legible, fluent and automatic and varies according to purpose and audience",WA6ELYC3,0,,c41a9912-6553-4e8a-bb9b-f467152998df
+11066,11062,Select and use features of digital tools to create or add to texts for a purpose and audience,WA6ELYC4,0,,0e6bfc58-c5b3-4aac-bde5-1ffe4d577498
+11056,11052,Interacting with others,,0,,9ae5733c-2981-46d6-80a3-692332a16136
+11057,11056,"Use interaction skills and awareness of formality when paraphrasing, questioning, clarifying and interrogating ideas, developing and supporting arguments, and sharing and evaluating information, experiences and opinions",WA6ELYI1,0,,f90e7740-2e13-4e91-b99a-00659b407341
+11054,11052,Texts in context,,0,,ad06ba3d-6151-4c5b-81ee-495c6ace2aff
+11055,11054,"Examine texts, including media texts, that represent ideas and events, and identify how they reflect the context in which they were created",WA6ELYT1,0,,bab668fe-7447-40e3-8739-1a942e3e614a
+11053,10877,Literature,,0,,a2d774c9-3008-4c93-bd5d-f9831b49d131
+11074,11053,Creating literature,,0,,fb45bda3-01cf-43db-aa10-71ef676cb5f6
+11075,11074,"Create and edit literary texts that adapt plot structure, characters, settings and/or ideas from texts students have experienced, and experiment with literary devices",WA6ELICR1,0,,7a3526b6-485d-4152-828a-413839741e02
+11069,11053,Engaging with and responding to literature,,0,,f8db67be-bf7d-4283-9739-89b8a94f4640
+11070,11069,"Identify similarities and differences in literary texts on similar topics, themes or plots",WA6ELIEN1,0,,699c9476-27d1-49d6-a404-e9124ef19b41
+11071,11053,Examining literature,,0,,935060bb-dec2-47aa-9180-a18ff306badb
+11072,11071,Identify and explain characteristics that define an author’s individual style,WA6ELIEX1,0,,852e5b6e-da04-41ac-931d-6b967802144e
+11073,11071,"Explain the way authors use sound and imagery to create meaning and effect in literary texts, including poetry",WA6ELIEX2,0,,ab4d424e-1d7a-4e3a-9f78-9335783c7e84
+11067,11053,Literature and contexts,,0,,a780c69b-c2eb-4997-b13c-dd3d31a3487c
+11068,11067,"Identify responses to characters and events drawn from historical, social or cultural contexts in literary texts by Aboriginal and Torres Strait Islander, wide-ranging Australian and world authors",WA6ELICO1,0,,75dfd2df-34cd-4a80-bde0-1e98fa20ae1b
+10876,10871,Year 7,,0,,79c495b5-a780-402e-b0dc-f2084645c2ee
+11010,10876,Language,,0,,9b85d385-726b-4b3c-b709-e1b63e71f909
+11043,11010,Language for expressing and developing ideas,,0,,0c3b46bc-2869-4716-a3d5-69d9ddab81ab
+11044,11043,"Understand how complex and compound‑complex sentences can be used to elaborate, extend and explain ideas",WA7ELALA1,0,,10eb36a9-e812-4283-8a4d-d12e4f9789f1
+11045,11043,Understand how consistency of tense through verbs and verb groups achieves clarity in sentences,WA7ELALA2,0,,e1723dfc-88af-43d0-9a0f-16ecc12fede3
+11046,11043,"Analyse how techniques, such as vectors, angle and/or framing in visual and multimodal texts can be used to create a perspective",WA7ELALA3,0,,12ff2747-5f93-4ed7-8b00-48f5b12caf96
+11047,11043,"Investigate the role of vocabulary in building specialist and technical knowledge, including terms that have both everyday and technical meanings",WA7ELALA4,0,,c4e68d0b-f5a8-4188-a6d6-3fde5020d530
+11048,11043,"Understand and use punctuation, including colons and brackets to support meaning",WA7ELALA5,0,,43df0b55-04e3-4d8e-b71f-9fcd655fc7c1
+11037,11010,Language for interacting with others,,0,,f77d0d28-5d33-48e1-aeca-e3d08006678b
+11038,11037,Understand how language expresses and creates personal and social identities,WA7ELAI1,0,,88cea7b4-74a2-4044-b73b-585c96602c2e
+11039,11037,"Recognise language used to evaluate texts, including visual and multimodal texts, and how evaluations of a text can be substantiated by reference to the text and other sources",WA7ELAI2,0,,66013c97-d2ff-4a67-8992-0c7e6747e828
+11040,11010,"Text structure, organisation and features",,0,,de4002e7-663f-4fcd-9db3-950f8734457c
+11041,11040,Identify and describe how text structures and language features vary in texts according to purpose,WA7ELAT1,0,,8b7658c8-2743-4888-b021-a47e0178253d
+11042,11040,"Understand that the cohesion of texts relies on devices that signal structure and guide readers, such as overviews and initial and concluding paragraphs",WA7ELAT2,0,,cadb3278-e436-48d3-a756-fe2c97af2d31
+11049,11010,Word knowledge,,0,,7c831683-9983-4a42-9587-e5a6ece8350b
+11050,11049,"Understand how to use spelling rules and word origins; for example, Greek and Latin roots, base words, suffixes, prefixes and spelling patterns to learn new words and how to spell them",WA7ELAW1,0,,4ba4bb66-85d9-47f2-946a-645c0dc0f0de
+11011,10876,Literacy,,0,,07322a4b-7939-44ca-b09a-fa78928355ee
+11017,11011,"Analysing, interpreting and evaluating",,0,,97aa643d-56d0-4595-9f49-1a63fafe5599
+11018,11017,Analyse the ways in which language features shape meaning and vary according to purpose and audience,WA7ELYA1,0,,19c246cc-06c6-43e5-bb54-2736c1835c01
+11019,11017,"Explain how ideas are organised through the use of text structures, such as taxonomies, cause and effect, extended metaphors and chronology",WA7ELYA2,0,,83043c21-31dc-49a5-88fe-98183b68677f
+11020,11017,"Use comprehension strategies, such as visualising, predicting, connecting, summarising, monitoring, questioning and inferring, to analyse and summarise information and ideas when listening, reading and viewing",WA7ELYA3,0,,068b2a0b-693b-401f-b215-6507fece7423
+11021,11011,Creating texts,,0,,8ea08285-0d34-4b01-92f0-8eb5cb580518
+11022,11021,"Plan, create, edit and publish written and multimodal texts, selecting subject matter, and using text structures, language features, literary devices and visual features as appropriate to convey information, ideas and opinions in ways that may be imaginative, reflective, informative, persuasive and/or analytical",WA7ELYC1,0,,c699d56c-3526-4010-aab5-4b80a319e851
+11023,11021,"Plan, create, rehearse and deliver spoken and multimodal presentations for purpose and audience in ways that may be imaginative, reflective, informative, persuasive and/or analytical, by selecting text structures, language features, literary devices and visual features, and using features of voice, including volume, tone, pitch and pace",WA7ELYC2,0,,dccab900-01a6-477d-81cb-31b9a567bc93
+11024,11021,"Consolidate a personal handwriting style that is legible, fluent and automatic and supports writing for extended periods",WA7ELYC3,0,,8f41a993-91ff-4a15-872a-3e69ccdec4f0
+11025,11021,Select and use features of digital tools to create texts for different purposes and audiences,WA7ELYC4,0,,96880a29-db81-4f72-a672-316169752b22
+11015,11011,Interacting with others,,0,,65e958ce-9a73-45a4-85e8-33787e9fefeb
+11016,11015,"Use interaction skills when discussing and presenting ideas and information, including evaluations of the features of spoken texts",WA7ELYI1,0,,1760c505-9f8a-4785-a8d6-c8476a874ad7
+11013,11011,Texts in context,,0,,d714bd6a-78df-4e8b-8ece-a69018e231d7
+11014,11013,"Explain the effect of current technology on reading, creating and responding to texts, including media texts",WA7ELYT1,0,,a6f6cf91-54c8-4bcc-b0dc-29fa9306911f
+11012,10876,Literature,,0,,16519139-d555-4579-9587-80e8ee8f8e0c
+11035,11012,Creating literature,,0,,874e5d49-10c9-4402-af13-19485b62f59e
+11036,11035,Create and edit literary texts that experiment with language features and literary devices encountered in texts,WA7ELICR1,0,,c06d736f-f11e-4ec8-8d79-fa55bc194982
+11028,11012,Engaging with and responding to literature,,0,,c92c166b-4c26-4633-bc10-1eea663e1a8f
+11029,11028,"Form an opinion about characters, settings and events in texts, identifying areas of agreement and difference with others’ opinions and justifying a response",WA7ELIEN1,0,,30bf3a57-11bd-42ee-a9e7-8bc98e4284fe
+11030,11028,"Explain the ways that literary devices and language features, such as dialogue, and visual and audio features are used to create character, and to influence emotions and opinions in different types of texts",WA7ELIEN2,0,,7f477de2-0886-40b1-8e28-1ac8443c9546
+11031,11028,Discuss the aesthetic and social value of literary texts using relevant and appropriate metalanguage,WA7ELIEN3,0,,9bb54d27-2d8c-41f7-8060-0d83c4a49125
+11032,11012,Examining literature,,0,,aa3ac809-0f42-46ae-a559-64daf4d46cc2
+11033,11032,"Identify and explain the ways that characters, settings and events combine to create meaning in narratives",WA7ELIEX1,0,,e55baace-b813-4de4-9001-26e4585c82c2
+11034,11032,"Identify and explain how literary devices create layers of meaning in texts, including poetry",WA7ELIEX2,0,,43d07740-bef5-462e-8de2-90eca38549f8
+11026,11012,Literature and contexts,,0,,d92748f5-4d30-4617-b368-1423ea295fff
+11027,11026,"Identify and explore ideas, perspectives, characters, events and/or issues in literary texts drawn from historical, social and/or cultural contexts by Aboriginal and Torres Strait Islander, wide-ranging Australian and world authors and creators",WA7ELICO1,0,,35655eaf-409f-4c7d-8845-45f38f0b8952
+10875,10871,Year 8,,0,,d975e1d7-984e-4473-b2ec-efb8643d47f7
+10972,10875,Language,,0,,2cb5b5f2-d72f-4d65-b9a5-09f9655e1d1a
+11002,10972,Language for expressing and developing ideas,,0,,4b1aa8e7-8562-4da1-9db7-1393bf1017c2
+11003,11002,"Examine a variety of clause structures, including embedded clauses, that add information and expand ideas in sentences",WA8ELALA1,0,,98e03c67-7e26-4a65-88ca-d42120a727cd
+11004,11002,Understand the effect of nominalisation in texts,WA8ELALA2,0,,72c3066b-d589-4a10-8b99-3338e3f29ca1
+11005,11002,Investigate how visual and multimodal texts use intertextual references to enhance and layer meaning,WA8ELALA3,0,,89098146-d80c-4afb-bace-b5c46c45b7d5
+11006,11002,Identify and use vocabulary typical of academic texts,WA8ELALA4,0,,70f1bec0-546d-4c78-b3d6-a3c1e81ddc17
+11007,11002,"Understand and use punctuation conventions, including semicolons and dashes, to extend ideas and support meaning",WA8ELALA5,0,,f3ff0f00-379a-4a81-bcd4-bf50650bd9a7
+10996,10972,Language for interacting with others,,0,,678ff29f-71ba-4b50-a279-49eb996f37b5
+10997,10996,Recognise how language shapes relationships and roles,WA8ELAI1,0,,3f2528ff-ba3d-48e2-93cc-f0fab030803e
+10998,10996,"Understand how layers of meaning can be created within a text by using literary devices, such as simile and metaphor to evaluate",WA8ELAI2,0,,973795ab-a1fa-49ae-a99f-13a668691cdd
+10999,10972,"Text structure, organisation and features",,0,,a18e0eae-eb32-4f15-bacd-3fe84f914164
+11000,10999,"Explain how text structures and language features vary depending on their purpose, recognising that some texts are hybrids that combine different genres or elements of different genres",WA8ELAT1,0,,d18a37f7-8f93-4a3f-a567-09cf31ec0ed2
+11001,10999,"Understand how cohesion in texts is improved by strengthening the internal structure of paragraphs with examples, quotations and substantiation of claims",WA8ELAT2,0,,a3af5cb3-2ab1-42a1-b25f-c4ca0271a680
+11008,10972,Word knowledge,,0,,20e880f2-0de2-4db9-8086-ed62aeb8d049
+11009,11008,Apply learnt word knowledge to spell new words and apply strategies to maintain accuracy,WA8ELAW1,0,,97560196-350e-4ab4-84df-ca33e2e77f26
+10970,10875,Literacy,,0,,345b2192-c482-4fab-9747-430901a073f3
+10977,10970,"Analysing, interpreting and evaluating",,0,,9dede169-0f04-4124-8f0e-eea0873fdf8b
+10978,10977,"Analyse and evaluate the ways that language features vary according to the purpose and audience of the text, and the ways that sources and quotations are used in a text",WA8ELYA1,0,,9b056645-ce6c-48b5-a0c2-74317481e477
+10979,10977,Analyse how authors and creators use text structures to organise ideas and develop and shape meaning,WA8ELYA2,0,,7d9a0e0b-affa-410b-b800-50ec80ac2958
+10980,10977,"Use comprehension strategies, such as visualising, predicting, connecting, summarising, monitoring, questioning and inferring, to interpret and evaluate ideas when listening, reading and viewing",WA8ELYA3,0,,5be7bd43-2265-4147-be11-d24fc5396888
+10981,10970,Creating texts,,0,,599406df-ef02-42ba-a222-b1a8f727bf68
+10982,10981,"Plan, create, edit and publish written and multimodal texts, organising and expanding ideas, and selecting text structures, language features, literary devices and visual features for purposes and audiences in ways that may be imaginative, reflective, informative, persuasive and/or analytical",WA8ELYC1,0,,24ad8cf6-0431-496e-ad78-96698a8cf416
+10983,10981,"Plan, create, rehearse and deliver spoken and multimodal presentations for purpose and audience, selecting language features, literary devices, visual features and features of voice to suit formal or informal situations, and organising and developing ideas in texts in ways that may be imaginative, reflective, informative, persuasive and/or analytical",WA8ELYC2,0,,c8f4a829-4f24-46fd-8aa9-85e0d2b2e895
+10984,10981,"Consolidate a personal handwriting style that is legible, fluent and automatic and supports writing for extended periods in relevant required contexts",WA8ELYC3,0,,4da8db29-a7b7-4655-9afd-d65ba3bfc4eb
+10985,10981,Select and vary features of digital tools to create texts for different purposes and audiences,WA8ELYC4,0,,5a1fefde-62dc-4b0f-813d-d0ca38f5268d
+10975,10970,Interacting with others,,0,,4d621463-b3e6-4e12-9647-a61535971ff2
+10976,10975,"Use interaction skills for identified purposes and situations, including when supporting or challenging the stated or implied meanings of spoken texts in presentations or discussions",WA8ELYI1,0,,e33f34f1-f834-4f0d-a68c-9397b80aa00b
+10973,10970,Texts in context,,0,,40098276-fa32-4518-a5d9-5bf81db901f4
+10974,10973,Identify how texts relate to contexts,WA8ELYT1,0,,410f3062-91ed-478f-9d0b-b3546f340523
+10971,10875,Literature,,0,,ead84824-1ae3-4002-8295-1a6329b20c83
+10994,10971,Creating literature,,0,,10d4801d-3785-4d39-9829-643d7cc33733
+10995,10994,Create and edit literary texts that experiment with language features and literary devices for particular purposes and effects,WA8ELICR1,0,,0e0a3945-ab2c-422b-bd52-53f63aeec4c5
+10988,10971,Engaging with and responding to literature,,0,,02111ea5-c9f1-4331-8c69-5083006df6c2
+10989,10988,"Share opinions about the language features, literary devices and text structures that contribute to the styles of literary texts",WA8ELIEN1,0,,77391453-2054-42f0-bd70-15ffb5f7b9d4
+10990,10988,"Explain how language and/or visual and audio features in texts position listeners, readers and viewers to respond and form perspectives",WA8ELIEN2,0,,4afd8cc8-765a-47f2-bff0-188c775d971c
+10991,10971,Examining literature,,0,,a9ba93ab-45e6-447e-a95b-2b31a35e468c
+10992,10991,Identify intertextual references in literary texts and explain how the references enable new understanding of the aesthetic quality of the text,WA8ELIEX1,0,,721d9751-6bc4-45db-8907-a0fa61d9cc1f
+10993,10991,"Analyse how language features, such as sentence patterns create tone, and literary devices, such as imagery create meaning and effect",WA8ELIEX2,0,,5ad92a51-08f3-4a25-8edb-bba859d62b66
+10986,10971,Literature and contexts,,0,,7f4967d8-4343-4536-b2e2-e6df9c496e6a
+10987,10986,"Explain the ways that ideas and perspectives may represent the values of individuals and groups in literary texts drawn from historical, social and cultural contexts by Aboriginal and Torres Strait Islander, wide-ranging Australian and world authors and creators",WA8ELICO1,0,,27cc075d-5557-44c5-9377-8b1bc44d7cd9
+10874,10871,Year 9,,0,,eb37f0ed-94be-46b6-a5aa-a25b08438ea0
+10930,10874,Language,,0,,a03a2280-bb9c-47f6-9ae4-19d23eaa3c2b
+10939,10930,Language for expressing and developing ideas,,0,,361063e4-3831-4699-8a29-7a335aea96f2
+10940,10939,"Identify how authors vary sentence structures creatively for effects, such as intentionally using a dependent clause on its own or a sentence fragment",WA9ELALA1,0,,f13acbb5-b717-4708-b415-bb6291e565fd
+10941,10939,Understand how abstract nouns and nominalisation can be used to summarise ideas in texts,WA9ELALA2,0,,2d942baf-a930-47a7-aa45-211b0ca3fcbe
+10942,10939,Analyse how symbols in visual and multimodal texts augment meaning,WA9ELALA3,0,,adbf56ed-1261-400e-98c9-d9b8d916ddad
+10943,10939,"Analyse how vocabulary choices contribute to style, mood and tone",WA9ELALA4,0,,c8fd53c3-30d7-43ee-bd1b-3797866719cf
+10944,10939,Understand and use punctuation conventions for referencing and citing others for formal and informal purposes,WA9ELALA5,0,,ec869a82-d1e9-4b70-9b1a-aea0e6bb7ab9
+10933,10930,Language for interacting with others,,0,,b9aea944-e465-40e7-995a-a48d8a4fc0c6
+10934,10933,Recognise how language empowers relationships and roles,WA9ELAI1,0,,d569e37e-2f0d-4bd3-a59d-089ff42719da
+10935,10933,"Understand how evaluation can be expressed directly and indirectly using devices, such as allusion, evocative vocabulary and metaphor",WA9ELAI2,0,,810498ec-c3f7-4f90-92c8-2863ab9ca176
+10936,10930,"Text structure, organisation and features",,0,,a23f8e76-3291-4574-9aee-ee1170325fbe
+10937,10936,"Examine how authors and creators adapt text structures and language features by experimenting with spoken, written, visual and multimodal elements and their combination",WA9ELAT1,0,,f01d2332-bb73-4e7b-9008-791b449c3f8e
+10938,10936,"Investigate a range of cohesive devices that condense information in texts, including nominalisation, and devices that link, expand and develop ideas, including text connectives",WA9ELAT2,0,,626751df-7640-41ac-ae54-bd5f0ad93cf7
+10945,10930,Word knowledge,,0,,53e8bd16-f23f-4b1c-b40f-30d8c6a4f3ae
+10946,10945,"Use word knowledge to maintain conventional spelling, and recognise that spelling can be varied for particular effects",WA9ELAW1,0,,fa7d9a28-5e44-49a7-a010-3809bc2d6a06
+10932,10874,Literacy,,0,,bacd7abb-74f4-4080-b3e6-7f0f6b056b50
+10961,10932,"Analysing, interpreting and evaluating",,0,,ddf5ab3d-89fc-43f5-bc95-96dab926463f
+10962,10961,"Analyse and evaluate how language features are used to represent a perspective of an issue, event, situation, individual or group",WA9ELYA1,0,,18fabeb9-ac2d-42ae-968d-2d557a63160d
+10963,10961,"Analyse the use of text structures within paragraphs and extended texts, and evaluate their impact on ideas and meaning",WA9ELYA2,0,,466cb7af-2e2f-4a78-b6f4-de492ffbec8b
+10964,10961,"Use comprehension strategies, such as visualising, predicting, connecting, summarising, monitoring, questioning and inferring, to compare and contrast ideas and opinions in and between texts when listening, reading and viewing",WA9ELYA3,0,,d43e4558-c6ad-488c-9cff-8b8b3fbf5685
+10965,10932,Creating texts,,0,,6fe2d590-3def-4025-9466-88a1425b1477
+10966,10965,"Plan, create, edit and publish written and multimodal texts, organising, expanding and developing ideas, and selecting text structures, language features, literary devices and multimodal features for purposes and audiences in ways that may be imaginative, reflective, informative, persuasive, analytical and/or critical",WA9ELYC1,0,,70c196b4-48b8-4e58-9481-a62d156f85f4
+10967,10965,"Plan, create, rehearse and deliver spoken and multimodal presentations for purpose and audience, using language features, literary devices and features of voice, such as volume, tone, pitch and pace, and organising, expanding and developing ideas in ways that may be imaginative, reflective, informative, persuasive, analytical and/or critical",WA9ELYC2,0,,8b93052d-57f9-4f36-bf77-4d7b6b3587d1
+10968,10965,"Consolidate a personal handwriting style that is legible, fluent and automatic and supports writing for extended periods in relevant required contexts",WA9ELYC3,0,,845132de-9850-486c-be28-cac50d173b1c
+10969,10965,Select and experiment with features of digital tools to create texts for a range of purposes and audiences,WA9ELYC4,0,,3d9ab855-a9ca-42ef-a367-b5af4c1821d3
+10959,10932,Interacting with others,,0,,42c4751b-ed6a-4bad-8779-a978586b0bc0
+10960,10959,"Listen to spoken texts that have different purposes and audiences, analysing how language features position listeners to respond in particular ways, and use interaction skills to present and discuss opinions regarding these texts",WA9ELYI1,0,,f37908ac-ab05-4ff7-a23f-129d9912c1dc
+10957,10932,Texts in context,,0,,249c7a92-8703-4050-a51d-aae58ed3bbf4
+10958,10957,"Analyse how representations of people, places, events and concepts relate to contexts",WA9ELYT1,0,,50a097a6-7ce1-444e-9284-0cc56946c657
+10931,10874,Literature,,0,,290b133c-aeb0-4a5a-a5be-9141657abe98
+10955,10931,Creating literature,,0,,92490633-5b95-4a69-bee1-4235fc96c05a
+10956,10955,"Create and edit literary texts, which may be hybrid, that experiment with text structures, language features and literary devices for purposes and audiences",WA9ELICR1,0,,61a7c936-e90d-48f4-a389-6a1668c745e7
+10949,10931,Engaging with and responding to literature,,0,,4ecdd56f-361b-4de7-8a44-82fbe9eecc86
+10950,10949,Present a personal response to a literary text comparing initial impressions and subsequent analysis of the whole text,WA9ELIEN1,0,,8684f76b-9e96-4e70-9367-ca87b9f1d3b2
+10951,10949,Analyse how features of literary texts influence readers’ preference for texts,WA9ELIEN2,0,,94c2a1d7-78fe-4063-9134-b0e4e38b88c9
+10952,10931,Examining literature,,0,,7c913e96-1a37-422e-be91-48d458aa0442
+10953,10952,Analyse texts and evaluate the aesthetic qualities and appeal of an author’s and creator’s literary style,WA9ELIEX1,0,,d6dfa22c-e45d-494c-8c0c-2b6c05614afd
+10954,10952,"Analyse the effect of text structures, language features and literary devices, such as extended metaphor, metonymy, allegory, symbolism and intertextual references",WA9ELIEX2,0,,1f38b079-c66d-41d7-ba2f-b6d917b2c691
+10947,10931,Literature and contexts,,0,,56f81547-1dca-49d4-a1d0-7b6ca1bfcc65
+10948,10947,"Analyse the representations of people and places in literary texts drawn from historical, social and cultural contexts by Aboriginal and Torres Strait Islander, wide-ranging Australian and world authors and creators",WA9ELICO1,0,,028d32fd-a630-4043-b5c1-60ae162820ad
+10872,10870,Health and Physical Education,,0,,628069cc-427f-4356-b26e-17dbb9fe91f4
+11549,10872,Pre-primary,,0,,4cd7197f-a4fe-4372-b2bf-1d842427404b
+11859,11549,Movement and Physical Activity,,0,,3ff3564c-8f1e-49f6-bd17-7574a97c4552
+11867,11859,Interpersonal skills,,0,,b6717698-fb64-4bb0-94be-789a160c7e13
+11868,11867,"Cooperation skills when participating in physical activities, including partners, small groups and whole class",WAPHEPMI1,0,,0d79b424-a59a-4a47-ba08-476d2ab46e3d
+11860,11859,Movement skills,,0,,ea99fbbe-9675-4bb2-8e0a-7067fd5679fd
+11861,11860,"Introduce fundamental movement skills:  Body management (static balance (one foot); climb line; walk) Locomotor (run, hop, gallop) Object control (underarm throw; underarm roll; catch)",WAPHEPMM1,0,,1d626e4d-2a0d-4635-96de-491c57a8246f
+11862,11860,"Apply fine and gross motor skills, play, and structured activities in increasingly complex patterns",WAPHEPMM2,0,,0fd3556e-fa66-4e9c-b415-cf4045a19299
+11863,11860,"Movement skills combining elements of effort, space and time",WAPHEPMM3,0,,938de0ed-ddb6-41a9-bfcd-1956eda2d98f
+11864,11859,Understanding movement,,0,,3a8d728b-6027-449c-8370-7466cf79055f
+11865,11864,"Ways in which safe and active play, and regular physical activity keep individuals healthy and well",WAPHEPMU1,0,,341d1017-43d8-4f4e-84eb-e053074d6b91
+11866,11864,Rules when participating in physical activities,WAPHEPMU2,0,,e13bf4bb-4a2b-4c69-bfaa-7c45f512ffd5
+11607,11549,"Personal, Social and Community Health",,0,,6947f49e-6099-49d7-ac06-537332130478
+11616,11607,Healthy and active communities,,0,,f3ecb606-2b26-4f6c-b568-e5e12fa31794
+11617,11616,Actions that promote health and wellbeing,WAPHEHPH1,0,,6e64e4d8-3d72-461b-a5c1-383a4c40757d
+11618,11607,Interacting with others,,0,,4bf7390f-7446-4711-86bb-c3395e584d39
+11619,11618,Personal and social skills to interact respectfully with others,WAPHEHPI1,0,,83d98a2c-1707-4327-a2b9-efa12e24ae52
+11620,11618,Emotional responses individuals may experience in different situations,WAPHEHPI2,0,,87f1efc1-d362-4ade-9778-cd2b61a8c68e
+11608,11607,Personal identity and change,,0,,caf534e2-9c30-4b4b-ba65-5ff60acc837a
+11609,11608,Personal strengths and qualities of individuals and a sense of belonging to groups and communities,WAPHEHPP1,0,,d690a5e5-8ab2-4cc5-80e4-84e43554ea52
+11610,11608,"Body parts, visible and private, and where they are located",WAPHEHPP2,0,,7f939a38-702f-4833-8cae-9723e9ffb349
+11611,11607,Staying safe,,0,,c27e96ec-a6c1-4000-9466-0eafd63d059d
+11612,11611,Protective behaviours and help-seeking strategies to keep safe,WAPHEHPS1,0,,e0f3d895-7310-43e4-998b-c49470817540
+11613,11611,Trusted people in the community who can help individuals feel safe,WAPHEHPS2,0,,c455ec8c-29da-4214-b046-b64d5561774d
+11614,11611,Actions that promote safety in a range of situations,WAPHEHPS3,0,,7ed74886-8a21-4d3f-9949-5839c1ba2079
+11615,11611,"Appropriate language and actions to communicate feelings in different situations, including exploring how to seek, give or deny permission when sharing possessions or personal space",WAPHEHPS4,0,,377dff41-c0d8-4167-afd2-cc5a80536afe
+11545,10872,Stage A,,0,,6f6baafe-cd19-4cde-83e1-3669926a7814
+11815,11545,Movement and Physical Activity,,0,,5eac0f2d-1225-4cbe-b29f-90e7bae897f6
+11822,11815,Learning through movement,,0,,78a8c378-1a6a-47d2-9562-40067a2839d8
+11823,11822,Cooperate when experiencing physical activities and movement,VCHPEM012,0,,3567e6e4-f05c-434c-a938-9152385ddfa9
+11824,11822,Experience body movement and demonstrate some basic movements,VCHPEM013,0,,d8f91a1c-bfad-406b-96cb-741d1f8e0d8f
+11825,11822,Engage in physical activities,VCHPEM014,0,,2958efc8-140d-4fe4-8e77-1daff8ad0e47
+11816,11815,Moving our body,,0,,f8161c53-b0bb-400a-8bb1-00098aa14ff3
+11817,11816,Experience their body being moved through a variety of positions and locations,VCHPEM008,0,,0d772167-1ebd-412d-9454-2c4396d707ed
+11818,11816,Experience a variety of physical and structured leisure activities,VCHPEM009,0,,4cda47f7-ff3b-4f87-906b-f78654ca430b
+11819,11815,Understanding movement,,0,,ed224e5e-8b6b-484b-974f-d67790bbb595
+11820,11819,Experience regular physical activities and begin to develop an awareness of how different parts of the body move,VCHPEM010,0,,65a60311-9a1a-441f-94c8-f7cc843dbbec
+11821,11819,"Experience their body moving in relation to effort, space, objects and people",VCHPEM011,0,,16641baf-99b3-4b6d-b52e-c2d035d32a65
+11560,11545,"Personal, Social and Community Health",,0,,c0da1574-1578-4678-951f-d8d018b47acc
+11564,11560,"Being healthy, safe and active",,0,,349a23ad-9b17-403d-94a3-097ead4d5a47
+11565,11564,Identify self (self-awareness),VCHPEP001,0,,fce3d714-7ca6-41ad-9821-4e11752fad6e
+11566,11564,React as body parts are moved and named,VCHPEP002,0,,4ed0d96d-a265-4b05-aa09-49a87adeb10f
+11567,11564,React to significant people,VCHPEP003,0,,2ec70f00-2b85-44c1-b85b-143b6edf3872
+11568,11560,Communicating and interacting for health and well being,,0,,9e98195d-3ca2-402c-bf0f-d049d14d8d82
+11569,11568,React to people and sensory experiences,VCHPEP004,0,,e8c26ad0-065a-4492-80c3-42d4e39a431d
+11570,11568,Use facial expressions to indicate an emotion and demonstrate preference,VCHPEP005,0,,37039ff8-2ef4-4439-861e-23d3bfecd92b
+11571,11560,Contributing to healthy and active communities,,0,,53187bdb-2d7c-486a-8cac-e717da73b42f
+11572,11571,Experience health and safety actions,VCHPEP006,0,,021dd761-b660-48a1-b1e0-e1a3ae567530
+11573,11571,Experience play activities,VCHPEP007,0,,0203b2bd-4554-4ba4-822c-d9681005532e
+11546,10872,Stage B,,0,,dd020566-a99f-42c6-95fc-e508fa0026ec
+11826,11546,Movement and Physical Activity,,0,,5b6127ed-6694-446f-9dfa-6d51d9dc4084
+11833,11826,Learning through movement,,0,,777f35f9-676f-4a8a-825d-777d41476466
+11834,11833,Cooperate with an adult to use equipment during physical activity,VCHPEM026,0,,34464965-9ed9-4e69-a1f0-5be46c185555
+11835,11833,"Use trial and error to develop balance, independent moving across surfaces and manipulation skills",VCHPEM027,0,,bcd2afe3-faa8-4074-8cff-5641b835b7a3
+11836,11833,Follow basic single word instructions when participating in structured physical activities,VCHPEM028,0,,412ef39c-db5b-4b79-9bb4-777f16b30b96
+11827,11826,Moving our body,,0,,2eaf4885-4646-47ca-9e85-f77e93e12503
+11828,11827,Practise basic gross motor movements,VCHPEM022,0,,b475622e-5e28-41f8-81a7-ad18d5ccd41f
+11829,11827,Engage in a variety of physical activities and explore basic play equipment,VCHPEM023,0,,5ceab08d-663b-4ba4-a51a-915330f3f09f
+11830,11826,Understanding movement,,0,,306f5461-eb5d-4bcb-a760-b547335ea593
+11831,11830,Engage in regular physical activities and explore the development of their ability,VCHPEM024,0,,f1070f8e-2d6f-4379-a6c9-7a0172209c9c
+11832,11830,"Explore the space around them and learn to move in relation to effort, space and objects",VCHPEM025,0,,3662a896-7a66-46d7-ad76-2dbcb5e1388c
+11574,11546,"Personal, Social and Community Health",,0,,85cf83a7-7462-4b2a-a70b-01d912164632
+11575,11574,"Being healthy, safe and active",,0,,465b0533-19ac-4e09-88a9-3fb249e4d982
+11576,11575,Identify what they like and dislike,VCHPEP015,0,,0afa8538-9042-4562-b631-ce1199d828d6
+11577,11575,Identify some major body parts,VCHPEP016,0,,a86dfa4b-1be1-4fe6-a32a-66a96d16b6a8
+11578,11575,Identify significant people and communicate when they feel safe/unsafe,VCHPEP017,0,,590544ea-9025-4067-b33c-210669257243
+11579,11574,Communicating and interacting for health and well being,,0,,e0730ae8-2de9-4dff-a54a-82b6fd1aed2c
+11580,11579,"Practise basic skills of personal care and communicate basic needs, likes and dislikes and experience the social skills of turn taking and sharing",VCHPEP018,0,,d946f223-27b4-4c3d-aee2-9548e64fdeca
+11581,11579,"Express their feelings, needs, likes and dislikes",VCHPEP019,0,,0e791e5b-1b4b-475f-85e9-4cba63672fc0
+11582,11574,Contributing to healthy and active communities,,0,,4b87e509-a459-4d33-9cad-60621e3a1a67
+11583,11582,"Participate in a variety of health, safety and wellbeing actions",VCHPEP020,0,,62fc488a-bff5-4a86-9639-4c722e0457d8
+11584,11582,Engage in structured play activities,VCHPEP021,0,,3a83f1bc-f5c1-494a-81c5-17dc10d9fab9
+11547,10872,Stage C,,0,,cc1f68e3-978c-4c5d-874c-8ead85457772
+11837,11547,Movement and Physical Activity,,0,,a5a287c8-68b6-42b2-8900-b4c9a2c353d3
+11844,11837,Learning through movement,,0,,13a7fa1e-614c-4a05-ba75-92a9863159e3
+11845,11844,Take turns with a partner or in small groups when participating in physical activities,VCHPEM040,0,,e5458b5c-da96-43e9-a643-3c2c51a65264
+11846,11844,Test possible solutions to movement challenges through trial and error to maintain balance and coordination as they move over and through a range of surfaces and grasp and manipulate objects,VCHPEM041,0,,89377ad5-81dd-4d89-a7e7-88b19e63dee8
+11847,11844,Follow simple movement instructions and safety rules when participating in structured physical activities,VCHPEM042,0,,77099828-cc93-461c-9f1c-0668442b2000
+11838,11837,Moving our body,,0,,dfe620fe-613a-4ac5-98ab-254df98de465
+11839,11838,Practise simple whole-body movements and gross motor movement patterns,VCHPEM036,0,,29280f0e-3c4d-4a5d-b1c0-a2c6c89be82c
+11840,11838,Participate in a variety of physical education experiences and games with simple rules with equipment in a range of environments,VCHPEM037,0,,7e8ed21d-d3ee-4c16-bf0e-30e20aae4001
+11841,11837,Understanding movement,,0,,d641f301-f45c-48da-a94a-88b69b20294d
+11842,11841,Engage in regular physical activities and explore the development of their ability and health,VCHPEM038,0,,cc7ca387-0325-47a8-a358-0e620dcbd87a
+11843,11841,Identify how their body moves and relate to space and objects,VCHPEM039,0,,96e88778-8431-4160-bff7-a859edeee26e
+11585,11547,"Personal, Social and Community Health",,0,,5dadfa77-f6dd-4d97-8c09-aaa454659af1
+11586,11585,"Being healthy, safe and active",,0,,61806bd9-f304-4227-a7a4-7ddc96565d90
+11587,11586,Identify their personal characteristics,VCHPEP029,0,,4e719494-e921-4abd-83c1-90ae8b851883
+11588,11586,Identify major body parts and stages of life,VCHPEP030,0,,3033cb14-52a6-4ffd-b696-ad2e64735076
+11589,11586,"Identify and name members of immediate family and demonstrate safety awareness, respond to safety instructions and identify safe and unsafe places and items in the environment",VCHPEP031,0,,f9bf1d6f-d606-43d9-83df-ef6e0dcccc99
+11590,11585,Communicating and interacting for health and well being,,0,,455c7bf6-514e-4d08-9bac-82511206daad
+11591,11590,"Practise personal hygiene, independence skills and social skills including taking turns",VCHPEP032,0,,75b94f55-2f59-43de-aed1-7f727c441ce1
+11592,11590,"Explore their feelings and practice expressing their needs, likes and dislikes using simple communication tools",VCHPEP033,0,,5b054ea5-c57b-4179-aeb0-6802e6d66d7d
+11593,11585,Contributing to healthy and active communities,,0,,69c1bdb3-bdec-44c7-8b5c-6a3a1f0f1696
+11594,11593,"Practise a variety of health, safety and wellbeing actions",VCHPEP034,0,,6933f010-4acc-41f5-9975-707b25d64860
+11595,11593,Participate in structured play in various settings,VCHPEP035,0,,26db4486-3c18-4840-9137-81d6f85962c3
+11548,10872,Stage D,,0,,5e3b578c-8a38-4e3d-97c9-28585c67f5c8
+11848,11548,Movement and Physical Activity,,0,,dfd7592b-628b-47d8-a16e-8f097917bd19
+11855,11848,Learning through movement,,0,,4f276bee-1891-47b7-8e34-91ae151fa400
+11856,11855,Cooperate with others and demonstrate characteristics of a good sport when participating in physical activities,VCHPEM054,0,,907c183d-a7a8-4fed-871b-686b91f4a98d
+11857,11855,Test possible solutions to movement challenges by negotiating the space around them and manipulate objects,VCHPEM055,0,,f0eaac9e-71c8-4647-9d29-1ac2968ada05
+11858,11855,"Follow basic safety directions, and familiar game rules when participating in physical activities",VCHPEM056,0,,9a0f6292-fd26-4eb0-b9ac-cdf3471e1116
+11849,11848,Moving our body,,0,,8a868419-3b5b-47b5-bd34-13f14c85ab61
+11850,11849,Practise simple gross motor and fine motor skills in a range of environments showing increasing control,VCHPEM050,0,,86a9c0db-bb33-4c51-bd61-28f6d5236204
+11851,11849,Participate in simple games with support and begin to anticipate the next step in familiar physical routines,VCHPEM051,0,,5b644ab3-b2f5-4f24-90f4-47651d878de2
+11852,11848,Understanding movement,,0,,7b7f96d6-1b75-475a-be13-6a2fa503d6ec
+11853,11852,Explore how regular physical activity keeps them healthy and well,VCHPEM052,0,,9ae39b3c-ed96-4922-a7bc-92ec5bb98a19
+11854,11852,"Identify their pathway through a space and use vocabulary associated with movement to describe how their body moves in relation to space, objects and people",VCHPEM053,0,,3a300261-fdfc-4d34-8755-c371c770e460
+11596,11548,"Personal, Social and Community Health",,0,,04caf21e-c234-4808-b823-7aaef6077eea
+11597,11596,"Being healthy, safe and active",,0,,f45635ce-0be2-4bd9-8908-02dbc410b270
+11598,11597,Identify what they can do,VCHPEP043,0,,5696b493-d078-4aa3-9a3b-8ef41f1b185e
+11599,11597,Identify the major parts of the body by their names and sequence images of major stages of life,VCHPEP044,0,,16a9c49f-c1b9-4d59-bf34-121d5dc16fcb
+11600,11597,Demonstrate an understanding of different kinds of relationships and identify some private places and safe and unsafe places or situations,VCHPEP045,0,,d5ca08ba-f2e9-40fe-a23d-fab15bbcf246
+11601,11596,Communicating and interacting for health and well being,,0,,cac5b52c-f723-4af4-bbfb-bff6aa6de49c
+11602,11601,"Practise personal skills of self-care, hygiene and independence and practise social skills to interact with others",VCHPEP046,0,,c48ab9a7-6d08-46d7-becf-4bf17256711c
+11603,11601,Identify emotional responses and describe their feelings using pictures and/or words,VCHPEP047,0,,4a9a5b12-f64c-4e41-800f-d1dddb363ede
+11604,11596,Contributing to healthy and active communities,,0,,404b2b7c-83d4-43d2-876a-6e950ba66aba
+11605,11604,"Explore what actions promote health, safety and wellbeing",VCHPEP048,0,,4eb3d9c3-d98c-4e25-b533-b79300f50a7d
+11606,11604,Explore play in outdoor settings and the natural environment,VCHPEP049,0,,2b3473c9-37e0-4e26-900e-09671afd661a
+11551,10872,Year 1,,0,,1379523a-bdad-45af-8841-022dcbb8fbc2
+11869,11551,Movement and Physical Activity,,0,,19556cc8-6af1-41fd-bd03-ecb7e9a76e7e
+11877,11869,Interpersonal skills,,0,,dd1f2d25-ce17-4bce-a0e9-7119e779db14
+11878,11877,Cooperation skills in partner and group work during physical activity practices,WA1HEPMI1,0,,3b4ef6d9-252c-4f06-a9bd-27c83cb552c2
+11870,11869,Movement skills,,0,,3d8767aa-76ae-4852-93a3-0fbd8c109a3e
+11871,11870,Introduce fundamental movement skills:  Body management (side roll (pencil); dynamic balance) Locomotor (jump (one foot); jump (distance); skip (step-hop movement)) Object control (overarm throw; kick-off the ground; two-handed side strike),WA1HEPMM1,0,,67c019af-0eb3-4fbb-b3e4-9beb4ecda1ae
+11872,11870,Apply and consolidate fine and gross motor skills previously learnt through minor games and play situations,WA1HEPMM2,0,,5137eaf5-136a-4c97-8f70-b18d350d1ee1
+11873,11870,"Movement skills that combine the elements of effort, space and time",WA1HEPMM3,0,,eef5aaef-9b0f-4aaf-9ae3-c48ee4d1a54a
+11874,11869,Understanding movement,,0,,f3e87063-f922-40c3-83c3-74f14e69608d
+11875,11874,Ways in which the body reacts during moderate physical activity,WA1HEPMU1,0,,0fdd0bd2-0cf2-4fb2-8a81-287d2e0ec2e9
+11876,11874,"Simple rules and fair play in partner or group activities, and minor games",WA1HEPMU2,0,,e03ac0de-0c1f-4197-baf1-c9d933737d1a
+11621,11551,"Personal, Social and Community Health",,0,,5d415175-83ae-45d7-9ce5-34447f1ec7b8
+11629,11621,Healthy and active communities,,0,,61d11298-24b5-4d27-89fa-acc425140fc4
+11630,11629,Benefits of healthy eating and regular physical activity on health and wellbeing,WA1HEHPH1,0,,a7a2dbfb-107b-4867-a50d-6cc29c784119
+11631,11629,Ways health messages are communicated in the media,WA1HEHPH2,0,,6de23dcd-a066-4ab6-83d5-00f3d8d997d9
+11632,11629,Actions that support a safe and inclusive environment,WA1HEHPH3,0,,c0fc887e-76e8-4d48-b55e-c15be13ef399
+11633,11621,Interacting with others,,0,,8df3ea23-4f7e-42d1-b3cb-8d6e7aa95b98
+11634,11633,Skills and strategies to develop respectful relationships,WA1HEHPI1,0,,a0b28076-d768-4e4f-9ac4-901de5090941
+11635,11633,Appreciation and encouragement of the behaviour of others through the use of: culturally appropriate manners; positive language; praise,WA1HEHPI2,0,,a628ada0-d5e1-4df9-b7d9-45eadf376b21
+11636,11633,Positive ways to react to their own emotions in different situations,WA1HEHPI3,0,,87bb2c28-bec7-4a1d-ab69-32d53aee94b6
+11622,11621,Personal identity and change,,0,,eab344d4-ff8a-436c-8ae6-c78b5a7f5876
+11623,11622,Personal strengths and qualities and how they change over time,WA1HEHPP1,0,,ee4b44c0-7d05-4fe7-83ce-7643d83305c6
+11624,11622,"Changes to the body, visible and private, as individuals grow older",WA1HEHPP2,0,,7fa07249-30e3-48e9-b254-30d82e2507b2
+11625,11621,Staying safe,,0,,4e59e314-51da-4b84-9292-ac07e0acb7f5
+11626,11625,Protective behaviours and help-seeking strategies to keep safe,WA1HEHPS1,0,,78bf024b-8ed7-4d6e-8dd5-b41c3ec547a7
+11627,11625,Strategies to use when help is needed,WA1HEHPS2,0,,db7a80ca-4439-46a7-823d-57756074bdf8
+11628,11625,"Strategies to use when needing to seek, give or deny permission are practised",WA1HEHPS3,0,,439d0caa-3a8a-49e7-9f16-07ddc6d00c00
+11550,10872,Year 10,,0,,f26bff2c-78ed-4f9b-bad8-f6bea1b71eb1
+11786,11550,Movement and Physical Activity,,0,,cdf2b17c-6bd8-4da1-859c-ec19b921cdda
+11811,11786,Interpersonal skills,,0,,e5546cb6-a069-4328-ae9a-586bccf8e8df
+11812,11811,Skills and strategies to improve team or group performance,WA10HEPMI1,0,,68be069c-e9b2-4af0-8229-8ddb42e58b2a
+11813,11811,Application of fair play and ethical behaviour and ways they can influence the outcome of physical activities,WA10HEPMI2,0,,9fc7617c-5f07-4b6a-b033-77e618e1869f
+11814,11811,Management of levels of participation and rules during physical activities,WA10HEPMI3,0,,975416d7-7f2f-40c7-bca0-031f74427e71
+11803,11786,Movement skills,,0,,bae159a8-a0b1-46dc-a690-a3296ebfa9ef
+11804,11803,Movement skills and sequences within different physical activity contexts and settings reflecting:  increased complexity; transference of skills to other activities,WA10HEPMM1,0,,a2ce9f42-4440-470d-9c76-8ab7c3fd10fd
+11805,11803,"The impact of changes to effort, space or time on skills, strategies and tactics in a range of movement contexts and settings",WA10HEPMM2,0,,09d8e08f-0ae6-4fbb-b2d8-2b1aa9a63256
+11806,11803,"Evaluation, selection and implementation of responses to changing conditions based on the outcome of previous performances",WA10HEPMM3,0,,dfbfd723-fdef-40a0-a7db-f5ba0bbbaded
+11807,11803,"Lifelong physical activities to enhance health, fitness and wellbeing, including moving in natural environments",WA10HEPMM4,0,,6831c3e8-3861-4451-bc1c-e31dc02053df
+11808,11786,Understanding movement,,0,,5931d1e2-cf04-475f-8097-fc86be720d6a
+11809,11808,Measurement of the body’s response to physical activity:  perceived exertion rating,WA10HEPMU1,0,,758b63c5-64e3-444f-b763-7595ad9100e0
+11810,11808,"Personalised plans for improving or maintaining physical activity levels to improve health, fitness and wellbeing",WA10HEPMU2,0,,0217a89e-1484-4c3b-a585-40c7303e48a0
+11787,11550,"Personal, Social and Community Health",,0,,cb1a4240-84dc-4caa-9c41-81fd6755faca
+11795,11787,Healthy and active communities,,0,,51198ac7-04cb-484c-a312-773d124ba386
+11796,11795,"Health information, support services and media messaging about relationships, lifestyle choices, health decisions and behaviours",WA10HEHPH1,0,,da17c87b-70b5-49d1-accd-be0a7096a89f
+11797,11795,"Health promotion designed to raise awareness, influence attitudes, promote healthy behaviours and increase connection to the community",WA10HEHPH2,0,,ade3704c-8751-403a-b02f-77f78372d565
+11798,11795,"Social, economic and environmental factors that can influence health",WA10HEHPH3,0,,b5f44076-e656-470a-8cd3-d4be0bdbe616
+11799,11787,Interacting with others,,0,,e6f73b03-fda9-4d18-a4d0-22e1d70cc43e
+11800,11799,Skills and strategies to promote respectful relationships,WA10HEHPI1,0,,e8c0c258-bacf-4624-82fa-5da530ebe426
+11801,11799,"Influences on sexuality and sexual health behaviours, including the impact decisions and actions have on own and others’ health and wellbeing",WA10HEHPI2,0,,a3decbb8-4562-4f95-9cd6-7a1faba4a455
+11802,11799,Managing the effects of emotional responses on relationships,WA10HEHPI3,0,,adc95b0e-01c6-46f5-8bd3-edec81fbdb51
+11788,11787,Personal identity and change,,0,,961e2412-9a7a-4d0b-997b-a952e1b16616
+11789,11788,Impact of societal and cultural influences on personal identities and health behaviour,WA10HEHPP1,0,,2a275ebb-2d4b-42c6-b42c-b582155fd450
+11790,11787,Staying safe,,0,,a240884d-52c3-4024-b80e-3bcceb6ff238
+11791,11790,"Analysis of health information and content related to:  alcohol, drugs or other harmful substances; body image; processed food; road safety; relationships",WA10HEHPS1,0,,4e217314-63cc-45fa-b886-a70d53509a6c
+11792,11790,Skills and strategies to manage situations where risk is encouraged by others,WA10HEHPS2,0,,01ee10cd-19d1-4732-aa41-9597ba0341b6
+11793,11790,Skills and strategies to manage situations where response to an emergency situation is required,WA10HEHPS3,0,,087f7938-e6ba-427b-8921-9ffadad6f2d9
+11794,11790,"Strategies are examined, such as communicating choices, seeking, giving and denying consent, and expressing opinions and needs that can support the development of respectful relationships, including sexual relationships",WA10HEHPS4,0,,435ade8b-a8fe-48a2-8cb3-82c6b43cf47a
+11552,10872,Year 2,,0,,4e988243-f633-40ab-92e2-399b47e45ab5
+11879,11552,Movement and Physical Activity,,0,,514ce83c-d658-4212-8972-512281c8b9d0
+11888,11879,Interpersonal skills,,0,,752616c9-59be-49d5-9a09-6e7abbb1dfea
+11889,11888,Positive choices when participating in group activities,WA2HEPMI1,0,,4c276a32-1912-4e27-b090-aa21ff3ea5c6
+11880,11879,Movement skills,,0,,beb1131e-50c9-4d99-ab5c-608b31692c0e
+11881,11880,Introduce fundamental movement skills:  Body management (forward roll) Locomotor (jump (height); side gallop) Object control (one-handed strike; hand dribble; ball bounce and catch),WA2HEPMM1,0,,2b551a4a-51e5-4066-af9e-3b35dd5886e1
+11882,11880,Apply and consolidate movement skills previously learnt through game and play situations,WA2HEPMM2,0,,1a315402-77a6-41bd-ac9e-96b35e6bc595
+11883,11880,"Movement skills that combine the elements of effort, space and time",WA2HEPMM3,0,,20b25f7f-43e7-460e-9bc4-dc8f5d5742db
+11884,11879,Understanding movement,,0,,ce79e3c0-fcc0-461e-83ab-d5e61ec2f416
+11885,11884,"Physical, mental and emotional responses to physical activity",WA2HEPMU1,0,,0d9c6ecd-7d5a-4206-ad41-f10cd56efc02
+11886,11884,Physical changes to the body when exercising,WA2HEPMU2,0,,913b10b7-20e8-4a68-b408-184f45a0c9bd
+11887,11884,"Importance of rules and fair play in partner or group activities, and in a range of minor games and physical activities",WA2HEPMU3,0,,32c2bf44-ca4f-47a3-a52a-900a78d85996
+11637,11552,"Personal, Social and Community Health",,0,,912ae21b-d78d-43d3-a886-1d90bb73abb1
+11645,11637,Healthy and active communities,,0,,224d5d5e-ef62-4254-8a63-d21d650b1ac8
+11646,11645,Strategies and behaviours that promote health and wellbeing,WA2HEHPH1,0,,1108e841-cdf3-48cf-b3b6-c0ec7529839e
+11647,11645,Ways health messages are communicated in the media and how they can influence personal health choices,WA2HEHPH2,0,,d19d3891-d0db-4526-a2f1-e900e123bc24
+11648,11645,Actions that keep people safe and healthy,WA2HEHPH3,0,,da71dfd1-617d-41ba-8466-a0d37f5e8bc8
+11649,11637,Interacting with others,,0,,a8a1db41-089b-4248-9e10-7fbd0063f255
+11650,11649,Ways to interpret the feelings of others in different situations to help develop respectful relationships as individuals grow older,WA2HEHPI1,0,,75999966-8456-4a44-8b5b-e7ec8672ea06
+11638,11637,Personal identity and change,,0,,321fe67c-7d8e-431f-841c-97f381f9c6be
+11639,11638,"Personal strengths, qualities and achievements, and how they contribute to developing identities",WA2HEHPP1,0,,31f3f042-021f-42e9-ab30-1278aab0c9b1
+11640,11638,"The body’s reactions to emotions, and strategies to help manage these reactions",WA2HEHPP2,0,,9b89d3e4-3f5a-4bb5-8799-6d5496401ea7
+11641,11637,Staying safe,,0,,45c726f6-afb7-46ac-a722-478e9dce8d6a
+11642,11641,Protective behaviours and communication skills to respond to unsafe situations,WA2HEHPS1,0,,39f1edbf-99de-49dd-a1df-34801aebfca7
+11643,11641,Strategies to use when help is needed,WA2HEHPS2,0,,9897cd59-a795-4613-b140-d6cf241affe7
+11644,11641,"Strategies to use when needing to seek, give or deny permission are practised",WA2HEHPS3,0,,08ecdb78-0329-4fb6-8e2e-53d99462fe0b
+11553,10872,Year 3,,0,,56ac398f-d4b0-4e0b-9639-2c35367d0b5a
+11890,11553,Movement and Physical Activity,,0,,15472656-f59f-4eb1-9b9e-7a8ef74b15af
+11898,11890,Interpersonal skills,,0,,6a7f70c3-53a3-44ee-bf02-65d10be21ffa
+11899,11898,Cooperation skills to include everyone in physical activities,WA3HEPMI1,0,,d48a3386-e7e3-4bbc-965b-5d7f30cf1bd4
+11891,11890,Movement skills,,0,,abea83dc-bdd8-4a57-9c95-8fff8472c7b6
+11892,11891,Introduce fundamental movement skills:  Locomotor (dodge; leap) Object control (foot dribble; overarm throw; punt),WA3HEPMM1,0,,e7cb1dee-e97e-418d-91fc-9e9beb0c5dad
+11893,11891,Combine fundamental movement skills with simple tactics to retain or gain possession in minor games,WA3HEPMM2,0,,2ef93859-cbca-4fd0-86a9-95ee2130d791
+11894,11891,"Movement skills that combine the elements of effort, space, time, objects and people",WA3HEPMM3,0,,0fbaeaf3-9a0b-46b2-90ff-7ee9435bbdb2
+11895,11890,Understanding movement,,0,,dbcd322c-1862-4251-9834-ca2aa6629f96
+11896,11895,Benefits of regular physical activity and physical fitness to health and wellbeing,WA3HEPMU1,0,,8ca6209d-88a2-49fe-ad64-2f6a022aea91
+11897,11895,Basic rules in a variety of physical activities and ways in which they keep activities safe and fair,WA3HEPMU2,0,,6c554fd9-4ce1-4b3d-9826-903a0e9dbb65
+11651,11553,"Personal, Social and Community Health",,0,,983e11b1-1623-4209-92e5-07189049d4ae
+11659,11651,Healthy and active communities,,0,,7e3d3be8-ca0e-4605-90b4-ab29846013cd
+11660,11659,Actions in daily routines that promote health and wellbeing,WA3HEHPH1,0,,bae8b274-6eb0-4492-8716-4025803f06be
+11661,11659,Choices and behaviours conveyed in health information and messages,WA3HEHPH2,0,,fab9db0e-1b7c-4b13-81a8-e94a61db3373
+11662,11651,Interacting with others,,0,,34521fa2-b49c-4c7a-ad5f-92cd27550b45
+11663,11662,Behaviours that show empathy and respect for others,WA3HEHPI1,0,,e8f5350f-034f-46a0-9989-83705314a566
+11664,11662,Circumstances that can influence the level of emotional response to situations,WA3HEHPI2,0,,d54b4369-5f05-45f7-9220-6e0f646e03bc
+11652,11651,Personal identity and change,,0,,f1255958-0ca1-44f5-8705-52a2d58fac00
+11653,11652,"Factors that strengthen personal identities, including family, friends, and school",WA3HEHPP1,0,,a4b56975-20f0-428a-a9f7-a4a205a18209
+11654,11652,"Physical, social and emotional changes that occur as individuals grow older",WA3HEHPP2,0,,abe3c166-0fcf-4f5e-a6af-cfa7183a40f9
+11655,11651,Staying safe,,0,,98edd8b7-7d62-4ead-bc7c-cd3d48a6a213
+11656,11655,Protective behaviours and communication skills to respond to unsafe situations,WA3HEHPS1,0,,f3f7a4e1-9283-4886-93a4-a4c4136ed39e
+11657,11655,Strategies to use when help is needed,WA3HEHPS2,0,,20498a5c-9ba1-46ce-b49b-ce622025c186
+11658,11655,"Strategies for seeking, giving and denying permission are rehearsed and refined, and situations where permission is required are described",WA3HEHPS3,0,,33613cdf-152e-4230-86fc-4881ee25bb6f
+11554,10872,Year 4,,0,,60ae9518-8c3f-4cb6-aee5-a14d93de7526
+11900,11554,Movement and Physical Activity,,0,,3663ecd9-b97c-40e0-bc1d-61994374b89b
+11909,11900,Interpersonal skills,,0,,959dde9a-aab6-4b1d-ad85-39d2dc464e36
+11910,11909,Working cooperatively with others to complete a movement task,WA4HEPMI1,0,,72cf4a0c-ade9-42a2-957d-68886f870648
+11901,11900,Movement skills,,0,,d6e86309-68ba-4e93-af2c-1b7589abecf4
+11902,11901,Consolidate fundamental movement skills,WA4HEPMM1,0,,7200b9ef-bd5f-4c7a-9756-f20672a4db68
+11903,11901,Combine fundamental movement skills with simple tactics to create or deny scoring opportunities in minor games of increasing complexity,WA4HEPMM2,0,,8b748c98-37ad-4e21-9fec-4d85f4efe537
+11904,11901,"Movement skills that combine the elements of effort, space, time, objects and people",WA4HEPMM3,0,,9ac4aba3-5c6e-45d8-8129-3ffe33f172da
+11905,11901,"Transfer of skills and knowledge to solve movement challenges in a variety of settings, including outdoors",WA4HEPMM4,0,,ceef20d5-03c2-4e11-b63d-7472d9451c6c
+11906,11900,Understanding movement,,0,,0f577e4b-7abd-4b0e-9213-f95847354b39
+11907,11906,Benefits of regular physical activity and physical fitness to health and wellbeing,WA4HEPMU1,0,,b04fcbfa-e437-4525-8956-c5f25a51fa4f
+11908,11906,Basic rules and scoring systems to keep physical activities safe and fair,WA4HEPMU2,0,,7a6723e1-90dc-43b7-b04c-e2ce7f692459
+11665,11554,"Personal, Social and Community Health",,0,,c77790a1-6808-4017-a33e-517e325cda9e
+11674,11665,Healthy and active communities,,0,,9c9bd534-314f-47a7-9086-81eba29a51d5
+11675,11674,Strategies that promote a healthy lifestyle,WA4HEHPH1,0,,b85701d2-1ec0-4615-bfcb-7f9aa585083d
+11676,11674,Ways in which health information can influence health decisions and behaviours,WA4HEHPH2,0,,8a76b507-6aa0-4a6b-a0f9-cb7212c6dbe2
+11677,11665,Interacting with others,,0,,138a06c6-3f04-440a-9dc8-dbcaf6428b0e
+11678,11677,"Positive influence of respect, empathy, and the valuing of differences in relationships and in society",WA4HEHPI1,0,,abec2ac5-2412-4e44-a9b8-4992c96b0e4a
+11679,11677,Strategies to cope with adverse situations and the demands of others,WA4HEHPI2,0,,19b186aa-f152-4163-9331-3cf8fa9276aa
+11680,11677,Strategies to identify and manage emotions before reacting,WA4HEHPI3,0,,2d517fed-b307-48ef-ac05-6cfedf328bff
+11666,11665,Personal identity and change,,0,,b81e4551-2ae1-4ea2-a2f1-e309b708176a
+11667,11666,"Ways to respond positively to challenges and failures, including the use of resilience and persistence",WA4HEHPP1,0,,a618ca30-8f49-46f1-aed1-36e79333fa37
+11668,11666,Changes associated with puberty,WA4HEHPP2,0,,3fe588dc-557e-4ec9-b7eb-1113c6544d60
+11669,11666,Strategies to manage changes associated with puberty,WA4HEHPP3,0,,882018a0-a718-4bd0-bf2b-720b0de4efb8
+11670,11665,Staying safe,,0,,c70fb036-ba81-431a-9df0-047a5ac84d74
+11671,11670,Protective behaviours and strategies to remain safe in uncomfortable or unsafe situations,WA4HEHPS1,0,,c4eb5df7-6153-4498-8156-1b6202637f04
+11672,11670,Strategies to ensure safety at home and at school,WA4HEHPS2,0,,008c7539-874a-45fd-a3c6-7ebe398d74ff
+11673,11670,"Strategies for seeking, giving and denying permission are rehearsed and refined, and situations where permission is required are described",WA4HEHPS3,0,,067e63bf-784e-4113-a8e1-09d13f078e58
+11555,10872,Year 5,,0,,c0093b97-ede8-4b32-b017-714e6ff5d3b2
+11911,11555,Movement and Physical Activity,,0,,a3a98ebf-ed92-43c3-b267-8ed607175dcd
+11919,11911,Interpersonal skills,,0,,8afb4d65-597e-4428-be5b-ec630d1c9eb6
+11920,11919,Responsibilities of different roles in a range of physical activities:  player; referee/umpire,WA5HEPMI1,0,,91808b8b-c715-4e87-81fb-87ec0bcf8cdc
+11921,11919,Ethical behaviour in applying rules in all game situations,WA5HEPMI2,0,,aa4c20cc-26a4-4e70-8ef5-ca4cb7311eac
+11912,11911,Movement skills,,0,,99f0d310-6270-4931-a311-a34c78f2451f
+11913,11912,Fundamental movement skills demonstrating adjustment of force and speed to improve accuracy and control,WA5HEPMM1,0,,b0f70cc2-a1cb-4b81-8659-d56c30f0e659
+11914,11912,"Linking of fundamental movement skills to specific skills used in organised games, sports and activities, such as linking throwing to basketball passing and shooting",WA5HEPMM2,0,,f92ff107-9a5b-4f0e-ba2e-1bcc5c3bda71
+11915,11912,Basic strategies and tactics to achieve a movement outcome or goal,WA5HEPMM3,0,,bb186d4e-6f31-4e23-b55d-72a5ba2fd8af
+11916,11912,"Movement skills that combine the elements of effort, space, time, objects and people applied to improve movement outcomes",WA5HEPMM4,0,,65886f8d-2e57-4ce4-a07a-a900aff5146e
+11917,11911,Understanding movement,,0,,21317df3-3b22-41e5-af9a-23634af11629
+11918,11917,"Benefits of regular physical activity and physical fitness to physical, mental and emotional wellbeing",WA5HEPMU1,0,,c7ae20b5-2851-488b-bc74-3b6a9d9b8845
+11681,11555,"Personal, Social and Community Health",,0,,02acc045-0f2c-427f-afa4-81e16de8d045
+11690,11681,Healthy and active communities,,0,,af717acc-90f4-4de0-89c9-46ec78c4ef4b
+11691,11690,"Strategies that promote a safe, healthy lifestyle",WA5HEHPH1,0,,ad4e0685-5a21-4754-835f-f7984628157f
+11692,11690,"Health messages that support and maintain an individual’s health, safety and wellbeing",WA5HEHPH2,0,,53cf0736-7d5c-4b3c-924b-aa9f68fad7e0
+11693,11681,Interacting with others,,0,,0c0398e7-4a3e-4115-82e0-357f21f3f754
+11694,11693,Skills and strategies to establish and maintain respectful relationships,WA5HEHPI1,0,,4bc59f47-6dad-4288-9d01-446fdd31f625
+11695,11693,Ways in which inappropriate emotional responses impact on relationships,WA5HEHPI2,0,,d7f68627-f41d-4fb3-bf65-550652b448d4
+11682,11681,Personal identity and change,,0,,16c3669f-604e-4dcf-a7f2-baedd70d8631
+11683,11682,Ways that individuals and groups adapt to different contexts and situations,WA5HEHPP1,0,,6e08a7b6-83a8-4778-b83e-bfdf082d1f31
+11684,11682,"Strategies to manage physical, mental/emotional and social changes associated with puberty",WA5HEHPP2,0,,d28a60d7-0373-4880-a277-00f88b825a64
+11685,11681,Staying safe,,0,,9364bf01-41a0-493a-bda6-a2dd712a8320
+11686,11685,Protective behaviours that can be implemented in uncomfortable or unsafe situations,WA5HEHPS1,0,,7eee2b2c-19db-4011-a619-7adabe7e07b4
+11687,11685,Strategies that promote safety,WA5HEHPS2,0,,59a941a2-84ed-46a0-9097-ae8527f07dc6
+11688,11685,"Reliable sources of information that inform health and safety decisions: internet-based information, publications and other media; community health organisations",WA5HEHPS3,0,,0281a460-933d-4429-88c7-79345c62d1cf
+11689,11685,"Strategies for seeking, giving or denying consent are described, and how to communicate intentions effectively are rehearsed",WA5HEHPS4,0,,ed558256-0dbc-4e85-84e6-886aee0f6391
+11556,10872,Year 6,,0,,aa49e159-a2ce-4658-9728-7131eae23b31
+11922,11556,Movement and Physical Activity,,0,,8e7d0ef8-27e6-41ce-8bfe-4e1f159a7fd0
+11931,11922,Interpersonal skills,,0,,77885030-e639-4833-a686-69deb31a0496
+11932,11931,Interpersonal skills in physical activities,WA6HEPMI1,0,,376bc6f1-3a93-4a52-a4ed-b4895ea9cc7c
+11923,11922,Movement skills,,0,,e2ed5bf8-c4e9-43d0-9c1d-9dadad0d0073
+11924,11923,Fundamental movement skills demonstrating adjustment of force and speed to improve accuracy and control,WA6HEPMM1,0,,c8cdbbac-a16a-414a-ac23-c35f139b8567
+11925,11923,"Linking of fundamental movement skills to specific skills used in organised games, sports and activities, such as linking kicking to passing and shooting in soccer",WA6HEPMM2,0,,b23ed25e-0a91-4bf0-8374-e9389b666b0e
+11926,11923,Strategies and tactics to achieve an offensive or defensive outcome or goal,WA6HEPMM3,0,,f1aaaa40-9446-45d7-8592-f585453d1d35
+11927,11923,"Movement skills that combine the elements of effort, space, time, objects and people applied to improve movement outcomes",WA6HEPMM4,0,,b4684e0e-b162-4708-b027-d38cd10e39d3
+11928,11922,Understanding movement,,0,,bb53b3db-2da5-4705-8aff-4850b3702367
+11929,11928,"Benefits of regular physical activity and physical fitness to physical, mental and emotional wellbeing",WA6HEPMU1,0,,6687507f-f714-4bc4-a281-c6a2e1a0fcc1
+11930,11928,Modification of rules and scoring systems in physical activities to create a more inclusive game and fairer contest,WA6HEPMU2,0,,0361e624-fac6-4c85-b993-ef8d8dc54df9
+11696,11556,"Personal, Social and Community Health",,0,,bec8437d-190d-4eec-827c-bbb62a4b1417
+11704,11696,Healthy and active communities,,0,,500504cb-5036-4b06-a03f-beeecd02d32a
+11705,11704,"Strategies that promote a safe, healthy lifestyle",WA6HEHPH1,0,,bb7106ee-64b8-494e-b7f0-f058e738005a
+11706,11704,"Criteria that can be applied to sources of information, including online, to assess their credibility",WA6HEHPH2,0,,29ee059a-3946-4b71-a29f-41286832e558
+11707,11704,"Actions that promote and maintain community health, safety and wellbeing",WA6HEHPH3,0,,ac0e4d89-e19f-4615-b43f-c533120da906
+11708,11696,Interacting with others,,0,,f1cf22a6-2cab-4821-8d58-1687178c2501
+11709,11708,Skills to establish and manage positive relationships,WA6HEHPI1,0,,6f695c75-1e23-4ecb-ab39-947e37ae1344
+11710,11708,Situations in which emotions can influence decision-making: in peer groups; with friends; with family,WA6HEHPI2,0,,4246ffd2-5600-40cd-8544-6d587712f3c9
+11697,11696,Personal identity and change,,0,,1bffb55b-1af5-41da-bef1-6c91df5638f5
+11698,11697,Ways that positive self-identities can develop and change over time,WA6HEHPP1,0,,79609a2f-33f1-4209-bf83-78ce9e975ecf
+11699,11697,"Strategies and resources to understand and manage the physical, mental/emotional, and social changes and transitions associated with puberty",WA6HEHPP2,0,,2a69ab38-a05f-4ff7-a05a-d9482ba92163
+11700,11696,Staying safe,,0,,fa8ac050-b2c0-49d2-8125-46783422e862
+11701,11700,Protective behaviours and help-seeking strategies that can be used when students feel unsafe online,WA6HEHPS1,0,,da40f827-69e1-43e7-a640-79fe4b60e66d
+11702,11700,Strategies that promote safety,WA6HEHPS2,0,,c0dc0d47-abd1-4bc6-809d-1f390e9cd6b6
+11703,11700,"Strategies for seeking, giving or denying consent are described, and how to communicate intentions effectively are rehearsed",WA6HEHPS3,0,,c120d4a7-1517-4bc1-b7df-e5cdc2f9e74d
+11557,10872,Year 7,,0,,ae415a08-4af5-4a09-ac47-c5609dd401ab
+11933,11557,Movement and Physical Activity,,0,,2359c204-2b56-464e-8fff-607af895d782
+11941,11933,Interpersonal skills,,0,,59cf7c05-69be-4ae8-8936-e65e73a787f4
+11942,11941,Communication skills that support and enhance:  group and team cohesion; leadership; inclusion,WA7HEPMI1,0,,cdfe9a21-8e48-4a53-b5db-c8e1c87346b7
+11943,11941,Ethical behaviour and fair play when participating in physical activities,WA7HEPMI2,0,,eb907192-06e0-49e5-9c9c-061659c4800f
+11934,11933,Movement skills,,0,,e47ce101-0467-480c-9583-0afa448fcf5d
+11935,11934,Movement skills and sequences within different physical activity contexts and settings,WA7HEPMM1,0,,15b4f380-5342-4a35-b05b-09119fe101c4
+11936,11934,"Strategic and tactical skills used to create and use space through the manipulation of effort, space, time, objects and people",WA7HEPMM2,0,,d728c634-8fef-4cf9-9fe7-f0bc6bcfedf3
+11937,11934,"Physical activities to enhance health, fitness and wellbeing, including moving in natural environments",WA7HEPMM3,0,,183c9f41-dc47-4ec0-a623-a3c0bb0a800f
+11938,11933,Understanding movement,,0,,d9648e78-4d78-4dee-a083-36ccc684a9d7
+11939,11938,"Impact of regular participation in physical activities on health, fitness and wellbeing",WA7HEPMU1,0,,0cabf705-df2a-4bb6-b5cb-19633afc63ff
+11940,11938,Strategies to increase physical activity levels,WA7HEPMU2,0,,7c87b737-c223-47e8-adcf-017b341368bb
+11711,11557,"Personal, Social and Community Health",,0,,95dd87ef-1937-4834-8e09-b1819384579b
+11721,11711,Healthy and active communities,,0,,0fb50c72-d635-40e7-8fc6-581ee7c33e78
+11722,11721,Strategies to make informed choices to promote health and wellbeing,WA7HEHPH1,0,,4c19f7fd-1ab7-4bf9-87ed-0fce4d8a683e
+11723,11721,Preventive health practices for young people to avoid and manage risk,WA7HEHPH2,0,,7b3e81bb-b776-45aa-babb-7edfe1182640
+11724,11721,Health and social benefits of physical activity and recreational pursuits,WA7HEHPH3,0,,fb56a752-f10b-437c-a208-ebbf65cece16
+11725,11721,"Ways in which the media and influential people impact attitudes, beliefs, decisions and behaviours",WA7HEHPH4,0,,4490dc4d-403c-40de-ae7b-43d6d0e53a10
+11726,11711,Interacting with others,,0,,b8991f7f-f227-4acd-bd02-321b6cfbac6e
+11727,11726,Impact of relationships on a person’s wellbeing,WA7HEHPI1,0,,51c2d887-0637-4d49-9770-2259966e632f
+11728,11726,"Ways in which decision-making, respect and empathy in developing respectful relationships can be influenced by gender stereotypes",WA7HEHPI2,0,,ee5abdac-a8bd-401d-a772-b90799539f0b
+11729,11726,Factors that influence emotional responses and behaviour,WA7HEHPI3,0,,db5272be-9ecd-4257-a40a-d0fb5699ee44
+11713,11711,Personal identity and change,,0,,adcbb46a-504d-48ff-931a-8e6ca3a16f56
+11714,11713,"Feelings, emotions and cultural beliefs and values associated with transitions; practising self-talk and help-seeking strategies to manage these changes",WA7HEHPP1,0,,af319932-fbe0-4712-bcef-c38d3ab6ab69
+11715,11713,"Ways to manage physical, emotional, and social changes associated with puberty",WA7HEHPP2,0,,fb9b0504-494e-4e08-81df-74874d02c360
+11716,11711,Staying safe,,0,,52725492-2547-40c9-870d-6d76ee251b82
+11717,11716,"Health information, services and help-seeking strategies that young people can use in a variety of situations",WA7HEHPS1,0,,ce2f6219-efb9-4e7a-951a-02a8197371e1
+11718,11716,"Protective behaviours and help-seeking strategies to ensure safety in a variety of situations, including online",WA7HEHPS2,0,,deb53c3b-0bbc-451e-aa77-879805050fa7
+11719,11716,"Strategies to make informed choices to promote health, safety and wellbeing",WA7HEHPS3,0,,8e517f7d-29be-4b49-8b37-7f2abccd3a23
+11720,11716,"Strategies and skills to communicate assertively when seeking, giving or denying consent are explained and applied",WA7HEHPS4,0,,7c69865d-86dc-44e7-b5dc-d79fb32d8c0c
+11558,10872,Year 8,,0,,a119776f-f4fa-45eb-8060-cfafc880cc46
+11748,11558,Movement and Physical Activity,,0,,7e4b65e4-603d-4f96-b5eb-68ad1ef1debb
+11756,11748,Interpersonal skills,,0,,fd7c9305-5f6a-46ac-86f0-fb597a842de4
+11757,11756,"Verbal, physical and situational cues to identify and appropriately respond to the feelings and motives of others when working in a team or group",WA8HEPMI1,0,,2ad3c5f7-a2c0-46e7-b8c5-434a81453426
+11758,11756,"Modification of rules, equipment or scoring systems to allow for fair play, safety and inclusion of all participants",WA8HEPMI2,0,,26005356-dd73-46a5-b88e-b39d1a9c1fae
+11749,11748,Movement skills,,0,,4c0643cb-9f98-4ae1-bf62-b3c6c867ccca
+11750,11749,Movement skills and sequences within different physical activity contexts and settings with a focus on:  increased efficiency in skill performance; control of balance and stability,WA8HEPMM1,0,,94081a28-b403-4227-baf0-ab5c23ce02d9
+11751,11749,"Selection of strategic and tactical skills in the manipulation of effort, space, time, objects and people in a variety of movement contexts",WA8HEPMM2,0,,e682aac5-ed20-41f4-a149-eb6b07967933
+11752,11749,"Physical activities to enhance health, fitness and wellbeing, including moving in natural environments",WA8HEPMM3,0,,65dfd291-b976-43e1-befa-c50b1f647679
+11753,11748,Understanding movement,,0,,5c708c0c-1bfe-42e6-bddf-5e0f0c546ac8
+11754,11753,Measurement of the body’s response to physical activity:  heart rate; breathing/respiration,WA8HEPMU1,0,,d2fd3d89-849a-4b9f-97e7-425f6db0ba76
+11755,11753,"Use of games, recreational activities and outdoor pursuits to enhance activity levels and achieve health and wellbeing outcomes",WA8HEPMU2,0,,13da352d-6af4-48e2-a6f5-3d382acd7288
+11730,11558,"Personal, Social and Community Health",,0,,82d933f0-81f1-451e-8352-536d242d7ba8
+11740,11730,Healthy and active communities,,0,,80bbb8a5-fa70-4544-9403-c0e5115cfd14
+11741,11740,Benefits to individuals and communities of valuing diversity and promoting inclusivity,WA8HEHPH1,0,,d54df22d-4f13-4347-ae71-ba966a5b8594
+11742,11740,"Health promotion initiatives which target relevant health, safety and wellbeing issues for young people and ways to manage them",WA8HEHPH2,0,,051234a7-d628-4a0e-a5c7-3dbf4beb9954
+11743,11730,Interacting with others,,0,,ea5aac94-51fc-43f4-ae51-53c5c845131a
+11744,11743,Strategies for managing the changing nature of peer and family relationships,WA8HEHPI1,0,,ea5ce749-f22b-4b6c-8963-19fc0a4e2e2b
+11745,11743,"Impacts of bullying and harassment on relationships, including online relationships",WA8HEHPI2,0,,e6f31a09-977e-4715-9ceb-fed2d4dc376d
+11746,11743,"Role of power and coercion within relationships, and how these can be influenced by gender stereotypes",WA8HEHPI3,0,,6aa59cbc-4a0d-414c-8385-67ff9b9a64c5
+11747,11743,"Personal, social and cultural factors that influence emotional responses and behaviour",WA8HEHPI4,0,,d52d7cf9-342c-41fd-89a1-4f33dda0c0e1
+11731,11730,Personal identity and change,,0,,99933d2f-e5ed-497f-b9a2-a9e9b10d63ba
+11732,11731,Strategies to cope with and manage the impact of changes and transitions,WA8HEHPP1,0,,4f301efc-580b-4faa-832a-324e7eaecb70
+11733,11731,Ways in which changing feelings and attractions form part of developing sexual identities,WA8HEHPP2,0,,09eacbc6-5b19-4853-bbb4-fcf09625f59e
+11734,11730,Staying safe,,0,,b0f229c5-fff7-4597-bfbc-09f0a065b660
+11735,11734,Credible health information that can support people in a variety of situations,WA8HEHPS1,0,,7132cab5-9454-4828-91d2-eaaa295e9044
+11736,11734,"Reasons why young people choose to use or not use alcohol, drugs or other harmful substances, and strategies that could be used if someone is being encouraged to use them",WA8HEHPS2,0,,cce602b3-552f-4a1b-aaeb-06a41a3d0ec6
+11737,11734,"Skills and strategies to promote physical and mental health, safety and wellbeing in various environments",WA8HEHPS3,0,,3cb2e320-254d-45f6-891f-6f937fa9c72c
+11738,11734,"Strategies and skills to communicate assertively when seeking, giving or denying consent are explained and applied",WA8HEHPS4,0,,65bd11ab-71a4-420f-b304-a241fd87f101
+11559,10872,Year 9,,0,,f4df5354-d9f1-4634-b9f5-749f6e302631
+11774,11559,Movement and Physical Activity,,0,,4dc9b415-28d7-4a07-9a61-c300b89453f7
+11782,11774,Interpersonal skills,,0,,91e1116d-26ee-4ca4-b1e9-8922ce207dae
+11783,11782,"Skills and strategies for effective leadership, including teamwork and motivation",WA9HEPMI1,0,,57885314-65b9-435a-bd05-0904b9912497
+11784,11782,Characteristics of fair play and application of fair and ethical behaviour in physical activity,WA9HEPMI2,0,,92c2a49c-c8df-4bd4-95cb-a76348f39d48
+11785,11782,Strategies for decision-making when working in groups or teams that demonstrate leadership and collaboration skills,WA9HEPMI3,0,,710f386c-1ea2-4f44-8369-adc3de33dead
+11775,11774,Movement skills,,0,,11523ee7-a62d-4b74-8571-506198129bf5
+11776,11775,Movement skills and sequences within different physical activity contexts and settings reflecting:  increased speed and accuracy; improved efficiency; increased complexity,WA9HEPMM1,0,,6b9369bc-185b-4a83-aeb7-bcc93ef38e54
+11777,11775,"Skills, strategies and tactics in new or challenging movement situations and the impact of each on movement outcomes",WA9HEPMM2,0,,21142b04-3903-4a06-b0b0-46e61ed50333
+11778,11775,"Lifelong physical activities to enhance health, fitness and wellbeing, including moving in natural environments",WA9HEPMM3,0,,81b436bd-a441-4ad8-8752-f8a66f7b3ca3
+11779,11774,Understanding movement,,0,,eaa59be5-3feb-4656-bdeb-f8e217b9af82
+11780,11779,Measurement of the body’s response to physical activity:  flexibility; strength; balance; endurance,WA9HEPMU1,0,,7537c953-560d-41fd-b024-ea71a6d0dbdb
+11781,11779,"Use of games, recreational activities and outdoor pursuits to improve components of health, fitness and wellbeing",WA9HEPMU2,0,,4ee4b6b7-c6d6-4ec2-b25f-3c0ecd2da9aa
+11759,11559,"Personal, Social and Community Health",,0,,5f0dea4b-e51d-4023-9a6c-6ce94b414568
+11768,11759,Healthy and active communities,,0,,d8923000-bad7-432f-8a3a-62545dd04e0b
+11769,11768,"Impact of external influences on the ability of adolescents to make safe and informed choices relating to:  sexual health; behaviours alcohol, drugs or other harmful substance use; risk-taking",WA9HEHPH1,0,,f54df6a2-915a-4699-8d42-95e716a4725c
+11770,11768,Implications of attitudes and behaviours on individuals and the community,WA9HEHPH2,0,,e10e3264-3f7e-4f6f-a6ae-5ec5c523aed2
+11771,11759,Interacting with others,,0,,b5509425-77ff-42c2-ab45-eb21f51965f3
+11772,11771,Characteristics of respectful relationships and how these can prevent violence and abuse,WA9HEHPI1,0,,07b469b8-e346-4240-884d-43c78d018c57
+11773,11771,Managing emotional responses and resolving conflict in family or social situations,WA9HEHPI2,0,,86571d8c-9b2b-4b8f-835b-00e2404903ef
+11760,11759,Personal identity and change,,0,,c0864387-25ed-441b-868b-44b6e1327fab
+11761,11760,Factors that shape personal identities and adolescent health behaviours,WA9HEHPP1,0,,385e9fba-6c59-4445-b679-8b8ac0e6436f
+11762,11760,Strategies for managing changes and transitions,WA9HEHPP2,0,,2b8f57dd-6032-4c01-9ca2-22fd05052f27
+11763,11759,Staying safe,,0,,f506fc4a-afe4-471f-b33d-2ad2cbc714a4
+11764,11763,Skills to determine the appropriateness and reliability of online health information,WA9HEHPS1,0,,926aa18d-b078-443b-a6cb-887c0ba4f5a7
+11765,11763,Skills to deal with challenging or unsafe situations:  refusal skills; initiating contingency plans; acting assertively,WA9HEHPS2,0,,0af79d04-cd6b-4dec-9c62-ac075e61a519
+11766,11763,Actions and strategies to enhance health and wellbeing in a range of environments,WA9HEHPS3,0,,7c9aba6f-ea92-4680-a11a-f448de83dd2d
+11767,11763,"Strategies are examined, such as communicating choices, seeking, giving and denying consent, and expressing opinions and needs that can support the development of respectful relationships, including sexual relationships",WA9HEHPS4,0,,99acaddf-d745-432e-9704-38f3d65ea98b

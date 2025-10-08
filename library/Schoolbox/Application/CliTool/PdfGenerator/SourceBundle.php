@@ -45,7 +45,7 @@ class SourceBundle
      * @param array|string[] $urls
      * @param string|null    $message
      */
-    public function __construct(string $filename, array $urls, string $message = null)
+    public function __construct(string $filename, array $urls, ?string $message = null)
     {
         $this->filename = $filename;
         $this->urls     = $urls;

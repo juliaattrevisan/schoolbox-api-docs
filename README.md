@@ -11,6 +11,8 @@ This file is internal use and is not shipped to clients.
 * dav - WebDav site for exporting the Schoolbox resources
 * data - client data and caches (client side only)
 * debian - APT package building definitions (not deployed to clients)
+* docker - definition of Docker images used in Schoolbox development and
+  production environments
 * docs - documentation for developers
 * library - Schoolbox code base
 * node_modules - directory for external libraries loaded via NPM
@@ -29,50 +31,105 @@ This file is internal use and is not shipped to clients.
 
 ## Installation
 
-### Development Environment with Vagrant
+### Download Schoolbox code
 
-* Install [Virtualbox](https://www.virtualbox.org/) (sudo apt install virtualbox)
-* Install [vagrant](https://vagrantup.com/downloads)
 * Create an SSH key and add to Github
-* Fork the [Schoolbox repo](https://github.com/alaress/schoolbox) to your Github
-```
+* Fork the [Schoolbox repo](https://github.com/alaress/schoolbox) to your Github:
+  ```shell
   git clone git@github.com:%YourGitHubUsername%/schoolbox.git schoolbox (for example git clone git@github.com:low613/schoolbox.git schoolbox)
   cd schoolbox
   git remote add upstream git@github.com:alaress/schoolbox.git
   git fetch upstream
   git checkout origin/master
   git checkout -b master
-```
+  ```
+* Install the [Git Scripts](https://github.com/alaress/git-scripts) suite of tools:
+  * If the `jira-issue-tag` doesn't work after install, add the file from the downloaded zip file at `git-scripts-master/hooks/prepare-commit-msg.jira-issue-tag` into `.git/hooks/` and remove the `.jira-issue-tag` from the file name.
+
+### Set up Docker development environment
+
+The Docker development environment closely matches the proposed cloud-hosted
+environment, which will be deployed to scalable containers and orchestrated via
+AWS' [Elastic Container Service](https://docs.aws.amazon.com/ecs/).
+
+Ideally, only the Docker development environment will need to be set up.
+
+* install the required dependencies:
+  * the most recent [Docker Engine](https://docs.docker.com/engine/install/)
+    for your operating system
+    > TODO test Docker Desktop
+  * the most recent [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+    for your operating system
+  * recommended: a [Docker Credentials Store](https://docs.docker.com/reference/cli/docker/login/#credential-stores)
+    for secure storage of credentials
+* add this line to `/etc/hosts` or its Windows equivalent
+  (usually `C:\Windows\System32\drivers\etc\hosts`)
+  ```
+  127.0.0.1 docker.dev.schoolbox.cloud
+  ```
+* create `docker.env`, and override any configuration in `docker.default.env`
+  if needed:
+  * the default settings should work for most development requirements, but
+    `cdn_bucket_prefix` will need to be set if testing S3 static file hosting
+* start the development environment's containers:
+  ```shell
+  sudo docker/up
+  ```
+* install Schoolbox within the development environment:
+  ```shell
+  sudo docker/provision
+  ```
+* visit https://docker.dev.schoolbox.cloud/
+
+See [docker/README.md](docker/README.md) for more information about the Docker
+development environment, including a migration guide from Vagrant.
+
+### Set up Vagrant development environment (optional)
+
+The Vagrant development environment more closely matches the current
+cloud-hosted and on-premise environment, which is deployed as an APT package to
+servers which are running an Ubuntu LTS release.
+
+Ideally, developers will only need to consider the Docker environment: however,
+the Vagrant environment is still supported.
+
+* Install [Virtualbox](https://www.virtualbox.org/) (sudo apt install virtualbox)
+* Install [vagrant](https://vagrantup.com/downloads)
 * Fork the [Puppet repo](https://github.com/alaress/puppet-alaress) to your Github
-```
+  ```shell
   git clone git@github.com:%YourGitHubUsername%/puppet-alaress.git puppet-alaress (for example git clone git@github.com:low613/puppet-alaress.git puppet-alaress)
   cd puppet-alaress
   git remote add upstream git@github.com:alaress/puppet-alaress.git
   git fetch upstream
   git checkout origin/stable
   git checkout -b stable
-```
+  ```
 * create `vagrant.yaml` for overrides, see `vagrant.default.yaml` for defaults
-```
+  ```yaml
   processors: 3
   memory: 4096
   data_filename: "demo.tar.gz"
   external_db: "schoolbox"
   puppet_sync_type: "gitsync"
-```
-
+  ```
 * Create a `/etc/vbox/networks.conf` on your local computer
-```
-sudo mkdir -p /etc/vbox/
-echo "* 192.168.36.0/24" |sudo tee -a /etc/vbox/networks.conf
-```
+  ```shell
+  sudo mkdir -p /etc/vbox/
+  echo "* 192.168.36.0/24" |sudo tee -a /etc/vbox/networks.conf
+  ```
+* If a Docker development environment has been set up, it should be cleaned up
+  before starting Vagrant as otherwise Vagrant cannot write files owned by
+  Docker:
+  ```shell
+  sudo docker/clean
+  ```
 * In your schoolbox directory import your vagrant box and bring it up for the first time
-```
-  vagrant box add ubuntu-2204-php80 https://s3-ap-southeast-2.amazonaws.com/schoolbox-data/ubuntu-2204-php80.box;
+  ```shell
+  vagrant box add ubuntu-2204-php82 https://s3-ap-southeast-2.amazonaws.com/schoolbox-data/ubuntu-2204-php82.box;
   vagrant up;
   vagrant provision;
-```
-* Install the [Git Scripts](https://github.com/alaress/git-scripts) suite of tools. If the `jira-issue-tag` doesn't work after install, add the file from the downloaded zip file at `git-scripts-master/hooks/prepare-commit-msg.jira-issue-tag` into `.git/hooks/` and remove the `.jira-issue-tag` from the file name.
+  ```
+* visit https://vagrant.dev.schoolbox.cloud/
 
 ## Live environment
 
@@ -113,7 +170,6 @@ For full information on the build process of making a APT package and deploying 
   * [Bell Daemon](./tools/notif/bell/README.md)
   * [Curriculum](./library/Schoolbox/Curriculum/README.md)
   * [EOTC](./www/modules/eotc/README.md)
-  * [NESA](./docs/nesa.md)
   * [Notifications](./docs/notifications/README.md)
   * [ResourceBooking](./library/Schoolbox/ResourceBooking/README.md)
   * [Task Daemon](./library/Schoolbox/TaskDaemon/README.md)

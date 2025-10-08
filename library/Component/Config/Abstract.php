@@ -11,7 +11,6 @@ use Schoolbox\Resource\Folder\Model as Folder;
 
 abstract class Component_Config_Abstract
 {
-
     /**
      * Where this Config's Component resides
      *
@@ -64,21 +63,21 @@ abstract class Component_Config_Abstract
     /**
      * Renders this configuration into a SitePage.
      *
-     * @param SitePage $page The SitePage to render into
-     * @param string $key I don't think this is used
-     * @param string $keyblock The block the config gets rendered into.
+     * @param SitePage                          $page        The SitePage to render into
+     * @param string                            $key         I don't think this is used
+     * @param string                            $keyblock    The block the config gets rendered into.
      *                                                  If a config template has sub-blocks, then
      *                                                  they are set into this block.
      *                                                  Is always set to the same value as $key.
-     * @param string $configValue The value of this config
-     * @param Component_ControllerAbstract $component The component this config is part of
+     * @param string                            $configValue The value of this config
+     * @param Component_ControllerAbstract|null $component   The component this config is part of
      */
     abstract public function parse(
         SitePage $page,
         $key,
         $keyblock,
         $configValue,
-        Component_ControllerAbstract $component = null
+        ?Component_ControllerAbstract $component = null
     );
 
     /* Getters / Setters

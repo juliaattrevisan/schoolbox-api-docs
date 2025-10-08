@@ -12,8 +12,10 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
-use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\CampusMapper;
 use Schoolbox\Permission\Access\UserAccessMapper;
+use Schoolbox\RoleMapper;
+use Schoolbox\UserMapper;
 use Twig\Error\LoaderError;
 
 class Module extends BaseModule
@@ -52,8 +54,10 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
-            $this->getMapperFactory()->get(ErrorMapper::class),
             $this->getMapperFactory()->get(UserAccessMapper::class),
+            $this->getMapperFactory()->get(UserMapper::class),
+            $this->getMapperFactory()->get(CampusMapper::class),
+            $this->getMapperFactory()->get(RoleMapper::class),
         );
     }
 }

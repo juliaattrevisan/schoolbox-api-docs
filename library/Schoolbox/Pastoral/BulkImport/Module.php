@@ -48,7 +48,7 @@ class Module extends BaseModule
         $runPermission = new Rule\All(
             $permission,
             new Rule\Callback(
-                function (array $params) {
+                function (array $params): void {
                     $import = $this->extractImportFromParams($params);
                     if ($import->isImported()) {
                         throw new Failure\InvalidPath('Import has already been run: cannot run again');
@@ -61,7 +61,7 @@ class Module extends BaseModule
         $undoPermission = new Rule\All(
             $permission,
             new Rule\Callback(
-                function (array $params) {
+                function (array $params): void {
                     $import = $this->extractImportFromParams($params);
                     if (!$import->isImported()) {
                         throw new Failure\InvalidPath('Import has not yet been run: cannot undo');
@@ -170,6 +170,8 @@ class Module extends BaseModule
             $this->injector->get('filesystem.receiver'),
             $pastoralRecordProcessor,
             $this->injector->get('l10n'),
+            $this->getMapperFactory()->get(Pastoral\Mapper::class),
+            $this->getMapperFactory()->get(\Schoolbox\Assessment\Term\Mapper::class),
         );
     }
 

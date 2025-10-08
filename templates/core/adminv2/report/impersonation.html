@@ -1,0 +1,22 @@
+<div class="scrollable">
+    <table>
+        <thead>
+            <tr>
+                <th><a href="/adminv2/reports/{SORT_BASE}/created_at/{SORT_CREATED_AT_DIR}">Date</a></th>
+                <th>Impersonator</th>
+                <th>Impersonated</th>
+                <th>Originating IP</th>
+            </tr>
+        </thead>
+        <tbody>
+        <!-- BEGIN activity -->
+        <tr>
+            <td>{DATE}</td>
+            <td><a href="/search/user/{IMPERSONATOR_ID}">{IMPERSONATOR}</a></td>
+            <td><a href="/search/user/{IMPERSONATED_ID}">{IMPERSONATED}</a></td>
+            <td>{IP}</td>
+        </tr>
+        <!-- END activity -->
+        </tbody>
+    </table>
+</div>

@@ -68,6 +68,17 @@
                         {% endfor %}
                     </select>
                 </div>
+                <div class="small-12 medium-12 columns">
+                    <label for="expiresAt">
+                        Expires At
+                        <span
+                            class="hint has-tip tip-top"
+                            data-tooltip
+                            title="Select when the record will expire. Expired records will move to an archived state."
+                        >?</span>
+                    </label>
+                    <input type="text" name="expiresAt" id="expiresAt" maxlength="50" value="" {% if canModifyExpiresAt %}data-datepicker{% else %}readonly{% endif %} />
+                </div>
                 <div class="small-12 medium-6 columns">
                     {% if severities | length %}
                         <label for="severityId">{{ locale.severity.proper }}</label>
@@ -78,11 +89,13 @@
                         </select>
                     {% endif %}
                 </div>
-                <div class="small-12 medium-6 columns">
-                    {# This label is intentionally unusual, there exists custom JS that PST uses occasionally which targets
-                     this <input> field, moving up one will break the form. See SA-18992 for more. #}
-                    <label> Points <input type="number" inputmode="numeric" name="points" size="35" min="-1000000" max="1000000" /> </label>
-                </div>
+                {% if config.pastoral_point_enabled %}
+                    <div class="small-12 medium-6 columns">
+                        {# This label is intentionally unusual, there exists custom JS that PST uses occasionally which targets
+                         this <input> field, moving up one will break the form. See SA-18992 for more. #}
+                        <label> Points <input id="points" type="text" inputmode="numeric" name="points" {% if canModifyPoints == false %}readonly {% endif %}/> </label>
+                    </div>
+                {% endif %}
                 <div class="small-12 columns">
                     <label for="tags">Tags</label>
                     <p class="meta">
@@ -126,7 +139,6 @@
         <input type="submit" data-submit value="Preview">
     </form>
 </div>
-
 {% include "@pastoral/modify_scripts.twig" with {
     record: record,
     canCreate: true,
@@ -134,11 +146,102 @@
     audiences: audiences,
     typesIndex: typesIndex,
     typesIndexPrivate: typesIndexPrivate,
+    typesIndexDefaultPoints: typesIndexDefaultPoints,
     subtypesIndex: subtypesIndex,
     subtypesIndexPrivate: subtypesIndexPrivate,
+    subtypesIndexDefaultPoints: subtypesIndexDefaultPoints,
 } only %}
 
 {% if showAdminNavMenu %}
     </div>
 </div>
 {% endif %}
+
+{% autoescape('js') %}
+<script type="text/javascript">
+    $(function () {
+        const subtypesIndexDefaultExpiry = {{ subtypesIndexDefaultExpiry|json_encode|raw }};
+        const typesIndexDefaultExpiry = {{ typesIndexDefaultExpiry|json_encode|raw }};
+
+        const isExistingRecord = {{ record.id != '' ? "true" : "false"  }};
+        const expiresAt = '{{ record.expiresAt ? record.expiresAt.localShort : null }}';
+        const calculatedExpiresAt = {{ calculatedExpiresAt|json_encode|raw }};
+
+        /**
+         * When the expires at date has manually changed, this takes precedence and
+         * any further changes when type/sub-type is changed will not update the expires at date.
+         * Rather conveniently, the jQuery .onChange will not trigger when the expiresAt.value is changed within
+         * the updateExpiresAt method, so we don't need to worry about this being triggered when it shouldn't be.
+         */
+        let hasManualExpiresAtInput = false;
+
+        $("#expiresAt").on("change", function () {
+            hasManualExpiresAtInput = true;
+        });
+
+        /**
+         * Check if the expires at date can be updated when the type/sub-type is changed
+         * We prevent updating the expires at date if the record is existing, the expires at date is set,
+         * or if there is a manual input for the expires at date
+         * @returns boolean
+         */
+        function canUpdateExpiresAt() {
+            return !isExistingRecord && expiresAt === "" && !hasManualExpiresAtInput;
+        }
+        /**
+         * Update the expires at date based on the current type / subtype selection
+         * @param defaultExpiry
+         */
+        function updateExpiresAt (defaultExpiry) {
+            if (!canUpdateExpiresAt()) {
+                return;
+            }
+            // ensure expiresAt actually exists before setting the value
+            const expiresAtElement = document.getElementById("expiresAt");
+            if (expiresAtElement === null) {
+                return;
+            }
+            // if the new type/sub-type Default Expiry is set to 'Never', clear the previously set value and return
+            if (defaultExpiry === null || defaultExpiry === "") {
+                expiresAtElement.value = "";
+                return;
+            }
+            // otherwise set the expires at date based on the Default Expiry that was set
+            expiresAtElement.value = calculatedExpiresAt[defaultExpiry] ?? '';
+        }
+
+        /* Some convenient selectors
+         */
+        const typeDropdown = $('#typeId');
+        const subtypeDropdown = $('#subtypeId');
+
+        /* Whenever Subtype changes, see if the now-selected subtypeId is null
+         * Decide which template to load
+         */
+        subtypeDropdown.on('change', function(event) {
+            init(typeDropdown.val(), subtypeDropdown.val());
+        });
+
+        {% if record.id != '' %}
+        /* Get the current entry tip when modifying the record
+         */
+        if (subtypeDropdown.val() === null) {
+            updateExpiresAt($.trim(typesIndexEntryTip[typeDropdown.val()]));
+        } else {
+            updateExpiresAt($.trim(subtypesIndexEntryTip[subtypeDropdown.val()]));
+        }
+        {% endif %}
+
+        /**
+         * Update the entry tip and expires at date based on the type / subtype selection
+         */
+        function init(typeVal, subtypeVal) {
+            if (null !== subtypeVal) {
+                updateExpiresAt($.trim(subtypesIndexDefaultExpiry[subtypeVal]));
+            } else {
+                updateExpiresAt($.trim(typesIndexDefaultExpiry[typeVal]));
+            }
+        }
+    })
+</script>
+{% endautoescape %}

@@ -46,8 +46,8 @@ class MailNotifier extends WorkNotifier
         IListFactory $factory,
         UserMapper $userMapper,
         EmailFactory $emailFactory,
-        IConfigLoader $configLoader = null,
-        LoggerInterface $log = null
+        ?IConfigLoader $configLoader = null,
+        ?LoggerInterface $log = null
     ) {
         parent::__construct($configLoader, $log);
 

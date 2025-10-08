@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\Markbook;
 
 use Alaress\Web\Controller\Base;
+use Alaress\HTMLPurifier\IPurifier;
 use Aura\Router\Exception\RouteNotFound;
 use Schoolbox\Assessment\Term;
 use Schoolbox\Collection;
@@ -18,53 +19,46 @@ use Schoolbox\Filter;
 use Schoolbox\Filter\Codec;
 use Schoolbox\Filter\Filters\Assessment\AssessmentType\Definition as AssessmentTypeDefinition;
 use Schoolbox\GenericCollection;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\Feedback\Visibility;
 use Schoolbox\Learning\Assessment\IAssessable;
+use Schoolbox\Learning\Assessment\DueWork;
+use Schoolbox\Learning\Assessment\Quiz;
+use Schoolbox\Learning\Assessment\Project;
+use Schoolbox\Learning\Assessment\Task;
+use Schoolbox\Learning\Assessment\Translator\UnitAssessments;
 use Schoolbox\Learning\MarkScheme\Factory;
+use Schoolbox\Learning\DueWork\State;
+use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Resource\Folder\Model as FolderModel;
 use Schoolbox\User;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 use function func_get_args;
 
 class Controller extends Base
 {
-    /** @var AssessmentMapperProxy */
-    private $assessmentMapperProxy;
-
-    /** @var Term\Mapper */
-    private $termMapper;
-
-    /** @var Access */
-    private $access;
-
-    /** @var Filter\Filters\Assessment\IdFinder */
-    private $assessmentIdFinder;
-
-    /** @var Filter\IFactoryFactory */
-    private $filterFactoryFactory;
-
-
     /**
      * @param AssessmentMapperProxy              $assessmentMapperProxy
      * @param Term\Mapper                        $termMapper
      * @param Access                             $access
      * @param Filter\Filters\Assessment\IdFinder $assessmentIdFinder
      * @param Filter\IFactoryFactory             $filterFactoryFactory
+     * @param StateMapper                        $stateMapper
+     * @param IPurifier                          $purifier
      */
     public function __construct(
-        AssessmentMapperProxy $assessmentMapperProxy,
-        Term\Mapper $termMapper,
-        Access $access,
-        Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
-        Filter\IFactoryFactory $filterFactoryFactory
+        private AssessmentMapperProxy $assessmentMapperProxy,
+        private Term\Mapper $termMapper,
+        private Access $access,
+        private Filter\Filters\Assessment\IdFinder $assessmentIdFinder,
+        private Filter\IFactoryFactory $filterFactoryFactory,
+        private StateMapper $stateMapper,
+        private IPurifier $purifier,
+        private EditorTemplateHelper $editorTemplateHelper
     ) {
-        $this->assessmentMapperProxy = $assessmentMapperProxy;
-        $this->termMapper            = $termMapper;
-        $this->access                = $access;
-        $this->assessmentIdFinder    = $assessmentIdFinder;
-        $this->filterFactoryFactory  = $filterFactoryFactory;
     }
 
 
@@ -101,6 +95,7 @@ class Controller extends Base
         $this->response = $this->responseFromTemplate('@learningMarkbook/markbookOuter.twig', [
                 'folder'      => $folder,
                 'filterPanel' => $filterPanel,
+                'editorTemplates' => $this->editorTemplateHelper->getTemplatesForCategory(),
             ], $pageTitle, 'submission');
     }
 
@@ -129,22 +124,344 @@ class Controller extends Base
             $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
             $markbook      = $this->buildMarkbook($assessmentIds, $folder);
 
+            $unitSpecs = $markbook->getAssessments()->map(function (IAssessable $assessment) {
+                $base = $assessment->getBaseContext();
+                if ($base instanceof \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model) {
+                    // Implementation
+                    return $base->getSpecification();
+                } elseif ($base instanceof \Schoolbox\Learning\Course\DataModel\Specification\Unit\Model) {
+                    // Specification
+                    return $base;
+                }
+
+                // no unit spec, return null
+                return null;
+            });
+
             /**
              * need to get an list of the students by id, with their ranking
              */
             $rank = $markbook->getRanking();
 
+            $writable = $this->getAssessmentsWritability($markbook->getAssessments());
+
+            $data = [
+                'rank' => (bool)$this->getConfigLoader()->get('view_rank') ? $rank : null,
+                'assessments' => $markbook->getAssessments()->reindex()->map(function (IAssessable $assessment, $sequence) {
+                    $unitAssessmentsTranslator = new UnitAssessments(
+                        $this->routeGenerator,
+                        $this->getAuthorizer(),
+                        $this->getUser(),
+                        $this->getUser(),
+                    );
+
+                    $unitSpec = null;
+                    $base = $assessment->getBaseContext();
+                    if ($base instanceof \Schoolbox\Learning\Course\DataModel\Implementation\Unit\Model) {
+                        // Implementation
+                        $unitSpec = $base->getSpecification();
+                    }
+
+                    return [
+                        'id'              => $assessment->getId(),
+                        'title'           => $assessment->getTitle(),
+                        'typeName'        => $assessment->getTypeName(),
+                        'assessmentType'  => $assessment->getFamilyName(),
+                        'sequence'        => $sequence,
+                        'unitSpec'        => $unitSpec !== null ? [
+                            /* for rendering the unit bars at the top of the page */
+                            'id'    => $unitSpec->getId(),
+                            'title' => $unitSpec->getTitle(),
+                        ] : null,
+                        /* the class markbook doesn't need any of the below, as this is always an implementation */
+                        'isSpecification' => $assessment->isSpecification(),
+                        'stats'           => null,
+                        '_links'          => $unitAssessmentsTranslator->getLinks($assessment, false),
+                        '_routes'         => [
+                            'postFeedbacks' => $this->getRouteIfAuthorized(
+                                'learningDueWorkFeedback.postParticipantFeedbacks',
+                                ['assessment' => $assessment, 'assessmentId' => $assessment->getId()]
+                            ),
+                        ],
+                    ];
+                })->indexByCallback(fn(array $assessment) => $assessment['id']),
+                /**
+                 * A "class implementation" is a course/class markbook-specific term.
+                 * Since the class markbook can contain non-unit assessments, this is a generalised term to allow
+                 * each of the course markbook's course implementation data and the class markbook's class data to
+                 * be returned as a similar payload structure
+                 *
+                 * For the class markbook, there is only ever one of these - the class folder itself
+                 */
+                'classImpls' => [[
+                    'folder' => [
+                        'id'    => $folder->getFolder()->getId(),
+                        'title' => $folder->getFolder()->getTitle(),
+                    ],
+                    'assessments' => $markbook->getAssessments()->indexBy('id')->map(function (IAssessable $aImpl) use ($markbook, $writable) {
+                        /** Only due work has the concept of "instructorMarkScheme", others just use markScheme for now */
+                        $instructorMarkScheme = $aImpl instanceof DueWork\Model
+                            ? $aImpl->getInstructorMarkScheme()
+                            : $aImpl->getMarkScheme();
+
+                        if ($aImpl->getOriginalAssessmentId() === null) {
+                            $aImpl = $this->assessmentMapperProxy->loadCustomisationsIntoAssessment($aImpl);
+                        }
+                        $originalUrl = null;
+                        if (null !== $aImpl->getOriginalAssessmentId() || $aImpl->getCustomisedAssessments()->count() > 0) {
+                            $originalAssessmentId = (null !== $aImpl->getOriginalAssessmentId()) ?
+                                $aImpl->getOriginalAssessmentId() :
+                                $aImpl->getId();
+                            $originalAssessment = $this->assessmentMapperProxy->findById($originalAssessmentId);
+                            if ($originalAssessment instanceof IAssessable) {
+                                $originalUrl = $this->getRouteIfAuthorized(
+                                    'learningAssessment.getAssessmentParticipationForm',
+                                    ['assessment' => $originalAssessment, 'assessmentId' => $originalAssessment->getId()]
+                                );
+                            }
+                        }
+
+                        return [
+                            'id'             => $aImpl->getId(),
+                            'markVisibility' => $aImpl->getMarkVisibility(),
+                            'courseManaged'  => $aImpl->getCourseManaged(),
+                            'weight'         => $aImpl->getWeight(),
+                            'writable'       => $writable[$aImpl->getId()] ?? null,
+                            'instructorMarkScheme' => [
+                                'template' => $instructorMarkScheme->getTemplate(),
+                                'context'  => $instructorMarkScheme->generateContext(),
+                            ],
+                            'participants'   => $markbook->getStudents()->map(
+                                function (User $student) use ($aImpl, $markbook) {
+                                    $participant = $aImpl->getParticipantIfExtant($student, false);
+                                    if ($participant === null) {
+                                        return null;
+                                    }
+
+                                    /* Find the progress tick status, only relevant for tasks */
+                                    $progressTick = null;
+                                    if ($aImpl instanceof Task\Model) {
+                                        $unitAssessmentsTranslator = new UnitAssessments(
+                                            $this->routeGenerator,
+                                            $this->getAuthorizer(),
+                                            $participant->getUser(),
+                                            $this->getUser(),
+                                        );
+                                        $progressTick = $unitAssessmentsTranslator->getProgressTick($aImpl, $participant);
+                                    }
+
+                                    $draftMark = isset($markbook->getHasDraft()[$aImpl->getId()][$student->getId()]);
+
+                                    $authoritativeFeedback = $participant->getAuthoritativeFeedback(true);
+                                    $authoritativeFeedbackDraft = $draftMark ? $participant->getAuthoritativeFeedback(false) : null;
+
+                                    if ($authoritativeFeedbackDraft && !$authoritativeFeedbackDraft->isDraft()) {
+                                        // this isn't actually a draft (it'll be the same as $authoritativeFeedback)
+                                        $authoritativeFeedbackDraft = null;
+                                    }
+
+                                    $resubmissionRequiredPublished = $authoritativeFeedback instanceof DueWork\Feedback\Model
+                                        ? $authoritativeFeedback->getResubmissionRequired()
+                                        : false;
+                                    $resubmissionRequiredDraft = $authoritativeFeedbackDraft instanceof DueWork\Feedback\Model
+                                        ? $authoritativeFeedbackDraft->getResubmissionRequired()
+                                        : false;
+
+                                    $responseIdPublished = $authoritativeFeedback?->getId() ?? null;
+                                    $responseIdDraft = $authoritativeFeedbackDraft?->getId() ?? null;
+
+                                    $authNormMarkPublished = $authoritativeFeedback || $aImpl instanceof Project ? $participant->getNormalisedMark(true) : null;
+                                    $authNormMarkDraft = $authoritativeFeedbackDraft || $aImpl instanceof Project ? $participant->getNormalisedMark(false) : null;
+
+                                    /** the markbook uses responseId !== null to determine if this mark actually exists, so jank a -1 here for projects */
+                                    if ($aImpl instanceof Project) {
+                                        if ($authNormMarkPublished) {
+                                            $responseIdPublished = -1;
+                                        }
+
+                                        if ($authNormMarkDraft) {
+                                            $responseIdDraft = -1;
+                                        }
+                                    }
+
+                                    return [
+                                        'isExcluded'           => $participant->isExcluded(),
+                                        'hasSubmittedResponse' => $participant->hasSubmittedResponse(),
+                                        'hasPublishedFeedback' => $participant->hasPublishedFeedback(),
+                                        'progressTick'       => $progressTick,
+                                        'marks' => [
+                                            'published' => [
+                                                'norm'         => $authNormMarkPublished,
+                                                'hr'           => $authoritativeFeedback || $aImpl instanceof Project ? $participant->getHumanReadableMark(true) : null,
+                                                'hrInstructor' => $authoritativeFeedback || $aImpl instanceof Project ? $participant->getHumanReadableInstructorMark(true) : null,
+                                                'comment'      => $this->purifier->purify($authoritativeFeedback?->getComment()),
+                                                'resubmissionRequired' => $resubmissionRequiredPublished,
+                                                'responseId'   => $responseIdPublished,
+                                            ],
+                                            'draft' => [
+                                                'norm'         => $authNormMarkDraft,
+                                                'hr'           => $authoritativeFeedbackDraft || $aImpl instanceof Project ? $participant->getHumanReadableMark(false) : null,
+                                                'hrInstructor' => $authoritativeFeedbackDraft || $aImpl instanceof Project ? $participant->getHumanReadableInstructorMark(false) : null,
+                                                'comment'      => $this->purifier->purify($authoritativeFeedbackDraft?->getComment()),
+                                                'resubmissionRequired' => $resubmissionRequiredDraft,
+                                                'responseId'   => $responseIdDraft
+                                            ],
+                                        ],
+                                        'plan' => [
+                                            'isDynamic' => $participant->getPlan()->getIsDynamic(),
+                                            'name' => $participant->getPlan()->getName(),
+                                            'dueDate' => $participant->getPlan()->getDueDate()?->getShort() ?? null,
+                                        ],
+                                    ];
+                                }
+                            ),
+                            'stats'          => array_merge(
+                                $markbook->getAssessmentStatistics()[$aImpl->getId()] ?? [],
+                                [ 'markVisibility' => $aImpl->getMarkVisibility() ]
+                            ),
+                            '_routes'        => [
+                                'learningAssessment.getStatus' => $this->routeGenerator->generate(
+                                    'learningAssessment.getStatus',
+                                    [ 'assessmentId' => $aImpl->getId() ]
+                                ),
+                                'student' => $markbook->getStudents()->map(fn(User $student) => [
+                                    'learningAssessmentTimeline.getFullTimeline' => $this->getRouteIfAuthorized(
+                                        'learningAssessmentTimeline.getFullTimeline',
+                                        [
+                                            'assessment' => $aImpl,
+                                            'assessmentId' => $aImpl->getId(),
+                                            'userId' => $student->getId(),
+                                        ]
+                                    ),
+                                    'learningDueWorkResponse.getParticularResponse' => $this->getRouteIfAuthorized(
+                                        'learningDueWorkResponse.getParticularResponse',
+                                        [
+                                            'assessment' => $aImpl,
+                                            'assessmentId' => $aImpl->getId(),
+                                            'studentId' => $student->getId(),
+                                            'student' => $student,
+                                        ]
+                                    ),
+                                    'learningDueWorkFeedback.postPublishFeedback' => $this->getRouteIfAuthorized(
+                                        'learningDueWorkFeedback.postPublishFeedback',
+                                        [
+                                            'assessment' => $aImpl,
+                                            'assessmentId' => $aImpl->getId(),
+                                            'studentId' => $student->getId(),
+                                            'student' => $student,
+                                        ]
+                                    ),
+                                    'learningAssessment.postExclude' => $this->getRouteIfAuthorized(
+                                        'learningAssessment.postExclude',
+                                        [
+                                            'assessment' => $aImpl,
+                                            'assessmentId' => $aImpl->getId(),
+                                            'studentId' => $student->getId(),
+                                            'student' => $student,
+                                        ]
+                                    ),
+                                    'learningAssessment.postInclude' => $this->getRouteIfAuthorized(
+                                        'learningAssessment.postInclude',
+                                        [
+                                            'assessment' => $aImpl,
+                                            'assessmentId' => $aImpl->getId(),
+                                            'studentId' => $student->getId(),
+                                            'student' => $student,
+                                        ]
+                                    ),
+                                    'learningAssessment.getSummary' => $this->getRouteIfAuthorized(
+                                        'learningAssessment.getSummary',
+                                        [
+                                            'assessment' => $aImpl,
+                                            'assessmentId' => $aImpl->getId(),
+                                            'studentId' => $student->getId(),
+                                            'student' => $student,
+                                        ]
+                                    ),
+                                    'learningAssessment.getInfo' => $this->getRouteIfAuthorized(
+                                        'learningAssessment.getInfo',
+                                        [
+                                            'assessment' => $aImpl,
+                                            'assessmentId' => $aImpl->getId(),
+                                            'studentId' => $student->getId(),
+                                            'student' => $student,
+                                        ]
+                                    ),
+                                    /* this will change depending on if it's a quiz or due work */
+                                    'postFeedback' =>
+                                        $aImpl instanceof DueWork\Model ? $this->getRouteIfAuthorized(
+                                            'learningDueWorkFeedback.postParticipantFeedback',
+                                            [
+                                                'assessment' => $aImpl,
+                                                'assessmentId' => $aImpl->getId(),
+                                                'studentId' => $student->getId(),
+                                                'student' => $student,
+                                            ]
+                                        ) : ($aImpl instanceof Quiz\Model ? $this->getRouteIfAuthorized(
+                                            'learningQuizAttempt.postModify',
+                                            [
+                                                'assessment' => $aImpl,
+                                                'assessmentId' => $aImpl->getId(),
+                                                'studentId' => $student->getId(),
+                                                'student' => $student,
+                                            ],
+                                        ) : null
+                                    ),
+                                    /* The original assessment customisation route, if it's a customised copy otherwise null
+                                     */
+                                    'getAssessmentParticipationForm' => $originalUrl,
+                                ]),
+                            ],
+                        ];
+                    }),
+                    'students'    => $markbook->getStudents()->map(fn (User $student) => [
+                        'id'         => $student->getId(),
+                        'externalId' => $student->getExternalId(), // ...for portrait.twig
+                        'givenName'  => $student->getGivenName(),
+                        'lastName'   => $student->getLastname(),
+                        'stats'      => $markbook->getStudentStatistics()[$student->getId()],
+                        '_routes'    => [
+                            'grades' => $this->routeGenerator->generate(
+                                'learningGrades.getGrades',
+                                [
+                                    'viewee'   => $student,
+                                    'userId'   => $student->getId(),
+                                    'termCode' => '',
+                                ]
+                            ),
+                        ]
+                    ]),
+                    /* overall stats for the entire class */
+                    'stats' => [
+                        'normalisedMean' => $markbook->getNormalisedMean(),
+                        'draftNormalisedMean' => $markbook->getDraftNormalisedMean(),
+                        'weightedMean' => $markbook->getWeightedMean(),
+                        'draftWeightedMean' => $markbook->getDraftWeightedMean(),
+                    ],
+                ]],
+                '_routes' => [
+                    'exportReport' => $this->routeGenerator->generate(
+                        'learningMarkbook.getMarkbookExportForClass',
+                        [
+                            'folder'   => $folder,
+                            'folderId' => $folder->getId(),
+                        ]
+                    ),
+                    'courseImport.getImport' => null, /* not relevant on the class markbook */
+                ],
+                'canAccessPopOut' => true, /* can always access the pop-out on the class markbook, I suppose */
+                'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get(ConfigMapper::NAME_SUBMISSION_VISIBILITY_MAX)),
+                'submissionErrorStates' => $this->stateMapper->findAll()->map(fn(State $state) => [
+                    'id' => $state->getId(),
+                    'name' => $state->getDisplayAs(),
+                    'normaliseAs' => $state->getNormaliseAs(),
+                ])->reindex(),
+                'filtersQueryArgs' => $codec->convertSelectionsToQueryString($selectionsPerFilter),
+            ];
+
             $this->response = $this->responseAsJson([
                 'status'  => 200,
-                'content' => $this->responseFromTemplateUnthemed('@learningMarkbook/markbookInner.twig', [
-                    'markbook'              => $markbook,
-                    'folder'                => $folder,
-                    'rank'                  => $rank,
-                    'rankEnabled'           => (bool)$this->getConfigLoader()->get('view_rank'),
-                    'writable'              => $this->getAssessmentsWritability($markbook->getAssessments()),
-                    'queryArgs'             => $codec->convertSelectionsToQueryString($selectionsPerFilter),
-                    'availableVisibilities' => Visibility::getAvailableVisibilities((int)$this->getConfigLoader()->get('submission_visibility_max')),
-                ])->getBody()->getContents(),
+                'content' => $data,
             ]);
         } catch (Filter\BrokenFilterException $e) {
             $this->captureException($e);
@@ -317,11 +634,13 @@ class Controller extends Base
         $assessmentIds = $this->assessmentIdFinder->findIdsByFilters($filters, $this->getUser());
         $markbook      = $this->buildMarkbook($assessmentIds, $folder);
         $showDrafts    = (bool)($filtersArray['showDrafts'] ?? false);
+        $showDisplayMarks = (bool)($filtersArray['showDisplayMarks'] ?? false);
         $csvExporter   = new Export\CSV((bool)$this->getConfigLoader()->get('view_rank'));
         $csvExporter->export(
             $markbook,
             (($showDrafts ? 'Draft - ' : '') . sprintf('%s - Class Markbook.csv', $folder->getName())),
             $showDrafts,
+            $showDisplayMarks,
         );
         exit;
     }
@@ -415,11 +734,22 @@ class Controller extends Base
      */
     private function isAssessmentMarkable(User $user, IAssessable $assessment, GenericCollection $terms): bool
     {
+        /* Note that this will contain Extraordinary Terms whose dates could
+         * be encompassed by another Extraordinary Term (ie. those extraordinary
+         * terms have overlapping dates)
+         *
+         * There used to be an exit-early here for an archived term, under the
+         * presumption that Academic Periods could never overlap. That's true,
+         * for ordinary terms, but not for Extraordinary Terms.
+         *
+         * This means we have to inspect the full set of $terms to potentially find
+         * one that matches, considering that overlapping dates are possible.
+         */
         foreach ($terms as $term) {
-            if ($term->contains($assessment->getDueAt())) {
-                if ($term->getArchived()) {
-                    return false;
-                }
+            /* Only care about terms that contain the assessment's due date
+             * and that the term is not archived
+             */
+            if ($term->contains($assessment->getDueAt()) && !$term->getArchived()) {
                 // Rely on access cache to catch repeated calls to same folder.
                 return $this->access->isInstructor($user, $assessment->getContext()->getFolder());
             }

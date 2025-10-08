@@ -117,6 +117,21 @@ class FactoryTest extends TestCase
 
     /**
      * @param DueWork $dueWork
+     *
+     * @throws DomainException If instructor MarkType is invalid for the assessment
+     * @throws InvalidArgumentException If assessment class not registered
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkInstructorMarkTypeInvalid')]
+    public function testDueWorkInstructorMarkTypeInvalid(DueWork $dueWork)
+    {
+        $this->expectException(DomainException::class);
+        $factory = new MarkSchemeFactory();
+        $factory->spawnInstructorMarkSchemeFor($dueWork);
+    }
+
+
+    /**
+     * @param DueWork $dueWork
      * @param string  $expectedMarkScheme
      * @throws DomainException If MarkType is invalid for the assessment
      * @throws InvalidArgumentException If assessment class not registered
@@ -127,6 +142,22 @@ class FactoryTest extends TestCase
     {
         $factory    = new MarkSchemeFactory();
         $markScheme = $factory->spawnMarkSchemeFor($dueWork);
+        $this->assertInstanceOf($expectedMarkScheme, $markScheme);
+    }
+
+
+    /**
+     * @param DueWork $dueWork
+     * @param string  $expectedMarkScheme
+     * @throws DomainException If instructor MarkType is invalid for the assessment
+     * @throws InvalidArgumentException If assessment class not registered
+     * @throws \PHPUnit\Framework\Exception
+     */
+    #[\PHPUnit\Framework\Attributes\DataProvider('providerDueWorkInstructorMarkTypeValid')]
+    public function testDueWorkInstructorMarkTypeValid(DueWork $dueWork, $expectedMarkScheme)
+    {
+        $factory    = new MarkSchemeFactory();
+        $markScheme = $factory->spawnInstructorMarkSchemeFor($dueWork);
         $this->assertInstanceOf($expectedMarkScheme, $markScheme);
     }
 
@@ -235,6 +266,20 @@ class FactoryTest extends TestCase
 
 
     /**
+     * @return DueWork[][]
+     * @throws InvalidArgumentException If $slug is not recognised
+     */
+    public static function providerDueWorkInstructorMarkTypeInvalid(): array
+    {
+        return [
+            [(new DueWork())->setInstructorMarkType(self::getDummyMarkType(MarkType::TYPE_FREE))],
+            [(new DueWork())->setInstructorMarkType(self::getDummyMarkType(MarkType::TYPE_RUBRIC))],
+            [(new DueWork())->setInstructorMarkType(self::getDummyMarkType(MarkType::TYPE_COMPLETION))],
+        ];
+    }
+
+
+    /**
      * @return array<array{0: DueWork, 1: class-string}>
      * @throws InvalidArgumentException If $slug is not recognised
      */
@@ -249,6 +294,25 @@ class FactoryTest extends TestCase
             [(new DueWork())->setMarkType(self::getDummyMarkType(MarkType::TYPE_TOTAL))->setMaxMark(50), TotalMarkFractional::class],
             [(new DueWork())->setMarkType(self::getDummyMarkType(MarkType::TYPE_TOTAL))->setMaxMark(49.99), TotalMarkFractional::class],
             [(new DueWork())->setMarkType(self::getDummyMarkType(MarkType::TYPE_NONE)), None::class],
+        ];
+    }
+
+
+    /**
+     * @return array<array{0: DueWork, 1: class-string}>
+     * @throws InvalidArgumentException If $slug is not recognised
+     */
+    public static function providerDueWorkInstructorMarkTypeValid(): array
+    {
+        return [
+            [(new DueWork())->setInstructorMarkType(self::getDummyMarkType(MarkType::TYPE_PERCENT)), Percentage::class],
+            [
+                (new DueWork())->setInstructorMarkType(self::getDummyMarkType(MarkType::TYPE_LETTER))->setInstructorGradeGroup(self::getDummyLetterGradeGroup()),
+                LetterGrade::class,
+            ],
+            [(new DueWork())->setInstructorMarkType(self::getDummyMarkType(MarkType::TYPE_TOTAL))->setInstructorMaxMark(50), TotalMarkFractional::class],
+            [(new DueWork())->setInstructorMarkType(self::getDummyMarkType(MarkType::TYPE_TOTAL))->setInstructorMaxMark(49.99), TotalMarkFractional::class],
+            [(new DueWork())->setInstructorMarkType(self::getDummyMarkType(MarkType::TYPE_NONE)), None::class],
         ];
     }
 

@@ -4,6 +4,7 @@
  * This represents a different way the field may show on the actual profile itself
  */
 
+import { ProfileEditorFieldSettingKey } from "./types/profileEditorTypes";
 import type { ProfileEditorActiveField, ProfileEditorAvailableField } from "./types/profileEditorTypes";
 
 interface Props {
@@ -29,6 +30,16 @@ const tooltipText = window.Vue.computed<string | undefined>(() => {
     }
     return undefined;
 });
+
+/**
+ * Is this a "click to reveal" field? If so, we'll show an icon
+ */
+const isClickToReveal = window.Vue.computed(() => {
+    if (!("fieldSettings" in props.field)) {
+        return false; // This isn't an "active" field, don't show the icon
+    }
+    return props.field.fieldSettings[ProfileEditorFieldSettingKey.ADDITIONAL_SETTINGS].includes("clickToReveal");
+});
 </script>
 
 <template>
@@ -36,20 +47,29 @@ const tooltipText = window.Vue.computed<string | undefined>(() => {
         v-if="props.field.icon"
         :data-tooltip="tooltipText !== undefined ? `pe-fields-icon-tip-${props.field.css}` : undefined"
         :title="tooltipText"
-        class="pe-fields-icon"
+        class="pe-fields-icon pe-fields-icon-primary"
         :class="`${props.field.icon} ${props.field.css || ''}`"
+    ></span>
+    <span
+        v-if="isClickToReveal"
+        data-tooltip
+        title="Content stays hidden until revealed by a click."
+        class="pe-fields-icon icon-view-hollow"
     ></span>
 </template>
 
 <style scoped lang="scss">
 .pe-fields-icon {
     cursor: help;
-    color: var(--content-ui-foreground);
 
     // For now, if "alert" is a specific class that may be applied,
     // in that scenario, we want to change the color to the alert color
     &.alert {
         color: var(--color-alert);
     }
+}
+
+.pe-fields-icon-primary {
+    color: var(--content-ui-foreground);
 }
 </style>

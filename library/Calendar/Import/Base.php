@@ -16,6 +16,11 @@ use Schoolbox\User;
 
 abstract class Base
 {
+    /**
+     * Maximum size allowed by schema.
+     */
+    protected const MAX_EVENT_TITLE = 250;
+
 
     /**
      * The person to whom these imported events are relevant
@@ -92,16 +97,16 @@ abstract class Base
     /**
      * Base constructor.
      *
-     * @param User $user
-     * @param User $author
-     * @param array $categoryList
-     * @param array $groupList
-     * @param array $campusList
-     * @param int $access
-     * @param string $file
+     * @param User        $user
+     * @param User        $author
+     * @param array       $categoryList
+     * @param array       $groupList
+     * @param array       $campusList
+     * @param int         $access
+     * @param string      $file
      * @param string|null $source
      */
-    public function __construct(User $user, User $author, array $categoryList, array $groupList, array $campusList, int $access, string $file, string $source = null)
+    public function __construct(User $user, User $author, array $categoryList, array $groupList, array $campusList, int $access, string $file, ?string $source = null)
     {
         $this->setUser($user);
         $this->setAuthor($author);
@@ -120,8 +125,10 @@ abstract class Base
 
     /**
      * Load events from file into schoolbox
+     *
+     * @param bool $perform should it be a dry-run instead
      */
-    abstract public function load();
+    abstract public function load(bool $perform = true);
 
     /* Getters/Setters
      */

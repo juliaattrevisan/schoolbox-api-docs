@@ -14,13 +14,19 @@ use Alaress\Authorizer\Rule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use Alaress\Authorizer\Failure\InvalidPath;
+use Alaress\HTMLPurifier\Adapter\ScrubAdapter;
 use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Mapper;
 use Schoolbox\Role;
+use Schoolbox\Learning\DueWork\StateMapper;
 use Schoolbox\Learning\Course\DataModel\Specification as CourseSpec;
 use Schoolbox\Filter;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImpl;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImpl;
+use Schoolbox\Permission\Access\Access;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
+use Schoolbox\Editor\Templates\Mapper as EditorTemplateMapper;
+use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
 
 class Module extends \Alaress\Module\Module
 {
@@ -92,6 +98,14 @@ class Module extends \Alaress\Module\Module
             $this->injector->get('assessmentDataSource'),
             $this->getMapperFactory()->get(CourseImpl\Mapper::class),
             $this->getMapperFactory()->get(UnitImpl\Mapper::class),
+            $this->getMapperFactory()->get(Access::class),
+            $this->getMapperFactory()->get(StateMapper::class),
+            new ScrubAdapter(),
+            new EditorTemplateHelper(
+                $this->getMapperFactory()->get(EditorTemplateMapper::class),
+                EditorTemplatesCategoryModel::FEEDBACK,
+                $this->injector->get('user')
+            ),
         );
     }
 

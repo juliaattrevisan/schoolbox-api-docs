@@ -75,7 +75,7 @@ function onModalClosed(): void {
             <li>
                 <button
                     class="button icon-approve submit"
-                    data-test="confirm-delete-node"
+                    :data-test="`fn-delete-node-confirm-${props.folderId}`"
                     :disabled="store().isProcessing"
                     @click.prevent="onDeleteSelected"
                 >

@@ -68,6 +68,7 @@ class ModelToArray
             'id'       => $node->getId(),
             'name'     => $node->getName(),
             'code'     => $node->getCode(),
+            'enabled'  => $node->getEnabled(),
             'usage'    => [
                 'courses' =>
                     $this->courseSpec->map(

@@ -14,7 +14,6 @@ namespace Custom\Dsfg\AchievementReport\NCEA;
  */
 class CourseCreditSummaryNavigation extends Base
 {
-
     /**
      * Heading
      *
@@ -41,7 +40,7 @@ class CourseCreditSummaryNavigation extends Base
             SELECT
                 StudentYear
             FROM
-                dbo.uvSchoolBoxNCEAResults
+                " . $this->getDbTableName() . "
             WHERE
                 id = :externalId AND
                 WithdrawnFlag = 0 AND

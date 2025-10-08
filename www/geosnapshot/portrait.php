@@ -51,7 +51,7 @@ if (
 
 $kernel->outputCacheControlMaxAgeHeaderFromConfig(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT);
 $kernel->getShutdownHandler()->registerFunction(
-    new ResourceLimitExceededHandler(function () {
+    new ResourceLimitExceededHandler(function (): void {
         header('Cache-Control: no-store');
         SitePage::redirectToBrokenImageWithTransform('portrait', TRANSFORM_KEY, 504);
     }),
@@ -96,7 +96,7 @@ try {
 
         $preSignedUrlDataObject = $preSignedUrlService->generate(
             $storageModel,
-            Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds($config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
+            Alaress_Date_Format::now()->setTimezone('UTC')->addSeconds((int)$config->get(ConfigMapper::NAME_BROWSER_CACHE_PORTRAIT_TIMEOUT)),
             $portrait->getTranscodePath(
                 FilesystemProxy::getPathFromHash($storageModel->getHash()),
                 $cacheKey,

@@ -7,131 +7,103 @@
  * @link        https://schoolbox.com.au/
  */
 
+declare(strict_types=1);
+
 namespace Alaress\Redis\Async;
 
-use Alaress\Redis\Async\Event\IEvent;
 use Alaress\Redis\Async\Event\Message;
 use Alaress\Redis\Async\Event\PMessage;
-use Alaress\Redis\Async\Event\Pong;
-use React\EventLoop\LoopInterface;
-use Predis;
-use stdClass;
+use Clue\React\Redis\Client as ReactRedisClient;
+use React\Promise;
+use React\Promise\PromiseInterface;
 
+/**
+ * Redis asynchronous client wrapper: provides a more convenient interface for
+ * subscribing to pub/sub queues.
+ */
 class Client
 {
-    /** @var Predis\Async\Client */
-    private $client;
-
     /**
-     * @param string        $dsn
-     * @param LoopInterface $loop
+     * Constructor
+     *
+     * @param ReactRedisClient $client The internal asynchronous Redis client.
+     *                                 This instance of the client may only be used for subscriptions to pub/sub queues:
+     *                                 once a client has started subscribing to a queue, it cannot be used for other
+     *                                 commands as per https://github.com/clue/reactphp-redis?tab=readme-ov-file#pubsub.
      */
-    public function __construct($dsn, LoopInterface $loop)
+    public function __construct(private ReactRedisClient $client)
     {
-        $this->client = new Predis\Async\Client($dsn, $loop);
     }
 
     /**
-     * @param string|string[] $channel  one or more channels to which to subscribe
-     * @param EventListener   $listener
-     * @throws Predis\ClientException if the subscribe fails
+     * Subscribe to one or more channels.
+     *
+     * @param string|array<string> $channel  One or more channels to which to subscribe.
+     * @param EventListener        $listener The event listener which handles messages on `$channel`.
+     * @return PromiseInterface Resolves successfully if all subscriptions are successful.
      */
-    public function subscribe($channel, EventListener $listener)
+    public function subscribe(array|string $channel, EventListener $listener): PromiseInterface
     {
-        $this->addSubscription(Predis\Async\PubSub\Consumer::SUBSCRIBE, $channel, $listener);
-    }
+        $channels = is_array($channel) ? $channel : [$channel];
 
-
-    /**
-     * @param string|string[] $pattern  one or more patterns to which to subscribe
-     * @param EventListener   $listener
-     * @throws Predis\ClientException if the subscribe fails
-     */
-    public function psubscribe($pattern, EventListener $listener)
-    {
-        $this->addSubscription(Predis\Async\PubSub\Consumer::PSUBSCRIBE, $pattern, $listener);
-    }
-
-
-    /**
-     * @param string|string[] $channel  one or more channels from which to unsubscribe
-     * @throws Predis\ClientException if the subscribe fails
-     */
-    public function unsubscribe($channel)
-    {
-        $this->removeSubscription(Predis\Async\PubSub\Consumer::UNSUBSCRIBE, $channel);
-    }
-
-
-    /**
-     * @param string|string[] $pattern  one or more patterns from which to unsubscribe
-     * @throws Predis\ClientException if the subscribe fails
-     */
-    public function punsubscribe($pattern)
-    {
-        $this->removeSubscription(Predis\Async\PubSub\Consumer::PUNSUBSCRIBE, $pattern);
-    }
-
-
-    /**
-     * @param string          $type
-     * @param string|string[] $arguments
-     * @param EventListener   $listener
-     * @throws Predis\ClientException if the subscribe fails
-     */
-    private function addSubscription($type, $arguments, EventListener $listener)
-    {
-        if (empty($arguments)) {
-            return;
-        }
-
-        $arguments = (array)$arguments;
-        $channels  = [ $type => $arguments ];
-
-        $this->client->pubSubLoop($channels, function (stdClass $event) use ($listener): void {
-            // cast this stdClass event object to a named class and push to the listener
-            if ($e = $this->castEvent($event)) {
-                $listener->handle($e);
+        /** @phpstan-ignore-next-line method.notFound - subscribe does exist */
+        $promise = Promise\all(array_map($this->client->subscribe(...), $channels));
+        $this->client->on('message', function (string $messageChannel, string $payload) use ($channels, $listener) {
+            if (in_array($messageChannel, $channels)) {
+                $listener->handle(new Message($payload, $messageChannel));
             }
         });
+        return $promise;
     }
 
 
     /**
-     * @param string          $type
-     * @param string|string[] $arguments
-     * @throws Predis\ClientException if the unsubscribe fails
-     */
-    private function removeSubscription($type, $arguments)
-    {
-        if (empty($arguments)) {
-            return;
-        }
-
-        foreach ((array)$arguments as $argument) {
-            $this->client->$type($argument);
-        }
-    }
-
-
-    /**
-     * Cast a primitive object into an actual class
+     * Subscribe to one or more message patterns.
      *
-     * @param stdClass $event
-     * @return IEvent
+     * @param string|array<string> $pattern  One or more patterns to which to subscribe.
+     * @param EventListener        $listener The event listener which handles messages on channels matching `$pattern`.
+     * @return PromiseInterface Resolves successfully if all subscriptions are successful.
      */
-    private function castEvent(stdClass $event)
+    public function psubscribe(string|array $pattern, EventListener $listener): PromiseInterface
     {
-        switch ($event->kind) {
-            case Predis\Async\PubSub\Consumer::PONG:
-                return new Pong($event->payload);
-            case Predis\Async\PubSub\Consumer::MESSAGE:
-                return new Message($event->payload, $event->channel);
-            case Predis\Async\PubSub\Consumer::PMESSAGE:
-                return new PMessage($event->payload, $event->channel, $event->pattern);
-            default:
-                // given its async nature, throwing an exception in here would be pointless
-                return null;
-        }
+        $patterns = is_array($pattern) ? $pattern : [$pattern];
+
+        /** @phpstan-ignore-next-line method.notFound - psubscribe does exist */
+        $promise = Promise\all(array_map($this->client->psubscribe(...), $patterns));
+        $this->client->on('pmessage', function (string $messagePattern, string $messageChannel, string $payload) use ($patterns, $listener) {
+            if (in_array($messagePattern, $patterns)) {
+                $event = new PMessage($payload, $messageChannel, $messagePattern);
+                $listener->handle($event);
+            }
+        });
+        return $promise;
+    }
+
+
+    /**
+     * Unsubscribe from one or more channels.
+     *
+     * @param string|array<string> $channel One or more channels from which to unsubscribe.
+     * @return PromiseInterface Resolves successfully if all unsubscriptions are successful.
+     */
+    public function unsubscribe(array|string $channel): PromiseInterface
+    {
+        $channels = is_array($channel) ? $channel : [$channel];
+        /** @phpstan-ignore-next-line method.notFound - unsubscribe does exist */
+        return Promise\all(array_map($this->client->unsubscribe(...), $channels));
+    }
+
+
+    /**
+     * Unsubscribe from one or more message patterns.
+     *
+     * @param string|array<string> $pattern One or more patterns from which to unsubscribe.
+     * @return PromiseInterface Resolves successfully if all unsubscriptions are successful.
+     */
+    public function punsubscribe(array|string $pattern): PromiseInterface
+    {
+        $patterns = is_array($pattern) ? $pattern : [$pattern];
+        /** @phpstan-ignore-next-line method.notFound - punsubscribe does exist */
+        return Promise\all(array_map($this->client->punsubscribe(...), $patterns));
     }
 }

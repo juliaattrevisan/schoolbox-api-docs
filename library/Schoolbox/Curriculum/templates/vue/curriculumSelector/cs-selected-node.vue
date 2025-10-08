@@ -1,6 +1,7 @@
 <script setup>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
 /**
  * A selected Curriculum node, it can be deleted and
@@ -8,6 +9,7 @@
  */
 
 import { useStore } from "./store/curriculumSelectorStore";
+import { useSharedStore } from "./store/csSharedStore";
 import { useSelectedNodesStore } from "./store/csSelectedNodesStore";
 
 const props = defineProps({
@@ -28,6 +30,7 @@ const props = defineProps({
 });
 
 const store = useStore();
+const sharedStore = useSharedStore();
 const selectedNodesStore = useSelectedNodesStore();
 
 /**
@@ -66,7 +69,7 @@ function onRemoveSelected() {
         </button>
         <button
             type="button"
-            v-if="!store.isReadOnly"
+            v-if="!sharedStore.isReadOnly"
             class="remove-button icon-close"
             :title="`Remove ${props.node.name}`"
             @click.prevent="onRemoveSelected"

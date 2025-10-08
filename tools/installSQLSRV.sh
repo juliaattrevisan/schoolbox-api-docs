@@ -11,6 +11,13 @@
 # @copyright   Copyright 2019, Schoolbox Pty Ltd
 # @link        https://schoolbox.com.au/
 
+# Deprecation notice
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m"
+echo -e "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+
 echo
 echo "-------------------------------------------------------------------------------------------"
 echo "Microsoft SQL Server ODBC Driver 13 (PHP 7.1 / PDO_SQLSRV) Installer"
@@ -76,15 +83,15 @@ echo "Updating shared library cache..."
 echo "Changing Schoolbox External Connector To Synergetic V68..."
 
 {
-    mysql schoolbox -e "UPDATE config SET value='synergetic.schoolbox.com.au' WHERE name='external_db_host'"
-    mysql schoolbox -e "UPDATE config SET value='Synergetic_AUVIC_ALARESS_PRD' WHERE name='external_db_db'"
-    mysql schoolbox -e "UPDATE config SET value='http://synergetic.schoolbox.com.au:7008/' WHERE name='external_portal'"
-    mysql schoolbox -e "UPDATE config SET value='synergetic' WHERE name='external_type'"
-    mysql schoolbox -e "UPDATE config SET value='sa' WHERE name='external_db_user'"
-    mysql schoolbox -e "UPDATE config SET value='Synergetic#1' WHERE name='external_db_passwd'"
-    mysql schoolbox -e "UPDATE config SET value='0' WHERE name='external_cache_timeout'"
-    mysql schoolbox -e "UPDATE config SET value='1' WHERE name='external_pastoral'"
-    mysql schoolbox -e "UPDATE config SET value='1' WHERE name='external_pastoral_upload'"
+    mariadb schoolbox -e "UPDATE config SET value='synergetic.schoolbox.com.au' WHERE name='external_db_host'"
+    mariadb schoolbox -e "UPDATE config SET value='Synergetic_AUVIC_ALARESS_PRD' WHERE name='external_db_db'"
+    mariadb schoolbox -e "UPDATE config SET value='http://synergetic.schoolbox.com.au:7008/' WHERE name='external_portal'"
+    mariadb schoolbox -e "UPDATE config SET value='synergetic' WHERE name='external_type'"
+    mariadb schoolbox -e "UPDATE config SET value='sa' WHERE name='external_db_user'"
+    mariadb schoolbox -e "UPDATE config SET value='Synergetic#1' WHERE name='external_db_passwd'"
+    mariadb schoolbox -e "UPDATE config SET value='0' WHERE name='external_cache_timeout'"
+    mariadb schoolbox -e "UPDATE config SET value='1' WHERE name='external_pastoral'"
+    mariadb schoolbox -e "UPDATE config SET value='1' WHERE name='external_pastoral_upload'"
 } &>> ~/php_7.1_pdosqlsrv_install.log
 
 echo "Removing downloaded files..."
@@ -143,3 +150,9 @@ php -i | grep 'PDO drivers'
 echo "Log file available at: ~/php_7.1_pdosqlsrv_install.log"
 echo
 
+# Deprecation notice
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/***************     Deprecated NOTICE - this will be deleted in future    ****************/\033[0m"
+echo -e "\033[1;33m/*    If you are running this, please add a comment of this scripts name into SA-19334    */\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"
+echo -e "\033[1;33m/******************************************************************************************/\033[0m"

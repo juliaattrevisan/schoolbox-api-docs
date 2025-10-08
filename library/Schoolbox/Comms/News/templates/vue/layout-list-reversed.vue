@@ -1,9 +1,11 @@
 <script>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
-import MediaArticle from "@schoolboxVue/components/media-article";
 import articleListMixin from "./article-list-mixin";
+import MediaArticle from "@schoolboxVue/components/media-article";
+import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time";
 
 export default {
     name: "layout-list-reversed",
@@ -22,7 +24,7 @@ export default {
         "articles-loading",
         "current-articles",
     ],
-    components: { MediaArticle },
+    components: { MediaArticle, RelativeTime },
     data() {
         return {};
     },
@@ -54,6 +56,12 @@ export default {
                         />
                         <img
                             v-else
+                            :srcset="
+                                article.featureImage._links.image.href +
+                                '&size=constrain200, ' +
+                                article.featureImage._links.image.href +
+                                '&size=constrain300 1.5x'
+                            "
                             :src="article.featureImage._links.image.href + '&size=constrain200'"
                             alt="feature image"
                         />
@@ -89,9 +97,9 @@ export default {
                 </template>
                 <div class="card-actions">
                     <h3>
-                        <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer">{{
-                            article.title
-                        }}</a>
+                        <a :href="article._links.self.href + '?' + queryStringReferrer + '=' + referrer"
+                            >{{ article.title }}
+                        </a>
                     </h3>
                     <div class="spacer"></div>
                     <nav>
@@ -124,16 +132,17 @@ export default {
                         <template v-else>{{ article.author.fullname }}</template>
                     </span>
                     <span>
-                        &mdash; <time :title="article.publishAt.long">{{ article.publishAt.relativeTime }}</time></span
-                    >
+                        &mdash;
+                        <relative-time :datetime="article.publishAt" full-diff></relative-time>
+                    </span>
                     <span v-if="article.topics.length">
                         in
                         <template v-for="(topic, index) in article.topics">
                             <template v-if="index">, </template>
                             <!-- Tab change event is triggered on parent article-list, as that has the full list of articles -->
-                            <a v-if="changeTabOnMeta" @click="$parent.onTabChange(topic.slug, false, false, true)">{{
-                                topic.name
-                            }}</a>
+                            <a v-if="changeTabOnMeta" @click="$parent.onTabChange(topic.slug, false, false, true)"
+                                >{{ topic.name }}
+                            </a>
                             <a v-else :href="getIndexRoute + '?' + queryStringTopic + '=' + topic.slug">{{
                                 topic.name
                             }}</a>

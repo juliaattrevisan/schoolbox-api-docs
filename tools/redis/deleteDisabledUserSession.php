@@ -31,6 +31,8 @@ $app = new class extends CliTool\App {
     /** Hands off execution over to the App */
     public function run(): void
     {
+        $this->deprecationNotice("SA-19334");
+
         if ($this->perform()) {
             $this->getLogger()->info('Deleting remember me and sessions.');
         } else {
@@ -96,6 +98,8 @@ $app = new class extends CliTool\App {
                 $redis->del($key);
             }
         }
+
+        $this->deprecationNotice("SA-19334");
     }
 };
 

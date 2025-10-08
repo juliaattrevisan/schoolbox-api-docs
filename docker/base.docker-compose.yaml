@@ -1,0 +1,362 @@
+# Base docker-compose.yaml for local running of a containerised Schoolbox
+# environment.
+#
+# This definition isn't itself enough to run the Schoolbox environment:
+# it must be combined with a docker-compose which defines:
+# * schoolbox-frankenphp
+# * schoolbox-taskd
+
+services:
+  # Frontend web server, mimicking a load balancer and SSL termination endpoint.
+  # In the dev environment, forwards requests to one of these containers:
+  # * schoolbox-frankenphp-1
+  # * schoolbox-frankenphp-2
+  caddy:
+    container_name: caddy
+    restart: always
+    build:
+      context: ./caddy
+    volumes:
+      - caddy-config:/etc/caddy
+      - caddy-ssl:/etc/nginx/certs/
+    ports:
+      - '80:80'
+      - '443:443'
+    # Make this host available across the network as docker.dev.schoolbox.cloud
+    networks:
+      default:
+        aliases:
+          - docker.dev.schoolbox.cloud
+
+  # Image intended for running command-line processes:
+  # * command-line tools
+  # * updates
+  # * cron tasks
+  #
+  # Basically, anything which we haven't yet figured out how to migrate into its
+  # own container will go here for now.
+  schoolbox-cli:
+    container_name: schoolbox-cli
+    pull_policy: never
+    restart: always
+    environment:
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN}
+      AWS_CREDENTIAL_EXPIRATION: ${AWS_CREDENTIAL_EXPIRATION}
+      INSTANCE_ID: ${INSTANCE_ID}
+      HOST_TYPE: docker
+      XDEBUG_CONFIG: "idekey=PHPSTORM"
+      PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
+    build:
+      context: ./schoolbox-cli
+      args:
+        BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
+        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
+        USER_ID: ${USER_ID}
+        GROUP_ID: ${GROUP_ID}
+    tty: true
+    volumes:
+      - code:/usr/share/schoolbox
+      - storage:/var/lib/schoolbox/docker/storage
+      - schoolbox-config:/etc/schoolbox
+      - caddy-ssl:/etc/nginx/certs/
+      - aws-config:/root/.aws
+    # Add host.docker.internal as an alias back to the host machine, so that
+    # the host can debug
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    # After building: create data dirs, start cron
+    post_start:
+      - command: /usr/share/schoolbox/tools/create-data-dirs.sh /var/lib/schoolbox/docker/
+        user: root
+      - command: /usr/share/schoolbox/tools/set-data-dir-perms.sh /var/lib/schoolbox/docker/ www-data
+        user: root
+      - command : /etc/init.d/cron start
+        user: root
+
+  # Database services:
+  # these are containers only in a development environment, they won't be on
+  # staging or production envs.
+  mariadb:
+    container_name: mariadb
+    build:
+      context: ./mariadb
+      args:
+        MARIADB_MAJOR_VERSION : ${MARIADB_MAJOR_VERSION}
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+      start_period: 30s
+      interval: 3s
+      timeout: 3s
+      retries: 5
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    ports:
+      - "${MARIADB_PUBLISHED_PORT}:3306"
+    environment:
+      MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: 1
+
+  redis-storage:
+    container_name: redis-storage
+    build:
+      context: ./redis-storage
+      args:
+        REDIS_MAJOR_VERSION : ${REDIS_MAJOR_VERSION}
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+      start_period: 30s
+      interval: 3s
+      timeout: 3s
+      retries: 5
+    volumes:
+#      - redis-storage-config:/usr/local/etc/redis
+      - redis-storage-data:/data
+    ports:
+      - "${REDIS_STORAGE_PUBLISHED_PORT}:6379"
+
+  redis-cache:
+    container_name: redis-cache
+    build:
+      context: ./redis-cache
+      args:
+        REDIS_MAJOR_VERSION : ${REDIS_MAJOR_VERSION}
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli ping | grep PONG" ]
+      start_period: 30s
+      interval: 3s
+      timeout: 3s
+      retries: 5
+    volumes:
+#      - redis-cache-config:/usr/local/etc/redis
+      - redis-cache-data:/data
+    ports:
+      - "${REDIS_CACHE_PUBLISHED_PORT}:6379"
+
+  rabbitmq:
+    container_name: rabbitmq
+    build:
+      context: ./rabbitmq
+      args:
+        RABBITMQ_MAJOR_VERSION : ${RABBITMQ_MAJOR_VERSION}
+    healthcheck:
+      test: [ "CMD", "rabbitmq-diagnostics", "check_port_connectivity" ]
+      start_period: 30s
+      interval: 3s
+      timeout: 3s
+      retries: 5
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+
+  # Not-yet-essential services:
+  # These will be implemented as separate containers (if they aren't already).
+  schoolbox-digestd:
+    container_name: schoolbox-digestd
+    pull_policy: never
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+      redis-storage:
+        condition: service_healthy
+    environment:
+      PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
+    build:
+      context: ./schoolbox-digestd
+      args:
+        BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
+        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
+    env_file: ./schoolbox/default-instance.env
+    volumes:
+      - code:/usr/share/schoolbox
+      - storage:/var/lib/schoolbox/docker/storage
+      - schoolbox-config:/etc/schoolbox
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  schoolbox-scheduled:
+    container_name: schoolbox-scheduled
+    pull_policy: never
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+      redis-storage:
+        condition: service_healthy
+    environment:
+      PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
+    build:
+      context: ./schoolbox-scheduled
+      args:
+        BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
+        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
+    env_file: ./schoolbox/default-instance.env
+    volumes:
+      - code:/usr/share/schoolbox
+      - storage:/var/lib/schoolbox/docker/storage
+      - schoolbox-config:/etc/schoolbox
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  schoolbox-mobiled:
+    container_name: schoolbox-mobiled
+    pull_policy: never
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+      redis-storage:
+        condition: service_healthy
+    environment:
+      PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
+    build:
+      context: ./schoolbox-mobiled
+      args:
+        BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
+        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
+    env_file: ./schoolbox/default-instance.env
+    volumes:
+      - code:/usr/share/schoolbox
+      - storage:/var/lib/schoolbox/docker/storage
+      - schoolbox-config:/etc/schoolbox
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  schoolbox-socketd:
+    container_name: schoolbox-socketd
+    pull_policy: never
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+      redis-storage:
+        condition: service_healthy
+    environment:
+      PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
+    build:
+      context: ./schoolbox-socketd
+      args:
+        BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
+        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
+    env_file: ./schoolbox/default-instance.env
+    volumes:
+      - code:/usr/share/schoolbox
+      - storage:/var/lib/schoolbox/docker/storage
+      - schoolbox-config:/etc/schoolbox
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  schoolbox-taskd:
+    container_name: schoolbox-taskd
+    depends_on:
+      redis-storage:
+        condition: service_healthy
+    build:
+      context: ./schoolbox-taskd
+    env_file:
+      - path: ./schoolbox-taskd/default.env
+        required: true
+
+  schoolbox-gotenberg:
+    container_name: schoolbox-gotenberg
+    image: gotenberg/gotenberg:8
+
+  schoolbox-etherpad:
+    container_name: schoolbox-etherpad
+    depends_on:
+      redis-storage:
+        condition: service_healthy
+    image: schoolbox/epl:latest
+    env_file: ./schoolbox-etherpad/default.env
+
+  clamav:
+    container_name: clamav
+    build:
+      context: ./clamav
+    volumes:
+      - clamav-data:/var/lib/clamav
+
+volumes:
+  # Volume for Schoolbox's code base
+  code:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ../
+
+  # Volume for database data:
+  # mounted outside of filesystem
+  mariadb-data:
+
+  redis-storage-data:
+
+  redis-cache-data:
+
+  rabbitmq-data:
+
+  # Volume for storage
+  storage:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ../data/docker/storage
+
+  # Volumes for config
+  schoolbox-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./schoolbox/config
+
+  caddy-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./caddy/config
+
+  caddy-ssl:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ../data/docker/ssl
+
+#  redis-storage-config:
+#    driver: local
+#    driver_opts:
+#      type: none
+#      o: bind
+#      device: ./redis-storage/config
+#
+#  redis-cache-config:
+#    driver: local
+#    driver_opts:
+#      type: none
+#      o: bind
+#      device: ./redis-cache/config
+
+  aws-config:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ../.aws
+
+  # Volume for ClamAV signatures
+  clamav-data:

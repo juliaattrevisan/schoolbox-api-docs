@@ -98,15 +98,16 @@ class Mapper extends BaseMapper
         $this->uses('learnosity_poll_count', self::TYPE_INTEGER);
 
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteAnswers']);
-
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'canParticipate']);
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'insertParticipation']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'removeParticipationIfNecessary']);
 
         // Markbook sync
         $this->registerCallback(self::CALLBACK_POSTSAVE, [$this, 'syncToExternalMarkbook']);
 //        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'syncToExternalMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'syncToExternalMarkbook']);
         $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'restoreAnswers']);
+        $this->registerCallback(self::CALLBACK_POSTRESTORE, [$this, 'insertParticipation']);
     }
 
 
@@ -117,7 +118,7 @@ class Mapper extends BaseMapper
      * @throws BaseMapper\DefinitionException
      * @throws Participant\Plan\InvalidState If permitting the save would cause the system to enter an invalid state
      */
-    public function canParticipate(Model $object, Model $previous = null): bool
+    public function canParticipate(Model $object, ?Model $previous = null): bool
     {
         if ($previous) {
             // If an update, assume the system is still valid
@@ -138,7 +139,7 @@ class Mapper extends BaseMapper
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    public function insertParticipation(Model $object, Model $previous = null): bool
+    public function insertParticipation(Model $object, ?Model $previous = null): bool
     {
         if ($previous) {
             // If an update, assume the participation record already exists
@@ -146,6 +147,28 @@ class Mapper extends BaseMapper
         }
         $assessment = $this->getQuizMapper()->findById($object->getQuiz()->getId())->getAssessmentModel();
         return $this->interactionChecker->insertParticipationOnFirstInteraction($object->getUser(), $assessment);
+    }
+
+
+    /**
+     * Remove the student's participant row if $student should no longer be a participant in $assessment.
+     *
+     * @param Model $object
+     * @return bool - Return true on success - whether or not a participation was removed.
+     *                This is the expected behaviour for callbacks registered with Schoolbox\Mapper.
+     */
+    public function removeParticipationIfNecessary(Model $object): bool
+    {
+        $student = $object->getUser();
+        $quiz = $object->getQuiz();
+
+        // If no attempts exist for the student, the student's participation can be removed.
+        // Note the response and feedback for quizzes are both stored in the assess_attempt table.
+        if ($this->getAttemptCountForStudent($quiz->getId(), $student->getId()) === 0) {
+            $this->interactionChecker->removeParticipationFromDynamicPlan($student, $quiz->getAssessmentModel());
+        }
+
+        return true;
     }
 
 

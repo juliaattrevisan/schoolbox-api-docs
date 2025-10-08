@@ -19,6 +19,7 @@ use League\Flysystem\UnableToMoveFile;
 use League\Flysystem\UnableToReadFile;
 use League\Flysystem\Filesystem;
 use League\Flysystem\MountManager;
+use League\Flysystem\UnableToWriteFile;
 use Schoolbox\Resource\FilesystemFactory;
 
 /**
@@ -54,12 +55,17 @@ class FilesystemProxy
      * @param string        $defaultVisibility Default visibility for newly uploaded files; should be:
      *                                         * `\League\Flysystem\Visibility::PUBLIC` for local filesystem
      *                                         * `\League\Flysystem\Visibility::PRIVATE` for S3
+     * @param bool          $isLocal           Is the proxy storing file locally?
+     * @param ?string       $localPath         Path to the local storage folder, or if stored remotely, the folder for
+     *                                         local cache storage folder
      */
     public function __construct(
         private Filesystem $filesystem,
         private HashGenerator $hashGenerator,
         private bool $verifyPrevious,
         private string $defaultVisibility,
+        private bool $isLocal,
+        private ?string $localPath,
     ) {
     }
 
@@ -177,29 +183,34 @@ class FilesystemProxy
         // the umask and restore it once done.
         $oldUmask = umask(0);
         try {
-            // Create the new folder with the filesystem's default visibility
-            // (public for local, private for s3)
-            $this->filesystem->createDirectory(dirname($storagePath));
-
-            // Copy the new file into storage
-            $mountManager = new MountManager([
-                FilesystemFactory::FILE_SYSTEM_TEMP    => $tempFilesystem,
-                FilesystemFactory::FILE_SYSTEM_STORAGE => $this->filesystem,
-            ]);
-
-            // Moving a file using the mount manager without config overrides any existing
-            // file's visibility. Need to explicitly provide visibility
-            // (public for local, private for s3)
-            $config = ['visibility' => $this->defaultVisibility];
-            $mountManager->move(
-                FilesystemFactory::FILE_SYSTEM_TEMP . "://" . $tempPath,
-                FilesystemFactory::FILE_SYSTEM_STORAGE . '://' . $storagePath,
-                $config
-            );
-
             // The file may already exist in the storage backend.
             // This is fine, because the storage file's contents determine the
             // file path: we can assume it's the same file.
+            // We don't want to store a new copy if file already existed, more specifically to avoid saving
+            // identical files as new versions in S3
+            if (!$this->filesystem->fileExists($storagePath)) {
+                // Create the new folder with the filesystem's default visibility
+                // (public for local, private for s3)
+                $this->filesystem->createDirectory(dirname($storagePath));
+
+                // Copy the new file into storage
+                $mountManager = new MountManager(
+                    [
+                        FilesystemFactory::FILE_SYSTEM_TEMP    => $tempFilesystem,
+                        FilesystemFactory::FILE_SYSTEM_STORAGE => $this->filesystem,
+                    ]
+                );
+
+                // Moving a file using the mount manager without config overrides any existing
+                // file's visibility. Need to explicitly provide visibility
+                // (public for local, private for s3)
+                $config = ['visibility' => $this->defaultVisibility];
+                $mountManager->move(
+                    FilesystemFactory::FILE_SYSTEM_TEMP . "://" . $tempPath,
+                    FilesystemFactory::FILE_SYSTEM_STORAGE . '://' . $storagePath,
+                    $config
+                );
+            }
             $this->updateStorage($storage, $hash, $storagePath);
         } finally {
             umask($oldUmask);
@@ -234,6 +245,44 @@ class FilesystemProxy
         return $this->filesystem->readStream(self::getPathFromHash($storage->getHash()));
     }
 
+    /**
+     * Return file path for the storage item, if file not found then return false
+     *
+     * @param IStorage $storage
+     * @return bool|string
+     *
+     * @throws FilesystemException
+     */
+    public function localPath(IStorage $storage): bool|string
+    {
+
+        /* Not catching the exception here so that it can scream out as loud as it can
+         */
+        $fileContent = $this->read($storage);
+
+        if ($this->isLocal) {
+            /* Return local storage path if files are stored locally
+             */
+            return $this->localPath . '/' . self::getPathFromHash($storage->getHash());
+        }
+
+        /* Create a copy of the remote file and return the local path
+         */
+        $localCachePath = sprintf(
+            "%s/local_%s_%s.%s",
+            $this->localPath,
+            INSTANCE_ID,
+            $storage->getHash(),
+            $storage->getExtension(),
+        );
+        if (!file_exists($localCachePath)) {
+            if (false === file_put_contents($localCachePath, $fileContent)) {
+                throw new UnableToWriteFile("Local cache file could not be saved.");
+            }
+        }
+
+        return $localCachePath;
+    }
 
     /**
      * Proxy for:

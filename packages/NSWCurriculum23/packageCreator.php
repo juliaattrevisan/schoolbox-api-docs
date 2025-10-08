@@ -6,7 +6,7 @@ require_once __DIR__ . '/../../conf/core/require.php';
 
 
 /**
- * Function to work with 'standard' subjects, that have strands and substrands
+ * Function to work with 'standard' subjects, that have strands and sub-strands
  * @param       $handle
  * @param array $output_rows
  * @param int   $lastSubject_id
@@ -21,7 +21,7 @@ function processRowsSubStrand($handle, array &$output_rows, int $lastSubject_id,
     // only some subjects will have Learning Area areas
     $lastLearning_id = $lastSubject_id;
 
-    while (($row = fgetcsv($handle)) !== false) {
+    while (($row = fgetcsv($handle, escape: '')) !== false) {
         // Sanitize the description, and remove the nbsp characters...
         $row[0] = str_replace(' ', ' ', $row[0]);
         $row[0] = trim($row[0]);
@@ -140,7 +140,7 @@ array_unshift($output_rows, $output_header);
 // Open the output CSV file and create a CSV writer object
 if (($handle = fopen(__DIR__ . "/" . $output_file, "w")) !== false) {
     foreach ($output_rows as $output_row) {
-        fputcsv($handle, $output_row);
+        fputcsv($handle, $output_row, escape: '');
     }
     fclose($handle);
 }

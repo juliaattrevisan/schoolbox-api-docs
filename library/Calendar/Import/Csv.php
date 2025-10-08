@@ -10,6 +10,7 @@
 
 namespace Calendar\Import;
 
+use Calendar\Import\CsvReader;
 use Schoolbox\Calendar\Event;
 use Schoolbox\Calendar\EventMapper;
 use Schoolbox\Calendar\EventType;
@@ -18,6 +19,8 @@ use Schoolbox\Calendar\Relation\CategoryMapper;
 use Schoolbox\Calendar\Relation\Role;
 use Schoolbox\Calendar\Relation\RoleMapper;
 use Schoolbox\CampusMapper;
+use Schoolbox\RoleMapper as UserRoleMapper;
+use Schoolbox\UserMapper;
 use Alaress_Date_Format;
 use Schoolbox\Calendar\EventTypeMapper;
 use Schoolbox\Mapper\Exception as MapperException;
@@ -28,8 +31,11 @@ class Csv extends Base
 {
     /**
      * Load all events into schoolbox, generate outcome array
+     *
+     * @param bool $perform should it be a dry-run instead
+     * @return void
      */
-    public function load(): void
+    public function load(bool $perform = true): void
     {
         $output = array();
 
@@ -39,6 +45,8 @@ class Csv extends Base
         $roleRelationMapper = new RoleMapper();
         $folderMapper = Folder\Mapper::getInstance();
         $folderCache  = [];
+        $roleMapper = UserRoleMapper::getInstance();
+        $userMapper = UserMapper::getInstance();
 
         // silence notifications
         $mockPropagator = new MockPropagator();
@@ -61,28 +69,103 @@ class Csv extends Base
          */
         $handle = fopen($this->getFile(), 'r');
         $handle = (new \Alaress\Csv\ValidCSV($handle))->skipBom();
-        $headerRow = fgetcsv($handle, 0, ",");
+        $headerRow = fgetcsv($handle, 0, ",", escape: '');
 
         $eventTypeMapper = new EventTypeMapper();
 
-        while (($thisRow = fgetcsv($handle, 0, ",")) !== false) {
+        $headerColumns = $this->getActualHeaderColumns($headerRow);
+
+        /* Column checks
+         */
+        $hasCampusColumn = array_key_exists('campus', $headerColumns);
+        $hasRolesColumn = array_key_exists('role', $headerColumns);
+        $hasOwnerColumn = array_key_exists('event owner id', $headerColumns);
+        $hasGroupColumn = array_key_exists('group ids', $headerColumns);
+
+        while (($thisRow = fgetcsv($handle, 0, ",", escape: '')) !== false) {
             // The CSV file will not contain character encoding info, so just assume a compatible encoding has been used.
             // Previously we stripped non-ASCII characters here, but users complained about loss of data.
 
-            [
-                $start_date,
-                $start_time,
-                $finish_date,
-                $finish_time,
-                $all_day,
-                $name,
-                $detail,
-                $location,
-                $event_type,
-                $publish_date,
-                $attendance,
-                $folderIds,
-            ] = array_pad($thisRow, 12, '');
+            $start_date   = $this->getColumnValues($headerColumns, $thisRow, 'start date');
+            $start_time   = $this->getColumnValues($headerColumns, $thisRow, 'start time');
+            $finish_date  = $this->getColumnValues($headerColumns, $thisRow, 'finish date');
+            $finish_time  = $this->getColumnValues($headerColumns, $thisRow, 'finish time');
+            $all_day      = $this->getColumnValues($headerColumns, $thisRow, 'all day');
+            $name         = $this->getColumnValues($headerColumns, $thisRow, 'name');
+            $detail       = $this->getColumnValues($headerColumns, $thisRow, 'detail');
+            $location     = $this->getColumnValues($headerColumns, $thisRow, 'location');
+            $event_type   = $this->getColumnValues($headerColumns, $thisRow, 'type');
+            $publish_date = $this->getColumnValues($headerColumns, $thisRow, 'publish date');
+            $attendance   = $this->getColumnValues($headerColumns, $thisRow, 'attendance');
+            $folderIds    = $this->getColumnValues($headerColumns, $thisRow, 'group ids');
+            $campuses     = $this->getColumnValues($headerColumns, $thisRow, 'campus', true);
+            $roles        = $this->getColumnValues($headerColumns, $thisRow, 'role', true);
+            $owner        = $this->getColumnValues($headerColumns, $thisRow, 'event owner id');
+
+            $cloneCampuses = $allCampuses;
+            if ($hasCampusColumn) {
+                $allCampusesName = $campuses;
+
+                foreach ($allCampusesName as $campus) {
+                    if (!strlen(trim($campus))) {
+                        continue;
+                    }
+                    try {
+                        $importingCampus = $campusMapper->findOneByColumn('name', $campus);
+                        $cloneCampuses[] = $importingCampus->getId();
+                    } catch (MapperException $e) {
+                        //Campus name not found or is invalid
+                        $output[] = array(
+                            'name'   => $name,
+                            'status' => 'Not Added',
+                            'error'  => sprintf(
+                                'Event campus contains invalid campus (%s)',
+                                $campus
+                            )
+                        );
+                        continue 2;
+                    }
+                }
+
+                if (empty($cloneCampuses)) {
+                    $output[] = array(
+                        'name'   => $name,
+                        'status' => 'Not Added',
+                        'error'  => 'Event campus not provided',
+                    );
+
+                    continue;
+                }
+            }
+
+            /* Role is mandatory
+             */
+            $roleCollection = $this->getGroupList();
+            if ($hasRolesColumn) {
+                /* Check if roles provided are valid
+                 */
+                foreach ($roles as $roleName) {
+                    $roleName = trim($roleName);
+                    if (!strlen($roleName)) {
+                        continue;
+                    }
+                    try {
+                        $role             = $roleMapper->findOneByColumn('name', $roleName);
+                        $roleCollection[] = $role->getId();
+                    } catch (MapperException $e) {
+                        $output[] = [
+                            'name'   => $name,
+                            'status' => 'Not Added',
+                            'error'  => sprintf(
+                                'Invalid role (%s) provided',
+                                $roleName,
+                            ),
+                        ];
+
+                        continue 2;
+                    }
+                }
+            }
 
             /* Event name is mandatory
              */
@@ -92,6 +175,18 @@ class Csv extends Base
                     'status' => 'Not Added',
                     'error'  => 'Event name not provided',
                 );
+
+                continue;
+            }
+
+            /* Event name is too long
+             */
+            if (strlen(trim($name)) > self::MAX_EVENT_TITLE) {
+                $output[] = [
+                    'name'   => $name,
+                    'status' => 'Not Added',
+                    'error'  => 'Event name is too long',
+                ];
 
                 continue;
             }
@@ -238,12 +333,45 @@ class Csv extends Base
                 continue;
             }
 
+            $eventOwner = $this->getUser();
+            $eventAuthor = $this->getAuthor();
+
+            if ($hasOwnerColumn && strlen(trim($owner))) {
+                if (!is_numeric(trim($owner))) {
+                    $output[] = [
+                        'name'   => $name,
+                        'status' => 'Not Added',
+                        'error'  => sprintf(
+                            'Invalid event owner ID (%s) provided',
+                            $owner
+                        )
+                    ];
+                    continue;
+                }
+
+                try {
+                    $user = $userMapper->findById($owner);
+                    $eventOwner = $user;
+                    $eventAuthor = $user;
+                } catch (MapperException $e) {
+                    $output[] = [
+                        'name'   => $name,
+                        'status' => 'Not Added',
+                        'error'  => sprintf(
+                            'Owner (%s) not found or deleted',
+                            $owner
+                        )
+                    ];
+                    continue;
+                }
+            }
+
             /* Save
              */
 
             $event = new Event();
-            $event->setOwner($this->getUser());
-            $event->setAuthor($this->getAuthor());
+            $event->setOwner($eventOwner);
+            $event->setAuthor($eventAuthor);
             $event->setAccess($this->getAccess());
             $event->setStartDateTime($startDatetime);
             $event->setEndDateTime($finishDatetime);
@@ -253,7 +381,7 @@ class Csv extends Base
             $event->setAllDay($all_day);
             $event->setType($eventType);
             $event->setAttendance($attendance);
-            $event->setCampusCollection($allCampuses);
+            $event->setCampusCollection($cloneCampuses);
             $event->setSource($this->getSource());
 
             /* If a publish date is specified, use it; otherwise leave as empty
@@ -276,6 +404,15 @@ class Csv extends Base
             // been set in the object
             $folderList = $this->categoryList;
             if (empty($folderList)) {
+                if ($hasGroupColumn && !strlen(trim($folderIds))) {
+                    $output[] = [
+                        'name'   => $name,
+                        'status' => 'Not Added',
+                        'error'  => sprintf('Group IDs not provided'),
+                    ];
+                    continue;
+                }
+
                 $folderList = [];
                 foreach (explode(',', $folderIds) as $folderId) {
                     // Empty folder ID: just ignore
@@ -289,7 +426,7 @@ class Csv extends Base
                         $output[] = [
                             'name'   => $name,
                             'status' => 'Not Added',
-                            'error'  => sprintf('Folder ID "%s" is not a number', $folderId),
+                            'error'  => sprintf('Group ID "%s" is not a number', $folderId),
                         ];
                         // If not skip this entire CSV row
                         continue 2;
@@ -302,7 +439,7 @@ class Csv extends Base
                         $output[] = [
                             'name'   => $name,
                             'status' => 'Not Added',
-                            'error'  => sprintf('Folder ID %d not found', $folderIdNum),
+                            'error'  => sprintf('Group ID %d not found', $folderIdNum),
                         ];
                         // If not skip this entire CSV row
                         continue 2;
@@ -315,32 +452,55 @@ class Csv extends Base
                 $event->setAccess(Event::ACCESS_GROUP);
             }
 
+            if ($event->isCampusLevel()) {
+                if (empty($roleCollection)) {
+                    $output[] = array(
+                        'name'   => $name,
+                        'status' => 'Not Added',
+                        'error'  => 'Roles not provided',
+                    );
+
+                    continue;
+                }
+            }
+
             /* Save it
              */
-            $result = $eventMapper->save($event);
-            if (is_array($result) && count($result)) {
-                /* Assign Category relations:
-                 * log what it was added to
-                 */
-                if ($event->isGroupLevel()) {
-                    foreach ($folderList as $folderId) {
-                        $category = new Category();
-                        $category->setEventId($event->getId());
-                        $category->setCategoryId($folderId);
-                        $categoryRelationMapper->save($category);
-                    }
-                }
+            $isSuccess = false;
+            if ($perform) {
+                try {
+                    $result = $eventMapper->save($event);
+                    if (is_array($result) && count($result)) {
+                        /* Assign Category relations:
+                         * log what it was added to
+                         */
+                        if ($event->isGroupLevel()) {
+                            foreach ($folderList as $folderId) {
+                                $category = new Category();
+                                $category->setEventId($event->getId());
+                                $category->setCategoryId($folderId);
+                                $categoryRelationMapper->save($category);
+                            }
+                        }
 
-                /* Assign Role relations
-                 */
-                if ($event->isCampusLevel()) {
-                    foreach ($this->getGroupList() as $currentRole) {
-                        $role = new Role();
-                        $role->setEventId($event->getId());
-                        $role->setRoleId($currentRole);
-                        $roleRelationMapper->save($role);
+                        /* Assign Role relations
+                         */
+                        if ($event->isCampusLevel()) {
+                            foreach ($roleCollection as $currentRole) {
+                                $role = new Role();
+                                $role->setEventId($event->getId());
+                                $role->setRoleId($currentRole);
+                                $roleRelationMapper->save($role);
+                            }
+                        }
+                        $isSuccess = true;
                     }
+                } catch (\Exception $e) {
+                    //noop
                 }
+            }
+
+            if ($isSuccess || !$perform) {
                 $output[] = array(
                     'name'   => $event->getTitle(),
                     'status' => 'Added',
@@ -359,5 +519,42 @@ class Csv extends Base
         }
 
         $this->setOutput($output);
+    }
+
+    /**
+     * Finding the column index for all the headers
+     *
+     * @param array $headerColumns
+     * @return array
+     */
+    private function getActualHeaderColumns(array $headerColumns): array
+    {
+        $actualHeaders = [];
+        foreach ($headerColumns as $index => $column) {
+            $actualHeaders[strtolower($column)][] = $index;
+        }
+        return $actualHeaders;
+    }
+
+    /**
+     * Find the values for each of the columns in the row
+     *
+     * @param array $headerColumns
+     * @param array $row
+     * @param string $columnName
+     * @param bool $returnArray
+     * @return string|array
+     */
+    private function getColumnValues(
+        array $headerColumns,
+        array $row,
+        string $columnName,
+        bool $returnArray = false
+    ): string|array {
+        if ($returnArray) {
+            return array_map(fn($value) => $row[$value], $headerColumns[$columnName] ?? []);
+        }
+
+        return isset($headerColumns[$columnName]) ? $row[$headerColumns[$columnName][0]] : '';
     }
 }

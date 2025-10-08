@@ -9,7 +9,6 @@ use Schoolbox\Application\CliTool;
 require_once __DIR__ . '/../../conf/core/require.php';
 
 $app = new class extends CliTool\App {
-
     private const OPT_LONG_FILE = 'file:';
     private const OPT_LONG_RUN = 'run';
 
@@ -39,12 +38,12 @@ $app = new class extends CliTool\App {
         }
         $handle = (new \Alaress\Csv\ValidCSV($handle))->skipBom();
 
-        $headers = fgetcsv($handle, 1000, ",");
+        $headers = fgetcsv($handle, 1000, ",", escape: '');
         $headers = array_flip($headers);
 
 
         /* Iterate over each csv row */
-        while (($row = fgetcsv($handle, 1000, ",")) !== false) {
+        while (($row = fgetcsv($handle, 1000, ",", escape: '')) !== false) {
             /* First lets make sure that the types and subtypes exist and match*/
 
             $currentTypeName = $row[$headers['Current Type']];

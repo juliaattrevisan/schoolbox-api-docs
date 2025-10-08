@@ -1,0 +1,256 @@
+{#    editorTemplates       array            Retrieve any pre-existing editor templates to insert into the 'Body' rich text editor
+#}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{% import '@learningAssessment/project/macro/icon.twig' as icon %}
+{% import '@learning/macro/dueDate.twig' as dueDate %}
+{% import '@learning/macro/markVisibilityMeta.twig' as markVisibilityMeta %}
+
+{# data-attributes (same for all assessment types) #}
+{% set statusIncomplete = 'incomplete' %}
+{% set statusPending    = 'pending'  %}
+{% set statusReviewed   = 'reviewed'  %}
+
+{# Does the information list require an extra CSS class ? eg 'expandable-card', 'sortable-card', 'card-selectable' etc #}
+{% set listClass = listClass ?? '' %}
+
+{# child templates may override #}
+{% set routeModify = routeModify ?? routeLookupIfAuthorized('learningAssessment.getUpdateAssessmentForm', {assessmentId: assessment.id, assessment: assessment})  %}
+{% set responseHistory = responseHistory ?? locale.submissionHistory.proper %}
+
+{% set isSpecification = assessment.isSpecification %}
+
+<script src="{{ CDN_PREFIX }}/js/submissions/jquery.combobox.js?v={{ config.site_version }}" type="text/javascript"></script>
+
+
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 columns">
+            <h1 data-test="assessment-status-meta-title">Status of {{ assessment.title }}</h1>
+        </div>
+    </div>
+    {# TODO Known bug SA-5985 - this nav tot should not appear if no actions are available (eg user is staff with read access only) #}
+    <nav>
+        <sbx-pop-out content-id="header-options" data-test="sbx-pop-out-header-options"></sbx-pop-out>
+    </nav>
+    <ul id="header-options" class="f-dropdown" data-dropdown-content data-assessment="{{ assessment.id }}">
+        {# The naming convention takes a weird and wonderful unique turn, here
+         # I have no idea why this is suddenly a different convention, but ok
+         #}
+        {% block routeModify %}
+            {% if routeModify %}
+                <li>
+                    <a class="icon-modify" href="{{ routeModify }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify</a>
+                </li>
+            {% endif %}
+        {% endblock %}
+
+        {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
+            assessmentId: assessment.id,
+            assessment: assessment
+        }) %}
+        {% if not isSpecification and viewCustomParticipationRoute and (assessment is dueWork or assessment is quiz or assessment is task) %}
+            <li><a class="icon-group" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
+        {% endif %}
+
+        {% block headerOptions %}{% endblock %}
+    </ul>
+</div>
+<div class="row">
+    <div class="small-12 large-4 columns">
+        <ul class="meta">
+            {% include '@learning/fragments/meta/dueDate.twig' %}
+            {% include '@learning/fragments/meta/workType.twig' %}
+            {% if not isSpecification %}
+                {{ markVisibilityMeta.markVisibilityMeta(assessment, true) }}
+
+                {% if readonly ?? false %}
+                    <li class="icon-archive">{{ locale.term.proper }} has been archived</li>
+                {% endif %}
+            {% endif %}
+        </ul>
+    </div>
+    <div class="small-12 large-8 columns text-right">
+        <ul class="filters" data-participant-filters id="filters">
+            <li>
+                <input type="checkbox" id="filter-incom" checked="checked" data-status="{{ statusIncomplete }}" />
+                <label for="filter-incom">
+                    <span class="progress-tick tiny"></span> {{ labelIncomplete }}
+                </label>
+            </li>
+            {% if statusFailed is defined %}
+            <li>
+                <input type="checkbox" id="filter-failed" checked="checked" data-status="{{ statusFailed }}" />
+                <label for="filter-failed">
+                    <span class="progress-tick tiny failed"></span> {{ labelFailed }}
+                </label>
+            </li>
+            {% endif %}
+            <li>
+                <input type="checkbox" id="filter-act" checked="checked" data-status="{{ statusPending }}" />
+                <label for="filter-act">
+                    <span class="progress-tick tiny pending"></span> {{ labelPending }}
+                </label>
+            </li>
+            <li>
+                <input type="checkbox" id="filter-comp" checked="checked" data-status="{{ statusReviewed }}" />
+                <label for="filter-comp">
+                    <span class="progress-tick tiny reviewed"></span> {{ labelReviewed }}
+                </label>
+            </li>
+        </ul>
+    </div>
+    <div class="small-12 columns">
+    {% block messages %}
+    {% endblock messages %}
+    </div>
+</div>
+
+{% block flashMessage %}{% endblock flashMessage %}
+
+{% if aImpls | length %} {# course spec, only show search bar if there are classes that have this assessment #}
+    {% block participantSearchBar %}
+        <div class="row">
+            <div class="small-12 columns">
+                <input type="search" placeholder="Search for a student" data-participant-search>
+            </div>
+        </div>
+    {% endblock participantSearchBar %}
+{% endif %}
+
+{% for aImpl in aImpls %}
+    <div class="component-container">
+        {% if isSpecification %}
+        <div class="row">
+            <div class="small-12 columns">
+                <div class="component-titlebar">
+                    <div class="actions-small-1">
+                        <div class="list-item">
+                            <h2>
+                                <a href="/homepage/{{ aImpl.assessment.getBaseContext.getFolder.id }}">
+                                    {{ aImpl.assessment.getBaseContext.getFolder.getTitle }}
+                                </a>
+                            </h2>
+                        </div>
+                        <nav>
+                            <a
+                                    data-collapser="collap-{{ aImpl.assessment.id }}"
+                                    href="#"
+                                    class="icon-up-arrow collapse"
+                                    title="Expand/collapse content"
+                            ></a>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% set includedParticipants = aImpl.assessment.allParticipants | filter(participant => not participant.isExcluded) %}
+        {% if includedParticipants | length %}
+            <div class="row" {% if isSpecification %}data-collapse-state="uncollapsed" data-collapsable="collap-{{ aImpl.assessment.id }}" {% endif %} data-participant-group>
+                <div class="small-12 island">
+                    <div class="empty-state hide" data-empty-filter>
+                        <i class="icon-staff-students"></i>
+                        <p>
+                            No students match the current filters.
+                            Add another filter or <a data-filter-show-all>show everything</a>.
+                        </p>
+                    </div>
+                    <section class="content" data-participant-loader data-assessment="{{ aImpl.assessment.id }}">
+                        <div class="loader"></div>
+                    </section>
+                    <section data-assessment-status data-assessment="{{ aImpl.assessment.id }}" class="hide">
+                        <ul class="information-list {{ listClass }}">
+                            {% for participant in includedParticipants %}
+
+                                {# Construct that represents a participant #}
+                                {% set routeArgs = {
+                                    viewee: participant.user,
+                                    assessmentId: aImpl.assessment.id,
+                                    assessment: aImpl.assessment,
+                                    student: participant.user,
+                                    studentId: participant.user.id
+                                } %}
+
+                                {# each class assessment may have different mark scheme / other settings, use that assessment, not the spec #}
+                                {% set specAssessment = assessment %}
+                                {% set assessment = aImpl.assessment %}
+
+                                {# not all assessment types have interactionLocked, this is currently just for Due Work #}
+                                {% set interactionLocked = aImpl.interactionLocked ?? false %}
+                                {% set readonly = interactionLocked and not USER.superUser %}
+
+                                {% block participant %}{% endblock %}
+                                {# reset back to the spec #}
+                                {% set assessment = specAssessment %}
+
+                            {% endfor %}
+                        </ul>
+                    </section>
+                </div>
+                {% block participantPaginator %}
+                    <div class="small-12 column l-pad-m--top" data-participant-paginator style="display: none">
+                        <ul class="pagination">
+                        </ul>
+                    </div>
+                {% endblock participantPaginator %}
+            </div>
+        {% else %}
+            <div class="row">
+                <div class="small-12 column">
+                    <div class="empty-state">
+                        <i class="{{ icon.renderClass(assessment) }}"></i>
+                        <p>This {{ locale.activity }} has no students participating.</p>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endfor %}
+{% if aImpls is empty %} {# course spec, only show search bar if there are classes that have this assessment #}
+    <div class="row">
+        <div class="small-12 column">
+            <div class="empty-state">
+                <i class="{{ icon.renderClass(assessment) }}"></i>
+                <p>This {{ locale.activity }} has no students participating.</p>
+            </div>
+        </div>
+    </div>
+{% endif %}
+
+{# Rich text editors / pagination #}
+<script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/editor.js?v={{ config.site_version }}'></script>
+<script type="text/javascript" src='{{ CDN_PREFIX }}/js/bundle/activityStatusPage.js?v={{ config.site_version }}'></script>
+<script type="text/javascript">
+    $(function () {
+        $('[data-collapser]').collapsable();
+    });
+    document.dispatchEvent(new CustomEvent('ACTIVITY_STATUS_PAGE_INIT', {
+        detail: {
+            pageItemLimit: 25,
+            pageItemLimitOffset: 5,
+            selectors: {
+                participantSearchInput: 'input[data-participant-search]',
+                participantFilters: '[data-participant-filters] input[data-status]',
+                participantGroup: {
+                    groupSelector: '[data-participant-group]',
+                    filterEmptyState: '[data-empty-filter]',
+                    filterReset: '[data-filter-show-all]',
+                    paginator: '[data-participant-paginator]',
+                    loader: '[data-participant-loader]',
+                    container: '[data-assessment-status]',
+                    rows: '[data-assessment-status] [data-participant]',
+                    rowName: '[data-participant-name]',
+                    rowCommentTextarea: '[data-feedback-comment]',
+                },
+            },
+            {% if editorTemplates is defined %}
+                templates: {{ editorTemplates|json_encode|raw }},
+            {% endif %}
+        }
+    }));
+</script>
+
+{% block scripts %}
+{% endblock %}

@@ -39,7 +39,7 @@
                             {% set color = (subtype ? subtype.color : type.color) %}
                             <div class="row">
                                 <div class="small-12 medium-8 columns">
-                                    <select id="pastoralIcon" name="icon">
+                                    <select id="pastoralIcon" name="icon" data-test="audiences-modify-pastoral-flag-select">
                                         <option value="">-- none selected --</option>
                                         {% for icon in icons %}
                                             <option value="{{ icon.name }}"
@@ -51,13 +51,49 @@
                                 </div>
                                 <div class="small-6 medium-2 columns">
                                     <input id="pastoralColor" name="color" type="text"
-                                           value="{{ flagColors.foreground }}"/>
+                                           value="{{ flagColors.foreground }}" data-test="audiences-modify-pastoral-flag-color-input" />
                                 </div>
                                 <div class="small-6 medium-2 columns">
                                     <span id="pastoralFlagPreview"
                                           class="label neutral {% if icon and color %}icon-{{ icon }}{% else %}hide{% endif %}"
                                           style="color: {{ flagColors.foreground }}; background-color: {{ flagColors.background }}"
                                     >1</span>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label for="defaultExpiry">Default Expiry</label>
+                            {% set currentDefaultExpiry  = (subtype ? subtype.defaultExpiry : type.defaultExpiry) %}
+                            <p class="meta">
+                               Set the default expiry duration for this pastoral care record type. Selecting an option below will automatically calculate and apply the expiry based on the record's creation date.
+                               Once expired, records will then be archived.
+                            </p>
+                            <div class="row">
+                                <div class="small-12 columns">
+                                    <select id="defaultExpiry" name="defaultExpiry" data-test="audiences-modify-pastoral-default-expiry-select">
+                                        {% for key, expiry in defaultExpiry %}
+                                            <option value="{{ expiry }}"
+                                                    label="{{ key | title }}"
+                                                    {% if expiry == currentDefaultExpiry %}selected{% endif %}
+                                            >{{ key | title }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="small-12 columns">
+                            <div class="row checklist">
+                                <div class="small-12 columns">
+                                    <ul class="option-list">
+                                        <li>
+                                            <input id="applyDefaultExpiry" name="applyDefaultExpiry" type="checkbox" value="1">
+                                            <label for="applyDefaultExpiry" class="f-no-margins" data-test="audiences-modify-apply-default-expiry">Apply to existing records
+                                            <p class="meta">This will overwrite and apply the Default Expiry to all existing records of this type.</p>
+                                        </label>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
@@ -80,6 +116,21 @@
                             </div>
                         </div>
                     </fieldset>
+                    {% set currentPoints  = (subtype ? subtype.defaultPoints : type.defaultPoints) %}
+                    {% if config.pastoral_point_enabled and config.pastoral_enabled and config.pastoral_default_points_enabled %}
+                    <fieldset class="content">
+                        <div class="small-12 columns">
+                            <label for="defaultPoints">Default Points</label>
+                            <div class="row">
+                                <div class="small-12 columns">
+                                    <input id="defaultPoints" name="defaultPoints" type="text" value="{{ currentPoints }}">
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                    {% else  %}
+                        <input id="defaultPoints" name="defaultPoints" type="hidden" value="{{ currentPoints }}">
+                    {% endif %}
                     {% if config.pastoral_action_enable %}
                     <fieldset class="content">
                         <div class="small-12 columns">
@@ -171,6 +222,15 @@
                     {% endif %}
                     <fieldset class="content">
                         <div class="small-12 columns">
+                            <label for="entryTip">Entry Tip</label>
+                            <p class="meta">
+                                This will appear on the pastoral record creation screen to provide additional information when creating a record of this Type / Sub-Type.
+                            </p>
+                            <textarea id="entryTip" name="entryTip">{% if subtype %}{{ subtype.entryTip }}{% elseif type %}{{ type.entryTip }}{% endif %}</textarea>
+                        </div>
+                    </fieldset>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
                             <label for="template">General Template</label>
 
                             <p class="meta">
@@ -190,7 +250,15 @@
                                             targetElements: ["#template", "#templatePrivate"],
                                             hasTokens: true
                                         }
-                                    }))
+                                    }));
+
+                                    document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
+                                        detail : {
+                                            maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
+                                            targetElements: ["#entryTip"],
+                                            toolbar: "simple",
+                                        }
+                                    }));
 
                                     let colorInput = document.getElementById('pastoralColor'),
                                         iconSelect = document.getElementById('pastoralIcon'),
@@ -290,8 +358,24 @@
                         visibilityLocked: false,
                     } only %}
 
-                <input type="submit" value="Save">
+                <input type="submit" value="Save" data-test="audiences-modify-pastoral-save-button"/>
             </form>
+            <script>
+            $(function () {
+
+                $("form#pastoralForm").alaressValidate({
+                    ignore: ':disabled',
+                    rules: {
+                        defaultPoints: {
+                            number: true,
+                            max: 1000000,
+                            min: -1000000
+                        }
+                    },
+                });
+
+            });
+            </script>
         </div>
     </div>
 </div>

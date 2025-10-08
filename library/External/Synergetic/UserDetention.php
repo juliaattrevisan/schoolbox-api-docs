@@ -28,18 +28,18 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
     /**
      * Dead simple query builder
      *
-     * @param  mixed    $externalId
-     * @param  string   $dateField
-     * @param  DateTime $fromDate
-     * @param  DateTime $toDate
+     * @param  mixed        $externalId
+     * @param  string       $dateField
+     * @param DateTime|null $fromDate
+     * @param DateTime|null $toDate
      * @return array    0: the where part, 1: the params to use in the quer
      *
      */
     protected function buildWherePart(
         $externalId,
         $dateField,
-        DateTime $fromDate = null,
-        DateTime $toDate = null
+        ?DateTime $fromDate = null,
+        ?DateTime $toDate = null
     ) {
         $whereParts = array(
             'ID = :externalId'
@@ -105,7 +105,7 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
     /**
      * @inheritDoc
      */
-    public function getDetentions(string $externalId, DateTime $fromDate = null, DateTime $toDate = null): array
+    public function getDetentions(string $externalId, ?DateTime $fromDate = null, ?DateTime $toDate = null): array
     {
         if (!$this->isExternalIdValid($externalId)) {
             return [];
@@ -134,7 +134,7 @@ class External_Synergetic_UserDetention implements External_UserDetentionInterfa
     /**
      * @inheritDoc
      */
-    public function getAbsences(string $externalId, DateTime $fromDate = null, DateTime $toDate = null): array
+    public function getAbsences(string $externalId, ?DateTime $fromDate = null, ?DateTime $toDate = null): array
     {
         if (!$this->isExternalIdValid($externalId)) {
             return [];

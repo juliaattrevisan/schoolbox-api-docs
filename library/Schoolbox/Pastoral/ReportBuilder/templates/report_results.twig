@@ -7,158 +7,25 @@
     <li class="active"><span>{{ title }}</span></li>
 </ul>
 
-<div class="row actions-small-1">
-    <div class="list-item">
-        <div class="small-12 columns">
-            <h1>{{ title }}</h1>
-        </div>
-    </div>
-    <nav>
-        {% if results | length %}
-            {% if export %}
-            <a href="{{ routeLookupIfAuthorized('pastoralReportBuilder.getReportResultsExport', {reportId: report.id}) }}" class="icon-download"></a>
-            {% endif %}
-            <a href="#" data-print class="icon-print" title="Print Report Results"></a>
-        {% endif %}
-    </nav>
+<div id="pastoral-report-container" class="f-container">
+    <pastoral-report
+        title="{{ title }}"
+        :export="{{ export ? 'true' : 'false' }}"
+        :report-id="{{ report.id }}"
+        :tabs="{{ tabs|json_encode }}"
+        :config="{{ {
+            pastoralPointEnabled: config.pastoral_point_enabled,
+            pastoralActionEnable: config.pastoral_action_enable
+        }|json_encode }}"
+        :routes="{{ {
+            getStudentRecord: routeLookup('pastoral.getStudentRecord'),
+            getReportTags: routeLookup('pastoralReportBuilder.getReportTags'),
+            getIndex: routeLookup('pastoralReportBuilder.getIndex'),
+            getReportResultsExport: routeLookupIfAuthorized('pastoralReportBuilder.getReportResultsExport', {reportId: report.id})
+        }|json_encode }}"
+        locale-pastoral="{{ locale.pastoral.proper|lower }}"
+        :show-severity="{{ showSeverity ? 'true' : 'false' }}"
+        :severity-colors="{{ severityColors|json_encode }}"
+    />
 </div>
-
-<div class="row">
-    {% if results | length > 0 %}
-
-        <div class="small-12 island">
-            {% for record in results %}
-                <section>
-                    <ul class="information-list threaded">
-                        <li>
-                            <div class="small-12 card wrap-down" id="record{{ record.id }}">
-                                {# Theres no need for the all the twig access checks like the list page, if the user got to this screen they can view everything #}
-                                <a href="{{ profile.link(record.student) }}">
-                                    {{ profile.imageSquare64(record.student) }}
-                                </a>
-                                <a href="{{ routeLookup('pastoral.getStudentRecord', {'studentId': record.student.id, 'recordId': record.id}) }}">
-                                    <h4>
-                                        {{ record.student.fullName }}: {{ record.heading }}
-                                        {# Pastoral event severity #}
-                                        {% if showSeverity ?? false and record.severity ?? false and severityColors[record.severity.id] ?? false %}
-                                            <span class="circle" style="background-color:{{ severityColors[record.severity.id]['back'] }}" title="{{ record.severity.name }}"></span>
-                                        {% endif %}
-                                    </h4>
-                                </a>
-                                <p class="meta">
-                                    {# Pastoral event type #}
-                                    {{ record.type.name }} {% if record.subtype.name is defined %}({{ record.subtype.name }}){% endif %} |
-                                    Created by <a
-                                            href="/search/user/{{ record.owner.id }}">{{ record.owner.fullName }}</a> {{ record.createdAt.short }}
-
-                                    {# Pastoral action #}
-                                    {% if config.pastoral_action_enable and record.uncompletedActionCount > 0 %}
-                                        | {% set count = record.uncompletedActionCount %}
-                                        {{ count }} follow up action{{ count == 1 ? '' : 's' }} remaining
-                                    {% endif %}
-                                </p>
-
-                            </div>
-
-                            {# Show article body #}
-                            <article>
-                                {% if record.bodyPublic is not empty %}
-                                    {{ record.bodyPublic | purify }}
-                                {% endif %}
-
-                                {% if record.points != 0 or (record.tags | length) > 0 %}
-                                    <p class="spaced">
-                                        {% if record.points != 0 %}
-                                            {% if record.points < 0 %}
-                                                {% set labelClass='alert' %}
-                                            {% else %}
-                                                {% set labelClass='success' %}
-                                            {% endif %}
-                                            <span class="{{ labelClass }} label hide-on-print">{{ record.points }}
-                                                Point{% if record.points < -1 or record.points > 1 %}s{% endif %}</span>
-                                            <b class="show-for-print"> {{ record.points }}
-                                                Point{% if record.points < -1 or record.points > 1 %}s{% endif %}</b>
-                                        {% endif %}
-                                        {% if record.tags | length > 0 %}
-                                            {% for tag in record.tags %}
-                                                <a class="neutral label hide-on-print"
-                                                    href="{{ routeLookup('pastoralReportBuilder.getReportTags', {tagId: tag.id}) }}"
-                                                    class="neutral label">
-                                                    {{ tag.name }}
-                                                </a>
-                                                <b class="show-for-print"> {{ tag.name }}</b>
-                                            {% endfor %}
-                                        {% endif %}
-                                    </p>
-                                {% endif %}
-                            </article>
-
-                            {% if record.comments | length %}
-
-                                {# Show all comments for this record #}
-                                 <ul class="information-list reply">
-                                {% for comment in record.comments | filter(comment => not comment.private) %}
-                                        <li>
-                                            <div class="card compact small-12">
-                                            {# Comment author photo #}
-                                            <a href="{{ profile.link(comment.owner) }}" title="View Profile">
-                                                {{ profile.imageSquare32(comment.owner) }}
-                                            {# Show comment author #}
-                                            <p>
-                                                {{ comment.owner.fullName }}
-                                                <span class="pipe meta">{{ comment.createdAt.short }}</span>
-                                            </p>
-                                            </a>
-                                            </div>
-                                            {# Show comment body #}
-                                            <article>
-                                                {{ comment.body | purify }}
-                                            </article>
-                                        </li>
-                                {% endfor %}
-                                 </ul>
-                            {% endif %}
-                        </li>
-                    </ul>
-                </section>
-            {% endfor %}
-        </div>
-
-    {% else %}
-
-        <div class="small-12 column">
-            <div class="empty-state">
-                <i class="icon-pastoral"></i>
-                <p>No {{ locale.pastoral }} records matched your report criteria.</p>
-            </div>
-
-            <a class="button submit" href="{{ routeLookup('pastoralReportBuilder.getIndex') }}">Select Another
-                Report</a>
-        </div>
-
-    {% endif %}
-</div>
-
-<script>
-    $(function () {
-        $('[data-print]').click(function () {
-            window.print();
-        });
-    })
-</script>
-<script>
-    //Search for the record in the report to highlight
-    function checkForRecordHighlight()
-    {
-        const hash = window.location.hash.substr(1);
-        const element = document.getElementById(hash);
-        if (element) {
-            element.parentElement.classList.add('highlight-selection');
-            setTimeout(() => {
-                element.parentElement.classList.remove('highlight-selection');
-            }, 5000);
-        }
-    }
-
-    checkForRecordHighlight();
-</script>
+<script src="{{ CDN_PREFIX }}/js/bundle/pastoralReport.js?v={{ config.site_version }}"></script>

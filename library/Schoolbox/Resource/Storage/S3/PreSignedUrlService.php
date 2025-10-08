@@ -43,18 +43,37 @@ class PreSignedUrlService
      */
     public function __construct(IConfigLoader $config)
     {
-        $this->s3Client = new S3Client([
+        $s3AccessKey          = trim($config->get('otfs_s3_cred_key') ?? '');
+        $s3SecretKey          = trim($config->get('otfs_s3_cred_secret') ?? '');
+        $s3Region             = trim($config->get('otfs_s3_region') ?? '');
+        $s3Version            = trim($config->get('otfs_s3_version') ?? '');
+        $s3Bucket             = trim($config->get('otfs_s3_bucket') ?? '');
+        $s3AltHost            = trim($config->get('otfs_s3_alt_host') ?? '');
+        $s3AltAccessKey       = trim($config->get('otfs_s3_alt_access_key') ?? '');
+        $s3AltSecretAccessKey = trim($config->get('otfs_s3_alt_secret_key') ?? '');
+        $s3AltBucket          = trim($config->get('otfs_s3_alt_bucket') ?? '');
+        $s3AltRegion          = trim($config->get('otfs_s3_alt_region') ?? '');
+
+        $cfg = [
             'credentials' => [
-                'key'    => trim($config->get('otfs_s3_cred_key') ?? ''),
-                'secret' => trim($config->get('otfs_s3_cred_secret') ?? ''),
+                'key'    => $s3AccessKey,
+                'secret' => $s3SecretKey,
             ],
-            'region'      => trim($config->get('otfs_s3_region') ?? ''),
-            'version'     => trim($config->get('otfs_s3_version') ?? ''),
+            'region'      => $s3Region,
+            'version'     => $s3Version,
             'http'    => [
                 GuzzleHttp\RequestOptions::CONNECT_TIMEOUT => FilesystemFactory::getConnectTimeout(),
             ],
-        ]);
-        $this->bucket   = trim($config->get('otfs_s3_bucket') ?? '');
+        ];
+
+        if (!empty($s3AltHost)) {
+            $cfg['endpoint'] = $s3AltHost;
+            $cfg['credentials']['key'] = $s3AltAccessKey;
+            $cfg['credentials']['secret'] = $s3AltSecretAccessKey;
+            $cfg['region'] = $s3AltRegion;
+        }
+        $this->s3Client = new S3Client($cfg);
+        $this->bucket = !empty($s3AltHost) && !empty($s3AltBucket) ? $s3AltBucket : $s3Bucket;
     }
 
     /**
@@ -73,8 +92,8 @@ class PreSignedUrlService
         string $path,
         array $cacheControlItems = ['private', 'must-revalidate'],
         string $disposition = self::DISPOSITION_INLINE,
-        string $mimeTypeOverride = null,
-        string $fileNameOverride = null
+        ?string $mimeTypeOverride = null,
+        ?string $fileNameOverride = null
     ): PreSignedUrlDataObject {
         $duration = $expireAt->getUnixTimeStamp() - time();
         if ($duration < 0) {
@@ -139,9 +158,9 @@ class PreSignedUrlService
     private function fileExistsInVideoQueue(string $hash): bool
     {
         return VideoQueueMapper::getInstance()->countByColumnList([
-                'hash'      => $hash,
-                'status'    => VideoQueueMapper::STATUS_COMPLETED,
-            ]) > 0;
+            'hash'      => $hash,
+            'status'    => VideoQueueMapper::STATUS_COMPLETED,
+        ]) > 0;
     }
 
     /**

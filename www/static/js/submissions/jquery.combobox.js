@@ -79,8 +79,11 @@
         setValue: function (value) {
             var oldValue = this.textInputElement.val();
             this.textInputElement.val(value);
+            console.log("Combobox setValue", value, "oldValue", oldValue);
             if (oldValue != value) {
-                this.textInputElement.trigger("change");
+                /* use dispatchEvent and not .trigger("change") so that Vue
+                 * and other non-jquery listeners can pick up the change */
+                this.textInputElement[0].dispatchEvent(new Event("change", { bubbles: true }));
             }
         },
 
@@ -139,6 +142,18 @@
                 thisSelector.hide();
             }
         };
+
+        // watch for changes in the width of the input element so that the selector is always aligned correctly
+        if (this.combobox.textInputElement[0]) {
+            const resizeObserver = new ResizeObserver(() => {
+                const selectorWidth =
+                    this.combobox.textInputElement.outerWidth() !== 0
+                        ? `${this.combobox.textInputElement.outerWidth()}px`
+                        : "100%"; // default to 100% if the input element has no width
+                this.selectorElement.css("width", selectorWidth);
+            });
+            resizeObserver.observe(this.combobox.textInputElement[0]);
+        }
     };
 
     ComboboxSelector.prototype = {

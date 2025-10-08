@@ -73,11 +73,17 @@
         &--1 {
             flex: 1;
         }
+        &--1-auto {
+            flex: 1 auto;
+        }
         &--0-shrink {
             flex-shrink: 0;
         }
         &--1-grow {
             flex-grow: 1;
+        }
+        &--none {
+            flex: none;
         }
     }
 }

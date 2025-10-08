@@ -210,9 +210,9 @@ class ImporterTool extends CliTool\App
      */
     private const QUERY_FEEDBACK = "
         INSERT INTO submission_return
-        (box_id, marker, owner, review_route, mark, resubmission_required, created_at, published_at, published_by, updated_at)
+        (box_id, marker, owner, review_route, mark, instructor_mark, resubmission_required, created_at, published_at, published_by, updated_at)
         VALUES
-        (:boxId, :marker, :owner, :reviewRoute, :mark, :resubmissionRequired, :createdAt, :publishedAt, :publishedBy, :updatedAt)
+        (:boxId, :marker, :owner, :reviewRoute, :mark, :instructorMark, :resubmissionRequired, :createdAt, :publishedAt, :publishedBy, :updatedAt)
     ";
 
 
@@ -389,11 +389,11 @@ HELP;
 
         /* Skip header row
          */
-        $row = fgetcsv($fp);
+        $row = fgetcsv($fp, escape: '');
 
         /* Maintain a row counter
          */
-        for ($i = 2; $row = fgetcsv($fp); ++$i) {
+        for ($i = 2; $row = fgetcsv($fp, escape: ''); ++$i) {
             $this->refreshLock($lock);
 
             /* Ignore column 0, that's the Academic Cycle id we don't care about
@@ -509,11 +509,11 @@ HELP;
 
         /* Skip header row
          */
-        $row = fgetcsv($fp);
+        $row = fgetcsv($fp, escape: '');
 
         /* Maintain a row counter
          */
-        for ($i = 2; $row = fgetcsv($fp); ++$i) {
+        for ($i = 2; $row = fgetcsv($fp, escape: ''); ++$i) {
             $this->refreshLock($lock);
 
             /* Ignore column 0, that's the Academic Cycle id we don't care about
@@ -643,11 +643,11 @@ HELP;
 
         /* Skip header row
          */
-        $row = fgetcsv($fp);
+        $row = fgetcsv($fp, escape: '');
 
         /* Maintain a row counter
          */
-        for ($i = 2; $row = fgetcsv($fp); ++$i) {
+        for ($i = 2; $row = fgetcsv($fp, escape: ''); ++$i) {
             $this->refreshLock($lock);
 
             /* Ignore column 0, that's the Academic Cycle id we don't care about
@@ -763,11 +763,11 @@ HELP;
 
         /* Skip header row
          */
-        $row = fgetcsv($fp);
+        $row = fgetcsv($fp, escape: '');
 
         /* Maintain a row counter
          */
-        for ($i = 2; $row = fgetcsv($fp); ++$i) {
+        for ($i = 2; $row = fgetcsv($fp, escape: ''); ++$i) {
             $this->refreshLock($lock);
 
             /* Ignore column 0, that's the Academic Cycle id we don't care about
@@ -919,7 +919,9 @@ HELP;
                         'dueDate' => self::ASSESSMENT_SEM2_DATE_DUE,
                         'closeDate' => self::ASSESSMENT_SEM2_DATE_CLOSE,
                         'markType' => (string)MarkType::TYPE_LETTER,
+                        'instructor-markType' => (string)MarkType::TYPE_LETTER,
                         'gradingScheme' => $gradingScheme,
+                        'instructor-gradingScheme' => $gradingScheme,
                         'visibility' => SubmissionBox::MARK_VISIBILITY_STAFF_STUDENT_PARENT,
                         /* Get past rubric foreign key shenanigans
                          */
@@ -976,6 +978,7 @@ HELP;
                     'owner' => $student->getId(),
                     'reviewRoute' => 'instructor',
                     'mark' => $row[11],
+                    'instructorMark' => $row[11],
                     'resubmissionRequired' => 0,
                     'createdAt' => \Alaress_Date_Format::now()->getDatabase(),
                     'publishedAt' => $feedbackPublishedAt,

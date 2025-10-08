@@ -24,11 +24,11 @@ test.describe("Homepage Initial Tests", () => {
      */
 
     test("create a homepage fail", async ({ tester, page }) => {
-        const createFolder = new CreateFolder(page);
+        const createFolder = new CreateFolder(tester, page);
         const folderName = "Test Homepage";
         const homepageTemplateOption = "Blank";
         tester.isGoingTo("create a homepage folder");
-        await tester.loginAsAdmin();
+        // await tester.loginAsAdmin();
         await createFolder.goto();
         tester.isGoingTo("type a folder name, select a template option and set access permissions");
         await createFolder.typeName(folderName);
@@ -49,23 +49,29 @@ test.describe("Homepage Initial Tests", () => {
      * creates a homepage successfully
      */
 
-    test("create a homepage", async ({ tester, page }) => {
-        const createFolder = new CreateFolder(page);
+    test("create a homepage", async ({ tester, page, db }) => {
+        const createFolder = new CreateFolder(tester, page);
         const folderName = "Test Homepage";
         const homepageTemplateOption = "Blank";
+        const schoolCode = "";
         tester.isGoingTo("create a homepage folder");
-        await tester.loginAsAdmin();
-        await createFolder.goto();
-        tester.isGoingTo("type a folder name, select a template option and set access permissions");
-        await createFolder.typeName(folderName);
-        await createFolder.setHomepageTemplate(homepageTemplateOption);
-        await createFolder.setAccessPermission(1, "write");
-        await createFolder.setAccessPermission(2, "write");
-        await createFolder.setAccessPermission(3, "read");
-        await createFolder.setAccessPermission(4, "read");
-        await createFolder.setAccessPermission(5, "read");
-        await createFolder.setAccessPermission(6, "read");
-        await createFolder.submit();
+
+        // sets write access permission for Administration and Teacher, read access permission for senior student, parent, junior student and middle student
+        await createFolder.createFolder(
+            folderName,
+            homepageTemplateOption,
+            db,
+            [
+                [1, "write"],
+                [2, "write"],
+                [3, "read"],
+                [4, "read"],
+                [5, "read"],
+                [6, "read"],
+            ],
+            schoolCode,
+        );
+
         tester.isGoingTo("navigate to the resources page and check the new homepage folder is presented");
         await createFolder.gotoResources();
         await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`)).toBeVisible();
@@ -76,10 +82,10 @@ test.describe("Homepage Initial Tests", () => {
      */
 
     test("add components", async ({ tester, page }) => {
-        const createFolder = new CreateFolder(page);
+        const createFolder = new CreateFolder(tester, page);
         const folderName = "Test Homepage";
         const resources = new Resources(page);
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         tester.isGoingTo("navigate to the Test Homepage via resources browser");
         await createFolder.gotoResources();
         await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`)).toBeVisible();
@@ -109,10 +115,10 @@ test.describe("Homepage Initial Tests", () => {
      */
 
     test("use components", async ({ tester, page, db }) => {
-        const createFolder = new CreateFolder(page);
+        const createFolder = new CreateFolder(tester, page);
         const folderName = "Test Homepage";
         const resources = new Resources(page);
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         const textbox = new TextboxForm(tester, page);
         tester.isGoingTo("Navigate to the Test Homepage via resources browser");
         await createFolder.gotoResources();
@@ -178,12 +184,12 @@ test.describe("Homepage Initial Tests", () => {
      */
 
     test("view components", async ({ tester, page }) => {
-        const createFolder = new CreateFolder(page);
+        const createFolder = new CreateFolder(tester, page);
         const folderName = "Test Homepage";
         const resources = new Resources(page);
         const student = "Ms Jana Reed";
         tester.isGoingTo("Navigate to the Test Homepage via resources browser");
-        await tester.impersonateViaModifyUserPage(student);
+        await tester.impersonateViaUserProfilePage(student);
         await createFolder.gotoResources();
         await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`)).toBeVisible();
         await resources.clickFolderName(folderName);
@@ -206,10 +212,10 @@ test.describe("Homepage Initial Tests", () => {
      */
 
     test("delete components", async ({ tester, page }) => {
-        const createFolder = new CreateFolder(page);
+        const createFolder = new CreateFolder(tester, page);
         const folderName = "Test Homepage";
         const resources = new Resources(page);
-        const homepage = new Homepage(page);
+        const homepage = new Homepage(tester, page);
         tester.isGoingTo("Navigate to the Test Homepage via resources browser");
         await createFolder.gotoResources();
         await expect(page.locator(`a.jstree-anchor:has-text("${folderName}")`)).toBeVisible();
@@ -244,7 +250,7 @@ test.describe("Homepage Initial Tests", () => {
      */
 
     test("delete homepage fail", async ({ tester, page }) => {
-        const createFolder = new CreateFolder(page);
+        const createFolder = new CreateFolder(tester, page);
         const folderName = "Test Homepage";
         const resources = new Resources(page);
         tester.isGoingTo(
@@ -265,7 +271,7 @@ test.describe("Homepage Initial Tests", () => {
      */
 
     test("delete homepage", async ({ tester, page }) => {
-        const createFolder = new CreateFolder(page);
+        const createFolder = new CreateFolder(tester, page);
         const folderName = "Test Homepage";
         const resources = new Resources(page);
         tester.isGoingTo("Navigate to the Test Homepage via resources browser and delete the homepage");
@@ -282,12 +288,13 @@ test.describe("Homepage Initial Tests", () => {
     /**
      * Soft deleting data to not impact the other tests
      */
-
-    test.afterAll(async ({ baseTester, db }) => {
+    test.afterAll(async ({ baseTester, db, api }) => {
         baseTester.isGoingTo(
             "update delete_at for the data created in this test so it does impact next suite of tests",
         );
-        await db.updateInDatabase("folder", { deleted_at: "2020-01-15 11:22:34" }, { "name like": "Test Homepage" });
+
+        await api.deleteFoldersByName(db, "Test Homepage");
+
         await db.updateInDatabase("blog", { deleted_at: "2020-01-15 11:22:34" }, { "heading like": "Test Blog Title" });
         await db.updateInDatabase(
             "textBox",

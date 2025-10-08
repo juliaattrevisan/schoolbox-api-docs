@@ -3,6 +3,7 @@
 namespace Schoolbox\Admin\Plan;
 
 use Alaress\Module\Cache\Rebuilder;
+use InvalidArgumentException;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Schoolbox\Application\CliTool;
@@ -58,7 +59,7 @@ NAME
     set-plan.php
 
 SYNOPSIS
-    set-plan.php --plan PLAN
+    set-plan.php --plan [name of plan .yaml file, without extension]
     set-plan.php --reset
 
 DESCRIPTION
@@ -94,7 +95,10 @@ HELP
 
         // Setting the plan for a single instance
         $plan = $this->getOpt(self::OPT_LONG_PLAN);
-        if ($plan) {
+
+        if ($plan !== null) {
+            $plan = $this->mapOldPlanNameToNewIfNecessary($plan);
+
             $planConfig = $this->extractPlanConfig((string)$plan);
 
             // Plan not found? That's an error
@@ -296,5 +300,43 @@ HELP
         /** @var Rebuilder $cacheBuilder */
         $cacheBuilder = $this->getDi()->get('moduleCache.rebuilder');
         $cacheBuilder->rebuild($this->getConfig()->get(ConfigMapper::NAME_SITE_SCHOOL_CODE));
+    }
+
+    /**
+     * Map old plan name to new plan name.
+     * This is done because in SA-16427 we updated the plan names.  However, the IR system still has the old names and
+     * will need to continue to provide the old names until all schools are upgraded to 25.0.  To deal with this
+     * transition we should add support to the set-plan.php script to map the old plan names to the new plan names.
+     * TODO: Remove this function once all schools have upgraded to >=25.0.
+     *
+     * @param string $planName
+     * @return string
+     */
+    private function mapOldPlanNameToNewIfNecessary(string $planName): string
+    {
+        $newPlanNameByOldPlanName = [
+            'elite' => 'learning-enhanced',
+            'pro' => 'learning-essentials',
+            'portal' => 'community-essentials',
+            'portalplus' => 'community-enhanced',
+            'wellbeing' => 'community-elite',
+            'canvas' => 'canvas-enhanced',
+            'canvasplus' => 'canvas-elite',
+            // Note the old 'basic' plan has been deleted, so does not map to any new plan.
+        ];
+
+        $newPlanNames = array_values($newPlanNameByOldPlanName);
+
+        if (array_key_exists($planName, $newPlanNames)) {
+            // The plan name is a new plan name.  No mapping necessary.
+            return $planName;
+        }
+
+        if (array_key_exists($planName, $newPlanNameByOldPlanName)) {
+            // The plan name is an old plan name.  Map to a new plan name.
+            return $newPlanNameByOldPlanName[$planName];
+        }
+
+        return $planName; // Plan name not recognised.  Return it and let it die if not recognised in the next step.
     }
 }

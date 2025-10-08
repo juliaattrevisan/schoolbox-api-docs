@@ -14,6 +14,9 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
+use Alaress_Date_Format;
+use Calendar_Api_Factory;
+use Calendar_Layout_Full_Ajax_JSON;
 
 class Factory
 {
@@ -23,11 +26,13 @@ class Factory
      * @param Mapper $fieldMapper
      * @param UserMapper $userMapper
      * @param \External_UserInterface $externalUser
+     * @param Calendar_Api_Factory $calendarApiFactory
      */
     public function __construct(
         private \Schoolbox\Admin\Profile\Editor\Field\Mapper $fieldMapper,
         private \Schoolbox\UserMapper $userMapper,
-        private \External_UserInterface $externalUser
+        private \External_UserInterface $externalUser,
+        private Calendar_Api_Factory $calendarApiFactory
     ) {
     }
 
@@ -68,6 +73,103 @@ class Factory
          */
         $renderableFields = $this->fieldMapper->findRenderableFields($viewee, $viewer);
 
+        /* Override the currentLocation field's value with all the data needed to render it
+         * This adds to mutatorIndex so it is only executed if the currentLocation field is renderable
+         * to avoid unnecessary generation of calendar data if the field is not visible
+         * Don't override if mutatorIndex already has a callback for currentLocation
+         */
+        if (!isset($mutatorIndex['currentLocation'])) {
+            $mutatorIndex['currentLocation'] = function () use ($viewee, $viewer) {
+                /* Use the same permission check as the normal calendar view
+                 *
+                 * Notably this check prevents students or parents from ever seeing a staff's location,
+                 * since we have no way to allow them to see a full staff timetable...
+                 * The "student" and "parent" options in the profile editor are hence meaningless for staff profiles
+                 */
+                try {
+                    Calendar_Layout_Full_Ajax_JSON::permissionCheck($viewee, $viewer);
+                } catch (\Exception $e) {
+                    return [];
+                }
+
+                // If the viewee's Hide Timetable is set, hide it from everyone (as per the calendar)
+                if ($viewee->getHideTimetable()) {
+                    return [];
+                }
+                // if the viewer is staff and the viewer's viewStudentProfile is not set, hide the timetable from them
+                if ($viewer->getRole()->isStaff() && !$viewer->getRole()->getViewStudentProfile()) {
+                    return [];
+                }
+
+                $timetableCalendarApi = $this->calendarApiFactory->produceForTimetableEvents($viewee, $viewer);
+
+                // Find all the events for the current user for today only (getEvents returns the entire day regardless of the timestamps)
+                $dayEvents = $timetableCalendarApi->getEvents(
+                    Alaress_Date_Format::now()->startOfDay()->getUnixTimeStamp(),
+                    Alaress_Date_Format::now()->endOfDay()->getUnixTimeStamp(),
+                );
+
+                // Filter down the events to just the ones that are currently happening
+                $now = Alaress_Date_Format::now();
+                $currentEvents = $dayEvents->filter(function ($event) use ($now): bool {
+                    // If it's an all-day event, show it (e.g. sports carnival sort of things?)
+                    if ($event->getAllDay()) {
+                        return true;
+                    }
+
+                    $startIsBeforeNow = $event->getStartTime()->compare($now) <= 0;
+                    $endIsAfterNow = $event->getEndTime()->compare($now) >= 0;
+
+                    return $startIsBeforeNow && $endIsAfterNow;
+                });
+
+                // Then map to only the data twig needs to render them
+                $currentEvents = $currentEvents->map(function ($event) {
+                    // There are two possible event types, each has a different set of fields
+
+                    // SUDS timetable event
+                    if ($event instanceof \Calendar\Event\Type\SudsTimetable\Event) {
+                        return [
+                            'title' => $event->getTitle(),
+                            'periodName' => $event->getPeriod(),
+                            'periodCancelled' => $event->getPeriodCancelled(),
+                            'location' => $event->getLocation(),
+                            'staff' => $event->getStaff(), // [id => name][]
+                            'startTime' => $event->getStartTime(),
+                            'endTime' => $event->getEndTime(),
+                        ];
+                    }
+                    // Timetable event
+                    if ($event instanceof \Calendar\Event\Type\Timetable\Event) {
+                        /* This is a special case for teachers with deleted user accounts.
+                         */
+                        $staff = [];
+
+                        if (-1 !== $event->getAuthorId() && '' !== trim((string)$event->getAuthorName())) {
+                            $staff = [
+                                $event->getAuthorId() => $event->getAuthorName()
+                            ];
+                        }
+
+                        return [
+                            'title' => $event->getTitle(),
+                            'periodName' => $event->getPeriodName(),
+                            'periodCancelled' => $event->getPeriodCancelled(),
+                            'location' => $event->getLocation(),
+                            // these events only support 1 teacher
+                            'staff' => $staff,
+                            'startTime' => $event->getStartTime(),
+                            'endTime' => $event->getEndTime(),
+                        ];
+                    }
+                    // otherwise, it's an unknown event type (we should never get here)
+                    throw new \UnexpectedValueException('Unknown event type: ' . get_class($event));
+                });
+
+                return $currentEvents;
+            };
+        }
+
         /** @var \Schoolbox\Admin\Profile\Editor\Field\Model $renderableField */
         foreach ($renderableFields as $renderableField) {
             $node = [
@@ -94,11 +196,35 @@ class Factory
             $payload['roleTypes']['fields']['selected'][] = $node;
         }
 
+        /* Put emergency contacts into this special place for now
+         * Parents and staff never use this yet, only students use this;
+         * their emergencyContacts node will be null in that case
+         *
+         * TODO Think about separating these by roletypes somehow
+         */
+        $payload['roleTypes']['tabs']['emergencyContacts'] = $referenceFields['emergencyContacts'] ?? [];
+
         /* The preprocessed payload that frontend can just use
          */
-        return [
-            'data' => $payload
+        $data = [
+            'data' => $payload,
         ];
+
+        if ($viewee->getRole()->isStudent()) {
+            $data = array_merge(
+                $data,
+                [
+                    /* Surfacing for email to teachers in student profile
+                     */
+                    'tutorTeacher' => $referenceFields['tutorTeacher'] ?? null,
+                    'formTeacher'  => $referenceFields['formTeacher'] ?? null,
+                    'hohTeacher'   => $referenceFields['hohTeacher'] ?? null,
+                    'coordTeacher' => $referenceFields['coordTeacher'] ?? null,
+                    'studentCoach' => $referenceFields['studentCoach'] ?? null,
+                ]
+            );
+        }
+        return $data;
     }
 
 
@@ -259,6 +385,25 @@ class Factory
             $campusNames = implode(', ', $viewee->getCampusCollection()->indexBy('name')->keys());
         }
 
+        /* Collect Emergency Contacts from the sis, using the awfully-named nodes
+         */
+        $emergencyContacts = [];
+
+        foreach (['StudentEmergency', 'StudentEmergency2', 'StudentEmergency3'] as $node) {
+            /* Go with the usual "if you have a name, you can be on the ui" idea
+             * Some connectors may not give us anything for a given contact node (or part of), so check for that
+             */
+            $name = trim((string)($externalUser[$node . 'Name'] ?? ''));
+
+            if ('' !== $name) {
+                $emergencyContacts[] = [
+                    'name' => $name,
+                    'phone' => $externalUser[$node . 'Phone'] ?? '',
+                    'phoneAlt' => $externalUser[$node . 'PhoneAlt'] ?? '',
+                ];
+            }
+        }
+
         /* Hybrid Theory
          */
         $referenceFields = [
@@ -291,6 +436,9 @@ class Factory
             /* Typically the external id, but could be anything really
              */
             'barcode' => $viewee->getExternalId(),
+            /* Emergency Contacts
+             */
+            'emergencyContacts' => $emergencyContacts
         ];
 
         return array_merge($externalUser, $referenceFields);

@@ -37,7 +37,7 @@ sqldb=$(schoolbox-conf --conf="$conffile" --option=SQL_db);
 echo "";
 echo "Looking for Staff accounts with a matching Parent account - ignoring soft-deleted";
 
-mysqldb="mysql -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb";
+mysqldb="mariadb -u $sqluser -p$sqlpasswd -h $sqlhost $sqldb";
 
 numberacc=`$mysqldb -BNe "
 	SELECT count(*) FROM user u

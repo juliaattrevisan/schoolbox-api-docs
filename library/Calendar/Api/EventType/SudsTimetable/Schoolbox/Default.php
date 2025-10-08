@@ -136,6 +136,11 @@ class Calendar_Api_EventType_SudsTimetable_Schoolbox_Default extends Calendar_Ap
             $configuration     = $this->loadConnectorConfiguration();
             $eventTypeSettings = (new \Schoolbox\External\Event\EventTypeGenerator($this->eventTypeMapper))
                 ->findEventType($configuration, $allowedEventTypes);
+            /* Event type is not allowed or not found a null will be returned, throw error for fall back value
+             */
+            if (null === $eventTypeSettings) {
+                throw new \Schoolbox\Mapper\Exception('Event type settings not found.');
+            }
             $eventType = $eventTypeSettings['type'];
         } catch (\Schoolbox\Mapper\Exception $e) {
             $eventType = $this->eventTypeMapper->findFirstMeaningfulId(null);

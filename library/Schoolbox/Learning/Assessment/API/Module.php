@@ -56,6 +56,7 @@ class Module extends BaseModule
         $submissionMapper    = $this->getMapperFactory()->get(SubmissionMapper::class);
         $storageTranslator   = new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfig()));
         $apiAssessmentHelper = new Helper($yearLevelMapper, $submissionMapper, $storageTranslator);
-        return new Controller($apiAssessmentHelper);
+        $validator           = new Validator();
+        return new Controller($apiAssessmentHelper, $validator);
     }
 }

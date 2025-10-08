@@ -84,6 +84,22 @@ class Code
      */
     public function decode(string $classCode): array
     {
+        /* Look for the exotic case where year levels contain a hyphen
+         */
+        $pattern = '/^(' . self::SEPARATOR . '[a-zA-Z0-9]*)' . self::SEPARATOR . '([a-zA-Z0-9]+)' . self::SEPARATOR . '([a-zA-Z0-9]+)/';
+
+        preg_match($pattern, $classCode, $matches);
+
+        if (!empty($matches)) {
+            return [
+                $matches[1],
+                $matches[2],
+                $matches[3],
+            ];
+        }
+
+        /* Otherwise explode on the separator as usual
+         */
         return explode(self::SEPARATOR, $classCode);
     }
 }

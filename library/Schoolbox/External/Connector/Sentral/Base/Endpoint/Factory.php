@@ -54,174 +54,51 @@ class Factory
 
 
     /**
-     * @var ValidStrats
-     */
-    private ValidStrats $validStrats;
-
-
-    /**
-     * @var LoggerInterface
-     */
-    private LoggerInterface $log;
-
-
-    /**
-     * The "perform" flag from the cli tool
-     *
-     * @var bool
-     */
-    private bool $perform;
-
-
-    /**
-     * @var string
-     */
-    private string $host;
-
-
-    /**
-     * @var string
-     */
-    private string $key;
-
-
-    /**
-     * @var array
-     */
-    private array $watchlist;
-
-
-    /**
-     * @var UserProfile\Mapper
-     */
-    private UserProfile\Mapper $baseProfileMapper;
-
-
-    /**
-     * @var UserProfile\Student\Mapper
-     */
-    private UserProfile\Student\Mapper $studentProfileMapper;
-
-
-    /**
-     * @var UserProfile\Parent\Mapper
-     */
-    private UserProfile\Parent\Mapper $parentProfileMapper;
-
-
-    /**
-     * @var UserProfile\Staff\Mapper
-     */
-    private UserProfile\Staff\Mapper $staffProfileMapper;
-
-
-    /**
-     * @var UserProfile\Relationship\Mapper
-     */
-    private UserProfile\Relationship\Mapper $relationshipMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Mapper
-     */
-    private \Schoolbox\External\Event\Mapper $eventMapper;
-
-
-    /**
-     * @var ClassEntryMapper
-     */
-    private ClassEntryMapper $classEntryMapper;
-
-
-    /**
-     * @var ClassInvolvementMapper
-     */
-    private ClassInvolvementMapper $classInvolvementMapper;
-
-
-    /**
-     * @var ClassPeriodMapper
-     */
-    private ClassPeriodMapper $classPeriodMapper;
-
-
-    /**
-     * @var TimetablePeriodMapper
-     */
-    private TimetablePeriodMapper $periodMapper;
-
-
-    /**
-     * @var \Schoolbox\External\Event\Overrides\Mapper
-     */
-    private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper;
-
-
-    /**
      * Factory constructor.
      *
-     * @param ValidStrats                                $validStrats
-     * @param LoggerInterface                            $log
-     * @param bool                                       $perform
-     * @param string                                     $host
-     * @param string                                     $key
-     * @param array                                      $watchlist
-     * @param Mapper                                     $baseProfileMapper
-     * @param UserProfile\Student\Mapper                 $studentProfileMapper
-     * @param UserProfile\Parent\Mapper                  $parentProfileMapper
-     * @param UserProfile\Staff\Mapper                   $staffProfileMapper
-     * @param UserProfile\Relationship\Mapper            $relationshipMapper
-     * @param \Schoolbox\External\Event\Mapper           $eventMapper
-     * @param ClassEntryMapper                           $classEntryMapper
-     * @param ClassInvolvementMapper                     $classInvolvementMapper
-     * @param ClassPeriodMapper                          $classPeriodMapper
-     * @param TimetablePeriodMapper                      $periodMapper
+     * @param ValidStrats $validStrats
+     * @param LoggerInterface $log
+     * @param bool $perform
+     * @param string $host
+     * @param string $key
+     * @param array $watchlist
+     * @param bool $includePhoto
+     * @param Mapper $baseProfileMapper
+     * @param UserProfile\Student\Mapper $studentProfileMapper
+     * @param UserProfile\Parent\Mapper $parentProfileMapper
+     * @param UserProfile\Staff\Mapper $staffProfileMapper
+     * @param UserProfile\Relationship\Mapper $relationshipMapper
+     * @param \Schoolbox\External\Event\Mapper $eventMapper
+     * @param ClassEntryMapper $classEntryMapper
+     * @param ClassInvolvementMapper $classInvolvementMapper
+     * @param ClassPeriodMapper $classPeriodMapper
+     * @param TimetablePeriodMapper $periodMapper
      * @param \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
+     * @param \Schoolbox\Resource\Storage\Mapper $storageMapper
      */
     public function __construct(
-        ValidStrats $validStrats,
-        LoggerInterface $log,
-        bool $perform,
-        string $host,
-        #[SensitiveParameter] string $key,
-        array $watchlist,
+        private ValidStrats $validStrats,
+        private LoggerInterface $log,
+        private bool $perform,
+        private string $host,
+        #[SensitiveParameter] private string $key,
+        private array $watchlist,
+        private bool $includePhoto,
         /* Profile pieces */
-        UserProfile\Mapper $baseProfileMapper,
-        UserProfile\Student\Mapper $studentProfileMapper,
-        UserProfile\Parent\Mapper $parentProfileMapper,
-        UserProfile\Staff\Mapper $staffProfileMapper,
-        UserProfile\Relationship\Mapper $relationshipMapper,
+        private UserProfile\Mapper $baseProfileMapper,
+        private UserProfile\Student\Mapper $studentProfileMapper,
+        private UserProfile\Parent\Mapper $parentProfileMapper,
+        private UserProfile\Staff\Mapper $staffProfileMapper,
+        private UserProfile\Relationship\Mapper $relationshipMapper,
         /* Timetable pieces */
-        \Schoolbox\External\Event\Mapper $eventMapper,
-        ClassEntryMapper $classEntryMapper,
-        ClassInvolvementMapper $classInvolvementMapper,
-        ClassPeriodMapper $classPeriodMapper,
-        TimetablePeriodMapper $periodMapper,
-        \Schoolbox\External\Event\Overrides\Mapper $overridesMapper
+        private \Schoolbox\External\Event\Mapper $eventMapper,
+        private ClassEntryMapper $classEntryMapper,
+        private ClassInvolvementMapper $classInvolvementMapper,
+        private ClassPeriodMapper $classPeriodMapper,
+        private TimetablePeriodMapper $periodMapper,
+        private \Schoolbox\External\Event\Overrides\Mapper $overridesMapper,
+        private \Schoolbox\Resource\Storage\Mapper $storageMapper,
     ) {
-        $this->validStrats = $validStrats;
-        $this->log = $log;
-        $this->perform = $perform;
-        $this->host = $host;
-        $this->key = $key;
-        $this->watchlist = $watchlist;
-
-        /* Profile pieces
-         */
-        $this->baseProfileMapper = $baseProfileMapper;
-        $this->studentProfileMapper = $studentProfileMapper;
-        $this->parentProfileMapper = $parentProfileMapper;
-        $this->staffProfileMapper = $staffProfileMapper;
-        $this->relationshipMapper = $relationshipMapper;
-
-        /* Timetable pieces
-         */
-        $this->eventMapper = $eventMapper;
-        $this->classEntryMapper = $classEntryMapper;
-        $this->classInvolvementMapper = $classInvolvementMapper;
-        $this->classPeriodMapper = $classPeriodMapper;
-        $this->periodMapper = $periodMapper;
-        $this->overridesMapper = $overridesMapper;
     }
 
 
@@ -234,10 +111,6 @@ class Factory
     public function produce(): GenericCollection
     {
         $api = new Api($this->host, $this->key);
-
-        /* A list of student ids that we previously imported
-         */
-        $registry = new Registry();
 
         /* Date range
          */
@@ -263,12 +136,13 @@ class Factory
                     $this->perform,
                     $api,
                     $this->watchlist,
-                    $registry,
+                    $this->includePhoto,
                     $this->baseProfileMapper,
                     $this->studentProfileMapper,
                     $this->parentProfileMapper,
                     $this->staffProfileMapper,
-                    $this->relationshipMapper
+                    $this->relationshipMapper,
+                    $this->storageMapper,
                 ))
                 ->add(new Profile\Cleanup(
                     $this->log,
@@ -297,7 +171,11 @@ class Factory
                     $this->log,
                     $this->perform,
                     $api,
-                    $registry,
+                    new Lookup\Users(
+                        $this->baseProfileMapper,
+                        $this->studentProfileMapper,
+                        $this->staffProfileMapper
+                    ),
                     $this->eventMapper,
                     $this->overridesMapper,
                     $this->classEntryMapper,

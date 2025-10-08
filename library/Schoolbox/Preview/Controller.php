@@ -85,11 +85,10 @@ class Controller extends Base
      */
     public function preview($params)
     {
-
         /* Test safeness of requested url via Cyberhound blacklist
          */
         $translator = new Translator(
-            $this->getSession()->get('ip'),
+            \Session::getIP(),
             $this->getConfigLoader()->get('cyberhound_api_url'),
             $this->getConfigLoader()->get('cyberhound_api_shared_key')
         );

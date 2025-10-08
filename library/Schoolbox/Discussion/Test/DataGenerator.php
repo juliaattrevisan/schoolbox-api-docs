@@ -94,7 +94,7 @@ class DataGenerator
      * @throws \Schoolbox\Mapper\Exception if something went wrong?
      * @throws \UnexpectedValueException
      */
-    public function generateTestData(int $seed = null): void
+    public function generateTestData(?int $seed = null): void
     {
         if (isset($seed)) {
             mt_srand($seed);

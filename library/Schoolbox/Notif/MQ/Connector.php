@@ -29,12 +29,15 @@ class Connector extends AMQPConnector
     /**
      * AMQP connection options
      */
-    public const AMQP_CONNECTION_OPTION_HOST      = 'host';
-    public const AMQP_CONNECTION_OPTION_PORT      = 'port';
-    public const AMQP_CONNECTION_OPTION_USER      = 'user';
-    public const AMQP_CONNECTION_OPTION_PASSWORD  = 'password';
-    public const AMQP_CONNECTION_OPTION_VHOST     = 'vhost';
-    public const AMQP_CONNECTION_OPTION_HEARTBEAT = 'heartbeat';
+    public const AMQP_CONNECTION_OPTION_HOST          = 'host';
+    public const AMQP_CONNECTION_OPTION_PORT          = 'port';
+    public const AMQP_CONNECTION_OPTION_USER          = 'user';
+    public const AMQP_CONNECTION_OPTION_PASSWORD      = 'password';
+    public const AMQP_CONNECTION_OPTION_VHOST         = 'vhost';
+    public const AMQP_CONNECTION_OPTION_HEARTBEAT     = 'heartbeat';
+    public const AMQP_CONNECTION_OPTION_READ_TIMEOUT  = 'read_timeout';
+    public const AMQP_CONNECTION_OPTION_WRITE_TIMEOUT = 'write_timeout';
+    public const AMQP_CONNECTION_OPTION_KEEPALIVE     = 'keepalive';
 
     /**
      * @var AbstractConnection|null
@@ -84,6 +87,15 @@ class Connector extends AMQPConnector
             $connectionConfig->setVhost($this->connectionOptions[self::AMQP_CONNECTION_OPTION_VHOST]);
             if (isset($this->connectionOptions[self::AMQP_CONNECTION_OPTION_HEARTBEAT])) {
                 $connectionConfig->setHeartbeat($this->connectionOptions[self::AMQP_CONNECTION_OPTION_HEARTBEAT]);
+            }
+            if (isset($this->connectionOptions[self::AMQP_CONNECTION_OPTION_READ_TIMEOUT])) {
+                $connectionConfig->setReadTimeout($this->connectionOptions[self::AMQP_CONNECTION_OPTION_READ_TIMEOUT]);
+            }
+            if (isset($this->connectionOptions[self::AMQP_CONNECTION_OPTION_WRITE_TIMEOUT])) {
+                $connectionConfig->setWriteTimeout($this->connectionOptions[self::AMQP_CONNECTION_OPTION_WRITE_TIMEOUT]);
+            }
+            if (isset($this->connectionOptions[self::AMQP_CONNECTION_OPTION_KEEPALIVE])) {
+                $connectionConfig->setKeepalive((bool)$this->connectionOptions[self::AMQP_CONNECTION_OPTION_KEEPALIVE]);
             }
 
             $this->conn = AMQPConnectionFactory::create($connectionConfig);

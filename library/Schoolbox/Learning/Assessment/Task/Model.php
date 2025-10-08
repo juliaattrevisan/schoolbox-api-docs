@@ -189,7 +189,7 @@ class Model extends AbstractAssessment
      * @param GradeGroup|null $gradeGroup
      * @return static
      */
-    public function setGradeGroup(GradeGroup $gradeGroup = null)
+    public function setGradeGroup(?GradeGroup $gradeGroup = null)
     {
         if (!is_null($gradeGroup)) {
             throw new \InvalidArgumentException('Tasks cannot have mark type of Letter Grade.');
@@ -465,7 +465,7 @@ class Model extends AbstractAssessment
 
     /**
      * @param Alaress_Date_Format|null $closeAt
-     * @return static
+     * @return $this
      */
     public function setCloseAt(?Alaress_Date_Format $closeAt): self
     {

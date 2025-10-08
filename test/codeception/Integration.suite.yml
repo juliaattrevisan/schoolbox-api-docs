@@ -3,7 +3,7 @@ modules:
   enabled:
     - Tests\Support\Helper\Integration:
         depends: PhpBrowser
-        url: 'https://vagrant.dev.schoolbox.cloud'
+        url: '%BASE_URL%'
         xdebug: false
     - Tests\Support\Helper\SchoolboxCli:
     - Asserts:

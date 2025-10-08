@@ -1,6 +1,7 @@
 <script>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
 /**
  * A single group item, can join/leave, add toggle favourites/notifications
@@ -442,6 +443,11 @@ export default {
                             <li v-else-if="isMembershipPending">
                                 <a href="#" class="icon-logout" @click="leave" title="Cancel membership request"
                                     >Cancel membership request</a
+                                >
+                            </li>
+                            <li v-if="group.cohortReportLink">
+                                <a :href="group.cohortReportLink" class="icon-share" title="Cohort Learning Moments"
+                                    >Cohort Learning Moments</a
                                 >
                             </li>
                         </ul>

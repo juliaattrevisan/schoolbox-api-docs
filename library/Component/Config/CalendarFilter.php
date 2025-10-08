@@ -34,7 +34,7 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
      * @return void
      * @throws JsonException
      */
-    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
+    public function parse(SitePage $page, $key, $keyblock, $configValue, ?Component_ControllerAbstract $component = null)
     {
         $di = $page->getDi();
 
@@ -50,12 +50,8 @@ class Component_Config_CalendarFilter extends Component_Config_Abstract
         /** @var IConfigLoader $config */
         $config = $di->get('config');
 
-        $factory = (new ApiFactory(
-            $assessmentDataSource,
-            new ModuleChecker($config),
-            $config,
-            $databaseExternal
-        ));
+        /** @var ApiFactory $factory */
+        $factory = $di->get('calendarDashboardApiFactory');
 
         /* These are the available options from which you can chooze
          */

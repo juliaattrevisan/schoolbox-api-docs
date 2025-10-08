@@ -235,7 +235,7 @@ class AjaxChat
                     'component_instance_id'          => $this->componentID
                 ))->first();
 
-            if (!($confI instanceof Component_Config && $confI->getId())) {
+            if (!$confI->getId()) {
                 $confI = new Component_Config();
                 $confI->setConfigDefinitionId($definition->getId());
                 $confI->setInstanceId($this->componentID);

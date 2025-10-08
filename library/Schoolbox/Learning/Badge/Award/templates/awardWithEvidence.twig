@@ -1,5 +1,5 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
-{%  set profile = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.recipient.id, uesr: award.recipient}) %}
+{%  set profile = routeLookupIfAuthorized('searchUser.getProfile', {userId: award.recipient.id, user: award.recipient}) %}
 {{ bread.crumbs(
     [ award.recipient.fullname, profile ],
     [ award.status | capitalize ~ 's', profile ~ '#' ~ award.status ~'s' ],

@@ -38,6 +38,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('lesson_plan_template_id', self::TYPE_INTEGER, null, 'lessonPlanTemplate');
         $this->uses('visibility', self::TYPE_STRING);
+        $this->uses('duration', self::TYPE_STRING, null, 'lessonPlanDuration');
         $this->joins('created_by', UserMapper::class, 'id', null, null, 'createdBy', 'createdBy');
         $this->joins('updated_by', UserMapper::class, 'id', null, null, 'updatedBy', 'updatedBy');
         $this->joins('deleted_by', UserMapper::class, 'id', null, null, 'deletedBy', 'deletedBy');
@@ -76,7 +77,7 @@ class Mapper extends \Schoolbox\Mapper
         );
 
         /* Linked Assessments
-       */
+         */
         $this->hasJoin(
             'linkedAssessments',
             [

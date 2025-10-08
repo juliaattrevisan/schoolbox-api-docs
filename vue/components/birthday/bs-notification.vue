@@ -14,14 +14,27 @@ const emit = defineEmits<{
 const notificationEl = window.Vue.ref<HTMLDivElement | null>(null);
 const canvasEl = window.Vue.ref<HTMLCanvasElement | null>(null);
 const duration = window.Vue.ref(1.5);
+const canDisplay = window.Vue.ref(false); // to check if the birthday notification can be displayed
 
 /**
- * Append the birthday notification to the notifications list
+ * Append the birthday notification to the header search button
  */
-function appendToNotifications(): void {
-    const toggle = document.querySelector("#notifications") as HTMLAnchorElement;
-    if (toggle) {
-        toggle.appendChild(notificationEl.value as HTMLDivElement);
+async function appendToNotifications(): Promise<void> {
+    /**
+     * As the bs-notification button sits above the header search input,
+     * the focus/hover on the header search input interferes with the button selection,
+     * meaning it has to be selected twice on some devices.
+     * As such the header search input is just removed until the button is selected.
+     */
+    const searchField = document.querySelector("#header-search-input") as HTMLInputElement;
+    if (searchField) {
+        searchField.style.setProperty("display", "none");
+    }
+    const container = document.querySelector("#search");
+    if (container) {
+        canDisplay.value = true; // show the birthday notification
+        await window.Vue.nextTick(); // wait for the DOM to update
+        container.appendChild(notificationEl.value as HTMLDivElement);
     }
 }
 
@@ -54,6 +67,11 @@ function animateBell(): void {
 function onSelected(): void {
     destroy(canvasEl.value as HTMLCanvasElement); // destroy the canvas so it doesn't keep animating
     notificationEl.value?.remove(); // remove once it's pressed so the usual notifications can be shown
+    // also add in the header search input again
+    const searchField = document.querySelector("#header-search-input") as HTMLInputElement;
+    if (searchField) {
+        searchField.style.setProperty("display", "grid");
+    }
     emit("selected");
 }
 
@@ -61,15 +79,17 @@ function onSelected(): void {
  * Append the birthday notification to the
  * notifications list and start animating
  */
-window.Vue.onMounted(() => {
-    appendToNotifications();
-    animateStars();
-    animateBell();
+window.Vue.onMounted(async () => {
+    await appendToNotifications();
+    if (canDisplay.value) {
+        animateStars();
+        animateBell();
+    }
 });
 </script>
 
 <template>
-    <button ref="notificationEl" class="birthday-button" @click.prevent="onSelected">
+    <button v-if="canDisplay" ref="notificationEl" class="birthday-button" @click.prevent="onSelected">
         <div class="birthday-container">
             <div class="birthday-container__background">
                 <canvas ref="canvasEl" width="72" height="72"></canvas>
@@ -91,6 +111,7 @@ window.Vue.onMounted(() => {
     margin: 0; // to remove the default button margin
     padding: 0; // to remove the default button padding
     position: absolute; // to overlay the notification bar
+    right: 0;
     top: 0;
 }
 

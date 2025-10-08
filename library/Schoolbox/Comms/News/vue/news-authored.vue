@@ -1,15 +1,18 @@
 <script>
-// Ignore this file for ESLint checks for now (SA-18376)
-/* eslint-disable */
+/* eslint-disable eslint-comments/disable-enable-pair -- see below */
+/* eslint-disable eslint-comments/no-unlimited-disable -- see below */
+/* eslint-disable -- Ignore this file for ESLint checks for now (SA-18376) */
 /* eslint-enable vue/no-v-html */
 import Paginate from "vuejs-paginate-next";
 import MediaArticle from "@schoolboxVue/components/media-article";
+import RelativeTime from "@schoolboxLearningMomentEvidence/relative-time";
 import { fetchAsJson } from "@js/fetch/fetch";
 
 export default {
     components: {
         Paginate,
         MediaArticle,
+        RelativeTime,
     },
     props: {
         pageNumber: Number, // The start page on the pagination
@@ -224,7 +227,7 @@ export default {
                                 </h3>
                                 <p class="meta">
                                     <b>{{ article.status }}</b>
-                                    <time :title="article.statusDate.long">{{ article.statusDate.relativeTime }}</time>
+                                    <relative-time :datetime="article.statusDate" full-diff></relative-time>
                                 </p>
                             </div>
                         </div>

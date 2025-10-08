@@ -297,55 +297,8 @@ class ServiceManager implements IServiceManager
      */
     private function getPemPath(Storage\Model $storage)
     {
-        $hash = $storage->getHash();
-
-        // since this is on-construction, check the file in play and see if it needs updating
-        if ($this->apnsCertRequiresUpdate($hash)) {
-            // copy the cert from storage
-            $fp = fopen($this->getTempCertFilename($hash), 'wb');
-            stream_copy_to_stream($this->filesystemProxy->readStream($storage), $fp);
-            fclose($fp);
-        }
-
-        return $this->getTempCertFilename($hash);
+        return $this->filesystemProxy->localPath($storage);
     }
-
-
-    /**
-     * Verify whether or not the given PEM hash requires update on-disk
-     *
-     * @param string $fileHash
-     * @return bool
-     */
-    private function apnsCertRequiresUpdate($fileHash)
-    {
-        $tempCert = $this->getTempCertFilename($fileHash);
-
-        if (!is_readable($tempCert)) {
-            return true;
-        }
-        if (!filesize($tempCert)) {
-            return true;
-        }
-        if (sha1_file($tempCert) !== $fileHash) {
-            return true;
-        }
-
-        return false;
-    }
-
-
-    /**
-     * Return a consistent temp-file path for the given hash
-     *
-     * @param string $fileHash
-     * @return string
-     */
-    private function getTempCertFilename($fileHash)
-    {
-        return sys_get_temp_dir() . "/{$fileHash}.pem";
-    }
-
 
     /**
      * @return bool

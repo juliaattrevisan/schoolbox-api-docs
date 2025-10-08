@@ -6,6 +6,8 @@
  * @link        https://schoolbox.com.au/
  */
 
+use Schoolbox\Error\Mapper as ErrorMapper;
+
 require_once __DIR__ . '/../../../../conf/core/require.php';
 $kernel = new \Schoolbox\Application\WebRequest\Kernel();
 
@@ -37,9 +39,18 @@ try {
 $authenticator = new Eportfolio_Authenticator($_SESSION['user'], $page->getOwner(), $page->getPageId());
 
 if ($authenticator->canModify()) {
+    $basicListMapper = \Component\Eportfolio\BasicListMapper::getInstance();
+    $componentInstanceMapper = Component_InstanceMapper::getInstance();
+
     /* Add a list item
-     */
+    */
     if ($action == 'addItem' && $_POST['content']) {
+        /* Make sure the component that is being modified is on the page we are modifying */
+        $instance = $componentInstanceMapper->findByInstanceId($componentInstanceId, $page->getPageId());
+        if (null === $instance) {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
         $content = $_POST['content'];
 
         $listItem = new \Component\Eportfolio\BasicList();
@@ -47,22 +58,36 @@ if ($authenticator->canModify()) {
         $listItem->setContent($content);
         $listItem->setSequence(1);
 
-        \Component\Eportfolio\BasicListMapper::getInstance()->save($listItem);
+        $basicListMapper->save($listItem);
     } elseif ($action == 'updateItem') {
         /* Update a list item */
         $listItemId = $_POST['listItemId'];
         $content    = $_POST['content'];
 
-        $listItem = \Component\Eportfolio\BasicListMapper::getInstance()->findById($listItemId);
+        $listItem = $basicListMapper->findById($listItemId);
+
+        /* Make sure the component that is being modified is on the page we are modifying */
+        $instance = $componentInstanceMapper->findByInstanceId($listItem->getComponentInstanceId(), $page->getPageId());
+        if (null === $instance) {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
         $listItem->setContent($content);
 
-        \Component\Eportfolio\BasicListMapper::getInstance()->save($listItem);
+        $basicListMapper->save($listItem);
     } elseif ($action == 'removeItem') {
         /* Delete a list item */
         $listItemId = $_GET['listItemId'];
 
-        $listItem = Component\Eportfolio\BasicListMapper::getInstance()->findById($listItemId);
-        Component\Eportfolio\BasicListMapper::getInstance()->delete($listItem);
+        $listItem = $basicListMapper->findById($listItemId);
+
+        /* Make sure the component that is being modified is on the page we are modifying */
+        $instance = $componentInstanceMapper->findByInstanceId($listItem->getComponentInstanceId(), $page->getPageId());
+        if (null === $instance) {
+            throw ErrorMapper::getInstance()->generateException(ErrorMapper::ERROR_GENERIC_NOT_FOUND);
+        }
+
+        $basicListMapper->delete($listItem);
     }
 
     SitePage::localRedir("/eportfolio/{$ownerId}/{$pageId}");

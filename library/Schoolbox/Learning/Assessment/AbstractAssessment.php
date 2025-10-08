@@ -98,6 +98,10 @@ abstract class AbstractAssessment implements IAssessable
      */
     private ?bool $sebEnabled = null;
 
+    /**
+     * @var int|null
+     */
+    private ?int $originalAssessmentId = null;
 
     /**
      * The person who created this Assessable
@@ -174,6 +178,11 @@ abstract class AbstractAssessment implements IAssessable
      */
     private $plans;
 
+    /**
+     * @var IAssessable[]|GenericCollection
+     */
+    private $customisedAssessments;
+
 
     /**
      * Assessable constructor.
@@ -182,6 +191,7 @@ abstract class AbstractAssessment implements IAssessable
     {
         $this->curriculumNodes = new GenericCollection(Node\Model::class);
         $this->plans           = new GenericCollection(Plan::class);
+        $this->customisedAssessments           = new GenericCollection(IAssessable::class);
     }
 
 
@@ -364,7 +374,6 @@ abstract class AbstractAssessment implements IAssessable
 
     /**
      * @inheritdoc
-     * @param $removeExcluded - If this is true, participants with isExcluded() true will be treated as non-extant.
      */
     public function getParticipantIfExtant(User $user, $removeExcluded = true): ?Participant
     {
@@ -408,7 +417,7 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @inheritdoc
      */
-    public function isPublished(?User $student, Alaress_Date_Format $now = null): bool
+    public function isPublished(?User $student, ?Alaress_Date_Format $now = null): bool
     {
         if (null === $now) {
             $now = Alaress_Date_Format::now();
@@ -425,7 +434,7 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @inheritdoc
      */
-    public function isOpen(User $student, Alaress_Date_Format $now = null): bool
+    public function isOpen(User $student, ?Alaress_Date_Format $now = null): bool
     {
         $participant = $this->getParticipantIfExtant($student);
 
@@ -449,7 +458,7 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @inheritdoc
      */
-    public function isOverdue(Alaress_Date_Format $now = null)
+    public function isOverdue(?Alaress_Date_Format $now = null)
     {
         if (null === $now) {
             $now = Alaress_Date_Format::now();
@@ -463,7 +472,7 @@ abstract class AbstractAssessment implements IAssessable
     /**
      * @inheritdoc
      */
-    public function isPastClose(Alaress_Date_Format $now = null)
+    public function isPastClose(?Alaress_Date_Format $now = null)
     {
         if (null === $now) {
             $now = Alaress_Date_Format::now();
@@ -635,6 +644,19 @@ abstract class AbstractAssessment implements IAssessable
         $authoritativeResponse = $this->getAuthoritativeResponse($participant, $publishedOnly);
 
         return $this->getMarkScheme()->getHumanReadableMark($normalisedMark, $authoritativeResponse);
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public function getHumanReadableInstructorMark(Participant $participant, $publishedOnly)
+    {
+        // For all non-due work assessments, this falls back to getHumanReadableMark (the due work model overrides this)
+        // This avoids having to do a ton of instanceof checks everywhere and as I expect we will introduce
+        // this functionality for more assessment types in the future, this makes it easier to do so.
+
+        return $this->getHumanReadableMark($participant, $publishedOnly);
     }
 
 
@@ -1040,6 +1062,23 @@ abstract class AbstractAssessment implements IAssessable
         return $this;
     }
 
+    /**
+     * @return int|null
+     */
+    public function getOriginalAssessmentId(): ?int
+    {
+        return $this->originalAssessmentId;
+    }
+
+    /**
+     * @param int|null $originalAssessmentId
+     * @return self
+     */
+    public function setOriginalAssessmentId(?int $originalAssessmentId): self
+    {
+        $this->originalAssessmentId = $originalAssessmentId;
+        return $this;
+    }
 
     /**
      * @return User
@@ -1228,7 +1267,7 @@ abstract class AbstractAssessment implements IAssessable
      * @param IAssessable|null $specification
      * @return static
      */
-    public function setSpecificationAssessment(IAssessable $specification = null)
+    public function setSpecificationAssessment(?IAssessable $specification = null)
     {
         $this->specificationAssessment = $specification;
         return $this;
@@ -1265,10 +1304,10 @@ abstract class AbstractAssessment implements IAssessable
 
 
     /**
-     * @param null|WorkType $workType
+     * @param WorkType|null $workType
      * @return static
      */
-    public function setWorkType(WorkType $workType = null)
+    public function setWorkType(?WorkType $workType = null)
     {
         $this->workType = $workType;
         return $this;
@@ -1332,6 +1371,17 @@ abstract class AbstractAssessment implements IAssessable
     {
         $this->plans->replaceWith($plans);
         return $this;
+    }
+
+    public function setCustomisedAssessments(GenericCollection $customisedAssessments): IAssessable
+    {
+        $this->customisedAssessments->replaceWith($customisedAssessments);
+        return $this;
+    }
+
+    public function getCustomisedAssessments(): GenericCollection
+    {
+        return $this->customisedAssessments;
     }
 
 

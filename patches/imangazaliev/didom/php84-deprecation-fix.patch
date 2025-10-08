@@ -1,0 +1,41 @@
+From 40988dc04394d5a775da770a74ac79d3130a9470 Mon Sep 17 00:00:00 2001
+From: Ayesh Karunaratne <ayesh@aye.sh>
+Date: Fri, 15 Mar 2024 13:37:10 +0700
+Subject: [PATCH] [PHP 8.4] Fixes for implicit nullability deprecation
+
+Fixes all issues that emits a deprecation notice on PHP 8.4.
+
+See:
+ - [RFC](https://wiki.php.net/rfc/deprecate-implicitly-nullable-types)
+ - [PHP 8.4: Implicitly nullable parameter declarations deprecated](https://php.watch/versions/8.4/implicitly-marking-parameter-type-nullable-deprecated)
+---
+ src/DiDom/Document.php | 2 +-
+ src/DiDom/Element.php  | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/src/DiDom/Document.php b/src/DiDom/Document.php
+index ca032de..ac1f12c 100644
+--- a/src/DiDom/Document.php
++++ b/src/DiDom/Document.php
+@@ -251,7 +251,7 @@ public function preserveWhiteSpace(bool $value = true): self
+      * @throws InvalidArgumentException if parameter 4 is not an integer or null
+      * @throws RuntimeException if the document type is invalid (not Document::TYPE_HTML or Document::TYPE_XML)
+      */
+-    public function load(string $string, bool $isFile = false, string $type = Document::TYPE_HTML, int $options = null): void
++    public function load(string $string, bool $isFile = false, string $type = Document::TYPE_HTML, ?int $options = null): void
+     {
+         if ( ! in_array(strtolower($type), [Document::TYPE_HTML, Document::TYPE_XML], true)) {
+             throw new RuntimeException(sprintf('Document type must be "xml" or "html", %s given.', $type));
+diff --git a/src/DiDom/Element.php b/src/DiDom/Element.php
+index 434cff1..dc4a563 100644
+--- a/src/DiDom/Element.php
++++ b/src/DiDom/Element.php
+@@ -281,7 +281,7 @@ public function attr(string $name, ?string $value = null)
+      *
+      * @return array|null
+      */
+-    public function attributes(array $names = null): ?array
++    public function attributes(?array $names = null): ?array
+     {
+         if ( ! $this->node instanceof DOMElement) {
+             return null;

@@ -42,6 +42,9 @@ use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Permission\Access\Access;
 use Schoolbox\Permission\Access\UserAccess;
 use Schoolbox\User;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
+use Schoolbox\Editor\Templates\Mapper as EditorTemplateMapper;
+use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
 
 class Module extends BaseModule
 {
@@ -79,6 +82,10 @@ class Module extends BaseModule
             return $this->preloadKami($params);
         };
 
+        $preloadAssessment = function (array $params) {
+            return $this->preloadAssessment($params);
+        };
+
         $hasResponseAccess = new Rule\All(
             new Rule\IsLoggedIn(),
             $this->buildRuleHasWriteAccess(),
@@ -96,6 +103,12 @@ class Module extends BaseModule
                 }
                 throw new InvalidPath();
             })
+        );
+
+        $hasViewGradeAccess = new Rule\All(
+            new Rule\IsLoggedIn(),
+            $this->buildRuleHasWriteAccess(),
+            new CanViewAssessable(new Visibility(Access::getInstance()))
         );
 
         $hasKamiAccess = new Rule\All(
@@ -126,6 +139,8 @@ class Module extends BaseModule
 
         $this->register('GET', $participantPattern . '/responses/blind{/responseId:\d+}', 'getParticularResponseBlind', $hasResponseAccess, $preloadParticipant); // a || r
         $this->register('GET', $participantPattern . '/responses{/responseId:\d+}', 'getParticularResponse', $hasResponseAccess, $preloadParticipant); // a || r
+        //Redirecting route to find the first participant in the duework
+        $this->register('GET', $assessmentPattern . '/responses/view', 'getFirstParticipantResponse', $hasViewGradeAccess, $preloadAssessment); // a || r
 
         $this->register('GET', $turnitinPattern, 'getTurnitinReport', $hasSimilarityAccess, $preloadTurnitinWithAss); // a || r
         $this->register('GET', $turnitinPattern . '/iframe', 'getTurnitinReportContents', $hasSimilarityAccess, $preloadTurnitinWithAss); // a || r
@@ -246,7 +261,7 @@ class Module extends BaseModule
             new Rule\IsSuperuser(),
             $this->buildRuleHasWriteAccess(),
             new Rule\Callback(
-                static function (array $params = [], User $user = null): void {
+                static function (array $params = [], ?User $user = null): void {
                     // students who own the kami worksheet, can always view the state of the draft feedback
                     if (isset($params['kami'])) {
                         /** @var Kami\Model $kamiModel */
@@ -343,6 +358,25 @@ class Module extends BaseModule
         ];
     }
 
+    /**
+     * @param array $params
+     * @return IAssessable[]
+     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws \Psr\Container\NotFoundExceptionInterface
+     */
+    private function preloadAssessment(array $params): array
+    {
+        if (isset($params['assessment']) && $params['assessment'] instanceof IAssessable) {
+            $assessment = $params['assessment'];
+        } else {
+            try {
+                $assessment = $this->getAssessmentMapperProxy()->findByIdForReview($params['assessmentId']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                throw $this->getErrorMapper()->generateException(Error\Mapper::ERROR_GENERIC_NOT_FOUND);
+            }
+        }
+        return ['assessment' => $assessment];
+    }
 
     /**
      * @param array $params
@@ -532,6 +566,12 @@ class Module extends BaseModule
             );
         }
 
+        $editorTemplateHelper = new EditorTemplateHelper(
+            $this->getMapperFactory()->get(EditorTemplateMapper::class),
+            EditorTemplatesCategoryModel::FEEDBACK,
+            $this->injector->get('user')
+        );
+
         return new Controller(
             $this->getMapperFactory()->get(Error\Mapper::class),
             $this->injector->get('responseDataSource'),
@@ -544,6 +584,7 @@ class Module extends BaseModule
             $turnitinFileApi,
             $this->injector->get('filesystem.receiver'),
             $this->injector->get('returnDataSource'),
+            $editorTemplateHelper
         );
     }
 

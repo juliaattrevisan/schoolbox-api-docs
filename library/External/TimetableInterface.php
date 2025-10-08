@@ -69,12 +69,12 @@ interface External_TimetableInterface extends External\IConnector
      * array['PeriodNumber']
      * array['PeriodNumberSeq']
      *
-     * @param Schoolbox\Campus $campus
-     * @param int $now
-     * @param \Schoolbox\User $user
+     * @param Schoolbox\Campus     $campus
+     * @param int                  $now
+     * @param \Schoolbox\User|null $user
      * @return array
      */
-    public function getPeriodNumber(Campus $campus, $now = 0, \Schoolbox\User $user = null): array;
+    public function getPeriodNumber(Campus $campus, $now = 0, ?\Schoolbox\User $user = null): array;
 
 
     /**

@@ -1,36 +1,44 @@
+/**
+ * Test some of the key functionality of the unit planner page
+ * 1. Provision sales.tar.gz data
+ * 2. Execute npx playwright test unitPlanner.spec.ts
+ */
+
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
+import UnitPlanner from "@schoolboxTest/playwright/support/page/unitPlanner/UnitPlanner";
+import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/AssessmentForm";
+import CurriculumSelector from "@schoolboxTest/playwright/support/page/curriculum/selector/CurriculumSelector";
 
 test.describe("Unit Planner Tests", () => {
+    test.describe.configure({ mode: "serial" });
+
+    let unitPlanner: UnitPlanner;
     const unitId = 15; // "Romeo and Juliet"
-    const overviewColumnId = "overview-1"; // "Unit Overview"
     const overviewColumnLabel = "Unit Overview";
     const romeoUnitId = 15; // "Romeo and Juliet"
     const persuasionUnitId = 17; // "Persuasion and the Media"
+    const toKillMockingbirdId = 16; // "To Kill a Mockingbird"
+    const folderId = 89; // "To Kill a Mockingbird" folder ID
 
     test.beforeEach(async ({ tester, page }) => {
         const teacher = "Jack Coles";
+        unitPlanner = new UnitPlanner(tester, page);
+        await tester.loginAsAdmin();
         await tester.impersonate(teacher);
-        await page.goto("/course/plan/6");
+        await unitPlanner.goto(6);
     });
 
-    // TODO: Split selectors into a UnitPlannerPage support file
-
     test("Create a Textbox", async ({ tester, page }) => {
-        const textBoxCell = page.getByTestId(`unit-planner-textbox-action-create-${unitId}-${overviewColumnId}`);
-
         tester.isGoingTo("create a Unit Overview textbox for Romeo and Juliet");
-        await textBoxCell.click();
-        await page.waitForTimeout(500); // Wait for the textbox to be focused
+        await unitPlanner.clickCreateTextBoxButton(unitId);
 
         tester.isGoingTo("type in the textbox and click save");
         const textToType = "By the end of this unit, you will know everything about Snakes! 🐍";
         await page.keyboard.type(textToType);
-        await page.getByTestId(`unit-planner-textbox-action-save-${unitId}-${overviewColumnId}`).click();
+        await unitPlanner.clickTextBoxSaveButton(unitId);
 
         tester.isGoingTo("go to the unit homepage and verify the textbox content");
-        const homepageUrl = (await page.getByTestId(`unit-planner-unit-link-${unitId}`).getAttribute("href")) as string;
-        expect(homepageUrl).not.toBeNull();
-        await page.goto(homepageUrl);
+        await unitPlanner.clickUnitLink(unitId);
 
         const componentInstanceId = await page
             .getByTestId("homepage-component-titlebar-name")
@@ -41,51 +49,18 @@ test.describe("Unit Planner Tests", () => {
         await expect(page.getByTestId(`component-textbox-${componentInstanceId}`)).toHaveText(textToType);
     });
 
-    test("Resequence Units", async ({ tester, page }) => {
-        /**
-         * Get the current order of units
-         * @returns - The order of unit IDs
-         */
-        async function getUnitOrder(): Promise<string[]> {
-            const allUnitRowSelector = /^unit-row-/;
-            const pageOrder = await page
-                .getByTestId(allUnitRowSelector)
-                .evaluateAll((unitRows) => unitRows.map((unitRow) => unitRow.getAttribute("data-test-unit-id")));
-            return pageOrder.filter((id) => id !== null);
-        }
+    test("Re-sequence Units", async ({ tester, page }) => {
+        tester.isGoingTo("Get the current order of units");
+        const initialUnitOrder = await unitPlanner.getUnitOrder();
 
-        const initialUnitOrder = await getUnitOrder();
-
-        // Expect Persuasion and the Media to be below Romeo and Juliet
+        tester.isGoingTo("Verify Persuasion and the Media to be below Romeo and Juliet");
         expect(initialUnitOrder.indexOf(romeoUnitId.toString())).toBeLessThan(
             initialUnitOrder.indexOf(persuasionUnitId.toString()),
         );
 
-        const persuasionUnitRow = page.getByTestId(`unit-row-${persuasionUnitId}`);
-
         tester.isGoingTo("drag Persuasion and the Media above Romeo and Juliet");
-        const persuasionDragHandle = persuasionUnitRow.getByTestId("unit-row-drag-handle");
-        await persuasionDragHandle.scrollIntoViewIfNeeded();
-        await persuasionDragHandle.hover();
-        await page.mouse.down();
-
-        const unitPlannerContainer = page.getByTestId("unit-planner-container");
-
-        // Move mouse to top of container, then wait for the reorder to happen
-        await unitPlannerContainer.hover({ position: { x: 0, y: 0 } });
-
-        tester.isGoingTo("keep dragging and wait for the units to reorder");
-        let newUnitOrder = await getUnitOrder();
-        const startTime = Date.now();
-        while (
-            newUnitOrder.indexOf(persuasionUnitId.toString()) > newUnitOrder.indexOf(romeoUnitId.toString()) &&
-            Date.now() - startTime < 5000 // Timeout after 5 seconds
-        ) {
-            // eslint-disable-next-line no-await-in-loop -- Need to wait for the order to change, await is acceptable here.
-            newUnitOrder = await getUnitOrder();
-        }
-
-        await page.mouse.up();
+        await unitPlanner.dragAndDropUnit(persuasionUnitId, romeoUnitId);
+        const newUnitOrder = await unitPlanner.getUnitOrder();
 
         tester.isGoingTo("verify that the units have been correctly reordered");
         expect(newUnitOrder.indexOf(persuasionUnitId.toString())).toBeLessThan(
@@ -96,12 +71,117 @@ test.describe("Unit Planner Tests", () => {
 
         await page.reload();
 
-        const finalUnitOrder = await getUnitOrder();
+        const finalUnitOrder = await unitPlanner.getUnitOrder();
         expect(finalUnitOrder).toEqual(newUnitOrder);
     });
 
-    test.afterEach(async ({ tester }) => {
-        await tester.logout();
+    test("Create, modifying and deleting learning activities", async ({ tester, page, db }) => {
+        const assessmentForm = new AssessmentForm(tester, page);
+
+        tester.isGoingTo("check all options are presented under Create Activity menu");
+        await unitPlanner.clickCreateActivityButton(persuasionUnitId);
+        await unitPlanner.checkCreateActivityOptions("project", persuasionUnitId);
+        await unitPlanner.checkCreateActivityOptions("due-work", persuasionUnitId);
+        await unitPlanner.checkCreateActivityOptions("quiz", persuasionUnitId);
+        await unitPlanner.checkCreateActivityOptions("task", persuasionUnitId);
+        await unitPlanner.checkCreateActivityOptions("lesson-plan", persuasionUnitId);
+
+        tester.isGoingTo("create a due work for Persuasion and Media unit via unit planner");
+        await unitPlanner.clickCreateActivityOption("due-work", persuasionUnitId);
+
+        tester.isGoingTo("Fill out a due work assessment form and submit it");
+        await assessmentForm.setTitle("Test Due Activity via unit planner");
+        await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
+        await assessmentForm.clickCreate();
+        tester.isGoingTo("checking the activity is presented in the learning activities list in the unit planner");
+        await expect(page.getByText("Test Due Activity via unit planner")).toBeVisible();
+
+        const assessmentId = (await db.grabFromDatabase("assessment", "id", {
+            deleted_at: null,
+            "title like": "Test Due Activity via unit planner",
+        })) as number;
+
+        tester.isGoingTo("check all options are presented under the activity menu");
+        await unitPlanner.clickActivityDotMenu(assessmentId);
+        await unitPlanner.checkActivityMenuOptions(assessmentId);
+
+        tester.isGoingTo("Modify a due work activity via unit planner");
+        await unitPlanner.clickActivityModify(assessmentId);
+        await assessmentForm.setTitle("Updated via unit planner");
+        await assessmentForm.update();
+        tester.isGoingTo(
+            "checking the activity is presented updated in the learning activities list in the unit planner",
+        );
+        await expect(page.getByTestId("unit-planner-textbox-action-create-17-overview-1")).toBeVisible();
+        await expect(page.getByText("Updated via unit planner")).toBeVisible();
+
+        tester.isGoingTo("Delete the due work assessment via unit planner");
+        await unitPlanner.clickActivityDotMenu(assessmentId);
+        await unitPlanner.clickActivityDelete(assessmentId);
+        tester.isGoingTo("checking the activity is not presented in the learning activities list in the unit planner");
+        await expect(page.getByText("Test Due Activity via unit planner")).not.toBeVisible();
+        await expect(page.getByText("Updated via unit planner")).not.toBeVisible();
+    });
+
+    test("Select, modify and remove curriculum codes", async ({ tester, page }) => {
+        const curriculumSelector = new CurriculumSelector(tester, page);
+
+        tester.isGoingTo("select curriculum codes for the To Kill a Mockingbird unit");
+        await unitPlanner.clickSelectCurriculumLink(toKillMockingbirdId); // Open the select courses modal
+        await curriculumSelector.clickAllTab(); // Click the All tab
+        await curriculumSelector.browseToNode([247, 248, 250, 251]);
+        await curriculumSelector.selectNodes([257]); // Select the first node
+        await curriculumSelector.saveModal(); // Select Select, closing the modal
+
+        tester.isGoingTo("check the selected curriculum codes are visible");
+        await expect(page.locator(`a[href="#257"]`)).toBeVisible(); // the curriculum code link
+        await expect(page.locator("div.unit-planner")).toContainText("[ACHHK078]");
+        await expect(page.locator("div.unit-planner")).toContainText("Year 4 History");
+        await expect(page.locator("div.unit-planner")).toContainText("First Contacts");
+
+        tester.isGoingTo("check the curriculum codes are visible in the curriculum overview tab");
+        await unitPlanner.clickUnitPlannerTabs("Curriculum Overview");
+        await expect(page.locator(`a[href="#257"]`)).toBeVisible(); // the curriculum code link
+        await expect(page.locator("div.unit-planner")).toContainText("[ACHHK078]");
+        await expect(page.locator("div.unit-planner")).toContainText("Year 4 History");
+        await expect(page.locator("div.unit-planner")).toContainText("First Contacts");
+
+        tester.isGoingTo("check the curriculum codes are visible in the unit page");
+        await unitPlanner.clickUnitLink(toKillMockingbirdId);
+        await expect(
+            page.locator(
+                `div[class="component-container Schoolbox_Curriculum_Component_CurriculumOverviewController"]`,
+            ),
+        ).toBeVisible();
+        await expect(page.getByTestId("fn-list-container")).toContainText("[ACHHK078]");
+        await expect(page.getByTestId("fn-list-container")).toContainText("Year 4 History");
+
+        tester.isGoingTo("delete the node via unit planner and ensure it is not visible");
+        await unitPlanner.goto(6);
+        await unitPlanner.clickUnitPlannerTabs("All");
+        await unitPlanner.clickRemoveNodeIcon(257);
+        await unitPlanner.clickConfirmDeleteNodeButton(folderId);
+        await expect(page.locator(`a[href="#257"]`)).not.toBeVisible(); // the curriculum code link
+        await expect(page.locator("div.unit-planner")).not.toContainText("[ACHHK078]");
+        await expect(page.locator("div.unit-planner")).not.toContainText("Year 4 History");
+        await expect(page.locator("div.unit-planner")).not.toContainText("First Contacts");
+
+        tester.isGoingTo("check the curriculum codes are not visible in the curriculum overview tab");
+        await unitPlanner.clickUnitPlannerTabs("Curriculum Overview");
+        await expect(page.locator(`a[href="#257"]`)).not.toBeVisible(); // the curriculum code link
+        await expect(page.locator("div.unit-planner")).not.toContainText("[ACHHK078]");
+        await expect(page.locator("div.unit-planner")).not.toContainText("Year 4 History");
+        await expect(page.locator("div.unit-planner")).not.toContainText("First Contacts");
+
+        tester.isGoingTo("check the curriculum codes are not visible in the unit page");
+        await unitPlanner.clickUnitLink(toKillMockingbirdId);
+        await expect(
+            page.locator(
+                `div[class="component-container Schoolbox_Curriculum_Component_CurriculumOverviewController"]`,
+            ),
+        ).toBeVisible();
+        await expect(page.getByTestId("fn-list-container")).not.toBeVisible();
+        await expect(page.locator("div.empty-state")).toBeVisible();
     });
 
     test.afterAll(async ({ baseTester, db }) => {
@@ -157,5 +237,40 @@ test.describe("Unit Planner Tests", () => {
         baseTester.isGoingTo("update the unit order back to the original order");
         await db.updateInDatabase("folder", { sequence: 3 }, { id: romeoUnitFolderId });
         await db.updateInDatabase("folder", { sequence: 2 }, { id: persuasionUnitFolderId });
+
+        baseTester.isGoingTo("delete the due work assessment created in this test if it exists");
+        await db.updateInDatabase(
+            "assessment",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": "Test Due Activity via unit planner" },
+        );
+        await db.updateInDatabase(
+            "assessment",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": "Updated via unit planner" },
+        );
+
+        baseTester.isGoingTo("remove the curriculum overview component from unit page");
+
+        const curriculumOverviewComponentId = (await db.grabFromDatabase("component_instance", "id", {
+            module: "homepage",
+            identifier: folderId,
+            position: "top",
+            sequence: 0,
+        })) as number | null;
+
+        if (curriculumOverviewComponentId === null) {
+            baseTester.isGoingTo("skip deletion as the curriculum overview component instance was not found");
+            return;
+        }
+
+        baseTester.isGoingTo(`delete the component instance with ID ${curriculumOverviewComponentId}`);
+        await db.dontHaveInDatabase("component_config_instance", {
+            component_instance_id: curriculumOverviewComponentId,
+        });
+
+        await db.dontHaveInDatabase("component_instance", {
+            id: curriculumOverviewComponentId,
+        });
     });
 });

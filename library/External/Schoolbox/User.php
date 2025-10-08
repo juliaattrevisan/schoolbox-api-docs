@@ -405,7 +405,7 @@ class External_Schoolbox_User implements External_UserInterface
     /**
      * {@inheritDoc}
      */
-    public function getCurrentSemester(string $externalUserId = null): ?string
+    public function getCurrentSemester(?string $externalUserId = null): ?string
     {
         return date('m') < 6 ? '1' : '2';
     }
@@ -414,7 +414,7 @@ class External_Schoolbox_User implements External_UserInterface
     /**
      * {@inheritDoc}
      */
-    public function getCurrentYear(string $externalUserId = null): ?string
+    public function getCurrentYear(?string $externalUserId = null): ?string
     {
         return date('Y');
     }
@@ -459,6 +459,8 @@ class External_Schoolbox_User implements External_UserInterface
         $config = \Schoolbox\Config\Loader::getInstance();
         $params = [];
 
+        $staff = [];
+
         /* Staff Category blacklist
          */
         $staffCategorySql = $this->buildRestrictionSql('staffCategory', ',', (string)$config->get('staff_dir_category_restrict'));
@@ -484,7 +486,28 @@ class External_Schoolbox_User implements External_UserInterface
             ";
         }
 
-        return $this->internalDatabase->executeQuery($query, $params)->fetchAll();
+        // if no restriction return all users
+        if ('' === trim((string)$config->get('staff_dir_position_title_restrict'))) {
+            return $this->internalDatabase->executeQuery($query, $params)->fetchAll();
+        }
+
+        $statement = $this->internalDatabase->executeQuery($query, $params);
+        /**
+         * array map to trim is needed for both these as browsers may be inserting \r\n and it also still needs to remove excessive ` ` or other whitespace
+         */
+        $positionTitlesBlacklist = array_map('trim', explode("\n", (string)$config->get('staff_dir_position_title_restrict')));
+        while ($row = $statement->fetch()) {
+            // filter out rows that collide with the config restriction
+            $staffPositionTitles = array_map('trim', explode(',', trim((string)($row['JobPositionDescription'] ?? null))));
+            $int = array_intersect($staffPositionTitles, $positionTitlesBlacklist);
+            if (!empty($int)) {
+                // position title has data and that data is in the blacklist, ignore this human
+                continue;
+            }
+            // position title is not in the blacklist use them
+            $staff[] = $row;
+        }
+        return $staff;
     }
 
 
@@ -628,9 +651,10 @@ class External_Schoolbox_User implements External_UserInterface
             "SELECT    external_id AS SchoolStaffCode,
                       building AS StaffBuilding,
                       room AS StaffRoom,
-                      phone AS StaffExtension,
+                      '' AS StaffExtension,
                       '' AS StaffMobilePhone,
                       '' AS StaffDefaultMobilePhone,
+                      phone AS StaffOccupPhone,
                       campus_name AS StaffCampusDescription,
                       category AS StaffCategoryDescription,
                       department AS StaffDepartment,

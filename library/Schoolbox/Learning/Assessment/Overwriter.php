@@ -240,7 +240,7 @@ class Overwriter
         if (!($source instanceof DueWork && $destination instanceof DueWork)) {
             return;
         }
-        $this->rubricMapper->copyRubric($source->getId(), $source->getContext(), $destination->getId());
+        $this->rubricMapper->copyRubric($source->getId(), $destination->getId(), $destination->getContext());
     }
 
     /**

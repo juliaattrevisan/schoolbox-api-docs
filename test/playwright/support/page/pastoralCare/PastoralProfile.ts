@@ -1,9 +1,6 @@
-import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
-import type { Page } from "@playwright/test";
+import type { Page, Locator } from "@playwright/test";
 
 export default class PastoralProfile {
-    private tester: AcceptanceTester;
-
     private page: Page;
 
     static readonly URL = "/pastoral/student/{studentId}";
@@ -18,8 +15,11 @@ export default class PastoralProfile {
 
     static readonly PASTORAL_RECORD_UPDATE = "a[href='/pastoral/student/{studentId}/record/{recordId}/update']";
 
-    constructor(tester: AcceptanceTester, page: Page) {
-        this.tester = tester;
+    static readonly DATA_TEST_PASTORAL_RECORDS = "student-section-records-pastoral-record";
+
+    static readonly DATA_TEST_SHOW_ARCHIVED_RECORDS_TOGGLE = "student-section-filter-show-archived-records-toggle";
+
+    constructor(page: Page) {
         this.page = page;
     }
 
@@ -27,7 +27,7 @@ export default class PastoralProfile {
      * Navigates to the profile page
      * @param id - The user id
      */
-    async goto(id: string): Promise<void> {
+    async goto(id: number): Promise<void> {
         await this.page.goto(PastoralProfile.URL.replace("{studentId}", id.toString()));
     }
 
@@ -43,7 +43,7 @@ export default class PastoralProfile {
      * @param studentId - The student id
      * @param recordId - The record id
      */
-    async clickModifyIcon(studentId: string, recordId: number): Promise<void> {
+    async clickModifyIcon(studentId: number, recordId: number): Promise<void> {
         await this.page.click(
             PastoralProfile.PASTORAL_RECORD_UPDATE.replace("{studentId}", studentId.toString()).replace(
                 "{recordId}",
@@ -65,7 +65,7 @@ export default class PastoralProfile {
      * @param studentId - The student id
      * @param recordId - The record id
      */
-    async clickPastoralRecord(studentId: string, recordId: number): Promise<void> {
+    async clickPastoralRecord(studentId: number, recordId: number): Promise<void> {
         await this.page.click(
             PastoralProfile.PASTORAL_RECORD.replace("{studentId}", studentId.toString()).replace(
                 "{recordId}",
@@ -86,5 +86,20 @@ export default class PastoralProfile {
      */
     async clickPostComment(): Promise<void> {
         await this.page.click(PastoralProfile.PASTORAL_POST_COMMENT);
+    }
+
+    /**
+     * Get the current records
+     * @returns - The current records
+     */
+    async getRecords(): Promise<Locator[]> {
+        return this.page.getByTestId(PastoralProfile.DATA_TEST_PASTORAL_RECORDS).all();
+    }
+
+    /**
+     * click post comment button
+     */
+    async clickShowArchivedRecordsToggle(): Promise<void> {
+        await this.page.getByTestId(PastoralProfile.DATA_TEST_SHOW_ARCHIVED_RECORDS_TOGGLE).click();
     }
 }

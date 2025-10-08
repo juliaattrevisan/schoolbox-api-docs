@@ -1,0 +1,111 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(allBreadcrumbs) }}
+
+<div class="admin-container row">
+
+    {{ renderAdminNavigation(pageCurrent) }}
+
+    <div class="admin-content">
+        <div class="small-12 columns">
+            <h2 class="subheader" style="display:none" data-subheader>Text Generation</h2>
+        </div>
+
+        <div id="textSettingsContainer" style="display:none">
+            {% include '@settings/moduleConfig.twig' with textConfigContext only %}
+        </div>
+
+        <div class="small-12 columns">
+            <h2 class="subheader" style="display:none" data-subheader>Image Generation</h2>
+        </div>
+
+        <div id="imageSettingsContainer" style="display:none">
+            {% include '@settings/moduleConfig.twig' with imageConfigContext only %}
+        </div>
+
+        <script>
+            $(function() {
+                const PROVIDER_OPENAI = '{{ models.openai }}';
+                const PROVIDER_AZURE = '{{ models.azure }}';
+
+                /* Text credentials
+                 */
+                const textContainer = $('#textSettingsContainer');
+                const textProvider = $('#openai_text_endpoint-field');
+                const textKey = $('#openai_text_key-field').parent('div');
+                const textModel = $('#openai_text_model-field').parent('div');
+                const textAzureResourceName = $('#openai_text_azure_resource_name-field').parent('div');
+                const textAzureDeploymentId = $('#openai_text_azure_deployment_id-field').parent('div');
+                const textSystemPrompt = $('#openai_text_generation_system_prompt-field').parent('div');
+
+                textProvider.on('change', function(event) {
+                    event.preventDefault();
+                    init(textContainer, textProvider, textKey, textModel, textAzureResourceName, textAzureDeploymentId, null, textSystemPrompt);
+                });
+
+                init(textContainer, textProvider, textKey, textModel, textAzureResourceName, textAzureDeploymentId, null, textSystemPrompt);
+
+                /* Image credentials
+                 */
+                const imageContainer = $('#imageSettingsContainer');
+                const imageProvider = $('#openai_image_endpoint-field');
+                const imageKey = $('#openai_image_key-field').parent('div');
+                const imageModel = $('#openai_image_model-field').parent('div');
+                const imageAzureResourceName = $('#openai_image_azure_resource_name-field').parent('div');
+                const imageAzureDeploymentId = $('#openai_image_azure_deployment_id-field').parent('div');
+                const imageOutputQuality = $('#openai_image_output_quality-field').parent('div');
+                const imageSystemPrompt = $('#openai_image_system_prompt-field').parent('div');
+
+                imageProvider.on('change', function(event) {
+                    event.preventDefault();
+                    init(imageContainer, imageProvider, imageKey, imageModel, imageAzureResourceName, imageAzureDeploymentId, imageOutputQuality, imageSystemPrompt);
+                });
+
+                init(imageContainer, imageProvider, imageKey, imageModel, imageAzureResourceName, imageAzureDeploymentId, imageOutputQuality, imageSystemPrompt);
+
+                /**
+                 *  Hide everything if you haven't chosen a provider yet
+                 */
+                function init(container,provider, key, model, azureResourceName, azureDeploymentId, outputQuality, systemPrompt)
+                {
+                    if ('{{ endpointTypeOff }}' === provider.val() || '' === provider.val()) {
+                        key.hide();
+                        model.hide();
+                        azureResourceName.hide();
+                        azureDeploymentId.hide();
+
+                        if (null !== outputQuality) {
+                            outputQuality.hide();
+                        }
+
+                        systemPrompt.hide();
+                    } else if (PROVIDER_OPENAI === provider.val()) {
+                        key.show();
+                        model.show();
+                        azureResourceName.hide();
+                        azureDeploymentId.hide();
+
+                        if (null !== outputQuality) {
+                            outputQuality.show();
+                        }
+
+                        systemPrompt.show();
+                    } else if (PROVIDER_AZURE === provider.val()) {
+                        key.show();
+                        model.hide();
+                        azureResourceName.show();
+                        azureDeploymentId.show();
+
+                        if (null !== outputQuality) {
+                            outputQuality.show();
+                        }
+
+                        systemPrompt.show();
+                    }
+
+                    $('[data-subheader]').show();
+                    container.show();
+                }
+            });
+        </script>
+    </div>
+</div>

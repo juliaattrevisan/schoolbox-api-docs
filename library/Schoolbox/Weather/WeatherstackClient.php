@@ -9,7 +9,10 @@ declare(strict_types=1);
 
 namespace Schoolbox\Weather;
 
+use Alaress\Http\Cache;
 use Alaress_Date_Format;
+use GuzzleHttp\Exception\GuzzleException;
+use Psr\SimpleCache\InvalidArgumentException;
 use SensitiveParameter;
 
 /**
@@ -27,29 +30,22 @@ class WeatherstackClient
      */
     private const NOW = 'Now';
 
+    private const CACHE_PREFIX = 'weather_';
 
     /**
-     * @var string
-     */
-    private $apiKey;
-
-
-    /**
-     * @var string
-     */
-    private $apiUrl;
-
-
-    /**
-     * ApixuClient constructor.
+     * Constructor
      *
-     * @param string $apiKey
-     * @param string $apiUrl
+     * @param string|null $apiKey
+     * @param string|null $apiUrl
+     * @param Cache $cache
+     * @param int $cacheTimeout
      */
-    public function __construct(#[SensitiveParameter] string $apiKey, string $apiUrl)
-    {
-        $this->apiKey = $apiKey;
-        $this->apiUrl = $apiUrl;
+    public function __construct(
+        #[SensitiveParameter] private ?string $apiKey,
+        private ?string $apiUrl,
+        private Cache $cache,
+        private int $cacheTimeout,
+    ) {
     }
 
 
@@ -63,15 +59,25 @@ class WeatherstackClient
      */
     public function getForecast(int $forecastLimit, string $location): array
     {
+        $default = ['weatherAvailable' => false];
+
+        /* Weatherstack might not always be configured.
+         */
+        if ('' === trim((string)$this->apiKey) || '' === trim((string)$this->apiUrl)) {
+            return $default;
+        }
+
         try {
             $requestUrl = "forecast?query={$location}&forecast_days={$forecastLimit}&units=m&hourly=1&access_key={$this->apiKey}";
             $response   = $this->makeRequest($requestUrl);
             $twigData   = $this->parseWeatherData($response);
+
+            return $twigData;
         } catch (\Exception $e) {
-            return ['weatherAvailable' => false];
+            // noop
         }
 
-        return $twigData;
+        return $default;
     }
 
 
@@ -86,14 +92,24 @@ class WeatherstackClient
      */
     public function getForecastByDate(Alaress_Date_Format $date, $latitude, $longitude)
     {
+        $default = [];
+
+        /* Weatherstack might not always be configured.
+         */
+        if ('' === trim((string)$this->apiKey) || '' === trim((string)$this->apiUrl)) {
+            return $default;
+        }
+
         try {
             $requestUrl = "forecast?date={$date->getDatabaseDate()}&query={$latitude},{$longitude}&units=m&hourly=1&access_key={$this->apiKey}";
             $response   = $this->makeRequest($requestUrl);
 
             return $response['forecast'][$date->getDatabaseDate()] ?? [];
         } catch (\Exception $e) {
-            return [];
+            // noop
         }
+
+        return $default;
     }
 
 
@@ -108,11 +124,14 @@ class WeatherstackClient
     {
         // Cache the request
         try {
-            $cache = new \Alaress_Weather_Cache();
-            $cache->init("{$this->apiUrl}/{$requestUrl}");
-            $response = $cache->getStreamContents();
-        } catch (\InvalidArgumentException $e) {
-            throw new \DomainException('Invalid Weather API endpoint');
+            $response = $this->cache->request(
+                "{$this->apiUrl}/{$requestUrl}",
+                self::CACHE_PREFIX,
+                [],
+                $this->cacheTimeout,
+            );
+        } catch (GuzzleException | InvalidArgumentException $e) {
+            throw new \DomainException('Invalid Weather API endpoint', 0, $e);
         }
 
         // Attempt to json decode the response body

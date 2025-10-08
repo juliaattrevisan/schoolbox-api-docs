@@ -13,7 +13,7 @@ use Alaress\Async\Stomp\IClient;
 use Alaress\Date\Clock;
 use Alaress\Jitter\Jitter;
 use Alaress\Random\FloatGenerator;
-use Alaress\Sentry\Tracing\Tracer;
+use Alaress\Redis\Async;
 use Alaress\WorkerCrew\Pooling\DefaultDispatchStrategy;
 use PhpAmqpLib\Exception\AMQPRuntimeException;
 use Predis\ClientInterface;
@@ -46,7 +46,7 @@ $kernel = new Daemon\Kernel(
 );
 
 // Create the mobile app delivery daemon.
-$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags) {
+$kernel->run(function (ContainerInterface $di, LoopInterface $loop, LoggerInterface $log, array $opts, string $flags): void {
     /** @var Instance $instance */
     $instance   = $di->get('instance');
     $instanceId = $instance->getId();
@@ -153,9 +153,16 @@ HELP;
             $config,
         );
 
-        // Dispatch to mobile queue
         $strat     = new DefaultDispatchStrategy($flags);
-        $scheduler = new Scheduler($loop, $strat, $log, $clock, $serviceManager, $jitter);
+        $scheduler = new Scheduler(
+            $loop,
+            $strat,
+            $log,
+            $clock,
+            $serviceManager,
+            $jitter,
+            $config,
+        );
 
         // This daemon does not need to restore its messages from the Redis
         // cache, like scheduled does.
@@ -163,12 +170,20 @@ HELP;
         // (thus removing them from the queue) and then defer processing of them
         // using a React loop (thus losing that message if the daemon fails).
 
+        /** @var Async\Client $asyncRedis */
+        $asyncRedis = $di->get('redis.signalQueue.sub');
+
         // due to the async nature of STOMP:
         // only register consumer once the connection is actually established
-        $stomp->connect()->then(function () use ($broker, $scheduler, $log) {
+        $stomp->connect()->then(function () use ($broker, $scheduler, $log, $asyncRedis): void {
             $log->info('Connected to STOMP', ['char' => '+']);
             $broker->registerConsumer($scheduler);
             $log->debug('Consuming amqp://' . Broker::QUEUE);
+
+            $topic = 'mobiled.' . INSTANCE_ID . '.*';
+
+            $asyncRedis->psubscribe($topic, $scheduler);
+            $log->info("Listening on redis://$topic");
         });
     } catch (ConnectionException $e) {
         $log->alert('AMQP server is offline or STOMP misconfigured: ' . $e->getMessage(), ['exception' => $e]);

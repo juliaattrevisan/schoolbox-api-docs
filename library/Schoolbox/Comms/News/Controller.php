@@ -53,6 +53,7 @@ use UnderflowException;
 use UnexpectedValueException;
 use Schoolbox\User;
 use Schoolbox\Discussion\Comment\Mapper as CommentMapper;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 use function array_keys;
 use function array_merge;
@@ -86,6 +87,7 @@ class Controller extends Base
      * @param File\Mapper                      $fileMapper
      * @param ValidChangeStickyStatus          $validChangeStickyStatus Spec pattern for if sticky status may be changed
      * @param RosettaStone                     $l10n
+     * @param EditorTemplateHelper             $editorTemplateHelper
      */
     public function __construct(
         private Mapper $newsMapper,
@@ -104,6 +106,7 @@ class Controller extends Base
         private File\Mapper $fileMapper,
         private ValidChangeStickyStatus $validChangeStickyStatus,
         private RosettaStone $l10n,
+        private EditorTemplateHelper $editorTemplateHelper,
     ) {
     }
 
@@ -204,6 +207,7 @@ class Controller extends Base
             'returnUrl'             => $this->getExplicitReturnUrl(),
             'entityTypesData'       => $this->getEntityTypesData(),
             'mayChangeStickyStatus' => $this->validChangeStickyStatus->isSatisfiedBy($this->getUser()),
+            'editorTemplates'       => $this->editorTemplateHelper->getTemplatesForCategory(),
         ], "Create {$this->getDi()->get('sitePage')->getLocalisedTerm('news', false, true)}", 'news');
     }
 
@@ -308,12 +312,13 @@ class Controller extends Base
             'article'               => $article,
             'featureImageZone'      => $zone->getTwigContext(),
             'fileZone'              => $fileZone->getTwigContext(),
-            'encodedSegments'       => $this->getAudienceSegments($article),
+            'encodedSegments'       => $this->getAudienceSegments(article: $article),
             'isAutoSavable'         => !$article->isSubmitted() || $article->isRejected(),
             'returnUrl'             => $this->getExplicitReturnUrl(),
             'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(),
             'entityTypesData'       => $this->getEntityTypesData(),
             'mayChangeStickyStatus' => $this->validChangeStickyStatus->isSatisfiedBy($this->getUser()),
+            'editorTemplates'       => $this->editorTemplateHelper->getTemplatesForCategory(),
         ], "Update {$article->getTitle()}", 'news');
     }
 
@@ -588,7 +593,7 @@ class Controller extends Base
                 'flashMessage'          => $segment->getFlash(ModerationController::ARTICLE_FLASH_MESSAGE_KEY),
                 'isSavedForLater'       => $isSavedForLater,
                 'returnUrl'             => $this->getExplicitReturnUrl(),
-                'encodedSegments'       => $this->getAudienceSegments($article, true),
+                'encodedSegments'       => $this->getAudienceSegments(article: $article, hideIndividualUsers: true, checkFolderAccess: true),
                 'availableEntityTypes'  => $this->getAvailableAudienceTypeStrategies(true),
                 'entityTypesData'       => $this->getEntityTypesData(false),
                 'isPublishable'         => $this->generateValidSubmittedArticleSpec()->isSatisfiedBy($article),
@@ -816,16 +821,10 @@ class Controller extends Base
             'author' => [
                 'fullname'
             ],
-            'publishAt' => [
-                'long',
-                'relativeTime',
-                'json',
-            ],
-            'viewedAt' => [
-                'long',
-                'relativeTime',
-                'json',
-            ],
+            'publishAt',
+            'viewedAt',
+            'status',
+            'statusDate',
             'topics' => [
                 'name',
                 'slug',
@@ -911,7 +910,7 @@ class Controller extends Base
      * @api   GET /news/archive{/year,month}
      * @since 18.1
      */
-    public function getArchive(int $year = null, int $month = null): void
+    public function getArchive(?int $year = null, ?int $month = null): void
     {
         $pageTitle = 'News Archive';
 
@@ -1176,21 +1175,13 @@ class Controller extends Base
             'title',
             'blurb',
             'featureImage',
-            'publishAt' => [
-                'long',
-                'relativeTime',
-                'json',
-            ],
+            'publishAt',
             'topics' => [
                 'name',
                 'slug',
             ],
             'status',
-            'statusDate' => [
-                'long',
-                'relativeTime',
-                'json',
-            ]
+            'statusDate',
         ];
 
         $this->hydrateArticleAudiences($articles);
@@ -1222,24 +1213,36 @@ class Controller extends Base
      * Generate article's audience segments with audience filtering based on the account access permission.
      * If the logged in user is a member of a staff, filtering will be skipped.
      *
+     * Severe warning:
+     * $checkFolderAccess will nullify an audience segment's value, causing it to be hidden in a ui element.
+     * This was intended to be used only on the Detail screen to hide data from certain members of the demographic
+     * and you have to be careful on the Update screen where a news author is using the result of this method
+     * to populate the audience selectize. Sadly there's a coupling between frontend representation for viewers
+     * and authoring representation for authors.
+     *
      * @param Model $article
      * @param boolean $hideIndividualUsers
+     * @param bool $checkFolderAccess
      * @return array
-     * @throws MapperException\InsufficientHydrationException
-     * @throws UnexpectedValueException
-     * @throws UnknownEntityTypeException
      */
-    private function getAudienceSegments(Model $article, $hideIndividualUsers = false): array
+    private function getAudienceSegments(Model $article, $hideIndividualUsers = false, $checkFolderAccess = false): array
     {
         $audienceSegments = [];
 
         $codec = new Audience\Segment\Codec();
+        $access = Access::getInstance();
 
         $translator = new Audience\Segment\Translator(
             $this->databaseInternal,
             $this->strategyFactory
         );
         $translator->buildCache($article);
+
+        /* SA-20576
+         * This is related to the $checkFolderAccess arg which allows you to check $viewer's folder access
+         * to an audiencing segment, conditionally disregarding that segment in specific usages of this method
+         */
+        $folderEntityType = Audience\Segment\Strategy\Folder::getEntityType();
 
         foreach ($article->getAudience() as $segment) {
             if (
@@ -1249,15 +1252,38 @@ class Controller extends Base
                 continue;
             }
 
+            // store this, so we can reuse and not need to fetch when we clear the id (if the user has no access)
+            $segmentName = $translator->getSegmentName($segment);
+
+            /**
+             * check if this is a folder, and if the user has access to it
+             * if no access, remove the folder id, so we hide the link.
+             */
+            /* Super-important Steve Notes
+             * The Detail screen also uses this method to potentially render a subset of the audiencing.
+             * However, the Update screen ALSO USES THIS to prepopulate the audience selectize so you have
+             * to be mindful about when to exclude elements and when not to exclude elements. This oddball
+             * action-at-a-distance emerged from SA-19147.
+             */
+            if (
+                $checkFolderAccess &&
+                $segment->getEntityType() === $folderEntityType &&
+                !$access->getFolderAccess($this->getUser(), (int)$segment->getEntityValue())
+            ) {
+                /* You didn't have access to this folder: pretend this didn't exist.
+                 */
+                continue;
+            }
+
             // Selectize will use 'value' and 'label' to index and display selected items in default rendering.
             // Labels are used in brick rendering
-            $option = new Audience\SegmentSelectizeOption($codec->encode($segment), $translator->getSegmentName($segment));
+            $option = new Audience\SegmentSelectizeOption($codec->encode($segment), $segmentName);
 
             // We must include the friendly name for each value so that bricks can display extra meta about their component segments.
             if ($segment->isSimple()) {
                 $encodedValue = $codec->encodeValue($segment->getEntityValue());
 
-                $option->addLabel($segment->getEntityType(), $encodedValue, $translator->getSegmentName($segment));
+                $option->addLabel($segment->getEntityType(), $encodedValue, $segmentName);
             } else {
                 foreach ($segment->getChildren() as $child) {
                     $encodedValue = $codec->encodeValue($child->getEntityValue());
@@ -1283,14 +1309,31 @@ class Controller extends Base
         // Base Case:
         if ($segment->isSimple()) {
             try {
-                return (
+                $access = Access::getInstance();
+                // do I have direct access to this news audience?
+                if (
                     $this->access->getAccessLevel($user, UserAccess::SERVICE_NEWS) >= UserAccess::ACCESS_WRITE ||
                     $segment->getEntityType() !== Audience\Segment\Strategy\Folder::getEntityType() ||
-                    Access::getInstance()->getFolderAccess($user, (int)$segment->getEntityValue()) >= UserAccess::ACCESS_READ
-                );
+                    $access->getFolderAccess($user, (int)$segment->getEntityValue()) >= UserAccess::ACCESS_READ
+                ) {
+                    return true;
+                }
+
+                // does my child have direct access to this news audience?
+                // intentionally ignoring children could have service perms
+                foreach ($user->getChildren() as $child) {
+                    if (
+                        $segment->getEntityType() !== Audience\Segment\Strategy\Folder::getEntityType() ||
+                        $access->getFolderAccess($child, (int)$segment->getEntityValue()) >= UserAccess::ACCESS_READ
+                    ) {
+                        return true;
+                    }
+                }
             } catch (MapperException\Deleted) {
                 return false;
             }
+            // neither me, or my child have access to the news audience. DENY
+            return false;
         }
 
         // Recursive Case:

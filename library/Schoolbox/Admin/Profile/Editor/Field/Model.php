@@ -142,7 +142,7 @@ class Model
      */
     public function isField(): bool
     {
-        return ('' !== $this->getIcon() && '' !== $this->getCss());
+        return ('' === trim((string)$this->getIcon()) || '' === trim((string)$this->getCss()));
     }
 
 

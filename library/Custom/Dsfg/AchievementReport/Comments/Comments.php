@@ -12,13 +12,14 @@ use Custom\Dsfg\AchievementReport\NormaliseTeachers;
 
 class Comments extends Base
 {
-
     /**
      * Consts corresponding to ResultType (that's synonymous with a report type)
      * Each comment belongs to one of these reports
+     * These values must match the values used in dbo.uvSchoolBoxReportComments.ResultType.
      */
     private const REPORT_TYPE_IB = 'IB';
     private const REPORT_TYPE_NCEA = 'NCEA';
+    private const REPORT_TYPE_YEAR11 = 'Year 11';
     private const REPORT_TYPE_SCHOOLGRADES = 'SG';
 
 
@@ -48,6 +49,17 @@ class Comments extends Base
     public function findNCEAData(): array
     {
         return $this->findCommentsForReport(self::REPORT_TYPE_NCEA);
+    }
+
+
+    /**
+     * Find NCEA Comments
+     *
+     * @return array
+     */
+    public function findYear11Data(): array
+    {
+        return $this->findCommentsForReport(self::REPORT_TYPE_YEAR11);
     }
 
 
@@ -188,9 +200,14 @@ class Comments extends Base
         ';
 
         if (null !== $resultType) {
-            $query .= ' AND ResultType = :resultType ';
-
-            $params['resultType'] = $resultType;
+            if ($resultType === self::REPORT_TYPE_YEAR11) {
+                $query .= ' AND ResultType IN (:resultType1, :resultType2) ';
+                $params['resultType1'] = self::REPORT_TYPE_YEAR11;
+                $params['resultType2'] = self::REPORT_TYPE_NCEA;
+            } else {
+                $query .= ' AND ResultType = :resultType ';
+                $params['resultType'] = $resultType;
+            }
         }
 
         $query .= '

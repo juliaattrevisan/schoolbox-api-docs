@@ -38,9 +38,26 @@
         {% endif %}
     </nav>
     {% if isActionRoutes %}
+
         <ul data-dropdown-content class="f-dropdown" id="duework-options{{ assessable.id }}">
             {% apply spaceless %}
                 {% if statusRoute %}<li><a class="icon-progress" href="{{ statusRoute }}" data-test="component-assessment-actions-viewStatus-{{ assessable.id }}">View Status</a></li>{% endif %}
+                {% if assessable is dueWork %}
+                    {% set viewGradeRoute = routeLookupIfAuthorized('learningDueWorkResponse.getFirstParticipantResponse', {
+                        assessmentId: assessable.id,
+                        assessment: assessable,
+                    }) %}
+                    {% if viewGradeRoute %}
+                        <li><a class="icon-task" href="{{ viewGradeRoute }}" >View and {{ locale.grades }} submissions</a></li>
+                    {% endif %}
+                {% endif %}
+                {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
+                    assessmentId: assessable.id,
+                    assessment: assessable
+                }) %}
+                {% if viewCustomParticipationRoute %}
+                    <li><a class="icon-group" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
+                {% endif %}
                 {% if assessable is dueWork and assessable.enableWorksheet and assessable.kamiWorksheetTemplate and worksheetClassView %}
                     <li>
                         <a id="kamiWorksheet" class="icon-surveys" href="{{ worksheetClassView }}">Class View</a>
@@ -50,12 +67,20 @@
 
                 {# Learnosity Quiz has two parts: Modify Quiz and Modify Contents #}
                 {% if modifyRoute %}
+                    {# configForm.php will use itself as RETURN_URL.current since it parses twig as part of
+                     # its component building process. The current url is a form processor in this circumstance
+                     # and is functionally invalid for what we intended to do here: use the controllers' returnUrl
+                     # param if specified, otherwise fall back to this global const's .current value
+                     #}
+                    {% set preferredReturnUrl = returnUrl ?? RETURN_URL.current %}
+
                     {% if assessable is quiz %}
                         {% set modifyContentsRoute = routeLookupIfAuthorized('learnosity.getContent', {assessment: assessable, assessmentId: assessable.id}) %}
-                        <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Settings</a></li>
-                        <li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify Contents</a></li>
+                        <li><a class="icon-class-list" href="{{ routeLookup('learnosity.getHorizontalMarking', {assessment: assessable, assessmentId: assessable.id}) }}">Review horizontally</a></li>
+                        <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ preferredReturnUrl }}">Modify Settings</a></li>
+                        <li><a class="icon-modify" href="{{ modifyContentsRoute }}?{{ RETURN_URL.name }}={{ preferredReturnUrl }}">Modify Contents</a></li>
                     {% else %}
-                        <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ RETURN_URL.current }}">Modify</a></li>
+                        <li><a class="icon-modify" href="{{ modifyRoute }}?{{ RETURN_URL.name }}={{ preferredReturnUrl }}">Modify</a></li>
                     {% endif %}
                 {% endif %}
 

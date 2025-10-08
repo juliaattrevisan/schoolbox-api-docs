@@ -69,10 +69,10 @@ class Model extends AbstractUnit
      * This unit is open if the current date is after the open date, and before
      * the due date.
      *
-     * @param Alaress_Date_Format $now Optionally override to enable testing
+     * @param Alaress_Date_Format|null $now Optionally override to enable testing
      * @return bool
      */
-    public function isOpen(Alaress_Date_Format $now = null)
+    public function isOpen(?Alaress_Date_Format $now = null)
     {
         if (!$now instanceof Alaress_Date_Format) {
             $now = Alaress_Date_Format::now();
@@ -83,10 +83,10 @@ class Model extends AbstractUnit
     /**
      * Is this unit open for submissions?
      *
-     * @param Alaress_Date_Format $now Optionally override to enable testing
+     * @param Alaress_Date_Format|null $now Optionally override to enable testing
      * @return bool
      */
-    public function isBeforeOpenDate(Alaress_Date_Format $now = null)
+    public function isBeforeOpenDate(?Alaress_Date_Format $now = null)
     {
         if (!$now instanceof Alaress_Date_Format) {
             $now = Alaress_Date_Format::now();
@@ -97,10 +97,10 @@ class Model extends AbstractUnit
     /**
      * Is this unit open for submissions?
      *
-     * @param Alaress_Date_Format $now Optionally override to enable testing
+     * @param Alaress_Date_Format|null $now Optionally override to enable testing
      * @return bool
      */
-    public function isAfterDueDate(Alaress_Date_Format $now = null)
+    public function isAfterDueDate(?Alaress_Date_Format $now = null)
     {
         if (!$now instanceof Alaress_Date_Format) {
             $now = Alaress_Date_Format::now();

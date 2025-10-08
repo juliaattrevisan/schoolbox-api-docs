@@ -31,6 +31,9 @@ use Schoolbox\Application\Exception\NotFound;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper;
 use Schoolbox\File\MimetypeMapper;
+use Schoolbox\Filter;
+use Schoolbox\Filter\CompositeFactoryFactory;
+use Schoolbox\Filter\Filters\Assessment\IdFinder;
 use Schoolbox\L10n\RosettaStone;
 use Schoolbox\Learning\Assessment\Breadcrumb\Factory;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper as LessonPlanDataModelMapper;
@@ -38,6 +41,8 @@ use Schoolbox\Learning\Assessment\DueWork\Download\MessageFactory;
 use Schoolbox\Learning\Assessment\Feedback\IFeedbackDataSource;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Learning\Assessment\Replicator;
+use Schoolbox\Learning\Course\DataModel\Implementation\Mapper as CourseImplementationMapper;
+use Schoolbox\Learning\Course\DataModel\Implementation\Unit\Mapper as UnitImplementationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Mapper as CourseSpecificationMapper;
 use Schoolbox\Learning\Course\DataModel\Specification\Unit\Mapper as UnitSpecificationMapper;
 use Schoolbox\Learning\DueWork\StateMapper;
@@ -89,6 +94,7 @@ use Schoolbox\User;
 use Schoolbox\UserMapper;
 use UnexpectedValueException;
 use Url;
+use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 
 use function count;
 
@@ -116,45 +122,54 @@ class Controller extends Assessment\Controller
 
     /**
      * The querystring param for Show Drafts from the ui
-     * Note that jquery.marksheet.js hardcodes this value
-     * and it needs to match this
+     * Note that the markbooks currently hardcode this value in both the frontend and backend
      */
     private const SHOW_DRAFTS_KEY = 'showDrafts';
 
 
     /**
-     * @param UserMapper                            $userMapper
-     * @param Mapper                                $errorMapper
-     * @param AssessmentDataSource                  $assessmentMapper
-     * @param WorkTypeMapper                        $workTypeMapper
-     * @param Access                                $access
-     * @param Transactor                            $transactor
-     * @param Factory                               $bakery
-     * @param RubricDataSource                      $rubricMapper
-     * @param RubricResultSetMapper                 $resultSetMapper
-     * @param DueWorkResponseMapper                 $dueWorkResponseMapper
-     * @param ParticipantMapper                     $participantMapper
-     * @param Term\Mapper                           $termMapper
-     * @param SingleFile\Mapper                     $submissionFileMapper
-     * @param Connector                             $kamiConnector
-     * @param Kami\Mapper                           $kamiMapper
-     * @param ParticipantMapper                     $participantDataSource
-     * @param CourseSpecificationMapper             $courseSpecificationMapper
-     * @param UnitSpecificationMapper               $unitSpecificationMapper
-     * @param Replicator                            $replicator
-     * @param Producer                              $producer           for sending the message created by `$messageFactory` to
+     * @param UserMapper $userMapper
+     * @param Mapper $errorMapper
+     * @param AssessmentDataSource $assessmentMapper
+     * @param WorkTypeMapper $workTypeMapper
+     * @param Access $access
+     * @param Transactor $transactor
+     * @param Factory $bakery
+     * @param RubricDataSource $rubricMapper
+     * @param RubricResultSetMapper $resultSetMapper
+     * @param DueWorkResponseMapper $dueWorkResponseMapper
+     * @param ParticipantMapper $participantMapper
+     * @param Term\Mapper $termMapper
+     * @param SingleFile\Mapper $submissionFileMapper
+     * @param Connector $kamiConnector
+     * @param Kami\Mapper $kamiMapper
+     * @param ParticipantMapper $participantDataSource
+     * @param CourseSpecificationMapper $courseSpecificationMapper
+     * @param UnitSpecificationMapper $unitSpecificationMapper
+     * @param Replicator $replicator
+     * @param Producer $producer for sending the message created by `$messageFactory` to
      *                                                                  taskd
-     * @param Turnitin\File\Mapper                  $turnitinFileMapper - for generating the Similarity Report.
-     * @param IFeedbackDataSource                   $feedbackDataSource
-     * @param \Schoolbox\Resource\Folder\Mapper     $folderMapper
-     * @param LatestViewMapper                      $latestViewMapper
-     * @param FilesystemProxy                       $filesystemProxy
-     * @param StateMapper                           $stateMapper
-     * @param RosettaStone                          $rosettaStone
-     * @param MessageFactory                        $dueWorkDownloadMessageFactory
+     * @param Turnitin\File\Mapper $turnitinFileMapper - for generating the Similarity Report.
+     * @param IFeedbackDataSource $feedbackDataSource
+     * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
+     * @param LatestViewMapper $latestViewMapper
+     * @param FilesystemProxy $filesystemProxy
+     * @param StateMapper $stateMapper
+     * @param RosettaStone $rosettaStone
+     * @param MessageFactory $dueWorkDownloadMessageFactory
      * @param Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
-     * @param LessonPlanTemplateMapper              $lessonPlanTemplateMapper
-     * @param LessonPlanDataModelMapper             $lessonPlanDataModelMapper
+     * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
+     * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
+     * @param MimetypeMapper $mimeTypeMapper
+     * @param IdFinder $filtersAssessmentIdFinder
+     * @param CompositeFactoryFactory $filtersFactoryFactory
+     * @param Filter\Mapper $filterMapper
+     * @param Filter\Selection\Mapper $filterSelectionMapper
+     * @param CourseImplementationMapper $courseImplementationMapper
+     * @param UnitImplementationMapper $unitImplementationMapper
+     * @param ?RubricDataSource $rubricDataSource
+     * @param EditorTemplateHelper|null $activityTemplateHelper
+     * @param EditorTemplateHelper|null $feedbackTemplateHelper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -189,6 +204,15 @@ class Controller extends Assessment\Controller
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
         protected MimetypeMapper $mimeTypeMapper,
+        protected Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder,
+        protected Filter\CompositeFactoryFactory $filtersFactoryFactory,
+        protected Filter\Mapper $filterMapper,
+        protected Filter\Selection\Mapper $filterSelectionMapper,
+        protected CourseImplementationMapper $courseImplementationMapper,
+        protected UnitImplementationMapper $unitImplementationMapper,
+        protected ?RubricDataSource $rubricDataSource,
+        private ?EditorTemplateHelper $activityTemplateHelper,
+        private ?EditorTemplateHelper $feedbackTemplateHelper,
     ) {
         parent::__construct(
             $userMapper,
@@ -208,7 +232,19 @@ class Controller extends Assessment\Controller
             $this->projectResultCacheMapper,
             $lessonPlanTemplateMapper,
             $lessonPlanDataModelMapper,
-            $this->mimeTypeMapper,
+            $filtersAssessmentIdFinder,
+            $filtersFactoryFactory,
+            $filterMapper,
+            $filterSelectionMapper,
+            $courseImplementationMapper,
+            $unitImplementationMapper,
+            null,
+            null,
+            null,
+            null,
+            $mimeTypeMapper,
+            $this->rubricDataSource,
+            $activityTemplateHelper,
         );
     }
 
@@ -277,6 +313,36 @@ class Controller extends Assessment\Controller
             }
         }
 
+        $aImpls = [];
+        // impl assessments we can just grab the details, spec we need to get the unit assessments first
+        if (!$assessment->isSpecification()) {
+            $aImpls[$assessment->getId()] = [
+                'assessment' => $assessment,
+            ];
+        } else {
+            $assessments = $this->getUnitAssessments($assessment);
+            foreach ($assessments as $assessmentImpl) {
+                $aImpls[$assessmentImpl->getId()] = [
+                    'assessment' => $assessmentImpl,
+                ];
+            }
+        }
+
+        /**
+         * It's possible to load this page when only some of the assessments are locked for interactions
+         * In that case, the user should still be able to edit feedback for the ones that aren't locked
+         * but they shouldn't be able to import feedback or do bulk operations on the locked ones...
+         *
+         * If all interactions are locked, then don't show the import feedback button at all
+         */
+        $interactionLockedCount = 0;
+        foreach ($aImpls as $i => $aImpl) {
+            $aImpls[$i]['interactionLocked'] = (new LockedChecker($this->getTermMapper()))->isLockedForInteractions($aImpl['assessment']);
+            if ($aImpls[$i]['interactionLocked']) {
+                $interactionLockedCount += 1;
+            }
+        }
+
         $twigData = [
             'errors'            => $this->stateMapper->listDisplayValues(),
             'type'              => Assessment\AssessmentType::objectToString($assessment),
@@ -287,10 +353,11 @@ class Controller extends Assessment\Controller
                 ]
             ),
             'assessment'        => $assessment,
+            'aImpls'           => $aImpls,
             // Only display download link if there are actually files to download
             'download'          => $this->hasDownloadableSubmissionFiles($assessment),
             'rubricMarks'       => RubricIndicatorMarkMapper::getInstance()->findMarkedByAssessment($assessment->getId()),
-            'interactionLocked' => (new Assessment\LockedChecker($this->getTermMapper()))->isLockedForInteractions($assessment),
+            'allInteractionsLocked' => $interactionLockedCount === count($aImpls),
             'selfReflect'       => false,
             'selfAssess'        => false,
             /* Find the first valid Blind Review url
@@ -302,7 +369,8 @@ class Controller extends Assessment\Controller
             ))->getFirstUrl(),
             /* Draft Responses made by each guy
              */
-            'draftResponses' => $draftResponses
+            'draftResponses' => $draftResponses,
+            'editorTemplates' => $this->feedbackTemplateHelper->getTemplatesForCategory(),
         ];
 
         $this->response = $this->responseFromTemplate(
@@ -448,7 +516,7 @@ class Controller extends Assessment\Controller
 
             /* External Url for third party apps which might have generated this assessment
              */
-            'externalRedirectUrl' => $externalRedirectUrl
+            'externalRedirectUrl' => $externalRedirectUrl,
         ];
 
         $routeArgs = [
@@ -911,7 +979,7 @@ class Controller extends Assessment\Controller
     {
         $fp = fopen('php://temp', 'w');
         foreach ($array as $row) {
-            fputcsv($fp, $row);
+            fputcsv($fp, $row, escape: '');
         }
         rewind($fp);
         $contents = stream_get_contents($fp);
@@ -1166,6 +1234,7 @@ class Controller extends Assessment\Controller
             'returnUrl'      => $returnUrl,
             'kamiSession'    => $kamiSession,
             'kamiFileId'     => $kamiFile,
+            'editorTemplates' => $this->activityTemplateHelper !== null ? $this->activityTemplateHelper->getTemplatesForCategory() : [],
 
             /* Only show these things if the assessment is self-gradable */
             'showDescriptorValue' => $selfAssess,
@@ -1629,7 +1698,7 @@ class Controller extends Assessment\Controller
          * forcibly submit them.
          */
         foreach ($postData['draft']['ids'] ?? [] as $studentId) {
-            $userStub = $this->getUserMapper()->createModel()->setId($studentId);
+            $userStub = $this->getUserMapper()->createModel()->setId((int)$studentId);
 
             /** @var \Schoolbox\Learning\Assessment\DueWork\Response\Model|null $latestResponse */
             $latestResponse = $assessment->getParticipant($userStub)->findMostRecentDraftResponse();
@@ -1663,7 +1732,7 @@ class Controller extends Assessment\Controller
         /* Acknowledge receipts of submission for each of these user ids in $assessment.
          */
         foreach ($postData['offline']['ids'] ?? [] as $studentId) {
-            $userStub = $this->getUserMapper()->createModel()->setId($studentId);
+            $userStub = $this->getUserMapper()->createModel()->setId((int)$studentId);
 
             /* If the postData[offline][punctual] was selected,
              * set the submission time to be just before the due date.
@@ -2185,6 +2254,76 @@ class Controller extends Assessment\Controller
                 ]),
                 'assessment' => $assessment,
                 'session'    => $session,
+            ]
+        );
+    }
+
+
+    /**
+     * Update each published authoritative feedback's human-readable marks to a new mark type.
+     * This applies to human-readable marks for both the display grade and the instructor-given grade.
+     *
+     * This is a preview screen to see what the feedbacks would become.
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws RouteNotFound
+     * @throws \Twig\Error\Error
+     */
+    public function getRescore(IAssessable $assessment): void
+    {
+        $changes = (new Assessment\DueWork\Feedback\Rescore($this->feedbackDataSource, $this->stateMapper))->preview($assessment);
+
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/dueWork/rescore.twig',
+            [
+                'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([
+                    $assessment->getTitle(),
+                    $this->getRouteIfAuthorized('learningAssessment.getStatus', [
+                        'assessment' => $assessment,
+                        'assessmentId' => $assessment->getId()
+                    ])
+                ])->add([
+                    'Rescore Preview',
+                    ''
+                ]),
+                'assessment' => $assessment,
+                'changes' => $changes,
+                'perform' => false
+            ]
+        );
+    }
+
+
+    /**
+     * Update each published authoritative feedback's human-readable marks to a new mark type.
+     * This applies to human-readable marks for both the display grade and the instructor-given grade.
+     *
+     * @param IAssessable $assessment
+     * @return void
+     * @throws RouteNotFound
+     * @throws \Twig\Error\Error
+     */
+    public function postRescore(IAssessable $assessment): void
+    {
+        $changes = (new Assessment\DueWork\Feedback\Rescore($this->feedbackDataSource, $this->stateMapper))->perform($assessment);
+
+        $this->response = $this->responseFromTemplate(
+            '@learningAssessment/dueWork/rescore.twig',
+            [
+                'breadcrumbs' => $this->bakery->produceFromAssessment($assessment, $this->getUser())->add([
+                    $assessment->getTitle(),
+                    $this->getRouteIfAuthorized('learningAssessment.getStatus', [
+                        'assessment' => $assessment,
+                        'assessmentId' => $assessment->getId()
+                    ])
+                ])->add([
+                    'Rescore',
+                    ''
+                ]),
+                'assessment' => $assessment,
+                'changes' => $changes,
+                'perform' => true
             ]
         );
     }

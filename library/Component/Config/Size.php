@@ -37,7 +37,7 @@ class Component_Config_Size extends Component_Config_Abstract
     /**
      * @inheritdoc
      */
-    public function parse(SitePage $page, $key, $keyblock, $configValue, Component_ControllerAbstract $component = null)
+    public function parse(SitePage $page, $key, $keyblock, $configValue, ?Component_ControllerAbstract $component = null)
     {
 
         // has an internal block for the select element

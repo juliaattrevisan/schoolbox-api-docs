@@ -92,6 +92,4 @@ function onRemoveSelected(): void {
     margin-top: 3px;
     padding: 0;
 }
-
-@import "../style/mcStyle";
 </style>

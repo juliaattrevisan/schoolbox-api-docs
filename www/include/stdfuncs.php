@@ -68,6 +68,8 @@ function score2pascal($score, $delim = '_')
 /**
  * Convenience wrapper for consistent temp file naming
  *
+ * @deprecated just use tempnam instead
+ *
  * @param string $prefix
  * @param string $dir
  * @return string

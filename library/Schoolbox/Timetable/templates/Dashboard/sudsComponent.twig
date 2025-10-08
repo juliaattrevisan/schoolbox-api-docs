@@ -73,7 +73,7 @@
                                              #}
                                             {% if event.code %}
                                                 {% if folderAccess[event.code] ?? false %}
-                                                    <span><a href="/homepage/code/{{ event.code }}">{{ event.title }}</a></span>
+                                                    <span><a href="/homepage/code/{{ event.code|url_encode|url_encode }}">{{ event.title }}</a></span>
                                                 {% else %}
                                                     <span>{{ event.title }}</span>
                                                 {% endif %}

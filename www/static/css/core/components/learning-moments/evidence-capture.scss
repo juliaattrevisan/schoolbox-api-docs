@@ -20,6 +20,7 @@
     }
     .share-photo {
         border: 1px solid $icon-color-image;
+        background-color: rgba($icon-color-image, 0.03);
         &:before {
             color: $icon-color-image;
         }
@@ -29,6 +30,7 @@
     }
     .share-video {
         border: 1px solid $icon-color-video-player;
+        background-color: rgba($icon-color-video-player, 0.03);
         &:before {
             color: $icon-color-video-player;
         }
@@ -38,6 +40,7 @@
     }
     .share-audio {
         border: 1px solid $icon-color-audio;
+        background-color: rgba($icon-color-audio, 0.03);
         &:before {
             color: $icon-color-audio;
         }
@@ -47,6 +50,7 @@
     }
     .share-file {
         border: 1px solid $icon-color-files;
+        background-color: rgba($icon-color-files, 0.03);
         &:before {
             color: $icon-color-files;
         }
@@ -56,6 +60,7 @@
     }
     .share-text {
         border: 1px solid $emotion;
+        background-color: rgba($emotion, 0.03);
         &:before {
             color: $emotion;
         }
@@ -158,6 +163,22 @@
         border-top: 1px solid #ededed;
         padding: 1rem 0 0 0;
     }
+}
+
+// Specifically on the moments' modify screens we put the comment thread at the top
+// necessitating this weird styling duping and special modifications - I think this
+// is because comments were always presumed to be at the bottom of stuff, not top
+.moment-comments {
+    // This would have inherited a 0.8125rem proportion from being inside a ul
+    // in the activity feed, but in the Moment modify screen there isn't a ul;
+    // we have to set this proportion manually and explicitly. Wild!
+    .article-read-more {
+        font-size: 0.8125rem;
+    }
+}
+
+.feed-comments,
+.moment-comments {
     .discussion-threads {
         padding: 0;
         margin: 0;

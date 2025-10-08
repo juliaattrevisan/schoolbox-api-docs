@@ -52,7 +52,7 @@
                     <h2 class="subheader">{{ pageTitle }}</h2>
                 </div>
             </div>
-            {% if isModify and isRouteAuthorized('pastoral.postDelete', {record: record}) %}
+            {% if isModify and isRouteAuthorized('pastoral.postRecordDelete', {record: record}) %}
                 <nav class="hide" id="formPastoralDelete">
                     <a href="#" data-delete class="icon-delete" title="Delete {{ locale.pastoral.proper }} Record"></a>
                 </nav>
@@ -125,3 +125,4 @@
 </div>
 
 {% include "@pastoral/modify_scripts.twig" %}
+{% include "@pastoral/modify_scripts_add_record.twig" %}

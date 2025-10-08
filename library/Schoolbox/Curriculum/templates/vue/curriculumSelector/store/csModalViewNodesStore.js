@@ -4,7 +4,7 @@
  */
 
 import { defineStore } from "pinia";
-import { useNodesStore } from "./csNodesStore";
+import { useNodesStore } from "./csAllNodesStore";
 import { UNSET_ID, findById } from "@schoolboxCurriculum/js/nodeUtils";
 import { useModalSearchStore } from "./csModalSearchStore";
 

@@ -173,12 +173,9 @@ class Transmit
 
             $this->changeState(
                 $model,
-                sprintf(
-                    'Report %s: Student Submission File %s not found; setting status [%s]',
-                    $model->getId(),
-                    $model->getStudentSubmissionFileId(),
-                    Turnitin\File\Model::STATUS_ERROR
-                ),
+                "Report {$model->getId()}: " .
+                "Student Submission File {$model->getStudentSubmissionFileId()} not found; " .
+                "setting status [" . Turnitin\File\Model::STATUS_ERROR . ']',
                 Turnitin\File\Model::STATUS_ERROR
             );
 
@@ -198,13 +195,8 @@ class Transmit
 
             $this->changeState(
                 $model,
-                sprintf(
-                    'Report %s: Student Submission File %s %s has an invalid mime type; setting status [%s]',
-                    $model->getId(),
-                    $ssf->getId(),
-                    $ssf->getBasename(),
-                    Turnitin\File\Model::STATUS_ERROR
-                ),
+                "Report {$model->getId()}: Student Submission File {$ssf->getId()} {$ssf->getBasename()}" .
+                " has an invalid mime type; setting status [" . Turnitin\File\Model::STATUS_ERROR . ']',
                 Turnitin\File\Model::STATUS_ERROR
             );
 

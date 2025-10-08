@@ -18,83 +18,72 @@
  #     modify them; but another workflow shows you the Lesson Plan Fields that you had previously
  #     spawned and altered
  #}
-<input type="hidden" name="lessonPlanTemplateId" value="{{ lessonPlanMeta.template }}" />
 
-<fieldset>
-    <div class="row">
-        <div class="small-12 columns">
-            <label class="required" for="title">Title</label>
-            <input id="title" type="text" name="title" maxlength="255" value="{% if assessment.id %}{{ assessment.title }}{% endif %}" required />
-        </div>
-    </div>
+{% import "@learningAssessment/fragments/macro/date.twig" as dateForm %}
 
-    {# Assessment dates; basically shanked from another assessment type's create.twig
-     # You have to manually do it every time you add a new assessment type. Only implementations
-     # can have dates, not specifications.
-     #
-     # TODO What is the ordering of this form - do the dates come before or after the Lesson Plan Fields?
-    #}
-    {% import "@learningAssessment/fragments/macro/date.twig" as dateForm %}
+<input type="hidden" name="lessonPlanTemplateId" value="{{ lessonPlanMeta.template.id }}" />
 
-    {% if context.baseContext is not unitSpecification %}
-        {{ dateForm.dateField('Lesson',     'due',     assessment.dueAt,     '#publishDate', '') }}
-    {% endif %}
-</fieldset>
+{# The <lesson-planner> component renders the following parts of the form:
+ # - Title (as a slot)
+ # - Lesson Date (as a slot)
+ # - Curriculum Codes (as a slot)
+ # - [Generate lesson with AI] button
+ # ----
+ # - Lesson Plan Fields, and associated regenerate with AI buttons
+ # Form submission is still handled by the form here, not the component
+ #}
+<div id="lesson-planner-container">
+    <input id="templateTitle" type="hidden" name="templateTitle" value="{{ lessonPlanMeta.template.title }}" />
 
-{% if assessment.id %}
-    {# Update a Lesson Plan. The fields' data already exist as Lesson Plan Fields, but we
-     # need to remember the Lesson Plan Template from which they spawned.
-     #}
-    <fieldset>
-        {% for field in lessonPlanMeta.fields %}
+    <lesson-planner
+        :new-field-keyword="{{ lessonPlanMeta.newKeyword |json_encode }}"
+        :student-const="{{ lessonPlanMeta.consts.student |json_encode }}"
+        :file-browser-category-id="{{ context.baseContext.folder.id ?? 0 }}"
+        :fields="{{ lessonPlanMeta.fields |json_encode }}"
+        context-name="{{ context.baseContext is unitSpecification ? context.baseContext.folder.name : context.baseContext.specification.folder.name }}"
+        lesson-plan-duration="{% if assessment.id %}{{ assessment.lessonPlanDuration }}{% endif %}"
+        generate-plan-route="{{ routeLookupIfAuthorized('openai.postLessonPlan') }}"
+    >
+        <template v-slot:title>
             <div class="row">
                 <div class="small-12 columns">
-                    <div class="lp-item-label">
-                        <label>{{ field.title }}</label>
-                        {% if lessonPlanMeta.consts.student != field.visibility %}
-                            <p class="meta"><span class="icon-view-hollow"></span>This field is not visible to students</p>
-                        {% endif %}
-                    </div>
-
-                    {# The Lesson Plan Template field which is related to this Lesson Plan Field
-                     # Because of the swamp you need to know both since the same function fulfils
-                     # create and update phases in mapperProxy->save()
-                     #}
-                    <input type="hidden" name="field[{{ field.id }}][template]" value="{{ field.lessonPlanTemplateField }}" />
-                    <textarea id="field-body-{{ field.id }}" name="field[{{ field.id }}][body]" data-ckeditor>{{ field.body }}</textarea>
+                    <label for="title" class="required">Title</label>
+                    <input id="title" type="text" name="title" maxlength="255" value="{% if assessment.id %}{{ assessment.title }}{% endif %}" required />
                 </div>
             </div>
-        {% endfor %}
-    </fieldset>
-{% else %}
-    {# Create a new Lesson Plan. The fields are derived from the Lesson Plan Template's fields
-     # but they won't have any Lesson Plan Field identifiers at this point.
-     #}
-    <fieldset>
-        {% for field in lessonPlanMeta.fields %}
-            {% if not field.isDeleted %}
-                {% set newFieldIdentifier = lessonPlanMeta.newKeyword ~ loop.index %}
-                <div class="row">
-                    <div class="small-12 columns">
-                        <div class="lp-item-label">
-                            <label>{{ field.title }}</label>
-                            {% if lessonPlanMeta.consts.student != field.visibility %}
-                                <p class="meta"><span class="icon-view-hollow"></span>This field is not visible to students</p>
-                            {% endif %}
-                        </div>
+        </template>
 
-                        {# The Lesson Plan Template field which is related to this Lesson Plan Field
-                         # Because of the swamp you need to know both since the same function fulfils
-                         # create and update phases in mapperProxy->save()
-                         #}
-                        <input type="hidden" name="field[{{ newFieldIdentifier }}][template]" value="{{ field.id }}" />
-                        <textarea id="field-body-{{ newFieldIdentifier }}" name="field[{{ newFieldIdentifier }}][body]" data-ckeditor>{{ field.body }}</textarea>
-                    </div>
-                </div>
+        {# Assessment dates; basically shanked from another assessment type's create.twig
+         # You have to manually do it every time you add a new assessment type. Only implementations
+         # can have dates, not specifications.
+         #
+         # This gets sent through to the vue component as a slot so we don't need to duplicate date.twig's logic
+         #
+         # TODO What is the ordering of this form - do the dates come before or after the Lesson Plan Fields?
+         #}
+        <template v-slot:date>
+            {% if context.baseContext is not unitSpecification %}
+                {{ dateForm.dateField(locale.translate('lessonPlan', false, true), 'due', assessment.dueAt, '#publishDate', '') }}
             {% endif %}
-        {% endfor %}
-    </fieldset>
-{% endif %}
+        </template>
+
+        {# Curriculum Codes
+         # This is the same include used by everything else. The entity type is some textual
+         # representation, randomly hardcoded here
+         # lessonPlanner.js also includes <curriculum-selector> as an available component so this can be used
+         #}
+        <template v-slot:curriculum-codes>
+            {% include '@learningAssessment/fragments/curriculumCodes.twig' with {
+                entityType: locale.lessonPlan.proper,
+                excludeLegend: true,
+                vueSlot: true,
+                hasTabs: true,
+                parentFolderId: parentFolderId ?? null
+            } %}
+        </template>
+    </lesson-planner>
+</div>
+<script src="{{ CDN_PREFIX }}/js/bundle/lessonPlanner.js?v={{ config.site_version }}"></script>
 
 {# Attach random files to this Lesson Plan
  # It implicitly constructs an attachments[] POST key which contains
@@ -140,7 +129,7 @@
         </div>
         <div class="small-12 medium-9 columns">
             {% if context.baseContext is not unitSpecification %}
-                {{ dateForm.dateField('Publish', 'publish', assessment.publishAt, '',             '#dueDate') }}
+                {{ dateForm.dateField('Publish', 'publish', assessment.publishAt, '', '#dueDate') }}
             {% endif %}
         </div>
     </div>
@@ -152,14 +141,6 @@
         {% include '@learningAssessment/fragments/assessmentLocation.twig' %}
     {% endif %}
 </fieldset>
-
-{# Curriculum Codes
- # This is the same include used by everything else. The entity type is some textual
- # representation, randomly hardcoded here
- #}
-{% include '@learningAssessment/fragments/curriculumCodes.twig' with {
-    entityType: locale.lessonPlan.proper,
-} %}
 
 {% if assessment.id %}
     {% set action = 'Update' %}
@@ -176,16 +157,6 @@
          */
         $('input[name="title"]').rules('add', 'requiredNotBlank');
     });
-
-    /* Spawn multiple ckeditors for fields which already existed
-     */
-    document.dispatchEvent(new CustomEvent("EDITOR__CREATE", {
-        detail: {
-            maxCharCount: window.sbProps.MAX_BYTES_MYSQL_MEDIUMTEXT,
-            targetElements: ['[data-ckeditor]'],
-            fileBrowserCategoryId: {{ context.baseContext.folder.id ?? 0 }},
-        }
-    }));
 
     /* but why? See SA-18416
      */

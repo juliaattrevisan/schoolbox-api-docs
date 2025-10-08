@@ -112,7 +112,6 @@ class Session extends BaseSession
         /**
          * session_id is provided by phpfunc
          *
-         * @phpstan-ignore-next-line
          * @noinspection PhpUndefinedMethodInspection
          */
         $sessionId = $this->phpfunc->session_id();
@@ -304,5 +303,10 @@ class Session extends BaseSession
     public function set($key, $value, $namespace = null)
     {
         $this->getSegment($namespace)->set($key, $value);
+    }
+
+    public function getCookie($name)
+    {
+        return $this->cookies[$name] ?? null;
     }
 }

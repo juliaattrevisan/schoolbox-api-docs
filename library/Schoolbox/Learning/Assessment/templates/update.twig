@@ -6,34 +6,10 @@
 <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/jquery-validation/dist/additional-methods.min.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js?v={{ config.site_version }}"></script>
 <script src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js?v={{ config.site_version }}"></script>
-<script src="{{ CDN_PREFIX }}/js/assessment/participation.js?v={{ config.site_version }}"></script>
 
 {% autoescape 'js' %}
 <script>
     $(function () {
-
-        // Participation
-        $('#participation-container').participationSettings({
-            getAvailableDateFields: function () {
-
-                var dateArray = [];
-
-                if($('#publishDate').length != 0 && $('#publishDate').is(":visible")) {
-                    dateArray.push('publish');
-                }
-                if($('#openDate').length != 0 && $('#openDate').is(":visible")) {
-                    dateArray.push('open');
-                }
-                if($('#dueDate').length != 0 && $('#dueDate').is(":visible")) {
-                    dateArray.push('due');
-                }
-                if($('#closeDate').length != 0 && $('#closeDate').is(":visible")) {
-                    dateArray.push('close');
-                }
-
-                return dateArray;
-            }
-        });
 
         // the mage plugin is applied to the submit buttons: setup a basic mage on all the buttons
         $('input[data-mage-next]').mage({
@@ -141,23 +117,23 @@
             event.preventDefault();
 
             $(this).confirmDialog({
-                header: 'Are you sure you wish to delete this activity?',
+                header: 'Are you sure you wish to delete this {{ locale.activity }}?',
                 text: {{ assessment.isSpecification ? '\'\'' : '\'<span class=\"alert alert-box\"><b>WARNING</b> All student responses, feedback and marks will also be deleted.</span>\'' }},
                 format: 'html',
                 confirmLabel: 'Yes, permanently delete',
                 cancelLabel: 'No, keep it',
                 confirmEvent: function() {
                     const toast = $('#toast');
-                    toast.toastActivate({text: 'Deleting activity...'});
+                    toast.toastActivate({text: 'Deleting {{ locale.activity }}...'});
 
                     $.post('{{ routeLookup('learningAssessment.postDeleteAssessment', {assessmentId: assessment.id, assessment: assessment}) }}')
                         .done(function(result) {
                             // Remove from list after AJAX returns
                             window.location.href = result.returnUrl;
-                            toast.toastTimeout({text: 'Activity deleted.', css: 'success'});
+                            toast.toastTimeout({text: '{{ locale.activity.proper }} deleted.', css: 'success'});
                         })
                         .fail(function() {
-                            toast.toastTimeout({text: 'Could not delete this activity.', css: 'alert'});
+                            toast.toastTimeout({text: 'Could not delete this {{ locale.activity }}.', css: 'alert'});
                         });
                 }
             });
@@ -184,13 +160,41 @@
                 <li>
                     <a href="{{ modifyContentsRoute }}{% if RETURN_URL.previous.encoded %}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}{% endif %}" class="icon-modify" title="Modify Contents">Modify Contents</a>
                 </li>
+                {% set exportRoute = routeLookupIfAuthorized('learnosity.getExportToJson', {assessment: assessment, assessmentId: assessment.id}) %}
+                <li>
+                    <a href="{{ exportRoute }}{% if RETURN_URL.previous.encoded %}?{{ RETURN_URL.name }}={{ RETURN_URL.previous.encoded }}{% endif %}" class="icon-download" title="Download a file to reuse this quiz elsewhere">Export quiz as file</a>
+                </li>
+            {% endif %}
+            {% set viewCustomParticipationRoute = routeLookupIfAuthorized('learningAssessment.getAssessmentParticipationForm', {
+                assessmentId: assessment.id,
+                assessment: assessment
+            }) %}
+            {% if viewCustomParticipationRoute and assessment.isImplementation and (assessment is dueWork or assessment is quiz or assessment is task) %}
+                <li><a class="icon-group" href="{{ viewCustomParticipationRoute }}">Student Participation</a></li>
             {% endif %}
             <li>
-                <a class="icon-delete" title="Delete Activity" data-delete>Delete Activity</a>
+                <a class="icon-delete" title="Delete" data-delete>Delete {{ locale.activity }}</a>
             </li>
         </ul>
     {% endif %}
 </div>
+
+{% if (customisedFor ?? '') | length and participants ?? [] is not empty %}
+    <div class="row">
+        <div class="small-12 column">
+            <ul class="meta">
+                <li>
+                    {% include 'sub/userListMetadata.twig'
+                        with {
+                        users:    participants,
+                        message: 'Updating for '
+                    } only
+                    %}
+                </li>
+            </ul>
+        </div>
+    </div>
+{% endif %}
 
 <div class="row">
     <div class="small-12 columns island">
@@ -202,6 +206,9 @@
                         <input type="hidden" name="{{ returnUrlName }}" value="{{ returnUrl }}" />
                         <input type="hidden" name="id" value="{{ assessment.id }}" />
                         <input type="hidden" name="folderId" value="{{ assessment.baseContext.folder.id }}" />
+                        {% if customisedFor is defined %}
+                            <input type="hidden" name="customisedFor" value="{{ customisedFor }}" />
+                        {% endif %}
                         {% include '@learningAssessment/'~assessmentType~'/create.twig' with { actionLabel: 'Update' } %}
                     </div>
                 </fieldset>
@@ -211,6 +218,3 @@
 </div>
 
 <div id="toast" class="toast"></div>
-
-{# Participation modal w/ form. Must live outside of main form #}
-{% include '@learningAssessment/fragments/participationModal.twig' %}

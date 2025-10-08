@@ -22,8 +22,8 @@ class Assess_Answer_Match extends Evaluation_Answer_Match implements IAutomarkab
      */
     public function mark($currentResponse): void
     {
-        $response = unserialize($currentResponse['response']);
-        $answer = unserialize($currentResponse['answer']);
+        $response = unserialize($currentResponse['response'] ?? '');
+        $answer = unserialize($currentResponse['answer'] ?? '');
 
         $marksPerAnswer = $currentResponse['marks'] / count($answer);
 

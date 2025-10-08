@@ -308,7 +308,7 @@
         <input type="hidden" name="useRubric" value="0" />
 
         <div class="switch">
-            <input name="useRubric" id="useRubric" type="checkbox" {% if assessment.useRubric %}checked="checked"{% endif %} {% if courseManagedReadonly %}disabled{% endif %} />
+            <input name="useRubric" id="useRubric" data-test="assessment-form-use-rubric" type="checkbox" {% if assessment.useRubric %}checked="checked"{% endif %} {% if courseManagedReadonly %}disabled{% endif %} />
             <label for="useRubric">
                 <span class="icon-approve"></span>
                 <span class="icon-cancel"></span>
@@ -324,6 +324,7 @@
         assessment: assessment,
         allMarkTypes: capabilityMarkTypes,
         allGradeSchemes: capabilityGradingSchemes,
+        selectedMaxMark: assessment.maxMark ?? null,
         selectedMarkType: assessment.capabilityMarkType.id ?? null,
         selectedGradeGroup: assessment.capabilityGradeGroup.id ?? null,
         defaultGradeGroup: defaultGradeGroup,
@@ -399,4 +400,3 @@
         </div>
     </div>
 {% endif %}
-

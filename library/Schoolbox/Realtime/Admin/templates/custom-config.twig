@@ -8,6 +8,19 @@ set iconClassnames = {
     'Email': 'email'
 }
 %}
+{# Overrides for display names
+ # Since the keys are meaningful in the backend/database, we need to override
+ # them for frontend display purposes when they change
+ #}
+{%
+set labelDisplayNames = {
+    'Muted': 'Muted',
+    'Digest': 'Digest',
+    'Instant': 'Instant',
+    'Mobile': 'Device',
+    'Email': 'Email'
+}
+%}
 
 <script type="text/javascript">
     $(function () {
@@ -115,7 +128,7 @@ set iconClassnames = {
                                                value="{{ level }}" type="checkbox"
                                                {% if perm[1] | slice(0, 2) | upper in role.mask %}checked="checked"{% endif %}
                                         />
-                                        <label for="opt-{{ source.id }}-{{ role.id }}-{{ level }}" title="{{ perm[1] }}" class="input-toggle">
+                                        <label for="opt-{{ source.id }}-{{ role.id }}-{{ level }}" title="{{ labelDisplayNames[perm[1]] }}" class="input-toggle">
                                             <span class="icon-{{ iconClassnames[perm[1]] }}"></span>
                                         </label>
                                     </span>

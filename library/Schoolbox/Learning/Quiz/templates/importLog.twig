@@ -1,0 +1,31 @@
+{##
+ # Legacy XML Import/Learnosity JSON Import error log
+ #
+ # I'm not really anticipating we get here very often (if at all) since the legacy quiz xml only had so much variation;
+ # however, Learnosity introduces a whole new category of problems we haven't encountered/solved yet.
+ #
+ # Also shows a list of errors/warnings whenever something went strangely with the json data. Usually this is a result
+ # of trying to import curriculum nodes that didn't have uuids, but other errors/warnings turn up here too
+ #
+ # @param IAssessable $assessment  The assessment instance we spawned
+ # @param array $breadcrumbs       A set of nodes to render as breadcrumb elements
+ # @param array $errors            A list of error messages spawned during quiz import
+ #}
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
+
+<div class="row">
+    <div class="small-12 island">
+        <h1>Quiz Import Errors</h1>
+
+        <section class="content">
+            <p>We encountered the following issues during quiz import:</p>
+
+            <ul>
+                {% for error in errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </section>
+    </div>
+</div>

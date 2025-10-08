@@ -16,6 +16,7 @@
     > h5,
     > h6,
     > a,
+    > i,
     > span,
     > input,
     > button,
@@ -49,6 +50,9 @@
 // which isn't how padding should be used moving forward. Padding should be used to add space between a container and its children
 .f-container {
     padding: var(--spacing-m);
+    &:has(h1) {
+        padding: 0 var(--spacing-m);
+    }
 }
 
 // to display a icon only button without the typical .actions-small-1 context

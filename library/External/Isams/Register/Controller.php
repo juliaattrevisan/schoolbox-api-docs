@@ -59,7 +59,6 @@ class Controller extends BaseController
      * @throws InvalidArgumentException
      * @throws SchoolboxException
      * @throws \JsonException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      * @since                    23.1
      * @api                      GET /modules/isams/register/{register}/student/{studentId}
      */
@@ -108,7 +107,6 @@ class Controller extends BaseController
      * @throws InvalidArgumentException
      * @throws SchoolboxException
      * @throws \JsonException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      * @api                      GET /modules/isams/register/{register}/parent
      * @since                    23.1
      */
@@ -282,7 +280,6 @@ class Controller extends BaseController
      * @param array $config   the admin approved register list
      * @return array
      * @throws InvalidArgumentException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     private function getUsersData(User $user, array $register, array $config): array
     {
@@ -324,7 +321,6 @@ class Controller extends BaseController
      * @param   int $registerId
      * @return  array
      * @throws  InvalidArgumentException
-     * @phpstan-ignore-next-line - InvalidArgumentException IS throwable
      */
     private function extractMetaFields(int $registerId): array
     {

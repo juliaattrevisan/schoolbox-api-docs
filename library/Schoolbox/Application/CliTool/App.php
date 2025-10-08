@@ -591,4 +591,43 @@ abstract class App
         }
         return null;
     }
+
+
+    /**
+     * Deprecation notice
+     *
+     * if you are still using this script, please add a comment of this scripts name into string $jiraNumber
+     * @param string $jiraNumber Jira ticket number to prevent deprecation
+     * @deprecated
+     */
+    public function deprecationNotice(string $jiraNumber): void
+    {
+        /**
+         * Deprecation notice
+         */
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/***************     Deprecated NOTICE - this will be deleted in future    ****************/');
+        $this->getLogger()->notice("/*    If you are running this, please add a comment of this scripts name into $jiraNumber    */");
+        $this->getLogger()->notice(sprintf("Class name: %s", get_class($this)));
+        $this->getLogger()->notice(sprintf("Script file: %s", $this->getToolFilename()));
+        $this->getLogger()->notice('/******************************************************************************************/');
+        $this->getLogger()->notice('/******************************************************************************************/');
+
+        // if interactive confirm you saw this
+        if ($this->isInteractive()) {
+            $this->readLine('Press enter to continue');
+        }
+    }
+
+
+    /**
+     * Fetch the freshest version number from config,
+     * bypassing any mapper-related caching mechanisms
+     */
+    protected function getVersion(): string
+    {
+        return trim((string)$this->databaseInternal->executeQuery("
+            SELECT value FROM config WHERE name = 'site_version' LIMIT 1
+        ")->fetchColumn());
+    }
 }

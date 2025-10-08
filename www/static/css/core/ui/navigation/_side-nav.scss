@@ -75,8 +75,8 @@ $side-nav-divider-color: scale-color(#fff, $lightness: 10%);
             display: block;
             margin: $side-nav-link-margin;
             padding: $side-nav-link-padding;
-            @media #{$mediumwide-up} {
-                //ensure isn't applied on mobile
+            @media #{$medium-up} {
+                //ensure isn't applied on desktop
                 &:hover,
                 &:focus {
                     background: $link-bg-hover;
@@ -134,8 +134,8 @@ $border-bottom-width: 2px;
             padding: 0.5rem 0.75rem;
             display: block;
             border-left: $border-bottom-width solid transparent;
-            @media #{$mediumwide-up} {
-                //ensure isn't applied on mobile
+            @media #{$medium-up} {
+                //ensure isn't applied on desktop
                 &:hover {
                     border-left: $border-bottom-width solid $content-ui-hover;
                     color: $side-nav-link-color-hover;
@@ -167,7 +167,7 @@ $border-bottom-width: 2px;
                 width: 100%;
                 z-index: var(--sbx-depth-pop-over);
 
-                @media #{$mediumwide-up} {
+                @media #{$medium-up} {
                     // Indent the subnavs on desktop only
                     a {
                         padding-left: 1.5rem !important;
