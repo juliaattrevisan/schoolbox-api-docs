@@ -931,7 +931,6 @@ window.Vue.onMounted(async () => {
                                                         >
                                                             Modify
                                                         </a>
-                                                        >
                                                     </li>
                                                 </template>
 
