@@ -288,6 +288,22 @@ function onFileDropFileUploaded(file: FileDropFile): void {
 }
 
 /**
+ * When a file is removed from the file drop, deselect the selected media type if the user has
+ * reached the max evidence limit and can't add any more evidence
+ * (This would only occur if the user tried to bulk upload files and exceeded the limit, then removed them)
+ */
+function onFileDropFileRemoved(): void {
+    if (!mfStore.moment) {
+        return;
+    }
+
+    // If the user has reached the max evidence limit, and there's nothing left to remove, deselect the media type
+    if (!canAddEvidence.value && !currentFileDropFiles.value.length) {
+        mediaType.value = null;
+    }
+}
+
+/**
  * Watch for changes to the moment body.
  */
 window.Vue.watch(
@@ -376,6 +392,7 @@ window.Vue.watch(
                 :multiple="MOMENT_MAX_EVIDENCE"
                 :actual-files-length="(mfStore.moment?.evidence.length || 0) + currentFileDropFiles.length"
                 @file-uploaded="onFileDropFileUploaded"
+                @file-removed="onFileDropFileRemoved"
             />
         </div>
     </div>

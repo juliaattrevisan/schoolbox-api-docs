@@ -65,7 +65,10 @@ const props = withDefaults(defineProps<Props>(), {
     fileHandler: () => true,
 });
 
-const emit = defineEmits<{ (e: "file-uploaded", file: FileDropFile): void }>();
+const emit = defineEmits<{
+    (e: "file-uploaded", file: FileDropFile): void;
+    (e: "file-removed", file: FileDropFile): void;
+}>();
 
 const currentFile = defineModel<FileDropFile | null>("currentFile", { default: null });
 const currentFiles = defineModel<FileDropFile[]>("currentFiles", { default: [] });
@@ -166,6 +169,8 @@ function handleRemove(file: FileDropFile): void {
     }
 
     currentFile.value = null;
+
+    emit("file-removed", file);
 }
 
 /**
