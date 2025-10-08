@@ -53,6 +53,7 @@ class BaseTest extends TestCase
                 'curriculumNodes'  => null,
                 'tags'             => null,
                 'currentState'     => Model::STATUS_DRAFT,
+                '_labels'          => [],
             ],
         ];
 
@@ -113,7 +114,8 @@ class BaseTest extends TestCase
                 '_links'           => [],
                 'curriculumNodes'  => new Collection([['id' => 500, 'name' => 'Test Curriculum', 'code' => 'TEST500']]),
                 'tags'             => new Collection([['id' => 1, 'name' => 'Class Work']]),
-                'currentState'     => Model::STATUS_PUBLISHED
+                'currentState'     => Model::STATUS_PUBLISHED,
+                '_labels'          => [],
             ],
         ];
     }
