@@ -53,7 +53,7 @@ test.describe("Files Component Tests", () => {
         tester.isGoingTo("Filter by Image and verify sorting.");
         await Files.sortImageFiles(filesComponent);
         const sortedImageFiles = await Files.getAllFiles(filesComponent);
-        tester.isGoingTo("Current sort (Images): " + sortedImageFiles.join(" | "));
+        tester.isGoingTo(`Current sort (Images): ${sortedImageFiles.join(" | ")}`);
         expect(sortedImageFiles).toEqual([fileTitle, "Glasses"]);
     });
 
@@ -66,42 +66,42 @@ test.describe("Files Component Tests", () => {
         tester.isGoingTo("Filter by Documents & Videos and verify sorting.");
         await Files.sortVideoAndDocumentFiles(filesComponent);
         const sortedDocumentAndVideoFiles: string[] = await Files.getAllFiles(filesComponent);
-        tester.isGoingTo("Current sort (Docs & Videos): " + sortedDocumentAndVideoFiles.join(" | "));
+        tester.isGoingTo(`Current sort (Docs & Videos): ${sortedDocumentAndVideoFiles.join(" | ")}`);
         expect(sortedDocumentAndVideoFiles).toEqual(["Where did English come from?", "Spelling tips"]);
 
         tester.isGoingTo("Sort by Name (ascending).");
         await Homepage.clickComponentSettings(filesComponent);
-        await Files.sortFiles(filesComponent, "Name", "asc");
+        await Files.sortFilesAsc(filesComponent, "Name", "asc");
         const sortedFilesByNameAsc: string[] = await Files.getAllFiles(filesComponent);
-        tester.isGoingTo("Sort by Name ASC: " + sortedFilesByNameAsc.join(" | "));
+        tester.isGoingTo(`Sort by Name ASC: ${sortedFilesByNameAsc.join(" | ")}`);
         expect(sortedFilesByNameAsc).toEqual(["Glasses", "Spelling tips", fileTitle, "Where did English come from?"]);
 
         tester.isGoingTo("Sort by Name (descending).");
         await Homepage.clickComponentSettings(filesComponent);
         await Files.sortFilesDesc(filesComponent, "Name", "desc");
         const sortedFilesByNameDesc: string[] = await Files.getAllFiles(filesComponent);
-        tester.isGoingTo("Sort by Name DESC: " + sortedFilesByNameDesc.join(" | "));
+        tester.isGoingTo(`Sort by Name DESC: ${sortedFilesByNameDesc.join(" | ")}`);
         expect(sortedFilesByNameDesc).toEqual(["Where did English come from?", fileTitle, "Spelling tips", "Glasses"]);
 
         tester.isGoingTo("Sort by Date (ascending).");
         await Homepage.clickComponentSettings(filesComponent);
         await Files.sortFilesDesc(filesComponent, "Date", "asc");
         const sortedFilesByDateAsc: string[] = await Files.getAllFiles(filesComponent);
-        tester.isGoingTo("Sort by Date ASC: " + sortedFilesByDateAsc.join(" | "));
+        tester.isGoingTo(`Sort by Date ASC: ${sortedFilesByDateAsc.join(" | ")}`);
         expect(sortedFilesByDateAsc).toEqual(["Spelling tips", "Where did English come from?", "Glasses", fileTitle]);
 
         tester.isGoingTo("Sort by Date (descending).");
         await Homepage.clickComponentSettings(filesComponent);
         await Files.sortFilesDesc(filesComponent, "Date", "desc");
         const sortedFilesByDateDesc: string[] = await Files.getAllFiles(filesComponent);
-        tester.isGoingTo("Sort by Date DESC: " + sortedFilesByDateDesc.join(" | "));
+        tester.isGoingTo(`Sort by Date DESC: ${sortedFilesByDateDesc.join(" | ")}`);
         expect(sortedFilesByDateDesc).toEqual([fileTitle, "Glasses", "Where did English come from?", "Spelling tips"]);
 
         tester.isGoingTo("Set file limit to 2 and verify only two entries are shown.");
         await Homepage.clickComponentSettings(filesComponent);
         await Files.setFileLimit(filesComponent, "2");
         const setLimit: string[] = await Files.getAllFiles(filesComponent);
-        tester.isGoingTo("Current files (limited to 2): " + setLimit.join(" | "));
+        tester.isGoingTo(`Current files (limited to 2): ${setLimit.join(" | ")}`);
         expect(setLimit).toEqual([fileTitle, "Glasses"]);
         tester.isGoingTo("Save component settings and verify description of the added file.");
         await Homepage.clickComponentSettings(filesComponent);
@@ -137,7 +137,7 @@ test.describe("Files Component Tests", () => {
         await Homepage.clickComponentSettings(filesComponent);
         await files.addExistingFile(filesComponent, "English", "9A English");
         const sortedFiles = await Files.getAllFiles(filesComponent);
-        tester.isGoingTo("Sort on 9B English after adding existing: " + sortedFiles.join(" | "));
+        tester.isGoingTo(`Sort on 9B English after adding existing: ${sortedFiles.join(" | ")}`);
         expect(sortedFiles).toEqual([newFileTitle, "Glasses", "Where did English come from?", "Spelling tips"]);
     });
 

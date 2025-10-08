@@ -143,7 +143,7 @@ export default class Files {
      * @param sortBy - e.g. 'name' | 'date'
      * @param sortingOrder - e.g. 'asc' | 'desc'
      */
-    public static async sortFiles(filesComponent: Locator, sortBy: string, sortingOrder: string): Promise<void> {
+    public static async sortFilesAsc(filesComponent: Locator, sortBy: string, sortingOrder: string): Promise<void> {
         await filesComponent.locator('label[for$="-filter-audio"]').click();
         await filesComponent.locator('label[for$="-filter-image"]').click();
         await filesComponent.locator('label[for$="-filter-other"]').click();
