@@ -142,7 +142,10 @@ class Client implements IClient
 
             // while there's at least one full chunk in the buffer, process it
             while (false !== ($pos = strpos($chunkBuffer, "\n\n"))) {
-                yield EventStream\Message::fromString(substr($chunkBuffer, 0, $pos));
+                $chunk = substr($chunkBuffer, 0, $pos);
+                yield $chunk;
+                yield "\n\n";
+//                yield EventStream\Message::fromString($chunk);
 
                 $chunkBuffer = substr($chunkBuffer, $pos + 2);
 //                $event = $this->parseChunk($chunk);

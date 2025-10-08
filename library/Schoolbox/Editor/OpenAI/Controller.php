@@ -11,6 +11,7 @@ namespace Schoolbox\Editor\OpenAI;
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use GuzzleHttp\Client;
+use GuzzleHttp\Psr7\Utils;
 use Psr\Http\Client\ClientExceptionInterface;
 use Ramsey\Uuid\Uuid;
 use Schoolbox\Admin\OpenAI\Config;
@@ -305,7 +306,13 @@ class Controller extends Base
                     'previousResponseId' => $this->requestPost->get('previousResponseId') ?? null,
                 ]);
 
-                $this->response = $this->responseFromEventStream($response);
+                // The iterable response can just be passed straight to
+                // responseFromStream
+                $this->response = $this->responseFromStream(Utils::streamFor($response))
+                    ->withHeader('Content-Type', 'text/event-stream')
+                    ->withHeader('Cache-Control', 'no-cache')
+                    ->withHeader('Connection', 'keep-alive')
+                    ->withHeader('Content-Encoding', 'none');
                 return;
 
                 // TODO also output a list of known shape arrays when streaming
