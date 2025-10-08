@@ -13,6 +13,7 @@ export const useAddUnitsStore = defineStore("unitPlannerAddUnits", () => {
     const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
     const newUnits = window.Vue.ref<string[]>([""]); // to store the new units being created
     const validationErrors = window.Vue.ref<boolean[]>([]); // to track validation errors for each unit
+    const loadError = window.Vue.ref<string | null>(null); // to store any error that occurs during the create
 
     /**
      * to display a prompt to add a unit
@@ -67,6 +68,7 @@ export const useAddUnitsStore = defineStore("unitPlannerAddUnits", () => {
         const toast = window.sbProps.toastActivate("Adding...");
         try {
             isProcessing.value = true;
+            loadError.value = null;
             const response = await apiRequest<Unit[], Record<string, unknown>>({
                 url: `/course/plan/${unitPlannerStore.courseId}/newUnits`,
                 method: "POST",
@@ -83,6 +85,7 @@ export const useAddUnitsStore = defineStore("unitPlannerAddUnits", () => {
             cancel();
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
+            loadError.value = errorMessage;
             toast.timeout({ text: errorMessage, isSuccess: false });
         } finally {
             isProcessing.value = false;
@@ -94,6 +97,7 @@ export const useAddUnitsStore = defineStore("unitPlannerAddUnits", () => {
         isOpen,
         newUnits,
         validationErrors,
+        loadError,
         prompt,
         add,
         remove,

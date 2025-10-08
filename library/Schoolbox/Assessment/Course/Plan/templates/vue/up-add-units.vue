@@ -5,6 +5,7 @@
 
 import locale from "@js/terminology/rosettaStone";
 import BasicModal from "@schoolboxVue/components/modal/basic-modal.vue";
+import RequestError from "@schoolboxVue/components/error/request-error.vue";
 import { useAddUnitsStore } from "./store/unitPlannerAddUnitsStore";
 
 const addUnitsStore = useAddUnitsStore();
@@ -62,6 +63,7 @@ function onAddSelected(): void {
                     Add another
                 </button>
             </div>
+            <request-error v-if="addUnitsStore.loadError" :further-info="addUnitsStore.loadError" />
             <div class="l-flex l-gap-xs f-no-margins">
                 <button
                     class="button l-flex__item--1"
