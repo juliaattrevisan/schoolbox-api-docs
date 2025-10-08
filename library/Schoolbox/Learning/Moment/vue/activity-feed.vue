@@ -1149,18 +1149,16 @@ window.Vue.onMounted(async () => {
                             </template>
                         </template>
 
-                        <template>
-                            <a
-                                v-if="props.routes.getSetAsGoalForm"
-                                :href="getReturnUrl(props.routes.getSetAsGoalForm)"
-                                title="Set a goal"
-                            >
-                                <!-- Different capitalization for if this is start or middle of a sentence -->
-                                <template v-if="props.routes.getCreateEvidenceForm">set a goal</template>
-                                <template v-else>Set a goal</template>
-                            </a>
-                            <template v-if="props.routes.getAwardAsAchievementForm"> or </template>
-                        </template>
+                        <a
+                            v-if="props.routes.getSetAsGoalForm"
+                            :href="getReturnUrl(props.routes.getSetAsGoalForm)"
+                            title="Set a goal"
+                        >
+                            <!-- Different capitalization for if this is start or middle of a sentence -->
+                            <template v-if="props.routes.getCreateEvidenceForm">set a goal</template>
+                            <template v-else>Set a goal</template>
+                        </a>
+                        <template v-if="props.routes.getAwardAsAchievementForm"> or </template>
 
                         <a
                             v-if="props.routes.getAwardAsAchievementForm"
