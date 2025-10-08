@@ -1218,7 +1218,7 @@ class Controller extends Base
                 'body' => \Scrub::html($moment->getBody()),
                 'blurb' => $blurb,
                 'showReadMore' => $showReadMore,
-                'files' => $files,
+                'evidence' => $momentTranslated['evidence'],
                 /* TODO we usually add role for extra meta about students and staffs, especially in cohorty scenarios
                  *  since there's a higher likelihood of encountering people with same- or same-sounding names.
                  *  Role description helps distinguish them. But it wasn't in any of the designs. I'm expecting

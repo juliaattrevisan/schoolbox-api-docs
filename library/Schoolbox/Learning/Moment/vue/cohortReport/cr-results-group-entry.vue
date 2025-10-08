@@ -31,18 +31,18 @@ const dropdownId = window.Vue.computed(() => {
 /**
  * The current evidence item hash that should be shown
  */
-const selectedEvidenceHash = window.Vue.ref<CohortReportEntry["files"][number]["hash"] | null>(null);
+const selectedEvidenceHash = window.Vue.ref<StorageFile["hash"] | null>(null);
 const selectedEvidence = window.Vue.computed(() => {
-    return props.entry.files.find((f) => f.hash === selectedEvidenceHash.value) || null;
+    return props.entry.evidence.find((f) => f.storage.hash === selectedEvidenceHash.value) || null;
 });
 
 const selectableEvidence = window.Vue.computed(() => {
-    return props.entry.files.filter((f) => f.hash !== selectedEvidenceHash.value);
+    return props.entry.evidence.filter((f) => f.storage.hash !== selectedEvidenceHash.value);
 });
 
 window.Vue.onMounted(() => {
-    if (props.entry.files.length > 0) {
-        selectedEvidenceHash.value = props.entry.files[0].hash;
+    if (props.entry.evidence.length > 0) {
+        selectedEvidenceHash.value = props.entry.evidence[0].storage.hash;
     }
 });
 
@@ -123,16 +123,15 @@ function spawnLightbox(file: StorageFile): void {
         <div class="l-flex__item--1 l-grid l-grid--12 l-gap-s l-mar-xs--top">
             <div class="small-12" :class="{ 'medium-8': selectableEvidence.length > 0 }">
                 <article
-                    v-if="selectedEvidence !== null && selectedEvidence.hash"
-                    :key="selectedEvidence.hash"
+                    v-if="selectedEvidence !== null && selectedEvidence.storage.hash"
+                    :key="selectedEvidence.storage.hash"
                     style="width: fit-content"
-                    :style="{ cursor: selectedEvidence.type === ResourceType.IMAGE ? 'pointer' : undefined }"
-                    @click="spawnLightbox(selectedEvidence)"
+                    :style="{ cursor: selectedEvidence.storage.type === ResourceType.IMAGE ? 'pointer' : undefined }"
+                    @click="spawnLightbox(selectedEvidence.storage)"
                 >
-                    <!-- TODO: this doesn't use the file name from the model, rather the base storage name... -->
                     <storage-object
-                        :storage="selectedEvidence"
-                        :filename="selectedEvidence.name"
+                        :storage="selectedEvidence.storage"
+                        :filename="selectedEvidence.filename || selectedEvidence.storage.name"
                         style="max-height: 10rem"
                         maintain-dims
                         data-test="learning-moment-evidence-media"
@@ -152,15 +151,15 @@ function spawnLightbox(file: StorageFile): void {
 
             <div v-if="selectableEvidence.length > 0" class="small-12 medium-4 l-flex-col l-gap-s">
                 <div
-                    v-for="storage in props.entry.files"
-                    :key="storage.hash"
+                    v-for="evidence in props.entry.evidence"
+                    :key="evidence.storage.hash"
                     class="cr-evidence-button l-flex--no-wrap l-flex-row l-gap-xs l-pad-xs"
-                    :class="{ 'cr-evidence-button-selected': storage.hash === selectedEvidenceHash }"
-                    :title="storage.name"
-                    @click="selectedEvidenceHash = storage.hash"
+                    :class="{ 'cr-evidence-button-selected': evidence.storage.hash === selectedEvidenceHash }"
+                    :title="evidence.storage.name"
+                    @click="selectedEvidenceHash = evidence.storage.hash"
                 >
-                    <img :src="`/ajax/mime/${storage.mime}`" />
-                    <span>{{ storage.name }}</span>
+                    <img :src="`/ajax/mime/${evidence.storage.mime}`" />
+                    <span>{{ evidence.filename || evidence.storage.name }}</span>
                 </div>
             </div>
         </div>
