@@ -218,13 +218,18 @@ class Api implements IApi
          */
         while (($n < self::MAX_PAYLOADS) && (!$payload || \count($payload['data']) === self::PAGE_SIZE)) {
             $this->log(sprintf(
-                "Retrieving %s @ page %s with %s max elements per page...\n",
+                " >> Retrieving %s @ page %s with %s max elements per page...\n",
                 $endpoint,
                 $pageNum,
                 $pageSize
             ));
 
             $payload = $this->retrieveOne($method, $endpoint, $scope, $pageNum, $pageSize, $params);
+
+            $this->log(sprintf(
+                "    Obtained %s elements in this payload.\n",
+                count($payload['data']),
+            ));
 
             $pageNum++;
             $n++;
@@ -285,10 +290,14 @@ class Api implements IApi
                 $accessToken = ($this->accessTokenGenerator->generate($scope))->getToken();
                 $end = microtime(true);
 
-                $this->log(sprintf(
-                    " ** Access token generation took %s seconds.\n",
-                    number_format($end - $start, 2)
-                ));
+                $duration = number_format($end - $start, 2);
+
+                if ($duration > 0) {
+                    $this->log(sprintf(
+                        " ** Access token generation took %s seconds.\n",
+                        $duration,
+                    ));
+                }
 
                 /* Slam in headers with the dynamic token
                  *
@@ -308,7 +317,7 @@ class Api implements IApi
                 $end = microtime(true);
 
                 $this->log(sprintf(
-                    " -- Client request took %s seconds to obtain response.\n",
+                    " << Client request took %s seconds to obtain response.\n",
                     number_format($end - $start, 2),
                 ));
 
