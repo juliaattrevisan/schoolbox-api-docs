@@ -4,6 +4,7 @@
 
 import { defineStore } from "pinia";
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import locale from "@js/terminology/rosettaStone";
 import { useUnitPlannerStore } from "./unitPlannerStore";
 import type { Unit } from "../unitPlannerTypes";
 
@@ -78,7 +79,7 @@ export const useAddUnitsStore = defineStore("unitPlannerAddUnits", () => {
             }
             const createdUnits = response.data;
             unitPlannerStore.units = [...unitPlannerStore.units, ...createdUnits];
-            toast.timeout({ text: "Units created successfully" });
+            toast.timeout({ text: `${locale.unit.translate(true, false)} successfully created` });
             cancel();
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "There was an unexpected error";
