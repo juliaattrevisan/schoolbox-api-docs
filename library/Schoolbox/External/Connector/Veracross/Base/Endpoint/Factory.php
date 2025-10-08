@@ -45,7 +45,7 @@ class Factory
      * Get timetable classes occurring this far in the past
      * Measured in months, defaults to -1 month
      */
-    private const FROM = -1;
+    private const FROM = 0;
 
 
     /**

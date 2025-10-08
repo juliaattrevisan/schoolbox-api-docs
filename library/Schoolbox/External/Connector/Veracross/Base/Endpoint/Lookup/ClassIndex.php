@@ -29,8 +29,10 @@ class ClassIndex
      * Constructor
      *
      * @param IApi $api
+     * @param array $watchlist
+     * @param array $enrolmentsLookup
      */
-    public function __construct(private IApi $api)
+    public function __construct(private IApi $api, private array $watchlist, private array $enrolmentsLookup)
     {
     }
 
@@ -47,15 +49,52 @@ class ClassIndex
         if (null === $this->lookup) {
             $this->lookup = [];
 
+            /* If a non-empty watchlist was provided, only obtain a specific list of classes
+             * using individual calls to the api. Watchlist usage is a diagnostic only so you
+             * would only be getting a handful of people plus their data: a few repeated calls
+             * to the api is bearable in this case.
+             *
+             * Standard usage in the fleet would be to have an empty watchlist so we can just
+             * use one api call and preprocess everyone's classes.
+             */
+            $watchlistEnabled = (bool)\count($this->watchlist);
+
+            if ($watchlistEnabled) {
+                /* Surgically obtain specific class data
+                 */
+                $specificClassIds = [];
+
+                foreach ($this->enrolmentsLookup as $externalId => $enrolmentTuple) {
+                    $specificClassIds = $specificClassIds + array_column($enrolmentTuple, 'internal_class_id');
+                }
+
+                /* Flip the script for a faster lookup
+                 */
+                $specificClassIds = array_fill_keys($specificClassIds, true);
+            }
+
+            /* Find class codes and stuff
+             */
             $generator = $this->api->retrieve('GET', 'classes', Classes::SCOPE);
 
             foreach ($generator as $page) {
                 /* Avengers Assemble!
                  */
                 foreach ($page['data'] as $record) {
-                    /* Overwrite with lookupped values
+                    /* No watchlist? Add every $record we encounter
+                     * This should be the main use case for the fleet
                      */
-                    $this->lookup[$record['id']] = $record;
+                    if (!$watchlistEnabled) {
+                        $this->lookup[$record['id']] = $record;
+                        continue;
+                    }
+
+                    /* Otherwise only add the ones specifically for each $specificClassIds
+                     * to help minimise memory consumption
+                     */
+                    if (isset($specificClassIds[$record['id']])) {
+                        $this->lookup[$record['id']] = $record;
+                    }
                 }
             }
         }

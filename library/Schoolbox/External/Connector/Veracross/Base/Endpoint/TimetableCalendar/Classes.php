@@ -17,6 +17,7 @@ use Schoolbox\External\ClassInvolvementMapper;
 use Schoolbox\External\Connector\ClassCode;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Factory;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\ClassIndex;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Enrolments;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Users;
 use Schoolbox\External\Connector\Watchlist;
@@ -125,7 +126,7 @@ class Classes implements IStrategy
         /* Precompiler
          * Note this has a local cache that remembers an endpoint's outcome
          */
-        $compiler = new PersonCompiler($this->api, self::SCOPE);
+//        $compiler = new PersonCompiler($this->api, self::SCOPE);
 
         /* Get a list of guys
          */
@@ -150,6 +151,7 @@ class Classes implements IStrategy
          *
          * This results in a list of classes that are relevant to the enrolments we prefetched.
          */
+        $classesLookup = (new ClassIndex($this->api, $this->watchlist, $enrolmentsLookup))->generate();
 
         /* Each class needs its meeting times which we can obtain with academics.classes.meeting_times:list
          * and precompile that into each class.
