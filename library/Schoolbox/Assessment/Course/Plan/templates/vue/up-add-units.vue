@@ -11,7 +11,7 @@ import { useAddUnitsStore } from "./store/unitPlannerAddUnitsStore";
 const addUnitsStore = useAddUnitsStore();
 
 /**
- * to add a new unit
+ * To add new units
  */
 function onAddSelected(): void {
     if (addUnitsStore.isProcessing) {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 /**
- * To display an error that we cant currently can't process the request
+ * To display an error that we currently can't process the request
  */
 
 interface Props {
@@ -23,7 +23,7 @@ function onRefreshSelected(): void {
         Sorry, we are currently unable to process the request. Please
         <a href="#refresh-page" @click.prevent="onRefreshSelected">refresh the page</a>
         to try again and contact your support if the problem persists.
-        <em v-if="props.furtherInfo && props.furtherInfo.length !== null">
+        <em v-if="props.furtherInfo && props.furtherInfo.length > 0">
             <br />
             <strong>Further information:</strong> {{ props.furtherInfo }}
         </em>
