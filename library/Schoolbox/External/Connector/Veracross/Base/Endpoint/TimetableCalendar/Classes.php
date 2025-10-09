@@ -19,7 +19,7 @@ use Schoolbox\External\Connector\Veracross\Base\Endpoint\Factory;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\ClassIndex;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Enrolments;
-use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\MeetingTimes;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\MeetingTimesConcurrent;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Users;
 use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Event\Mapper;
@@ -161,7 +161,7 @@ class Classes implements IStrategy
         $startDate = $this->fromDate->getDatabaseDate();
         $endDate = $this->toDate->getDatabaseDate();
 
-        $meetingTimesLookup = (new MeetingTimes($this->api, array_keys($classesLookup), $this->log))->generate($startDate, $endDate);
+        $meetingTimesLookup = (new MeetingTimesConcurrent($this->api, array_keys($classesLookup), $this->log))->generate($startDate, $endDate);
 
         /* At the end of all this you should have a:
          *   - a lookup of enrolments which tells you a person and the internal_class_ids they're in

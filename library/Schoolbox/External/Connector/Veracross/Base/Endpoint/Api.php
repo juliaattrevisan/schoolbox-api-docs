@@ -384,6 +384,45 @@ class Api implements IApi
 
 
     /**
+     * Experimental
+     *
+     * @param string $method
+     * @param array $endpoints
+     * @param string $scope
+     * @param array $params
+     * @param int $pageSize
+     * @return array
+     * @throws \Throwable
+     */
+    public function retrieveConcurrent(string $method, array $endpoints, string $scope, array $params = [], int $pageSize = self::PAGE_SIZE): array
+    {
+        $promises = [];
+
+        foreach ($endpoints as $endpoint) {
+            $accessToken = ($this->accessTokenGenerator->generate($scope))->getToken();
+
+            $options = [];
+
+            if (!empty($params)) {
+                $options[RequestOptions::QUERY] = $params;
+            }
+
+            $options['headers'] = [
+                'Authorization' => "Bearer {$accessToken}",
+                'Content-Type' => 'application/json',
+                'X-API-Value-Lists' => 'include',
+                'X-Page-Number' => 1,
+                'X-Page-Size' => $pageSize
+            ];
+
+            $promises[] = $this->client->requestAsync($method, $endpoint, $options);
+        }
+
+        return \GuzzleHttp\Promise\Utils::unwrap($promises);
+    }
+
+
+    /**
      * Deeper diagnostics
      *
      * @param string $msg

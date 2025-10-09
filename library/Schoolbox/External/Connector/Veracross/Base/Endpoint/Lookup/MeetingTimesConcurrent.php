@@ -1,0 +1,113 @@
+<?php
+
+/**
+ * @copyright   Copyright 2025, Schoolbox Pty Ltd
+ * @link        https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup;
+
+use Psr\Log\LoggerInterface;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\TimetableCalendar\Classes;
+
+/**
+ * Grab all the Meeting Times everywhere
+ */
+class MeetingTimesConcurrent
+{
+    /**
+     * Remember the output we might have previously generated
+     *
+     * @var array|null
+     */
+    private ?array $lookup = null;
+
+
+    private const CLASS_CHUNK_SIZE = 100;
+
+
+    /**
+     * Constructor
+     *
+     * @param IApi $api
+     * @param array $classIds
+     * @param LoggerInterface $log
+     */
+    public function __construct(
+        private IApi $api,
+        private array $classIds,
+        private LoggerInterface $log
+    ) {
+    }
+
+
+    /**
+     * Generate a compiled list of records, indexed by an identifier
+     *
+     * @param string $from
+     * @param string $to
+     * @return array
+     * @throws \JsonException
+     * @throws \Throwable
+     */
+    public function generate(string $from, string $to): array
+    {
+        $this->log->debug('Prefetching meeting times...');
+
+        $start = microtime(true);
+
+        /* If we generated this lookup previously, just recycle it
+         */
+        if (null === $this->lookup) {
+            $this->lookup = [];
+
+            $classChunks = array_chunk($this->classIds, self::CLASS_CHUNK_SIZE);
+
+            foreach ($classChunks as $classChunk) {
+                $endpoints = [];
+
+                foreach ($classChunk as $classId) {
+                    $endpoints[] = sprintf(
+                        'academics/classes/%s/meeting_times',
+                        $classId
+                    );
+                }
+
+                $responses = $this->api->retrieveConcurrent('GET', $endpoints, Classes::SCOPE, [
+                    'on_or_after_date' => $from,
+                    'on_or_before_date' => $to,
+                ]);
+
+                foreach ($responses as $response) {
+                    if ($response->getStatusCode() === 200) {
+                        $content = $response->getBody()->getContents();
+
+                        if ('' === $content) {
+                            return [];
+                        }
+
+                        $page = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+
+                        foreach ($page['data'] as $record) {
+                            $this->lookup[$record['internal_class_id']][] = $record;
+                        }
+                    }
+                }
+            }
+        }
+
+        $end = microtime(true);
+
+        $this->log->debug(sprintf(
+            'Prefetching meeting times took %s seconds',
+            number_format($end - $start, 2)
+        ));
+
+        $this->log->debug('');
+
+        return $this->lookup;
+    }
+}
