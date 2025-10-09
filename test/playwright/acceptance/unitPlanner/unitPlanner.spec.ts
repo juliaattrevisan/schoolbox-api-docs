@@ -184,7 +184,7 @@ test.describe("Unit Planner Tests", () => {
         await expect(page.locator("div.empty-state")).toBeVisible();
     });
 
-    test("Create new units on empty course", async ({ tester, page, db }) => {
+    test("Create new units on empty course", async ({ tester, page }) => {
         const courseName = "Party time";
         const firstUnitName = "Soft party";
         const secondUnitName = "Hard party";
@@ -222,24 +222,8 @@ test.describe("Unit Planner Tests", () => {
         tester.isGoingTo("click the 'creating a unit' button to open the modal");
         await page.getByRole("button", { name: "creating a unit." }).click();
 
-        tester.isGoingTo("confirm modal is visible");
-        await page.locator('[data-test="up-add-units-title"]').isVisible();
-
-        tester.isGoingTo(`add '${firstUnitName}' to the first unit name input`);
-        await page.locator('[data-test="up-add-units-name-input-0"]').fill(firstUnitName);
-
-        tester.isGoingTo("click 'Add another' to add a second unit");
-        await page.locator('[data-test="up-add-units-add"]').click();
-
-        tester.isGoingTo(`add '${secondUnitName}' to the second unit name input`);
-        await page.locator('[data-test="up-add-units-name-input-1"]').fill(secondUnitName);
-
-        tester.isGoingTo("click Create to create both units");
-        await page.locator('[data-test="up-add-units-create"]').click();
-
-        tester.isGoingTo("verify both units are visible on the page after creation");
-        await expect(page.locator('[data-test^="unit-planner-unit-link-"]').getByText(firstUnitName)).toBeVisible();
-        await expect(page.locator('[data-test^="unit-planner-unit-link-"]').getByText(secondUnitName)).toBeVisible();
+        tester.isGoingTo("create both units using the modal and verify they are visible");
+        await unitPlanner.createUnitsInModal([firstUnitName, secondUnitName]);
 
         tester.isGoingTo("navigate to course list page to delete the course");
         await page.goto("https://vagrant.dev.schoolbox.cloud/course/list");
