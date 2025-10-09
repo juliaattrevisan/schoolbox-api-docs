@@ -184,12 +184,19 @@ test.describe("Unit Planner Tests", () => {
         await expect(page.locator("div.empty-state")).toBeVisible();
     });
 
-    test("Create new units on empty course", async ({ tester, page }) => {
+    test("Create new units on empty course", async ({ tester, page, db }) => {
+        const courseName = "Party time";
+        const firstUnitName = "Soft party";
+        const secondUnitName = "Hard party";
+
+        // switch to admin so can later delete the created course
+        await tester.loginAsAdmin();
+
         tester.isGoingTo("navigate to course creation page");
         await page.goto("https://vagrant.dev.schoolbox.cloud/course/new");
 
-        tester.isGoingTo("fill in course name with 'Party time'");
-        await page.getByRole("textbox", { name: "Name *" }).fill("Party time");
+        tester.isGoingTo(`fill in course name with '${courseName}'`);
+        await page.getByRole("textbox", { name: "Name *" }).fill(courseName);
 
         tester.isGoingTo("select English faculty folder");
         await page.getByRole("link", { name: " (Click to select)" }).click();
@@ -199,8 +206,15 @@ test.describe("Unit Planner Tests", () => {
         tester.isGoingTo("click Next to create the course");
         await page.getByRole("button", { name: "Next" }).click();
 
-        tester.isGoingTo("navigate to course plan page to verify empty units message");
-        await page.goto("https://vagrant.dev.schoolbox.cloud/course/plan/16");
+        tester.isGoingTo("wait for the URL to change to course/modify/{courseId}");
+        await page.waitForURL("**/course/modify/*");
+
+        // grab the courseId from the URL after the navigation is complete
+        const courseId = page.url().split("/").pop();
+        console.warn(`Created course with ID ${courseId}`);
+
+        tester.isGoingTo("navigate to unit planner page to verify empty units message");
+        await page.goto(`https://vagrant.dev.schoolbox.cloud/course/plan/${courseId}`);
 
         tester.isGoingTo("confirm the empty units message is visible");
         await expect(page.getByText("This course currently does not have any units")).toBeVisible();
@@ -208,27 +222,27 @@ test.describe("Unit Planner Tests", () => {
         tester.isGoingTo("click the 'creating a unit' button to open the modal");
         await page.getByRole("button", { name: "creating a unit." }).click();
 
-        tester.isGoingTo("add 'Soft party' to the first unit name input");
-        await page.getByRole("textbox", { name: "New unit name" }).fill("Soft party");
+        tester.isGoingTo(`add '${firstUnitName}' to the first unit name input`);
+        await page.locator('[data-test="up-add-units-name-input-0"]').fill(firstUnitName);
 
         tester.isGoingTo("click 'Add another' to add a second unit");
-        await page.getByRole("button", { name: "Add another" }).click();
+        await page.locator('[data-test="up-add-units-add"]').click();
 
-        tester.isGoingTo("add 'Hard party' to the second unit name input");
-        await page.getByRole("textbox").nth(1).fill("Hard party");
+        tester.isGoingTo(`add '${secondUnitName}' to the second unit name input`);
+        await page.locator('[data-test="up-add-units-name-input-1"]').fill(secondUnitName);
 
         tester.isGoingTo("click Create to create both units");
-        await page.getByRole("button", { name: "Create" }).click();
+        await page.locator('[data-test="up-add-units-create"]').click();
 
         tester.isGoingTo("verify both units are visible on the page after creation");
-        await expect(page.getByText("Soft party")).toBeVisible();
-        await expect(page.getByText("Hard party")).toBeVisible();
+        await expect(page.locator('[data-test^="unit-planner-unit-link-"]').getByText(firstUnitName)).toBeVisible();
+        await expect(page.locator('[data-test^="unit-planner-unit-link-"]').getByText(secondUnitName)).toBeVisible();
 
         tester.isGoingTo("navigate to course list page to delete the course");
         await page.goto("https://vagrant.dev.schoolbox.cloud/course/list");
 
         tester.isGoingTo("click the course dropdown button to open the actions menu");
-        await page.locator('[data-test="sbx-pop-out-courseDropdown-18-button"]').click();
+        await page.locator(`[data-test="sbx-pop-out-courseDropdown-${courseId}-button"]`).click();
 
         tester.isGoingTo("click the Delete link from the dropdown menu");
         await page.getByRole("link", { name: "Delete" }).click();
@@ -236,8 +250,8 @@ test.describe("Unit Planner Tests", () => {
         tester.isGoingTo("confirm deletion in the modal by clicking the confirm button");
         await page.locator('[data-test="confirm-dialog-confirm-button"]').click();
 
-        tester.isGoingTo("verify that Party time is no longer visible on the page");
-        await expect(page.getByText("Party time")).not.toBeVisible();
+        tester.isGoingTo(`verify that ${courseName} is no longer visible on the page`);
+        await expect(page.getByText(courseName)).not.toBeVisible();
     });
 
     test.afterAll(async ({ baseTester, db }) => {
