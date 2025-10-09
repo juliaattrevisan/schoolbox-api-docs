@@ -107,8 +107,23 @@ class MeetingTimesConcurrent
 
                         $page = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 
+                        $classId = null;
+
                         foreach ($page['data'] as $record) {
-                            $this->lookup[$record['internal_class_id']][] = $record;
+                            $classId = $record['internal_class_id'];
+
+                            $this->lookup[$classId][] = $record;
+                        }
+
+                        /* We know this $classId if there were $records to process.
+                         * There won't be a $classId for an empty set, so no need to log anything about that.
+                         */
+                        if ($classId) {
+                            $this->log->debug(sprintf(
+                                'Processing %s meeting times for class %s.',
+                                \count($page['data']),
+                                $classId
+                            ));
                         }
                     }
                 }
