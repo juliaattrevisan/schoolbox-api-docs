@@ -289,7 +289,8 @@ class Generator
      * @param string $msg
      * @return void
      */
-    private function log(string $msg): void {
+    private function log(string $msg): void
+    {
         if ($this->deepLog) {
             echo $msg;
         }
