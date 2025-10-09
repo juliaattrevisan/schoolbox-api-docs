@@ -3,6 +3,7 @@
 namespace Schoolbox\APIUser;
 
 use PDO;
+use PDOException;
 use Schoolbox\UserMapper;
 
 class Helper
@@ -19,14 +20,12 @@ class Helper
 
     /**
      * get the count of users from the search query, irrespective fo the limit, or cursor location
-     * @param string|null $keyword
-     * @param array|null  $filter
+     * @param string $keyword
+     * @param array $filter
      * @return int
      */
-    public function ajaxSearchCount(
-        ?string $keyword,
-        ?array $filter
-    ) {
+    public function ajaxSearchCount(string $keyword, array $filter): int
+    {
         [$query, $params] = $this->buildSearch($keyword, $filter);
         $statement = $this->userMapper->getDatabase()->prepare($query);
         foreach ($params as $label => $value) {
@@ -38,36 +37,32 @@ class Helper
 
     /**
      * Find a user based on a keyword, for an AJAX response.
-     * stripped and updated from `library/User.php`
+     * Stripped and updated from `library/User.php`
      *
-     * @param string|null $keyword
-     * @param array|null $filter
-     * @param int|null   $limit
-     * @param int|null   $cursor
-     * @return array|bool
-     * @throws \Exception
+     * @param string $keyword
+     * @param array $filter
+     * @param int|null $limit
+     * @param int|null $cursor
+     * @return array
+     * @throws PDOException
      */
-    public function ajaxSearch(
-        ?string $keyword,
-        ?array $filter,
-        ?int $limit = null,
-        ?int $cursor = null
-    ) {
+    public function ajaxSearch(string $keyword, array $filter, ?int $limit = null, ?int $cursor = null): array
+    {
         [$query, $params] = $this->buildSearch($keyword, $filter);
 
-        if (0 !== $cursor) {
+        if (null !== $cursor) {
             $query .= " AND user.id > :cursor ";
         }
         $query .= "ORDER BY user.id, lyl.sequence, lastname, chosen_name";
-        if (0 !== $limit) {
+        if (null !== $limit) {
             $query .= " LIMIT :limit";
         }
 
         $statement = $this->userMapper->getDatabase()->prepare($query);
-        if (0 !== $limit) {
+        if (null !== $limit) {
             $statement->bindValue('limit', $limit, PDO::PARAM_INT);
         }
-        if (0 !== $cursor) {
+        if (null !== $cursor) {
             $statement->bindValue('cursor', $cursor, PDO::PARAM_INT);
         }
         foreach ($params as $label => $value) {
@@ -78,11 +73,11 @@ class Helper
     }
 
     /**
-     * @param string|null $keyword
-     * @param array|null  $filter
+     * @param string $keyword
+     * @param array $filter
      * @return array [sqlQuery, params]
      */
-    private function buildSearch(?string $keyword, ?array $filter)
+    private function buildSearch(string $keyword, array $filter): array
     {
         $username   = $filter['username'] ?? '';
         $externalId = $filter['externalId'] ?? '';
@@ -116,7 +111,7 @@ class Helper
             WHERE user.deleted_at IS NULL
             ';
         $params = [];
-        if ($keyword != "") {
+        if ($keyword !== "") {
             if (is_numeric($keyword)) {
                 $params['externalId'] = $keyword;
                 $where .= "AND ( synergy_id = :externalId  ) ";

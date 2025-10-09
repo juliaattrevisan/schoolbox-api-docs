@@ -16,7 +16,7 @@ use Schoolbox\Learning\Assessment\AssessmentType;
 /**
  * Validator of assessment-related API requests.
  *
- * @package Schoolbox\User\Password
+ * @package Schoolbox\Assessment\API
  */
 class Validator
 {
@@ -154,15 +154,15 @@ class Validator
                     throw new SchoolboxException("Filter 'folder' item must not be empty.");
                 }
 
-                foreach ($subArray as $key => $value) {
+                foreach ($subArray as $key => $subValue) {
                     switch ($key) {
                         case 'id':
-                            if (!is_int($value) && !ctype_digit($value)) {
+                            if (!is_int($subValue) && !ctype_digit($subValue)) {
                                 throw new SchoolboxException("Filter 'folder' item property 'id' must have an integer value.");
                             }
                             break;
                         case 'code':
-                            if (!is_string($value)) {
+                            if (!is_string($subValue)) {
                                 throw new SchoolboxException("Filter 'folder' item property 'name' must have a string value.");
                             }
                             break;
@@ -201,6 +201,9 @@ class Validator
     }
 
     /**
+     * See also the same method in the APIUser\Validator class.
+     * TODO: It may be a good idea to combine the two classes with a common parent class.
+     *
      * @param string $arrayName
      * @param array $array
      */

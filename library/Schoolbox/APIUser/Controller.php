@@ -10,9 +10,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\APIUser;
 
+use Alaress\Authorizer\Authorizer;
 use Alaress\Web\Controller\Base;
+use Aura\Router\Generator;
 use Crell\ApiProblem\ApiProblem;
 use HouseMapper;
+use PDOException;
 use Schoolbox\Collection;
 use Schoolbox\Group\API\ModelToArray;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
@@ -38,17 +41,12 @@ use UnexpectedValueException;
 class Controller extends Base
 {
     private GroupsHelper $groupsHelper;
-    protected UserMapper $userMapper;
-    protected HouseMapper $houseMapper;
-    protected CampusMapper $campusMapper;
-    protected YearLevelMapper $yearLevelMapper;
-    protected RoleMapper $roleMapper;
 
     /**
      * Controller constructor.
      *
-     * @param \Alaress\Authorizer\Authorizer $authorizer
-     * @param \Aura\Router\Generator $routeGenerator
+     * @param Authorizer             $authorizer
+     * @param Generator              $routeGenerator
      * @param UserAccessMapper       $userAccessMapper
      * @param GroupMapper            $groupMapper
      * @param FolderMapper           $folderMapper
@@ -59,6 +57,7 @@ class Controller extends Base
      * @param CampusMapper           $campusMapper
      * @param YearLevelMapper        $yearLevelMapper
      * @param RoleMapper             $roleMapper
+     * @param Validator              $validator
      */
     public function __construct(
         \Alaress\Authorizer\Authorizer $authorizer,
@@ -68,17 +67,13 @@ class Controller extends Base
         FolderMapper $folderMapper,
         Timetable_ColourMapper $timetableColourMapper,
         RerouteOverrideMapper $reRouteOverrideMapper,
-        UserMapper $userMapper,
-        HouseMapper $houseMapper,
-        CampusMapper $campusMapper,
-        YearLevelMapper $yearLevelMapper,
-        RoleMapper $roleMapper
+        protected UserMapper $userMapper,
+        protected HouseMapper $houseMapper,
+        protected CampusMapper $campusMapper,
+        protected YearLevelMapper $yearLevelMapper,
+        protected RoleMapper $roleMapper,
+        private readonly Validator $validator,
     ) {
-        $this->userMapper = $userMapper;
-        $this->houseMapper = $houseMapper;
-        $this->campusMapper = $campusMapper;
-        $this->yearLevelMapper = $yearLevelMapper;
-        $this->roleMapper = $roleMapper;
         $this->groupsHelper = new GroupsHelper(
             $authorizer,
             $routeGenerator,
@@ -436,28 +431,34 @@ class Controller extends Base
      * Searches for a user based on a filter list
      * param: {search: search basic term (optional)} {filter: extra parameters for determining how to filter the search results}
      *
-     * @api /api/user
      * @link http://api.schoolbox.com.au/#operation/userSearch
+     * @api  /api/user
      */
-    public function apiUserSearch()
+    public function apiUserSearch(): void
     {
-        $search = $this->requestQuery->get('search', '');
-        $cursor = (int)$this->requestQuery->get('cursor', null);
-        $limit = (int)$this->requestQuery->get('limit', 5);
-        /**
-         * check if filter is an array or string and use it like that
-         */
-        $filter = null;
-        $getFilter = $this->requestQuery->get('filter', '');
-        if (is_string($getFilter)) {
-            $filter = json_decode($this->requestQuery->get('filter', ''), true) ?? null;
-        } elseif (is_array($getFilter)) {
-            $filter = $getFilter;
+        try {
+            [$search, $filter, $limit, $cursor] = $this->validator->validateForApiUserSearch($this->requestQuery);
+        } catch (SchoolboxException $e) {
+            $this->sendJsonError('Failed to get users: ' . $e->getMessage(), 400);
+            return;
         }
 
+        // The $cursor is a string because that is the standard type for cursor values specified in the API docs.
+        // Cursor values sometimes need to be strings, because database primary keys are sometimes strings.
+        // For this specific endpoint, the relevant primary key (user.id) is an integer, so the cursor should be a digit
+        // string, and so we convert it to an integer or null (null to distinguish from a cursor value of 0).
+        $cursor = ($cursor === '') ? null : (int)$cursor;
+
         $userHelper = new Helper($this->userMapper);
-        $output = [];
-        $ajaxSearch = $userHelper->ajaxSearch($search, $filter, $limit, $cursor);
+
+        try {
+            $ajaxSearch = $userHelper->ajaxSearch($search, $filter, $limit, $cursor);
+            $ajaxSearchCount = $userHelper->ajaxSearchCount($search, $filter);
+        } catch (PDOException) {
+            $this->sendJsonError('Failed to get users due to database access problem.', 500);
+            return;
+        }
+
         $userIds = [];
         foreach ($ajaxSearch as $item) {
             foreach ($item as $label => $value) {
@@ -470,6 +471,7 @@ class Controller extends Base
          * now we have the user id's that match the search result, create the standard user array with hydration.
          */
         $users = $this->userMapper->findByColumn('id', $userIds);
+        $output = [];
         foreach ($users as $user) {
             $apiGroups = $this->groupsHelper->getCurrentGroups($user);
             $groupsArr = $apiGroups->map(new ModelToArray());
@@ -489,7 +491,7 @@ class Controller extends Base
             [
                 'data'  =>  $output,
                 'metadata'  => [
-                    'count' => $userHelper->ajaxSearchCount($search, $filter),
+                    'count' => $ajaxSearchCount,
                     'cursor' => end($output)['id'] ?? null
                 ]
             ]

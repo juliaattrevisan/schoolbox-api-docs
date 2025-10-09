@@ -89,6 +89,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(CampusMapper::class),
             $this->getMapperFactory()->get(YearLevelMapper::class),
             $this->getMapperFactory()->get(RoleMapper::class),
+            new Validator(),
         );
     }
 
