@@ -411,6 +411,10 @@ class Controller extends Base
 
         $requestBody = $this->request->getParsedBody();
 
+        if (!array_key_exists('folders', $requestBody)) {
+            $requestBody['folders'] = [];
+        }
+
         /* This is a bit brutal and maybe you can mess around more with a diff,
          * but this is guaranteed to be correct without all the kerfuffle...for now
          */
