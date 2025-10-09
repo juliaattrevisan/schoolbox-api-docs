@@ -372,7 +372,7 @@ function install_instance() {
   --config instance_registry_url "'$INSTANCE_REGISTRY_URL'" \
   --config ldap_enable "'0'" \
   --config mail_enable "'1'" \
-  --config mail_smtp_host "'127.0.0.1'" \
+  --config mail_smtp_host "'mailcatcher'" \
   --config mail_smtp_port "'1025'" \
   --config office365_client "'85671866-2f6b-4ec3-9940-1f39ecc05e50'" \
   --config office365_immersive_reader_name "'schoolbox-test'" \
