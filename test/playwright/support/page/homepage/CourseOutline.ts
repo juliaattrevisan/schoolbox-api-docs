@@ -215,7 +215,7 @@ export default class CourseOutline {
     }
 
     /**
-     * click the check box "Show Title to Read-Ony Users"
+     * click the check box "Show Title to Read-Only Users"
      * @param component - The locator of the course outline component
      * @param componentId - The ID of the course outline component eg: id="component4902"
      */
