@@ -36,6 +36,7 @@ function onAddSelected(): void {
                             type="text"
                             class="input l-flex__item--1"
                             maxlength="255"
+                            :data-test="`up-add-units-name-input-${index}`"
                             :placeholder="`Enter ${locale.unit.translate(false, false).toLowerCase()} name`"
                         />
                         <button
@@ -45,7 +46,7 @@ function onAddSelected(): void {
                             :disabled="addUnitsStore.newUnits.length === 1"
                             title="Delete"
                             aria-label="Delete"
-                            data-test="up-add-units-delete"
+                            :data-test="`up-add-units-delete-${index}`"
                             @click.prevent="addUnitsStore.remove(index)"
                         ></button>
                     </div>

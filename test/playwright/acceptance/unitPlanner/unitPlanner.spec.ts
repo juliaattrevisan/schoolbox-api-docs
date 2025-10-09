@@ -184,6 +184,28 @@ test.describe("Unit Planner Tests", () => {
         await expect(page.locator("div.empty-state")).toBeVisible();
     });
 
+    test("Create new units on empty course", async ({ tester, page }) => {
+        tester.isGoingTo("navigate to course creation page");
+        await page.goto("https://vagrant.dev.schoolbox.cloud/course/new");
+
+        tester.isGoingTo("fill in course name with 'Party time'");
+        await page.getByRole("textbox", { name: "Name *" }).fill("Party time");
+
+        tester.isGoingTo("select English faculty folder");
+        await page.getByRole("link", { name: " (Click to select)" }).click();
+        await page.getByRole("treeitem", { name: " English" }).click();
+        await page.getByRole("button", { name: "Use this folder" }).click();
+
+        tester.isGoingTo("click Next to create the course");
+        await page.getByRole("button", { name: "Next" }).click();
+
+        tester.isGoingTo("navigate to course plan page to verify empty units message");
+        await page.goto("https://vagrant.dev.schoolbox.cloud/course/plan/16");
+
+        tester.isGoingTo("confirm the empty units message is visible");
+        await expect(page.getByText("This course currently does not have any units")).toBeVisible();
+    });
+
     test.afterAll(async ({ baseTester, db }) => {
         baseTester.isGoingTo("find the textbox that was created in this test so it can be deleted");
 
