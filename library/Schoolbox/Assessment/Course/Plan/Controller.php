@@ -481,8 +481,19 @@ class Controller extends Base
         try {
             $unitSpec = $this->createUnit($unitName, $course);
 
+            /* Finding the textbox definition ID from the Unit Template
+             */
+            $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
+            $class = Textbox\Component\Homepage\Controller::class;
+            $unitTextboxComp = $this->componentInstanceMapper->findByContextAndClass(
+                $module,
+                $course->getTemplate()->getUnitTemplate()->getId(),
+                $class
+            );
+            $textboxDefId = $unitTextboxComp->first()?->getDefinitionId();
+
             $this->response = $this->responseAsJson(
-                $this->getTranslatedUnitData($unitSpec, $course)
+                $this->getTranslatedUnitData($unitSpec, $course, $textboxDefId)
             )->withStatus(201);
         } catch (\Exception $e) {
             $problem = (new ApiProblem($e->getMessage()))
@@ -508,7 +519,7 @@ class Controller extends Base
 
         /* If the names is not an array or is an empty array, return error
          */
-        if (!is_array($names) || count($names) === 0) {
+        if (!is_array($names) || empty($names)) {
             $problem = (new ApiProblem('Could not create units. You need to give at least one unit name'))
                 ->setStatus(400)
                 ->asArray();
@@ -519,9 +530,19 @@ class Controller extends Base
 
         $units = [];
         try {
+            /* Finding the textbox definition ID from the Unit Template
+             */
+            $module = \Component_Definition::MODULE_HOMEPAGE_TEMPLATE;
+            $class = Textbox\Component\Homepage\Controller::class;
+            $unitTextboxComp = $this->componentInstanceMapper->findByContextAndClass(
+                $module,
+                $course->getTemplate()->getUnitTemplate()->getId(),
+                $class
+            );
+            $textboxDefId = $unitTextboxComp->first()?->getDefinitionId();
             foreach ($names as $name) {
                 $newUnit = ($this->createUnit(trim($name ?? ''), $course));
-                $units[] = $this->getTranslatedUnitData($newUnit, $course);
+                $units[] = $this->getTranslatedUnitData($newUnit, $course, $textboxDefId);
             }
         } catch (\Exception $e) {
             $problem = (new ApiProblem($e->getMessage()))
@@ -588,7 +609,7 @@ class Controller extends Base
      * @throws RouteNotFound
      * @throws \Schoolbox\Mapper\Exception
      */
-    private function getTranslatedUnitData(Model $unitSpec, CourseSpecification $course): array
+    private function getTranslatedUnitData(Model $unitSpec, CourseSpecification $course, ?int $textboxDefId): array
     {
         [$curriculumTemplate, $curriculumKey, $curriculumDefId] = $this->getTemplateCurric($course->getTemplate()?->getUnitTemplate()->getId());
         [$activityTemplate, $activityKey, $activityDefId] = $this->getTemplateCourseBuilder($course->getTemplate()?->getUnitTemplate()->getId());
@@ -597,7 +618,7 @@ class Controller extends Base
             $course->getTemplate()->getUnitTemplate()->getId(),
             $curriculumKey,
             $activityKey,
-            null,
+            $textboxDefId,
             $curriculumDefId,
             $activityDefId
         );
