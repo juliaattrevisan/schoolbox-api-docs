@@ -6,7 +6,7 @@ import Common from "@schoolboxTest/playwright/support/page/Common";
 
 /**
  * navigate to pastoral care management settings
- * set tup some record visibility settings for 2 types
+ * set up some record visibility settings for 2 types
  * lock it for one of them
  * check the non pastoral moderator cannot change the locked visibility
  * check the pastoral moderator can change the locked visibility
