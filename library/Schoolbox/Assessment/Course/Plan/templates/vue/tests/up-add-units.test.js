@@ -131,4 +131,84 @@ describe("UpAddUnits", () => {
         const errorLabel = wrapper.find(".error");
         expect(errorLabel.exists()).toBe(false);
     });
+
+    test("add another button creates additional unit inputs", async () => {
+        // Initially we should have one unit input
+        expect(addUnitsStore.newUnits.length).toBe(1);
+        expect(wrapper.find('[data-test="up-add-units-name-input-0"]').exists()).toBe(true);
+        expect(wrapper.find('[data-test="up-add-units-name-input-1"]').exists()).toBe(false);
+
+        // Click "Add another" button
+        const addButton = wrapper.find('[data-test="up-add-units-add"]');
+        expect(addButton.exists()).toBe(true);
+        await addButton.trigger("click");
+        await wrapper.vm.$nextTick();
+
+        // Verify we now have 2 unit inputs
+        expect(addUnitsStore.newUnits.length).toBe(2);
+        expect(wrapper.find('[data-test="up-add-units-name-input-0"]').exists()).toBe(true);
+        expect(wrapper.find('[data-test="up-add-units-name-input-1"]').exists()).toBe(true);
+
+        // Verify the delete button is now visible for the second input
+        expect(wrapper.find('[data-test="up-add-units-delete-1"]').exists()).toBe(true);
+        // But not for the first input (index 0 never gets a delete button)
+        expect(wrapper.find('[data-test="up-add-units-delete-0"]').exists()).toBe(false);
+
+        // Add a third unit
+        await addButton.trigger("click");
+        await wrapper.vm.$nextTick();
+
+        // Verify we now have 3 unit inputs
+        expect(addUnitsStore.newUnits.length).toBe(3);
+        expect(wrapper.find('[data-test="up-add-units-name-input-0"]').exists()).toBe(true);
+        expect(wrapper.find('[data-test="up-add-units-name-input-1"]').exists()).toBe(true);
+        expect(wrapper.find('[data-test="up-add-units-name-input-2"]').exists()).toBe(true);
+
+        // Verify delete buttons exist for units 1 and 2, but not 0
+        expect(wrapper.find('[data-test="up-add-units-delete-0"]').exists()).toBe(false);
+        expect(wrapper.find('[data-test="up-add-units-delete-1"]').exists()).toBe(true);
+        expect(wrapper.find('[data-test="up-add-units-delete-2"]').exists()).toBe(true);
+    });
+
+    test("delete button removes the relevant name input", async () => {
+        const firstUnitName = "Unit 1";
+        const secondUnitName = "Unit 2";
+
+        // Add a second unit by clicking "Add another"
+        const addButton = wrapper.find('[data-test="up-add-units-add"]');
+        await addButton.trigger("click");
+        await wrapper.vm.$nextTick();
+
+        // Verify we now have 2 unit inputs
+        expect(addUnitsStore.newUnits.length).toBe(2);
+        expect(wrapper.find('[data-test="up-add-units-name-input-0"]').exists()).toBe(true);
+        expect(wrapper.find('[data-test="up-add-units-name-input-1"]').exists()).toBe(true);
+
+        // Fill in both inputs
+        const firstInput = wrapper.find('[data-test="up-add-units-name-input-0"]');
+        const secondInput = wrapper.find('[data-test="up-add-units-name-input-1"]');
+        await firstInput.setValue(firstUnitName);
+        await secondInput.setValue(secondUnitName);
+
+        // Verify both values are in the store
+        expect(addUnitsStore.newUnits[0]).toBe(firstUnitName);
+        expect(addUnitsStore.newUnits[1]).toBe(secondUnitName);
+
+        // Click the delete button for the second unit (index 1)
+        const deleteButton = wrapper.find('[data-test="up-add-units-delete-1"]');
+        expect(deleteButton.exists()).toBe(true);
+        await deleteButton.trigger("click");
+        await wrapper.vm.$nextTick();
+
+        // Verify that the second unit was removed
+        expect(addUnitsStore.newUnits.length).toBe(1);
+        expect(addUnitsStore.newUnits[0]).toBe(firstUnitName);
+
+        // Verify that only the first input exists now
+        expect(wrapper.find('[data-test="up-add-units-name-input-0"]').exists()).toBe(true);
+        expect(wrapper.find('[data-test="up-add-units-name-input-1"]').exists()).toBe(false);
+
+        // Verify that the delete button is no longer visible (since we only have 1 unit)
+        expect(wrapper.find('[data-test="up-add-units-delete-0"]').exists()).toBe(false);
+    });
 });
