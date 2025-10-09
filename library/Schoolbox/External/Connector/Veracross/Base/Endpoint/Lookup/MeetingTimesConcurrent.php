@@ -84,10 +84,18 @@ class MeetingTimesConcurrent
                  * at obtaining 100 meeting times elements; you could supply 10 months of meeting times under this
                  * paradigm. At most we use 6 months, and even then, I've just halved it to 3 months.
                  */
+                $concurrencyStart = microtime(true);
                 $responses = $this->api->retrieveConcurrent('GET', $endpoints, Classes::SCOPE, [
                     'on_or_after_date' => $from,
                     'on_or_before_date' => $to,
                 ]);
+                $concurrencyEnd = microtime(true);
+
+                $this->log->debug(sprintf(
+                    'Concurrently fetching meeting times for %s classes took %s seconds to resolve all promises.',
+                    \count($endpoints),
+                    number_format($concurrencyEnd - $concurrencyStart, 2)
+                ));
 
                 foreach ($responses as $response) {
                     if ($response->getStatusCode() === 200) {

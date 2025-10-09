@@ -418,6 +418,10 @@ class Api implements IApi
             ];
 
             $promises[] = $this->client->requestAsync($method, $endpoint, $options);
+
+            /* Record endpoint usage
+             */
+            $this->apiUsage->record($endpoint);
         }
 
         return \GuzzleHttp\Promise\Utils::unwrap($promises);
