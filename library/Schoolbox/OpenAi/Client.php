@@ -15,6 +15,7 @@ use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
+use Schoolbox\Application\Exception\Exception as SchoolboxException;
 
 /**
  * A standard client for an AI provider.
@@ -25,6 +26,12 @@ class Client implements IClient
      * Default chunk size when reading a streaming response.
      */
     private const DEFAULT_CHUNK_SIZE = 128;
+
+    /**
+     * When an image is omitted from the request/response: replace the image
+     * data with this in the log.
+     */
+    private const IMAGE_DATA_OMITTED = 'omitted';
 
     /**
      * Constructor
@@ -136,54 +143,136 @@ class Client implements IClient
             }
             yield $data;
 
-//            // Normalise CRLF to LF
-//            $data = strtr($data, ["\r\n" => "\n", "\r" => "\n"]);
+            // Actually listen to the event stream
+            // Normalise CRLF to LF
+            $data = strtr($data, ["\r\n" => "\n", "\r" => "\n"]);
+
+            $chunkBuffer .= $data;
+
+            // while there's at least one full chunk in the buffer, process it
+            while (false !== ($pos = strpos($chunkBuffer, "\n\n"))) {
+                $chunk = substr($chunkBuffer, 0, $pos);
+                // If this can't be parsed: raise something but still log
+                $this->onMessage(EventStream\Message::fromString($chunk));
+                $chunkBuffer = substr($chunkBuffer, $pos + 2);
+//                $event = $this->parseChunk($chunk);
+////                $this->appendChunkToLog($event, $log, $type);
 //
-//            $chunkBuffer .= $data;
-//
-//            // while there's at least one full chunk in the buffer, process it
-//            while (false !== ($pos = strpos($chunkBuffer, "\n\n"))) {
-//                $chunk = substr($chunkBuffer, 0, $pos);
-//                yield $chunk;
-//                yield "\n\n";
-////                yield EventStream\Message::fromString($chunk);
-//
-//                $chunkBuffer = substr($chunkBuffer, $pos + 2);
-////                $event = $this->parseChunk($chunk);
-//////                $this->appendChunkToLog($event, $log, $type);
-////
-//////                // Don't echo an 'error' chunk if this isn't going to ckeditor as it won't follow the format of an ApiProblem
-//////                if ($type === self::FEATURE_CHAT || $event['type'] !== 'error') {
-//////                    echo "{$chunk}\n\n";
-//////                }
-////
-////                // Is this the final event?
-////                // There are 3 possible events that indicate the end of a response (see https://platform.openai.com/docs/api-reference/responses-streaming/response)
-////                if (in_array($event['type'], ['response.completed', 'response.failed', 'response.incomplete'])) {
-////                    $completedEvent = $event['data'][0]['response'];
-////                    // Keep reading the stream as there *might* be more later that we can still log to debug issues
+////                // Don't echo an 'error' chunk if this isn't going to ckeditor as it won't follow the format of an ApiProblem
+////                if ($type === self::FEATURE_CHAT || $event['type'] !== 'error') {
+////                    echo "{$chunk}\n\n";
 ////                }
-//
-////                // Keep track of whether we're generating an image
-////                if ($event['type'] === 'response.image_generation_call.generating') {
-////                    $isGeneratingImage = true;
-////                } else if ($event['type'] === 'response.image_generation_call.completed') {
-////                    $isGeneratingImage = false;
-////                }
-////
-////                // flush PHP buffers
-////                if (ob_get_length()) {
-////                    @ob_flush();
-////                }
-////                @flush();
-//            }
+            }
         }
 
-////        // If we have any remaining data in the buffer, process it
-//        if (strlen(trim($chunkBuffer)) > 0) {
-//            yield $chunkBuffer;
-//        }
+//        // If we have any remaining data in the buffer, process it
+        if (strlen(trim($chunkBuffer)) > 0) {
+            $this->onMessage(EventStream\Message::fromString($chunkBuffer));
+        }
+    }
 
-//        return $completedEvent;
+    private function onMessage(EventStream\Message $message): void
+    {
+        // Prepare the message for logging
+        $itemType = $message->eventType;
+        $output   = '';
+        try {
+            // Omit partial and completed image data from the output
+            $data = $message->data;
+            $item = json_decode($message->data, true, 512, JSON_THROW_ON_ERROR);
+            if ($itemType === 'response.image_generation_call.partial_image' && isset($item['partial_image_b64'])) {
+                $item['partial_image_b64'] = self::IMAGE_DATA_OMITTED;
+            }
+            if ($itemType === 'response.output_item.done' && isset($item['item']['result'])) {
+                $item['item']['result'] = self::IMAGE_DATA_OMITTED;
+            }
+
+            // apparently there is a final final image, lets remove that also
+            if ($itemType === 'response.completed' && isset($item['response']['output']) && is_array($item['response']['output'])) {
+                // $item['response']['output'] is apparently an array, and we need to omit the b64 from each $item['response']['output'][]['result']
+                foreach ($item['response']['output'] as $i => $respOutput) {
+                    if (isset($respOutput['result'])) {
+                        $item['response']['output'][$i]['result'] = self::IMAGE_DATA_OMITTED;
+                    }
+                }
+            }
+
+            $output .= sprintf("data: %s\n", json_encode($item, JSON_THROW_ON_ERROR));
+        } catch (\JsonException $e) {
+            // If it's not JSON, still save the raw data
+            $output .= "{$message->data}\n";
+        }
+
+        // This chunk gets added to the log
+        $event = [
+            'type' => $itemType,
+            'data' => $data,
+            'output' => $output,
+        ];
+
+        // Extract the completed event, and add it to the log
+        // Is this the final event?
+        // There are 3 possible events that indicate the end of a response
+        // (see https://platform.openai.com/docs/api-reference/responses-streaming/response)
+        if (in_array($itemType, ['response.completed', 'response.failed', 'response.incomplete'])) {
+            $completedEvent = $event['data'][0]['response'];
+
+            /* If something went wrong on the openAI side, it'll send us an "error" key
+             * https://platform.openai.com/docs/api-reference/responses/object#responses/object-error
+             * If we get this, send on the human-readable message to the user
+             */
+            if ($completedEvent["error"] ?? null) {
+                $returnCode = 500;
+
+                $error_message = $completedEvent["error"]["message"] ?? '';
+
+                $log->setReturnCode($returnCode)
+                    ->setErrorMessage($error_message);
+                $this->logMapper->save($log);
+
+                throw new SchoolboxException(
+                    $error_message,
+                    $returnCode
+                );
+            }
+
+            /* Did we recieve an incomplete response? i.e. max output tokens reached?
+             * If so, send those details on so we have some idea of why it failed
+             * https://platform.openai.com/docs/api-reference/responses/object#responses/object-status
+             */
+            $status = $completedEvent["status"] ?? null;
+            if ($status !== "completed") {
+                $returnCode = 500;
+
+                $title = sprintf(
+                    "Failed to generate a response: %s",
+                    $status ?? "unknown"
+                );
+
+                /* there may be some extra details about why it was incomplete */
+                $incompleteMessage = $completedEvent["incomplete_details"]["reason"] ?? null;
+                if ($incompleteMessage) {
+                    $title .= sprintf(" (%s)", $incompleteMessage);
+                }
+
+                $log->setReturnCode($returnCode)
+                    ->setErrorMessage($incompleteMessage);
+                $this->logMapper->save($log);
+
+                throw new SchoolboxException(
+                    $title,
+                    $returnCode
+                );
+            }
+
+            // well we didn't die, so let's assume we got a good response
+
+            /** store the response, and the ai usage */
+            $log->setReturnCode(200)
+                ->setModel($completedEvent['model'] ?? null)
+                ->setInputTokens($completedEvent['usage']['input_tokens'] ?? null)
+                ->setOutputTokens($completedEvent['usage']['output_tokens'] ?? null);
+            $this->logMapper->save($log);
+        }
     }
 }
