@@ -133,7 +133,7 @@ class Classes implements IStrategy
 
         /* Get a list of guys
          */
-        $userLookup = (new Users($this->eventMapper))->generate();
+        $userLookup = (new Users($this->watchlist, $this->eventMapper))->generate();
 
         /* Start with an enrolments-first philosophy.
          * The list of enrolments informs us which internal_class_ids we care about.
@@ -178,15 +178,7 @@ class Classes implements IStrategy
          */
 
 
-
-
         foreach ($userLookup as $externalId => $user) {
-            /* Only import for specific users
-             */
-            if (!$this->watcher->isOnWatchlist((string)$externalId, $this->watchlist)) {
-                continue;
-            }
-
             $this->log->debug(sprintf(
                 'Fetching timetable data for %s %s (%s) - this might take a little while',
                 $user['firstname'],

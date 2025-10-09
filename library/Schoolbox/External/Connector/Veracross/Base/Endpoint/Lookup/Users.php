@@ -9,6 +9,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup;
 
+use Schoolbox\External\Connector\Watchlist;
 use Schoolbox\External\Event\Mapper;
 
 /**
@@ -31,7 +32,7 @@ class Users
     /**
      * Lookup constructor.
      */
-    public function __construct(private Mapper $eventMapper)
+    public function __construct(private array $watchlist, private Mapper $eventMapper)
     {
     }
 
@@ -68,6 +69,7 @@ class Users
     {
         $userProfileTable    = \Schoolbox\External\Profile\Mapper::getInstance()->getTable();
         $studentProfileTable = \Schoolbox\External\Profile\Student\Mapper::getInstance()->getTable();
+
         $userStatement = $this->eventMapper->getDatabase()->query("
             SELECT external_id, firstname, lastname
             FROM {$userProfileTable} sup
@@ -75,8 +77,18 @@ class Users
             WHERE external_id IS NOT NULL
         ");
 
+        $watcher = new Watchlist();
+
         foreach ($userStatement as $row) {
-            $this->userLookup[(string)$row['external_id']] = $row;
+            $externalId = trim((string)$row['external_id']);
+
+            /* Only import for specific users
+             */
+            if (!$watcher->isOnWatchlist($externalId, $this->watchlist)) {
+                continue;
+            }
+
+            $this->userLookup[$externalId] = $row;
         }
     }
 
