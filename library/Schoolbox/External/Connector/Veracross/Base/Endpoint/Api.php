@@ -48,15 +48,6 @@ class Api implements IApi
 
 
     /**
-     * Decide how pig each page size should be
-     * Veracross lets you have up to 1000 rows per return
-     *
-     * Lots of little pages is super slow for them
-     */
-    private const PAGE_SIZE = 1000;
-
-
-    /**
      * Maximum number of pages to obtain from an endpoint
      * to safeguard against infinite loops
      */
@@ -204,7 +195,7 @@ class Api implements IApi
      * @throws \JsonException
      * @throws \RuntimeException
      */
-    public function retrieve(string $method, string $endpoint, string $scope, array $params = [], int $pageSize = self::PAGE_SIZE): \Generator
+    public function retrieve(string $method, string $endpoint, string $scope, array $params = [], int $pageSize = IApi::PAGE_SIZE): \Generator
     {
         $pageNum = 1;
         $payload = null;
@@ -394,7 +385,7 @@ class Api implements IApi
      * @return array
      * @throws \Throwable
      */
-    public function retrieveConcurrent(string $method, array $endpoints, string $scope, array $params = [], int $pageSize = self::PAGE_SIZE): array
+    public function retrieveConcurrent(string $method, array $endpoints, string $scope, array $params = [], int $pageSize = IApi::PAGE_SIZE): array
     {
         $promises = [];
 

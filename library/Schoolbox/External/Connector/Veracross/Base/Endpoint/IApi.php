@@ -17,6 +17,22 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint;
 interface IApi
 {
     /**
+     * Decide how pig each page size should be
+     * Veracross lets you have up to 1000 rows per return
+     *
+     * Lots of little pages is super slow for them
+     */
+    public const PAGE_SIZE = 1000;
+
+
+    /**
+     * Concurrently retrieves results for each $endpoint in the $endpoints array,
+     * returning an array of guzzle Response instances once all promises resolved.
+     */
+    public function retrieveConcurrent(string $method, array $endpoints, string $scope, array $params = [], int $pageSize = self::PAGE_SIZE): array;
+
+
+    /**
      * Iteratively retrieves all pages of data from an endpoint
      *
      * @param string $method
