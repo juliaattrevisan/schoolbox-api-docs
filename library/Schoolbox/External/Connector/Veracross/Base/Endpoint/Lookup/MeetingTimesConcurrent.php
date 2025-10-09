@@ -105,6 +105,8 @@ class MeetingTimesConcurrent
                             return [];
                         }
 
+                        /* TODO Restore retry, armouring and error handling
+                         */
                         $page = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 
                         $classId = null;
