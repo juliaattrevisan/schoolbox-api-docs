@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ResourceType } from "@js/resource/resourceUtils";
+import { getFileIcon, ResourceType } from "@js/resource/resourceUtils";
 import type { StorageFile } from "@js/resource/resourceUtils";
 import { IMAGE_LIGHTBOX_CREATE } from "@js/image-lightbox/imageLightboxEvent";
 import type { ImageLightboxCreateEvent } from "@js/image-lightbox/imageLightboxEvent";
@@ -159,7 +159,7 @@ function spawnLightbox(file: StorageFile): void {
                     :title="evidence.storage.name"
                     @click="selectedEvidenceHash = evidence.storage.hash"
                 >
-                    <img :src="`/ajax/mime/${evidence.storage.mime}`" />
+                    <img :src="getFileIcon(evidence.storage)" />
                     <span>{{ evidence.filename || evidence.storage.name }}</span>
                 </div>
             </div>

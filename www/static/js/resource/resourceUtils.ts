@@ -102,6 +102,23 @@ export function getFileFormValue(file: StorageFile): StorageFileFormValue {
 }
 
 /**
+ * Get the URL to use as an icon for a given file
+ * @param file The file to get the icon for
+ * @returns url
+ */
+export function getFileIcon(file: StorageFile): string {
+    if (file._links.image) {
+        return `${file._links.image}&size=square64`;
+    }
+
+    if (file._links.icon) {
+        return file._links.icon;
+    }
+
+    return `/ajax/mime/${file.type}`;
+}
+
+/**
  * Get the url of the resource, and if we have specified a baseHref, to then use that
  * @param url - the url to reformat
  * @param baseHref - an option baseHref to add to the url
