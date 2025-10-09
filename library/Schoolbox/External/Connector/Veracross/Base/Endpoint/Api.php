@@ -411,6 +411,8 @@ class Api implements IApi
                 'Authorization' => "Bearer {$accessToken}",
                 'Content-Type' => 'application/json',
                 'X-API-Value-Lists' => 'include',
+                /* Currently hardcoded to be one page for now
+                 */
                 'X-Page-Number' => 1,
                 'X-Page-Size' => $pageSize
             ];

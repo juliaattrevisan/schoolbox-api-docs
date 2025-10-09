@@ -69,6 +69,8 @@ class MeetingTimesConcurrent
             foreach ($classChunks as $classChunk) {
                 $endpoints = [];
 
+                /* Compile a set of endpoints to hit concurrently
+                 */
                 foreach ($classChunk as $classId) {
                     $endpoints[] = sprintf(
                         'academics/classes/%s/meeting_times',
@@ -76,6 +78,12 @@ class MeetingTimesConcurrent
                     );
                 }
 
+                /* This returns a set of guzzle response instances in a generic array but it presumes one page is
+                 * all you needed. Each page contains 1000 elements (1000 meeting times per class) which should be
+                 * more than enough in practice. If a class ran five times a day for a whole month you'd be looking
+                 * at obtaining 100 meeting times elements; you could supply 10 months of meeting times under this
+                 * paradigm. At most we use 6 months, and even then, I've just halved it to 3 months.
+                 */
                 $responses = $this->api->retrieveConcurrent('GET', $endpoints, Classes::SCOPE, [
                     'on_or_after_date' => $from,
                     'on_or_before_date' => $to,
