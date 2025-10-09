@@ -129,7 +129,7 @@ test.describe("Pastoral Care - Management Settings", () => {
      */
     test.afterAll(async ({ baseTester, db }) => {
         baseTester.isGoingTo(
-            "update delete_at for the data created in this test so it does impact next suite of tests",
+            "update delete_at for the data created in this test so it does not impact next suite of tests",
         );
         await db.updateInDatabase(
             "pastoral",
