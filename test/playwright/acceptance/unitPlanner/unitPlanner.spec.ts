@@ -222,6 +222,9 @@ test.describe("Unit Planner Tests", () => {
         tester.isGoingTo("click the 'creating a unit' button to open the modal");
         await page.getByRole("button", { name: "creating a unit." }).click();
 
+        tester.isGoingTo("confirm modal is visible");
+        await page.locator('[data-test="up-add-units-title"]').isVisible();
+
         tester.isGoingTo(`add '${firstUnitName}' to the first unit name input`);
         await page.locator('[data-test="up-add-units-name-input-0"]').fill(firstUnitName);
 
