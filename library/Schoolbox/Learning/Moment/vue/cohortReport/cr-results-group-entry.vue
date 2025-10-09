@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { getFileIcon, ResourceType } from "@js/resource/resourceUtils";
 import type { StorageFile } from "@js/resource/resourceUtils";
+import { openFilePreview } from "@js/preview/previewUtils";
 import { createLightbox, getStorageGallerySlides } from "@js/image-lightbox/imageLightboxEvent";
 import StorageObject from "@schoolboxVue/components/storage-object.vue";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
@@ -46,29 +47,41 @@ window.Vue.onMounted(() => {
 });
 
 /**
- * Open an image lightbox for a specific file if it has an image link
- * Will include all other images in the moment's evidence
- *
- * Due to limitations of preview.ts/our way of showing iframes/pdfs/etc in a modal,
- * we can't show multiple media types as part of the same lightbox, so only images are supported here for now
+ * Open a lightbox for a specific file
+ * If it's an image, it will include all other images in the moment's evidence
  * @param file The file to open
  */
 async function openLightbox(file: StorageFile): Promise<void> {
-    if (!file._links.image) {
-        return; // no link available, can't show lightbox
+    if (file.type === ResourceType.IMAGE && file._links.image) {
+        /**
+         * This is an image, so we can show multiple at once.
+         * Due to limitations of preview.ts/our way of showing iframes/pdfs/etc in a modal,
+         * we can't show multiple media types as part of the same lightbox, so only images are supported here for now
+         */
+
+        const allImageEvidence = props.entry.evidence.filter((e) => e.storage._links.image);
+
+        const { slides, selectedIndex } = getStorageGallerySlides(
+            allImageEvidence.map((f) => f.storage),
+            file.hash,
+        );
+
+        const lightbox = await createLightbox("cr-results-group-entry-file", slides, {
+            index: selectedIndex,
+        });
+        lightbox.openGallery();
+        return;
     }
 
-    const allImageEvidence = props.entry.evidence.filter((e) => e.storage._links.image);
+    if (file.type === ResourceType.AUDIO || file.type === ResourceType.VIDEO) {
+        // videos/audio already have their own dedicated media players, nothing to do for those
+        return;
+    }
 
-    const { slides, selectedIndex } = getStorageGallerySlides(
-        allImageEvidence.map((f) => f.storage),
-        file.hash,
-    );
-
-    const lightbox = await createLightbox("cr-results-group-entry-file", slides, {
-        index: selectedIndex,
-    });
-    lightbox.openGallery();
+    // otherwise, figure out what to do via preview.ts if there's a fetch URL
+    if (file._links.fetch) {
+        await openFilePreview(file._links.fetch);
+    }
 }
 </script>
 
