@@ -2,19 +2,9 @@ import { buildApiRequest } from "@js/util/sbx/apiUtils";
 import type { Metadata } from "@js/util/sbx/apiUtils";
 import type { EvidenceStatus, LearningMoment } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 
-export type CohortReportEntry = Omit<LearningMoment, "createdAt" | "updatedAt"> & {
+export type CohortReportEntry = LearningMoment & {
     blurb: string;
     showReadMore: boolean;
-    createdAt: {
-        timestamp: number;
-        displayAs: string;
-        rfc: string;
-    };
-    updatedAt: {
-        timestamp: number;
-        displayAs: string;
-        rfc: string;
-    };
 };
 
 export type CohortReportApiPayload = {

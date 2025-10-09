@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import dayjs from "dayjs";
 import { useCohortReportStore } from "./store/cohortReportStore";
 import { useCohortReportFiltersStore } from "./store/cohortReportFiltersStore";
 import CrResultsGroup from "./cr-results-group.vue";
@@ -12,21 +13,27 @@ const crfStore = useCohortReportFiltersStore();
  * Items inside groups are sorted by entry.updatedAt.timestamp
  */
 const resultGroups = window.Vue.computed(() => {
-    const groups: Record<string, typeof crStore.results> = {};
-    crStore.results.forEach((entry) => {
-        const weekStart = entry.createdAt.displayAs;
+    const moments = crStore.results.map((moment) => ({
+        moment,
+        createdAt: dayjs(moment.createdAt),
+        updatedAt: dayjs(moment.updatedAt),
+    }));
+
+    const groups: Record<string, (typeof moments)[number][]> = {};
+    moments.forEach((moment) => {
+        const weekStart = moment.createdAt.format(window.dateDisplayFormats.dayjsDateShort);
         if (!groups[weekStart]) {
             groups[weekStart] = [];
         }
-        groups[weekStart].push(entry);
+        groups[weekStart].push(moment);
     });
 
     return Object.values(groups)
-        .sort((a, b) => b[0].createdAt.timestamp - a[0].createdAt.timestamp)
+        .sort((a, b) => b[0].createdAt.diff(a[0].createdAt))
         .map((entries) => ({
-            id: entries[0].createdAt.timestamp,
-            label: entries[0].createdAt.displayAs,
-            entries: entries.sort((a, b) => b.updatedAt.timestamp - a.updatedAt.timestamp),
+            id: entries[0].createdAt.unix(),
+            label: entries[0].createdAt.format(window.dateDisplayFormats.dayjsDateShort),
+            entries: entries.sort((a, b) => b.updatedAt.diff(a.updatedAt)).map((e) => e.moment),
         }));
 });
 

@@ -1179,28 +1179,6 @@ class Controller extends Base
              */
             $momentTranslated['showReadMore'] = '' !== (string)$moment->getBody();
 
-            /* Override the createdAt/updatedAt so we can show the value of "getShortDateOnly()"
-             * which is an admin config setting
-             *
-             * This is used to group moments per day in the cohort report
-             */
-            $momentTranslated['createdAt'] = [
-                'timestamp' => $moment->getCreatedAt()->getUnixTimestamp(),
-                'displayAs' => $moment->getCreatedAt()->getShortDateOnly(),
-                'rfc' => $moment->getCreatedAt()->toRfc3339String(),
-            ];
-            /* We don't store updatedBy, for whatever reason: I suppose it was presumed
-             * to always be the same as its author...
-             *
-             * Anyway, this is the localised version of config's date_short which you can use
-             * to group moments per day.
-             */
-            $momentTranslated['updatedAt'] = [
-                'timestamp' => $moment->getUpdatedAt()->getUnixTimestamp(),
-                'displayAs' => $moment->getUpdatedAt()->getShortDateOnly(),
-                'rfc' => $moment->getUpdatedAt()->toRfc3339String(),
-            ];
-
             $payload[] = $momentTranslated;
         }
 
