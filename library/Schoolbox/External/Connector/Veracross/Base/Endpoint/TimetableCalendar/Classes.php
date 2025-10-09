@@ -170,21 +170,19 @@ class Classes implements IStrategy
          * ...which should allow you to craft the entire timetable for every relevant person
          * without needing api spam to veracross
          */
-
-        /* TODO can't get past Meeting Times lookup: every request takes 2 seconds even for empty payloads.
-         */
+        $compiler = new Compiler($enrolmentsLookup, $classesLookup, $meetingTimesLookup);
 
         /* TODO Chunk users to keep memory usage down; atm retaining the entire universe
          */
-
-
         foreach ($userLookup as $externalId => $user) {
             $this->log->debug(sprintf(
-                'Fetching timetable data for %s %s (%s) - this might take a little while',
+                'Compiling timetable data for %s %s (%s) - this might take a little while',
                 $user['firstname'],
                 $user['lastname'],
                 $externalId
             ));
+
+            $timetable = $compiler->compile($externalId);
 
 //            $timetable = $compiler->compile((string)$externalId, $startDate, $endDate);
 //
