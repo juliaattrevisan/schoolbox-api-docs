@@ -279,7 +279,7 @@ export default class UnitPlanner {
             .fill(unitNames[0]);
 
         // Add additional units by clicking "Add another" and filling in the names
-        for (let i = 1; i < unitNames.length; i++) {
+        for (let i = 1; i < unitNames.length; i += 1) {
             await this.page.getByTestId(UnitPlanner.DATA_TEST_ADD_UNITS_ADD_BUTTON).click();
             await this.page
                 .getByTestId(UnitPlanner.DATA_TEST_ADD_UNITS_NAME_INPUT.replace("{index}", i.toString()))
