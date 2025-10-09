@@ -293,5 +293,11 @@ export default class UnitPlanner {
         for (const unitName of unitNames) {
             await expect(this.page.locator('[data-test^="unit-planner-unit-link-"]').getByText(unitName)).toBeVisible();
         }
+
+        // refresh the page and ensure the units are still there
+        await this.page.reload();
+        for (const unitName of unitNames) {
+            await expect(this.page.locator('[data-test^="unit-planner-unit-link-"]').getByText(unitName)).toBeVisible();
+        }
     }
 }
