@@ -22,8 +22,6 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Role;
 use Schoolbox\User;
 use Schoolbox\UserMapper;
-use Schoolbox\Cdn\PrefixGenerator;
-use Schoolbox\Resource\Storage;
 use Schoolbox\Editor\Templates\Helper as EditorTemplateHelper;
 use Schoolbox\Editor\Templates\Mapper as EditorTemplateMapper;
 use Schoolbox\Admin\Editor\Templates\Category\Model as EditorTemplatesCategoryModel;
@@ -408,7 +406,6 @@ class Module extends BaseModule
                 $this->injector->get('user')
             ),
             $this->getMapperFactory()->get(\Schoolbox\Permission\Access\UserAccessMapper::class),
-            new Storage\Translator\ModelToArray(new PrefixGenerator($this->getConfig())),
             $this->getMapperFactory()->get(\Schoolbox\Resource\Folder\Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Discussion\Thread\Mapper::class),
         );

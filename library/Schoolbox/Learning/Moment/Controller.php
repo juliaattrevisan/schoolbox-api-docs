@@ -68,7 +68,6 @@ class Controller extends Base
      * @param Comment\Mapper $commentMapper
      * @param EditorTemplateHelper    $editorTemplateHelper
      * @param \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper
-     * @param Storage\Translator\ModelToArray $storageTranslator
      * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
      * @param \Schoolbox\Discussion\Thread\Mapper $discussionThreadMapper
      */
@@ -77,7 +76,6 @@ class Controller extends Base
         private Comment\Mapper $commentMapper,
         private EditorTemplateHelper $editorTemplateHelper,
         private \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper,
-        private Storage\Translator\ModelToArray $storageTranslator,
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
         private \Schoolbox\Discussion\Thread\Mapper $discussionThreadMapper,
     ) {
