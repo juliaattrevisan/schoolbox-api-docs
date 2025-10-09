@@ -921,8 +921,7 @@ abstract class Kernel
 
                     /* Find the main version number for this instance
                      */
-                    preg_match('/(\d+\.\d+)\.(.*)/', $config->get('site_version'), $matches);
-                    $version = $matches[1];
+                    $version = (new \Alaress\Application\Version())->generate($config->get('site_version'));
 
                     $dataGenerators = [
                         'ws' => new Output\DataGenerator\Websocket(
