@@ -204,6 +204,25 @@ test.describe("Unit Planner Tests", () => {
 
         tester.isGoingTo("confirm the empty units message is visible");
         await expect(page.getByText("This course currently does not have any units")).toBeVisible();
+
+        tester.isGoingTo("click the 'creating a unit' button to open the modal");
+        await page.getByRole("button", { name: "creating a unit." }).click();
+
+        tester.isGoingTo("add 'Soft party' to the first unit name input");
+        await page.getByRole("textbox", { name: "New unit name" }).fill("Soft party");
+
+        tester.isGoingTo("click 'Add another' to add a second unit");
+        await page.getByRole("button", { name: "Add another" }).click();
+
+        tester.isGoingTo("add 'Hard party' to the second unit name input");
+        await page.getByRole("textbox").nth(1).fill("Hard party");
+
+        tester.isGoingTo("click Create to create both units");
+        await page.getByRole("button", { name: "Create" }).click();
+
+        tester.isGoingTo("verify both units are visible on the page after creation");
+        await expect(page.getByText("Soft party")).toBeVisible();
+        await expect(page.getByText("Hard party")).toBeVisible();
     });
 
     test.afterAll(async ({ baseTester, db }) => {
