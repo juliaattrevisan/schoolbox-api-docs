@@ -1,23 +1,19 @@
 import { buildApiRequest } from "@js/util/sbx/apiUtils";
 import type { Metadata } from "@js/util/sbx/apiUtils";
-import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import type { EvidenceStatus, LearningMoment } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 
-export type CohortReportEntry = Pick<
-    LearningMoment,
-    "id" | "body" | "currentState" | "evidence" | "discussionThread" | "tags" | "_links" | "_labels"
-> & {
+export type CohortReportEntry = Omit<LearningMoment, "createdAt" | "updatedAt"> & {
     blurb: string;
     showReadMore: boolean;
-    recipient: UserAuthor;
-    creator: UserAuthor;
     createdAt: {
         timestamp: number;
         displayAs: string;
+        rfc: string;
     };
     updatedAt: {
         timestamp: number;
         displayAs: string;
+        rfc: string;
     };
 };
 

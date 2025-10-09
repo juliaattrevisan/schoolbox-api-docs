@@ -106,7 +106,8 @@ function spawnLightbox(file: StorageFile): void {
             </label>
             <component
                 :is="props.entry.recipient._links.profile ? 'a' : 'span'"
-                :href="props.entry.recipient._links.profile"
+                v-if="props.entry.recipient"
+                :href="props.entry.recipient._links.profile || undefined"
             >
                 <user-photo :user="props.entry.recipient" render="tiny" />
                 <span class="l-pad-s--left">{{ props.entry.recipient.fullName }}</span>
@@ -164,7 +165,7 @@ function spawnLightbox(file: StorageFile): void {
             </div>
         </div>
 
-        <div v-if="props.entry.recipient.id !== props.entry.creator.id" class="l-mar-s--top">
+        <div v-if="props.entry.creator && props.entry.recipient?.id !== props.entry.creator.id" class="l-mar-s--top">
             <user-photo
                 :user="props.entry.creator"
                 render="tiny"

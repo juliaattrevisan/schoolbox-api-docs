@@ -85,7 +85,11 @@ async function onAction(type: keyof typeof selectedResultActions.value): Promise
     if (type === "delete") {
         crmStore.openModal(entries, CohortReportModalType.CONFIRM_DELETE, clearSelection);
     } else if (type === "publish") {
-        if (entries.some((entry) => entry.hasComments)) {
+        if (
+            entries.some(
+                (entry) => entry.discussionThread !== null && entry.discussionThread.children.metadata.count > 0,
+            )
+        ) {
             // If there are comments, open the confirmation modal to ask if they want to delete them
             crmStore.openModal(entries, CohortReportModalType.CONFIRM_PUBLISH, clearSelection);
         } else {
