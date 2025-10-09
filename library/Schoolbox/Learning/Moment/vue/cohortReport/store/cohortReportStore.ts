@@ -127,13 +127,26 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         entry: CohortReportEntry,
         responseData: Record<LearningMoment["id"], LearningMoment>,
     ): void {
-        if (responseData[entry.id] === undefined) {
+        const entryResponse = responseData[entry.id];
+        if (entryResponse === undefined) {
             console.error(`No response data found for entry ID ${entry.id}`);
             return;
         }
 
-        entry.currentState = responseData[entry.id].currentState;
-        Object.assign(entry._links, responseData[entry.id]._links);
+        entry.currentState = entryResponse.currentState;
+        Object.assign(entry._links, entryResponse._links);
+
+        // Update the discussion thread info in case new comments were added
+        const newDiscussionThread = entryResponse.discussionThread;
+        if (entry.discussionThread === null) {
+            entry.discussionThread = newDiscussionThread;
+        } else if (newDiscussionThread === null) {
+            entry.discussionThread = null;
+        } else {
+            // assign objects to preserve reactivity
+            Object.assign(entry.discussionThread.children.metadata, newDiscussionThread.children.metadata);
+            entry.discussionThread.children.data = newDiscussionThread.children.data;
+        }
     }
 
     /**
@@ -176,10 +189,6 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         entries.forEach((entry) => {
             updateEntryState(entry, response.data);
             delete selectedResults.value[entry.id];
-
-            if (deleteComments) {
-                entry.hasComments = false; // assume comments are deleted
-            }
         });
     }
 
@@ -223,8 +232,6 @@ export const useCohortReportStore = defineStore("cohortReport", () => {
         entries.forEach((entry) => {
             updateEntryState(entry, response.data);
             delete selectedResults.value[entry.id];
-
-            entry.hasComments = true; // assume this generated a comment, blank comments seem to count
         });
     }
 
