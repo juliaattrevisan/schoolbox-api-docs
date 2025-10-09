@@ -58,6 +58,13 @@
                 function initText(textProvider) {
                     // get the provider
                     const provider = textProvider.val();
+                    if ('Off' === provider || '' === provider) {
+                        $('#textModuleContainer').hide();
+                        textSystemPrompt.hide();
+                        return;
+                    }
+                    $('#textModuleContainer').show();
+                    textSystemPrompt.show();
                     //replace the url with the provider
                     const path = '{{ routeLookupIfAuthorized('adminOpenAi.getBlankConfig') }}'.replace('{provider}', provider);
                     // fetch the new html
