@@ -66,7 +66,7 @@ test.describe("Editor templates tests", () => {
 
         tester.isGoingTo("Click the template title in the template list, check its details are correct");
         await templates.clickTemplateTitle(templateName);
-        await expect(page.locator("div.modal")).toContainText("Automation Body 1");
+        await expect(page.locator("div.modal")).toContainText("Automation Body 2");
         await page.locator("button.close-modal").click();
 
         tester.isGoingTo("Click the modify button in the editor template lists page");
