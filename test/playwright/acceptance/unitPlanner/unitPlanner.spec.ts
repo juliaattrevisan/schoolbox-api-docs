@@ -223,6 +223,21 @@ test.describe("Unit Planner Tests", () => {
         tester.isGoingTo("verify both units are visible on the page after creation");
         await expect(page.getByText("Soft party")).toBeVisible();
         await expect(page.getByText("Hard party")).toBeVisible();
+
+        tester.isGoingTo("navigate to course list page to delete the course");
+        await page.goto("https://vagrant.dev.schoolbox.cloud/course/list");
+
+        tester.isGoingTo("click the course dropdown button to open the actions menu");
+        await page.locator('[data-test="sbx-pop-out-courseDropdown-18-button"]').click();
+
+        tester.isGoingTo("click the Delete link from the dropdown menu");
+        await page.getByRole("link", { name: "Delete" }).click();
+
+        tester.isGoingTo("confirm deletion in the modal by clicking the confirm button");
+        await page.locator('[data-test="confirm-dialog-confirm-button"]').click();
+
+        tester.isGoingTo("verify that Party time is no longer visible on the page");
+        await expect(page.getByText("Party time")).not.toBeVisible();
     });
 
     test.afterAll(async ({ baseTester, db }) => {
