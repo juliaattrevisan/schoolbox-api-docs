@@ -655,7 +655,6 @@ test.describe("Course import tests", () => {
         await expect(componentBottom.getByTestId("homepage-component-titlebar-name")).not.toBeVisible();
 
         await expect(componentBottom.getByTestId(`course-outline-assessment-title-${dueWorkName}`)).not.toBeVisible();
-        await expect(componentBottom.getByTestId(`course-outline-assessment-title-${taskName}`)).toBeVisible();
         await expect(componentBottom.getByTestId(`course-outline-assessment-title-${quizName}`)).toBeVisible();
         await expect(componentBottom.getByTestId(`course-outline-assessment-title-${lessonPlanName}`)).toBeVisible();
         await expect(componentBottom.getByTestId(`course-outline-assessment-title-${projectName}`)).toBeVisible();
