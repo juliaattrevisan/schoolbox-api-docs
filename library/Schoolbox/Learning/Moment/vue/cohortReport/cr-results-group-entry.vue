@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import { getFileIcon, ResourceType } from "@js/resource/resourceUtils";
 import type { StorageFile } from "@js/resource/resourceUtils";
-import { IMAGE_LIGHTBOX_CREATE } from "@js/image-lightbox/imageLightboxEvent";
-import type { ImageLightboxCreateEvent } from "@js/image-lightbox/imageLightboxEvent";
+import { createLightbox, getStorageGallerySlides } from "@js/image-lightbox/imageLightboxEvent";
 import StorageObject from "@schoolboxVue/components/storage-object.vue";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { EvidenceStatus, evidenceStatusLabels } from "@schoolboxLearningMomentEvidence/evidenceTypes";
@@ -47,26 +46,29 @@ window.Vue.onMounted(() => {
 });
 
 /**
- * Show a lightbox for a specific file if it has an image link
- * @param file The file to show in the lightbox
+ * Open an image lightbox for a specific file if it has an image link
+ * Will include all other images in the moment's evidence
+ *
+ * Due to limitations of preview.ts/our way of showing iframes/pdfs/etc in a modal,
+ * we can't show multiple media types as part of the same lightbox, so only images are supported here for now
+ * @param file The file to open
  */
-function spawnLightbox(file: StorageFile): void {
+async function openLightbox(file: StorageFile): Promise<void> {
     if (!file._links.image) {
         return; // no link available, can't show lightbox
     }
 
-    document.dispatchEvent(
-        new CustomEvent<ImageLightboxCreateEvent["detail"]>(IMAGE_LIGHTBOX_CREATE, {
-            detail: {
-                targetKey: `ig-feed-lightbox`,
-                options: {
-                    dynamic: true,
-                    dynamicEl: [{ src: file._links.image }],
-                },
-                onCreated: (gallery) => gallery.openGallery(),
-            },
-        }),
+    const allImageEvidence = props.entry.evidence.filter((e) => e.storage._links.image);
+
+    const { slides, selectedIndex } = getStorageGallerySlides(
+        allImageEvidence.map((f) => f.storage),
+        file.hash,
     );
+
+    const lightbox = await createLightbox("cr-results-group-entry-file", slides, {
+        index: selectedIndex,
+    });
+    lightbox.openGallery();
 }
 </script>
 
@@ -128,7 +130,7 @@ function spawnLightbox(file: StorageFile): void {
                     :key="selectedEvidence.storage.hash"
                     style="width: fit-content"
                     :style="{ cursor: selectedEvidence.storage.type === ResourceType.IMAGE ? 'pointer' : undefined }"
-                    @click="spawnLightbox(selectedEvidence.storage)"
+                    @click="openLightbox(selectedEvidence.storage)"
                 >
                     <storage-object
                         :storage="selectedEvidence.storage"
