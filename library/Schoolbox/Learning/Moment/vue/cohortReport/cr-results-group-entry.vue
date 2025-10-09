@@ -50,9 +50,11 @@ window.Vue.onMounted(() => {
  * Open a lightbox for a specific file
  * If it's an image, it will include all other images in the moment's evidence
  * @param file The file to open
+ * @param event The click event
  */
-async function openLightbox(file: StorageFile): Promise<void> {
+async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void> {
     if (file.type === ResourceType.IMAGE && file._links.image) {
+        event.preventDefault();
         /**
          * This is an image, so we can show multiple at once.
          * Due to limitations of preview.ts/our way of showing iframes/pdfs/etc in a modal,
@@ -80,6 +82,11 @@ async function openLightbox(file: StorageFile): Promise<void> {
 
     // otherwise, figure out what to do via preview.ts if there's a fetch URL
     if (file._links.fetch) {
+        if (event.ctrlKey || event.shiftKey || event.metaKey) {
+            return; // the user is trying to open in a new tab/window, don't open the preview
+        }
+
+        event.preventDefault();
         await openFilePreview(file._links.fetch);
     }
 }
@@ -143,7 +150,7 @@ async function openLightbox(file: StorageFile): Promise<void> {
                     :key="selectedEvidence.storage.hash"
                     style="width: fit-content"
                     :style="{ cursor: selectedEvidence.storage.type === ResourceType.IMAGE ? 'pointer' : undefined }"
-                    @click="openLightbox(selectedEvidence.storage)"
+                    @click="($event) => openLightbox(selectedEvidence!.storage, $event)"
                 >
                     <storage-object
                         :storage="selectedEvidence.storage"
