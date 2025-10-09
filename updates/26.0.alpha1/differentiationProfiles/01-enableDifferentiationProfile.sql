@@ -1,3 +1,7 @@
+ALTER TABLE config
+MODIFY module enum ('settings', 'comms', 'custom', 'oauth', 'schoolData', 'lti', 'report-export', 'feature-tours', 'openai-text', 'openai-image', 'differentiation-profiles')
+DEFAULT 'settings';
+
 INSERT INTO config (`name`, `title`, `value`, `description`, `field_id`,  `type_id`, `editable`, `hidden`, `required`, `module`, `sequence`)
 VALUES (
            'differentiation_profiles_enabled',
@@ -9,6 +13,6 @@ VALUES (
            'true',
            'false',
            'false',
-           'settings',
+           'differentiation-profiles',
            (SELECT MAX(sequence)+1 FROM `config` c)
        );

@@ -637,7 +637,7 @@ class Subnav
                         'description' => 'Manage Flag, Audience and Template Defaults',
                     ],
                     '/adminv2/pastoral/differentiation-profiles' => [
-                        'name'        => 'Settings - Differentiation Profile',
+                        'name'        => 'Settings - Differentiation Profiles',
                         'visible'     => $userIsSuperuser || $userHasServicePermissionDifferentiationProfile,
                         'description' => 'Configure settings related to the differentiation profiles.',
                     ],
