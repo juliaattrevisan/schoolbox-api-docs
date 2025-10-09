@@ -2,7 +2,7 @@
 import { fromEntriesOf, keysOf } from "@js/util/arrayUtils";
 import { assertUnreachable } from "@js/util/errorUtils";
 import BottomDrawer from "@schoolboxVue/components/bottomDrawer/bottom-drawer.vue";
-import { evidenceStatusLabels } from "@schoolboxLearningMomentEvidence/evidenceTypes";
+import { EvidenceStatus, evidenceStatusLabels } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 import { useCohortReportStore } from "./store/cohortReportStore";
 import { CohortReportModalType, useCohortReportModalStore } from "./store/cohortReportModalStore";
 import type { CohortReportEntry } from "./store/cohortReportPayload";
@@ -27,6 +27,12 @@ const selectedResultActions = window.Vue.computed(() => {
         }
 
         actionTypes.forEach((type) => {
+            if (type === "publish" && entry.currentState === EvidenceStatus.PUBLISHED) {
+                // Approve on the cohort report is special, if it's already approved then you'll still technically have access
+                // to re-approve it, but showing this button may be confusing in the workflow. So hide it if it's already published.
+                // This aims to avoid deletion of comments on already published items by mistake
+                return;
+            }
             if (entry._links[type] !== null) {
                 actionEntries[type].push(entry);
             }
