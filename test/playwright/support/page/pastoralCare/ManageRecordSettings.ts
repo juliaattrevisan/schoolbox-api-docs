@@ -26,6 +26,14 @@ export default class PastoralExpiry {
 
     static readonly DATA_TEST_MANAGE_SAVE_BUTTON = "audiences-modify-pastoral-save-button";
 
+    static readonly SELECTOR_VISIBILITY_ROLE_LINK = 'a[title="Add Role"]';
+
+    static readonly DATA_TEST_LOCK_VISIBILITY_TOGGLE = "pastoral-settings-lock-visibility-toggle";
+
+    static readonly SELECTOR_DENY_PARENT = 'label[for="roleDenyrole-type-parent"]';
+
+    static readonly SELECTOR_CONFIDENTIAL_COMMENT = 'label[for="rolePrivate{id}"]';
+
     constructor(page: Page) {
         this.page = page;
     }
@@ -104,5 +112,46 @@ export default class PastoralExpiry {
      */
     async clickSave(): Promise<void> {
         await this.page.getByTestId(PastoralExpiry.DATA_TEST_MANAGE_SAVE_BUTTON).click();
+    }
+
+    /**
+     * Click the visibility role link to open the modal
+     */
+    async clickVisibilityRoleLink(): Promise<void> {
+        await this.page.locator(PastoralExpiry.SELECTOR_VISIBILITY_ROLE_LINK).click();
+    }
+
+    /**
+     * click one or more roles in the visibility modal: Administration, Teacher, parent, student
+     * @param roles - array of role names to click
+     */
+    async clickRolesInModal(roles: string[]): Promise<void> {
+        const rolesModal = this.page.locator("ul.information-list");
+
+        for (const role of roles) {
+            await rolesModal.getByTestId(`modal-add-pastoral-role-${role}`).click();
+        }
+    }
+
+    /**
+     * Click the lock visibility toggle
+     */
+    async clickLockVisibilityToggle(): Promise<void> {
+        await this.page.getByTestId(PastoralExpiry.DATA_TEST_LOCK_VISIBILITY_TOGGLE).click();
+    }
+
+    /**
+     * click the deny parent checkbox
+     */
+    async clickDenyParent(): Promise<void> {
+        await this.page.locator(PastoralExpiry.SELECTOR_DENY_PARENT).click();
+    }
+
+    /**
+     * click general confidential comment checkbox: 1 for administration, 2 for teacher, 3 for parent, 4 for student
+     * @param id - the id of the checkbox to click
+     */
+    async clickConfidentialComment(id: number | string): Promise<void> {
+        await this.page.locator(PastoralExpiry.SELECTOR_CONFIDENTIAL_COMMENT.replace("{id}", id.toString())).click();
     }
 }

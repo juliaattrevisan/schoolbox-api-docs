@@ -95,7 +95,7 @@
                 {# Only show roles which actually have users #}
                 {% for role in roles|filter(r => roleUserCounts[r.id] > 0) %}
                     <li data-role-add="{{ role.id }}" data-role-name="{{ role.name }}">
-                        <a class="list-item link-row">
+                        <a class="list-item link-row" data-test="modal-add-pastoral-role-{{ role.name }}">
                             <div class="card small-12">
                                 <i class="icon-group alert size-32"></i>
                                 <p>{{ role.name }}</p>
@@ -125,7 +125,7 @@
                 {# Students/Parents: a role type, rather than a role #}
                 {% for roleType in roleTypes %}
                     <li data-role-add="role-type-{{ roleType }}" data-role-name="{{ roleType | capitalize }}">
-                        <a class="list-item link-row">
+                        <a class="list-item link-row" data-test="modal-add-pastoral-role-{{ roleType }}">
                             <div class="card small-12">
                                 <i class="icon-group alert size-32"></i>
                                 <p>{{ roleType | capitalize }}</p>

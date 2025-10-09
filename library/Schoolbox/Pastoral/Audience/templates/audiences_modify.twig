@@ -332,7 +332,7 @@
                                 {% set visibilityLocked = subtype ? subtype.visibilityLocked : type.visibilityLocked %}
                                 <input name="visibilityLocked" id="visibilityLocked" type="checkbox"
                                        {% if visibilityLocked %}checked="checked"{% endif %} value="1"/>
-                                <label for="visibilityLocked">
+                                <label data-test="pastoral-settings-lock-visibility-toggle" for="visibilityLocked">
                                     <span class="icon-locked"></span>
                                     <span class="icon-unlocked"></span>
                                 </label>
