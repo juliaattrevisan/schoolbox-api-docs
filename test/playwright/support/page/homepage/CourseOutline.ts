@@ -203,6 +203,7 @@ export default class CourseOutline {
         this.tester.isGoingTo("confirm in the confirm dialog");
         await this.page.getByTestId("confirm-dialog-confirm-button").getByText("Yes, permanently delete").click();
         await this.page.getByTestId("confirm-dialog-confirm-button").isHidden();
+        await expect(this.page.getByTestId("toast")).toBeHidden();
     }
 
     /**
