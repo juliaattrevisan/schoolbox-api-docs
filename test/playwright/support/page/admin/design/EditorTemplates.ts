@@ -1,5 +1,6 @@
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 import type { Page } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 export default class EditorTemplate {
     private page: Page;
@@ -55,15 +56,6 @@ export default class EditorTemplate {
     }
 
     /**
-     * Navigate to the url to create a editor template according to the template type
-     * @param categoryId - The category ID: 1 for badge, 2 for calendar, 3 for email, 4 for feedback, 5 for homepage, 6 for activity, 7 for moments, 8 for news
-     * @returns - the URL
-     */
-    public static gotoCreateTemplate(categoryId: number): string {
-        return this.URL.replace("{category_id}", categoryId.toString());
-    }
-
-    /**
      * clicks the link Create a new template
      * @param templateType - The template type: badge-evidence, calendar-events, email, feedback, homepage, learning-activity, learning-moments, news
      */
@@ -79,7 +71,7 @@ export default class EditorTemplate {
      * @param templateType - The template type: badge-evidence, calendar-events, email, feedback, homepage, learning-activity, learning-moments, news
      */
     async clickAddTemplateButton(templateType: string): Promise<void> {
-        this.tester.isGoingTo("click the link Create a new template");
+        this.tester.isGoingTo("click the Add Template button");
         await this.page
             .getByTestId(EditorTemplate.DATA_TEST_CREATE_BUTTON.replace("{template_type}", templateType))
             .click();
@@ -99,7 +91,7 @@ export default class EditorTemplate {
      * @param templateType - The template type: badge-evidence, calendar-events, email, feedback, homepage, learning-activity, learning-moments, news
      */
     async clickTemplateTab(templateType: string): Promise<void> {
-        this.tester.isGoingTo("click the link Create a new template");
+        this.tester.isGoingTo("click the template tab");
         await this.page.getByTestId(EditorTemplate.DATA_TEST_TABS.replace("{template_type}", templateType)).click();
     }
 
@@ -153,35 +145,153 @@ export default class EditorTemplate {
 
     /**
      * click the template title in the template list to preview it
-     * @param templatetTitle - the title of the template
+     * @param templateTitle - the title of the template
      */
-    async clickTemplateTitle(templatetTitle: string): Promise<void> {
+    async clickTemplateTitle(templateTitle: string): Promise<void> {
         this.tester.isGoingTo("click the template title in the template list");
         await this.page
-            .getByTestId(EditorTemplate.DATA_TEST_TEMPLATE_ITEM_LINK.replace("{template_title}", templatetTitle))
-            .getByText(templatetTitle)
+            .getByTestId(EditorTemplate.DATA_TEST_TEMPLATE_ITEM_LINK.replace("{template_title}", templateTitle))
+            .getByText(templateTitle)
             .click();
     }
 
     /**
      * click the edit icon in the template list to edit it
-     * @param templatetTitle - the title of the template
+     * @param templateTitle - the title of the template
      */
-    async clickEditIcon(templatetTitle: string): Promise<void> {
+    async clickEditIcon(templateTitle: string): Promise<void> {
         this.tester.isGoingTo("click the edit icon in the template list");
         await this.page
-            .getByTestId(EditorTemplate.DATA_TEST_EDIT_BUTTON.replace("{template_title}", templatetTitle))
+            .getByTestId(EditorTemplate.DATA_TEST_EDIT_BUTTON.replace("{template_title}", templateTitle))
             .click();
     }
 
     /**
      * click the delete icon in the template list to delete it
-     * @param templatetTitle - the title of the template
+     * @param templateTitle - the title of the template
      */
-    async clickDeleteIcon(templatetTitle: string): Promise<void> {
+    async clickDeleteIcon(templateTitle: string): Promise<void> {
         this.tester.isGoingTo("click the delete icon in the template list");
         await this.page
-            .getByTestId(EditorTemplate.DATA_TEST_DELETE_BUTTON.replace("{template_title}", templatetTitle))
+            .getByTestId(EditorTemplate.DATA_TEST_DELETE_BUTTON.replace("{template_title}", templateTitle))
             .click();
+    }
+
+    /**
+     *clicks a few of the template type tabs to verify the proper empty message is shown according to the tab clicked
+     */
+    async verifyEmptyStateMessage(): Promise<void> {
+        this.tester.isGoingTo("verify the empty state message for each template type tab");
+
+        const templateTypes = [
+            { tab: "calendar-events", message: "No Calendar Events templates have been created." },
+            { tab: "badge-evidence", message: "No Badge Evidence templates have been created." },
+            { tab: "email", message: "No Email templates have been created." },
+            { tab: "feedback", message: "No Feedback templates have been created." },
+            { tab: "homepage", message: "No Homepage templates have been created." },
+            { tab: "learning-activity", message: "No Learning Activity templates have been created." },
+            { tab: "learning-moments", message: "No Learning Moments templates have been created." },
+            { tab: "news", message: "No News templates have been created." },
+        ];
+
+        // clicks each of the template tabs and verifies the empty state message as per above const
+        for (const type of templateTypes) {
+            await this.clickTab(type.tab);
+            await expect(this.page.locator(EditorTemplate.EMPTY_STATE)).toContainText(type.message);
+        }
+    }
+
+    /**
+     * create a template and check it appears in the list
+     * @param templateType - The template type: badge-evidence, calendar-events, email, feedback, homepage, learning-activity, learning-moments, news
+     * @param templateTitle - the title of the template
+     * @param templateDescription - the description of the template
+     * @param body - the body text for the template
+     */
+    async createAndCheckTemplateAppearsInList(
+        templateType: string,
+        templateTitle: string,
+        templateDescription: string,
+        body: string,
+    ): Promise<void> {
+        this.tester.isGoingTo(
+            `create a ${templateType} template and check it appears in the list of ${templateType} templates`,
+        );
+        await this.goto();
+        await this.clickTemplateTab(templateType);
+        await this.clickCreateNewTemplate(templateType);
+        await this.createTemplate(templateTitle, templateDescription, body);
+        await this.clickTab(templateType);
+        await expect(
+            this.page.getByTestId(
+                EditorTemplate.DATA_TEST_TEMPLATE_ITEM_LINK.replace("{template_title}", templateTitle),
+            ),
+        ).toContainText(templateTitle);
+        await expect(
+            this.page.getByTestId(
+                EditorTemplate.DATA_TEST_TEMPLATE_ITEM_LINK.replace("{template_title}", templateTitle),
+            ),
+        ).toContainText(templateDescription);
+    }
+
+    /**
+     * creates a template for each type with unique title, description and body for each type and checks it appears in the list
+     */
+    async verifyCreateTemplates(): Promise<void> {
+        const templateData = [
+            {
+                tab: "calendar-events",
+                title: "Automation Template Event",
+                description: "Description for this template",
+                body: "Automation Body 1",
+            },
+            {
+                tab: "badge-evidence",
+                title: "Automation Template Badge",
+                description: "Description for this template",
+                body: "Automation Body 2",
+            },
+            {
+                tab: "email",
+                title: "Automation Template Email",
+                description: "Description for this template",
+                body: "Automation Body 3",
+            },
+            {
+                tab: "feedback",
+                title: "Automation Template Feedback",
+                description: "Description for this template",
+                body: "Automation Body 4",
+            },
+            {
+                tab: "homepage",
+                title: "Automation Template Homepage",
+                description: "Description for this template",
+                body: "Automation Body 5",
+            },
+            {
+                tab: "learning-activity",
+                title: "Automation Template Activity",
+                description: "Description for this template",
+                body: "Automation Body 6",
+            },
+            {
+                tab: "learning-moments",
+                title: "Automation Template Moments",
+                description: "Description for this template",
+                body: "Automation Body 7",
+            },
+            {
+                tab: "news",
+                title: "Automation Template News",
+                description: "Description for this template",
+                body: "Automation Body 8",
+            },
+        ];
+
+        // clicks each of the template tabs and verifies the empty state message as per above const
+        for (const data of templateData) {
+            await this.createAndCheckTemplateAppearsInList(data.tab, data.title, data.description, data.body);
+        }
     }
 }
