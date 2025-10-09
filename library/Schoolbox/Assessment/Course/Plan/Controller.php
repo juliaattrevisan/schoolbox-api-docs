@@ -540,11 +540,13 @@ class Controller extends Base
                 $class
             );
             $textboxDefId = $unitTextboxComp->first()?->getDefinitionId();
+            $this->unitSpecificationMapper->getDatabase()->beginTransaction();
             foreach ($names as $name) {
                 $newUnit = ($this->createUnit(trim($name ?? ''), $course));
                 $units[] = $this->getTranslatedUnitData($newUnit, $course, $textboxDefId);
             }
         } catch (\Exception $e) {
+            $this->unitSpecificationMapper->getDatabase()->rollBack();
             $problem = (new ApiProblem($e->getMessage()))
                 ->setStatus($e->getCode())
                 ->asArray();
