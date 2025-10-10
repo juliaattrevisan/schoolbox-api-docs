@@ -52,7 +52,7 @@ class Factory
      * Get timetable classes up to this far into the future
      * Measured in weeks, defaults to 12 weeks (3 months)
      */
-    private const TO = 1;
+    private const TO = 12;
 
 
     /**
