@@ -127,8 +127,7 @@ class ImageGeneration
      */
     public function requestStream(array $payload, User $user, string $feature): iterable
     {
-        return $this->client->requestStream(
-            'POST',
+        return $this->client->createResponseStream(
             $this->augmentPayload($payload),
             $user,
             $feature,

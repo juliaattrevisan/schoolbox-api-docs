@@ -9,6 +9,8 @@ declare(strict_types=1);
 
 namespace Schoolbox\OpenAi;
 
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\RequestOptions;
 use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Schoolbox\User;
@@ -30,6 +32,34 @@ use Schoolbox\User;
  */
 interface IClient
 {
+    /**
+     * Call the create model response API, and receive a standard HTTP response:
+     * * https://platform.openai.com/docs/api-reference/responses/create
+     *
+     * @param array  $payload The request body to send.
+     * @param User   $user    The user making the request: will be logged.
+     * @param string $feature An identifier for the feature being requested:
+     *                        will be logged.
+     * @return ResponseInterface The response from the AI provider.
+     * @throws ClientExceptionInterface if something went wrong with the request
+     */
+    public function createResponse(array $payload, User $user, string $feature): ResponseInterface;
+
+    /**
+     * Call the create model response API, and receive a stream:
+     * * https://platform.openai.com/docs/api-reference/responses-streaming
+     *
+     * @param array    $payload   The request body to send.
+     * @param User     $user      The user making the request: will be logged.
+     * @param string   $feature   An identifier for the feature being requested:
+     *                            will be logged.
+     * @param int|null $chunkSize If provided, read this many bytes for each stream iteration:
+     *                            otherwise, allow the implementation to decide.
+     * @return iterable<string> Each chunk of the stream as it's received.
+     * @throws ClientExceptionInterface if something went wrong with the request
+     */
+    public function createResponseStream(array $payload, User $user, string $feature, ?int $chunkSize = null): iterable;
+
     /**
      * Send a request to the configured AI provider and its endpoint.
      *
