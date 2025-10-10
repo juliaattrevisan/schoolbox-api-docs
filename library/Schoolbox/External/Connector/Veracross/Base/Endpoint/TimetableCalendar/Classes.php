@@ -302,55 +302,12 @@ class Classes implements IStrategy
             $classInstance['end_time']
         ));
 
-        /* There is an omega bug in Veracross where they send us UTC timestamps
-         * but they aren't actually UTC values lol...for example, they send this:
-         *
-            [start_time] => 2025-09-02T14:30:00Z
-            [end_time] => 2025-09-02T15:25:00Z
-
-         * ...but that means it should display at 2:30pm-3:25pm in the timetable.
-         * We can glitch around this by simply str_replace T and Z out (?!!!?)
-         * until they figure out how to repair their api.
-         */
-//        $startAt = (new \Alaress_Date_Format(
-//            $classInstance['start_time'],
-//            \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
-//            new \DateTimeZone('UTC')
-//        ))->setTimezone($this->timezone);
-//
-//        $finishAt = (new \Alaress_Date_Format(
-//            $classInstance['end_time'],
-//            \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
-//            new \DateTimeZone('UTC')
-//        ))->setTimezone($this->timezone);
-
         /* Weird hacky version for now. Revert when veracross repairs their data.
          */
+        $converter = new TimeConverter();
 
-        /* Note that class instances sometimes won't have a start_time or an end_time
-         * I suppose this was meant to be an all-day event or broken data
-         */
-        $tempStart = $classInstance['start_time'] ?? sprintf(
-            '%s %s',
-            $classInstance['date'],
-            '00:00:00',
-        );
-
-        $tempEnd = $classInstance['end_time'] ?? sprintf(
-            '%s %s',
-            $classInstance['date'],
-            '23:59:59',
-        );
-
-        $startAt = (new \Alaress_Date_Format(
-            trim(str_replace(['T', 'Z'], ' ', $tempStart)),
-            \Alaress_Date_Format::DATABASE_DATE_FORMAT,
-        ));
-
-        $finishAt = (new \Alaress_Date_Format(
-            trim(str_replace(['T', 'Z'], ' ', $tempEnd)),
-            \Alaress_Date_Format::DATABASE_DATE_FORMAT,
-        ));
+        $startAt = $converter->convert($classInstance['start_time'], $classInstance['date']);
+        $finishAt = $converter->convert($classInstance['end_time'], $classInstance['date']);
 
         /* Try to recycle based on guid
          */
