@@ -47,6 +47,9 @@ class ContactInfo
         if (null === $this->lookup) {
             $this->lookup = [];
 
+            /* TODO You could maybe cram 10 pages of contacts (10,0000 people) into
+             *  a pile of async requests to crunch down the time spent here...
+             */
             $generator = $this->api->retrieve('GET', 'contact_info', Profile::SCOPE);
 
             foreach ($generator as $page) {

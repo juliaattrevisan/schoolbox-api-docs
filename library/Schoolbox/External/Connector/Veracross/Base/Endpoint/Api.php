@@ -433,6 +433,13 @@ class Api implements IApi
                 'X-Page-Size' => $pageSize
             ];
 
+            /* There's this jibberjabber about Guzzle Pools that might be useful at some point
+             * but I haven't really understood those yet.
+             *
+             * GuzzleHttp\Pool
+             * https://docs.guzzlephp.org/en/stable/quickstart.html
+             */
+
             $start = microtime(true);
             $promises[] = $this->client->requestAsync($method, $endpoint, $options);
             $end = microtime(true);
