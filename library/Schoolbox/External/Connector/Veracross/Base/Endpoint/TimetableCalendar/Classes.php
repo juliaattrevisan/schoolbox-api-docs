@@ -475,8 +475,9 @@ class Classes implements IStrategy
          * in a particular sis_event instance, rather than being associated with all
          */
         $this->log->debug(sprintf(
-            'Creating new class involvement for %s in timetable event %s - %s, %s, %s-%s',
+            'Creating new class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
             $externalId,
+            $name,
             $event->getTitle(),
             $event->getDay(),
             $event->getPeriod(),
@@ -528,7 +529,7 @@ class Classes implements IStrategy
     ): void {
         if (isset($this->classInvolvements[$classEntry->getId()][$externalId])) {
             $this->log->debug(sprintf(
-                'Reusing previous class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
+                'Reusing previous class enrolment for %s (%s) in timetable event %s - %s, %s, %s-%s',
                 $name,
                 $externalId,
                 $event->getTitle(),
@@ -549,7 +550,7 @@ class Classes implements IStrategy
             $this->classInvolvements[$classEntry->getId()][$externalId] = true;
 
             $this->log->debug(sprintf(
-                'Creating new class involvement for %s (%s) in timetable event %s - %s, %s, %s-%s',
+                'Creating new class enrolment for %s (%s) in timetable event %s - %s, %s, %s-%s',
                 $name,
                 $externalId,
                 $event->getTitle(),
