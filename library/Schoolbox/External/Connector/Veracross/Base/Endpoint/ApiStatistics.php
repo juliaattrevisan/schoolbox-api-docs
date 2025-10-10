@@ -71,7 +71,7 @@ class ApiStatistics implements IStrategy
         $this->log->info(sprintf(
             '    %s%s%s',
             str_pad($headings['endpoint'], $maxEndpointLength, ' ', STR_PAD_RIGHT),
-            str_pad($headings['accesses'], $maxAccessesLength , ' ', STR_PAD_BOTH),
+            str_pad($headings['accesses'], $maxAccessesLength , ' ', STR_PAD_LEFT),
             str_pad($headings['duration'], $maxDurationLength, ' ', STR_PAD_LEFT),
         ));
 
@@ -81,7 +81,7 @@ class ApiStatistics implements IStrategy
             $this->log->info(sprintf(
                 '    %s%s%s',
                 str_pad($endpoint, $maxEndpointLength, ' ', STR_PAD_RIGHT),
-                str_pad((string)$data['count'], $maxAccessesLength, ' ', STR_PAD_BOTH),
+                str_pad((string)$data['count'], $maxAccessesLength, ' ', STR_PAD_LEFT),
                 str_pad(number_format($data['duration'], 2), $maxDurationLength, ' ', STR_PAD_LEFT),
             ));
         }
