@@ -240,29 +240,29 @@ class Controller extends Base
         $this->extendExecutionTime();
 
         try {
-            $helper = new Helper(
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_ENDPOINT)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_KEY)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_RESOURCE_NAME)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_DEPLOYMENT_ID)),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_MODEL)),
-                $this->client,
-                $this->errorMapper,
-                $this->logMapper,
-            );
-
-            $payloadGenerator = (new Payload\ImageGeneration(
-                $helper->getModel(),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_SYSTEM_PROMPT)),
-                trim((string)($this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_OUTPUT_QUALITY) ?? 'low')),
-            ));
-
-            $payload = $payloadGenerator->generate(
-                $this->requestPost->get('userPrompt'),
-                $this->requestPost->get('attributes') ?? [],
-                $this->requestPost->get('imageUrl') ?? null,
-                $this->requestPost->get('previousResponseId') ?? null,
-            );
+//            $helper = new Helper(
+//                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_ENDPOINT)),
+//                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_KEY)),
+//                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_RESOURCE_NAME)),
+//                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_DEPLOYMENT_ID)),
+//                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_MODEL)),
+//                $this->client,
+//                $this->errorMapper,
+//                $this->logMapper,
+//            );
+//
+//            $payloadGenerator = (new Payload\ImageGeneration(
+//                $helper->getModel(),
+//                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_SYSTEM_PROMPT)),
+//                trim((string)($this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_OUTPUT_QUALITY) ?? 'low')),
+//            ));
+//
+//            $payload = $payloadGenerator->generate(
+//                $this->requestPost->get('userPrompt'),
+//                $this->requestPost->get('attributes') ?? [],
+//                $this->requestPost->get('imageUrl') ?? null,
+//                $this->requestPost->get('previousResponseId') ?? null,
+//            );
 
             // use the frontend's aiSessionId to keep track of conversations
             $sessionId = $this->requestPost->get('aiSessionId');
@@ -273,11 +273,12 @@ class Controller extends Base
                     ->setStatus(400)
                     ->asArray();
 
-                // If we've indicated that this is a streaming request, send it in the right format
-                if (headers_sent()) {
-                    echo "event: error\ndata: 'AI Session id is required and must be a valid UUID.'\n\n";
-                    die();
-                }
+                // This can never be a stream yet
+//                // If we've indicated that this is a streaming request, send it in the right format
+//                if (headers_sent()) {
+//                    echo "event: error\ndata: 'AI Session id is required and must be a valid UUID.'\n\n";
+//                    die();
+//                }
 
                 $this->response = $this->responseAsJson($problem)
                     ->withStatus(400);
@@ -320,37 +321,56 @@ class Controller extends Base
 
 //                $helper->request($this->getUser(), $payload, Helper::FEATURE_IMAGE, $sessionId);
             } catch (SchoolboxException $e) {
+                // This will always be a stream
                 $problem = (new ApiProblem($e->getMessage()))
                     ->setStatus($e->getCode())
                     ->asArray();
 
-                // If we've indicated that this is a streaming request, send it in the right format
-                if (headers_sent()) {
-                    echo sprintf("event: error\ndata: %s\n\n", json_encode($problem));
-                    die();
-                }
+                $this->response = $this
+                    ->responseFromStream(
+                        Utils::streamFor(sprintf("event: error\ndata: %s\n\n", json_encode($problem)))
+                    )
+                    ->withStatus($e->getCode())
+                    ->withHeader('Content-Type', 'text/event-stream')
+                    ->withHeader('Cache-Control', 'no-cache')
+                    ->withHeader('Connection', 'keep-alive')
+                    ->withHeader('Content-Encoding', 'none');
 
-                $this->response = $this->responseAsJson($problem)
-                    ->withStatus($e->getCode());
+//                // If we've indicated that this is a streaming request, send it in the right format
+//                if (headers_sent()) {
+//                    echo sprintf("event: error\ndata: %s\n\n", json_encode($problem));
+//                    die();
+//                }
+//
+//                $this->response = $this->responseAsJson($problem)
+//                    ->withStatus($e->getCode());
 
                 return;
             }
-
-            return;
         } catch (\DomainException $e) {
+            // This will always be a stream
             /* Not configured? Not found
              */
             $returnCode = 404;
-
-            $problem = (new ApiProblem($e->getMessage()))
+            $problem    = (new ApiProblem($e->getMessage()))
                 ->setStatus($returnCode)
                 ->asArray();
 
-            // If we've indicated that this is a streaming request, send it in the right format
-            if (headers_sent()) {
-                echo sprintf("event: error\ndata: %s\n\n", json_encode($problem));
-                die();
-            }
+            $this->response = $this
+                ->responseFromStream(
+                    Utils::streamFor(sprintf("event: error\ndata: %s\n\n", json_encode($problem)))
+                )
+                ->withStatus($e->getCode())
+                ->withHeader('Content-Type', 'text/event-stream')
+                ->withHeader('Cache-Control', 'no-cache')
+                ->withHeader('Connection', 'keep-alive')
+                ->withHeader('Content-Encoding', 'none');
+
+//            // If we've indicated that this is a streaming request, send it in the right format
+//            if (headers_sent()) {
+//                echo sprintf("event: error\ndata: %s\n\n", json_encode($problem));
+//                die();
+//            }
 
             $this->response = $this->responseAsJson($problem)
                 ->withStatus($returnCode);
