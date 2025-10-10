@@ -61,14 +61,7 @@ class Client implements IClient
     }
 
     /**
-     * Call the create model response API, and receive a standard HTTP response:
-     * * https://platform.openai.com/docs/api-reference/responses/create
-     *
-     * @param array  $payload The request body to send.
-     * @param User   $user    The user making the request: will be logged.
-     * @param string $feature An identifier for the feature being requested:
-     *                        will be logged.
-     * @return ResponseInterface The response from the AI provider.
+     * @inheritdoc
      */
     public function createResponse(array $payload, User $user, string $feature): ResponseInterface
     {
@@ -90,16 +83,7 @@ class Client implements IClient
     }
 
     /**
-     * Call the create model response API, and receive a stream:
-     * * https://platform.openai.com/docs/api-reference/responses-streaming
-     *
-     * @param array    $payload   The request body to send.
-     * @param User     $user      The user making the request: will be logged.
-     * @param string   $feature   An identifier for the feature being requested:
-     *                            will be logged.
-     * @param int|null $chunkSize If provided, read this many bytes for each stream iteration:
-     *                            otherwise, allow the implementation to decide.
-     * @return iterable<string> Each chunk of the stream as it's received.
+     * @inheritdoc
      */
     public function createResponseStream(array $payload, User $user, string $feature, ?int $chunkSize = null): iterable
     {
@@ -146,85 +130,6 @@ class Client implements IClient
         }
 
         // Once entire stream is received: log it
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function request(string $method, array $payload, User $user, string $feature): ResponseInterface
-    {
-        $request = new Request(
-            $method,
-            $this->endpoint,
-            $this->authHeaders + ['Content-Type' => 'application/json'],
-            json_encode($payload),
-        );
-        return $this->httpClient->send(
-            $request,
-            [
-                RequestOptions::ALLOW_REDIRECTS => false,
-                RequestOptions::HTTP_ERRORS     => false,
-                RequestOptions::STREAM          => false,
-            ],
-        );
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function requestStream(string $method, array $payload, User $user, string $feature, ?int $chunkSize = null): iterable
-    {
-        $chunkSize ??= self::DEFAULT_CHUNK_SIZE;
-        $encodedPayload = json_encode($payload);
-
-        // TODO either pass in previous session ID, or extract from payload
-        $log = $this->logMapper->createModel()
-            ->setUser($user)
-            ->setPrompt($encodedPayload)
-            ->setFeature($feature)
-//            ->setSessionId($aiSessionId)
-            ->setEndpoint($this->endpoint);
-
-        $request = new Request(
-            $method,
-            $this->endpoint,
-            $this->authHeaders + ['Content-Type' => 'application/json'],
-            $encodedPayload,
-        );
-        $response = $this->httpClient->send(
-            $request,
-            [
-                RequestOptions::ALLOW_REDIRECTS => false,
-                RequestOptions::HTTP_ERRORS     => false,
-                RequestOptions::STREAM          => true,
-            ],
-        );
-
-        // This needs to be an event stream: otherwise raise an exception
-        $contentType = $response->getHeaderLine('Content-Type');
-        if (str_contains($contentType, 'text/event-stream')) {
-            foreach ($this->readEvents($response->getBody(), $chunkSize, $log) as $stream) {
-                yield $stream;
-            }
-        } else {
-            throw new BadResponseException(
-                sprintf('Expected text/event-stream response: received %s', $contentType),
-                $request,
-                $response,
-            );
-        }
-
-        // Once entire stream is received: log it
-    }
-
-    /**
-     * Add whatever authorization headers the API provider requires.
-     *
-     * @return array<string>
-     */
-    protected function getAuthorization(): array
-    {
-        return ['Authorization' => 'Bearer ' . $this->apiKey];
     }
 
     /**
