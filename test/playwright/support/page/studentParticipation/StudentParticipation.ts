@@ -39,6 +39,7 @@ export default class StudentParticipation {
      * Exclude a student from participation
      * @param userId - The user ID of the student to exclude
      * @param studentName - The name of the student for verification
+     * @param hasConfirmExclusion - Whether to confirm the exclusion in the modal
      */
     async excludeStudent(userId: string, studentName: string, hasConfirmExclusion: boolean): Promise<void> {
         this.tester.isGoingTo(`Click the Show Actions button for participant ${userId} (${studentName})`);
@@ -222,6 +223,6 @@ export default class StudentParticipation {
 
         this.tester.isGoingTo(`Verify there is a span element that includes the set due date '${expectedDueDate}'`);
         const dueDateSpan = this.page.locator(`span:text-is("${expectedDueDate}")`);
-        await expect(dueDateSpan).toBeDefined();
+        expect(dueDateSpan).toBeDefined();
     }
 }
