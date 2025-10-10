@@ -279,11 +279,10 @@ class Classes implements IStrategy
             $classInstance['end_time']
         );
 
-        /* TODO Maybe put a Session Time in here, in accordance with Haines' feature request
-         *  I *think* this might be the $classInstance['block'] but could be wrong.
-         *  To be confirmed
+        /* Put a Session Time in here, in accordance with Haines' feature request
+         * I *think* this might be the $classInstance['block'] but could be wrong.
          */
-        $period = null;
+        $period = $classInstance['block']['description'] ?? '';
 
         /* Decide where this class happens
          */
