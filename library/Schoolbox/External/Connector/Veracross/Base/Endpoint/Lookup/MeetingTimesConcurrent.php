@@ -106,7 +106,7 @@ class MeetingTimesConcurrent
                 ));
 
                 foreach ($responses as $response) {
-                    if (IApi::CONCURRENCY_FULFILLED === $response['state'] && 200 === $response['value']->getStatusCode()) {
+//                    if (IApi::CONCURRENCY_FULFILLED === $response['state'] && 200 === $response['value']->getStatusCode()) {
                         $content = $response['value']->getBody()->getContents();
 
                         try {
@@ -115,6 +115,17 @@ class MeetingTimesConcurrent
                             }
 
                             $page = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+
+                            /* "Successfully failed" due to some random issue such as Rate Limits etc.
+                             * and maybe other misc errors that I've not yet seen before
+                             *
+                             * Rate Limit is 300 per 3 minutes
+                             * https://api-docs.veracross.com/docs/docs/87c4e0dc5e47b-rate-limiting
+                             */
+                            if (isset($page['error'])) {
+                                $this->log->warning($page['error']);
+                                continue;
+                            }
 
                             $classId = null;
 
@@ -147,7 +158,7 @@ class MeetingTimesConcurrent
                                 $content
                             ));
                         }
-                    }
+//                    }
                 }
             }
         }
