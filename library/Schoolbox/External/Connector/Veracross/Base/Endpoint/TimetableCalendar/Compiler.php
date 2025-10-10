@@ -45,24 +45,26 @@ class Compiler
             $classId = $class['internal_class_id'];
 
             $timetable[$classId] = [
-                'internal_class_id' => $classId,
-                'name' => trim((string)$class['class_description']),
-                /* Try not to get confused by all the class_id values floating around
-                 * Some of them are a class code and some are primary keys in veracross
-                 */
-                'code' => $this->classesLookup[$classId]['class_id'] ?? null,
-                'teachers' => [
-                    [
-                        'id' => $class['primary_teacher']['id'],
-                        'name' => sprintf(
-                            '%s %s %s',
-                            $class['primary_teacher']['name_prefix'],
-                            $class['primary_teacher']['last_name'],
-                            (new FirstMeaningfulValue())->find([
-                                $class['primary_teacher']['preferred_name'],
-                                $class['primary_teacher']['first_name'],
-                            ])
-                        ),
+                'info' => [
+                    'internal_class_id' => $classId,
+                    'name' => trim((string)$class['class_description']),
+                    /* Try not to get confused by all the class_id values floating around
+                     * Some of them are a class code and some are primary keys in veracross
+                     */
+                    'code' => $this->classesLookup[$classId]['class_id'] ?? null,
+                    'teachers' => [
+                        [
+                            'id' => $class['primary_teacher']['id'],
+                            'name' => sprintf(
+                                '%s %s %s',
+                                $class['primary_teacher']['name_prefix'],
+                                $class['primary_teacher']['last_name'],
+                                (new FirstMeaningfulValue())->find([
+                                    $class['primary_teacher']['preferred_name'],
+                                    $class['primary_teacher']['first_name'],
+                                ])
+                            ),
+                        ],
                     ],
                 ],
                 /* Slap in the set of meeting times for this class. These eventually become

@@ -132,9 +132,6 @@ class ClassIndex
     private function minimise(array $record): array
     {
         return array_intersect_key($record, [
-            /* This id is used to manufacture a somewhat-arbitrary guid
-             */
-            'id' => true,
             'class_id' => true,
             'description' => true,
             'room' => true,

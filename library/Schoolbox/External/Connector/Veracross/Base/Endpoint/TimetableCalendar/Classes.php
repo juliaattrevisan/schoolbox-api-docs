@@ -187,8 +187,8 @@ class Classes implements IStrategy
 
             /* A student's timetable is a set of enrolments for their classes
              */
-            foreach ($timetable as $enrolment) {
-                $this->processClass((string)$externalId, $enrolment, $userLookup);
+            foreach ($timetable as $classEnrolment) {
+                $this->processClass((string)$externalId, $classEnrolment, $userLookup);
             }
         }
 
@@ -208,7 +208,7 @@ class Classes implements IStrategy
      * Ignore lessons that occur outside the [$from, $to] window
      *
      * @param string $externalId
-     * @param array  $enrolment
+     * @param array  $classEnrolment
      * @param array  $userLookup
      * @return void
      * @throws DebugBarException
@@ -217,9 +217,9 @@ class Classes implements IStrategy
      * @throws \PDOException
      * @throws \UnexpectedValueException
      */
-    private function processClass(string $externalId, array $enrolment, array $userLookup): void
+    private function processClass(string $externalId, array $classEnrolment, array $userLookup): void
     {
-        foreach ($enrolment['schedule'] as $classInstance) {
+        foreach ($classEnrolment['schedule'] as $classInstance) {
             /* Info about a class is actually a subset of $enrolment:
              *
                 $class = array_intersect_key($enrolment, [
@@ -228,21 +228,21 @@ class Classes implements IStrategy
                     'code' => true,
                 ]);
              *
-             * but to save this mundane step, pass $enrolment as the class info
-             * even though it also contains $classInstances
+             * But to save this mundane step, there's a $classEnrolment['info'] node specifically
+             * for these data
              */
 
             /* Save sis_event record
              */
-            $event = $this->createEvent($enrolment, $classInstance);
+            $event = $this->createEvent($classEnrolment['info'], $classInstance);
 
             /* Save sis_class record
              */
-            $classEntry = $this->createClassEntry($enrolment, $event);
+            $classEntry = $this->createClassEntry($classEnrolment['info'], $event);
 
             /* Save the involvements
              */
-            $this->createInvolvements($externalId, $enrolment, $event, $classEntry, $userLookup);
+            $this->createInvolvements($externalId, $classEnrolment['info'], $event, $classEntry, $userLookup);
         }
     }
 
@@ -274,9 +274,9 @@ class Classes implements IStrategy
          */
         $guid = sprintf(
             '%s_%s_%s',
-            $class['class_id'],
-            $classInstance['start'],
-            $classInstance['end']
+            $class['internal_class_id'],
+            $classInstance['start_time'],
+            $classInstance['end_time']
         );
 
         /* TODO Maybe put a Session Time in here, in accordance with Haines' feature request
@@ -305,44 +305,41 @@ class Classes implements IStrategy
          */
         $this->log->debug(sprintf(
             'Original dates: %s - %s',
-            $classInstance['start'],
-            $classInstance['end']
+            $classInstance['start_time'],
+            $classInstance['end_time']
         ));
 
         /* There is an omega bug in Veracross where they send us UTC timestamps
          * but they aren't actually UTC values lol...for example, they send this:
          *
-            [start] => 2025-09-02T14:30:00Z
-            [end] => 2025-09-02T15:25:00Z
+            [start_time] => 2025-09-02T14:30:00Z
+            [end_time] => 2025-09-02T15:25:00Z
 
          * ...but that means it should display at 2:30pm-3:25pm in the timetable.
          * We can glitch around this by simply str_replace T and Z out (?!!!?)
          * until they figure out how to repair their api.
          */
 //        $startAt = (new \Alaress_Date_Format(
-//            $classInstance['start'],
+//            $classInstance['start_time'],
 //            \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
 //            new \DateTimeZone('UTC')
 //        ))->setTimezone($this->timezone);
 //
 //        $finishAt = (new \Alaress_Date_Format(
-//            $classInstance['end'],
+//            $classInstance['end_time'],
 //            \Alaress_Date_Format::FORMAT_DATETIME_UTC_NO_MLS,
 //            new \DateTimeZone('UTC')
 //        ))->setTimezone($this->timezone);
 
         /* Weird hacky version for now. Revert when veracross repairs their data.
          */
-        $tempStart = trim(str_replace(['T', 'Z'], ' ', $classInstance['start']));
-        $tempEnd = trim(str_replace(['T', 'Z'], ' ', $classInstance['end']));
-
         $startAt = (new \Alaress_Date_Format(
-            $tempStart,
+            trim(str_replace(['T', 'Z'], ' ', $classInstance['start_time'])),
             \Alaress_Date_Format::DATABASE_DATE_FORMAT,
         ));
 
         $finishAt = (new \Alaress_Date_Format(
-            $tempEnd,
+            trim(str_replace(['T', 'Z'], ' ', $classInstance['end_time'])),
             \Alaress_Date_Format::DATABASE_DATE_FORMAT,
         ));
 
@@ -428,8 +425,8 @@ class Classes implements IStrategy
             $classEntry = $this->classEntries[$event->getCode()];
         } else {
             $classEntry = $this->classEntryMapper->createModel()
-                ->setName($class['description'])
-                ->setCode($class['class_id']);
+                ->setName($class['name'])
+                ->setCode($class['code']);
 
             if ($this->perform) {
                 $this->classEntryMapper->save($classEntry);
@@ -463,9 +460,10 @@ class Classes implements IStrategy
         array $userLookup
     ): void {
         /* Save the teacher's involvement
+         * atm there's only one teacher per class, but it's possible there might be more somewhere
          */
-        $teacherExternalId = trim((string)$class['primary_teacher']['id']);
-        $name = trim((string)$class['primary_teacher']['name']);
+        $teacherExternalId = trim((string)$class['teachers'][0]['id']);
+        $name = trim((string)$class['teachers'][0]['name']);
 
         /* TODO Figure out overrides to put into saveStaffInvolvement
          *  So far, no distinction has yet been made for Overrides to exist
