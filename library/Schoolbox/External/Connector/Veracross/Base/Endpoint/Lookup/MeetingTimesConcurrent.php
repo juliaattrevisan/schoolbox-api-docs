@@ -12,6 +12,7 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup;
 use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\TimetableCalendar\Classes;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\TimetableCalendar\TimeConverter;
 
 /**
  * Grab all the Meeting Times everywhere
@@ -66,7 +67,11 @@ class MeetingTimesConcurrent
          */
         if (null === $this->lookup) {
             $this->lookup = [];
+            $converter = new TimeConverter();
 
+            /* Process CLASS_CHUNK_SIZE elements concurrently to save the galactic penalty
+             * that it costs to make api requests to veracross
+             */
             $classChunks = array_chunk($this->classIds, self::CLASS_CHUNK_SIZE);
 
             foreach ($classChunks as $classChunk) {
@@ -116,6 +121,11 @@ class MeetingTimesConcurrent
 
                         foreach ($page['data'] as $record) {
                             $classId = $record['internal_class_id'];
+
+                            /* Weird hacky version for now. Revert when veracross repairs their data.
+                             */
+                            $record['start'] = $converter->convert($record['start_time'], $record['date']);
+                            $record['end'] = $converter->convert($record['end_time'], $record['date']);
 
                             $this->lookup[$classId][] = $record;
                         }

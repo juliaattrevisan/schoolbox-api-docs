@@ -269,8 +269,8 @@ class Classes implements IStrategy
         $guid = sprintf(
             '%s_%s_%s',
             $class['internal_class_id'],
-            $classInstance['start_time'],
-            $classInstance['end_time']
+            $classInstance['start']->getDatabaseDate(),
+            $classInstance['end']->getDatabaseDate()
         );
 
         /* Put a Session Time in here, in accordance with Haines' feature request
@@ -304,10 +304,8 @@ class Classes implements IStrategy
 
         /* Weird hacky version for now. Revert when veracross repairs their data.
          */
-        $converter = new TimeConverter();
-
-        $startAt = $converter->convert($classInstance['start_time'], $classInstance['date']);
-        $finishAt = $converter->convert($classInstance['end_time'], $classInstance['date']);
+        $startAt = $classInstance['start'];
+        $finishAt = $classInstance['end'];
 
         /* Try to recycle based on guid
          */
