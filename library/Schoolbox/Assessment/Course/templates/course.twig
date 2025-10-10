@@ -393,9 +393,10 @@ Usage:
                                 css: "pop success",
                             });
                         })
-                        .fail(function () {
+                        .fail(function (response) {
                             toaster.toastTimeout({
-                                text: "Framework could not be re-applied.",
+                                text: "Framework could not be re-applied. " +
+                                        (response.responseJSON && response.responseJSON.error ? response.responseJSON.error : ""),
                                 css: "pop alert",
                             });
                         });

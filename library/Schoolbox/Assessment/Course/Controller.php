@@ -1390,6 +1390,13 @@ class Controller extends Base\Base
      */
     public function reApplyFramework(CourseSpecification $courseSpec)
     {
+        /* It's possible for template to be null, so we want to return error and end early if it does
+         */
+        if (null === $courseSpec->getTemplate()) {
+            $this->response = $this->responseAsJson(['error' => 'No framework selected'])->withStatus(400);
+            return;
+        }
+
         try {
             // update existing units / course with the new templates
             $this->updateExistingFolders($courseSpec, $courseSpec->getTemplate());
