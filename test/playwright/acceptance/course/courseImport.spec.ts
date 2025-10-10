@@ -12,6 +12,7 @@ import AssessmentForm from "@schoolboxTest/playwright/support/page/dueWork/Asses
 import ManageGroup from "@schoolboxTest/playwright/support/page/group/ManageGroup";
 import dayjs from "dayjs";
 import CourseOutline from "@schoolboxTest/playwright/support/page/homepage/CourseOutline";
+import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 
 test.describe("Course import tests", () => {
     // Run tests serially, as tests rely on prior tests to have been run
@@ -459,6 +460,222 @@ test.describe("Course import tests", () => {
         await courseOutline.deleteActivity(unitName, dueworkId, `delete-${dueworkId}`);
         await expect(page.getByTestId(`course-outline-assessment-title-${taskName}`)).not.toBeVisible();
         await expect(page.getByTestId(`course-outline-assessment-title-${dueWorkName}`)).not.toBeVisible();
+    });
+
+    test("Course Outline: filters and 3-dot options", async ({ tester, page, db }) => {
+        const homepage = new Homepage(tester, page);
+        const courseOutline = new CourseOutline(tester, page);
+
+        const dueWorkName = `Essay - Final Assessment`;
+        const taskName = `Post to Forum: Prologue`;
+        const projectName = "Export Activity Project for Romeo and Juliet";
+        const lessonPlanName = "Export Activity Lesson Plan for Romeo and Juliet";
+        const quizName = "Pre-unit Quiz";
+
+        tester.isGoingTo(
+            "Filter the course outline by project, quiz and lesson plans and do not show title to read-only users",
+        );
+        const folderId = (await db.grabFromDatabase("folder", "id", {
+            name: "Automation Course Import Folder1",
+            deleted_at: null,
+        })) as string;
+        await page.goto(`/homepage/${folderId}`);
+
+        await homepage.clickLockToggle();
+        const component = page.locator(Homepage.locateComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1));
+        const componentId = (await component.getAttribute("id")) as string;
+        await Homepage.clickComponentSettings(component);
+        await courseOutline.filterByLabel(componentId, "dueWork");
+        await courseOutline.filterByLabel(componentId, "task");
+        await CourseOutline.clickReadOnlyUsers(component, componentId);
+        await component.locator(`input[type="submit"]`).click();
+        await expect(component.locator(`input[type="submit"]`)).toBeHidden();
+
+        tester.isGoingTo("add another course outline component to the page and filter by due work and task");
+        await page.reload();
+        await homepage.addComponent(Homepage.ELEMENT_ADD_COMPONENT_SECTION_LEARNING, "Course Outline");
+        const componentCourseOutline = page.locator(Homepage.locateComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1));
+        const componentCourseOutlineId = (await componentCourseOutline.getAttribute("id")) as string;
+        await homepage.clickLockToggle();
+        await Homepage.clickComponentSettings(componentCourseOutline);
+        await homepage.typeTextBoxHeading(`Due Work and Tasks Only`);
+        await courseOutline.filterByLabel(componentCourseOutlineId, "project");
+        await courseOutline.filterByLabel(componentCourseOutlineId, "quiz");
+        await courseOutline.filterByLabel(componentCourseOutlineId, "lessonPlan");
+        await CourseOutline.selectImportedCourse(componentCourseOutline, "Year 9 English");
+        await componentCourseOutline.locator(`input[type="submit"]`).click();
+
+        tester.isGoingTo("check the filters are working correctly for the teacher and the title is showing for them");
+        await tester.impersonate("Jack Coles");
+        await page.goto(`/homepage/${folderId}`);
+        await expect(componentCourseOutline.locator("a.icon-filter")).toContainText("This is being filtered");
+        await expect(componentCourseOutline.locator("a.icon-course")).toContainText("Year 9 English");
+        await expect(componentCourseOutline.getByTestId(`homepage-component-titlebar-name`)).toContainText(
+            `Due Work and Tasks Only`,
+        );
+        await expect(componentCourseOutline.getByTestId(`course-outline-assessment-title-${taskName}`)).toBeVisible();
+        await expect(
+            componentCourseOutline.getByTestId(`course-outline-assessment-title-${dueWorkName}`),
+        ).toBeVisible();
+        await expect(
+            componentCourseOutline.getByTestId(`course-outline-assessment-title-${quizName}`),
+        ).not.toBeVisible();
+        await expect(
+            componentCourseOutline.getByTestId(`course-outline-assessment-title-${lessonPlanName}`),
+        ).not.toBeVisible();
+        await expect(
+            componentCourseOutline.getByTestId(`course-outline-assessment-title-${projectName}`),
+        ).not.toBeVisible();
+
+        tester.isGoingTo("check Jack Coles can see the proper options under the unit 3-dot menu");
+        await courseOutline.clickUnitDotMenu("Romeo and Juliet");
+        await expect(componentCourseOutline.getByTestId("course-outline-menu-add-project")).toContainText("Project");
+        await expect(componentCourseOutline.getByTestId("course-outline-menu-add-due-work")).toContainText("Due Work");
+        await expect(componentCourseOutline.getByTestId("course-outline-menu-add-quiz")).toContainText("Quiz");
+        await expect(componentCourseOutline.getByTestId("course-outline-menu-add-task")).toContainText("Task");
+        await expect(componentCourseOutline.getByTestId("course-outline-menu-add-lesson-plan")).toContainText(
+            "Lesson Plan",
+        );
+        await expect(componentCourseOutline.getByTestId("course-outline-menu-course-markbook")).toContainText(
+            "Course Markbook",
+        );
+        await expect(componentCourseOutline.getByTestId("course-outline-unit-delete")).toContainText("Delete");
+        await courseOutline.clickUnitDotMenu("Romeo and Juliet");
+
+        tester.isGoingTo("check Jack Coles can see the proper options in the 3-dot menu for each activity type");
+        // task
+        tester.isGoingTo("checking task");
+        await courseOutline.clickActivityDotMenu("Due Work and Tasks Only", "Romeo and Juliet", taskName);
+
+        const taskId = await courseOutline.getActivityId("Due Work and Tasks Only", "Romeo and Juliet", taskName);
+
+        await expect(componentCourseOutline.getByTestId(`course-outline-view-status-${taskId}`)).toContainText(
+            "View Status",
+        );
+        await expect(componentCourseOutline.getByTestId(`course-outline-custom-participation-${taskId}`)).toContainText(
+            "Student Participation",
+        );
+        await expect(componentCourseOutline.getByTestId(`course-outline-modify-${taskId}`)).toContainText("Modify");
+        await expect(componentCourseOutline.getByTestId(`activity-delete-${taskId}`)).toContainText("Delete");
+        await expect(componentCourseOutline.getByTestId(`activity-save-course-${taskId}`)).toContainText(
+            "Save to Course...",
+        );
+        await courseOutline.clickActivityDotMenu("Due Work and Tasks Only", "Romeo and Juliet", taskName);
+
+        // due work
+        tester.isGoingTo("checking due work");
+        const dueWorkId = await courseOutline.getActivityId("Due Work and Tasks Only", "Romeo and Juliet", dueWorkName);
+
+        await courseOutline.clickActivityDotMenu("Due Work and Tasks Only", "Romeo and Juliet", dueWorkName);
+        await expect(componentCourseOutline.getByTestId(`course-outline-view-status-${dueWorkId}`)).toContainText(
+            "View Status",
+        );
+        await expect(
+            componentCourseOutline.getByTestId(`course-outline-view-grade-submissions-${dueWorkId}`),
+        ).toContainText("View and grade submissions");
+        await expect(
+            componentCourseOutline.getByTestId(`course-outline-custom-participation-${dueWorkId}`),
+        ).toContainText("Student Participation");
+        await expect(componentCourseOutline.getByTestId(`course-outline-similarity-report-${dueWorkId}`)).toContainText(
+            "Similarity Report",
+        );
+        await expect(componentCourseOutline.getByTestId(`course-outline-rubric-report-${dueWorkId}`)).toContainText(
+            "Rubric Report",
+        );
+        await expect(componentCourseOutline.getByTestId(`course-outline-modify-${dueWorkId}`)).toContainText("Modify");
+        await expect(componentCourseOutline.getByTestId(`activity-delete-${dueWorkId}`)).toContainText("Delete");
+        await expect(componentCourseOutline.getByTestId(`activity-save-course-${dueWorkId}`)).toContainText(
+            "Save to Course...",
+        );
+        await courseOutline.clickActivityDotMenu("Due Work and Tasks Only", "Romeo and Juliet", dueWorkName);
+
+        const componentBottom = page.locator(Homepage.locateComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 2));
+
+        // project
+        tester.isGoingTo("checking project");
+        const projectId = await courseOutline.getActivityId("Course Outline", "Romeo and Juliet", projectName);
+
+        await courseOutline.clickActivityDotMenu("Course Outline", "Romeo and Juliet", projectName);
+        await expect(componentBottom.getByTestId(`course-outline-view-status-${projectId}`)).toContainText(
+            "View Status",
+        );
+        await expect(componentBottom.getByTestId(`course-outline-modify-${projectId}`)).toContainText("Modify");
+        await expect(componentBottom.getByTestId(`activity-delete-${projectId}`)).toContainText("Delete");
+        await expect(componentBottom.getByTestId(`activity-save-course-${projectId}`)).toContainText(
+            "Save to Course...",
+        );
+        await courseOutline.clickActivityDotMenu("Course Outline", "Romeo and Juliet", projectName);
+
+        // lesson plan
+        tester.isGoingTo("checking lesson plan");
+        const lessonPlanId = await courseOutline.getActivityId("Course Outline", "Romeo and Juliet", lessonPlanName);
+
+        await courseOutline.clickActivityDotMenu("Course Outline", "Romeo and Juliet", lessonPlanName);
+        await expect(componentBottom.getByTestId(`course-outline-modify-${lessonPlanId}`)).toContainText("Modify");
+        await expect(componentBottom.getByTestId(`activity-delete-${lessonPlanId}`)).toContainText("Delete");
+        await expect(componentBottom.getByTestId(`activity-save-course-${lessonPlanId}`)).toContainText(
+            "Save to Course...",
+        );
+        await courseOutline.clickActivityDotMenu("Course Outline", "Romeo and Juliet", lessonPlanName);
+
+        // quiz
+        tester.isGoingTo("checking quiz");
+        const quizId = await courseOutline.getActivityId("Course Outline", "Romeo and Juliet", quizName);
+
+        await courseOutline.clickActivityDotMenu("Course Outline", "Romeo and Juliet", quizName);
+        await expect(componentBottom.getByTestId(`course-outline-view-status-${quizId}`)).toContainText("View Status");
+        await expect(componentBottom.getByTestId(`course-outline-custom-participation-${quizId}`)).toContainText(
+            "Student Participation",
+        );
+        await expect(componentBottom.getByTestId(`course-outline-horizontal-${quizId}`)).toContainText(
+            "Review horizontally",
+        );
+        await expect(componentBottom.getByTestId(`course-outline-modify-settings-${quizId}`)).toContainText(
+            "Modify Settings",
+        );
+        await expect(componentBottom.getByTestId(`course-outline-modify-contents-${quizId}`)).toContainText(
+            "Modify Contents",
+        );
+        await expect(componentBottom.getByTestId(`activity-delete-${quizId}`)).toContainText("Delete");
+        await expect(componentBottom.getByTestId(`activity-save-course-${quizId}`)).toContainText("Save to Course...");
+        await courseOutline.clickActivityDotMenu("Course Outline", "Romeo and Juliet", quizName);
+
+        tester.isGoingTo("check the filters are working correctly for the student and the title is hidden for them");
+
+        await tester.impersonate("Jana Reed");
+        await page.goto(`/homepage/${folderId}`);
+        await expect(componentCourseOutline.getByTestId("homepage-component-titlebar-name")).toContainText(
+            "Due Work and Tasks Only",
+        );
+        await expect(componentCourseOutline.locator("a.icon-filter")).not.toBeVisible();
+        await expect(componentCourseOutline.locator("a.icon-course")).toContainText("Year 9 English");
+        await expect(componentCourseOutline.getByTestId(`homepage-component-titlebar-name`)).toContainText(
+            `Due Work and Tasks Only`,
+        );
+        await expect(componentBottom.getByTestId("homepage-component-titlebar-name")).not.toBeVisible();
+
+        await expect(componentBottom.getByTestId(`course-outline-assessment-title-${dueWorkName}`)).not.toBeVisible();
+        await expect(componentBottom.getByTestId(`course-outline-assessment-title-${taskName}`)).not.toBeVisible();
+        await expect(componentBottom.getByTestId(`course-outline-assessment-title-${quizName}`)).toBeVisible();
+        await expect(componentBottom.getByTestId(`course-outline-assessment-title-${lessonPlanName}`)).toBeVisible();
+        await expect(componentBottom.getByTestId(`course-outline-assessment-title-${projectName}`)).toBeVisible();
+
+        tester.isGoingTo("check Jana Reed is redirected to the activity page when clicking on an activity title");
+        await componentCourseOutline.getByTestId(`course-outline-assessment-title-${taskName}`).click();
+        await expect(page).toHaveURL(`learning/assessments/${taskId}/25`);
+        await page.goBack();
+        await componentCourseOutline.getByTestId(`course-outline-assessment-title-${dueWorkName}`).click();
+        await expect(page).toHaveURL(`learning/assessments/${dueWorkId}/25`);
+        await page.goBack();
+        await componentBottom.getByTestId(`course-outline-assessment-title-${projectName}`).click();
+        await expect(page).toHaveURL(`learning/assessments/${projectId}/25`);
+        await page.goBack();
+        await componentBottom.getByTestId(`course-outline-assessment-title-${lessonPlanName}`).click();
+        await expect(page).toHaveURL(`learning/assessments/${lessonPlanId}/25`);
+        await page.goBack();
+        await componentBottom.getByTestId(`course-outline-assessment-title-${quizName}`).click();
+        await expect(page).toHaveURL(`learning/assessments/${quizId}/25`);
+        await page.goBack();
     });
 
     test.afterEach(async ({ tester }) => {
