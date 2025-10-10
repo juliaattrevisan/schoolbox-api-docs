@@ -126,11 +126,6 @@ class Classes implements IStrategy
 
         $this->log->debug('');
 
-        /* Precompiler
-         * Note this has a local cache that remembers an endpoint's outcome
-         */
-//        $compiler = new PersonCompiler($this->api, self::SCOPE);
-
         /* Get a list of guys
          */
         $userLookup = (new Users($this->watchlist, $this->eventMapper))->generate();
@@ -183,7 +178,6 @@ class Classes implements IStrategy
             ));
 
             $timetable = $compiler->compile((string)$externalId);
-
 
             /* A student's timetable is a set of enrolments for their classes
              */

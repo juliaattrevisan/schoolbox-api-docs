@@ -26,6 +26,9 @@ class MeetingTimesConcurrent
     private ?array $lookup = null;
 
 
+    /**
+     * Quantity of concurrent requests per chunk
+     */
     private const CLASS_CHUNK_SIZE = 100;
 
 
