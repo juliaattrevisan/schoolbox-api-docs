@@ -42,6 +42,9 @@ class ContactInfo
      */
     public function generate(): array
     {
+        // FIXME shortcut
+        return [];
+
         /* If we generated this lookup previously, just recycle it
          */
         if (null === $this->lookup) {

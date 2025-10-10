@@ -113,6 +113,12 @@ class Enrolments
                     /* Avengers Assemble!
                      */
                     foreach ($page['data'] as $record) {
+                        // FIXME 09SCMH 05
+                        // FIXME Science Mainstream
+                        if ($record['internal_class_id'] == 288) {
+                            print_r($record);
+                        }
+
                         $externalId = trim((string)$record['person_id']);
 
                         $this->lookup[$externalId][$record['internal_class_id']] = $this->minimise($record);
