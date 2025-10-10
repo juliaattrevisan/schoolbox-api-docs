@@ -95,7 +95,7 @@ class ClassIndex
                      * This should be the main use case for the fleet
                      */
                     if (!$watchlistEnabled) {
-                        $this->lookup[$record['id']] = $record;
+                        $this->lookup[$record['id']] = $this->minimise($record);
                         continue;
                     }
 
@@ -103,7 +103,7 @@ class ClassIndex
                      * to help minimise memory consumption
                      */
                     if (isset($specificClassIds[$record['id']])) {
-                        $this->lookup[$record['id']] = $record;
+                        $this->lookup[$record['id']] = $this->minimise($record);
                     }
                 }
             }
@@ -119,5 +119,22 @@ class ClassIndex
         $this->log->debug('');
 
         return $this->lookup;
+    }
+
+
+    /**
+     * We only need some of the $record, not all of it; save some memory
+     * by only keeping what we needed.
+     *
+     * @param array $record
+     * @return array
+     */
+    private function minimise(array $record): array
+    {
+        return array_intersect_key($record, [
+            'class_id' => true,
+            'description' => true,
+            'room' => true,
+        ]);
     }
 }
