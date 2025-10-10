@@ -269,8 +269,8 @@ class Classes implements IStrategy
         $guid = sprintf(
             '%s_%s_%s',
             $class['internal_class_id'],
-            $classInstance['start']->getDatabaseDate(),
-            $classInstance['end']->getDatabaseDate()
+            $classInstance['start']->getDatabase(),
+            $classInstance['end']->getDatabase()
         );
 
         /* Put a Session Time in here, in accordance with Haines' feature request

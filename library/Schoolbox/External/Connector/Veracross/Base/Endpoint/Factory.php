@@ -45,14 +45,14 @@ class Factory
      * Get timetable classes occurring this far in the past
      * Measured in weeks, defaults to -2 weeks
      */
-    private const FROM = -2;
+    private const FROM = -1;
 
 
     /**
      * Get timetable classes up to this far into the future
      * Measured in weeks, defaults to 12 weeks (3 months)
      */
-    private const TO = 12;
+    private const TO = 1;
 
 
     /**
