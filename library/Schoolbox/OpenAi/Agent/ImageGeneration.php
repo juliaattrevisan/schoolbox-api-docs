@@ -125,12 +125,27 @@ class ImageGeneration
      * @param T $payload
      * @throws ClientExceptionInterface if HTTP request fails
      */
-    public function requestStream(array $payload, User $user, string $feature): iterable
-    {
+    public function requestStream(
+        User $user,
+        string $prompt,
+        string $feature,
+        string $sessionId,
+        ?string $size = null,
+        ?string $style = null,
+        ?string $imageUrl = null,
+        ?string $previousResponseId = null,
+    ): iterable {
         return $this->client->createResponseStream(
-            $this->augmentPayload($payload),
+            $this->augmentPayload([
+                'prompt'             => $prompt,
+                'size'               => $size,
+                'style'              => $style,
+                'imageUrl'           => $imageUrl,
+                'previousResponseId' => $previousResponseId,
+            ]),
             $user,
             $feature,
+            $sessionId,
             8192,
         );
     }

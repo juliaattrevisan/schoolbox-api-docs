@@ -298,16 +298,14 @@ class Controller extends Base
             try {
                 // Size and style need to be converted
                 $response = $agent->requestStream(
-                    [
-                        'prompt'             => $this->requestPost->get('userPrompt'),
-                        'size'               => '1024x1024',
-    //                    'size'               => ($this->requestPost->get('attributes') ?? [])['size'] ?? null,
-                        'style'              => ($this->requestPost->get('attributes') ?? [])['style'] ?? null,
-                        'imageUrl'           => $this->requestPost->get('imageUrl') ?? null,
-                        'previousResponseId' => $this->requestPost->get('previousResponseId') ?? null,
-                    ],
                     $this->getUser(),
+                    $this->requestPost->get('userPrompt'),
                     Helper::FEATURE_IMAGE,
+                    $sessionId,
+                    size: ($this->requestPost->get('attributes') ?? [])['size'] ?? null,
+                    style: ($this->requestPost->get('attributes') ?? [])['style'] ?? null,
+                    imageUrl: $this->requestPost->get('imageUrl') ?? null,
+                    previousResponseId: $this->requestPost->get('previousResponseId') ?? null,
                 );
 
                 // The iterable response can just be passed straight to

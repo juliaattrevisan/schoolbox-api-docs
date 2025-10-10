@@ -63,7 +63,7 @@ class Client implements IClient
     /**
      * @inheritdoc
      */
-    public function createResponse(array $payload, User $user, string $feature): ResponseInterface
+    public function createResponse(array $payload, User $user, string $feature, ?string $aiSessionId = null): ResponseInterface
     {
         $request = new Request(
             'POST',
@@ -85,18 +85,17 @@ class Client implements IClient
     /**
      * @inheritdoc
      */
-    public function createResponseStream(array $payload, User $user, string $feature, ?int $chunkSize = null): iterable
+    public function createResponseStream(array $payload, User $user, string $feature, ?string $aiSessionId = null, ?int $chunkSize = null): iterable
     {
         $chunkSize ??= self::DEFAULT_CHUNK_SIZE;
         $encodedPayload = json_encode($payload);
 
-        // TODO either pass in previous session ID, or extract from payload
         $url = $this->baseUrl->withPath(rtrim($this->baseUrl->getPath(), '/') .  self::RESPONSES_ENDPOINT);
         $log = $this->logMapper->createModel()
             ->setUser($user)
             ->setPrompt($encodedPayload)
             ->setFeature($feature)
-//            ->setSessionId($aiSessionId)
+            ->setSessionId($aiSessionId)
             ->setEndpoint($url->__toString());
 
         $request = new Request(
