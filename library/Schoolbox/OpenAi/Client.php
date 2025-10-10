@@ -189,10 +189,11 @@ class Client implements IClient
         // Prepare the message for logging
         $itemType = $message->eventType;
         $output   = '';
+        $data     = [];
         try {
             // Omit partial and completed image data from the output
-            $data = $message->data;
             $item = json_decode($message->data, true, 512, JSON_THROW_ON_ERROR);
+            $data[] = $item;
             if ($itemType === 'response.image_generation_call.partial_image' && isset($item['partial_image_b64'])) {
                 $item['partial_image_b64'] = self::IMAGE_DATA_OMITTED;
             }
@@ -210,10 +211,10 @@ class Client implements IClient
                 }
             }
 
-            $output .= sprintf("data: %s\n", json_encode($item, JSON_THROW_ON_ERROR));
+            $output .= sprintf("event: %s\ndata: %s\n\n", $itemType, json_encode($item, JSON_THROW_ON_ERROR));
         } catch (\JsonException $e) {
             // If it's not JSON, still save the raw data
-            $output .= "{$message->data}\n";
+            $output .= sprintf("event: %s\n%s\n\n", $itemType, $message->data);
         }
 
         // This chunk gets added to the log
@@ -222,6 +223,7 @@ class Client implements IClient
             'data' => $data,
             'output' => $output,
         ];
+        $this->appendChunkToLog($event, $log);
 
         // Extract the completed event, and add it to the log
         // Is this the final event?
@@ -286,6 +288,43 @@ class Client implements IClient
                 ->setInputTokens($completedEvent['usage']['input_tokens'] ?? null)
                 ->setOutputTokens($completedEvent['usage']['output_tokens'] ?? null);
             $this->logMapper->save($log);
+        }
+    }
+
+
+    private function appendChunkToLog(array $chunkData, Log\Model $log): void
+    {
+        $log->setResponse(($log->getResponse() ?? '') . $chunkData['output']);
+
+        foreach ($chunkData['data'] as $item) {
+            $model = null;
+            $inputTokens = null;
+            $outputTokens = null;
+
+            // Model, input and output tokens depend on the endpoint
+            $model = $item['response']['model'] ?? $item['model'] ?? null;
+            $inputTokens = $item['response']['usage']['input_tokens'] ?? $item['usage']['prompt_tokens'] ?? null;
+            $outputTokens = $item['response']['usage']['output_tokens'] ?? $item['usage']['completion_tokens'] ?? null;
+
+//            if ($type === self::FEATURE_CHAT) {
+//                $model = $item['model'] ?? null;
+//                $inputTokens = $item['usage']['prompt_tokens'] ?? null;
+//                $outputTokens = $item['usage']['completion_tokens'] ?? null;
+//            } else {
+//                $model = $item['response']['model'] ?? null;
+//                $inputTokens = $item['response']['usage']['input_tokens'] ?? null;
+//                $outputTokens = $item['response']['usage']['output_tokens'] ?? null;
+//            }
+
+            if ($model) {
+                $log->setModel($model);
+            }
+            if ($inputTokens) {
+                $log->setInputTokens($inputTokens);
+            }
+            if ($outputTokens) {
+                $log->setOutputTokens($outputTokens);
+            }
         }
     }
 }
