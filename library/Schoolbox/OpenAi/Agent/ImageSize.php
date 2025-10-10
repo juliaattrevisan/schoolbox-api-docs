@@ -10,6 +10,8 @@ namespace Schoolbox\OpenAi\Agent;
 
 /**
  * Enum for the image generator agent's allowed sizes.
+ *
+ * @see https://platform.openai.com/docs/guides/image-generation?image-generation-model=gpt-image-1#size-and-quality-options
  */
 enum ImageSize: string
 {

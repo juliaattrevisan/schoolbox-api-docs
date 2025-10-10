@@ -15,14 +15,6 @@ use Schoolbox\User;
 
 /**
  * Agent for generating images via OpenAI.
- *
- * @template T as array{
- *     prompt: string,
- *     size?: ?string,
- *     style?: ?string,
- *     imageUrl?: ?string,
- *     previousResponseId?: ?string
- * }
  */
 class ImageGeneration
 {
@@ -32,7 +24,6 @@ class ImageGeneration
     private const TEMPERATURE = 0.7;
     private const TOP_P = 0.9;
     private const MAX_OUTPUT_TOKENS = 20000;
-
 
     /**
      * We always use this model for image generation, it's not configurable
@@ -69,23 +60,6 @@ class ImageGeneration
     ";
 
     /**
-     * Constants to determine available sizes
-     *
-     * These labels are used by the frontend to display the options
-     * They match the available sizes from OpenAI, see https://platform.openai.com/docs/guides/image-generation#size-and-quality-options
-     */
-    private const ATTRIBUTE_KEY_SIZE = 'size';
-
-    /**
-     * Constants to determine available styles
-     * This could theoretically become configurable in the future
-     *
-     * These labels are used by the frontend to display the options
-     * There's no equivalent to this in the OpenAI AI, we just inject it into the prompt
-     */
-    private const ATTRIBUTE_KEY_STYLE = 'style';
-
-    /**
      * Constructor
      *
      * @param IClient $client       An AI provider client: needs to point to the Responses endpoint of the client
@@ -105,8 +79,18 @@ class ImageGeneration
     /**
      * Streams an image generation payload.
      *
-     * @param T $payload
-     * @throws ClientExceptionInterface if HTTP request fails
+     * @param User        $user               The user making the request.
+     * @param string      $prompt             The user's input prompt.
+     * @param string      $feature            The feature which this request should be logged against.
+     * @param string      $sessionId          The session ID against which this request should be logged.
+     * @param string|null $size               If provided: a size for the image.
+     *                                        Should match a value of `ImageSize`.
+     * @param string|null $style              If provided: a style for the image.
+     *                                        Should match a value of `ImageStyle`.
+     * @param string|null $imageUrl           If provided: a URL to use as an example for the image.
+     * @param string|null $previousResponseId If provided: the ID of a previous request made to OpenAI.
+     * @return iterable
+     * @throws ClientExceptionInterface
      */
     public function requestStream(
         User $user,
@@ -119,13 +103,13 @@ class ImageGeneration
         ?string $previousResponseId = null,
     ): iterable {
         return $this->client->createResponseStream(
-            $this->augmentPayload([
-                'prompt'             => $prompt,
-                'size'               => $size,
-                'style'              => $style,
-                'imageUrl'           => $imageUrl,
-                'previousResponseId' => $previousResponseId,
-            ]),
+            $this->buildPayload(
+                $prompt,
+                $size,
+                $style,
+                $imageUrl,
+                $previousResponseId,
+            ),
             $user,
             $feature,
             $sessionId,
@@ -134,13 +118,24 @@ class ImageGeneration
     }
 
     /**
-     * Augment a base payload with the extra fields required by the AI provider.
+     * Build a payload for the AI provider.
      *
-     * @param array $basePayload
+     * @param string      $prompt              The user's input prompt.
+     * @param string|null $size                If provided: a size for the image.
+     *                                         Should match a value of `ImageSize`.
+     * @param string|null $style               If provided: a style for the image.
+     *                                         Should match a value of `ImageStyle`.
+     * @param string|null $imageUrl            If provided: a URL to use as an example for the image.
+     * @param string|null $previousResponseId  If provided: the ID of a previous request made to OpenAI.
      * @return array
      */
-    private function augmentPayload(array $basePayload): array
-    {
+    private function buildPayload(
+        string $prompt,
+        ?string $size = null,
+        ?string $style = null,
+        ?string $imageUrl = null,
+        ?string $previousResponseId = null,
+    ): array {
         /* See https://platform.openai.com/docs/api-reference/responses/create */
         $payload = [
             /* An ordered list of instructions for OpenAi
@@ -164,7 +159,7 @@ class ImageGeneration
                     'background'     => 'auto',
                     'partial_images' => self::PARTIAL_IMAGE_QTY,
                     'quality'        => $this->quality,
-                    'size'           => (ImageSize::tryFrom($basePayload[self::ATTRIBUTE_KEY_SIZE]) ?? ImageSize::Auto)->value,
+                    'size'           => (ImageSize::tryFrom($size) ?? ImageSize::Auto)->value,
                 ],
             ],
             /* A kind of OpenAI currency to use in this request
@@ -185,7 +180,7 @@ class ImageGeneration
         ];
 
         /** add prompt inputs if they are meaningful */
-        $imageStyle   = ImageStyle::tryFrom($basePayload[self::ATTRIBUTE_KEY_STYLE])?->value;
+        $imageStyle   = ImageStyle::tryFrom($style)?->value;
         $systemPrompt = strtr(
             self::PROMPT_SYSTEM_PERSONA,
             [
@@ -199,7 +194,6 @@ class ImageGeneration
             'content' => $systemPrompt,
         ];
 
-        $prompt     = $basePayload['prompt'];
         $userPrompt = [
             ['type' => 'input_text', 'text' => trim($prompt), ],
         ];
@@ -207,7 +201,6 @@ class ImageGeneration
         /* Did the user include an image as additional context? Add it to the prompt
          * See https://platform.openai.com/docs/guides/images-vision#image-input-requirements
          */
-        $imageUrl = $basePayload['imageUrl'] ?? null;
         if (trim((string)$imageUrl) !== '') {
             $userPrompt[] = [
                 'type' => 'input_image',
@@ -224,7 +217,6 @@ class ImageGeneration
         /* If there is a previous response ID, add it to the payload
          * This is used to continue a conversation
          */
-        $previousResponseId = $basePayload['previousResponseId'] ?? null;
         if (null !== $previousResponseId) {
             $payload['previous_response_id'] = $previousResponseId;
         }
