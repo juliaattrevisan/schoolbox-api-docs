@@ -64,11 +64,11 @@ class Compiler
                             'name' => sprintf(
                                 '%s %s %s',
                                 $class['primary_teacher']['name_prefix'],
-                                $class['primary_teacher']['last_name'],
                                 (new FirstMeaningfulValue())->find([
                                     $class['primary_teacher']['preferred_name'],
                                     $class['primary_teacher']['first_name'],
-                                ])
+                                ]),
+                                $class['primary_teacher']['last_name'],
                             ),
                         ],
                     ],
