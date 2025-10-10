@@ -332,13 +332,30 @@ class Classes implements IStrategy
 
         /* Weird hacky version for now. Revert when veracross repairs their data.
          */
+        print_r($classInstance);
+
+        /* Note that class instances sometimes won't have a start_time or an end_time
+         * I suppose this was meant to be an all-day event or broken data
+         */
+        $tempStart = $classInstance['start_time'] ?? sprintf(
+            '%s %s',
+            $classInstance['date'],
+            '00:00:00',
+        );
+
+        $tempEnd = $classInstance['end_time'] ?? sprintf(
+            '%s %s',
+            $classInstance['date'],
+            '23:59:59',
+        );
+
         $startAt = (new \Alaress_Date_Format(
-            trim(str_replace(['T', 'Z'], ' ', $classInstance['start_time'])),
+            trim(str_replace(['T', 'Z'], ' ', $tempStart)),
             \Alaress_Date_Format::DATABASE_DATE_FORMAT,
         ));
 
         $finishAt = (new \Alaress_Date_Format(
-            trim(str_replace(['T', 'Z'], ' ', $classInstance['end_time'])),
+            trim(str_replace(['T', 'Z'], ' ', $tempEnd)),
             \Alaress_Date_Format::DATABASE_DATE_FORMAT,
         ));
 
