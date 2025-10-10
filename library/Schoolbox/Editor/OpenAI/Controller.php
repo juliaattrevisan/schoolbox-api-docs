@@ -286,12 +286,10 @@ class Controller extends Base
             }
 
             $agent = new ImageGeneration(
-                new \Schoolbox\OpenAi\Client(
-                    $this->client,
-                    'https://api.openai.com/v1/responses',
-                    $this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_KEY),
+                new \Schoolbox\OpenAi\ClientFactory(
                     $this->logMapper,
-                ),
+                    $this->client,
+                )->buildOpenAi($this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_KEY)),
                 $this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_MODEL),
                 $this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_OUTPUT_QUALITY) ?? 'low',
                 $this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_SYSTEM_PROMPT),

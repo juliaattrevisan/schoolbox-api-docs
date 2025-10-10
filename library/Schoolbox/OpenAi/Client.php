@@ -35,19 +35,24 @@ class Client implements IClient
      */
     private const IMAGE_DATA_OMITTED = 'omitted';
 
+    private const RESPONSES_ENDPOINT = '/v1/responses';
+
     /**
      * Constructor
      *
-     * @param HttpClient $httpClient The HTTP client, for making requests to the AI provider.
-     * @param string     $endpoint   The base endpoint for the API provider.
-     * @param string     $apiKey     The API key which must be provided to the provider, in order to authenticate
-     *                               requests.
-     * @param Log\Mapper $logMapper  Mapper for storing logs.
+     * @param HttpClient            $httpClient  The HTTP client, for making requests to the AI provider.
+     * @param string                $endpoint    The base endpoint for the API provider.
+     * @param array<string, string> $authHeaders The headers (as a key-value pair) which must be provided to the
+     *                                           provider, in order to authenticate requests.
+     *                                           * OpenAI accepts `["Authorization" => "Bearer $apiKey"]`
+     *                                           * Azure's OpenAI compat layer accepts `['api-key' => $apiKey]`
+     *
+     * @param Log\Mapper            $logMapper   Mapper for storing logs.
      */
     public function __construct(
         private HttpClient $httpClient,
         private string $endpoint,
-        private string $apiKey,
+        private array $authHeaders,
         private Log\Mapper $logMapper,
     ) {
     }
@@ -60,7 +65,7 @@ class Client implements IClient
         $request = new Request(
             $method,
             $this->endpoint,
-            $this->getAuthorization() + ['Content-Type' => 'application/json'],
+            $this->authHeaders + ['Content-Type' => 'application/json'],
             json_encode($payload),
         );
         return $this->httpClient->send(
@@ -92,7 +97,7 @@ class Client implements IClient
         $request = new Request(
             $method,
             $this->endpoint,
-            $this->getAuthorization() + ['Content-Type' => 'application/json'],
+            $this->authHeaders + ['Content-Type' => 'application/json'],
             $encodedPayload,
         );
         $response = $this->httpClient->send(
