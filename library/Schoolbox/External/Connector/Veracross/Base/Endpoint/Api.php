@@ -10,13 +10,8 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Veracross\Base\Endpoint;
 
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\InvalidArgumentException;
-use GuzzleHttp\HandlerStack;
-use GuzzleHttp\Middleware;
-use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\RequestOptions;
 use GuzzleHttp\TransferStats;
-use Schoolbox\External\Connector\Veracross\Base\Endpoint\Codec;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\AccessToken\Generator as AccessTokenGenerator;
 use SensitiveParameter;
 
