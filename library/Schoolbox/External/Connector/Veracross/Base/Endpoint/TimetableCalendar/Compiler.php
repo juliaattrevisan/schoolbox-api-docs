@@ -44,21 +44,13 @@ class Compiler
         foreach ($classes as $class) {
             $classId = $class['internal_class_id'];
 
-            /* Obtain the class code from this special place
-             */
-            $classInfo = $this->classesLookup[$classId];
-
-            if ($classInfo['description'] !== $class['class_description']) {
-                sprintf('comparing %s to %s', $classInfo['description'], $class['class_description']);
-            }
-
             $timetable[$classId] = [
                 'internal_class_id' => $classId,
                 'name' => trim((string)$class['class_description']),
                 /* Try not to get confused by all the class_id values floating around
                  * Some of them are a class code and some are primary keys in veracross
                  */
-                'code' => $classInfo['class_id'],
+                'code' => $this->classesLookup[$classId]['class_id'] ?? null,
                 'teachers' => [
                     [
                         'id' => $class['primary_teacher']['id'],
@@ -75,6 +67,8 @@ class Compiler
                 ],
             ];
         }
+
+        print_r($timetable);
         die();
 
         return $timetable;
