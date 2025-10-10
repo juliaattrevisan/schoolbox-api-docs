@@ -14,7 +14,6 @@ use Schoolbox\File\MimetypeMapper;
  */
 class SocialStream_Post_Url extends SocialStream_Post_Abstract
 {
-
     /**
      * @var string
      */
@@ -56,13 +55,22 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract
             /* Mimetype unknown? Try to load either an icon or a thumbnail image
              * specified in the DB for this social stream post
              */
-            if (false !== stripos($this->getThumbnail(), 'icon:')) {
-                // Icon
-                $iconFile = str_replace('icon:', '', $this->getThumbnail());
-                $icon = $iconDirectory . $iconFile;
-            } elseif ($this->hasThumbnail()) {
-                // Thumbnail image
-                $icon = "/socialstream/image.php?size={$iconSize}&id=" . $this->getPostId();
+            if ($this->hasThumbnail()) {
+                $thumbnail = $this->getThumbnail();
+                if (false !== stripos($thumbnail, 'icon:')) {
+                    // Icon
+                    $iconFile = str_replace('icon:', '', $thumbnail);
+                    $icon     = $iconDirectory . $iconFile;
+                } else {
+                    // Thumbnail image
+                    $icon = "/socialstream/image.php?size={$iconSize}&id=" . $this->getPostId();
+                }
+            } else {
+                // Broken image when no thumbnail found
+                $icon = SitePage::getBrokenImagePath(404, [
+                    'transform_type' => 'storage',
+                    'transform'      => $iconSize,
+                ]);
             }
         }
 
@@ -76,7 +84,7 @@ class SocialStream_Post_Url extends SocialStream_Post_Abstract
      */
     public function hasThumbnail(): bool
     {
-        return '' !== $this->getThumbnail();
+        return '' !== (string)$this->getThumbnail();
     }
 
     /**
