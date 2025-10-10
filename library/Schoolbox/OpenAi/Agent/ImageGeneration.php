@@ -181,7 +181,7 @@ class ImageGeneration
                     'background'     => 'auto',
                     'partial_images' => self::PARTIAL_IMAGE_QTY,
                     'quality'        => $this->quality,
-                    'size'           => $basePayload['size'] ?? 'auto',
+                    'size'           => (ImageSize::tryFrom($basePayload['size']) ?? ImageSize::Auto)->value,
                 ],
             ],
             /* A kind of OpenAI currency to use in this request
@@ -202,7 +202,7 @@ class ImageGeneration
         ];
 
         /** add prompt inputs if they are meaningful */
-        $imageStyle   = $basePayload['style'] ?? null;
+        $imageStyle   = ImageStyle::tryFrom($basePayload['style']);
         $systemPrompt = strtr(
             self::PROMPT_SYSTEM_PERSONA,
             [
