@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Schoolbox\OpenAi;
 
 use GuzzleHttp\Client as HttpClient;
+use GuzzleHttp\Psr7\Uri;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Log\Mapper;
 
@@ -20,7 +21,7 @@ use Schoolbox\Editor\OpenAI\Log\Mapper;
  */
 class ClientFactory
 {
-    private const OPENAI_BASE_URL = 'https://api.openai.com/v1/';
+    private const OPENAI_BASE_URL = 'https://api.openai.com/';
 
     private const AZURE_BASE_URL = 'https://%s.openai.azure.com/openai/';
     private const AZURE_DEPLOYMENT_BASE_URL = 'https://%s.openai.azure.com/openai/deployments/%s/';
@@ -36,7 +37,7 @@ class ClientFactory
         $authHeader = ['Authorization' => 'Bearer ' . $apiKey];
         return new Client(
             $this->httpClient,
-            self::OPENAI_BASE_URL,
+            new Uri(self::OPENAI_BASE_URL),
             $authHeader,
             $this->logMapper,
         );
@@ -57,7 +58,7 @@ class ClientFactory
         $authHeader = ['api-key' => $apiKey];
         return new Client(
             $this->httpClient,
-            self::OPENAI_BASE_URL,
+            new Uri($endpoint)->withQuery(http_build_query($queryParts)),
             $authHeader,
             $this->logMapper,
         );
