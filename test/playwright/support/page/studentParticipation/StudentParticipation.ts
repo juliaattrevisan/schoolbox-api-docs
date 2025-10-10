@@ -157,14 +157,6 @@ export default class StudentParticipation {
     }
 
     /**
-     * Navigate back to the participation page
-     */
-    async returnToParticipationPage(): Promise<void> {
-        this.tester.isGoingTo("Navigate back to participation page to remove the exclusion");
-        await this.page.goto(StudentParticipation.URL_PARTICIPATION);
-    }
-
-    /**
      * Modify current activity for a student
      * @param userId - The user ID of the student
      * @param studentName - The name of the student for verification

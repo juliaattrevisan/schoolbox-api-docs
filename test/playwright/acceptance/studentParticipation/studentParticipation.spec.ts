@@ -29,7 +29,7 @@ test.describe("Student Participation Tests", () => {
         await studentParticipation.verifyCourseMarkbookExcluded(userId, courseActivityId);
 
         // Return to participation page and remove customisation
-        await studentParticipation.returnToParticipationPage();
+        await studentParticipation.goto();
         await studentParticipation.removeCustomisation(userId, studentName);
 
         // Verify removal in markbooks
