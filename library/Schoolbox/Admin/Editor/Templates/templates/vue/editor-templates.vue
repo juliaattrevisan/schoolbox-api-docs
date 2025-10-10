@@ -208,6 +208,7 @@ async function onDeleteConfirmed(): Promise<void> {
             <a
                 v-if="props.createTemplateEndpoint !== ''"
                 :href="props.createTemplateEndpoint.replace('{categoryId}', currentCategory.id.toString())"
+                :data-test="`editor-templates-create-template-link-${currentCategory.name}`"
                 >Create a new template</a
             >
         </div>
@@ -216,7 +217,10 @@ async function onDeleteConfirmed(): Promise<void> {
                 <div
                     :class="`l-flex-row l-gap-m ${index !== currentTemplates.length - 1 ? `c-card--border-end-alt` : ''}`"
                 >
-                    <div class="l-flex-col l-flex--justify-center l-flex__item--1 l-gap-xs l-pad-m f-no-margins">
+                    <div
+                        class="l-flex-col l-flex--justify-center l-flex__item--1 l-gap-xs l-pad-m f-no-margins"
+                        :data-test="`editor-templates-list-item-${template.title}`"
+                    >
                         <h3>
                             <button class="sbx-link-button f-no-margins" @click.prevent="onPreviewSelected(template)">
                                 {{ template.title }}
@@ -246,6 +250,7 @@ async function onDeleteConfirmed(): Promise<void> {
                             class="sbx-icon-only-button f-no-margins"
                             aria-label="Edit template"
                             title="Edit template"
+                            :data-test="`editor-templates-edit-icon-${template.title}`"
                             :href="props.updateTemplateEndpoint.replace('{templateId}', template.id.toString())"
                         >
                             <sbx-icon name="modify" />
@@ -254,6 +259,7 @@ async function onDeleteConfirmed(): Promise<void> {
                             class="sbx-icon-only-button f-no-margins"
                             aria-label="Delete template"
                             title="Delete template"
+                            :data-test="`editor-templates-delete-icon-${template.title}`"
                             @click.prevent="onDeleteSelected(template)"
                         >
                             <sbx-icon name="delete" />
@@ -266,6 +272,7 @@ async function onDeleteConfirmed(): Promise<void> {
                     <a
                         :href="props.createTemplateEndpoint.replace('{categoryId}', currentCategory.id.toString())"
                         class="button"
+                        :data-test="`editor-templates-add-template-button-${currentCategory.name}`"
                         >Add template</a
                     >
                 </section>
