@@ -10,7 +10,6 @@ declare(strict_types=1);
 namespace Schoolbox\OpenAi\Agent;
 
 use Psr\Http\Client\ClientExceptionInterface;
-use Schoolbox\OpenAi\IAgent;
 use Schoolbox\OpenAi\IClient;
 
 /**
@@ -24,7 +23,7 @@ use Schoolbox\OpenAi\IClient;
  *     previousResponseId?: ?string
  * }
  */
-class ImageGeneration implements IAgent
+class ImageGeneration
 {
     /**
      * These three params control wildness and output length
