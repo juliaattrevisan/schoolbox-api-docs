@@ -75,7 +75,7 @@ class ClassIndex
                 $specificClassIds = [];
 
                 foreach ($this->enrolmentsLookup as $externalId => $enrolmentTuple) {
-                    $specificClassIds = $specificClassIds + array_column($enrolmentTuple, 'internal_class_id');
+                    $specificClassIds = array_merge($specificClassIds, array_column($enrolmentTuple, 'internal_class_id'));
                 }
 
                 /* Flip the script for a faster lookup

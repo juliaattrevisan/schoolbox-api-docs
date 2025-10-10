@@ -35,6 +35,22 @@ class Compiler
     {
         $timetable = [];
 
+        $classes = $this->enrolmentsLookup[$externalId];
+
+        foreach ($classes as $class) {
+//            $timetable[$classId] = [
+//                'internal_class_id' => $classId,
+//                'name' => trim((string)$class['class_description']),
+//                'code' => null,
+//                'teachers' => [
+//                    [
+//                        'id' => $class['primary_teacher']['id'],
+//                        'name' => $class['primary_teacher']['name']
+//                    ],
+//                ],
+//            ];
+        }
+        die();
 
         return $timetable;
     }

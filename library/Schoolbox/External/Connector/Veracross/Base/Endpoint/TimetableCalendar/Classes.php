@@ -182,7 +182,7 @@ class Classes implements IStrategy
                 $externalId
             ));
 
-            $timetable = $compiler->compile($externalId);
+            $timetable = $compiler->compile((string)$externalId);
 
 //            $timetable = $compiler->compile((string)$externalId, $startDate, $endDate);
 //
