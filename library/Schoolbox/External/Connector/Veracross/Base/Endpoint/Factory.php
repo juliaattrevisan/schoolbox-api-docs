@@ -43,16 +43,16 @@ class Factory
 
     /**
      * Get timetable classes occurring this far in the past
-     * Measured in months, defaults to -1 month
+     * Measured in weeks, defaults to -2 weeks
      */
-    private const FROM = -1;
+    private const FROM = -2;
 
 
     /**
      * Get timetable classes up to this far into the future
-     * Measured in months, defaults to 6 months
+     * Measured in weeks, defaults to 12 weeks (3 months)
      */
-    private const TO = 1;
+    private const TO = 12;
 
 
     /**
@@ -116,8 +116,8 @@ class Factory
     {
         /* Schedule/SUDS Timetable: Date Range
          */
-        $from = \Alaress_Date_Format::now()->addMonths(self::FROM);
-        $to = \Alaress_Date_Format::now()->addMonths(self::TO);
+        $from = \Alaress_Date_Format::now()->addWeeks(self::FROM)->startOfWeek();
+        $to = \Alaress_Date_Format::now()->addWeeks(self::TO)->endofWeek();
 
         /* Decide a timezone for all the UTC dates sis gives to us
          */
