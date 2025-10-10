@@ -190,8 +190,8 @@ class Classes implements IStrategy
 
         $this->log->info('');
 
-        $this->log->info(sprintf(
-            'Duration: %s seconds.',
+        $this->log->debug(sprintf(
+            'Timetable import duration: %s seconds.',
             number_format($end - $start, 2)
         ));
     }
