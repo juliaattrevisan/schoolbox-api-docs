@@ -11,6 +11,9 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\InvalidArgumentException;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
+use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\RequestOptions;
 use GuzzleHttp\TransferStats;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Codec;
@@ -121,16 +124,15 @@ class Api implements IApi
      *
      * @param string $host
      * @param string $dsn
-     * @param int    $timeout
+     * @param int $timeout
+     * @param callable $decider
      * @return Client
-     * @throws \DomainException
-     * @throws \GuzzleHttp\Exception\InvalidArgumentException
      */
     private function initClient(string $host, #[SensitiveParameter] string $dsn, int $timeout): Client
     {
         /* You need these parts when build attendance links
          */
-        $this->credentials = (new Codec\DSN())->decode($this->apiKey);
+        $this->credentials = (new Codec\DSN())->decode($dsn);
 
         /* Enforce slash in the endpoint prefix
          *
@@ -160,10 +162,36 @@ class Api implements IApi
             $this->deepLog
         );
 
+        /* Use guzzle's Retry middleware
+         * https://github.com/caseyamcl/guzzle_retry_middleware
+         */
         return new Client([
             'base_uri' => $this->baseUri,
             'timeout' => $timeout,
             'http_errors' => false,
+            'max_retry_attempts' => 3,
+            'retry_on_timeout' => true,
+            'on_retry_callback' => static function(
+                int $attemptNumber,
+                float $delay,
+                /* This is Psr\Http\Message\RequestInterface but we don't have that
+                 */
+                &$request,
+                array &$options,
+                /* This is Psr\Http\Message\ResponseInterface but we don't have that
+                 */
+                $response,
+                ?\Throwable $exception
+            ) {
+                echo sprintf(
+                    "Retrying request to %s. Server responded with %s. Will wait %s seconds. This is attempt #%s. The error was %s",
+                    $request->getUri()->getPath(),
+                    $response->getStatusCode(),
+                    number_format($delay, 2),
+                    $attemptNumber,
+                    $exception->getMessage()
+                );
+            }
         ]);
     }
 
@@ -388,7 +416,6 @@ class Api implements IApi
     public function retrieveConcurrent(string $method, array $endpoints, string $scope, array $params = [], int $pageSize = IApi::PAGE_SIZE): array
     {
         $promises = [];
-        $promiseParams = [];
 
         foreach ($endpoints as $endpoint) {
             $accessToken = ($this->accessTokenGenerator->generate($scope))->getToken();
@@ -409,47 +436,14 @@ class Api implements IApi
                 'X-Page-Size' => $pageSize
             ];
 
-            $promiseParams[$endpoint] = [
-                'method' => $method,
-                'endpoint' => $endpoint,
-                'options' => $options
-            ];
-
-            $promises[$endpoint] = $this->client->requestAsync($method, $endpoint, $options);
+            $promises[] = $this->client->requestAsync($method, $endpoint, $options);
 
             /* Record endpoint usage
              */
             $this->apiUsage->record($endpoint);
         }
 
-        /* Check each status code for $outcome. If it's retry-able, retry that endpoint
-         * Most people use unwrap() but settle() does something useful for us:
-         * https://stackoverflow.com/questions/36347457/how-can-i-use-guzzle-to-send-concurrent-requests-with-timeout-limits
-         */
-        $outcomes = \GuzzleHttp\Promise\Utils::settle($promises)->wait();
-
-        while ($n < self::NUM_RETRY) {
-            $hasRejections = false;
-
-            foreach ($outcomes as $endpoint => $outcome) {
-                if ('rejected' === $outcome['state']) {
-                    $promises[$endpoint] = $this->client->requestAsync(
-                        $promiseParams[$endpoint]['method'],
-                        $promiseParams[$endpoint]['endpoint'],
-                        $promiseParams[$endpoint]['options'],
-                    );
-
-                    $hasRejections = true;
-                }
-            }
-
-            if (!$hasRejections) {
-                return $outcomes;
-            }
-
-            $n++;
-        }
-        die();
+        return \GuzzleHttp\Promise\Utils::settle($promises)->wait();
     }
 
 

@@ -106,8 +106,8 @@ class MeetingTimesConcurrent
                 ));
 
                 foreach ($responses as $response) {
-                    if ($response->getStatusCode() === 200) {
-                        $content = $response->getBody()->getContents();
+                    if (IApi::CONCURRENCY_FULFILLED === $response['state'] && 200 === $response['value']->getStatusCode()) {
+                        $content = $response['value']->getBody()->getContents();
 
                         if ('' === $content) {
                             return [];

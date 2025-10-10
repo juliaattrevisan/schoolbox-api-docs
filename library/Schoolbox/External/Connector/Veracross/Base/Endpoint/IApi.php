@@ -17,6 +17,12 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint;
 interface IApi
 {
     /**
+     * A const that declares the Fulfilled state of a concurrent api request
+     */
+    public const CONCURRENCY_FULFILLED = 'fulfilled';
+
+
+    /**
      * Decide how pig each page size should be
      * Veracross lets you have up to 1000 rows per return
      *
