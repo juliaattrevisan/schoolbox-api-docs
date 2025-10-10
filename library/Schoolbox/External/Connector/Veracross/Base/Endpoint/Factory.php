@@ -111,6 +111,7 @@ class Factory
      * @throws UnexpectedValueException
      * @throws \DomainException
      * @throws InvalidArgumentException
+     * @throws \DateInvalidTimeZoneException
      */
     public function produce(): GenericCollection
     {
