@@ -388,6 +388,7 @@ class Api implements IApi
     public function retrieveConcurrent(string $method, array $endpoints, string $scope, array $params = [], int $pageSize = IApi::PAGE_SIZE): array
     {
         $promises = [];
+        $promiseParams = [];
 
         foreach ($endpoints as $endpoint) {
             $accessToken = ($this->accessTokenGenerator->generate($scope))->getToken();
@@ -408,14 +409,47 @@ class Api implements IApi
                 'X-Page-Size' => $pageSize
             ];
 
-            $promises[] = $this->client->requestAsync($method, $endpoint, $options);
+            $promiseParams[$endpoint] = [
+                'method' => $method,
+                'endpoint' => $endpoint,
+                'options' => $options
+            ];
+
+            $promises[$endpoint] = $this->client->requestAsync($method, $endpoint, $options);
 
             /* Record endpoint usage
              */
             $this->apiUsage->record($endpoint);
         }
 
-        return \GuzzleHttp\Promise\Utils::unwrap($promises);
+        /* Check each status code for $outcome. If it's retry-able, retry that endpoint
+         * Most people use unwrap() but settle() does something useful for us:
+         * https://stackoverflow.com/questions/36347457/how-can-i-use-guzzle-to-send-concurrent-requests-with-timeout-limits
+         */
+        $outcomes = \GuzzleHttp\Promise\Utils::settle($promises)->wait();
+
+        while ($n < self::NUM_RETRY) {
+            $hasRejections = false;
+
+            foreach ($outcomes as $endpoint => $outcome) {
+                if ('rejected' === $outcome['state']) {
+                    $promises[$endpoint] = $this->client->requestAsync(
+                        $promiseParams[$endpoint]['method'],
+                        $promiseParams[$endpoint]['endpoint'],
+                        $promiseParams[$endpoint]['options'],
+                    );
+
+                    $hasRejections = true;
+                }
+            }
+
+            if (!$hasRejections) {
+                return $outcomes;
+            }
+
+            $n++;
+        }
+        die();
     }
 
 
