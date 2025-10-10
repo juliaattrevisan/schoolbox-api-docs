@@ -290,6 +290,7 @@ class Controller extends Base
                     $this->client,
                     'https://api.openai.com/v1/responses',
                     $this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_KEY),
+                    $this->logMapper,
                 ),
                 $this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_MODEL),
                 $this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_OUTPUT_QUALITY) ?? 'low',
@@ -297,14 +298,18 @@ class Controller extends Base
             );
             try {
                 // Size and style need to be converted
-                $response = $agent->requestStream([
-                    'prompt'             => $this->requestPost->get('userPrompt'),
-                    'size'               => '1024x1024',
-//                    'size'               => ($this->requestPost->get('attributes') ?? [])['size'] ?? null,
-                    'style'              => ($this->requestPost->get('attributes') ?? [])['style'] ?? null,
-                    'imageUrl'           => $this->requestPost->get('imageUrl') ?? null,
-                    'previousResponseId' => $this->requestPost->get('previousResponseId') ?? null,
-                ]);
+                $response = $agent->requestStream(
+                    [
+                        'prompt'             => $this->requestPost->get('userPrompt'),
+                        'size'               => '1024x1024',
+    //                    'size'               => ($this->requestPost->get('attributes') ?? [])['size'] ?? null,
+                        'style'              => ($this->requestPost->get('attributes') ?? [])['style'] ?? null,
+                        'imageUrl'           => $this->requestPost->get('imageUrl') ?? null,
+                        'previousResponseId' => $this->requestPost->get('previousResponseId') ?? null,
+                    ],
+                    $this->getUser(),
+                    Helper::FEATURE_IMAGE,
+                );
 
                 // The iterable response can just be passed straight to
                 // responseFromStream

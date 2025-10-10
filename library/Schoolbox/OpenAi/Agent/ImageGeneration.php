@@ -11,6 +11,7 @@ namespace Schoolbox\OpenAi\Agent;
 
 use Psr\Http\Client\ClientExceptionInterface;
 use Schoolbox\OpenAi\IClient;
+use Schoolbox\User;
 
 /**
  * Agent for generating images via OpenAI.
@@ -119,31 +120,18 @@ class ImageGeneration
     }
 
     /**
-     * Generate an image from the payload.
-     *
-     * @param T $payload
-     * @throws ClientExceptionInterface if HTTP request fails
-     */
-    public function request(array $payload): array
-    {
-        $response = $this->client->request(
-            'POST',
-            $this->augmentPayload($payload),
-        );
-        return json_decode($response->getBody()->getContents(), null, 512, JSON_OBJECT_AS_ARRAY);
-    }
-
-    /**
      * Streams an image generation payload.
      *
      * @param T $payload
      * @throws ClientExceptionInterface if HTTP request fails
      */
-    public function requestStream(array $payload): iterable
+    public function requestStream(array $payload, User $user, string $feature): iterable
     {
         return $this->client->requestStream(
             'POST',
             $this->augmentPayload($payload),
+            $user,
+            $feature,
             8192,
         );
     }

@@ -16,6 +16,8 @@ use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
+use Schoolbox\Editor\OpenAI\Log\Mapper as LogMapper;
+use Schoolbox\User;
 
 /**
  * A standard client for an AI provider.
@@ -40,18 +42,20 @@ class Client implements IClient
      * @param string     $endpoint   The base endpoint for the API provider.
      * @param string     $apiKey     The API key which must be provided to the provider, in order to authenticate
      *                               requests.
+     * @param LogMapper  $logMapper  Mapper for storing logs.
      */
     public function __construct(
         private HttpClient $httpClient,
         private string $endpoint,
         private string $apiKey,
+        private LogMapper $logMapper,
     ) {
     }
 
     /**
      * @inheritdoc
      */
-    public function request(string $method, array $payload): ResponseInterface
+    public function request(string $method, array $payload, User $user, string $feature): ResponseInterface
     {
         $request = new Request(
             $method,
@@ -72,7 +76,7 @@ class Client implements IClient
     /**
      * @inheritdoc
      */
-    public function requestStream(string $method, array $payload, ?int $chunkSize = null): iterable
+    public function requestStream(string $method, array $payload, User $user, string $feature, ?int $chunkSize = null): iterable
     {
         $chunkSize ??= self::DEFAULT_CHUNK_SIZE;
         $request = new Request(
