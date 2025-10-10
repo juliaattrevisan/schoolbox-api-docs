@@ -184,26 +184,12 @@ class Classes implements IStrategy
 
             $timetable = $compiler->compile((string)$externalId);
 
-//            $timetable = $compiler->compile((string)$externalId, $startDate, $endDate);
-//
-//            /* A student's timetable is a set of enrolments for their classes
-//             */
-//            foreach ($timetable as $enrolment) {
-//                /* You can use the class_id (this is the Veracross class code)
-//                 * as a watchlist param to specifically import this one class.
-//                 * Once we find it, we exit this loop - we don't expect it to
-//                 * appear again in the classes index. You can use the numeric
-//                 * class id instead if that helps
-//                 */
-////                if (!$this->watcher->isOnWatchlist((string)$enrolment['internal_class_id']['id'], $this->watchlist)) {
-////                    continue;
-////                }
-////                if (!$this->watcher->isOnWatchlist((string)$enrolment['internal_class_id']['class_id'], $this->watchlist)) {
-////                    continue;
-////                }
-//
-//                $this->processClass((string)$externalId, $enrolment, $userLookup);
-//            }
+
+            /* A student's timetable is a set of enrolments for their classes
+             */
+            foreach ($timetable as $enrolment) {
+                $this->processClass((string)$externalId, $enrolment, $userLookup);
+            }
         }
 
         $end = microtime(true);
@@ -234,19 +220,29 @@ class Classes implements IStrategy
     private function processClass(string $externalId, array $enrolment, array $userLookup): void
     {
         foreach ($enrolment['schedule'] as $classInstance) {
-            $class = $enrolment['internal_class_id'];
+            /* Info about a class is actually a subset of $enrolment:
+             *
+                $class = array_intersect_key($enrolment, [
+                    'internal_class_id' => true,
+                    'name' => true,
+                    'code' => true,
+                ]);
+             *
+             * but to save this mundane step, pass $enrolment as the class info
+             * even though it also contains $classInstances
+             */
 
             /* Save sis_event record
              */
-            $event = $this->createEvent($class, $classInstance);
+            $event = $this->createEvent($enrolment, $classInstance);
 
             /* Save sis_class record
              */
-            $classEntry = $this->createClassEntry($class, $event);
+            $classEntry = $this->createClassEntry($enrolment, $event);
 
             /* Save the involvements
              */
-            $this->createInvolvements($externalId, $class, $event, $classEntry, $userLookup);
+            $this->createInvolvements($externalId, $enrolment, $event, $classEntry, $userLookup);
         }
     }
 
@@ -269,8 +265,8 @@ class Classes implements IStrategy
     ): Model {
         /* Fill in these vars as usual
          */
-        $classCode = (new ClassCode($this->log))->generate(trim((string)$class['class_id']));
-        $day = trim((string)$classInstance['day']['name']);
+        $classCode = (new ClassCode($this->log))->generate(trim((string)$class['code']));
+        $day = trim((string)$classInstance['day']['description']);
         $detail = null;
 
         /* Arbitrarily manufacture a guid for now, which represents
@@ -283,21 +279,25 @@ class Classes implements IStrategy
             $classInstance['end']
         );
 
+        /* TODO Maybe put a Session Time in here, in accordance with Haines' feature request
+         *  I *think* this might be the $classInstance['block'] but could be wrong.
+         *  To be confirmed
+         */
         $period = null;
-        $room = null;
-        $title = trim((string)$class['description']);
+
+        /* Decide where this class happens
+         */
+        if (is_array($classInstance['room'])) {
+            $room = $classInstance['room']['description'];
+        }
+
+        $title = trim((string)$class['name']);
 
         /* This is pretty optional - this is the sis' equivalent of our luEventType
          * Sometimes it's provided, sometimes it's not - we can record it here if
          * possible. If you can't get it, dw about it
          */
         $type = '';
-
-        /* Decide where this class happens
-         */
-        if (is_array($classInstance['room'])) {
-            $room = $classInstance['room']['name'];
-        }
 
         /* Convert strings to adf
          *
