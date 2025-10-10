@@ -332,7 +332,6 @@ class Classes implements IStrategy
 
         /* Weird hacky version for now. Revert when veracross repairs their data.
          */
-        print_r($classInstance);
 
         /* Note that class instances sometimes won't have a start_time or an end_time
          * I suppose this was meant to be an all-day event or broken data

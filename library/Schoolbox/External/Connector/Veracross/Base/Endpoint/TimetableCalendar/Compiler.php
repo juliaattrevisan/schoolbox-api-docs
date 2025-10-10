@@ -39,7 +39,13 @@ class Compiler
 
         /* Assemble basic class info
          */
-        $classes = $this->enrolmentsLookup[$externalId];
+        $classes = $this->enrolmentsLookup[$externalId] ?? null;
+
+        /* No enrolments/classes for this person
+         */
+        if (null === $classes) {
+            return $timetable;
+        }
 
         foreach ($classes as $class) {
             $classId = $class['internal_class_id'];
