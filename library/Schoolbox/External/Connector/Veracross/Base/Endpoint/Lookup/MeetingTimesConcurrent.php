@@ -109,35 +109,42 @@ class MeetingTimesConcurrent
                     if (IApi::CONCURRENCY_FULFILLED === $response['state'] && 200 === $response['value']->getStatusCode()) {
                         $content = $response['value']->getBody()->getContents();
 
-                        if ('' === $content) {
-                            return [];
-                        }
+                        try {
+                            if ('' === $content) {
+                                return [];
+                            }
 
-                        /* TODO Restore retry, armouring and error handling
-                         */
-                        $page = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+                            $page = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 
-                        $classId = null;
+                            $classId = null;
 
-                        foreach ($page['data'] as $record) {
-                            $classId = $record['internal_class_id'];
+                            foreach ($page['data'] as $record) {
+                                $classId = $record['internal_class_id'];
 
-                            /* Weird hacky version for now. Revert when veracross repairs their data.
+                                /* Weird hacky version for now. Revert when veracross repairs their data.
+                                 */
+                                $record['start'] = $converter->convert($record['start_time'], $record['date']);
+                                $record['end'] = $converter->convert($record['end_time'], $record['date']);
+
+                                $this->lookup[$classId][] = $record;
+                            }
+
+                            /* We know this $classId if there were $records to process.
+                             * There won't be a $classId for an empty set, so no need to log anything about that.
                              */
-                            $record['start'] = $converter->convert($record['start_time'], $record['date']);
-                            $record['end'] = $converter->convert($record['end_time'], $record['date']);
-
-                            $this->lookup[$classId][] = $record;
-                        }
-
-                        /* We know this $classId if there were $records to process.
-                         * There won't be a $classId for an empty set, so no need to log anything about that.
-                         */
-                        if ($classId) {
+                            if ($classId) {
+                                $this->log->debug(sprintf(
+                                    'Processing %s meeting times for class %s.',
+                                    \count($page['data']),
+                                    $classId
+                                ));
+                            }
+                        } catch (\JsonException $e) {
+                            /* Couldn't decode json, or server refused something, or something else died
+                             */
                             $this->log->debug(sprintf(
-                                'Processing %s meeting times for class %s.',
-                                \count($page['data']),
-                                $classId
+                                'Could not decode json data: %s',
+                                $content
                             ));
                         }
                     }
