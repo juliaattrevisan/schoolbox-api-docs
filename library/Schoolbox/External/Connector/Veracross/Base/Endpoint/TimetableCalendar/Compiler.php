@@ -7,6 +7,8 @@
 
 namespace Schoolbox\External\Connector\Veracross\Base\Endpoint\TimetableCalendar;
 
+use Schoolbox\External\Connector\FirstMeaningfulValue;
+
 class Compiler
 {
     /**
@@ -35,20 +37,43 @@ class Compiler
     {
         $timetable = [];
 
+        /* Assemble basic class info
+         */
         $classes = $this->enrolmentsLookup[$externalId];
 
         foreach ($classes as $class) {
-//            $timetable[$classId] = [
-//                'internal_class_id' => $classId,
-//                'name' => trim((string)$class['class_description']),
-//                'code' => null,
-//                'teachers' => [
-//                    [
-//                        'id' => $class['primary_teacher']['id'],
-//                        'name' => $class['primary_teacher']['name']
-//                    ],
-//                ],
-//            ];
+            $classId = $class['internal_class_id'];
+
+            /* Obtain the class code from this special place
+             */
+            $classInfo = $this->classesLookup[$classId];
+
+            if ($classInfo['description'] !== $class['class_description']) {
+                sprintf('comparing %s to %s', $classInfo['description'], $class['class_description']);
+            }
+
+            $timetable[$classId] = [
+                'internal_class_id' => $classId,
+                'name' => trim((string)$class['class_description']),
+                /* Try not to get confused by all the class_id values floating around
+                 * Some of them are a class code and some are primary keys in veracross
+                 */
+                'code' => $classInfo['class_id'],
+                'teachers' => [
+                    [
+                        'id' => $class['primary_teacher']['id'],
+                        'name' => sprintf(
+                            '%s %s %s',
+                            $class['primary_teacher']['name_prefix'],
+                            $class['primary_teacher']['last_name'],
+                            (new FirstMeaningfulValue())->find([
+                                $class['primary_teacher']['preferred_name'],
+                                $class['primary_teacher']['first_name'],
+                            ])
+                        ),
+                    ],
+                ],
+            ];
         }
         die();
 
