@@ -105,6 +105,7 @@ class ImageGeneration
         return $this->client->createResponseStream(
             $this->buildPayload(
                 $prompt,
+                true,
                 $size,
                 $style,
                 $imageUrl,
@@ -121,6 +122,7 @@ class ImageGeneration
      * Build a payload for the AI provider.
      *
      * @param string      $prompt              The user's input prompt.
+     * @param bool        $stream              Whether or not to request a stream.
      * @param string|null $size                If provided: a size for the image.
      *                                         Should match a value of `ImageSize`.
      * @param string|null $style               If provided: a style for the image.
@@ -131,6 +133,7 @@ class ImageGeneration
      */
     private function buildPayload(
         string $prompt,
+        bool $stream,
         ?string $size = null,
         ?string $style = null,
         ?string $imageUrl = null,
@@ -157,7 +160,7 @@ class ImageGeneration
                     'model'          => self::OPENAI_IMAGE_MODEL,
                     'output_format'  => self::IMAGE_OUTPUT_FORMAT,
                     'background'     => 'auto',
-                    'partial_images' => self::PARTIAL_IMAGE_QTY,
+                    'partial_images' => $stream ? self::PARTIAL_IMAGE_QTY : 0,
                     'quality'        => $this->quality,
                     'size'           => (ImageSize::tryFrom($size) ?? ImageSize::Auto)->value,
                 ],
@@ -171,7 +174,7 @@ class ImageGeneration
              */
             "temperature" => self::TEMPERATURE,
             "top_p" => self::TOP_P,
-            "stream" => true,
+            "stream" => $stream,
             'text' => [
                 'format' => [
                     'type' => 'text',

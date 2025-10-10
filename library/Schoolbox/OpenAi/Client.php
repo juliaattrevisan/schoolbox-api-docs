@@ -12,7 +12,10 @@ namespace Schoolbox\OpenAi;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\Psr7\Utils;
 use GuzzleHttp\RequestOptions;
+use JsonException;
+use Psr\Http\Client\ClientExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Message\UriInterface;
@@ -65,21 +68,52 @@ class Client implements IClient
      */
     public function createResponse(array $payload, User $user, string $feature, ?string $aiSessionId = null): ResponseInterface
     {
+        $encodedPayload = json_encode($payload);
+
+        $url = $this->baseUrl->withPath(rtrim($this->baseUrl->getPath(), '/') .  self::RESPONSES_ENDPOINT);
+        $log = $this->logMapper->createModel()
+            ->setUser($user)
+            ->setPrompt($encodedPayload)
+            ->setFeature($feature)
+            ->setSessionId($aiSessionId)
+            ->setEndpoint($url->__toString());
+
         $request = new Request(
             'POST',
             $this->baseUrl->withPath(rtrim($this->baseUrl->getPath(), '/') .  self::RESPONSES_ENDPOINT),
             $this->authHeaders + ['Content-Type' => 'application/json'],
-            json_encode($payload),
+            $encodedPayload,
         );
 
-        return $this->httpClient->send(
-            $request,
-            [
-                RequestOptions::ALLOW_REDIRECTS => false,
-                RequestOptions::HTTP_ERRORS     => false,
-                RequestOptions::STREAM          => false,
-            ],
-        );
+        try {
+            $response = $this->httpClient->send(
+                $request,
+                [
+                    RequestOptions::ALLOW_REDIRECTS => false,
+                    RequestOptions::HTTP_ERRORS     => false,
+                    RequestOptions::STREAM          => false,
+                ],
+            );
+        } catch (BadResponseException $e) {
+            $log->setReturnCode($e->getResponse()->getStatusCode())
+                ->setErrorMessage($e->getMessage());
+            $this->logMapper->save($log);
+            throw $e;
+        } catch (ClientExceptionInterface $e) {
+            $log->setReturnCode(null)
+                ->setErrorMessage($e->getMessage());
+            $this->logMapper->save($log);
+            throw $e;
+        }
+
+        // Do something with the response:
+        // extract the body, and also log it
+        $responseBody = $response->getBody()->getContents();
+        $data         = json_decode($responseBody, true, 512, JSON_THROW_ON_ERROR);
+        $this->finaliseLog($data, $log);
+
+        // Restore the body in its streamable glory
+        return $response->withBody(Utils::streamFor($responseBody));
     }
 
     /**
@@ -121,14 +155,13 @@ class Client implements IClient
                 yield $stream;
             }
         } else {
+            // Log the fact this isn't a stream, too
             throw new BadResponseException(
                 sprintf('Expected text/event-stream response: received %s', $contentType),
                 $request,
                 $response,
             );
         }
-
-        // Once entire stream is received: log it
     }
 
     /**
@@ -145,8 +178,6 @@ class Client implements IClient
     private function readEvents(StreamInterface $stream, int $chunkSize, Log\Model $log): iterable
     {
         $chunkBuffer = '';
-        $completedEvent = null;
-
         while (!$stream->eof()) {
             $data = $stream->read($chunkSize);
 
@@ -155,17 +186,18 @@ class Client implements IClient
                 usleep(100000);
                 continue;
             }
+
+            // Output the stream contents
             yield $data;
 
-            // Actually listen to the event stream
-            // Normalise CRLF to LF
-            $data = strtr($data, ["\r\n" => "\n", "\r" => "\n"]);
-
+            // Also buffer the stream contents for processing
+            $data         = strtr($data, ["\r\n" => "\n", "\r" => "\n"]);
             $chunkBuffer .= $data;
 
             // while there's at least one full chunk in the buffer, process it
             while (false !== ($pos = strpos($chunkBuffer, "\n\n"))) {
                 $chunk = substr($chunkBuffer, 0, $pos);
+
                 // If this can't be parsed: raise something but still log
                 $this->onMessage(EventStream\Message::fromString($chunk), $log);
                 $chunkBuffer = substr($chunkBuffer, $pos + 2);
@@ -177,7 +209,7 @@ class Client implements IClient
             }
         }
 
-//        // If we have any remaining data in the buffer, process it
+        // If we have any remaining data in the buffer, process it
         if (strlen(trim($chunkBuffer)) > 0) {
             $this->onMessage(EventStream\Message::fromString($chunkBuffer), $log);
         }
@@ -219,7 +251,7 @@ class Client implements IClient
             }
 
             $output .= sprintf("event: %s\ndata: %s\n\n", $eventType, json_encode($item, JSON_THROW_ON_ERROR));
-        } catch (\JsonException $e) {
+        } catch (JsonException $e) {
             // If it's not JSON, still save the raw data
             $output .= sprintf("event: %s\n%s\n\n", $eventType, $message->data);
         }
@@ -232,58 +264,7 @@ class Client implements IClient
         // There are 3 possible events that indicate the end of a response
         // (see https://platform.openai.com/docs/api-reference/responses-streaming/response)
         if (in_array($eventType, ['response.completed', 'response.failed', 'response.incomplete'])) {
-            $completedEvent = $data[0]['response'];
-
-            /* If something went wrong on the openAI side, it'll send us an "error" key
-             * https://platform.openai.com/docs/api-reference/responses/object#responses/object-error
-             * If we get this, send on the human-readable message to the user
-             */
-            if ($completedEvent["error"] ?? null) {
-                $returnCode = 500;
-
-                $errorMessage = $completedEvent["error"]["message"] ?? '';
-
-                $log->setReturnCode($returnCode)
-                    ->setErrorMessage($errorMessage);
-                $this->logMapper->save($log);
-
-                throw new SchoolboxException($errorMessage, $returnCode);
-            }
-
-            /* Did we receive an incomplete response? i.e. max output tokens reached?
-             * If so, send those details on so we have some idea of why it failed
-             * https://platform.openai.com/docs/api-reference/responses/object#responses/object-status
-             */
-            $status = $completedEvent["status"] ?? null;
-            if ($status !== "completed") {
-                $returnCode = 500;
-
-                $title = sprintf(
-                    "Failed to generate a response: %s",
-                    $status ?? "unknown"
-                );
-
-                /* there may be some extra details about why it was incomplete */
-                $incompleteMessage = $completedEvent["incomplete_details"]["reason"] ?? null;
-                if ($incompleteMessage) {
-                    $title .= sprintf(" (%s)", $incompleteMessage);
-                }
-
-                $log->setReturnCode($returnCode)
-                    ->setErrorMessage($incompleteMessage);
-                $this->logMapper->save($log);
-
-                throw new SchoolboxException($title, $returnCode);
-            }
-
-            // well we didn't die, so let's assume we got a good response
-
-            /** store the response, and the ai usage */
-            $log->setReturnCode(200)
-                ->setModel($completedEvent['model'] ?? null)
-                ->setInputTokens($completedEvent['usage']['input_tokens'] ?? null)
-                ->setOutputTokens($completedEvent['usage']['output_tokens'] ?? null);
-            $this->logMapper->save($log);
+            $this->finaliseLog($data[0]['response'], $log);
         }
     }
 
@@ -317,5 +298,65 @@ class Client implements IClient
                 $log->setOutputTokens($outputTokens);
             }
         }
+    }
+
+    /**
+     * @param array $completedEvent
+     * @param Log\Model $log
+     * @return void
+     * @throws \Schoolbox\Mapper\Exception
+     */
+    private function finaliseLog(array $completedEvent, Log\Model $log): void
+    {
+        /* If something went wrong on the openAI side, it'll send us an "error" key
+         * https://platform.openai.com/docs/api-reference/responses/object#responses/object-error
+         * If we get this, send on the human-readable message to the user
+         */
+        if ($completedEvent["error"] ?? null) {
+            $returnCode = 500;
+
+            $errorMessage = $completedEvent["error"]["message"] ?? '';
+
+            $log->setReturnCode($returnCode)
+                ->setErrorMessage($errorMessage);
+            $this->logMapper->save($log);
+
+            throw new SchoolboxException($errorMessage, $returnCode);
+        }
+
+        /* Did we receive an incomplete response? i.e. max output tokens reached?
+         * If so, send those details on so we have some idea of why it failed
+         * https://platform.openai.com/docs/api-reference/responses/object#responses/object-status
+         */
+        $status = $completedEvent["status"] ?? null;
+        if ($status !== "completed") {
+            $returnCode = 500;
+
+            $title = sprintf(
+                "Failed to generate a response: %s",
+                $status ?? "unknown"
+            );
+
+            /* there may be some extra details about why it was incomplete */
+            $incompleteMessage = $completedEvent["incomplete_details"]["reason"] ?? null;
+            if ($incompleteMessage) {
+                $title .= sprintf(" (%s)", $incompleteMessage);
+            }
+
+            $log->setReturnCode($returnCode)
+                ->setErrorMessage($incompleteMessage);
+            $this->logMapper->save($log);
+
+            throw new SchoolboxException($title, $returnCode);
+        }
+
+        // well we didn't die, so let's assume we got a good response
+
+        /** store the response, and the ai usage */
+        $log->setReturnCode(200)
+            ->setModel($completedEvent['model'] ?? null)
+            ->setInputTokens($completedEvent['usage']['input_tokens'] ?? null)
+            ->setOutputTokens($completedEvent['usage']['output_tokens'] ?? null);
+        $this->logMapper->save($log);
     }
 }
