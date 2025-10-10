@@ -16,7 +16,7 @@ use GuzzleHttp\RequestOptions;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\StreamInterface;
 use Schoolbox\Application\Exception\Exception as SchoolboxException;
-use Schoolbox\Editor\OpenAI\Log\Mapper as LogMapper;
+use Schoolbox\Editor\OpenAI\Log;
 use Schoolbox\User;
 
 /**
@@ -42,13 +42,13 @@ class Client implements IClient
      * @param string     $endpoint   The base endpoint for the API provider.
      * @param string     $apiKey     The API key which must be provided to the provider, in order to authenticate
      *                               requests.
-     * @param LogMapper  $logMapper  Mapper for storing logs.
+     * @param Log\Mapper $logMapper  Mapper for storing logs.
      */
     public function __construct(
         private HttpClient $httpClient,
         private string $endpoint,
         private string $apiKey,
-        private LogMapper $logMapper,
+        private Log\Mapper $logMapper,
     ) {
     }
 
@@ -79,11 +79,20 @@ class Client implements IClient
     public function requestStream(string $method, array $payload, User $user, string $feature, ?int $chunkSize = null): iterable
     {
         $chunkSize ??= self::DEFAULT_CHUNK_SIZE;
+        $encodedPayload = json_encode($payload);
+
+        $log = $this->logMapper->createModel()
+            ->setUser($user)
+            ->setPrompt($encodedPayload)
+            ->setFeature($feature)
+//            ->setSessionId($aiSessionId)
+            ->setEndpoint($this->endpoint);
+
         $request = new Request(
             $method,
             $this->endpoint,
             $this->getAuthorization() + ['Content-Type' => 'application/json'],
-            json_encode($payload),
+            $encodedPayload,
         );
         $response = $this->httpClient->send(
             $request,
@@ -97,7 +106,7 @@ class Client implements IClient
         // This needs to be an event stream: otherwise raise an exception
         $contentType = $response->getHeaderLine('Content-Type');
         if (str_contains($contentType, 'text/event-stream')) {
-            foreach ($this->readEvents($response->getBody(), $chunkSize) as $stream) {
+            foreach ($this->readEvents($response->getBody(), $chunkSize, $log) as $stream) {
                 yield $stream;
             }
         } else {
@@ -132,7 +141,7 @@ class Client implements IClient
      *                                   stream at once?
      * @return iterable<string>
      */
-    private function readEvents(StreamInterface $stream, int $chunkSize): iterable
+    private function readEvents(StreamInterface $stream, int $chunkSize, Log\Model $log): iterable
     {
         $chunkBuffer = '';
         $completedEvent = null;
@@ -157,7 +166,7 @@ class Client implements IClient
             while (false !== ($pos = strpos($chunkBuffer, "\n\n"))) {
                 $chunk = substr($chunkBuffer, 0, $pos);
                 // If this can't be parsed: raise something but still log
-                $this->onMessage(EventStream\Message::fromString($chunk));
+                $this->onMessage(EventStream\Message::fromString($chunk), $log);
                 $chunkBuffer = substr($chunkBuffer, $pos + 2);
 //                $event = $this->parseChunk($chunk);
 ////                $this->appendChunkToLog($event, $log, $type);
@@ -171,11 +180,11 @@ class Client implements IClient
 
 //        // If we have any remaining data in the buffer, process it
         if (strlen(trim($chunkBuffer)) > 0) {
-            $this->onMessage(EventStream\Message::fromString($chunkBuffer));
+            $this->onMessage(EventStream\Message::fromString($chunkBuffer), $log);
         }
     }
 
-    private function onMessage(EventStream\Message $message): void
+    private function onMessage(EventStream\Message $message, Log\Model $log): void
     {
         // Prepare the message for logging
         $itemType = $message->eventType;
