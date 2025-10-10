@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { ResourceType } from "@js/resource/resourceUtils";
+import { getFileIcon, ResourceType } from "@js/resource/resourceUtils";
 import type { StorageFile } from "@js/resource/resourceUtils";
-import { IMAGE_LIGHTBOX_CREATE } from "@js/image-lightbox/imageLightboxEvent";
-import type { ImageLightboxCreateEvent } from "@js/image-lightbox/imageLightboxEvent";
+import { openFilePreview } from "@js/preview/previewUtils";
+import { createLightbox, getStorageGallerySlides } from "@js/image-lightbox/imageLightboxEvent";
 import StorageObject from "@schoolboxVue/components/storage-object.vue";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import { EvidenceStatus, evidenceStatusLabels } from "@schoolboxLearningMomentEvidence/evidenceTypes";
@@ -31,42 +31,64 @@ const dropdownId = window.Vue.computed(() => {
 /**
  * The current evidence item hash that should be shown
  */
-const selectedEvidenceHash = window.Vue.ref<CohortReportEntry["files"][number]["hash"] | null>(null);
+const selectedEvidenceHash = window.Vue.ref<StorageFile["hash"] | null>(null);
 const selectedEvidence = window.Vue.computed(() => {
-    return props.entry.files.find((f) => f.hash === selectedEvidenceHash.value) || null;
+    return props.entry.evidence.find((f) => f.storage.hash === selectedEvidenceHash.value) || null;
 });
 
 const selectableEvidence = window.Vue.computed(() => {
-    return props.entry.files.filter((f) => f.hash !== selectedEvidenceHash.value);
+    return props.entry.evidence.filter((f) => f.storage.hash !== selectedEvidenceHash.value);
 });
 
 window.Vue.onMounted(() => {
-    if (props.entry.files.length > 0) {
-        selectedEvidenceHash.value = props.entry.files[0].hash;
+    if (props.entry.evidence.length > 0) {
+        selectedEvidenceHash.value = props.entry.evidence[0].storage.hash;
     }
 });
 
 /**
- * Show a lightbox for a specific file if it has an image link
- * @param file The file to show in the lightbox
+ * Open a lightbox for a specific file
+ * If it's an image, it will include all other images in the moment's evidence
+ * @param file The file to open
+ * @param event The click event
  */
-function spawnLightbox(file: StorageFile): void {
-    if (!file._links.image) {
-        return; // no link available, can't show lightbox
+async function openLightbox(file: StorageFile, event: MouseEvent): Promise<void> {
+    if (file.type === ResourceType.IMAGE && file._links.image) {
+        event.preventDefault();
+        /**
+         * This is an image, so we can show multiple at once.
+         * Due to limitations of preview.ts/our way of showing iframes/pdfs/etc in a modal,
+         * we can't show multiple media types as part of the same lightbox, so only images are supported here for now
+         */
+
+        const allImageEvidence = props.entry.evidence.filter((e) => e.storage._links.image);
+
+        const { slides, selectedIndex } = getStorageGallerySlides(
+            allImageEvidence.map((f) => f.storage),
+            file.hash,
+        );
+
+        const lightbox = await createLightbox("cr-results-group-entry-file", slides, {
+            index: selectedIndex,
+        });
+        lightbox.openGallery();
+        return;
     }
 
-    document.dispatchEvent(
-        new CustomEvent<ImageLightboxCreateEvent["detail"]>(IMAGE_LIGHTBOX_CREATE, {
-            detail: {
-                targetKey: `ig-feed-lightbox`,
-                options: {
-                    dynamic: true,
-                    dynamicEl: [{ src: file._links.image }],
-                },
-                onCreated: (gallery) => gallery.openGallery(),
-            },
-        }),
-    );
+    if (file.type === ResourceType.AUDIO || file.type === ResourceType.VIDEO) {
+        // videos/audio already have their own dedicated media players, nothing to do for those
+        return;
+    }
+
+    // otherwise, figure out what to do via preview.ts if there's a fetch URL
+    if (file._links.fetch) {
+        if (event.ctrlKey || event.shiftKey || event.metaKey) {
+            return; // the user is trying to open in a new tab/window, don't open the preview
+        }
+
+        event.preventDefault();
+        await openFilePreview(file._links.fetch);
+    }
 }
 </script>
 
@@ -106,7 +128,8 @@ function spawnLightbox(file: StorageFile): void {
             </label>
             <component
                 :is="props.entry.recipient._links.profile ? 'a' : 'span'"
-                :href="props.entry.recipient._links.profile"
+                v-if="props.entry.recipient"
+                :href="props.entry.recipient._links.profile || undefined"
             >
                 <user-photo :user="props.entry.recipient" render="tiny" />
                 <span class="l-pad-s--left">{{ props.entry.recipient.fullName }}</span>
@@ -123,16 +146,15 @@ function spawnLightbox(file: StorageFile): void {
         <div class="l-flex__item--1 l-grid l-grid--12 l-gap-s l-mar-xs--top">
             <div class="small-12" :class="{ 'medium-8': selectableEvidence.length > 0 }">
                 <article
-                    v-if="selectedEvidence !== null && selectedEvidence.hash"
-                    :key="selectedEvidence.hash"
+                    v-if="selectedEvidence !== null && selectedEvidence.storage.hash"
+                    :key="selectedEvidence.storage.hash"
                     style="width: fit-content"
-                    :style="{ cursor: selectedEvidence.type === ResourceType.IMAGE ? 'pointer' : undefined }"
-                    @click="spawnLightbox(selectedEvidence)"
+                    :style="{ cursor: selectedEvidence.storage.type === ResourceType.IMAGE ? 'pointer' : undefined }"
+                    @click="($event) => openLightbox(selectedEvidence!.storage, $event)"
                 >
-                    <!-- TODO: this doesn't use the file name from the model, rather the base storage name... -->
                     <storage-object
-                        :storage="selectedEvidence"
-                        :filename="selectedEvidence.name"
+                        :storage="selectedEvidence.storage"
+                        :filename="selectedEvidence.filename || selectedEvidence.storage.name"
                         style="max-height: 10rem"
                         maintain-dims
                         data-test="learning-moment-evidence-media"
@@ -152,20 +174,20 @@ function spawnLightbox(file: StorageFile): void {
 
             <div v-if="selectableEvidence.length > 0" class="small-12 medium-4 l-flex-col l-gap-s">
                 <div
-                    v-for="storage in props.entry.files"
-                    :key="storage.hash"
+                    v-for="evidence in props.entry.evidence"
+                    :key="evidence.storage.hash"
                     class="cr-evidence-button l-flex--no-wrap l-flex-row l-gap-xs l-pad-xs"
-                    :class="{ 'cr-evidence-button-selected': storage.hash === selectedEvidenceHash }"
-                    :title="storage.name"
-                    @click="selectedEvidenceHash = storage.hash"
+                    :class="{ 'cr-evidence-button-selected': evidence.storage.hash === selectedEvidenceHash }"
+                    :title="evidence.storage.name"
+                    @click="selectedEvidenceHash = evidence.storage.hash"
                 >
-                    <img :src="`/ajax/mime/${storage.mime}`" />
-                    <span>{{ storage.name }}</span>
+                    <img :src="getFileIcon(evidence.storage)" />
+                    <span>{{ evidence.filename || evidence.storage.name }}</span>
                 </div>
             </div>
         </div>
 
-        <div v-if="props.entry.recipient.id !== props.entry.creator.id" class="l-mar-s--top">
+        <div v-if="props.entry.creator && props.entry.recipient?.id !== props.entry.creator.id" class="l-mar-s--top">
             <user-photo
                 :user="props.entry.creator"
                 render="tiny"

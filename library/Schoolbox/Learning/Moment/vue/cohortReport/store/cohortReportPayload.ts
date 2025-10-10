@@ -1,33 +1,10 @@
 import { buildApiRequest } from "@js/util/sbx/apiUtils";
 import type { Metadata } from "@js/util/sbx/apiUtils";
-import type { StorageFile } from "@js/resource/resourceUtils";
-import type { UserAuthor } from "@schoolboxLibrary/types/User";
 import type { EvidenceStatus, LearningMoment } from "@schoolboxLearningMomentEvidence/evidenceTypes";
 
-export type CohortReportEntry = {
-    id: number;
-    body: string;
+export type CohortReportEntry = LearningMoment & {
     blurb: string;
     showReadMore: boolean;
-    files: StorageFile[];
-    recipient: UserAuthor;
-    creator: UserAuthor;
-    createdAt: {
-        timestamp: number;
-        displayAs: string;
-    };
-    updatedAt: {
-        timestamp: number;
-        displayAs: string;
-    };
-    hasComments: boolean;
-    currentState: EvidenceStatus;
-    tags: {
-        id: number;
-        name: string;
-    }[];
-    _links: LearningMoment["_links"];
-    _labels: LearningMoment["_labels"];
 };
 
 export type CohortReportApiPayload = {

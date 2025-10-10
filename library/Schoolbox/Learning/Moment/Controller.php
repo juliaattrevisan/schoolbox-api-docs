@@ -68,7 +68,6 @@ class Controller extends Base
      * @param Comment\Mapper $commentMapper
      * @param EditorTemplateHelper    $editorTemplateHelper
      * @param \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper
-     * @param Storage\Translator\ModelToArray $storageTranslator
      * @param \Schoolbox\Resource\Folder\Mapper $folderMapper
      * @param \Schoolbox\Discussion\Thread\Mapper $discussionThreadMapper
      */
@@ -77,7 +76,6 @@ class Controller extends Base
         private Comment\Mapper $commentMapper,
         private EditorTemplateHelper $editorTemplateHelper,
         private \Schoolbox\Permission\Access\UserAccessMapper $userAccessMapper,
-        private Storage\Translator\ModelToArray $storageTranslator,
         private \Schoolbox\Resource\Folder\Mapper $folderMapper,
         private \Schoolbox\Discussion\Thread\Mapper $discussionThreadMapper,
     ) {
@@ -661,22 +659,6 @@ class Controller extends Base
 
 
     /**
-     * Find out if there any comments related to this learning moment
-     * Finding at least one comment means there's stuff to delete here
-     *
-     * @param Model $evidence
-     * @return bool
-     */
-    private function hasComments(Model $evidence): bool
-    {
-        $translator = $this->buildTranslatorWithComments(1);
-        $item = $translator($evidence);
-
-        return (bool)\count($item['discussionThread']['children']['data'] ?? []);
-    }
-
-
-    /**
      * Builds a translator which contains comments.
      *
      * @param int $commentLimit
@@ -1168,24 +1150,16 @@ class Controller extends Base
         $payload = [];
 
         foreach ($moments as $moment) {
-            /* Accumulate a list of associated files for this learning moment
-             * At the moment there's gonna be just one but SA-20433 causes this to be multiple
-             */
-            $files = [];
-
-            foreach ($moment->getEvidence() as $evidence) {
-                if (null !== $evidence->getStorage()) {
-                    $files[] = call_user_func($this->storageTranslator, $evidence->getStorage());
-                }
-            }
+            $translator = $this->buildTranslatorWithComments(1);
+            $momentTranslated = $translator($moment);
 
             /* The actual body may be too long or contain too much HTML (i.e. images/videos)
              * so we can't just show it in the cohort report as-is.
              * Similar to news, provide a cut-down blurb of the body content to show instead
              */
-            $blurb = \TextFormatter::cutSentence(
+            $momentTranslated['blurb'] = \TextFormatter::cutSentence(
                 \Scrub::html2text($moment->getBody()),
-                count($files) > 0 ? self::COHORT_REPORT_BLURB_LENGTH : self::COHORT_REPORT_BLURB_LENGTH_EXTENDED,
+                count($moment->getEvidence()) > 0 ? self::COHORT_REPORT_BLURB_LENGTH : self::COHORT_REPORT_BLURB_LENGTH_EXTENDED,
             );
 
             /* If the learning moment has a body content, there's something to read
@@ -1201,96 +1175,12 @@ class Controller extends Base
              * For now, presume there's something to see
              * Show the link
              */
-            $showReadMore = '' !== (string)$moment->getBody();
+            $momentTranslated['showReadMore'] = '' !== (string)$moment->getBody();
 
-            /* This is a stack because empty payloads result in a datatype difference in frontend world:
-             * empty payloads emerge as [], but non-empty payloads emerge as {}
-             */
-            $userTranslator = new \Schoolbox\User\Translator\Author\ModelToArray();
-
-            // We'll steal the links from here
-            // TODO: Let's see how much of this can be refactored to just use the translator directly... I expect most if not all of it
-            $translator = $this->buildTranslatorWithComments(1);
-            $momentTranslated = $translator($moment);
-
-            $payload[] = [
-                'id' => $moment->getId(),
-                'body' => \Scrub::html($moment->getBody()),
-                'blurb' => $blurb,
-                'showReadMore' => $showReadMore,
-                'files' => $files,
-                /* TODO we usually add role for extra meta about students and staffs, especially in cohorty scenarios
-                 *  since there's a higher likelihood of encountering people with same- or same-sounding names.
-                 *  Role description helps distinguish them. But it wasn't in any of the designs. I'm expecting
-                 *  to need this further down the trail
-                 */
-                'recipient' => $userTranslator($moment->getRecipient()),
-                'creator' => $userTranslator($moment->getCreator()),
-                /* This is always set
-                 */
-                'createdAt' => [
-                    'timestamp' => $moment->getCreatedAt()->getUnixTimestamp(),
-                    'displayAs' => $moment->getCreatedAt()->getShortDateOnly(),
-                    'rfc' => $moment->getCreatedAt()->toRfc3339String(),
-                ],
-                /* We don't store updatedBy, for whatever reason: I suppose it was presumed
-                 * to always be the same as its author...
-                 *
-                 * Anyway, this is the localised version of config's date_short which you can use
-                 * to group moments per day.
-                 */
-                'updatedAt' => [
-                    'timestamp' => $moment->getUpdatedAt()->getUnixTimestamp(),
-                    'displayAs' => $moment->getUpdatedAt()->getShortDateOnly(),
-                    'rfc' => $moment->getUpdatedAt()->toRfc3339String(),
-                ],
-                /* Whether this moment had comments or not, which affects a user interaction
-                 * where they have an opportunity to delete comments upon approval
-                 */
-                'hasComments' => $this->hasComments($moment),
-                /* The current state of the learning moment
-                 */
-                'currentState' => $moment->getCurrentState(),
-                /* Any associated tags which you can find in a db lookup table
-                 */
-                'tags' => $this->getTagsForMoment($moment),
-                /* Add any associated curriculum nodes
-                 * TODO will be added in a future ticket that has yet to be written.
-                 */
-                'curriculumNodes' => [],
-                /* A shortcut to urls for changing states in this learning moment
-                 * Note that a controller method must fulfil this node after the fact, for aura reasons
-                 * (not easy to dedupe that implementation, sadly)
-                 */
-                '_links' => $momentTranslated['_links'],
-                /* A special Publish button label for exactly one workflow
-                 */
-                '_labels' => $momentTranslated['_labels'],
-            ];
+            $payload[] = $momentTranslated;
         }
 
         return $payload;
-    }
-
-
-    /**
-     * Convert a set of moment tags into a scalar stack
-     *
-     * @param Model $moment
-     * @return array
-     */
-    private function getTagsForMoment(Model $moment): array
-    {
-        $stack = [];
-
-        foreach ($moment->getTags() as $tag) {
-            $stack[] = [
-                'id' => $tag->getId(),
-                'name' => $tag->getName(),
-            ];
-        }
-
-        return $stack;
     }
 
 

@@ -4,6 +4,7 @@
  */
 import { humanFileSize } from "@js/util/fileUtils";
 import { openFilePreview } from "@js/preview/previewUtils";
+import { getFileIcon } from "./resourceUtils";
 import type { StorageFile } from "./resourceUtils";
 
 type FileWithName = {
@@ -35,23 +36,6 @@ async function onFileClick(file: FileWithName, event: MouseEvent): Promise<void>
 
     event.preventDefault();
     await openFilePreview(href);
-}
-
-/**
- * Get the URL to use as an icon for a given file
- * @param file The file to get the icon for
- * @returns url
- */
-function getFileIcon(file: StorageFile): string {
-    if (file._links.image) {
-        return `${file._links.image}&size=square64`;
-    }
-
-    if (file._links.icon) {
-        return file._links.icon;
-    }
-
-    return `/ajax/mime/${file.type}`;
 }
 </script>
 

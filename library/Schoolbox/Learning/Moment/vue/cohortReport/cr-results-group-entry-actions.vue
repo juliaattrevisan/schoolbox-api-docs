@@ -17,7 +17,7 @@ const crmStore = useCohortReportModalStore();
  * Approve this entry
  */
 async function onApprove(): Promise<void> {
-    if (props.entry.hasComments) {
+    if (props.entry.discussionThread !== null && props.entry.discussionThread.children.metadata.count > 0) {
         // If there are comments, open the confirmation modal to ask if they want to delete them
         crmStore.openModal(props.entry, CohortReportModalType.CONFIRM_PUBLISH);
         return;

@@ -31,6 +31,7 @@ declare global {
             dayjs: string;
             dayjsDatetime: string;
             dayjsDateLong: string;
+            dayjsDateShort: string;
             dayjsTime: string;
             localDate: string;
             localDateTime: string;
