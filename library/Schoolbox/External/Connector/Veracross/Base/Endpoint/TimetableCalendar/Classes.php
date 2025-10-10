@@ -108,9 +108,8 @@ class Classes implements IStrategy
      * @return void
      * @throws DebugBarException
      * @throws Exception
-     * @throws \InvalidArgumentException
-     * @throws \PDOException
-     * @throws \UnexpectedValueException
+     * @throws \JsonException
+     * @throws \Throwable
      */
     public function import(): void
     {
@@ -128,7 +127,7 @@ class Classes implements IStrategy
 
         /* Get a list of guys
          */
-        $userLookup = (new Users($this->watchlist, $this->eventMapper))->generate();
+        $userLookup = (new Users($this->watcher, $this->watchlist, $this->eventMapper))->generate();
 
         /* Start with an enrolments-first philosophy.
          * The list of enrolments informs us which internal_class_ids we care about.

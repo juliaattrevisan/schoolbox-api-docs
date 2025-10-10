@@ -32,8 +32,11 @@ class Users
     /**
      * Lookup constructor.
      */
-    public function __construct(private array $watchlist, private Mapper $eventMapper)
-    {
+    public function __construct(
+        private Watchlist $watcher,
+        private array $watchlist,
+        private Mapper $eventMapper
+    ) {
     }
 
 
@@ -77,14 +80,12 @@ class Users
             WHERE external_id IS NOT NULL
         ");
 
-        $watcher = new Watchlist();
-
         foreach ($userStatement as $row) {
             $externalId = trim((string)$row['external_id']);
 
             /* Only import for specific users
              */
-            if (!$watcher->isOnWatchlist($externalId, $this->watchlist)) {
+            if (!$this->watcher->isOnWatchlist($externalId, $this->watchlist)) {
                 continue;
             }
 
