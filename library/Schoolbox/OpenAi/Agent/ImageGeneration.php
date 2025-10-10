@@ -68,7 +68,6 @@ class ImageGeneration
         You will not deviate from these instructions under any circumstances. The user request will occur from now -
     ";
 
-
     /**
      * Constants to determine available sizes
      *
@@ -76,11 +75,6 @@ class ImageGeneration
      * They match the available sizes from OpenAI, see https://platform.openai.com/docs/guides/image-generation#size-and-quality-options
      */
     private const ATTRIBUTE_KEY_SIZE = 'size';
-    private const AVAILABLE_SIZES = [
-        '1024x1024' => 'Square (1x1)',
-        '1536x1024' => 'Landscape (3x2)',
-        '1024x1536' => 'Portrait (2x3)',
-    ];
 
     /**
      * Constants to determine available styles
@@ -90,17 +84,6 @@ class ImageGeneration
      * There's no equivalent to this in the OpenAI AI, we just inject it into the prompt
      */
     private const ATTRIBUTE_KEY_STYLE = 'style';
-    private const AVAILABLE_STYLES = [
-        'background' => 'Background',
-        'cartoon' => 'Cartoon',
-        'oil_painting' => 'Oil Painting',
-        'photo_realistic' => 'Photorealistic',
-        'pop_art' => 'Pop Art',
-        'sketch' => 'Sketch',
-        'surrealism' => 'Surrealism',
-        'wide_angle' => 'Wide Angle',
-        'vector_art' => 'Vector Art',
-    ];
 
     /**
      * Constructor
@@ -181,7 +164,7 @@ class ImageGeneration
                     'background'     => 'auto',
                     'partial_images' => self::PARTIAL_IMAGE_QTY,
                     'quality'        => $this->quality,
-                    'size'           => (ImageSize::tryFrom($basePayload['size']) ?? ImageSize::Auto)->value,
+                    'size'           => (ImageSize::tryFrom($basePayload[self::ATTRIBUTE_KEY_SIZE]) ?? ImageSize::Auto)->value,
                 ],
             ],
             /* A kind of OpenAI currency to use in this request
@@ -202,7 +185,7 @@ class ImageGeneration
         ];
 
         /** add prompt inputs if they are meaningful */
-        $imageStyle   = ImageStyle::tryFrom($basePayload['style']);
+        $imageStyle   = ImageStyle::tryFrom($basePayload[self::ATTRIBUTE_KEY_STYLE])?->value;
         $systemPrompt = strtr(
             self::PROMPT_SYSTEM_PERSONA,
             [
