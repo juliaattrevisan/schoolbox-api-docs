@@ -65,6 +65,10 @@ class Compiler
                         ),
                     ],
                 ],
+                /* Slap in the set of meeting times for this class. These eventually become
+                 * class instances of $classId occurring at a particluar date and time.
+                 */
+                'schedule' => $this->meetingTimesLookup[$classId] ?? []
             ];
         }
 
