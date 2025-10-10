@@ -96,7 +96,7 @@ class Enrolments
                         /* Avengers Assemble!
                          */
                         foreach ($page['data'] as $record) {
-                            $this->lookup[$externalId][$record['internal_class_id']] = $record;
+                            $this->lookup[$externalId][$record['internal_class_id']] = $this->minimise($record);
                         }
                     }
                 }
@@ -115,7 +115,7 @@ class Enrolments
                     foreach ($page['data'] as $record) {
                         $externalId = trim((string)$record['person_id']);
 
-                        $this->lookup[$externalId][$record['internal_class_id']] = $record;
+                        $this->lookup[$externalId][$record['internal_class_id']] = $this->minimise($record);
                     }
                 }
             }
@@ -131,5 +131,22 @@ class Enrolments
         $this->log->debug('');
 
         return $this->lookup;
+    }
+
+
+    /**
+     * We only need some of the $record, not all of it; save some memory
+     * by only keeping what we needed.
+     *
+     * @param array $record
+     * @return array
+     */
+    private function minimise(array $record): array
+    {
+        return array_intersect_key($record, [
+            'internal_class_id' => true,
+            'class_description' => true,
+            'primary_teacher' => true,
+        ]);
     }
 }
