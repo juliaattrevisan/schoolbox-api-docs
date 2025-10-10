@@ -81,6 +81,7 @@ class Client implements IClient
         $chunkSize ??= self::DEFAULT_CHUNK_SIZE;
         $encodedPayload = json_encode($payload);
 
+        // TODO either pass in previous session ID, or extract from payload
         $log = $this->logMapper->createModel()
             ->setUser($user)
             ->setPrompt($encodedPayload)
@@ -168,9 +169,7 @@ class Client implements IClient
                 // If this can't be parsed: raise something but still log
                 $this->onMessage(EventStream\Message::fromString($chunk), $log);
                 $chunkBuffer = substr($chunkBuffer, $pos + 2);
-//                $event = $this->parseChunk($chunk);
-////                $this->appendChunkToLog($event, $log, $type);
-//
+
 ////                // Don't echo an 'error' chunk if this isn't going to ckeditor as it won't follow the format of an ApiProblem
 ////                if ($type === self::FEATURE_CHAT || $event['type'] !== 'error') {
 ////                    echo "{$chunk}\n\n";
@@ -184,25 +183,33 @@ class Client implements IClient
         }
     }
 
+    /**
+     * Write this message to the log.
+     *
+     * @param EventStream\Message $message
+     * @param Log\Model           $log
+     * @return void
+     * @throws \Schoolbox\Mapper\Exception
+     */
     private function onMessage(EventStream\Message $message, Log\Model $log): void
     {
         // Prepare the message for logging
-        $itemType = $message->eventType;
-        $output   = '';
-        $data     = [];
+        $eventType = $message->eventType;
+        $output    = '';
+        $data      = [];
         try {
             // Omit partial and completed image data from the output
-            $item = json_decode($message->data, true, 512, JSON_THROW_ON_ERROR);
+            $item   = json_decode($message->data, true, 512, JSON_THROW_ON_ERROR);
             $data[] = $item;
-            if ($itemType === 'response.image_generation_call.partial_image' && isset($item['partial_image_b64'])) {
+            if ($eventType === 'response.image_generation_call.partial_image' && isset($item['partial_image_b64'])) {
                 $item['partial_image_b64'] = self::IMAGE_DATA_OMITTED;
             }
-            if ($itemType === 'response.output_item.done' && isset($item['item']['result'])) {
+            if ($eventType === 'response.output_item.done' && isset($item['item']['result'])) {
                 $item['item']['result'] = self::IMAGE_DATA_OMITTED;
             }
 
             // apparently there is a final final image, lets remove that also
-            if ($itemType === 'response.completed' && isset($item['response']['output']) && is_array($item['response']['output'])) {
+            if ($eventType === 'response.completed' && isset($item['response']['output']) && is_array($item['response']['output'])) {
                 // $item['response']['output'] is apparently an array, and we need to omit the b64 from each $item['response']['output'][]['result']
                 foreach ($item['response']['output'] as $i => $respOutput) {
                     if (isset($respOutput['result'])) {
@@ -211,26 +218,21 @@ class Client implements IClient
                 }
             }
 
-            $output .= sprintf("event: %s\ndata: %s\n\n", $itemType, json_encode($item, JSON_THROW_ON_ERROR));
+            $output .= sprintf("event: %s\ndata: %s\n\n", $eventType, json_encode($item, JSON_THROW_ON_ERROR));
         } catch (\JsonException $e) {
             // If it's not JSON, still save the raw data
-            $output .= sprintf("event: %s\n%s\n\n", $itemType, $message->data);
+            $output .= sprintf("event: %s\n%s\n\n", $eventType, $message->data);
         }
 
         // This chunk gets added to the log
-        $event = [
-            'type' => $itemType,
-            'data' => $data,
-            'output' => $output,
-        ];
-        $this->appendChunkToLog($event, $log);
+        $this->appendMessageToLog($output, $data, $log);
 
         // Extract the completed event, and add it to the log
         // Is this the final event?
         // There are 3 possible events that indicate the end of a response
         // (see https://platform.openai.com/docs/api-reference/responses-streaming/response)
-        if (in_array($itemType, ['response.completed', 'response.failed', 'response.incomplete'])) {
-            $completedEvent = $event['data'][0]['response'];
+        if (in_array($eventType, ['response.completed', 'response.failed', 'response.incomplete'])) {
+            $completedEvent = $data[0]['response'];
 
             /* If something went wrong on the openAI side, it'll send us an "error" key
              * https://platform.openai.com/docs/api-reference/responses/object#responses/object-error
@@ -239,19 +241,16 @@ class Client implements IClient
             if ($completedEvent["error"] ?? null) {
                 $returnCode = 500;
 
-                $error_message = $completedEvent["error"]["message"] ?? '';
+                $errorMessage = $completedEvent["error"]["message"] ?? '';
 
                 $log->setReturnCode($returnCode)
-                    ->setErrorMessage($error_message);
+                    ->setErrorMessage($errorMessage);
                 $this->logMapper->save($log);
 
-                throw new SchoolboxException(
-                    $error_message,
-                    $returnCode
-                );
+                throw new SchoolboxException($errorMessage, $returnCode);
             }
 
-            /* Did we recieve an incomplete response? i.e. max output tokens reached?
+            /* Did we receive an incomplete response? i.e. max output tokens reached?
              * If so, send those details on so we have some idea of why it failed
              * https://platform.openai.com/docs/api-reference/responses/object#responses/object-status
              */
@@ -274,10 +273,7 @@ class Client implements IClient
                     ->setErrorMessage($incompleteMessage);
                 $this->logMapper->save($log);
 
-                throw new SchoolboxException(
-                    $title,
-                    $returnCode
-                );
+                throw new SchoolboxException($title, $returnCode);
             }
 
             // well we didn't die, so let's assume we got a good response
@@ -291,30 +287,25 @@ class Client implements IClient
         }
     }
 
-
-    private function appendChunkToLog(array $chunkData, Log\Model $log): void
+    /**
+     * Append the message to the log, including:
+     * * the message itself (with redundant field filtered)
+     * * the model the API endpoint used
+     * * the input and output tokens used
+     *
+     * @param string    $output The message, formatted as an event stream, with filtered fields.
+     * @param array     $data   The unfiltered parsed data from the message.
+     * @param Log\Model $log    The log to write to.
+     * @return void
+     */
+    private function appendMessageToLog(string $output, array $data, Log\Model $log): void
     {
-        $log->setResponse(($log->getResponse() ?? '') . $chunkData['output']);
-
-        foreach ($chunkData['data'] as $item) {
-            $model = null;
-            $inputTokens = null;
-            $outputTokens = null;
-
+        $log->setResponse(($log->getResponse() ?? '') . $output);
+        foreach ($data as $item) {
             // Model, input and output tokens depend on the endpoint
-            $model = $item['response']['model'] ?? $item['model'] ?? null;
-            $inputTokens = $item['response']['usage']['input_tokens'] ?? $item['usage']['prompt_tokens'] ?? null;
+            $model        = $item['response']['model'] ?? $item['model'] ?? null;
+            $inputTokens  = $item['response']['usage']['input_tokens'] ?? $item['usage']['prompt_tokens'] ?? null;
             $outputTokens = $item['response']['usage']['output_tokens'] ?? $item['usage']['completion_tokens'] ?? null;
-
-//            if ($type === self::FEATURE_CHAT) {
-//                $model = $item['model'] ?? null;
-//                $inputTokens = $item['usage']['prompt_tokens'] ?? null;
-//                $outputTokens = $item['usage']['completion_tokens'] ?? null;
-//            } else {
-//                $model = $item['response']['model'] ?? null;
-//                $inputTokens = $item['response']['usage']['input_tokens'] ?? null;
-//                $outputTokens = $item['response']['usage']['output_tokens'] ?? null;
-//            }
 
             if ($model) {
                 $log->setModel($model);
