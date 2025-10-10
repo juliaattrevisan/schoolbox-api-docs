@@ -238,7 +238,9 @@ class Api implements IApi
                 $pageSize
             ));
 
+            $start = microtime(true);
             $payload = $this->retrieveOne($method, $endpoint, $scope, $pageNum, $pageSize, $params);
+            $end = microtime(true);
 
             $this->log(sprintf(
                 "    Obtained %s elements in this payload.\n",
@@ -250,7 +252,7 @@ class Api implements IApi
 
             /* Record endpoint usage
              */
-            $this->apiUsage->record($endpoint);
+            $this->apiUsage->record($endpoint, $end - $start);
 
             yield $payload;
         }
@@ -431,11 +433,13 @@ class Api implements IApi
                 'X-Page-Size' => $pageSize
             ];
 
+            $start = microtime(true);
             $promises[] = $this->client->requestAsync($method, $endpoint, $options);
+            $end = microtime(true);
 
             /* Record endpoint usage
              */
-            $this->apiUsage->record($endpoint);
+            $this->apiUsage->record($endpoint, $end - $start);
         }
 
         return \GuzzleHttp\Promise\Utils::settle($promises)->wait();

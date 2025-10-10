@@ -46,12 +46,12 @@ class ApiUsage
 
 
     /**
-     * Increment count
-     *
+     * Increment count and total duration spent in an endpoint
      *
      * @param string $endpoint
+     * @param float $duration
      */
-    public function record(string $endpoint): void
+    public function record(string $endpoint, float $duration): void
     {
         /* Remove querystring params
          * Remove prefix
@@ -61,12 +61,16 @@ class ApiUsage
         /* Initialise counter if needed
          */
         if (!isset($this->usage[$baseEndpoint])) {
-            $this->usage[$baseEndpoint] = 0;
+            $this->usage[$baseEndpoint] = [
+                'count' => 0,
+                'duration' => 0
+            ];
         }
 
         /* Increment count of $endpoint usage
          */
-        $this->usage[$baseEndpoint]++;
+        $this->usage[$baseEndpoint]['count']++;
+        $this->usage[$baseEndpoint]['duration'] += $duration;
     }
 
 
