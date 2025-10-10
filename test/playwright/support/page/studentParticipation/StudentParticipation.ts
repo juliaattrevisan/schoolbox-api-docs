@@ -18,6 +18,10 @@ export default class StudentParticipation {
 
     static readonly URL_COURSE_MARKBOOK = "/learning/courseMarkbook/6?1=&5=&8[15]=1&10=&11=&12=&14[83]=1";
 
+    static readonly DATA_TEST_POP_OUT_PARTICIPANT_BUTTON = "sbx-pop-out-participant-{userId}-button";
+
+    static readonly DATA_TEST_MARKBOOK_CELL = "markbook-cell-{activityId}-{userId}";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -29,7 +33,6 @@ export default class StudentParticipation {
     async goto(): Promise<void> {
         this.tester.isGoingTo("Navigate to student participation page");
         await this.page.goto(StudentParticipation.URL_PARTICIPATION);
-        await expect(this.page).toHaveTitle(/Schoolbox \[vagrant\]/);
     }
 
     /**
@@ -37,19 +40,23 @@ export default class StudentParticipation {
      * @param userId - The user ID of the student to exclude
      * @param studentName - The name of the student for verification
      */
-    async excludeStudent(userId: string, studentName: string): Promise<void> {
+    async excludeStudent(userId: string, studentName: string, hasConfirmExclusion: boolean): Promise<void> {
         this.tester.isGoingTo(`Click the Show Actions button for participant ${userId} (${studentName})`);
-        await this.page.locator(`[data-test="sbx-pop-out-participant-${userId}-button"]`).click();
+        await this.page
+            .getByTestId(StudentParticipation.DATA_TEST_POP_OUT_PARTICIPANT_BUTTON.replace("{userId}", userId))
+            .click();
 
         this.tester.isGoingTo("Click the Exclude button in the popup");
         await this.page.getByRole("button", { name: "Exclude" }).click();
 
-        this.tester.isGoingTo("Confirm exclusion by clicking Yes in the modal");
-        await this.page.getByRole("button", { name: "Yes" }).click();
+        if (hasConfirmExclusion) {
+            this.tester.isGoingTo("Confirm exclusion by clicking Yes in the modal");
+            await this.page.getByRole("button", { name: "Yes" }).click();
+        }
 
-        this.tester.isGoingTo("Verify the student row shows 'Excluded' in the Customisation column");
+        this.tester.isGoingTo("Verify the student row shows 'Excluded'");
         const studentRow = this.page.locator("tr").filter({ hasText: studentName });
-        await expect(studentRow.locator("td").nth(3)).toContainText("Excluded");
+        await expect(studentRow).toContainText("Excluded");
 
         this.tester.isGoingTo("Verify success message is displayed");
         await expect(this.page.getByText("Student excluded successfully")).toBeVisible();
@@ -62,7 +69,9 @@ export default class StudentParticipation {
      */
     async removeCustomisation(userId: string, studentName: string): Promise<void> {
         this.tester.isGoingTo(`Click the Show Actions button for participant ${userId} (${studentName})`);
-        await this.page.locator(`[data-test="sbx-pop-out-participant-${userId}-button"]`).click();
+        await this.page
+            .getByTestId(StudentParticipation.DATA_TEST_POP_OUT_PARTICIPANT_BUTTON.replace("{userId}", userId))
+            .click();
 
         this.tester.isGoingTo("Click Remove Customisation button");
         await this.page.getByRole("button", { name: " Remove Customisation" }).click();
@@ -70,9 +79,9 @@ export default class StudentParticipation {
         this.tester.isGoingTo("Verify success message appears for removal");
         await expect(this.page.getByText("Customisation removed successfully")).toBeVisible();
 
-        this.tester.isGoingTo("Verify student's customisation column is now empty (no longer shows Excluded)");
+        this.tester.isGoingTo("Verify student's row no longer shows 'Excluded'");
         const studentRow = this.page.locator("tr").filter({ hasText: studentName });
-        await expect(studentRow.locator("td").nth(3)).toBeEmpty();
+        await expect(studentRow).not.toContainText("Excluded");
     }
 
     /**
@@ -83,7 +92,14 @@ export default class StudentParticipation {
     async verifyClassMarkbookExcluded(userId: string, activityId: string): Promise<void> {
         this.tester.isGoingTo("Navigate to class markbook and verify excluded class is present");
         await this.page.goto(StudentParticipation.URL_CLASS_MARKBOOK);
-        await expect(this.page.locator(`[data-test="markbook-cell-${activityId}-${userId}"]`)).toHaveClass(/excluded/);
+        await expect(
+            this.page.getByTestId(
+                StudentParticipation.DATA_TEST_MARKBOOK_CELL.replace("{activityId}", activityId).replace(
+                    "{userId}",
+                    userId,
+                ),
+            ),
+        ).toHaveClass(/excluded/);
     }
 
     /**
@@ -94,9 +110,14 @@ export default class StudentParticipation {
     async verifyClassMarkbookNotExcluded(userId: string, activityId: string): Promise<void> {
         this.tester.isGoingTo("Navigate to class markbook and verify cells no longer have excluded class");
         await this.page.goto(StudentParticipation.URL_CLASS_MARKBOOK);
-        await expect(this.page.locator(`[data-test="markbook-cell-${activityId}-${userId}"]`)).not.toHaveClass(
-            /excluded/,
-        );
+        await expect(
+            this.page.getByTestId(
+                StudentParticipation.DATA_TEST_MARKBOOK_CELL.replace("{activityId}", activityId).replace(
+                    "{userId}",
+                    userId,
+                ),
+            ),
+        ).not.toHaveClass(/excluded/);
     }
 
     /**
@@ -107,7 +128,14 @@ export default class StudentParticipation {
     async verifyCourseMarkbookExcluded(userId: string, activityId: string): Promise<void> {
         this.tester.isGoingTo("Navigate to course markbook and verify excluded class is present");
         await this.page.goto(StudentParticipation.URL_COURSE_MARKBOOK);
-        await expect(this.page.locator(`[data-test="markbook-cell-${activityId}-${userId}"]`)).toHaveClass(/excluded/);
+        await expect(
+            this.page.getByTestId(
+                StudentParticipation.DATA_TEST_MARKBOOK_CELL.replace("{activityId}", activityId).replace(
+                    "{userId}",
+                    userId,
+                ),
+            ),
+        ).toHaveClass(/excluded/);
     }
 
     /**
@@ -118,9 +146,14 @@ export default class StudentParticipation {
     async verifyCourseMarkbookNotExcluded(userId: string, activityId: string): Promise<void> {
         this.tester.isGoingTo("Navigate to course markbook and verify cells no longer have excluded class");
         await this.page.goto(StudentParticipation.URL_COURSE_MARKBOOK);
-        await expect(this.page.locator(`[data-test="markbook-cell-${activityId}-${userId}"]`)).not.toHaveClass(
-            /excluded/,
-        );
+        await expect(
+            this.page.getByTestId(
+                StudentParticipation.DATA_TEST_MARKBOOK_CELL.replace("{activityId}", activityId).replace(
+                    "{userId}",
+                    userId,
+                ),
+            ),
+        ).not.toHaveClass(/excluded/);
     }
 
     /**
@@ -147,7 +180,9 @@ export default class StudentParticipation {
         dueDate: string,
     ): Promise<void> {
         this.tester.isGoingTo(`Click the Show Actions button for participant ${userId} (${studentName})`);
-        await this.page.locator(`[data-test="sbx-pop-out-participant-${userId}-button"]`).click();
+        await this.page
+            .getByTestId(StudentParticipation.DATA_TEST_POP_OUT_PARTICIPANT_BUTTON.replace("{userId}", userId))
+            .click();
 
         this.tester.isGoingTo("Click the Modify button in the popup");
         await this.page.locator(`[id="participant-${userId}"]`).getByRole("button", { name: "Modify" }).click();

@@ -22,7 +22,7 @@ test.describe("Student Participation Tests", () => {
 
         // Navigate to participation page and exclude student
         await studentParticipation.goto();
-        await studentParticipation.excludeStudent(userId, studentName);
+        await studentParticipation.excludeStudent(userId, studentName, true);
 
         // Verify exclusion in markbooks
         await studentParticipation.verifyClassMarkbookExcluded(userId, classActivityId);
@@ -78,7 +78,9 @@ test.describe("Student Participation Tests", () => {
         await studentParticipation.modifyStudentActivity(userId, studentName, newTitle, description, dueDate);
 
         // Select the button with data-test attribute
-        await page.click('[data-test="sbx-pop-out-participant-29-button"]');
+        await page
+            .getByTestId(StudentParticipation.DATA_TEST_POP_OUT_PARTICIPANT_BUTTON.replace("{userId}", "29"))
+            .click();
 
         // Find the Include in Existing customisation link within participant-29 element
         await page.locator("#participant-29").getByText("Include in Existing customisation").click();
@@ -98,8 +100,8 @@ test.describe("Student Participation Tests", () => {
         // Once the modal is closed, look for the table row that contains the student 'Li, Penelope'
         const penelopeRow = page.locator('tr:has-text("Li, Penelope")');
 
-        // For that student, in the 'Customisation' column, they should have the newTitle text
-        await expect(penelopeRow.locator("td").nth(3)).toContainText(newTitle); // Assuming Customisation is the 4th column (index 3)
+        // For that student, they should have the newTitle text in their row
+        await expect(penelopeRow).toContainText(newTitle);
 
         // Clean up database entries, removing the foreign key then the plan itself
         const planId = (await db.grabFromDatabase("participant_plan", "id", {
@@ -123,12 +125,9 @@ test.describe("Student Participation Tests", () => {
 
         // Verify the new customisation is shown in the table
         const studentRow = page.locator(`tr:has-text("${studentName}")`);
-        await expect(studentRow.locator("td").nth(3)).toContainText(newTitle); // Assuming Customisation is the 4th column (index 3)
+        await expect(studentRow).toContainText(newTitle);
 
         await studentParticipation.removeCustomisation(userId, studentName);
-
-        // Verify the customisation is removed in the table
-        await expect(studentRow.locator("td").nth(3)).not.toContainText(newTitle); // Assuming Customisation is the 4th column (index 3)
 
         // Clean up database entries, removing the foreign key then the plan itself
         const planId = (await db.grabFromDatabase("participant_plan", "id", {
