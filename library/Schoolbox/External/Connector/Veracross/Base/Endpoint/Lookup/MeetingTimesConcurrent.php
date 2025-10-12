@@ -106,7 +106,31 @@ class MeetingTimesConcurrent
                 ));
 
                 foreach ($responses as $response) {
-//                    if (IApi::CONCURRENCY_FULFILLED === $response['state'] && 200 === $response['value']->getStatusCode()) {
+                    /* Requests that are CONCURRENCY_FULFILLED could still be in an error state
+                     * so you still have to check for the http status code returned
+                     *
+                     * For non-200 payloads we can maybe just say the reasonPhrase and statusCode
+                     */
+                    if (IApi::CONCURRENCY_FULFILLED === $response['state']) {
+                        /* There is a rate limit on requests which might leave some fulfilled but
+                         * ultimately unsuccessful. The Veracross rate limit is discussed here:
+
+                         * Rate Limit is 300 per 3 minutes
+                         * https://api-docs.veracross.com/docs/docs/87c4e0dc5e47b-rate-limiting
+                         */
+                        if (200 !== $response['value']->getStatusCode()) {
+                            $this->log->warning(sprintf(
+                                'Incomplete concurrency request returned HTTP %s %s',
+                                $response['value']->getStatusCode(),
+                                $response['value']->getReasonPhrase(),
+                            ));
+
+                            continue;
+                        }
+
+                        /* Otherwise we got a 200 back from them, but even that might contain an error
+                         * message of some sort.
+                         */
                         $content = $response['value']->getBody()->getContents();
 
                         try {
@@ -117,10 +141,7 @@ class MeetingTimesConcurrent
                             $page = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
 
                             /* "Successfully failed" due to some random issue such as Rate Limits etc.
-                             * and maybe other misc errors that I've not yet seen before
-                             *
-                             * Rate Limit is 300 per 3 minutes
-                             * https://api-docs.veracross.com/docs/docs/87c4e0dc5e47b-rate-limiting
+                             * can appear here; also, maybe other misc errors that I've not yet seen before
                              */
                             if (isset($page['error'])) {
                                 $this->log->warning($page['error']);
@@ -144,21 +165,14 @@ class MeetingTimesConcurrent
                              * There won't be a $classId for an empty set, so no need to log anything about that.
                              */
                             if ($classId) {
-                                $this->log->debug(sprintf(
-                                    'Processing %s meeting times for class %s.',
-                                    \count($page['data']),
-                                    $classId
-                                ));
+                                $this->log->debug(sprintf('Processing %s meeting times for class %s.', \count($page['data']), $classId));
                             }
                         } catch (\JsonException $e) {
                             /* Couldn't decode json, or server refused something, or something else died
                              */
-                            $this->log->debug(sprintf(
-                                'Could not decode json data: %s',
-                                $content
-                            ));
+                            $this->log->debug(sprintf('Could not decode json data: %s', $content));
                         }
-//                    }
+                    }
                 }
             }
         }
