@@ -5,6 +5,7 @@ import type { Locator } from "@playwright/test";
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 import Files from "@schoolboxTest/playwright/support/page/homepage/Files";
+import path from "path";
 
 test.describe("Files Component Tests", () => {
     // Run tests serially, as tests rely on prior tests to have been run
@@ -18,6 +19,7 @@ test.describe("Files Component Tests", () => {
     const newFileTitle: string = "Text Automation Updated File";
     const fileTitle: string = "Test Automation File";
     const fileDescription: string = "Description for File";
+    const filePath = path.resolve(__dirname, "../../support/file/baboon.png");
 
     test.beforeEach(async ({ tester, page }) => {
         homepage = new Homepage(tester, page);
@@ -25,7 +27,7 @@ test.describe("Files Component Tests", () => {
         await tester.loginAsAdmin();
     });
 
-    test("Verify Add File", async ({ tester, page }) => {
+    test("Verify Add File", async ({ tester, db }) => {
         tester.isGoingTo("Homepage, open tab panel, click components tab");
         await homepage.goto(83);
         tester.isGoingTo("Add Files component");
@@ -39,7 +41,7 @@ test.describe("Files Component Tests", () => {
         await Files.verifyFileTitle(filesComponent, "Where did English come from?", false);
         await Files.verifyFileTitle(filesComponent, "Spelling tips", false);
         tester.isGoingTo("Add a new file via 'Select File'.");
-        await Files.selectFile(page, filesComponent, fileTitle, fileDescription, false);
+        await files.selectFile(filesComponent, fileTitle, fileDescription, false, db, filePath);
         tester.isGoingTo("Verify File added Translucent Title ");
         await Files.verifyFileTitle(filesComponent, fileTitle, true);
     });

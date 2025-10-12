@@ -1,6 +1,7 @@
 import { expect } from "@playwright/test";
 import type { Locator, Page } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import type DatabaseHelper from "@schoolboxTest/playwright/support/DatabaseHelper";
 
 export default class Files {
     private tester: AcceptanceTester;
@@ -11,24 +12,49 @@ export default class Files {
 
     static readonly ELEMENT_FILE_DESCRIPTION_TEXTBOX = "#comment";
 
-    static readonly FILE_TILE_TITLE_TRANSLUCENT = 'div.translucent a[data-plugin="preview"][title="{fileTitle}"] h3';
-
-    static readonly FILE_TILE_TITLE_NONTRANSLUCENT =
-        'div:not(.translucent) a[data-plugin="preview"][title="{fileTitle}"] h3';
-
     static readonly ELEMENT_POST_FILE_BUTTON = 'input[value="Post File"]';
 
-    static readonly ELEMENT_ATTACH_FILE_BUTTON = "#CmsZone";
+    static readonly ELEMENT_SELECTOR_UPDATE_BUTTON = 'input[value="Update"]';
+
+    static readonly ELEMENT_SELECTOR_COMPONENTNAME_INPUT = 'input[name="componentname"]';
+
+    static readonly ELEMENT_ATTACH_FILE = "#CmsZone";
 
     static readonly ELEMENT_MY_FILES_LINK = 'a.icon-files[href="#filesystem-myfile-panel"]';
-
-    static readonly ELEMENT_FILE_ITEM = 'a[title="Abby"]';
-
-    static readonly ELEMENT_PREVIEW_FILES = '[data-test^="file-component-title-"]';
 
     static readonly ELEMENT_FILE_VISIBILITY_CHECKBOX_INPUT = "#visible";
 
     static readonly ELEMENT_FILE_VISIBILITY_CHECKBOX_LABEL = 'label[for="visible"]';
+
+    static readonly DATA_TEST_FILE_MODIFY = "file-list-modify-icon-{fileId}";
+
+    static readonly DATA_TEST_FILE_SELECT_LINK = "file-select-link";
+
+    static readonly DATA_TEST_VIEW_ALL_FILES_BUTTON = "view-all-files-button";
+
+    static readonly DATA_TEST_PREVIEW_FILES = /^file-component-title-/;
+
+    static readonly ELEMENT_SELECTOR_SORT = 'select[name="sort"]';
+
+    static readonly ELEMENT_SELECTOR_SORTDIR = 'select[name="sortdir"]';
+
+    static readonly ELEMENT_SELECTOR_SIZE = "select[name='size']";
+
+    static readonly ELEMENT_FILTER_DOCUMENT = 'label[for$="-filter-document"]';
+
+    static readonly ELEMENT_FILTER_AUDIO = 'label[for$="-filter-audio"]';
+
+    static readonly ELEMENT_FILTER_VIDEO = 'label[for$="-filter-video"]';
+
+    static readonly ELEMENT_FILTER_IMAGE = 'label[for$="-filter-image"]';
+
+    static readonly ELEMENT_FILTER_OTHER = 'label[for$="-filter-other"]';
+
+    static readonly ELEMENT_FILE_TILE_TITLE_TRANSLUCENT =
+        'div.translucent a[data-plugin="preview"][title="{fileTitle}"] h3';
+
+    static readonly ELEMENT_FILE_TILE_TITLE_NONTRANSLUCENT =
+        'div:not(.translucent) a[data-plugin="preview"][title="{fileTitle}"] h3';
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -58,11 +84,11 @@ export default class Files {
     ): Promise<void> {
         if (translucent) {
             await expect(
-                container.locator(Files.FILE_TILE_TITLE_TRANSLUCENT.replace("{fileTitle}", fileTitle)),
+                container.locator(Files.ELEMENT_FILE_TILE_TITLE_TRANSLUCENT.replace("{fileTitle}", fileTitle)),
             ).toBeVisible();
         } else {
             await expect(
-                container.locator(Files.FILE_TILE_TITLE_NONTRANSLUCENT.replace("{fileTitle}", fileTitle)),
+                container.locator(Files.ELEMENT_FILE_TILE_TITLE_NONTRANSLUCENT.replace("{fileTitle}", fileTitle)),
             ).toBeVisible();
         }
     }
@@ -75,31 +101,31 @@ export default class Files {
      * @param fileTitle - Title to enter in the form.
      * @param description - Description to enter in the form.
      * @param expectedVisibility - Whether the file should be visible after posting.
+     * @param db - The DatabaseHelper instance
+     * @param filePath - The file to attach
      */
-    public static async selectFile(
-        page: Page,
+    public async selectFile(
         component: Locator,
         fileTitle: string,
         description: string,
         expectedVisibility: boolean,
+        db: DatabaseHelper,
+        filePath: string,
     ): Promise<void> {
-        await component.getByTestId("file-select-link").click();
-        await page.fill(Files.ELEMENT_FILE_TITLE_TEXTBOX, fileTitle);
-        await page.fill(Files.ELEMENT_FILE_DESCRIPTION_TEXTBOX, description);
-        await page.click(Files.ELEMENT_ATTACH_FILE_BUTTON);
-        await page.click(Files.ELEMENT_MY_FILES_LINK);
-        await page.click(Files.ELEMENT_FILE_ITEM);
-
-        // Ensure visibility matches expectation:
-        // - read state from INPUT
-        // - toggle via LABEL (custom UIs often hide the input)
-        const actualVisibility = await page.isChecked(Files.ELEMENT_FILE_VISIBILITY_CHECKBOX_INPUT);
+        await component.getByTestId(Files.DATA_TEST_FILE_SELECT_LINK).click();
+        await this.page.fill(Files.ELEMENT_FILE_TITLE_TEXTBOX, fileTitle);
+        await this.page.fill(Files.ELEMENT_FILE_DESCRIPTION_TEXTBOX, description);
+        const attachZone = this.page.locator(Files.ELEMENT_ATTACH_FILE);
+        // Attach the file using your drag-and-drop helper
+        await this.tester.dragAndDropFile(db, attachZone, filePath);
+        // Ensure visibility matches expectation by toggling via label
+        const actualVisibility = await this.page.isChecked(Files.ELEMENT_FILE_VISIBILITY_CHECKBOX_INPUT);
         if (expectedVisibility && !actualVisibility) {
-            await page.click(Files.ELEMENT_FILE_VISIBILITY_CHECKBOX_LABEL);
+            await this.page.click(Files.ELEMENT_FILE_VISIBILITY_CHECKBOX_LABEL);
         } else if (!expectedVisibility && actualVisibility) {
-            await page.click(Files.ELEMENT_FILE_VISIBILITY_CHECKBOX_LABEL);
+            await this.page.click(Files.ELEMENT_FILE_VISIBILITY_CHECKBOX_LABEL);
         }
-        await page.click(Files.ELEMENT_POST_FILE_BUTTON);
+        await this.page.click(Files.ELEMENT_POST_FILE_BUTTON);
     }
 
     /**
@@ -107,12 +133,12 @@ export default class Files {
      * @param filesComponent - Root locator for the Files component.
      */
     public static async sortImageFiles(filesComponent: Locator): Promise<void> {
-        await filesComponent.locator('label[for$="-filter-document"]').click();
-        await filesComponent.locator('label[for$="-filter-audio"]').click();
-        await filesComponent.locator('label[for$="-filter-video"]').click();
-        await filesComponent.locator('label[for$="-filter-other"]').click();
-        await filesComponent.locator('input[value="Update"]').click();
-        await expect(filesComponent.locator('select[name="sort"]')).toBeHidden();
+        await filesComponent.locator(Files.ELEMENT_FILTER_DOCUMENT).click();
+        await filesComponent.locator(Files.ELEMENT_FILTER_AUDIO).click();
+        await filesComponent.locator(Files.ELEMENT_FILTER_VIDEO).click();
+        await filesComponent.locator(Files.ELEMENT_FILTER_OTHER).click();
+        await filesComponent.locator(Files.ELEMENT_SELECTOR_UPDATE_BUTTON).click();
+        await expect(filesComponent.locator(Files.ELEMENT_SELECTOR_SORT)).toBeHidden();
     }
 
     /**
@@ -120,11 +146,11 @@ export default class Files {
      * @param filesComponent - Root locator for the Files component.
      */
     public static async sortVideoAndDocumentFiles(filesComponent: Locator): Promise<void> {
-        await filesComponent.locator('label[for$="-filter-document"]').click();
-        await filesComponent.locator('label[for$="-filter-video"]').click();
-        await filesComponent.locator('label[for$="-filter-image"]').click();
-        await filesComponent.locator('input[value="Update"]').click();
-        await expect(filesComponent.locator('select[name="sort"]')).toBeHidden();
+        await filesComponent.locator(Files.ELEMENT_FILTER_DOCUMENT).click();
+        await filesComponent.locator(Files.ELEMENT_FILTER_VIDEO).click();
+        await filesComponent.locator(Files.ELEMENT_FILTER_IMAGE).click();
+        await filesComponent.locator(Files.ELEMENT_SELECTOR_UPDATE_BUTTON).click();
+        await expect(filesComponent.locator(Files.ELEMENT_SELECTOR_SORT)).toBeHidden();
     }
 
     /*
@@ -133,7 +159,7 @@ export default class Files {
      * @returns Array of file titles.
      */
     public static async getAllFiles(filesComponent: Locator): Promise<string[]> {
-        const fileTexts = await filesComponent.locator(Files.ELEMENT_PREVIEW_FILES).allTextContents();
+        const fileTexts = await filesComponent.getByTestId(Files.DATA_TEST_PREVIEW_FILES).allTextContents();
         return fileTexts.map((text) => text.trim());
     }
 
@@ -144,13 +170,13 @@ export default class Files {
      * @param sortingOrder - e.g. 'asc' | 'desc'
      */
     public static async sortFilesAsc(filesComponent: Locator, sortBy: string, sortingOrder: string): Promise<void> {
-        await filesComponent.locator('label[for$="-filter-audio"]').click();
-        await filesComponent.locator('label[for$="-filter-image"]').click();
-        await filesComponent.locator('label[for$="-filter-other"]').click();
-        await filesComponent.locator('select[name="sort"]').selectOption(sortBy);
-        await filesComponent.locator('select[name="sortdir"]').selectOption(sortingOrder);
-        await filesComponent.locator('input[value="Update"]').click();
-        await expect(filesComponent.locator('select[name="sort"]')).toBeHidden();
+        await filesComponent.locator(Files.ELEMENT_FILTER_AUDIO).click();
+        await filesComponent.locator(Files.ELEMENT_FILTER_IMAGE).click();
+        await filesComponent.locator(Files.ELEMENT_FILTER_OTHER).click();
+        await filesComponent.locator(Files.ELEMENT_SELECTOR_SORT).selectOption(sortBy);
+        await filesComponent.locator(Files.ELEMENT_SELECTOR_SORTDIR).selectOption(sortingOrder);
+        await filesComponent.locator(Files.ELEMENT_SELECTOR_UPDATE_BUTTON).click();
+        await expect(filesComponent.locator(Files.ELEMENT_SELECTOR_SORT)).toBeHidden();
     }
 
     /**
@@ -160,10 +186,10 @@ export default class Files {
      * @param sortingOrder - e.g. 'asc' | 'desc'
      */
     public static async sortFilesDesc(filesComponent: Locator, sortBy: string, sortingOrder: string): Promise<void> {
-        await filesComponent.locator('select[name="sort"]').selectOption(sortBy);
-        await filesComponent.locator('select[name="sortdir"]').selectOption(sortingOrder);
-        await filesComponent.locator('input[value="Update"]').click();
-        await expect(filesComponent.locator('select[name="sort"]')).toBeHidden();
+        await filesComponent.locator(Files.ELEMENT_SELECTOR_SORT).selectOption(sortBy);
+        await filesComponent.locator(Files.ELEMENT_SELECTOR_SORTDIR).selectOption(sortingOrder);
+        await filesComponent.locator(Files.ELEMENT_SELECTOR_UPDATE_BUTTON).click();
+        await expect(filesComponent.locator(Files.ELEMENT_SELECTOR_SORT)).toBeHidden();
     }
 
     /**
@@ -172,22 +198,22 @@ export default class Files {
      * @param limit - '1' | '2' | 'All'
      */
     public static async setFileLimit(fileComponent: Locator, limit: string): Promise<void> {
-        await fileComponent.locator("select[name='size']").selectOption(limit);
-        await fileComponent.locator('input[value="Update"]').click();
-        await expect(fileComponent.locator('select[name="sort"]')).toBeHidden();
+        await fileComponent.locator(Files.ELEMENT_SELECTOR_SIZE).selectOption(limit);
+        await fileComponent.locator(Files.ELEMENT_SELECTOR_UPDATE_BUTTON).click();
+        await expect(fileComponent.locator(Files.ELEMENT_SELECTOR_SORT)).toBeHidden();
     }
 
     /**
      * @param fileComponent - Root locator for this Files component; actions are scoped to it.
      *   - Tick compact mode
-     *   - Tick show component title
+     *   - Tick show component titleAbby
      *   - Clicks Update and waits for the form to close
      */
     public static async updateFileComponentSetting(fileComponent: Locator): Promise<void> {
         await fileComponent.locator('label[for$="-compactMode"]').click();
         await fileComponent.locator('label[for$="-showComponentTitle"]').click();
-        await fileComponent.locator('input[value="Update"]').click();
-        await expect(fileComponent.locator("select[name='size']")).toBeHidden();
+        await fileComponent.locator(Files.ELEMENT_SELECTOR_UPDATE_BUTTON).click();
+        await expect(fileComponent.locator(Files.ELEMENT_SELECTOR_SIZE)).toBeHidden();
     }
 
     /**
@@ -226,12 +252,16 @@ export default class Files {
      * @param newFileTitle - New value for the title field.
      */
     public async modifyFile(fileComponent: Locator, fileId: number, newFileTitle: string): Promise<void> {
-        await fileComponent.locator(`a.icon-modify[title="Modify File"][href^="/cms/file/${fileId}"]`).click();
-        await this.page.locator("#description").fill(newFileTitle);
-        await this.page.locator('input[value="Modify File"]').click();
-        await expect(this.page.locator("#description")).toBeHidden();
-    }
+        //await fileComponent.locator(`a.icon-modify[title="Modify File"][href^="/cms/file/${fileId}"]`).click();
+        //await fileComponent.getByTestId(`${Files.ELEMENT_MODIFY_FILE}-${fileId}`).click();
+        //await fileComponent.getByTestId(`file-card-${fileId}`).getByTestId(Files.ELEMENT_MODIFY_FILE).click();
+        // await fileComponent.getByTestId(Files.DATA_TEST_FILE_MODIFY).click();
+        await fileComponent.getByTestId(Files.DATA_TEST_FILE_MODIFY.replace("{fileId}", String(fileId))).click();
 
+        await this.page.locator(Files.ELEMENT_FILE_TITLE_TEXTBOX).fill(newFileTitle);
+        await this.page.locator('input[value="Modify File"]').click();
+        await expect(this.page.locator(Files.ELEMENT_FILE_TITLE_TEXTBOX)).toBeHidden();
+    }
     /**
      * Configure the Files component to use an existing folder ("Use This Folder").
      * @param fileComponent - Root locator for the Files component.
@@ -250,7 +280,7 @@ export default class Files {
             .click();
         const locatorEng = fileComponent.locator("div.source a", { hasText: subSrcFolder });
         await expect(locatorEng).toBeVisible();
-        await fileComponent.locator('input[type="submit"][value="Update"]').click();
+        await fileComponent.locator(Files.ELEMENT_SELECTOR_UPDATE_BUTTON).click();
         await expect(locatorEng).toBeHidden();
     }
 
@@ -267,9 +297,9 @@ export default class Files {
         classPageId: number,
         newHeading: string = "Automation Heading Test",
     ): Promise<void> {
-        await filesComponent.locator('input[name="componentname"]').fill(newHeading);
-        await filesComponent.locator('input[value="Update"]').click();
-        await filesComponent.getByTestId("view-all-files-button").click();
+        await filesComponent.locator(Files.ELEMENT_SELECTOR_COMPONENTNAME_INPUT).fill(newHeading);
+        await filesComponent.locator(Files.ELEMENT_SELECTOR_UPDATE_BUTTON).click();
+        await filesComponent.getByTestId(Files.DATA_TEST_VIEW_ALL_FILES_BUTTON).click();
 
         // e.g. /resources/folder/4905/files/83
         await expect(page).toHaveURL(new RegExp(`/resources/folder/\\d+/files/${classPageId}$`));
@@ -289,9 +319,9 @@ export default class Files {
         classPageId: number,
         expectedHeading: string = "Files",
     ): Promise<void> {
-        await filesComponent.locator('input[name="componentname"]').fill("");
-        await filesComponent.locator('input[value="Update"]').click();
-        await filesComponent.getByTestId("view-all-files-button").click();
+        await filesComponent.locator(Files.ELEMENT_SELECTOR_COMPONENTNAME_INPUT).fill("");
+        await filesComponent.locator(Files.ELEMENT_SELECTOR_UPDATE_BUTTON).click();
+        await filesComponent.getByTestId(Files.DATA_TEST_VIEW_ALL_FILES_BUTTON).click();
         await expect(page).toHaveURL(new RegExp(`/resources/folder/\\d+/files/${classPageId}$`));
         await expect(page.locator("ul.breadcrumb > li.active > span")).toContainText(expectedHeading);
     }
