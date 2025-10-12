@@ -9,8 +9,8 @@ test.describe("Breadcrumbs Component Tests", () => {
     let breadcrumb9AEnglishId: number;
     let breadcrumb9BEnglishId: number;
     let breadcrumb9AFrenchId: number;
-    let homepage: Homepage;
     let breadcrumbsComponent: Locator;
+    let homepage: Homepage;
 
     test.beforeEach(async ({ tester, page }) => {
         homepage = new Homepage(tester, page);
@@ -67,7 +67,6 @@ test.describe("Breadcrumbs Component Tests", () => {
         await homepage.goto(83);
         tester.isGoingTo("Use existing Breadcrumbs component from previous test");
         breadcrumbsComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
-        breadcrumb9AEnglishId = await Homepage.getComponentId(breadcrumbsComponent);
         tester.isGoingTo(`Use component: ${breadcrumb9AEnglishId}`);
         const breadcrumb = page.locator("ul.breadcrumb");
         await expect(breadcrumb.locator('a:text-is("Classes")')).toHaveAttribute("href", "/homepage/263/");
@@ -79,7 +78,6 @@ test.describe("Breadcrumbs Component Tests", () => {
         await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
         await Homepage.clickComponentSettings(breadcrumbsComponent);
         tester.isGoingTo("Update Breadcrumbs settings (hide title for read-only users)");
-        tester.isGoingTo("Uncheck Show to Read Only Users");
         await page.locator(`#component${breadcrumb9AEnglishId} input[type="submit"][value="Update"]`).click();
         tester.isGoingTo("Confirm title bar is visible for Alress");
         const breadcrumbHeader = breadcrumbsComponent.getByTestId("homepage-component-titlebar-name");
