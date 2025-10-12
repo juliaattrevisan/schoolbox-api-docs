@@ -252,16 +252,12 @@ export default class Files {
      * @param newFileTitle - New value for the title field.
      */
     public async modifyFile(fileComponent: Locator, fileId: number, newFileTitle: string): Promise<void> {
-        //await fileComponent.locator(`a.icon-modify[title="Modify File"][href^="/cms/file/${fileId}"]`).click();
-        //await fileComponent.getByTestId(`${Files.ELEMENT_MODIFY_FILE}-${fileId}`).click();
-        //await fileComponent.getByTestId(`file-card-${fileId}`).getByTestId(Files.ELEMENT_MODIFY_FILE).click();
-        // await fileComponent.getByTestId(Files.DATA_TEST_FILE_MODIFY).click();
         await fileComponent.getByTestId(Files.DATA_TEST_FILE_MODIFY.replace("{fileId}", String(fileId))).click();
-
         await this.page.locator(Files.ELEMENT_FILE_TITLE_TEXTBOX).fill(newFileTitle);
         await this.page.locator('input[value="Modify File"]').click();
         await expect(this.page.locator(Files.ELEMENT_FILE_TITLE_TEXTBOX)).toBeHidden();
     }
+
     /**
      * Configure the Files component to use an existing folder ("Use This Folder").
      * @param fileComponent - Root locator for the Files component.
