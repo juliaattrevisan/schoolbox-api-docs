@@ -50,7 +50,7 @@ $app = new class extends CliTool\App {
         $this->getLogger()->notice("Migrated AI text config, provider: " . ($newConfig['provider'] ?? 'unknown'));
 
         // insert new config into DB
-        foreach (['openai_text_chat', 'openai_lessonplan', 'openai_assessment', 'openai_differentiation'] as $moduleKey) {
+        foreach (['openai_text_chat', 'openai_lessonplan', 'openai_dialogagent', 'openai_differentiation'] as $moduleKey) {
             $this->getLogger()->notice("Migrating AI config for module $moduleKey");
             $this->getDatabaseInternal()->executeQuery(
                 "UPDATE config SET value = :value WHERE name = :name;",
