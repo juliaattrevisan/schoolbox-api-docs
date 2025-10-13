@@ -21,7 +21,6 @@ use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\OpenAi\Agent\ImageGeneration;
 use Scrub;
-use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 /**
  * This controller acts as a proxy for OpenAI API.  It just appends the configured API key to the request in
@@ -273,13 +272,6 @@ class Controller extends Base
                     ->setStatus(400)
                     ->asArray();
 
-                // This can never be a stream yet
-//                // If we've indicated that this is a streaming request, send it in the right format
-//                if (headers_sent()) {
-//                    echo "event: error\ndata: 'AI Session id is required and must be a valid UUID.'\n\n";
-//                    die();
-//                }
-
                 $this->response = $this->responseAsJson($problem)
                     ->withStatus(400);
 
@@ -288,6 +280,7 @@ class Controller extends Base
 
             $agent = new ImageGeneration(
                 new \Schoolbox\OpenAi\ClientFactory(
+                    $this->getConfigLoader(),
                     $this->logMapper,
                     $this->client,
                 )->buildOpenAi($this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_KEY)),
@@ -316,8 +309,6 @@ class Controller extends Base
                     ->withHeader('Connection', 'keep-alive')
                     ->withHeader('Content-Encoding', 'none');
                 return;
-
-//                $helper->request($this->getUser(), $payload, Helper::FEATURE_IMAGE, $sessionId);
             } catch (SchoolboxException $e) {
                 // This will always be a stream
                 $problem = (new ApiProblem($e->getMessage()))
@@ -325,24 +316,12 @@ class Controller extends Base
                     ->asArray();
 
                 $this->response = $this
-                    ->responseFromStream(
-                        Utils::streamFor(sprintf("event: error\ndata: %s\n\n", json_encode($problem)))
-                    )
+                    ->responseFromContent(printf("event: error\ndata: %s\n\n", json_encode($problem)))
                     ->withStatus($e->getCode())
                     ->withHeader('Content-Type', 'text/event-stream')
                     ->withHeader('Cache-Control', 'no-cache')
                     ->withHeader('Connection', 'keep-alive')
                     ->withHeader('Content-Encoding', 'none');
-
-//                // If we've indicated that this is a streaming request, send it in the right format
-//                if (headers_sent()) {
-//                    echo sprintf("event: error\ndata: %s\n\n", json_encode($problem));
-//                    die();
-//                }
-//
-//                $this->response = $this->responseAsJson($problem)
-//                    ->withStatus($e->getCode());
-
                 return;
             }
         } catch (\DomainException $e) {
@@ -355,20 +334,12 @@ class Controller extends Base
                 ->asArray();
 
             $this->response = $this
-                ->responseFromStream(
-                    Utils::streamFor(sprintf("event: error\ndata: %s\n\n", json_encode($problem)))
-                )
+                ->responseFromContent(sprintf("event: error\ndata: %s\n\n", json_encode($problem)))
                 ->withStatus($e->getCode())
                 ->withHeader('Content-Type', 'text/event-stream')
                 ->withHeader('Cache-Control', 'no-cache')
                 ->withHeader('Connection', 'keep-alive')
                 ->withHeader('Content-Encoding', 'none');
-
-//            // If we've indicated that this is a streaming request, send it in the right format
-//            if (headers_sent()) {
-//                echo sprintf("event: error\ndata: %s\n\n", json_encode($problem));
-//                die();
-//            }
 
             $this->response = $this->responseAsJson($problem)
                 ->withStatus($returnCode);
