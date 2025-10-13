@@ -135,6 +135,13 @@ class Mapper extends BaseMapper
             $grouped[$sessionId][] = $result;
         }
 
+        // sort by most recent created_at in each group
+        uasort($grouped, function ($a, $b) {
+            $aDate = $a[0]->getCreatedAt() ? $a[0]->getCreatedAt()->getUnixTimeStamp() : 0;
+            $bDate = $b[0]->getCreatedAt() ? $b[0]->getCreatedAt()->getUnixTimeStamp() : 0;
+            return $bDate <=> $aDate;
+        });
+
         return $grouped;
     }
 
@@ -165,6 +172,14 @@ class Mapper extends BaseMapper
             }
             $grouped[$sessionId]->add($result);
         }
+
+        // sort by most recent created_at in each group
+        uasort($grouped, function ($a, $b) {
+            $aDate = $a[0]->getCreatedAt() ? $a[0]->getCreatedAt()->getUnixTimeStamp() : 0;
+            $bDate = $b[0]->getCreatedAt() ? $b[0]->getCreatedAt()->getUnixTimeStamp() : 0;
+            return $bDate <=> $aDate;
+        });
+
 
         return $grouped;
     }
