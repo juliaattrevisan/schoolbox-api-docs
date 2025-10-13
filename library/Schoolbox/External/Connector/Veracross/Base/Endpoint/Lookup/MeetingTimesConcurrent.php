@@ -119,8 +119,6 @@ class MeetingTimesConcurrent
                          * https://api-docs.veracross.com/docs/docs/87c4e0dc5e47b-rate-limiting
                          */
                         if (200 !== $response['value']->getStatusCode()) {
-                            print_r($response['value']);
-                            die();
                             $this->log->warning(sprintf(
                                 'Incomplete concurrency request returned HTTP %s %s',
                                 $response['value']->getStatusCode(),

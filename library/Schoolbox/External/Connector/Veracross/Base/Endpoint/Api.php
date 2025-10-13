@@ -56,6 +56,12 @@ class Api implements IApi
 
 
     /**
+     * Try three times before dying
+     */
+    private const MAX_CONCURRENCY_RETRIES = 3;
+
+
+    /**
      * @var ApiUsage
      */
     private ApiUsage $apiUsage;
@@ -123,7 +129,6 @@ class Api implements IApi
      * @param string $host
      * @param string $dsn
      * @param int $timeout
-     * @param callable $decider
      * @return Client
      */
     private function initClient(string $host, #[SensitiveParameter] string $dsn, int $timeout): Client
@@ -161,12 +166,16 @@ class Api implements IApi
         );
 
         /* TODO How to implement this? Our retrymiddleware doesn't have a factory() method lol
+         *
+         * Ended up stealing the ai-generated stuff, this guy's idea,
+         * https://gist.github.com/christeredvartsen/7776e40a0102a571c35a9fc892164a8c
+         * ...and some of my own ideas and smooshed it all together here, in a somewhat
+         * awkward casserole of ideas.
          */
+        $maxRetries = self::MAX_CONCURRENCY_RETRIES;
 
-        /* https://gist.github.com/christeredvartsen/7776e40a0102a571c35a9fc892164a8c
+        /* Decide whether a request needs a retry or not
          */
-        $maxRetries = 3;
-
         $decider = function(int $retries, $request, $response = null) use ($maxRetries) : bool {
             return
                 $retries < $maxRetries
@@ -174,22 +183,28 @@ class Api implements IApi
                 && 429 === $response->getStatusCode();
         };
 
+        /* Decide how long to wait between retries
+         *
+         * Note that delay() accepts the number of retries and returns the number of milliseconds to delay.
+         * https://github.com/guzzle/guzzle/blob/7.5/src/RetryMiddleware.php
+         */
         $delay = function(int $retries, $response) : int {
             if (!$response->hasHeader('x-rate-limit-reset')) {
                 return RetryMiddleware::exponentialDelay($retries);
             }
 
-            $retryAfter = (int)$response->getHeaderLine('x-rate-limit-reset') - time();
-
-            return $retryAfter * 1000;
+            /* Veracross lets us make more requests after this x-rate-limit-reset datetime
+             * that is (in?)conveniently expressed as a unix timestamp
+             */
+            return 1000 * ((int)$response->getHeaderLine('x-rate-limit-reset') - time());
         };
-
-        $stack = HandlerStack::create();
-        $stack->push(Middleware::retry($decider, $delay));
 
         /* Use guzzle's Retry middleware
          * https://github.com/caseyamcl/guzzle_retry_middleware
          */
+        $stack = HandlerStack::create();
+        $stack->push(Middleware::retry($decider, $delay));
+
         return new Client([
             'base_uri' => $this->baseUri,
             'timeout' => $timeout,
@@ -208,15 +223,22 @@ class Api implements IApi
                 $response,
                 ?\Throwable $exception
             ) {
-                /* I've never seen this happen, but want to see it happen.
+                /* Veracross lets us make more requests after this datetime
+                 */
+                $resetAt = (int)$response->getHeaderLine('x-rate-limit-reset');
+
+                $retryAfter = $resetAt - time();
+
+                /* Craft a shifty log for now
                  */
                 echo sprintf(
-                    "Retrying request to %s. Server responded with %s. Will wait %s seconds. This is attempt #%s. The error was %s",
+                    "%s  Retrying request to %s after %s seconds napping (unblocks at %s) due to %s %s\n",
+                    date(\Alaress_Date_Format::DATABASE_DATE_FORMAT, time()),
                     $request->getUri()->getPath(),
+                    $retryAfter,
+                    date(\Alaress_Date_Format::DATABASE_DATE_FORMAT, $resetAt),
                     $response->getStatusCode(),
-                    number_format($delay, 2),
-                    $attemptNumber,
-                    $exception->getMessage()
+                    $response->getReasonPhrase()
                 );
             },
             /* Apparently guzzle can inspect a header request to infer how long to wait between retries...but veracross
@@ -240,7 +262,7 @@ class Api implements IApi
              */
             'retry_after_header' => 'x-rate-limit-reset',
             'retry_after_date_format' => 'U',
-            /* TODO How to implement this?
+            /* This sort-of worked, mostly...
              */
             'handler' => $stack,
         ]);
