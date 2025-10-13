@@ -135,10 +135,19 @@
          # and let each feature decide when it's off and when it's on.
          #}
         {% if user.current.role.staff and config.openai_text_endpoint != 'Off' %}
-        // to display the AI features around the site
-        window.sbProps.hasAIFeatures = true;
-        window.sbProps.openAIModel = "{{ config.openai_text_model }}";
+        {# loop through each of the aiFeatures to specify which should be enabled and what model they are using... #}
+        window.sbProps.aiFeatures = {};
+        {% for feature, config in aiFeatures %}
+        window.sbProps.aiFeatures["{{ feature }}"] = {
+            enabled: "{{ config.enabled ? 'true' : 'false' }}",
+            {% if config.enabled %}
+                model: "{{ config.model ?? '' }}",
+            {% endif %}
+        };
+        {% endfor %}
         {% endif %}
+        {#window.sbProps.hasAIFeatures = true;#}
+        {#window.sbProps.openAIModel = "{{ config.openai_text_model }}";#}
 
         window.sbProps.firebaseApps = [];
         {% for app in firebase.apps %}

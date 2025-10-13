@@ -944,6 +944,7 @@ abstract class Kernel
                             $sideMenuMapper,
                             $bookMarkMapper,
                         ),
+                        'aiFeatures' => new \Schoolbox\Admin\OpenAI\DataGenerator($config),
                         'scripts' => new Output\DataGenerator\Scripts($config, $_SERVER),
                     ];
 
