@@ -108,4 +108,31 @@ class Mapper extends BaseMapper
 
         return $collection;
     }
+
+    /**
+     * @param int $limit
+     * @param int $offset
+     * @param array $options
+     * @return array grouped by session id
+     */
+    public function findAllGrouped(int $limit = 100, int $offset = 0, array $options = []): array
+    {
+        $options['limit'] = $limit;
+        $options['offset'] = $offset;
+        $options['order'] = $options['order'] ?? 'created_at DESC';
+
+        $results = $this->findAll($options);
+
+        // group by session id
+        $grouped = [];
+        foreach ($results as $result) {
+            $sessionId = $result->getSessionId() ?? 'no-session-' . $result->getId();
+            if (!isset($grouped[$sessionId])) {
+                $grouped[$sessionId] = [];
+            }
+            $grouped[$sessionId][] = $result;
+        }
+
+        return $grouped;
+    }
 }

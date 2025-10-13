@@ -32,10 +32,10 @@ class Controller extends Base
     public function getIndex(): void
     {
         // get the first 100 logs to display in the table
-        $logs = $this->aiLogMapper->findAll(['limit' => 100, 'order' => 'created_at DESC']);
+        $logGroups = $this->aiLogMapper->findAllGrouped();
 
         $this->response = $this->responseFromTemplate('@openAIUsage/index.twig', [
-            'logs' => $logs,
+            'logGroups' => $logGroups,
             'pageCurrent' => $this->routeGenerator->generate('openAIUsage.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('openAIUsage.getIndex')),
         ]);

@@ -2,7 +2,7 @@
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
 {% set debug = true %}
-{% set debug = false %}
+{#{% set debug = false %}#}
 
 <div class="admin-container row">
 
@@ -20,16 +20,20 @@
                         <th>Date</th>
                         <th>Feature</th>
                         <th>User</th>
+                        {% if debug %}
+                            <th>Log Count</th>
+                        {% endif %}
                     </tr>
-                    {% for log in logs %}
-                        <tr data-log-session-id="{{ log.sessionId }}">
+                    {% for sesionId,logs in logGroups %}
+                        {% set log = logs|first %}
+                        <tr data-log-session-id="{{ sesionId }}">
                             {% if debug %}
-                                {% set route = routeLookupIfAuthorized('openAIUsage.getLog', {sessionId: log.sessionId, log: log}) %}
+                                {% set route = routeLookupIfAuthorized('openAIUsage.getLog', {sessionId: sesionId, log: log}) %}
                                 <td>
                                     {% if route %}
-                                    <a href="{{ route }}">{{ log.sessionId }}</a>
+                                    <a href="{{ route }}">{{ sesionId }}</a>
                                     {% else %}
-                                        {{ log.sessionId }}
+                                        {{ sesionId }}
                                     {% endif %}
                                 </td>
                             {% endif %}
@@ -42,6 +46,9 @@
                             <td>
                                 <a href="/search/user/{{ log.user.getId }}">{{ log.user.getFullName }}</a>
                             </td>
+                            {% if debug %}
+                                <td>{{ logs|length }}</td>
+                            {% endif %}
                         </tr>
 
                     {% endfor %}
