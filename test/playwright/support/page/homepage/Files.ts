@@ -50,11 +50,8 @@ export default class Files {
 
     static readonly ELEMENT_FILTER_OTHER = 'label[for$="-filter-other"]';
 
-    static readonly ELEMENT_FILE_TILE_TITLE_TRANSLUCENT =
-        'div.translucent a[data-plugin="preview"][title="{fileTitle}"] h3';
-
-    static readonly ELEMENT_FILE_TILE_TITLE_NONTRANSLUCENT =
-        'div:not(.translucent) a[data-plugin="preview"][title="{fileTitle}"] h3';
+    static readonly ELEMENT_SELECTOR_FILE_ITEM_BY_TITLE =
+        '.list-item:has([data-test="file-component-title-{fileTitle}"])';
 
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
@@ -82,14 +79,12 @@ export default class Files {
         fileTitle: string,
         translucent: boolean = false,
     ): Promise<void> {
+        await expect(container.getByTestId(`file-component-title-${fileTitle}`)).toBeVisible();
+        const item = container.locator(Files.ELEMENT_SELECTOR_FILE_ITEM_BY_TITLE.replace("{fileTitle}", fileTitle));
         if (translucent) {
-            await expect(
-                container.locator(Files.ELEMENT_FILE_TILE_TITLE_TRANSLUCENT.replace("{fileTitle}", fileTitle)),
-            ).toBeVisible();
+            await expect(item).toHaveClass(/translucent/);
         } else {
-            await expect(
-                container.locator(Files.ELEMENT_FILE_TILE_TITLE_NONTRANSLUCENT.replace("{fileTitle}", fileTitle)),
-            ).toBeVisible();
+            await expect(item).not.toHaveClass(/translucent/);
         }
     }
 
