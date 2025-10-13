@@ -31,7 +31,9 @@ enum ImageStyle: string
      */
     public function label(): string
     {
-        /** @phpcs:ignore - this is a valid use of $this */
+        // This is a valid use of $this:
+        // see https://www.php.net/manual/en/language.enumerations.methods.php
+        // phpcs:ignore
         return match ($this) {
             self::Background     => 'Background',
             self::Cartoon        => 'Cartoon',
