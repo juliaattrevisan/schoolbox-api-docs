@@ -36,8 +36,12 @@ class Controller extends Base
         // get the first 100 logs to display in the table
         $logGroups = $this->aiLogMapper->findAllGrouped();
 
+        // count of all
+        $count = $this->aiLogMapper->countAll();
+
         $this->response = $this->responseFromTemplate('@openAIUsage/index.twig', [
             'features' => AIConfig::ALL_MODULES,
+            'count' => $count,
             'logGroups' => $logGroups,
             'pageCurrent' => $this->routeGenerator->generate('openAIUsage.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('openAIUsage.getIndex')),
