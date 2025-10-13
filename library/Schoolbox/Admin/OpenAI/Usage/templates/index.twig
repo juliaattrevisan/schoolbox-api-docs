@@ -10,6 +10,35 @@
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
+        {# filters #}
+        <div class="filters">
+            <form method="POST" action="{{ routeLookupIfAuthorized('openAIUsage.postSearch') }}">
+                <div class="filter-group">
+                    <label for="feature">Feature:</label>
+                    <select name="feature" id="feature">
+                        <option value="">All</option>
+                        {% for feature in features %}
+                            <option value="{{ feature }}">{{ feature }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="userId">User ID:</label>
+                    <input id='user' name="user" type='text' value='' placeholder="Search Users" data-selectizeuser required />
+                </div>
+                <div class="filter-group">
+                    <label for="dateFrom">Date From:</label>
+                    <input type="text" name="from" id="dateFrom" data-datepicker value="">
+                </div>
+                <div class="filter-group">
+                    <label for="dateTo">Date To:</label>
+                    <input type="text" name="before" id="dateTo" data-datepicker value="">
+                </div>
+                <div class="filter-actions">
+                    <button type="submit">Apply Filters</button>
+                    <a href="{{ routeLookupIfAuthorized('openAIUsage.getIndex') }}" class="reset-filters">Reset</a>
+                </div>
+            </form>
         <div class="usage-charts">
             <div id="usage-global-container">
                 <table>
@@ -57,4 +86,16 @@
         </div>
     </div>
 </div>
+    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js"></script>
+    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            $('#user').userSelectizeSelector({
+                ajax: {
+                    data:     {groupID: 0, showCampus: true},
+                },
+                multiple: false {# why this doesn't multiple false... i have no idea... #}
+            });
+        });
+    </script>
 <div id="toast" class="toast"></div>

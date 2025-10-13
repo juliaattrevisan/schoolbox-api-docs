@@ -37,6 +37,7 @@ class Controller extends Base
         $logGroups = $this->aiLogMapper->findAllGrouped();
 
         $this->response = $this->responseFromTemplate('@openAIUsage/index.twig', [
+            'features' => AIConfig::ALL_MODULES,
             'logGroups' => $logGroups,
             'pageCurrent' => $this->routeGenerator->generate('openAIUsage.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('openAIUsage.getIndex')),
@@ -87,9 +88,9 @@ class Controller extends Base
 
         // dates (before/after)
         if ($after) {
-            if ($date = strtotime($after)) {
-                $after = date('Y-m-d H:i:s', $date);
-            } else {
+            try {
+                $after  = new \Alaress_Date_Format($after, \Alaress_Date_Format::FORMAT_DATE_ALT);
+            } catch (\InvalidArgumentException $e) {
                 $problem = (new ApiProblem('Invalid After Date'))
                     ->setStatus(400)
                     ->asArray();
@@ -99,9 +100,9 @@ class Controller extends Base
             $predicate->greaterThanOrEqualTo('created_at', $after);
         }
         if ($before) {
-            if ($date = strtotime($before)) {
-                $before = date('Y-m-d H:i:s', $date);
-            } else {
+            try {
+                $before  = new \Alaress_Date_Format($before, \Alaress_Date_Format::FORMAT_DATE_ALT);
+            } catch (\InvalidArgumentException $e) {
                 $problem = (new ApiProblem('Invalid Before Date'))
                     ->setStatus(400)
                     ->asArray();
