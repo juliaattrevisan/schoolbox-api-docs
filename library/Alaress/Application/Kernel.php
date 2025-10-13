@@ -2393,6 +2393,19 @@ abstract class Kernel
             )
         );
 
+        // AI client factory
+        $di->set(
+            'ai.clientFactory',
+            $di->lazyNew(
+                \Schoolbox\OpenAi\ClientFactory::class,
+                [
+                    'config'     => $di->lazyGet('config'),
+                    'logMapper'  => $mapperFactory->getLazy(\Schoolbox\Editor\OpenAI\Log\Mapper::class),
+                    'httpClient' => $di->lazyGet('httpClient'),
+                ]
+            )
+        );
+
         return $di;
     }
 

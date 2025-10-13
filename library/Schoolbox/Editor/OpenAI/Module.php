@@ -45,19 +45,12 @@ class Module extends BaseModule
 
     public function buildController(): Base
     {
-        /** @var Client $httpClient */
-        $httpClient   = $this->injector->get('httpClient');
-        $logMapper    = $this->getMapperFactory()->get(Mapper::class);
         return new Controller(
-            $httpClient,
+            $this->injector->get('httpClient'),
             $this->getMapperFactory()->get(\Schoolbox\Error\Mapper::class),
-            $logMapper,
+            $this->getMapperFactory()->get(Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Curriculum\Node\Mapper::class),
-            $openAiClientFactory = new ClientFactory(
-                $this->getConfig(),
-                $logMapper,
-                $httpClient,
-            ),
+            $this->injector->get('ai.clientFactory'),
         );
     }
 }
