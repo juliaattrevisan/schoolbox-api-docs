@@ -36,6 +36,8 @@ class Model
     // MEDIUM TEXT max length, to trim the response, rather than die.
     private const RESPONSE_MAX_LENGTH = 16777215;
 
+    public const MISSING_SESSIONID = 'no-session-';
+
 
     /**
      * @return User

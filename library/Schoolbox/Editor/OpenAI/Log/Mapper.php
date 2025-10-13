@@ -127,7 +127,8 @@ class Mapper extends BaseMapper
         // group by session id
         $grouped = [];
         foreach ($results as $result) {
-            $sessionId = $result->getSessionId() ?? 'no-session-' . $result->getId();
+            // if no session ID, then group by no-session-{id}
+            $sessionId = $result->getSessionId() ?? Model::MISSING_SESSIONID . $result->getId();
             if (!isset($grouped[$sessionId])) {
                 $grouped[$sessionId] = [];
             }

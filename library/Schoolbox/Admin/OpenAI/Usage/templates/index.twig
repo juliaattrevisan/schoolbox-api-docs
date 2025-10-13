@@ -26,11 +26,11 @@
                     </tr>
                     {% for sesionId,logs in logGroups %}
                         {% set log = logs|first %}
-                        <tr data-log-session-id="{{ sesionId }}">
+                        <tr data-log-session-id="{{ log.sessionId }}">
                             {% if debug %}
-                                {% set route = routeLookupIfAuthorized('openAIUsage.getLog', {sessionId: sesionId, log: log}) %}
+                                {% set route = routeLookupIfAuthorized('openAIUsage.getLog', {sessionId: log.sessionId, log: log}) %}
                                 <td>
-                                    {% if route %}
+                                    {% if route and log.sessionId %}
                                     <a href="{{ route }}">{{ sesionId }}</a>
                                     {% else %}
                                         {{ sesionId }}
