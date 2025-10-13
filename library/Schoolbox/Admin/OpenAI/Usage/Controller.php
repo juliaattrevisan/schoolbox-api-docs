@@ -10,13 +10,12 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\OpenAI\Usage;
 
-use Alaress\Database\Predicate\Builder as PredicateBuilder;
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Admin\Navigation\Subnav;
-use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
 use Schoolbox\Editor\OpenAI\Log\Model as AILog;
+use Schoolbox\Admin\OpenAI\Config as AIConfig;
 use Schoolbox\Editor\OpenAI\Log\ModelToArray;
 use Schoolbox\UserMapper;
 
@@ -61,15 +60,16 @@ class Controller extends Base
         $predicate = $this->aiLogMapper->getPredicateBuilder();
 
         //ensure feature is one of the actual features...
-// need SA-20932 to check features, ill use the same logic in that
-//        if ($feature && !in_array($feature, AILog::getFeatures(), true)) {
-//            $problem = (new ApiProblem('Unknown Feature'))
-//                ->setStatus(404)
-//                ->asArray();
-//            $this->response = $this->responseAsJson($problem)->withStatus(404);
-//            return;
-//        $predicate->equals('feature', $feature);
-//        }
+        if ($feature) {
+            if (!in_array($feature, AIConfig::ALL_MODULES, true)) {
+                $problem = (new ApiProblem('Unknown Feature'))
+                    ->setStatus(404)
+                    ->asArray();
+                $this->response = $this->responseAsJson($problem)->withStatus(404);
+                return;
+            }
+            $predicate->equals('feature', $feature);
+        }
 
         // ensue the user exists (allow deleted)
         if ($user) {
@@ -86,13 +86,6 @@ class Controller extends Base
         }
 
         // dates (before/after)
-        /**
-         * if ($date = strtotime($value)) {
-         * $date = date('Y-m-d H:i:s', $date);
-         * $sqlFilter[] = "`time` >= :after";
-         * $params['after'] = $date;
-         * }
-         */
         if ($after) {
             if ($date = strtotime($after)) {
                 $after = date('Y-m-d H:i:s', $date);
