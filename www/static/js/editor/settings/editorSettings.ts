@@ -36,7 +36,7 @@ export function getSettings(config: SbxEditorConfig): EditorConfig {
         ...getTokensSettings(config),
         ...getWordCountSettings(),
         ...getHTMLSupportSettings(),
-        ...getAISettings(window.sbProps.aiFeatures.chat.model),
+        ...getAISettings(window.sbProps.aiFeatures.chat?.model),
         ...getFullscreenSettings(),
         ...getSpecialCharactersSettings(),
         ...getTemplateSettings(config),

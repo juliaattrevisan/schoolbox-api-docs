@@ -57,7 +57,7 @@ declare global {
             };
             editors: Partial<Record<string, SbxEditor>>;
             gradeGradientEnabled: boolean;
-            aiFeatures: Partial<Record<string, { enabled: boolean; model: string }>>;
+            aiFeatures: Partial<Record<string, { enabled: boolean; model: string | undefined }>>;
             lightGallery: typeof lightGallery;
             lightGalleryInit: InitLightGallery;
             lightGalleries: Record<string, LightGallery | undefined>;
