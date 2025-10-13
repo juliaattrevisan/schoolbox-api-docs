@@ -57,11 +57,7 @@ declare global {
             };
             editors: Partial<Record<string, SbxEditor>>;
             gradeGradientEnabled: boolean;
-            aiFeatures: [
-                string: {
-                enabled: boolean; // to display the AI features around the site
-                model: string; // chosen open AI model to use
-            }] | undefined; // list of AI features and if they are enabled
+            aiFeatures: Partial<Record<string, { enabled: boolean; model: string }>>;
             lightGallery: typeof lightGallery;
             lightGalleryInit: InitLightGallery;
             lightGalleries: Record<string, LightGallery | undefined>;
