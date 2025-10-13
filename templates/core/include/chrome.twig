@@ -137,11 +137,11 @@
         window.sbProps.aiFeatures = {};
         {% if user.current.role.staff and config.openai_text_endpoint != 'Off' %}
         {# loop through each of the aiFeatures to specify which should be enabled and what model they are using... #}
-            {% for feature, config in aiFeatures %}
+            {% for feature, aiConfig in aiFeatures %}
             window.sbProps.aiFeatures["{{ feature }}"] = {
-                enabled: "{{ config.enabled ? 'true' : 'false' }}",
-                {% if config.enabled %}
-                    model: "{{ config.model ?? '' }}",
+                enabled: Boolean('{{ aiConfig.enabled }}'),
+                {% if aiConfig.enabled %}
+                    model: "{{ aiConfig.model ?? '' }}",
                 {% endif %}
             };
             {% endfor %}
