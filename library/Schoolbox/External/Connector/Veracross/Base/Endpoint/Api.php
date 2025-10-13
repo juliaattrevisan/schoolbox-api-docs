@@ -11,6 +11,7 @@ namespace Schoolbox\External\Connector\Veracross\Base\Endpoint;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Middleware;
 use GuzzleHttp\RetryMiddleware;
 use GuzzleHttp\RequestOptions;
 use GuzzleHttp\TransferStats;
@@ -161,8 +162,30 @@ class Api implements IApi
 
         /* TODO How to implement this? Our retrymiddleware doesn't have a factory() method lol
          */
-//        $stack = HandlerStack::create();
-//        $stack->push(RetryMiddleware::factory());
+
+        /* https://gist.github.com/christeredvartsen/7776e40a0102a571c35a9fc892164a8c
+         */
+        $maxRetries = 3;
+
+        $decider = function(int $retries, $request, $response = null) use ($maxRetries) : bool {
+            return
+                $retries < $maxRetries
+                && null !== $response
+                && 429 === $response->getStatusCode();
+        };
+
+        $delay = function(int $retries, $response) : int {
+            if (!$response->hasHeader('x-rate-limit-reset')) {
+                return RetryMiddleware::exponentialDelay($retries);
+            }
+
+            $retryAfter = (int)$response->getHeaderLine('x-rate-limit-reset') - time();
+
+            return $retryAfter * 1000;
+        };
+
+        $stack = HandlerStack::create();
+        $stack->push(Middleware::retry($decider, $delay));
 
         /* Use guzzle's Retry middleware
          * https://github.com/caseyamcl/guzzle_retry_middleware
@@ -219,7 +242,7 @@ class Api implements IApi
             'retry_after_date_format' => 'U',
             /* TODO How to implement this?
              */
-//            'handler' => $stack,
+            'handler' => $stack,
         ]);
     }
 
