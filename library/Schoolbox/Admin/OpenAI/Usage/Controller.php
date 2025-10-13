@@ -154,8 +154,7 @@ class Controller extends Base
                 'total' => $count,
                 'cursor' => $offset + count($logs),
                 ]
-            ]
-        );
+            ]);
     }
 
     /**
