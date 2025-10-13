@@ -21,7 +21,7 @@
         </div>
     </div>
     {% for year, data in dataByYear %}
-        <div data-result id="data-{{ year }}-result" class="hide">
+        <div data-result id="data-{{ year }}-result"{% if year != selectedYear %} class="hide"{% endif %}>
             {% include '@myp/result.twig' with {subjects: data.subjects, grades: data.grades, headings: data.headings} %}
         </div>
     {% endfor %}
