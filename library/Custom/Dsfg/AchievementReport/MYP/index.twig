@@ -22,7 +22,7 @@
     </div>
     {% for year, data in dataByYear %}
         <div data-result id="data-{{ year }}-result" class="hide">
-            {% include '@myp/result.twig' with {subjects: data.subjects.data, grades: data.grades, headings: data.subjects.headings} %}
+            {% include '@myp/result.twig' with {subjects: data.subjects, grades: data.grades, headings: data.headings} %}
         </div>
     {% endfor %}
     <div class="row">
