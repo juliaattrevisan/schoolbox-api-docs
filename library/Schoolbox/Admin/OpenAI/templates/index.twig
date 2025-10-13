@@ -49,10 +49,10 @@
                 });
 
                 // init load
-                initText(textModuleContainer, textProvider);
+                initText(textModuleContainer, textProvider, true);
 
                 // when the text provider changes, we need to fetch the new html from adminOpenAi.getConfigStruct
-                function initText(textModuleContainer, textProvider) {
+                function initText(textModuleContainer, textProvider, initLoad= false) {
                     // get the provider
                     const provider = textProvider.val();
                     if ('Off' === provider || '' === provider) {
@@ -63,6 +63,11 @@
                     }
                     textModuleContainer.show();
                     textSystemPrompt.show();
+
+                    // don't fetch, first load...
+                    if (initLoad) {
+                        return;
+                    }
                     //replace the url with the provider
                     const path = '{{ routeLookupIfAuthorized('adminOpenAi.getBlankConfig') }}'.replace('{provider}', provider);
                     // fetch the new html
