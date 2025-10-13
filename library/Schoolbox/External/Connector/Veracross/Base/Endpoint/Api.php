@@ -205,10 +205,9 @@ class Api implements IApi
             /* Craft a shifty log for now
              */
             $this->logger?->debug(sprintf(
-                "%s  Retrying request after %s seconds napping (unblocks at %s) due to %s %s\n",
-                date(\Alaress_Date_Format::DATABASE_DATE_FORMAT, time()),
+                "Retrying request after %s seconds napping (unblocks at %s) due to %s %s",
                 $retryAfter,
-                date(\Alaress_Date_Format::DATABASE_DATE_FORMAT, $resetAt),
+                date(\Alaress_Date_Format::DATABASE_FORMAT, $resetAt),
                 $response->getStatusCode(),
                 $response->getReasonPhrase()
             ));
