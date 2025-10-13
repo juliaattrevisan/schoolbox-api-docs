@@ -70,7 +70,7 @@ VALUES (
            )
        ),
        (
-           'openai_assessment',
+           'openai_dialogagent',
            'Discussion Learning Activity',
            '',
            (

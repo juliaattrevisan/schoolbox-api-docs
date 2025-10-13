@@ -48,7 +48,7 @@ class Helper
     public const FEATURE_LESSONPLAN = 'lessonplan';
     public const FEATURE_IMAGE = 'image';
     // Discussion Learning Activity
-    public const FEATURE_ASSESSMENT = 'assessment';
+    public const FEATURE_DIALOGAGENT = 'dialogagent';
     // Differentiation Profiles
     public const FEATURE_DIFFERENTIATION = 'differentiation';
 
