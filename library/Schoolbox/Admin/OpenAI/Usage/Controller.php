@@ -15,6 +15,7 @@ use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
 use Schoolbox\Editor\OpenAI\Log\Model as AILog;
+use Schoolbox\Editor\OpenAI\Log\ModelToArray;
 use Schoolbox\UserMapper;
 
 class Controller extends Base
@@ -47,16 +48,14 @@ class Controller extends Base
      */
     public function postSearch(): void
     {
-
         $cursor = $this->getRequestPost()->get('cursor', null);
+        $logGroups = $this->aiLogMapper->findAllGrouped(offset: $cursor);
 
-        $logs = $this->aiLogMapper->findAll([
-            'limit' => 100,
-            'offset' => $cursor,
-            'order' => 'created_at DESC'
-        ]);
-
-
+        $translator = new ModelToArray();
+        $logs = [];
+        foreach ($logGroups as $sessionId => $group) {
+            $logs[$sessionId] = $group->map($translator);
+        }
         $this->response = $this->responseAsJson($logs);
     }
 
@@ -67,12 +66,10 @@ class Controller extends Base
      */
     public function getLog(AILog $log): void
     {
-        // find the rest of the tree and add into a chain
-        $logEntries = [];
-        foreach ($this->aiLogMapper->findByColumn('session_id', $log->getSessionId(), ['order' => 'created_at ASC']) as $entry) {
-            $logEntries[] = $entry;
-        }
+        $logEntries = $this->aiLogMapper->findByColumn('session_id', $log->getSessionId(), ['order' => 'created_at ASC']);
 
-        $this->response = $this->responseAsJson($logEntries);
+        $translator = new ModelToArray();
+        $logEntriesArray = $logEntries->map($translator);
+        $this->response = $this->responseAsJson($logEntriesArray);
     }
 }
