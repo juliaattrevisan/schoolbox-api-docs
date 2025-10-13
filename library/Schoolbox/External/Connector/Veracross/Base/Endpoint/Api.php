@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace Schoolbox\External\Connector\Veracross\Base\Endpoint;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\RetryMiddleware;
 use GuzzleHttp\RequestOptions;
 use GuzzleHttp\TransferStats;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\AccessToken\Generator as AccessTokenGenerator;
@@ -157,6 +159,11 @@ class Api implements IApi
             $this->deepLog
         );
 
+        /* TODO How to implement this? Our retrymiddleware doesn't have a factory() method lol
+         */
+//        $stack = HandlerStack::create();
+//        $stack->push(RetryMiddleware::factory());
+
         /* Use guzzle's Retry middleware
          * https://github.com/caseyamcl/guzzle_retry_middleware
          */
@@ -178,6 +185,8 @@ class Api implements IApi
                 $response,
                 ?\Throwable $exception
             ) {
+                /* I've never seen this happen, but want to see it happen.
+                 */
                 echo sprintf(
                     "Retrying request to %s. Server responded with %s. Will wait %s seconds. This is attempt #%s. The error was %s",
                     $request->getUri()->getPath(),
@@ -186,7 +195,31 @@ class Api implements IApi
                     $attemptNumber,
                     $exception->getMessage()
                 );
-            }
+            },
+            /* Apparently guzzle can inspect a header request to infer how long to wait between retries...but veracross
+             * gives us a unix timestamp. This forces us to use retry_after_date_format ironically because veracross
+             * violates the http standards by giving us a unix timestamp
+             *
+                [x-rate-limit-reset] => Array
+                    (
+                        [0] => 1760313241
+                    )
+
+                [x-rate-limit-remaining] => Array
+                    (
+                        [0] => 0
+                    )
+
+                [x-rate-limit-limit] => Array
+                    (
+                        [0] => 300
+                    )
+             */
+            'retry_after_header' => 'x-rate-limit-reset',
+            'retry_after_date_format' => 'U',
+            /* TODO How to implement this?
+             */
+//            'handler' => $stack,
         ]);
     }
 
