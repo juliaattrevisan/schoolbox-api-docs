@@ -28,6 +28,7 @@ enum ImageSize: string
      */
     public function label(): string
     {
+        /** @phpcs:ignore - this is a valid use of $this */
         return match ($this) {
             self::Auto      => 'Auto',
             self::Square    => 'Square (1x1)',
