@@ -20,17 +20,17 @@ use Schoolbox\External\Connector\Veracross\Base\Endpoint\TimetableCalendar\TimeC
 class MeetingTimesConcurrent
 {
     /**
+     * Quantity of concurrent requests per chunk
+     */
+    private const CLASS_CHUNK_SIZE = 100;
+
+
+    /**
      * Remember the output we might have previously generated
      *
      * @var array|null
      */
     private ?array $lookup = null;
-
-
-    /**
-     * Quantity of concurrent requests per chunk
-     */
-    private const CLASS_CHUNK_SIZE = 100;
 
 
     /**
