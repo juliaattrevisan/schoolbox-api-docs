@@ -277,11 +277,7 @@ class Controller extends Base
 
                 // The iterable response can just be passed straight to
                 // responseFromStream
-                $this->response = $this->responseFromStream(Utils::streamFor($response))
-                    ->withHeader('Content-Type', 'text/event-stream')
-                    ->withHeader('Cache-Control', 'no-cache')
-                    ->withHeader('Connection', 'keep-alive')
-                    ->withHeader('Content-Encoding', 'none');
+                $this->response = $this->responseAsEventStream($response);
                 return;
             } catch (SchoolboxException $e) {
                 // This will always be a stream
@@ -290,12 +286,8 @@ class Controller extends Base
                     ->asArray();
 
                 $this->response = $this
-                    ->responseFromContent(printf("event: error\ndata: %s\n\n", json_encode($problem)))
-                    ->withStatus($e->getCode())
-                    ->withHeader('Content-Type', 'text/event-stream')
-                    ->withHeader('Cache-Control', 'no-cache')
-                    ->withHeader('Connection', 'keep-alive')
-                    ->withHeader('Content-Encoding', 'none');
+                    ->responseAsEventStream(sprintf("event: error\ndata: %s\n\n", json_encode($problem)))
+                    ->withStatus($e->getCode());
                 return;
             }
         } catch (\DomainException $e) {
@@ -308,12 +300,8 @@ class Controller extends Base
                 ->asArray();
 
             $this->response = $this
-                ->responseFromContent(sprintf("event: error\ndata: %s\n\n", json_encode($problem)))
-                ->withStatus($e->getCode())
-                ->withHeader('Content-Type', 'text/event-stream')
-                ->withHeader('Cache-Control', 'no-cache')
-                ->withHeader('Connection', 'keep-alive')
-                ->withHeader('Content-Encoding', 'none');
+                ->responseAsEventStream(sprintf("event: error\ndata: %s\n\n", json_encode($problem)))
+                ->withStatus($e->getCode());
 
             $this->response = $this->responseAsJson($problem)
                 ->withStatus($returnCode);
