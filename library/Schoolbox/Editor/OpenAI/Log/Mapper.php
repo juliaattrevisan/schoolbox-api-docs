@@ -10,6 +10,7 @@
 
 namespace Schoolbox\Editor\OpenAI\Log;
 
+use Alaress\Database\Predicate\Builder;
 use Schoolbox\Mapper as BaseMapper;
 use Schoolbox\UserMapper;
 use Schoolbox\GenericCollection;
@@ -131,6 +132,37 @@ class Mapper extends BaseMapper
                 $grouped[$sessionId] = [];
             }
             $grouped[$sessionId][] = $result;
+        }
+
+        return $grouped;
+    }
+
+
+    /**
+     * Find by predicate and group by session id
+     *
+     * @param Builder $pb
+     * @param int $limit
+     * @param int $offset
+     * @param array $options
+     * @return array grouped by session id
+     */
+    public function findPredicateGrouped(Builder $pb, int $limit = 100, int $offset = 0, array $options = []): array
+    {
+        $results = $this->findByPredicates($pb, [
+            'limit' => $limit,
+            'offset' => $offset,
+            'order' => 'created_at DESC',
+        ]);
+
+        // group by session id
+        $grouped = [];
+        foreach ($results as $result) {
+            $sessionId = $result->getSessionId() ?? 'no-session-' . $result->getId();
+            if (!isset($grouped[$sessionId])) {
+                $grouped[$sessionId] = $this->createCollection();
+            }
+            $grouped[$sessionId]->add($result);
         }
 
         return $grouped;
