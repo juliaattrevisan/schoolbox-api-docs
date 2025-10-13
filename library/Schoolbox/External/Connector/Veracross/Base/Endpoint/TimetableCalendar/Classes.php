@@ -279,6 +279,8 @@ class Classes implements IStrategy
 
         /* Decide where this class happens
          */
+        $room = null;
+
         if (is_array($classInstance['room'])) {
             $room = $classInstance['room']['description'];
         }

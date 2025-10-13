@@ -65,7 +65,7 @@ class Status implements IStatus
     public function getReport(): array
     {
         try {
-            $api = new Api(host: $this->host, apikey: $this->key);
+            $api = new Api(host: $this->host, apiKey: $this->key);
         } catch (\DomainException | \InvalidArgumentException $e) {
             return [[
                 'message' => 'Cannot access api endpoint',
