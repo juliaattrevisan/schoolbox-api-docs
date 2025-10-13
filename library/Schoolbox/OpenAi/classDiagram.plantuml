@@ -1,0 +1,57 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+
+interface IClient {
+    +createResponse() : ResponseInterface
+    +createResponseStream() : iterable
+    .. for each implemented endpoint ..
+    +endpoint() : ResponseInterface
+    +endpointStream() : iterable
+}
+note left of IClient
+    IClient defines a low-level interface to the AI provider's API.
+
+    createResponse and createResponseStream call the create response endpoint on
+    the AI provider:
+    * createResponse returns an actual response
+    * createResponseStream returns an iterable which outputs the stream as it's
+      received: this can then be used to create a response
+
+    It's expected other endpoint methods will follow the same pattern.
+end note
+
+IClient <|-- Client
+class Client {
+    -HttpClient $httpClient : used for making requests to AI provider
+    -UriInterface $baseUrl : contains base URL and any query string parameters
+    -array $authHeaders : contains authorization headers the AI provider requires
+    __
+    +createResponse() : ResponseInterface
+    +createResponseStream() : iterable
+    ..
+    +endpoint() : ResponseInterface
+    +endpointStream() : iterable
+}
+note left of Client
+    The Client implementation is likely to be the only IClient implementation
+    required, so long as only OpenAI-compatible AI providers are supported.
+
+    It's possible that more implementations will be required, if Schoolbox
+    supports providers which deviate subtly from OpenAI, or don't follow it at
+    all.
+end note
+
+class Agent {
+    -IClient $client
+    +request() : ResponseInterface
+    +requestStream() : iterable
+    -buildPayload() : array
+}
+note right of Agent
+    There's no interface for Agent: this is because each agent is likely to
+    accept different parameters to its request method, in order to build its
+    payload before it gets sent to $client.
+end note
+
+@enduml
