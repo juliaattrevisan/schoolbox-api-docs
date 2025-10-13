@@ -16,7 +16,7 @@
                 {% include '@settings/moduleConfig.twig' with textConfigContext only %}
 
                 {# module specific config #}
-                <div id="textModuleContainer" class="l-grid l-gap-l l-mar-m--bottom">
+                <div id="textModuleContainer" class="l-grid l-gap-l l-mar-m--bottom" style="display:none">
                     {% include '@adminOpenAi/config.twig' with {textModuleContext: textModuleContext} only %}
                 </div>
                 {# manually create a save button for this section... #}
@@ -39,28 +39,29 @@
 
                 /* Text credentials
                  */
-                const textContainer = $('#textSettingsContainer');
+                const textModuleContainer = $('#textModuleContainer');
                 const textProvider = $('#openai_text_endpoint-field');
                 const textSystemPrompt = $('#openai_text_generation_system_prompt-field').parent('div');
 
                 textProvider.on('change', function(event) {
                     event.preventDefault();
-                    initText(textContainer, textProvider);
+                    initText(textModuleContainer, textProvider);
                 });
 
                 // init load
-                initText(textContainer, textProvider);
+                initText(textModuleContainer, textProvider);
 
                 // when the text provider changes, we need to fetch the new html from adminOpenAi.getConfigStruct
-                function initText(textContainer, textProvider) {
+                function initText(textModuleContainer, textProvider) {
                     // get the provider
                     const provider = textProvider.val();
                     if ('Off' === provider || '' === provider) {
-                        textContainer.hide();
+                        textModuleContainer.hide();
                         textSystemPrompt.hide();
+                        textProvider.show();
                         return;
                     }
-                    textContainer.show();
+                    textModuleContainer.show();
                     textSystemPrompt.show();
                     //replace the url with the provider
                     const path = '{{ routeLookupIfAuthorized('adminOpenAi.getBlankConfig') }}'.replace('{provider}', provider);
@@ -70,7 +71,7 @@
                         type: 'GET',
                         success: function(response) {
                             // replace the html in the textModuleContainer
-                            textContainer.html(response);
+                            textModuleContainer.html(response);
                         },
                         error: function(xhr, status, error) {
                             console.error('Error fetching config struct:', error);
@@ -193,6 +194,16 @@
                     fetch('{{ routeLookupIfAuthorized('adminOpenAi.postTextOptions') }}', {
                         method: 'POST',
                         body: formData
+                    }). then(response => {
+                        if (response.ok) {
+                            // reload the window, so its the same workflow as before
+                            window.location.reload();
+                        } else {
+                            // reload the window, so its the same workflow as before
+                            window.location.reload();
+                        }
+                    }).catch(error => {
+                        console.error('Error:', error);
                     });
                 }
 
