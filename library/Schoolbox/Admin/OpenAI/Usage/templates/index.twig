@@ -17,8 +17,8 @@
                     <label for="feature">Feature:</label>
                     <select name="feature" id="feature">
                         <option value="">All</option>
-                        {% for feature in features %}
-                            <option value="{{ feature }}">{{ feature }}</option>
+                        {% for feature,featureConf in features %}
+                            <option value="{{ feature }}">{{ featureConf.title }}</option>
                         {% endfor %}
                     </select>
                 </div>
@@ -70,7 +70,7 @@
                                 {{ log.getCreatedAt|date("Y-m-d H:i:s") }}
                             </td>
                             <td>
-                                {{ log.feature }}
+                                {{ features[log.feature].title ?? 'unknown' }}
                             </td>
                             <td>
                                 <a href="/search/user/{{ log.user.getId }}">{{ log.user.getFullName }}</a>

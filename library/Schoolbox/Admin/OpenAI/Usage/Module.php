@@ -16,6 +16,7 @@ use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
 use Schoolbox\Application\Exception\NotFound;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Mapper;
@@ -62,7 +63,8 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
-            $this->getAILogMapper()
+            $this->getAILogMapper(),
+            $this->getMapperFactory()->get(ConfigMapper::class)
         );
     }
 

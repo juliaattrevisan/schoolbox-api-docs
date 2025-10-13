@@ -13,6 +13,7 @@ namespace Schoolbox\Admin\OpenAI\Usage;
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Admin\Navigation\Subnav;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Log\Mapper as AILogMapper;
 use Schoolbox\Editor\OpenAI\Log\Model as AILog;
 use Schoolbox\Admin\OpenAI\Config as AIConfig;
@@ -28,6 +29,7 @@ class Controller extends Base
      */
     public function __construct(
         private AILogMapper $aiLogMapper,
+        private ConfigMapper $configMapper,
     ) {
     }
 
@@ -39,8 +41,15 @@ class Controller extends Base
         // count of all
         $count = $this->aiLogMapper->countAll();
 
+        $features = new AIConfig($this->configMapper)->getFeatures();
+
+        // add on image as a feature
+        $features['image'] = [
+            'title' => 'Image Generation',
+        ];
+
         $this->response = $this->responseFromTemplate('@openAIUsage/index.twig', [
-            'features' => array_merge(AIConfig::ALL_MODULES, ['image']),
+            'features' => $features,
             'count' => $count,
             'logGroups' => $logGroups,
             'pageCurrent' => $this->routeGenerator->generate('openAIUsage.getIndex'),
