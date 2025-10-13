@@ -14,6 +14,7 @@ use Alaress\Web\Controller\Base;
 use GuzzleHttp\Client;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Log\Mapper;
+use Schoolbox\OpenAi\ClientFactory;
 use Schoolbox\Role;
 
 class Module extends BaseModule
@@ -47,17 +48,16 @@ class Module extends BaseModule
         /** @var Client $httpClient */
         $httpClient   = $this->injector->get('httpClient');
         $logMapper    = $this->getMapperFactory()->get(Mapper::class);
-        $openAiClient = new \Schoolbox\OpenAi\ClientFactory(
-            $this->getConfig(),
-            $logMapper,
-            $httpClient,
-        )
-            ->buildOpenAi($this->getConfig()->get(ConfigMapper::NAME_OPENAI_IMAGE_KEY));
         return new Controller(
             $httpClient,
             $this->getMapperFactory()->get(\Schoolbox\Error\Mapper::class),
             $logMapper,
             $this->getMapperFactory()->get(\Schoolbox\Curriculum\Node\Mapper::class),
+            $openAiClientFactory = new ClientFactory(
+                $this->getConfig(),
+                $logMapper,
+                $httpClient,
+            ),
         );
     }
 }

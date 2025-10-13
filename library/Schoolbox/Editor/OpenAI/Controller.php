@@ -20,6 +20,7 @@ use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 use Schoolbox\OpenAi\Agent\ImageGeneration;
+use Schoolbox\OpenAi\ClientFactory;
 use Scrub;
 
 /**
@@ -42,6 +43,7 @@ class Controller extends Base
         private \Schoolbox\Error\Mapper $errorMapper,
         private Log\Mapper $logMapper,
         private \Schoolbox\Curriculum\Node\Mapper $curriculumNodeMapper,
+        private ClientFactory $clientFactory,
     ) {
     }
 
@@ -279,11 +281,7 @@ class Controller extends Base
             }
 
             $agent = new ImageGeneration(
-                new \Schoolbox\OpenAi\ClientFactory(
-                    $this->getConfigLoader(),
-                    $this->logMapper,
-                    $this->client,
-                )->buildOpenAi($this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_KEY)),
+                $this->clientFactory->buildForFeature(Helper::FEATURE_IMAGE),
                 $this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_MODEL),
                 $this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_OUTPUT_QUALITY) ?? 'low',
                 $this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_IMAGE_SYSTEM_PROMPT),
