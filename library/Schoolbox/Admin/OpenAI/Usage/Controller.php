@@ -57,6 +57,9 @@ class Controller extends Base
         $before = $this->getRequestPost()->get('before', null);
         $cursor = $this->getRequestPost()->get('cursor', null);
 
+        // Build predicate using system predicate builder
+        $predicate = $this->aiLogMapper->getPredicateBuilder();
+
         //ensure feature is one of the actual features...
 // need SA-20932 to check features, ill use the same logic in that
 //        if ($feature && !in_array($feature, AILog::getFeatures(), true)) {
@@ -65,6 +68,7 @@ class Controller extends Base
 //                ->asArray();
 //            $this->response = $this->responseAsJson($problem)->withStatus(404);
 //            return;
+//        $predicate->equals('feature', $feature);
 //        }
 
         // ensue the user exists (allow deleted)
@@ -78,6 +82,7 @@ class Controller extends Base
                 $this->response = $this->responseAsJson($problem)->withStatus(404);
                 return;
             }
+            $predicate->equals('user_id', $user);
         }
 
         // dates (before/after)
@@ -98,6 +103,7 @@ class Controller extends Base
                 $this->response = $this->responseAsJson($problem)->withStatus(400);
                 return;
             }
+            $predicate->greaterThanOrEqualTo('created_at', $after);
         }
         if ($before) {
             if ($date = strtotime($before)) {
@@ -109,28 +115,15 @@ class Controller extends Base
                 $this->response = $this->responseAsJson($problem)->withStatus(400);
                 return;
             }
+            $predicate->lessThanOrEqualTo('created_at', $before);
         }
 
-        // Build predicate using system predicate builder
-        $predicate = $this->aiLogMapper->getPredicateBuilder();
-        if ($user) {
-            $predicate->equals('user_id', $user);
-        }
-        if ($feature) {
-            $predicate->equals('feature', $feature);
-        }
         if ($keyword) {
             $predicate->any(
                 ($this->aiLogMapper->getPredicateBuilder())
                     ->like('prompt', "%$keyword%")
                     ->like('response', "%$keyword%")
             );
-        }
-        if ($after) {
-            $predicate->greaterThanOrEqualTo('created_at', $after);
-        }
-        if ($before) {
-            $predicate->lessThanOrEqualTo('created_at', $before);
         }
 
         $offset = $cursor ?? 0;
