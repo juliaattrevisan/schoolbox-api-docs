@@ -545,6 +545,7 @@ class Controller extends Base
                 $newUnit = ($this->createUnit(trim($name ?? ''), $course));
                 $units[] = $this->getTranslatedUnitData($newUnit, $course, $textboxDefId);
             }
+            $this->unitSpecificationMapper->getDatabase()->commit();
         } catch (\Exception $e) {
             $this->unitSpecificationMapper->getDatabase()->rollBack();
             $problem = (new ApiProblem($e->getMessage()))
