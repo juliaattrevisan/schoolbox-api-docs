@@ -134,20 +134,18 @@
          # To avoid dealing with this Off const we can just pass the provider(s) values
          # and let each feature decide when it's off and when it's on.
          #}
+        window.sbProps.aiFeatures = {};
         {% if user.current.role.staff and config.openai_text_endpoint != 'Off' %}
         {# loop through each of the aiFeatures to specify which should be enabled and what model they are using... #}
-        window.sbProps.aiFeatures = {};
-        {% for feature, config in aiFeatures %}
-        window.sbProps.aiFeatures["{{ feature }}"] = {
-            enabled: "{{ config.enabled ? 'true' : 'false' }}",
-            {% if config.enabled %}
-                model: "{{ config.model ?? '' }}",
-            {% endif %}
-        };
-        {% endfor %}
+            {% for feature, config in aiFeatures %}
+            window.sbProps.aiFeatures["{{ feature }}"] = {
+                enabled: "{{ config.enabled ? 'true' : 'false' }}",
+                {% if config.enabled %}
+                    model: "{{ config.model ?? '' }}",
+                {% endif %}
+            };
+            {% endfor %}
         {% endif %}
-        {#window.sbProps.hasAIFeatures = true;#}
-        {#window.sbProps.openAIModel = "{{ config.openai_text_model }}";#}
 
         window.sbProps.firebaseApps = [];
         {% for app in firebase.apps %}

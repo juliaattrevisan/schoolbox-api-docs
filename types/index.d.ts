@@ -59,11 +59,9 @@ declare global {
             gradeGradientEnabled: boolean;
             aiFeatures: [
                 string: {
-                enabled: boolean;
-                model: string;
+                enabled: boolean; // to display the AI features around the site
+                model: string; // chosen open AI model to use
             }] | undefined; // list of AI features and if they are enabled
-            // hasAIFeatures: true | undefined; // to display the AI features around the site
-            // openAIModel: string | undefined; // chosen open AI model to use
             lightGallery: typeof lightGallery;
             lightGalleryInit: InitLightGallery;
             lightGalleries: Record<string, LightGallery | undefined>;
