@@ -11,13 +11,9 @@ namespace Schoolbox\Admin\EmailDKIM;
 
 use Alaress\Web\Controller\Base;
 use Aura\Router\Exception\RouteNotFound;
-use GuzzleHttp\Client;
-use Proxy\Server;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\EmailDKIM\Mapper as EmailDKIMMapper;
 use Schoolbox\Auth\KeyPairGenerator;
-use Schoolbox\Config\ConfigMapper;
-use Schoolbox\IConfigLoader;
 use Schoolbox\Mapper\Exception as MapperException;
 use Symfony\Component\Mime\Crypto\DkimSigner;
 

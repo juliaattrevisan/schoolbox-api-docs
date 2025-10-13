@@ -146,26 +146,54 @@ switch ($_POST['module']) {
     case 'service_email':
         /** @var IConfigLoader $config */
         $config = $kernel->get('config');
-        if ($config->get('mail_enable') && $config->get('mail_smtp_host')) {
+        // Check if Amazon SES is configured
+        $sesUsername = $config->get(ConfigMapper::AMAZON_SES_USERNAME);
+        $sesPassword = $config->get(ConfigMapper::AMAZON_SES_PASSWORD);
+        $sesRegion = $config->get(ConfigMapper::AMAZON_SES_REGION);
+
+        if ($config->get('mail_enable') && $sesUsername && $sesPassword && $sesRegion) {
+            // Amazon SES is configured - test SES connectivity
+            $sesEndpoint = sprintf('email-smtp.%s.amazonaws.com', $sesRegion);
+            $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+            socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, array('sec' => 3, 'usec' => 0));
+
+            if (@socket_connect($socket, $sesEndpoint, 587)) {
+                $email_light = 'success';
+                $email_status = 'Online (Amazon SES)';
+                $email_service = 'Amazon SES';
+            } else {
+                $email_light = 'alert';
+                $email_status = 'Offline (Amazon SES)';
+                $email_service = 'Amazon SES';
+            }
+
+            socket_close($socket);
+        } elseif ($config->get('mail_enable') && $config->get('mail_smtp_host')) {
+            // Traditional SMTP is configured
             $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
             socket_set_option($socket, SOL_SOCKET, SO_RCVTIMEO, array('sec' => 1, 'usec' => 0));
 
             if (@socket_connect($socket, $config->get('mail_smtp_host'), $config->get('mail_smtp_port'))) {
                 $email_light = 'success';
-                $email_status = 'Online';
+                $email_status = 'Online (SMTP)';
+                $email_service = 'SMTP';
             } else {
                 $email_light = 'alert';
-                $email_status = 'Offline';
+                $email_status = 'Offline (SMTP)';
+                $email_service = 'SMTP';
             }
 
             socket_close($socket);
         } else {
             $email_light = 'alert';
             $email_status = 'Disabled';
+            $email_service = 'None';
         }
+
         $output = [
             'email_light' => $email_light,
             'email_status' => $email_status,
+            'email_service' => $email_service,
         ];
         break;
     case 'service_ldap':

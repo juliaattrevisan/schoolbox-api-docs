@@ -40,6 +40,8 @@ class Mailer
 {
     private const MAX_RETRIES   = 4;
     private const RETRY_TIMEOUT = 1;
+    private const AMAZON_SES_ENDPOINT_FORMAT = 'email-smtp.%s.amazonaws.com';
+    private const AMAZON_SES_PORT = 587;
 
     /**
      * Instance of mail transporter.
@@ -410,8 +412,8 @@ class Mailer
             // Check if all three config values are present for SES
             if (count(array_filter($configValues)) === count($configKeys)) {
                 [$username, $password, $region] = $configValues;
-                $endpoint = sprintf(ConfigMapper::AMAZON_SES_ENDPOINT_FORMAT, $region);
-                self::$transport = new EsmtpTransport($endpoint, 587);
+                $endpoint = sprintf(self::AMAZON_SES_ENDPOINT_FORMAT, $region);
+                self::$transport = new EsmtpTransport($endpoint, self::AMAZON_SES_PORT);
                 self::$transport->setUsername($username);
                 self::$transport->setPassword($password);
                 self::$transport->setLocalDomain($endpoint);
