@@ -11,6 +11,7 @@ namespace Schoolbox\Editor\OpenAI;
 use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Editor\OpenAI\Log\Mapper;
 use Schoolbox\Role;
 
@@ -47,6 +48,7 @@ class Module extends BaseModule
             $this->getMapperFactory()->get(\Schoolbox\Error\Mapper::class),
             $this->getMapperFactory()->get(Mapper::class),
             $this->getMapperFactory()->get(\Schoolbox\Curriculum\Node\Mapper::class),
+            $this->getMapperFactory()->get(ConfigMapper::class)
         );
     }
 }
