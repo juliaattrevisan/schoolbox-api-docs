@@ -39,7 +39,11 @@ class Client implements IClient
      */
     private const IMAGE_DATA_OMITTED = 'omitted';
 
-    private const RESPONSES_ENDPOINT = '/v1/responses';
+    /**
+     * The endpoint which OpenAI-compatible clients use for their Responses
+     * feature.
+     */
+    private const RESPONSES_ENDPOINT = '/responses';
 
     /**
      * Constructor
@@ -190,7 +194,8 @@ class Client implements IClient
             // Output the stream contents
             yield $data;
 
-            // Also buffer the stream contents for processing
+            // Also buffer the stream contents into a set of message objects,
+            // for later processing and logging
             $data         = strtr($data, ["\r\n" => "\n", "\r" => "\n"]);
             $chunkBuffer .= $data;
 
@@ -202,10 +207,11 @@ class Client implements IClient
                 $this->onMessage(EventStream\Message::fromString($chunk), $log);
                 $chunkBuffer = substr($chunkBuffer, $pos + 2);
 
-////                // Don't echo an 'error' chunk if this isn't going to ckeditor as it won't follow the format of an ApiProblem
-////                if ($type === self::FEATURE_CHAT || $event['type'] !== 'error') {
-////                    echo "{$chunk}\n\n";
-////                }
+                // TODO does anything need to be done about this?
+//                // Don't echo an 'error' chunk if this isn't going to ckeditor as it won't follow the format of an ApiProblem
+//                if ($type === self::FEATURE_CHAT || $event['type'] !== 'error') {
+//                    echo "{$chunk}\n\n";
+//                }
             }
         }
 

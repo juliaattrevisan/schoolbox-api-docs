@@ -25,11 +25,38 @@ use Schoolbox\IConfigLoader;
  */
 class ClientFactory
 {
-    private const OPENAI_BASE_URL = 'https://api.openai.com/';
+    /**
+     * Base URL for OpenAI's API.
+     *
+     * Note that the version is part of the path.
+     */
+    private const OPENAI_BASE_URL = 'https://api.openai.com/v1/';
 
+    /**
+     * Base URL for Azure's OpenAI-compatible API, when not using a defined
+     * deployment.
+     *
+     * Azure has the concept of resources and deployments:
+     * * resources are created per-account, and allow configuration of how that
+     *   Azure AI instance may be accessed
+     * * deployments are created per-resource, and include the model which is
+     *   actually called
+     */
     private const AZURE_BASE_URL = 'https://%s.openai.azure.com/openai/';
+
+    /**
+     * Base URL for Azure's OpenAI-compatible API, when using a defined
+     * deployment.
+     */
     private const AZURE_DEPLOYMENT_BASE_URL = 'https://%s.openai.azure.com/openai/deployments/%s/';
 
+    /**
+     * Constructor
+     *
+     * @param IConfigLoader $config     Configuration: used to determine how to create an AI client.
+     * @param Mapper        $logMapper  Log: used for logging calls to AI providers.
+     * @param HttpClient    $httpClient HTTP client: used for sending calls to AI providers.
+     */
     public function __construct(
         private IConfigLoader $config,
         private Mapper $logMapper,
@@ -88,7 +115,7 @@ class ClientFactory
             }
         }
 
-        throw new UnexpectedValueException(sprintf('AI provider "%s" is not implemented'), $provider);
+        throw new UnexpectedValueException(sprintf('AI provider "%s" is not implemented', $provider));
     }
 
 
