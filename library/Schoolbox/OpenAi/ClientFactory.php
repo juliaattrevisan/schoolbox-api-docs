@@ -9,10 +9,14 @@ declare(strict_types=1);
 
 namespace Schoolbox\OpenAi;
 
+use Config\Modules\OpenAI;
 use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\Uri;
+use UnexpectedValueException;
 use Schoolbox\Config\ConfigMapper;
+use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Editor\OpenAI\Log\Mapper;
+use Schoolbox\IConfigLoader;
 
 /**
  * Factory for building OpenAI clients.
@@ -27,11 +31,73 @@ class ClientFactory
     private const AZURE_DEPLOYMENT_BASE_URL = 'https://%s.openai.azure.com/openai/deployments/%s/';
 
     public function __construct(
+        private IConfigLoader $config,
         private Mapper $logMapper,
         private HttpClient $httpClient,
     ) {
     }
 
+    /**
+     * Build a client for a given feature.
+     *
+     * @param string&Helper::FEATURE_* $feature The feature to build for.
+     * @return IClient
+     * @throws UnexpectedValueException if the provider is not implemented, or
+     *                                  it is but doesn't implement the feature.
+     */
+    public function buildForFeature(string $feature): IClient
+    {
+        switch ($feature) {
+            case Helper::FEATURE_IMAGE:
+                $apiKey   = $this->config->get(ConfigMapper::NAME_OPENAI_IMAGE_KEY);
+                $provider = $this->config->get(ConfigMapper::NAME_OPENAI_IMAGE_ENDPOINT);
+                break;
+            default:
+                $apiKey   = $this->config->get(ConfigMapper::NAME_OPENAI_TEXT_KEY);
+                $provider = $this->config->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT);
+                break;
+        }
+
+        $providerEnum = Provider::tryFrom($provider) ?? Provider::Off;
+
+        // OpenAI: build something standard
+        if ($providerEnum === Provider::OpenAi) {
+            return $this->buildOpenAi($apiKey);
+        }
+
+        // Azure: depends on feature
+        if ($providerEnum === Provider::Azure) {
+            switch ($feature) {
+                case Helper::FEATURE_CHAT:
+                    // Chat does use deployment ID
+                    return $this->buildAzure(
+                        $apiKey,
+                        $this->config->get(ConfigMapper::NAME_OPENAI_TEXT_RESOURCE_NAME),
+                        $this->config->get(ConfigMapper::NAME_OPENAI_TEXT_DEPLOYMENT_ID),
+                        '2023-12-01-preview',
+                    );
+                case Helper::FEATURE_IMAGE:
+                    throw new UnexpectedValueException('Image feature for Azure is not implemented');
+                default:
+                    return $this->buildAzure(
+                        $apiKey,
+                        $this->config->get(ConfigMapper::NAME_OPENAI_TEXT_RESOURCE_NAME),
+                        null,
+                        '2025-03-01-preview',
+                    );
+            }
+        }
+
+        throw new UnexpectedValueException(sprintf('AI provider "%s" is not implemented'), $provider);
+    }
+
+
+    /**
+     * Build a standard OpenAI client.
+     *
+     * @param string $apiKey
+     * @return IClient
+     */
     public function buildOpenAi(string $apiKey): IClient
     {
         $authHeader = ['Authorization' => 'Bearer ' . $apiKey];
@@ -43,6 +109,15 @@ class ClientFactory
         );
     }
 
+    /**
+     * Build an OpenAI-compatible Azure client.
+     *
+     * @param string      $apiKey
+     * @param string      $resourceName
+     * @param string|null $deploymentId
+     * @param string|null $apiVersion
+     * @return IClient
+     */
     public function buildAzure(
         string $apiKey,
         string $resourceName,

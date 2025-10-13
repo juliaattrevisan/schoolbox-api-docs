@@ -11,10 +11,12 @@ namespace Schoolbox\OpenAi;
 /**
  * Enum for the available OpenAI providers.
  *
- * Each option corresponds to an implemented OpenAI-compatible AI provider.
+ * Each option corresponds to an implemented OpenAI-compatible AI provider
+ * (Off corresponds to no provider being set up)
  */
 enum Provider: string
 {
+    case Off    = 'Off';
     case OpenAi = 'OpenAI';
     case Azure  = 'Azure';
 }
