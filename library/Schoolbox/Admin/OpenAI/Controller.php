@@ -52,8 +52,8 @@ class Controller extends ConfigController
         $aiConfig = new Config($this->getConfigMapper());
 
         $textModules = [];
-        foreach (Config::ALL_MODULES as $module) {
-            $textModules[$module] = $aiConfig->decode($this->getConfigLoader()->get(Config::MODULE_CONFIG[$module]), $textProvider);
+        foreach ($aiConfig->getFeatures() as $module) {
+            $textModules[$module['title']] = $module['config'];
         }
 
         $textModuleContext = $aiConfig->buildTwigConfig(

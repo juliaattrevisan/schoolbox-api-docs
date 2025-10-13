@@ -20,8 +20,8 @@ class Config
     public const ALL_MODULES = [
         Helper::FEATURE_CHAT,
         Helper::FEATURE_LESSONPLAN,
-//        Helper::FEATURE_DIFFERENTIATION,
-//        Helper::FEATURE_DIALOGAGENT,
+        Helper::FEATURE_DIFFERENTIATION,
+        Helper::FEATURE_DIALOGAGENT,
     ];
 
     /** Open AI models, and the 'OFF' option to be used in the same select box */
