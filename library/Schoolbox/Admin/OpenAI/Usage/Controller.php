@@ -40,7 +40,7 @@ class Controller extends Base
         $count = $this->aiLogMapper->countAll();
 
         $this->response = $this->responseFromTemplate('@openAIUsage/index.twig', [
-            'features' => AIConfig::ALL_MODULES,
+            'features' => array_merge(AIConfig::ALL_MODULES, ['image']),
             'count' => $count,
             'logGroups' => $logGroups,
             'pageCurrent' => $this->routeGenerator->generate('openAIUsage.getIndex'),
@@ -66,7 +66,7 @@ class Controller extends Base
 
         //ensure feature is one of the actual features...
         if ($feature) {
-            if (!in_array($feature, AIConfig::ALL_MODULES, true)) {
+            if (!in_array($feature, array_merge(AIConfig::ALL_MODULES, ['image']), true)) {
                 $problem = (new ApiProblem('Unknown Feature'))
                     ->setStatus(404)
                     ->asArray();
