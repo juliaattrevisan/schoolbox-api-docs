@@ -174,6 +174,13 @@ class MeetingTimesConcurrent
                         }
                     }
                 }
+
+                /* TODO Plan B
+                 *  If the concurrency isn't reliable enough in prod, arbitrarily nap for 100 seconds to stay under
+                 *  the Veracross rate limit radar. They have 300-requests-per-3-minutes limit.
+                 *
+                 * sleep(100);
+                 */
             }
         }
 
