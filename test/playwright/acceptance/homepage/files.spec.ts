@@ -182,6 +182,7 @@ test.describe("Files Component Tests", () => {
         baseTester.isGoingTo("clean up: remove Files component and soft-delete created file rows");
 
         await db.dontHaveInDatabase("file", { description: newFileTitle, deleted_at: null });
+        await db.dontHaveInDatabase("file", { description: fileTitle, deleted_at: null });
         await api.deleteHomepageComponent(83, componentEnglishId);
         await api.deleteHomepageComponent(188, componentId);
     });
