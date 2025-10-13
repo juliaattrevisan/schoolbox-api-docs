@@ -126,13 +126,15 @@ class Factory
 
         /* Spawn an Api instance
          */
-        $api = new Api(host: $this->host, apiKey: $this->key, deepLog: false);
-
-        $bus = new GenericCollection(IStrategy::class);
+        $api = new Api(host: $this->host, apiKey: $this->key, logger: $this->log);
 
         /* A Watchlist instance that we'll reuse when diagnosing stuff
          */
         $watcher = new Watchlist();
+
+        /* Command bus
+         */
+        $bus = new GenericCollection(IStrategy::class);
 
         if ($this->validStrats->isProfileStratEnabled()) {
             $bus

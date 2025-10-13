@@ -48,7 +48,7 @@ class Status implements IStatus
         $scope = 'students:list';
 
         try {
-            (new Api($this->host, $this->key))->retrieveOne('GET', 'students', $scope, 1, 1, []);
+            (new Api(host: $this->host, apiKey: $this->key))->retrieveOne('GET', 'students', $scope, 1, 1, []);
         } catch (\DomainException | \InvalidArgumentException | \RuntimeException $e) {
             return false;
         }
@@ -65,7 +65,7 @@ class Status implements IStatus
     public function getReport(): array
     {
         try {
-            $api = new Api($this->host, $this->key);
+            $api = new Api(host: $this->host, apikey: $this->key);
         } catch (\DomainException | \InvalidArgumentException $e) {
             return [[
                 'message' => 'Cannot access api endpoint',

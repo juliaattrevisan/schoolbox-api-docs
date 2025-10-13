@@ -15,6 +15,7 @@ use GuzzleHttp\Middleware;
 use GuzzleHttp\RetryMiddleware;
 use GuzzleHttp\RequestOptions;
 use GuzzleHttp\TransferStats;
+use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\AccessToken\Generator as AccessTokenGenerator;
 use SensitiveParameter;
 
@@ -107,12 +108,14 @@ class Api implements IApi
      * @param string $apiKey
      * @param int $timeout
      * @param bool $deepLog
+     * @param LoggerInterface|null $logger
      */
     public function __construct(
         private string $host,
         #[SensitiveParameter] private string $apiKey,
         private int $timeout = self::DEFAULT_TIMEOUT,
         private bool $deepLog = false,
+        private ?LoggerInterface $logger = null,
     ) {
         $this->client = $this->initClient($this->host, $this->apiKey, $this->timeout);
 
@@ -193,6 +196,23 @@ class Api implements IApi
                 return RetryMiddleware::exponentialDelay($retries);
             }
 
+            /* Veracross lets us make more requests after this datetime
+             */
+            $resetAt = (int)$response->getHeaderLine('x-rate-limit-reset');
+
+            $retryAfter = $resetAt - time();
+
+            /* Craft a shifty log for now
+             */
+            $this->logger?->debug(sprintf(
+                "%s  Retrying request after %s seconds napping (unblocks at %s) due to %s %s\n",
+                date(\Alaress_Date_Format::DATABASE_DATE_FORMAT, time()),
+                $retryAfter,
+                date(\Alaress_Date_Format::DATABASE_DATE_FORMAT, $resetAt),
+                $response->getStatusCode(),
+                $response->getReasonPhrase()
+            ));
+
             /* Veracross lets us make more requests after this x-rate-limit-reset datetime
              * that is (in?)conveniently expressed as a unix timestamp
              */
@@ -211,36 +231,6 @@ class Api implements IApi
             'http_errors' => false,
             'max_retry_attempts' => 3,
             'retry_on_timeout' => true,
-            'on_retry_callback' => static function(
-                int $attemptNumber,
-                float $delay,
-                /* This is Psr\Http\Message\RequestInterface but we don't have that
-                 */
-                &$request,
-                array &$options,
-                /* This is Psr\Http\Message\ResponseInterface but we don't have that
-                 */
-                $response,
-                ?\Throwable $exception
-            ) {
-                /* Veracross lets us make more requests after this datetime
-                 */
-                $resetAt = (int)$response->getHeaderLine('x-rate-limit-reset');
-
-                $retryAfter = $resetAt - time();
-
-                /* Craft a shifty log for now
-                 */
-                echo sprintf(
-                    "%s  Retrying request to %s after %s seconds napping (unblocks at %s) due to %s %s\n",
-                    date(\Alaress_Date_Format::DATABASE_DATE_FORMAT, time()),
-                    $request->getUri()->getPath(),
-                    $retryAfter,
-                    date(\Alaress_Date_Format::DATABASE_DATE_FORMAT, $resetAt),
-                    $response->getStatusCode(),
-                    $response->getReasonPhrase()
-                );
-            },
             /* Apparently guzzle can inspect a header request to infer how long to wait between retries...but veracross
              * gives us a unix timestamp. This forces us to use retry_after_date_format ironically because veracross
              * violates the http standards by giving us a unix timestamp
