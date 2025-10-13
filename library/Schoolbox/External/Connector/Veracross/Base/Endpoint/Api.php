@@ -179,7 +179,7 @@ class Api implements IApi
 
         /* Decide whether a request needs a retry or not
          */
-        $decider = function(int $retries, $request, $response = null) use ($maxRetries) : bool {
+        $decider = function (int $retries, $request, $response = null) use ($maxRetries): bool {
             return
                 $retries < $maxRetries
                 && null !== $response
@@ -191,7 +191,7 @@ class Api implements IApi
          * Note that delay() accepts the number of retries and returns the number of milliseconds to delay.
          * https://github.com/guzzle/guzzle/blob/7.5/src/RetryMiddleware.php
          */
-        $delay = function(int $retries, $response) : int {
+        $delay = function (int $retries, $response): int {
             if (!$response->hasHeader('x-rate-limit-reset')) {
                 return RetryMiddleware::exponentialDelay($retries);
             }
