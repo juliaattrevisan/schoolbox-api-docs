@@ -49,7 +49,7 @@ class Controller extends ConfigController
     {
         $textProvider = $this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT);
         // 26.0 grab the config for text and add in any new or missing configs
-        $aiConfig = new Config();
+        $aiConfig = new Config($this->getConfigMapper());
 
         $textModules = [];
         foreach (Config::ALL_MODULES as $module) {
@@ -115,7 +115,7 @@ class Controller extends ConfigController
         $postData = $this->requestPost->getArrayCopy();
 
         // for each ai feature module, update the config if needed
-        $aiConfig = new Config();
+        $aiConfig = new Config($this->getConfigMapper());
         foreach (Config::ALL_MODULES as $module) {
             $conf = $aiConfig->extractPost($postData, $module);
             $postData[Config::MODULE_CONFIG[$module]] = json_encode($conf, JSON_THROW_ON_ERROR);
@@ -159,7 +159,7 @@ class Controller extends ConfigController
      */
     public function getBlankConfig(string $provider): void
     {
-        $aiConfig = new Config();
+        $aiConfig = new Config($this->getConfigMapper());
         $blank = $aiConfig->generateInitConfig($provider);
         $textModules = [];
         foreach (Config::ALL_MODULES as $module) {

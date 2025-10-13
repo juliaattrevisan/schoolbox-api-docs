@@ -99,6 +99,52 @@ class Config
     private const FORM_NAME_SPRINTF = '%s;%s';
 
     /**
+     * array of AI features and their config
+     * @var array|null
+     */
+    private ?array $features = null;
+
+    /**
+     * @param ConfigMapper $configMapper
+     * @throws \JsonException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    public function __construct(ConfigMapper $configMapper)
+    {
+        // if no features set, init the array
+        $provider = $configMapper->findOneByColumn(ConfigMapper::COL_NAME, ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)->getValue();
+        if ($this->features === null) {
+            foreach (self::ALL_MODULES as $feature) {
+                $row = $configMapper->findOneByColumn(ConfigMapper::COL_NAME, self::MODULE_CONFIG[$feature]);
+                $this->features[$feature] = [
+                    'title' => $row->getTitle(),
+                    'config' => $this->decode($row->getValue(), $provider)
+                ];
+            }
+        }
+    }
+
+    /**
+     * Get all features and their config
+     * @return array|null
+     */
+    public function getFeatures(): ?array
+    {
+        return $this->features;
+    }
+
+    /**
+     * Get a specific feature's name and config
+     * @param string $feature
+     * @return array|null
+     */
+    public function getFeature(string $feature): ?array
+    {
+        return $this->features[$feature] ?? null;
+    }
+
+    /**
      * Take the stored settings and convert it into an associative array
      *
      * @param string|null $config
