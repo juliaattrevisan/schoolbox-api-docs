@@ -141,7 +141,7 @@
             window.sbProps.aiFeatures["{{ feature }}"] = {
                 enabled: Boolean('{{ aiConfig.enabled }}'),
                 {% if aiConfig.enabled %}
-                    model: "{{ aiConfig.model ?? '' }}",
+                    model: "{{ aiConfig.config.model ?? '' }}",
                 {% endif %}
             };
             {% endfor %}
