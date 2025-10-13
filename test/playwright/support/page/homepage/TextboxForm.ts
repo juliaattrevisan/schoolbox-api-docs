@@ -32,6 +32,21 @@ export default class TextboxForm {
         await this.tester.fillCKEditorByLocator(descriptionTextarea, description);
     }
 
+    /**
+     * Click the template icon in the CKEditor5 bar and selects a template based on the template name
+     * @param templateName - The name of the template to select
+     */
+    async clickEditorTemplateCKEditor(templateName: string): Promise<void> {
+        // wait for the ckeditor to be visible
+        await expect(this.page.locator("div.ck.ck-editor").first()).toHaveCount(1);
+
+        // click the template icon in the ckeditor toolbar
+        await this.page.locator(`button[data-cke-tooltip-text="Insert template"]`).click();
+
+        // select a template
+        await this.page.locator("li.ck.ck-list__item").getByText(templateName).click();
+    }
+
     async seeInContent(content: string): Promise<this> {
         const id = await this.page.locator(`${TextboxForm.FORM} textarea[name^="textBoxBody"]`).getAttribute("id");
         await expect(this.page.locator(`#${id}`)).toHaveText(content);

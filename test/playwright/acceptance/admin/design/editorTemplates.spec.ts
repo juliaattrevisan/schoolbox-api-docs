@@ -97,6 +97,17 @@ test.describe("Editor templates tests", () => {
     });
 
     /**
+     * navigate to create an email as Jack Coles and check the template is available to use
+     */
+    test("Check the template is available to use in the email", async ({ tester, page }) => {
+        tester.isGoingTo("check the template is available to use in the email");
+        await tester.impersonate("Jack Coles");
+        await page.goto("/mail/create");
+        await tester.clickEditorTemplateCKEditor("body", "Automation Template Email");
+        await expect(page.locator("div.ck-content")).toContainText("Automation Body 3");
+    });
+
+    /**
      * Soft deleting data to not impact the tests
     //
      */
