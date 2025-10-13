@@ -39,7 +39,7 @@ window.Vue.onMounted(() => {
         <div class="row l-pad-m--top">
             <div class="small-12 columns">
                 <button
-                    v-if="sbProps.aiFeature?.lessonplan.enabled"
+                    v-if="sbProps.aiFeatures.lessonplan?.enabled"
                     type="button"
                     class="button expand icon-ai"
                     @click="() => lpStore.openModal()"
@@ -62,7 +62,7 @@ window.Vue.onMounted(() => {
         />
     </fieldset>
 
-    <basic-modal v-if="sbProps.aiFeature?.lessonplan.enabled" v-model:is-open="lpStore.isModalOpen">
+    <basic-modal v-if="sbProps.aiFeatures.lessonplan?.enabled" v-model:is-open="lpStore.isModalOpen">
         <section>
             <lp-modal-generate v-if="lpStore.modalStep === LessonPlannerModalStep.GENERATE" />
             <lp-modal-generating v-else-if="lpStore.modalStep === LessonPlannerModalStep.GENERATING" />
