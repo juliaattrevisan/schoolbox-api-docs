@@ -264,7 +264,9 @@ export default class Files {
         await fileComponent.locator('[id*="modalLinkButton"]', { hasText: "Browse" }).click();
         await this.page.locator("#filesystem-browse-panel a", { hasText: regexSrc }).click();
         const locatorEng9A = this.page.locator("#filesystem-browse-panel li.resource a", { hasText: subSrcFolder });
-        await locatorEng9A.click({ delay: 1000 });
+        await expect(locatorEng9A).toBeVisible();
+        await locatorEng9A.click();
+
         await expect(locatorEng9A).toBeHidden();
         await this.page
             .locator("#filesystem-browse-panel div.component-action a", { hasText: "Use This Folder" })
