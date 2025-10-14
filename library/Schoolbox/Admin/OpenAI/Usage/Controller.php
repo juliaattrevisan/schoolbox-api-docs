@@ -36,12 +36,6 @@ class Controller extends Base
 
     public function getIndex(): void
     {
-        // get the first 100 logs to display in the table
-        $logGroups = $this->aiLogMapper->findAllGrouped();
-
-        // count of all
-        $count = $this->aiLogMapper->countAll();
-
         $features = new AIConfig()->fetchFeatures($this->configMapper);
 
         // add on image as a feature
@@ -56,8 +50,6 @@ class Controller extends Base
 
         $this->response = $this->responseFromTemplate('@openAIUsage/index.twig', [
             'features' => $features,
-            'count' => $count,
-            'logGroups' => $logGroups,
             'pageCurrent' => $this->routeGenerator->generate('openAIUsage.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('openAIUsage.getIndex')),
         ]);
