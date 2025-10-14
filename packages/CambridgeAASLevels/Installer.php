@@ -17,5 +17,9 @@ class Installer extends Package\BaseCurriculum
     /**
      * @inheritdoc
      */
+    protected bool $extendParent = true;
+    /**
+     * @inheritdoc
+     */
     protected string $sourceFile = __DIR__ . '/CambridgeAASLevels.csv';
 }
