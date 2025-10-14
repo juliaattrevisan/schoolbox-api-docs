@@ -1072,10 +1072,10 @@ class Controller extends Base
                 'modify' => $this->getRouteIfAuthorized('folder.getFolderModify', [
                     'id' => $unit->getFolder()->getId(),
                     'folder' => $unit->getFolder(),
-                ]),
+                ]) ?: null,
                 'delete' => $this->getRouteIfAuthorized('course.deleteUnitSpecification', [
                     'id' => $unit->getId(),
-                ]),
+                ]) ?: null,
             ]
         ];
     }
