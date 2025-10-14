@@ -4,10 +4,10 @@ CREATE TABLE `dialog_agent_scenario` (
     `title` VARCHAR(255),
     `description` TEXT,
     `prompt_template` TEXT,
-    `type` ENUM('system, custom') NOT NULL,
-    `created_by` INT NOT NULL,
-    `updated_by` INT NOT NULL,
-    `deleted_by` INT NULL DEFAULT NULL,
+    `type` ENUM('system', 'custom') NOT NULL,
+    `created_at` DATETIME NOT NULL,
+    `updated_at` DATETIME NOT NULL,
+    `deleted_at` DATETIME,
     PRIMARY KEY (`id`)
 );
 
@@ -17,13 +17,13 @@ CREATE TABLE `dialog_agent_scenario_field` (
     `scenario_id` INT NOT NULL,
     `title` VARCHAR(255),
     `slug` VARCHAR(255),
-    `type` ENUM('textarea, switch, dropdown') NOT NULL,
+    `type` ENUM('textarea', 'switch', 'dropdown') NOT NULL,
     `meta` VARCHAR(255),
     `options` JSON,
     `sequence` INT,
-    `created_by` INT NOT NULL,
-    `updated_by` INT NOT NULL,
-    `deleted_by` INT NULL DEFAULT NULL,
+    `created_at` DATETIME NOT NULL,
+    `updated_at` DATETIME NOT NULL,
+    `deleted_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `fk_das_field_scenario_idx` (`scenario_id` ASC),
     CONSTRAINT `fk_das_field_scenario`
@@ -39,14 +39,17 @@ CREATE TABLE `dialog_agent` (
     `assessment_id` INT UNSIGNED NOT NULL,
     `scenario_id` INT NOT NULL,
     `language` VARCHAR(255) NULL,
-    `helpfulness` ENUM('minimal, moderate, extreme') NOT NULL,
+    `helpfulness` ENUM('minimal', 'moderate', 'extreme') NOT NULL,
     `opening_message` TEXT,
     `rules` TEXT,
     `prompt` TEXT,
     `duration` INT,
-    `created_by` INT NOT NULL,
-    `updated_by` INT NOT NULL,
-    `deleted_by` INT NULL DEFAULT NULL,
+    `created_at` DATETIME NOT NULL,
+    `created_by` INT UNSIGNED NOT NULL,
+    `updated_at` DATETIME NOT NULL,
+    `updated_by` INT UNSIGNED NOT NULL,
+    `deleted_at` DATETIME,
+    `deleted_by` INT UNSIGNED DEFAULT NULL,
     PRIMARY KEY (`id`),
     INDEX `fk_da_scenario_idx` (`scenario_id` ASC),
     CONSTRAINT `fk_da_scenario`
@@ -59,6 +62,24 @@ CREATE TABLE `dialog_agent` (
         FOREIGN KEY (`assessment_id`)
             REFERENCES `assessment` (`id`)
             ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
+    INDEX `fk_da_createdby_idx` (`created_by` ASC),
+    CONSTRAINT `fk_da_createdby`
+        FOREIGN KEY (`created_by`)
+            REFERENCES `user` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
+    INDEX `fk_da_updatedby_idx` (`updated_by` ASC),
+    CONSTRAINT `fk_da_updatedby`
+        FOREIGN KEY (`updated_by`)
+            REFERENCES `user` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
+    INDEX `fk_da_deletedby_idx` (`deleted_by` ASC),
+    CONSTRAINT `fk_da_deletedby`
+        FOREIGN KEY (`deleted_by`)
+            REFERENCES `user` (`id`)
+            ON DELETE NO ACTION
             ON UPDATE NO ACTION
 );
 
@@ -68,9 +89,9 @@ CREATE TABLE `dialog_agent_scenario_field_context` (
     `field_id` INT NOT NULL,
     `dialog_agent_id` INT NOT NULL,
     `body` TEXT,
-    `created_by` INT NOT NULL,
-    `updated_by` INT NOT NULL,
-    `deleted_by` INT NULL DEFAULT NULL,
+    `created_at` DATETIME NOT NULL,
+    `updated_at` DATETIME NOT NULL,
+    `deleted_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `fk_dasfc_dasf_idx` (`field_id` ASC),
     CONSTRAINT `fk_dasfc_dasf`
@@ -93,9 +114,9 @@ CREATE TABLE `dialog_agent_scenario_criteria` (
     `title` VARCHAR(255),
     `prompt` TEXT,
     `sequence` INT,
-    `created_by` INT NOT NULL,
-    `updated_by` INT NOT NULL,
-    `deleted_by` INT NULL DEFAULT NULL,
+    `created_at` DATETIME NOT NULL,
+    `updated_at` DATETIME NOT NULL,
+    `deleted_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `fk_dasc_dialog_agent_scenario_idx` (`scenario_id` ASC),
     CONSTRAINT `fk_dasc_dialog_agent_scenario`
@@ -120,9 +141,12 @@ CREATE TABLE `dialog_agent_response` (
     `assistance_requested_at` DATETIME,
     `submitted_by` INT UNSIGNED NOT NULL,
     `submitted_at` DATETIME,
-    `created_by` INT NOT NULL,
-    `updated_by` INT NOT NULL,
-    `deleted_by` INT NULL DEFAULT NULL,
+    `created_at` DATETIME NOT NULL,
+    `created_by` INT UNSIGNED NOT NULL,
+    `updated_at` DATETIME NOT NULL,
+    `updated_by` INT UNSIGNED NOT NULL,
+    `deleted_at` DATETIME,
+    `deleted_by` INT UNSIGNED DEFAULT NULL,
     PRIMARY KEY (`id`),
     INDEX `fk_dar_dialog_agent_idx` (`dialog_agent_id` ASC),
     CONSTRAINT `fk_dar_dialog_agent`
@@ -147,6 +171,24 @@ CREATE TABLE `dialog_agent_response` (
         FOREIGN KEY (`submitted_by`)
             REFERENCES `user` (`id`)
             ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
+    INDEX `fk_dar_createdby_idx` (`created_by` ASC),
+    CONSTRAINT `fk_dar_createdby`
+        FOREIGN KEY (`created_by`)
+            REFERENCES `user` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
+    INDEX `fk_dar_updatedby_idx` (`updated_by` ASC),
+    CONSTRAINT `fk_dar_updatedby`
+        FOREIGN KEY (`updated_by`)
+            REFERENCES `user` (`id`)
+            ON DELETE NO ACTION
+            ON UPDATE NO ACTION,
+    INDEX `fk_dar_deletedby_idx` (`deleted_by` ASC),
+    CONSTRAINT `fk_dar_deletedby`
+        FOREIGN KEY (`deleted_by`)
+            REFERENCES `user` (`id`)
+            ON DELETE NO ACTION
             ON UPDATE NO ACTION
 );
 
@@ -156,9 +198,9 @@ CREATE TABLE `dialog_agent_feedback` (
     `response_id` INT NOT NULL,
     `criteria_id` INT NOT NULL,
     `body` TEXT,
-    `created_by` INT NOT NULL,
-    `updated_by` INT NOT NULL,
-    `deleted_by` INT NULL DEFAULT NULL,
+    `created_at` DATETIME NOT NULL,
+    `updated_at` DATETIME NOT NULL,
+    `deleted_at` DATETIME,
     PRIMARY KEY (`id`),
     INDEX `fk_daf_response_idx` (`response_id` ASC),
     CONSTRAINT `fk_daf_response`
