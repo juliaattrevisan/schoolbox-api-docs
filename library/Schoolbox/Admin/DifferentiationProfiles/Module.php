@@ -13,6 +13,7 @@ use Alaress\Authorizer\Rule;
 use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
+use Schoolbox\Admin\DifferentiationProfiles\Translator\ModelToArray;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Permission\Access\UserAccess;
@@ -58,7 +59,11 @@ class Module extends BaseModule
             new FieldStrategyFactory($this->getMapperFactory(), new CollectorFactory()),
             $this->injector->get('moduleCache.rebuilder'),
             $this->injector->get('oidc.cache'),
-            $this->getMapperFactory()->get(Mapper::class)
+            $this->getMapperFactory()->get(Mapper::class),
+            new ModelToArray(
+                $this->getRouter()->getGenerator(),
+                $this->getAuthorizer(),
+            ),
         );
     }
 

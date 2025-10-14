@@ -13,6 +13,7 @@ use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
 use Psr\SimpleCache\CacheInterface;
+use Schoolbox\Admin\DifferentiationProfiles\Translator\ModelToArray;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
@@ -28,6 +29,7 @@ class Controller extends ConfigController
      * @param Rebuilder            $rebuilder
      * @param CacheInterface       $oidcCache
      * @param Mapper               $differentiationProfilesMapper
+     * @param ModelToArray         $modelToArray
      */
     public function __construct(
         ConfigMapper $configMapper,
@@ -35,6 +37,7 @@ class Controller extends ConfigController
         Rebuilder $rebuilder,
         CacheInterface $oidcCache,
         private Mapper $differentiationProfilesMapper,
+        private ModelToArray $modelToArray,
     ) {
         parent::__construct($configMapper, $fieldStrategyFactory, $rebuilder, $oidcCache);
     }
@@ -52,6 +55,23 @@ class Controller extends ConfigController
     public function getIndex(): void
     {
         $pageCurrent = $this->routeGenerator->generate('differentiationProfiles.getIndex');
+
+        /* Get all the configs and sort it by sequence, so it will always be in the sequence order
+         */
+        $differentiationProfilesConfigs = $this->differentiationProfilesMapper->findAll()->sortBy('sequence', 'ASC');
+
+        $differentiationProfilesConfigsArray = $differentiationProfilesConfigs->reduce(function ($carry, Model $item) {
+            $carry[$item->getModule()][$item->getName()] = call_user_func($this->modelToArray, $item);
+            return $carry;
+        }, []);
+
+        $differentiationProfilesEnabled =
+            $this->getConfigMapper()
+                 ->findOneByColumn(
+                     'name',
+                     ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED
+                 );
+
         $this->response = $this->responseFromTemplate(
             '@differentiationProfiles/index.twig',
             [
@@ -61,13 +81,17 @@ class Controller extends ConfigController
                     $this->getUser()
                 )->generateBreadcrumbs($this->routeGenerator->generate('differentiationProfiles.getIndex')),
                 'returnUrl' => Redirect::encode($pageCurrent),
-                'differentiationProfilesEnabled' =>
-                    $this->getConfigMapper()
-                         ->findOneByColumn(
-                             'name',
-                             ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED
-                         ),
-                'differentiationProfilesConfig' => $this->differentiationProfilesMapper->findAll()
+                'differentiationProfilesEnabled' => $differentiationProfilesEnabled,
+                'data' => [
+                    'differentiationProfiles' => [
+                        'enabled' => (bool)$differentiationProfilesEnabled->getValue(),
+                        'modules' => [
+                            'fields' => $differentiationProfilesConfigsArray,
+                            'isSortable' => true,
+                        ],
+                        'headers' => Model::CONFIGS_HEADER
+                    ]
+                ]
             ],
             'Differentiation Profiles'
         );

@@ -23,6 +23,32 @@ class Model
     private string $module;
     private ?int $sequence = null;
 
+    public const array CONFIGS_HEADER = [
+        'is_enabled' => [
+            'type' => 'toggle',
+            'colSpan' => 1,
+            'key' => 'is_enabled',
+        ],
+        'title' => [
+            'type' => 'text',
+            'colSpan' => 2,
+            'key' => 'title',
+        ],
+        'terminology' => [
+            'title' => 'Terminology',
+            'type' => 'text',
+            'colSpan' => 2,
+            'key' => 'terminology',
+            'maxLength' => 100,
+        ],
+        'description' => [
+            'title' => 'Description / Definition',
+            'type' => 'text',
+            'colSpan' => 5,
+            'key' => 'description',
+            'maxLength' => 256,
+        ],
+    ];
 
     /**
      * @return string
