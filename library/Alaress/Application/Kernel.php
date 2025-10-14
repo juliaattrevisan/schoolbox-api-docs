@@ -2435,9 +2435,12 @@ abstract class Kernel
             $di->lazyNew(
                 \Schoolbox\OpenAi\ClientFactory::class,
                 [
-                    'config'     => $di->lazyGet('config'),
-                    'logMapper'  => $mapperFactory->getLazy(\Schoolbox\Editor\OpenAI\Log\Mapper::class),
-                    'httpClient' => $di->lazyGet('httpClient'),
+                    'config'         => $di->lazyGet('config'),
+                    'logMapper'      => $mapperFactory->getLazy(\Schoolbox\Editor\OpenAI\Log\Mapper::class),
+                    'httpClient'     => $di->lazyGet('httpClient'),
+                    'presidioClient' => $di->lazy(
+                        fn () => new \Schoolbox\Presidio\ClientFactory($config, $di->get('httpClient'))->build(),
+                    ),
                 ]
             )
         );

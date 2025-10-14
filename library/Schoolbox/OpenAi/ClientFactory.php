@@ -14,6 +14,7 @@ use GuzzleHttp\Client as HttpClient;
 use GuzzleHttp\Psr7\Uri;
 use JsonException;
 use Schoolbox\Admin\OpenAI;
+use Schoolbox\Presidio\Client as PresidioClient;
 use UnexpectedValueException;
 use Schoolbox\Editor\OpenAI\Helper;
 use Schoolbox\Editor\OpenAI\Log\Mapper;
@@ -54,14 +55,16 @@ class ClientFactory
     /**
      * Constructor
      *
-     * @param IConfigLoader $config     Configuration: used to determine how to create an AI client.
-     * @param Mapper        $logMapper  Log: used for logging calls to AI providers.
-     * @param HttpClient    $httpClient HTTP client: used for sending calls to AI providers.
+     * @param IConfigLoader       $config         Configuration: used to determine how to create an AI client.
+     * @param Mapper              $logMapper      Log: used for logging calls to AI providers.
+     * @param HttpClient          $httpClient     HTTP client: used for sending calls to AI providers.
+     * @param PresidioClient|null $presidioClient Presidio client instance, if it's configured.
      */
     public function __construct(
         private IConfigLoader $config,
         private Mapper $logMapper,
         private HttpClient $httpClient,
+        private ?PresidioClient $presidioClient,
     ) {
     }
 
@@ -144,6 +147,7 @@ class ClientFactory
             new Uri(self::OPENAI_BASE_URL),
             $authHeader,
             $this->logMapper,
+//            $this->presidioClient,
         );
     }
 
@@ -174,6 +178,7 @@ class ClientFactory
             new Uri($endpoint)->withQuery(http_build_query($queryParts)),
             $authHeader,
             $this->logMapper,
+//            $this->presidioClient,
         );
     }
 }

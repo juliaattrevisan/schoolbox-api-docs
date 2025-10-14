@@ -424,6 +424,11 @@ class ConfigMapper extends Mapper
     public const NAME_OPENAI_IMAGE_OUTPUT_QUALITY = 'openai_image_output_quality';
 
 
+    // Presedio (anonymisation service, used by AI clients)
+    public const NAME_PRESIDIO_ANALYSIS_HOST = 'presidio_analysis_host';
+    public const NAME_PRESIDIO_ANONYMISATION_HOST = 'presidio_anonymisation_host';
+
+
     /* Differentiation profiles
      */
     public const NAME_DIFFERENTIATION_PROFILE_ENABLED = 'differentiation_profiles_enabled';
