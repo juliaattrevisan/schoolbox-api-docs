@@ -13,6 +13,9 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Resource\Storage\GC\Check\Check;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
+use Symfony\Component\Lock\LockInterface;
 
 /**
  * Garbage collector: uses a set of checks to determine if a storage record is
@@ -46,6 +49,9 @@ class GarbageCollector
      * @param bool                     $perform       If true, actually delete storage records and update the last
      *                                                processed time: otherwise, only output what would've been deleted.
      * @param int                      $batchSize     The maximum number of results to process per batch.
+     * @param LockInterface            $lock          Process lock: periodically refreshed during the garbage collection
+     *                                                process.
+     * @param int                      $lockTtl       Amount of time to refresh the lock for, each time it's refreshed.
      * @param int|null                 $limit         Maximum number of storage records to process: null if no limit.
      * @param int|null                 $maxTime       Maximum amount of time to run for, in seconds: null if no limit.
      * @param Alaress_Date_Format|null $thresholdDate Do not process any storage records which were last processed more
@@ -56,6 +62,8 @@ class GarbageCollector
         private LoggerInterface $log,
         private bool $perform,
         private int $batchSize,
+        private LockInterface $lock,
+        private int $lockTtl,
         private ?int $limit = null,
         private ?int $maxTime = null,
         private ?Alaress_Date_Format $thresholdDate = null,
@@ -202,6 +210,8 @@ class GarbageCollector
      *
      * @param string|null $hash If set, target this specific hash for cleanup.
      * @return int
+     * @throws LockConflictedException if the lock refresh failed because another process has the lock
+     * @throws LockAcquiringException if the lock can't be acquired when refreshing
      */
     public function purge(?string $hash = null): int
     {

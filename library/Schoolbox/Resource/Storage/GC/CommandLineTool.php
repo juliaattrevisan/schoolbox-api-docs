@@ -14,6 +14,8 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
 
 /**
  * Command-line tool for Schoolbox's garbage collector.
@@ -266,6 +268,8 @@ HELP;
             $logger,
             $this->perform(),
             $batchSize,
+            $lock,
+            self::LOCK_TTL,
             limit: $limit,
             maxTime: $maxTime,
             thresholdDate: $thresholdDate,
@@ -276,7 +280,15 @@ HELP;
             ->addCheck(new Check\TextField($db, $logger, SQL_db, $mapper->getTable()))
         ;
 
-        $gc->purge();
+        // Purge, throwing a lock exception if not held
+        try {
+            $gc->purge();
+        } catch (LockAcquiringException | LockConflictedException $e) {
+            if ($lock->isAcquired() && !$lock->isExpired()) {
+                $lock->release();
+            }
+            throw $e;
+        }
         $lock->release();
         exit(CliKernelAbstract::EXIT_STATUS_OK);
     }
