@@ -191,7 +191,7 @@ export default class StudentParticipation {
         this.tester.isGoingTo(`Add '${description}' into the Description`);
         await this.page.getByLabel("Description").fill(description);
 
-        this.tester.isGoingTo(`Add '${dueDate}' as the Due Date`);
+        this.tester.isGoingTo(`Add '${dueDate.toISOString()}' as the Due Date`);
         await this.page.getByLabel("Due Date").fill(Common.formatDate(dueDate, true));
 
         this.tester.isGoingTo("Select the Update button to save");
