@@ -21,6 +21,17 @@ use Schoolbox\Resource\Storage\Mapper as StorageMapper;
 class CommandLineTool extends CliTool\App
 {
     /**
+     * The name of the lock this tool acquires.
+     */
+    public const LOCK_NAME = 'storageCleanup';
+
+    /**
+     * The amount of time (in seconds) this lock is held for: note that this
+     * tool during processing may re-acquire the lock.
+     */
+    private const LOCK_TTL = 60;
+
+    /**
      * Print help
      */
     private const OPT_SHORT_HELP = 'h';
@@ -160,6 +171,13 @@ HELP;
 
         $logger = $this->getLogger();
 
+        // Obey lock
+        try {
+            $lock = $this->acquireLock(self::LOCK_NAME, self::LOCK_TTL);
+        } catch (\RuntimeException $e) {
+            return;
+        }
+
         // Keep running or exit, depending on whether it's enabled in config.
         if (!$this->getConfig()->get(ConfigMapper::NAME_STORAGE_CLEANUP_ENABLED)) {
             if ($this->getOpt(self::OPT_LONG_FORCE_RUN_IF_DISABLED)) {
@@ -183,6 +201,7 @@ HELP;
                         self::OPT_LONG_FORCE_RUN_IF_DISABLED,
                     ),
                 );
+                $lock->release();
                 exit(CliKernelAbstract::EXIT_STATUS_OK);
             }
         }
@@ -210,11 +229,13 @@ HELP;
                             break;
                         }
                         if ($continue === 'q') {
+                            $lock->release();
                             exit(CliKernelAbstract::EXIT_STATUS_OK);
                         }
                     }
                 } else {
                     $logger->notice('Refusing to run in perform mode on a staging instance without the --force-run-on-staging flag.');
+                    $lock->release();
                     exit(CliKernelAbstract::EXIT_STATUS_OK);
                 }
             } else {
@@ -256,6 +277,7 @@ HELP;
         ;
 
         $gc->purge();
+        $lock->release();
         exit(CliKernelAbstract::EXIT_STATUS_OK);
     }
 
