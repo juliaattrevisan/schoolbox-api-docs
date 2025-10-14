@@ -6,7 +6,6 @@
  * @link        https://schoolbox.com.au/
  */
 
-
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent\Scenario\Field;

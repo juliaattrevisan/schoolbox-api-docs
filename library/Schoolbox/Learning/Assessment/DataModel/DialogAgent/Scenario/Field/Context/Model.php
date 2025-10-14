@@ -6,14 +6,13 @@
  * @link        https://schoolbox.com.au/
  */
 
-
 declare(strict_types=1);
 
 namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent\Scenario\Field\Context;
 
 use Schoolbox\ISoftDeletable;
 use \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Scenario\Field\Model as ScenarioField;
-use \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgent;
+use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgent;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;
