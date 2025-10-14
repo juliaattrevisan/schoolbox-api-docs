@@ -38,6 +38,7 @@ const endDateFilter = window.Vue.ref<string>(EMPTY_DATE);
 const usageSessions = window.Vue.ref<AiSession[]>([]);
 
 const isLoadingSession = window.Vue.ref(false);
+const sessionLoadError = window.Vue.ref<string | null>(null);
 const sessionDetails = window.Vue.ref<{
     sessionId: string;
     feed: AgentChatFeedMessage[];
@@ -59,6 +60,12 @@ async function loadUsageLogs(): Promise<void> {
     isLoading.value = true;
     loadError.value = null;
 
+    isLoadingSession.value = false;
+    sessionDetails.value = null;
+    sessionLoadError.value = null;
+
+    usageSessions.value = [];
+
     const response = await apiRequest<AiUsageLogApiResponse, AiUsageLogApiRequest>({
         method: "POST",
         url: props.routeSearch,
@@ -72,16 +79,14 @@ async function loadUsageLogs(): Promise<void> {
         },
     });
 
+    isLoading.value = false;
+
     if (!response.success) {
-        isLoading.value = false;
-        usageSessions.value = [];
         loadError.value = response.message;
         return;
     }
 
     usageSessions.value = response.data.data;
-
-    isLoading.value = false;
 }
 
 window.Vue.onMounted(async () => {
@@ -98,6 +103,8 @@ async function openSessionDetails(session: AiSession): Promise<void> {
     }
 
     isLoadingSession.value = true;
+    sessionLoadError.value = null;
+
     sessionDetails.value = null;
 
     const response = await apiRequest<AiSessionLogApiResponse>({
@@ -105,10 +112,14 @@ async function openSessionDetails(session: AiSession): Promise<void> {
         url: session._routes.getLog,
     });
 
+    isLoadingSession.value = false;
+
     if (!response.success) {
-        loadError.value = response.message;
+        sessionLoadError.value = response.message;
         return;
     }
+
+    // TODO: this is going to have to handle whatever happens for lesson plans/non-chat stuff but for now just assume it's a chat
 
     sessionDetails.value = {
         sessionId: session.id,
@@ -207,7 +218,10 @@ async function openSessionDetails(session: AiSession): Promise<void> {
     </div>
 
     <div v-else class="row">
-        <div class="small-12 columns" :class="{ 'medium-6': isLoadingSession || sessionDetails !== null }">
+        <div
+            class="small-12 columns l-mar-m--bottom"
+            :class="{ 'medium-6': isLoadingSession || sessionDetails !== null || sessionLoadError !== null }"
+        >
             <div v-if="loadError" data-alert class="alert-box alert">
                 {{ loadError }}
             </div>
@@ -271,8 +285,14 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                 </table>
             </div>
         </div>
-        <div v-if="isLoadingSession || sessionDetails !== null" class="small-12 medium-6 island">
-            <section>
+        <div
+            v-if="isLoadingSession || sessionDetails !== null || sessionLoadError !== null"
+            class="small-12 medium-6 island"
+        >
+            <div v-if="sessionLoadError" data-alert class="alert-box alert">
+                {{ sessionLoadError }}
+            </div>
+            <section v-else>
                 <div v-if="sessionDetails === null" class="loader"></div>
                 <ac-feed v-else class="l-mar-m" :feed="sessionDetails.feed" :allow-selection="false" />
             </section>
