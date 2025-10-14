@@ -86,16 +86,16 @@ CREATE TABLE `dialog_agent` (
 -- Something the teacher writes for a particular field
 CREATE TABLE `dialog_agent_scenario_field_context` (
     `id` INT NOT NULL AUTO_INCREMENT,
-    `field_id` INT NOT NULL,
+    `scenario_field_id` INT NOT NULL,
     `dialog_agent_id` INT NOT NULL,
     `body` TEXT,
     `created_at` DATETIME NOT NULL,
     `updated_at` DATETIME NOT NULL,
     `deleted_at` DATETIME,
     PRIMARY KEY (`id`),
-    INDEX `fk_dasfc_dasf_idx` (`field_id` ASC),
+    INDEX `fk_dasfc_dasf_idx` (`scenario_field_id` ASC),
     CONSTRAINT `fk_dasfc_dasf`
-        FOREIGN KEY (`field_id`)
+        FOREIGN KEY (`scenario_field_id`)
             REFERENCES `dialog_agent_scenario_field` (`id`)
             ON DELETE NO ACTION
             ON UPDATE NO ACTION,

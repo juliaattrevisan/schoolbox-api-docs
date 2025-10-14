@@ -26,7 +26,6 @@ class Model implements ISoftDeletable
     use DeletedAtDate;
 
 
-
     /**
      * Type enum values
      *
@@ -38,7 +37,11 @@ class Model implements ISoftDeletable
     private const string TYPE_DROPDOWN = 'dropdown';
 
 
+    /**
+     * @var ScenarioModel|null
+     */
     private ?ScenarioModel $scenario = null;
+
 
     /**
      * @var string|null
