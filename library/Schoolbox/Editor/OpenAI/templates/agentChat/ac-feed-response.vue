@@ -1,19 +1,19 @@
 <script lang="ts" setup>
-import { useImageGeneratorStore } from "./store/agentChatStore";
-import type { ImageResponse } from "./agentChatTypes";
+import { useAgentChatStore } from "./store/agentChatStore";
+import type { AgentChatResponse } from "./agentChatTypes";
 
 interface Props {
     /**
      * The message to display
      */
-    message: ImageResponse;
+    message: AgentChatResponse;
 }
 
 const props = defineProps<Props>();
-const igStore = useImageGeneratorStore();
+const acStore = useAgentChatStore();
 
 const radioId = window.Vue.computed(() => {
-    return `ig-feed-response-${props.message.entryKey}`;
+    return `ac-feed-response-${props.message.entryKey}`;
 });
 
 const imageSrc = window.Vue.computed(() => {
@@ -25,24 +25,24 @@ const imageSrc = window.Vue.computed(() => {
 </script>
 
 <template>
-    <div v-if="props.message.status === 'in_progress'" class="ig-feed-response">
+    <div v-if="props.message.status === 'in_progress'" class="ac-feed-response">
         <div class="loader"></div>
         <div>
             <img v-if="imageSrc" :src="imageSrc" />
 
             <p
-                class="l-mar--0-bottom ig-feed-message-content"
-                :class="{ 'ig-feed-message-loading': !imageSrc, 'l-mar-s--top': imageSrc }"
+                class="l-mar--0-bottom ac-feed-message-content"
+                :class="{ 'ac-feed-message-loading': !imageSrc, 'l-mar-s--top': imageSrc }"
             >
                 {{ props.message.message.length === 0 ? "Generating... Please wait" : props.message.message }}
             </p>
         </div>
     </div>
 
-    <div v-else class="ig-feed-response ig-feed-response-success radiolist">
+    <div v-else class="ac-feed-response ac-feed-response-success radiolist">
         <input
             :id="radioId"
-            v-model="igStore.selectedFeedEntry"
+            v-model="acStore.selectedFeedEntry"
             type="radio"
             :name="radioId"
             :value="props.message.entryKey"
@@ -60,9 +60,9 @@ const imageSrc = window.Vue.computed(() => {
                 <nav>
                     <a :href="imageSrc" class="icon-download" title="Download" download></a>
                 </nav>
-                <img :src="imageSrc" @click="() => igStore.spawnLightbox(props.message.entryKey)" />
+                <img :src="imageSrc" @click="() => acStore.spawnLightbox(props.message.entryKey)" />
             </div>
-            <p class="l-mar--0-bottom l-mar-s--top ig-feed-message-content">
+            <p class="l-mar--0-bottom l-mar-s--top ac-feed-message-content">
                 {{ props.message.message }}
             </p>
         </div>
@@ -70,7 +70,7 @@ const imageSrc = window.Vue.computed(() => {
 </template>
 
 <style scoped lang="scss">
-.ig-feed-response {
+.ac-feed-response {
     width: 80%;
     display: flex;
 
@@ -79,7 +79,7 @@ const imageSrc = window.Vue.computed(() => {
         max-height: 200px;
     }
 
-    &.ig-feed-response-success img {
+    &.ac-feed-response-success img {
         cursor: zoom-in;
     }
 
@@ -105,11 +105,11 @@ const imageSrc = window.Vue.computed(() => {
         margin: 0 0.5rem 0 0;
     }
 
-    .ig-feed-message-loading {
+    .ac-feed-message-loading {
         margin-top: 0.125rem;
     }
 
-    .ig-feed-message-content {
+    .ac-feed-message-content {
         white-space: pre-wrap;
     }
 }

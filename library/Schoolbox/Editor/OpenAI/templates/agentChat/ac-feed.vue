@@ -1,17 +1,17 @@
 <script lang="ts" setup>
-import { useImageGeneratorStore } from "./store/agentChatStore";
+import { useAgentChatStore } from "./store/agentChatStore";
 import AcFeedRequest from "./ac-feed-request.vue";
 import AcFeedResponse from "./ac-feed-response.vue";
 
-const igStore = useImageGeneratorStore();
+const acStore = useAgentChatStore();
 
 const feed = window.Vue.computed(() => {
     /** To get scrolling to happen automatically, we must use flex-direction: column-reverse and reverse the list here */
-    const reversedFeed = igStore.feed.slice().reverse();
+    const reversedFeed = acStore.feed.slice().reverse();
 
     /** Is it generating? Add the partial entry to the bottom of the feed */
-    if (igStore.activeGeneration !== null) {
-        return [igStore.activeGeneration, ...reversedFeed];
+    if (acStore.activeGeneration !== null) {
+        return [acStore.activeGeneration, ...reversedFeed];
     }
 
     return reversedFeed;
@@ -19,7 +19,7 @@ const feed = window.Vue.computed(() => {
 </script>
 
 <template>
-    <div v-if="feed.length > 0" class="l-mar-m--bottom l-pad-s ig-feed">
+    <div v-if="feed.length > 0" class="l-mar-m--bottom l-pad-s ac-feed">
         <template v-for="(message, index) in feed" :key="message.entryKey">
             <br v-if="index > 0" />
 
@@ -30,7 +30,7 @@ const feed = window.Vue.computed(() => {
 </template>
 
 <style scoped lang="scss">
-.ig-feed {
+.ac-feed {
     border: 1px solid #b3b3b3;
     max-height: 35vh;
     overflow-y: auto;
