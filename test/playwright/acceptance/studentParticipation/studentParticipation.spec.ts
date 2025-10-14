@@ -6,6 +6,7 @@
 
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import StudentParticipation from "@schoolboxTest/playwright/support/page/studentParticipation/StudentParticipation";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 import dayjs from "@js/dayjs/dayjsWithPlugins";
 
 test.describe("Student Participation Tests", () => {
@@ -43,7 +44,8 @@ test.describe("Student Participation Tests", () => {
         const studentName = "Izzo, Mario";
         const newTitle = "Single task";
         const description = "test";
-        const dueDate = dayjs().add(7, "day").format("DD/MM/YYYY HH:mma");
+        const dueDate = Common.getTodayAtMidnight();
+        const dueDateText = dayjs(dueDate).format("MMM D, YYYY h:mma");
 
         // Navigate to participation page and modify student's activity
         await studentParticipation.goto();
@@ -51,11 +53,11 @@ test.describe("Student Participation Tests", () => {
 
         // Impersonate Mario Izzo and verify the new due date of the activity
         await tester.impersonateViaUserProfilePage("Mario Izzo");
-        await studentParticipation.verifyDueDateText(userId, "650", "6 days remaining");
+        await studentParticipation.verifyDueDateText(userId, "650", "Due today");
 
         // Impersonate Jack Coles and verify the new due date activity on status page
         await tester.impersonateTeacher();
-        await studentParticipation.verifyDueDateSpan("650", dueDate);
+        await studentParticipation.verifyDueDateSpan("650", dueDateText);
 
         // Clean up database entries, removing the foreign key then the plan itself
         const planId = (await db.grabFromDatabase("participant_plan", "id", {
@@ -71,7 +73,7 @@ test.describe("Student Participation Tests", () => {
         const studentName = "Izzo, Mario";
         const newTitle = "Shared task";
         const description = "test";
-        const dueDate = dayjs().add(7, "day").format("DD/MM/YYYY HH:mma");
+        const dueDate = Common.getTodayAtMidnight();
 
         // Navigate to participation page and modify student's activity
         await studentParticipation.goto();
@@ -117,7 +119,7 @@ test.describe("Student Participation Tests", () => {
         const studentName = "Izzo, Mario";
         const newTitle = "My task";
         const description = "test";
-        const dueDate = dayjs().add(7, "day").format("DD/MM/YYYY HH:mma");
+        const dueDate = Common.getTodayAtMidnight();
 
         // Navigate to participation page and modify student's activity
         await studentParticipation.goto();

@@ -6,6 +6,7 @@
 import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
 import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import Common from "@schoolboxTest/playwright/support/page/Common";
 
 export default class StudentParticipation {
     private tester: AcceptanceTester;
@@ -170,7 +171,7 @@ export default class StudentParticipation {
         studentName: string,
         newTitle: string,
         description: string,
-        dueDate: string,
+        dueDate: Date,
     ): Promise<void> {
         this.tester.isGoingTo(`Click the Show Actions button for participant ${userId} (${studentName})`);
         await this.page
@@ -187,7 +188,7 @@ export default class StudentParticipation {
         await this.page.getByLabel("Description").fill(description);
 
         this.tester.isGoingTo(`Add '${dueDate}' as the Due Date`);
-        await this.page.getByLabel("Due Date").fill(dueDate);
+        await this.page.getByLabel("Due Date").fill(Common.formatDate(dueDate, true));
 
         this.tester.isGoingTo("Select the Update button to save");
         await this.page.getByRole("button", { name: "Update" }).click();
