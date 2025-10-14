@@ -579,9 +579,7 @@ class Module extends BaseModule
                 );
 
                 if (empty($nextRoutes[$state])) {
-                    throw new \Schoolbox\Application\Exception\Exception(
-                        "Cannot progress from state '{$moment->getCurrentState()}' to state '$state'"
-                    );
+                    throw new Forbidden("Cannot progress to state '$state'");
                 }
             }),
         );
