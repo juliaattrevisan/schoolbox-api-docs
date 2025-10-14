@@ -171,7 +171,7 @@ class RecordProcessor
          * try to find it. If the subtype was deleted, disregard it.
          */
         if ($partial['subtypeId'] ?? false) {
-            if ((int)$partial['subtypeId'] !== (int)$record->getSubType()->getId()) {
+            if ((int)$partial['subtypeId'] !== (int)$record->getSubType()?->getId()) {
                 try {
                     $record->setSubType($this->pastoralSubTypeMapper->findById($partial['subtypeId']));
                 } catch (MapperException $e) {
@@ -189,7 +189,7 @@ class RecordProcessor
          * try to find it. If the severity was deleted, disregard it.
          */
         if ($partial['severityId'] ?? false) {
-            if ((int)$partial['severityId'] !== (int)$record->getSeverity()->getId()) {
+            if ((int)$partial['severityId'] !== (int)$record->getSeverity()?->getId()) {
                 try {
                     $record->setSeverity($this->pastoralSeverityMapper->findById($partial['severityId']));
                 } catch (MapperException $e) {
