@@ -120,7 +120,7 @@ test.describe("Editor templates tests", () => {
         const createEvent = new CreateEvent(tester, page);
         const editorTemplate = new EditorTemplates(page, tester);
         const news = new Form(tester, page);
-        tester.isGoingTo("check only the template related to the feature is shown in the ck editor template lis");
+        tester.isGoingTo("check only the template related to the feature is shown in the ck editor template list");
         // checking in the create event page and attempt to search for homepage template
         await createEvent.goto();
         await editorTemplate.verifyTemplateAvailability("Automation Template Event", "Homepage", 1);

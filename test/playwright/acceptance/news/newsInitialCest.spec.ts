@@ -55,7 +55,7 @@ test.describe("Create a News Article", () => {
         const listItem = page.locator(`ul.information-list`).first();
         await listItem.locator(`a:has-text("${headline}")`).first().click();
         await expect(page.locator(`section.detail.content`)).toContainText(headline);
-        await expect(page.locator(`section.detail.content`)).toContainText("article");
+        await expect(page.locator(`section.detail.content`)).toContainText(article);
     });
 
     test("Unpublish the News Article", async ({ tester, page, db }) => {
