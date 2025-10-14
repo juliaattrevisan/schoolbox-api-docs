@@ -68,8 +68,13 @@ export default class StudentParticipation {
      * Remove customisation (inclusion) for a student
      * @param userId - The user ID of the student to include
      * @param studentName - The name of the student for verification
+     * @param customisationTitle - The modified title to verify removal
      */
-    async removeCustomisation(userId: string, studentName: string): Promise<void> {
+    async removeCustomisation(userId: string, studentName: string, customisationTitle: string): Promise<void> {
+        this.tester.isGoingTo("Verify student's row shows the modified customisation title");
+        const studentRow = this.page.locator("tr").filter({ hasText: studentName });
+        await expect(studentRow).toContainText(customisationTitle);
+
         this.tester.isGoingTo(`Click the Show Actions button for participant ${userId} (${studentName})`);
         await this.page
             .getByTestId(StudentParticipation.DATA_TEST_POP_OUT_PARTICIPANT_BUTTON.replace("{userId}", userId))
@@ -81,9 +86,8 @@ export default class StudentParticipation {
         this.tester.isGoingTo("Verify success message appears for removal");
         await expect(this.page.getByText("Customisation removed successfully")).toBeVisible();
 
-        this.tester.isGoingTo("Verify student's row no longer shows 'Excluded'");
-        const studentRow = this.page.locator("tr").filter({ hasText: studentName });
-        await expect(studentRow).not.toContainText("Excluded");
+        this.tester.isGoingTo("Verify student's row no longer shows the modified customisation title");
+        await expect(studentRow).not.toContainText(customisationTitle);
     }
 
     /**

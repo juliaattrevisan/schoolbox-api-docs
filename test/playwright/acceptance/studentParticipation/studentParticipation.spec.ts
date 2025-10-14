@@ -47,7 +47,7 @@ test.describe("Student Participation Tests", () => {
 
         // Return to participation page and remove customisation
         await studentParticipation.goto();
-        await studentParticipation.removeCustomisation(userId, studentName);
+        await studentParticipation.removeCustomisation(userId, studentName, "Excluded");
 
         // Verify removal in markbooks
         await studentParticipation.verifyClassMarkbookNotExcluded(userId, classActivityId);
@@ -134,7 +134,7 @@ test.describe("Student Participation Tests", () => {
         const studentRow = page.locator(`tr:has-text("${studentName}")`);
         await expect(studentRow).toContainText(modifyTitle);
 
-        await studentParticipation.removeCustomisation(userId, studentName);
+        await studentParticipation.removeCustomisation(userId, studentName, modifyTitle);
 
         // Clean up database entries
         await cleanupParticipantPlan(db, modifyTitle);
