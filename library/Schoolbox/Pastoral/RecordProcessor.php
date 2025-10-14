@@ -156,6 +156,7 @@ class RecordProcessor
             if ((int)$partial['typeId'] !== (int)$record->getType()->getId()) {
                 try {
                     $record->setType($this->pastoralTypeMapper->findById($partial['typeId']));
+                    $record->setSubType(null);
                 } catch (MapperException $e) {
                     $db->rollBack();
 
@@ -173,7 +174,18 @@ class RecordProcessor
         if ($partial['subtypeId'] ?? false) {
             if ((int)$partial['subtypeId'] !== (int)$record->getSubType()?->getId()) {
                 try {
-                    $record->setSubType($this->pastoralSubTypeMapper->findById($partial['subtypeId']));
+                    $subType = $this->pastoralSubTypeMapper->findById($partial['subtypeId']);
+                    if ($record->getType()->getId() === $subType->getPastoralType()->getId()) {
+                        $record->setSubType($subType);
+                    } else {
+                        $db->rollBack();
+
+                        throw new SchoolboxException(sprintf(
+                            'Pastoral subtype with id %s is not a subtype of type %s',
+                            $partial['subtypeId'],
+                            $record->getType()->getId()
+                        ));
+                    }
                 } catch (MapperException $e) {
                     $db->rollBack();
 
