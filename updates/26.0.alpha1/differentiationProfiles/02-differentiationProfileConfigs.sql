@@ -16,11 +16,18 @@ SET @details_sequence = COALESCE((SELECT MAX(sequence) FROM differentiation_prof
 INSERT INTO differentiation_profiles_config (name, title, terminology, description, is_enabled, module, sequence)
 VALUES
 -- Adjustments Module
-('adjustment_category', 'Adjustment Category', null, null, 1, 'adjustments', @adjustments_sequence),
-('adjustment_level', 'Adjustment Level', null, null, 1, 'adjustments', @adjustments_sequence + 1),
+('adjustment_category', 'Adjustment Category', 'Adjustment Category', 'Category for Adjustment', 1, 'adjustments',
+ @adjustments_sequence),
+('adjustment_level', 'Adjustment Level', 'Adjustment Level', 'Level of adjustment required', 1, 'adjustments',
+ @adjustments_sequence + 1),
 
 -- Details Module
-('summary', 'Summary', null, null, 1, 'details', @details_sequence),
-('needs_challenges', 'Needs / Challenges', null, null, 1, 'details', @details_sequence + 1),
-('strategies_adjustments', 'Strategies / Adjustments', null, null, 1, 'details', @details_sequence + 2),
-('goals', 'Goals', null, null, 1, 'details', @details_sequence + 3);
+('overview', 'Overview', 'Overview', 'Concise overview of learner attributes essential to effective differentiation', 1,
+ 'details', @details_sequence),
+('interests_strengths', 'Interests / Strengths', 'Interests / Strengths', 'List of students strengths and interests ',
+ 1, 'details', @details_sequence + 1),
+('needs_challenges', 'Learning Needs / Challenges', 'Learning Needs', 'List of Needs/Challenges that the student faces',
+ 1, 'details', @details_sequence + 2),
+('strategies_adjustments', 'Strategies / Adjustments', 'Specific Strategies',
+ 'Specific Strategies to consider when differentiating for the student', 1, 'details', @details_sequence + 3),
+('goals', 'Goals', 'Learning Goals', 'Students individual learning goals', 1, 'details', @details_sequence + 4);
