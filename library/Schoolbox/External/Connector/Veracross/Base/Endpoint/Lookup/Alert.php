@@ -55,7 +55,7 @@ class Alert
             foreach ($generator as $page) {
                 /* Avengers Assemble!
                  */
-                foreach ($page['data'] as &$record) {
+                foreach ($page['data'] as $record) {
                     /* omg why couldn't they have called this person_id instead...
                      * that's what id allegedly means
                      */
@@ -90,8 +90,6 @@ class Alert
 
                     $this->lookup[$externalId] = $record;
                 }
-
-                unset($record);
             }
         }
 

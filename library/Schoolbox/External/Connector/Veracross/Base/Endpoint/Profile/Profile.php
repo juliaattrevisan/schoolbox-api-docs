@@ -23,7 +23,6 @@ use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Alert;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\ContactInfo;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\EmergencyContact;
-use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Health;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Household;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Language;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Photo;
