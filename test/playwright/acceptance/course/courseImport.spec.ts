@@ -722,7 +722,7 @@ test.describe("Course import tests", () => {
         await db.updateInDatabase(
             "editor_template",
             { deleted_at: "2022-01-15 11:22:34" },
-            { "title like": "Learning Activity Automation Template%" },
+            { "title like": "Learning Activity Automation Template%", deleted_at: null },
         );
     });
 });

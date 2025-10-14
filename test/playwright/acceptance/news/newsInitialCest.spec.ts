@@ -225,7 +225,7 @@ test.describe("Create a News Article", () => {
         await db.updateInDatabase(
             "editor_template",
             { deleted_at: "2022-01-15 11:22:34" },
-            { "title like": "News Automation%", deleted_at: null },
+            { "title like": "News Automation Template%", deleted_at: null },
         );
         await db.updateInDatabase(
             "comms_news_article",

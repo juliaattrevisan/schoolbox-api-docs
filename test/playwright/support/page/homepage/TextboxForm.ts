@@ -37,7 +37,7 @@ export default class TextboxForm {
      * @param templateName - The name of the template to select
      */
     async clickEditorTemplateCKEditor(templateName: string): Promise<void> {
-        // wait for the ckeditor to be visible
+        // wait for the ckeditor to have count 1
         await expect(this.page.locator("div.ck.ck-editor").first()).toHaveCount(1);
 
         // click the template icon in the ckeditor toolbar
