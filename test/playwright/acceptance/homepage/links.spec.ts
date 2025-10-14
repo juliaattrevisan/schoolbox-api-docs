@@ -33,7 +33,7 @@ test.describe("Links Component Tests", () => {
         tester.isGoingTo("Add Links component");
         await homepage.addComponent(Homepage.ELEMENT_ADD_COMPONENT_SECTION_RESOURCES, "Links");
         linksComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
-        componentId = await Homepage.getComponentId(linksComponent);
+        componentEnglishId = await Homepage.getComponentId(linksComponent);
         tester.isGoingTo(`Use component: ${componentId}`);
         await homepage.seeInComponentHeading("Links", Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
         tester.isGoingTo("Check the two links exists ");
@@ -49,7 +49,6 @@ test.describe("Links Component Tests", () => {
         tester.isGoingTo("Navigate to 9A English homepage and configure the Links component");
         await homepage.goto(83);
         linksComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
-        componentId = await Homepage.getComponentId(linksComponent);
 
         await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
         await Homepage.clickComponentSettings(linksComponent);
@@ -102,7 +101,7 @@ test.describe("Links Component Tests", () => {
         await homepage.goto(83);
         tester.isGoingTo("Modify Link Title");
         linksComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
-        componentId = await Homepage.getComponentId(linksComponent);
+
         await links.modifyLink(linksComponent, linkId, newLinkTitle);
         tester.isGoingTo("Update link setting");
         await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
@@ -123,7 +122,7 @@ test.describe("Links Component Tests", () => {
         tester.isGoingTo("Navigate to 9A English homepage and update a link in the Links component");
         await homepage.goto(83);
         linksComponent = homepage.getComponent(Homepage.ELEMENT_COMPONENT_LAYOUT_TOP, 1);
-        componentEnglishId = await Homepage.getComponentId(linksComponent);
+
         await homepage.clickComponentsTab(Homepage.ELEMENT_LOCK_TOGGLE);
         await Homepage.clickComponentSettings(linksComponent);
         tester.isGoingTo("Update the component limit to 2 and un-tick the title to read only");
@@ -156,7 +155,7 @@ test.describe("Links Component Tests", () => {
 
     test.afterAll(async ({ baseTester, db, api }) => {
         baseTester.isGoingTo("clean up: remove Links component and soft-delete created link rows");
-        await db.dontHaveInDatabase("link", { url: linkUrl });
+        await db.dontHaveInDatabase("link", { url: linkUrl, deleted_at: null });
         await api.deleteHomepageComponent(83, componentEnglishId);
         await api.deleteHomepageComponent(188, componentId);
     });

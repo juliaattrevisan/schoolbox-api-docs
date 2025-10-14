@@ -229,7 +229,6 @@ export default class Links {
      * @param newlinkTitle - The new title for the link
      */
     public async modifyLink(linkComponent: Locator, linkId: number, newlinkTitle: string): Promise<void> {
-        // await linkComponent.locator(`//a[text()='${existingLinkTitle}']//ancestor::li//nav//a`).click();
         await linkComponent.locator(`a[href='/cms/link/${linkId}']`).click();
         await this.page.locator("#description").fill(newlinkTitle);
         await this.page.locator('input[value="Modify Link"]').click();
