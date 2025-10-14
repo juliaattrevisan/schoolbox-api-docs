@@ -14,6 +14,7 @@ use Schoolbox\Admin\Package;
  */
 class Installer extends Package\BaseCurriculum
 {
+    protected bool $extendParent = true;
     /**
      * @inheritdoc
      */

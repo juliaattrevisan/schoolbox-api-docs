@@ -45,7 +45,15 @@ abstract class BaseCurriculum implements IPackageInstall
      * @var string
      */
     protected string $sourceFile = __DIR__ . '/exampleFile.csv';
-
+    /**
+     * If true, will attempt to find and reuse any parent nodes that already exist in the system
+     * based on their UUID - if not found, will create them as normal
+     *
+     * If false, will always create new nodes, even if a node with the same UUID already exists
+     *
+     * @var bool
+     */
+    protected bool $extendParent = false;
     /**
      * Constructor.
      *
@@ -161,16 +169,29 @@ abstract class BaseCurriculum implements IPackageInstall
 
                 $parent = $graph[$row['curriculum_node_parent_id']];
 
-                $node = $this->getCurriculumMapper()->createModel()
-                             ->setParent($parent['curriculum_node_parent_id'] ? $this->parentLookup[$parent['curriculum_node_parent_id']] : null)
-                             ->setName($parent['name'])
-                             ->setDescription($parent['description'])
-                             ->setCode(trim($parent['code']))
-                             ->setOrder($parent['order'])
-                             ->setUuid($uuid);
+                /* Should we try to find existing parent nodes by their UUID and reuse them?
+                 */
+                if ($this->extendParent) {
+                    try {
+                        $node = $this->getCurriculumMapper()->findOneByColumn('uuid', $parent['uuid']);
+                    } catch (\Schoolbox\Mapper\Exception $e) {
+                        /* If the parent node(s) are not already installed, then let it fallthrough
+                         * to the node creation code below
+                         */
+                    }
+                }
 
-                $this->getCurriculumMapper()->save($node);
+                if (!isset($node)) {
+                    $node = $this->getCurriculumMapper()->createModel()
+                                 ->setParent($parent['curriculum_node_parent_id'] ? $this->parentLookup[$parent['curriculum_node_parent_id']] : null)
+                                 ->setName($parent['name'])
+                                 ->setDescription($parent['description'])
+                                 ->setCode(trim($parent['code']))
+                                 ->setOrder($parent['order'])
+                                 ->setUuid($uuid);
 
+                    $this->getCurriculumMapper()->save($node);
+                }
                 // Store the inserted ID so we can link children to it
                 $this->parentLookup[$parent['id']] = $node;
 
@@ -223,16 +244,29 @@ abstract class BaseCurriculum implements IPackageInstall
         if ($uuid === '') {
             $uuid = null;
         }
+        /* Should we try to find existing parent nodes by their UUID and reuse them?
+         */
+        if ($this->extendParent) {
+            try {
+                $node = $this->getCurriculumMapper()->findOneByColumn('uuid', $row['uuid']);
+            } catch (\Schoolbox\Mapper\Exception $e) {
+                /* If the parent node(s) are not already installed, then let it fallthrough
+                 * to the node creation code below
+                 */
+            }
+        }
 
-        $node = $this->getCurriculumMapper()->createModel()
-                     ->setParent($parentId ? $this->parentLookup[$row['curriculum_node_parent_id']] : null)
-                     ->setName($row['name'])
-                     ->setDescription($row['description'])
-                     ->setCode(trim($row['code']))
-                     ->setOrder($row['order'])
-                     ->setUuid($uuid);
+        if (!isset($node)) {
+            $node = $this->getCurriculumMapper()->createModel()
+                         ->setParent($parentId ? $this->parentLookup[$row['curriculum_node_parent_id']] : null)
+                         ->setName($row['name'])
+                         ->setDescription($row['description'])
+                         ->setCode(trim($row['code']))
+                         ->setOrder($row['order'])
+                         ->setUuid($uuid);
 
-        $this->getCurriculumMapper()->save($node);
+            $this->getCurriculumMapper()->save($node);
+        }
 
         // Store the inserted ID so we can link children to it
         $this->parentLookup[$row['id']] = $node;
