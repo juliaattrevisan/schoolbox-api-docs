@@ -37,15 +37,15 @@ class Model implements IAssessableDataModel, ISoftDeletable
     /**
      * Helpfulness enum values
      */
-    private const HELPFULNESS_MINIMAL = 'minimal';
-    private const HELPFULNESS_MODERATE = 'moderate';
-    private const HELPFULNESS_EXTREME = 'extreme';
+    private const string HELPFULNESS_MINIMAL = 'minimal';
+    private const string HELPFULNESS_MODERATE = 'moderate';
+    private const string HELPFULNESS_EXTREME = 'extreme';
 
 
     /**
-     * @var int|null
+     * @var Scenario\Model|null
      */
-    private ?int $scenario = null;
+    private ?Scenario\Model $scenario = null;
 
 
     /**
@@ -124,19 +124,19 @@ class Model implements IAssessableDataModel, ISoftDeletable
 
 
     /**
-     * @return int|null
+     * @return Scenario\Model|null
      */
-    public function getScenario(): ?int
+    public function getScenario(): ?Scenario\Model
     {
         return $this->scenario;
     }
 
 
     /**
-     * @param int|null $scenario
+     * @param Scenario\Model|null $scenario
      * @return $this
      */
-    public function setScenario(?int $scenario): self
+    public function setScenario(?Scenario\Model $scenario): self
     {
         $this->scenario = $scenario;
         return $this;
