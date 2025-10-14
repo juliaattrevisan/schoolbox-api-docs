@@ -718,6 +718,7 @@ class Controller extends Base
         );
     }
 
+
     /**
      * Create/update student records
      *
@@ -733,6 +734,54 @@ class Controller extends Base
     {
         return $this->recordProcessor->processPastoralRecords($this->getUser(), $primaryStudentId, $post, $duplicateStudentIds, $parent);
     }
+
+
+    /**
+     * Update an existing pastoral record with a partial set of its fields.
+     *
+     * This subset of fields is specifically less than what the pastoral record contains:
+     * notably, attachments is disregarded and any linked pastoral records remain unchanged
+     * (and unchangeable) via this method.
+     *
+     * This is a somewhat-unique take on processPastoralRecords()
+     *
+     * @param Model $record
+     * @return void
+     * @throws MapperException
+     * @throws RouteNotFound
+     */
+    public function patchRecordUpdate(Model $record): void
+    {
+        /* In admin, if pastoral synchronisation was turned on,
+         * but the currently-logged-in-user doesn't have a meaningful external id,
+         * die loudly as the external id is mandatory for synchronisation somehow
+         */
+        $this->assertSyncability();
+
+        /* A partial set of fields
+         */
+        $partial = $this->request->getParsedBody();
+
+        /* Not entirely sure why there's a processPastoralRecords() wrapper around one method that
+         * you could directly access: recordProcessors aren't interchangeable and there's only one
+         * of them that has ever existed afaict.
+         */
+        $this->recordProcessor->processPartialPastoralRecords($partial, $record);
+
+        /* Send back a json copy of what we just mutated in $record
+         */
+        if ($this->isJsonRequest()) {
+            $this->response = $this->responseAsJson(($this->pastoralTranslator)($record))->withStatus(201);
+            return;
+        }
+
+        // Go back to students pastoral record
+
+        $this->response = $this->redirectAfterPost(
+            $this->routeGenerator->generate('pastoral.getStudent', ['studentId' => $record->getStudent()->getId(),])
+        );
+    }
+
 
     /**
      * Delete a pastoral care record

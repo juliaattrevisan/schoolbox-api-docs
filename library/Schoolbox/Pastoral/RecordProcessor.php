@@ -32,7 +32,6 @@ use Schoolbox\Pastoral\Tag\Mapper as PastoralTagMapper;
 use Schoolbox\Pastoral\Tag\Model as PastoralTagsModel;
 use Schoolbox\Pastoral\Translator\VisibilityTranslator;
 use Schoolbox\Pastoral\Type\Mapper as PastoralTypeMapper;
-use Schoolbox\Pastoral\Type\TypeAbstract;
 use Schoolbox\Resource\Attachment\Collector\CollectorFactory;
 use Schoolbox\Resource\Storage\Model as Storage;
 use Schoolbox\TokenReplacer;
@@ -45,6 +44,12 @@ use Sentry\State\HubInterface;
  */
 class RecordProcessor
 {
+    /* Pastoral Points must fall within this range
+     */
+    private const POINTS_MIN = -1000000;
+    private const POINTS_MAX = 1000000;
+
+
     /**
      * Constructor
      *
@@ -80,6 +85,364 @@ class RecordProcessor
         private HubInterface $sentry,
     ) {
     }
+
+
+    /**
+     * Overwrites $record's props with whatever ones existed in $partial, an array of key-value tuples
+     * that partially represent a pastoral record.
+     *
+     * @param array $partial
+     * @param Model $record
+     * @return void
+     * @throws MapperException
+     */
+    public function processPartialPastoralRecords(array $partial, PastoralModel $record): void
+    {
+        /* TODO maybe just convert $partial to a Values instance completely arbitrarily
+         *  though I don't know exactly why we built an object wrapper around an array;
+         *  the benefits seem minimal
+         */
+
+        /* Some fields incur an in-situ database mutation (because strange thinking)
+         * which means you need to start a db transaction and rollback upon deaths (if any)
+         */
+        $db = $this->pastoralTypeMapper->getDatabase();
+        $db->beginTransaction();
+
+        /* Manually map the partial array into $record, one prop at a time
+         * Not all of them can be conveniently derived: body_public maps to setBody_public() (nonexistent method)
+         * and some require actual hydrated stubs to proceed (types, subtypes, severity, etc)
+         *
+         * Do it the long way (really?)
+         */
+        if ($partial['heading'] ?? false) {
+            $heading = trim((string)$partial['heading']);
+
+            /* Check length first. Invalid headings rollback and die
+             */
+            if ('' === $heading) {
+                $db->rollBack();
+
+                throw new SchoolboxException('Heading cannot be empty');
+            }
+
+            $record->setHeading($partial['heading']);
+        }
+
+        /* Points must be within a range of valid values randomly hardcoded here
+         */
+        if ($partial['points'] ?? false) {
+            $points = (float)$partial['points'];
+
+            /* Assert correct value range
+             */
+            if (!is_numeric($partial['points']) || $points < self::POINTS_MIN || $points > self::POINTS_MAX) {
+                $db->rollBack();
+
+                throw new SchoolboxException(sprintf(
+                    'Points must be a float between %s and %s',
+                    self::POINTS_MIN,
+                    self::POINTS_MAX
+                ));
+            }
+
+            $record->setPoints($partial['points']);
+        }
+
+        /* If a type id was specified and it differed to what we already have,
+         * try to find it. If the type was deleted, disregard it.
+         */
+        if ($partial['typeId'] ?? false) {
+            if ((int)$partial['typeId'] !== (int)$record->getType()->getId()) {
+                try {
+                    $record->setType($this->pastoralTypeMapper->findById($partial['typeId']));
+                    $record->setSubType(null);
+                } catch (MapperException $e) {
+                    $db->rollBack();
+
+                    throw new SchoolboxException(sprintf(
+                        'Pastoral type with id %s cannot be found',
+                        $partial['typeId']
+                    ));
+                }
+            }
+        }
+
+        /* If a subtype id was specified and it differed to what we already have,
+         * try to find it. If the subtype was deleted, disregard it.
+         */
+        if ($partial['subtypeId'] ?? false) {
+            if ((int)$partial['subtypeId'] !== (int)$record->getSubType()?->getId()) {
+                try {
+                    $subType = $this->pastoralSubTypeMapper->findById($partial['subtypeId']);
+                    if ($record->getType()->getId() === $subType->getPastoralType()->getId()) {
+                        $record->setSubType($subType);
+                    } else {
+                        $db->rollBack();
+
+                        throw new SchoolboxException(sprintf(
+                            'Pastoral subtype with id %s is not a subtype of type %s',
+                            $partial['subtypeId'],
+                            $record->getType()->getId()
+                        ));
+                    }
+                } catch (MapperException $e) {
+                    $db->rollBack();
+
+                    throw new SchoolboxException(sprintf(
+                        'Pastoral subtype with id %s cannot be found',
+                        $partial['subtypeId']
+                    ));
+                }
+            }
+        }
+
+        /* If a severity id was specified and it differed to what we already have,
+         * try to find it. If the severity was deleted, disregard it.
+         */
+        if ($partial['severityId'] ?? false) {
+            if ((int)$partial['severityId'] !== (int)$record->getSeverity()?->getId()) {
+                try {
+                    $record->setSeverity($this->pastoralSeverityMapper->findById($partial['severityId']));
+                } catch (MapperException $e) {
+                    $db->rollBack();
+
+                    throw new SchoolboxException(sprintf(
+                        'Pastoral severity with id %s cannot be found',
+                        $partial['severityId']
+                    ));
+                }
+            }
+        }
+
+        /* This has to be in one of the rfc formats or the locale's format
+         * which might change per instance
+         */
+        $locale = new \Alaress_Date_Locale_Config();
+
+        if ($partial['expiresAt'] ?? false) {
+            $expiresAt = new \Alaress_Date_Format(
+                $partial['expiresAt'],
+                [
+                    $locale->localFormat(),
+                    // API docs state we accept RFC3339 without qualification, so we must accept both variants.
+                    \DateTimeInterface::RFC3339,
+                    \DateTimeInterface::RFC3339_EXTENDED
+                ]
+            );
+
+            $record->setExpiresAt($expiresAt);
+        }
+
+        if ($partial['occurredOn'] ?? false) {
+            $occurredOn = new \Alaress_Date_Format(
+                $partial['occurredOn'],
+                [
+                    $locale->localFormat(),
+                    // API docs state we accept RFC3339 without qualification, so we must accept both variants.
+                    \DateTimeInterface::RFC3339,
+                    \DateTimeInterface::RFC3339_EXTENDED
+                ]
+            );
+
+            $record->setOccurredOn($occurredOn);
+        }
+
+        /* Allow token replacements in Confidential
+         */
+        if ($partial['body_private'] ?? false) {
+            $record->setBodyPrivate((new TokenReplacer\Student(new TokenReplacer\Simple()))
+                ->replace(trim($partial['body_private']), $record->getStudent()));
+        }
+
+        /* Allow token replacements in General
+         */
+        if ($partial['body_public'] ?? false) {
+            $record->setBodyPublic((new TokenReplacer\Student(new TokenReplacer\Simple()))
+                ->replace(trim($partial['body_public']), $record->getStudent()));
+        }
+
+        /* Everything below this point performs an in-situ mutation
+         * Any random errors should cause the transaction to rollback
+         */
+        try {
+            if ($partial['actions'] ?? false) {
+                /* There's a config option which, if enabled, allows you to mutate pastoral actions;
+                 * otherwise, leave everything unchanged I suppose
+                 */
+                if ($this->config->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
+                    /* Spawn a Values instance to make this compatible with existing method which does a lot
+                     */
+                    $newRecordActions = $this->prepareRecordActions(new Values($partial));
+
+                    $this->updateActions($record, $newRecordActions);
+                }
+            }
+
+            /* Such a strange mix of philosophies in this place, it does my head in
+             * The same idea is implemented in such subtly different ways everywhere here
+             */
+            if (($partial['tags'] ?? false) || ($partial['tagNames'] ?? false)) {
+                /* At least one of these had data:
+                 * if you supplied both, merge and treat synonymously
+                 */
+                $tags = $this->prepareTags($partial['tags'] ?? '', $partial['tagNames'] ?? '');
+
+                // Save pastoral tags
+                $this->pastoralTagMapper->deleteForRecord($record);
+                foreach ($tags as $tag) {
+                    $this->pastoralTagMapper->assignToRecord($record, $tag);
+                }
+                $record->setTags($tags);
+            }
+
+            /* This precedes any mutations to roles/groups/users access changes, because those
+             * mutate in situ...for some reason.
+             */
+            $this->pastoralDataSource->save($record);
+
+            /* Role and Group selections are both processed in the same method.
+             * If either was specified in $partial then maybe we have some work to do.
+             *
+             * Note that these mutate in situ.
+             */
+            if (($partial['role'] ?? false) || ($partial['group'] ?? false) || ($partial['user'] ?? false)) {
+                /* By this point, types and subtypes were already updated in $record which
+                 * is a circumstantial sequential dependency that we happen to fulfil...
+                 */
+                $type = $record->getType();
+                $subtype = $record->getSubtype();
+
+                /* Accesses depend on types and subtypes, somehow
+                 */
+                $accesses = (new VisibilityTranslator(
+                    $this->pastoralAccessMapper,
+                    $this->pastoralGroupMapper,
+                    $this->userMapper,
+                    \Schoolbox\Pastoral\Access\Model::class
+                ))->prepareAccesses(new Values($partial), $subtype ?? $type);
+
+                /* Remember the accesses that currently exist
+                 */
+                $existingAccesses = $record->getAccess()->indexBy('id');
+
+                /* A somewhat-different reimplementation from the one in processPastoralRecords() because
+                 * we don't need $previousRecord afaict
+                 */
+                $record->setAccess($this->pastoralAccessMapper->createCollection());
+
+                /* A list of accesses we want to keep
+                 */
+                $keptAccessIds = [];
+
+                /** @var PastoralAccessModel $access */
+                foreach ($accesses as $access) {
+                    if ($access->getId()) {
+                        $keptAccessIds[] = $access->getId();
+                    }
+
+                    $recordAccess = clone $access;
+                    $recordAccess->setPastoral($record);
+                    $this->pastoralAccessMapper->save($recordAccess);
+                    $record->getAccess()->add($recordAccess);
+                }
+
+                // Delete accesses no longer exists
+                $removingAccesses = $existingAccesses->filter(
+                    static function ($access) use ($keptAccessIds) {
+                        /** @var PastoralAccessModel $access */
+                        return !in_array($access->getId(), $keptAccessIds);
+                    }
+                );
+
+                $this->pastoralAccessMapper->delete($removingAccesses);
+            }
+
+            /* Sync with a third party (synergetic, at time of writing) knowing that we can only ever
+             * update an existing record here, never creating a new one.
+             */
+            $pastoralExternal = new External_Pastoral();
+
+            $db->onPersist(
+                function () use ($record, $pastoralExternal): void {
+                    // raise notification
+                    $action = \Schoolbox\Mapper::METHOD_UPDATE;
+                    $this->pastoralDataSource->resetPropagator();
+                    $this->pastoralDataSource->raiseNotification($record, $action);
+
+                    // Save record in external database, and set pastoral external_id in Schoolbox database
+                    try {
+                        $pastoralExternal->syncPastoral(
+                            $record,
+                            $this->config->get('external_pastoral_title_include')
+                        );
+                    } catch (\Exception $e) {
+                        // Send it to Sentry I suppose: there's nothing that
+                        // the end user may do with this information.
+                        /** @noinspection PhpExpressionResultUnusedInspection */
+                        $this->sentry->captureException($e);
+                    }
+                }
+            );
+        } catch (\Exception $e) {
+            /* Whatever died here, roll it back and re-throw it
+             */
+            $db->rollBack();
+
+            throw $e;
+        }
+
+        /* We ran the gauntlet and didn't die
+         */
+        $db->commit();
+    }
+
+
+    /**
+     * Perform a mutative in-place update of a pastoral record's Actions collection, mutating the
+     * db whenever we add a new action or remove an existing action.
+     *
+     * @param Model $record
+     * @param Collection $newRecordActions
+     * @return void
+     * @throws MapperException
+     */
+    private function updateActions(PastoralModel $record, Collection $newRecordActions): void
+    {
+        // Save actions, record actions are compared against luAction id rather than recordAction id.
+        $existingRecordActions = $record->getRecordActions()->indexByCallback(
+            static function ($recordAction) {
+                /** @var RecordAction\Model $recordAction */
+                return $recordAction->getAction()->getId();
+            }
+        );
+        $record->setRecordActions($this->pastoralRecordActionMapper->createCollection());
+
+        /** @var RecordAction\Model $action */
+        foreach ($newRecordActions as $action) {
+            // if this action is already set to this record, just put it back
+            if (in_array($action->getAction()->getId(), $existingRecordActions->keys())) {
+                $record->getRecordActions()->add($existingRecordActions->getOffset($action->getAction()->getId()));
+            } else {
+                $recordAction = clone $action;
+                $recordAction->setPastoral($record);
+                $this->pastoralRecordActionMapper->save($recordAction);
+                $record->getRecordActions()->add($recordAction);
+            }
+        }
+        // Delete actions no longer exists
+        $removingRecordActions = $existingRecordActions->filter(
+            static function ($action) use ($newRecordActions) {
+                /** @var RecordAction\Model $action */
+                return !in_array($action->getAction()->getId(), $newRecordActions->keys());
+            }
+        );
+        $this->pastoralRecordActionMapper->deleteByColumn(
+            'id',
+            $removingRecordActions->getPropertyValues('id')
+        );
+    }
+
 
     /**
      * Create and/or update student records, based on the content of a form.
@@ -270,9 +633,17 @@ class RecordProcessor
                 $record->setPoints(null);
             } else {
                 $points = $post->getFloat('points');
-                if (!is_numeric($post->get('points')) || $points < -1000000 || $points > 1000000) {
-                    throw new SchoolboxException('Points must be a float between -1000000 and 1000000');
+
+                /* Assert correct value range
+                 */
+                if (!is_numeric($post->get('points')) || $points < self::POINTS_MIN || $points > self::POINTS_MAX) {
+                    throw new SchoolboxException(sprintf(
+                        'Points must be a float between %s and %s',
+                        self::POINTS_MIN,
+                        self::POINTS_MAX
+                    ));
                 }
+
                 $record->setPoints($points);
             }
 
@@ -343,36 +714,7 @@ class RecordProcessor
 
             // Save actions, record actions are compared against luAction id rather than recordAction id.
             if ($this->config->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED)) {
-                $existingRecordActions = $record->getRecordActions()->indexByCallback(
-                    static function ($recordAction) {
-                        /** @var RecordAction\Model $recordAction */
-                        return $recordAction->getAction()->getId();
-                    }
-                );
-                $record->setRecordActions($this->pastoralRecordActionMapper->createCollection());
-                /** @var RecordAction\Model $action */
-                foreach ($newRecordActions as $action) {
-                    // if this action is already set to this record, just put it back
-                    if (in_array($action->getAction()->getId(), $existingRecordActions->keys())) {
-                        $record->getRecordActions()->add($existingRecordActions->getOffset($action->getAction()->getId()));
-                    } else {
-                        $recordAction = clone $action;
-                        $recordAction->setPastoral($record);
-                        $this->pastoralRecordActionMapper->save($recordAction);
-                        $record->getRecordActions()->add($recordAction);
-                    }
-                }
-                // Delete actions no longer exists
-                $removingRecordActions = $existingRecordActions->filter(
-                    static function ($action) use ($newRecordActions) {
-                        /** @var RecordAction\Model $action */
-                        return !in_array($action->getAction()->getId(), $newRecordActions->keys());
-                    }
-                );
-                $this->pastoralRecordActionMapper->deleteByColumn(
-                    'id',
-                    $removingRecordActions->getPropertyValues('id')
-                );
+                $this->updateActions($record, $newRecordActions);
             }
 
             // preparation

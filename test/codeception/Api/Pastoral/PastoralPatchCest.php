@@ -1,0 +1,266 @@
+<?php
+
+/**
+ * @copyright Copyright 2025, Schoolbox Pty Ltd
+ * @link      https://schoolbox.com.au/
+ */
+
+declare(strict_types=1);
+
+namespace Tests\Api\Pastoral;
+
+use Tests\Support\ApiTester;
+use Schoolbox\Pastoral\Access\Mapper;
+use Schoolbox\Role;
+use Schoolbox\User;
+
+/**
+ * pastoral@patch.yaml
+ * /usr/share/schoolbox/vendor/bin/codecept run api PastoralPatchCest
+ *
+ */
+class PastoralPatchCest
+{
+    private User $userPrivate;
+    private User $userPublic;
+    private User $userDeny;
+    private User $student;
+
+    /**
+     * @param ApiTester $i
+     * @return void
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    public function run(ApiTester $i)
+    {
+        $i->preparePastoralActions();
+
+        $users = $i->getUsers();
+
+        $this->userPrivate = $i->createTestUser('private-' . time(), Role::STAFF, false);
+        $this->userPublic = $i->createTestUser('public-' . time(), Role::STAFF, false);
+        $this->userDeny = $i->createTestUser('deny-' . time(), Role::STAFF, false);
+
+        /* Pastoral records get created with this user as the recipient
+         * The foreach() below also tests a student creating the pastoral record for themselves
+         */
+        $this->student = $i->createTestUser('student-' . time(), Role::STUDENT, false);
+
+        foreach ($users as $user) {
+            $this->testPatch($i, $user);
+        }
+    }
+
+    /**
+     * @param ApiTester $i
+     * @param User      $user
+     * @return void
+     * @throws \Aura\Di\Exception\ServiceNotFound
+     */
+    private function testPatch(ApiTester $i, User $user)
+    {
+        /* Yoink the first Pastoral Type that is in the lookup, somewhat arbitrarily
+         */
+        /** @var \Schoolbox\Pastoral\Type\Model $pastoralType */
+        $pastoralType = $i->getPastoralTypes()->first();
+
+        /* Yoink the first Pastoral Subtype that is in the Pastoral Type, somewhat arbitrarily
+         */
+        $pastoralSubtype = $pastoralType->getSubTypes()->first()?->getId();
+
+        /* Set up a pastoral record that's mostly complete.
+         * It fulfils the minimum required fields, and maybe a couple more.
+         * This emulates the most averagest pastoral record in the wild to my best estimation.
+         */
+        $pastoral = [
+            'data' => [
+                'student_id' => $this->student->getId(),
+                'heading' => 'Base record for PATCH mutations',
+                'occurredOn' => \Alaress_Date_Format::now()->getLocalShort(),
+                'typeId' => $pastoralType->getId(),
+                'subtypeId' => $pastoralSubtype,
+                'severityId' => $i->getPastoralSeverities()->first()->getId(),
+                'role' => [
+                    /* These are hardcoded in the user interface: valid options are
+                     *     - role-type-student
+                     *     - role-type-parent
+                     *     - an integer id
+                     *         - this corresponds to "Administration" in sales data
+                     *         - this corresponds to "Staff" in demo datums
+                     *
+                     */
+                    1 => Mapper::ACCESS_PUBLIC,
+                    'role-type-parent' => Mapper::ACCESS_PUBLIC,
+                ],
+                'group' => [
+                    /* These are ids of Pastoral Groups which are user-definable.
+                     * 1 corresponds to Year 9 Coordinators in the sales data
+                     */
+                    1 => Mapper::ACCESS_PUBLIC
+                ],
+                'user' => [
+                    $this->userPrivate->getId() => Mapper::ACCESS_PRIVATE,
+                    $this->userPublic->getId() => Mapper::ACCESS_PUBLIC,
+                    $this->userDeny->getId() => Mapper::ACCESS_DENY,
+                ],
+                'public_attachments' => [
+                    'store:723b6e31c2979b33deea852cdbbad9c4b0e00b96:piglet2.jpg'
+                ],
+                'private_attachments' => [
+                    'store:69903e5d89e1574d92de8afd1634f472e3096b3c:scrabble2.jpg'
+                ],
+                'tags' => implode(',', [
+                    $i->getPastoralTags()->first()->getId(),
+                    $i->getPastoralTags()->last()->getId(),
+                ]),
+                'tagNames' => "test tag A,test tag B",
+                'duplicateIds' => '25,26',
+                'points' => 100.1,
+                'body_public' => "Public body\nPublic body.",
+                'body_private' => "Private body\nPrivate body.",
+            ],
+        ];
+
+        $i->comment("Testing as user {$user->getUsername()} [{$user->getId()}]");
+        $i->switchUser($user);
+
+        /* Create a pastoral record
+         */
+        $i->sendPost('/pastoral/record/insert', $pastoral['data']);
+
+        /* Sequential dependency
+         * These checks must occur after sendPost() executes, not beforehand: you can't exit early
+         *
+         * A $user is one of four different user setups: some have permission to create
+         * pastoral records and some don't. This simulates what happens when a student user
+         * tries to create a pastoral record, etc.
+         */
+        if (!$user->getRole()->isStaff()) {
+            $i->seeResponseCodeIs(401);
+            return;
+        }
+
+        /* Successfully created the pastoral record
+         */
+        $i->seeResponseCodeIs(201);
+
+        /* The following mutations occur on the same pastoral record, in sequence, to test
+         * repeated mutability. This is the most recent record inserted, presuming we succeeded.
+         * We'll be recycling its id throughout the mutations
+         */
+        $query = "SELECT MAX(id) AS id FROM pastoral";
+
+        $pastoralId = \Schoolbox\Pastoral\Mapper::getInstance()
+            ->getDatabase()
+            ->executeQuery($query)
+            ->fetchAll()[0]['id'];
+
+        $endpoint = sprintf('/pastoral/record/%s/update', $pastoralId);
+
+        /* These are required for a PATCH endpoint expecting json data
+         * Set these before initiating a restful request
+         */
+        $i->haveHttpHeader('Accept', 'application/json');
+        $i->haveHttpHeader('Content-Type', 'application/json');
+
+        /* Mutate one field via the patch endpoint
+         * Just the heading
+         */
+        $update1 = [
+            'data' => [
+                'id' => $pastoralId,
+                'heading' => 'Updated heading only',
+            ],
+        ];
+
+        /* Evaluate response
+         */
+        $i->sendPatch($endpoint, json_encode($update1['data']));
+
+        /* Mutate multiple fields via the patch endpoint
+         */
+        $update2 = [
+            'data' => [
+                'id' => $pastoralId,
+                'heading' => 'A new heading for a new world',
+                'points' => 117.23,
+                'expiresAt' => '2025-12-12T01:23:45+10:00',
+                'occurredOn' => '1997-08-29T02:14:00+10:00',
+                'body_public' => 'For Public Consumption',
+                'body_private' => 'For Private Consumption',
+            ],
+        ];
+
+        /* Evaluate response
+         */
+        $i->sendPatch($endpoint, json_encode($update2['data']));
+
+        /* Mutate no fields using a payload containing invalid nodes via the patch endpoint
+         */
+        $update3 = [
+            'data' => [
+                'id' => $pastoralId,
+                'cat' => 'meow',
+                'dog' => 'woof',
+                'horse' => 'neighborhood',
+                'lion' => 'rawr',
+            ],
+        ];
+
+        /* Evaluate response
+         */
+        $i->sendPatch($endpoint, json_encode($update3['data']));
+
+        /* Mutate a mixture of valid and invalid nodes in a payload via the patch endpoint
+         */
+        $update4 = [
+            'data' => [
+                'id' => $pastoralId,
+                'cat' => 'meow',
+                'heading' => 'The fourth iteration!',
+                'horse' => 'neighborhood',
+                'lion' => 'rawr',
+                'body_public' => 'We did it!',
+                'tagNames' => 'hadoken,shoryuken',
+                'dog' => 'woof',
+                /* Corresponds to Critical in the sales data
+                 */
+                'severityId' => 4,
+                /* A misnamed field
+                 */
+                'severity' => 3,
+            ],
+        ];
+
+        /* Evaluate response
+         */
+        $i->sendPatch($endpoint, json_encode($update4['data']));
+
+        /* Chuck some actions, roles and groups on
+         */
+        $update5 = [
+            'data' => [
+                'id' => $pastoralId,
+                'heading' => 'Roles and Groups updated',
+                'role' => [
+                    /* Administration
+                     */
+                    1 => 1,
+                ],
+                'group' => [
+                    /* Year 9 Coordinators
+                     */
+                    1 => 1,
+                    /* Student Wellbeing Team
+                     */
+                    2 => 1,
+                ],
+                'actions' => [1, 3, 5]
+            ],
+        ];
+
+        /* Evaluate response
+         */
+        $i->sendPatch($endpoint, json_encode($update5['data']));
+    }
+}

@@ -234,6 +234,9 @@ class Module extends BaseModule
                     '/record/{recordId:\d+}/comment/{commentId:\d+}/delete' => ['postCommentDelete' => $permissionCommentDelete],
                     '/record/{recordId:\d+}/action/update'                  => ['postActionUpdate' => $permissionActionUpdate],
                 ],
+                self::METHOD_PATCH => [
+                    '/record/{recordId:\d+}/update' => ['patchRecordUpdate' => $permissionRecordUpdate],
+                ]
             ]
         );
     }
