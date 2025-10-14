@@ -190,32 +190,32 @@ test.describe("Learning Moment Photo Tests", () => {
         await db.updateInDatabase(
             "moment",
             { deleted_at: "2022-01-15 11:22:34" },
-            { "body LIKE": "%This is a learning moments test - take a photo%" },
+            { "body LIKE": "%This is a learning moments test - take a photo%", deleted_at: null },
         );
         await db.updateInDatabase(
             "moment",
             { deleted_at: "2022-01-15 11:22:34" },
-            { "body LIKE": "%This is a learning moments test to be commented%" },
+            { "body LIKE": "%This is a learning moments test to be commented%", deleted_at: null },
         );
         await db.updateInDatabase(
             "moment",
             { deleted_at: "2022-01-15 11:22:34" },
-            { "body LIKE": "%This is a learning moments test to be modified%" },
+            { "body LIKE": "%This is a learning moments test to be modified%", deleted_at: null },
         );
         await db.updateInDatabase(
             "moment",
             { deleted_at: "2022-01-15 11:22:34" },
-            { "body LIKE": "%This is a learning moments test to get comments deleted%" },
+            { "body LIKE": "%This is a learning moments test to get comments deleted%", deleted_at: null },
         );
         await db.updateInDatabase(
             "moment",
             { deleted_at: "2022-01-15 11:22:34" },
-            { "body LIKE": "%This is a learning moments test to get deleted%" },
+            { "body LIKE": "%This is a learning moments test to get deleted%", deleted_at: null },
         );
         await db.updateInDatabase(
             "editor_template",
             { deleted_at: "2022-01-15 11:22:34" },
-            { "title like": "Learning Moments Automation Template%" },
+            { "title like": "Learning Moments Automation%", deleted_at: null },
         );
     });
 });

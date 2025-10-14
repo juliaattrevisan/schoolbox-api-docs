@@ -182,15 +182,31 @@ test.describe("Calendar tests", () => {
         const eventTitleGroup = "My Group Test Event";
         const eventTitleSchool = "My School Test Event";
         const eventTitle = "My Test Event";
-        await db.updateInDatabase("event", { deleted_at: "2022-01-15 11:22:34" }, { "title like": eventTitlePersonal });
-        await db.updateInDatabase("event", { deleted_at: "2022-01-15 11:22:34" }, { "title like": eventTitleGroup });
-        await db.updateInDatabase("event", { deleted_at: "2022-01-15 11:22:34" }, { "title like": eventTitleSchool });
-        await db.updateInDatabase("event", { deleted_at: "2022-01-15 11:22:34" }, { "title like": eventTitle });
+        await db.updateInDatabase(
+            "event",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": eventTitlePersonal, deleted_at: null },
+        );
+        await db.updateInDatabase(
+            "event",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": eventTitleGroup, deleted_at: null },
+        );
+        await db.updateInDatabase(
+            "event",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": eventTitleSchool, deleted_at: null },
+        );
+        await db.updateInDatabase(
+            "event",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": eventTitle, deleted_at: null },
+        );
         await db.dontHaveInDatabase("userAccess", { uid: 22, service: 2, sid: 2, type: 3 });
         await db.updateInDatabase(
             "editor_template",
             { deleted_at: "2022-01-15 11:22:34" },
-            { "title like": "Calendar Automation Template%" },
+            { "title like": "Calendar Automation%", deleted_at: null },
         );
     });
 });

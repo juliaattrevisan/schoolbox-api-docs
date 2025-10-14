@@ -188,6 +188,18 @@ export default class AcceptanceTester extends BaseTester {
 
     /**
      * Click the template icon in the CKEditor5 bar based on the CKEditor on its ID and the template name
+     */
+    async clickDropdownTemplateCKEditor(): Promise<void> {
+        // wait the ck editor bar to be visible - waiting the first one on the page to work well in the page with multiple ck editors
+        await expect(this.page.locator("div.ck.ck-toolbar").first()).toBeVisible();
+
+        // click the template icon in the ckeditor toolbar
+        this.isGoingTo("click the template icon in the ckeditor toolbar and select a template");
+        await this.page.locator(AcceptanceTester.CKEDITOR_TEMPLATE_BUTTON).click();
+    }
+
+    /**
+     * Click and select a the template icon in the CKEditor5 bar based on the CKEditor on its ID and the template name
      * @param editorId - The ID of the CKEditor5 instance
      * @param templateName - The name of the template to select
      */

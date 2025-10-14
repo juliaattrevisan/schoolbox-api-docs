@@ -6,6 +6,7 @@ import FeedbackForm from "@schoolboxTest/playwright/support/page/dueWork/Feedbac
 import StatusPage from "@schoolboxTest/playwright/support/page/dueWork/StatusPage";
 import SubmitForm from "@schoolboxTest/playwright/support/page/dueWork/SubmitForm";
 import Common from "@schoolboxTest/playwright/support/page/Common";
+import EditorTemplate from "@schoolboxTest/playwright/support/page/admin/design/EditorTemplates";
 
 const SELECTOR_ASSESSMENT_SUMMARY_CREATE_BUTTON = "assessment-summary-create-button";
 
@@ -27,6 +28,15 @@ test.describe("Feedback Tests", () => {
         const teacher = Common.USER_JACKCOLES;
         const dueworkTitle1 = `Cest One ${Common.genText(6)}`;
         const filename = path.join(__dirname, "../../support/file/test-80x80.png");
+
+        const editorTemplate = new EditorTemplate(page, tester);
+        tester.isGoingTo("Create a editor template to use in the feedback comment");
+        await editorTemplate.gotoCreateTemplatePage(4);
+        await editorTemplate.createTemplate(
+            "Automation Template for Feedback",
+            "This is an automation template",
+            "This is a feedback comment test",
+        );
 
         tester.isGoingTo("As Jack Coles, create a due work");
         await tester.impersonate(teacher);
@@ -77,12 +87,15 @@ test.describe("Feedback Tests", () => {
         tester.isGoingTo("As Jack Coles, click to the students submission page");
         const dueworkPage = new AssessmentPage(tester, page);
         await dueworkPage.openInlineGrader(student, dueworkTitle1);
+        tester.isGoingTo("check the feedback template is visible in the inline grader ckeditor");
+        await tester.checkTemplateIconVisibility(true);
 
+        tester.isGoingTo("enter grade and feedback via the inline grader using the feedback template in the ckeditor");
         const grade = Math.floor(Math.random() * 50) + 50; // Random grade between 50 and 100
 
         const feedbackForm = new FeedbackForm(tester, page);
         await feedbackForm.setGrade(grade, studentId);
-        await feedbackForm.setComment(Common.genText(200), studentId);
+        await tester.clickEditorTemplateCKEditor(`comment-${studentId}`, "Automation Template for Feedback");
         await feedbackForm.publish();
 
         tester.isGoingTo("As Louisa Smith, check notification");
@@ -95,6 +108,10 @@ test.describe("Feedback Tests", () => {
         tester.isGoingTo("As Louisa Smith, click into the due work");
         await assessmentNotificationLuisa2.getByText(dueworkTitle1).click();
         await expect(page.locator("h2.subheader").filter({ hasText: "GRADING" })).toBeVisible();
+        const feedbackSummary = page.getByTestId("assessment-feedback-summary");
+        await expect(
+            feedbackSummary.locator("blockquote").filter({ hasText: "This is a feedback comment test" }),
+        ).toBeVisible();
     });
 
     /**
@@ -167,6 +184,12 @@ test.describe("Feedback Tests", () => {
             "Reviewed",
         );
 
+        tester.isGoingTo("check the feedback template is visible in the status page ckeditor");
+        // search for the student to avoid issues with multiple ck editors on the page
+        await page.locator(`input[type="search"]`).fill(student);
+        await expect(page.locator("div.ck.ck-editor")).toHaveCount(1);
+        await tester.checkTemplateIconVisibility(true);
+
         tester.isGoingTo("As Louisa, check notification");
         await tester.impersonateViaUserProfilePage(student);
         const assessmentNotificationLuisa2 = await tester.common.findNotification(
@@ -187,6 +210,15 @@ test.describe("Feedback Tests", () => {
             "lesson_plan_template",
             { deleted_at: "2022-01-15 11:22:34" },
             { "title LIKE": "Automation Template%" },
+        );
+    });
+
+    test.afterAll(async ({ baseTester, db }) => {
+        baseTester.isGoingTo("delete the editor template created for the feedback comment");
+        await db.updateInDatabase(
+            "editor_template",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": "Automation Template%", deleted_at: null },
         );
     });
 });

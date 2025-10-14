@@ -232,13 +232,25 @@ test.describe("Textbox Tests", () => {
 
         await api.deleteFoldersByName(db, "Test TextBox Homepage");
 
-        await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Test Text Box Title" });
-        await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Second Text Box" });
-        await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Third Text Box" });
+        await db.updateInDatabase(
+            "textBox",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { heading: "Test Text Box Title", deleted_at: null },
+        );
+        await db.updateInDatabase(
+            "textBox",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { heading: "Second Text Box", deleted_at: null },
+        );
+        await db.updateInDatabase(
+            "textBox",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { heading: "Third Text Box", deleted_at: null },
+        );
         await db.updateInDatabase(
             "editor_template",
             { deleted_at: "2022-01-15 11:22:34" },
-            { "title like": "Homepage Automation Template%" },
+            { "title like": "Homepage Automation%", deleted_at: null },
         );
     });
 });

@@ -287,13 +287,14 @@ test.describe("Goals and Achievements tests", () => {
             { deleted_at: "2022-01-15 11:22:34" },
             {
                 "name like": "Automation Badge%",
+                deleted_at: null,
             },
         );
 
         await db.updateInDatabase(
             "editor_template",
             { deleted_at: "2022-01-15 11:22:34" },
-            { "title like": "Badge Automation Template%" },
+            { "title like": "Badge Automation Template%", deleted_at: null },
         );
     });
 });
