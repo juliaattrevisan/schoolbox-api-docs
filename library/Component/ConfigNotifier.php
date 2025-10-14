@@ -100,6 +100,13 @@ class Component_ConfigNotifier extends AbstractModuleNotifier
         }
         try {
             $instance = $this->componentInstanceMapper->findById($model->getInstanceId());
+            /* The definition object is only hydrated when the postSave is triggered, but when committing changes via transaction,
+             * the postSave doesn't get triggered when committing the transaction, so we need to manually hydrate it here to make sure
+             * that it's always hydrated at this point
+             */
+            if (null === $instance->getDefinition()) {
+                $instance->setDefinition(\Component_DefinitionMapper::getInstance()->findById($instance->getDefinitionId()));
+            }
             if (!$instance->getDefinition()->getNamespace() || !$instance->isHomepage()) {
                 return;
             }
