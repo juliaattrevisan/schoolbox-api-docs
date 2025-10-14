@@ -9,8 +9,20 @@ declare(strict_types=1);
 
 namespace Schoolbox\Editor\OpenAI\Log;
 
+use Schoolbox\User;
+
 class ModelToArray
 {
+    /**
+     * Constructor
+     *
+     * @param User\Translator\Author\ModelToArray $userTranslator
+     */
+    public function __construct(
+        private User\Translator\Author\ModelToArray $userTranslator,
+    ) {
+    }
+
     /**
      * Convert an AILog model to an array for API responses.
      *
@@ -19,11 +31,11 @@ class ModelToArray
      */
     public function __invoke(Model $log): array
     {
-        return [
+        $translation = [
             'id' => $log->getId(),
             'sessionId' => $log->getSessionId(),
             'createdAt' => $log->getCreatedAt()?->getUsingFormat(DATE_ATOM),
-            'userId' => $log->getUser()->getId(),
+            'createdBy' => $this->userTranslator->__invoke($log->getUser()),
             'prompt' => $log->getPrompt(),
             'inputTokens' => $log->getInputTokens(),
             'outputTokens' => $log->getOutputTokens(),
@@ -34,5 +46,7 @@ class ModelToArray
             'returnCode' => $log->getReturnCode(),
             'errorMessage' => $log->getErrorMessage(),
         ];
+
+        return $translation;
     }
 }

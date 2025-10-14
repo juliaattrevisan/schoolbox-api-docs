@@ -19,6 +19,7 @@ use Schoolbox\Editor\OpenAI\Log\Model as AILog;
 use Schoolbox\Admin\OpenAI\Config as AIConfig;
 use Schoolbox\Editor\OpenAI\Log\ModelToArray;
 use Schoolbox\UserMapper;
+use Schoolbox\User;
 
 class Controller extends Base
 {
@@ -47,6 +48,11 @@ class Controller extends Base
         $features['image'] = [
             'title' => 'Image Generation',
         ];
+
+        // only include the title as that's all that the frontend needs here
+        $features = array_map(fn($item) => [
+            'title' => $item['title']
+        ], $features);
 
         $this->response = $this->responseFromTemplate('@openAIUsage/index.twig', [
             'features' => $features,
@@ -139,22 +145,37 @@ class Controller extends Base
         $logGroups = $this->aiLogMapper->findPredicateGrouped($predicate, offset: $offset);
         $count = $this->aiLogMapper->countByPredicates($predicate);
 
-        $translator = new ModelToArray();
-        $logs = [];
+        $translator = new ModelToArray(
+            new User\Translator\Author\ModelToArray()
+        );
+
+        $sessions = [];
 
         //translate each group of session ID's
         foreach ($logGroups as $sessionId => $group) {
-            $logs[$sessionId] = $group->map($translator);
+            $actualSessionId = $group->first()?->getSessionId() ?? null;
+
+            $sessions[$sessionId] = [
+                'id' => $sessionId,
+                'entries' => $group->map($translator),
+                '_routes' => [
+                    'getLog' => $actualSessionId !== null ? $this->getRouteIfAuthorized(
+                        'openAIUsage.getLog',
+                        [ 'sessionId' => $actualSessionId ]
+                    ) : null,
+                ],
+            ];
         }
 
+        $sessions = array_values($sessions);
 
         $this->response = $this->responseAsJson([
-            'data' => $logs,
+            'data' => $sessions,
             'metadata' => [
                 'total' => $count,
-                'cursor' => $offset + count($logs),
-                ]
-            ]);
+                'cursor' => $offset + count($sessions),
+            ],
+        ]);
     }
 
     /**
@@ -166,7 +187,9 @@ class Controller extends Base
     {
         $logEntries = $this->aiLogMapper->findByColumn('session_id', $log->getSessionId(), ['order' => 'created_at ASC']);
 
-        $translator = new ModelToArray();
+        $translator = new ModelToArray(
+            new User\Translator\Author\ModelToArray()
+        );
         $logEntriesArray = $logEntries->map($translator);
         $this->response = $this->responseAsJson($logEntriesArray);
     }

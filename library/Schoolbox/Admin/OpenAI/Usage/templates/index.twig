@@ -1,101 +1,20 @@
 {% import 'sub/breadcrumbs.twig' as bread %}
 {{ bread.crumbsArray(allBreadcrumbs) }}
 
-{% set debug = true %}
-{#{% set debug = false %}#}
-
 <div class="admin-container row">
 
     {# Shared navigation menu #}
     {{ renderAdminNavigation(pageCurrent) }}
 
     <div class="admin-content">
-        {# filters #}
-        <div class="filters">
-            <form method="POST" action="{{ routeLookupIfAuthorized('openAIUsage.postSearch') }}">
-                <div class="filter-group">
-                    <label for="feature">Feature:</label>
-                    <select name="feature" id="feature">
-                        <option value="">All</option>
-                        {% for feature,featureConf in features %}
-                            <option value="{{ feature }}">{{ featureConf.title }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="userId">User ID:</label>
-                    <input id='user' name="user" type='text' value='' placeholder="Search Users" data-selectizeuser required />
-                </div>
-                <div class="filter-group">
-                    <label for="dateFrom">Date From:</label>
-                    <input type="text" name="from" id="dateFrom" data-datepicker value="">
-                </div>
-                <div class="filter-group">
-                    <label for="dateTo">Date To:</label>
-                    <input type="text" name="before" id="dateTo" data-datepicker value="">
-                </div>
-                <div class="filter-actions">
-                    <button type="submit">Apply Filters</button>
-                    <a href="{{ routeLookupIfAuthorized('openAIUsage.getIndex') }}" class="reset-filters">Reset</a>
-                </div>
-            </form>
-        <div class="usage-charts">
-            <div id="usage-global-container">
-                <table>
-                    <tr>
-                        {% if debug %}
-                            <th>Session ID</th>
-                        {% endif %}
-                        <th>Date</th>
-                        <th>Feature</th>
-                        <th>User</th>
-                        {% if debug %}
-                            <th>Log Count</th>
-                        {% endif %}
-                    </tr>
-                    {% for sesionId,logs in logGroups %}
-                        {% set log = logs|first %}
-                        <tr data-log-session-id="{{ log.sessionId }}">
-                            {% if debug %}
-                                {% set route = routeLookupIfAuthorized('openAIUsage.getLog', {sessionId: log.sessionId, log: log}) %}
-                                <td>
-                                    {% if route and log.sessionId %}
-                                    <a href="{{ route }}">{{ sesionId }}</a>
-                                    {% else %}
-                                        {{ sesionId }}
-                                    {% endif %}
-                                </td>
-                            {% endif %}
-                            <td>
-                                {{ log.getCreatedAt|date("Y-m-d H:i:s") }}
-                            </td>
-                            <td>
-                                {{ features[log.feature].title ?? 'unknown' }}
-                            </td>
-                            <td>
-                                <a href="/search/user/{{ log.user.getId }}">{{ log.user.getFullName }}</a>
-                            </td>
-                            {% if debug %}
-                                <td>{{ logs|length }}</td>
-                            {% endif %}
-                        </tr>
-
-                    {% endfor %}
-                </table>
+        <div class="small-12 columns">
+            <div id="ai-usage-log-container">
+                <ai-usage-log
+                    :route-search="'{{ routeLookupIfAuthorized('openAIUsage.postSearch') }}'"
+                    :features='{{ features|json_encode|raw }}'
+                />
             </div>
+            <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/aiUsageLog.js?v={{ config.site_version }}"></script>
         </div>
     </div>
 </div>
-    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/selectize.min.js"></script>
-    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/vendors/selectize/jquery.selectize-selector.js"></script>
-    <script type="text/javascript">
-        $(function() {
-            $('#user').userSelectizeSelector({
-                ajax: {
-                    data:     {groupID: 0, showCampus: true},
-                },
-                multiple: false {# why this doesn't multiple false... i have no idea... #}
-            });
-        });
-    </script>
-<div id="toast" class="toast"></div>
