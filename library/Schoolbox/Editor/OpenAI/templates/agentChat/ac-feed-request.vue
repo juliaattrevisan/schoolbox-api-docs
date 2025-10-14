@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import FileDrop from "@js/resource/file-drop.vue";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
-import type { ImageRequest } from "./imageGeneratorTypes";
+import type { ImageRequest } from "./agentChatTypes";
 
 interface Props {
     message: ImageRequest;

@@ -3,9 +3,9 @@ import type { GalleryItem } from "lightgallery/lg-utils";
 import { IMAGE_LIGHTBOX_CREATE } from "@js/image-lightbox/imageLightboxEvent";
 import type { ImageLightboxCreateEvent } from "@js/image-lightbox/imageLightboxEvent";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
-import type { AiFeedMessage, ImageResponseInProgress } from "../imageGeneratorTypes";
-import { generateImage } from "./imageGeneratorPayload";
-import type { ImageGeneratorApiPayload } from "./imageGeneratorPayload";
+import type { AiFeedMessage, ImageResponseInProgress } from "../agentChatTypes";
+import { generateImage } from "./agentChatPayload";
+import type { ImageGeneratorApiPayload } from "./agentChatPayload";
 
 export const useImageGeneratorStore = defineStore("imageGenerator", () => {
     const feed = window.Vue.ref<AiFeedMessage[]>([]);

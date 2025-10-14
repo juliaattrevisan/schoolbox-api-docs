@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { useImageGeneratorStore } from "./store/imageGeneratorStore";
-import type { ImageResponse } from "./imageGeneratorTypes";
+import { useImageGeneratorStore } from "./store/agentChatStore";
+import type { ImageResponse } from "./agentChatTypes";
 
 interface Props {
     /**

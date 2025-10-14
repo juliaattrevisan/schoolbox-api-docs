@@ -4,10 +4,10 @@
  * This could easily be expanded to be used in other places when we inevitably need that
  */
 
-import { useImageGeneratorStore } from "./store/imageGeneratorStore";
-import type { ImagePromptAttribute } from "./imageGeneratorTypes";
-import IgPrompt from "./ig-prompt.vue";
-import igFeed from "./ig-feed.vue";
+import { useImageGeneratorStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
+import type { ImagePromptAttribute } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
+import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-prompt.vue";
+import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
 import IgActions from "./ig-actions.vue";
 
 interface Props {
@@ -45,8 +45,8 @@ window.Vue.onMounted(() => {
             and framing. See more information on these on
             <a href="/help/sso/send?returnUrl=/homepage/5438" target="_blank">Schoolbox Help</a>
         </p>
-        <ig-feed />
-        <ig-prompt :prompt-attributes="props.promptAttributes" :ai-session-id="props.aiSessionId" />
+        <ac-feed />
+        <ac-prompt :prompt-attributes="props.promptAttributes" :ai-session-id="props.aiSessionId" />
         <div v-if="igStore.uploadError !== null" class="alert-box alert l-mar--0">
             <b>There was a problem uploading the image.</b>
             {{ igStore.uploadError }}

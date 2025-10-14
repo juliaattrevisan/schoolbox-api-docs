@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { useImageGeneratorStore } from "./store/imageGeneratorStore";
-import IgFeedRequest from "./ig-feed-request.vue";
-import IgFeedResponse from "./ig-feed-response.vue";
+import { useImageGeneratorStore } from "./store/agentChatStore";
+import AcFeedRequest from "./ac-feed-request.vue";
+import AcFeedResponse from "./ac-feed-response.vue";
 
 const igStore = useImageGeneratorStore();
 
@@ -23,8 +23,8 @@ const feed = window.Vue.computed(() => {
         <template v-for="(message, index) in feed" :key="message.entryKey">
             <br v-if="index > 0" />
 
-            <ig-feed-request v-if="message.type === 'request'" :message="message" />
-            <ig-feed-response v-else :message="message" />
+            <ac-feed-request v-if="message.type === 'request'" :message="message" />
+            <ac-feed-response v-else :message="message" />
         </template>
     </div>
 </template>

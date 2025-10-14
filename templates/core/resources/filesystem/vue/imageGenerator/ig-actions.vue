@@ -4,7 +4,7 @@
  */
 
 import { uploadFileToStorage } from "@js/resource/resourceUtils";
-import { useImageGeneratorStore } from "./store/imageGeneratorStore";
+import { useImageGeneratorStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
 
 const igStore = useImageGeneratorStore();
 

@@ -1,5 +1,5 @@
 import type { FileDropFile } from "@js/resource/fileDropTypes";
-import type { ImageGeneratorApiPayload } from "./store/imageGeneratorPayload";
+import type { ImageGeneratorApiPayload } from "./store/agentChatPayload";
 
 type Image = {
     b64: string;

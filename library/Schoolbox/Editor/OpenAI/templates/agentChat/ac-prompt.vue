@@ -2,8 +2,8 @@
 import { useTemplateRefsList } from "@vueuse/core";
 import FileDrop from "@js/resource/file-drop.vue";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
-import { useImageGeneratorStore } from "./store/imageGeneratorStore";
-import type { ImagePromptAttribute } from "./imageGeneratorTypes";
+import { useImageGeneratorStore } from "./store/agentChatStore";
+import type { ImagePromptAttribute } from "./agentChatTypes";
 
 interface Props {
     /**
