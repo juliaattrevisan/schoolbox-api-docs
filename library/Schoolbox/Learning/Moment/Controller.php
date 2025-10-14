@@ -222,6 +222,9 @@ class Controller extends Base
             ->setCreator($this->getUser())
             ->draft();
 
+        $momentTranslated = $translator($moment);
+        $momentTranslated['_links'] = []; // As this is a new moment, it has no actual _links yet
+
         // This should follow the same structure as a moment's _links, but it's for creating stuff instead
         $usersString = implode(',', $users->getPropertyValues('id'));
 
@@ -243,7 +246,7 @@ class Controller extends Base
         $params = [
             'hasAutosave'              => $users->count() === 1, // only autosave on create if there's one target user
             'moment'                   => $moment,
-            'momentTranslated'         => $translator($moment),
+            'momentTranslated'         => $momentTranslated,
             'editorTemplates'          => $this->editorTemplateHelper->getTemplatesForCategory(),
             'createRoutes'             => $createRoutes,
             'curriculumTaggingEnabled' => $this->curriculumTaggingEnabled(),
