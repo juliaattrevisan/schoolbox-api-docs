@@ -28,6 +28,17 @@ export const useAgentChatStore = defineStore("agentChat", () => {
     }
 
     /**
+     * @returns The full feed of messages (includes the partial entry at the end if currently generating)
+     */
+    const fullFeed = window.Vue.computed((): AgentChatFeedMessage[] => {
+        if (activeGeneration.value === null) {
+            return feed.value;
+        }
+
+        return [...feed.value, activeGeneration.value];
+    });
+
+    /**
      * @returns The previous response ID from the feed if it exists
      */
     function getPreviousResponseId(): string | null {
@@ -68,7 +79,14 @@ export const useAgentChatStore = defineStore("agentChat", () => {
         feed.value.push({
             type: "request",
             entryKey: getNextEntryKey(),
-            user: window.schoolboxUser,
+            user: {
+                id: window.schoolboxUser.id,
+                fullName: window.schoolboxUser.name,
+                _links: {
+                    profile: `/search/user/${window.schoolboxUser.id}`,
+                    avatar: `/portrait.php?id=${window.schoolboxUser.id}&size=square64`,
+                },
+            },
             payload,
             file,
         });
@@ -220,7 +238,9 @@ export const useAgentChatStore = defineStore("agentChat", () => {
     return {
         init,
         feed,
+        fullFeed,
         activeGeneration,
+        getNextEntryKey,
         getPreviousResponseId,
         sendRequest,
         selectedFeedEntry,

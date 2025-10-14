@@ -21,7 +21,7 @@ export type AiSession = {
     };
 };
 
-export type AiUserLogApiRequest = {
+export type AiUsageLogApiRequest = {
     keyword: string | null;
     feature: string | null;
     user: number | null;
@@ -30,10 +30,12 @@ export type AiUserLogApiRequest = {
     cursor: string | null;
 };
 
-export type AiUserLogApiResponse = {
+export type AiUsageLogApiResponse = {
     data: AiSession[];
     cursor: {
         total: number;
         cursor: number; // TODO: this isn't the normal way we do cursors...
     };
 };
+
+export type AiSessionLogApiResponse = AiSessionEntry[];

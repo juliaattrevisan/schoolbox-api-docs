@@ -4,7 +4,20 @@ import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/Se
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import { EMPTY_DATE } from "@schoolboxVue/components/dateTimePicker/datePickerTypes";
 import DateRange from "@schoolboxVue/components/dateTimePicker/date-range.vue";
-import type { AiSession, AiSessionEntry, AiUserLogApiRequest, AiUserLogApiResponse } from "./payload";
+import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
+import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
+import type {
+    AgentChatFeedMessage,
+    AgentChatRequest,
+    AgentChatResponse,
+} from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
+import type {
+    AiSession,
+    AiSessionEntry,
+    AiUsageLogApiRequest,
+    AiUsageLogApiResponse,
+    AiSessionLogApiResponse,
+} from "./payload";
 
 interface Props {
     routeSearch: string;
@@ -12,6 +25,7 @@ interface Props {
 }
 
 const props = defineProps<Props>();
+const acStore = useAgentChatStore();
 
 const isLoading = window.Vue.ref(true);
 const loadError = window.Vue.ref<string | null>(null);
@@ -22,6 +36,12 @@ const startDateFilter = window.Vue.ref<string>(EMPTY_DATE);
 const endDateFilter = window.Vue.ref<string>(EMPTY_DATE);
 
 const usageSessions = window.Vue.ref<AiSession[]>([]);
+
+const isLoadingSession = window.Vue.ref(false);
+const sessionDetails = window.Vue.ref<{
+    sessionId: string;
+    feed: AgentChatFeedMessage[];
+} | null>(null);
 
 /**
  * Get the formatted date to show for a log entry
@@ -39,7 +59,7 @@ async function loadUsageLogs(): Promise<void> {
     isLoading.value = true;
     loadError.value = null;
 
-    const response = await apiRequest<AiUserLogApiResponse, AiUserLogApiRequest>({
+    const response = await apiRequest<AiUsageLogApiResponse, AiUsageLogApiRequest>({
         method: "POST",
         url: props.routeSearch,
         body: {
@@ -67,6 +87,60 @@ async function loadUsageLogs(): Promise<void> {
 window.Vue.onMounted(async () => {
     await loadUsageLogs();
 });
+
+/**
+ * Open the details for a specific session
+ * @param session The session to open
+ */
+async function openSessionDetails(session: AiSession): Promise<void> {
+    if (!session._routes.getLog) {
+        return; // no access to view the log
+    }
+
+    isLoadingSession.value = true;
+    sessionDetails.value = null;
+
+    const response = await apiRequest<AiSessionLogApiResponse>({
+        method: "GET",
+        url: session._routes.getLog,
+    });
+
+    if (!response.success) {
+        loadError.value = response.message;
+        return;
+    }
+
+    sessionDetails.value = {
+        sessionId: session.id,
+        feed: response.data.flatMap((entry) => {
+            const req: AgentChatRequest = {
+                type: "request",
+                entryKey: acStore.getNextEntryKey(),
+                user: entry.createdBy,
+                payload: {
+                    // TODO
+                    userPrompt: "prompt message",
+                    attributes: {},
+                    imageUrl: null,
+                    previousResponseId: null,
+                    aiSessionId: session.id,
+                },
+                file: null,
+            };
+
+            const res: AgentChatResponse = {
+                type: "response",
+                entryKey: acStore.getNextEntryKey(),
+                status: "success", // assume success for now...
+                responseId: null, // no openai response ID available I guess
+                image: null,
+                message: "response message", // TODO
+            };
+
+            return [req, res];
+        }),
+    };
+}
 </script>
 
 <template>
@@ -119,7 +193,7 @@ window.Vue.onMounted(async () => {
     <div>
         <div class="list-item">
             <h2 class="subheader">
-                AI Usage<template v-if="!isLoading">: {{ usageSessions.length }} results</template>
+                Activity<template v-if="!isLoading">: {{ usageSessions.length }} events</template>
             </h2>
         </div>
     </div>
@@ -133,7 +207,7 @@ window.Vue.onMounted(async () => {
     </div>
 
     <div v-else class="row">
-        <div class="small-12 columns">
+        <div class="small-12 columns" :class="{ 'medium-6': isLoadingSession || sessionDetails !== null }">
             <div v-if="loadError" data-alert class="alert-box alert">
                 {{ loadError }}
             </div>
@@ -142,6 +216,7 @@ window.Vue.onMounted(async () => {
                 <table>
                     <thead>
                         <tr>
+                            <th></th>
                             <th>Session ID</th>
                             <th>Date</th>
                             <th>Feature</th>
@@ -153,9 +228,22 @@ window.Vue.onMounted(async () => {
                     <tbody>
                         <tr v-for="session in usageSessions" :key="session.id">
                             <td>
+                                <div class="selector">
+                                    <input
+                                        :id="`chk-${session.id}`"
+                                        type="radio"
+                                        name="ai-usage-session"
+                                        :checked="session.id === sessionDetails?.sessionId"
+                                        :disabled="!session._routes.getLog || undefined"
+                                        @change="() => openSessionDetails(session)"
+                                    />
+                                    <label :for="`chk-${session.id}`" class="radio-label no-margin"></label>
+                                </div>
+                            </td>
+                            <td>
                                 <component
                                     :is="session._routes.getLog ? 'a' : 'span'"
-                                    :href="session._routes.getLog ? '#' : undefined"
+                                    @click="() => openSessionDetails(session)"
                                 >
                                     {{ session.id }}
                                 </component>
@@ -182,6 +270,12 @@ window.Vue.onMounted(async () => {
                     </tbody>
                 </table>
             </div>
+        </div>
+        <div v-if="isLoadingSession || sessionDetails !== null" class="small-12 medium-6 island">
+            <section>
+                <div v-if="sessionDetails === null" class="loader"></div>
+                <ac-feed v-else class="l-mar-m" :feed="sessionDetails.feed" :allow-selection="false" />
+            </section>
         </div>
     </div>
 </template>

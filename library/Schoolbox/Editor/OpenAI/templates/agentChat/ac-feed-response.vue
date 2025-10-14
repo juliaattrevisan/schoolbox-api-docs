@@ -7,6 +7,8 @@ interface Props {
      * The message to display
      */
     message: AgentChatResponse;
+    /** Whether the user can select this response */
+    allowSelection: boolean;
 }
 
 const props = defineProps<Props>();
@@ -40,15 +42,17 @@ const imageSrc = window.Vue.computed(() => {
     </div>
 
     <div v-else class="ac-feed-response ac-feed-response-success radiolist">
-        <input
-            :id="radioId"
-            v-model="acStore.selectedFeedEntry"
-            type="radio"
-            :name="radioId"
-            :value="props.message.entryKey"
-            :disabled="props.message.status !== 'success' || undefined"
-        />
-        <label :for="radioId"> </label>
+        <template v-if="props.allowSelection">
+            <input
+                :id="radioId"
+                v-model="acStore.selectedFeedEntry"
+                type="radio"
+                :name="radioId"
+                :value="props.message.entryKey"
+                :disabled="props.message.status !== 'success' || undefined"
+            />
+            <label :for="radioId"> </label>
+        </template>
 
         <p v-if="props.message.status === 'error'" class="alert-box alert l-mar--0">
             <b>There was a problem generating the image.</b>
@@ -62,7 +66,7 @@ const imageSrc = window.Vue.computed(() => {
                 </nav>
                 <img :src="imageSrc" @click="() => acStore.spawnLightbox(props.message.entryKey)" />
             </div>
-            <p class="l-mar--0-bottom l-mar-s--top ac-feed-message-content">
+            <p class="l-mar--0-bottom ac-feed-message-content" :class="{ 'l-mar-s--top': imageSrc }">
                 {{ props.message.message }}
             </p>
         </div>

@@ -45,7 +45,7 @@ window.Vue.onMounted(() => {
             and framing. See more information on these on
             <a href="/help/sso/send?returnUrl=/homepage/5438" target="_blank">Schoolbox Help</a>
         </p>
-        <ac-feed />
+        <ac-feed :feed="acStore.fullFeed" class="l-mar-m--bottom" style="max-height: 35vh" allow-selection />
         <ac-prompt :prompt-attributes="props.promptAttributes" :ai-session-id="props.aiSessionId" />
         <div v-if="acStore.uploadError !== null" class="alert-box alert l-mar--0">
             <b>There was a problem uploading the image.</b>
