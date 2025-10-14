@@ -201,7 +201,7 @@ export default class Files {
     /**
      * @param fileComponent - Root locator for this Files component; actions are scoped to it.
      *   - Tick compact mode
-     *   - Tick show component titleAbby
+     *   - Tick show component title
      *   - Clicks Update and waits for the form to close
      */
     public static async updateFileComponentSetting(fileComponent: Locator): Promise<void> {
