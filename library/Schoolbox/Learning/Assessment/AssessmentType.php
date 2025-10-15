@@ -10,6 +10,7 @@ namespace Schoolbox\Learning\Assessment;
 
 use InvalidArgumentException;
 use Schoolbox\Assessment\Rubric\DataModel\DataSource as RubricDataSource;
+use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\DueWork\Model as DueWork;
 use Schoolbox\Learning\Assessment\LessonPlan\Model as LessonPlan;
 use Schoolbox\Learning\Assessment\Lti\Model as LtiAssessment;
@@ -41,6 +42,7 @@ class AssessmentType implements IType
     public const TYPE_QUIZ = 'quiz';
     public const TYPE_LTI_ASSESSMENT = 'lti';
     public const TYPE_LESSON_PLAN = 'lessonPlan';
+    public const TYPE_DIALOG_AGENT = 'dialogAgent';
 
     public const ALL_TYPES = [
         self::TYPE_PROJECT,
@@ -61,17 +63,32 @@ class AssessmentType implements IType
     {
         if ($assessment instanceof Project) {
             return self::TYPE_PROJECT;
-        } elseif ($assessment instanceof DueWork) {
+        }
+
+        if ($assessment instanceof DueWork) {
             return self::TYPE_DUE_WORK;
-        } elseif ($assessment instanceof Task) {
+        }
+
+        if ($assessment instanceof Task) {
             return self::TYPE_TASK;
-        } elseif ($assessment instanceof Quiz) {
+        }
+
+        if ($assessment instanceof Quiz) {
             return self::TYPE_QUIZ;
-        } elseif ($assessment instanceof LtiAssessment) {
+        }
+
+        if ($assessment instanceof LtiAssessment) {
             return self::TYPE_LTI_ASSESSMENT;
-        } elseif ($assessment instanceof LessonPlan) {
+        }
+
+        if ($assessment instanceof LessonPlan) {
             return self::TYPE_LESSON_PLAN;
         }
+
+        if ($assessment instanceof DialogAgent) {
+            return self::TYPE_DIALOG_AGENT;
+        }
+
         throw new \UnexpectedValueException('Unknown IAssessable: ' . get_class($assessment));
     }
 
@@ -87,7 +104,9 @@ class AssessmentType implements IType
     {
         if (self::TYPE_PROJECT === $stringVal) {
             return (new Project())->setContext($context);
-        } elseif (self::TYPE_DUE_WORK === $stringVal) {
+        }
+
+        if (self::TYPE_DUE_WORK === $stringVal) {
             $object = (new DueWork())->setContext($context);
 
             if ($context) {
@@ -95,14 +114,26 @@ class AssessmentType implements IType
             }
 
             return $object;
-        } elseif (self::TYPE_TASK === $stringVal) {
+        }
+
+        if (self::TYPE_TASK === $stringVal) {
             return (new Task())->setContext($context);
-        } elseif (self::TYPE_QUIZ === $stringVal) {
+        }
+
+        if (self::TYPE_QUIZ === $stringVal) {
             return (new Quiz())->setContext($context);
-        } elseif (self::TYPE_LTI_ASSESSMENT === $stringVal) {
+        }
+
+        if (self::TYPE_LTI_ASSESSMENT === $stringVal) {
             return (new LtiAssessment())->setContext($context);
-        } elseif (self::TYPE_LESSON_PLAN === $stringVal) {
+        }
+
+        if (self::TYPE_LESSON_PLAN === $stringVal) {
             return (new \Schoolbox\Learning\Assessment\LessonPlan\Model())->setContext($context);
+        }
+
+        if (self::TYPE_DIALOG_AGENT === $stringVal) {
+            return (new \Schoolbox\Learning\Assessment\DialogAgent\Model())->setContext($context);
         }
 
         throw new \UnexpectedValueException("Unknown Assessment: $stringVal");
@@ -128,6 +159,8 @@ class AssessmentType implements IType
                 return LtiAssessment::getDefaultTypeNameTranslated();
             case self::TYPE_LESSON_PLAN:
                 return LessonPlan::getDefaultTypeNameTranslated();
+            case self::TYPE_DIALOG_AGENT:
+                return DialogAgent::getDefaultTypeNameTranslated();
             default:
                 throw new InvalidArgumentException("Unknown assessment type: $stringVal");
         }
@@ -186,6 +219,7 @@ class AssessmentType implements IType
             self::TYPE_PROJECT => 'project',
             self::TYPE_LTI_ASSESSMENT => 'lti',
             self::TYPE_LESSON_PLAN => 'lesson-plan',
+            self::TYPE_DIALOG_AGENT => 'dialog-agent',
             default => throw new InvalidArgumentException("Expected valid assessment type, received '$type'."),
         };
     }
