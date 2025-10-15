@@ -63,7 +63,7 @@ class Controller extends Base
         $lpConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_LESSONPLAN), trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)));
 
         // if not enabled, 404
-        if ($aiConfig::isEnabled($lpConfig) === false) {
+        if ($aiConfig->isEnabled($lpConfig) === false) {
             $returnCode = 404;
 
             $problem = new ApiProblem("Lesson Plan AI is not enabled.")
@@ -343,7 +343,7 @@ class Controller extends Base
         $chatConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_CHAT), trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)));
 
         // if not enabled, 404
-        if ($aiConfig::isEnabled($chatConfig) === false) {
+        if ($aiConfig->isEnabled($chatConfig) === false) {
             $returnCode = 404;
 
             $problem = new ApiProblem("Lesson Plan AI is not enabled.")

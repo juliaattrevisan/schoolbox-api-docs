@@ -113,7 +113,7 @@ class Config
         /* Superimpose selected options over the default
          * Disabling fields prevents the keys from existing
          */
-        return self::mergeConfig($optionsPayload, $provider);
+        return $this->mergeConfig($optionsPayload, $provider);
     }
 
 
@@ -123,7 +123,7 @@ class Config
      * @param string $provider
      * @return array
      */
-    public static function generateInitConfig(string $provider): array
+    public function generateInitConfig(string $provider): array
     {
         return match ($provider) {
             Helper::ENDPOINT_TYPE_AZURE => self::CONFIG_STRUCT_AZURE,
@@ -140,7 +140,7 @@ class Config
      * @param string $provider
      * @return array
      */
-    public static function mergeConfig(array $config, string $provider): array
+    public function mergeConfig(array $config, string $provider): array
     {
         switch ($provider) {
             case Helper::ENDPOINT_TYPE_AZURE:
@@ -228,18 +228,18 @@ class Config
      * @param string|null $model
      * @return array
      */
-    public static function migrate(?string $provider, ?string $key, ?string $resourceName, ?string $deploymentId, ?string $model): array
+    public function migrate(?string $provider, ?string $key, ?string $resourceName, ?string $deploymentId, ?string $model): array
     {
         switch ($provider) {
             case Helper::ENDPOINT_TYPE_AZURE:
-                $config = self::generateInitConfig($provider);
+                $config = $this->generateInitConfig($provider);
                 $config[self::FIELD_OPENAIKEY] = $key ?? '';
                 $config[self::FIELD_RESOURCE_NAME] = $resourceName ?? '';
                 $config[self::FIELD_DEPLOYMENT_ID] = $deploymentId ?? '';
                 $config[self::FIELD_ENABLED] = true;
                 break;
             case Helper::ENDPOINT_TYPE_OPENAI:
-                $config = self::generateInitConfig($provider);
+                $config = $this->generateInitConfig($provider);
                 $config[self::FIELD_OPENAIKEY] = $key ?? '';
                 $config[self::FIELD_MODEL] = $model ?? self::NOT_ACTIVE;
 
@@ -278,7 +278,7 @@ class Config
      * check if the config is enabled
      * both openai and azure do this differently
      */
-    public static function isEnabled(?array $config): bool
+    public function isEnabled(?array $config): bool
     {
         if (empty($config) || !isset($config['provider'])) {
             return false;

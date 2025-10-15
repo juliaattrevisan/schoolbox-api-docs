@@ -34,7 +34,7 @@ class DataGenerator implements IDataGenerator
         foreach (Config::ALL_MODULES as $module) {
             $config = $aiConfig->decode($this->config->get(Config::MODULE_CONFIG[$module]), $textProvider);
             $textModules[$module] = [
-                'enabled' => $aiConfig::isEnabled($config),
+                'enabled' => $aiConfig->isEnabled($config),
                 'config'  => $config,
                 ];
         }

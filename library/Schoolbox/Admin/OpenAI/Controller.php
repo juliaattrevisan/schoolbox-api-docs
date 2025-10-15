@@ -160,7 +160,7 @@ class Controller extends ConfigController
     public function getBlankConfig(string $provider): void
     {
         $aiConfig = new Config();
-        $blank = Config::generateInitConfig($provider);
+        $blank = $aiConfig->generateInitConfig($provider);
         $textModules = [];
         foreach (Config::ALL_MODULES as $module) {
             $textModules[$module] = $blank;
