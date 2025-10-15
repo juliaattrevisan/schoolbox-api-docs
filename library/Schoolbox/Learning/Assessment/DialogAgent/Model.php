@@ -21,6 +21,15 @@ use Schoolbox\User;
 class Model extends AbstractAssessment
 {
     /**
+     * This appears on Create Activity screens but you probably need to rename
+     * this to something friendlier because it's user-facing.
+     *
+     * TODO Rename to whatever this is canonically called
+     */
+    private const DEFAULT_TYPE_NAME = 'Dialog Agent';
+
+
+    /**
      * The IAssessable associated with this Dialog Agent
      */
     private ?AssessmentModel $assessmentModel = null;
@@ -54,6 +63,15 @@ class Model extends AbstractAssessment
      * @var string|null
      */
     private ?string $duration = null;
+
+
+    /**
+     * @return string
+     */
+    public static function getDefaultTypeName(): string
+    {
+        return self::DEFAULT_TYPE_NAME;
+    }
 
 
     /**
