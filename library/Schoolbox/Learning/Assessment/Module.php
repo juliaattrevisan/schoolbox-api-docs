@@ -442,6 +442,7 @@ class Module extends BaseModule
             AssessmentType::TYPE_TASK           => Assessment\Task\Controller::class,
             AssessmentType::TYPE_LTI_ASSESSMENT => Assessment\Lti\Controller::class,
             AssessmentType::TYPE_LESSON_PLAN    => Assessment\LessonPlan\Controller::class,
+            AssessmentType::TYPE_DIALOG_AGENT   => Assessment\DialogAgent\Controller::class,
         ];
 
         // set the controller class for later
@@ -971,6 +972,30 @@ class Module extends BaseModule
                     $linkedAssessmentsMapper,
                 );
 
+            case Assessment\DialogAgent\Controller::class:
+                return new Assessment\DialogAgent\Controller(
+                    $userMapper,
+                    $errorMapper,
+                    $assessmentDataSource,
+                    $workTypeMapper,
+                    $this->getAccess(),
+                    $transactor,
+                    $bakery,
+                    $termMapper,
+                    $participantDataSource,
+                    $courseSpecMapper,
+                    $unitSpecMapper,
+                    $this->injector->get('l10n'),
+                    $replicator,
+                    $viewLatestMapper,
+                    $projectResultCacheMapper,
+                    $lessonPlanTemplateMapper,
+                    $lessonPlanDataModelMapper,
+                    $courseImplementationMapper,
+                    $unitImplementationMapper,
+                    $linkedAssessmentsMapper,
+                );
+
             default:
                 throw new InvalidArgumentException(
                     sprintf('Assessment controller for class "%s" not found', $className),
@@ -1015,6 +1040,10 @@ class Module extends BaseModule
 
             case AssessmentType::TYPE_LESSON_PLAN:
                 $controller = $this->buildControllerForClass(Assessment\LessonPlan\Controller::class);
+                break;
+
+            case AssessmentType::TYPE_DIALOG_AGENT:
+                $controller = $this->buildControllerForClass(Assessment\DialogAgent\Controller::class);
                 break;
 
             default:
