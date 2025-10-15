@@ -39,6 +39,12 @@ export default class UnitPlanner {
 
     static readonly DATA_TEST_UNIT_PLANNER_TABS = "unit-planner-tabs-{tabName}";
 
+    static readonly DATA_TEST_ADD_UNITS_NAME_INPUT = "up-add-units-name-input-{index}";
+
+    static readonly DATA_TEST_ADD_UNITS_ADD_BUTTON = "up-add-units-add";
+
+    static readonly DATA_TEST_ADD_UNITS_CREATE_BUTTON = "up-add-units-create";
+
     constructor(tester: AcceptanceTester, page: Page) {
         this.tester = tester;
         this.page = page;
@@ -253,5 +259,45 @@ export default class UnitPlanner {
 
     async clickUnitPlannerTabs(tabName: string): Promise<void> {
         await this.page.getByTestId(UnitPlanner.DATA_TEST_UNIT_PLANNER_TABS.replace("{tabName}", tabName)).click();
+    }
+
+    /**
+     * Create multiple units within the add units modal
+     * @param unitNames - Array of unit names to create
+     */
+    async createUnitsInModal(unitNames: string[]): Promise<void> {
+        if (unitNames.length === 0) {
+            throw new Error("At least one unit name must be provided");
+        }
+
+        // Confirm modal is visible
+        await this.page.locator('[data-test="up-add-units-title"]').isVisible();
+
+        // Fill in the first unit name (input field already exists)
+        await this.page
+            .getByTestId(UnitPlanner.DATA_TEST_ADD_UNITS_NAME_INPUT.replace("{index}", "0"))
+            .fill(unitNames[0]);
+
+        // Add additional units by clicking "Add another" and filling in the names
+        for (let i = 1; i < unitNames.length; i += 1) {
+            await this.page.getByTestId(UnitPlanner.DATA_TEST_ADD_UNITS_ADD_BUTTON).click();
+            await this.page
+                .getByTestId(UnitPlanner.DATA_TEST_ADD_UNITS_NAME_INPUT.replace("{index}", i.toString()))
+                .fill(unitNames[i]);
+        }
+
+        // Click Create to create all units
+        await this.page.getByTestId(UnitPlanner.DATA_TEST_ADD_UNITS_CREATE_BUTTON).click();
+
+        // Verify each unit is visible on the page after creation
+        for (const unitName of unitNames) {
+            await expect(this.page.locator('[data-test^="unit-planner-unit-link-"]').getByText(unitName)).toBeVisible();
+        }
+
+        // refresh the page and ensure the units are still there
+        await this.page.reload();
+        for (const unitName of unitNames) {
+            await expect(this.page.locator('[data-test^="unit-planner-unit-link-"]').getByText(unitName)).toBeVisible();
+        }
     }
 }

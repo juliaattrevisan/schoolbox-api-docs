@@ -1,38 +1,34 @@
 <script setup lang="ts">
 /**
  * Displayed when there's currently no Units linked to the Course
- * NOTE: We initially had planned to create a new unit directly from the unit planner,
- * but for now this functionality has been removed as we would just be duplicating
- * functionality provided elsewhere without also provided the ability to rename/deleting units as well.
- * The relevant code has been commented out for now as it may be added in the future however.
  */
-import { getReturnUrl } from "@js/util/sbx/urlUtils";
-// import { useAddUnitStore } from "./store/unitPlannerAddUnitStore";s
 
-interface Props {
-    courseId: number;
-}
-const props = defineProps<Props>();
-// const addUnitStore = useAddUnitStore();
+import locale from "@js/terminology/rosettaStone";
+import { useAddUnitsStore } from "./store/unitPlannerAddUnitsStore";
+
+const addUnitsStore = useAddUnitsStore();
 
 /**
- * To show the add unit display
+ * To show the add units display
  */
-// function onCreateSelected() {
-// if (!addUnitStore.isOpen) {
-//     addUnitStore.prompt();
-// }
-// }
+function onCreateSelected(): void {
+    if (!addUnitsStore.isOpen) {
+        addUnitsStore.prompt();
+    }
+}
 </script>
 
 <template>
     <div class="row">
         <div class="small-12 island">
-            <div class="empty-state">
+            <div class="empty-state-flex-centered">
                 <i class="icon-unit"></i>
                 <p>
-                    This course currently does not have any units. To begin building this course start by
-                    <a :href="`/course/modify/${props.courseId}?${getReturnUrl()}`">creating a unit.</a>
+                    This course currently does not have any {{ locale.unit.translate(true, false) }}. To begin building
+                    this course start by
+                    <button data-test="up-empty-state-create" @click.prevent="onCreateSelected">
+                        creating a {{ locale.unit.translate(false, false) }}.
+                    </button>
                 </p>
             </div>
         </div>

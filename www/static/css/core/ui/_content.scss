@@ -57,7 +57,8 @@
         min-height: auto;
         padding: 0;
         vertical-align: baseline;
-        &:hover {
+        &:hover,
+        &:focus {
             background: none;
         }
     }

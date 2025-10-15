@@ -59,6 +59,17 @@ a.disabled {
         max-width: $global-button-height;
     }
 
+    &--icon-only {
+        align-items: center;
+        align-self: start;
+        background: none;
+        display: inline-flex;
+        justify-content: center;
+        line-height: 1;
+        min-height: 2.5rem;
+        padding: var(--spacing-s);
+    }
+
     &[class^="icon-"]:before,
     &[class*=" icon-"]:before {
         line-height: normal;

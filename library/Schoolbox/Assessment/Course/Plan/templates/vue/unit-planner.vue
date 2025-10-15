@@ -10,6 +10,7 @@ import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import type { Unit, UnitTemplate } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
 import UpHeader from "./up-header.vue";
+import UpAddUnits from "./up-add-units.vue";
 import UpEmptyState from "./up-empty-state.vue";
 import UpUnitCell from "./up-unit-cell.vue";
 import UpUnitCellTextboxContentPlaceholder from "./up-unit-cell-textbox-content-placeholder.vue";
@@ -160,7 +161,8 @@ window.Vue.onUnmounted(() => {
         :folder-id="props.folderId"
         :route-curriculum-coverage="props.routeCurriculumCoverage"
     />
-    <up-empty-state v-if="store.units.length === 0" :course-id="store.courseId" />
+    <up-add-units />
+    <up-empty-state v-if="store.units.length === 0" />
     <div v-else class="row">
         <div class="small-12 island">
             <dl ref="tabsEl" class="tabs no-print">

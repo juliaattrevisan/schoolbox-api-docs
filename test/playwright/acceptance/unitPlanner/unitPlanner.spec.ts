@@ -184,6 +184,63 @@ test.describe("Unit Planner Tests", () => {
         await expect(page.locator("div.empty-state")).toBeVisible();
     });
 
+    test("Create new units on empty course", async ({ tester, page }) => {
+        const courseName = "Party time";
+        const firstUnitName = "Soft party";
+        const secondUnitName = "Hard party";
+
+        // switch to admin so can later delete the created course
+        await tester.loginAsAdmin();
+
+        tester.isGoingTo("navigate to course creation page");
+        await page.goto("https://vagrant.dev.schoolbox.cloud/course/new");
+
+        tester.isGoingTo(`fill in course name with '${courseName}'`);
+        await page.getByRole("textbox", { name: "Name *" }).fill(courseName);
+
+        tester.isGoingTo("select English faculty folder");
+        await page.getByRole("link", { name: " (Click to select)" }).click();
+        await page.getByRole("treeitem", { name: " English" }).click();
+        await page.getByRole("button", { name: "Use this folder" }).click();
+
+        tester.isGoingTo("click Next to create the course");
+        await page.getByRole("button", { name: "Next" }).click();
+
+        tester.isGoingTo("wait for the URL to change to course/modify/{courseId}");
+        await page.waitForURL("**/course/modify/*");
+
+        // grab the courseId from the URL after the navigation is complete
+        const courseId = page.url().split("/").pop();
+        console.warn(`Created course with ID ${courseId}`);
+
+        tester.isGoingTo("navigate to unit planner page to verify empty units message");
+        await page.goto(`https://vagrant.dev.schoolbox.cloud/course/plan/${courseId}`);
+
+        tester.isGoingTo("confirm the empty units message is visible");
+        await expect(page.getByText("This course currently does not have any units")).toBeVisible();
+
+        tester.isGoingTo("click the 'creating a unit' button to open the modal");
+        await page.getByRole("button", { name: "creating a unit." }).click();
+
+        tester.isGoingTo("create both units using the modal and verify they are visible");
+        await unitPlanner.createUnitsInModal([firstUnitName, secondUnitName]);
+
+        tester.isGoingTo("navigate to course list page to delete the course");
+        await page.goto("https://vagrant.dev.schoolbox.cloud/course/list");
+
+        tester.isGoingTo("click the course dropdown button to open the actions menu");
+        await page.locator(`[data-test="sbx-pop-out-courseDropdown-${courseId}-button"]`).click();
+
+        tester.isGoingTo("click the Delete link from the dropdown menu");
+        await page.getByRole("link", { name: "Delete" }).click();
+
+        tester.isGoingTo("confirm deletion in the modal by clicking the confirm button");
+        await page.locator('[data-test="confirm-dialog-confirm-button"]').click();
+
+        tester.isGoingTo(`verify that ${courseName} is no longer visible on the page`);
+        await expect(page.getByText(courseName)).not.toBeVisible();
+    });
+
     test.afterAll(async ({ baseTester, db }) => {
         baseTester.isGoingTo("find the textbox that was created in this test so it can be deleted");
 
