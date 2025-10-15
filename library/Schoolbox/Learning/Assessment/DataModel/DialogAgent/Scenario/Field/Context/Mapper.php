@@ -30,7 +30,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
         $this->uses('scenario_field_id', self::TYPE_INTEGER, null, 'scenarioField');
-        $this->uses('dialog_agent_id', self::TYPE_STRING, null, 'dialogAgent');
+        $this->uses('dialog_agent_id', self::TYPE_INTEGER, null, 'dialogAgent');
         $this->uses('body', self::TYPE_STRING, null, 'body');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
