@@ -87,8 +87,13 @@ class GarbageCollector
     /**
      * Returns a list of hashes that are considered stale.
      *
+     * This will find every eligible hash, then process them in batch sizes of
+     * `$this->batchSize`: before each batch, the lock will be refreshed.
+     *
      * @param string|null $hash If set, target this specific hash for cleanup.
      * @return array<string>
+     * @throws LockConflictedException if the lock refresh failed because another process has the lock
+     * @throws LockAcquiringException if the lock can't be acquired when refreshing
      */
     public function getStale(?string $hash = null): array
     {
@@ -144,6 +149,7 @@ class GarbageCollector
         $startTime      = microtime(true);
         $totalProcessed = 0;
         foreach ($batches as $batch) {
+            $this->lock->refresh($this->lockTtl);
             $batchStartTime = microtime(true);
             $this->log->notice(
                 sprintf(
@@ -208,6 +214,15 @@ class GarbageCollector
     /**
      * Delete all stale hashes.
      *
+     * This works by:
+     * * finding the set of hashes which are stale
+     * * marking hashes which are still fresh as having been processed
+     *   (so they're not re-processed before a certain time)
+     * * removing any hashes which are stale
+     *
+     * The lock is refreshed between all of these steps, and before every hash
+     * is removed.
+     *
      * @param string|null $hash If set, target this specific hash for cleanup.
      * @return int
      * @throws LockConflictedException if the lock refresh failed because another process has the lock
@@ -216,7 +231,11 @@ class GarbageCollector
     public function purge(?string $hash = null): int
     {
         $this->log->debug("Starting GC");
+
+        $this->lock->refresh($this->lockTtl);
         $purge = $this->getStale($hash);
+
+        $this->lock->refresh($this->lockTtl);
         $this->preserve(array_diff($this->list, $purge));
 
         if (!count($purge)) {
@@ -227,6 +246,7 @@ class GarbageCollector
         $this->log->error('Deleting ' . count($purge) . ' stale');
         foreach ($purge as $hash) {
             try {
+                $this->lock->refresh($this->lockTtl);
                 $this->removeFromStorage($hash);
             } catch (MapperException $e) {
                 $this->log->error("Could not delete storage hash '$hash' due to a database issue: " . $e->getMessage());
