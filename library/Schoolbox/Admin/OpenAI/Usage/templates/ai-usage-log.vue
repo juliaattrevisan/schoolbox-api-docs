@@ -4,6 +4,8 @@ import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/Se
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import { EMPTY_DATE } from "@schoolboxVue/components/dateTimePicker/datePickerTypes";
 import DateRange from "@schoolboxVue/components/dateTimePicker/date-range.vue";
+import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
+import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vue";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
 import type {
@@ -17,6 +19,8 @@ interface Props {
     routeSearch: string;
     features: Record<string, { title: string }>;
 }
+
+const UNKNOWN_FEATURE_TEXT = "Unknown Feature";
 
 const props = defineProps<Props>();
 const acStore = useAgentChatStore();
@@ -34,6 +38,24 @@ const usageSessions = window.Vue.ref<AiSession[]>([]);
 const sessionLoadError = window.Vue.ref<string | null>(null);
 const selectedSessionId = window.Vue.ref<AiSession["id"] | null>(null);
 const selectedSessionFeed = window.Vue.ref<AgentChatFeedMessage[] | null>(null);
+
+const selectedSessionInfo = window.Vue.computed(() => {
+    if (selectedSessionId.value === null) {
+        return null;
+    }
+
+    const sessionInfo = usageSessions.value.find((s) => s.id === selectedSessionId.value);
+    const feedInfo = selectedSessionFeed.value;
+
+    if (sessionInfo === undefined || feedInfo === null) {
+        return null;
+    }
+
+    return {
+        session: sessionInfo,
+        feed: feedInfo,
+    };
+});
 
 /**
  * Close the current session details pane
@@ -258,7 +280,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                                 {{ formatSessionDate(session) }}
                             </td>
                             <td>
-                                {{ props.features[session.feature]?.title ?? "unknown" }}
+                                {{ props.features[session.feature]?.title ?? UNKNOWN_FEATURE_TEXT }}
                             </td>
                             <td>
                                 <component
@@ -282,8 +304,29 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                 {{ sessionLoadError }}
             </div>
             <section v-else>
-                <div v-if="selectedSessionFeed === null" class="loader"></div>
-                <ac-feed v-else class="l-mar-m" :feed="selectedSessionFeed" :allow-selection="false" />
+                <div v-if="selectedSessionInfo === null" class="loader"></div>
+                <template v-else>
+                    <div class="card small-12">
+                        <span>
+                            <user-photo :user-id="selectedSessionInfo.session.createdBy.id || 0" render="small" />
+                            <h3>
+                                {{ props.features[selectedSessionInfo.session.feature]?.title ?? UNKNOWN_FEATURE_TEXT }}
+                            </h3>
+                        </span>
+                        <p class="meta">
+                            Created by
+                            <component
+                                :is="selectedSessionInfo.session.createdBy._links.profile ? 'a' : 'span'"
+                                :href="selectedSessionInfo.session.createdBy._links.profile ?? undefined"
+                            >
+                                {{ selectedSessionInfo.session.createdBy.fullName }}
+                            </component>
+                            <relative-time :datetime="selectedSessionInfo.session.createdAt" full-diff></relative-time>
+                        </p>
+                    </div>
+                    <div class="clearfix"></div>
+                    <ac-feed class="l-mar-m" :feed="selectedSessionInfo.feed" :allow-selection="false" />
+                </template>
             </section>
         </div>
     </div>
