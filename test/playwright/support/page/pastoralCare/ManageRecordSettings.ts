@@ -4,9 +4,12 @@
 
 import type { Page } from "@playwright/test";
 import { expect } from "@playwright/test";
+import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
 
 export default class PastoralExpiry {
     private page: Page;
+
+    private tester: AcceptanceTester;
 
     static readonly URL_AWARD_ACHIEVEMENT = "/pastoral/management/audience/subtype/1/modify";
 
@@ -34,8 +37,17 @@ export default class PastoralExpiry {
 
     static readonly SELECTOR_CONFIDENTIAL_COMMENT = 'label[for="rolePrivate{id}"]';
 
-    constructor(page: Page) {
+    static readonly SELECTOR_SENTIMENT_DROPDOWN = "#sentiment";
+
+    static readonly SELECTOR_ENTRY_TIP_ID = "entryTip";
+
+    static readonly SELECTOR_GENERAL_TEMPLATE_ID = "template";
+
+    static readonly SELECTOR_PRIVATE_TEMPLATE_ID = "templatePrivate";
+
+    constructor(page: Page, tester: AcceptanceTester) {
         this.page = page;
+        this.tester = tester;
     }
 
     /**
@@ -153,5 +165,38 @@ export default class PastoralExpiry {
      */
     async clickConfidentialComment(id: number | string): Promise<void> {
         await this.page.locator(PastoralExpiry.SELECTOR_CONFIDENTIAL_COMMENT.replace("{id}", id.toString())).click();
+    }
+
+    /**
+     * Selects a sentiment by value: positive, neutral, negative
+     * @param option - The value of the sentiment to select: positive, neutral, negative
+     */
+    async selectSentiment(option: string): Promise<void> {
+        await this.page.locator(PastoralExpiry.SELECTOR_SENTIMENT_DROPDOWN).click();
+        await this.page.locator(PastoralExpiry.SELECTOR_SENTIMENT_DROPDOWN).selectOption({ label: option });
+    }
+
+    /**
+     * fill the entry tip text
+     * @param tip - The tip text to fill
+     */
+    async fillEntryTip(tip: string): Promise<void> {
+        await this.tester.fillCKEditorById(PastoralExpiry.SELECTOR_ENTRY_TIP_ID, tip);
+    }
+
+    /**
+     * fill the general template text
+     * @param template - The general template text to fill
+     */
+    async fillGeneralTemplate(template: string): Promise<void> {
+        await this.tester.fillCKEditorById(PastoralExpiry.SELECTOR_GENERAL_TEMPLATE_ID, template);
+    }
+
+    /**
+     * fill the private template text
+     * @param template - The private template text to fill
+     */
+    async fillPrivateTemplate(template: string): Promise<void> {
+        await this.tester.fillCKEditorById(PastoralExpiry.SELECTOR_PRIVATE_TEMPLATE_ID, template);
     }
 }
