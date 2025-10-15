@@ -1,21 +1,34 @@
-FROM php:8-fpm
+FROM php:8.4-fpm
 
-RUN apt-get update && \
-    apt-get install -y libpng-dev libjpeg-dev libpq-dev libzip-dev zip unzip sudo wget zlib1g-dev libicu-dev libzstd-dev g++ && \
-    rm -rf /var/lib/apt/lists/*
+#RUN apt-get update && \
+#    apt-get install -y libpng-dev libjpeg-dev libpq-dev libzip-dev zip unzip sudo wget zlib1g-dev libicu-dev libzstd-dev g++ && \
+#    rm -rf /var/lib/apt/lists/*
+#
+#RUN yes | pecl update-channels
+#
+#RUN yes | pecl install igbinary redis
+#
+#RUN docker-php-ext-install intl && \
+#    docker-php-ext-install gd && \
+#    docker-php-ext-install opcache && \
+#    docker-php-ext-install zip && \
+#    docker-php-ext-install calendar && \
+#    docker-php-ext-install sockets && \
+#    docker-php-ext-enable igbinary && \
+#    docker-php-ext-enable redis
 
-RUN yes | pecl update-channels
+COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
-RUN yes | pecl install igbinary redis
-
-RUN docker-php-ext-install intl && \
-    docker-php-ext-install gd && \
-    docker-php-ext-install opcache && \
-    docker-php-ext-install zip && \
-    docker-php-ext-install calendar && \
-    docker-php-ext-install sockets && \
-    docker-php-ext-enable igbinary && \
-    docker-php-ext-enable redis
+RUN apt-get update && apt-get upgrade -y && \
+    install-php-extensions \
+        intl \
+        gd \
+        opcache \
+        zip \
+        calendar \
+        sockets \
+        igbinary \
+        redis
 
 RUN rm -rf /var/www/html \
     && chmod 0777 /tmp/
