@@ -296,12 +296,11 @@ services:
     container_name: mailcatcher
     ports:
       - "1080:1080" # Web UI
-      - "1025:1025" # SMTP
     restart: always
     networks:
       default:
         aliases:
-          - mailcatcher
+          - mailcatcher.localhost
 
 volumes:
   # Volume for Schoolbox's code base
