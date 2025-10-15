@@ -278,8 +278,7 @@ services:
     build:
       context: ./devkit-lti1p3-nginx
     ports:
-      - '8000:80'
-      - '8443:443'
+      - "${LTI_DEVKIT_PUBLISHED_PORT}:80"
     volumes:
       - ../../devkit-lti1p3:/var/www/html
       - ./devkit-lti1p3-nginx/config/nginx.conf:/etc/nginx/conf.d/default.conf
@@ -288,6 +287,8 @@ services:
       default:
         aliases:
           - devkit-lti1p3.localhost
+    profiles:
+      - lti
 
   devkit-lti1p3-phpfpm:
     container_name: devkit-lti1p3-phpfpm
@@ -302,6 +303,8 @@ services:
     volumes:
       - ../../devkit-lti1p3:/var/www/html
     working_dir: /var/www/html
+    profiles:
+      - lti
 
   schoolbox-gotenberg:
     container_name: schoolbox-gotenberg
@@ -329,7 +332,7 @@ services:
     image: schickling/mailcatcher
     container_name: mailcatcher
     ports:
-      - "1080:1080" # Web UI
+      - "${MAILCATCHER_UI_PUBLISHED_PORT}:1080"
     restart: always
     networks:
       default:
