@@ -41,7 +41,7 @@ class ConfigTest extends TestCase
     }
 
     /**
-     * Test that mergeConfig overwrites values and removes invalid keys for Azure provider.
+     * Test that decode overwrites values and removes invalid keys for Azure provider.
      */
     public function testMergeConfigOverwritesAndRemovesInvalidKeysForAzure()
     {
@@ -65,7 +65,7 @@ class ConfigTest extends TestCase
     }
 
     /**
-     * Test that mergeConfig overwrites values and removes invalid keys for OpenAI provider.
+     * Test that decode overwrites values and removes invalid keys for OpenAI provider.
      */
     public function testMergeConfigOverwritesAndRemovesInvalidKeysForOpenAI()
     {
@@ -85,7 +85,7 @@ class ConfigTest extends TestCase
     }
 
     /**
-     * Test that mergeConfig fills missing keys with defaults for OpenAI provider.
+     * Test that decode fills missing keys with defaults for OpenAI provider.
      */
     public function testMergeConfigFillsMissingKeysWithDefaults()
     {
@@ -100,7 +100,7 @@ class ConfigTest extends TestCase
     }
 
     /**
-     * Test that mergeConfig returns an empty array for an unknown provider.
+     * Test that decode returns an empty array for an unknown provider.
      */
     public function testMergeConfigReturnsEmptyArrayForUnknownProvider()
     {
@@ -110,16 +110,26 @@ class ConfigTest extends TestCase
     }
 
     /**
-     * Test that mergeConfig fills all modules with defaults when given an empty config.
+     * Test that decode fills all modules with defaults when given an empty config.
      */
-    public function testMergeConfigHandlesEmptyConfig()
+    public function testMergeConfigWithEmptyJsonForOpenAI()
     {
         $merged = new Config()->decode('{}', Helper::ENDPOINT_TYPE_OPENAI);
         $this->assertEquals(Config::CONFIG_STRUCT_OPENAI, $merged);
     }
 
     /**
-     * Test that mergeConfig always sets the provider key to the selected provider, regardless of input.
+     * Test decode with empty JSON objects for Azure modules (should fill with defaults).
+     */
+    public function testMergeConfigWithEmptyJsonForAzure()
+    {
+        $json = '{}';
+        $merged = new \Schoolbox\Admin\OpenAI\Config()->decode($json, Helper::ENDPOINT_TYPE_AZURE);
+        $this->assertEquals(\Schoolbox\Admin\OpenAI\Config::CONFIG_STRUCT_AZURE, $merged);
+    }
+
+    /**
+     * Test that decode always sets the provider key to the selected provider, regardless of input.
      */
     public function testMergeConfigAlwaysSetsProviderCorrectly()
     {
@@ -133,7 +143,7 @@ class ConfigTest extends TestCase
     }
 
     /**
-     * Test mergeConfig with a realistic Azure JSON payload for all modules.
+     * Test decode with a realistic Azure JSON payload for all modules.
      */
     public function testMergeConfigWithExampleJsonForAzureChat()
     {
@@ -147,7 +157,7 @@ class ConfigTest extends TestCase
     }
 
     /**
-     * Test mergeConfig with a realistic Azure JSON payload for all modules.
+     * Test decode with a realistic Azure JSON payload for all modules.
      */
     public function testMergeConfigWithExampleJsonForAzureLP()
     {
@@ -161,7 +171,7 @@ class ConfigTest extends TestCase
     }
 
     /**
-     * Test mergeConfig with a realistic OpenAI JSON payload for all modules.
+     * Test decode with a realistic OpenAI JSON payload for all modules.
      */
     public function testMergeConfigWithExampleJsonForOpenAIChat()
     {
@@ -173,7 +183,7 @@ class ConfigTest extends TestCase
     }
 
     /**
-     * Test mergeConfig with a realistic OpenAI JSON payload for all modules.
+     * Test decode with a realistic OpenAI JSON payload for all modules.
      */
     public function testMergeConfigWithExampleJsonForOpenAILP()
     {
@@ -185,7 +195,7 @@ class ConfigTest extends TestCase
     }
 
     /**
-     * Test mergeConfig with a partial Azure JSON payload (some keys missing, some present).
+     * Test decode with a partial Azure JSON payload (some keys missing, some present).
      */
     public function testMergeConfigWithPartialJsonForAzureChat()
     {
@@ -199,7 +209,7 @@ class ConfigTest extends TestCase
     }
 
     /**
-     * Test mergeConfig with a partial Azure JSON payload (some keys missing, some present).
+     * Test decode with a partial Azure JSON payload (some keys missing, some present).
      */
     public function testMergeConfigWithPartialJsonForAzureLP()
     {
@@ -213,17 +223,7 @@ class ConfigTest extends TestCase
     }
 
     /**
-     * Test mergeConfig with empty JSON objects for Azure modules (should fill with defaults).
-     */
-    public function testMergeConfigWithEmptyJsonForAzure()
-    {
-        $json = '{}';
-        $merged = new \Schoolbox\Admin\OpenAI\Config()->decode($json, Helper::ENDPOINT_TYPE_AZURE);
-        $this->assertEquals(\Schoolbox\Admin\OpenAI\Config::CONFIG_STRUCT_AZURE, $merged);
-    }
-
-    /**
-     * Test mergeConfig with a missing module in OpenAI JSON payload (should fill with defaults for missing module).
+     * Test decode with a missing module in OpenAI JSON payload (should fill with defaults for missing module).
      */
     public function testMergeConfigWithMissingModuleJsonForOpenAI()
     {
