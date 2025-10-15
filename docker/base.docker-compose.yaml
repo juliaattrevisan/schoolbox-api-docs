@@ -269,6 +269,35 @@ services:
       - path: ./schoolbox-taskd/default.env
         required: true
 
+  # This has the devkit mounted
+  devkit-lti1p3-nginx:
+    container_name: devkit-lti1p3-nginx
+    depends_on:
+      redis-cache:
+        condition: service_healthy
+    build:
+      context: ./devkit-lti1p3-nginx
+    ports:
+      - '8000:80'
+      - '8443:443'
+    volumes:
+      - ../../devkit-lti1p3:/var/www/html
+      - ../../devkit-lti1p3/docker/nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+
+  devkit-lti1p3-phpfpm:
+    container_name: devkit-lti1p3-phpfpm
+    depends_on:
+      redis-cache:
+        condition: service_healthy
+    build:
+      context: ./devkit-lti1p3-phpfpm
+    env_file:
+      - path: ./devkit-lti1p3-phpfpm/default.env
+        required: true
+    volumes:
+      - ../../devkit-lti1p3:/var/www/html
+    working_dir: /var/www/html
+
   schoolbox-gotenberg:
     container_name: schoolbox-gotenberg
     image: gotenberg/gotenberg:8
