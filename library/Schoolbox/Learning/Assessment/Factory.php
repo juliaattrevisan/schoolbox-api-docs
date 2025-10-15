@@ -540,14 +540,18 @@ class Factory
                 $this->getLineItemScoreMaximum()
             );
         } elseif ($assessment instanceof LessonPlan\Model) {
-            /* TODO Add other fields that are LessonPlan specific
-             */
             $decorator = new LessonPlan\Decorator\Decorator(
                 $this->getLessonPlanTemplateId(),
                 $this->getLessonPlanFields(),
                 $this->getLessonPlanVisibility(),
                 $this->getAttachedFiles(),
                 $this->getLessonPlanDuration(),
+            );
+        } elseif ($assessment instanceof DialogAgent\Model) {
+            /* TODO Add other fields that are DialogAgent specific
+             */
+            $decorator = new LessonPlan\Decorator\Decorator(
+                $this->getDialogAgentScenarioId()
             );
         } else {
             throw new DomainException('Please select an assessment type');

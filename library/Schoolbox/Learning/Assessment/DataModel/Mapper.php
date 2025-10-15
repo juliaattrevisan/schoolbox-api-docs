@@ -94,12 +94,14 @@ class Mapper extends BaseMapper
         // * project
         // * LTI assessment
         // * Lesson Plan
+        // * Dialog Agent
         $this->joinsReverseSingle('assessment_id', TaskMapper::class, 'task', 'task');
         $this->joinsReverseSingle('assessment_id', SubmissionBoxMapper::class, 'duework', 'duework');
         $this->joinsReverseSingle('assessment_id', Quiz\Mapper::class, 'quiz', 'quiz');
         $this->joinsReverseSingle('assessment_id', Project\Mapper::class, 'project', 'project');
         $this->joinsReverseSingle('assessment_id', LtiAssessment\Mapper::class, 'ltiAssessment', 'ltiAssessment');
         $this->joinsReverseSingle('assessment_id', LessonPlan\Mapper::class, 'lessonPlan', 'lessonPlan');
+        $this->joinsReverseSingle('assessment_id', DialogAgent\Mapper::class, 'dialogAgent', 'dialogAgent');
 
         // Participation plan join
         $this->joinsReverseMulti('assessment_id', Plan\Mapper::class, 'plans', 'plans');
@@ -197,6 +199,7 @@ class Mapper extends BaseMapper
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteDueWork']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteLtiAssessment']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteLessonPlan']);
+        $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteDialogAgent']);
         $this->registerCallback(self::CALLBACK_POSTSOFTDELETE, [$this, 'softDeleteCustomisation']);
 
         $this->registerPersistSearchIndexCallbacks();
@@ -403,6 +406,25 @@ class Mapper extends BaseMapper
         return true;
     }
 
+
+    /**
+     * Delete all of a Dialog Agent's subobjects
+     *
+     * @param Model $assessment
+     * @return bool
+     */
+    public function softDeleteDialogAgent(Model $assessment): bool
+    {
+        if ($assessment->getDialogAgent() instanceof DialogAgent\Model) {
+            $dialogAgentMapper = $this->getJoinMapper('dialogAgent');
+            $dialogAgents = $dialogAgentMapper->findByColumn('assessment_id', $assessment->getId());
+            $dialogAgentMapper->softDelete($dialogAgents);
+        }
+
+        return true;
+    }
+
+
     /**
      * Cascades soft-delete to any customisation of this assessment.
      *
@@ -499,6 +521,15 @@ class Mapper extends BaseMapper
             JOIN  {$this->getJoinSql('ltiAssessment.scores', 'l', 'ls')} AND ls.student_id = :userId
                   {$planJoin}
             WHERE {$where}
+            
+            UNION
+            
+            SELECT DISTINCT a.id
+            FROM  {$this->getDatabase()->getQuoter()->quoteIdentifier($this->getTable())} a
+            JOIN  {$this->getJoinSql('dialogAgent', 'a', 'da', true)}
+            JOIN  {$this->getJoinSql('dialogAgent.responses', 'da', 'dr')} AND dr.learner_id = :userId
+                  {$planJoin}
+            WHERE {$where}
 
             ORDER BY id ASC
         ";
@@ -535,6 +566,7 @@ class Mapper extends BaseMapper
                 {$this->getJoinColumnString('ltiAssessment', 'l')},
                 {$this->getJoinColumnString('ltiAssessment.ltiTool', 'ltool')},
                 {$this->getJoinColumnString('lessonPlan', 'lessonPlan')},
+                {$this->getJoinColumnString('dialogAgent', 'dialogAgent')},
                 {$this->getJoinColumnString('project', 'p')},
                 {$this->getJoinColumnString('assessment_folder', 'f')},
                 {$this->getJoinColumnString('assessment_course_unit_specification', 'us')},
@@ -556,6 +588,7 @@ class Mapper extends BaseMapper
             LEFT JOIN {$this->getJoinSql('duework.worksheetTemplate', 'd', 'dueworkWorksheetTemplate', true)}
             LEFT JOIN {$this->getJoinSql('duework.worksheetTemplate.allowedFileExtension', 'dueworkWorksheetTemplate', 'dueworkWorksheetTemplateAllowedFileExtension', true)}
             LEFT JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}
+            LEFT JOIN {$this->getJoinSql('dialogAgent', '', 'dialogAgent', true)}
             LEFT JOIN {$this->getJoinSql('work_type', '', 'wt')}
             LEFT JOIN {$this->getJoinSql('duework.mark_type', 'd', 'mt')}
             LEFT JOIN {$this->getJoinSql('duework.instructor_mark_type', 'd', 'imt')}
@@ -659,6 +692,10 @@ class Mapper extends BaseMapper
                         $typeJoins[] = " LEFT JOIN {$this->getJoinSql('lessonPlan', '', 'lessonPlan', true)}";
                         $typesPb     = $typesPb->notNull('lessonPlan.id');
                         break;
+                    case AssessmentType::TYPE_DIALOG_AGENT:
+                        $typeJoins[] = " LEFT JOIN {$this->getJoinSql('dialogAgent', '', 'dialogAgent', true)}";
+                        $typesPb     = $typesPb->notNull('dialogAgent.id');
+                        break;
                     default:
                         break;
                 }
@@ -717,6 +754,7 @@ class Mapper extends BaseMapper
         $modelList = $this->augmentListWithQuizzes($modelList);
         $modelList = $this->augmentListWithLtiAssessments($modelList);
         $modelList = $this->augmentListWithLessonPlans($modelList);
+        $modelList = $this->augmentListWithDialogAgents($modelList);
         $modelList = $this->augmentListWithProjects($modelList);
 
         // Augmentations for one-to-many fields, copied from standard hydrate.
@@ -1060,6 +1098,21 @@ class Mapper extends BaseMapper
             } else {
                 $model->setLessonPlan(null);
             }
+
+            /* Dialog Agents
+             */
+            if ($row['dialogAgent.id']) {
+                /* TOOD Maybe needed; can't remember
+                 */
+                $dialogAgentIds[] = $row['dialogAgent.id'];
+
+                $dialogAgent = $this->hydrateJoin($row, 'dialogAgent', 'dialogAgent');
+
+                $model->setDialogAgent($dialogAgent);
+            } else {
+                $model->setDialogAgent(null);
+            }
+
             // Project?
             if ($row['p.id']) {
                 $projectIds[$row['p.id']] = true;
@@ -1165,6 +1218,9 @@ class Mapper extends BaseMapper
          */
         $modelList = $this->augmentListWithLessonPlanFiles($modelList, $lessonPlanIds);
         $modelList = $this->augmentWithLessonPlanFields($modelList, $lessonPlanIds);
+
+        /* TODO Maybe augment with something here; can't remember what
+         */
 
         // Project contexts
         if ($hydrateProjectContext) {
@@ -1372,6 +1428,31 @@ class Mapper extends BaseMapper
             fn ($row) => $mapper->hydrate($row),
         );
     }
+
+
+    /**
+     * For any assessments in `$modelList`: fetch and add their corresponding
+     * Dialog Agent, if there are any.
+     *
+     * @param GenericCollection<Model> $modelList
+     * @return GenericCollection<Model>
+     */
+    private function augmentListWithDialogAgents(GenericCollection $modelList): GenericCollection
+    {
+        /** @var DialogAgent\Mapper $mapper */
+        $mapper = $this->getJoinMapper('dialogAgent');
+
+        return $this->augmentListWithSubObjects(
+            $modelList,
+            $mapper,
+            "
+                SELECT {$mapper->getColumnString()}
+                FROM {$mapper->getDatabase()->getQuoter()->quoteIdentifier($mapper->getTable())}
+            ",
+            fn ($row) => $mapper->hydrate($row),
+        );
+    }
+
 
     /**
      * For any assessments in `$modelList`: fetch and add their corresponding

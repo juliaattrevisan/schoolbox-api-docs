@@ -15,6 +15,7 @@ use Schoolbox\Assessment\Participant\Plan;
 use Schoolbox\Curriculum\Node;
 use Schoolbox\GenericCollection;
 use Schoolbox\ISoftDeletable;
+use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgent;
 use Schoolbox\Learning\Assessment\DataModel\Project\Model as Project;
 use Schoolbox\Learning\Assessment\DataModel\LessonPlan\Model as LessonPlan;
 use Schoolbox\Learning\Assessment\WorkType\Model as WorkType;
@@ -138,7 +139,7 @@ class Model implements ISoftDeletable
     /**
      * The task which may or may not be associated with this assessment.
      *
-     * Only one of task, due work, quiz, LTI assessment or project may be
+     * Only one of task, due work, quiz, LTI assessment, Lesson Plan, Dialog Agent or project may be
      * associated with a single assessment.
      *
      * @var null|Task
@@ -148,7 +149,7 @@ class Model implements ISoftDeletable
     /**
      * The due work which may or may not be associated with this assessment.
      *
-     * Only one of task, due work, quiz, LTI assessment or project may be
+     * Only one of task, due work, quiz, LTI assessment, Lesson Plan, Dialog Agent or project may be
      * associated with a single assessment.
      *
      * @var null|DueWork
@@ -158,7 +159,7 @@ class Model implements ISoftDeletable
     /**
      * The quiz which may or may not be associated with this assessment.
      *
-     * Only one of task, due work, quiz, LTI assessment or project may be
+     * Only one of task, due work, quiz, LTI assessment, Lesson Plan, Dialog Agent or project may be
      * associated with a single assessment.
      *
      * @var null|Quiz
@@ -169,9 +170,8 @@ class Model implements ISoftDeletable
      * The LTI assessment which may or may not be associated with this
      * assessment.
      *
-     * Only one of task, due work, quiz, LTI assessment, Lesson Plan or project may be
+     * Only one of task, due work, quiz, LTI assessment, Lesson Plan, Dialog Agent or project may be
      * associated with a single assessment.
-
      */
     private ?LtiAssessment $ltiAssessment = null;
 
@@ -179,12 +179,23 @@ class Model implements ISoftDeletable
     /**
      * The Lesson Plan which might exist for this assessment
      *
-     * Only one of task, due work, quiz, LTI assessment, Lesson Plan or project may be
+     * Only one of task, due work, quiz, LTI assessment, Lesson Plan, Dialog Agent or project may be
      * associated with a single assessment.
      *
      * @var LessonPlan|null
      */
     private ?LessonPlan $lessonPlan = null;
+
+
+    /**
+     * The Dialog Agent which might exist for this assessment
+     *
+     * Only one of task, due work, quiz, LTI assessment, Lesson Plan, Dialog Agent or project may be
+     * associated with a single assessment.
+     *
+     * @var DialogAgent|null
+     */
+    private ?DialogAgent $dialogAgent = null;
 
 
     /**
@@ -265,23 +276,33 @@ class Model implements ISoftDeletable
     public function __clone()
     {
         $this->id = null;
+
         if ($this->hasQuiz()) {
             $this->quiz = clone $this->quiz;
         }
+
         if ($this->hasDueWork()) {
             $this->dueWork = clone $this->dueWork;
         }
+
         if ($this->hasTask()) {
             $this->task = clone $this->task;
         }
+
         if ($this->hasLtiAssessment()) {
             $this->ltiAssessment = clone $this->ltiAssessment;
         }
+
         if ($this->hasProject()) {
             $this->project = clone $this->project;
         }
+
         if ($this->hasLessonPlan()) {
             $this->lessonPlan = clone $this->lessonPlan;
+        }
+
+        if ($this->hasDialogAgent()) {
+            $this->dialogAgent = clone $this->dialogAgent;
         }
     }
 
@@ -296,15 +317,23 @@ class Model implements ISoftDeletable
         $unitSpec = $this->getContextUnitSpecification();
         $unitImpl = $this->getContextUnitImplementation();
         $project  = $this->getContextProject();
+
         if (isset($folder)) {
             return $folder;
-        } elseif (isset($unitSpec)) {
+        }
+
+        if (isset($unitSpec)) {
             return $unitSpec;
-        } elseif (isset($unitImpl)) {
+        }
+
+        if (isset($unitImpl)) {
             return $unitImpl;
-        } elseif (isset($project)) {
+        }
+
+        if (isset($project)) {
             return $project;
         }
+
         return null;
     }
 
@@ -322,27 +351,33 @@ class Model implements ISoftDeletable
                         ->setContextUnitImplementation(null)
                         ->setContextUnitSpecification(null)
                         ->setContextProject(null);
-        } elseif ($context instanceof UnitSpecification) {
+        }
+
+        if ($context instanceof UnitSpecification) {
             return $this->setContextFolder(null)
                         ->setContextUnitImplementation(null)
                         ->setContextUnitSpecification($context)
                         ->setContextProject(null);
-        } elseif ($context instanceof UnitImplementation) {
+        }
+
+        if ($context instanceof UnitImplementation) {
             return $this->setContextFolder(null)
                         ->setContextUnitImplementation($context)
                         ->setContextUnitSpecification(null)
                         ->setContextProject(null);
-        } elseif ($context instanceof Project) {
+        }
+
+        if ($context instanceof Project) {
             return $this->setContextFolder(null)
                         ->setContextUnitImplementation(null)
                         ->setContextUnitSpecification(null)
                         ->setContextProject($context);
-        } else {
-            return $this->setContextFolder(null)
-                        ->setContextUnitImplementation(null)
-                        ->setContextUnitSpecification(null)
-                        ->setContextProject(null);
         }
+
+        return $this->setContextFolder(null)
+                    ->setContextUnitImplementation(null)
+                    ->setContextUnitSpecification(null)
+                    ->setContextProject(null);
     }
 
     /**
@@ -410,13 +445,31 @@ class Model implements ISoftDeletable
 
 
     /**
+     * Does this have a Dialog Agent
+     *
+     * @return bool
+     */
+    public function hasDialogAgent(): bool
+    {
+        return ($this->getDialogAgent() instanceof DialogAgent);
+    }
+
+
+    /**
      * Does this have any sub-objects?
      *
      * @return bool
      */
     public function hasSubObject(): bool
     {
-        return $this->hasTask() || $this->hasDueWork() || $this->hasQuiz() || $this->hasProject() || $this->hasLessonPlan();
+        /* Okay this is a bit ridiculous
+         */
+        return $this->hasTask() ||
+            $this->hasDueWork() ||
+            $this->hasQuiz() ||
+            $this->hasProject() ||
+            $this->hasLessonPlan() ||
+            $this->hasDialogAgent();
     }
 
     /**
@@ -432,21 +485,30 @@ class Model implements ISoftDeletable
         if ($this->hasDueWork()) {
             return $this->getDueWork();
         }
+
         if ($this->hasQuiz()) {
             return $this->getQuiz();
         }
+
         if ($this->hasLtiAssessment()) {
             return $this->getLtiAssessment();
         }
+
         if ($this->hasProject()) {
             return $this->getProject();
         }
+
         if ($this->hasTask()) {
             // this test must go last because old course-based quizzes and works register as "task == true" :(
             return $this->getTask();
         }
+
         if ($this->hasLessonPlan()) {
             return $this->getLessonPlan();
+        }
+
+        if ($this->hasDialogAgent()) {
+            return $this->getDialogAgent();
         }
 
         return null;
@@ -462,16 +524,30 @@ class Model implements ISoftDeletable
     {
         if ($subObject instanceof Task) {
             return $this->setTask($subObject);
-        } elseif ($subObject instanceof DueWork) {
+        }
+
+        if ($subObject instanceof DueWork) {
             return $this->setDueWork($subObject);
-        } elseif ($subObject instanceof Quiz) {
+        }
+
+        if ($subObject instanceof Quiz) {
             return $this->setQuiz($subObject);
-        } elseif ($subObject instanceof LtiAssessment) {
+        }
+
+        if ($subObject instanceof LtiAssessment) {
             return $this->setLtiAssessment($subObject);
-        } elseif ($subObject instanceof Project) {
+        }
+
+        if ($subObject instanceof Project) {
             return $this->setProject($subObject);
-        } else if ($subObject instanceof LessonPlan) {
+        }
+
+        if ($subObject instanceof LessonPlan) {
             return $this->setLessonPlan($subObject);
+        }
+
+        if ($subObject instanceof DialogAgent) {
+            return $this->setDialogAgent($subObject);
         }
 
         return $this;
@@ -751,6 +827,26 @@ class Model implements ISoftDeletable
     public function setLessonPlan(?LessonPlan $lessonPlan = null): self
     {
         $this->lessonPlan = $lessonPlan;
+        return $this;
+    }
+
+
+    /**
+     * @return DialogAgent|null
+     */
+    public function getDialogAgent(): ?DialogAgent
+    {
+        return $this->dialogAgent;
+    }
+
+
+    /**
+     * @param DialogAgent|null $dialogAgent
+     * @return $this
+     */
+    public function setDialogAgent(?DialogAgent $dialogAgent): self
+    {
+        $this->dialogAgent = $dialogAgent;
         return $this;
     }
 

@@ -57,14 +57,15 @@ class Mapper extends \Schoolbox\Mapper
             'assessmentModel',
         );
 
-        $this->joins(
-            'scenario_id',
-            Scenario\Mapper::class,
-            'id',
-            null,
-            null,
-            'scenario',
-            'scenario',
-        );
+// Disabled due to swamp, for now
+//        $this->joins(
+//            'scenario_id',
+//            Scenario\Mapper::class,
+//            'id',
+//            null,
+//            null,
+//            'scenario',
+//            'scenario',
+//        );
     }
 }

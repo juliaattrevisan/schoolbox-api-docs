@@ -30,6 +30,12 @@ class Model extends AbstractAssessment
 
 
     /**
+     * @var \Schoolbox\Learning\Assessment\DialogAgent\DataModel\Scenario\Model|null
+     */
+    private ?\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Scenario\Model $scenario = null;
+
+
+    /**
      * The IAssessable associated with this Dialog Agent
      */
     private ?AssessmentModel $assessmentModel = null;
@@ -220,6 +226,30 @@ class Model extends AbstractAssessment
     }
 
 
+
+    /* Getters/Setters
+     */
+
+    /**
+     * @return \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Scenario\Model|null
+     */
+    public function getScenario(): ?\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Scenario\Model
+    {
+        return $this->scenario;
+    }
+
+
+    /**
+     * @param \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Scenario\Model|null $scenario
+     * @return $this
+     */
+    public function setScenario(?\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Scenario\Model $scenario): self
+    {
+        $this->scenario = $scenario;
+        return $this;
+    }
+
+
     /**
      * @return AssessmentModel|null
      */
@@ -228,9 +258,6 @@ class Model extends AbstractAssessment
         return $this->assessmentModel;
     }
 
-
-    /* Getters/Setters
-     */
 
     /**
      * @param AssessmentModel|null $assessmentModel

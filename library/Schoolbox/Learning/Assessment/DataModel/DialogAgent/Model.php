@@ -42,9 +42,9 @@ class Model implements IAssessableDataModel, ISoftDeletable
 
 
     /**
-     * @var Scenario\Model|null
+     * @var int|null
      */
-    private ?Scenario\Model $scenario = null;
+    private ?int $scenario = null;
 
 
     /**
@@ -81,6 +81,12 @@ class Model implements IAssessableDataModel, ISoftDeletable
      * @var int|null
      */
     private ?int $duration = null;
+
+
+    /**
+     * @var \Schoolbox\GenericCollection|null
+     */
+    private ?\Schoolbox\GenericCollection $fields = null;
 
 
     /* Modest conveniences
@@ -123,19 +129,19 @@ class Model implements IAssessableDataModel, ISoftDeletable
 
 
     /**
-     * @return Scenario\Model|null
+     * @return int|null
      */
-    public function getScenario(): ?Scenario\Model
+    public function getScenario(): ?int
     {
         return $this->scenario;
     }
 
 
     /**
-     * @param Scenario\Model|null $scenario
+     * @param int|null $scenario
      * @return $this
      */
-    public function setScenario(?Scenario\Model $scenario): self
+    public function setScenario(?int $scenario): self
     {
         $this->scenario = $scenario;
         return $this;
@@ -258,6 +264,26 @@ class Model implements IAssessableDataModel, ISoftDeletable
     public function setDuration(?int $duration): self
     {
         $this->duration = $duration;
+        return $this;
+    }
+
+
+    /**
+     * @return \Schoolbox\GenericCollection|null
+     */
+    public function getFields(): ?\Schoolbox\GenericCollection
+    {
+        return $this->fields;
+    }
+
+
+    /**
+     * @param \Schoolbox\GenericCollection|null $fields
+     * @return $this
+     */
+    public function setFields(?\Schoolbox\GenericCollection $fields): self
+    {
+        $this->fields = $fields;
         return $this;
     }
 }
