@@ -4,6 +4,7 @@
  * This could easily be expanded to be used in other places when we inevitably need that
  */
 
+import type { AiSession } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
 import type { AgentChatPromptAttribute } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
 import AcPrompt from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-prompt.vue";
@@ -22,7 +23,7 @@ interface Props {
      *
      * This should be unique for a new unique conversation
      */
-    aiSessionId: string;
+    aiSessionId: AiSession["id"];
 }
 
 const props = defineProps<Props>();

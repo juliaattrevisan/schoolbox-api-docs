@@ -2,6 +2,7 @@
 import { useTemplateRefsList } from "@vueuse/core";
 import FileDrop from "@js/resource/file-drop.vue";
 import type { FileDropFile } from "@js/resource/fileDropTypes";
+import type { AiSession } from "@schoolboxLibrary/Admin/OpenAI/Usage/templates/payload";
 import { useAgentChatStore } from "./store/agentChatStore";
 import type { AgentChatPromptAttribute } from "./agentChatTypes";
 
@@ -16,7 +17,7 @@ interface Props {
      *
      * This should be unique for a new unique conversation
      */
-    aiSessionId: string;
+    aiSessionId: AiSession["id"];
 }
 
 const props = defineProps<Props>();

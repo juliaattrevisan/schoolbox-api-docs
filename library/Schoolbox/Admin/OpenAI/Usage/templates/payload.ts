@@ -4,9 +4,11 @@
  */
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 
-export type AiSessionEntry = {
+type AiSessionId = string;
+
+export type AiSessionLog = {
     id: number;
-    sessionId: string;
+    sessionId: AiSessionId;
     feature: string;
     createdAt: string;
     createdBy: UserAuthor;
@@ -14,8 +16,11 @@ export type AiSessionEntry = {
 };
 
 export type AiSession = {
-    id: string;
-    entries: AiSessionEntry[];
+    id: AiSessionId;
+    feature: string;
+    createdAt: string;
+    createdBy: UserAuthor;
+    totalLogs: number;
     _routes: {
         getLog?: string | null;
     };
@@ -38,4 +43,4 @@ export type AiUsageLogApiResponse = {
     };
 };
 
-export type AiSessionLogApiResponse = AiSessionEntry[];
+export type AiSessionLogApiResponse = AiSessionLog[];

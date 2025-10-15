@@ -11,13 +11,7 @@ import type {
     AgentChatRequest,
     AgentChatResponse,
 } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/agentChatTypes";
-import type {
-    AiSession,
-    AiSessionEntry,
-    AiUsageLogApiRequest,
-    AiUsageLogApiResponse,
-    AiSessionLogApiResponse,
-} from "./payload";
+import type { AiSession, AiUsageLogApiRequest, AiUsageLogApiResponse, AiSessionLogApiResponse } from "./payload";
 
 interface Props {
     routeSearch: string;
@@ -37,20 +31,26 @@ const endDateFilter = window.Vue.ref<string>(EMPTY_DATE);
 
 const usageSessions = window.Vue.ref<AiSession[]>([]);
 
-const isLoadingSession = window.Vue.ref(false);
 const sessionLoadError = window.Vue.ref<string | null>(null);
-const sessionDetails = window.Vue.ref<{
-    sessionId: string;
-    feed: AgentChatFeedMessage[];
-} | null>(null);
+const selectedSessionId = window.Vue.ref<AiSession["id"] | null>(null);
+const selectedSessionFeed = window.Vue.ref<AgentChatFeedMessage[] | null>(null);
 
 /**
- * Get the formatted date to show for a log entry
- * @param log The log entry
+ * Close the current session details pane
+ */
+function closeSessionDetails(): void {
+    sessionLoadError.value = null;
+    selectedSessionId.value = null;
+    selectedSessionFeed.value = null;
+}
+
+/**
+ * Get the formatted createdAt date for a given AI session
+ * @param session the given session
  * @returns The formatted createdAt date
  */
-function getLogDateFormatted(log: AiSessionEntry): string {
-    return window.dayjs(log.createdAt).format(window.dateDisplayFormats.dayjsDateLong);
+function formatSessionDate(session: AiSession): string {
+    return window.dayjs(session.createdAt).format(window.dateDisplayFormats.dayjsDateLong);
 }
 
 /**
@@ -60,9 +60,7 @@ async function loadUsageLogs(): Promise<void> {
     isLoading.value = true;
     loadError.value = null;
 
-    isLoadingSession.value = false;
-    sessionDetails.value = null;
-    sessionLoadError.value = null;
+    closeSessionDetails();
 
     usageSessions.value = [];
 
@@ -102,17 +100,14 @@ async function openSessionDetails(session: AiSession): Promise<void> {
         return; // no access to view the log
     }
 
-    isLoadingSession.value = true;
     sessionLoadError.value = null;
-
-    sessionDetails.value = null;
+    selectedSessionId.value = session.id;
+    selectedSessionFeed.value = null;
 
     const response = await apiRequest<AiSessionLogApiResponse>({
         method: "GET",
         url: session._routes.getLog,
     });
-
-    isLoadingSession.value = false;
 
     if (!response.success) {
         sessionLoadError.value = response.message;
@@ -121,36 +116,33 @@ async function openSessionDetails(session: AiSession): Promise<void> {
 
     // TODO: this is going to have to handle whatever happens for lesson plans/non-chat stuff but for now just assume it's a chat
 
-    sessionDetails.value = {
-        sessionId: session.id,
-        feed: response.data.flatMap((entry) => {
-            const req: AgentChatRequest = {
-                type: "request",
-                entryKey: acStore.getNextEntryKey(),
-                user: entry.createdBy,
-                payload: {
-                    // TODO
-                    userPrompt: "prompt message",
-                    attributes: {},
-                    imageUrl: null,
-                    previousResponseId: null,
-                    aiSessionId: session.id,
-                },
-                file: null,
-            };
+    selectedSessionFeed.value = response.data.flatMap((entry) => {
+        const req: AgentChatRequest = {
+            type: "request",
+            entryKey: acStore.getNextEntryKey(),
+            user: entry.createdBy,
+            payload: {
+                // TODO
+                userPrompt: "prompt message",
+                attributes: {},
+                imageUrl: null,
+                previousResponseId: null,
+                aiSessionId: session.id,
+            },
+            file: null,
+        };
 
-            const res: AgentChatResponse = {
-                type: "response",
-                entryKey: acStore.getNextEntryKey(),
-                status: "success", // assume success for now...
-                responseId: null, // no openai response ID available I guess
-                image: null,
-                message: "response message", // TODO
-            };
+        const res: AgentChatResponse = {
+            type: "response",
+            entryKey: acStore.getNextEntryKey(),
+            status: "success", // assume success for now...
+            responseId: null, // no openai response ID available I guess
+            image: null,
+            message: "response message", // TODO
+        };
 
-            return [req, res];
-        }),
-    };
+        return [req, res];
+    });
 }
 </script>
 
@@ -220,7 +212,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
     <div v-else class="row">
         <div
             class="small-12 columns l-mar-m--bottom"
-            :class="{ 'medium-6': isLoadingSession || sessionDetails !== null || sessionLoadError !== null }"
+            :class="{ 'medium-6': selectedSessionId !== null || sessionLoadError !== null }"
         >
             <div v-if="loadError" data-alert class="alert-box alert">
                 {{ loadError }}
@@ -247,7 +239,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                                         :id="`chk-${session.id}`"
                                         type="radio"
                                         name="ai-usage-session"
-                                        :checked="session.id === sessionDetails?.sessionId"
+                                        :checked="session.id.toString() === selectedSessionId?.toString() || undefined"
                                         :disabled="!session._routes.getLog || undefined"
                                         @change="() => openSessionDetails(session)"
                                     />
@@ -263,38 +255,35 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                                 </component>
                             </td>
                             <td>
-                                {{ getLogDateFormatted(session.entries[0]) }}
+                                {{ formatSessionDate(session) }}
                             </td>
                             <td>
-                                {{ props.features[session.entries[0].feature]?.title ?? "unknown" }}
+                                {{ props.features[session.feature]?.title ?? "unknown" }}
                             </td>
                             <td>
                                 <component
-                                    :is="session.entries[0].createdBy._links.profile ? 'a' : 'span'"
-                                    :href="session.entries[0].createdBy._links.profile ?? undefined"
-                                    :title="session.entries[0].createdBy._links.profile ? 'View Profile' : undefined"
+                                    :is="session.createdBy._links.profile ? 'a' : 'span'"
+                                    :href="session.createdBy._links.profile ?? undefined"
+                                    :title="session.createdBy._links.profile ? 'View Profile' : undefined"
                                 >
-                                    {{ session.entries[0].createdBy.fullName }}
+                                    {{ session.createdBy.fullName }}
                                 </component>
                             </td>
                             <td>
-                                {{ session.entries.length }}
+                                {{ session.totalLogs }}
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
-        <div
-            v-if="isLoadingSession || sessionDetails !== null || sessionLoadError !== null"
-            class="small-12 medium-6 island"
-        >
+        <div v-if="selectedSessionId !== null || sessionLoadError !== null" class="small-12 medium-6 island">
             <div v-if="sessionLoadError" data-alert class="alert-box alert">
                 {{ sessionLoadError }}
             </div>
             <section v-else>
-                <div v-if="sessionDetails === null" class="loader"></div>
-                <ac-feed v-else class="l-mar-m" :feed="sessionDetails.feed" :allow-selection="false" />
+                <div v-if="selectedSessionFeed === null" class="loader"></div>
+                <ac-feed v-else class="l-mar-m" :feed="selectedSessionFeed" :allow-selection="false" />
             </section>
         </div>
     </div>

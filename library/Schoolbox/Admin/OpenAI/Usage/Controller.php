@@ -137,19 +137,29 @@ class Controller extends Base
         $logGroups = $this->aiLogMapper->findPredicateGrouped($predicate, offset: $offset);
         $count = $this->aiLogMapper->countByPredicates($predicate);
 
-        $translator = new ModelToArray(
-            new User\Translator\Author\ModelToArray()
-        );
+        $userTranslator = new User\Translator\Author\ModelToArray();
 
         $sessions = [];
 
         //translate each group of session ID's
         foreach ($logGroups as $sessionId => $group) {
-            $actualSessionId = $group->first()?->getSessionId() ?? null;
+            /**
+             * This route only needs to show overall information about the session,
+             * We can derive that from the first log in the group I suppose
+             * @var AILog $firstLog
+             */
+            $firstLog = $group->first();
+
+            // $sessionId could be some fake "no-session-{id}" that we created in the mapper
+            // so figure out the real session ID which we need to generate the route for
+            $actualSessionId = $firstLog->getSessionId() ?? null;
 
             $sessions[$sessionId] = [
                 'id' => $sessionId,
-                'entries' => $group->map($translator),
+                'feature' => $firstLog->getFeature(),
+                'createdAt' => $firstLog->getCreatedAt()?->getUsingFormat(DATE_ATOM),
+                'createdBy' => $userTranslator->__invoke($firstLog->getUser()),
+                'totalLogs' => $group->count(),
                 '_routes' => [
                     'getLog' => $actualSessionId !== null ? $this->getRouteIfAuthorized(
                         'openAIUsage.getLog',

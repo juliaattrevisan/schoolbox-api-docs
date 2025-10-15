@@ -153,7 +153,7 @@ class Mapper extends BaseMapper
      * @param int $limit
      * @param int $offset
      * @param array $options
-     * @return array grouped by session id
+     * @return (Model[]|GenericCollection)[] grouped by session id
      */
     public function findPredicateGrouped(Builder $pb, int $limit = 100, int $offset = 0, array $options = []): array
     {
