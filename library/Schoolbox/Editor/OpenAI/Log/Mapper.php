@@ -110,41 +110,6 @@ class Mapper extends BaseMapper
         return $collection;
     }
 
-    /**
-     * @param int $limit
-     * @param int $offset
-     * @param array $options
-     * @return array grouped by session id
-     */
-    public function findAllGrouped(int $limit = 100, int $offset = 0, array $options = []): array
-    {
-        $options['limit'] = $limit;
-        $options['offset'] = $offset;
-        $options['order'] = $options['order'] ?? 'created_at DESC';
-
-        $results = $this->findAll($options);
-
-        // group by session id
-        $grouped = [];
-        foreach ($results as $result) {
-            // if no session ID, then group by no-session-{id}
-            $sessionId = $result->getSessionId() ?? Model::MISSING_SESSIONID . $result->getId();
-            if (!isset($grouped[$sessionId])) {
-                $grouped[$sessionId] = [];
-            }
-            $grouped[$sessionId][] = $result;
-        }
-
-        // sort by most recent created_at in each group
-        uasort($grouped, function ($a, $b) {
-            $aDate = $a[0]->getCreatedAt() ? $a[0]->getCreatedAt()->getUnixTimeStamp() : 0;
-            $bDate = $b[0]->getCreatedAt() ? $b[0]->getCreatedAt()->getUnixTimeStamp() : 0;
-            return $bDate <=> $aDate;
-        });
-
-        return $grouped;
-    }
-
 
     /**
      * Find by predicate and group by session id
