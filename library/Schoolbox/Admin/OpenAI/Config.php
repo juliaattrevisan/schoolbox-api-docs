@@ -265,7 +265,7 @@ class Config
             if (array_key_exists($key, $postData)) {
                 // boolean fields are sent as 'on' or not at all
                 if ($type === ConfigMapper::FIELD_BOOLEAN) {
-                    $config[$field] = $postData[$key] === 'on';
+                    $config[$field] = $postData[$key] === '1';
                 } else {
                     $config[$field] = trim((string)$postData[$key]);
                 }
