@@ -24,10 +24,21 @@ class Config
 //        Helper::FEATURE_DIALOGAGENT,
     ];
 
+    /** Open AI models, and the 'OFF' option to be used in the same select box */
+    public const NOT_ACTIVE = "Not Active";
+    public const AI_MODELS = [
+        self::NOT_ACTIVE,
+        "gpt-4o",
+        "gpt-4o-mini",
+        "gpt-4.1",
+        "gpt-4.1-mini",
+    ];
+
+    // map feature to config name
     public const MODULE_CONFIG = [
         Helper::FEATURE_CHAT => ConfigMapper::NAME_OPENAI_TEXT_CHAT,
         Helper::FEATURE_LESSONPLAN => ConfigMapper::NAME_OPENAI_LESSONPLAN,
-        Helper::FEATURE_DIFFERENTIATION => ConfigMapper::NAME_OPENAI_DIALOGAGENTT,
+        Helper::FEATURE_DIFFERENTIATION => ConfigMapper::NAME_OPENAI_DIALOGAGENT,
         Helper::FEATURE_DIALOGAGENT => ConfigMapper::NAME_OPENAI_DIFFERENTIATION,
     ];
 
@@ -69,15 +80,7 @@ class Config
         self::FIELD_MODEL => 'Select which model you wish to use for your OpenAI service.',
     ];
 
-    public const NOT_ACTIVE = "Not Active";
-    public const AI_MODELS = [
-        self::NOT_ACTIVE,
-        "gpt-4o",
-        "gpt-4o-mini",
-        "gpt-4.1",
-        "gpt-4.1-mini",
-    ];
-
+    // default config structures
     public const CONFIG_STRUCT_AZURE = [
         self::FIELD_PROVIDER => Helper::ENDPOINT_TYPE_AZURE,
         self::FIELD_ENABLED => false,

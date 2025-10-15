@@ -408,7 +408,7 @@ class ConfigMapper extends Mapper
     // Text Feature json config
     public const NAME_OPENAI_TEXT_CHAT = 'openai_text_chat';
     public const NAME_OPENAI_LESSONPLAN = 'openai_lessonplan';
-    public const NAME_OPENAI_DIALOGAGENTT = 'openai_dialogagent';
+    public const NAME_OPENAI_DIALOGAGENT = 'openai_dialogagent';
     public const NAME_OPENAI_DIFFERENTIATION = 'openai_differentiation';
 
     // image ai configs
