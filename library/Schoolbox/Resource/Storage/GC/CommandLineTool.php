@@ -174,6 +174,7 @@ HELP;
         $logger = $this->getLogger();
 
         // Obey lock
+        $logger->debug("Attempting to acquire process lock");
         try {
             $lock = $this->acquireLock(self::LOCK_NAME, self::LOCK_TTL);
         } catch (\RuntimeException $e) {

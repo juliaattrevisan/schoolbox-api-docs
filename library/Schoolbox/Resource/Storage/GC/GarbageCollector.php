@@ -149,6 +149,7 @@ class GarbageCollector
         $startTime      = microtime(true);
         $totalProcessed = 0;
         foreach ($batches as $batch) {
+            $this->log->debug("Refreshing lock before processing batch");
             $this->lock->refresh($this->lockTtl);
             $batchStartTime = microtime(true);
             $this->log->notice(
@@ -232,9 +233,11 @@ class GarbageCollector
     {
         $this->log->debug("Starting GC");
 
+        $this->log->debug("Refreshing lock before finding hashes");
         $this->lock->refresh($this->lockTtl);
         $purge = $this->getStale($hash);
 
+        $this->log->debug("Refreshing lock before preserving fresh hashes");
         $this->lock->refresh($this->lockTtl);
         $this->preserve(array_diff($this->list, $purge));
 
@@ -246,6 +249,7 @@ class GarbageCollector
         $this->log->error('Deleting ' . count($purge) . ' stale');
         foreach ($purge as $hash) {
             try {
+                $this->log->debug("Refreshing lock before deleting hash");
                 $this->lock->refresh($this->lockTtl);
                 $this->removeFromStorage($hash);
             } catch (MapperException $e) {
