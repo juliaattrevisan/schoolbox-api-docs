@@ -236,6 +236,14 @@ function start_containers() {
     # FrankenPHP container.
     frankenphp_compose_file="docker/schoolbox-frankenphp/dev.docker-compose.yaml"
 
+    # Build profiles
+    profiles=''
+    case "${LTI_DEVKIT_ENABLE}" in
+        1 | true | yes | on)
+            profiles="$profiles --profile lti"
+            ;;
+    esac
+
     # start default environment:
     # this has Schoolbox's code folder mounted as a local mount, thus changes
     # made locally are available immediately within the container.
@@ -244,7 +252,7 @@ function start_containers() {
         -f "${frankenphp_compose_file}" \
         -f "${taskd_compose_file}" \
         --env-file .docker-compose.env \
-        up -d $docker_compose_args
+        $profiles up -d $docker_compose_args
 
     # start cron in schoolbox-cli container, so that cron tasks actually run:
     # even though this is in a post_start in docker/base.docker-compose.yaml,
