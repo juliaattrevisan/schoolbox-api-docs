@@ -8,7 +8,6 @@ import {
     type DowncastInsertEvent,
     type Element,
     type ViewElement,
-    type InsertTableCommand,
     type TableAlignmentCommand,
 } from "ckeditor5";
 
@@ -106,22 +105,33 @@ export default class TableUpdates extends Plugin {
     }
 
     /**
-     * Add the following properties as default to newly created tables, columns and rows
+     * Whenever a new table is added, we add the isCK5Attribute to it so we can apply our .sb-ck-table class
+     * This is done by listening for changes to the model document, and checking for inserted tables
+     * When a table is inserted, we add the default properties to it
      */
     addDefaultProperties(): void {
-        const insertTableCommand = this.editor.commands.get("insertTable") as InsertTableCommand;
-        insertTableCommand.on("execute", () => {
-            this.editor.execute("tableWidth", {
-                value: "100%",
-            });
-            this.editor.execute("tableAlignment", {
-                value: "left",
-            });
+        this.editor.model.document.on("change:data", () => {
+            const changes = this.editor.model.document.differ.getChanges();
             this.editor.model.change((writer) => {
-                // add the isCK5Attribute attribute to the table so we can add .sb-ck-table to the table in the downcast
-                const selectedTable = this.getSelectedTable();
-                if (!selectedTable) return;
-                writer.setAttribute(this.isCK5Attribute, "true", selectedTable);
+                changes.forEach((change) => {
+                    if (change.type === "insert") {
+                        // Create a range over the inserted content to find all tables
+                        const insertedRange = this.editor.model.createRange(
+                            change.position,
+                            change.position.getShiftedBy(change.length),
+                        );
+                        // Walk through all inserted content to find table elements
+                        const walker = insertedRange.getWalker({
+                            ignoreElementEnd: true,
+                        });
+                        for (const item of walker) {
+                            if (item.item.is("element", "table")) {
+                                const insertedTable = item.item;
+                                writer.setAttribute(this.isCK5Attribute, "true", insertedTable);
+                            }
+                        }
+                    }
+                });
             });
         });
     }

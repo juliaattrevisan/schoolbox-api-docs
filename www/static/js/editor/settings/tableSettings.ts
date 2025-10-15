@@ -14,6 +14,13 @@ export function getTableSettings(): { table: TableConfig } {
             tableProperties: {
                 borderColors: tableBorderColourSwatches,
                 backgroundColors: tableBackgroundColourSwatches,
+                defaultProperties: {
+                    alignment: "left",
+                    borderColor: "#b3b3b3",
+                    borderStyle: "solid",
+                    borderWidth: "1px",
+                    width: "100%",
+                },
             },
 
             tableCellProperties: {
