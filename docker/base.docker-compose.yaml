@@ -291,6 +291,17 @@ services:
     volumes:
       - clamav-data:/var/lib/clamav
 
+  mailcatcher:
+    image: schickling/mailcatcher
+    container_name: mailcatcher
+    ports:
+      - "1080:1080" # Web UI
+    restart: always
+    networks:
+      default:
+        aliases:
+          - mailcatcher.localhost
+
 volumes:
   # Volume for Schoolbox's code base
   code:
