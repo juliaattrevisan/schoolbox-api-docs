@@ -782,42 +782,39 @@ class Controller extends Base
     {
         $currentYear = (int)date('Y');
 
-        // get historical data
-        $currentYearLevel = (int)$user->getYear()->getName();
-        $historical       = [];
+        // Get report data indexed by year.
+        $currentYearLevel = (int)$user->getYear()?->getName();
+        $dataByYear = [];
         foreach ([7, 8, 9, 10] as $yearLevel) {
-            if ($yearLevel === $currentYearLevel) {
+            if ($yearLevel > $currentYearLevel) {
                 break;
             }
             $historicalYear    = $currentYear - ($currentYearLevel - $yearLevel);
             $historicalMypBase = new MYP\Base($user, $externalUser, $db, $historicalYear);
-
-            $subjects = $historicalMypBase->findData();
-            $grades   = $historicalMypBase->getMYPGrade();
+            $historicalMypData = $historicalMypBase->findData();
+            $grades            = $historicalMypBase->getMYPGrade();
 
             if (count($grades) > 0) {
-                $historical[$historicalYear] = [
-                    'subjects' => $subjects,
+                $dataByYear[$historicalYear] = [
+                    'headings' => $historicalMypData['headings'],
+                    'subjects' => $historicalMypData['data'],
                     'grades'   => $grades,
                 ];
             }
         }
 
-        krsort($historical); // Ensure historical tabs are displayed in reverse chronological order.
+        krsort($dataByYear); // Ensure historical tabs are displayed in reverse chronological order.
 
         /* Default to this year if none specified
          */
         $selectedYear = $year ?? $currentYear;
-        $historicalYears = array_keys($historical);
+        $yearsWithData = array_keys($dataByYear);
 
         /* If no data for the selected year and data exists for at least one year, select the most recent year with data.
          */
-        if (!in_array($selectedYear, $historicalYears, false) && count($historicalYears) > 0) {
-            $selectedYear = $historicalYears[0];
+        if (!in_array($selectedYear, $yearsWithData, false) && count($yearsWithData) > 0) {
+            $selectedYear = $yearsWithData[0];
         }
-
-        $mypBase = new MYP\Base($user, $externalUser, $db, $selectedYear);
-        $mypData = $mypBase->findData();
 
         $this->response = $this->responseFromTemplate(
             '@myp/index.twig',
@@ -828,11 +825,8 @@ class Controller extends Base
                 ],
                 'externalUser' => $externalUser,
                 'user'         => $user,
-                'year'         => $selectedYear,
-                'headings'     => $mypData['headings'],
-                'subjects'     => $mypData['data'],
-                'grades'       => $mypBase->getMYPGrade(),
-                'historical'   => $historical
+                'selectedYear' => $selectedYear,
+                'dataByYear'   => $dataByYear
             ],
         );
     }
