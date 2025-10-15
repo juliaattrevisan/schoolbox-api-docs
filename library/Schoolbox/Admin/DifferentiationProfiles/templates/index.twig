@@ -26,21 +26,42 @@
                         </div>
                     </fieldset>
                 </section>
-{#                <section>#}
-{#                    <fieldset class="content">#}
-{#                        {% for differentiationProfile in differentiationProfilesConfig %}#}
-{#                        <div class="small-12 columns">#}
-{#                            <div class="switch">#}
-{#                                <input id="differentiation-profiles-adjustments-field" type="checkbox" name="enabled" {% if differentiationProfile.isEnabled ?? false %}checked{% endif %}/>#}
-{#                                <label for="differentiation-profiles-adjustments-field">#}
-{#                                    <span>On</span>#}
-{#                                    <span>Off</span>#}
-{#                                </label>#}
-{#                            </div>#}
-{#                        </div>#}
-{#                        {% endfor %}#}
-{#                    </fieldset>#}
-{#                </section>#}
+                {# TODO: Temporary twig code for testing; to be removed #}
+                {% for key, differentiationProfile in data.differentiationProfiles.modules %}
+                    <section>
+                        <fieldset class="content">
+                            {% for module in differentiationProfile.fields %}
+                                <div class="small-12 medium-1 columns">
+                                    <div class="switch">
+                                        <input id="differentiation-profiles-adjustments-field-{{ module.id }}" type="checkbox" name="modules[{{key}}][{{ module.name }}][is_enabled]" {% if module.is_enabled ?? false %}checked{% endif %}/>
+                                        <label for="differentiation-profiles-adjustments-field-{{ module.id }}">
+                                            <span>On</span>
+                                            <span>Off</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="small-12 medium-3 columns">
+                                    <label>
+                                        <input type="text" name="modules[{{key}}][{{ module.name }}][title]" value="{{ module.title }}" readonly />
+                                    </label>
+                                </div>
+                                <div class="small-12 medium-3 columns">
+                                    <label>
+                                        <input type="text" name="modules[{{key}}][{{ module.name }}][terminology]" value="{{ module.terminology }}" />
+                                    </label>
+                                </div>
+                                <div class="small-12 medium-5 columns">
+                                    <label>
+                                        <input type="text" name="modules[{{key}}][{{ module.name }}][description]" value="{{ module.description }}" />
+                                    </label>
+                                </div>
+                                <input type="hidden" name="modules[{{key}}][{{ module.name }}][name]" value="{{ module.name }}" />
+                                <input type="hidden" name="modules[{{key}}][{{ module.name }}][id]" value="{{ module.id }}" />
+                            {% endfor %}
+                        </fieldset>
+                    </section>
+                {% endfor %}
+                {# End of temporary twig code #}
                 <div class="row">
                     <div class="small-12 column">
                         <input type="hidden" name="returnUrl" value="{{ returnUrl }}">

@@ -26,7 +26,7 @@ class ModelToArray
             'title'       => $model->getTitle(),
             'terminology' => $model->getTerminology(),
             'description' => $model->getDescription(),
-            'is_enabled'  => $model->isEnabled(),
+            'is_enabled'  => $model->getIsEnabled(),
             'sequence'    => $model->getSequence(),
         ];
     }

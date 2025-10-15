@@ -61,7 +61,8 @@ class Controller extends ConfigController
         $differentiationProfilesConfigs = $this->differentiationProfilesMapper->findAll()->sortBy('sequence', 'ASC');
 
         $differentiationProfilesConfigsArray = $differentiationProfilesConfigs->reduce(function ($carry, Model $item) {
-            $carry[$item->getModule()][$item->getName()] = call_user_func($this->modelToArray, $item);
+            $carry[$item->getModule()]['fields'][$item->getName()] = call_user_func($this->modelToArray, $item);
+            $carry[$item->getModule()]['isSortable'] = true;
             return $carry;
         }, []);
 
@@ -85,13 +86,13 @@ class Controller extends ConfigController
                 'data' => [
                     'differentiationProfiles' => [
                         'enabled' => (bool)$differentiationProfilesEnabled->getValue(),
-                        'modules' => [
-                            'fields' => $differentiationProfilesConfigsArray,
-                            'isSortable' => true,
-                        ],
+                        'modules' => $differentiationProfilesConfigsArray,
                         'headers' => Model::CONFIGS_HEADER
                     ]
-                ]
+                ],
+                '_routes' => [
+                    'update' => $this->getRouteIfAuthorized('differentiationProfiles.postConfig')
+                ],
             ],
             'Differentiation Profiles'
         );
@@ -108,14 +109,43 @@ class Controller extends ConfigController
     {
         $post = $this->requestPost;
         $enabled = (null !== $post->get('enabled')) ? '1' : '0';
+        $modules = $post->get('modules') ?? [];
         $returnUrl = $post->get(Redirect::RETURN_URL);
-        $differentiationProfilesEnabledConfig =
-            $this->getConfigMapper()
-                 ->findOneByColumn(
-                     'name',
-                     ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED
-                 );
-        $this->getConfigMapper()->save($differentiationProfilesEnabledConfig->setValue($enabled));
+        try {
+            $this->differentiationProfilesMapper->getDatabase()->beginTransaction();
+            $differentiationProfilesEnabledConfig =
+                $this->getConfigMapper()
+                     ->findOneByColumn(
+                         'name',
+                         ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED
+                     );
+            $this->getConfigMapper()->save($differentiationProfilesEnabledConfig->setValue($enabled));
+
+            if (!empty($modules)) {
+                foreach ($modules as $moduleName => $module) {
+                    $index = 0;
+                    foreach ($module as $name => $fields) {
+                        $moduleConfig = $this->differentiationProfilesMapper
+                            ->createModel()
+                            ->setId($fields['id'])
+                            ->setName($name)
+                            ->setTitle($fields['title'])
+                            ->setTerminology(trim($fields['terminology']) ?: null)
+                            ->setDescription(trim($fields['description']) ?: null)
+                            ->setIsEnabled((bool)($fields['is_enabled'] ?? false))
+                            ->setModule($moduleName)
+                            ->setSequence($index);
+                        $this->differentiationProfilesMapper->save($moduleConfig);
+                        $index++;
+                    }
+                }
+            }
+            $this->differentiationProfilesMapper->getDatabase()->commit();
+        } catch (Exception $e) {
+            $this->differentiationProfilesMapper->getDatabase()->rollBack();
+            //TODO: decide what response to return here, so throw it back out for now
+            throw $e;
+        }
         $this->response = $this->redirectAfterPost($returnUrl ? Redirect::decode($returnUrl) : $this->getSession()->getHistory());
     }
 }

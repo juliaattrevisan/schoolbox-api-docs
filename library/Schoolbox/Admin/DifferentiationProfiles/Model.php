@@ -124,7 +124,7 @@ class Model
     /**
      * @return bool
      */
-    public function isEnabled(): bool
+    public function getIsEnabled(): bool
     {
         return $this->is_enabled;
     }
