@@ -45,15 +45,15 @@ class ConfigTest extends TestCase
      */
     public function testMergeConfigOverwritesAndRemovesInvalidKeysForAzure()
     {
-        $input = [
-            'provider' => 'Wrong',
-            'enabled' => true,
-            'open_ai_key' => 'abc',
-            'resource_name' => 'res',
-            'deployment_id' => 'dep',
-            'invalid_key' => 'should be removed'
-        ];
-        $merged = new Config()->mergeConfig($input, Helper::ENDPOINT_TYPE_AZURE);
+        $json = '{
+            "provider": "Wrong",
+            "enabled": true,
+            "open_ai_key": "abc",
+            "resource_name": "res",
+            "deployment_id": "dep",
+            "invalid_key": "should be removed"
+        }';
+        $merged = new Config()->decode($json, Helper::ENDPOINT_TYPE_AZURE);
 
         $this->assertEquals(Helper::ENDPOINT_TYPE_AZURE, $merged['provider']);
         $this->assertTrue($merged['enabled']);
@@ -69,14 +69,14 @@ class ConfigTest extends TestCase
      */
     public function testMergeConfigOverwritesAndRemovesInvalidKeysForOpenAI()
     {
-        $input = [
-            'provider' => 'Wrong',
-            'open_ai_key' => 'xyz',
-            'model' => 'gpt-4o',
-            'extra' => 'should be removed'
-        ];
+        $input = '{
+          "provider": "Wrong",
+          "open_ai_key": "xyz",
+          "model": "gpt-4o",
+          "extra": "should be removed"
+        }';
 
-        $merged = new Config()->mergeConfig($input, Helper::ENDPOINT_TYPE_OPENAI);
+        $merged = new Config()->decode($input, Helper::ENDPOINT_TYPE_OPENAI);
         $this->assertEquals(Helper::ENDPOINT_TYPE_OPENAI, $merged['provider']);
         $this->assertEquals('xyz', $merged['open_ai_key']);
         $this->assertEquals('gpt-4o', $merged['model']);
@@ -89,11 +89,11 @@ class ConfigTest extends TestCase
      */
     public function testMergeConfigFillsMissingKeysWithDefaults()
     {
-        $input = [
-            'open_ai_key' => 'partial',
-        ];
+        $input = '{
+            "open_ai_key": "partial"
+        }';
 
-        $merged = new Config()->mergeConfig($input, Helper::ENDPOINT_TYPE_OPENAI);
+        $merged = new Config()->decode($input, Helper::ENDPOINT_TYPE_OPENAI);
         $this->assertEquals('partial', $merged['open_ai_key']);
         $this->assertEquals(Helper::ENDPOINT_TYPE_OPENAI, $merged['provider']);
         $this->assertEquals(Config::NOT_ACTIVE, $merged['model']);
@@ -104,8 +104,8 @@ class ConfigTest extends TestCase
      */
     public function testMergeConfigReturnsEmptyArrayForUnknownProvider()
     {
-        $input = ['open_ai_key' => 'irrelevant'];
-        $merged = new Config()->mergeConfig($input, 'UnknownProvider');
+        $input = '{"open_ai_key": "irrelevant"}';
+        $merged = new Config()->decode($input, 'UnknownProvider');
         $this->assertEquals([], $merged);
     }
 
@@ -114,7 +114,7 @@ class ConfigTest extends TestCase
      */
     public function testMergeConfigHandlesEmptyConfig()
     {
-        $merged = new Config()->mergeConfig([], Helper::ENDPOINT_TYPE_OPENAI);
+        $merged = new Config()->decode('{}', Helper::ENDPOINT_TYPE_OPENAI);
         $this->assertEquals(Config::CONFIG_STRUCT_OPENAI, $merged);
     }
 
@@ -123,27 +123,13 @@ class ConfigTest extends TestCase
      */
     public function testMergeConfigAlwaysSetsProviderCorrectly()
     {
-        $input = [
-            'provider' => 'SomeOtherProvider',
-            'open_ai_key' => 'key',
-            'model' => 'gpt-4o',
-        ];
-        $merged = new Config()->mergeConfig($input, Helper::ENDPOINT_TYPE_OPENAI);
+        $input = '{
+            "provider": "SomeOtherProvider",
+            "open_ai_key": "key",
+            "model": "gpt-4o"
+        }';
+        $merged = new Config()->decode($input, Helper::ENDPOINT_TYPE_OPENAI);
         $this->assertEquals(Helper::ENDPOINT_TYPE_OPENAI, $merged['provider']);
-    }
-
-    /**
-     * Test that mergeConfig does not mutate the input array.
-     */
-    public function testMergeConfigDoesNotMutateInput()
-    {
-        $input = [
-            'open_ai_key' => 'immutable',
-            'model' => 'gpt-4o',
-        ];
-        $copy = $input;
-        new Config()->mergeConfig($input, Helper::ENDPOINT_TYPE_OPENAI);
-        $this->assertEquals($copy, $input);
     }
 
     /**
@@ -152,8 +138,7 @@ class ConfigTest extends TestCase
     public function testMergeConfigWithExampleJsonForAzureChat()
     {
         $json = '{"enabled":true,"open_ai_key":"test key","resource_name":"","deployment_id":""}';
-        $config = json_decode($json, true);
-        $merged = new \Schoolbox\Admin\OpenAI\Config()->mergeConfig($config, Helper::ENDPOINT_TYPE_AZURE);
+        $merged = new \Schoolbox\Admin\OpenAI\Config()->decode($json, Helper::ENDPOINT_TYPE_AZURE);
         $this->assertEquals(Helper::ENDPOINT_TYPE_AZURE, $merged['provider']);
         $this->assertTrue($merged['enabled']);
         $this->assertEquals('test key', $merged['open_ai_key']);
@@ -167,8 +152,7 @@ class ConfigTest extends TestCase
     public function testMergeConfigWithExampleJsonForAzureLP()
     {
         $json = '{"enabled":true,"open_ai_key":"test key","resource_name":"","deployment_id":""}';
-        $config = json_decode($json, true);
-        $merged = new \Schoolbox\Admin\OpenAI\Config()->mergeConfig($config, Helper::ENDPOINT_TYPE_AZURE);
+        $merged = new \Schoolbox\Admin\OpenAI\Config()->decode($json, Helper::ENDPOINT_TYPE_AZURE);
         $this->assertEquals(Helper::ENDPOINT_TYPE_AZURE, $merged['provider']);
         $this->assertTrue($merged['enabled']);
         $this->assertEquals('test key', $merged['open_ai_key']);
@@ -182,8 +166,7 @@ class ConfigTest extends TestCase
     public function testMergeConfigWithExampleJsonForOpenAIChat()
     {
         $json = '{"provider":"OpenAI","open_ai_key":"test key","model":"gpt-4.1-mini"}';
-        $config = json_decode($json, true);
-        $merged = new \Schoolbox\Admin\OpenAI\Config()->mergeConfig($config, Helper::ENDPOINT_TYPE_OPENAI);
+        $merged = new \Schoolbox\Admin\OpenAI\Config()->decode($json, Helper::ENDPOINT_TYPE_OPENAI);
         $this->assertEquals('test key', $merged['open_ai_key']);
         $this->assertEquals('gpt-4.1-mini', $merged['model']);
         $this->assertEquals(Helper::ENDPOINT_TYPE_OPENAI, $merged['provider']);
@@ -195,8 +178,7 @@ class ConfigTest extends TestCase
     public function testMergeConfigWithExampleJsonForOpenAILP()
     {
         $json = '{"provider":"OpenAI","open_ai_key":"","model":"gpt-4.1"}';
-        $config = json_decode($json, true);
-        $merged = new \Schoolbox\Admin\OpenAI\Config()->mergeConfig($config, Helper::ENDPOINT_TYPE_OPENAI);
+        $merged = new \Schoolbox\Admin\OpenAI\Config()->decode($json, Helper::ENDPOINT_TYPE_OPENAI);
         $this->assertEquals('', $merged['open_ai_key']);
         $this->assertEquals('gpt-4.1', $merged['model']);
         $this->assertEquals(Helper::ENDPOINT_TYPE_OPENAI, $merged['provider']);
@@ -208,8 +190,7 @@ class ConfigTest extends TestCase
     public function testMergeConfigWithPartialJsonForAzureChat()
     {
         $json = '{"enabled":false,"open_ai_key":"partial-key"}';
-        $config = json_decode($json, true);
-        $merged = new \Schoolbox\Admin\OpenAI\Config()->mergeConfig($config, Helper::ENDPOINT_TYPE_AZURE);
+        $merged = new \Schoolbox\Admin\OpenAI\Config()->decode($json, Helper::ENDPOINT_TYPE_AZURE);
         $this->assertFalse($merged['enabled']);
         $this->assertEquals('partial-key', $merged['open_ai_key']);
         $this->assertEquals('', $merged['resource_name']);
@@ -223,8 +204,7 @@ class ConfigTest extends TestCase
     public function testMergeConfigWithPartialJsonForAzureLP()
     {
         $json = '{"resource_name":"lesson-resource"}';
-        $config = json_decode($json, true);
-        $merged = new \Schoolbox\Admin\OpenAI\Config()->mergeConfig($config, Helper::ENDPOINT_TYPE_AZURE);
+        $merged = new \Schoolbox\Admin\OpenAI\Config()->decode($json, Helper::ENDPOINT_TYPE_AZURE);
         $this->assertFalse($merged['enabled']);
         $this->assertEquals('', $merged['open_ai_key']);
         $this->assertEquals('lesson-resource', $merged['resource_name']);
@@ -238,8 +218,7 @@ class ConfigTest extends TestCase
     public function testMergeConfigWithEmptyJsonForAzure()
     {
         $json = '{}';
-        $config = json_decode($json, true);
-        $merged = new \Schoolbox\Admin\OpenAI\Config()->mergeConfig($config, Helper::ENDPOINT_TYPE_AZURE);
+        $merged = new \Schoolbox\Admin\OpenAI\Config()->decode($json, Helper::ENDPOINT_TYPE_AZURE);
         $this->assertEquals(\Schoolbox\Admin\OpenAI\Config::CONFIG_STRUCT_AZURE, $merged);
     }
 
@@ -249,8 +228,7 @@ class ConfigTest extends TestCase
     public function testMergeConfigWithMissingModuleJsonForOpenAI()
     {
         $json = '{"open_ai_key":"only-key","model":"gpt-4o"}';
-        $config = json_decode($json, true);
-        $merged = new \Schoolbox\Admin\OpenAI\Config()->mergeConfig($config, Helper::ENDPOINT_TYPE_OPENAI);
+        $merged = new \Schoolbox\Admin\OpenAI\Config()->decode($json, Helper::ENDPOINT_TYPE_OPENAI);
         $this->assertEquals('only-key', $merged['open_ai_key']);
         $this->assertEquals('gpt-4o', $merged['model']);
         $this->assertEquals(Helper::ENDPOINT_TYPE_OPENAI, $merged['provider']);

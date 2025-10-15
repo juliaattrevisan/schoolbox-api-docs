@@ -140,7 +140,7 @@ class Config
      * @param string $provider
      * @return array
      */
-    public function mergeConfig(array $config, string $provider): array
+    private function mergeConfig(array $config, string $provider): array
     {
         switch ($provider) {
             case Helper::ENDPOINT_TYPE_AZURE:
