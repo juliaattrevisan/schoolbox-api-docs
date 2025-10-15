@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 /**
- * A hidden file input that is kept in sync with a v-model currentFile
+ * A hidden file input that is kept in sync with a v-model currentFiles
  */
 
 import type { FileDropFile } from "./fileDropTypes";
@@ -8,14 +8,13 @@ import type { FileDropFile } from "./fileDropTypes";
 interface Props {
     id: string;
     accept?: string;
-    class?: string;
     inputName?: string;
     required?: boolean;
+    multiple?: boolean;
+    currentFiles: (FileDropFile | null)[];
 }
 
 const props = defineProps<Props>();
-
-const currentFile = defineModel<FileDropFile>("currentFile", { default: null });
 
 const inputEl = window.Vue.useTemplateRef<HTMLInputElement>("inputRef");
 
@@ -23,22 +22,27 @@ const inputEl = window.Vue.useTemplateRef<HTMLInputElement>("inputRef");
  * Keep the hidden input in sync with currentFile
  */
 window.Vue.watch(
-    currentFile,
-    (file) => {
+    () => props.currentFiles,
+    (files) => {
         if (inputEl.value === null) {
             return;
         }
 
-        // no file? clear it
-        if (file === null || file.error !== false) {
+        // filter out files with errors (two filters so TS can derive the correct type)
+        const validFiles = files.filter((file) => file !== null).filter((file) => !file.error);
+
+        // no files? clear it
+        if (validFiles.length === 0) {
             inputEl.value.value = "";
             inputEl.value.files = null;
             return;
         }
 
-        // otherwise, set the file
+        // otherwise, set the files
         const dataTransfer = new DataTransfer();
-        dataTransfer.items.add(file.file);
+        validFiles.forEach((file) => {
+            dataTransfer.items.add(file.file);
+        });
         inputEl.value.files = dataTransfer.files;
     },
     { immediate: true },
@@ -53,6 +57,7 @@ window.Vue.watch(
         :accept="props.accept"
         :name="props.inputName"
         :required="props.required || undefined"
+        :multiple="props.multiple || undefined"
         autocomplete="off"
     />
 </template>

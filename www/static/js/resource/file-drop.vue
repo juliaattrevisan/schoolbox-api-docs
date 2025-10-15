@@ -5,9 +5,10 @@
  */
 
 import { useFileDialog } from "@vueuse/core";
-import FileDropPreview from "./file-drop-preview.vue";
-import type { FileDropFile } from "./fileDropTypes";
 import { uploadFileToStorage } from "./resourceUtils";
+import type { FileDropFile } from "./fileDropTypes";
+import FileDropPreview from "./file-drop-preview.vue";
+import FileDropInput from "./file-drop-input.vue";
 
 interface Props {
     id: string;
@@ -281,15 +282,13 @@ function handleDrop(event: DragEvent): void {
         </label>
 
         <!-- Always render this hidden input so that forms can access it for validation -->
-        <input
+        <file-drop-input
             :id="props.id"
-            ref="inputRef"
-            type="file"
             :accept="props.accept"
-            :multiple="!!props.multiple || undefined"
-            :name="props.inputName"
-            :required="props.required || undefined"
-            autocomplete="off"
+            :multiple="!!props.multiple"
+            :input-name="props.inputName"
+            :required="props.required"
+            :current-files="filesList"
         />
     </div>
 </template>
