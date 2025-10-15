@@ -128,6 +128,12 @@ export default class TableUpdates extends Plugin {
                             if (item.item.is("element", "table")) {
                                 const insertedTable = item.item;
                                 writer.setAttribute(this.isCK5Attribute, "true", insertedTable);
+                                // Check if tableWidth is 0px and set it to 100% instead
+                                // This seems to occur sometimes when pasting a table in from MS Word
+                                const currentWidth = insertedTable.getAttribute("tableWidth");
+                                if (currentWidth === "0px") {
+                                    writer.setAttribute("tableWidth", "100%", insertedTable);
+                                }
                             }
                         }
                     }
