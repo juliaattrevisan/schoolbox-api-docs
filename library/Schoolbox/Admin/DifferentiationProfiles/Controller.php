@@ -12,14 +12,16 @@ namespace Schoolbox\Admin\DifferentiationProfiles;
 use Alaress\Module\Cache\Rebuilder;
 use Alaress\Web\Controller\ConfigController;
 use Aura\Router\Exception\RouteNotFound;
+use Crell\ApiProblem\ApiProblem;
 use Psr\SimpleCache\CacheInterface;
 use Schoolbox\Admin\DifferentiationProfiles\Translator\ModelToArray;
 use Schoolbox\Admin\Navigation\Subnav;
 use Schoolbox\Admin\Settings\FieldStrategyFactory;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Learning\Assessment\Redirect;
-use Schoolbox\Mapper\Exception;
+use Schoolbox\Mapper\Exception as MapperException;
 use Schoolbox\Mapper\Exception\Deleted;
+use Symfony\Component\HttpFoundation\Response;
 
 class Controller extends ConfigController
 {
@@ -47,7 +49,7 @@ class Controller extends ConfigController
      *
      * @return void
      * @throws Deleted
-     * @throws Exception
+     * @throws MapperException
      * @throws RouteNotFound
      * @throws \Twig\Error\Error
      * @api GET /adminv2/pastoral/differentiation-profiles
@@ -105,8 +107,8 @@ class Controller extends ConfigController
     /**
      * Updating the differentiation profiles configs
      *
-     * @throws Exception
-     * @throws Deleted
+     * @throws \Exception
+     * @throws MapperException
      * @api POST /adminv2/pastoral/differentiation-profiles
      */
     public function postConfig(): void
@@ -114,7 +116,6 @@ class Controller extends ConfigController
         $post = $this->requestPost;
         $enabled = (null !== $post->get('enabled')) ? '1' : '0';
         $modules = $post->get('modules') ?? [];
-        $returnUrl = $post->get(Redirect::RETURN_URL);
         try {
             $this->differentiationProfilesMapper->getDatabase()->beginTransaction();
             $differentiationProfilesEnabledConfig =
@@ -145,11 +146,19 @@ class Controller extends ConfigController
                 }
             }
             $this->differentiationProfilesMapper->getDatabase()->commit();
-        } catch (Exception $e) {
+            $this->response = $this->responseEmpty(200);
+        } catch (MapperException $e) {
             $this->differentiationProfilesMapper->getDatabase()->rollBack();
-            //TODO: decide what response to return here, so throw it back out for now
-            throw $e;
+            $status = Response::HTTP_INTERNAL_SERVER_ERROR;
+            $problem = new ApiProblem($e->getMessage());
+            $problem->setStatus($status);
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus($status);
+        } catch (\Exception $e) {
+            $this->differentiationProfilesMapper->getDatabase()->rollBack();
+            $status = Response::HTTP_BAD_REQUEST;
+            $problem = new ApiProblem($e->getMessage());
+            $problem->setStatus($status);
+            $this->response = $this->responseAsJson($problem->asArray())->withStatus($status);
         }
-        $this->response = $this->redirectAfterPost($returnUrl ? Redirect::decode($returnUrl) : $this->getSession()->getHistory());
     }
 }
