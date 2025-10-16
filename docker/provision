@@ -40,7 +40,7 @@ if [ -f ./docker.env ]; then
 fi
 case "${SECOND_INSTANCE_ENABLE}" in
     1 | true | yes | on)
-#        docker exec -it -e INSTANCE_ID=docker2 -u root schoolbox-cli tools/docker-provision.sh --install-instance-only
+        docker exec -it -e INSTANCE_ID=docker2 -u root schoolbox-cli tools/docker-provision.sh --install-instance-only
         ;;
 esac
 
