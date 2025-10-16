@@ -21,7 +21,7 @@ test.describe("Homepage Components Tests", () => {
 
         await expect(homepageTabsEl).toContainText("Information (7)");
         await expect(homepageTabsEl).toContainText("Collaboration (10)");
-        await expect(homepageTabsEl).toContainText("Learning (13)");
+        await expect(homepageTabsEl).toContainText("Learning (14)");
         await expect(homepageTabsEl).toContainText("Multimedia (9)");
         await expect(homepageTabsEl).toContainText("Resources (4)");
         await expect(homepageTabsEl).toContainText("Feeds (5)");
@@ -103,6 +103,9 @@ test.describe("Homepage Components Tests", () => {
 
         await expect(homepageTabsEl).toContainText("Curriculum Overview");
         await homepage.checkComponentIcon("Schoolbox_Curriculum_Component_CurriculumOverviewController");
+
+        await expect(homepageTabsEl).toContainText("Discussions");
+        await homepage.checkComponentIcon("Schoolbox_Learning_Assessment_DialogAgent_Component_Homepage_Controller");
 
         await expect(homepageTabsEl).toContainText("Due Work");
         await homepage.checkComponentIcon("Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller");
