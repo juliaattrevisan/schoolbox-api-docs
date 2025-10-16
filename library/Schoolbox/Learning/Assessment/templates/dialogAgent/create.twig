@@ -121,7 +121,7 @@
         <ul class="option-list">
             {% for scenario in dialogAgent.scenarios %}
                 {# TODO Snake pls decorate this in a reptilian manner thx #}
-                <li style="border:1px solid #f00;min-width:400px;float:left;padding-right:2rem;">
+                <li style="border:1px solid #f00;width:50%;min-height:200px;float:left;padding-right:2rem;">
                     <input type="radio" id="scenario-{{ scenario.id }}" name="scenario" value="{{ scenario.id }}" required />
                     <label for="scenario-{{ scenario.id }}">{{ scenario.title }}</label>
 

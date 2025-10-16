@@ -67,9 +67,9 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @var string|null
+     * @var array|null
      */
-    private ?string $options = null;
+    private ?array $options = null;
 
 
     /**
@@ -218,19 +218,19 @@ class Model implements ISoftDeletable
 
 
     /**
-     * @return string|null
+     * @return array|null
      */
-    public function getOptions(): ?string
+    public function getOptions(): ?array
     {
         return $this->options;
     }
 
 
     /**
-     * @param string|null $options
+     * @param array|null $options
      * @return $this
      */
-    public function setOptions(?string $options): self
+    public function setOptions(?array $options): self
     {
         $this->options = $options;
         return $this;

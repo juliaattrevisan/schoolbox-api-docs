@@ -378,13 +378,11 @@ abstract class Controller extends ListController implements IAssessmentControlle
          * of its constituent fields in a modal
          */
         if (AssessmentType::TYPE_DIALOG_AGENT === $type) {
+            /* TODO inject dependency
+             */
             $scenarioMapper = \Schoolbox\Admin\DialogAgent\Scenario\Mapper::getInstance();
 
-            $data['dialogAgent']['scenarios'] = $scenarioMapper->findAll([
-                'order' => [
-                    'title' => 'ASC',
-                ],
-            ]);
+            $data['dialogAgent']['scenarios'] = $scenarioMapper->findAll();
         }
 
         /* TODO lol why is this outside the AssessmentType check?
