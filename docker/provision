@@ -8,6 +8,11 @@ cd "$(dirname "$0")/.." || exit 1
 # Run the provision script in the schoolbox-cli container
 docker exec -it -u root schoolbox-cli tools/docker-provision.sh
 
+# Is the second env in action?
+# If so copy from the second to the first, or just re-run the provision script
+# for INSTANCE_ID=docker2
+# For now I think it's fine to share storage folders
+
 # restart the caddy container to pick up any changes
 docker restart caddy
 
