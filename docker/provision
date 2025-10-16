@@ -12,6 +12,17 @@ docker exec -it -u root schoolbox-cli tools/docker-provision.sh
 # If so copy from the second to the first, or just re-run the provision script
 # for INSTANCE_ID=docker2
 # For now I think it's fine to share storage folders
+# Load config to find out
+declare SECOND_INSTANCE_ENABLE
+source ./docker.default.env
+if [ -f ./docker.env ]; then
+    source ./docker.env
+fi
+case "${SECOND_INSTANCE_ENABLE}" in
+    1 | true | yes | on)
+#        docker exec -it -e INSTANCE_ID=docker2 -u root schoolbox-cli tools/docker-provision.sh --install-instance-only
+        ;;
+esac
 
 # restart the caddy container to pick up any changes
 docker restart caddy
