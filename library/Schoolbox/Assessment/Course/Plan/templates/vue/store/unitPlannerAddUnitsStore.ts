@@ -8,6 +8,8 @@ import locale from "@js/terminology/rosettaStone";
 import { useUnitPlannerStore } from "./unitPlannerStore";
 import type { Unit } from "../unitPlannerTypes";
 
+export const MAX_UNITS = 20; // maximum number of units that can be added at once
+
 export const useAddUnitsStore = defineStore("unitPlannerAddUnits", () => {
     const isProcessing = window.Vue.ref(false);
     const isOpen = window.Vue.ref(false); // to notify that the prompt is opened / closed
