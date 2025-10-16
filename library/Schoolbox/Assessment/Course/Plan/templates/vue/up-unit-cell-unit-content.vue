@@ -120,6 +120,7 @@ window.Vue.onUnmounted(() => {
     > div > div:not(.sortable-holder) {
         display: flex;
         left: 5px;
+        padding-right: 0.5rem;
         position: absolute; // Avoid the content being pushed around by the draggable holder
         text-wrap: wrap;
         top: 5px;
