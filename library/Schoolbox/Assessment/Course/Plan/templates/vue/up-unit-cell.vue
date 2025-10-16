@@ -8,7 +8,6 @@
  */
 import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
-import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import type { Column } from "./unitPlannerConfig";
@@ -16,6 +15,7 @@ import { ColumnType } from "./unitPlannerConfig";
 import type { Unit } from "./unitPlannerTypes";
 
 // Import all the content/action/empty components for the different column types
+import UpUnitCellUnitAction from "./up-unit-cell-unit-action.vue";
 import UpUnitCellTextboxContent from "./up-unit-cell-textbox-content.vue";
 import UpUnitCellTextboxAction from "./up-unit-cell-textbox-action.vue";
 import UpUnitCellTextboxEmpty from "./up-unit-cell-textbox-empty.vue";
@@ -284,24 +284,6 @@ const isFirstUnit = window.Vue.computed(() => {
                         </ul>
                     </div>
                 </div>
-                <div v-if="props.unit._routes.modify || props.unit._routes.delete" class="component-action">
-                    <section>
-                        <sbx-pop-out
-                            :content-id="`dropdown-unit-${props.unit.id}-modify`"
-                            button-text="Manage"
-                            move-to="#unitplanner-dropdown-container"
-                            is-component-action
-                        ></sbx-pop-out>
-                        <ul :id="`dropdown-unit-${props.unit.id}-modify`" class="f-dropdown" data-dropdown-content>
-                            <li v-if="props.unit._routes.modify">
-                                <a class="icon-modify" :href="getReturnUrl(props.unit._routes.modify)"> Modify </a>
-                            </li>
-                            <li v-if="props.unit._routes.delete">
-                                <a class="icon-delete" :href="getReturnUrl(props.unit._routes.delete)"> Delete </a>
-                            </li>
-                        </ul>
-                    </section>
-                </div>
             </template>
 
             <up-unit-cell-textbox-content
@@ -373,8 +355,9 @@ const isFirstUnit = window.Vue.computed(() => {
             </div>
 
             <div ref="componentActionEl">
+                <up-unit-cell-unit-action v-if="props.column.type === ColumnType.UNIT" :unit="props.unit" />
                 <up-unit-cell-textbox-action
-                    v-if="props.column.type === ColumnType.OVERVIEW"
+                    v-else-if="props.column.type === ColumnType.OVERVIEW"
                     ref="textboxActionComponent"
                     :unit="props.unit"
                     :column="props.column"
