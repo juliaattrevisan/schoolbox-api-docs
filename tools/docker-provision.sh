@@ -348,10 +348,10 @@ function install_instance() {
   --data-source "$DATA_SOURCE" \
   --dataset "$DATA_FILENAME" \
   --skip-bucket-copy \
-  --sql-host 'mariadb' \
-  --sql-schema 'schoolbox' \
-  --sql-user 'schoolboxdocker' \
-  --sql-pass 'abc123' \
+  --sql-host "$(schoolbox-read-instances --option SQL_host)" \
+  --sql-schema "$(schoolbox-read-instances --option SQL_db)"  \
+  --sql-user "$(schoolbox-read-instances --option SQL_user)"  \
+  --sql-pass "$(schoolbox-read-instances --option SQL_passwd)"  \
   --cache-dir "${CACHE_DIR}" \
   --config amqp_host "'rabbitmq'" \
   --config amqp_user "'guest'" \
