@@ -716,7 +716,7 @@ class Controller extends Base
      * This is almost a direct replica of postMomentForUsers()
      *
      * @api POST /learning/evidence/user/{userIds}/draft
-     * @since 25.1.3
+     * @since 25.1.0
      * @param Collection $users
      * @return void
      * @throws MapperException
@@ -732,7 +732,7 @@ class Controller extends Base
      * to its content such as body, tags, curric nodes, etc.
      *
      * @api PUT /learning/evidence/{id}/draft
-     * @since 25.1.3
+     * @since 25.1.0
      * @param Model $evidence
      * @return void
      * @throws Exception
@@ -750,7 +750,7 @@ class Controller extends Base
      * instance rather than assume a Draft state.
      *
      * @api POST /learning/evidence/{id}/submit
-     * @since 25.1.3
+     * @since 25.1.0
      * @param Collection $users
      * @return void
      * @throws MapperException
@@ -766,7 +766,7 @@ class Controller extends Base
      * to its content such as body, tags, curric nodes, etc.
      *
      * @api PUT /learning/evidence/{id}/submit
-     * @since 25.1.3
+     * @since 25.1.0
      * @param Model $evidence
      * @return void
      * @throws Exception
@@ -784,7 +784,7 @@ class Controller extends Base
      * instance rather than assume a Submitted state.
      *
      * @api POST /learning/evidence/{id}/publish
-     * @since 25.1.3
+     * @since 25.1.0
      * @param Collection $users
      * @return void
      * @throws MapperException
@@ -800,7 +800,7 @@ class Controller extends Base
      * to its content such as body, tags, curric nodes, etc.
      *
      * @api PUT /learning/evidence/{id}/publish
-     * @since 25.1.3
+     * @since 25.1.0
      * @param Model $evidence
      * @return void
      * @throws Exception
@@ -816,7 +816,7 @@ class Controller extends Base
      * Bulk publish a set of $moments
      *
      * @api PUT /learning/evidence/bulk/publish
-     * @since 25.1.3
+     * @since 25.1.0
      * @return void
      * @throws Exception
      * @throws MapperException
@@ -864,7 +864,7 @@ class Controller extends Base
      * Reject a Moment, along with a reason which goes int the Moment's comment thread.
      *
      * @api PUT /learning/evidence/{id}/reject
-     * @since 25.1.3
+     * @since 25.1.0
      * @param Model $evidence
      * @return void
      * @throws Exception
@@ -881,7 +881,7 @@ class Controller extends Base
      * Bulk reject a set of $moments
      *
      * @api PUT /learning/evidence/bulk/reject
-     * @since 25.1.3
+     * @since 25.1.0
      * @return void
      * @throws Exception
      * @throws MapperException
@@ -1126,7 +1126,7 @@ class Controller extends Base
      * ]
      *
      * @api GET /learning/evidence/cohort/{folderId}/payload
-     * @since 25.1.3
+     * @since 25.1.0
      * @param Folder\Model $folder
      * @return void
      * @throws RouteNotFound
