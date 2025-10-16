@@ -32,6 +32,7 @@ const acStore = useAgentChatStore();
 const isLoading = window.Vue.ref(true);
 const loadError = window.Vue.ref<string | null>(null);
 
+const keywordFilter = window.Vue.ref<string>("");
 const featureFilter = window.Vue.ref<keyof typeof props.features | null>(null);
 const userFilter = window.Vue.ref<SearchSelectItem[]>([]);
 const startDateFilter = window.Vue.ref<string>(EMPTY_DATE);
@@ -95,7 +96,7 @@ async function loadUsageLogs(): Promise<void> {
         method: "POST",
         url: props.routeSearch,
         body: {
-            keyword: null,
+            keyword: keywordFilter.value.trim() !== "" ? keywordFilter.value.trim() : null,
             feature: featureFilter.value,
             user: userFilter.value.length > 0 ? userFilter.value[0].id : null,
             after: startDateFilter.value !== EMPTY_DATE ? startDateFilter.value : null,
@@ -196,27 +197,42 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                     <legend>Filter</legend>
                     <div class="small-12 columns l-flex-col l-gap-m">
                         <label>
-                            Feature:
-                            <select v-model="featureFilter" name="feature" class="f-no-margins">
-                                <option :value="null">All</option>
-                                <option
-                                    v-for="(featureConf, feature) in props.features"
-                                    :key="feature"
-                                    :value="feature"
-                                >
-                                    {{ featureConf.title }}
-                                </option>
-                            </select>
+                            Keyword
+                            <input
+                                v-model="keywordFilter"
+                                class="f-no-margins"
+                                type="text"
+                                name="keyword"
+                                placeholder="Filter by keyword"
+                            />
                         </label>
-
-                        <search-select
-                            v-model:selected="userFilter"
-                            label="User"
-                            label-id="users"
-                            endpoint="/ajax/user.php?groupID=0&"
-                            :is-single-select="true"
-                            placeholder="Search for user..."
-                        />
+                        <div class="l-flex-row l-flex--no-wrap l-gap-m">
+                            <div class="l-flex-col l-flex__item--1">
+                                <label>
+                                    Feature
+                                    <select v-model="featureFilter" name="feature" class="f-no-margins">
+                                        <option :value="null">All</option>
+                                        <option
+                                            v-for="(featureConf, feature) in props.features"
+                                            :key="feature"
+                                            :value="feature"
+                                        >
+                                            {{ featureConf.title }}
+                                        </option>
+                                    </select>
+                                </label>
+                            </div>
+                            <div class="l-flex-col l-flex__item--1">
+                                <search-select
+                                    v-model:selected="userFilter"
+                                    label="User"
+                                    label-id="users"
+                                    endpoint="/ajax/user.php?groupID=0&"
+                                    :is-single-select="true"
+                                    placeholder="Search for user..."
+                                />
+                            </div>
+                        </div>
 
                         <date-range
                             ref="dateRangeRef"
@@ -243,24 +259,20 @@ async function openSessionDetails(session: AiSession): Promise<void> {
         </div>
     </div>
 
-    <div v-if="isLoading" class="row">
-        <div class="small-12 island">
-            <section>
-                <div class="loader"></div>
-            </section>
-        </div>
-    </div>
-
-    <div v-else class="row">
+    <div class="row">
         <div
             class="small-12 columns l-mar-m--bottom"
-            :class="{ 'medium-6': selectedSessionId !== null || sessionLoadError !== null }"
+            :class="{ 'medium-6': selectedSessionId !== null || sessionLoadError !== null, island: isLoading }"
         >
             <div v-if="loadError" data-alert class="alert-box alert">
                 {{ loadError }}
             </div>
 
-            <div v-if="usageSessions.length > 0" class="scrollable">
+            <section v-else-if="isLoading">
+                <div class="loader"></div>
+            </section>
+
+            <div v-else-if="usageSessions.length > 0" class="scrollable">
                 <table>
                     <thead>
                         <tr>
@@ -268,7 +280,6 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                             <th>Date</th>
                             <th>Feature</th>
                             <th>User</th>
-                            <th>Session ID</th>
                         </tr>
                     </thead>
 
