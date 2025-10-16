@@ -25,6 +25,7 @@ const props = defineProps<{
     headers: TableHeader[];
     rowData: { [key: string]: RowOptions };
     recordsOrPoints: "records" | "points";
+    isFirstColumnSticky: boolean;
     isTotalSticky: boolean;
     isTrendSticky: boolean;
 }>();
@@ -55,11 +56,11 @@ function onCellSelected(header: TableHeader): void {
             :class="{
                 'u-border-right': true,
                 'u-sticky-left':
-                    index === 0 ||
+                    (index === 0 && props.isFirstColumnSticky) ||
                     (header.key === 'total' && props.isTotalSticky) ||
                     (header.key === 'trend' && props.isTrendSticky),
                 'u-sticky-left--row':
-                    index === 0 ||
+                    (index === 0 && props.isFirstColumnSticky) ||
                     (header.key === 'total' && props.isTotalSticky) ||
                     (header.key === 'trend' && props.isTrendSticky),
                 'l-pad--0': header.key === 'user',
