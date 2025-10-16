@@ -246,7 +246,7 @@ function start_containers() {
     esac
     case "${SECOND_INSTANCE_ENABLE}" in
         1 | true | yes | on)
-            profiles="$profiles --profile docker2"
+            profiles="$profiles --profile second-instance"
             ;;
     esac
 

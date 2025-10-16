@@ -231,6 +231,95 @@ services:
     extra_hosts:
       - host.docker.internal:host-gateway
 
+  # Second instance's notif daemons:
+  # These are the same as above, but use the second instance ID instead.
+  schoolbox2-digestd:
+    container_name: schoolbox-digestd
+    pull_policy: never
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+      redis-storage:
+        condition: service_healthy
+    environment:
+      PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
+    build:
+      context: ./schoolbox-digestd
+      args:
+        BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
+        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
+    env_file: ./schoolbox/second-instance.env
+    volumes:
+      - code:/usr/share/schoolbox
+      - storage:/var/lib/schoolbox/docker/storage
+      - schoolbox-config:/etc/schoolbox
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    profiles:
+      - second-instance
+
+  schoolbox2-scheduled:
+    container_name: schoolbox-scheduled
+    pull_policy: never
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+      redis-storage:
+        condition: service_healthy
+    environment:
+      PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
+    build:
+      context: ./schoolbox-scheduled
+      args:
+        BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
+        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
+    env_file: ./schoolbox/second-instance.env
+    volumes:
+      - code:/usr/share/schoolbox
+      - storage:/var/lib/schoolbox/docker/storage
+      - schoolbox-config:/etc/schoolbox
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    profiles:
+      - second-instance
+
+  schoolbox2-mobiled:
+    container_name: schoolbox-mobiled
+    pull_policy: never
+    depends_on:
+      mariadb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis-cache:
+        condition: service_healthy
+      redis-storage:
+        condition: service_healthy
+    environment:
+      PHP_IDE_CONFIG: "serverName=${PHPSTORM_SERVER_NAME}"
+    build:
+      context: ./schoolbox-mobiled
+      args:
+        BASE_PHP_IMAGE: ${BASE_PHP_IMAGE}
+        PRIVATE_CONTAINER_REGISTRY: ${PRIVATE_CONTAINER_REGISTRY}
+    env_file: ./schoolbox/second-instance.env
+    volumes:
+      - code:/usr/share/schoolbox
+      - storage:/var/lib/schoolbox/docker/storage
+      - schoolbox-config:/etc/schoolbox
+    extra_hosts:
+      - host.docker.internal:host-gateway
+    profiles:
+      - second-instance
+
   schoolbox-socketd:
     container_name: schoolbox-socketd
     pull_policy: never
