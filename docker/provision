@@ -3,10 +3,30 @@
 # Always run within root folder
 cd "$(dirname "$0")/.." || exit 1
 
+# Parse args for --install-instance-only
+provision_args=''
+errors='0'
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --install-instance-only )
+            provision_args="--install-instance-only"
+            shift
+            ;;
+        *)
+            error "Unrecognised option: '$1'"
+            shift # past argument
+            errors="1"
+            ;;
+    esac
+done
+if [[ $errors == "1" ]]; then
+    exit 1
+fi
+
 # Add tests that containers are actually up, or just run docker-up
 
 # Run the provision script in the schoolbox-cli container
-docker exec -it -u root schoolbox-cli tools/docker-provision.sh
+docker exec -it -u root schoolbox-cli tools/docker-provision.sh $provision_args
 
 # Is the second env in action?
 # If so copy from the second to the first, or just re-run the provision script

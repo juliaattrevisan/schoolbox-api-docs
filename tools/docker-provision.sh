@@ -443,17 +443,43 @@ function main() {
   load_consts
   load_config
   setup_aws_sso
-  create_ir_config_file
 
-  cleanup_cache_dir
-  download_secrets
-  download_certs
-  mark_safe_for_git
+  # Should the setup of everything be skipped?
+  install_instance_only='0'
+  errors='0'
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      --install-instance-only )
+        install_instance_only='1'
+        shift
+        ;;
+      *)
+        error "Unrecognised option: '$1'"
+        shift # past argument
+        errors="1"
+        ;;
+    esac
+  done
+  if [[ $errors == "1" ]]; then
+    exit 1
+  fi
 
-  init_composer_dependencies
-  init_npm_dependencies
+  if [[ $install_instance_only == "0" ]]; then
+    create_ir_config_file
 
-  init_database
+    cleanup_cache_dir
+    download_secrets
+    download_certs
+    mark_safe_for_git
+
+    init_composer_dependencies
+    init_npm_dependencies
+
+    init_database
+  else
+    log "Skipping setup";
+  fi
+
   install_instance
   create_cron_config_file
   create_crontab_files
