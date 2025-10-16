@@ -10,14 +10,15 @@
                 <section>
                     <fieldset class="content">
                         <div class="small-12 columns">
+                            {% set featureToggle = data.differentiationProfiles.featureToggle %}
                             <label id="differentiation-profiles" class="inline-block" for="differentiation-profiles-field">
-                                <span class="{% if differentiationProfilesEnabled.required ?? false %} required-with-tip{% endif %}">{{ (differentiationProfilesEnabled.title ?? '')|trim }}</span>
-                                {% if differentiationProfilesEnabled.description|trim %}
-                                    <span data-tooltip class="hint has-tip tip-bottom" title="{{ differentiationProfilesEnabled.description }}">?</span>
+                                <span class="{% if featureToggle.required %} required-with-tip{% endif %}">{{ (featureToggle.title)|trim }}</span>
+                                {% if featureToggle.description|trim %}
+                                    <span data-tooltip class="hint has-tip tip-bottom" title="{{ featureToggle.description }}">?</span>
                                 {% endif %}
                             </label>
                             <div class="switch">
-                                <input id="differentiation-profiles-field" type="checkbox" name="enabled" {% if differentiationProfilesEnabled.value ?? false %}checked{% endif %}/>
+                                <input id="differentiation-profiles-field" type="checkbox" name="enabled" {% if featureToggle.enabled %}checked{% endif %}/>
                                 <label for="differentiation-profiles-field">
                                     <span>On</span>
                                     <span>Off</span>

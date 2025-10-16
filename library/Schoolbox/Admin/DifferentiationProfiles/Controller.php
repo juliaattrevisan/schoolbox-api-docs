@@ -82,10 +82,14 @@ class Controller extends ConfigController
                     $this->getUser()
                 )->generateBreadcrumbs($this->routeGenerator->generate('differentiationProfiles.getIndex')),
                 'returnUrl' => Redirect::encode($pageCurrent),
-                'differentiationProfilesEnabled' => $differentiationProfilesEnabled,
                 'data' => [
                     'differentiationProfiles' => [
-                        'enabled' => (bool)$differentiationProfilesEnabled->getValue(),
+                        'featureToggle' => [
+                            'enabled' => (bool)$differentiationProfilesEnabled->getValue(),
+                            'required' => $differentiationProfilesEnabled->getRequired() ?? false,
+                            'title' => $differentiationProfilesEnabled->getTitle() ?? '',
+                            'description' => $differentiationProfilesEnabled->getDescription() ?? '',
+                        ],
                         'modules' => $differentiationProfilesConfigsArray,
                         'headers' => Model::CONFIGS_HEADER
                     ]
