@@ -194,7 +194,7 @@ test.describe("Unit Planner Tests", () => {
             await tester.loginAsAdmin();
 
             tester.isGoingTo("navigate to course creation page");
-            await page.goto("https://vagrant.dev.schoolbox.cloud/course/new");
+            await page.goto("/course/new");
 
             tester.isGoingTo(`fill in course name with '${courseName}'`);
             await page.getByRole("textbox", { name: "Name *" }).fill(courseName);
@@ -215,7 +215,7 @@ test.describe("Unit Planner Tests", () => {
             console.warn(`Created course with ID ${courseId}`);
 
             tester.isGoingTo("navigate to unit planner page to verify empty units message");
-            await page.goto(`https://vagrant.dev.schoolbox.cloud/course/plan/${courseId}`);
+            await page.goto(`/course/plan/${courseId}`);
 
             tester.isGoingTo("confirm the empty units message is visible");
             await expect(page.getByText("This course currently does not have any units")).toBeVisible();
@@ -227,16 +227,16 @@ test.describe("Unit Planner Tests", () => {
             await unitPlanner.createUnitsInModal([firstUnitName, secondUnitName]);
 
             tester.isGoingTo("navigate to course list page to delete the course");
-            await page.goto("https://vagrant.dev.schoolbox.cloud/course/list");
+            await page.goto("/course/list");
 
             tester.isGoingTo("click the course dropdown button to open the actions menu");
-            await page.locator(`[data-test="sbx-pop-out-courseDropdown-${courseId}-button"]`).click();
+            await page.getByTestId(`sbx-pop-out-courseDropdown-${courseId}-button`).click();
 
             tester.isGoingTo("click the Delete link from the dropdown menu");
             await page.getByRole("link", { name: "Delete" }).click();
 
             tester.isGoingTo("confirm deletion in the modal by clicking the confirm button");
-            await page.locator('[data-test="confirm-dialog-confirm-button"]').click();
+            await page.getByTestId("confirm-dialog-confirm-button").click();
 
             tester.isGoingTo(`verify that ${courseName} is no longer visible on the page`);
             await expect(page.getByText(courseName)).not.toBeVisible();
