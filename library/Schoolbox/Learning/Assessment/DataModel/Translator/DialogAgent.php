@@ -11,11 +11,7 @@ namespace Schoolbox\Learning\Assessment\DataModel\Translator;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
 use Schoolbox\Learning\Assessment\IAssessable;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentModel;
-use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Scenario\Mapper as ScenarioMapper;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgentObject;
-use Schoolbox\Learning\MarkScheme\None;
-use Schoolbox\Mapper\Exception;
-use Schoolbox\Mapper\Exception\InsufficientHydrationException;
 
 /**
  * Sub-translator for Lesson Plan specific fields.
@@ -67,42 +63,40 @@ class DialogAgent implements IAssessmentTypeTranslator
     /**
      * Copies all attributes from the domainObject to dataModel
      *
-     * @param IAssessable          $domainObject  A LessonPlanObject instance
-     * @param IAssessableDataModel $dataModel     A LessonPlanModel instance
-     * @throws InsufficientHydrationException If domain object is insufficiently hydrated for translation
-     * @throws Exception
+     * @param IAssessable|DialogAgentObject $domainObject A LessonPlanObject instance
+     * @param IAssessableDataModel|DialogAgentModel $dataModel A LessonPlanModel instance
      */
-    public function translateToDataModel(IAssessable $domainObject, IAssessableDataModel $dataModel): void
+    public function translateToDataModel(IAssessable|DialogAgentObject $domainObject, IAssessableDataModel|DialogAgentModel $dataModel): void
     {
-        $scenarioMapper = ScenarioMapper::getInstance();
-
-        /* Remember the Dialog Agent Scenario that was chosen
-         */
-        $dataModel->setScenario($domainObject->getScenario());
+        $dataModel->setScenario($domainObject->getScenario()->getId());
+        $dataModel->setLanguage($domainObject->getLanguage());
+        $dataModel->setHelpfulness($domainObject->getHelpfulness());
+        $dataModel->setOpeningMessage($domainObject->getOpeningMessage());
+        $dataModel->setRules($domainObject->getRules());
+        $dataModel->setPrompt($domainObject->getPrompt());
+        $dataModel->setDuration($domainObject->getDuration());
     }
 
 
     /**
      * Copies all attributes from the dataModel to domainObject
      *
-     * @param IAssessableDataModel $dataModel
-     * @param IAssessable          $domainObject
-     * @throws Exception
-     * @throws \UnexpectedValueException
+     * @param IAssessableDataModel|DialogAgentModel $dataModel
+     * @param IAssessable|DialogAgentObject $domainObject
      */
-    public function translateToDomainModel(IAssessableDataModel $dataModel, IAssessable $domainObject): void
+    public function translateToDomainModel(IAssessableDataModel|DialogAgentModel $dataModel, IAssessable|DialogAgentObject $domainObject): void
     {
-        /* Reuse data models here because they're the same as domain representations
+        $domainObject->setScenario($dataModel->getScenario());
+        $domainObject->setLanguage($dataModel->getLanguage());
+        $domainObject->setHelpfulness($dataModel->getHelpfulness());
+        $domainObject->setOpeningMessage($dataModel->getOpeningMessage());
+        $domainObject->setRules($dataModel->getRules());
+        $domainObject->setPrompt($dataModel->getPrompt());
+        $domainObject->setDuration($dataModel->getDuration());
+
+        /* TODO This *used* tbe needed at some point, but idk why
+         *  maybe can just delete this entirely since they're never marked anyway.
          */
-        $scenarioMapper = ScenarioMapper::getInstance();
-
-        /* Dialog Agent Scenario that was associated with this assessment
-         */
-        $scenario = $scenarioMapper->createModel()
-            ->setId($dataModel->getScenario());
-
-        $domainObject->setScenario($scenario);
-
-        $domainObject->setMarkScheme(new None());
+//        $domainObject->setMarkScheme(new None());
     }
 }

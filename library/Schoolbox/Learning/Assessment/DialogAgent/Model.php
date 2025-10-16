@@ -30,15 +30,51 @@ class Model extends AbstractAssessment
 
 
     /**
-     * @var \Schoolbox\Learning\Assessment\DialogAgent\DataModel\Scenario\Model|null
+     * @var int|null
      */
-    private ?\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Scenario\Model $scenario = null;
+    private ?int $scenario = null;
 
 
     /**
      * The IAssessable associated with this Dialog Agent
      */
     private ?AssessmentModel $assessmentModel = null;
+
+
+    /**
+     * @var string|null
+     */
+    private ?string $language = null;
+
+
+    /**
+     * @var string|null
+     */
+    private ?string $helpfulness = null;
+
+
+    /**
+     * @var string|null
+     */
+    private ?string $openingMessage = null;
+
+
+    /**
+     * @var string|null
+     */
+    private ?string $rules = null;
+
+
+    /**
+     * @var string|null
+     */
+    private ?string $prompt = null;
+
+
+    /**
+     * @var int|null
+     */
+    private ?int $duration = null;
 
 
     /**
@@ -63,12 +99,6 @@ class Model extends AbstractAssessment
      * @var User|null
      */
     private ?User $deletedBy = null;
-
-
-    /**
-     * @var string|null
-     */
-    private ?string $duration = null;
 
 
     /**
@@ -226,7 +256,6 @@ class Model extends AbstractAssessment
     }
 
 
-
     /* Getters/Setters
      */
 
@@ -240,10 +269,10 @@ class Model extends AbstractAssessment
 
 
     /**
-     * @param \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Scenario\Model|null $scenario
+     * @param \int|null $scenario
      * @return $this
      */
-    public function setScenario(?\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Scenario\Model $scenario): self
+    public function setScenario(?int $scenario): self
     {
         $this->scenario = $scenario;
         return $this;
@@ -330,21 +359,121 @@ class Model extends AbstractAssessment
 
 
     /**
-     * @return string|null
+     * @return int|null
      */
-    public function getDuration(): ?string
+    public function getDuration(): ?int
     {
         return $this->duration;
     }
 
 
     /**
-     * @param string|null $duration
+     * @param int|null $duration
      * @return $this
      */
-    public function setDuration(?string $duration): self
+    public function setDuration(?int $duration): self
     {
         $this->duration = $duration;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getLanguage(): ?string
+    {
+        return $this->language;
+    }
+
+
+    /**
+     * @param string|null $language
+     * @return $this
+     */
+    public function setLanguage(?string $language): self
+    {
+        $this->language = $language;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getHelpfulness(): ?string
+    {
+        return $this->helpfulness;
+    }
+
+
+    /**
+     * @param string|null $helpfulness
+     * @return $this
+     */
+    public function setHelpfulness(?string $helpfulness): self
+    {
+        $this->helpfulness = $helpfulness;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getOpeningMessage(): ?string
+    {
+        return $this->openingMessage;
+    }
+
+
+    /**
+     * @param string|null $openingMessage
+     * @return $this
+     */
+    public function setOpeningMessage(?string $openingMessage): self
+    {
+        $this->openingMessage = $openingMessage;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getRules(): ?string
+    {
+        return $this->rules;
+    }
+
+
+    /**
+     * @param string|null $rules
+     * @return $this
+     */
+    public function setRules(?string $rules): self
+    {
+        $this->rules = $rules;
+        return $this;
+    }
+
+
+    /**
+     * @return string|null
+     */
+    public function getPrompt(): ?string
+    {
+        return $this->prompt;
+    }
+
+
+    /**
+     * @param string|null $prompt
+     * @return $this
+     */
+    public function setPrompt(?string $prompt): self
+    {
+        $this->prompt = $prompt;
         return $this;
     }
 }
