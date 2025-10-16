@@ -8,6 +8,7 @@
  */
 import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
+import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import type { Column } from "./unitPlannerConfig";
@@ -282,6 +283,24 @@ const isFirstUnit = window.Vue.computed(() => {
                             </li>
                         </ul>
                     </div>
+                </div>
+                <div v-if="props.unit._routes.modify || props.unit._routes.delete" class="component-action">
+                    <section>
+                        <sbx-pop-out
+                            :content-id="`dropdown-unit-${props.unit.id}-modify`"
+                            button-text="Manage"
+                            move-to="#unitplanner-dropdown-container"
+                            is-component-action
+                        ></sbx-pop-out>
+                        <ul :id="`dropdown-unit-${props.unit.id}-modify`" class="f-dropdown" data-dropdown-content>
+                            <li v-if="props.unit._routes.modify">
+                                <a class="icon-modify" :href="getReturnUrl(props.unit._routes.modify)"> Modify </a>
+                            </li>
+                            <li v-if="props.unit._routes.delete">
+                                <a class="icon-delete" :href="getReturnUrl(props.unit._routes.delete)"> Delete </a>
+                            </li>
+                        </ul>
+                    </section>
                 </div>
             </template>
 
