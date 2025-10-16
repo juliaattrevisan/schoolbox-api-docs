@@ -112,14 +112,22 @@
             </div>
         </div>
     </div>
+</fieldset>
 
+<fieldset>
+    <legend class="required">Select scenario</legend>
     {# Scenarios #}
     <div class="radiolist">
         <ul class="option-list">
             {% for scenario in dialogAgent.scenarios %}
-                <li>
-                    <input type="radio" id="scenario-{{ scenario.id }}" name="scenario" value="{{ scenario.id }}" />
+                {# TODO Snake pls decorate this in a reptilian manner thx #}
+                <li style="border:1px solid #f00;min-width:400px;float:left;padding-right:2rem;">
+                    <input type="radio" id="scenario-{{ scenario.id }}" name="scenario" value="{{ scenario.id }}" required />
                     <label for="scenario-{{ scenario.id }}">{{ scenario.title }}</label>
+
+                    <article>
+                        {{ scenario.description }}
+                    </article>
 
                     <ul>
                         {% for field in scenario.fields %}
