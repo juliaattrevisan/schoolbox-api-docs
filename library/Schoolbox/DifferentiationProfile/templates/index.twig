@@ -1,0 +1,13 @@
+{% import 'sub/breadcrumbs.twig' as bread %}
+
+{{ bread.crumbs(
+    [ locale.differentiationProfile.plural ]
+) }}
+
+<div class="row actions-small-1">
+    <div class="list-item">
+        <div class="small-12 column">
+            <h1>Manage {{ locale.differentiationProfile.plural }}</h1>
+        </div>
+    </div>
+</div>
