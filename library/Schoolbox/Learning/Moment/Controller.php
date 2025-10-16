@@ -411,14 +411,14 @@ class Controller extends Base
 
         $requestBody = $this->request->getParsedBody();
 
-        if (!array_key_exists('folders', $requestBody)) {
-            $requestBody['folders'] = [];
-        }
-
         /* This is a bit brutal and maybe you can mess around more with a diff,
          * but this is guaranteed to be correct without all the kerfuffle...for now
          */
-        $folders = $this->folderMapper->findByColumn('id', $requestBody['folders']);
+        $folders = (
+            array_key_exists('folders', $requestBody)
+            ? $this->folderMapper->findByColumn('id', $requestBody['folders'])
+            : new GenericCollection(Model::class)
+        );
 
         //unless there are mapper errors (and those will change it to 500 as required
         //set the return code to 201 (Created)
