@@ -59,6 +59,7 @@ services:
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
+      - storage2:/var/lib/schoolbox/docker2/storage
       - schoolbox-config:/etc/schoolbox
       - caddy-ssl:/etc/nginx/certs/
       - aws-config:/root/.aws
@@ -234,7 +235,7 @@ services:
   # Second instance's notif daemons:
   # These are the same as above, but use the second instance ID instead.
   schoolbox2-digestd:
-    container_name: schoolbox-digestd
+    container_name: schoolbox2-digestd
     pull_policy: never
     depends_on:
       mariadb:
@@ -255,7 +256,7 @@ services:
     env_file: ./schoolbox/second-instance.env
     volumes:
       - code:/usr/share/schoolbox
-      - storage:/var/lib/schoolbox/docker/storage
+      - storage2:/var/lib/schoolbox/docker2/storage
       - schoolbox-config:/etc/schoolbox
     extra_hosts:
       - host.docker.internal:host-gateway
@@ -263,7 +264,7 @@ services:
       - second-instance
 
   schoolbox2-scheduled:
-    container_name: schoolbox-scheduled
+    container_name: schoolbox2-scheduled
     pull_policy: never
     depends_on:
       mariadb:
@@ -284,7 +285,7 @@ services:
     env_file: ./schoolbox/second-instance.env
     volumes:
       - code:/usr/share/schoolbox
-      - storage:/var/lib/schoolbox/docker/storage
+      - storage2:/var/lib/schoolbox/docker2/storage
       - schoolbox-config:/etc/schoolbox
     extra_hosts:
       - host.docker.internal:host-gateway
@@ -292,7 +293,7 @@ services:
       - second-instance
 
   schoolbox2-mobiled:
-    container_name: schoolbox-mobiled
+    container_name: schoolbox2-mobiled
     pull_policy: never
     depends_on:
       mariadb:
@@ -313,7 +314,7 @@ services:
     env_file: ./schoolbox/second-instance.env
     volumes:
       - code:/usr/share/schoolbox
-      - storage:/var/lib/schoolbox/docker/storage
+      - storage2:/var/lib/schoolbox/docker2/storage
       - schoolbox-config:/etc/schoolbox
     extra_hosts:
       - host.docker.internal:host-gateway
@@ -343,6 +344,7 @@ services:
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
+      - storage2:/var/lib/schoolbox/docker2/storage
       - schoolbox-config:/etc/schoolbox
     extra_hosts:
       - host.docker.internal:host-gateway
@@ -463,6 +465,13 @@ volumes:
       type: none
       o: bind
       device: ../data/docker/storage
+
+  storage2:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ../data/docker2/storage
 
   # Volumes for config
   schoolbox-config:
