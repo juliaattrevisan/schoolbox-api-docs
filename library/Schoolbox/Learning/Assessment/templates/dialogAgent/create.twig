@@ -25,6 +25,7 @@
  # @param $courseManaged
  # @param $lessonPlanTemplates
  # @param bool $acceptingResponses                                   Whether this assessment can accept responses (see dates.twig)
+ # @param \Schoolbox\GenericCollection $scenarios                    A list of predefined scenarios users can choose
  #}
 
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
@@ -110,6 +111,26 @@
                 </label>
             </div>
         </div>
+    </div>
+
+    {# Scenarios #}
+    <div class="radiolist">
+        <ul class="option-list">
+            {% for scenario in dialogAgent.scenarios %}
+                <li>
+                    <input type="radio" id="scenario-{{ scenario.id }}" name="scenario" value="{{ scenario.id }}" />
+                    <label for="scenario-{{ scenario.id }}">{{ scenario.title }}</label>
+
+                    <ul>
+                        {% for field in scenario.fields %}
+                            <li>
+                                {{ field.title }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </li>
+            {% endfor %}
+        </ul>
     </div>
 </fieldset>
 

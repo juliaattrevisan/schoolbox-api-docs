@@ -59,6 +59,14 @@ class Model implements ISoftDeletable
     private ?string $type = null;
 
 
+    /**
+     * A set of scenario fields gets put here
+     *
+     * @var \Schoolbox\GenericCollection|null
+     */
+    private ?\Schoolbox\GenericCollection $fields = null;
+
+
     /* Modest conveniences
      */
 
@@ -164,6 +172,40 @@ class Model implements ISoftDeletable
     public function setType(?string $type): self
     {
         $this->type = $type;
+        return $this;
+    }
+
+
+    /**
+     * @return \Schoolbox\GenericCollection|null
+     */
+    public function getFields(): ?\Schoolbox\GenericCollection
+    {
+        return $this->fields;
+    }
+
+
+    /**
+     * @param \Schoolbox\GenericCollection|null $fields
+     * @return $this
+     */
+    public function setFields(?\Schoolbox\GenericCollection $fields): self
+    {
+        $this->fields = $fields;
+        return $this;
+    }
+
+
+    /**
+     * Add a scenario field to this scenario
+     *
+     * @param Field\Model $field
+     * @return $this
+     * @throws \UnexpectedValueException
+     */
+    public function addField(Field\Model $field): self
+    {
+        $this->fields->add($field);
         return $this;
     }
 }
