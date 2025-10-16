@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent\Scenario\Field;
+namespace Schoolbox\Admin\DialogAgent\Scenario\Field\Context;
 
 use Schoolbox\GenericCollection;
 
@@ -26,28 +26,34 @@ class Mapper extends \Schoolbox\Mapper
      */
     protected function mapping(): void
     {
-        $this->hasTable('dialog_agent_scenario_field');
+        $this->hasTable('dialog_agent_scenario_field_context');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('scenario_id', self::TYPE_INTEGER, null, 'scenario');
-        $this->uses('title', self::TYPE_STRING, null, 'title');
-        $this->uses('slug', self::TYPE_STRING, null, 'slug');
-        $this->uses('type', self::TYPE_STRING, null, 'type');
-        $this->uses('meta', self::TYPE_STRING, null, 'meta');
-        $this->uses('sequence', self::TYPE_INTEGER, null, 'sequence');
-        $this->uses('options', self::TYPE_JSON, null, 'options');
+        $this->uses('scenario_field_id', self::TYPE_INTEGER, null, 'scenarioField');
+        $this->uses('dialog_agent_id', self::TYPE_INTEGER, null, 'dialogAgent');
+        $this->uses('body', self::TYPE_STRING, null, 'body');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
 
         $this->joins(
-            'scenario_id',
-            \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Scenario\Mapper::class,
+            'scenario_field_id',
+            \Schoolbox\Admin\DialogAgent\Scenario\Field\Mapper::class,
             'id',
             null,
             null,
-            'scenario',
-            'scenario',
+            'scenarioField',
+            'scenarioField',
+        );
+
+        $this->joins(
+            'dialog_agent_id',
+            \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::class,
+            'id',
+            null,
+            null,
+            'dialogAgent',
+            'dialogAgent',
         );
     }
 }

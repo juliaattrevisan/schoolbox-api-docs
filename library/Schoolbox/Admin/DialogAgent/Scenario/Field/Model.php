@@ -8,10 +8,10 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent\Scenario\Field;
+namespace Schoolbox\Admin\DialogAgent\Scenario\Field;
 
+use Schoolbox\Admin\DialogAgent\Scenario\Model as ScenarioModel;
 use Schoolbox\ISoftDeletable;
-use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Scenario\Model as ScenarioModel;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
 use Schoolbox\Mapper\Traits\Model\DeletedAtDate;
 use Schoolbox\Mapper\Traits\Model\Id;

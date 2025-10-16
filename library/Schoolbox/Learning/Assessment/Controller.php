@@ -373,7 +373,23 @@ abstract class Controller extends ListController implements IAssessmentControlle
                 ->setFileVar('worksheet')
                 ->getTwigContext();
         }
-        /* A list of lesson plans
+
+        /* Dialog Agents need scenarios pre-populated for selection and examination
+         * of its constituent fields in a modal
+         */
+        if (AssessmentType::TYPE_DIALOG_AGENT === $type) {
+            $scenarioMapper = \Schoolbox\Admin\DialogAgent\Scenario\Mapper::getInstance();
+
+            $data['dialogAgent']['scenarios'] = $scenarioMapper->findAll([
+                'order' => [
+                    'title' => 'ASC',
+                ],
+            ]);
+        }
+
+        /* TODO lol why is this outside the AssessmentType check?
+         *
+         * A list of lesson plans
          * We've literally been piling everything into this one controller method!
          */
         $data['lessonPlanTemplates'] = [

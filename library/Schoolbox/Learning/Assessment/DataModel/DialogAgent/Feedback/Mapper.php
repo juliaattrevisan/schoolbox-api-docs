@@ -48,7 +48,7 @@ class Mapper extends \Schoolbox\Mapper
 
         $this->joins(
             'criteria_id',
-            \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Scenario\Criteria\Mapper::class,
+            \Schoolbox\Admin\DialogAgent\Scenario\Criteria\Mapper::class,
             'id',
             null,
             null,

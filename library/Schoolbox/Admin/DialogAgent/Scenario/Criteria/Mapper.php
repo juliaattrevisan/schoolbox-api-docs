@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent\Scenario\Criteria;
+namespace Schoolbox\Admin\DialogAgent\Scenario\Criteria;
 
 use Schoolbox\GenericCollection;
 
@@ -39,7 +39,7 @@ class Mapper extends \Schoolbox\Mapper
 
         $this->joins(
             'scenario_id',
-            \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Scenario\Mapper::class,
+            \Schoolbox\Admin\DialogAgent\Scenario\Mapper::class,
             'id',
             null,
             null,

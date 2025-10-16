@@ -260,9 +260,9 @@ class Model extends AbstractAssessment
      */
 
     /**
-     * @return \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Scenario\Model|null
+     * @return \Schoolbox\Admin\DialogAgent\Scenario\Model|null
      */
-    public function getScenario(): ?\Schoolbox\Learning\Assessment\DataModel\DialogAgent\Scenario\Model
+    public function getScenario(): ?\Schoolbox\Admin\DialogAgent\Scenario\Model
     {
         return $this->scenario;
     }

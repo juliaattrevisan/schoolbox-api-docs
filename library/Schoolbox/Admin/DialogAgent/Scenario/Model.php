@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Schoolbox\Learning\Assessment\DataModel\DialogAgent\Scenario;
+namespace Schoolbox\Admin\DialogAgent\Scenario;
 
 use Schoolbox\ISoftDeletable;
 use Schoolbox\Mapper\Traits\Model\CreatedAtDate;
