@@ -6,7 +6,7 @@ import { isAbortError } from "@js/util/errorUtils";
 import { parseSseEvent } from "./fetchUtils";
 
 /**
- * Metadata typically for paginated API responses
+ * Metadata typically for API responses using a cursor for pagination
  * Includes the total count of items and cursor for pagination
  */
 export type Metadata = {
@@ -16,6 +16,18 @@ export type Metadata = {
         next: string | null;
     };
     url?: string;
+};
+
+/**
+ * Metadata typically for API responses using page-based pagination
+ */
+export type PaginationMeta = {
+    count: number;
+    pagination: {
+        limit: number;
+        pages: number;
+        current: number;
+    };
 };
 
 type ApiBaseResponseSuccess<TRespData> = {

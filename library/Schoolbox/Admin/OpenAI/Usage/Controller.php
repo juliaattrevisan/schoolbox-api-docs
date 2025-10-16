@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Schoolbox\Admin\OpenAI\Usage;
 
+use Alaress\Paginator;
 use Alaress\Web\Controller\Base;
 use Crell\ApiProblem\ApiProblem;
 use Schoolbox\Admin\Navigation\Subnav;
@@ -23,6 +24,8 @@ use Schoolbox\User;
 
 class Controller extends Base
 {
+    private const MAX_PAGE_SIZE = 100;
+
     /**
      * Controller constructor.
      *
@@ -66,7 +69,9 @@ class Controller extends Base
         $feature = $this->getRequestPost()->get('feature', null);
         $after = $this->getRequestPost()->get('after', null);
         $before = $this->getRequestPost()->get('before', null);
-        $cursor = $this->getRequestPost()->get('cursor', null);
+
+        $page = $this->getRequestPost()->getInt('page', 1);
+        $limit = $this->getRequestPost()->getInt('limit', self::MAX_PAGE_SIZE);
 
         // Build predicate using system predicate builder
         $predicate = $this->aiLogMapper->getPredicateBuilder();
@@ -131,11 +136,20 @@ class Controller extends Base
             );
         }
 
-        $offset = $cursor ?? 0;
-
-        // Find logs by predicate using the system builder
-        $logGroups = $this->aiLogMapper->findPredicateGrouped($predicate, offset: $offset);
+        // Find total count of logs by predicate and set up the paginator
         $count = $this->aiLogMapper->countByPredicates($predicate);
+        $pageSize = min($limit, self::MAX_PAGE_SIZE);
+
+        $paginator = (new Paginator\Paginator())
+            ->setTotal($count)
+            ->setPageSize($pageSize);
+
+        // Find logs for the current page by predicate using the system builder
+        $logGroups = $this->aiLogMapper->findPredicateGrouped(
+            $predicate,
+            limit: $paginator->getPageSize(),
+            offset: $paginator->getOffset($page),
+        );
 
         $userTranslator = new User\Translator\Author\ModelToArray();
 
@@ -169,13 +183,15 @@ class Controller extends Base
             ];
         }
 
-        $sessions = array_values($sessions);
-
         $this->response = $this->responseAsJson([
-            'data' => $sessions,
+            'data' => array_values($sessions),
             'metadata' => [
-                'total' => $count,
-                'cursor' => $offset + count($sessions),
+                'count' => $count,
+                'pagination' => [
+                    'limit' => $paginator->getPageSize(),
+                    'pages' => $paginator->getPageCount(),
+                    'current' => $page,
+                ]
             ],
         ]);
     }

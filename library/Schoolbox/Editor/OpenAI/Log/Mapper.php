@@ -122,6 +122,8 @@ class Mapper extends BaseMapper
      */
     public function findPredicateGrouped(Builder $pb, int $limit = 100, int $offset = 0, array $options = []): array
     {
+        // TODO: this actually needs to GROUP BY session_id so that the limit/offset refers to sessions, not individual log entries
+        // although at that point it feels odd for it to be a method directly on this mapper perhaps... hmm
         $results = $this->findByPredicates($pb, [
             'limit' => $limit,
             'offset' => $offset,

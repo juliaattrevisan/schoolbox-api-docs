@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { apiRequest } from "@js/util/sbx/apiUtils";
+import type { PaginationMeta } from "@js/util/sbx/apiUtils";
 import type { SearchSelectItem } from "@schoolboxVue/composables/search/types/SearchSelectItem";
 import SearchSelect from "@schoolboxVue/components/searchSelect/search-select.vue";
 import { EMPTY_DATE } from "@schoolboxVue/components/dateTimePicker/datePickerTypes";
 import DateRange from "@schoolboxVue/components/dateTimePicker/date-range.vue";
 import UserPhoto from "@schoolboxVue/components/userPhoto/user-photo.vue";
 import RelativeTime from "@schoolboxVue/components/relativeTime/relative-time.vue";
+import PaginatorButtons from "@schoolboxVue/components/paginator-buttons.vue";
 import { useAgentChatStore } from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/store/agentChatStore";
 import AcFeed from "@schoolboxLibrary/Editor/OpenAI/templates/agentChat/ac-feed.vue";
 import type {
@@ -19,6 +21,8 @@ interface Props {
     routeSearch: string;
     features: Record<string, { title: string }>;
 }
+
+const PAGE_SIZE = 30;
 
 const UNKNOWN_FEATURE_TEXT = "Unknown Feature";
 
@@ -34,6 +38,7 @@ const startDateFilter = window.Vue.ref<string>(EMPTY_DATE);
 const endDateFilter = window.Vue.ref<string>(EMPTY_DATE);
 
 const usageSessions = window.Vue.ref<AiSession[]>([]);
+const pageInfo = window.Vue.ref<PaginationMeta | null>(null);
 
 const sessionLoadError = window.Vue.ref<string | null>(null);
 const selectedSessionId = window.Vue.ref<AiSession["id"] | null>(null);
@@ -95,7 +100,8 @@ async function loadUsageLogs(): Promise<void> {
             user: userFilter.value.length > 0 ? userFilter.value[0].id : null,
             after: startDateFilter.value !== EMPTY_DATE ? startDateFilter.value : null,
             before: endDateFilter.value !== EMPTY_DATE ? endDateFilter.value : null,
-            cursor: null,
+            page: pageInfo.value !== null ? pageInfo.value.pagination.current : 1,
+            limit: pageInfo.value !== null ? pageInfo.value.pagination.limit : PAGE_SIZE,
         },
     });
 
@@ -107,6 +113,20 @@ async function loadUsageLogs(): Promise<void> {
     }
 
     usageSessions.value = response.data.data;
+    pageInfo.value = response.data.metadata;
+}
+
+/**
+ * To change the currently selected page
+ * @param page - The new page number
+ */
+async function changePage(page: number): Promise<void> {
+    if (pageInfo.value !== null) {
+        // show that the page changed before loading the data
+        pageInfo.value.pagination.current = page;
+    }
+
+    await loadUsageLogs();
 }
 
 window.Vue.onMounted(async () => {
@@ -298,6 +318,12 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                     </tbody>
                 </table>
             </div>
+            <paginator-buttons
+                v-if="pageInfo !== null && pageInfo.pagination.pages > 1"
+                :page-count="pageInfo.pagination.pages"
+                :current="pageInfo.pagination.current"
+                @page-change="changePage"
+            />
         </div>
         <div v-if="selectedSessionId !== null || sessionLoadError !== null" class="small-12 medium-6 island">
             <div v-if="sessionLoadError" data-alert class="alert-box alert">

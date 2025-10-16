@@ -2,6 +2,7 @@
  * Types for the AI usage log admin API
  * @see /library/Schoolbox/Admin/OpenAI/Usage/Controller.php
  */
+import type { PaginationMeta } from "@js/util/sbx/apiUtils";
 import type { UserAuthor } from "@schoolboxLibrary/types/User";
 
 type AiSessionId = string;
@@ -32,15 +33,13 @@ export type AiUsageLogApiRequest = {
     user: number | null;
     after: string | null;
     before: string | null;
-    cursor: string | null;
+    page?: number;
+    limit?: number;
 };
 
 export type AiUsageLogApiResponse = {
     data: AiSession[];
-    cursor: {
-        total: number;
-        cursor: number; // TODO: this isn't the normal way we do cursors...
-    };
+    metadata: PaginationMeta;
 };
 
 export type AiSessionLogApiResponse = AiSessionLog[];
