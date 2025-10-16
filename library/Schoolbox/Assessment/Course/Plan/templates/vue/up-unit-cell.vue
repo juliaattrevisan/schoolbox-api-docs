@@ -6,15 +6,14 @@
  * to allow for resequencing units in the unit planner
  * The content height of the cell is measured and reflected in the store to allow for units to expand and collapse
  */
-import { gsap } from "gsap";
-import { Draggable } from "gsap/Draggable";
+
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
-import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import type { Column } from "./unitPlannerConfig";
 import { ColumnType } from "./unitPlannerConfig";
 import type { Unit } from "./unitPlannerTypes";
 
 // Import all the content/action/empty components for the different column types
+import UpUnitCellUnitContent from "./up-unit-cell-unit-content.vue";
 import UpUnitCellUnitAction from "./up-unit-cell-unit-action.vue";
 import UpUnitCellTextboxContent from "./up-unit-cell-textbox-content.vue";
 import UpUnitCellTextboxAction from "./up-unit-cell-textbox-action.vue";
@@ -29,8 +28,6 @@ import UpUnitCellCurriculumContent from "./up-unit-cell-curriculum-content.vue";
 import UpUnitCellCurriculumAction from "./up-unit-cell-curriculum-action.vue";
 import UpUnitCellCurriculumEmpty from "./up-unit-cell-curriculum-empty.vue";
 
-gsap.registerPlugin(Draggable);
-
 interface Props {
     unit: Unit;
     column: Column;
@@ -39,7 +36,6 @@ interface Props {
 const props = defineProps<Props>();
 
 const store = useUnitPlannerStore();
-const dragStore = useUnitPlannerDragStore();
 
 const storeUnit = window.Vue.computed(() => {
     return store.units.find((unit) => unit.id === props.unit.id);
@@ -140,12 +136,6 @@ const showViewMoreInner = window.Vue.computed(() => {
 });
 
 /**
- * The current draggable element, relevant if the column type is UNIT
- */
-const draggableEl = window.Vue.ref<HTMLElement>();
-let draggableInstance: ReturnType<typeof Draggable.create> | null = null;
-
-/**
  * When the content is clicked
  * @param event - the click event
  */
@@ -173,10 +163,6 @@ function onContentClicked(event: MouseEvent): void {
     }
 }
 
-const extraCurriculumComponents = props.unit.curriculum.components.filter((component) => !component.inTemplate).length; // Number of extra components in the template
-
-const extraActivitiesComponents = props.unit.activities.components.filter((component) => !component.inTemplate).length; // Number of extra components in the template
-
 /**
  * To detect when the dimensions of the cell changes,
  * like when a different tab is selected
@@ -186,42 +172,14 @@ function initResizeObserver(): void {
     resizeObserver.observe(contentEl.value as HTMLElement);
 }
 
+/**
+ * When the component is mounted, initialise the resize observer
+ * and update the content height after a tick to ensure the content is rendered
+ */
 window.Vue.onMounted(() => {
     initResizeObserver();
-
     // Wait a tick to ensure the content has been rendered before measuring its height
     setTimeout(updateContentHeight, 0);
-
-    // Whether to allow the user to resequence the units
-    if (dragStore.routeFolderSequence) {
-        if (draggableEl.value) {
-            draggableInstance = Draggable.create(draggableEl.value, {
-                type: "y",
-                cursor: "move",
-                autoScroll: 1, // Scroll speed
-                inertia: true,
-                allowContextMenu: true,
-                onPress: () => {
-                    if (!draggableInstance) return;
-                    dragStore.onDragStart(draggableInstance[0], props.unit);
-                },
-                onDrag: () => {
-                    if (!draggableInstance) return;
-                    dragStore.onDragMove(draggableInstance[0]);
-                },
-                onRelease: () => {
-                    if (!draggableInstance) return;
-                    dragStore.onDragEnd(draggableInstance[0]);
-                },
-            });
-        }
-    }
-});
-
-window.Vue.onUnmounted(() => {
-    if (draggableInstance) {
-        draggableInstance[0].kill();
-    }
 });
 
 /**
@@ -252,39 +210,8 @@ const isFirstUnit = window.Vue.computed(() => {
                 <strong>{{ props.unit.title }}</strong>
             </h2>
             <h3 v-else class="print-only label-print">{{ props.column.label }}</h3>
-            <template v-if="props.column.type === ColumnType.UNIT">
-                <div
-                    v-if="dragStore.routeFolderSequence"
-                    ref="draggableEl"
-                    class="sortable-holder"
-                    data-test="unit-row-drag-handle"
-                    :class="{ isDragging: store.dragCurrentUnit === props.unit }"
-                ></div>
-                <div class="no-print">
-                    <i v-if="dragStore.routeFolderSequence" class="icon-grip ui-sortable-handle grip" />
-                    <div>
-                        <a :href="props.unit.homepage" :data-test="`unit-planner-unit-link-${props.unit.id}`">
-                            <strong>{{ props.unit.title }}</strong>
-                        </a>
-                        <ul>
-                            <li v-if="props.unit.extraTextboxes > 0" class="meta">
-                                {{ props.unit.extraTextboxes }} extra textbox{{
-                                    props.unit.extraTextboxes === 1 ? "" : "es"
-                                }}
-                            </li>
-                            <li v-if="extraCurriculumComponents > 0" class="meta">
-                                {{ extraCurriculumComponents }} extra curriculum component{{
-                                    extraCurriculumComponents === 1 ? "" : "s"
-                                }}
-                            </li>
-                            <li v-if="extraActivitiesComponents > 0" class="meta">
-                                Includes {{ extraActivitiesComponents }} additional Course Builder component
-                                {{ extraActivitiesComponents === 1 ? "" : "s" }}
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </template>
+
+            <up-unit-cell-unit-content v-if="props.column.type === ColumnType.UNIT" :unit="props.unit" />
 
             <up-unit-cell-textbox-content
                 v-else-if="props.column.type === ColumnType.OVERVIEW"
@@ -400,18 +327,6 @@ const isFirstUnit = window.Vue.computed(() => {
     }
 }
 
-.sortable-holder {
-    background-color: transparent;
-    height: 25px;
-    position: absolute;
-    width: 25px;
-    z-index: var(--sbx-depth-default);
-
-    &:not(.isDragging) {
-        transform: none !important;
-    }
-}
-
 .content-container-fixed {
     bottom: 0;
     display: flex;
@@ -460,19 +375,6 @@ const isFirstUnit = window.Vue.computed(() => {
                 pointer-events: all;
             }
         }
-    }
-}
-
-/* Overrides for column type specific styles */
-[data-column-type="unit"] {
-    padding: 5px;
-
-    > div > div:not(.sortable-holder) {
-        display: flex;
-        left: 5px;
-        position: absolute; // Avoid the content being pushed around by the draggable holder
-        text-wrap: wrap;
-        top: 5px;
     }
 }
 
