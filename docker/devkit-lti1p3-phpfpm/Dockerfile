@@ -18,3 +18,6 @@ RUN rm -rf /var/www/html \
 
 # Install Composer
 COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer
+
+# Copy configs
+COPY ./config/*.ini /usr/local/etc/php/conf.d/
