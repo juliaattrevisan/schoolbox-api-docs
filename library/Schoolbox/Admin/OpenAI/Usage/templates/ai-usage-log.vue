@@ -302,14 +302,6 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                                     {{ session.createdBy.fullName }}
                                 </component>
                             </td>
-                            <td>
-                                <component
-                                    :is="session._routes.getLog ? 'a' : 'span'"
-                                    @click="() => openSessionDetails(session)"
-                                >
-                                    {{ session.id }}
-                                </component>
-                            </td>
                         </tr>
                     </tbody>
                 </table>
