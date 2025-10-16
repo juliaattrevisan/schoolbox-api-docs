@@ -1,7 +1,7 @@
 CREATE TABLE differentiation_profiles_config
 (
     id          INT PRIMARY KEY AUTO_INCREMENT,
-    name        VARCHAR(80)                   NOT NULL,
+    name        VARCHAR(80)                   NOT NULL UNIQUE,
     title       VARCHAR(100)                  NOT NULL,
     terminology VARCHAR(100),
     description VARCHAR(256),
