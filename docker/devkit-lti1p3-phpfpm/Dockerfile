@@ -11,7 +11,8 @@ RUN apt-get update && apt-get upgrade -y && \
         calendar \
         sockets \
         igbinary \
-        redis
+        redis \
+        xdebug
 
 RUN rm -rf /var/www/html \
     && chmod 0777 /tmp/
