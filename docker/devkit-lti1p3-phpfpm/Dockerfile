@@ -15,3 +15,6 @@ RUN apt-get update && apt-get upgrade -y && \
 
 RUN rm -rf /var/www/html \
     && chmod 0777 /tmp/
+
+# Install Composer
+COPY --from=composer:2.8 /usr/bin/composer /usr/bin/composer

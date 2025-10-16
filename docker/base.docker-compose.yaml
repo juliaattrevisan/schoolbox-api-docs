@@ -305,6 +305,11 @@ services:
     working_dir: /var/www/html
     profiles:
       - lti
+    post_start:
+      # Install Composer dependencies:
+      # first without plugins to clear old dependencies, then standard install
+      - command: composer install --no-plugins --no-scripts;
+      - command: composer install -o
 
   schoolbox-gotenberg:
     container_name: schoolbox-gotenberg
