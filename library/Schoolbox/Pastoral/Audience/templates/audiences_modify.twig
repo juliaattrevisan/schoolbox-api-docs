@@ -100,6 +100,20 @@
                     </fieldset>
                     <fieldset class="content">
                         <div class="small-12 columns">
+                            <label for="contributesToDifferentiationProfile">Contributes to Differentiation Profile</label>
+                            <p class="meta">
+                                When checked, records of this type will be linked to students Differentiation Profiles.
+                            </p>
+                            <div class="row">
+                                <div class="small-12 columns">
+                                    <input id="contributesToDifferentiationProfile" name="contributesToDifferentiationProfile" type="checkbox" value="1">
+                                    <label class="checkbox-label"></label>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset class="content">
+                        <div class="small-12 columns">
                             <label for="sentiment">Sentiment</label>
                             {% set currentSentiment  = (subtype ? subtype.sentiment : type.sentiment) %}
                             <div class="row">
