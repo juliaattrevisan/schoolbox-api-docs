@@ -6,10 +6,18 @@
 
 import { getReturnUrl } from "@js/util/sbx/urlUtils";
 import type { Unit } from "./unitPlannerTypes";
+import { useDeleteUnitsStore } from "./store/unitPlannerDeleteUnitStore";
 
 const props = defineProps<{
     unit: Unit;
 }>();
+
+/**
+ * Display the delete unit prompt
+ */
+function onDeleteUnit(): void {
+    useDeleteUnitsStore().prompt(props.unit._routes.delete);
+}
 </script>
 
 <template>
@@ -23,10 +31,10 @@ const props = defineProps<{
             ></sbx-pop-out>
             <ul :id="`dropdown-unit-${props.unit.id}-modify`" class="f-dropdown" data-dropdown-content>
                 <li v-if="props.unit._routes.modify">
-                    <a class="icon-modify" :href="getReturnUrl(props.unit._routes.modify)"> Modify </a>
+                    <a class="icon-modify" :href="getReturnUrl(props.unit._routes.modify)">Modify</a>
                 </li>
                 <li v-if="props.unit._routes.delete">
-                    <a class="icon-delete" :href="getReturnUrl(props.unit._routes.delete)"> Delete </a>
+                    <button class="icon-delete" @click.prevent="onDeleteUnit">Delete</button>
                 </li>
             </ul>
         </section>
