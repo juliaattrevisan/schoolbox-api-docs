@@ -77,7 +77,7 @@ function closeSessionDetails(): void {
  * @returns The formatted createdAt date
  */
 function formatSessionDate(session: AiSession): string {
-    return window.dayjs(session.createdAt).format(window.dateDisplayFormats.dayjsDateLong);
+    return window.dayjs(session.createdAt).format(window.dateDisplayFormats.dayjsDatetime);
 }
 
 /**
@@ -265,11 +265,10 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                     <thead>
                         <tr>
                             <th></th>
-                            <th>Session ID</th>
                             <th>Date</th>
                             <th>Feature</th>
                             <th>User</th>
-                            <th>Log Count</th>
+                            <th>Session ID</th>
                         </tr>
                     </thead>
 
@@ -289,14 +288,6 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                                 </div>
                             </td>
                             <td>
-                                <component
-                                    :is="session._routes.getLog ? 'a' : 'span'"
-                                    @click="() => openSessionDetails(session)"
-                                >
-                                    {{ session.id }}
-                                </component>
-                            </td>
-                            <td>
                                 {{ formatSessionDate(session) }}
                             </td>
                             <td>
@@ -312,7 +303,12 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                                 </component>
                             </td>
                             <td>
-                                {{ session.totalLogs }}
+                                <component
+                                    :is="session._routes.getLog ? 'a' : 'span'"
+                                    @click="() => openSessionDetails(session)"
+                                >
+                                    {{ session.id }}
+                                </component>
                             </td>
                         </tr>
                     </tbody>
