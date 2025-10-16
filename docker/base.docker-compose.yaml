@@ -310,6 +310,10 @@ services:
       # first without plugins to clear old dependencies, then standard install
       - command: composer install --no-plugins --no-scripts;
       - command: composer install -o
+    # Add host.docker.internal as an alias back to the host machine, so that
+    # the host can debug
+    extra_hosts:
+      - host.docker.internal:host-gateway
 
   schoolbox-gotenberg:
     container_name: schoolbox-gotenberg
