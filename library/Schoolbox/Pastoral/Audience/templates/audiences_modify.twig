@@ -100,14 +100,21 @@
                     </fieldset>
                     <fieldset class="content">
                         <div class="small-12 columns">
-                            <label for="contributesToDifferentiationProfile">Contributes to Differentiation Profile</label>
+                            <label for="contributeDifferentiationProfile">Contributes to Differentiation Profile</label>
                             <p class="meta">
                                 When checked, records of this type will be linked to students Differentiation Profiles.
                             </p>
                             <div class="row">
                                 <div class="small-12 columns">
-                                    <input id="contributesToDifferentiationProfile" name="contributesToDifferentiationProfile" type="checkbox" value="1">
-                                    <label class="checkbox-label"></label>
+                                    {% set currentContribute = (subtype ? subtype.contributeDifferentiationProfile : type.contributeDifferentiationProfile) %}
+                                    <input
+                                            id="contributeDifferentiationProfile"
+                                            name="contributeDifferentiationProfile"
+                                            type="checkbox"
+                                            value="1"
+                                            {% if currentContribute %}checked="checked"{% endif %}
+                                    >
+                                    <label for="contributeDifferentiationProfile" class="checkbox-label"></label>
                                 </div>
                             </div>
                         </div>

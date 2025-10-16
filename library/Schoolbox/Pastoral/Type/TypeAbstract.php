@@ -131,6 +131,12 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
      */
     protected ?string $defaultExpiry = Model::PASTORAL_EXPIRY_DEFAULT;
 
+    /**
+     * Contributes to differentiation profile
+     * @var bool
+     */
+    protected bool $contributeDifferentiationProfile = false;
+
     /** @var GenericCollection */
     protected GenericCollection $typeActions;
 
@@ -368,5 +374,23 @@ abstract class TypeAbstract implements ISoftDeletable, Sequential, \JsonSerializ
     {
         $this->defaultExpiry = $defaultExpiry;
         return $this;
+    }
+
+    /**
+     * @param bool $contributeDifferentiationProfile
+     * @return static
+     */
+    public function setContributeDifferentiationProfile(bool $contributeDifferentiationProfile): self
+    {
+        $this->contributeDifferentiationProfile = $contributeDifferentiationProfile;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getContributeDifferentiationProfile(): bool
+    {
+        return $this->contributeDifferentiationProfile;
     }
 }

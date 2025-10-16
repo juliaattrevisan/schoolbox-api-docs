@@ -389,6 +389,14 @@ class Controller extends Base
             }
         }
 
+        /* Contributes to differentiation profile
+         */
+        if ($post->offsetExists('contributeDifferentiationProfile')) {
+            $currentType->setContributeDifferentiationProfile($post->getBool('contributeDifferentiationProfile'));
+        } else {
+            $currentType->setContributeDifferentiationProfile(false);
+        }
+
         $currentType->setColor(!empty($post['color']) ? $this->colorFactory->build($post['color']) : null);
         $currentType->setVisibilityLocked($isVisibilityLocked);
         if ($isSubType) {
