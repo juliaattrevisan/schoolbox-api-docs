@@ -16,7 +16,7 @@ const props = defineProps<{
  * Display the delete unit prompt
  */
 function onDeleteUnit(): void {
-    useDeleteUnitsStore().prompt(props.unit._routes.delete);
+    useDeleteUnitsStore().prompt(props.unit);
 }
 </script>
 
@@ -27,14 +27,26 @@ function onDeleteUnit(): void {
                 :content-id="`dropdown-unit-${props.unit.id}-modify`"
                 button-text="Manage"
                 move-to="#unitplanner-dropdown-container"
+                :data-test="`sbx-pop-out-unit-cell-unit-action-${props.unit.id}`"
                 is-component-action
             ></sbx-pop-out>
             <ul :id="`dropdown-unit-${props.unit.id}-modify`" class="f-dropdown" data-dropdown-content>
                 <li v-if="props.unit._routes.modify">
-                    <a class="icon-modify" :href="getReturnUrl(props.unit._routes.modify)">Modify</a>
+                    <a
+                        class="icon-modify"
+                        :data-test="`up-unit-cell-unit-action-${props.unit.id}-modify-link`"
+                        :href="getReturnUrl(props.unit._routes.modify)"
+                        >Modify</a
+                    >
                 </li>
                 <li v-if="props.unit._routes.delete">
-                    <button class="icon-delete" @click.prevent="onDeleteUnit">Delete</button>
+                    <button
+                        class="icon-delete"
+                        :data-test="`up-unit-cell-unit-action-${props.unit.id}-delete-button`"
+                        @click.prevent="onDeleteUnit"
+                    >
+                        Delete
+                    </button>
                 </li>
             </ul>
         </section>

@@ -31,7 +31,12 @@ function onDeleteSelected(): void {
             </p>
             <request-error v-if="deleteUnitsStore.loadError" :further-info="deleteUnitsStore.loadError" />
             <div class="l-flex l-gap-xs f-no-margins">
-                <button class="button submit l-flex__item--1" type="button" data-test="up-delete-units-create">
+                <button
+                    class="button submit l-flex__item--1"
+                    type="button"
+                    data-test="up-delete-units-create"
+                    @click.prevent="onDeleteSelected"
+                >
                     {{ deleteUnitsStore.isProcessing ? "Deleting..." : "Yes" }}
                 </button>
                 <button
