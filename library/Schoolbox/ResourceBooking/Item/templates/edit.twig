@@ -262,8 +262,8 @@
                     </legend>
                     <div class="small-12 columns">
                         <div class="switch">
-                            <input id="exampleCheckboxSwitch" type="checkbox" value="{{ item.getAllowClashBookings() }}">
-                            <label for="exampleCheckboxSwitch">
+                            <input type="checkbox" value="1" {% if item.allowClashBookings %}checked{% endif %} id="allow_clash_bookings" name="allow_clash_bookings">
+                            <label for="allow_clash_bookings">
                                 <span>On</span>
                                 <span>Off</span>
                             </label>
