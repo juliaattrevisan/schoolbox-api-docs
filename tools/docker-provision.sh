@@ -384,8 +384,8 @@ function install_instance() {
     --config taskd_redis_url "'tcp://redis-storage:6379'" \
     --config resource_booking_enabled "'1'" \
     --config site_domain "'dev.schoolbox.cloud'" \
-    --config site_hostname "'docker'" \
-    --config site_school_code "'docker'" \
+    --config site_hostname "'${INSTANCE_ID}'" \
+    --config site_school_code "'${INSTANCE_ID}'" \
     --config site_environment "'client-hosted'" \
     --config site_type "'dev'" \
     --config strict_templates "'1'" \
