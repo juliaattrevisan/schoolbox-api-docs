@@ -1,6 +1,9 @@
 {% import "@learningAssessment/fragments/macro/date.twig" as dateForm %}
 
-{% if acceptingResponses %}
+{# Accommodate the odd occasion where acceptingResponses wasn't defined in an activity's
+ # controller via getAssessmentTwigData struct
+ #}
+{% if acceptingResponses ?? false %}
     {{ dateForm.dateField('Publish', 'publish', assessment.publishAt, '',             '#openDate') }}
     {{ dateForm.dateField('Open',    'open',    assessment.openAt,    '#publishDate', '#dueDate') }}
     {{ dateForm.dateField('Due',     'due',     assessment.dueAt,     '#openDate',    '#closeDate') }}
