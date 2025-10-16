@@ -186,6 +186,9 @@
 .icon-sort-down:before {
   content: "\e621";
 }
+.icon-dialog-agent:before {
+  content: "\e933";
+}
 .icon-due-work:before {
   content: "\e622";
 }

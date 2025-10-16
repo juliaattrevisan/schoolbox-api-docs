@@ -284,6 +284,11 @@
     font-family: $font-family-icon;
 }
 
+.icon-dialog-agent:before {
+    content: "\e933";
+    font-family: $font-family-icon;
+}
+
 .icon-due-work:before,
 .icon-submissions:before,
 .icon-import:before {

@@ -140,6 +140,10 @@ $masonry-drop-background: $input-focus-bg-color;
     @extend .icon-drop-box;
     color: $icon-color-file-drop-box;
 }
+.icon-masonry-Schoolbox_Learning_Assessment_DialogAgent_Component_Homepage_Controller:before {
+    @extend .icon-dialog-agent;
+    color: $icon-color-dialog-agent;
+}
 .icon-masonry-Schoolbox_Learning_Assessment_DueWork_Component_Homepage_Controller:before {
     @extend .icon-due-work;
     color: $icon-color-due-work;
