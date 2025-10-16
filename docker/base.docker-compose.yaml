@@ -59,7 +59,6 @@ services:
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
-      - storage2:/var/lib/schoolbox/docker2/storage
       - schoolbox-config:/etc/schoolbox
       - caddy-ssl:/etc/nginx/certs/
       - aws-config:/root/.aws
@@ -256,7 +255,9 @@ services:
     env_file: ./schoolbox/second-instance.env
     volumes:
       - code:/usr/share/schoolbox
-      - storage2:/var/lib/schoolbox/docker2/storage
+      # For now: docker and docker2 share a storage folder,
+      # because I'm short of disk space
+      - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
     extra_hosts:
       - host.docker.internal:host-gateway
@@ -285,7 +286,7 @@ services:
     env_file: ./schoolbox/second-instance.env
     volumes:
       - code:/usr/share/schoolbox
-      - storage2:/var/lib/schoolbox/docker2/storage
+      - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
     extra_hosts:
       - host.docker.internal:host-gateway
@@ -314,7 +315,7 @@ services:
     env_file: ./schoolbox/second-instance.env
     volumes:
       - code:/usr/share/schoolbox
-      - storage2:/var/lib/schoolbox/docker2/storage
+      - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
     extra_hosts:
       - host.docker.internal:host-gateway
@@ -344,7 +345,7 @@ services:
     volumes:
       - code:/usr/share/schoolbox
       - storage:/var/lib/schoolbox/docker/storage
-      - storage2:/var/lib/schoolbox/docker2/storage
+      - storage:/var/lib/schoolbox/docker/storage
       - schoolbox-config:/etc/schoolbox
     extra_hosts:
       - host.docker.internal:host-gateway
@@ -465,13 +466,6 @@ volumes:
       type: none
       o: bind
       device: ../data/docker/storage
-
-  storage2:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: ../data/docker2/storage
 
   # Volumes for config
   schoolbox-config:
