@@ -10,7 +10,13 @@ export function getTableSettings(): { table: TableConfig } {
         table: {
             // the table controls provided: https://ckeditor.com/docs/ckeditor5/latest/features/table.html
             contentToolbar: ["tableColumn", "tableRow", "mergeTableCells", "tableProperties", "tableCellProperties"],
-
+            /**
+             * The .defaultProperties match those found in www/static/css/core/components/editor/custom-styles.scss
+             * and are applied when a new table is created. When different styles are applied to a table, these
+             * default styles are not applied, so the table will keep the styles it has been given.
+             * The defaultProperties are also applied when a table is loaded into the editor that does not have
+             * any styles set on it.
+             */
             tableProperties: {
                 borderColors: tableBorderColourSwatches,
                 backgroundColors: tableBackgroundColourSwatches,
