@@ -613,6 +613,13 @@ class Subnav
                             (bool)$this->configLoader->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED),
                         'description' => 'Adjustment categories.',
                     ],
+                    '/adminv2/lists/differentiation/adjustment-levels' => [
+                        'name'        => 'Lists - Adjustment Levels',
+                        'visible'     =>
+                            ($userIsSuperuser || $userHasServicePermissionDifferentiationProfile) &&
+                            (bool)$this->configLoader->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED),
+                        'description' => 'Adjustment levels.',
+                    ],
                     '/adminv2/lists/pastoral/pastoral-severity' => [
                         'name'        => 'Lists - Record Severity',
                         'visible'     => $userIsSuperuserOrHasServicePermissionPastoral && (bool)$this->configLoader->get('pastoral_severity'),

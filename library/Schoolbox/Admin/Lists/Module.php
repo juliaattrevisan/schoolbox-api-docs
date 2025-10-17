@@ -122,7 +122,7 @@ class Module extends BaseModule
         $this->register('POST', "/pastoral/delete/{table:$pastoralTablesRegex}", 'postPastoralDelete', $rulePastoral);
 
         // Routes to which users with service permission UserAccess::SERVICE_DIFFERENTIATION_PROFILE need access.
-        $diffProfilesRegex = '(adjustment-categories)';
+        $diffProfilesRegex = '(adjustment-categories|adjustment-levels)';
         $this->register('GET', "/differentiation/{table:$diffProfilesRegex}", 'getDifferentiationIndex', $ruleDiffProfiles);
         $this->register('GET', "/differentiation/data/{table:$diffProfilesRegex}", 'getDifferentiationData', $ruleDiffProfiles);
         $this->register('POST', "/differentiation/save/{table:$diffProfilesRegex}", 'postDifferentiationSave', $ruleDiffProfiles);

@@ -1459,6 +1459,27 @@ class Controller extends Base
                     ],
                 ]
             ];
+
+            $return['adjustment-levels'] = [
+                'title'  => 'Adjustment Levels',
+                'mapper' => \Schoolbox\DifferentiationProfile\AdjustmentLevels\Mapper::class,
+                'delete' => true,
+                'showId' => false,
+                'fields' => [
+                    'id' => [
+                        'caption'   => 'ID',
+                        'width'     => 1,
+                        'readonly'  => true,
+                    ],
+                    'name' => [
+                        'caption'   => 'Name',
+                        'width'     => 11,
+                        'maxLength' => 255,
+                        'mandatory' => true,
+                        'default'   => '',
+                    ],
+                ]
+            ];
         }
 
         $gradeList   = GradeLevelGroupMapper::getInstance()->findAllForAdminOption();
@@ -1883,6 +1904,7 @@ class Controller extends Base
             'submission-errors' => 'Lms',
             'achievement-category' => 'Badge',
             'timetable-colour' => 'Design',
+            'adjustment-levels',
             'adjustment-categories' => 'Differentiation',
             default => '',
         };
