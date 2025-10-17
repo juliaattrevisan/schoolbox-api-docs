@@ -835,9 +835,16 @@ class Mapper extends AbstractFolderMapper implements ILocator
             return $this->createCollection();
         }
 
+        // Create a query which fetches IDs for all matching codes
         $builder = $this->getPredicateBuilder()->in('cn.code', $codes);
-
-        return $this->findByPredicates($builder);
+        $query   = "
+            SELECT {$this->getTable()}.id FROM {$this->getTable()}
+            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category', '', 'cn')}
+            WHERE {$builder->getWhereIntersect()}
+        ";
+        $query = $this->getDatabase()->prepare($query);
+        $query->execute($builder->getParams());
+        return $this->findByColumn('id', $query->fetchAll(\PDO::FETCH_COLUMN));
     }
 
     /**
