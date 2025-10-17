@@ -104,12 +104,31 @@ class Config
     private ?array $features = null;
 
     /**
-     * @param ConfigMapper $configMapper
      * @throws \JsonException
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
     public function __construct(ConfigMapper $configMapper)
+    {
+        // leave this for the moment...
+        $this->fetchFeatures($configMapper);
+    }
+
+    // allow setting features directly (e.g. for testing)
+    public function setFeatures(array $features): void
+    {
+        $this->features = $features;
+    }
+
+    /**
+     * Fetch all features and their config from the DB
+     * @param ConfigMapper $configMapper
+     * @return void
+     * @throws \JsonException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    public function fetchFeatures(ConfigMapper $configMapper): void
     {
         // if no features set, init the array
         $provider = $configMapper->findOneByColumn(ConfigMapper::COL_NAME, ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)->getValue();
