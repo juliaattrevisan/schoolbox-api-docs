@@ -79,10 +79,10 @@ class Controller extends Base
         try {
             $helper = new Helper(
                 trim($lpConfig[Config::FIELD_PROVIDER]),
-                trim($lpConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_OPENAIKEY]),
-                trim($lpConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_RESOURCE_NAME] ?? ''),
-                trim($lpConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID] ?? ''),
-                trim($lpConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL] ?? ''),
+                trim($lpConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_OPENAIKEY]['value']),
+                trim($lpConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_RESOURCE_NAME]['value'] ?? ''),
+                trim($lpConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
+                trim($lpConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
                 $this->client,
                 $this->errorMapper,
                 $this->logMapper,
@@ -90,9 +90,9 @@ class Controller extends Base
 
             $payloadGenerator = (new Payload\LessonPlan(
                 trim($lpConfig[Config::FIELD_PROVIDER]),
-                trim($lpConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL] ?? ''),
-                trim($lpConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID] ?? ''),
-                trim($lpConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_SYSTEM_PROMPT] ?? ''),
+                trim($lpConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
+                trim($lpConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
+                trim($lpConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_SYSTEM_PROMPT]['value'] ?? ''),
                 trim((string)$this->getConfigLoader()->get('spellcheck_language')),
                 $this->curriculumNodeMapper
             ));
@@ -364,14 +364,14 @@ class Controller extends Base
         try {
             (new Helper(
                 trim($chatConfig[Config::FIELD_PROVIDER]),
-                trim($chatConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_OPENAIKEY]),
-                trim($chatConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_RESOURCE_NAME] ?? ''),
-                trim($chatConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID] ?? ''),
-                trim($chatConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL] ?? ''),
+                trim($chatConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_OPENAIKEY]['value']),
+                trim($chatConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_RESOURCE_NAME]['value'] ?? ''),
+                trim($chatConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value'] ?? ''),
+                trim($chatConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value'] ?? ''),
                 $this->client,
                 $this->errorMapper,
                 $this->logMapper,
-            ))->aiAssistantChat($this->getUser(), $this->request->getBody()->getContents(), trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_SYSTEM_PROMPT)), $aiSessionId);
+            ))->aiAssistantChat($this->getUser(), $this->request->getBody()->getContents(), $chatConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_SYSTEM_PROMPT]['value'], $aiSessionId);
         } catch (\DomainException $e) {
             /* Not configured? Not found
              */
