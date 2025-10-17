@@ -30,15 +30,7 @@ class DataGenerator implements IDataGenerator
     {
         // returns each feature / module for ai, its creds, and if its enabled
         $textProvider = $this->config->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT);
-        $aiConfig = new Config($this->configMapper);
-        $textModules = [];
-        foreach (Config::ALL_MODULES as $module) {
-            $config = $aiConfig->decode($this->config->get(Config::MODULE_CONFIG[$module]), $textProvider);
-            $textModules[$module] = [
-                'enabled' => $aiConfig->isEnabled($config),
-                'config'  => $config,
-                ];
-        }
-        return $textModules;
+        $aiConfig = new Config();
+        return $aiConfig->fetchFeatures($this->configMapper);
     }
 }

@@ -49,31 +49,10 @@ class Controller extends ConfigController
     {
         $textProvider = $this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT);
         // 26.0 grab the config for text and add in any new or missing configs
-        $aiConfig = new Config($this->getConfigMapper());
+        $aiConfig = new Config();
 
         $textModules = [];
-        foreach ($aiConfig->getFeatures() as $module) {
-            $textModules[$module['title']] = $module['config'];
-        }
-
-        $textModuleContext = $aiConfig->buildTwigConfig(
-            $textModules,
-            $this->fieldStrategyFactory,
-            $this->getConfigLoader()->get('site_version'),
-            $this->routeGenerator->generate('adminOpenAi.postTextOptions'),
-            [
-                ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,
-                ModuleConfig::CONTEXT_ISEDITABLE => false,
-            ]
-        );
-        $textConfigContext = $this->buildConfigContext(
-            $this->buildTextConfigPredicate(),
-            $this->routeGenerator->generate('adminOpenAi.postTextOptions'),
-            [
-                ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,
-                ModuleConfig::CONTEXT_ISEDITABLE => false
-            ],
-        );
+        $textFeatures = $aiConfig->fetchFeatures($this->getConfigMapper());
 
         $imageConfigContext = $this->buildConfigContext(
             $this->buildImageConfigPredicate(),
@@ -89,14 +68,19 @@ class Controller extends ConfigController
         $this->response = $this->responseFromTemplate('@adminOpenAi/index.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminOpenAi.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminOpenAi.getIndex')),
-            'textModuleContext' => $textModuleContext,
-            'textConfigContext' => $textConfigContext,
+
             'textConfigFormId' => $textConfigFormId,
             'textConfig' => $textModules,
             'imageConfigContext' => $imageConfigContext,
             'endpointTypeOff' => Helper::ENDPOINT_TYPE_OFF,
-            'features' => $aiConfig->getFeatures(),
+            'features' => $textFeatures,
             'providers' => [
+                Helper::ENDPOINT_TYPE_OFF,
+                Helper::ENDPOINT_TYPE_OPENAI,
+                Helper::ENDPOINT_TYPE_AZURE,
+            ],
+            'providersOld' => [
+                'off' => Helper::ENDPOINT_TYPE_OFF,
                 'openai' => Helper::ENDPOINT_TYPE_OPENAI,
                 'azure' => Helper::ENDPOINT_TYPE_AZURE,
             ],

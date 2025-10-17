@@ -38,7 +38,7 @@ $app = new class extends CliTool\App {
         }
 
         // migrate to new config format
-        $newConfig = Schoolbox\Admin\OpenAI\Config::migrate(
+        $newConfig = new Schoolbox\Admin\OpenAI\Config()->migrate(
             $conf['openai_text_endpoint'] ?? null,
             $conf['openai_text_key'] ?? null,
             $conf['openai_text_azure_resource_name'] ?? null,

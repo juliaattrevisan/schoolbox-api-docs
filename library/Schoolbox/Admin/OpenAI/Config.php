@@ -26,6 +26,9 @@ class Config
 
     /** Open AI models, and the 'OFF' option to be used in the same select box */
     public const NOT_ACTIVE = "Not Active";
+
+    public const NO_PROVIDER = "off";
+
     public const AI_MODELS = [
         "gpt-4o",
         "gpt-4o-mini",
@@ -108,10 +111,8 @@ class Config
      * @throws \Schoolbox\Mapper\Exception
      * @throws \Schoolbox\Mapper\Exception\Deleted
      */
-    public function __construct(ConfigMapper $configMapper)
+    public function __construct()
     {
-        // leave this for the moment...
-        $this->fetchFeatures($configMapper);
     }
 
     // new config struct
@@ -141,174 +142,32 @@ class Config
      *
      */
 
-
-    // allow setting features directly (e.g. for testing)
-    public function setFeatures(array $features): void
+    public function initOpenAi()
     {
-        $this->features = $features;
+        return [
+            'key' => [
+                'value' => '',
+            ],
+            'model' => [
+                'value' => '', // -- select an option --
+            ],
+            'systemprompt' => [
+                'value' => '',
+            ],
+        ];
     }
 
-    /**
-     * Fetch all features and their config from the DB
-     * @param ConfigMapper $configMapper
-     * @return void
-     * @throws \JsonException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
-     */
-    public function fetchFeatures(ConfigMapper $configMapper): void
+    public function initAzure()
     {
-        // if no features set, init the array
-        $provider = $configMapper->findOneByColumn(ConfigMapper::COL_NAME, ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)->getValue();
-        if ($this->features === null) {
-            foreach (self::ALL_MODULES as $feature) {
-                $row = $configMapper->findOneByColumn(ConfigMapper::COL_NAME, self::MODULE_CONFIG[$feature]);
-                $this->features[$feature] = [
-                    'feature' => $feature,
-                    'title' => $row->getTitle(),
-                    'config' => $this->decode($row->getValue(), $provider)
-                ];
-            }
-        }
-    }
 
-    /**
-     * Get all features and their config
-     * @return array|null
-     */
-    public function getFeatures(): ?array
-    {
-        return $this->features;
-    }
-
-    /**
-     * Get a specific feature's name and config
-     * @param string $feature
-     * @return array|null
-     */
-    public function getFeature(string $feature): ?array
-    {
-        return $this->features[$feature] ?? null;
-    }
-
-    /**
-     * Take the stored settings and convert it into an associative array
-     *
-     * @param string|null $config
-     * @param string $provider
-     * @return array|null
-     * @throws \JsonException
-     */
-    public function decode(?string $config, string $provider): ?array
-    {
-        $optionsPayload = json_decode($config ?? '{}', true, 512, JSON_THROW_ON_ERROR);
-
-        /* Superimpose selected options over the default
-         * Disabling fields prevents the keys from existing
-         */
-        return $this->mergeConfig($optionsPayload, $provider);
-    }
-
-
-    /**
-     * Generate initial config structure based on provider
-     *
-     * @param string $provider
-     * @return array
-     */
-    public function generateInitConfig(string $provider): array
-    {
-        return match ($provider) {
-            Helper::ENDPOINT_TYPE_AZURE => self::CONFIG_STRUCT_AZURE,
-            Helper::ENDPOINT_TYPE_OPENAI => self::CONFIG_STRUCT_OPENAI,
-            default => [],
-        };
-    }
-
-    /**
-     * Merge config with initial and remove any invalid keys,
-     * overwriting any existing values.
-     *
-     * @param array $config
-     * @param string $provider
-     * @return array
-     */
-    private function mergeConfig(array $config, string $provider): array
-    {
-        switch ($provider) {
-            case Helper::ENDPOINT_TYPE_AZURE:
-                $expected = self::CONFIG_STRUCT_AZURE;
-                break;
-            case Helper::ENDPOINT_TYPE_OPENAI:
-                $expected = self::CONFIG_STRUCT_OPENAI;
-                break;
-            default:
-                return [];
-        }
-
-        // Only keep expected keys and overwrite defaults
-        $merged = array_intersect_key($config, $expected) + $expected;
-
-        // Always set provider to avoid issues if switching providers
-        $merged['provider'] = $provider;
-
-        return $merged;
-    }
-
-    /**
-     * Build the standard Twig config for setting page for all modules
-     * @param array $config
-     * @param $fieldStrategyFactory
-     * @param $siteVersion
-     * @param $postRoute
-     * @param $additionalContext
-     * @return array|void
-     */
-    public function buildTwigConfig(array $config, $fieldStrategyFactory, $siteVersion, $postRoute, $additionalContext)
-    {
-        //loop through the modules
-        if (empty($config)) {
-            return;
-        }
-        $modules = [];
-        foreach ($config as $module => $settings) {
-            // create a fake config collection
-            $configCollection = new GenericCollection(\Schoolbox\Config\Config::class);
-            foreach ($settings as $key => $value) {
-                $cfg = new \Schoolbox\Config\Config();
-                $cfg->setName(sprintf(self::FORM_NAME_SPRINTF, $module, $key))
-                    ->setTitle(self::FIELD_TITLE[$key])
-                    ->setDescription(self::FIELD_DESCRIPTION[$key])
-                    ->setValue((string)$value)
-                    ->setTypeId(ConfigMapper::TYPE_AI)
-                    ->setFieldId(self::FIELD_OPTIONS[$key] ?? ConfigMapper::FIELD_INPUT)
-                    ->setEditable(true);
-
-                // if model, show options
-                if ($key === self::FIELD_MODEL) {
-                    $cfg->setOptions(implode(':', self::AI_MODELS));
-                }
-
-                // don't show provider
-                if ($key === self::FIELD_PROVIDER) {
-//                    $cfg->setEditable(false);
-//                        ->setHidden(true);
-                }
-                $configCollection->add($cfg);
-            }
-
-            $modules[$module] = (new ModuleConfig($fieldStrategyFactory))->getContext(
-                $siteVersion,
-                $configCollection,
-                $postRoute,
-                $additionalContext +
-                [
-                    'formId' => sprintf('text_config_%s', $module)
-                ],
-            );
-        }
-
-        return $modules;
+        return [
+            'resource' => [
+                'value' => '',
+            ],
+            'deployment' => [
+                'value' => '',
+            ],
+        ];
     }
 
     /**
@@ -323,63 +182,276 @@ class Config
      */
     public function migrate(?string $provider, ?string $key, ?string $resourceName, ?string $deploymentId, ?string $model): array
     {
-        switch ($provider) {
-            case Helper::ENDPOINT_TYPE_AZURE:
-                $config = $this->generateInitConfig($provider);
-                $config[self::FIELD_OPENAIKEY] = $key ?? '';
-                $config[self::FIELD_RESOURCE_NAME] = $resourceName ?? '';
-                $config[self::FIELD_DEPLOYMENT_ID] = $deploymentId ?? '';
-                $config[self::FIELD_ENABLED] = true;
-                break;
-            case Helper::ENDPOINT_TYPE_OPENAI:
-                $config = $this->generateInitConfig($provider);
-                $config[self::FIELD_OPENAIKEY] = $key ?? '';
-                $config[self::FIELD_MODEL] = $model ?? self::NOT_ACTIVE;
+        // start with a blank config
+        $config = ['provider' => self::NO_PROVIDER];
+        $config['openai'] = $this->initOpenAi();
+        $config['azure'] = $this->initAzure();
 
-                break;
-            default:
-                $config = [];
+        // set the fields we know about
+        if ($provider === Helper::ENDPOINT_TYPE_AZURE) {
+            $config['provider'] = Helper::ENDPOINT_TYPE_AZURE;
+            $config['azure']['resource']['value'] = $resourceName ?? '';
+            $config['azure']['deployment']['value'] = $deploymentId ?? '';
+            $config['openai']['key']['value'] = $key ?? '';
+        } elseif ($provider === Helper::ENDPOINT_TYPE_OPENAI) {
+            $config['provider'] = Helper::ENDPOINT_TYPE_OPENAI;
+            $config['openai']['key']['value'] = $key ?? '';
+            $config['openai']['model']['value'] = $model ?? self::NOT_ACTIVE;
         }
         return $config;
     }
 
     /**
-     * Extract the posted data for a given module
+     * Check if the config is enabled
      *
-     * @param array $postData
-     * @param string $module
-     * @return array
-     */
-    public function extractPost(array $postData, string $module): array
-    {
-        $config = [];
-        foreach (self::FIELD_OPTIONS as $field => $type) {
-            $key = sprintf(self::FORM_NAME_SPRINTF, $module, $field);
-            if (array_key_exists($key, $postData)) {
-                // boolean fields are sent as 'on' or not at all
-                if ($type === ConfigMapper::FIELD_BOOLEAN) {
-                    $config[$field] = $postData[$key] === '1';
-                } else {
-                    $config[$field] = trim((string)$postData[$key]);
-                }
-            }
-        }
-        return $config;
-    }
-
-    /**
-     * check if the config is enabled
-     * both openai and azure do this differently
+     * @param array|null $config
+     * @return bool
      */
     public function isEnabled(?array $config): bool
     {
-        if (empty($config) || !isset($config['provider'])) {
-            return false;
-        }
-        return match ($config['provider']) {
-            Helper::ENDPOINT_TYPE_AZURE => $config['enabled'],
-            Helper::ENDPOINT_TYPE_OPENAI => $config['model'] !== self::NOT_ACTIVE,
-            default => false,
-        };
+        return $config['provider'] !== self::NO_PROVIDER;
     }
+
+//
+//    // allow setting features directly (e.g. for testing)
+//    public function setFeatures(array $features): void
+//    {
+//        $this->features = $features;
+//    }
+//
+    /**
+     * Fetch all features and their config from the DB
+     * @param ConfigMapper $configMapper
+     * @return array
+     * @throws \JsonException
+     * @throws \Schoolbox\Mapper\Exception
+     * @throws \Schoolbox\Mapper\Exception\Deleted
+     */
+    public function fetchFeatures(ConfigMapper $configMapper): array
+    {
+        if ($this->features === null) {
+            foreach (self::ALL_MODULES as $feature) {
+                $row = $configMapper->findOneByColumn(ConfigMapper::COL_NAME, self::MODULE_CONFIG[$feature]);
+                $this->features[$feature] = [
+                    'feature' => $feature,
+                    'title' => $row->getTitle(),
+                    'config' => json_decode($row->getValue(), true, 512, JSON_THROW_ON_ERROR)
+
+                ];
+            }
+        }
+
+        return $this->features;
+    }
+//
+//    /**
+//     * Get all features and their config
+//     * @return array|null
+//     */
+//    public function getFeatures(): ?array
+//    {
+//        return $this->features;
+//    }
+//
+//    /**
+//     * Get a specific feature's name and config
+//     * @param string $feature
+//     * @return array|null
+//     */
+//    public function getFeature(string $feature): ?array
+//    {
+//        return $this->features[$feature] ?? null;
+//    }
+//
+//    /**
+//     * Take the stored settings and convert it into an associative array
+//     *
+//     * @param string|null $config
+//     * @param string $provider
+//     * @return array|null
+//     * @throws \JsonException
+//     */
+//    public function decode(?string $config, string $provider): ?array
+//    {
+//        $optionsPayload = json_decode($config ?? '{}', true, 512, JSON_THROW_ON_ERROR);
+//
+//        /* Superimpose selected options over the default
+//         * Disabling fields prevents the keys from existing
+//         */
+//        return $this->mergeConfig($optionsPayload, $provider);
+//    }
+//
+//
+//    /**
+//     * Generate initial config structure based on provider
+//     *
+//     * @param string $provider
+//     * @return array
+//     */
+//    public function generateInitConfig(string $provider): array
+//    {
+//        return match ($provider) {
+//            Helper::ENDPOINT_TYPE_AZURE => self::CONFIG_STRUCT_AZURE,
+//            Helper::ENDPOINT_TYPE_OPENAI => self::CONFIG_STRUCT_OPENAI,
+//            default => [],
+//        };
+//    }
+//
+//    /**
+//     * Merge config with initial and remove any invalid keys,
+//     * overwriting any existing values.
+//     *
+//     * @param array $config
+//     * @param string $provider
+//     * @return array
+//     */
+//    private function mergeConfig(array $config, string $provider): array
+//    {
+//        switch ($provider) {
+//            case Helper::ENDPOINT_TYPE_AZURE:
+//                $expected = self::CONFIG_STRUCT_AZURE;
+//                break;
+//            case Helper::ENDPOINT_TYPE_OPENAI:
+//                $expected = self::CONFIG_STRUCT_OPENAI;
+//                break;
+//            default:
+//                return [];
+//        }
+//
+//        // Only keep expected keys and overwrite defaults
+//        $merged = array_intersect_key($config, $expected) + $expected;
+//
+//        // Always set provider to avoid issues if switching providers
+//        $merged['provider'] = $provider;
+//
+//        return $merged;
+//    }
+//
+//    /**
+//     * Build the standard Twig config for setting page for all modules
+//     * @param array $config
+//     * @param $fieldStrategyFactory
+//     * @param $siteVersion
+//     * @param $postRoute
+//     * @param $additionalContext
+//     * @return array|void
+//     */
+//    public function buildTwigConfig(array $config, $fieldStrategyFactory, $siteVersion, $postRoute, $additionalContext)
+//    {
+//        //loop through the modules
+//        if (empty($config)) {
+//            return;
+//        }
+//        $modules = [];
+//        foreach ($config as $module => $settings) {
+//            // create a fake config collection
+//            $configCollection = new GenericCollection(\Schoolbox\Config\Config::class);
+//            foreach ($settings as $key => $value) {
+//                $cfg = new \Schoolbox\Config\Config();
+//                $cfg->setName(sprintf(self::FORM_NAME_SPRINTF, $module, $key))
+//                    ->setTitle(self::FIELD_TITLE[$key])
+//                    ->setDescription(self::FIELD_DESCRIPTION[$key])
+//                    ->setValue((string)$value)
+//                    ->setTypeId(ConfigMapper::TYPE_AI)
+//                    ->setFieldId(self::FIELD_OPTIONS[$key] ?? ConfigMapper::FIELD_INPUT)
+//                    ->setEditable(true);
+//
+//                // if model, show options
+//                if ($key === self::FIELD_MODEL) {
+//                    $cfg->setOptions(implode(':', self::AI_MODELS));
+//                }
+//
+//                // don't show provider
+//                if ($key === self::FIELD_PROVIDER) {
+////                    $cfg->setEditable(false);
+////                        ->setHidden(true);
+//                }
+//                $configCollection->add($cfg);
+//            }
+//
+//            $modules[$module] = (new ModuleConfig($fieldStrategyFactory))->getContext(
+//                $siteVersion,
+//                $configCollection,
+//                $postRoute,
+//                $additionalContext +
+//                [
+//                    'formId' => sprintf('text_config_%s', $module)
+//                ],
+//            );
+//        }
+//
+//        return $modules;
+//    }
+//
+//    /**
+//     * migrate from the old config to the new config structure
+//     *
+//     * @param string|null $provider
+//     * @param string|null $key
+//     * @param string|null $resourceName
+//     * @param string|null $deploymentId
+//     * @param string|null $model
+//     * @return array
+//     */
+//    public function migrate(?string $provider, ?string $key, ?string $resourceName, ?string $deploymentId, ?string $model): array
+//    {
+//        switch ($provider) {
+//            case Helper::ENDPOINT_TYPE_AZURE:
+//                $config = $this->generateInitConfig($provider);
+//                $config[self::FIELD_OPENAIKEY] = $key ?? '';
+//                $config[self::FIELD_RESOURCE_NAME] = $resourceName ?? '';
+//                $config[self::FIELD_DEPLOYMENT_ID] = $deploymentId ?? '';
+//                $config[self::FIELD_ENABLED] = true;
+//                break;
+//            case Helper::ENDPOINT_TYPE_OPENAI:
+//                $config = $this->generateInitConfig($provider);
+//                $config[self::FIELD_OPENAIKEY] = $key ?? '';
+//                $config[self::FIELD_MODEL] = $model ?? self::NOT_ACTIVE;
+//
+//                break;
+//            default:
+//                $config = [];
+//        }
+//        return $config;
+//    }
+//
+//    /**
+//     * Extract the posted data for a given module
+//     *
+//     * @param array $postData
+//     * @param string $module
+//     * @return array
+//     */
+//    public function extractPost(array $postData, string $module): array
+//    {
+//        $config = [];
+//        foreach (self::FIELD_OPTIONS as $field => $type) {
+//            $key = sprintf(self::FORM_NAME_SPRINTF, $module, $field);
+//            if (array_key_exists($key, $postData)) {
+//                // boolean fields are sent as 'on' or not at all
+//                if ($type === ConfigMapper::FIELD_BOOLEAN) {
+//                    $config[$field] = $postData[$key] === '1';
+//                } else {
+//                    $config[$field] = trim((string)$postData[$key]);
+//                }
+//            }
+//        }
+//        return $config;
+//    }
+//
+//    /**
+//     * check if the config is enabled
+//     * both openai and azure do this differently
+//     */
+//    public function isEnabled(?array $config): bool
+//    {
+//        if (empty($config) || !isset($config['provider'])) {
+//            return false;
+//        }
+//        return match ($config['provider']) {
+//            Helper::ENDPOINT_TYPE_AZURE => $config['enabled'],
+//            Helper::ENDPOINT_TYPE_OPENAI => $config['model'] !== self::NOT_ACTIVE,
+//            default => false,
+//        };
+//    }
 }
