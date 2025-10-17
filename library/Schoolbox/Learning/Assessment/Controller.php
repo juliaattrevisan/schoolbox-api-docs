@@ -99,6 +99,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
      * @param Project\ResultCache\Mapper $projectResultCacheMapper
      * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
      * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
+     * @param \Schoolbox\Admin\DialogAgent\Scenario\Mapper $dialogAgentScenarioMapper
      * @param IdFinder|null $filtersAssessmentIdFinder
      * @param CompositeFactoryFactory|null $filtersFactoryFactory
      * @param Filter\Mapper|null $filterMapper
@@ -131,6 +132,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
         protected Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
+        protected \Schoolbox\Admin\DialogAgent\Scenario\Mapper $dialogAgentScenarioMapper,
         private ?Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder = null,
         private ?Filter\CompositeFactoryFactory $filtersFactoryFactory = null,
         private ?Filter\Mapper $filterMapper = null,
@@ -378,12 +380,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
          * of its constituent fields in a modal
          */
         if (AssessmentType::TYPE_DIALOG_AGENT === $type) {
-            /* TODO inject dependency
-             */
-            $scenarioMapper = \Schoolbox\Admin\DialogAgent\Scenario\Mapper::getInstance();
-
             $data['dialogAgent']['instance'] = null;
-            $data['dialogAgent']['scenarios'] = $scenarioMapper->findAll();
+            $data['dialogAgent']['scenarios'] = $this->dialogAgentScenarioMapper->findAll();
         }
 
         /* TODO lol why is this outside the AssessmentType check?

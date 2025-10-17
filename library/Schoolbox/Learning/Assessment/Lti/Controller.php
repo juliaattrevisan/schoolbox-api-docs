@@ -113,6 +113,7 @@ class Controller extends Assessment\Controller
      * @param Assessment\Project\ResultCache\Mapper $projectResultCacheMapper
      * @param LessonPlanTemplateMapper $lessonPlanTemplateMapper
      * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
+     * @param \Schoolbox\Admin\DialogAgent\Scenario\Mapper $dialogAgentScenarioMapper,
      * @param IdFinder $filtersAssessmentIdFinder
      * @param CompositeFactoryFactory $filtersFactoryFactory
      * @param Filter\Mapper $filterMapper
@@ -145,6 +146,7 @@ class Controller extends Assessment\Controller
         protected Assessment\Project\ResultCache\Mapper $projectResultCacheMapper,
         protected LessonPlanTemplateMapper $lessonPlanTemplateMapper,
         protected LessonPlanDataModelMapper $lessonPlanDataModelMapper,
+        protected \Schoolbox\Admin\DialogAgent\Scenario\Mapper $dialogAgentScenarioMapper,
         protected Filter\Filters\Assessment\IdFinder $filtersAssessmentIdFinder,
         protected Filter\CompositeFactoryFactory $filtersFactoryFactory,
         protected Filter\Mapper $filterMapper,
@@ -171,6 +173,7 @@ class Controller extends Assessment\Controller
             $this->projectResultCacheMapper,
             $lessonPlanTemplateMapper,
             $lessonPlanDataModelMapper,
+            $dialogAgentScenarioMapper,
             $filtersAssessmentIdFinder,
             $filtersFactoryFactory,
             $filterMapper,

@@ -686,6 +686,7 @@ class Module extends BaseModule
         $projectResultCacheMapper  = $this->getMapperFactory()->get(Assessment\Project\ResultCache\Mapper::class);
         $lessonPlanTemplateMapper  = $this->getMapperFactory()->get(\Schoolbox\Admin\LessonPlan\Template\Mapper::class);
         $lessonPlanDataModelMapper = $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\Mapper::class);
+        $dialogAgentScenarioMapper = $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Mapper::class);
         $linkedAssessmentsMapper   = $this->getMapperFactory()->get(\Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper::class);
         $courseImplementationMapper = $this->getMapperFactory()->get(CourseImplementationMapper::class);
         $unitImplementationMapper = $this->getMapperFactory()->get(UnitImplementationMapper::class);
@@ -778,6 +779,7 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
+                    $dialogAgentScenarioMapper,
                     MimetypeMapper::getInstance(),
                     $filtersAssessmentIdFinder,
                     $filtersFactoryFactory,
@@ -817,6 +819,7 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
+                    $dialogAgentScenarioMapper,
                     $filtersAssessmentIdFinder,
                     $filtersFactoryFactory,
                     $filterMapper,
@@ -853,6 +856,7 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
+                    $dialogAgentScenarioMapper,
                     $this->getMapperFactory()->get(\Schoolbox\Learning\Quiz\Attempt\Mapper::class),
                     $stateMapper,
                     new \Schoolbox\Url\Factory($this->getConfig()),
@@ -897,6 +901,7 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
+                    $dialogAgentScenarioMapper,
                     $filtersAssessmentIdFinder,
                     $filtersFactoryFactory,
                     $filterMapper,
@@ -935,6 +940,7 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
+                    $dialogAgentScenarioMapper,
                     $filtersAssessmentIdFinder,
                     $filtersFactoryFactory,
                     $filterMapper,
@@ -967,6 +973,7 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
+                    $dialogAgentScenarioMapper,
                     $courseImplementationMapper,
                     $unitImplementationMapper,
                     $linkedAssessmentsMapper,
@@ -991,6 +998,7 @@ class Module extends BaseModule
                     $projectResultCacheMapper,
                     $lessonPlanTemplateMapper,
                     $lessonPlanDataModelMapper,
+                    $dialogAgentScenarioMapper,
                     $courseImplementationMapper,
                     $unitImplementationMapper,
                 );
