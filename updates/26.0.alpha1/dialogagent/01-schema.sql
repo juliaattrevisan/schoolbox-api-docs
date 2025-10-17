@@ -39,7 +39,7 @@ CREATE TABLE `dialog_agent` (
     `assessment_id` INT UNSIGNED NOT NULL,
     `scenario_id` INT NOT NULL,
     `language` VARCHAR(255) NULL,
-    `helpfulness` ENUM('minimal', 'moderate', 'extreme') NOT NULL,
+    `helpfulness` ENUM('minimal', 'moderate', 'extreme') NULL,
     `opening_message` TEXT,
     `rules` TEXT,
     `prompt` TEXT,

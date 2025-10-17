@@ -30,7 +30,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->hasTable('dialog_agent');
         $this->hasModel(Model::class);
         $this->uses('id', self::TYPE_INTEGER, self::COLUMN_IDENTIFIER);
-        $this->uses('scenario_id', self::TYPE_INTEGER, null, 'scenario');
+        $this->uses('scenario_id', self::TYPE_INTEGER, null, 'scenarioId');
         $this->uses('language', self::TYPE_STRING, null, 'language');
         $this->uses('helpfulness', self::TYPE_STRING, null, 'helpfulness');
         $this->uses('opening_message', self::TYPE_STRING, null, 'openingMessage');
@@ -57,15 +57,26 @@ class Mapper extends \Schoolbox\Mapper
             'assessmentModel',
         );
 
-// Disabled due to swamp, for now
-//        $this->joins(
-//            'scenario_id',
-//            Scenario\Mapper::class,
-//            'id',
-//            null,
-//            null,
-//            'scenario',
-//            'scenario',
-//        );
+        $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'auditorFields']);
+    }
+
+
+    /**
+     * Prefill auditor fields (the Swamp shouldn't need to know about this)
+     */
+    protected function auditorFields(Model $lessonPlan): void
+    {
+        /* TODO Technical Uplift Candidate
+         *  The traits are wrong and should have accepted a user instance rather than just an id
+         *  All usages of the trait require you to ->getId() anyway, which means you have the user instance already.
+         *  WHy not just supply that instead?
+         */
+        if (null === $lessonPlan->getCreatedBy()) {
+            $lessonPlan->setCreatedBy($this->getSessionUser()->getId());
+        }
+
+        if (null === $lessonPlan->getUpdatedBy()) {
+            $lessonPlan->setUpdatedBy($this->getSessionUser()->getId());
+        }
     }
 }

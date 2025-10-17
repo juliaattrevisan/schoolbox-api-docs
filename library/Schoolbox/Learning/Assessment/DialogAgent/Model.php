@@ -32,7 +32,7 @@ class Model extends AbstractAssessment
     /**
      * @var int|null
      */
-    private ?int $scenario = null;
+    private ?int $scenarioId = null;
 
 
     /**
@@ -260,21 +260,21 @@ class Model extends AbstractAssessment
      */
 
     /**
-     * @return \Schoolbox\Admin\DialogAgent\Scenario\Model|null
+     * @return int|null
      */
-    public function getScenario(): ?\Schoolbox\Admin\DialogAgent\Scenario\Model
+    public function getScenarioId(): ?int
     {
-        return $this->scenario;
+        return $this->scenarioId;
     }
 
 
     /**
-     * @param \int|null $scenario
+     * @param \int|null $scenarioId
      * @return $this
      */
-    public function setScenario(?int $scenario): self
+    public function setScenarioId(?int $scenarioId): self
     {
-        $this->scenario = $scenario;
+        $this->scenarioId = $scenarioId;
         return $this;
     }
 

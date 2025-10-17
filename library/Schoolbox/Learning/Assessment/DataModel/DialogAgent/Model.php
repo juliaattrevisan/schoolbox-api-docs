@@ -44,7 +44,7 @@ class Model implements IAssessableDataModel, ISoftDeletable
     /**
      * @var int|null
      */
-    private ?int $scenario = null;
+    private ?int $scenarioId = null;
 
 
     /**
@@ -131,19 +131,19 @@ class Model implements IAssessableDataModel, ISoftDeletable
     /**
      * @return int|null
      */
-    public function getScenario(): ?int
+    public function getScenarioId(): ?int
     {
-        return $this->scenario;
+        return $this->scenarioId;
     }
 
 
     /**
-     * @param int|null $scenario
+     * @param int|null $scenarioId
      * @return $this
      */
-    public function setScenario(?int $scenario): self
+    public function setScenarioId(?int $scenarioId): self
     {
-        $this->scenario = $scenario;
+        $this->scenarioId = $scenarioId;
         return $this;
     }
 
