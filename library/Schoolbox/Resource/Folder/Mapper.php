@@ -874,8 +874,7 @@ class Mapper extends AbstractFolderMapper implements ILocator
                 {$homepageConfig_mapper->getColumnString('hp')},
                 {$group_mapper->getColumnString('ug')},
                 {$courseSpecMapper->getColumnString('cs')},
-                {$unitSpecMapper->getColumnString('us')},
-                {$this->getJoinColumnString('curriculum_node_for_category', 'cn')}
+                {$unitSpecMapper->getColumnString('us')}
         ";
     }
 
@@ -896,7 +895,6 @@ class Mapper extends AbstractFolderMapper implements ILocator
             LEFT JOIN {$this->getJoinSql('groups', '', 'ug')}
             LEFT JOIN {$this->getJoinSql('course_specification', '', 'cs')}
             LEFT JOIN {$this->getJoinSql('unit_specification', '', 'us')}
-            LEFT JOIN {$this->getJoinSql('curriculum_node_for_category', '', 'cn')}
         ";
     }
 
@@ -1009,7 +1007,6 @@ class Mapper extends AbstractFolderMapper implements ILocator
             // Examine the first row to determine what joins to hydrate
             if ($firstRow) {
                 $hydrateCodes           = array_key_exists('cc.code', $row);
-                $hydrateCurriculumNodes = array_key_exists('cn.id', $row); // TODO this probably needs to be more granular
                 $hydrateHomepage        = array_key_exists('hp.cid', $row);
                 $hydrateGroup           = array_key_exists('ug.cid', $row);
                 $hydrateCourseSpec      = array_key_exists('cs.id', $row);
@@ -1065,24 +1062,15 @@ class Mapper extends AbstractFolderMapper implements ILocator
                     $folders[$folderId]->getCodes()[$folderCode->getCode()] = $folderCode;
                 }
             }
-
-            // Hydrate curriculum node codes (avoiding duplicates)
-            // BTW fetching multiple 1-M relations in a single query
-            // is how you get ants!
-            // TODO replace ant infestation with `\Schoolbox\Curriculum\Node\Mapper::findForOtherMapper`
-            if ($hydrateCurriculumNodes) {
-                /** @var Node\Model|null $curriculumNode */
-                $curriculumNode = $curriculumNodeMapper->hydrate($row, 'cn');
-                if ($curriculumNode) {
-                    $folders[$folderId]->getCurriculumNodes()[$curriculumNode->getId()] = $curriculumNode;
-                }
-            }
         }
 
         // Hydrate one-to-many relations
         $yearLevelsByFolderId = $yearLevelMapper->findForOtherMapper($this, 'folder_year_level', $folders->keys());
+        $curriculumNodesByFolderId = $curriculumNodeMapper->findForOtherMapper($this, 'curriculum_node_for_category', $folders->keys());
         foreach ($folders as $folderId => $folder) {
-            $folders[$folderId]->setYearLevels($yearLevelsByFolderId[$folderId] ?? $yearLevelMapper->createCollection());
+            $folders[$folderId]
+                ->setYearLevels($yearLevelsByFolderId[$folderId] ?? $yearLevelMapper->createCollection())
+                ->setCurriculumNodes($curriculumNodesByFolderId[$folderId] ?? $curriculumNodeMapper->createCollection());
         }
 
         return $folders;
