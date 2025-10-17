@@ -270,46 +270,6 @@ class Controller extends Assessment\Controller
 
 
     /**
-     * Derive sort values for this assessment.
-     *
-     * This ordering is supposed to mirror their ordering in either a course
-     * builder or course outline:
-     * * if a course builder, order by the unit's ID first
-     * * if a course outline, order by the unit's due date first
-     *
-     * Then:
-     * * if the assessment is in a project: order by its project's sequence then
-     *   the assessment's sequence
-     * * otherwise, order by the assessment's sequence
-     *
-     * @param IAssessable $assessment
-     * @return array|null
-     */
-    private function deriveSortValues(IAssessable $assessment): ?array
-    {
-        $sortValues  = [];
-        $baseContext = $assessment->getBaseContext();
-        if ($baseContext instanceof UnitSpecification\Model) {
-            $sortValues[] = $baseContext->getId();
-        } elseif ($baseContext instanceof UnitImplementation\Model) {
-            $sortValues[] = $baseContext->getDueDate()->getUnixTimeStamp();
-        } else {
-            return null;
-        }
-
-        $context = $assessment->getContext();
-        if ($context instanceof Project) {
-            $sortValues[] = $context->getSequence();
-            $sortValues[] = $assessment->getSequence();
-        } else {
-            $sortValues[] = $assessment->getSequence();
-            $sortValues[] = 0;
-        }
-        return $sortValues;
-    }
-
-
-    /**
      * TODO I guess this is where students will create their conversation stuffs
      *
      * @param IAssessable $assessment
