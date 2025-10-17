@@ -316,7 +316,7 @@ class Controller extends Base
      * @throws RouteNotFound
      * @throws ReflectionException|Error
      */
-    public function getDifferentiationProfilesIndex(?string $table): void
+    public function getDifferentiationIndex(?string $table): void
     {
         $this->getLists($table, false);
     }
@@ -328,7 +328,7 @@ class Controller extends Base
      * @throws ReflectionException
      * @throws Error
      */
-    public function getDifferentiationProfilesData(?string $table): void
+    public function getDifferentiationData(?string $table): void
     {
         $this->getLists($table, true);
     }
@@ -340,7 +340,7 @@ class Controller extends Base
      * @throws MapperException
      * @throws RouteNotFound
      */
-    public function postDifferentiationProfilesSave(string $table): void
+    public function postDifferentiationSave(string $table): void
     {
         $this->postSaveSlave($table);
     }
@@ -349,7 +349,7 @@ class Controller extends Base
      * @param string $table
      * @return void
      */
-    public function postDifferentiationProfilesDelete(string $table): void
+    public function postDifferentiationDelete(string $table): void
     {
         $this->postDeleteSlave($table);
     }
@@ -1883,7 +1883,7 @@ class Controller extends Base
             'submission-errors' => 'Lms',
             'achievement-category' => 'Badge',
             'timetable-colour' => 'Design',
-            'adjustment-categories' => 'DifferentiationProfiles',
+            'adjustment-categories' => 'Differentiation',
             default => '',
         };
     }

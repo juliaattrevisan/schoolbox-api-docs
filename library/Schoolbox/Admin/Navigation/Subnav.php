@@ -606,7 +606,7 @@ class Subnav
                         'visible'     => $userIsSuperuserOrHasServicePermissionPastoral && (bool)$this->configLoader->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED),
                         'description' => 'Setup the actions of pastoral records.',
                     ],
-                    '/adminv2/lists/differentiationprofiles/adjustment-categories' => [
+                    '/adminv2/lists/differentiation/adjustment-categories' => [
                         'name'        => 'Lists - Adjustment Categories',
                         'visible'     =>
                             ($userIsSuperuser || $userHasServicePermissionDifferentiationProfile) &&

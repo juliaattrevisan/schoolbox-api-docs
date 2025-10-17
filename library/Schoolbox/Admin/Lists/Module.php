@@ -123,10 +123,10 @@ class Module extends BaseModule
 
         // Routes to which users with service permission UserAccess::SERVICE_DIFFERENTIATION_PROFILE need access.
         $diffProfilesRegex = '(adjustment-categories)';
-        $this->register('GET', "/differentiationprofiles/{table:$diffProfilesRegex}", 'getDifferentiationProfilesIndex', $ruleDiffProfiles);
-        $this->register('GET', "/differentiationprofiles/data/{table:$diffProfilesRegex}", 'getDifferentiationProfilesData', $ruleDiffProfiles);
-        $this->register('POST', "/differentiationprofiles/save/{table:$diffProfilesRegex}", 'postDifferentiationProfilesSave', $ruleDiffProfiles);
-        $this->register('POST', "/differentiationprofiles/delete/{table:$diffProfilesRegex}", 'postDifferentiationProfilesDelete', $ruleDiffProfiles);
+        $this->register('GET', "/differentiation/{table:$diffProfilesRegex}", 'getDifferentiationIndex', $ruleDiffProfiles);
+        $this->register('GET', "/differentiation/data/{table:$diffProfilesRegex}", 'getDifferentiationData', $ruleDiffProfiles);
+        $this->register('POST', "/differentiation/save/{table:$diffProfilesRegex}", 'postDifferentiationSave', $ruleDiffProfiles);
+        $this->register('POST', "/differentiation/delete/{table:$diffProfilesRegex}", 'postDifferentiationDelete', $ruleDiffProfiles);
 
         // Routes to which users with service permission UserAccess::SERVICE_LMS need access.
         $lmsTablesRegex = '(submission-type|submission-errors)';
