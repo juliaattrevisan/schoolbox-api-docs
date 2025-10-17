@@ -1154,7 +1154,7 @@ abstract class SectionAssessmentAbstract
         $isDynamic      = !is_array($participants) ? PlanMapper::PLAN_TYPE_DYNAMIC : PlanMapper::PLAN_TYPE_STATIC;
         $planType       = ($isDynamic === PlanMapper::PLAN_TYPE_DYNAMIC) ? 'dynamic' : 'static';
 
-        if ($isEveryonePlan || $isDynamic || $allDay === null || ($unlockAt === null && $lockAt === null && $dueAt === null && $allDayDate === null)) {
+        if ($isEveryonePlan || $isDynamic === PlanMapper::PLAN_TYPE_DYNAMIC || $allDay === null || ($unlockAt === null && $lockAt === null && $dueAt === null && $allDayDate === null)) {
             // If dynamic, or no dates are specified, set all plans dates to null to enable assessment dates to apply
             [$publish, $open, $due, $close] = [null, null, null, null];
         } else {
