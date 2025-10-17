@@ -2252,8 +2252,8 @@ class Mapper extends AbstractFolderMapper implements ILocator
     /** @inheritDoc */
     protected function getDefaultOrderByParams(): array
     {
-        // By default, order by folder.name, yearLevel.sequence
-        return ['name' => 'ASC', 'yl.' .  YearLevel\Mapper::COL_SEQUENCE => 'ASC'];
+        // By default, order by folder.name
+        return ['name' => 'ASC'];
     }
 
     /**
