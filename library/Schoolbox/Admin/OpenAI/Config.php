@@ -120,13 +120,13 @@ class Config
      * $aiChat = [
      * 'provider' => 'off' // can be off openai or azure if OFF then feature is disabled
      * 'openai' => [
-     * 'key' => [
+     * 'key' => [ // should this be in a common space?
      * 'value' => 'aaaaaa',
      * ],
      * 'model' => [
      * 'value' => 'gippity4.1-mini',
      * ],
-     * 'systemprompt' => [
+     * 'systemprompt' => [ // should this be in a common space?
      * 'value' => 'Talk like a pirate',
      * ],
      * 'azure' => [
