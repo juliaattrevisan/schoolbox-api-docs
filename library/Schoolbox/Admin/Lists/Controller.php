@@ -308,6 +308,52 @@ class Controller extends Base
         $this->postDeleteSlave($table);
     }
 
+    // Functions for routes accessible by Differentiation Profiles Moderators -----------------------------------------//
+
+    /**
+     * @param string|null $table
+     * @return void
+     * @throws RouteNotFound
+     * @throws ReflectionException|Error
+     */
+    public function getDifferentiationIndex(?string $table): void
+    {
+        $this->getLists($table, false);
+    }
+
+    /**
+     * @param string|null $table
+     * @return void
+     * @throws RouteNotFound
+     * @throws ReflectionException
+     * @throws Error
+     */
+    public function getDifferentiationData(?string $table): void
+    {
+        $this->getLists($table, true);
+    }
+
+    /**
+     * @param string $table
+     * @return void
+     * @throws Deleted
+     * @throws MapperException
+     * @throws RouteNotFound
+     */
+    public function postDifferentiationSave(string $table): void
+    {
+        $this->postSaveSlave($table);
+    }
+
+    /**
+     * @param string $table
+     * @return void
+     */
+    public function postDifferentiationDelete(string $table): void
+    {
+        $this->postDeleteSlave($table);
+    }
+
     // Functions for routes accessible by LMS Moderators -------------------------------------------------------------//
 
     /**
@@ -1392,6 +1438,29 @@ class Controller extends Base
             ];
         }
 
+        if ($this->getConfigLoader()->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED)) {
+            $return['adjustment-categories'] = [
+                'title'  => 'Adjustment Categories',
+                'mapper' => \Schoolbox\DifferentiationProfile\AdjustmentCategories\Mapper::class,
+                'delete' => true,
+                'showId' => false,
+                'fields' => [
+                    'id' => [
+                        'caption'   => 'ID',
+                        'width'     => 1,
+                        'readonly'  => true,
+                    ],
+                    'name' => [
+                        'caption'   => 'Name',
+                        'width'     => 11,
+                        'maxLength' => 255,
+                        'mandatory' => true,
+                        'default'   => '',
+                    ],
+                ]
+            ];
+        }
+
         $gradeList   = GradeLevelGroupMapper::getInstance()->findAllForAdminOption();
         $luGradeList = [];
         foreach ($gradeList as $grade) {
@@ -1814,6 +1883,7 @@ class Controller extends Base
             'submission-errors' => 'Lms',
             'achievement-category' => 'Badge',
             'timetable-colour' => 'Design',
+            'adjustment-categories' => 'Differentiation',
             default => '',
         };
     }
