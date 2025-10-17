@@ -256,6 +256,28 @@ class Model extends AbstractAssessment
     }
 
 
+    /**
+     * Takes $duration seconds and converts it to an (hours, minutes) tuple
+     *
+     * The number of hours and minutes that is represented by getDuration()
+     * (which is the duration represented in seconds)
+     *
+     * @param int|null $duration
+     * @return array
+     */
+    public function getDurationComponents(?int $duration): array
+    {
+        if ($duration && $duration > 0) {
+            return [
+                'hours'   => floor($duration / 3600),
+                'minutes' => ($duration % 3600) / 60
+            ];
+        }
+
+        return [];
+    }
+
+
     /* Getters/Setters
      */
 
