@@ -799,6 +799,12 @@ abstract class Controller extends ListController implements IAssessmentControlle
             );
         }
 
+        /* Enforce Close Date = Due Date for Dialog Agents
+         */
+        if ($assessment instanceof DialogAgent\Model) {
+            $assessment->setCloseAt($assessment->getDueAt());
+        }
+
         /* Regular update while you're creating the assessment, otherwise
          */
         try {

@@ -633,6 +633,12 @@ class Factory
             }
         }
 
+        /* Dialog Agents have a special treatment of dates where Close Date = Due Date
+         */
+        if ($assessment instanceof DialogAgent\Model) {
+            $assessment->setCloseAt($assessment->getDueAt());
+        }
+
         // find out if the dates are all g - if not, a mage-friendly exception will be thrown
         $assessment->assertValidDates();
 

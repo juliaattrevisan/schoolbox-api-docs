@@ -64,19 +64,19 @@ class Mapper extends \Schoolbox\Mapper
     /**
      * Prefill auditor fields (the Swamp shouldn't need to know about this)
      */
-    protected function auditorFields(Model $lessonPlan): void
+    protected function auditorFields(Model $dialogAgent): void
     {
         /* TODO Technical Uplift Candidate
          *  The traits are wrong and should have accepted a user instance rather than just an id
          *  All usages of the trait require you to ->getId() anyway, which means you have the user instance already.
          *  WHy not just supply that instead?
          */
-        if (null === $lessonPlan->getCreatedBy()) {
-            $lessonPlan->setCreatedBy($this->getSessionUser()->getId());
+        if (null === $dialogAgent->getCreatedBy()) {
+            $dialogAgent->setCreatedBy($this->getSessionUser()->getId());
         }
 
-        if (null === $lessonPlan->getUpdatedBy()) {
-            $lessonPlan->setUpdatedBy($this->getSessionUser()->getId());
+        if (null === $dialogAgent->getUpdatedBy()) {
+            $dialogAgent->setUpdatedBy($this->getSessionUser()->getId());
         }
     }
 }
