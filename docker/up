@@ -76,8 +76,9 @@ function create_dirs() {
     # ensure that the AWS folder exists
     mkdir -p .aws
 
-    # ensure that the storage folder exists
+    # ensure that the storage folders exist
     mkdir -p ./data/docker/storage
+    mkdir -p ./data/docker2/storage
 
     # ensure the ssl cert folder exists (schoolbox-cli / caddy share):
     # schoolbox-cli must download them so that the Caddy container can use them.
