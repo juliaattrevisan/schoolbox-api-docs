@@ -277,7 +277,7 @@ class Controller extends Base
 
         /* Append the booking's id to the url, for the calling module to
          * process in whatever way it needs. This allows a decoupling between
-         * Resource Booking any any modules that use it.
+         * Resource Booking and any modules that use it.
          *
          * resourcebooking/booking/book/(itemId)?callbackUrl=/eotc/event/{eotcId}/addBooking/{bookingId}
          * (name/startdate/enddate/details)
