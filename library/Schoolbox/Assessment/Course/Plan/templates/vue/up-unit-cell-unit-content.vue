@@ -114,9 +114,10 @@ window.Vue.onUnmounted(() => {
     }
 }
 
+// though  [data-column-type="unit"] sit above in up-unit-cell.vue, these styles are still applied
 [data-column-type="unit"] {
     padding: 5px;
-
+    // to apply to every div except the .sortable-holder
     > div > div:not(.sortable-holder) {
         display: flex;
         left: 5px;
