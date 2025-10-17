@@ -291,8 +291,9 @@ class Controller extends Base
         if ($this->isXhrRequest()) {
             $this->response = $this->responseAsJson(
                 [
-                    'item'      => $bookingList,
-                    'errors'    => $errors,
+                    'item' => $bookingList,
+                    'errors' => $errors,
+                    'bookedPendingBecauseClashes' => $saveBookingAsPending,
                     'returnUrl' => (string)$returnUrl,
                 ],
             )->withStatus($code);
@@ -434,8 +435,9 @@ class Controller extends Base
         if ($this->isXhrRequest()) {
             $this->response = $this->responseAsJson(
                 [
-                    'item'      => $item,
-                    'errors'    => $errors,
+                    'item' => $item,
+                    'errors' => $errors,
+                    'bookedPendingBecauseClashes' => $saveBookingAsPending,
                     'returnUrl' => $returnUrl,
                 ],
             )->withStatus($code);
