@@ -3098,6 +3098,55 @@ abstract class Mapper implements IMapper
     }
 
     /**
+     * Retrieves instances of this mapper's model for a set of IDs that
+     * reference objects from a related mapper.
+     *
+     * The related mappers have `joinsVia` relations to this one, but this
+     * mapper doesn't have relations back.
+     *
+     * @param Mapper $otherMapper The mapper that joins onto this one
+     * @param string $otherJoin   The name of the join via which `$otherMapper`
+     *                            joins onto this
+     * @param array  $ids         A list of `$otherMapper` IDs to fetch for
+     *
+     * @return array|GenericCollection[]|object[][] First level key: `$otherMapper` model instance ID
+     *                                              Second level key: `Model` instance ID
+     *                                              Second level value: `Model` instance
+     */
+    public function findForOtherMapper(Mapper $otherMapper, string $otherJoin, array $ids): array
+    {
+        if (empty($ids)) {
+            // do nothing
+            return [];
+        }
+
+        $otherIdColumn = $otherMapper->getIdentifierColumn();
+        $nodePb        = $otherMapper->getPredicateBuilder()->in($otherIdColumn, $ids);
+        $where         = implode(' AND ', $nodePb->getWhere());
+        $nodeQuery     = "
+                SELECT
+                    {$otherMapper->getTable()}.$otherIdColumn,
+                    {$otherMapper->getJoinColumnString($otherJoin, 'o')}
+                FROM {$otherMapper->getTable()}
+                INNER JOIN {$otherMapper->getJoinSql($otherJoin, '', 'o')}
+                WHERE {$where}
+            ";
+
+        $statement = $this->getDatabase()->prepare($nodeQuery);
+        $statement->execute($nodePb->getParams());
+        $result = [];
+        foreach ($statement as $row) {
+            $id          = $row[$otherIdColumn];
+            $result[$id] ??= $this->createCollection();
+            $model       = $this->hydrate($row, 'o');
+            if ($model) {
+                $result[$id][$model->getId()] = $model;
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Loads joined models into this object.
      *
      * @param string $join                @see $this->findJoinedModelList() $join param
