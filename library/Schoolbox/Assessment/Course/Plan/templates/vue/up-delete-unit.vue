@@ -34,7 +34,7 @@ function onDeleteSelected(): void {
                 <button
                     class="button submit l-flex__item--1"
                     type="button"
-                    data-test="up-delete-units-create"
+                    data-test="up-delete-unit-delete"
                     @click.prevent="onDeleteSelected"
                 >
                     {{ deleteUnitsStore.isProcessing ? "Deleting..." : "Yes" }}

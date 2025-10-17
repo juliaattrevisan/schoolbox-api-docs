@@ -264,12 +264,13 @@ test.describe("Unit Planner Tests", () => {
     });
 
     test("modify unit name", async ({ tester, page, db }) => {
+        const courseId = 11; // Year 5
         const unitId = 30; // "English"
         const folderId = 144; // "English" folder ID
         const unitNameChange = "Ancient English";
         try {
             tester.isGoingTo("visit the Year 5 unit planner page");
-            await page.goto("/course/plan/11");
+            await page.goto(`/course/plan/${courseId}`);
 
             tester.isGoingTo("click on the unit action button for unit 30");
             await page.getByTestId("sbx-pop-out-unit-cell-unit-action-30").click();
@@ -288,6 +289,39 @@ test.describe("Unit Planner Tests", () => {
         } finally {
             tester.isGoingTo(`reset the unit name back to 'English' for unit ${unitId}`);
             await db.updateInDatabase("folder", { name: "English" }, { id: folderId });
+        }
+    });
+
+    test("delete unit", async ({ tester, page, db }) => {
+        const courseId = 11; // Year 5
+        const unitId = 34; // Unit to be deleted
+        const folderId = 161;
+        try {
+            tester.isGoingTo("visit the Year 5 unit planner page");
+            await page.goto(`/course/plan/${courseId}`);
+
+            tester.isGoingTo("click on the unit action button for unit 34");
+            await page.getByTestId("sbx-pop-out-unit-cell-unit-action-34").click();
+
+            tester.isGoingTo("click the delete button");
+            await page.getByTestId(`up-unit-cell-unit-action-${unitId}-delete-button`).click();
+
+            tester.isGoingTo("confirm the deletion in the modal");
+            await page.getByTestId("up-delete-unit-delete").click();
+
+            tester.isGoingTo("verify that the toast with the message 'Unit successfully deleted' appears");
+            await expect(page.getByTestId("toast")).toHaveText("Unit successfully deleted");
+
+            tester.isGoingTo("verify that the unit has been successfully deleted");
+            await expect(page.getByText("5MS Spelling")).not.toBeVisible();
+            await expect(page.getByTestId(`sbx-pop-out-unit-cell-unit-action-${unitId}`)).not.toBeVisible();
+        } finally {
+            tester.isGoingTo(`restore the folder`);
+            await db.updateInDatabase(
+                "course_unit_specification",
+                { deleted_at: null },
+                { folder_id: folderId, course_specification_id: courseId },
+            );
         }
     });
 
