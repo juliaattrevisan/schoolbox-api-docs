@@ -128,7 +128,7 @@
 </fieldset>
 
 {# Scenario selection #}
-{% if not dialogAgent %}
+{% if not dialogAgent.instance %}
     {# Create a new Dialog Agent #}
     <fieldset>
         <legend class="required">Select scenario</legend>
@@ -161,12 +161,13 @@
     {# Update a Dialog Agent: show the currently selected scenario #}
     <fieldset>
         <legend>Selected scenario</legend>
-        <input type="hidden" name="scenarioId" value="{{ dialogAgentScenario.id }}">
+        ggg
+        <input type="hidden" name="scenarioId" value="{{ dialogAgent.scenario.id }}">
 
-        <h5>{{ dialogAgentScenario.title }}</h5>
+        <h5>{{ dialogAgent.scenario.title }}</h5>
 
         <p>
-            {{ dialogAgentScenario.description }}
+            {{ dialogAgent.scenario.description }}
         </p>
     </fieldset>
 {% endif %}

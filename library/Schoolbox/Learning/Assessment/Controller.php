@@ -382,6 +382,7 @@ abstract class Controller extends ListController implements IAssessmentControlle
              */
             $scenarioMapper = \Schoolbox\Admin\DialogAgent\Scenario\Mapper::getInstance();
 
+            $data['dialogAgent']['instance'] = null;
             $data['dialogAgent']['scenarios'] = $scenarioMapper->findAll();
         }
 
@@ -713,8 +714,8 @@ abstract class Controller extends ListController implements IAssessmentControlle
             $dialogAgentMapper = \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::getInstance();
             $dialogAgentScenarioMapper = \Schoolbox\Admin\DialogAgent\Scenario\Mapper::getInstance();
 
-            $data['dialogAgent'] = $dialogAgentMapper->findOneByColumn('assessment_id', $assessment->getId());
-            $data['dialogAgentScenario'] = $dialogAgentScenarioMapper->findById($assessment->getScenarioId());
+            $data['dialogAgent']['instance'] = $dialogAgentMapper->findOneByColumn('assessment_id', $assessment->getId());
+            $data['dialogAgent']['scenario'] = $dialogAgentScenarioMapper->findById($assessment->getScenarioId());
         }
 
         $data['courseManaged'] = [
