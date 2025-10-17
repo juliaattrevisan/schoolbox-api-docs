@@ -263,6 +263,34 @@ test.describe("Unit Planner Tests", () => {
         }
     });
 
+    test("modify unit name", async ({ tester, page, db }) => {
+        const unitId = 30; // "English"
+        const folderId = 144; // "English" folder ID
+        const unitNameChange = "Ancient English";
+        try {
+            tester.isGoingTo("visit the Year 5 unit planner page");
+            await page.goto("/course/plan/11");
+
+            tester.isGoingTo("click on the unit action button for unit 30");
+            await page.getByTestId("sbx-pop-out-unit-cell-unit-action-30").click();
+
+            tester.isGoingTo("wait for dropdown and click the modify button");
+            await page.getByTestId(`up-unit-cell-unit-action-${unitId}-modify-link`).click();
+
+            tester.isGoingTo(`change the folder name to '${unitNameChange}'`);
+            await page.getByTestId("folder-form-input-name").fill(unitNameChange);
+
+            tester.isGoingTo("click the Modify Folder button");
+            await page.getByTestId("folder-form-submit").click();
+
+            tester.isGoingTo(`verify that the unit name has been changed to '${unitNameChange}'`);
+            await expect(page.getByTestId(`unit-planner-unit-link-${unitId}`)).toHaveText(unitNameChange);
+        } finally {
+            tester.isGoingTo(`reset the unit name back to 'English' for unit ${unitId}`);
+            await db.updateInDatabase("folder", { name: "English" }, { id: folderId });
+        }
+    });
+
     test.afterAll(async ({ baseTester, db }) => {
         baseTester.isGoingTo("find the textbox that was created in this test so it can be deleted");
 
