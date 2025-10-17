@@ -118,34 +118,27 @@ class Config
     /**
      *
      * $aiChat = [
-     * 'enabled' => true,
+     * 'provider' => 'off' // can be off openai or azure if OFF then feature is disabled
      * 'openai' => [
      * 'key' => [
-     * 'label' => 'OpenAI Key', // or you can store this in the frontend, outside of config; included for illustration mainly
      * 'value' => 'aaaaaa',
      * ],
      * 'model' => [
-     * 'label' => 'OpenAI Model',
      * 'value' => 'gippity4.1-mini',
      * ],
+     * 'systemprompt' => [
+     * 'value' => 'Talk like a pirate',
      * ],
      * 'azure' => [
      * 'resource' => [
-     * 'label' => 'Azure Resource Name',
      * 'value' => 'ccccccccc',
      * ],
      * 'deployment' => [
-     * 'label' => 'Azure Deployment ID',
      * 'value' => 'dddddd',
      * ]
      * ]
      * ];
      *
-     * // similar to above
-     * $aiLessonPlan => [ ... ]
-     *
-     * // similar to above
-     * $aiImageGeneration => [ ... ]
      */
 
 
