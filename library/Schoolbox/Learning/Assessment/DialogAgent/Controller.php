@@ -310,10 +310,10 @@ class Controller extends Assessment\Controller
     public function determineRedirect(IAssessable $assessment, $postReturnUrl = null, $defaultReturnUrl = '', bool $relocated = false, bool $isCreate = false, bool $toParticipation = false): string
     {
         /**
-         * Always go to the summary screen when a lesson plan has been created,
+         * Always go to the summary screen when a dialog agent has been created,
          * but send the return url with it
          *
-         * If the lesson plan was only updated, use the parent logic to determine the redirect instead
+         * If the dialog agent was only updated, use the parent logic to determine the redirect instead
          */
         if ($isCreate) {
             $redirect = $this->routeGenerator->generate('learningAssessment.getSummary', [

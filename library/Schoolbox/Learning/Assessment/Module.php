@@ -993,7 +993,6 @@ class Module extends BaseModule
                     $lessonPlanDataModelMapper,
                     $courseImplementationMapper,
                     $unitImplementationMapper,
-                    $linkedAssessmentsMapper,
                 );
 
             default:

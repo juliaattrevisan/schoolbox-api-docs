@@ -94,7 +94,7 @@ class DialogAgent implements IAssessmentTypeTranslator
         $domainObject->setPrompt($dataModel->getPrompt());
         $domainObject->setDuration($dataModel->getDuration());
 
-        /* TODO This *used* tbe needed at some point, but idk why
+        /* TODO This *used* tobe needed at some point, but idk why
          *  maybe can just delete this entirely since they're never marked anyway.
          */
 //        $domainObject->setMarkScheme(new None());
