@@ -13,6 +13,7 @@ use JsonException;
 use PHPUnit\Framework\TestCase;
 use Schoolbox\Admin\OpenAI\Config;
 use Schoolbox\Editor\OpenAI\Helper;
+use TypeError;
 
 /**
  * Class ConfigTest
@@ -159,6 +160,25 @@ class ConfigTest extends TestCase
         );
     }
 
+    public function testMigrateWithInvalidProvider(): void
+    {
+        $cfg = new Config();
+        // Pass a provider string that's not handled (not OpenAI nor Azure)
+        $result = $cfg->migrate('InvalidProvider', null, null, null, null, null);
+
+        // Should fall back to NO_PROVIDER and default fields
+        $this->assertArrayHasKey(Config::FIELD_PROVIDER, $result);
+        $this->assertEquals(Config::NO_PROVIDER, $result[Config::FIELD_PROVIDER]);
+
+        $this->assertArrayHasKey(Helper::ENDPOINT_TYPE_OPENAI, $result);
+        $this->assertEquals('', $result[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_OPENAIKEY]['value']);
+        $this->assertEquals('', $result[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL]['value']);
+
+        $this->assertArrayHasKey(Helper::ENDPOINT_TYPE_AZURE, $result);
+        $this->assertEquals('', $result[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_RESOURCE_NAME]['value']);
+        $this->assertEquals('', $result[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID]['value']);
+    }
+
     /**
      * Data provider for isEnabled
      *
@@ -190,6 +210,13 @@ class ConfigTest extends TestCase
     {
         $cfg = new Config();
         $this->assertSame($expected, $cfg->isEnabled($config));
+    }
+
+    // test isEnabled with null config
+    public function testIsEnabledWithNullThrowsTypeError(): void
+    {
+        $cfg = new Config();
+        $this->assertFalse($cfg->isEnabled(null));
     }
 
     /**
@@ -239,6 +266,14 @@ class ConfigTest extends TestCase
 
         $decoded = $cfg->decode($json);
         $this->assertEquals($expected, $decoded);
+    }
+
+    public function testDecodeNonArrayJsonReturnsScalar(): void
+    {
+        $cfg = new Config();
+        // JSON boolean true (valid JSON) decodes to boolean true
+        $this->expectException(TypeError::class);
+        $decoded = $cfg->decode('true');
     }
 
     public function testDecodeThrowsOnInvalidJson(): void

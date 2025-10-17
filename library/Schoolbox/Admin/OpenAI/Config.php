@@ -169,6 +169,10 @@ class Config
      */
     public function isEnabled(?array $config): bool
     {
+        // if no config, then not enabled
+        if ($config === null) {
+            return false;
+        }
         return $config[self::FIELD_PROVIDER] !== self::NO_PROVIDER;
     }
 
