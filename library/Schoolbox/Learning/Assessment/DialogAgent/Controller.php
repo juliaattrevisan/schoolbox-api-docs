@@ -28,7 +28,6 @@ use Schoolbox\Learning\Assessment\Replicator;
 use Schoolbox\Learning\Assessment\Transactor;
 use Schoolbox\Learning\Assessment\Views\Mapper as LatestViewMapper;
 use Schoolbox\Learning\Assessment\WorkType\Mapper as WorkTypeMapper;
-use Schoolbox\Learning\Assessment\DataModel\LessonPlan\LinkedAssessments\Mapper as LinkedAssessmentsMapper;
 use Schoolbox\Learning\Course\DataModel\AbstractUnit;
 use Schoolbox\Learning\Course\DataModel\Implementation as CourseImplementation;
 use Schoolbox\Learning\Course\DataModel\Implementation\Unit as UnitImplementation;
@@ -63,7 +62,6 @@ class Controller extends Assessment\Controller
      * @param LessonPlanDataModelMapper $lessonPlanDataModelMapper
      * @param CourseImplementation\Mapper $courseImplementationMapper
      * @param UnitImplementation\Mapper $unitImplementationMapper
-     * @param LinkedAssessmentsMapper $linkedAssessmentsMapper
      */
     public function __construct(
         UserMapper $userMapper,
@@ -85,7 +83,6 @@ class Controller extends Assessment\Controller
         LessonPlanDataModelMapper $lessonPlanDataModelMapper,
         private CourseImplementation\Mapper $courseImplementationMapper,
         private UnitImplementation\Mapper $unitImplementationMapper,
-        private LinkedAssessmentsMapper $linkedAssessmentsMapper,
     ) {
         parent::__construct(
             $userMapper,

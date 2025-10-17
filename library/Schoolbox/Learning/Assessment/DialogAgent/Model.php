@@ -291,7 +291,7 @@ class Model extends AbstractAssessment
 
 
     /**
-     * @param \int|null $scenarioId
+     * @param int|null $scenarioId
      * @return $this
      */
     public function setScenarioId(?int $scenarioId): self
