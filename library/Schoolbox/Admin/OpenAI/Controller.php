@@ -47,12 +47,7 @@ class Controller extends ConfigController
      */
     public function getIndex(): void
     {
-        $textProvider = $this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT);
-        // 26.0 grab the config for text and add in any new or missing configs
-        $aiConfig = new Config();
-
-        $textModules = [];
-        $textFeatures = $aiConfig->fetchFeatures($this->getConfigMapper());
+        $textFeatures = new Config()->fetchFeatures($this->getConfigMapper());
 
         $imageConfigContext = $this->buildConfigContext(
             $this->buildImageConfigPredicate(),
@@ -62,15 +57,11 @@ class Controller extends ConfigController
 
         /* Make islands independent of each other for validation reasons
          */
-        $textConfigFormId = 'textSettings';
         $imageConfigContext['formId'] = 'imageSettings';
 
         $this->response = $this->responseFromTemplate('@adminOpenAi/index.twig', [
             'pageCurrent' => $this->routeGenerator->generate('adminOpenAi.getIndex'),
             'allBreadcrumbs' => (new Subnav($this->getConfigLoader(), $this->getUser()))->generateBreadcrumbs($this->routeGenerator->generate('adminOpenAi.getIndex')),
-
-            'textConfigFormId' => $textConfigFormId,
-            'textConfig' => $textModules,
             'imageConfigContext' => $imageConfigContext,
             'endpointTypeOff' => Helper::ENDPOINT_TYPE_OFF,
             'features' => $textFeatures,
@@ -84,7 +75,7 @@ class Controller extends ConfigController
                 'openai' => Helper::ENDPOINT_TYPE_OPENAI,
                 'azure' => Helper::ENDPOINT_TYPE_AZURE,
             ],
-            'models' => $aiConfig::AI_MODELS,
+            'models' => Config::AI_MODELS,
         ], 'AI Services');
     }
 
@@ -98,7 +89,6 @@ class Controller extends ConfigController
      */
     public function postTextOptions(): void
     {
-        $var = false;
         $postData = $this->requestPost->getArrayCopy();
 
         foreach (Config::ALL_MODULES as $module) {
@@ -137,77 +127,6 @@ class Controller extends ConfigController
         /* Go back to the place from whence you came
          */
         $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminOpenAi.getIndex'));
-    }
-
-    /**
-     * Get the blank configuration structure for a given provider
-     *
-     * @param string $provider
-     * @return void
-     * @api GET /adminv2/ai-services/blank/OpenAI
-     */
-    public function getBlankConfig(string $provider): void
-    {
-        $aiConfig = new Config($this->getConfigMapper());
-        $blank = $aiConfig->generateInitConfig($provider);
-        $textModules = [];
-        foreach (Config::ALL_MODULES as $module) {
-            $textModules[$module] = $blank;
-        }
-
-        $textModuleContext = $aiConfig->buildTwigConfig(
-            $textModules,
-            $this->fieldStrategyFactory,
-            $this->getConfigLoader()->get('site_version'),
-            $this->routeGenerator->generate('adminOpenAi.postTextOptions'),
-            [
-                ModuleConfig::CONTEXT_USE_BOTTOM_DRAWER => false,
-                ModuleConfig::CONTEXT_ISEDITABLE => false,
-            ]
-        );
-
-        $this->response = $this->responseFromTemplateUnthemed('@adminOpenAi/config.twig', [
-            'features' => $aiConfig->getFeatures(),
-            'feature' => $aiConfig->getFeatures()['chat'],
-            'providers' => [
-                'openai' => Helper::ENDPOINT_TYPE_OPENAI,
-                'azure' => Helper::ENDPOINT_TYPE_AZURE,
-            ]
-        ]);
-    }
-
-
-    /**
-     *
-     * Returns a predicate builder for finding main system config for the AI text module
-     *
-     * @return Builder
-     * @throws InvalidColumnException
-     */
-    private function buildTextConfigPredicate(): Builder
-    {
-        // as of 26.0 text config is only endpoint and the system prompt
-        $pb = $this->getConfigMapper()->getPredicateBuilder();
-        return $this->getConfigMapper()->getPredicateBuilder()
-            ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_OPENAI_TEXT)
-            ->any(
-                $pb->equals(ConfigMapper::COL_NAME, ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)
-                    ->equals(ConfigMapper::COL_NAME, ConfigMapper::NAME_OPENAI_TEXT_SYSTEM_PROMPT)
-            );
-    }
-
-    /**
-     *
-     * Returns a predicate builder for finding main system config for the AI text module
-     *
-     * @return Builder
-     * @throws InvalidColumnException
-     */
-    private function buildTextAllPredicate(): Builder
-    {
-        // as of 26.0 text config is only endpoint and the system prompt
-        return $this->getConfigMapper()->getPredicateBuilder()
-            ->equals(ConfigMapper::COL_MODULE, ConfigMapper::MODULE_OPENAI_TEXT);
     }
 
 

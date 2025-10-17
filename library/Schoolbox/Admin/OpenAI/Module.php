@@ -43,9 +43,6 @@ class Module extends BaseModule
         $this->register('GET', '', 'getIndex', $perms);
         $this->register('POST', '/text', 'postTextOptions', $perms);
         $this->register('POST', '/image', 'postImageOptions', $perms);
-
-        // get the blank config for a provider
-        $this->register('GET', '/blank/{provider}', 'getBlankConfig', $perms);
     }
 
 
