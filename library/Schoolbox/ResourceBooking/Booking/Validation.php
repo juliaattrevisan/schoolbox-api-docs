@@ -13,6 +13,7 @@ use Calendar\Event\Type\EventInterface;
 use DateTime;
 use Alaress_Date_Format;
 use External_Timetable;
+use InvalidArgumentException;
 use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\Importer\Endpoint\ValidUsesSudsTimetable;
 use Schoolbox\GenericCollection;
@@ -136,7 +137,7 @@ class Validation
      * @param Values       $postData
      * @param Booking|null $existingBooking If provided, this is the booking that is being updated.
      *                                     Leave it out of conflict checks.
-     * @return array
+     * @return array<string, array<string>> Array of error array, keyed by self::START_DATETIME or self::END_DATETIME.
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
@@ -701,5 +702,23 @@ class Validation
     {
         $this->eventMapper = $eventMapper;
         return $this;
+    }
+
+
+    /**
+     * Return true if the given array is non-empty, and all values are Validation::ERROR_CONFLICT.
+     * @param array<string, array<string>> $errorsByKey Assumed to come from this class.
+     * @return bool
+     */
+    public static function validationErrorsAreAllConflicts(array $errorsByKey): bool
+    {
+        if (count($errorsByKey) === 0) {
+            throw new InvalidArgumentException('No errors, so this function should not have been called.');
+        }
+
+        return array_all(
+            $errorsByKey,
+            static fn ($errors) => !array_any($errors, static fn ($error) => $error !== self::ERROR_CONFLICT)
+        );
     }
 }

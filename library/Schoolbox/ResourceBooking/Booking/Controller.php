@@ -26,6 +26,7 @@ use Schoolbox\External\TimetableArrayExporter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\ResourceBooking\Item;
+use Schoolbox\ResourceBooking\Booking\Status\Model as BookingStatusModel;
 use Calendar\Event\Type\Timetable\Renderer\Javascript;
 use Calendar\Event\Collection\Renderer;
 use Schoolbox\Assessment\Term\Mapper as TermMapper;
@@ -208,6 +209,16 @@ class Controller extends Base
             $this->getExternalEventMapper()
         );
         $errors = $validation->validateBookingFromPostData($item, $this->requestPost, null);
+
+        // If clashes are allowed on the booking, and the only validation errors are clash errors,
+        // the clashes can be ignored and the booking should be saved with status 'pending'.
+        $saveBookingAsPending = false;
+        if ($item->getAllowClashBookings() && count($errors) > 0 && Validation::validationErrorsAreAllConflicts($errors))
+        {
+            $errors = []; // Ignore errors since all were clashes and clashes are allowed.
+            $saveBookingAsPending = true; // Save with status 'pending' because there are clashes to resolve.
+        }
+
         if (empty($errors)) {
             // Get the event that all bookings are based off of.
             $event = $this->getBaseEvent();
@@ -221,6 +232,11 @@ class Controller extends Base
             $booking
                 ->setName($this->requestPost['name'])
                 ->setNotes($this->requestPost['notes']);
+            if ($saveBookingAsPending) {
+                $booking->setStatus(
+                    $this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING)
+                );
+            }
             $bookingList = new Collection();
             $bookingList->add($booking);
 
