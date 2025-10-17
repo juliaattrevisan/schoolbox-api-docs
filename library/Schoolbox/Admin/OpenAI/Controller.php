@@ -98,17 +98,20 @@ class Controller extends ConfigController
      */
     public function postTextOptions(): void
     {
+        $var = false;
         $postData = $this->requestPost->getArrayCopy();
 
-        // for each ai feature module, update the config if needed
-        $aiConfig = new Config($this->getConfigMapper());
         foreach (Config::ALL_MODULES as $module) {
-            $conf = $aiConfig->extractPost($postData, $module);
-            $postData[Config::MODULE_CONFIG[$module]] = json_encode($conf, JSON_THROW_ON_ERROR);
+            // only update config if there is data in the post for that module
+            if (!isset($postData[$module])) {
+                continue;
+            }
+            // get the config item
+            $conf = $this->getConfigMapper()->findOneByColumn('name', Config::MODULE_CONFIG[$module]);
+            // save the new config into that item
+            $conf->setValue(json_encode($postData[$module], JSON_THROW_ON_ERROR));
+            $this->getConfigMapper()->save($conf);
         }
-        /* Save it
-         */
-        $this->updateConfig($postData, $this->buildTextAllPredicate());
 
         /* Go back to the place from whence you came
          */

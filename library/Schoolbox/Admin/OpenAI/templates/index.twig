@@ -14,15 +14,22 @@
         <div class="small-12 columns island">
             <section id="textSettingsContainer">
                 {# module specific config #}
-                <form method="POST" action="{{ routeLookupIfAuthorized('adminOpenAi.postTextOptions') }}">
+                <form id="textForm" method="post" action="{{ routeLookupIfAuthorized('adminOpenAi.postTextOptions') }}">
                     <div id="textModuleContainer" class="l-grid l-gap-l l-mar-m--bottom" style="display:none">
                         {% for feature in features %}
                             {% include '@adminOpenAi/config.twig' with {feature:feature, providers:providers, models:models} only %}
                         {% endfor %}
                     </div>
+                    {# manually create a save button for this section... #}
+                    <input id="textFormSubmit" type="submit" value="Save">
+{#                    <div id="save-admin-settings-container">#}
+{#                        <save-admin-settings#}
+{#                                form-id="textForm"#}
+{#                                :use-polling="'false'"#}
+{#                        />#}
+{#                    </div>#}
+{#                    <script type="text/javascript" src="{{ CDN_PREFIX }}/js/bundle/saveAdminSettings.js?v={{ config.site_version }}"></script>#}
                 </form>
-                {# manually create a save button for this section... #}
-                <input id="textFormSubmit" type="submit" value="Save">
             </section>
         </div>
 
@@ -154,26 +161,42 @@
 
                 /** submit text settings from all text forms **/
                 function submitTextSettings() {
-                    // gather all features in the text settings container
-                    // features are based on data-feature parent attribute
-                    // they should be added into a json object to send via ajax
-                    // e.g. { feature1: { provider: 'OpenAI', model: 'gpt-4', systemPrompt: '...' }, feature2: { ... } }
-                    const features = {
-                    {% for feature in features %}
-                    {{ feature.feature }}:
-                    document.querySelector('[data-feature={{ feature.feature }}]').querySelectorAll('input, select, textarea'),
-                    {% endfor %}
-                }
-                    ;
-                    // build json object from all features
-                    const data = {};
-                    for (const [featureName, inputs] of Object.entries(features)) {
-                        data[featureName] = {};
-                        inputs.forEach(input => {
-                            data[featureName][input.name] = input.value;
+                    //grab the text setting form, and post the data via fetch
+                    const textForm = document.getElementById('textForm');
+                    const formData = new FormData(textForm);
+                    const data = Object.fromEntries(formData.entries());
+
+                    /**
+                     * Convert flat form array with bracketed keys to nested JSON (written by gpt-4.1)
+                     * @param flatObj
+                     * @returns {{}}
+                     */
+                    function formArrayToNestedJson(flatObj) {
+                        const result = {};
+
+                        Object.entries(flatObj).forEach(([flatKey, value]) => {
+                            // Match all bracketed keys, e.g. [chat][openai][key]
+                            const keys = [];
+                            flatKey.replace(/\[([^\]]+)\]/g, (_, k) => keys.push(k));
+
+                            if (keys.length === 0) return; // skip if no brackets
+
+                            let current = result;
+                            keys.forEach((key, idx) => {
+                                if (idx === keys.length - 1) {
+                                    current[key] = value;
+                                } else {
+                                    if (!current[key] || typeof current[key] !== 'object') {
+                                        current[key] = {};
+                                    }
+                                    current = current[key];
+                                }
+                            });
                         });
 
+                        return result;
                     }
+
                     // send via javascript fetch to adminOpenAi.postTextOptions
                     const response = fetch('{{ routeLookupIfAuthorized('adminOpenAi.postTextOptions') }}', {
                         method: 'POST',
@@ -181,7 +204,7 @@
                             'Content-Type': 'application/json',
                             'Accept': 'application/json'
                         },
-                        body: JSON.stringify(data)
+                        body: JSON.stringify(formArrayToNestedJson(data))
                     });
                     if (response.ok) {
                         // success
