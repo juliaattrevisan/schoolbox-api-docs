@@ -4,7 +4,7 @@
         <span>Provider</span>
         <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title='Select which provider you will use for conducting AI text queries; choose "Off" to disable this feature.'>?</span>
     </label>
-    <select id="{{ feature.feature }}-provider-value" type="text" name="{{ feature.feature }}-provider">
+    <select id="{{ feature.feature }}-provider-value" type="text" name="provider">
         {% for provider in providers %}
             <option value="{{ provider }}"{% if feature.config.provider ==  provider %} selected {% endif %}>{{ provider }}</option>
         {% endfor %}
@@ -14,13 +14,13 @@
         <span>OpenAI API Key</span>
         <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="This is your secure key for authorising GPT based AI assistant services. The key can be created at https://openai.com/ or in Azure.">?</span>
     </label>
-    <input id="{{ feature.feature }}-apiKey-value" type="text" name="{{ feature.feature }}-apiKey" value="{{ feature.config.openai.key.value }}" data-feature-openai data-feature-azure>
+    <input id="{{ feature.feature }}-apiKey-value" type="text" name="key" value="{{ feature.config.openai.key.value }}" data-feature-openai data-feature-azure>
 
     <label id="{{ feature.feature }}-model" for="{{ feature.feature }}-model-value" data-feature-openai>
         <span>OpenAI Model</span>
         <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="Select which model you wish to use for your OpenAI service.">?</span>
     </label>
-    <select id="{{ feature.feature }}-model-value" type="text" name="{{ feature.feature }}-model" data-feature-openai>
+    <select id="{{ feature.feature }}-model-value" type="text" name="model" data-feature-openai>
         <option value="">-- select an option --</option>
         {% for model in models %}
             <option value="{{ model }}"{% if feature.config.openai.model.value ==  model %} selected {% endif %}>{{ model }}</option>
@@ -31,19 +31,19 @@
         <span>Azure OpenAI Resource Name</span>
         <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="The name of your Azure OpenAI Resource.">?</span>
     </label>
-    <input id="{{ feature.feature }}-resourceName-value" type="text" name="{{ feature.feature }}-resourceName" value="{{ feature.config.azure.resource.value }}" data-feature-azure>
+    <input id="{{ feature.feature }}-resourceName-value" type="text" name="resource" value="{{ feature.config.azure.resource.value }}" data-feature-azure>
 
     <label id="{{ feature.feature }}-deploymentId" for="{{ feature.feature }}-deploymentId-value" data-feature-azure>
         <span>Azure OpenAI Deployment ID</span>
         <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="The deployment name you chose when you deployed the model in Azure.">?</span>
     </label>
-    <input id="{{ feature.feature }}-deploymentId-value" type="text" name="{{ feature.feature }}-deploymentId" value="{{ feature.config.azure.deployment.value }}" data-feature-azure>
+    <input id="{{ feature.feature }}-deploymentId-value" type="text" name="deployment" value="{{ feature.config.azure.deployment.value }}" data-feature-azure>
 
     <label id="{{ feature.feature }}-systemPrompt" for="{{ feature.feature }}-systemPrompt-value" data-feature-azure data-feature-openai>
         <span>{{ feature.title }} Generation System Prompt</span>
         <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="Provide some additional instructions to shape what the AI service generates for {{ feature.title }} Generation requests.">?</span>
     </label>
-    <textarea id="{{ feature.feature }}-systemPrompt-value" name="{{ feature.feature }}-systemPrompt" rows="5" data-feature-azure data-feature-openai>{{ feature.config.openai.systemprompt.value }}</textarea>
+    <textarea id="{{ feature.feature }}-systemPrompt-value" name="systemprompt" rows="5" data-feature-azure data-feature-openai>{{ feature.config.openai.systemprompt.value }}</textarea>
 
     <script type="application/javascript">
         // use a const feature as the container selector

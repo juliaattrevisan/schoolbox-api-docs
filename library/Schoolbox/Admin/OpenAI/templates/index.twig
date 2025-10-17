@@ -14,11 +14,13 @@
         <div class="small-12 columns island">
             <section id="textSettingsContainer">
                 {# module specific config #}
-                <div id="textModuleContainer" class="l-grid l-gap-l l-mar-m--bottom" style="display:none">
-                    {% for feature in features %}
-                        {% include '@adminOpenAi/config.twig' with {feature:feature, providers:providers, models:models} only %}
-                    {% endfor %}
-                </div>
+                <form method="POST" action="{{ routeLookupIfAuthorized('adminOpenAi.postTextOptions') }}">
+                    <div id="textModuleContainer" class="l-grid l-gap-l l-mar-m--bottom" style="display:none">
+                        {% for feature in features %}
+                            {% include '@adminOpenAi/config.twig' with {feature:feature, providers:providers, models:models} only %}
+                        {% endfor %}
+                    </div>
+                </form>
                 {# manually create a save button for this section... #}
                 <input id="textFormSubmit" type="submit" value="Save">
             </section>
@@ -43,7 +45,7 @@
                 const textProvider = $('#openai_text_endpoint-field');
                 const textSystemPrompt = $('#openai_text_generation_system_prompt-field').parent('div');
 
-                textProvider.on('change', function(event) {
+                textProvider.on('change', function (event) {
                     event.preventDefault();
                     initText(textModuleContainer, textProvider);
                 });
@@ -52,7 +54,7 @@
                 initText(textModuleContainer, textProvider, true);
 
                 // when the text provider changes, we need to fetch the new html from adminOpenAi.getConfigStruct
-                function initText(textModuleContainer, textProvider, initLoad= false) {
+                function initText(textModuleContainer, textProvider, initLoad = false) {
                     // get the provider
                     const provider = textProvider.val();
                     if ('Off' === provider || '' === provider) {
@@ -74,11 +76,11 @@
                     $.ajax({
                         url: path,
                         type: 'GET',
-                        success: function(response) {
+                        success: function (response) {
                             // replace the html in the textModuleContainer
                             textModuleContainer.html(response);
                         },
-                        error: function(xhr, status, error) {
+                        error: function (xhr, status, error) {
                             console.error('Error fetching config struct:', error);
                         }
                     })
@@ -95,7 +97,7 @@
                 const imageOutputQuality = $('#openai_image_output_quality-field').parent('div');
                 const imageSystemPrompt = $('#openai_image_system_prompt-field').parent('div');
 
-                imageProvider.on('change', function(event) {
+                imageProvider.on('change', function (event) {
                     event.preventDefault();
                     init(imageContainer, imageProvider, imageKey, imageModel, imageAzureResourceName, imageAzureDeploymentId, imageOutputQuality, imageSystemPrompt);
                 });
@@ -105,8 +107,7 @@
                 /**
                  *  Hide everything if you haven't chosen a provider yet
                  */
-                function init(container,provider, key, model, azureResourceName, azureDeploymentId, outputQuality, systemPrompt)
-                {
+                function init(container, provider, key, model, azureResourceName, azureDeploymentId, outputQuality, systemPrompt) {
                     if ('{{ endpointTypeOff }}' === provider.val() || '' === provider.val()) {
                         key.hide();
                         model.hide();
@@ -146,71 +147,49 @@
                     container.show();
                 }
 
-                $('#textFormSubmit').on('click', function(event) {
+                $('#textFormSubmit').on('click', function (event) {
                     event.preventDefault();
                     submitTextSettings();
                 });
 
                 /** submit text settings from all text forms **/
                 function submitTextSettings() {
-                    // Find all forms inside the container
-                    const forms = document.querySelector('#textSettingsContainer').querySelectorAll('form');
-
-                    // Create a new form element
-                    const combinedForm = document.createElement('form');
-                    combinedForm.id = 'combinedForm';
-
-                    // Loop through each form
-                    forms.forEach(form => {
-                        Array.from(form.elements).forEach(field => {
-                            if (field.name && !['submit', 'button', 'reset'].includes(field.type)) {
-                                let clonedField;
-
-                                if (field.tagName === 'SELECT') {
-                                    clonedField = field.cloneNode(true);
-                                    // Explicitly set the selected value on the cloned select
-                                    clonedField.value = field.value;
-                                    // For multiple selects, copy the selected options
-                                    if (field.multiple) {
-                                        Array.from(field.options).forEach((option, i) => {
-                                            clonedField.options[i].selected = option.selected;
-                                        });
-                                    }
-                                } else {
-                                    clonedField = field.cloneNode(true);
-                                    // For other input types, ensure the value is copied
-                                    if (field.type !== 'checkbox' && field.type !== 'radio') {
-                                        clonedField.value = field.value;
-                                    } else {
-                                        clonedField.checked = field.checked;
-                                    }
-                                }
-
-                                combinedForm.appendChild(clonedField);
-                            }
-                        });
-                    });
-
-                    // Now you can add the form to the DOM, e.g.:
-                    // document.body.appendChild(combinedForm);
-
-                    // Or send it as FormData to the backend
-                    const formData = new FormData(combinedForm);
-                    fetch('{{ routeLookupIfAuthorized('adminOpenAi.postTextOptions') }}', {
-                        method: 'POST',
-                        body: formData
-                    }). then(response => {
-                        if (response.ok) {
-                            // reload the window, so its the same workflow as before
-                            window.location.reload();
-                        } else {
-                            // reload the window, so its the same workflow as before
-                            window.location.reload();
-                        }
-                    }).catch(error => {
-                        console.error('Error:', error);
-                    });
+                    // gather all features in the text settings container
+                    // features are based on data-feature parent attribute
+                    // they should be added into a json object to send via ajax
+                    // e.g. { feature1: { provider: 'OpenAI', model: 'gpt-4', systemPrompt: '...' }, feature2: { ... } }
+                    const features = {
+                    {% for feature in features %}
+                    {{ feature.feature }}:
+                    document.querySelector('[data-feature={{ feature.feature }}]').querySelectorAll('input, select, textarea'),
+                    {% endfor %}
                 }
+                    ;
+                    // build json object from all features
+                    const data = {};
+                    for (const [featureName, inputs] of Object.entries(features)) {
+                        data[featureName] = {};
+                        inputs.forEach(input => {
+                            data[featureName][input.name] = input.value;
+                        });
+
+                    }
+                    // send via javascript fetch to adminOpenAi.postTextOptions
+                    const response = fetch('{{ routeLookupIfAuthorized('adminOpenAi.postTextOptions') }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(data)
+                    });
+                    if (response.ok) {
+                        // success
+                       window.refresh();
+                    } else {
+                        // error
+                        console.log('Error saving text settings.');
+                    }    }
 
             });
         </script>
