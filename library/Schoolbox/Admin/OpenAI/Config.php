@@ -24,6 +24,11 @@ class Config
         Helper::FEATURE_DIALOGAGENT,
     ];
 
+    public const PROVIDERS = [
+        Helper::ENDPOINT_TYPE_OPENAI => Helper::ENDPOINT_TYPE_OPENAI,
+        Helper::ENDPOINT_TYPE_AZURE => Helper::ENDPOINT_TYPE_AZURE,
+    ];
+
     /** Open AI models, and the 'OFF' option to be used in the same select box */
     public const NOT_ACTIVE = "Not Active";
 
@@ -137,21 +142,21 @@ class Config
     {
         // start with a blank config
         $config = [self::FIELD_PROVIDER => self::NO_PROVIDER];
-        $config['openai'] = $this->initOpenAi();
-        $config['azure'] = $this->initAzure();
+        $config[Helper::ENDPOINT_TYPE_OPENAI] = $this->initOpenAi();
+        $config[Helper::ENDPOINT_TYPE_AZURE] = $this->initAzure();
 
         // set the fields we know about
         if ($provider === Helper::ENDPOINT_TYPE_AZURE) {
             $config[self::FIELD_PROVIDER] = Helper::ENDPOINT_TYPE_AZURE;
-            $config['azure'][self::FIELD_RESOURCE_NAME]['value'] = $resourceName ?? '';
-            $config['azure'][self::FIELD_DEPLOYMENT_ID]['value'] = $deploymentId ?? '';
-            $config['openai'][self::FIELD_OPENAIKEY]['value'] = $key ?? '';
-            $config['openai'][self::FIELD_SYSTEM_PROMPT]['value'] = $systemPrompt ?? '';
+            $config[Helper::ENDPOINT_TYPE_AZURE][self::FIELD_RESOURCE_NAME]['value'] = $resourceName ?? '';
+            $config[Helper::ENDPOINT_TYPE_AZURE][self::FIELD_DEPLOYMENT_ID]['value'] = $deploymentId ?? '';
+            $config[Helper::ENDPOINT_TYPE_OPENAI][self::FIELD_OPENAIKEY]['value'] = $key ?? '';
+            $config[Helper::ENDPOINT_TYPE_OPENAI][self::FIELD_SYSTEM_PROMPT]['value'] = $systemPrompt ?? '';
         } elseif ($provider === Helper::ENDPOINT_TYPE_OPENAI) {
             $config[self::FIELD_PROVIDER] = Helper::ENDPOINT_TYPE_OPENAI;
-            $config['openai'][self::FIELD_OPENAIKEY]['value'] = $key ?? '';
-            $config['openai'][self::FIELD_MODEL]['value'] = $model ?? self::NOT_ACTIVE;
-            $config['openai'][self::FIELD_SYSTEM_PROMPT]['value'] = $systemPrompt ?? '';
+            $config[Helper::ENDPOINT_TYPE_OPENAI][self::FIELD_OPENAIKEY]['value'] = $key ?? '';
+            $config[Helper::ENDPOINT_TYPE_OPENAI][self::FIELD_MODEL]['value'] = $model ?? self::NOT_ACTIVE;
+            $config[Helper::ENDPOINT_TYPE_OPENAI][self::FIELD_SYSTEM_PROMPT]['value'] = $systemPrompt ?? '';
         }
         return $config;
     }
@@ -183,12 +188,36 @@ class Config
                 $this->features[$feature] = [
                     'feature' => $feature,
                     'title' => $row->getTitle(),
-                    'config' => json_decode($row->getValue(), true, 512, JSON_THROW_ON_ERROR)
+                    'config' => $this->decode($row->getValue())
 
                 ];
             }
         }
 
         return $this->features;
+    }
+
+    /**
+     * @param string|null $config
+     * @return array{
+     *    provider: string,
+     *    OpenAI: array{
+     *      open_ai_key: array{value: string},
+     *      model: array{value: string},
+     *      system_prompt: array{value: string}
+     *    },
+     *    Azure: array{
+     *      resource_name: array{value: string},
+     *      deployment_id: array{value: string}
+     *    }
+     *  }|null
+     * @throws \JsonException
+     */
+    public function decode(?string $config): ?array
+    {
+        if ($config === null) {
+            return null;
+        }
+        return json_decode($config, true, 512, JSON_THROW_ON_ERROR);
     }
 }

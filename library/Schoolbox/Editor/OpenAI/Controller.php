@@ -60,7 +60,7 @@ class Controller extends Base
 
         // ai Config
         $aiConfig = new Config();
-        $lpConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_LESSONPLAN), trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)));
+        $lpConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_LESSONPLAN));
 
         // if not enabled, 404
         if ($aiConfig->isEnabled($lpConfig) === false) {
@@ -79,10 +79,10 @@ class Controller extends Base
         try {
             $helper = new Helper(
                 trim($lpConfig[Config::FIELD_PROVIDER]),
-                trim($lpConfig[Config::FIELD_OPENAIKEY]),
-                trim($lpConfig[Config::FIELD_RESOURCE_NAME] ?? ''),
-                trim($lpConfig[Config::FIELD_DEPLOYMENT_ID] ?? ''),
-                trim($lpConfig[Config::FIELD_MODEL] ?? ''),
+                trim($lpConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_OPENAIKEY]),
+                trim($lpConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_RESOURCE_NAME] ?? ''),
+                trim($lpConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID] ?? ''),
+                trim($lpConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL] ?? ''),
                 $this->client,
                 $this->errorMapper,
                 $this->logMapper,
@@ -90,9 +90,9 @@ class Controller extends Base
 
             $payloadGenerator = (new Payload\LessonPlan(
                 trim($lpConfig[Config::FIELD_PROVIDER]),
-                trim($lpConfig[Config::FIELD_MODEL] ?? ''),
-                trim($lpConfig[Config::FIELD_DEPLOYMENT_ID] ?? ''),
-                trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_SYSTEM_PROMPT)),
+                trim($lpConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL] ?? ''),
+                trim($lpConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID] ?? ''),
+                trim($lpConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_SYSTEM_PROMPT] ?? ''),
                 trim((string)$this->getConfigLoader()->get('spellcheck_language')),
                 $this->curriculumNodeMapper
             ));
@@ -340,7 +340,7 @@ class Controller extends Base
 
         // ai Config
         $aiConfig = new Config();
-        $chatConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_CHAT), trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_ENDPOINT)));
+        $chatConfig = $aiConfig->decode((string)$this->getConfigLoader()->get(ConfigMapper::NAME_OPENAI_TEXT_CHAT));
 
         // if not enabled, 404
         if ($aiConfig->isEnabled($chatConfig) === false) {
@@ -364,10 +364,10 @@ class Controller extends Base
         try {
             (new Helper(
                 trim($chatConfig[Config::FIELD_PROVIDER]),
-                trim($chatConfig[Config::FIELD_OPENAIKEY]),
-                trim($chatConfig[Config::FIELD_RESOURCE_NAME] ?? ''),
-                trim($chatConfig[Config::FIELD_DEPLOYMENT_ID] ?? ''),
-                trim($chatConfig[Config::FIELD_MODEL] ?? ''),
+                trim($chatConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_OPENAIKEY]),
+                trim($chatConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_RESOURCE_NAME] ?? ''),
+                trim($chatConfig[Helper::ENDPOINT_TYPE_AZURE][Config::FIELD_DEPLOYMENT_ID] ?? ''),
+                trim($chatConfig[Helper::ENDPOINT_TYPE_OPENAI][Config::FIELD_MODEL] ?? ''),
                 $this->client,
                 $this->errorMapper,
                 $this->logMapper,

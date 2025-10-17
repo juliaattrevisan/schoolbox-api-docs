@@ -33,7 +33,7 @@ class Controller extends ConfigController
      */
     public function __construct(
         ConfigMapper $configMapper,
-        private FieldStrategyFactory $fieldStrategyFactory,
+        FieldStrategyFactory $fieldStrategyFactory,
         Rebuilder $rebuilder,
         CacheInterface $oidcCache,
     ) {
