@@ -852,7 +852,6 @@ class Mapper extends AbstractFolderMapper implements ILocator
     protected function getSelectString()
     {
         $code_mapper           = $this->getJoinMapper('codes');
-        $yearLevelMapper       = $this->getJoinMapper('folder_year_level');
         $homepageConfig_mapper = $this->getJoinMapper('homepages');
         $group_mapper          = $this->getJoinMapper('groups');
         $courseSpecMapper      = $this->getJoinMapper('course_specification');
@@ -865,7 +864,6 @@ class Mapper extends AbstractFolderMapper implements ILocator
                 {$this->getJoinColumnString('coverImage', 'ci')},
                 {$this->getJoinColumnString('coverImage.allowedFileExtension', 'cim')},
                 {$code_mapper->getColumnString('cc')},
-                {$yearLevelMapper->getColumnString('yl')},
                 {$homepageConfig_mapper->getColumnString('hp')},
                 {$group_mapper->getColumnString('ug')},
                 {$courseSpecMapper->getColumnString('cs')},
@@ -885,7 +883,6 @@ class Mapper extends AbstractFolderMapper implements ILocator
         return "
             FROM {$this->getTable()}
             LEFT JOIN {$this->getJoinSql('codes', '', 'cc')}
-            LEFT JOIN {$this->getJoinSql('folder_year_level', '', 'yl')}
             LEFT JOIN {$this->getJoinSql('coverImage', '', 'ci', true)}
             LEFT JOIN {$this->getJoinSql('coverImage.allowedFileExtension', 'ci', 'cim', true)}
             LEFT JOIN {$this->getJoinSql('homepages', '', 'hp')}
@@ -992,7 +989,6 @@ class Mapper extends AbstractFolderMapper implements ILocator
 
         // Track which joins we need to hydrate.
         $hydrateCodes           = false;
-        $hydrateYearLevels      = false;
         $hydrateCurriculumNodes = false;
         $hydrateHomepage        = false;
         $hydrateGroup           = false;
@@ -1006,7 +1002,6 @@ class Mapper extends AbstractFolderMapper implements ILocator
             // Examine the first row to determine what joins to hydrate
             if ($firstRow) {
                 $hydrateCodes           = array_key_exists('cc.code', $row);
-                $hydrateYearLevels      = array_key_exists('yl.' . YearLevel\Mapper::COL_ID, $row);
                 $hydrateCurriculumNodes = array_key_exists('cn.id', $row); // TODO this probably needs to be more granular
                 $hydrateHomepage        = array_key_exists('hp.cid', $row);
                 $hydrateGroup           = array_key_exists('ug.cid', $row);
@@ -1026,9 +1021,6 @@ class Mapper extends AbstractFolderMapper implements ILocator
                 // Instantiate collections we are about to populate
                 if ($hydrateCodes) {
                     $folders[$folderId]->setCodes($codeMapper->createCollection());
-                }
-                if ($hydrateYearLevels) {
-                    $folders[$folderId]->setYearLevels($yearLevelMapper->createCollection());
                 }
                 if ($hydrateCurriculumNodes) {
                     $folders[$folderId]->setCurriculumNodes($curriculumNodeMapper->createCollection());
@@ -1067,17 +1059,6 @@ class Mapper extends AbstractFolderMapper implements ILocator
                 }
             }
 
-            // Year Level usages: Ensure we de-duplicate (as we have joined multiple 1:N relationships)
-            if ($hydrateYearLevels) {
-                $yearLevelId = $row['yl.' . YearLevel\Mapper::COL_ID];
-                if ($yearLevelId) {
-                    if (!array_key_exists($yearLevelId, $yearLevelCache)) {
-                        $yearLevelCache[$yearLevelId] = $yearLevelMapper->hydrate($row, 'yl');
-                    }
-                    $folders[$folderId]->getYearLevels()->setOffset($yearLevelId, $yearLevelCache[$yearLevelId]);
-                }
-            }
-
             // Hydrate curriculum node codes (avoiding duplicates)
             // BTW fetching multiple 1-M relations in a single query
             // is how you get ants!
@@ -1089,6 +1070,12 @@ class Mapper extends AbstractFolderMapper implements ILocator
                     $folders[$folderId]->getCurriculumNodes()[$curriculumNode->getId()] = $curriculumNode;
                 }
             }
+        }
+
+        // Hydrate one-to-many relations
+        $yearLevelsByFolderId = $yearLevelMapper->findForOtherMapper($this, 'folder_year_level', $folders->keys());
+        foreach ($folders as $folderId => $folder) {
+            $folders[$folderId]->setYearLevels($yearLevelsByFolderId[$folderId] ?? $yearLevelMapper->createCollection());
         }
 
         return $folders;
