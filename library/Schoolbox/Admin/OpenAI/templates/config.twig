@@ -14,16 +14,16 @@
         <span>OpenAI API Key</span>
         <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="This is your secure key for authorising GPT based AI assistant services. The key can be created at https://openai.com/ or in Azure.">?</span>
     </label>
-    <input id="{{ feature.feature }}-open_ai_key-value" type="text" name="[{{ feature.feature }}][openai][open_ai_key][value]" value="{{ feature.config.openai.open_ai_key.value }}" data-feature-openai data-feature-azure>
+    <input id="{{ feature.feature }}-open_ai_key-value" type="text" name="[{{ feature.feature }}][OpenAI][open_ai_key][value]" value="{{ feature.config.OpenAI.open_ai_key.value }}" data-feature-openai data-feature-azure>
 
     <label id="{{ feature.feature }}-model" for="{{ feature.feature }}-model-value" data-feature-openai>
         <span>OpenAI Model</span>
         <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="Select which model you wish to use for your OpenAI service.">?</span>
     </label>
-    <select id="{{ feature.feature }}-model-value" type="text" name="[{{ feature.feature }}][openai][model][value]" data-feature-openai>
+    <select id="{{ feature.feature }}-model-value" type="text" name="[{{ feature.feature }}][OpenAI][model][value]" data-feature-openai>
         <option value="">-- select an option --</option>
         {% for model in models %}
-            <option value="{{ model }}"{% if feature.config.openai.model.value ==  model %} selected {% endif %}>{{ model }}</option>
+            <option value="{{ model }}"{% if feature.config.OpenAI.model.value ==  model %} selected {% endif %}>{{ model }}</option>
         {% endfor %}
     </select>
 
@@ -31,19 +31,19 @@
         <span>Azure OpenAI Resource Name</span>
         <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="The name of your Azure OpenAI Resource.">?</span>
     </label>
-    <input id="{{ feature.feature }}-resource_name-value" type="text" name="[{{ feature.feature }}][azure][resource_name][value]" value="{{ feature.config.azure.resource_name.value }}" data-feature-azure>
+    <input id="{{ feature.feature }}-resource_name-value" type="text" name="[{{ feature.feature }}][Azure][resource_name][value]" value="{{ feature.config.Azure.resource_name.value }}" data-feature-azure>
 
     <label id="{{ feature.feature }}-deployment_id" for="{{ feature.feature }}-deployment_id-value" data-feature-azure>
         <span>Azure OpenAI Deployment ID</span>
         <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="The deployment name you chose when you deployed the model in Azure.">?</span>
     </label>
-    <input id="{{ feature.feature }}-deployment_id-value" type="text" name="[{{ feature.feature }}][azure][deployment_id][value]" value="{{ feature.config.azure.deployment_id.value }}" data-feature-azure>
+    <input id="{{ feature.feature }}-deployment_id-value" type="text" name="[{{ feature.feature }}][Azure][deployment_id][value]" value="{{ feature.config.Azure.deployment_id.value }}" data-feature-azure>
 
     <label id="{{ feature.feature }}-system_prompt" for="{{ feature.feature }}-system_prompt-value" data-feature-azure data-feature-openai>
         <span>{{ feature.title }} Generation System Prompt</span>
         <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="Provide some additional instructions to shape what the AI service generates for {{ feature.title }} Generation requests.">?</span>
     </label>
-    <textarea id="{{ feature.feature }}-system_prompt-value" name="[{{ feature.feature }}][openai][system_prompt][value]" rows="5" data-feature-azure data-feature-openai>{{ feature.config.openai.system_prompt.value }}</textarea>
+    <textarea id="{{ feature.feature }}-system_prompt-value" name="[{{ feature.feature }}][OpenAI][system_prompt][value]" rows="5" data-feature-azure data-feature-openai>{{ feature.config.OpenAI.system_prompt.value }}</textarea>
 
     <script type="application/javascript">
         // use a const feature as the container selector
