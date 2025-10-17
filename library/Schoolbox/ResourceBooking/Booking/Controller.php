@@ -210,8 +210,7 @@ class Controller extends Base
         );
         $errors = $validation->validateBookingFromPostData($item, $this->requestPost, null);
 
-        // If clashes are allowed on the booking, and the only validation errors are clash errors,
-        // the clashes can be ignored and the booking should be saved with status 'pending'.
+        // If clashes are allowed on the booking, and the only validation errors are clash errors...
         $saveBookingAsPending = false;
         if (
             $item->getAllowClashBookings() && count($errors) > 0 &&
