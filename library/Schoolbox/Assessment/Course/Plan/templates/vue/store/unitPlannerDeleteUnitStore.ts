@@ -27,6 +27,7 @@ export const useDeleteUnitsStore = defineStore("unitPlannerDeleteUnit", () => {
      * to hide the delete prompt
      */
     function cancel(): void {
+        unitToDelete.value = null;
         isOpen.value = false;
     }
 
@@ -38,7 +39,6 @@ export const useDeleteUnitsStore = defineStore("unitPlannerDeleteUnit", () => {
             loadError.value = "No delete route specified";
             return;
         }
-        const unitPlannerStore = useUnitPlannerStore();
         const toast = window.sbProps.toastActivate("Deleting...");
         try {
             isProcessing.value = true;
@@ -50,7 +50,7 @@ export const useDeleteUnitsStore = defineStore("unitPlannerDeleteUnit", () => {
             if (!response.success) {
                 throw new Error(response.message || `Failed to delete ${locale.unit.translate(false, true)}`);
             }
-            unitPlannerStore.units = unitPlannerStore.units.filter((unit) => unit.id !== unitToDelete.value?.id);
+            useUnitPlannerStore().deleteUnit(unitToDelete.value);
             toast.timeout({ text: `${locale.unit.translate(false, true)} successfully deleted` });
             cancel();
         } catch (error) {
