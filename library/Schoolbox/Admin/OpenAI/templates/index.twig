@@ -169,7 +169,7 @@
                     /**
                      * Convert flat form array with bracketed keys to nested JSON (written by gpt-4.1)
                      * @param flatObj
-                     * @returns {{}}
+                     * @returns {}
                      */
                     function formArrayToNestedJson(flatObj) {
                         const result = {};
@@ -208,7 +208,7 @@
                     });
                     if (response.ok) {
                         // success
-                       window.refresh();
+                        window.location.reload()
                     } else {
                         // error
                         console.log('Error saving text settings.');
