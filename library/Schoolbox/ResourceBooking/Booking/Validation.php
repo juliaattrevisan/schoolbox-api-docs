@@ -132,12 +132,27 @@ class Validation
 
     /**
      * Attempts to validate the creation or update of a booking from post data.
+     * Example of return array: [
+     *     'start_datetime' => [
+     *         'invalid' => [
+     *             // Errors on invalid dates ('invalid' key is used because can't convert to desired format).
+     *             'invalid'
+     *         ],
+     *         // Errors on valid dates are keyed by the valid date in Y-m-d H:i:s format.
+     *         '2025-01-01 10:00:00' => [
+     *             'conflict',
+     *             ...
+     *         ],
+     *         ...
+     *     ],
+     *     'end_datetime' => // Array with same structure as start_datetime.
+     * ]
      *
      * @param Item\Model   $resource
      * @param Values       $postData
      * @param Booking|null $existingBooking If provided, this is the booking that is being updated.
      *                                     Leave it out of conflict checks.
-     * @return array<string, array<string>> Array of error array, keyed by self::START_DATETIME or self::END_DATETIME.
+     * @return array<string, array<string, string>> Array of errorStringByDateTimeString arrays, keyed by self::START_DATETIME or self::END_DATETIME.
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
@@ -163,13 +178,13 @@ class Validation
         try {
             $startDate = Alaress_Date_Format::newLocal($postData['startDate'])->getDateTimeObject();
         } catch (\Exception $e) {
-            $errors[self::START_DATETIME][] = self::ERROR_INVALID;
+            $errors[self::START_DATETIME][self::ERROR_INVALID][] = self::ERROR_INVALID;
         }
 
         try {
             $endDate = Alaress_Date_Format::newLocal($postData['endDate'])->getDateTimeObject();
         } catch (\Exception $e) {
-            $errors[self::END_DATETIME][] = self::ERROR_INVALID;
+            $errors[self::END_DATETIME][self::ERROR_INVALID][] = self::ERROR_INVALID;
         }
 
         // Having a power to override doesn't make you a God. Start comes always before End.
@@ -308,7 +323,8 @@ class Validation
         $errors = [];
 
         if ($startDate > $endDate) {
-            $errors[self::END_DATETIME][] = self::ERROR_BEFORE_START;
+            $endDateKey = $endDate->format(Alaress_Date_Format::DATABASE_FORMAT);
+            $errors[self::END_DATETIME][$endDateKey][] = self::ERROR_BEFORE_START;
         }
 
         return $errors;
@@ -327,7 +343,8 @@ class Validation
         $startDate->format('Y-m-d H:i');
 
         if ($startDate->format('Y-m-d H:i') < $now->format('Y-m-d H:i')) {
-            $errors[self::START_DATETIME][] = self::ERROR_IN_PAST;
+            $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_FORMAT);
+            $errors[self::START_DATETIME][$startDateKey][] = self::ERROR_IN_PAST;
         }
 
         return $errors;
@@ -347,7 +364,8 @@ class Validation
         $earliest->add($resource->getMinLeadTime()->getAsDateInterval());
 
         if ($startDate->format('Y-m-d H:i') < $earliest->format('Y-m-d H:i')) {
-            $errors[self::START_DATETIME][] = self::ERROR_TOO_EARLY;
+            $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_FORMAT);
+            $errors[self::START_DATETIME][$startDateKey][] = self::ERROR_TOO_EARLY;
         }
 
         return $errors;
@@ -370,7 +388,8 @@ class Validation
 
         $earliestEnd->add($resource->getMinReservationTime()->getAsDateInterval());
         if ($endDate < $earliestEnd) {
-            $errors[self::END_DATETIME][] = self::ERROR_TOO_SHORT;
+            $endDateKey = $startDate->format(Alaress_Date_Format::DATABASE_FORMAT);
+            $errors[self::END_DATETIME][$endDateKey][] = self::ERROR_TOO_SHORT;
         }
 
         return $errors;
@@ -393,7 +412,8 @@ class Validation
             $latestEnd = clone $startDate;
             $latestEnd->add($resource->getMaxReservationTime()->getAsDateInterval());
             if ($endDate > $latestEnd) {
-                $errors[self::END_DATETIME][] = self::ERROR_TOO_LONG;
+                $endDateKey = $startDate->format(Alaress_Date_Format::DATABASE_FORMAT);
+                $errors[self::END_DATETIME][$endDateKey][] = self::ERROR_TOO_LONG;
             }
         }
 
@@ -463,7 +483,8 @@ class Validation
 
         // Anything still in list of conflicts? We have a conflict
         if (count($conflictingBookings)) {
-            $errors[self::START_DATETIME][] = self::ERROR_CONFLICT;
+            $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_FORMAT);
+            $errors[self::START_DATETIME][$startDateKey][] = self::ERROR_CONFLICT;
         } elseif (strlen($resource->getRoomCode() ?? '') > 0) {
             // Check if there's a timetabled class here, too.
             $roomEvents = $this->getTimetableRoomEvents(
@@ -473,7 +494,8 @@ class Validation
             );
 
             if (count($roomEvents)) {
-                $errors[self::START_DATETIME][] = self::ERROR_TIMETABLED_CLASS;
+                $startDateKey = $startDate->format(Alaress_Date_Format::DATABASE_FORMAT);
+                $errors[self::START_DATETIME][$startDateKey][] = self::ERROR_TIMETABLED_CLASS;
             }
         }
 
@@ -493,7 +515,8 @@ class Validation
 
         $currentTermFinishDate = $currentTerm->getDisplayFinish()->getDateTimeObject();
         if ($endDate > $currentTermFinishDate) {
-            $errors[self::END_DATETIME][] = self::ERROR_CURRENT_TERM;
+            $endDateKey = $endDate->format(Alaress_Date_Format::DATABASE_FORMAT);
+            $errors[self::END_DATETIME][$endDateKey][] = self::ERROR_CURRENT_TERM;
         }
 
         return $errors;
