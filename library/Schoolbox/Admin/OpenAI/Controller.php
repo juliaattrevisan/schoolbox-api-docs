@@ -65,6 +65,7 @@ class Controller extends ConfigController
             'imageConfigContext' => $imageConfigContext,
             'endpointTypeOff' => Helper::ENDPOINT_TYPE_OFF,
             'features' => $textFeatures,
+            'fields' => Config::FIELDS,
             'providers' => [
                 Helper::ENDPOINT_TYPE_OFF,
                 Helper::ENDPOINT_TYPE_OPENAI,
