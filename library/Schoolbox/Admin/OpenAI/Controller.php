@@ -100,10 +100,7 @@ class Controller extends ConfigController
                 'openai' => Helper::ENDPOINT_TYPE_OPENAI,
                 'azure' => Helper::ENDPOINT_TYPE_AZURE,
             ],
-            'models' => [
-                'openai' => Helper::ENDPOINT_TYPE_OPENAI,
-                'azure' => Helper::ENDPOINT_TYPE_AZURE,
-            ]
+            'models' => $aiConfig::AI_MODELS,
         ], 'AI Services');
     }
 

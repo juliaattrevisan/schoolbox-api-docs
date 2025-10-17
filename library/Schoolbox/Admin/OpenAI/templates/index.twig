@@ -16,7 +16,7 @@
                 {# module specific config #}
                 <div id="textModuleContainer" class="l-grid l-gap-l l-mar-m--bottom" style="display:none">
                     {% for feature in features %}
-                        {% include '@adminOpenAi/config.twig' with {feature:feature, providers:providers} only %}
+                        {% include '@adminOpenAi/config.twig' with {feature:feature, providers:providers, models:models} only %}
                     {% endfor %}
                 </div>
                 {# manually create a save button for this section... #}
@@ -34,8 +34,8 @@
 
         <script>
             $(function() {
-                const PROVIDER_OPENAI = '{{ models.openai }}';
-                const PROVIDER_AZURE = '{{ models.azure }}';
+                const PROVIDER_OPENAI = '{{ providers.openai }}';
+                const PROVIDER_AZURE = '{{ providers.azure }}';
 
                 /* Text credentials
                  */

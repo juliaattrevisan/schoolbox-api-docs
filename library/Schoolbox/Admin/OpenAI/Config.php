@@ -27,7 +27,6 @@ class Config
     /** Open AI models, and the 'OFF' option to be used in the same select box */
     public const NOT_ACTIVE = "Not Active";
     public const AI_MODELS = [
-        self::NOT_ACTIVE,
         "gpt-4o",
         "gpt-4o-mini",
         "gpt-4.1",

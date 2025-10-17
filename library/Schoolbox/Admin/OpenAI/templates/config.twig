@@ -22,13 +22,9 @@
     </label>
     <select id="{{ feature.feature }}-provider-value" type="text" name="{{ feature.feature }}-provider" data-feature-openai>
         <option value="">-- select an option --</option>
-        {% for modal in modals ?? [] %}
-            <option value="{{ modal }}">{{ modal }}</option>
+        {% for model in models %}
+            <option value="{{ model }}">{{ model }}</option>
         {% endfor %}
-        <option value="gpt-4o">gpt-4o</option>
-        <option value="gpt-4o-mini">gpt-4o-mini</option>
-        <option value="gpt-4.1">gpt-4.1</option>
-        <option value="gpt-4.1-mini">gpt-4.1-mini</option>
     </select>
 
     <label id="{{ feature.feature }}-resourceName" for="{{ feature.feature }}-resourceName-value" data-feature-azure>
