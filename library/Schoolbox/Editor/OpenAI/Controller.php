@@ -346,7 +346,7 @@ class Controller extends Base
         if ($aiConfig->isEnabled($chatConfig) === false) {
             $returnCode = 404;
 
-            $problem = new ApiProblem("Lesson Plan AI is not enabled.")
+            $problem = (new ApiProblem("AI Assistant is not enabled."))
                 ->setStatus($returnCode)
                 ->asArray();
 
