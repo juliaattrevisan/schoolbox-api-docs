@@ -13,11 +13,11 @@
         {# main text config space, which provider. #}
         <div class="small-12 columns island">
             <section id="textSettingsContainer">
-                {% include '@settings/moduleConfig.twig' with textConfigContext only %}
-
                 {# module specific config #}
                 <div id="textModuleContainer" class="l-grid l-gap-l l-mar-m--bottom" style="display:none">
-                    {% include '@adminOpenAi/config.twig' with {textModuleContext: textModuleContext} only %}
+                    {% for feature in features %}
+                        {% include '@adminOpenAi/config.twig' with {feature:feature, providers:providers} only %}
+                    {% endfor %}
                 </div>
                 {# manually create a save button for this section... #}
                 <input id="textFormSubmit" type="submit" value="Save">

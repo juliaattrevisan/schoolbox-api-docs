@@ -95,6 +95,11 @@ class Controller extends ConfigController
             'textConfig' => $textModules,
             'imageConfigContext' => $imageConfigContext,
             'endpointTypeOff' => Helper::ENDPOINT_TYPE_OFF,
+            'features' => $aiConfig->getFeatures(),
+            'providers' => [
+                'openai' => Helper::ENDPOINT_TYPE_OPENAI,
+                'azure' => Helper::ENDPOINT_TYPE_AZURE,
+            ],
             'models' => [
                 'openai' => Helper::ENDPOINT_TYPE_OPENAI,
                 'azure' => Helper::ENDPOINT_TYPE_AZURE,
@@ -177,7 +182,14 @@ class Controller extends ConfigController
             ]
         );
 
-        $this->response = $this->responseFromTemplateUnthemed('@adminOpenAi/config.twig', ['textModuleContext' => $textModuleContext]);
+        $this->response = $this->responseFromTemplateUnthemed('@adminOpenAi/config.twig', [
+            'features' => $aiConfig->getFeatures(),
+            'feature' => $aiConfig->getFeatures()['chat'],
+            'providers' => [
+                'openai' => Helper::ENDPOINT_TYPE_OPENAI,
+                'azure' => Helper::ENDPOINT_TYPE_AZURE,
+            ]
+        ]);
     }
 
 

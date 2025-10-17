@@ -1,6 +1,90 @@
-{% for module,textConfig in textModuleContext %}
-    <div data-module="{{ module }}">
-        <h2 class="subheader">{{ module }}</h2>
-        {% include '@settings/moduleConfig.twig' with textConfig only %}
-    </div>
-{% endfor %}
+<div data-feature={{ feature.feature }}>
+    <h2 class="subheader">{{ feature.title }}</h2>
+    <label id="{{ feature.feature }}-provider" for="{{ feature.feature }}-provider-value">
+        <span>Provider</span>
+        <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title='Select which provider you will use for conducting AI text queries; choose "Off" to disable this feature.'>?</span>
+    </label>
+    <select id="{{ feature.feature }}-provider-value" type="text" name="{{ feature.feature }}-provider">
+        <option value="off">Off</option>
+        <option value="openai">OpenAI</option>
+        <option value="azure">Azure</option>
+    </select>
+
+    <label id="{{ feature.feature }}-apiKey" for="{{ feature.feature }}-apiKey-value" data-feature-openai data-feature-azure>
+        <span>OpenAI API Key</span>
+        <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="This is your secure key for authorising GPT based AI assistant services. The key can be created at https://openai.com/ or in Azure.">?</span>
+    </label>
+    <input id="{{ feature.feature }}-apiKey-value" type="text" name="" value="" data-feature-openai data-feature-azure>
+
+    <label id="{{ feature.feature }}-provider" for="{{ feature.feature }}-provider-value" data-feature-openai>
+        <span>OpenAI Model</span>
+        <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="Select which model you wish to use for your OpenAI service.">?</span>
+    </label>
+    <select id="{{ feature.feature }}-provider-value" type="text" name="{{ feature.feature }}-provider" data-feature-openai>
+        <option value="">-- select an option --</option>
+        {% for modal in modals ?? [] %}
+            <option value="{{ modal }}">{{ modal }}</option>
+        {% endfor %}
+        <option value="gpt-4o">gpt-4o</option>
+        <option value="gpt-4o-mini">gpt-4o-mini</option>
+        <option value="gpt-4.1">gpt-4.1</option>
+        <option value="gpt-4.1-mini">gpt-4.1-mini</option>
+    </select>
+
+    <label id="{{ feature.feature }}-resourceName" for="{{ feature.feature }}-resourceName-value" data-feature-azure>
+        <span>Azure OpenAI Resource Name</span>
+        <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="The name of your Azure OpenAI Resource.">?</span>
+    </label>
+    <input id="{{ feature.feature }}-resourceName-value" type="text" name="{{ feature.feature }}-resourceName" value="" data-feature-azure>
+
+    <label id="{{ feature.feature }}-deploymentId" for="{{ feature.feature }}-deploymentId-value" data-feature-azure>
+        <span>Azure OpenAI Deployment ID</span>
+        <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="The deployment name you chose when you deployed the model in Azure.">?</span>
+    </label>
+    <input id="{{ feature.feature }}-deploymentId-value" type="text" name="{{ feature.feature }}-deploymentId" value="" data-feature-azure>
+
+    <label id="{{ feature.feature }}-systemPrompt" for="{{ feature.feature }}-systemPrompt-value" data-feature-azure data-feature-openai>
+        <span>{{ feature.title }} Generation System Prompt</span>
+        <span data-tooltip class="has-tip tip-top hint"  data-allow-html='true' title="Provide some additional instructions to shape what the AI service generates for {{ feature.title }} Generation requests.">?</span>
+    </label>
+    <textarea id="{{ feature.feature }}-systemPrompt-value" name="{{ feature.feature }}-systemPrompt" rows="5" data-feature-azure data-feature-openai></textarea>
+
+    <script type="application/javascript">
+        // use a const feature as the container selector
+        const feature{{ feature.feature }} = document.querySelector('[data-feature={{ feature.feature }}]');
+
+        /**
+         * reusable function to show/hide fields based on provider
+         * @param provider
+         */
+        function showHide(feature, provider) {
+            // hide all fields
+            feature.querySelectorAll('[data-feature-openai]').forEach(el => el.style.display = 'none');
+            feature.querySelectorAll('[data-feature-azure]').forEach(el => el.style.display = 'none');
+
+            if (provider === 'openai') {
+                feature.querySelectorAll('[data-feature-openai]').forEach(el => el.style.display = 'block');
+                return;
+            } else if (provider === 'azure') {
+                feature.querySelectorAll('[data-feature-azure]').forEach(el => el.style.display = 'block');
+                return;
+            }
+        }
+
+        // on page load, show the current selected provider fields
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentValue{{ feature.feature }} = feature{{ feature.feature }}.querySelector('#{{ feature.feature }}-provider-value').value;
+            showHide(feature{{ feature.feature }}, currentValue{{ feature.feature }});
+            }
+        );
+
+        // when changing the provider select, show/hide the relevant fields
+        feature{{ feature.feature }}.querySelector('#{{ feature.feature }}-provider-value').addEventListener('change', (event) => {
+            const value = event.target.value;
+
+            // show relevant fields
+            showHide(feature{{ feature.feature }}, value);
+        });
+
+    </script>
+</div>

@@ -118,6 +118,7 @@ class Config
             foreach (self::ALL_MODULES as $feature) {
                 $row = $configMapper->findOneByColumn(ConfigMapper::COL_NAME, self::MODULE_CONFIG[$feature]);
                 $this->features[$feature] = [
+                    'feature' => $feature,
                     'title' => $row->getTitle(),
                     'config' => $this->decode($row->getValue(), $provider)
                 ];
