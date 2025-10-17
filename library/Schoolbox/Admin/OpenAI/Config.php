@@ -114,6 +114,41 @@ class Config
         $this->fetchFeatures($configMapper);
     }
 
+    // new config struct
+    /**
+     *
+     * $aiChat = [
+     * 'enabled' => true,
+     * 'openai' => [
+     * 'key' => [
+     * 'label' => 'OpenAI Key', // or you can store this in the frontend, outside of config; included for illustration mainly
+     * 'value' => 'aaaaaa',
+     * ],
+     * 'model' => [
+     * 'label' => 'OpenAI Model',
+     * 'value' => 'gippity4.1-mini',
+     * ],
+     * ],
+     * 'azure' => [
+     * 'resource' => [
+     * 'label' => 'Azure Resource Name',
+     * 'value' => 'ccccccccc',
+     * ],
+     * 'deployment' => [
+     * 'label' => 'Azure Deployment ID',
+     * 'value' => 'dddddd',
+     * ]
+     * ]
+     * ];
+     *
+     * // similar to above
+     * $aiLessonPlan => [ ... ]
+     *
+     * // similar to above
+     * $aiImageGeneration => [ ... ]
+     */
+
+
     // allow setting features directly (e.g. for testing)
     public function setFeatures(array $features): void
     {
