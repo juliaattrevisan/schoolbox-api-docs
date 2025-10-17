@@ -20,9 +20,9 @@ use Psr\Log\LoggerInterface;
 use Schoolbox\External\Connector\FirstMeaningfulValue;
 use Schoolbox\External\Connector\ValidStrats;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\IApi;
+use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Alert;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\ContactInfo;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\EmergencyContact;
-use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Health;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Household;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Language;
 use Schoolbox\External\Connector\Veracross\Base\Endpoint\Lookup\Photo;
@@ -61,6 +61,7 @@ class Profile implements IStrategy
      * staff_faculty:list
      * contact_info:list
      * person_photos:list
+     * academics.student_alerts:list
      */
     public const SCOPE = '
         students:list
@@ -72,6 +73,7 @@ class Profile implements IStrategy
         staff_faculty:list
         contact_info:list
         person_photos:list
+        academics.student_alerts:list
     ';
 
 
@@ -105,6 +107,14 @@ class Profile implements IStrategy
      * @var Photo
      */
     private Photo $photoLookup;
+
+
+    /**
+     * A list of alerts
+     *
+     * @var Alert
+     */
+    private Alert $alertLookup;
 
 
     /**
@@ -161,6 +171,7 @@ class Profile implements IStrategy
         /* Shared lookups
          */
         $this->contactInfoLookup = new ContactInfo($this->api);
+        $this->alertLookup = new Alert($this->api, $this->watchlist);
 
         /* Students might have profile pics;
          * Staff might have profile pics
@@ -205,15 +216,15 @@ class Profile implements IStrategy
      */
     private function importStudents(): void
     {
-        /* Prefetch a list of medically-afflicted dudes
-         */
-        $this->log->debug('Prefetching medicals...');
-        $medicalLookup = (new Health($this->api, $this->watchlist))->generate();
-
         /* Prefetch a list of language usages
          */
         $this->log->debug('Prefetching languages...');
         $languageLookup = (new Language($this->api, $this->watchlist))->generate();
+
+        /* Prefetch a list of alerts
+         */
+        $this->log->debug('Prefetching alerts...');
+        $alertLookup = $this->alertLookup->generate();
 
         /* Optionally process profile pics
          */
@@ -328,7 +339,7 @@ class Profile implements IStrategy
 
                 /* Alerts
                  */
-                $comments = '';
+                $comments = $alertLookup[$externalId]['academic_alert'] ?? null;
 
                 /* TODO Find out how a split family is represented in pilot school
                  *
@@ -337,17 +348,10 @@ class Profile implements IStrategy
                  * The relationships lookup specifically filters to legal_custody 1
                  * so anyone appearing here is legally allowed to do so
                  */
-                $legal = '';
+                $legal = $alertLookup[$externalId]['family_alert'] ?? null;
 
-                /* This student might not have any meaningful medical records
-                 */
-                $medical = null;
-
-                if (isset($medicalLookup[$student['id']])) {
-                    $medical = 'This student has medical conditions.';
-                }
-
-                $messages = '';
+                $medical = $alertLookup[$externalId]['medical_alert'] ?? null;
+                $messages = $alertLookup[$externalId]['general_alert'] ?? null;
 
                 /* From Thad, 7/2/23:
                  *     "In the U.S., an Advisor is typically a faculty or staff member who meets with

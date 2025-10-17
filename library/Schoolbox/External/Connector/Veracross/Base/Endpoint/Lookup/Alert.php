@@ -14,9 +14,9 @@ use Schoolbox\External\Connector\Veracross\Base\Endpoint\Profile\Profile;
 use Schoolbox\External\Connector\Watchlist;
 
 /**
- * Grab all the Health everywhere
+ * A list of all the alerts per person.
  */
-class Health
+class Alert
 {
     /**
      * Remember the output we might have previously generated
@@ -48,29 +48,47 @@ class Health
          */
         if (null === $this->lookup) {
             $this->lookup = [];
+            $watchlist = new Watchlist();
 
-            $generator = $this->api->retrieve('GET', 'health/patients', Profile::SCOPE);
+            $generator = $this->api->retrieve('GET', 'academics/student_alerts', Profile::SCOPE);
 
             foreach ($generator as $page) {
                 /* Avengers Assemble!
                  */
                 foreach ($page['data'] as $record) {
+                    /* omg why couldn't they have called this person_id instead...
+                     * that's what id allegedly means
+                     */
                     $externalId = trim((string)$record['id']);
 
                     /* Only import for specific users
                      */
-                    if (!(new Watchlist())->isOnWatchlist($externalId, $this->watchlist)) {
+                    if (!$watchlist->isOnWatchlist($externalId, $this->watchlist)) {
                         continue;
                     }
 
-                    /* Overwrite with lookupped values
-                     * If any of the following fields has contents, then they have a Medical Alert
+                    /* Record is a 4-tuple whose array nodes *should* all exist
+                     * but sometimes they're empty/null. Note that these are multiline
+                     * strings, not just one sentence.
+                     *
+                            [id] => 40622
+                            [family_alert] =>
+                            [medical_alert] =>
+                            [general_alert] =>
+                            [academic_alert] =>
+                     *
+                     * Sometimes slabs of text contain a bunch of extraneous whitespace,
+                     * so we can trim them here and not worry about it anymore
                      */
-                    foreach (['allergies_symptoms', 'current_medications', 'general_medical_notes'] as $field) {
-                        if ('' !== trim((string)$record[$field])) {
-                            $this->lookup[$externalId] = true;
+                    $keys = ['family_alert', 'medical_alert', 'general_alert', 'academic_alert'];
+
+                    foreach ($keys as $key) {
+                        if (null !== $record[$key]) {
+                            $record[$key] = trim($record[$key]);
                         }
                     }
+
+                    $this->lookup[$externalId] = $record;
                 }
             }
         }
