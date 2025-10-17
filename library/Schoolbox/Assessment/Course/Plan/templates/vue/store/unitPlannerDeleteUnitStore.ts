@@ -16,7 +16,7 @@ export const useDeleteUnitsStore = defineStore("unitPlannerDeleteUnit", () => {
 
     /**
      * to display a prompt to delete a unit
-     * @param deleteRoute the route to use to delete the unit
+     * @param $unitToDelete - the unit to delete
      */
     function prompt($unitToDelete: Unit): void {
         unitToDelete.value = $unitToDelete;

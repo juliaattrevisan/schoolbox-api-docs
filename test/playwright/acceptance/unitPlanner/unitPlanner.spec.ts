@@ -265,8 +265,8 @@ test.describe("Unit Planner Tests", () => {
 
     test("modify unit name", async ({ tester, page, db }) => {
         const courseId = 11; // Year 5
-        const unitId = 30; // "English"
-        const folderId = 144; // "English" folder ID
+        const modifyUnitId = 30; // "English"
+        const modifyFolderId = 144; // "English" folder ID
         const unitNameChange = "Ancient English";
         try {
             tester.isGoingTo("visit the Year 5 unit planner page");
@@ -276,7 +276,7 @@ test.describe("Unit Planner Tests", () => {
             await page.getByTestId("sbx-pop-out-unit-cell-unit-action-30").click();
 
             tester.isGoingTo("wait for dropdown and click the modify button");
-            await page.getByTestId(`up-unit-cell-unit-action-${unitId}-modify-link`).click();
+            await page.getByTestId(`up-unit-cell-unit-action-${modifyUnitId}-modify-link`).click();
 
             tester.isGoingTo(`change the folder name to '${unitNameChange}'`);
             await page.getByTestId("folder-form-input-name").fill(unitNameChange);
@@ -285,17 +285,17 @@ test.describe("Unit Planner Tests", () => {
             await page.getByTestId("folder-form-submit").click();
 
             tester.isGoingTo(`verify that the unit name has been changed to '${unitNameChange}'`);
-            await expect(page.getByTestId(`unit-planner-unit-link-${unitId}`)).toHaveText(unitNameChange);
+            await expect(page.getByTestId(`unit-planner-unit-link-${modifyUnitId}`)).toHaveText(unitNameChange);
         } finally {
-            tester.isGoingTo(`reset the unit name back to 'English' for unit ${unitId}`);
-            await db.updateInDatabase("folder", { name: "English" }, { id: folderId });
+            tester.isGoingTo(`reset the unit name back to 'English' for unit ${modifyUnitId}`);
+            await db.updateInDatabase("folder", { name: "English" }, { id: modifyFolderId });
         }
     });
 
     test("delete unit", async ({ tester, page, db }) => {
         const courseId = 11; // Year 5
-        const unitId = 34; // Unit to be deleted
-        const folderId = 161;
+        const deleteUnitId = 34; // Unit to be deleted
+        const deleteFolderId = 161;
         try {
             tester.isGoingTo("visit the Year 5 unit planner page");
             await page.goto(`/course/plan/${courseId}`);
@@ -304,7 +304,7 @@ test.describe("Unit Planner Tests", () => {
             await page.getByTestId("sbx-pop-out-unit-cell-unit-action-34").click();
 
             tester.isGoingTo("click the delete button");
-            await page.getByTestId(`up-unit-cell-unit-action-${unitId}-delete-button`).click();
+            await page.getByTestId(`up-unit-cell-unit-action-${deleteUnitId}-delete-button`).click();
 
             tester.isGoingTo("confirm the deletion in the modal");
             await page.getByTestId("up-delete-unit-delete").click();
@@ -314,13 +314,13 @@ test.describe("Unit Planner Tests", () => {
 
             tester.isGoingTo("verify that the unit has been successfully deleted");
             await expect(page.getByText("5MS Spelling")).not.toBeVisible();
-            await expect(page.getByTestId(`sbx-pop-out-unit-cell-unit-action-${unitId}`)).not.toBeVisible();
+            await expect(page.getByTestId(`sbx-pop-out-unit-cell-unit-action-${deleteUnitId}`)).not.toBeVisible();
         } finally {
             tester.isGoingTo(`restore the folder`);
             await db.updateInDatabase(
                 "course_unit_specification",
                 { deleted_at: null },
-                { folder_id: folderId, course_specification_id: courseId },
+                { folder_id: deleteFolderId, course_specification_id: courseId },
             );
         }
     });
