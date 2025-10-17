@@ -25,6 +25,7 @@ use Schoolbox\External\Event\Mapper;
 use Schoolbox\External\TimetableArrayExporter;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Mapper\Exception;
 use Schoolbox\ResourceBooking\Item;
 use Calendar\Event\Type\Timetable\Renderer\Javascript;
 use Calendar\Event\Collection\Renderer;
@@ -190,6 +191,7 @@ class Controller extends Base
      * Creates a booking for this resource.
      *
      * @param Item\Model $item The resource to create a booking for.
+     * @throws Exception
      */
     public function createBooking(Item\Model $item)
     {
@@ -212,7 +214,7 @@ class Controller extends Base
         // If clashes are allowed on the booking, and the only validation errors are clash errors...
         $saveBookingAsPending = false;
         if (
-            $item->getAllowClashBookings() && count($errors) > 0 &&
+            count($errors) > 0 && $item->getAllowClashBookings() &&
             Validation::validationErrorsAreAllConflicts($errors)
         ) {
             $errors = []; // Ignore errors since all were clashes and clashes are allowed.
@@ -305,6 +307,7 @@ class Controller extends Base
      * Stub for update method
      *
      * @param Model $item
+     * @throws Exception
      */
     public function update(Model $item)
     {
@@ -323,7 +326,18 @@ class Controller extends Base
             $this->getConfigLoader(),
             $this->getExternalEventMapper()
         );
-        $errors = $validation->validateBookingFromPostData($item->getResource(), $this->requestPost, $item);
+        $itemResource = $item->getResource();
+        $errors = $validation->validateBookingFromPostData($itemResource, $this->requestPost, $item);
+
+        // If clashes are allowed on the booking, and the only validation errors are clash errors...
+        $saveBookingAsPending = false;
+        if (
+            count($errors) > 0 && $itemResource->getAllowClashBookings() &&
+            Validation::validationErrorsAreAllConflicts($errors)
+        ) {
+            $errors = []; // Ignore errors since all were clashes and clashes are allowed.
+            $saveBookingAsPending = true; // Save with status 'pending' because there are clashes to resolve.
+        }
 
         if (empty($errors)) {
             $item
@@ -364,21 +378,27 @@ class Controller extends Base
                 $moderationId = $booking->getResource()->getModerationType()->getId();
                 $statusId     = $booking->getStatus()->getId();
 
-                if (
-                    $booking->getResource()->isUserModerator($this->getUser())
-                    && (int)$event->getAuthor()->getId() === (int)$this->getUser()->getId()
-                ) {
-                    /* If you're a Moderator and can moderate this request,
-                     * and you created the booking in the first place,
-                     * set it to Approved - otherwise you'll end up approving your own request anyway
-                     */
-                    $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
-                } elseif (
-                    ($moderationId == Item\ModerationType\Model::TYPE_MODERATED || $moderationId == Item\ModerationType\Model::TYPE_MANAGED) &&
-                    $statusId == Status\Model::STATUS_APPROVED &&
-                    $isTimeChanged
-                ) {
-                    $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING));
+                if ($saveBookingAsPending) {
+                    $booking->setStatus(
+                        $this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING)
+                    );
+                } else {
+                    if (
+                        $booking->getResource()->isUserModerator($this->getUser())
+                        && (int)$event->getAuthor()->getId() === (int)$this->getUser()->getId()
+                    ) {
+                        /* If you're a Moderator and can moderate this request,
+                         * and you created the booking in the first place,
+                         * set it to Approved - otherwise you'll end up approving your own request anyway
+                         */
+                        $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
+                    } elseif (
+                        ($moderationId == Item\ModerationType\Model::TYPE_MODERATED || $moderationId == Item\ModerationType\Model::TYPE_MANAGED) &&
+                        $statusId == Status\Model::STATUS_APPROVED &&
+                        $isTimeChanged
+                    ) {
+                        $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING));
+                    }
                 }
 
                 $bookingList->add($booking);
