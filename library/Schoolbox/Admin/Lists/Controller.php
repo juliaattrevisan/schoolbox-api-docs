@@ -1904,6 +1904,7 @@ class Controller extends Base
             'submission-errors' => 'Lms',
             'achievement-category' => 'Badge',
             'timetable-colour' => 'Design',
+            'adjustment-levels',
             'adjustment-categories' => 'Differentiation',
             default => '',
         };
