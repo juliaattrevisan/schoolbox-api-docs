@@ -44,6 +44,7 @@ class Mapper extends BaseMapper
         $this->uses('sentiment', self::TYPE_STRING, self::COLUMN_ENUM, null, Model::SENTIMENT_VALUES);
         $this->uses('default_points', self::TYPE_DECIMAL);
         $this->uses('default_expiry', self::TYPE_STRING);
+        $this->uses('contribute_differentiation_profile', self::TYPE_BOOLEAN);
         $this->uses('sequence', self::TYPE_INTEGER);
         $this->uses('updated_by', self::TYPE_INTEGER);
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
