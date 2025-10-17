@@ -312,7 +312,8 @@ test.describe("Unit Planner Tests", () => {
             tester.isGoingTo("verify that the toast with the message 'Unit successfully deleted' appears");
             await expect(page.getByTestId("toast")).toHaveText("Unit successfully deleted");
 
-            tester.isGoingTo("verify that the unit has been successfully deleted");
+            tester.isGoingTo("verify that the unit has been successfully deleted after waiting for delete animation");
+            await page.waitForTimeout(1000); // Wait for delete animation to complete
             await expect(page.getByText("5MS Spelling")).not.toBeVisible();
             await expect(page.getByTestId(`sbx-pop-out-unit-cell-unit-action-${deleteUnitId}`)).not.toBeVisible();
         } finally {
