@@ -92,7 +92,7 @@ class Mapper extends \Schoolbox\Mapper
     protected function hydrateSelect(\PDOStatement $statement): GenericCollection
     {
         /** @var \Schoolbox\Admin\DialogAgent\Scenario\Field\Mapper $scenarioFieldMapper */
-        $fieldMapper = $this->getJoinMapper('field');
+        $scenarioFieldMapper = $this->getJoinMapper('field');
 
         /** @var Model[] $scenarios */
         $scenarios = [];
@@ -101,14 +101,14 @@ class Mapper extends \Schoolbox\Mapper
             if (!isset($scenarios[$row['id']])) {
                 /** @var Model $scenario */
                 $scenario = $this->hydrate($row);
-                $scenario->setFields($fieldMapper->createCollection());
+                $scenario->setFields($scenarioFieldMapper->createCollection());
 
                 $scenarios[$row['id']] = $scenario;
             }
 
             /* Stack up all the adjoining fields
              */
-            $field = $fieldMapper->hydrate($row, 'field');
+            $field = $scenarioFieldMapper->hydrate($row, 'field');
 
             if ($field instanceof Field\Model) {
                 $scenarios[$row['id']]->addField($field);
