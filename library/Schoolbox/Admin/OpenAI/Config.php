@@ -178,9 +178,10 @@ class Config
      * @param string|null $resourceName
      * @param string|null $deploymentId
      * @param string|null $model
+     * @param string|null $systemPrompt
      * @return array
      */
-    public function migrate(?string $provider, ?string $key, ?string $resourceName, ?string $deploymentId, ?string $model): array
+    public function migrate(?string $provider, ?string $key, ?string $resourceName, ?string $deploymentId, ?string $model, ?string $systemPrompt): array
     {
         // start with a blank config
         $config = ['provider' => self::NO_PROVIDER];
@@ -193,10 +194,12 @@ class Config
             $config['azure']['resource']['value'] = $resourceName ?? '';
             $config['azure']['deployment']['value'] = $deploymentId ?? '';
             $config['openai']['key']['value'] = $key ?? '';
+            $config['openai']['systemprompt']['value'] = $systemPrompt ?? '';
         } elseif ($provider === Helper::ENDPOINT_TYPE_OPENAI) {
             $config['provider'] = Helper::ENDPOINT_TYPE_OPENAI;
             $config['openai']['key']['value'] = $key ?? '';
             $config['openai']['model']['value'] = $model ?? self::NOT_ACTIVE;
+            $config['openai']['systemprompt']['value'] = $systemPrompt ?? '';
         }
         return $config;
     }

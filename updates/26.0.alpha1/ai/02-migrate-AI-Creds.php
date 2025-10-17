@@ -27,7 +27,8 @@ $app = new class extends CliTool\App {
                     'openai_text_key',
                     'openai_text_azure_resource_name',
                     'openai_text_azure_deployment_id',
-                    'openai_text_model'
+                    'openai_text_model',
+                    'openai_text_generation_system_prompt'
                     )"
         );
 
@@ -43,7 +44,8 @@ $app = new class extends CliTool\App {
             $conf['openai_text_key'] ?? null,
             $conf['openai_text_azure_resource_name'] ?? null,
             $conf['openai_text_azure_deployment_id'] ?? null,
-            $conf['openai_text_model'] ?? null
+            $conf['openai_text_model'] ?? null,
+            $conf['openai_text_generation_system_prompt'] ?? null
         );
 
         // log provider
@@ -52,6 +54,7 @@ $app = new class extends CliTool\App {
         // insert new config into DB
         foreach (['openai_text_chat', 'openai_lessonplan', 'openai_dialogagent', 'openai_differentiation'] as $moduleKey) {
             $this->getLogger()->notice("Migrating AI config for module $moduleKey");
+            $this->getLogger()->debug("New config: " . json_encode($newConfig, JSON_THROW_ON_ERROR));
             $this->getDatabaseInternal()->executeQuery(
                 "UPDATE config SET value = :value WHERE name = :name;",
                 [
