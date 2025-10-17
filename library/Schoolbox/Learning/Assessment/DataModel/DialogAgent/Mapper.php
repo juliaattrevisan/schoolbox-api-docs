@@ -57,6 +57,13 @@ class Mapper extends \Schoolbox\Mapper
             'assessmentModel',
         );
 
+        $this->hasJoin('responses', array(
+            'multiple'  => true,
+            'mapper'    => \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Response\Mapper::class,
+            'this_key'  => 'id',
+            'other_key' => 'dialog_agent_id',
+        ));
+
         $this->registerCallback(self::CALLBACK_PRESAVE, [$this, 'auditorFields']);
     }
 
