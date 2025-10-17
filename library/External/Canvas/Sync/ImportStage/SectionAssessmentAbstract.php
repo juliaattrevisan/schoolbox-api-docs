@@ -23,6 +23,7 @@ use External\Canvas\Sync\ImportStage\Traits\ModelSaveTrait;
 use External_ClassInterface;
 use PDOException;
 use Psr\Log\LoggerInterface;
+use Schoolbox\Assessment\Participant\Plan\Mapper as PlanMapper;
 use Schoolbox\GenericCollection;
 use Schoolbox\Learning\Assessment\DataModel as Assessment;
 use Schoolbox\Learning\Assessment\DataModel\IAssessableDataModel;
@@ -1150,8 +1151,8 @@ abstract class SectionAssessmentAbstract
             : $canvasId;
         $title          = $isEveryonePlan ? $this->assignmentOverrideBridge->getEveryoneOverrideTitle() : $title;
         $planName       = $this->assignmentOverrideBridge->generateLinkedPlanName($title, $canvasId);
-        $isDynamic      = !is_array($participants);
-        $planType       = $isDynamic ? 'dynamic' : 'static';
+        $isDynamic      = !is_array($participants) ? PlanMapper::PLAN_TYPE_DYNAMIC : PlanMapper::PLAN_TYPE_STATIC;
+        $planType       = ($isDynamic === PlanMapper::PLAN_TYPE_DYNAMIC) ? 'dynamic' : 'static';
 
         if ($isEveryonePlan || $isDynamic || $allDay === null || ($unlockAt === null && $lockAt === null && $dueAt === null && $allDayDate === null)) {
             // If dynamic, or no dates are specified, set all plans dates to null to enable assessment dates to apply
