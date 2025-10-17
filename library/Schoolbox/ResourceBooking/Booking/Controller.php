@@ -213,8 +213,10 @@ class Controller extends Base
         // If clashes are allowed on the booking, and the only validation errors are clash errors,
         // the clashes can be ignored and the booking should be saved with status 'pending'.
         $saveBookingAsPending = false;
-        if ($item->getAllowClashBookings() && count($errors) > 0 && Validation::validationErrorsAreAllConflicts($errors))
-        {
+        if (
+            $item->getAllowClashBookings() && count($errors) > 0 &&
+            Validation::validationErrorsAreAllConflicts($errors)
+        ) {
             $errors = []; // Ignore errors since all were clashes and clashes are allowed.
             $saveBookingAsPending = true; // Save with status 'pending' because there are clashes to resolve.
         }
