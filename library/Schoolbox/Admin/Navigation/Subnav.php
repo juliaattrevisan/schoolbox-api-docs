@@ -606,6 +606,13 @@ class Subnav
                         'visible'     => $userIsSuperuserOrHasServicePermissionPastoral && (bool)$this->configLoader->get(ConfigMapper::NAME_PASTORAL_ACTION_ENABLED),
                         'description' => 'Setup the actions of pastoral records.',
                     ],
+                    '/adminv2/lists/differentiationprofiles/adjustment-categories' => [
+                        'name'        => 'Lists - Adjustment Categories',
+                        'visible'     =>
+                            ($userIsSuperuser || $userHasServicePermissionDifferentiationProfile) &&
+                            (bool)$this->configLoader->get(ConfigMapper::NAME_DIFFERENTIATION_PROFILE_ENABLED),
+                        'description' => 'Adjustment categories.',
+                    ],
                     '/adminv2/lists/pastoral/pastoral-severity' => [
                         'name'        => 'Lists - Record Severity',
                         'visible'     => $userIsSuperuserOrHasServicePermissionPastoral && (bool)$this->configLoader->get('pastoral_severity'),

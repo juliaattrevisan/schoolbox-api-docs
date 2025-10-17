@@ -64,6 +64,14 @@ class Module extends BaseModule
             )
         );
 
+        $ruleDiffProfiles = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\Any(
+                new Rule\IsSuperuser(),
+                new Rule\HasServicePermission(UserAccess::SERVICE_DIFFERENTIATION_PROFILE, UserAccess::ACCESS_FULL)
+            )
+        );
+
         $ruleLms = new Rule\All(
             new Rule\IsLoggedIn(),
             new Rule\Any(
@@ -112,6 +120,13 @@ class Module extends BaseModule
         $this->register('GET', "/pastoral/data/{table:$pastoralTablesRegex}", 'getPastoralData', $rulePastoral);
         $this->register('POST', "/pastoral/save/{table:$pastoralTablesRegex}", 'postPastoralSave', $rulePastoral);
         $this->register('POST', "/pastoral/delete/{table:$pastoralTablesRegex}", 'postPastoralDelete', $rulePastoral);
+
+        // Routes to which users with service permission UserAccess::SERVICE_DIFFERENTIATION_PROFILE need access.
+        $diffProfilesRegex = '(adjustment-categories)';
+        $this->register('GET', "/differentiationprofiles/{table:$diffProfilesRegex}", 'getDifferentiationProfilesIndex', $ruleDiffProfiles);
+        $this->register('GET', "/differentiationprofiles/data/{table:$diffProfilesRegex}", 'getDifferentiationProfilesData', $ruleDiffProfiles);
+        $this->register('POST', "/differentiationprofiles/save/{table:$diffProfilesRegex}", 'postDifferentiationProfilesSave', $ruleDiffProfiles);
+        $this->register('POST', "/differentiationprofiles/delete/{table:$diffProfilesRegex}", 'postDifferentiationProfilesDelete', $ruleDiffProfiles);
 
         // Routes to which users with service permission UserAccess::SERVICE_LMS need access.
         $lmsTablesRegex = '(submission-type|submission-errors)';
