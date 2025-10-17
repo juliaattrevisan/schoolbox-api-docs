@@ -706,6 +706,17 @@ abstract class Controller extends ListController implements IAssessmentControlle
             }
         }
 
+        /* Dialog Agents
+         * These need their chosen scenario supplied
+         */
+        if ($assessment instanceof DialogAgent\Model) {
+            $dialogAgentMapper = \Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper::getInstance();
+            $dialogAgentScenarioMapper = \Schoolbox\Admin\DialogAgent\Scenario\Mapper::getInstance();
+
+            $data['dialogAgent'] = $dialogAgentMapper->findOneByColumn('assessment_id', $assessment->getId());
+            $data['dialogAgentScenario'] = $dialogAgentScenarioMapper->findById($assessment->getScenarioId());
+        }
+
         $data['courseManaged'] = [
             'isVisible' => $courseManagedFields->isVisible(),
             'isMutable' => $courseManagedFields->isMutable(),

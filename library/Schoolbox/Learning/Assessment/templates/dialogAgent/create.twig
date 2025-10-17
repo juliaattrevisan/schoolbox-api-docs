@@ -127,33 +127,49 @@
     </div>
 </fieldset>
 
-<fieldset>
-    <legend class="required">Select scenario</legend>
-    {# Scenarios #}
-    <div class="radiolist">
-        <ul class="option-list">
-            {% for scenario in dialogAgent.scenarios %}
-                {# TODO Snake pls decorate this in a reptilian manner thx #}
-                <li style="border:1px solid #f00;width:50%;min-height:200px;float:left;padding-right:2rem;">
-                    <input type="radio" id="scenario-{{ scenario.id }}" name="scenarioId" value="{{ scenario.id }}" required />
-                    <label for="scenario-{{ scenario.id }}">{{ scenario.title }}</label>
+{# Scenario selection #}
+{% if not dialogAgent %}
+    {# Create a new Dialog Agent #}
+    <fieldset>
+        <legend class="required">Select scenario</legend>
+        {# Scenarios #}
+        <div class="radiolist">
+            <ul class="option-list">
+                {% for scenario in dialogAgent.scenarios %}
+                    {# TODO Snake pls decorate this in a reptilian manner thx #}
+                    <li style="border:1px solid #f00;width:50%;min-height:200px;float:left;padding-right:2rem;">
+                        <input type="radio" id="scenario-{{ scenario.id }}" name="scenarioId" value="{{ scenario.id }}" required />
+                        <label for="scenario-{{ scenario.id }}">{{ scenario.title }}</label>
 
-                    <article>
-                        {{ scenario.description }}
-                    </article>
+                        <article>
+                            {{ scenario.description }}
+                        </article>
 
-                    <ul>
-                        {% for field in scenario.fields %}
-                            <li>
-                                {{ field.title }}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
-</fieldset>
+                        <ul>
+                            {% for field in scenario.fields %}
+                                <li>
+                                    {{ field.title }}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </fieldset>
+{% else %}
+    {# Update a Dialog Agent: show the currently selected scenario #}
+    <fieldset>
+        <legend>Selected scenario</legend>
+        <input type="hidden" name="scenarioId" value="{{ dialogAgentScenario.id }}">
+
+        <h5>{{ dialogAgentScenario.title }}</h5>
+
+        <p>
+            {{ dialogAgentScenario.description }}
+        </p>
+    </fieldset>
+{% endif %}
 
 {# Submit #}
 {{ mage.submitRow(actionLabel ?? 'Create', 'part-2', 'end') }}

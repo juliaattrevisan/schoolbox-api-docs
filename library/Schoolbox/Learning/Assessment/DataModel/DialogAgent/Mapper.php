@@ -38,11 +38,11 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('prompt', self::TYPE_STRING, null, 'prompt');
         $this->uses('duration', self::TYPE_INTEGER, null, 'duration');
         $this->uses('created_at', self::TYPE_DATETIME, self::COLUMN_CREATED_TIMESTAMP);
-        $this->joins('created_by', self::TYPE_INTEGER, null, 'createdBy');
+        $this->uses('created_by', self::TYPE_INTEGER, null, 'createdBy');
         $this->uses('updated_at', self::TYPE_DATETIME, self::COLUMN_UPDATED_TIMESTAMP);
-        $this->joins('updated_by', self::TYPE_INTEGER, null, 'updatedBy');
+        $this->uses('updated_by', self::TYPE_INTEGER, null, 'updatedBy');
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
-        $this->joins('deleted_by', self::TYPE_INTEGER, null, 'deletedBy');
+        $this->uses('deleted_by', self::TYPE_INTEGER, null, 'deletedBy');
 
         // This column is duplicate of assessment.deleted_at, but is required to ensure soft-deletion on this table.
         $this->uses('deleted_at', self::TYPE_DATETIME, self::COLUMN_SOFTDELETE);
