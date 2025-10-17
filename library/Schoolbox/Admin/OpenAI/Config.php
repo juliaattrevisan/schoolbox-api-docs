@@ -46,74 +46,26 @@ class Config
 
     // field name and types
     public const FIELD_PROVIDER = 'provider';
-    public const FIELD_ENABLED = 'enabled';
     public const FIELD_OPENAIKEY = 'open_ai_key';
     public const FIELD_RESOURCE_NAME = 'resource_name';
     public const FIELD_DEPLOYMENT_ID = 'deployment_id';
     public const FIELD_MODEL = 'model';
+    public const FIELD_SYSTEM_PROMPT = 'system_prompt';
 
-    // model options
-    public const FIELD_OPTIONS = [
-        self::FIELD_PROVIDER => ConfigMapper::FIELD_INPUT,
-        self::FIELD_ENABLED => ConfigMapper::FIELD_BOOLEAN,
-        self::FIELD_OPENAIKEY => ConfigMapper::FIELD_INPUT,
-        self::FIELD_RESOURCE_NAME => ConfigMapper::FIELD_INPUT,
-        self::FIELD_DEPLOYMENT_ID => ConfigMapper::FIELD_INPUT,
-        self::FIELD_MODEL => ConfigMapper::FIELD_SELECT,
+    public const FIELDS = [
+        self::FIELD_PROVIDER => self::FIELD_PROVIDER,
+        self::FIELD_OPENAIKEY => self::FIELD_OPENAIKEY,
+        self::FIELD_RESOURCE_NAME => self::FIELD_RESOURCE_NAME,
+        self::FIELD_DEPLOYMENT_ID => self::FIELD_DEPLOYMENT_ID,
+        self::FIELD_MODEL => self::FIELD_MODEL,
+        self::FIELD_SYSTEM_PROMPT => self::FIELD_SYSTEM_PROMPT,
     ];
-
-    // human readable titles
-    public const FIELD_TITLE = [
-        self::FIELD_PROVIDER => 'Endpoint Provider',
-        self::FIELD_ENABLED => 'Enable Feature',
-        self::FIELD_OPENAIKEY => 'OpenAI API Key',
-        self::FIELD_RESOURCE_NAME => 'Azure Resource Name',
-        self::FIELD_DEPLOYMENT_ID => 'Azure Deployment ID',
-        self::FIELD_MODEL => 'OpenAI Model',
-    ];
-
-    // human readable descriptions (tooltips)
-    public const FIELD_DESCRIPTION = [
-        self::FIELD_PROVIDER => 'Select which provider you will use for conducting AI text queries.',
-        self::FIELD_ENABLED => 'Enable or disable this AI feature.',
-        self::FIELD_OPENAIKEY => 'This is your secure key for authorising GPT based AI assistant services. The key can be created at https://openai.com/ or in Azure',
-        self::FIELD_RESOURCE_NAME => 'The name of your Azure OpenAI Resource',
-        self::FIELD_DEPLOYMENT_ID => 'The deployment name you chose when you deployed the model in Azure',
-        self::FIELD_MODEL => 'Select which model you wish to use for your OpenAI service.',
-    ];
-
-    // default config structures
-    public const CONFIG_STRUCT_AZURE = [
-        self::FIELD_PROVIDER => Helper::ENDPOINT_TYPE_AZURE,
-        self::FIELD_ENABLED => false,
-        self::FIELD_OPENAIKEY => '',
-        self::FIELD_RESOURCE_NAME => '',
-        self::FIELD_DEPLOYMENT_ID => '',
-    ];
-
-    public const CONFIG_STRUCT_OPENAI = [
-        self::FIELD_PROVIDER => Helper::ENDPOINT_TYPE_OPENAI,
-        self::FIELD_OPENAIKEY => '',
-        self::FIELD_MODEL => self::NOT_ACTIVE,
-    ];
-
-    // sprintf format for form field names (e.g. $module, $key)
-    private const FORM_NAME_SPRINTF = '%s;%s';
 
     /**
      * array of AI features and their config
      * @var array|null
      */
     private ?array $features = null;
-
-    /**
-     * @throws \JsonException
-     * @throws \Schoolbox\Mapper\Exception
-     * @throws \Schoolbox\Mapper\Exception\Deleted
-     */
-    public function __construct()
-    {
-    }
 
     // new config struct
     /**
@@ -145,13 +97,13 @@ class Config
     public function initOpenAi()
     {
         return [
-            'key' => [
+            self::FIELD_OPENAIKEY => [
                 'value' => '',
             ],
-            'model' => [
+            self::FIELD_MODEL => [
                 'value' => '', // -- select an option --
             ],
-            'systemprompt' => [
+            self::FIELD_SYSTEM_PROMPT => [
                 'value' => '',
             ],
         ];
@@ -161,10 +113,10 @@ class Config
     {
 
         return [
-            'resource' => [
+            self::FIELD_RESOURCE_NAME => [
                 'value' => '',
             ],
-            'deployment' => [
+            self::FIELD_DEPLOYMENT_ID => [
                 'value' => '',
             ],
         ];
@@ -184,22 +136,22 @@ class Config
     public function migrate(?string $provider, ?string $key, ?string $resourceName, ?string $deploymentId, ?string $model, ?string $systemPrompt): array
     {
         // start with a blank config
-        $config = ['provider' => self::NO_PROVIDER];
+        $config = [self::FIELD_PROVIDER => self::NO_PROVIDER];
         $config['openai'] = $this->initOpenAi();
         $config['azure'] = $this->initAzure();
 
         // set the fields we know about
         if ($provider === Helper::ENDPOINT_TYPE_AZURE) {
-            $config['provider'] = Helper::ENDPOINT_TYPE_AZURE;
-            $config['azure']['resource']['value'] = $resourceName ?? '';
-            $config['azure']['deployment']['value'] = $deploymentId ?? '';
-            $config['openai']['key']['value'] = $key ?? '';
-            $config['openai']['systemprompt']['value'] = $systemPrompt ?? '';
+            $config[self::FIELD_PROVIDER] = Helper::ENDPOINT_TYPE_AZURE;
+            $config['azure'][self::FIELD_RESOURCE_NAME]['value'] = $resourceName ?? '';
+            $config['azure'][self::FIELD_DEPLOYMENT_ID]['value'] = $deploymentId ?? '';
+            $config['openai'][self::FIELD_OPENAIKEY]['value'] = $key ?? '';
+            $config['openai'][self::FIELD_SYSTEM_PROMPT]['value'] = $systemPrompt ?? '';
         } elseif ($provider === Helper::ENDPOINT_TYPE_OPENAI) {
-            $config['provider'] = Helper::ENDPOINT_TYPE_OPENAI;
-            $config['openai']['key']['value'] = $key ?? '';
-            $config['openai']['model']['value'] = $model ?? self::NOT_ACTIVE;
-            $config['openai']['systemprompt']['value'] = $systemPrompt ?? '';
+            $config[self::FIELD_PROVIDER] = Helper::ENDPOINT_TYPE_OPENAI;
+            $config['openai'][self::FIELD_OPENAIKEY]['value'] = $key ?? '';
+            $config['openai'][self::FIELD_MODEL]['value'] = $model ?? self::NOT_ACTIVE;
+            $config['openai'][self::FIELD_SYSTEM_PROMPT]['value'] = $systemPrompt ?? '';
         }
         return $config;
     }
@@ -212,16 +164,9 @@ class Config
      */
     public function isEnabled(?array $config): bool
     {
-        return $config['provider'] !== self::NO_PROVIDER;
+        return $config[self::FIELD_PROVIDER] !== self::NO_PROVIDER;
     }
 
-//
-//    // allow setting features directly (e.g. for testing)
-//    public function setFeatures(array $features): void
-//    {
-//        $this->features = $features;
-//    }
-//
     /**
      * Fetch all features and their config from the DB
      * @param ConfigMapper $configMapper
@@ -246,215 +191,4 @@ class Config
 
         return $this->features;
     }
-//
-//    /**
-//     * Get all features and their config
-//     * @return array|null
-//     */
-//    public function getFeatures(): ?array
-//    {
-//        return $this->features;
-//    }
-//
-//    /**
-//     * Get a specific feature's name and config
-//     * @param string $feature
-//     * @return array|null
-//     */
-//    public function getFeature(string $feature): ?array
-//    {
-//        return $this->features[$feature] ?? null;
-//    }
-//
-//    /**
-//     * Take the stored settings and convert it into an associative array
-//     *
-//     * @param string|null $config
-//     * @param string $provider
-//     * @return array|null
-//     * @throws \JsonException
-//     */
-//    public function decode(?string $config, string $provider): ?array
-//    {
-//        $optionsPayload = json_decode($config ?? '{}', true, 512, JSON_THROW_ON_ERROR);
-//
-//        /* Superimpose selected options over the default
-//         * Disabling fields prevents the keys from existing
-//         */
-//        return $this->mergeConfig($optionsPayload, $provider);
-//    }
-//
-//
-//    /**
-//     * Generate initial config structure based on provider
-//     *
-//     * @param string $provider
-//     * @return array
-//     */
-//    public function generateInitConfig(string $provider): array
-//    {
-//        return match ($provider) {
-//            Helper::ENDPOINT_TYPE_AZURE => self::CONFIG_STRUCT_AZURE,
-//            Helper::ENDPOINT_TYPE_OPENAI => self::CONFIG_STRUCT_OPENAI,
-//            default => [],
-//        };
-//    }
-//
-//    /**
-//     * Merge config with initial and remove any invalid keys,
-//     * overwriting any existing values.
-//     *
-//     * @param array $config
-//     * @param string $provider
-//     * @return array
-//     */
-//    private function mergeConfig(array $config, string $provider): array
-//    {
-//        switch ($provider) {
-//            case Helper::ENDPOINT_TYPE_AZURE:
-//                $expected = self::CONFIG_STRUCT_AZURE;
-//                break;
-//            case Helper::ENDPOINT_TYPE_OPENAI:
-//                $expected = self::CONFIG_STRUCT_OPENAI;
-//                break;
-//            default:
-//                return [];
-//        }
-//
-//        // Only keep expected keys and overwrite defaults
-//        $merged = array_intersect_key($config, $expected) + $expected;
-//
-//        // Always set provider to avoid issues if switching providers
-//        $merged['provider'] = $provider;
-//
-//        return $merged;
-//    }
-//
-//    /**
-//     * Build the standard Twig config for setting page for all modules
-//     * @param array $config
-//     * @param $fieldStrategyFactory
-//     * @param $siteVersion
-//     * @param $postRoute
-//     * @param $additionalContext
-//     * @return array|void
-//     */
-//    public function buildTwigConfig(array $config, $fieldStrategyFactory, $siteVersion, $postRoute, $additionalContext)
-//    {
-//        //loop through the modules
-//        if (empty($config)) {
-//            return;
-//        }
-//        $modules = [];
-//        foreach ($config as $module => $settings) {
-//            // create a fake config collection
-//            $configCollection = new GenericCollection(\Schoolbox\Config\Config::class);
-//            foreach ($settings as $key => $value) {
-//                $cfg = new \Schoolbox\Config\Config();
-//                $cfg->setName(sprintf(self::FORM_NAME_SPRINTF, $module, $key))
-//                    ->setTitle(self::FIELD_TITLE[$key])
-//                    ->setDescription(self::FIELD_DESCRIPTION[$key])
-//                    ->setValue((string)$value)
-//                    ->setTypeId(ConfigMapper::TYPE_AI)
-//                    ->setFieldId(self::FIELD_OPTIONS[$key] ?? ConfigMapper::FIELD_INPUT)
-//                    ->setEditable(true);
-//
-//                // if model, show options
-//                if ($key === self::FIELD_MODEL) {
-//                    $cfg->setOptions(implode(':', self::AI_MODELS));
-//                }
-//
-//                // don't show provider
-//                if ($key === self::FIELD_PROVIDER) {
-////                    $cfg->setEditable(false);
-////                        ->setHidden(true);
-//                }
-//                $configCollection->add($cfg);
-//            }
-//
-//            $modules[$module] = (new ModuleConfig($fieldStrategyFactory))->getContext(
-//                $siteVersion,
-//                $configCollection,
-//                $postRoute,
-//                $additionalContext +
-//                [
-//                    'formId' => sprintf('text_config_%s', $module)
-//                ],
-//            );
-//        }
-//
-//        return $modules;
-//    }
-//
-//    /**
-//     * migrate from the old config to the new config structure
-//     *
-//     * @param string|null $provider
-//     * @param string|null $key
-//     * @param string|null $resourceName
-//     * @param string|null $deploymentId
-//     * @param string|null $model
-//     * @return array
-//     */
-//    public function migrate(?string $provider, ?string $key, ?string $resourceName, ?string $deploymentId, ?string $model): array
-//    {
-//        switch ($provider) {
-//            case Helper::ENDPOINT_TYPE_AZURE:
-//                $config = $this->generateInitConfig($provider);
-//                $config[self::FIELD_OPENAIKEY] = $key ?? '';
-//                $config[self::FIELD_RESOURCE_NAME] = $resourceName ?? '';
-//                $config[self::FIELD_DEPLOYMENT_ID] = $deploymentId ?? '';
-//                $config[self::FIELD_ENABLED] = true;
-//                break;
-//            case Helper::ENDPOINT_TYPE_OPENAI:
-//                $config = $this->generateInitConfig($provider);
-//                $config[self::FIELD_OPENAIKEY] = $key ?? '';
-//                $config[self::FIELD_MODEL] = $model ?? self::NOT_ACTIVE;
-//
-//                break;
-//            default:
-//                $config = [];
-//        }
-//        return $config;
-//    }
-//
-//    /**
-//     * Extract the posted data for a given module
-//     *
-//     * @param array $postData
-//     * @param string $module
-//     * @return array
-//     */
-//    public function extractPost(array $postData, string $module): array
-//    {
-//        $config = [];
-//        foreach (self::FIELD_OPTIONS as $field => $type) {
-//            $key = sprintf(self::FORM_NAME_SPRINTF, $module, $field);
-//            if (array_key_exists($key, $postData)) {
-//                // boolean fields are sent as 'on' or not at all
-//                if ($type === ConfigMapper::FIELD_BOOLEAN) {
-//                    $config[$field] = $postData[$key] === '1';
-//                } else {
-//                    $config[$field] = trim((string)$postData[$key]);
-//                }
-//            }
-//        }
-//        return $config;
-//    }
-//
-//    /**
-//     * check if the config is enabled
-//     * both openai and azure do this differently
-//     */
-//    public function isEnabled(?array $config): bool
-//    {
-//        if (empty($config) || !isset($config['provider'])) {
-//            return false;
-//        }
-//        return match ($config['provider']) {
-//            Helper::ENDPOINT_TYPE_AZURE => $config['enabled'],
-//            Helper::ENDPOINT_TYPE_OPENAI => $config['model'] !== self::NOT_ACTIVE,
-//            default => false,
-//        };
-//    }
 }
