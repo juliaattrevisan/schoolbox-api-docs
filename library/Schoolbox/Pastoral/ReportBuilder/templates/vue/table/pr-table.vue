@@ -233,21 +233,17 @@ window.Vue.onMounted(() => {
 .highcharts-tooltip-container {
     z-index: var(--sbx-depth-pop-over) !important;
 }
+
 /* on small containers (<=700px), remove ALL sticky behavior */
 @container (max-width: 700px) {
     .pr-table thead {
-        position: static !important;
-        top: auto !important;
+        position: static;
+        top: auto;
     }
-    .u-sticky-left,
-    .u-sticky-left--row,
-    .total-header--sticky,
-    .trend-header--sticky,
-    .total-cell--sticky,
-    .trend-cell--sticky {
-        position: static !important;
-        left: auto !important;
-        right: auto !important;
+    .u-sticky-left--row {
+        position: static;
+        left: auto;
+        right: auto;
     }
 }
 </style>
