@@ -30,6 +30,8 @@
 
 {% import '@learningAssessment/fragments/macro/submitRow.twig' as mage %}
 
+<input type="hidden" name="assessmentType" value="{{ assessmentType }}" />
+
 {# Basic Details #}
 <fieldset>
     <label class="required" for="title">Title</label>
