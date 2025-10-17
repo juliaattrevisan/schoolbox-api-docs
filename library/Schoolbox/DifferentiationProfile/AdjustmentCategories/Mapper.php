@@ -9,7 +9,6 @@ namespace Schoolbox\DifferentiationProfile\AdjustmentCategories;
 
 use Schoolbox\GenericCollection;
 use Schoolbox\Mapper as BaseMapper;
-use Schoolbox\Pastoral\Action\Model;
 
 /**
  * Class Mapper
