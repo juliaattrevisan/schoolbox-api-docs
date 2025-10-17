@@ -10,6 +10,8 @@ import Common from "@schoolboxTest/playwright/support/page/Common";
  * lock it for one of them
  * check the non pastoral moderator cannot change the locked visibility
  * check the pastoral moderator can change the locked visibility
+ * set up sentiment, tip, general and confidential templates
+ * check the tip and templates are available when creating a pastoral record
  */
 
 test.describe("Pastoral Care - Management Settings", () => {
@@ -19,14 +21,14 @@ test.describe("Pastoral Care - Management Settings", () => {
     let common: Common;
 
     test.beforeEach(async ({ page, tester }) => {
-        pastoralProfile = new PastoralProfile(page);
+        pastoralProfile = new PastoralProfile(page, tester);
         createPastoralRecord = new CreatePastoralRecord(page);
         // login as admin
         await tester.loginAsAdmin();
     });
 
-    test("set and check pastoral care management settings", async ({ page, tester, db }) => {
-        pastoralRecordSettings = new PastoralExpiry(page);
+    test("set and check pastoral care management settings: lock visibility", async ({ page, tester, db }) => {
+        pastoralRecordSettings = new PastoralExpiry(page, tester);
         common = new Common(page);
         createPastoralRecord = new CreatePastoralRecord(page);
         const studentId = 25;
@@ -124,6 +126,72 @@ test.describe("Pastoral Care - Management Settings", () => {
         await expect(page.locator("#pastoralRecords")).toContainText(pastoralTitle2);
     });
 
+    test("set and check pastoral care management settings: sentiment, tip, general and confidential templates", async ({
+        page,
+        tester,
+        db,
+    }) => {
+        pastoralRecordSettings = new PastoralExpiry(page, tester);
+        common = new Common(page);
+        createPastoralRecord = new CreatePastoralRecord(page);
+        const studentId = 25;
+        const pastoralTitle = "Automation Test Pastoral Record Sentiment, Tip and Templates";
+        const tipTemplateAcademic = "This is a tip for the pastoral record academic type";
+        const generalTemplateAcademic = "This is a general template for the pastoral record academic type";
+        const confidentialTemplateAcademic = "This is a confidential template for the pastoral record academic type";
+        const tipTemplateAttendance = "This is a tip for the pastoral record attendance type";
+        const generalTemplateAttendance = "This is a general template for the pastoral record attendance type";
+        const confidentialTemplateAttendance =
+            "This is a confidential template for the pastoral record attendance type";
+        // navigate to pastoral care management settings as a pastoral moderator
+        tester.isGoingTo("navigate to pastoral care management settings as a pastoral moderator");
+        await tester.impersonate("Jack Coles");
+        await pastoralRecordSettings.gotoAwardAchievement();
+        // set up sentiment, tip, general and confidential templates
+        tester.isGoingTo("set up sentiment, tip, general and confidential templates");
+        await pastoralRecordSettings.selectSentiment("Positive");
+        await pastoralRecordSettings.fillEntryTip(tipTemplateAcademic);
+        await pastoralRecordSettings.fillGeneralTemplate(generalTemplateAcademic);
+        await pastoralRecordSettings.fillPrivateTemplate(confidentialTemplateAcademic);
+        await pastoralRecordSettings.clickSave();
+        // checking the sentiment setting is saved as this is not used anywhere else yet - only Intellischools are using it
+        await page.reload();
+        await expect(page.locator("select#sentiment")).toContainText("Positive");
+        await pastoralRecordSettings.gotoAttendance();
+        await pastoralRecordSettings.fillEntryTip(tipTemplateAttendance);
+        await pastoralRecordSettings.fillGeneralTemplate(generalTemplateAttendance);
+        await pastoralRecordSettings.fillPrivateTemplate(confidentialTemplateAttendance);
+        await pastoralRecordSettings.clickSave();
+
+        // create a pastoral record and check the templates are available
+        await tester.loginAsAdmin();
+        tester.isGoingTo("create a pastoral record as alaress and check the templates are available");
+        await createPastoralRecord.goto(studentId);
+        await createPastoralRecord.typeTitle(pastoralTitle);
+        tester.isGoingTo("check the attendance type shows the proper tip");
+        await createPastoralRecord.clickTypeDropdown();
+        await createPastoralRecord.selectType("2");
+        await createPastoralRecord.verifyEntryTip(tipTemplateAttendance);
+        // checking the templates once the record is created to avoid interacting too much with the ckeditor
+        tester.isGoingTo(
+            "check that selecting academic type shows the proper general and confidential comments in the record",
+        );
+        await createPastoralRecord.clickTypeDropdown();
+        await createPastoralRecord.selectType("1");
+        await createPastoralRecord.verifyEntryTip(tipTemplateAcademic);
+        await createPastoralRecord.clickSave();
+        const recordId = (await db.grabFromDatabase("pastoral", "id", {
+            deleted_at: null,
+            "heading like": pastoralTitle,
+        })) as number;
+        await pastoralProfile.clickPastoralRecord(studentId, recordId);
+        await pastoralProfile.seeInProfileContent("Academic");
+        await pastoralProfile.seeInProfileContent("Award/Achievement");
+        await pastoralProfile.seeInGeneralPanel(generalTemplateAcademic);
+        await pastoralProfile.clickConfidentialPanelLink();
+        await pastoralProfile.seeInConfidentialPanel(confidentialTemplateAcademic);
+    });
+
     /**
      * Soft deleting data to not impact the tests
      */
@@ -138,5 +206,15 @@ test.describe("Pastoral Care - Management Settings", () => {
         );
         await db.updateInDatabase("pastoral_audience", { deleted_at: "2022-01-15 11:22:34" }, { deleted_at: null });
         await db.updateInDatabase("lu_pastoral_type", { visibility_locked: 0 }, { name: "Bullying" });
+        await db.updateInDatabase(
+            "lu_pastoral_subtype",
+            { sentiment: "neutral", template: null, template_private: null, entry_tip: null },
+            { name: "Award/Achievement" },
+        );
+        await db.updateInDatabase(
+            "lu_pastoral_type",
+            { template: null, template_private: null, entry_tip: null },
+            { name: "Attendance" },
+        );
     });
 });

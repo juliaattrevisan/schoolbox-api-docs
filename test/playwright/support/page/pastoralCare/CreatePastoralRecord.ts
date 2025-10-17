@@ -18,6 +18,8 @@ export default class CreatePastoralRecord {
 
     static readonly DATA_TEST_EXPIRES_AT_INPUT = "modify-section-general-pastoral-expires-at-input";
 
+    static readonly SELECTOR_ENTRY_TIP = "#entry-tip-input";
+
     constructor(page: Page) {
         this.page = page;
     }
@@ -125,5 +127,14 @@ export default class CreatePastoralRecord {
      */
     async clickSave(): Promise<void> {
         await this.page.locator(CreatePastoralRecord.SAVE_BUTTON).last().click();
+    }
+
+    /**
+     * check the entry tip is presented with the proper text
+     * @param tip - The tip text to check
+     */
+    async verifyEntryTip(tip: string): Promise<void> {
+        await expect(this.page.locator(CreatePastoralRecord.SELECTOR_ENTRY_TIP)).toBeVisible();
+        await expect(this.page.locator(CreatePastoralRecord.SELECTOR_ENTRY_TIP)).toContainText(tip);
     }
 }

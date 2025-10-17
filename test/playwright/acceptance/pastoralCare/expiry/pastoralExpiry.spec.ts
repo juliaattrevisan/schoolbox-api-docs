@@ -18,7 +18,7 @@ test.describe("Test the pastoral care modules expiry feature", () => {
     });
 
     test("Confirm default expiry changes are saved", async ({ tester, page, db }) => {
-        const manageRecordSettings = new ManageRecordSettings(page);
+        const manageRecordSettings = new ManageRecordSettings(page, tester);
 
         tester.isGoingTo("Visit the Attendance page");
         await manageRecordSettings.gotoAttendance();
@@ -38,7 +38,7 @@ test.describe("Test the pastoral care modules expiry feature", () => {
     });
 
     test("Check type/subtype changes just the expires at", async ({ tester, page, db }) => {
-        const manageRecordSettings = new ManageRecordSettings(page);
+        const manageRecordSettings = new ManageRecordSettings(page, tester);
         const createPastoralRecord = new CreatePastoralRecord(page);
 
         tester.isGoingTo("Visit the Award/Achievement page");
@@ -101,7 +101,7 @@ test.describe("Test the pastoral care modules expiry feature", () => {
     });
 
     test("Check manual date entry takes precedence over type/subtype selection", async ({ tester, page, db }) => {
-        const manageRecordSettings = new ManageRecordSettings(page);
+        const manageRecordSettings = new ManageRecordSettings(page, tester);
         const createPastoralRecord = new CreatePastoralRecord(page);
 
         tester.isGoingTo("Visit the Award/Achievement page");
@@ -130,7 +130,7 @@ test.describe("Test the pastoral care modules expiry feature", () => {
     });
 
     test("Check Apply to existing records updates existing records", async ({ tester, page, db }) => {
-        const manageRecordSettings = new ManageRecordSettings(page);
+        const manageRecordSettings = new ManageRecordSettings(page, tester);
         const createPastoralRecord = new CreatePastoralRecord(page);
 
         await createPastoralRecord.gotoExisting(25, 2);
@@ -159,7 +159,7 @@ test.describe("Test the pastoral care modules expiry feature", () => {
     });
 
     test("Check the show archived records toggle on a users pastoral profile page", async ({ tester, page, db }) => {
-        const pastoralProfile = new PastoralProfile(page);
+        const pastoralProfile = new PastoralProfile(page, tester);
         const createPastoralRecord = new CreatePastoralRecord(page);
 
         tester.isGoingTo("Visit the pastoral profile page for Jana Reed");
@@ -189,7 +189,7 @@ test.describe("Test the pastoral care modules expiry feature", () => {
         page,
         db,
     }) => {
-        const pastoralProfile = new PastoralProfile(page);
+        const pastoralProfile = new PastoralProfile(page, tester);
         const createPastoralRecord = new CreatePastoralRecord(page);
         const classReport = new ClassReport(page);
 
@@ -219,7 +219,7 @@ test.describe("Test the pastoral care modules expiry feature", () => {
     });
 
     test("Confirm expired pastoral flags do not appear on student profile", async ({ tester, page, db }) => {
-        const manageRecordSettings = new ManageRecordSettings(page);
+        const manageRecordSettings = new ManageRecordSettings(page, tester);
         const profilePage = new ProfilePage(tester, page);
 
         tester.isGoingTo("Visit the Award/Achievement page");

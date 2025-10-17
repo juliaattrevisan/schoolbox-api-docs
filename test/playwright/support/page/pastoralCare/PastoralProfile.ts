@@ -1,7 +1,11 @@
 import type { Page, Locator } from "@playwright/test";
+import type AcceptanceTester from "@schoolboxTest/playwright/support/AcceptanceTester";
+import { expect } from "@playwright/test";
 
 export default class PastoralProfile {
     private page: Page;
+
+    private tester: AcceptanceTester;
 
     static readonly URL = "/pastoral/student/{studentId}";
 
@@ -19,8 +23,17 @@ export default class PastoralProfile {
 
     static readonly DATA_TEST_SHOW_ARCHIVED_RECORDS_TOGGLE = "student-section-filter-show-archived-records-toggle";
 
-    constructor(page: Page) {
+    static readonly SELECTOR_PROFILE_CONTENT = "div.profile.content";
+
+    static readonly SELECTOR_PANEL_GENERAL = "div#panel-general";
+
+    static readonly SELECTOR_PANEL_CONFIDENTIAL = "div#panel-confidential";
+
+    static readonly SELECTOR_PANEL_CONFIDENTIAL_LINK = "a#panel-confidential";
+
+    constructor(page: Page, tester: AcceptanceTester) {
         this.page = page;
+        this.tester = tester;
     }
 
     /**
@@ -101,5 +114,36 @@ export default class PastoralProfile {
      */
     async clickShowArchivedRecordsToggle(): Promise<void> {
         await this.page.getByTestId(PastoralProfile.DATA_TEST_SHOW_ARCHIVED_RECORDS_TOGGLE).click();
+    }
+
+    /**
+     * check the profile content contains the text
+     * @param text - The text to check
+     */
+    async seeInProfileContent(text: string): Promise<void> {
+        await expect(this.page.locator(PastoralProfile.SELECTOR_PROFILE_CONTENT)).toContainText(text);
+    }
+
+    /**
+     * check the general panel contains the text
+     * @param text - The text to check
+     */
+    async seeInGeneralPanel(text: string): Promise<void> {
+        await expect(this.page.locator(PastoralProfile.SELECTOR_PANEL_GENERAL)).toContainText(text);
+    }
+
+    /**
+     * click confidential panel link
+     */
+    async clickConfidentialPanelLink(): Promise<void> {
+        await this.page.click(PastoralProfile.SELECTOR_PANEL_CONFIDENTIAL_LINK);
+    }
+
+    /**
+     * check the confidential panel contains the text
+     * @param text - The text to check
+     */
+    async seeInConfidentialPanel(text: string): Promise<void> {
+        await expect(this.page.locator(PastoralProfile.SELECTOR_PANEL_CONFIDENTIAL)).toContainText(text);
     }
 }
