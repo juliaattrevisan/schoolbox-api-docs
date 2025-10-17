@@ -7,4 +7,4 @@ UPDATE config SET value='http://schoolbox-gotenberg:3000' WHERE name='gotenberg_
 # UPDATE config SET value='dev.schoolbox.cloud' WHERE name='site_domain';
 UPDATE config SET value='http://schoolbox-etherpad:9001' WHERE name='etherpad_host';
 UPDATE config SET value='test' WHERE name='etherpad_api_token';
-UPDATE config SET value=REPLACE(value, '/vagrantx', '/docker') WHERE name LIKE '%dir%';
+# UPDATE config SET value=REPLACE(value, '/vagrantx', '/docker') WHERE name LIKE '%dir%';

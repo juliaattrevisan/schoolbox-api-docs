@@ -391,7 +391,15 @@ function install_instance() {
     --config strict_templates "'1'" \
     --config summative_report_enabled "'1'" \
     --config title "'Schoolbox [${INSTANCE_ID}]'" \
-    --config ups_groups_enabled "'1'";
+    --config ups_groups_enabled "'1'" \
+    --config zip_dir "'/var/lib/schoolbox/${INSTANCE_ID}/cache/zip'" \
+    --config portrait_dir "'/var/lib/schoolbox/${INSTANCE_ID}/cache/portrait'" \
+    --config stream_dir "'/var/lib/schoolbox/${INSTANCE_ID}/cache/stream'" \
+    --config storage_dir "'/var/lib/schoolbox/${INSTANCE_ID}/storage'" \
+    --config logs_dir "'/var/log/schoolbox/${INSTANCE_ID}'" \
+    --config purifier_cache_dir "'/var/lib/schoolbox/${INSTANCE_ID}/purifier'" \
+    --config twig_cache_dir "'/var/lib/schoolbox/${INSTANCE_ID}/twig'" \
+    --config backup_dir "'/var/lib/schoolbox/${INSTANCE_ID}/backups'";
   then
     error "Unable to install instance. Exiting."
     exit 1
