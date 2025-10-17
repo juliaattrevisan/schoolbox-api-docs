@@ -30,6 +30,7 @@ class Controller extends Base
      * Controller constructor.
      *
      * @param AILogMapper $aiLogMapper
+     * @param ConfigMapper $configMapper
      */
     public function __construct(
         private AILogMapper $aiLogMapper,
@@ -50,6 +51,9 @@ class Controller extends Base
         $features = array_map(fn($item) => [
             'title' => $item['title']
         ], $features);
+
+        // sort features alphabetically
+        usort($features, fn($a, $b) => strcmp($a['title'], $b['title']));
 
         $this->response = $this->responseFromTemplate('@openAIUsage/index.twig', [
             'features' => $features,
