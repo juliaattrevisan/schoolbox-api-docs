@@ -203,7 +203,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
      * The unit has been deleted from the backend,
      * so we want to visually animate the unit being removed
      * then remove it from the store
-     * @param unitToDelete - the unit that's been deleted
+     * @param $unitDeleted - the unit that's been deleted
      */
     function deleteUnit($unitDeleted: Unit): void {
         /**
