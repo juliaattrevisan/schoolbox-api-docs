@@ -14,12 +14,25 @@ use Schoolbox\Application\CliTool;
 use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Instance;
 use Schoolbox\Resource\Storage\Mapper as StorageMapper;
+use Symfony\Component\Lock\Exception\LockAcquiringException;
+use Symfony\Component\Lock\Exception\LockConflictedException;
 
 /**
  * Command-line tool for Schoolbox's garbage collector.
  */
 class CommandLineTool extends CliTool\App
 {
+    /**
+     * The name of the lock this tool acquires.
+     */
+    public const LOCK_NAME = 'storageCleanup';
+
+    /**
+     * The amount of time (in seconds) this lock is held for: note that this
+     * tool during processing may re-acquire the lock.
+     */
+    private const LOCK_TTL = 60;
+
     /**
      * Print help
      */
@@ -160,6 +173,14 @@ HELP;
 
         $logger = $this->getLogger();
 
+        // Obey lock
+        $logger->debug("Attempting to acquire process lock");
+        try {
+            $lock = $this->acquireLock(self::LOCK_NAME, self::LOCK_TTL);
+        } catch (\RuntimeException $e) {
+            return;
+        }
+
         // Keep running or exit, depending on whether it's enabled in config.
         if (!$this->getConfig()->get(ConfigMapper::NAME_STORAGE_CLEANUP_ENABLED)) {
             if ($this->getOpt(self::OPT_LONG_FORCE_RUN_IF_DISABLED)) {
@@ -183,6 +204,7 @@ HELP;
                         self::OPT_LONG_FORCE_RUN_IF_DISABLED,
                     ),
                 );
+                $lock->release();
                 exit(CliKernelAbstract::EXIT_STATUS_OK);
             }
         }
@@ -210,11 +232,13 @@ HELP;
                             break;
                         }
                         if ($continue === 'q') {
+                            $lock->release();
                             exit(CliKernelAbstract::EXIT_STATUS_OK);
                         }
                     }
                 } else {
                     $logger->notice('Refusing to run in perform mode on a staging instance without the --force-run-on-staging flag.');
+                    $lock->release();
                     exit(CliKernelAbstract::EXIT_STATUS_OK);
                 }
             } else {
@@ -245,6 +269,8 @@ HELP;
             $logger,
             $this->perform(),
             $batchSize,
+            $lock,
+            self::LOCK_TTL,
             limit: $limit,
             maxTime: $maxTime,
             thresholdDate: $thresholdDate,
@@ -255,7 +281,14 @@ HELP;
             ->addCheck(new Check\TextField($db, $logger, SQL_db, $mapper->getTable()))
         ;
 
-        $gc->purge();
+        // Purge, throwing a lock exception if not held
+        try {
+            $gc->purge();
+        } finally {
+            if ($lock->isAcquired() && !$lock->isExpired()) {
+                $lock->release();
+            }
+        }
         exit(CliKernelAbstract::EXIT_STATUS_OK);
     }
 

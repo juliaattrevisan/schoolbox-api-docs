@@ -129,6 +129,9 @@ class Inspector extends CliTool\App
         /* Lesson Plan Template Updater
          */
         \Schoolbox\Admin\LessonPlan\Template\Cli\LimitedUpdaterTool::LOCK_NAME => 'Lesson Plan Template: Updater',
+
+        // Storage cleanup
+        \Schoolbox\Resource\Storage\GC\CommandLineTool::LOCK_NAME => 'Storage Cleanup tool (./tools/gc-storage.php)',
     ];
 
 
