@@ -284,13 +284,11 @@ HELP;
         // Purge, throwing a lock exception if not held
         try {
             $gc->purge();
-        } catch (LockAcquiringException | LockConflictedException $e) {
+        } finally {
             if ($lock->isAcquired() && !$lock->isExpired()) {
                 $lock->release();
             }
-            throw $e;
         }
-        $lock->release();
         exit(CliKernelAbstract::EXIT_STATUS_OK);
     }
 
