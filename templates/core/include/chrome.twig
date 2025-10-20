@@ -141,7 +141,7 @@
             window.sbProps.aiFeatures["{{ feature }}"] = {
                 enabled: Boolean('{{ aiConfig.config.provider != 'Off' }}'),
                 {% if aiConfig.config.provider != 'Off' %}
-                    model: "{{ aiConfig.config.openai.model.value ?? '' }}",
+                    model: "{{ aiConfig.config.OpenAI.model.value ?? '' }}",
                 {% endif %}
             };
             {% endfor %}
