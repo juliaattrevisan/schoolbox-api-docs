@@ -124,7 +124,7 @@ class Mapper extends BaseMapper
         int $offset = 0
     ): array {
         // base query
-        $query = "Select id, session_id, user_id, created_at, feature from {$this->table} WHERE session_id is not NULL ";
+        $query = "Select id, session_id, user_id, created_at, feature, return_code from {$this->table} WHERE session_id is not NULL ";
         $where = "";
         $order = " group by session_id order by max(created_at) desc limit :limit offset :offset";
         $params = [
@@ -171,6 +171,7 @@ class Mapper extends BaseMapper
                 'user' => $user,
                 'created_at' => new \Alaress_Date_Format($row['created_at'], \Alaress_Date_Format::DATABASE_FORMAT),
                 'feature' => $row['feature'],
+                'return_code' => $row['return_code'],
             ];
         }
         return $data;

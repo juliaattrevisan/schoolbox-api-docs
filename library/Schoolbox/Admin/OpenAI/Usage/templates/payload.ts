@@ -21,6 +21,7 @@ export type AiSession = {
     feature: string;
     createdAt: string;
     createdBy: UserAuthor;
+    return_code: number | null;
     _routes: {
         getLog?: string | null;
     };

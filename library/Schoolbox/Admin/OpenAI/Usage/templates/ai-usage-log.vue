@@ -280,6 +280,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                             <th>Date</th>
                             <th>Feature</th>
                             <th>User</th>
+                            <th>&nbsp;</th>
                         </tr>
                     </thead>
 
@@ -312,6 +313,12 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                                 >
                                     {{ session.createdBy.fullName }}
                                 </component>
+                            </td>
+                            <td v-if:="200 !== session.return_code">
+                              Error
+                            </td>
+                            <td v-else>
+                              &nbsp;
                             </td>
                         </tr>
                     </tbody>
