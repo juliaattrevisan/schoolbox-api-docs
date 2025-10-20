@@ -20,7 +20,14 @@ use Schoolbox\External\Connector\Veracross\Base\Endpoint\TimetableCalendar\TimeC
 class MeetingTimesConcurrent
 {
     /**
-     * Quantity of concurrent requests per chunk
+     * Quantity of concurrent requests per chunk.
+     *
+     * The 100 default value was arbitrarily chosen, though veracross has a 300-per-3min rate limit.
+     * As long as you don't exceed that you'll be okay.
+     *
+     * You could simplify this to 3 requests per second, I think, but 100 is an easier number to work with
+     * while we're experimenting with limits in prod. If we wanted to push the veracross limits, we might
+     * end up needing to fulfil plan B, which is make 300 requests then nap for 3 minutes.
      */
     private const CLASS_CHUNK_SIZE = 100;
 
