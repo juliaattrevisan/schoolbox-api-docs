@@ -326,6 +326,33 @@ test.describe("Unit Planner Tests", () => {
         }
     });
 
+    test("Create new unit on existing course", async ({ tester, page, db }) => {
+        const courseId = 4; // ELC
+        const firstUnitName = "Happy Days";
+        try {
+            tester.isGoingTo("navigate to ELC unit planner page ");
+            await page.goto(`/course/plan/${courseId}`);
+
+            tester.isGoingTo("click the create units button to open the modal");
+            await page.getByTestId(`unit-planner-create-units`).click();
+
+            tester.isGoingTo("create a new unit using the modal and verify it is visible");
+            await unitPlanner.createUnitsInModal([firstUnitName]);
+        } finally {
+            tester.isGoingTo("remove the unit created");
+            const folderId = (await db.grabFromDatabase("folder", "id", {
+                name: firstUnitName,
+            })) as number | null;
+            if (folderId === null) {
+                tester.isGoingTo("skip deletion as the folder was not found");
+                return;
+            }
+            await db.dontHaveInDatabase("homepage_config", { cid: folderId });
+            await db.dontHaveInDatabase("perms", { cid: folderId });
+            await db.dontHaveInDatabase("folder", { id: folderId });
+        }
+    });
+
     test.afterAll(async ({ baseTester, db }) => {
         baseTester.isGoingTo("find the textbox that was created in this test so it can be deleted");
 
