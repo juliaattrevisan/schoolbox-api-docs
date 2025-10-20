@@ -31,10 +31,12 @@ class Controller extends Base
      *
      * @param AILogMapper $aiLogMapper
      * @param ConfigMapper $configMapper
+     * @param UserMapper $userMapper
      */
     public function __construct(
         private AILogMapper $aiLogMapper,
         private ConfigMapper $configMapper,
+        private UserMapper $userMapper,
     ) {
     }
 
@@ -87,8 +89,7 @@ class Controller extends Base
 
         // ensue the user exists (allow deleted)
         if ($user) {
-            $userMapper = UserMapper::getInstance();
-            $userObj = $userMapper->findByIdWithFallback($user);
+            $userObj = $this->userMapper->findByIdWithFallback($user);
             if (null === $userObj->getId()) {
                 $problem = (new ApiProblem('Unknown User'))
                     ->setStatus(404)

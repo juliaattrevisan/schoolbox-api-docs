@@ -64,7 +64,8 @@ class Module extends BaseModule
     {
         return new Controller(
             $this->getAILogMapper(),
-            $this->getMapperFactory()->get(ConfigMapper::class)
+            $this->getMapperFactory()->get(ConfigMapper::class),
+            $this->getMapperFactory()->get(UserMapper::class),
         );
     }
 
