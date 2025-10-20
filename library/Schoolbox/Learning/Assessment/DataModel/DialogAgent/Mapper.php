@@ -33,6 +33,7 @@ class Mapper extends \Schoolbox\Mapper
         $this->uses('scenario_id', self::TYPE_INTEGER, null, 'scenarioId');
         $this->uses('language', self::TYPE_STRING, null, 'language');
         $this->uses('helpfulness', self::TYPE_STRING, null, 'helpfulness');
+        $this->uses('use_diff_profile', self::TYPE_BOOLEAN, null, 'useDifferentiationProfile');
         $this->uses('opening_message', self::TYPE_STRING, null, 'openingMessage');
         $this->uses('rules', self::TYPE_STRING, null, 'rules');
         $this->uses('prompt', self::TYPE_STRING, null, 'prompt');

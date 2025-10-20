@@ -60,6 +60,12 @@ class Model implements IAssessableDataModel, ISoftDeletable
 
 
     /**
+     * @var bool|null
+     */
+    private ?bool $useDifferentiationProfile = null;
+
+
+    /**
      * @var string|null
      */
     private ?string $openingMessage = null;
@@ -184,6 +190,26 @@ class Model implements IAssessableDataModel, ISoftDeletable
     public function setHelpfulness(?string $helpfulness): self
     {
         $this->helpfulness = $helpfulness;
+        return $this;
+    }
+
+
+    /**
+     * @return bool|null
+     */
+    public function getUseDifferentiationProfile(): ?bool
+    {
+        return $this->useDifferentiationProfile;
+    }
+
+
+    /**
+     * @param bool|null $useDifferentiationProfile
+     * @return $this
+     */
+    public function setUseDifferentiationProfile(?bool $useDifferentiationProfile): self
+    {
+        $this->useDifferentiationProfile = $useDifferentiationProfile;
         return $this;
     }
 

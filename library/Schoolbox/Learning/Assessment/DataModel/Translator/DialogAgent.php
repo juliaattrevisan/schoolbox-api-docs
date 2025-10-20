@@ -72,6 +72,7 @@ class DialogAgent implements IAssessmentTypeTranslator
         $dataModel->setLanguage($domainObject->getLanguage());
         $dataModel->setHelpfulness($domainObject->getHelpfulness());
         $dataModel->setOpeningMessage($domainObject->getOpeningMessage());
+        $dataModel->setUseDifferentiationProfile($domainObject->getUseDifferentiationProfile());
         $dataModel->setRules($domainObject->getRules());
         $dataModel->setPrompt($domainObject->getPrompt());
         $dataModel->setDuration($domainObject->getDuration());
@@ -89,6 +90,7 @@ class DialogAgent implements IAssessmentTypeTranslator
         $domainObject->setScenarioId($dataModel->getScenarioId());
         $domainObject->setLanguage($dataModel->getLanguage());
         $domainObject->setHelpfulness($dataModel->getHelpfulness());
+        $domainObject->setUseDifferentiationProfile($dataModel->getUseDifferentiationProfile());
         $domainObject->setOpeningMessage($dataModel->getOpeningMessage());
         $domainObject->setRules($dataModel->getRules());
         $domainObject->setPrompt($dataModel->getPrompt());

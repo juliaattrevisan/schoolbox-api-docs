@@ -40,6 +40,7 @@ CREATE TABLE `dialog_agent` (
     `scenario_id` INT NOT NULL,
     `language` VARCHAR(255) NULL,
     `helpfulness` ENUM('minimal', 'moderate', 'extreme') NULL,
+    `use_diff_profile` INT NULL,
     `opening_message` TEXT,
     `rules` TEXT,
     `prompt` TEXT,
