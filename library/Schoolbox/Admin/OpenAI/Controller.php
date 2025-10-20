@@ -51,7 +51,7 @@ class Controller extends ConfigController
 
         $imageConfigContext = $this->buildConfigContext(
             $this->buildImageConfigPredicate(),
-            $this->routeGenerator->generate('adminOpenAi.postImageOptions'),
+            $this->routeGenerator->generate('adminOpenAi.postOptions'),
         );
 
         /* Make islands independent of each other for validation reasons
@@ -85,9 +85,9 @@ class Controller extends ConfigController
      *
      * @return void
      * @throws RouteNotFound
-     * @throws Exception
+     * @throws Exception|\JsonException
      */
-    public function postTextOptions(): void
+    public function postOptions(): void
     {
         $postData = $this->requestPost->getArrayCopy();
 
@@ -111,28 +111,6 @@ class Controller extends ConfigController
          */
         $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminOpenAi.getIndex'));
     }
-
-
-    /**
-     * Save the configuration for AI Services
-     *
-     * @return void
-     * @throws RouteNotFound
-     * @throws Exception
-     */
-    public function postImageOptions(): void
-    {
-        $postData = $this->requestPost->getArrayCopy();
-
-        /* Save it
-         */
-        $this->updateConfig($postData, $this->buildImageConfigPredicate());
-
-        /* Go back to the place from whence you came
-         */
-        $this->response = $this->redirectAfterPost($this->routeGenerator->generate('adminOpenAi.getIndex'));
-    }
-
 
     /**
      *

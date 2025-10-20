@@ -14,14 +14,12 @@
         <div class="small-12 columns island">
             <section id="textSettingsContainer">
                 {# module specific config #}
-                <form id="textForm" method="post" action="{{ routeLookupIfAuthorized('adminOpenAi.postTextOptions') }}">
+                <form id="textForm" method="post" action="{{ routeLookupIfAuthorized('adminOpenAi.postOptions') }}">
                     <div id="textModuleContainer" class="l-grid l-gap-l l-mar-m--bottom" style="">
                         {% for feature in features %}
                             {% include '@adminOpenAi/config.twig' with {feature:feature, providers:providers, models:models, fields:fields} only %}
                         {% endfor %}
                     </div>
-                    {# manually create a save button for this section... #}
-{#                    <input id="textFormSubmit" type="submit" value="Save">#}
                     <div id="save-admin-settings-container">
                         <save-admin-settings
                                 form-id="textForm"
@@ -147,7 +145,7 @@
                     }
 
                     // send via javascript fetch to adminOpenAi.postTextOptions
-                    const response = await fetch('{{ routeLookupIfAuthorized('adminOpenAi.postTextOptions') }}', {
+                    const response = await fetch('{{ routeLookupIfAuthorized('adminOpenAi.postOptions') }}', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
