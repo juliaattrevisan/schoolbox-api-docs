@@ -2,7 +2,9 @@
  # Configure a Dialog Agent's settings
  #
  # @param Assessment\DialogAgent\Model                 An assessment instance
- # @param \Schoolbox\Admin\DialogAgent\Scenario\Model  A Scenario instance
+ # @param \Schoolbox\Admin\DialogAgent\Scenario\Model  A Scenario instance with its corresponding fields
+ # @param array $helpfulness                           A list of key-value pairs for Helpfulness options
+ # @param array $language                              A list of key-value pairs for Langauge options
  #}
 Breadcrumbs
 
@@ -62,6 +64,14 @@ Breadcrumbs
                              </label>
                          </div>
                      </div>
+                 </fieldset>
+                 <fieldset class="content">
+                     {% for field in scenario.fields %}
+                     <div class="small-12 columns">
+                         <label for="field-{{ field.id }}" class="required">{{ field.title }}</label>
+                         <textarea id="field-{{ field.id }}" name="fields[{{ field.id }}]" style="width:100%;height:100px;"></textarea>
+                     </div>
+                     {% endfor %}
                  </fieldset>
              </section>
          </form>
