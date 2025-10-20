@@ -417,8 +417,8 @@ class Controller extends Base
                     ) {
                         $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_PENDING));
                     } else {
-                        // Since this is not a clash booking, it should not be 'pending', so set it to 'approved'.
-                        $booking->setStatus($this->getStatusMapper()->createModel(Status\Model::STATUS_APPROVED));
+                        // Otherwise set the status as if we were creating a non-clashing booking.
+                        $booking->setStatus($this->getStatusMapper()->createModel($this->getStatusForNonClashBooking($booking)));
                     }
                 }
 
