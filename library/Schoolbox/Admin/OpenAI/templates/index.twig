@@ -73,33 +73,21 @@
                         model.hide();
                         azureResourceName.hide();
                         azureDeploymentId.hide();
-
-                        if (null !== outputQuality) {
-                            outputQuality.hide();
-                        }
-
+                        outputQuality.hide();
                         systemPrompt.hide();
                     } else if (PROVIDER_OPENAI === provider.val()) {
                         key.show();
                         model.show();
                         azureResourceName.hide();
                         azureDeploymentId.hide();
-
-                        if (null !== outputQuality) {
-                            outputQuality.show();
-                        }
-
+                        outputQuality.show();
                         systemPrompt.show();
                     } else if (PROVIDER_AZURE === provider.val()) {
                         key.show();
                         model.hide();
                         azureResourceName.show();
                         azureDeploymentId.show();
-
-                        if (null !== outputQuality) {
-                            outputQuality.show();
-                        }
-
+                        outputQuality.show();
                         systemPrompt.show();
                     }
 
