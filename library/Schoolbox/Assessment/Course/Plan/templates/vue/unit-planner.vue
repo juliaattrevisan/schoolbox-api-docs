@@ -4,8 +4,10 @@
  */
 import type { Ref } from "vue";
 import type { Template as EditorTemplate } from "@js/editor/types/editorTypes";
+import locale from "@js/terminology/rosettaStone";
 import { useActivitiesListGlobalStore } from "./activities-list/store/activitiesListGlobalStore";
 import { useUnitPlannerStore } from "./store/unitPlannerStore";
+import { useAddUnitsStore } from "./store/unitPlannerAddUnitsStore";
 import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import type { Unit, UnitTemplate } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
@@ -32,6 +34,7 @@ interface Props {
 
 const props = defineProps<Props>();
 const store = useUnitPlannerStore();
+const addStore = useAddUnitsStore();
 const activitiesListGlobalStore = useActivitiesListGlobalStore();
 const dragStore = useUnitPlannerDragStore();
 
@@ -232,9 +235,11 @@ window.Vue.onUnmounted(() => {
                             />
                         </template>
                     </div>
-                </div>
-                <div>
-                    <p>Create new Unit</p>
+                    <div class="fixed-left l-pad-s f-no-margins">
+                        <button class="button icon-add" @click.prevent="addStore.prompt()">
+                            Create {{ locale.unit.translate(true, true) }}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

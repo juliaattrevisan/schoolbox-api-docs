@@ -24,7 +24,7 @@ function onAddSelected(): void {
 <template>
     <basic-modal v-model:is-open="addUnitsStore.isOpen">
         <form class="l-flex-col l-gap-s f-no-margins" @submit.prevent="onAddSelected">
-            <h2 data-test="up-add-units-title">Create new {{ locale.unit.translate(true, false) }}</h2>
+            <h2 data-test="up-add-units-title">Create {{ locale.unit.translate(true, true) }}</h2>
             <div class="c-vert-scroll-container l-flex-col l-gap-s l-pad-s">
                 <div class="l-flex-col l-gap-s">
                     <!-- Loop through newUnits and display label and text input for each -->
