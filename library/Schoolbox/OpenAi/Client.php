@@ -177,7 +177,7 @@ class Client implements IClient
      * @param StreamInterface $stream    The response's body, as a stream.
      * @param int             $chunkSize How many bytes should be read from the
      *                                   stream at once?
-     * @return iterable<string>
+     * @return iterable<EventStream\Message>
      */
     private function readEvents(StreamInterface $stream, int $chunkSize, Log\Model $log): iterable
     {
@@ -191,8 +191,8 @@ class Client implements IClient
                 continue;
             }
 
-            // Output the stream contents
-            yield $data;
+//            // Output the stream contents
+//            yield $data;
 
             // Also buffer the stream contents into a set of message objects,
             // for later processing and logging
@@ -204,7 +204,9 @@ class Client implements IClient
                 $chunk = substr($chunkBuffer, 0, $pos);
 
                 // If this can't be parsed: raise something but still log
-                $this->onMessage(EventStream\Message::fromString($chunk), $log);
+                $message = EventStream\Message::fromString($chunk);
+                yield $message;
+                $this->onMessage($message, $log);
                 $chunkBuffer = substr($chunkBuffer, $pos + 2);
 
                 // TODO does anything need to be done about this?
@@ -217,7 +219,9 @@ class Client implements IClient
 
         // If we have any remaining data in the buffer, process it
         if (strlen(trim($chunkBuffer)) > 0) {
-            $this->onMessage(EventStream\Message::fromString($chunkBuffer), $log);
+            $message = EventStream\Message::fromString($chunkBuffer);
+            yield $message;
+            $this->onMessage($message, $log);
         }
     }
 

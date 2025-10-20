@@ -62,7 +62,7 @@ interface IClient
      *                                 so that this call may be identified in logs.
      * @param int|null    $chunkSize   If provided, read this many bytes for each stream iteration:
      *                                 otherwise, allow the client itself to decide.
-     * @return iterable<string> Each chunk of the stream as it's received.
+     * @return iterable<EventStream\Message> Each message in the stream as it's received.
      * @throws ClientExceptionInterface if something went wrong with the request
      */
     public function createResponseStream(
