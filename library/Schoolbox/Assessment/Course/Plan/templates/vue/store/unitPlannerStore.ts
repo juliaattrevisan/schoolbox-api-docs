@@ -9,6 +9,8 @@ import type { CourseBuilderComponent, CurriculumOverviewComponent, Unit, UnitTem
 gsap.registerPlugin(Draggable);
 gsap.registerPlugin(ScrollToPlugin);
 
+export const ANIMATION_DURATION = 0.5; // duration for animations in seconds
+
 export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
     const unexpandedUnitHeight: number = 300; // The default unexpanded height of a unit, in px
     const dragUnitHeight: number = 80; // The height of a unit when it is being dragged, in px
@@ -211,10 +213,13 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
          * which will get picked up by the up-unit-cell.vue components to animate the heights of each to 0.
          */
         unitDeleted.value = $unitDeleted;
-        setTimeout(() => {
-            units.value = units.value.filter((unit) => unit.id !== $unitDeleted.id);
-            unitDeleted.value = null;
-        }, 1000); // 1 second should allow the 0.5s CSS transition duration in up-unit-cell.vue to complete
+        setTimeout(
+            () => {
+                units.value = units.value.filter((unit) => unit.id !== $unitDeleted.id);
+                unitDeleted.value = null;
+            },
+            ANIMATION_DURATION * 1000 + 100,
+        ); // extra 100ms to ensure the animation has completed
     }
 
     return {

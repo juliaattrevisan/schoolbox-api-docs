@@ -7,7 +7,7 @@
  * The content height of the cell is measured and reflected in the store to allow for units to expand and collapse
  */
 
-import { useUnitPlannerStore } from "./store/unitPlannerStore";
+import { useUnitPlannerStore, ANIMATION_DURATION } from "./store/unitPlannerStore";
 import type { Column } from "./unitPlannerConfig";
 import { ColumnType } from "./unitPlannerConfig";
 import type { Unit } from "./unitPlannerTypes";
@@ -36,6 +36,7 @@ interface Props {
 const props = defineProps<Props>();
 
 const store = useUnitPlannerStore();
+const animationDuration = `${ANIMATION_DURATION}s`; // duration for animations in seconds
 
 const storeUnit = window.Vue.computed(() => {
     return store.units.find((unit) => unit.id === props.unit.id);
@@ -317,7 +318,7 @@ const isFirstUnit = window.Vue.computed(() => {
     overflow: clip; // Use clip to avoid focus scrolling the cell content
     position: relative;
     text-overflow: ellipsis;
-    transition: height 0.5s ease;
+    transition: height v-bind(animationDuration) ease;
 
     &.sortable-dropzone {
         background-color: #f8f8f8;
