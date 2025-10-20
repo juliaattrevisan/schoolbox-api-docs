@@ -43,6 +43,15 @@ class TimeConverter
 
 
     /**
+     * A placeholder time value to fulfil database date format.
+     *
+     * This indicates that no time was provided by veracross so we just
+     * have to append it to whatever date was provided
+     */
+    private const ZERO_TIME = '00:00:00';
+
+
+    /**
      * Convert a broken Veracross timestamp into something sensible
      *
      * @param string|null $datetime
@@ -57,7 +66,7 @@ class TimeConverter
         $temp = $datetime ?? sprintf(
             '%s %s',
             $date,
-            '00:00:00',
+            self::ZERO_TIME,
         );
 
         /* Sometimes (sometimes...) veracross has data like this, so you have to butcher it some more:
