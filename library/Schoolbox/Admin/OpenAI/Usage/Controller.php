@@ -160,7 +160,7 @@ class Controller extends Base
                 'feature' => $log['feature'],
                 'createdAt' => $log['created_at'],
                 'createdBy' => $userTranslator->__invoke($log['user']),
-                'return_code' => $log['return_code'],
+                'returnCode' => $log['return_code'],
                 '_routes' => [
                     'getLog' => $this->getRouteIfAuthorized(
                         'openAIUsage.getLog',

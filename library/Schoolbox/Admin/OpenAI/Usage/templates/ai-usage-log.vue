@@ -314,7 +314,7 @@ async function openSessionDetails(session: AiSession): Promise<void> {
                                     {{ session.createdBy.fullName }}
                                 </component>
                             </td>
-                            <td v-if:="200 !== session.return_code">
+                            <td v-if:="200 !== session.returnCode">
                               Error
                             </td>
                             <td v-else>

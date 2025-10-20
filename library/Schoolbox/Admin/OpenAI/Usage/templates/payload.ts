@@ -21,7 +21,7 @@ export type AiSession = {
     feature: string;
     createdAt: string;
     createdBy: UserAuthor;
-    return_code: number | null;
+    returnCode: number | null; // HTTP return code from OpenAI API
     _routes: {
         getLog?: string | null;
     };
