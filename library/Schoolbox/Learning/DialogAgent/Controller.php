@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\DialogAgent;
 
 use Alaress\Web\Controller\Base;
+use Aura\Router\Exception\RouteNotFound;
 use DebugBar\DebugBarException;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Mapper as DialogAgentMapper;
 use Schoolbox\Admin\DialogAgent\Scenario\Mapper as ScenarioMapper;
@@ -20,6 +21,7 @@ use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentDataModel;
 use Schoolbox\Learning\Assessment\DataModel\MapperProxy as AssessmentMapperProxy;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
+use Schoolbox\Learning\Assessment\Redirect;
 use Schoolbox\Mapper\Exception;
 use Schoolbox\Mapper\Exception\Deleted;
 
@@ -88,9 +90,9 @@ class Controller extends Base
      *
      * @param DialogAgent $assessment
      * @return void
-     * @throws DebugBarException
-     * @throws Exception
      * @throws Deleted
+     * @throws Exception
+     * @throws RouteNotFound
      */
     public function postUpdate(DialogAgent $assessment): void
     {
@@ -144,8 +146,22 @@ class Controller extends Base
          */
         $this->fieldContextMapper->save($existingContexts);
 
-        /* TODO Redirect back to the configuration screen I suppose, if a specific url didn't exist...
+        /* Respond to synchronous POST with redirect
          */
-        new \Alaress_Probe($postArray, $existingContexts, $scenario->getFields()->indexBy('id')->keys());
+        $returnUrlEncoded = $this->requestPost['returnUrl'] ?? '';
+
+        if ($returnUrlEncoded !== '') {
+            $returnUrl = Redirect::decode($returnUrlEncoded);
+        } else {
+            /* If no return URL supplied, redirect to configuration page, under the assumption that you'll
+             * probably want to try out your changes to the dialog agent configuration...
+             */
+            $returnUrl = $this->getRouteIfAuthorized('learningDialogAgent.getUpdateForm', [
+                'assessmentId' => $assessment->getId(),
+                'assessment' => $assessment,
+            ]);
+        }
+
+        $this->response = $this->redirectAfterPost($returnUrl);
     }
 }
