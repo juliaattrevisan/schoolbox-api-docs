@@ -341,6 +341,12 @@ function add_rabbitmq_vhost() {
   curl -u guest:guest -H "Accept: application/json" -X PUT -d '{"configure":".*","write":".*","read":".f"}' "http://rabbitmq:15672/api/permissions/${INSTANCE_ID}/guest"
 }
 
+function create_data_dirs() {
+  log "Creating data dirs for instance";
+  /usr/share/schoolbox/tools/create-data-dirs.sh "/var/lib/schoolbox/${INSTANCE_ID}/"
+  /usr/share/schoolbox/tools/set-data-dir-perms.sh "/var/lib/schoolbox/${INSTANCE_ID}/" www-data
+}
+
 function install_instance() {
   log "Installing instance via 'schoolbox-data-refresh.sh'";
 
@@ -495,6 +501,7 @@ function main() {
   fi
 
   add_rabbitmq_vhost
+  create_data_dirs
   install_instance
   create_cron_config_file
   create_crontab_files

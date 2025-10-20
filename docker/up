@@ -83,6 +83,7 @@ function create_dirs() {
     # ensure the ssl cert folder exists (schoolbox-cli / caddy share):
     # schoolbox-cli must download them so that the Caddy container can use them.
     mkdir -p ./data/docker/ssl
+    mkdir -p ./data/docker2/ssl
 }
 
 function load_config() {
