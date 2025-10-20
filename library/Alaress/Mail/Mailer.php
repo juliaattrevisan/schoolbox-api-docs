@@ -475,7 +475,7 @@ class Mailer
             ) {
                 $this->email->addReplyTo($from);
             }
-            $replaceFrom[] = new Address($this->systemFrom->getAddress(), $this->systemFrom->getName());
+            $replaceFrom[] = new Address($this->systemFrom->getAddress(), $from->getName());
         }
         foreach ($replaceFrom as $i => $replace) {
             if ($i === 0) {
