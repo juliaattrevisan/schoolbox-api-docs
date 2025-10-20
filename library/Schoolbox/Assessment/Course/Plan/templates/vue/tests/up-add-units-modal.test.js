@@ -37,7 +37,7 @@ global.window = {
     },
 };
 
-describe("UpAddUnits", () => {
+describe("UpAddUnitsModal", () => {
     let wrapper;
     let addUnitsStore;
     let unitPlannerStore;
