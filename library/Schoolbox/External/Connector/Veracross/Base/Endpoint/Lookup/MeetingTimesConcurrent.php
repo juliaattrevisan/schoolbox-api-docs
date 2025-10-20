@@ -33,6 +33,12 @@ class MeetingTimesConcurrent
 
 
     /**
+     * Number of decimal places for logging purposes.
+     */
+    private const PRECISION = 2;
+
+
+    /**
      * Remember the output we might have previously generated
      *
      * @var array|null
@@ -109,7 +115,7 @@ class MeetingTimesConcurrent
                 $this->log->debug(sprintf(
                     'Concurrently fetching meeting times for %s classes took %s seconds to resolve all promises.',
                     \count($endpoints),
-                    number_format($concurrencyEnd - $concurrencyStart, 2)
+                    number_format($concurrencyEnd - $concurrencyStart, self::PRECISION)
                 ));
 
                 foreach ($responses as $response) {
@@ -201,7 +207,7 @@ class MeetingTimesConcurrent
 
         $this->log->debug(sprintf(
             'Prefetching meeting times took %s seconds',
-            number_format($end - $start, 2)
+            number_format($end - $start, self::PRECISION)
         ));
 
         $this->log->debug('');
