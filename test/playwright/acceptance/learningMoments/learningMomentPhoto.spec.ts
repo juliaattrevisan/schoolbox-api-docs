@@ -3,6 +3,7 @@
  */
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import LearningMomentsPage from "@schoolboxTest/playwright/support/page/learningMoments/LearningMomentsPage";
+import EditorTemplate from "@schoolboxTest/playwright/support/page/admin/design/EditorTemplates";
 
 test.describe("Learning Moment Photo Tests", () => {
     /**
@@ -23,6 +24,15 @@ test.describe("Learning Moment Photo Tests", () => {
 
     test("Learning Moment Photo", async ({ tester, page }) => {
         const learningMomentsPage = new LearningMomentsPage(tester, page);
+        const editorTemplate = new EditorTemplate(page, tester);
+        tester.isGoingTo("Create a editor template to use as learning moment description");
+        await editorTemplate.gotoCreateTemplatePage(7);
+        await editorTemplate.createTemplate(
+            "Learning Moments Automation Template",
+            "This is an automation template",
+            "This is a learning moments test - take a photo",
+        );
+
         await page.goto(LearningMomentsPage.getStudentProfilePage(25));
 
         tester.isGoingTo("share a photo learning moment");
@@ -37,13 +47,20 @@ test.describe("Learning Moment Photo Tests", () => {
 
         tester.isGoingTo("write a description");
         await learningMomentsPage.clickWriteSomethingButton();
-        await learningMomentsPage.typeMediaEvidenceDescription("This is a learning moments test - take a photo");
+        await tester.clickEditorTemplateCKEditor("mf-evidence-textarea", "Learning Moments Automation Template");
         await learningMomentsPage.clickSubmit();
 
         tester.isGoingTo("check if the picture and text are presented in the student activity feed");
         await learningMomentsPage.verifyEvidence("This is a learning moments test - take a photo");
         await learningMomentsPage.verifyEvidenceHasPhoto();
         await learningMomentsPage.verifyShareLearningMomentLinkExists();
+
+        tester.isGoingTo("As Jana Reed check that student cannot see the template icon in the CKEditor");
+        await tester.impersonate("Jana Reed");
+        await page.goto(LearningMomentsPage.getStudentProfilePage(25));
+        await learningMomentsPage.clickShareLearningMomentLink();
+        await learningMomentsPage.clickWriteSomethingButton();
+        await tester.checkTemplateIconVisibility(false);
     });
 
     test("Learning Moment Comments", async ({ tester, page }) => {
@@ -173,27 +190,32 @@ test.describe("Learning Moment Photo Tests", () => {
         await db.updateInDatabase(
             "moment",
             { deleted_at: "2022-01-15 11:22:34" },
-            { "body LIKE": "%This is a learning moments test - take a photo%" },
+            { "body LIKE": "%This is a learning moments test - take a photo%", deleted_at: null },
         );
         await db.updateInDatabase(
             "moment",
             { deleted_at: "2022-01-15 11:22:34" },
-            { "body LIKE": "%This is a learning moments test to be commented%" },
+            { "body LIKE": "%This is a learning moments test to be commented%", deleted_at: null },
         );
         await db.updateInDatabase(
             "moment",
             { deleted_at: "2022-01-15 11:22:34" },
-            { "body LIKE": "%This is a learning moments test to be modified%" },
+            { "body LIKE": "%This is a learning moments test to be modified%", deleted_at: null },
         );
         await db.updateInDatabase(
             "moment",
             { deleted_at: "2022-01-15 11:22:34" },
-            { "body LIKE": "%This is a learning moments test to get comments deleted%" },
+            { "body LIKE": "%This is a learning moments test to get comments deleted%", deleted_at: null },
         );
         await db.updateInDatabase(
             "moment",
             { deleted_at: "2022-01-15 11:22:34" },
-            { "body LIKE": "%This is a learning moments test to get deleted%" },
+            { "body LIKE": "%This is a learning moments test to get deleted%", deleted_at: null },
+        );
+        await db.updateInDatabase(
+            "editor_template",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": "Learning Moments Automation%", deleted_at: null },
         );
     });
 });

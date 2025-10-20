@@ -294,4 +294,32 @@ export default class EditorTemplate {
             await this.createAndCheckTemplateAppearsInList(data.tab, data.title, data.description, data.body);
         }
     }
+
+    /**
+     * check if the template is only available for the related feature
+     * @param templateName - the name of the template to check
+     * @param templateNameCheck - the name of the template to search and check it is not available
+     * @param numberItems - the number of items expected to be shown in the list or to be hidden
+     */
+    async verifyTemplateAvailability(
+        templateName: string,
+        templateNameCheck: string,
+        numberItems: number,
+    ): Promise<void> {
+        await this.tester.clickDropdownTemplateCKEditor();
+        // check the number of items returned and it is the correct one
+        await expect(this.page.locator("li.ck.ck-list__item")).toHaveCount(numberItems);
+        await expect(this.page.locator("li.ck.ck-list__item")).toContainText(templateName);
+        // check the info message is hidden as there is a template found
+        await expect(this.page.locator("div.ck.ck-search__info.ck-hidden")).toHaveCount(1);
+        // search for a template by typing in the search field
+        await this.page.locator(`input[inputmode="text"]`).fill(templateNameCheck);
+        await expect(this.page.locator("li.ck.ck-list__item.ck-hidden")).toHaveCount(numberItems);
+        // checks the no template found message is shown
+        await expect(this.page.locator("div.ck.ck-search__info")).toContainText("No templates were found matching");
+        await expect(this.page.locator("div.ck.ck-search__info")).toContainText(
+            "Please try a different phrase or check the spelling.",
+        );
+        await expect(this.page.locator("div.ck.ck-search__info.ck-hidden")).toHaveCount(0);
+    }
 }

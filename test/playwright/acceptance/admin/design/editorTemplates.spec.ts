@@ -1,5 +1,7 @@
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import EditorTemplates from "@schoolboxTest/playwright/support/page/admin/design/EditorTemplates";
+import CreateEvent from "@schoolboxTest/playwright/support/page/calendar/CreateEvent";
+import Form from "@schoolboxTest/playwright/support/page/news/Form";
 
 /**
  * This test adds, updates and deletes a template
@@ -97,6 +99,40 @@ test.describe("Editor templates tests", () => {
     });
 
     /**
+     * navigate to create an email as Jack Coles and check the template is available to use
+     */
+    test("Check the template is available to use in the email", async ({ tester, page }) => {
+        tester.isGoingTo("check the template is available to use in the email");
+        await tester.impersonate("Jack Coles");
+        await page.goto("/mail/create");
+        await tester.clickEditorTemplateCKEditor("body", "Automation Template Email");
+        await expect(page.locator("div.ck-content")).toContainText("Automation Body 3");
+    });
+
+    /**
+     * check if only the template related to the feature is shown in the ck editor template list
+     * check for create event, news, learning moments
+     */
+    test("Check only the template related to the feature is shown in the ck editor template list", async ({
+        tester,
+        page,
+    }) => {
+        const createEvent = new CreateEvent(tester, page);
+        const editorTemplate = new EditorTemplates(page, tester);
+        const news = new Form(tester, page);
+        tester.isGoingTo("check only the template related to the feature is shown in the ck editor template list");
+        // checking in the create event page and attempt to search for homepage template
+        await createEvent.goto();
+        await editorTemplate.verifyTemplateAvailability("Automation Template Event", "Homepage", 1);
+        // checking in the create news page and attempt to search for event template
+        await news.goto();
+        await editorTemplate.verifyTemplateAvailability("Automation Template News", "Event", 1);
+        // checking in the create learning moment page and attempt to search for news template
+        await page.goto("/learning/evidence/user/25/create?momentType=text");
+        await editorTemplate.verifyTemplateAvailability("Automation Template Moments", "News", 1);
+    });
+
+    /**
      * Soft deleting data to not impact the tests
     //
      */
@@ -107,7 +143,7 @@ test.describe("Editor templates tests", () => {
         await db.updateInDatabase(
             "editor_template",
             { deleted_at: "2022-01-15 11:22:34" },
-            { "title like": "Automation Template%" },
+            { "title like": "Automation Template%", deleted_at: null },
         );
     });
 });

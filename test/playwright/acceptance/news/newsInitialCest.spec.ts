@@ -41,14 +41,11 @@ test.describe("Create a News Article", () => {
         tester.isGoingTo("Go to the create news article page");
         await form.goto();
         await form.fillHeadline(headline);
-        await form.fillArticle(article);
         await tester.clickEditorTemplateCKEditor("body", "News Automation Template");
         await form.selectAudienceOption(audienceOption);
         await form.checkboxAudience(yearLevel);
         await form.clickAddAudience();
         await form.submit();
-        // had to add this as it was going away from this page too quickly and not publishing
-        // await page.waitForURL("/");
 
         tester.isGoingTo("Verify that the news is in the All topic, and is the first news item");
         await index.goto("all");
@@ -58,6 +55,7 @@ test.describe("Create a News Article", () => {
         const listItem = page.locator(`ul.information-list`).first();
         await listItem.locator(`a:has-text("${headline}")`).first().click();
         await expect(page.locator(`section.detail.content`)).toContainText(headline);
+        await expect(page.locator(`section.detail.content`)).toContainText(article);
     });
 
     test("Unpublish the News Article", async ({ tester, page, db }) => {
@@ -227,7 +225,12 @@ test.describe("Create a News Article", () => {
         await db.updateInDatabase(
             "editor_template",
             { deleted_at: "2022-01-15 11:22:34" },
-            { "title like": "News Automation Template%" },
+            { "title like": "News Automation Template%", deleted_at: null },
+        );
+        await db.updateInDatabase(
+            "comms_news_article",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": "Test News Title%", deleted_at: null },
         );
     });
 });

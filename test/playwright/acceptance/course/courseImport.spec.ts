@@ -13,6 +13,7 @@ import ManageGroup from "@schoolboxTest/playwright/support/page/group/ManageGrou
 import dayjs from "dayjs";
 import CourseOutline from "@schoolboxTest/playwright/support/page/homepage/CourseOutline";
 import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
+import EditorTemplate from "@schoolboxTest/playwright/support/page/admin/design/EditorTemplates";
 
 test.describe("Course import tests", () => {
     // Run tests serially, as tests rely on prior tests to have been run
@@ -42,6 +43,7 @@ test.describe("Course import tests", () => {
         const templateList = new TemplateList(tester, page);
         const assessmentForm = new AssessmentForm(tester, page);
         const manageGroup = new ManageGroup(page);
+        const editorTemplate = new EditorTemplate(page, tester);
 
         const folderName = `Automation Course Import Folder1`;
         const homepageTemplateOption = "Course";
@@ -49,6 +51,15 @@ test.describe("Course import tests", () => {
         const lessonPlanName = "Export Activity Lesson Plan for Romeo and Juliet";
         const projectName = "Export Activity Project for Romeo and Juliet";
         const dueWorkName = "Export Activity Test Due Work Project";
+
+        // create a editor template to use in the due work
+        tester.isGoingTo("Create a editor template to use in the due work");
+        await editorTemplate.gotoCreateTemplatePage(6);
+        await editorTemplate.createTemplate(
+            "Learning Activity Automation Template",
+            "This is an automation template",
+            "This is a learning activity description.",
+        );
 
         // sets write access permission for Administration and Teacher, read access permission for senior student, parent, junior student and middle student
         await createFolder.createFolder(
@@ -110,9 +121,17 @@ test.describe("Course import tests", () => {
         await page.getByTestId("project-create-activity-link").click();
         await page.locator(`label[for="due-work"]`).click();
         await assessmentForm.setTitle(dueWorkName);
+        // adding a description using a editor template to ensure it works via specification
+        await tester.clickEditorTemplateCKEditor("assessment-description", "Learning Activity Automation Template");
         await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
         await assessmentForm.clickCreate();
         await expect(page.locator("#assessment-list")).toBeVisible();
+        const dueworkId = (await db.grabFromDatabase("assessment", "id", {
+            deleted_at: null,
+            "title LIKE": dueWorkName,
+        })) as number;
+        await page.locator(`li[data-assessment="${dueworkId}"]`).click();
+        await expect(page.locator("#ir-content")).toContainText("This is a learning activity description.");
 
         tester.isGoingTo("navigate to the course list and click the option Import into classes from the dropdown menu");
         await courseList.goto();
@@ -426,6 +445,7 @@ test.describe("Course import tests", () => {
 
         await courseOutline.selectOptionUnitDotMenu(unitName, "task");
         await assessmentForm.setTitle(taskName);
+        await tester.clickEditorTemplateCKEditor("assessment-description", "Learning Activity Automation Template");
         await assessmentForm.setWorkType(AssessmentForm.WORKTYPE_ASSESSMENT_TASK);
         await assessmentForm.create();
         const taskId = (await db.grabFromDatabase("assessment", "id", {
@@ -440,6 +460,10 @@ test.describe("Course import tests", () => {
         tester.isGoingTo("save the due work and task into the course via course outline");
         await courseOutline.saveActivityToCourse(unitName, taskId, `save-course-${taskId}`);
         await courseOutline.saveActivityToCourse(unitName, dueworkId, `save-course-${dueworkId}`);
+
+        tester.isGoingTo("check that the task has the template description");
+        await page.getByTestId(`course-outline-assessment-title-${taskName}`).click();
+        await expect(page.locator("article.content")).toContainText("This is a learning activity description.");
 
         tester.isGoingTo("navigate to Romeo and Juliet unit page and check the assessment are presented");
         await page.goto("/homepage/88");
@@ -694,6 +718,11 @@ test.describe("Course import tests", () => {
             "assessment",
             { deleted_at: "2022-01-15 11:22:34" },
             { "title like": "%Course Outline%", deleted_at: null },
+        );
+        await db.updateInDatabase(
+            "editor_template",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": "Learning Activity Automation Template%", deleted_at: null },
         );
     });
 });

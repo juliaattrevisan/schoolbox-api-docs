@@ -6,6 +6,7 @@
 import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import Calendar from "@schoolboxTest/playwright/support/page/calendar/Calendar";
 import CreateEvent from "@schoolboxTest/playwright/support/page/calendar/CreateEvent";
+import EditorTemplate from "@schoolboxTest/playwright/support/page/admin/design/EditorTemplates";
 
 test.describe("Calendar tests", () => {
     // Run tests serially, as tests rely on prior tests to have been run
@@ -85,6 +86,15 @@ test.describe("Calendar tests", () => {
         const eventTitlePersonal = "My Personal Test Event";
         const eventTitleSchool = "My School Test Event";
 
+        const editorTemplate = new EditorTemplate(page, tester);
+        tester.isGoingTo("Create a editor template to use as calendar description");
+        await editorTemplate.gotoCreateTemplatePage(2);
+        await editorTemplate.createTemplate(
+            "Calendar Automation Template",
+            "This is an automation template",
+            "This is a calendar description.",
+        );
+
         tester.isGoingTo("as Jack Coles I create a personal event via calendar panel");
         await tester.impersonate(user);
         await calendar.goto();
@@ -106,6 +116,7 @@ test.describe("Calendar tests", () => {
         tester.isGoingTo("as Jack Coles I create a group event");
         await createEvent.goto();
         await createEvent.typeTitle(eventTitleGroup);
+        await tester.clickEditorTemplateCKEditor("event-detail", "Calendar Automation Template");
         await createEvent.selectLevel("Group");
         await createEvent.selectGroup("55");
         await createEvent.clickSubmitEvent();
@@ -151,6 +162,11 @@ test.describe("Calendar tests", () => {
         await expect(page.getByTestId("view-event-modal-modify-button")).toContainText("Modify");
         await expect(page.getByTestId("view-event-modal-delete-button")).toContainText("Delete");
 
+        tester.isGoingTo("As Jana Reed check that student cannot see the template icon in the CKEditor");
+        await tester.impersonate("Jana Reed");
+        await createEvent.goto();
+        await tester.checkTemplateIconVisibility(false);
+
         tester.isGoingTo("delete the event so it does not impact in the next test");
         await db.updateInDatabase("event", { deleted_at: "2022-01-15 11:22:34" }, { "title like": eventTitleSchool });
     });
@@ -166,10 +182,31 @@ test.describe("Calendar tests", () => {
         const eventTitleGroup = "My Group Test Event";
         const eventTitleSchool = "My School Test Event";
         const eventTitle = "My Test Event";
-        await db.updateInDatabase("event", { deleted_at: "2022-01-15 11:22:34" }, { "title like": eventTitlePersonal });
-        await db.updateInDatabase("event", { deleted_at: "2022-01-15 11:22:34" }, { "title like": eventTitleGroup });
-        await db.updateInDatabase("event", { deleted_at: "2022-01-15 11:22:34" }, { "title like": eventTitleSchool });
-        await db.updateInDatabase("event", { deleted_at: "2022-01-15 11:22:34" }, { "title like": eventTitle });
+        await db.updateInDatabase(
+            "event",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": eventTitlePersonal, deleted_at: null },
+        );
+        await db.updateInDatabase(
+            "event",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": eventTitleGroup, deleted_at: null },
+        );
+        await db.updateInDatabase(
+            "event",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": eventTitleSchool, deleted_at: null },
+        );
+        await db.updateInDatabase(
+            "event",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": eventTitle, deleted_at: null },
+        );
         await db.dontHaveInDatabase("userAccess", { uid: 22, service: 2, sid: 2, type: 3 });
+        await db.updateInDatabase(
+            "editor_template",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": "Calendar Automation%", deleted_at: null },
+        );
     });
 });

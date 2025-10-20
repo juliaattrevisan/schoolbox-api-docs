@@ -2,6 +2,7 @@ import { test, expect } from "@schoolboxTest/playwright/support/integrations";
 import Badges from "@schoolboxTest/playwright/support/page/badges/Badges";
 import CreateBadge from "@schoolboxTest/playwright/support/page/badges/CreateBadge";
 import ProfilePage from "@schoolboxTest/playwright/support/page/profilePage/ProfilePage";
+import EditorTemplate from "@schoolboxTest/playwright/support/page/admin/design/EditorTemplates";
 
 /**
  * This test sets a goal, award an achievement, remove the goal, withdraw the achievement, adds an evidence
@@ -166,9 +167,19 @@ test.describe("Goals and Achievements tests", () => {
     test("View evidence", async ({ tester, page, db }) => {
         const badges = new Badges(tester, page);
         const profilePage = new ProfilePage(tester, page);
+        const editorTemplate = new EditorTemplate(page, tester);
         const badgeNameGoal = "Automation Badge created to set goal from Badges page";
         const student = "Jana Reed";
         const studentId = 25;
+
+        tester.isGoingTo("Create a editor template to use as evidence");
+        await editorTemplate.gotoCreateTemplatePage(1);
+        await editorTemplate.createTemplate(
+            "Badge Automation Template",
+            "This is an automation template",
+            "Awarding this as achievement with evidence.",
+        );
+
         tester.isGoingTo("Set a Goal to Jana Reed");
         await badges.goto();
         const badgeId = (await db.grabFromDatabase("badge", "id", {
@@ -244,7 +255,7 @@ test.describe("Goals and Achievements tests", () => {
         await profilePage.clickTab("goals");
         await profilePage.clickBadgeOrDropdownOption(badgeNameGoal);
         await profilePage.clickBadgeOrDropdownOption("Award with evidence");
-        await tester.fillCKEditorById("reason", "Awarding this as achievement with evidence.");
+        await tester.clickEditorTemplateCKEditor("reason", "Badge Automation Template");
         await badges.clickEvidenceSubmitButton();
         await profilePage.goto(studentId);
         await profilePage.clickTab("achievements");
@@ -276,7 +287,14 @@ test.describe("Goals and Achievements tests", () => {
             { deleted_at: "2022-01-15 11:22:34" },
             {
                 "name like": "Automation Badge%",
+                deleted_at: null,
             },
+        );
+
+        await db.updateInDatabase(
+            "editor_template",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": "Badge Automation Template%", deleted_at: null },
         );
     });
 });

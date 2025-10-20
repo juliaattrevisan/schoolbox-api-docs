@@ -12,6 +12,7 @@ import Homepage from "@schoolboxTest/playwright/support/page/homepage/Homepage";
 import Resources from "@schoolboxTest/playwright/support/page/resources/Resources";
 import TextboxForm from "@schoolboxTest/playwright/support/page/homepage/TextboxForm";
 import SearchPage from "@schoolboxTest/playwright/support/page/search/SearchPage";
+import EditorTemplate from "@schoolboxTest/playwright/support/page/admin/design/EditorTemplates";
 
 test.describe("Textbox Tests", () => {
     test.beforeEach(async ({ tester }) => {
@@ -65,6 +66,11 @@ test.describe("Textbox Tests", () => {
         const heading = "Test Text Box Title";
         const content = "I am textbox content";
 
+        const editorTemplate = new EditorTemplate(page, tester);
+        tester.isGoingTo("Create a editor template to use as homepage text box description");
+        await editorTemplate.gotoCreateTemplatePage(5);
+        await editorTemplate.createTemplate("Homepage Automation Template", "This is an automation template", content);
+
         tester.isGoingTo("Get the folder id");
         const homepageId = (await db.grabFromDatabase("folder", "id", {
             deleted_at: null,
@@ -85,11 +91,8 @@ test.describe("Textbox Tests", () => {
         await homepage.clickComponentEmptyStateLink(layout, position);
         await textbox.fillHeading(heading);
         await textbox.submit();
-        tester.isGoingTo("get the component id");
-        const textboxId = (await db.grabFromDatabase("component_instance", "id", {
-            identifier: homepageId,
-        })) as number;
-        await textbox.fillContent(content, textboxId);
+        tester.isGoingTo("select the text box template in the textbox CKEditor");
+        await textbox.clickEditorTemplateCKEditor("Homepage Automation Template");
         await textbox.save();
         tester.isGoingTo("Verify what I entered is the heading and body");
         await expect(page.locator("#container")).toContainText(heading);
@@ -229,8 +232,25 @@ test.describe("Textbox Tests", () => {
 
         await api.deleteFoldersByName(db, "Test TextBox Homepage");
 
-        await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Test Text Box Title" });
-        await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Second Text Box" });
-        await db.updateInDatabase("textBox", { deleted_at: "2022-01-15 11:22:34" }, { heading: "Third Text Box" });
+        await db.updateInDatabase(
+            "textBox",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { heading: "Test Text Box Title", deleted_at: null },
+        );
+        await db.updateInDatabase(
+            "textBox",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { heading: "Second Text Box", deleted_at: null },
+        );
+        await db.updateInDatabase(
+            "textBox",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { heading: "Third Text Box", deleted_at: null },
+        );
+        await db.updateInDatabase(
+            "editor_template",
+            { deleted_at: "2022-01-15 11:22:34" },
+            { "title like": "Homepage Automation%", deleted_at: null },
+        );
     });
 });

@@ -19,6 +19,8 @@ export default class AcceptanceTester extends BaseTester {
 
     public common: Common;
 
+    static readonly CKEDITOR_TEMPLATE_BUTTON = `button[data-cke-tooltip-text="Insert template"]`;
+
     constructor(page: Page) {
         super(); // Call the constructor of the BaseTester class
         this.page = page;
@@ -186,6 +188,18 @@ export default class AcceptanceTester extends BaseTester {
 
     /**
      * Click the template icon in the CKEditor5 bar based on the CKEditor on its ID and the template name
+     */
+    async clickDropdownTemplateCKEditor(): Promise<void> {
+        // wait the ck editor bar to be visible - waiting the first one on the page to work well in the page with multiple ck editors
+        await expect(this.page.locator("div.ck.ck-toolbar").first()).toBeVisible();
+
+        // click the template icon in the ckeditor toolbar
+        this.isGoingTo("click the template icon in the ckeditor toolbar and select a template");
+        await this.page.locator(AcceptanceTester.CKEDITOR_TEMPLATE_BUTTON).click();
+    }
+
+    /**
+     * Click and select a the template icon in the CKEditor5 bar based on the CKEditor on its ID and the template name
      * @param editorId - The ID of the CKEditor5 instance
      * @param templateName - The name of the template to select
      */
@@ -220,10 +234,22 @@ export default class AcceptanceTester extends BaseTester {
 
         // click the template icon in the ckeditor toolbar
         this.isGoingTo("click the template icon in the ckeditor toolbar and select a template");
-        await this.page.locator(`button[data-cke-tooltip-text="Insert template"]`).click();
+        await this.page.locator(AcceptanceTester.CKEDITOR_TEMPLATE_BUTTON).click();
 
         // select a template
         await this.page.locator("li.ck.ck-list__item").getByText(templateName).click();
+    }
+
+    /**
+     * checks whether the template icon is visible in the CKEditor toolbar or not
+     * @param isVisible - pass true to check if the icon is visible, false to check if it is not visible
+     */
+    async checkTemplateIconVisibility(isVisible: boolean): Promise<void> {
+        if (isVisible) {
+            await expect(this.page.locator(AcceptanceTester.CKEDITOR_TEMPLATE_BUTTON)).toBeVisible();
+        } else {
+            await expect(this.page.locator(AcceptanceTester.CKEDITOR_TEMPLATE_BUTTON)).not.toBeVisible();
+        }
     }
 
     /**
