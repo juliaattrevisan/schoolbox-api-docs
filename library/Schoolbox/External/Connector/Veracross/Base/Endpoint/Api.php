@@ -61,6 +61,12 @@ class Api implements IApi
 
 
     /**
+     * Veracross' 3-minute rate limit, expressed as seconds
+     */
+    private const RESUME_RETRY_DELAY = 1;
+
+
+    /**
      * @var ApiUsage
      */
     private ApiUsage $apiUsage;
@@ -212,7 +218,23 @@ class Api implements IApi
             /* Veracross lets us make more requests after this x-rate-limit-reset datetime
              * that is (in?)conveniently expressed as a unix timestamp
              */
-            return 1000 * ((int)$response->getHeaderLine('x-rate-limit-reset') - time());
+            $resetAt = 1000 * ((int)$response->getHeaderLine('x-rate-limit-reset') - time());
+
+            /* If (x-rate-limit-reset - time()) is somehow in the past, assume we're good to go.
+             *
+             * Resume retries after a 1 second delay as this seemingly is in accordance with x-rate-limit-reset
+             * being in the past since we've already reached the timestamp where the rate limit's been reset.
+             *
+             * You can probably get away with a 0 second delay, but I'm not sure if that val does some weird
+             * or wonderful thing in the guzzle middleware.
+             *
+             * Delays require an expression in milliseconds.
+             */
+            if ($resetAt < 0) {
+                return self::RESUME_RETRY_DELAY;
+            }
+
+            return $resetAt;
         };
 
         /* Use guzzle's Retry middleware
