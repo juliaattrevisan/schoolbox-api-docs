@@ -335,6 +335,12 @@ function init_npm_dependencies() {
   chown -R schoolboxsuper:schoolboxsuper node_modules/ www/static/js/bundle/
 }
 
+function add_rabbitmq_vhost() {
+  log "Adding RabbitMQ vhost and permissions";
+  curl -u guest:guest -H "Accept: application/json" -X PUT "http://rabbitmq:15672/api/vhosts/${INSTANCE_ID}"
+  curl -u guest:guest -H "Accept: application/json" -X PUT -d '{"configure":".*","write":".*","read":".f"}' "http://rabbitmq:15672/api/permissions/${INSTANCE_ID}/guest"
+}
+
 function install_instance() {
   log "Installing instance via 'schoolbox-data-refresh.sh'";
 
@@ -488,6 +494,7 @@ function main() {
     log "Skipping setup";
   fi
 
+  add_rabbitmq_vhost
   install_instance
   create_cron_config_file
   create_crontab_files
