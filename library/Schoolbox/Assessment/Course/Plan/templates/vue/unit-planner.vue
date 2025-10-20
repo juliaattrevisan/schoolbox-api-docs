@@ -11,7 +11,7 @@ import type { Unit, UnitTemplate } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
 import UpHeader from "./up-header.vue";
 import UpAddUnitsModal from "./up-add-units-modal.vue";
-import UpDeleteUnit from "./up-delete-unit.vue";
+import UpDeleteUnitModal from "./up-delete-unit-modal.vue";
 import UpEmptyState from "./up-empty-state.vue";
 import UpUnitCell from "./up-unit-cell.vue";
 import UpUnitCellTextboxContentPlaceholder from "./up-unit-cell-textbox-content-placeholder.vue";
@@ -240,7 +240,7 @@ window.Vue.onUnmounted(() => {
         </div>
     </div>
     <up-add-units-modal />
-    <up-delete-unit />
+    <up-delete-unit-modal />
     <activities-list-delete-modal />
     <up-curriculum :parent-folder-id="props.folderId" />
 </template>
