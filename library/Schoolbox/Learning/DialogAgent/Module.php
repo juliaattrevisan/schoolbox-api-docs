@@ -138,6 +138,11 @@ class Module extends BaseModule
     public function buildController(): Base
     {
         return new Controller(
+            new \Schoolbox\Learning\Assessment\Breadcrumb\Factory(
+                $this->getRouter()->getGenerator(),
+                $this->getAuthorizer(),
+                $this->getMapperFactory()->get(Access::class),
+            ),
             $this->getMapperFactory()->get(\Schoolbox\Admin\DialogAgent\Scenario\Mapper::class),
         );
     }

@@ -6,7 +6,9 @@
  # @param array $helpfulness                           A list of key-value pairs for Helpfulness options
  # @param array $language                              A list of key-value pairs for Langauge options
  #}
-Breadcrumbs
+
+{% import 'sub/breadcrumbs.twig' as bread %}
+{{ bread.crumbsArray(breadcrumbs) }}
 
 <div class="row">
     <div class="small-12 columns">

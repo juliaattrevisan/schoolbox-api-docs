@@ -11,15 +11,22 @@ declare(strict_types=1);
 namespace Schoolbox\Learning\DialogAgent;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Learning\Assessment\Breadcrumb\Factory as BreadcrumbFactory;
 use Schoolbox\Learning\Assessment\DataModel\DialogAgent\Model as DialogAgentDataModel;
 use Schoolbox\Learning\Assessment\DialogAgent\Model as DialogAgent;
 
 class Controller extends Base
 {
     /**
-     * Controller constructor.
+     * Constructor.
+     *
+     * @param BreadcrumbFactory $bakery
+     * @param \Schoolbox\Admin\DialogAgent\Scenario\Mapper $scenarioMapper
      */
-    public function __construct(private \Schoolbox\Admin\DialogAgent\Scenario\Mapper $scenarioMapper) {
+    public function __construct(
+        private BreadcrumbFactory $bakery,
+        private \Schoolbox\Admin\DialogAgent\Scenario\Mapper $scenarioMapper
+    ) {
     }
 
 
@@ -32,8 +39,18 @@ class Controller extends Base
      */
     public function getUpdateForm(DialogAgent $assessment): void
     {
+        /* Breadcrumbs
+         */
+        $breadcrumbs = $this->bakery->produceFromAssessment($assessment, $this->getUser())
+            ->add([
+                $assessment->getTitle(),
+                $assessment->isImplementation() ? $this->routeGenerator->generate('learningAssessment.getStatus', ['assessmentId' => $assessment->getId()]) : null
+            ])
+            ->add(['Configure', null]);
+
         $data = [
             'assessment' => $assessment,
+            'breadcrumbs' => $breadcrumbs,
             'scenario' => $this->scenarioMapper->findById($assessment->getScenarioId()),
             'helpfulness' => [
                 DialogAgentDataModel::HELPFULNESS_MINIMAL => 'Minimal',
