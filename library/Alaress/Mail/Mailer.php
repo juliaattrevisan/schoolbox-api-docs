@@ -23,6 +23,7 @@ use Symfony\Component\Mailer\Exception\TransportException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\Mailer as SymfonyMailer;
 use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mailer\Transport\NullTransport;
 use Symfony\Component\Mailer\Transport\Smtp\EsmtpTransport;
 use Symfony\Component\Mailer\Transport\TransportInterface;
@@ -39,6 +40,8 @@ class Mailer
 {
     private const MAX_RETRIES   = 4;
     private const RETRY_TIMEOUT = 1;
+    public const AMAZON_SES_ENDPOINT_FORMAT = 'email-smtp.%s.amazonaws.com';
+    public const AMAZON_SES_PORT = 587;
 
     /**
      * Instance of mail transporter.
@@ -182,7 +185,7 @@ class Mailer
     public function setFrom(Address $address): void
     {
         $this->email->from($address);
-        $this->email->returnPath($address);
+        $this->email->returnPath($address->getEncodedAddress()); // The name should not be passed in return path so we only set the email address in return path
     }
 
     /**
@@ -338,11 +341,12 @@ class Mailer
      * @return bool
      * @throws TransportExceptionInterface if not send after `$retries` attempts
      */
-    private function trySend($retries = 0, $reinitialise = false): bool
+    private function trySend(int $retries = 0, bool $reinitialise = false): bool
     {
         // create transport and send email
         try {
             $mailer = new SymfonyMailer(self::getConfiguredTransport($this->config, $reinitialise));
+
             $this->configureMailer($mailer);
 
             // get all recipients before signing
@@ -398,10 +402,22 @@ class Mailer
      * @param bool          $reinitialise
      * @return TransportInterface
      */
-    public static function getConfiguredTransport($conf, $reinitialise = false)
+    public static function getConfiguredTransport($conf, $reinitialise = false): TransportInterface
     {
         if (!(isset(self::$transport)) || $reinitialise) {
-            if ($conf->get('mail_smtp_host') && $conf->get('mail_smtp_port')) {
+            // Check if the SES config exists, if yes, use SES transporter
+            $configKeys = [ConfigMapper::AMAZON_SES_USERNAME, ConfigMapper::AMAZON_SES_PASSWORD, ConfigMapper::AMAZON_SES_REGION];
+            $configValues = array_map(fn($key) => $conf->get($key), $configKeys);
+
+            // Check if all three config values are present for SES
+            if (count(array_filter($configValues)) === count($configKeys)) {
+                [$username, $password, $region] = $configValues;
+                $endpoint = sprintf(self::AMAZON_SES_ENDPOINT_FORMAT, $region);
+                self::$transport = new EsmtpTransport($endpoint, self::AMAZON_SES_PORT);
+                self::$transport->setUsername($username);
+                self::$transport->setPassword($password);
+                self::$transport->setLocalDomain($endpoint);
+            } else if ($conf->get('mail_smtp_host') && $conf->get('mail_smtp_port')) {
                 self::$transport = new EsmtpTransport(
                     $conf->get('mail_smtp_host'),
                     $conf->get('mail_smtp_port')

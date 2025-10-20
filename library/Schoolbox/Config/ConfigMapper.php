@@ -166,6 +166,12 @@ class ConfigMapper extends Mapper
     public const NAME_MAIL_SUPPORT_ADDRESS   = 'mail_support_address';
     public const NAME_MAIL_FROM_ADDRESS      = 'mail_from_address';
     public const NAME_MAIL_FROM_NAME         = 'mail_from_name';
+
+    public const AMAZON_SES_USERNAME         = 'amazon_ses_username';
+
+    public const AMAZON_SES_PASSWORD         = 'amazon_ses_password';
+
+    public const AMAZON_SES_REGION         = 'amazon_ses_region';
     public const NAME_AUTH_EMAIL_ENABLED     = 'auth_email_enabled';
 
     public const NAME_BROWSER_CACHE_IMAGE_TIMEOUT    = 'browser_cache_image_timeout';
