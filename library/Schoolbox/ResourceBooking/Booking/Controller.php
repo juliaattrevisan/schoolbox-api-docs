@@ -524,7 +524,8 @@ class Controller extends Base
      * @param int $campusId
      * @param array  $clashBookingStartDatesAsKeys array<string, null>
      *               Array containing start dates of bookings that clash with existing bookings.
-     *               This function needs to know when bookings clash so they can be saved with 'pending' status.
+     *               This function needs to know which bookings clash so those bookings can be saved with 'pending' status.
+     *               Note the most frequent recurrence rule is 'daily', so the recurrence will have at most one booking per day.
      *               The dates are stored as keys to enable efficient checks using array_key_exists().
      *               The format of the dates is expected to be YYYY-MM-DD.
      *
