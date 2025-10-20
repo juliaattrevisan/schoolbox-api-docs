@@ -119,3 +119,11 @@
 .c-island {
     background-color: var(--color-foreground-primary);
 }
+
+// default styling for a vertically scrollable container
+.c-vert-scroll-container {
+    border: 1px solid var(--form-border-color);
+    max-height: 500px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}

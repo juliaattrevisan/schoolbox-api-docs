@@ -271,7 +271,7 @@ export default class UnitPlanner {
         }
 
         // Confirm modal is visible
-        await this.page.locator('[data-test="up-add-units-title"]').isVisible();
+        await this.page.getByTestId("up-add-units-title").isVisible();
 
         // Fill in the first unit name (input field already exists)
         await this.page
@@ -291,13 +291,13 @@ export default class UnitPlanner {
 
         // Verify each unit is visible on the page after creation
         for (const unitName of unitNames) {
-            await expect(this.page.locator('[data-test^="unit-planner-unit-link-"]').getByText(unitName)).toBeVisible();
+            await expect(this.page.getByTestId(/^unit-planner-unit-link-/).getByText(unitName)).toBeVisible();
         }
 
         // refresh the page and ensure the units are still there
         await this.page.reload();
         for (const unitName of unitNames) {
-            await expect(this.page.locator('[data-test^="unit-planner-unit-link-"]').getByText(unitName)).toBeVisible();
+            await expect(this.page.getByTestId(/^unit-planner-unit-link-/).getByText(unitName)).toBeVisible();
         }
     }
 }

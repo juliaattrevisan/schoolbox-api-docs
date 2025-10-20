@@ -9,6 +9,8 @@ import type { CourseBuilderComponent, CurriculumOverviewComponent, Unit, UnitTem
 gsap.registerPlugin(Draggable);
 gsap.registerPlugin(ScrollToPlugin);
 
+export const ANIMATION_DURATION = 0.5; // duration for animations in seconds
+
 export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
     const unexpandedUnitHeight: number = 300; // The default unexpanded height of a unit, in px
     const dragUnitHeight: number = 80; // The height of a unit when it is being dragged, in px
@@ -18,6 +20,7 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
     const unitCount = window.Vue.computed(() => units.value.length); // The number of units in the course
     const template = window.Vue.ref<UnitTemplate | null>(null); // the course framework template that units are linked to
     const editorTemplates = window.Vue.ref<EditorTemplate[]>([]); // the editor templates available for insertion into textboxes
+    const unitDeleted = window.Vue.ref<Unit | null>(null); // to animate a unit being deleted
 
     /**
      * store any passed through properties
@@ -137,11 +140,13 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         const cellMinHeights: Record<number, Record<string, number>> = {};
 
         units.value.forEach((unit) => {
+            const isUnitDeleted = unitDeleted.value?.id === unit.id;
             const isDragging = dragCurrentUnitNextTick.value?.id === unit.id;
             const isViewMore = viewMoreUnitIDs.value.includes(unit.id);
 
             cellMinHeights[unit.id] = Object.fromEntries(
                 Object.entries(unitContentHeights.value[unit.id] || {}).map(([columnId, contentHeight]) => {
+                    if (isUnitDeleted) return [columnId, 0];
                     if (isDragging) return [columnId, dragUnitHeight];
                     if (isViewMore) return [columnId, contentHeight];
                     if (focusedUnitCells.value[unit.id]?.includes(columnId)) return [columnId, contentHeight];
@@ -196,6 +201,27 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         matchedUnit.activities.components.push(component);
     }
 
+    /**
+     * The unit has been deleted from the backend,
+     * so we want to visually animate the unit being removed
+     * then remove it from the store
+     * @param $unitDeleted - the unit that's been deleted
+     */
+    function deleteUnit($unitDeleted: Unit): void {
+        /**
+         * Setting unitDeleted will trigger isUnitDeleted in unitCellMinDisplayHeights to return 0 height each of the unit cells,
+         * which will get picked up by the up-unit-cell.vue components to animate the heights of each to 0.
+         */
+        unitDeleted.value = $unitDeleted;
+        setTimeout(
+            () => {
+                units.value = units.value.filter((unit) => unit.id !== $unitDeleted.id);
+                unitDeleted.value = null;
+            },
+            ANIMATION_DURATION * 1000 + 100,
+        ); // extra 100ms to ensure the animation has completed
+    }
+
     return {
         init,
         unexpandedUnitHeight,
@@ -217,5 +243,6 @@ export const useUnitPlannerStore = defineStore("unitPlannerStore", () => {
         unitRowDisplayHeights,
         addCurriculumComponent,
         addCourseBuilderComponent,
+        deleteUnit,
     };
 });

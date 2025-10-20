@@ -184,61 +184,146 @@ test.describe("Unit Planner Tests", () => {
         await expect(page.locator("div.empty-state")).toBeVisible();
     });
 
-    test("Create new units on empty course", async ({ tester, page }) => {
+    test("Create new units on empty course", async ({ tester, page, db }) => {
         const courseName = "Party time";
         const firstUnitName = "Soft party";
         const secondUnitName = "Hard party";
 
-        // switch to admin so can later delete the created course
-        await tester.loginAsAdmin();
+        try {
+            // switch to admin so can later delete the created course
+            await tester.loginAsAdmin();
 
-        tester.isGoingTo("navigate to course creation page");
-        await page.goto("https://vagrant.dev.schoolbox.cloud/course/new");
+            tester.isGoingTo("navigate to course creation page");
+            await page.goto("/course/new");
 
-        tester.isGoingTo(`fill in course name with '${courseName}'`);
-        await page.getByRole("textbox", { name: "Name *" }).fill(courseName);
+            tester.isGoingTo(`fill in course name with '${courseName}'`);
+            await page.getByRole("textbox", { name: "Name *" }).fill(courseName);
 
-        tester.isGoingTo("select English faculty folder");
-        await page.getByRole("link", { name: " (Click to select)" }).click();
-        await page.getByRole("treeitem", { name: " English" }).click();
-        await page.getByRole("button", { name: "Use this folder" }).click();
+            tester.isGoingTo("select English faculty folder");
+            await page.getByRole("link", { name: " (Click to select)" }).click();
+            await page.getByRole("treeitem", { name: " English" }).click();
+            await page.getByRole("button", { name: "Use this folder" }).click();
 
-        tester.isGoingTo("click Next to create the course");
-        await page.getByRole("button", { name: "Next" }).click();
+            tester.isGoingTo("click Next to create the course");
+            await page.getByRole("button", { name: "Next" }).click();
 
-        tester.isGoingTo("wait for the URL to change to course/modify/{courseId}");
-        await page.waitForURL("**/course/modify/*");
+            tester.isGoingTo("wait for the URL to change to course/modify/{courseId}");
+            await page.waitForURL("**/course/modify/*");
 
-        // grab the courseId from the URL after the navigation is complete
-        const courseId = page.url().split("/").pop();
-        console.warn(`Created course with ID ${courseId}`);
+            // grab the courseId from the URL after the navigation is complete
+            const courseId = page.url().split("/").pop();
+            console.warn(`Created course with ID ${courseId}`);
 
-        tester.isGoingTo("navigate to unit planner page to verify empty units message");
-        await page.goto(`https://vagrant.dev.schoolbox.cloud/course/plan/${courseId}`);
+            tester.isGoingTo("navigate to unit planner page to verify empty units message");
+            await page.goto(`/course/plan/${courseId}`);
 
-        tester.isGoingTo("confirm the empty units message is visible");
-        await expect(page.getByText("This course currently does not have any units")).toBeVisible();
+            tester.isGoingTo("confirm the empty units message is visible");
+            await expect(page.getByText("This course currently does not have any units")).toBeVisible();
 
-        tester.isGoingTo("click the 'creating a unit' button to open the modal");
-        await page.getByRole("button", { name: "creating a unit." }).click();
+            tester.isGoingTo("click the 'creating a unit' button to open the modal");
+            await page.getByRole("button", { name: "creating a unit." }).click();
 
-        tester.isGoingTo("create both units using the modal and verify they are visible");
-        await unitPlanner.createUnitsInModal([firstUnitName, secondUnitName]);
+            tester.isGoingTo("create both units using the modal and verify they are visible");
+            await unitPlanner.createUnitsInModal([firstUnitName, secondUnitName]);
 
-        tester.isGoingTo("navigate to course list page to delete the course");
-        await page.goto("https://vagrant.dev.schoolbox.cloud/course/list");
+            tester.isGoingTo("navigate to course list page to delete the course");
+            await page.goto("/course/list");
 
-        tester.isGoingTo("click the course dropdown button to open the actions menu");
-        await page.locator(`[data-test="sbx-pop-out-courseDropdown-${courseId}-button"]`).click();
+            tester.isGoingTo("click the course dropdown button to open the actions menu");
+            await page.getByTestId(`sbx-pop-out-courseDropdown-${courseId}-button`).click();
 
-        tester.isGoingTo("click the Delete link from the dropdown menu");
-        await page.getByRole("link", { name: "Delete" }).click();
+            tester.isGoingTo("click the Delete link from the dropdown menu");
+            await page.getByRole("link", { name: "Delete" }).click();
 
-        tester.isGoingTo("confirm deletion in the modal by clicking the confirm button");
-        await page.locator('[data-test="confirm-dialog-confirm-button"]').click();
+            tester.isGoingTo("confirm deletion in the modal by clicking the confirm button");
+            await page.getByTestId("confirm-dialog-confirm-button").click();
 
-        tester.isGoingTo(`verify that ${courseName} is no longer visible on the page`);
-        await expect(page.getByText(courseName)).not.toBeVisible();
+            tester.isGoingTo(`verify that ${courseName} is no longer visible on the page`);
+            await expect(page.getByText(courseName)).not.toBeVisible();
+        } catch (error) {
+            // in case the test fails halfway through, try to delete the course/units via the DB directly
+            tester.isGoingTo("remove the units created in the Create new units on empty course test");
+            await db.updateInDatabase(
+                "folder",
+                { deleted_at: "2022-01-15 11:22:34" },
+                { "name like": firstUnitName, deleted_at: null },
+            );
+            await db.updateInDatabase(
+                "folder",
+                { deleted_at: "2022-01-15 11:22:34" },
+                { "name like": secondUnitName, deleted_at: null },
+            );
+            const courseFolderId = (await db.grabFromDatabase("folder", "id", { name: courseName })) as number | null;
+            if (courseFolderId) {
+                await db.dontHaveInDatabase("course_specification", { folder_id: courseFolderId });
+                await db.dontHaveInDatabase("homepage_config", { cid: courseFolderId });
+                await db.dontHaveInDatabase("perms", { cid: courseFolderId });
+                await db.dontHaveInDatabase("folder", { id: courseFolderId });
+            }
+        }
+    });
+
+    test("modify unit name", async ({ tester, page, db }) => {
+        const courseId = 11; // Year 5
+        const modifyUnitId = 30; // "English"
+        const modifyFolderId = 144; // "English" folder ID
+        const unitNameChange = "Ancient English";
+        try {
+            tester.isGoingTo("visit the Year 5 unit planner page");
+            await page.goto(`/course/plan/${courseId}`);
+
+            tester.isGoingTo("click on the unit action button for unit 30");
+            await page.getByTestId("sbx-pop-out-unit-cell-unit-action-30").click();
+
+            tester.isGoingTo("wait for dropdown and click the modify button");
+            await page.getByTestId(`up-unit-cell-unit-action-${modifyUnitId}-modify-link`).click();
+
+            tester.isGoingTo(`change the folder name to '${unitNameChange}'`);
+            await page.getByTestId("folder-form-input-name").fill(unitNameChange);
+
+            tester.isGoingTo("click the Modify Folder button");
+            await page.getByTestId("folder-form-submit").click();
+
+            tester.isGoingTo(`verify that the unit name has been changed to '${unitNameChange}'`);
+            await expect(page.getByTestId(`unit-planner-unit-link-${modifyUnitId}`)).toHaveText(unitNameChange);
+        } finally {
+            tester.isGoingTo(`reset the unit name back to 'English' for unit ${modifyUnitId}`);
+            await db.updateInDatabase("folder", { name: "English" }, { id: modifyFolderId });
+        }
+    });
+
+    test("delete unit", async ({ tester, page, db }) => {
+        const courseId = 11; // Year 5
+        const deleteUnitId = 34; // Unit to be deleted
+        const deleteFolderId = 161;
+        try {
+            tester.isGoingTo("visit the Year 5 unit planner page");
+            await page.goto(`/course/plan/${courseId}`);
+
+            tester.isGoingTo("click on the unit action button for unit 34");
+            await page.getByTestId("sbx-pop-out-unit-cell-unit-action-34").click();
+
+            tester.isGoingTo("click the delete button");
+            await page.getByTestId(`up-unit-cell-unit-action-${deleteUnitId}-delete-button`).click();
+
+            tester.isGoingTo("confirm the deletion in the modal");
+            await page.getByTestId("up-delete-unit-delete").click();
+
+            tester.isGoingTo("verify that the toast with the message 'Unit successfully deleted' appears");
+            await expect(page.getByTestId("toast")).toHaveText("Unit successfully deleted");
+
+            tester.isGoingTo("verify that the unit has been successfully deleted after waiting for delete animation");
+            await page.waitForTimeout(1000); // Wait for delete animation to complete
+            await expect(page.getByText("5MS Spelling")).not.toBeVisible();
+            await expect(page.getByTestId(`sbx-pop-out-unit-cell-unit-action-${deleteUnitId}`)).not.toBeVisible();
+        } finally {
+            tester.isGoingTo(`restore the folder`);
+            await db.updateInDatabase(
+                "course_unit_specification",
+                { deleted_at: null },
+                { folder_id: deleteFolderId, course_specification_id: courseId },
+            );
+        }
     });
 
     test.afterAll(async ({ baseTester, db }) => {

@@ -81,10 +81,13 @@ export type Unit = {
         };
         items: Partial<Record<string, TextboxContent>>;
     };
-
     extraTextboxes: number;
     extraActivities: number;
     sequence: number;
+    _routes: {
+        modify: string | null;
+        delete: string | null;
+    };
 };
 
 /**
