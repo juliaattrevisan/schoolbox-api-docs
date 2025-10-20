@@ -234,8 +234,7 @@ class Transactor
             foreach ($scenario->getFields() as $field) {
                 $fieldContexts->add($this->fieldContextMapper->createModel()
                     ->setField($field)
-                    ->setDialogAgent($dialogAgent)
-                );
+                    ->setDialogAgent($dialogAgent));
             }
 
             /* I'll save them. I'll save them all.

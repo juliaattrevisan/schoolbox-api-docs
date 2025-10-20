@@ -168,7 +168,7 @@ class Module extends BaseModule
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    protected function getAssessmentMapperProxy():AssessmentMapperProxy
+    protected function getAssessmentMapperProxy(): AssessmentMapperProxy
     {
         return $this->injector->get('assessmentDataSource');
     }
