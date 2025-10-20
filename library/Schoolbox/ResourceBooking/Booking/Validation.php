@@ -132,27 +132,28 @@ class Validation
 
     /**
      * Attempts to validate the creation or update of a booking from post data.
-     * Example of return array: [
-     *     'start_datetime' => [
-     *         'invalid' => [
-     *             // Errors on invalid dates ('invalid' key is used because can't convert to desired format).
-     *             'invalid'
-     *         ],
-     *         // Errors on valid dates are keyed by the valid date in Y-m-d H:i:s format.
-     *         '2025-01-01 10:00:00' => [
-     *             'conflict',
-     *             ...
-     *         ],
-     *         ...
-     *     ],
-     *     'end_datetime' => // Array with same structure as start_datetime.
-     * ]
      *
      * @param Item\Model   $resource
      * @param Values       $postData
      * @param Booking|null $existingBooking If provided, this is the booking that is being updated.
-     *                                     Leave it out of conflict checks.
-     * @return array<string, array<string, string>> Array of errorStringByDateTimeString arrays, keyed by self::START_DATETIME or self::END_DATETIME.
+     *                                      Leave it out of conflict checks.
+     * @return array<string, array<string, array<string>>> Example:
+     *         [
+     *             'start_datetime' => [
+     *                 'invalid' => [
+     *                     // Errors on invalid dates ('invalid' key is used because can't convert to desired format).
+     *                     'invalid'
+     *                 ],
+     *                 // Errors on valid dates are keyed by the valid date in Y-m-d H:i:s format.
+     *                 '2025-01-01 10:00:00' => [
+     *                     'conflict',
+     *                     ...
+     *                 ],
+     *                 ...
+     *             ],
+     *             'end_datetime' => // Array with same structure as start_datetime.
+     *         ]
+     *
      * @throws \PDOException
      * @throws \Schoolbox\Mapper\DefinitionException
      * @throws \Schoolbox\Mapper\Exception
@@ -730,7 +731,7 @@ class Validation
 
     /**
      * Return true if the given array is non-empty, and all values are Validation::ERROR_CONFLICT.
-     * @param array<string, array<string>> $errorsByKey Assumed to come from this class.
+     * @param array<string, array<string, array<string>>> $errorsByKey Assumed to come from this class.
      * @return bool
      */
     public static function validationErrorsAreAllConflicts(array $errorsByKey): bool
@@ -738,10 +739,14 @@ class Validation
         if (count($errorsByKey) === 0) {
             throw new InvalidArgumentException('No errors, so this function should not have been called.');
         }
+        foreach ($errorsByKey as $keyIgnored => $errorTypesByTimeString) {
+            foreach ($errorTypesByTimeString as $timeStringIgnored => $errorTypes) {
+                if (array_any($errorTypes, static fn($errorType) => $errorType !== self::ERROR_CONFLICT)) {
+                    return false;
+                }
+            }
+        }
 
-        return array_all(
-            $errorsByKey,
-            static fn ($errors) => !array_any($errors, static fn ($error) => $error !== self::ERROR_CONFLICT)
-        );
+        return true;
     }
 }
