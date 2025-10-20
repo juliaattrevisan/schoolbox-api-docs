@@ -10,7 +10,7 @@ import { useUnitPlannerDragStore } from "./store/unitPlannerDragStore";
 import type { Unit, UnitTemplate } from "./unitPlannerTypes";
 import { createTabs } from "./unitPlannerConfig";
 import UpHeader from "./up-header.vue";
-import UpAddUnits from "./up-add-units.vue";
+import UpAddUnitsModal from "./up-add-units-modal.vue";
 import UpDeleteUnit from "./up-delete-unit.vue";
 import UpEmptyState from "./up-empty-state.vue";
 import UpUnitCell from "./up-unit-cell.vue";
@@ -233,10 +233,13 @@ window.Vue.onUnmounted(() => {
                         </template>
                     </div>
                 </div>
+                <div>
+                    <p>Create new Unit</p>
+                </div>
             </div>
         </div>
     </div>
-    <up-add-units />
+    <up-add-units-modal />
     <up-delete-unit />
     <activities-list-delete-modal />
     <up-curriculum :parent-folder-id="props.folderId" />

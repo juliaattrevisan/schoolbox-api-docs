@@ -1,7 +1,7 @@
 import { mount } from "@vue/test-utils";
 import { createPinia, setActivePinia } from "pinia";
 import { ref, computed } from "vue";
-import UpAddUnits from "../up-add-units.vue";
+import UpAddUnits from "../up-add-units-modal.vue";
 import { useAddUnitsStore } from "../store/unitPlannerAddUnitsStore";
 import { useUnitPlannerStore } from "../store/unitPlannerStore";
 
