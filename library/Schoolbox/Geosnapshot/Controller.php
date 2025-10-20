@@ -11,7 +11,10 @@ declare(strict_types=1);
 namespace Schoolbox\Geosnapshot;
 
 use Alaress\Web\Controller\Base;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
+use Schoolbox\Oidc\Server\RelyingParty\Grant\Mapper as RelyingPartyGrantMapper;
+use Schoolbox\Oidc\Server\RelyingParty\Mapper as RelyingPartyMapper;
 use Schoolbox\Resource\Storage\FilesystemProxy;
 use Schoolbox\User;
 
@@ -33,8 +36,10 @@ class Controller extends Base
      *
      * @param ErrorMapper     $errorMapper
      * @param FilesystemProxy $filesystemProxy
+     * @param RelyingPartyGrantMapper $grantMapper
+     * @param RelyingPartyMapper $partyMapper
      */
-    public function __construct(ErrorMapper $errorMapper, private FilesystemProxy $filesystemProxy)
+    public function __construct(ErrorMapper $errorMapper, private FilesystemProxy $filesystemProxy, private RelyingPartyGrantMapper $grantMapper, private RelyingPartyMapper $partyMapper)
     {
         $this->errorMapper = $errorMapper;
     }
@@ -86,5 +91,38 @@ class Controller extends Base
                  // 'payload' => $api->getLastPayload()
             ]
         );
+    }
+
+    /**
+     * Staff only Geo photo management tool, with oauth login
+     *
+     * @api GET /geosnapshot/management
+     */
+    public function getManagement()
+    {
+        // does an oAuth session exist for the current user
+        $session = false;
+        // find the Geo oAuth Client...
+        $oAuthClients = $this->partyMapper->findByPredicates(
+            $this->partyMapper->getPredicateBuilder()->like('name', RelyingPartyMapper::GEOSNAPSHOT_LIKE)
+        );
+        // if there is a session for the $this->getUser() in oidc_relying_party_grant then set $session true, else set session false
+        foreach ($oAuthClients as $oAuthClient) {
+            $auth = $this->grantMapper->findByRelyingPartyAndUser($oAuthClient, $this->getUser());
+            if ($auth && (!$auth->isExpired(\Alaress_Date_Format::now()))) {
+                $session = true;
+                break;
+            }
+        }
+
+        // get launch url and library URL from config
+        $launchUrl = trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_GEOSNAPSHOT_LAUNCH_URL));
+        $libraryUrl =  trim((string)$this->getConfigLoader()->get(ConfigMapper::NAME_GEOSNAPSHOT_LIBRARY_URL));
+
+        $this->response = $this->responseFromTemplate('@geosnapshotApi/management.twig', [
+            'session' => $session,
+            'launchUrl' => $launchUrl,
+            'libraryUrl' => $libraryUrl
+        ]);
     }
 }

@@ -16,10 +16,14 @@ use Alaress\Module\Module as BaseModule;
 use Alaress\Twig\Loader\IChainLoader;
 use Alaress\Web\Controller\Base;
 use InvalidArgumentException;
+use Schoolbox\Config\ConfigMapper;
 use Schoolbox\Error\Mapper as ErrorMapper;
 use Schoolbox\Learning\Assessment\Redirect;
+use Schoolbox\Oidc\Server\RelyingParty\Grant\Mapper as RelyingPartyGrantMapper;
+use Schoolbox\Oidc\Server\RelyingParty\Mapper as RelyingPartyMapper;
 use Schoolbox\Mapper;
 use Schoolbox\Mapper\Exception as MapperException;
+use Schoolbox\Role;
 use Schoolbox\UserMapper;
 
 /**
@@ -48,7 +52,38 @@ class Module extends BaseModule
 
         $canGetPhotos = $this->canGetPhotosUrl();
 
+        // only staff should be able to hit this endpoint
+        $isLoggedIsStaff = new Rule\All(
+            new Rule\IsLoggedIn(),
+            new Rule\HasRole(Role::STAFF),
+            // if no launch url or library url is set in config, then no work
+            new Rule\IsConfigOn(ConfigMapper::NAME_GEOSNAPSHOT_LAUNCH_URL, $this->getConfig()),
+            new Rule\IsConfigOn(ConfigMapper::NAME_GEOSNAPSHOT_LIBRARY_URL, $this->getConfig()),
+            new Rule\Callback(function (array $params, \Schoolbox\User $sessionUser) {
+                /* No Geosnapshot? No trabajo
+                 *
+                 * One or more misconfigurations or access controls could have caused this
+                 * but all result in nothing to see for the current user
+                 */
+
+                // find the Geo oAuth Client...
+                $oAuthClients = $this->getRelyingPartyMapper()->findByPredicates(
+                    $this->getRelyingPartyMapper()->getPredicateBuilder()->like('name', RelyingPartyMapper::GEOSNAPSHOT_LIKE)
+                );
+                $isGeosnapshotAvailable = $oAuthClients->count() && (new ValidPhotosAvailable())
+                    ->isConfigured(
+                        $this->getConfig()->get(ConfigMapper::NAME_GEOSNAPSHOT_API_KEY),
+                        $this->getConfig()->get(ConfigMapper::NAME_GEOSNAPSHOT_ENABLED),
+                    );
+
+                if (!$isGeosnapshotAvailable) {
+                    throw new Failure\InvalidPath();
+                }
+            })
+        );
+
         $this->register('GET', '/user/{id}', 'getPhotos', $canGetPhotos, $preloadUserAndUrl);
+        $this->register('GET', '/management', 'getManagement', $isLoggedIsStaff);
     }
 
 
@@ -144,6 +179,8 @@ class Module extends BaseModule
         return new Controller(
             $this->getMapperFactory()->get(ErrorMapper::class),
             $this->injector->get('filesystem.storageProxy'),
+            $this->getMapperFactory()->get(RelyingPartyGrantMapper::class),
+            $this->getRelyingPartyMapper()
         );
     }
 
@@ -164,5 +201,13 @@ class Module extends BaseModule
     protected function getUserMapper()
     {
         return $this->getMapperFactory()->get(UserMapper::class);
+    }
+
+    /**
+     * @return RelyingPartyMapper
+     */
+    protected function getRelyingPartyMapper()
+    {
+        return $this->getMapperFactory()->get(RelyingPartyMapper::class);
     }
 }
